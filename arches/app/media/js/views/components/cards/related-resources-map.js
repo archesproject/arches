@@ -62,7 +62,7 @@ define([
                     console.log("HERE", widgetData())
 
                     if (widgetData() && widgetData()['hasMapData']) {
-                        // self.widgets.push(widget);
+                        self.widgets.push(widget);
 
 
                         // UNDO THIS
@@ -70,11 +70,17 @@ define([
                         widgetData().data.forEach(function(foo) {
                             Object.values(foo).forEach(function(bar) {
                                 if (bar instanceof Object && bar['geometry'] && bar['geometry']['coordinates']) {
+                                    var qux = {
+                                        nodeId: foo.meta.nodeId,
+                                        ...bar
+                                    };
+
+
                                     if (!params['foo']) {
-                                        params['foo'] = [bar];
+                                        params['foo'] = [qux];
                                     }
                                     else {
-                                        params['foo'].push(bar);
+                                        params['foo'].push(qux);
                                     }
                                     // params['sources']['geojson-editor-data']['data']['features'].push(bar);
                                 }
@@ -258,6 +264,22 @@ define([
         };
         updateResourceBounds(selectedResourceIds());
         selectedResourceIds.subscribe(updateResourceBounds);
+
+
+
+
+
+
+        // resourceBounds(geojsonExtent(params['foo']))
+
+        // console.log('UUUUU', self, params, resourceBounds())
+
+
+
+
+
+
+
         var zoomToData = true;
         resourceBounds.subscribe(function(bounds) {
             var map = self.map();

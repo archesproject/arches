@@ -181,16 +181,7 @@ define([
 
         
         
-        if (params['foo']) {
-            params.usePosition = false;
-            params.bounds = geojsonExtent({
-                type: 'FeatureCollection',
-                features: params['foo']
-            });
-            params.fitBoundsOptions = { padding: {top: padding, left: padding + 200, bottom: padding, right: padding + 200} };
-            console.log("HERE YOU", params, params.bounds)
 
-        }
 
 
 
@@ -571,115 +562,173 @@ define([
             }
         };
 
-        var addFromGeoJSON = function(geoJSONString, nodeId) {
-            var hint = geojsonhint.hint(geoJSONString);
-            var errors = [];
-            hint.forEach(function(item) {
-                if (item.level !== 'message') {
-                    errors.push(item);
-                }
-            });
-            if (errors.length === 0) {
-                var geoJSON = JSON.parse(geoJSONString);
-                geoJSON.features = geoJSON.features.filter(function(feature) {
-                    return feature.geometry;
+        // var addFromGeoJSON = function(geoJSONString, nodeId) {
+        //     var hint = geojsonhint.hint(geoJSONString);
+        //     var errors = [];
+        //     hint.forEach(function(item) {
+        //         if (item.level !== 'message') {
+        //             errors.push(item);
+        //         }
+        //     });
+        //     if (errors.length === 0) {
+        //         var geoJSON = JSON.parse(geoJSONString);
+        //         geoJSON.features = geoJSON.features.filter(function(feature) {
+        //             return feature.geometry;
+        //         });
+        //         if (geoJSON.features.length > 0) {
+        //             self.map().fitBounds(
+        //                 geojsonExtent(geoJSON),
+        //                 {
+        //                     padding: padding
+        //                 }
+        //             );
+        //             geoJSON.features.forEach(function(feature) {
+        //                 feature.id = uuid.generate();
+        //                 if (!feature.properties) feature.properties = {};
+        //                 feature.properties.nodeId = nodeId;
+        //                 self.draw.add(feature);
+        //             });
+        //             self.updateTiles();
+        //         }
+        //     }
+        //     return errors;
+        // };
+
+        // self.addGeoFOO = addFromGeoJSON;
+
+
+
+
+        if (params['foo']) {
+            self.map.subscribe(function(foo) {
+                console.log("REALLY?")
+
+                
+                params['foo'].forEach(function(bar) {
+                    self.draw.add(bar)
                 });
-                if (geoJSON.features.length > 0) {
-                    self.map().fitBounds(
-                        geojsonExtent(geoJSON),
-                        {
-                            padding: padding
-                        }
-                    );
-                    geoJSON.features.forEach(function(feature) {
-                        feature.id = uuid.generate();
-                        if (!feature.properties) feature.properties = {};
-                        feature.properties.nodeId = nodeId;
-                        self.draw.add(feature);
-                    });
-                    self.updateTiles();
-                }
-            }
-            return errors;
-        };
 
-        self.handleFiles = function(files, nodeId) {
-            var errors = [];
-            var promises = [];
-            for (var i = 0; i < files.length; i++) {
-                var extension = files[i].name.split('.').pop();
-                if (!['kml', 'json', 'geojson'].includes(extension)) {
-                    errors.push({
-                        message: 'File unsupported: "' + files[i].name + '"'
-                    });
-                } else {
-                    promises.push(new Promise(function(resolve) {
-                        var file = files[i];
-                        var extension = file.name.split('.').pop();
-                        var reader = new window.FileReader();
-                        reader.onload = function(e) {
-                            var geoJSON;
-                            if (['json', 'geojson'].includes(extension))
-                                geoJSON = JSON.parse(e.target.result);
-                            else
-                                geoJSON = toGeoJSON.kml(
-                                    new window.DOMParser()
-                                        .parseFromString(e.target.result, "text/xml")
-                                );
-                            resolve(geoJSON);
-                        };
-                        reader.readAsText(file);
-                    }));
+            })
+            console.log("SSSSS", params, self, self.draw)
+
+            params['foo'].forEach(function(bar) {
+                if (!bar.id) {
+                    bar.id = uuid.generate();
                 }
-            }
-            Promise.all(promises).then(function(results) {
-                var geoJSON = {
-                    "type": "FeatureCollection",
-                    "features": results.reduce(function(features, geoJSON) {
-                        features = features.concat(geoJSON.features);
-                        return features;
-                    }, [])
-                };
-                errors = errors.concat(
-                    addFromGeoJSON(JSON.stringify(geoJSON), nodeId)
-                );
-                self.featureLookup[nodeId].dropErrors(errors);
             });
-        };
 
-        self.dropZoneHandler = function(data, e) {
-            var nodeId = data.node.nodeid;
-            e.stopPropagation();
-            e.preventDefault();
-            var files = e.originalEvent.dataTransfer.files;
-            self.handleFiles(files, nodeId);
-            self.dropZoneLeaveHandler(data, e);
-        };
+            var id = ko.unwrap(params.foo[0].nodeId);
 
-        self.dropZoneOverHandler = function(data, e) {
-            e.stopPropagation();
-            e.preventDefault();
-            e.originalEvent.dataTransfer.dropEffect = 'copy';
-        };
+            self.featureLookup[id] = {
+                features: params.foo,
+                selectedTool: ko.observable(),
+                dropErrors: ko.observableArray()
+            };
+            self.featureLookup[id].selectedTool.subscribe(function(tool) {
+                if (self.draw) {
+                    if (tool === '') {
+                        self.draw.trash();
+                        self.draw.changeMode('simple_select');
+                    } else if (tool) {
+                        _.each(self.featureLookup, function(value, key) {
+                            if (key !== id) {
+                                value.selectedTool(null);
+                            }
+                        });
+                        self.newNodeId = id;
+                    }
+                    self.setDrawTool(tool);
+                }
+            });
 
-        self.dropZoneClickHandler = function(data, e) {
-            var fileInput = e.target.parentNode.querySelector('.hidden-file-input input');
-            var event = window.document.createEvent("MouseEvents");
-            event.initEvent("click", true, false);
-            fileInput.dispatchEvent(event);
-        };
 
-        self.dropZoneEnterHandler = function(data, e) {
-            e.target.classList.add('drag-hover');
-        };
+            params.usePosition = false;
+            params.bounds = geojsonExtent({
+                type: 'FeatureCollection',
+                features: params['foo']
+            });
+            params.fitBoundsOptions = { padding: {top: padding, left: padding + 200, bottom: padding, right: padding + 200} };
+            console.log("HERE YOU", self, params, params.bounds)
 
-        self.dropZoneLeaveHandler = function(data, e) {
-            e.target.classList.remove('drag-hover');
-        };
+        }
 
-        self.dropZoneFileSelected = function(data, e) {
-            self.handleFiles(e.target.files, data.node.nodeid);
-        };
+        // self.handleFiles = function(files, nodeId) {
+        //     var errors = [];
+        //     var promises = [];
+        //     for (var i = 0; i < files.length; i++) {
+        //         var extension = files[i].name.split('.').pop();
+        //         if (!['kml', 'json', 'geojson'].includes(extension)) {
+        //             errors.push({
+        //                 message: 'File unsupported: "' + files[i].name + '"'
+        //             });
+        //         } else {
+        //             promises.push(new Promise(function(resolve) {
+        //                 var file = files[i];
+        //                 var extension = file.name.split('.').pop();
+        //                 var reader = new window.FileReader();
+        //                 reader.onload = function(e) {
+        //                     var geoJSON;
+        //                     if (['json', 'geojson'].includes(extension))
+        //                         geoJSON = JSON.parse(e.target.result);
+        //                     else
+        //                         geoJSON = toGeoJSON.kml(
+        //                             new window.DOMParser()
+        //                                 .parseFromString(e.target.result, "text/xml")
+        //                         );
+        //                     resolve(geoJSON);
+        //                 };
+        //                 reader.readAsText(file);
+        //             }));
+        //         }
+        //     }
+        //     Promise.all(promises).then(function(results) {
+        //         var geoJSON = {
+        //             "type": "FeatureCollection",
+        //             "features": results.reduce(function(features, geoJSON) {
+        //                 features = features.concat(geoJSON.features);
+        //                 return features;
+        //             }, [])
+        //         };
+        //         errors = errors.concat(
+        //             addFromGeoJSON(JSON.stringify(geoJSON), nodeId)
+        //         );
+        //         self.featureLookup[nodeId].dropErrors(errors);
+        //     });
+        // };
+
+        // self.dropZoneHandler = function(data, e) {
+        //     var nodeId = data.node.nodeid;
+        //     e.stopPropagation();
+        //     e.preventDefault();
+        //     var files = e.originalEvent.dataTransfer.files;
+        //     self.handleFiles(files, nodeId);
+        //     self.dropZoneLeaveHandler(data, e);
+        // };
+
+        // self.dropZoneOverHandler = function(data, e) {
+        //     e.stopPropagation();
+        //     e.preventDefault();
+        //     e.originalEvent.dataTransfer.dropEffect = 'copy';
+        // };
+
+        // self.dropZoneClickHandler = function(data, e) {
+        //     var fileInput = e.target.parentNode.querySelector('.hidden-file-input input');
+        //     var event = window.document.createEvent("MouseEvents");
+        //     event.initEvent("click", true, false);
+        //     fileInput.dispatchEvent(event);
+        // };
+
+        // self.dropZoneEnterHandler = function(data, e) {
+        //     e.target.classList.add('drag-hover');
+        // };
+
+        // self.dropZoneLeaveHandler = function(data, e) {
+        //     e.target.classList.remove('drag-hover');
+        // };
+
+        // self.dropZoneFileSelected = function(data, e) {
+        //     self.handleFiles(e.target.files, data.node.nodeid);
+        // };
     };
     return viewModel;
 });

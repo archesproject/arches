@@ -651,17 +651,11 @@ class ResourceFOO(View):
                                     "properties": {},
                                 }
 
-                                # parsed_row[node_data['node_id']] = {
-                                #     "type": "Point", 
-                                #     "coordinates": [0, 0],
-                                # }
-                            
+                            # why reverse x/y order?                            
                             if 'x' in node_data['args']:
-                                parsed_row[node_data['node_id']]['geometry']['coordinates'][0] = float(value)
-                                # parsed_row[node_data['node_id']]['geometry']['coordinates'][0] = value
-                            if 'y' in node_data['args']:
                                 parsed_row[node_data['node_id']]['geometry']['coordinates'][1] = float(value)
-                                # parsed_row[node_data['node_id']]['geometry']['coordinates'][1] = value
+                            if 'y' in node_data['args']:
+                                parsed_row[node_data['node_id']]['geometry']['coordinates'][0] = float(value)
                     
                     else:
                         node_id = node_data  # node_data is a uuid string

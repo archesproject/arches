@@ -182,6 +182,7 @@ define([
                     response.data.forEach(function(parsedRow) {
                         parsedRow['meta'] = {
                             'file': file,
+                            'nodeId': self.node.id,
                             'errors': ko.observable(parsedRow['errors']),
                         };
 
