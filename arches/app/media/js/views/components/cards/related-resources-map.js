@@ -50,10 +50,43 @@ define([
         if (self.form && self.tile) self.card.widgets().forEach(function(widget) {
             var id = widget.node_id();
             var type = ko.unwrap(self.form.nodeLookup[id].datatype);
+
             if (type === 'resource-instance' || type === 'resource-instance-list' || type === 'geojson-feature-collection') {
                 self.widgets.push(widget);
             }
+            /* if file-preview-widget with loaded map data */
+            else if (type === 'file-list') {
+                if (params.tile) {
+                    var widgetData = params.tile.data[widget.node_id()];
+
+                    console.log("HERE", widgetData())
+
+                    if (widgetData() && widgetData()['hasMapData']) {
+                        // self.widgets.push(widget);
+
+
+                        // UNDO THIS
+                        console.log(widgetData())
+                        widgetData().data.forEach(function(foo) {
+                            Object.values(foo).forEach(function(bar) {
+                                if (bar instanceof Object && bar['geometry'] && bar['geometry']['coordinates']) {
+                                    if (!params['foo']) {
+                                        params['foo'] = [bar];
+                                    }
+                                    else {
+                                        params['foo'].push(bar);
+                                    }
+                                    // params['sources']['geojson-editor-data']['data']['features'].push(bar);
+                                }
+                            });
+                        });
+                    }
+                }
+            }
         });
+
+        console.log('####', self)
+
         var getNodeIds = function(){
             var nodeids = [];
             if (self.selectRelatedSource()) {
@@ -79,6 +112,9 @@ define([
        this.overlayConfigs = ko.observable();
        this.centerX = ko.observable();
        this.centerY = ko.observable();
+
+       console.log("!!!", self, params)
+       this.sources = params.sources;
 
        for (var widget of self.widgets) {
            if (widget.config.basemap) {

@@ -21,6 +21,8 @@ define([
         if (this.widgets === undefined) { // could be [], so checking specifically for undefined
             this.widgets = params.widgets || [];
         }
+
+        console.log("(((", self, params)
         this.geojsonWidgets = this.widgets.filter(function(widget){ return widget.datatype.datatype === 'geojson-feature-collection'; });
         this.newNodeId = null;
         this.featureLookup = {};
@@ -47,6 +49,7 @@ define([
                 });
             }
         };
+
 
         var sources = [];
         for (var sourceName in arches.mapSources) {
@@ -165,6 +168,7 @@ define([
         };
         drawFeatures = getDrawFeatures();
 
+
         if (drawFeatures.length > 0) {
             params.usePosition = false;
             params.bounds = geojsonExtent({
@@ -173,6 +177,26 @@ define([
             });
             params.fitBoundsOptions = { padding: {top: padding, left: padding + 200, bottom: padding, right: padding + 200} };
         }
+
+
+        
+        
+        if (params['foo']) {
+            params.usePosition = false;
+            params.bounds = geojsonExtent({
+                type: 'FeatureCollection',
+                features: params['foo']
+            });
+            params.fitBoundsOptions = { padding: {top: padding, left: padding + 200, bottom: padding, right: padding + 200} };
+            console.log("HERE YOU", params, params.bounds)
+
+        }
+
+
+
+
+
+
         params.activeTab = 'editor';
         params.sources = Object.assign({
             "geojson-editor-data": {

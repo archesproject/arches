@@ -642,24 +642,26 @@ class ResourceFOO(View):
                     if isinstance(node_data, dict):
                         if (node_data['flag'] == 'format_location'):
                             if not parsed_row.get(node_data['node_id']):
-                                # parsed_row[node_data['node_id']] = {
-                                #     "geometry": {
-                                #         "type": "Point", 
-                                #         "coordinates": [0, 0],
-                                #     },
-                                #     "type": "Feature",
-                                #     "properties": {},
-                                # }
-
                                 parsed_row[node_data['node_id']] = {
-                                    "type": "Point", 
-                                    "coordinates": [0, 0],
+                                    "geometry": {
+                                        "type": "Point", 
+                                        "coordinates": [0, 0],
+                                    },
+                                    "type": "Feature",
+                                    "properties": {},
                                 }
+
+                                # parsed_row[node_data['node_id']] = {
+                                #     "type": "Point", 
+                                #     "coordinates": [0, 0],
+                                # }
                             
                             if 'x' in node_data['args']:
-                                parsed_row[node_data['node_id']]['coordinates'][0] = value
+                                parsed_row[node_data['node_id']]['geometry']['coordinates'][0] = float(value)
+                                # parsed_row[node_data['node_id']]['geometry']['coordinates'][0] = value
                             if 'y' in node_data['args']:
-                                parsed_row[node_data['node_id']]['coordinates'][1] = value
+                                parsed_row[node_data['node_id']]['geometry']['coordinates'][1] = float(value)
+                                # parsed_row[node_data['node_id']]['geometry']['coordinates'][1] = value
                     
                     else:
                         node_id = node_data  # node_data is a uuid string

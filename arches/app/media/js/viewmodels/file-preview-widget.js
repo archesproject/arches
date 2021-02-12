@@ -86,8 +86,17 @@ define([
         this.resourceModelNodeData = ko.observable();
 
         this.parsedFileData = ko.observableArray();
-        this.parsedFileData.subscribe(function(nodeData) {
-            self.value(nodeData)
+        this.parsedFileData.subscribe(function() {
+            var hasMapData = self.parsedFileData().find(function(fileData) {
+                return Object.values(fileData).find(function(value) {
+                    return Boolean(value instanceof Object && value['geometry']['coordinates']);
+                });
+            });
+
+            self.value({
+                hasMapData: Boolean(hasMapData),
+                data: self.parsedFileData(),
+            })
         });
 
 
