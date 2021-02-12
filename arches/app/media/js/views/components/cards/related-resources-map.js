@@ -58,6 +58,15 @@ define([
             else if (type === 'file-list') {
                 if (params.tile) {
                     var widgetData = params.tile.data[widget.node_id()];
+                    widgetData.subscribe(function(bar) {
+
+                        if (!bar && params.bar) {
+                            console.log("MDDMDMD", params.bar)
+                            params.tile.data[widget.node_id()](params.bar);
+                        }
+                        console.log('THERETHERE', bar, self, params)
+
+                    })
 
                     console.log("HERE", widgetData())
 
@@ -66,7 +75,7 @@ define([
 
 
                         // UNDO THIS
-                        console.log(widgetData())
+                        console.log('OY THERE', widget, widgetData())
                         widgetData().data.forEach(function(foo) {
                             Object.values(foo).forEach(function(bar) {
                                 if (bar instanceof Object && bar['geometry'] && bar['geometry']['coordinates']) {
@@ -76,13 +85,20 @@ define([
                                     };
 
 
+
+
+                                    params['bar'] = widgetData();
+
                                     if (!params['foo']) {
                                         params['foo'] = [qux];
                                     }
                                     else {
                                         params['foo'].push(qux);
                                     }
-                                    // params['sources']['geojson-editor-data']['data']['features'].push(bar);
+                                    // if (params['sources']) {
+
+                                    //     params['sources']['geojson-editor-data']['data']['features'].push(bar);
+                                    // }
                                 }
                             });
                         });
@@ -250,6 +266,7 @@ define([
             });
             return ids;
         });
+
         var updateResourceBounds = function(ids) {
             if (ids.length > 0) {
                 $.getJSON({
@@ -264,21 +281,6 @@ define([
         };
         updateResourceBounds(selectedResourceIds());
         selectedResourceIds.subscribe(updateResourceBounds);
-
-
-
-
-
-
-        // resourceBounds(geojsonExtent(params['foo']))
-
-        // console.log('UUUUU', self, params, resourceBounds())
-
-
-
-
-
-
 
         var zoomToData = true;
         resourceBounds.subscribe(function(bounds) {

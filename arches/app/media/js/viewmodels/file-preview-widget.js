@@ -69,6 +69,8 @@ define([
     var ExternalResourceDataViewModel = function(params) {
         var self = this;
 
+        console.log("PREVIEW FILE WIDGET", self, params)
+        
         params.configKeys = ['acceptedFiles', 'maxFilesize', 'maxFiles'];
         WidgetViewModel.apply(this, [params]);
 
@@ -81,7 +83,12 @@ define([
         this.uploadMultiple = ko.observable(true);
 
         this.addedFiles = ko.observableArray();
-        this.selectedFile = ko.observable(self.addedFiles()[0]);
+        this.addedFiles.subscribe(function(file) {
+            // console.log("SHSHSHSHSHSHS", self, self.parseCSVFile, params, file)
+            // self.parseCSVFile(file[0]);
+            self.selectedFile(file[0])
+        });
+        this.selectedFile = ko.observable();
 
         this.resourceModelNodeData = ko.observable();
 
@@ -93,11 +100,28 @@ define([
                 });
             });
 
+            
             self.value({
                 hasMapData: Boolean(hasMapData),
                 data: self.parsedFileData(),
             })
+
         });
+        if (self.value()) {
+            var uploadedFiles = {};
+
+            self.value().data.forEach(function(foo) {
+                self.parsedFileData.push(foo);
+
+                var fileId = foo.meta.file.upload.uuid;
+
+                if (!uploadedFiles[fileId]) {
+                    uploadedFiles[fileId] = foo.meta.file;
+                }
+
+                self.addedFiles(Object.values(uploadedFiles));
+            });
+        }
 
 
         this.dropzoneOptions = {
@@ -177,8 +201,6 @@ define([
                 method: 'POST',
                 data: formData,
                 success: function (response) {
-                    self.addedFiles.push(file);
-
                     response.data.forEach(function(parsedRow) {
                         parsedRow['meta'] = {
                             'file': file,
@@ -227,7 +249,8 @@ define([
         this.dropZoneInit = function() {
             self.dropzone.on("addedfile", function(file) {
                 if (file.type === 'text/csv') {
-                    self.parseCSVFile(file)
+                    console.log("FILE HERE", file)
+                    self.parseCSVFile(file);
                 }
             });
 
