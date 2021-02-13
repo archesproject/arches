@@ -813,7 +813,7 @@ class Command(BaseCommand):
 
         def update_resource_materialized_view():
             with connection.cursor() as cursor:
-                cursor.execute("REFRESH MATERIALIZED VIEW mv_geojson_geoms;")
+                cursor.execute("SELECT * FROM refresh_geojson_geometries();")
 
         def load_apps(package_dir):
             package_apps = glob.glob(os.path.join(package_dir, "apps", "*"))

@@ -1393,3 +1393,13 @@ class VwAnnotation(models.Model):
     class Meta:
         managed = False
         db_table = "vw_annotations"
+
+class GeoJSONGeometry(models.Model):
+    tile = models.ForeignKey(TileModel, on_delete=models.DO_NOTHING, db_column="tileid")
+    resourceinstance = models.ForeignKey(ResourceInstance, on_delete=models.DO_NOTHING, db_column="resourceinstanceid")
+    node = models.ForeignKey(Node, on_delete=models.DO_NOTHING, db_column="nodeid")
+    geom = models.GeometryField(srid=3857)
+
+    class Meta:
+        managed = True
+        db_table = "geojson_geometries"

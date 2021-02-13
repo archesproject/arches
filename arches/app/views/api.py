@@ -416,7 +416,7 @@ class MVT(APIBase):
                                     resourceinstanceid,
                                     nodeid,
                                     geom
-                                FROM mv_geojson_geoms
+                                FROM geojson_geometries
                                 WHERE nodeid = %s and resourceinstanceid not in %s
                             ) m
                         )
@@ -468,7 +468,7 @@ class MVT(APIBase):
                                 TileBBox(%s, %s, %s, 3857)
                             ) AS geom,
                             1 AS total
-                        FROM mv_geojson_geoms
+                        FROM geojson_geometries
                         WHERE nodeid = %s and resourceinstanceid not in %s) AS tile;""",
                         [nodeid, zoom, x, y, nodeid, resource_ids],
                     )
