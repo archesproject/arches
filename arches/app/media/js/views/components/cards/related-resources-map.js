@@ -4,12 +4,13 @@ define([
     'knockout',
     'knockout-mapping',
     'geojson-extent',
+    'uuid',
     'viewmodels/card-component',
     'viewmodels/map-editor',
     'viewmodels/map-filter',
     'views/components/cards/select-related-feature-layers',
     'text!templates/views/components/cards/related-resources-map-popup.htm'
-], function($, arches, ko, koMapping, geojsonExtent, CardComponentViewModel, MapEditorViewModel, MapFilterViewModel, selectFeatureLayersFactory, popupTemplate) {
+], function($, arches, ko, koMapping, geojsonExtent, uuid, CardComponentViewModel, MapEditorViewModel, MapFilterViewModel, selectFeatureLayersFactory, popupTemplate) {
     var viewModel = function(params) {
         var self = this;
 
@@ -59,16 +60,10 @@ define([
                 if (params.tile) {
                     var widgetData = params.tile.data[widget.node_id()];
                     widgetData.subscribe(function(bar) {
-
                         if (!bar && params.bar) {
-                            console.log("MDDMDMD", params.bar)
                             params.tile.data[widget.node_id()](params.bar);
                         }
-                        console.log('THERETHERE', bar, self, params)
-
                     })
-
-                    console.log("HERE", widgetData())
 
                     if (widgetData() && widgetData()['hasMapData']) {
                         self.widgets.push(widget);
@@ -80,14 +75,19 @@ define([
                             Object.values(foo).forEach(function(bar) {
                                 if (bar instanceof Object && bar['geometry'] && bar['geometry']['coordinates']) {
                                     var qux = {
+                                        id: foo.meta.id,
                                         nodeId: foo.meta.nodeId,
                                         ...bar
                                     };
 
 
+                                    if (!params['bar']) {
+                                        params['bar'] = {};
+                                    }
 
-
-                                    params['bar'] = widgetData();
+                                    params['bar'][foo.meta.id] = widgetData().data.find(function(qux) {
+                                        return qux['meta']['id'] === foo.meta.id;
+                                    });
 
                                     if (!params['foo']) {
                                         params['foo'] = [qux];

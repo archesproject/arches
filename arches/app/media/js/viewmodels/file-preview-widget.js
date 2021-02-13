@@ -110,17 +110,35 @@ define([
         if (self.value()) {
             var uploadedFiles = {};
 
-            self.value().data.forEach(function(foo) {
-                self.parsedFileData.push(foo);
+            console.log("AHHHHHH", self.value())
 
-                var fileId = foo.meta.file.upload.uuid;
+            if (self.value().data) {
+                self.value().data.forEach(function(foo) {
+                    self.parsedFileData.push(foo);
+    
+                    var fileId = foo.meta.file.upload.uuid;
+    
+                    if (!uploadedFiles[fileId]) {
+                        uploadedFiles[fileId] = foo.meta.file;
+                    }
+    
+                    self.addedFiles(Object.values(uploadedFiles));
+                });
+            }
+            else {
+                Object.values(self.value()).forEach(function(foo) {
+                    self.parsedFileData.push(foo);
+    
+                    var fileId = foo.meta.file.upload.uuid;
+    
+                    if (!uploadedFiles[fileId]) {
+                        uploadedFiles[fileId] = foo.meta.file;
+                    }
+    
+                    self.addedFiles(Object.values(uploadedFiles));
+                });
+            }
 
-                if (!uploadedFiles[fileId]) {
-                    uploadedFiles[fileId] = foo.meta.file;
-                }
-
-                self.addedFiles(Object.values(uploadedFiles));
-            });
         }
 
 
@@ -203,6 +221,7 @@ define([
                 success: function (response) {
                     response.data.forEach(function(parsedRow) {
                         parsedRow['meta'] = {
+                            'id': uuid.generate(),
                             'file': file,
                             'nodeId': self.node.id,
                             'errors': ko.observable(parsedRow['errors']),
@@ -212,8 +231,6 @@ define([
 
                         self.parsedFileData.push(parsedRow);
                     });
-
-                    console.log(response, self, params)
                 }
             });
         };
@@ -249,7 +266,6 @@ define([
         this.dropZoneInit = function() {
             self.dropzone.on("addedfile", function(file) {
                 if (file.type === 'text/csv') {
-                    console.log("FILE HERE", file)
                     self.parseCSVFile(file);
                 }
             });

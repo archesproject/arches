@@ -5,6 +5,7 @@ define([
     'knockout',
     'knockout-mapping',
     'uuid',
+    'mapbox-gl',
     'mapbox-gl-draw',
     'geojson-extent',
     'geojsonhint',
@@ -12,7 +13,7 @@ define([
     'views/components/map',
     'views/components/cards/select-feature-layers',
     'text!templates/views/components/cards/map-popup.htm'
-], function(arches, $, _, ko, koMapping, uuid, MapboxDraw, geojsonExtent, geojsonhint, toGeoJSON, MapComponentViewModel, selectFeatureLayersFactory, popupTemplate) {
+], function(arches, $, _, ko, koMapping, uuid, mapboxgl, MapboxDraw, geojsonExtent, geojsonhint, toGeoJSON, MapComponentViewModel, selectFeatureLayersFactory, popupTemplate) {
     var viewModel = function(params) {
         var self = this;
         var padding = 40;
@@ -585,22 +586,34 @@ define([
 
 
         if (params['foo']) {
-            self.map.subscribe(function(foo) {
-                console.log("REALLY?")
+            self.map.subscribe(function(fooMap) {
+                console.log("REALLY?", fooMap)
 
-                
+                fooMap.on('click', function(e) {
+                    console.log("EDITOR CLICK", e, self, params)
+                    var hoverFeature = _.find(
+                        fooMap.queryRenderedFeatures(e.point),
+                        function(feature) { return feature.properties.id; }
+                    );
+
+                    if (hoverFeature) {
+                        console.log(params['bar'][hoverFeature['properties']['id']])
+                        self.popup = new mapboxgl.Popup()
+                            .setLngLat(e.lngLat)
+                            .setHTML(`<div>${Object.values(params['bar'][hoverFeature['properties']['id']])}</div>`)
+                            .addTo(fooMap);
+                    }
+                })
+
                 params['foo'].forEach(function(bar) {
+                    // bar['id'] = uuid.generate();
+                    console.log(bar)
                     self.draw.add(bar)
+                    // params['sources']['geojson-editor-data']['data']['features'].push(bar)
                 });
 
             })
             console.log("SSSSS", params, self, self.draw)
-
-            params['foo'].forEach(function(bar) {
-                if (!bar.id) {
-                    bar.id = uuid.generate();
-                }
-            });
 
             var id = ko.unwrap(params.foo[0].nodeId);
 
@@ -632,7 +645,6 @@ define([
                 type: 'FeatureCollection',
                 features: params['foo']
             });
-            params.fitBoundsOptions = { padding: {top: padding, left: padding + 200, bottom: padding, right: padding + 200} };
             console.log("HERE YOU", self, params, params.bounds)
 
         }
