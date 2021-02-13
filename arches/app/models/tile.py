@@ -508,7 +508,7 @@ class Tile(models.TileModel):
         nodegroup = models.NodeGroup.objects.get(pk=self.nodegroup_id)
         for node in nodegroup.node_set.all():
             datatype = self.datatype_factory.get_instance(node.datatype)
-            datatype.after_update_all(tile=tile)
+            datatype.after_update_all(tile=self)
         for tile in self.tiles:
             tile.after_update_all()
 
