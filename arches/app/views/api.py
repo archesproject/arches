@@ -736,23 +736,55 @@ class Resources(APIBase):
 
         try:
             if user_can_edit_resource(user=request.user, resourceid=resourceid):
-                data = JSONDeserializer().deserialize(request.body)
-                reader = JsonLdReader()
-                if slug is not None:
-                    graphid = models.GraphModel.objects.get(slug=slug).pk
-                reader.read_resource(data, graphid=graphid)
-                if reader.errors:
-                    response = []
-                    for value in reader.errors.values():
-                        response.append(value.message)
-                    return JSONResponse({"error": response}, indent=indent, status=400)
+
+
+                foobar = json.dumps(request.POST.get('foobar'))
+
+                if foobar:
+                    foo = json.loads(request.body)
+                    # graph = models.GraphModel.objects.get(pk=graphid)
+
+                    resource_instance = models.ResourceInstance(graph_id=graphid)
+                    resource_instance.save()
+
+
+                    foo['foo'][0].pop('meta')
+
+                    tile = TileProxyModel(
+                        data=foo['foo'][0],
+                        resourceinstance=resource_instance,
+                        nodegroup_id = 'f7c974a0-29f4-11eb-8487-aae9fe8789ac',  # Related Observations
+                    )
+
+
+                    tile.save()
+
+                    import pdb; pdb.set_trace()
+
+
+
                 else:
-                    response = []
-                    for resource in reader.resources:
-                        with transaction.atomic():
-                            resource.save(request=request)
-                        response.append(JSONDeserializer().deserialize(self.get(request, resource.resourceinstanceid).content))
-                    return JSONResponse(response, indent=indent, status=201)
+                    data = JSONDeserializer().deserialize(request.body)
+                    reader = JsonLdReader()
+                    if slug is not None:
+                        graphid = models.GraphModel.objects.get(slug=slug).pk
+                    reader.read_resource(data, graphid=graphid)
+                    if reader.errors:
+                        response = []
+                        for value in reader.errors.values():
+                            response.append(value.message)
+                        return JSONResponse({"error": response}, indent=indent, status=400)
+                    else:
+                        response = []
+                        for resource in reader.resources:
+                            with transaction.atomic():
+                                resource.save(request=request)
+                            response.append(JSONDeserializer().deserialize(self.get(request, resource.resourceinstanceid).content))
+                        return JSONResponse(response, indent=indent, status=201)
+
+
+
+
             else:
                 return JSONResponse(status=403)
         except Exception as e:

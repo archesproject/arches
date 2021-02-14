@@ -95,10 +95,10 @@ define([
                                     else {
                                         params['foo'].push(qux);
                                     }
-                                    // if (params['sources']) {
+                                    if (params['sources']) {
 
-                                    //     params['sources']['geojson-editor-data']['data']['features'].push(bar);
-                                    // }
+                                        params['sources']['geojson-editor-data']['data']['features'].push(bar);
+                                    }
                                 }
                             });
                         });

@@ -137,6 +137,8 @@ class ResourceEditorView(MapBaseManagerView):
         if self.action == "copy":
             return self.copy(request, resourceid)
 
+
+
         creator = None
         user_created_instance = None
         if resourceid is None:
@@ -159,6 +161,13 @@ class ResourceEditorView(MapBaseManagerView):
         relationship_type_values = get_resource_relationship_types()
         nodegroups = []
         editable_nodegroups = []
+
+
+
+        # import pdb; pdb.set_trace()
+
+
+
         for node in nodes:
             if node.is_collector:
                 added = False

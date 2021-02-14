@@ -365,6 +365,9 @@ class Tile(models.TileModel):
         except AttributeError:  # no user - probably importing data
             user = None
 
+
+        import pdb; pdb.set_trace()
+
         with transaction.atomic():
             for nodeid, value in self.data.items():
                 node = models.Node.objects.get(nodeid=nodeid)

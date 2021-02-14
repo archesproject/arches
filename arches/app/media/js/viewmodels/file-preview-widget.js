@@ -17,6 +17,8 @@ define([
      * @param  {string} params - a configuration object
      */
 
+
+    OBSERVATIONS_GRAPH_ID = "d41455df-033e-11eb-9978-02e99e44e93e";
     
 
     VISIBLE_COLUMN_IDS = [
@@ -69,7 +71,7 @@ define([
     var ExternalResourceDataViewModel = function(params) {
         var self = this;
 
-        console.log("PREVIEW FILE WIDGET", self, params)
+        console.log("PREVIEW FILE WIDGET", self, params, arches)
         
         params.configKeys = ['acceptedFiles', 'maxFilesize', 'maxFiles'];
         WidgetViewModel.apply(this, [params]);
@@ -188,15 +190,20 @@ define([
         };
 
         this.fetchResourceModelNodeData = function() {
+            console.log("BUH?", arches)
+
             $.ajax({
                 dataType: "json",
-                url: arches.urls.graph_nodes(arches.resources[1]['graphid']),
+                url: arches.urls.graph_nodes(OBSERVATIONS_GRAPH_ID),
                 success: function (response) {
                     Object.values(response).forEach(function(nodeData) {
                         nodeData['visible'] = VISIBLE_COLUMN_IDS.some(function(columnId) { 
                             return columnId === nodeData.nodeid; 
                         });
                     });
+
+
+                    console.log("BUH?", response)
                     self.resourceModelNodeData(response);
                 }
             });
@@ -234,6 +241,30 @@ define([
                 }
             });
         };
+
+        this.buttonFOO = function() {
+            console.log("BEGIN BUTTON FOO", arches, self.parsedFileData())
+            var qux = $.ajax({
+                dataType: "json",
+                type: 'POST',
+                contentType: "application/json",
+                data: JSON.stringify({
+                    'foobar': true,
+                    'foo': self.parsedFileData(),
+                }),
+                url: arches.urls.root + `resourcesFOO/${OBSERVATIONS_GRAPH_ID}`,
+                complete: function(data, status) {
+                    // response.then(function(foo) {
+                    //     console.log("dddddd", foo)
+                    // })
+                    console.log('LINE ERROR', data, status, data.done())
+                },
+            });
+
+            qux.then(function(quux) {
+                console.log("SJSJSJSJSJSJSJSJ", quux)
+            })
+        }
 
         this.validateNodeData = function(parsedFile, nodeId, cellValue) {
             /* 
