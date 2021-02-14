@@ -55,59 +55,7 @@ define([
             if (type === 'resource-instance' || type === 'resource-instance-list' || type === 'geojson-feature-collection') {
                 self.widgets.push(widget);
             }
-            /* if file-preview-widget with loaded map data */
-            else if (type === 'file-list') {
-                if (params.tile) {
-                    var widgetData = params.tile.data[widget.node_id()];
-                    widgetData.subscribe(function(bar) {
-                        if (!bar && params.bar) {
-                            params.tile.data[widget.node_id()](params.bar);
-                        }
-                    })
-
-                    if (widgetData() && widgetData()['hasMapData']) {
-                        self.widgets.push(widget);
-
-
-                        // UNDO THIS
-                        console.log('OY THERE', widget, widgetData())
-                        widgetData().data.forEach(function(foo) {
-                            Object.values(foo).forEach(function(bar) {
-                                if (bar instanceof Object && bar['geometry'] && bar['geometry']['coordinates']) {
-                                    var qux = {
-                                        id: foo.meta.id,
-                                        nodeId: foo.meta.nodeId,
-                                        ...bar
-                                    };
-
-
-                                    if (!params['bar']) {
-                                        params['bar'] = {};
-                                    }
-
-                                    params['bar'][foo.meta.id] = widgetData().data.find(function(qux) {
-                                        return qux['meta']['id'] === foo.meta.id;
-                                    });
-
-                                    if (!params['foo']) {
-                                        params['foo'] = [qux];
-                                    }
-                                    else {
-                                        params['foo'].push(qux);
-                                    }
-                                    if (params['sources']) {
-
-                                        params['sources']['geojson-editor-data']['data']['features'].push(bar);
-                                    }
-                                }
-                            });
-                        });
-                    }
-                }
-            }
         });
-
-        console.log('####', self)
 
         var getNodeIds = function(){
             var nodeids = [];
