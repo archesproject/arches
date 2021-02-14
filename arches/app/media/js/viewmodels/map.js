@@ -379,7 +379,6 @@ define([
 
         this.popupTemplate = popupTemplate;
         this.onFeatureClick = function(feature, lngLat) {
-            console.log("FEATURE CLICK", feature)
             var map = self.map();
             self.popup = new mapboxgl.Popup()
                 .setLngLat(lngLat)
