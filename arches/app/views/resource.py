@@ -77,6 +77,19 @@ from guardian.shortcuts import (
 )
 import logging
 
+
+
+
+
+
+
+
+from arches.app.models.concept import get_valueids_from_concept_label
+from arches.app.datatypes.concept_types import ConceptListDataType, ConceptDataType
+
+
+
+
 logger = logging.getLogger(__name__)
 
 
@@ -652,25 +665,47 @@ class ResourceFOO(View):
                         if (node_data['flag'] == 'format_location'):
                             if not parsed_row.get(node_data['node_id']):
                                 parsed_row[node_data['node_id']] = {
-                                    "geometry": {
-                                        "type": "Point", 
-                                        "coordinates": [0, 0],
-                                    },
-                                    "type": "Feature",
-                                    "properties": {},
+                                    "type": "FeatureCollection",
+                                    "features": [{
+                                        "type": "Feature",
+                                        "properties": {},
+                                        "geometry": {
+                                            "type": "Point", 
+                                            "coordinates": [0, 0]
+                                        }
+                                    }]
                                 }
 
                             # why reverse x/y order?                            
                             if 'x' in node_data['args']:
-                                parsed_row[node_data['node_id']]['geometry']['coordinates'][1] = float(value)
+                                parsed_row[node_data['node_id']]['features'][0]['geometry']['coordinates'][1] = float(value)
                             if 'y' in node_data['args']:
-                                parsed_row[node_data['node_id']]['geometry']['coordinates'][0] = float(value)
+                                parsed_row[node_data['node_id']]['features'][0]['geometry']['coordinates'][0] = float(value)
                     
                     else:
                         node_id = node_data  # node_data is a uuid string
 
                         node = models.Node.objects.get(pk=node_id)
                         datatype = datatype_factory.get_instance(node.datatype)
+
+
+      
+
+                        if isinstance(datatype, (ConceptDataType, ConceptListDataType)):
+                            value_data = get_valueids_from_concept_label(value)
+
+
+    
+                            # `get_valueids_from_concept_label` returns a list including concepts 
+                            # where the value is a partial match let's filter for the exact value
+                            exact_match = None
+
+                            for value_datum in value_data:
+                                if value_datum['value'] == value:
+                                    exact_match = value_datum
+
+                            value = exact_match['id']  # value_id
+
                         
                         # GET RID OF TRY AFTER DOMAIN VALUE REFACTOR!
                         try:

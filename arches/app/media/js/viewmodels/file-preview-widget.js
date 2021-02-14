@@ -98,7 +98,7 @@ define([
         this.parsedFileData.subscribe(function() {
             var hasMapData = self.parsedFileData().find(function(fileData) {
                 return Object.values(fileData).find(function(value) {
-                    return Boolean(value instanceof Object && value['geometry']['coordinates']);
+                    return Boolean(value instanceof Object && value['features'][0]['geometry']['coordinates']);
                 });
             });
 
@@ -226,7 +226,12 @@ define([
                 method: 'POST',
                 data: formData,
                 success: function (response) {
+
+
+                    
+                    
                     response.data.forEach(function(parsedRow) {
+                        console.log("HUH?", parsedRow)
                         parsedRow['meta'] = {
                             'id': uuid.generate(),
                             'file': file,

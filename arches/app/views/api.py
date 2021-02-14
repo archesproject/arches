@@ -739,14 +739,15 @@ class Resources(APIBase):
 
 
                 foobar = json.dumps(request.POST.get('foobar'))
+                foo = json.loads(request.body)
 
-                if foobar:
-                    foo = json.loads(request.body)
+                # import pdb; pdb.set_trace()
+
+                if foobar and foo.get('foo'):
                     # graph = models.GraphModel.objects.get(pk=graphid)
 
                     resource_instance = models.ResourceInstance(graph_id=graphid)
                     resource_instance.save()
-
 
                     foo['foo'][0].pop('meta')
 
@@ -759,7 +760,6 @@ class Resources(APIBase):
 
                     tile.save()
 
-                    import pdb; pdb.set_trace()
 
 
 
