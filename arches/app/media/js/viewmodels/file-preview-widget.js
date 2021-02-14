@@ -226,10 +226,6 @@ define([
                 method: 'POST',
                 data: formData,
                 success: function (response) {
-
-
-                    
-                    
                     response.data.forEach(function(parsedRow) {
                         console.log("HUH?", parsedRow)
                         parsedRow['meta'] = {

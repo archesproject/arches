@@ -23,7 +23,6 @@ define([
             this.widgets = params.widgets || [];
         }
 
-        console.log("(((", self, params)
         this.geojsonWidgets = this.widgets.filter(function(widget){ return widget.datatype.datatype === 'geojson-feature-collection'; });
         this.newNodeId = null;
         this.featureLookup = {};
@@ -585,69 +584,69 @@ define([
         };
 
 
-        if (params['foo']) {
-            self.map.subscribe(function(fooMap) {
-                console.log("REALLY?", fooMap)
+        // if (params['foo']) {
+        //     self.map.subscribe(function(fooMap) {
+        //         console.log("REALLY?", fooMap)
 
-                fooMap.on('click', function(e) {
-                    console.log("EDITOR CLICK", e, self, params)
-                    var hoverFeature = _.find(
-                        fooMap.queryRenderedFeatures(e.point),
-                        function(feature) { return feature.properties.id; }
-                    );
+        //         fooMap.on('click', function(e) {
+        //             console.log("EDITOR CLICK", e, self, params)
+        //             var hoverFeature = _.find(
+        //                 fooMap.queryRenderedFeatures(e.point),
+        //                 function(feature) { return feature.properties.id; }
+        //             );
 
-                    if (hoverFeature) {
-                        console.log(params['bar'][hoverFeature['properties']['id']])
-                        self.popup = new mapboxgl.Popup()
-                            .setLngLat(e.lngLat)
-                            .setHTML(`<div>${Object.values(params['bar'][hoverFeature['properties']['id']])}</div>`)
-                            .addTo(fooMap);
-                    }
-                })
+        //             if (hoverFeature) {
+        //                 console.log(params['bar'][hoverFeature['properties']['id']])
+        //                 self.popup = new mapboxgl.Popup()
+        //                     .setLngLat(e.lngLat)
+        //                     .setHTML(`<div>${Object.values(params['bar'][hoverFeature['properties']['id']])}</div>`)
+        //                     .addTo(fooMap);
+        //             }
+        //         })
 
-                params['foo'].forEach(function(bar) {
-                    // bar['id'] = uuid.generate();
-                    console.log(bar)
-                    self.draw.add(bar)
-                    // params['sources']['geojson-editor-data']['data']['features'].push(bar)
-                });
+        //         params['foo'].forEach(function(bar) {
+        //             // bar['id'] = uuid.generate();
+        //             console.log(bar)
+        //             self.draw.add(bar)
+        //             // params['sources']['geojson-editor-data']['data']['features'].push(bar)
+        //         });
 
-            })
-            console.log("SSSSS", params, self, self.draw)
+        //     })
+        //     console.log("SSSSS", params, self, self.draw)
 
-            var id = ko.unwrap(params.foo[0].nodeId);
+        //     var id = ko.unwrap(params.foo[0].nodeId);
 
-            self.featureLookup[id] = {
-                features: params.foo,
-                selectedTool: ko.observable(),
-                dropErrors: ko.observableArray()
-            };
-            self.featureLookup[id].selectedTool.subscribe(function(tool) {
-                if (self.draw) {
-                    if (tool === '') {
-                        self.draw.trash();
-                        self.draw.changeMode('simple_select');
-                    } else if (tool) {
-                        _.each(self.featureLookup, function(value, key) {
-                            if (key !== id) {
-                                value.selectedTool(null);
-                            }
-                        });
-                        self.newNodeId = id;
-                    }
-                    self.setDrawTool(tool);
-                }
-            });
+        //     self.featureLookup[id] = {
+        //         features: params.foo,
+        //         selectedTool: ko.observable(),
+        //         dropErrors: ko.observableArray()
+        //     };
+        //     self.featureLookup[id].selectedTool.subscribe(function(tool) {
+        //         if (self.draw) {
+        //             if (tool === '') {
+        //                 self.draw.trash();
+        //                 self.draw.changeMode('simple_select');
+        //             } else if (tool) {
+        //                 _.each(self.featureLookup, function(value, key) {
+        //                     if (key !== id) {
+        //                         value.selectedTool(null);
+        //                     }
+        //                 });
+        //                 self.newNodeId = id;
+        //             }
+        //             self.setDrawTool(tool);
+        //         }
+        //     });
 
 
-            params.usePosition = false;
-            params.bounds = geojsonExtent({
-                type: 'FeatureCollection',
-                features: params['foo']
-            });
-            console.log("HERE YOU", self, params, params.bounds)
+        //     params.usePosition = false;
+        //     params.bounds = geojsonExtent({
+        //         type: 'FeatureCollection',
+        //         features: params['foo']
+        //     });
+        //     console.log("HERE YOU", self, params, params.bounds)
 
-        }
+        // }
 
 
         

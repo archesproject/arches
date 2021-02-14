@@ -8,8 +8,9 @@ define([
     'viewmodels/map-editor',
     'viewmodels/map-filter',
     'views/components/cards/select-related-feature-layers',
+    'views/components/cards/foo-map-card',
     'text!templates/views/components/cards/related-resources-map-popup.htm'
-], function($, arches, ko, koMapping, geojsonExtent, CardComponentViewModel, MapEditorViewModel, MapFilterViewModel, selectFeatureLayersFactory, popupTemplate) {
+], function($, arches, ko, koMapping, geojsonExtent, CardComponentViewModel, MapEditorViewModel, MapFilterViewModel, selectFeatureLayersFactory, fooMapCard, popupTemplate) {
     var viewModel = function(params) {
         var self = this;
 
@@ -407,8 +408,13 @@ define([
         });
 
     };
+
+
+
+
+    
     ko.components.register('related-resources-map-card', {
-        viewModel: viewModel,
+        viewModel: fooMapCard,
         template: {
             require: 'text!templates/views/components/cards/related-resources-map.htm'
         }
