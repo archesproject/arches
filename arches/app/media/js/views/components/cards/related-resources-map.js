@@ -4,13 +4,12 @@ define([
     'knockout',
     'knockout-mapping',
     'geojson-extent',
-    'uuid',
     'viewmodels/card-component',
     'viewmodels/map-editor',
     'viewmodels/map-filter',
     'views/components/cards/select-related-feature-layers',
     'text!templates/views/components/cards/related-resources-map-popup.htm'
-], function($, arches, ko, koMapping, geojsonExtent, uuid, CardComponentViewModel, MapEditorViewModel, MapFilterViewModel, selectFeatureLayersFactory, popupTemplate) {
+], function($, arches, ko, koMapping, geojsonExtent, CardComponentViewModel, MapEditorViewModel, MapFilterViewModel, selectFeatureLayersFactory, popupTemplate) {
     var viewModel = function(params) {
         var self = this;
 
@@ -83,11 +82,8 @@ define([
        this.centerX = ko.observable();
        this.centerY = ko.observable();
 
-       console.log("!!!", self, params)
-       this.sources = params.sources;
-
        for (var widget of self.widgets) {
-           if (widget.config.basemap) {
+            if (widget.config.basemap) {
                self.basemap(widget.config.basemap());
             }
             if (widget.config.overlayConfigs) {

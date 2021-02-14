@@ -18,6 +18,8 @@ define([
 
         fooRRMAP.apply(this, [params]);
 
+        this.sources = params.sources;
+
         if (params.tile) {
             var widgetData = params.tile.data[widget.node_id()];
             widgetData.subscribe(function(bar) {
