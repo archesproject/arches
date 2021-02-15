@@ -658,6 +658,32 @@ define([
         };
 
         self.coordinates = ko.observableArray();
+        self.rawCoordinates = ko.computed(function() {
+            return self.coordinates().map(function(coords) {
+                return [window.Number(coords[0]()), window.Number(coords[1]())];
+            });
+        });
+        self.rawCoordinates.subscribe(function(rawCoordinates) {
+            var selectedFeatureId = self.selectedFeatureIds()[0];
+            console.log(selectedFeatureId);
+            if (self.coordinateEditing() && selectedFeatureId) {
+                var drawFeatures = getDrawFeatures();
+                drawFeatures.forEach(function(feature) {
+                    if (feature.id === selectedFeatureId) {
+                        if (feature.geometry.type === 'Polygon') {
+                            rawCoordinates.push(rawCoordinates[0]);
+                            feature.geometry.coordinates[0] = rawCoordinates;
+                        } else
+                            feature.geometry.coordinates = rawCoordinates;
+                    }
+                });
+                self.draw.set({
+                    type: 'FeatureCollection',
+                    features: drawFeatures
+                });
+                self.updateTiles();
+            }
+        });
         self.coordinateEditing = ko.observable(false);
         self.newX = ko.observable();
         self.newY = ko.observable();
@@ -703,7 +729,7 @@ define([
                     selectConfig = {
                         featureIds: [featureId]
                     };
-                    self.selectedFeatureIds(featureId);
+                    self.selectedFeatureIds([featureId]);
                     var feature = self.draw.get(featureId);
                     coordinateEditngGeometryType = feature.geometry.type;
                     if (coordinateEditngGeometryType === 'Polygon')
