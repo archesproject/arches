@@ -656,6 +656,93 @@ define([
         self.dropZoneFileSelected = function(data, e) {
             self.handleFiles(e.target.files, data.node.nodeid);
         };
+
+        self.coordinates = ko.observableArray();
+        self.coordinateEditing = ko.observable(false);
+        self.newX = ko.observable();
+        self.newY = ko.observable();
+        var newCoordinatePair = ko.computed(function() {
+            var x = self.newX();
+            var y = self.newY();
+            return [x, y];
+        });
+        self.focusLatestY = ko.observable(true);
+        var getNewCoordinatePair = function(coords) {
+            var newCoords = [
+                ko.observable(coords[0]),
+                ko.observable(coords[1])
+            ];
+            newCoords.forEach(function(value) {
+                value.subscribe(function(newValue) {
+                    if ([undefined, null, ""].includes(newValue)) value(0);
+                });
+            });
+            return newCoords;
+        };
+        newCoordinatePair.subscribe(function(coords) {
+            if (coords[0] && coords[1]) {
+                self.coordinates.push(getNewCoordinatePair(coords));
+                self.newX(undefined);
+                self.newY(undefined);
+                self.focusLatestY(true);
+            }
+        });
+        var coordinateEditngGeometryType;
+        self.coordinateEditing.subscribe(function(editing) {
+            var selectedTool = self.selectedTool();
+            var selectedFeatureIds = self.selectedFeatureIds();
+            var featureId = selectedFeatureIds[0];
+            var editingNodeId = self.newNodeId + "";
+            var sourceCoordinates = [];
+            self.focusLatestY(false);
+            self.newX(undefined);
+            self.newY(undefined);
+            if (editing) {
+                var selectConfig;
+                if (selectedFeatureIds.length > 0) {
+                    selectConfig = {
+                        featureIds: [featureId]
+                    };
+                    self.selectedFeatureIds(featureId);
+                    var feature = self.draw.get(featureId);
+                    coordinateEditngGeometryType = feature.geometry.type;
+                    if (coordinateEditngGeometryType === 'Polygon')
+                        sourceCoordinates = feature.geometry.coordinates[0];
+                    else
+                        sourceCoordinates = feature.geometry.coordinates;
+                    self.coordinates(sourceCoordinates.map(getNewCoordinatePair));
+
+                }
+                if (selectedTool) {
+                    self.draw.trash();
+                }
+                self.draw.changeMode('simple_select', selectConfig);
+                _.each(self.featureLookup, function(value) {
+                    value.selectedTool(null);
+                });
+                console.log(selectedTool);
+                console.log(editingNodeId);
+                // add listeneners to manage selected feature against coordinates...
+            } else {
+                self.coordinates([]);
+            }
+        });
+
+        self.editCoordinates = function() {
+            self.coordinateEditing(true);
+        };
+
+        self.canEditCoordinates = ko.computed({
+            read: function() {
+                console.log(self.selectedTool());
+                console.log(self.selectedFeatureIds());
+                console.log(self.draw);
+                return self.selectedFeatureIds();
+            },
+            write: function() {
+                console.log('write');
+            }
+        });
     };
     return viewModel;
 });
