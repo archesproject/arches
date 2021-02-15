@@ -1,5 +1,3 @@
-const { type } = require("jquery");
-
 define([
     'jquery',
     'arches',
@@ -489,10 +487,24 @@ define([
             }
 
             if (self.foo_features()) {
+                var barfoo = {"type": "FeatureCollection", 'features': []};
+
+                var qux = [];
+
                 self.foo_features().forEach(function(feature) {
-                    console.log(feature);
                     self.draw.add(feature);
+                    barfoo.features.push(feature)
+                    qux.push(feature.geometry.coordinates)
                 });
+
+                
+                map.fitBounds(
+                    qux, 
+                    { 
+                        padding: { top: 120, right: 540, bottom: 120, left: 120 },
+                        linear: true,
+                    }
+                );
             }
 
             map.on('click', function(e) {
