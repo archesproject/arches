@@ -76,6 +76,7 @@ define([
         params.configKeys = ['acceptedFiles', 'maxFilesize', 'maxFiles'];
         WidgetViewModel.apply(this, [params]);
 
+
         this.unique_id = uuid.generate();
         this.uniqueidClass = ko.computed(function() {
             return "unique_id_" + self.unique_id;
@@ -96,31 +97,18 @@ define([
 
         this.parsedFileData = ko.observableArray();
         this.parsedFileData.subscribe(function() {
-            var hasMapData = self.parsedFileData().find(function(fileData) {
-                return Object.values(fileData).find(function(value) {
-                    return Boolean(value instanceof Object && value['features'][0]['geometry']['coordinates']);
-                });
-            });
-
-
-            console.log("AHAHAHA", self.parsedFileData())
 
 
             var value = {
-                hasMapData: Boolean(hasMapData),
+                nodeId: self.node.id,
                 data: self.parsedFileData(),
                 addedFiles: self.addedFiles(),
             };
 
-            params.boofar = ko.observable(value)
-            
             self.value(value)
-
         });
         if (self.value()) {
             var uploadedFiles = {};
-
-            console.log("AHHHHHH", self.value())
 
             if (self.value().data) {
                 self.value().data.forEach(function(foo) {
@@ -235,11 +223,9 @@ define([
                 data: formData,
                 success: function (response) {
                     response.data.forEach(function(parsedRow) {
-                        // console.log("HUH?", parsedRow)
                         parsedRow['meta'] = {
                             'id': uuid.generate(),
                             'file': file,
-                            'nodeId': self.node.id,
                             'errors': ko.observable(parsedRow['errors']),
                         };
 

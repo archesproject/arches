@@ -1,9 +1,12 @@
+const { type } = require("jquery");
+
 define([
     'jquery',
     'arches',
     'knockout',
     'knockout-mapping',
     'geojson-extent',
+    'mapbox-gl',
     'uuid',
     'views/components/cards/related-resources-map',
     'viewmodels/card-component',
@@ -11,7 +14,7 @@ define([
     'viewmodels/map-filter',
     'views/components/cards/select-related-feature-layers',
     'text!templates/views/components/cards/related-resources-map-popup.htm'
-], function($, arches, ko, koMapping, geojsonExtent, uuid, fooRRMAP, CardComponentViewModel, MapEditorViewModel, MapFilterViewModel, selectFeatureLayersFactory, popupTemplate) {
+], function($, arches, ko, koMapping, geojsonExtent, mapboxgl, uuid, fooRRMAP, CardComponentViewModel, MapEditorViewModel, MapFilterViewModel, selectFeatureLayersFactory, popupTemplate) {
 
 
     var foo = function(params) {
@@ -415,196 +418,102 @@ define([
 
     var viewModel = function(params) {
         var self = this;
-        ko.utils.extend(self, new foo(params))
+        ko.utils.extend(self, new foo(params));
 
-
-        
-        // if (!params.foobar) {
-        //     params.foobar = ko.observable();
-        // }
-        // this.foobar = params.foobar;
-
-
+        this.foo_features = ko.observable();
+        this.fileData = ko.observable();
 
         if (params.tile && params.card) {
+            var fileListWidget = params.card.widgets().find(function(widget) {
+                return widget.datatype.datatype === 'file-list';
+            });
 
-            params.card.widgets().forEach(function(widget) {
-                self.widgets.push(widget);
+            var fileWidgetData = params.tile.data[fileListWidget.node_id()];
 
+            if (!fileWidgetData() && ko.unwrap(fileListWidget._value)) {
+                params.tile.data[fileListWidget.node_id()](ko.unwrap(fileListWidget._value));
+            }
 
-                var widgetData = params.tile.data[widget.node_id()];
-                console.log("FJDISOFJIODSFDS", self, params, widgetData())
+            fileWidgetData.subscribe(function(value) {
+                if (value) { fileListWidget._value = value; }
+            });
 
-
-                if (!widgetData() && widget.boofar) {
-                    params.tile.data[widget.node_id()](widget.boofar)
-                }
-
-                widgetData.subscribe(function(bar) {
-                    console.log("dhdh", self,  params, widgetData(), bar, widget)
-                    // if (bar) {
-                    //     console.log(bar, self, params)
-                    //     bar.data.forEach(function(baz) {
-                    //         Object.values(baz).forEach(function(qux) {
-
-                    //             if (!params['parsedFileLookup']) {
-                    //                 params['parsedFileLookup'] = {};
-                    //             } 
-
-                    //             params['parsedFileLookup'][baz.meta.id] = widgetData().data.find(function(qux) {
-                    //                 return qux['meta']['id'] === baz.meta.id;
-                    //             });
-                            
-                    //         });
-                    //     });
+            self.fileData(fileWidgetData())
 
 
-                    // }
+            var fileData = fileWidgetData();
+            if (fileData) {
+                var nodeId = fileData.nodeId;
 
+                var features = fileData.data.reduce(function(acc, parsedRow) {
+                    Object.values(parsedRow).forEach(function(cellValue) {
+                        if (cellValue instanceof Object && cellValue['features']) {
+                            cellValue.features.forEach(function(feature) {
+                                feature.id = parsedRow['meta']['id'];
+                                acc.push(feature);
+                            });
+                        }
+                    })
+                    return acc;
+                }, []);
 
-                    // if (!params.foobar) {
-                    //     params.foobar = ko.observable()
-                    // }
+                self.foo_features(features)
 
-                    if (bar) {
-                        widget.boofar = bar;
-                        // params.foobar(bar)
-
-                        // if (params['sources']) {
-                        //     params['sources']['geojson-editor-data']['data']['features'].push(bar);
-                        // }
-
-
-                        // Object.values(bar).forEach(function(baz) {
-                        //     if (baz instanceof Object && baz['features']) {
-                        //         baz.features.forEach(function(feature) {
-                        //             params['sources']['geojson-editor-data']['data']['features'].push(feature);
-                        //         });
-                        //     }
-                        // });
-
-                        
-                    }
-
-                    // if (!params.tile.data[widget.node_id()] && params.foobar()) {
-                    //     params.tile.data[widget.node_id()] = params.foobar();
-                    // }
-
-
-
-
-                    // if (!bar && params.bar) {
-                        // params.tile.data[widget.node_id()](bar);
-                        // params.value(bar)
-                    // }
-                })
-    
-                if (widgetData()) {
-                    self.widgets.push(widget);
-    
-    
-                    // UNDO THIS
-                    console.log('OY THERE', widget, widgetData())
-                    widgetData().data.forEach(function(foo) {
-                        Object.values(foo).forEach(function(bar) {
-                            if (bar instanceof Object && bar['geometry'] && bar['geometry']['coordinates']) {
-                                var qux = {
-                                    id: foo.meta.id,
-                                    nodeId: foo.meta.nodeId,
-                                    ...bar
-                                };
-    
-    
-                                if (!params['bar']) {
-                                    params['bar'] = {};
-                                }
-    
-                                params['bar'][foo.meta.id] = widgetData().data.find(function(qux) {
-                                    return qux['meta']['id'] === foo.meta.id;
-                                });
-    
-                                if (!params['foo']) {
-                                    params['foo'] = [qux];
-                                }
-                                else {
-                                    params['foo'].push(qux);
-                                }
-                                if (params['sources']) {
-    
-                                    params['sources']['geojson-editor-data']['data']['features'].push(bar);
-                                }
-                            }
-                        });
-                    });
-                }
-            })
+                // self.featureLookup[nodeId] = {
+                //     features: features,
+                //     selectedTool: ko.observable(),
+                //     dropErrors: ko.observableArray()
+                // };
+                // self.featureLookup[nodeId].selectedTool.subscribe(function(tool) {
+                //     if (self.draw) {
+                //         if (tool === '') {
+                //             self.draw.trash();
+                //             self.draw.changeMode('simple_select');
+                //         } else if (tool) {
+                //             _.each(self.featureLookup, function(value, key) {
+                //                 if (key !== nodeId) {
+                //                     value.selectedTool(null);
+                //                 }
+                //             });
+                //             self.newNodeId = nodeId;
+                //         }
+                //         self.setDrawTool(tool);
+                //     }
+                // });
+            }
         }
-        
 
-        self.map.subscribe(function(fooMap) {
-            // console.log("REALLY?", fooMap)
+        self.map.subscribe(function(map) {
+            if (!self.draw && params.draw) {
+                self.draw = params.draw;
+            }
 
-            fooMap.on('click', function(e) {
-                // console.log("EDITOR CLICK", e, self, params)
+            if (self.foo_features()) {
+                self.foo_features().forEach(function(feature) {
+                    console.log(feature);
+                    self.draw.add(feature);
+                });
+            }
+
+            map.on('click', function(e) {
                 var hoverFeature = _.find(
-                    fooMap.queryRenderedFeatures(e.point),
+                    map.queryRenderedFeatures(e.point),
                     function(feature) { return feature.properties.id; }
                 );
 
                 if (hoverFeature) {
-                    console.log(params['bar'][hoverFeature['properties']['id']])
+                    var foo = self.fileData().data.find(function(bar) {
+                        return bar.meta.id === hoverFeature.properties.id;
+                    });
+
                     self.popup = new mapboxgl.Popup()
                         .setLngLat(e.lngLat)
-                        .setHTML(`<div>${Object.values(params['bar'][hoverFeature['properties']['id']])}</div>`)
-                        .addTo(fooMap);
+                        .setHTML(`<div>${Object.values(foo)}</div>`)
+                        .addTo(map);
                 }
-            })
-
-            // params['foo'].forEach(function(bar) {
-            //     // bar['id'] = uuid.generate();
-            //     console.log(bar)
-            //     self.draw.add(bar)
-            //     // params['sources']['geojson-editor-data']['data']['features'].push(bar)
-            // });
-
-        })
-        // console.log("SSSSS", params, self, self.draw)
-
-        // var id = ko.unwrap(params.foo[0].nodeId);
-
-        // self.featureLookup[id] = {
-        //     features: params.foo,
-        //     selectedTool: ko.observable(),
-        //     dropErrors: ko.observableArray()
-        // };
-        // self.featureLookup[id].selectedTool.subscribe(function(tool) {
-        //     if (self.draw) {
-        //         if (tool === '') {
-        //             self.draw.trash();
-        //             self.draw.changeMode('simple_select');
-        //         } else if (tool) {
-        //             _.each(self.featureLookup, function(value, key) {
-        //                 if (key !== id) {
-        //                     value.selectedTool(null);
-        //                 }
-        //             });
-        //             self.newNodeId = id;
-        //         }
-        //         self.setDrawTool(tool);
-        //     }
-        // });
-
-
-        // params.usePosition = false;
-        // params.bounds = geojsonExtent({
-        //     type: 'FeatureCollection',
-        //     features: params['foo']
-        // });
-        // console.log("HERE YOU", self, params, params.bounds)
-
+            });
+        });
     }
-
-
 
     return viewModel;
 });

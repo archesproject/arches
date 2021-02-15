@@ -430,7 +430,6 @@ define([
             }
         };
 
-
         if (this.provisionalTileViewModel) {
             this.provisionalTileViewModel.resetAuthoritative();
             this.provisionalTileViewModel.selectedProvisionalEdit.subscribe(function(val){
@@ -585,8 +584,12 @@ define([
 
 
         // if (params['foo']) {
-        //     self.map.subscribe(function(fooMap) {
-        //         console.log("REALLY?", fooMap)
+            self.map.subscribe(function(fooMap) {
+                console.log("flds?", self)
+                if (self.draw) {
+                    params.draw = self.draw;
+                }
+            });
 
         //         fooMap.on('click', function(e) {
         //             console.log("EDITOR CLICK", e, self, params)
