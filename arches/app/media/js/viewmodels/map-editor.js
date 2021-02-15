@@ -5,7 +5,6 @@ define([
     'knockout',
     'knockout-mapping',
     'uuid',
-    'mapbox-gl',
     'mapbox-gl-draw',
     'geojson-extent',
     'geojsonhint',
@@ -13,7 +12,7 @@ define([
     'views/components/map',
     'views/components/cards/select-feature-layers',
     'text!templates/views/components/cards/map-popup.htm'
-], function(arches, $, _, ko, koMapping, uuid, mapboxgl, MapboxDraw, geojsonExtent, geojsonhint, toGeoJSON, MapComponentViewModel, selectFeatureLayersFactory, popupTemplate) {
+], function(arches, $, _, ko, koMapping, uuid, MapboxDraw, geojsonExtent, geojsonhint, toGeoJSON, MapComponentViewModel, selectFeatureLayersFactory, popupTemplate) {
     var viewModel = function(params) {
         var self = this;
         var padding = 40;
@@ -455,6 +454,12 @@ define([
 
         this.map.subscribe(setupDraw);
 
+        self.map.subscribe(function() {
+            if (self.draw && !params.draw) {
+                params.draw = self.draw;
+            }
+        });
+
         if (!params.additionalDrawOptions) {
             params.additionalDrawOptions = [];
         }
@@ -581,78 +586,6 @@ define([
             }
             return errors;
         };
-
-
-        // if (params['foo']) {
-            self.map.subscribe(function(fooMap) {
-                console.log("flds?", self)
-                if (self.draw) {
-                    params.draw = self.draw;
-                }
-            });
-
-        //         fooMap.on('click', function(e) {
-        //             console.log("EDITOR CLICK", e, self, params)
-        //             var hoverFeature = _.find(
-        //                 fooMap.queryRenderedFeatures(e.point),
-        //                 function(feature) { return feature.properties.id; }
-        //             );
-
-        //             if (hoverFeature) {
-        //                 console.log(params['bar'][hoverFeature['properties']['id']])
-        //                 self.popup = new mapboxgl.Popup()
-        //                     .setLngLat(e.lngLat)
-        //                     .setHTML(`<div>${Object.values(params['bar'][hoverFeature['properties']['id']])}</div>`)
-        //                     .addTo(fooMap);
-        //             }
-        //         })
-
-        //         params['foo'].forEach(function(bar) {
-        //             // bar['id'] = uuid.generate();
-        //             console.log(bar)
-        //             self.draw.add(bar)
-        //             // params['sources']['geojson-editor-data']['data']['features'].push(bar)
-        //         });
-
-        //     })
-        //     console.log("SSSSS", params, self, self.draw)
-
-        //     var id = ko.unwrap(params.foo[0].nodeId);
-
-        //     self.featureLookup[id] = {
-        //         features: params.foo,
-        //         selectedTool: ko.observable(),
-        //         dropErrors: ko.observableArray()
-        //     };
-        //     self.featureLookup[id].selectedTool.subscribe(function(tool) {
-        //         if (self.draw) {
-        //             if (tool === '') {
-        //                 self.draw.trash();
-        //                 self.draw.changeMode('simple_select');
-        //             } else if (tool) {
-        //                 _.each(self.featureLookup, function(value, key) {
-        //                     if (key !== id) {
-        //                         value.selectedTool(null);
-        //                     }
-        //                 });
-        //                 self.newNodeId = id;
-        //             }
-        //             self.setDrawTool(tool);
-        //         }
-        //     });
-
-
-        //     params.usePosition = false;
-        //     params.bounds = geojsonExtent({
-        //         type: 'FeatureCollection',
-        //         features: params['foo']
-        //     });
-        //     console.log("HERE YOU", self, params, params.bounds)
-
-        // }
-
-
-        
 
         self.handleFiles = function(files, nodeId) {
             var errors = [];
