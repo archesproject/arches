@@ -102,11 +102,19 @@ define([
                 });
             });
 
-            
-            self.value({
+
+            console.log("AHAHAHA", self.parsedFileData())
+
+
+            var value = {
                 hasMapData: Boolean(hasMapData),
                 data: self.parsedFileData(),
-            })
+                addedFiles: self.addedFiles(),
+            };
+
+            params.boofar = ko.observable(value)
+            
+            self.value(value)
 
         });
         if (self.value()) {
@@ -190,7 +198,7 @@ define([
         };
 
         this.fetchResourceModelNodeData = function() {
-            console.log("BUH?", arches)
+            // console.log("BUH?", arches)
 
             $.ajax({
                 dataType: "json",
@@ -203,7 +211,7 @@ define([
                     });
 
 
-                    console.log("BUH?", response)
+                    // console.log("BUH?", response)
                     self.resourceModelNodeData(response);
                 }
             });
@@ -227,7 +235,7 @@ define([
                 data: formData,
                 success: function (response) {
                     response.data.forEach(function(parsedRow) {
-                        console.log("HUH?", parsedRow)
+                        // console.log("HUH?", parsedRow)
                         parsedRow['meta'] = {
                             'id': uuid.generate(),
                             'file': file,
@@ -239,12 +247,14 @@ define([
 
                         self.parsedFileData.push(parsedRow);
                     });
+
+                    self.addedFiles.push(file);
                 }
             });
         };
 
         this.buttonFOO = function() {
-            console.log("BEGIN BUTTON FOO", arches, self.parsedFileData())
+            // console.log("BEGIN BUTTON FOO", arches, self.parsedFileData())
             var qux = $.ajax({
                 dataType: "json",
                 type: 'POST',
@@ -258,12 +268,12 @@ define([
                     // response.then(function(foo) {
                     //     console.log("dddddd", foo)
                     // })
-                    console.log('LINE ERROR', data, status, data.done())
+                    // console.log('LINE ERROR', data, status, data.done())
                 },
             });
 
             qux.then(function(quux) {
-                console.log("SJSJSJSJSJSJSJSJ", quux)
+                // console.log("SJSJSJSJSJSJSJSJ", quux)
             })
         }
 

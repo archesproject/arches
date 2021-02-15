@@ -418,22 +418,88 @@ define([
         ko.utils.extend(self, new foo(params))
 
 
-        console.log(params)
+        
+        // if (!params.foobar) {
+        //     params.foobar = ko.observable();
+        // }
+        // this.foobar = params.foobar;
 
-        this.sources = params.sources;
+
 
         if (params.tile && params.card) {
 
             params.card.widgets().forEach(function(widget) {
-                console.log("FJDISOFJIODSFDS", params)
+                self.widgets.push(widget);
+
+
                 var widgetData = params.tile.data[widget.node_id()];
+                console.log("FJDISOFJIODSFDS", self, params, widgetData())
+
+
+                if (!widgetData() && widget.boofar) {
+                    params.tile.data[widget.node_id()](widget.boofar)
+                }
+
                 widgetData.subscribe(function(bar) {
-                    if (!bar && params.bar) {
-                        params.tile.data[widget.node_id()](params.bar);
+                    console.log("dhdh", self,  params, widgetData(), bar, widget)
+                    // if (bar) {
+                    //     console.log(bar, self, params)
+                    //     bar.data.forEach(function(baz) {
+                    //         Object.values(baz).forEach(function(qux) {
+
+                    //             if (!params['parsedFileLookup']) {
+                    //                 params['parsedFileLookup'] = {};
+                    //             } 
+
+                    //             params['parsedFileLookup'][baz.meta.id] = widgetData().data.find(function(qux) {
+                    //                 return qux['meta']['id'] === baz.meta.id;
+                    //             });
+                            
+                    //         });
+                    //     });
+
+
+                    // }
+
+
+                    // if (!params.foobar) {
+                    //     params.foobar = ko.observable()
+                    // }
+
+                    if (bar) {
+                        widget.boofar = bar;
+                        // params.foobar(bar)
+
+                        // if (params['sources']) {
+                        //     params['sources']['geojson-editor-data']['data']['features'].push(bar);
+                        // }
+
+
+                        // Object.values(bar).forEach(function(baz) {
+                        //     if (baz instanceof Object && baz['features']) {
+                        //         baz.features.forEach(function(feature) {
+                        //             params['sources']['geojson-editor-data']['data']['features'].push(feature);
+                        //         });
+                        //     }
+                        // });
+
+                        
                     }
+
+                    // if (!params.tile.data[widget.node_id()] && params.foobar()) {
+                    //     params.tile.data[widget.node_id()] = params.foobar();
+                    // }
+
+
+
+
+                    // if (!bar && params.bar) {
+                        // params.tile.data[widget.node_id()](bar);
+                        // params.value(bar)
+                    // }
                 })
     
-                if (widgetData() && widgetData()['hasMapData']) {
+                if (widgetData()) {
                     self.widgets.push(widget);
     
     
@@ -476,10 +542,10 @@ define([
         
 
         self.map.subscribe(function(fooMap) {
-            console.log("REALLY?", fooMap)
+            // console.log("REALLY?", fooMap)
 
             fooMap.on('click', function(e) {
-                console.log("EDITOR CLICK", e, self, params)
+                // console.log("EDITOR CLICK", e, self, params)
                 var hoverFeature = _.find(
                     fooMap.queryRenderedFeatures(e.point),
                     function(feature) { return feature.properties.id; }
@@ -502,7 +568,7 @@ define([
             // });
 
         })
-        console.log("SSSSS", params, self, self.draw)
+        // console.log("SSSSS", params, self, self.draw)
 
         // var id = ko.unwrap(params.foo[0].nodeId);
 
@@ -534,7 +600,7 @@ define([
         //     type: 'FeatureCollection',
         //     features: params['foo']
         // });
-        console.log("HERE YOU", self, params, params.bounds)
+        // console.log("HERE YOU", self, params, params.bounds)
 
     }
 
