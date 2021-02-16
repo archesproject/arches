@@ -665,10 +665,11 @@ define([
 
         self.coordinates = ko.observableArray();
         self.rawCoordinates = ko.computed(function() {
+            // TODO: do transformation back to 4326 here when CRS switcher is added
             return self.coordinates().map(function(coords) {
                 return [window.Number(coords[0]()), window.Number(coords[1]())];
             });
-        });
+        }).extend({ throttle: 100 });
         self.rawCoordinates.subscribe(function(rawCoordinates) {
             var selectedFeatureId = self.selectedFeatureIds()[0];
             if (self.coordinateEditing() && selectedFeatureId) {
@@ -678,7 +679,9 @@ define([
                         if (feature.geometry.type === 'Polygon') {
                             rawCoordinates.push(rawCoordinates[0]);
                             feature.geometry.coordinates[0] = rawCoordinates;
-                        } else
+                        } else if (feature.geometry.type === 'Point')
+                            feature.geometry.coordinates = rawCoordinates[0];
+                        else
                             feature.geometry.coordinates = rawCoordinates;
                     }
                 });
@@ -725,12 +728,15 @@ define([
                 for (var i = 0; i < feature.geometry.coordinates[0].length - 1; i++) {
                     sourceCoordinates.push(feature.geometry.coordinates[0][i]);
                 }
-            } else sourceCoordinates = feature.geometry.coordinates;
+            } else if (feature.geometry.type === 'Point')
+                sourceCoordinates = [feature.geometry.coordinates];
+            else sourceCoordinates = feature.geometry.coordinates;
             self.coordinates(sourceCoordinates.map(getNewCoordinatePair));
         };
 
         self.coordinateGeomType = ko.observable();
         self.coordinateEditing.subscribe(function(editing) {
+            self.coordinateGeomType(null);
             var selectedTool = self.selectedTool();
             switch (selectedTool) {
             case 'draw_point':
@@ -773,13 +779,13 @@ define([
             }
         });
         self.showNewCoordinates = ko.computed(function() {
-            var geomType = self.coordinateGeomType;
+            var geomType = self.coordinateGeomType();
             var coordCount = self.coordinates().length;
             return geomType === 'Point' && coordCount > 0;
         });
 
         self.minCoordinates = ko.computed(function() {
-            var geomType = self.coordinateGeomType;
+            var geomType = self.coordinateGeomType();
             var minCoordinates;
             switch (geomType) {
             case 'Point':
@@ -798,6 +804,7 @@ define([
         });
 
         self.allowDeleteCoordinates = ko.computed(function() {
+            console.log(self.coordinates().length > self.minCoordinates());
             return self.coordinates().length > self.minCoordinates();
         });
 
@@ -806,13 +813,14 @@ define([
         };
 
         self.canEditCoordinates = ko.computed(function() {
-            console.log(self.selectedTool());
-            console.log(self.selectedFeatureIds());
-            console.log(self.draw);
-            // can only edit if:
-            //  - a draw tool is selected (point line or polygon)
-            //  - a feature is selected (point line or polygon)
-            return true;
+            var featureId = self.selectedFeatureIds()[0];
+            if (featureId) {
+                var feature = self.draw.get(featureId);
+                return ['Point', 'LineString', 'Polygon'].includes(feature.geometry.type);
+            } else {
+                var selectedTool = self.selectedTool();
+                return ['draw_point', 'draw_line_string', 'draw_polygon'].includes(selectedTool);
+            }
         });
     };
     return viewModel;
