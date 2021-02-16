@@ -9,10 +9,11 @@ define([
     'geojson-extent',
     'geojsonhint',
     'togeojson',
+    'proj4',
     'views/components/map',
     'views/components/cards/select-feature-layers',
     'text!templates/views/components/cards/map-popup.htm'
-], function(arches, $, _, ko, koMapping, uuid, MapboxDraw, geojsonExtent, geojsonhint, toGeoJSON, MapComponentViewModel, selectFeatureLayersFactory, popupTemplate) {
+], function(arches, $, _, ko, koMapping, uuid, MapboxDraw, geojsonExtent, geojsonhint, toGeoJSON, proj4, MapComponentViewModel, selectFeatureLayersFactory, popupTemplate) {
     var viewModel = function(params) {
         var self = this;
         var padding = 40;
@@ -667,12 +668,14 @@ define([
         self.dropZoneFileSelected = function(data, e) {
             self.handleFiles(e.target.files, data.node.nodeid);
         };
-
+        self.coordinateReferences = arches.preferredCoordinateSystems;
+        self.selectedCoordinateReference = ko.observable(self.coordinateReferences[0].proj4);
         self.coordinates = ko.observableArray();
+        var geographic = '+proj=longlat +datum=WGS84 +no_defs", "default';
         self.rawCoordinates = ko.computed(function() {
-            // TODO: do transformation back to 4326 here when CRS switcher is added
             return self.coordinates().map(function(coords) {
-                return [window.Number(coords[0]()), window.Number(coords[1]())];
+                var sourceCRS = self.selectedCoordinateReference();
+                return proj4(sourceCRS, geographic, [window.Number(coords[0]()), window.Number(coords[1]())]);
             });
         }).extend({ throttle: 100 });
         self.rawCoordinates.subscribe(function(rawCoordinates) {
@@ -770,8 +773,27 @@ define([
                 sourceCoordinates = [feature.geometry.coordinates];
             else sourceCoordinates = feature.geometry.coordinates;
             self.coordinateGeomType(feature.geometry.type);
-            self.coordinates(sourceCoordinates.map(getNewCoordinatePair));
+            self.coordinates(sourceCoordinates.map(function(coords) {
+                var newCoords = getNewCoordinatePair(coords);
+                transformCoordinatePair(newCoords, geographic);
+                return newCoords;
+            }));
         };
+        var transformCoordinatePair = function(coords, sourceCRS) {
+            var targetCRS = self.selectedCoordinateReference();
+            var transformedCoordinates = proj4(sourceCRS, targetCRS, [coords[0](), coords[1]()]);
+            coords[0](transformedCoordinates[0]);
+            coords[1](transformedCoordinates[1]);
+        };
+        var previousCRS = self.selectedCoordinateReference();
+        var transformCoordinates = function() {
+            var targetCRS = self.selectedCoordinateReference();
+            self.coordinates().forEach(function(coords) {
+                transformCoordinatePair(coords, previousCRS);
+            });
+            previousCRS = targetCRS;
+        };
+        self.selectedCoordinateReference.subscribe(transformCoordinates);
 
         self.coordinateGeomType = ko.observable();
         self.coordinateEditing.subscribe(function(editing) {
