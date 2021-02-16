@@ -269,6 +269,11 @@ define([
         this.deleteFeature = function(feature) {
             if (self.draw) {
                 self.draw.delete(feature.id);
+                self.selectedFeatureIds(
+                    self.selectedFeatureIds().filter(function(id) {
+                        return id !== feature.id;
+                    })
+                );
                 self.updateTiles();
             }
         };
@@ -731,6 +736,7 @@ define([
             } else if (feature.geometry.type === 'Point')
                 sourceCoordinates = [feature.geometry.coordinates];
             else sourceCoordinates = feature.geometry.coordinates;
+            self.coordinateGeomType(feature.geometry.type);
             self.coordinates(sourceCoordinates.map(getNewCoordinatePair));
         };
 
@@ -764,7 +770,6 @@ define([
                     };
                     self.selectedFeatureIds([featureId]);
                     var feature = self.draw.get(featureId);
-                    self.coordinateGeomType(feature.geometry.type);
                     updateCoordinatesFromFeature(feature);
                 }
                 if (selectedTool) {
@@ -778,7 +783,7 @@ define([
                 self.coordinates([]);
             }
         });
-        self.showNewCoordinates = ko.computed(function() {
+        self.hideNewCoordinates = ko.computed(function() {
             var geomType = self.coordinateGeomType();
             var coordCount = self.coordinates().length;
             return geomType === 'Point' && coordCount > 0;
@@ -804,7 +809,6 @@ define([
         });
 
         self.allowDeleteCoordinates = ko.computed(function() {
-            console.log(self.coordinates().length > self.minCoordinates());
             return self.coordinates().length > self.minCoordinates();
         });
 
@@ -820,6 +824,14 @@ define([
             } else {
                 var selectedTool = self.selectedTool();
                 return ['draw_point', 'draw_line_string', 'draw_polygon'].includes(selectedTool);
+            }
+        });
+
+        self.selectedFeatureIds.subscribe(function(ids) {
+            if (ids.length === 0) self.coordinateEditing(false);
+            else if (self.canEditCoordinates()) {
+                var feature = self.draw.get(ids[0]);
+                updateCoordinatesFromFeature(feature);
             }
         });
     };
