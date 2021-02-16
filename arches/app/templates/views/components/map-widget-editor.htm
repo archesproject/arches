@@ -64,6 +64,20 @@
                     {% trans 'Show Feature' %}
                     </a>
                 </div>
+                <div class="map-coordinate-editor-crs-selector">
+                    <select data-bind="
+                        options: coordinateReferences,
+                        optionsText: 'name',
+                        optionsValue: 'proj4',
+                        value: selectedCoordinateReference,
+                        valueAllowUnset: false,
+                        chosen: {
+                            'width': '100%',
+                            'disable_search_threshold': 10,
+                            'allow_single_deselect': false
+                        }
+                    "></select>
+                </div>
                 <div class="map-coordinate-editor-list" data-bind="sortable: {
                     data: coordinates
                 }">
