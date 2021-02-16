@@ -421,7 +421,9 @@ define([
         this.foo_features = ko.observable();
         this.fileData = ko.observable();
 
+        
         if (params.tile && params.card) {
+            console.log(self, params)
             var fileListWidget = params.card.widgets().find(function(widget) {
                 return widget.datatype.datatype === 'file-list';
             });

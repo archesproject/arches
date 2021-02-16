@@ -71,8 +71,6 @@ define([
     var ExternalResourceDataViewModel = function(params) {
         var self = this;
 
-        console.log("PREVIEW FILE WIDGET", self, params, arches)
-        
         params.configKeys = ['acceptedFiles', 'maxFilesize', 'maxFiles'];
         WidgetViewModel.apply(this, [params]);
 
@@ -87,8 +85,6 @@ define([
 
         this.addedFiles = ko.observableArray();
         this.addedFiles.subscribe(function(file) {
-            // console.log("SHSHSHSHSHSHS", self, self.parseCSVFile, params, file)
-            // self.parseCSVFile(file[0]);
             self.selectedFile(file[0])
         });
         this.selectedFile = ko.observable();
@@ -97,8 +93,6 @@ define([
 
         this.parsedFileData = ko.observableArray();
         this.parsedFileData.subscribe(function() {
-
-
             var value = {
                 nodeId: self.node.id,
                 data: self.parsedFileData(),
@@ -107,6 +101,14 @@ define([
 
             self.value(value)
         });
+
+
+        this.createdResources = ko.observableArray();
+
+
+
+
+
         if (self.value()) {
             var uploadedFiles = {};
 
@@ -186,8 +188,6 @@ define([
         };
 
         this.fetchResourceModelNodeData = function() {
-            // console.log("BUH?", arches)
-
             $.ajax({
                 dataType: "json",
                 url: arches.urls.graph_nodes(OBSERVATIONS_GRAPH_ID),
@@ -198,8 +198,6 @@ define([
                         });
                     });
 
-
-                    // console.log("BUH?", response)
                     self.resourceModelNodeData(response);
                 }
             });
@@ -213,8 +211,6 @@ define([
                 'column_name_to_node_id_map', 
                 JSON.stringify(OBSERVATIONS_CSV_COLUMN_NAME_TO_NODE_IDS)
             );
-
-            console.log(arches.urls)
 
             $.ajax({
                 dataType: "json",
@@ -242,27 +238,29 @@ define([
         };
 
         this.buttonFOO = function() {
-            // console.log("BEGIN BUTTON FOO", arches, self.parsedFileData())
-            var qux = $.ajax({
-                dataType: "json",
-                type: 'POST',
-                contentType: "application/json",
-                data: JSON.stringify({
-                    'foobar': true,
-                    'foo': self.parsedFileData(),
-                }),
-                url: arches.urls.api_external_foobar(graphid=OBSERVATIONS_GRAPH_ID, resourceid=""),
-                complete: function(data, status) {
-                    // response.then(function(foo) {
-                    //     console.log("dddddd", foo)
-                    // })
-                    // console.log('LINE ERROR', data, status, data.done())
-                },
-            });
+            console.log(self, params)
+            // params.node.loading = ko.observable(true)
 
-            qux.then(function(quux) {
-                // console.log("SJSJSJSJSJSJSJSJ", quux)
-            })
+
+            self.createdResources(
+                self.parsedFileData.removeAll()
+            );
+
+
+
+            // $.ajax({
+            //     dataType: "json",
+            //     type: 'POST',
+            //     contentType: "application/json",
+            //     data: JSON.stringify({
+            //         'foobar': true,
+            //         'foo': self.parsedFileData(),
+            //     }),
+            //     url: arches.urls.api_external_foobar(graphid=OBSERVATIONS_GRAPH_ID),
+            //     success: function(response) {
+            //         console.log(response)
+            //     },
+            // });
         }
 
         this.validateNodeData = function(parsedFile, nodeId, cellValue) {

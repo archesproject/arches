@@ -366,7 +366,7 @@ class Tile(models.TileModel):
             user = None
 
 
-        import pdb; pdb.set_trace()
+        # import pdb; pdb.set_trace
 
         with transaction.atomic():
             for nodeid, value in self.data.items():

@@ -648,29 +648,28 @@ class ExternalResourceDataFOO(APIBase):
 
 
 class ExternalResourceDataBAR(APIBase):
-    def post(self, request, resourceid=None, graphid=None):
+    def post(self, request, graphid=None):
         try:
-            if user_can_edit_resource(user=request.user, resourceid=resourceid):
-                foo = json.loads(request.body)
+            foo = json.loads(request.body)
 
-                if foo.get('foo'):
-                    # graph = models.GraphModel.objects.get(pk=graphid)
+            if foo.get('foo'):
+                # graph = models.GraphModel.objects.get(pk=graphid)
 
-                    resource_instance = models.ResourceInstance(graph_id=graphid)
+                for bar in foo['foo']:
+                    resource_instance = Resource(graph_id=graphid)
                     resource_instance.save()
 
-                    foo['foo'][0].pop('meta')
+                    bar.pop('meta')
 
                     tile = TileProxyModel(
-                        data=foo['foo'][0],
+                        data=bar,
                         resourceinstance=resource_instance,
                         nodegroup_id = 'f7c974a0-29f4-11eb-8487-aae9fe8789ac',  # Related Observations
                     )
                     tile.save()
 
-                    return JSONResponse(status=200)
-            else:
-                return JSONResponse(status=403)
+                return JSONResponse({'foo': foo}, status=200)
+            
         except Exception as e:
             if settings.DEBUG is True:
                 exc_type, exc_value, exc_traceback = sys.exc_info()
