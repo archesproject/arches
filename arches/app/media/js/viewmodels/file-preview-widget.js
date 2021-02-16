@@ -242,25 +242,29 @@ define([
             // params.node.loading = ko.observable(true)
 
 
-            self.createdResources(
-                self.parsedFileData.removeAll()
-            );
+            // self.createdResources(
+            //     self.parsedFileData.removeAll()
+            // );
 
 
 
-            // $.ajax({
-            //     dataType: "json",
-            //     type: 'POST',
-            //     contentType: "application/json",
-            //     data: JSON.stringify({
-            //         'foobar': true,
-            //         'foo': self.parsedFileData(),
-            //     }),
-            //     url: arches.urls.api_external_foobar(graphid=OBSERVATIONS_GRAPH_ID),
-            //     success: function(response) {
-            //         console.log(response)
-            //     },
-            // });
+            $.ajax({
+                dataType: "json",
+                type: 'POST',
+                contentType: "application/json",
+                data: JSON.stringify({
+                    'foobar': true,
+                    'foo': self.parsedFileData(),
+                }),
+                url: arches.urls.api_external_foobar(graphid=OBSERVATIONS_GRAPH_ID),
+                success: function(response) {
+                    console.log(response)
+
+                    self.createdResources(
+                        self.parsedFileData.removeAll()
+                    );
+                },
+            });
         }
 
         this.validateNodeData = function(parsedFile, nodeId, cellValue) {

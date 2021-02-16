@@ -11,7 +11,7 @@ define([
     'viewmodels/map-editor',
     'viewmodels/map-filter',
     'views/components/cards/select-related-feature-layers',
-    'text!templates/views/components/cards/related-resources-map-popup.htm'
+    'text!templates/views/components/cards/foo-map-popup.htm'
 ], function($, arches, ko, koMapping, geojsonExtent, mapboxgl, uuid, fooRRMAP, CardComponentViewModel, MapEditorViewModel, MapFilterViewModel, selectFeatureLayersFactory, popupTemplate) {
 
 
@@ -421,9 +421,19 @@ define([
         this.foo_features = ko.observable();
         this.fileData = ko.observable();
 
+
+        // this.boofar = ko.observable();
+        // this.boofar.subscribe(function(foo) {
+        //     var fileListWidget = params.card.widgets().find(function(widget) {
+        //         return widget.datatype.datatype === 'file-list';
+        //     });
+
+        //     fileListWidget._boofar = foo;
+        // });
+
         
         if (params.tile && params.card) {
-            console.log(self, params)
+            // console.log(self, params)
             var fileListWidget = params.card.widgets().find(function(widget) {
                 return widget.datatype.datatype === 'file-list';
             });
@@ -437,6 +447,8 @@ define([
             fileWidgetData.subscribe(function(value) {
                 if (value) { fileListWidget._value = value; }
             });
+
+            fileListWidget._foo = 'bar'
 
             self.fileData(fileWidgetData())
 
@@ -491,17 +503,16 @@ define([
             if (self.foo_features()) {
                 var barfoo = {"type": "FeatureCollection", 'features': []};
 
-                var qux = [];
+                var bounds = new mapboxgl.LngLatBounds();
 
                 self.foo_features().forEach(function(feature) {
                     self.draw.add(feature);
                     barfoo.features.push(feature)
-                    qux.push(feature.geometry.coordinates)
+                    bounds.extend(feature.geometry.coordinates)
                 });
-
                 
                 map.fitBounds(
-                    qux, 
+                    bounds, 
                     { 
                         padding: { top: 120, right: 540, bottom: 120, left: 120 },
                         linear: true,
@@ -520,10 +531,20 @@ define([
                         return bar.meta.id === hoverFeature.properties.id;
                     });
 
+
                     self.popup = new mapboxgl.Popup()
                         .setLngLat(e.lngLat)
-                        .setHTML(`<div>${Object.values(foo)}</div>`)
+                        .setHTML(self.popupTemplate)
                         .addTo(map);
+                    ko.applyBindingsToDescendants(
+                        {'foo': foo},
+                        self.popup._content
+                    );
+                    if (map.getStyle() && hoverFeature.id) map.setFeatureState(feature, { selected: true });
+                    self.popup.on('close', function() {
+                        if (map.getStyle() && feature.id) map.setFeatureState(feature, { selected: false });
+                        self.popup = undefined;
+                    });
                 }
             });
         });

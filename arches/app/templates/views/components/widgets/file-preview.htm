@@ -254,15 +254,13 @@
                     </thead>
                     <tbody>
                         <!-- ko foreach: parsedFileData() -->
-                            <tr>
+                            <tr
+                                data-bind="style: { backgroundColor: $data['meta']['errors']() && 'red'  }"
+                            >
                                 <!-- ko foreach: Object.values($parent.resourceModelNodeData()) -->
                                     <!-- ko if: visible -->
                                     <td>
-                                        <div
-                                            style="
-                                                padding: 10px;
-                                            "
-                                        >
+                                        <div>
                                             <span data-bind="{text: $parent[$data.nodeid]}"></span>
                                         </div>
                                     </td>
