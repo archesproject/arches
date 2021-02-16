@@ -55,7 +55,14 @@
             <!-- ko if: coordinateEditing() -->
             <div class="card map-coordinate-editor">
                 <div class="map-coordinate-editor-header">
+                    <strong>
                     {% trans 'Edit Coordinates' %}
+                    </strong>
+                    |
+                    <a href="javascript:void(0);" data-bind="click: showCoordinateFeature">
+                    <i class="fa fa-search"></i>
+                    {% trans 'Show Feature' %}
+                    </a>
                 </div>
                 <div class="map-coordinate-editor-list" data-bind="sortable: {
                     data: coordinates
