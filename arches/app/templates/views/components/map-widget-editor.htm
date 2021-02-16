@@ -61,12 +61,18 @@
                     data: coordinates
                 }">
                     <div class="map-coordinate-editor-pair">
+                        <i class="fa fa-list map-coordinate-editor-drag-handler"></i>
                         <input type="number" class="coordinate-input" data-bind="valueUpdate: 'keyup', value: $data[0]"></input>
                         <!-- ko if: $parent.coordinates().length-1 === $index() -->
                         <input type="number" class="coordinate-input" data-bind="hasFocus: $parent.focusLatestY, valueUpdate: 'keyup', value: $data[1]"></input>
                         <!-- /ko-->
                         <!-- ko if: $parent.coordinates().length-1 !== $index() -->
                         <input type="number" class="coordinate-input" data-bind="valueUpdate: 'keyup', value: $data[1]"></input>
+                        <!-- /ko-->
+                        <!-- ko if: $parent.allowDeleteCoordinates() -->
+                        <a href="javascript:void(0);" class="map-coordinate-editor-delete-button" data-bind="click: function() {
+                            $parent.coordinates.remove($data);
+                        }"><i class="fa fa-trash"></i></a>
                         <!-- /ko-->
                     </div>
                 </div>
@@ -162,12 +168,20 @@
                                         {% trans "Edit GeoJSON" %}
                                     </a>
                                     |
+                                    <!-- ko if: canEditCoordinates() -->
                                     <a href="javascript:void(0);" data-bind="click: function() {
                                         self.coordinateEditing(true);
                                     }">
                                         <i class="fa fa-pencil map-card-feature-edit"></i>
                                         {% trans "Edit Coordinates" %}
                                     </a>
+                                    <!-- /ko -->
+                                    <!-- ko if: !canEditCoordinates() -->
+                                    <span>
+                                        <i class="fa fa-pencil map-card-feature-edit"></i>
+                                        {% trans "Edit Coordinates" %}
+                                    </span>
+                                    <!-- /ko -->
                                     <!-- ko if: self.featureLookup[widget.node_id()].features().length > 0 -->
                                     |
                                     <a href="javascript:void(0);" data-bind="click: function() {
