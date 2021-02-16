@@ -1,4 +1,5 @@
 from base64 import b64decode
+import csv
 import importlib
 import json
 import logging
@@ -60,6 +61,18 @@ from arches.app.search.components.base import SearchFilterFactory
 from arches.app.datatypes.datatypes import DataTypeFactory
 from arches.app.search.search_engine_factory import SearchEngineFactory
 from arches.app.search.search_export import SearchResultsExporter
+
+
+
+
+
+from arches.app.models.concept import get_valueids_from_concept_label
+from arches.app.datatypes.concept_types import ConceptListDataType, ConceptDataType
+
+
+
+
+
 
 
 from arches.celery import app
@@ -502,6 +515,173 @@ class Graphs(APIBase):
         return JSONResponse({"datatypes": datatypes, "cards": permitted_cards, "graph": graph, "cardwidgets": cardwidgets})
 
 
+
+
+
+
+class ExternalResourceDataFOO(APIBase):
+    def post(self, request, node_id=None):
+        if node_id:
+            return self.bar(request, node_id)
+        else:
+            return self.foo(request)
+
+    def foo(self, request):
+
+
+
+
+        column_name_to_node_id_map = json.loads(
+            request.POST.get('column_name_to_node_id_map')
+        )
+
+        uploaded_file = request.FILES.get('uploaded_file')
+        decoded_file = uploaded_file.read().decode('utf-8').splitlines()
+
+        parsed_rows = []
+
+        datatype_factory = DataTypeFactory()
+
+
+        for row_dict in csv.DictReader(decoded_file):
+            parsed_row = {}
+            errors = {}
+
+            for key, value in row_dict.items():
+                node_data = column_name_to_node_id_map[key]
+
+                if node_data:
+                    # edge case for converting columns into complex node values
+                    if isinstance(node_data, dict):
+                        if (node_data['flag'] == 'format_location'):
+                            if not parsed_row.get(node_data['node_id']):
+                                parsed_row[node_data['node_id']] = {
+                                    "type": "FeatureCollection",
+                                    "features": [{
+                                        "type": "Feature",
+                                        "properties": {},
+                                        "geometry": {
+                                            "type": "Point", 
+                                            "coordinates": [0, 0]
+                                        }
+                                    }]
+                                }
+
+                            # why reverse x/y order?                            
+                            if 'x' in node_data['args']:
+                                parsed_row[node_data['node_id']]['features'][0]['geometry']['coordinates'][1] = float(value)
+                            if 'y' in node_data['args']:
+                                parsed_row[node_data['node_id']]['features'][0]['geometry']['coordinates'][0] = float(value)
+                    
+                    else:
+                        node_id = node_data  # node_data is a uuid string
+
+                        node = models.Node.objects.get(pk=node_id)
+                        datatype = datatype_factory.get_instance(node.datatype)
+
+
+      
+
+                        if isinstance(datatype, (ConceptDataType, ConceptListDataType)):
+                            value_data = get_valueids_from_concept_label(value)
+
+
+    
+                            # `get_valueids_from_concept_label` returns a list including concepts 
+                            # where the value is a partial match let's filter for the exact value
+                            exact_match = None
+
+                            for value_datum in value_data:
+                                if value_datum['value'] == value:
+                                    exact_match = value_datum
+
+                            value = exact_match['id']  # value_id
+
+                        
+                        # GET RID OF TRY AFTER DOMAIN VALUE REFACTOR!
+                        try:
+                            validation_errors = datatype.validate(value, node=node)
+
+                            if validation_errors:
+                                errors[node_id] = {
+                                    'errors': validation_errors,
+                                    'node_id': node_id,
+                                    'cell_value': value,
+                                }
+                        except Exception as e:
+                            print(str(e))
+
+                        parsed_row[node_id] = value
+
+            parsed_row['errors'] = errors
+            parsed_rows.append(parsed_row)
+        
+        return JSONResponse({'data': parsed_rows})
+
+    def bar(self, request, node_id):
+        cell_value = json.loads(
+            request.POST.get('cell_value')
+        )
+
+        datatype_factory = DataTypeFactory()
+
+        node = models.Node.objects.get(pk=node_id)
+        datatype = datatype_factory.get_instance(node.datatype)
+
+        errors = []
+        
+        # GET RID OF TRY AFTER DOMAIN VALUE REFACTOR!
+        try:
+            validation_errors = datatype.validate(cell_value, node=node)
+
+            if validation_errors:
+                errors.append({
+                    'errors': validation_errors,
+                    'node_id': node_id,
+                    'cell_value': cell_value
+                })
+
+        except Exception as e:
+            print(str(e))
+
+        return JSONResponse({ 'errors': errors })
+
+
+class ExternalResourceDataBAR(APIBase):
+    def post(self, request, resourceid=None, graphid=None):
+        try:
+            if user_can_edit_resource(user=request.user, resourceid=resourceid):
+                foo = json.loads(request.body)
+
+                if foo.get('foo'):
+                    # graph = models.GraphModel.objects.get(pk=graphid)
+
+                    resource_instance = models.ResourceInstance(graph_id=graphid)
+                    resource_instance.save()
+
+                    foo['foo'][0].pop('meta')
+
+                    tile = TileProxyModel(
+                        data=foo['foo'][0],
+                        resourceinstance=resource_instance,
+                        nodegroup_id = 'f7c974a0-29f4-11eb-8487-aae9fe8789ac',  # Related Observations
+                    )
+                    tile.save()
+
+                    return JSONResponse(status=200)
+            else:
+                return JSONResponse(status=403)
+        except Exception as e:
+            if settings.DEBUG is True:
+                exc_type, exc_value, exc_traceback = sys.exc_info()
+                formatted = traceback.format_exception(exc_type, exc_value, exc_traceback)
+                if len(formatted):
+                    for message in formatted:
+                        print(message)
+            return JSONResponse({"error": "resource data could not be saved: %s" % e}, status=500, reason=e)
+
+
+
 @method_decorator(csrf_exempt, name="dispatch")
 class Resources(APIBase):
 
@@ -736,55 +916,23 @@ class Resources(APIBase):
 
         try:
             if user_can_edit_resource(user=request.user, resourceid=resourceid):
-
-
-                foobar = json.dumps(request.POST.get('foobar'))
-                foo = json.loads(request.body)
-
-                # import pdb; pdb.set_trace()
-
-                if foobar and foo.get('foo'):
-                    # graph = models.GraphModel.objects.get(pk=graphid)
-
-                    resource_instance = models.ResourceInstance(graph_id=graphid)
-                    resource_instance.save()
-
-                    foo['foo'][0].pop('meta')
-
-                    tile = TileProxyModel(
-                        data=foo['foo'][0],
-                        resourceinstance=resource_instance,
-                        nodegroup_id = 'f7c974a0-29f4-11eb-8487-aae9fe8789ac',  # Related Observations
-                    )
-
-
-                    tile.save()
-
-
-
-
+                data = JSONDeserializer().deserialize(request.body)
+                reader = JsonLdReader()
+                if slug is not None:
+                    graphid = models.GraphModel.objects.get(slug=slug).pk
+                reader.read_resource(data, graphid=graphid)
+                if reader.errors:
+                    response = []
+                    for value in reader.errors.values():
+                        response.append(value.message)
+                    return JSONResponse({"error": response}, indent=indent, status=400)
                 else:
-                    data = JSONDeserializer().deserialize(request.body)
-                    reader = JsonLdReader()
-                    if slug is not None:
-                        graphid = models.GraphModel.objects.get(slug=slug).pk
-                    reader.read_resource(data, graphid=graphid)
-                    if reader.errors:
-                        response = []
-                        for value in reader.errors.values():
-                            response.append(value.message)
-                        return JSONResponse({"error": response}, indent=indent, status=400)
-                    else:
-                        response = []
-                        for resource in reader.resources:
-                            with transaction.atomic():
-                                resource.save(request=request)
-                            response.append(JSONDeserializer().deserialize(self.get(request, resource.resourceinstanceid).content))
-                        return JSONResponse(response, indent=indent, status=201)
-
-
-
-
+                    response = []
+                    for resource in reader.resources:
+                        with transaction.atomic():
+                            resource.save(request=request)
+                        response.append(JSONDeserializer().deserialize(self.get(request, resource.resourceinstanceid).content))
+                    return JSONResponse(response, indent=indent, status=201)
             else:
                 return JSONResponse(status=403)
         except Exception as e:

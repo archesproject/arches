@@ -177,6 +177,10 @@
                 change_password: "{% url 'change_password' %}",
                 export_concept: "{% url 'export_concept' 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa' %}",
                 export_concept_collections: "{% url 'export_concept_collections' %}",
+                api_external_resource_data: "{% url 'api_external_resource_data' %}",
+                api_external_foobar: function(graphid, resourceid){
+                    return "{% url 'api_external_foobar' 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa' 'bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbbb' %}".replace('aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa', graphid).replace('bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbbb', resourceid)
+                },
                 get_concept_collections: "{% url 'get_concept_collections' %}",
                 dropdown: "{% url 'dropdown' %}",
                 paged_dropdown: "{% url 'paged_dropdown' %}",

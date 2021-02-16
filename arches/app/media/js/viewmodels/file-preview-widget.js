@@ -214,9 +214,11 @@ define([
                 JSON.stringify(OBSERVATIONS_CSV_COLUMN_NAME_TO_NODE_IDS)
             );
 
+            console.log(arches.urls)
+
             $.ajax({
                 dataType: "json",
-                url: arches.urls.resource + '/data/',
+                url: arches.urls.api_external_resource_data,
                 processData: false, /* important! */
                 contentType: false, /* important! */
                 method: 'POST',
@@ -249,7 +251,7 @@ define([
                     'foobar': true,
                     'foo': self.parsedFileData(),
                 }),
-                url: arches.urls.root + `resourcesFOO/${OBSERVATIONS_GRAPH_ID}`,
+                url: arches.urls.api_external_foobar(graphid=OBSERVATIONS_GRAPH_ID, resourceid=""),
                 complete: function(data, status) {
                     // response.then(function(foo) {
                     //     console.log("dddddd", foo)

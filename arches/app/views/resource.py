@@ -16,7 +16,6 @@ You should have received a copy of the GNU Affero General Public License
 along with this program. If not, see <http://www.gnu.org/licenses/>.
 """
 
-import csv
 import json
 import uuid
 
@@ -76,19 +75,6 @@ from guardian.shortcuts import (
     get_perms_for_model,
 )
 import logging
-
-
-
-
-
-
-
-
-from arches.app.models.concept import get_valueids_from_concept_label
-from arches.app.datatypes.concept_types import ConceptListDataType, ConceptDataType
-
-
-
 
 logger = logging.getLogger(__name__)
 
@@ -150,8 +136,6 @@ class ResourceEditorView(MapBaseManagerView):
         if self.action == "copy":
             return self.copy(request, resourceid)
 
-
-
         creator = None
         user_created_instance = None
         if resourceid is None:
@@ -174,13 +158,6 @@ class ResourceEditorView(MapBaseManagerView):
         relationship_type_values = get_resource_relationship_types()
         nodegroups = []
         editable_nodegroups = []
-
-
-
-        # import pdb; pdb.set_trace()
-
-
-
         for node in nodes:
             if node.is_collector:
                 added = False
@@ -638,129 +615,6 @@ class ResourceData(View):
 
         return HttpResponseNotFound()
 
-
-class ResourceFOO(View):
-    def post(self, request):
-        column_name_to_node_id_map = json.loads(
-            request.POST.get('column_name_to_node_id_map')
-        )
-
-        uploaded_file = request.FILES.get('uploaded_file')
-        decoded_file = uploaded_file.read().decode('utf-8').splitlines()
-
-        parsed_rows = []
-
-        datatype_factory = DataTypeFactory()
-
-        for row_dict in csv.DictReader(decoded_file):
-            parsed_row = {}
-            errors = {}
-
-            for key, value in row_dict.items():
-                node_data = column_name_to_node_id_map[key]
-
-                if node_data:
-                    # edge case for converting columns into complex node values
-                    if isinstance(node_data, dict):
-                        if (node_data['flag'] == 'format_location'):
-                            if not parsed_row.get(node_data['node_id']):
-                                parsed_row[node_data['node_id']] = {
-                                    "type": "FeatureCollection",
-                                    "features": [{
-                                        "type": "Feature",
-                                        "properties": {},
-                                        "geometry": {
-                                            "type": "Point", 
-                                            "coordinates": [0, 0]
-                                        }
-                                    }]
-                                }
-
-                            # why reverse x/y order?                            
-                            if 'x' in node_data['args']:
-                                parsed_row[node_data['node_id']]['features'][0]['geometry']['coordinates'][1] = float(value)
-                            if 'y' in node_data['args']:
-                                parsed_row[node_data['node_id']]['features'][0]['geometry']['coordinates'][0] = float(value)
-                    
-                    else:
-                        node_id = node_data  # node_data is a uuid string
-
-                        node = models.Node.objects.get(pk=node_id)
-                        datatype = datatype_factory.get_instance(node.datatype)
-
-
-      
-
-                        if isinstance(datatype, (ConceptDataType, ConceptListDataType)):
-                            value_data = get_valueids_from_concept_label(value)
-
-
-    
-                            # `get_valueids_from_concept_label` returns a list including concepts 
-                            # where the value is a partial match let's filter for the exact value
-                            exact_match = None
-
-                            for value_datum in value_data:
-                                if value_datum['value'] == value:
-                                    exact_match = value_datum
-
-                            value = exact_match['id']  # value_id
-
-                        
-                        # GET RID OF TRY AFTER DOMAIN VALUE REFACTOR!
-                        try:
-                            validation_errors = datatype.validate(value, node=node)
-
-                            if validation_errors:
-                                errors[node_id] = {
-                                    'errors': validation_errors,
-                                    'node_id': node_id,
-                                    'cell_value': value,
-                                }
-                        except Exception as e:
-                            print(str(e))
-
-                        parsed_row[node_id] = value
-
-            parsed_row['errors'] = errors
-            parsed_rows.append(parsed_row)
-        
-        return JSONResponse({'data': parsed_rows})
-
-
-# class ResourceBAR(View):
-#     def post(self, request):
-#         node_id = json.loads(
-#             request.POST.get('node_id')
-#         )
-
-#         cell_value = json.loads(
-#             request.POST.get('cell_value')
-#         )
-
-#         datatype_factory = DataTypeFactory()
-
-#         node = models.Node.objects.get(pk=node_id)
-#         datatype = datatype_factory.get_instance(node.datatype)
-
-#         errors = []
-        
-#         # GET RID OF TRY AFTER DOMAIN VALUE REFACTOR!
-#         try:
-#             validation_errors = datatype.validate(cell_value, node=node)
-
-#             if validation_errors:
-#                 errors.append({
-#                     'errors': validation_errors,
-#                     'node_id': node_id,
-#                     'cell_value': cell_value
-#                 })
-
-#         except Exception as e:
-#             print(str(e))
-
-#         return JSONResponse({ 'errors': errors })
-        
 
 @method_decorator(can_read_resource_instance, name="dispatch")
 class ResourceTiles(View):

@@ -37,7 +37,6 @@ from arches.app.views.graph import (
 from arches.app.views.resource import (
     ResourceListView,
     ResourceData,
-    ResourceFOO,
     ResourceCards,
     ResourceReportView,
     RelatedResourcesView,
@@ -184,7 +183,6 @@ urlpatterns = [
     url(r"^resource/(?P<resourceid>%s)/copy$" % uuid_regex, ResourceEditorView.as_view(action="copy"), name="resource_copy"),
     url(r"^resource/(?P<resourceid>%s)/history$" % uuid_regex, ResourceEditLogView.as_view(), name="resource_edit_log"),
     url(r"^resource/(?P<resourceid>%s)/data/(?P<formid>%s)$" % (uuid_regex, uuid_regex), ResourceData.as_view(), name="resource_data"),
-    url(r"^resource/data/$", ResourceFOO.as_view(), name="validate_resource_data"),
     url(r"^resource/(?P<resourceid>%s)/cards$" % uuid_regex, ResourceCards.as_view(), name="resource_cards"),
     url(r"^resource/history$", ResourceEditLogView.as_view(), name="edit_history"),
     url(r"^resource/related/(?P<resourceid>%s|())$" % uuid_regex, RelatedResourcesView.as_view(), name="related_resources"),
@@ -192,6 +190,15 @@ urlpatterns = [
     url(r"^resource/related/relatable", RelatedResourcesView.as_view(action="get_relatable_resources"), name="relatable_resources"),
     url(r"^resource/descriptors/(?P<resourceid>%s|())$" % uuid_regex, ResourceDescriptors.as_view(), name="resource_descriptors"),
     url(r"^resource/(?P<resourceid>%s)/tiles$" % uuid_regex, ResourceTiles.as_view(), name="resource_tiles"),
+
+
+    url(r"^resource-data$", api.ExternalResourceDataFOO.as_view(), name="api_external_resource_data"),
+    # url(r"^resource-data-BAR/(?P<graphid>%s)$" % (uuid_regex), api.ExternalResourceDataBAR.as_view(), name="create_resources_from_external_data"),
+    url(r"^resource-data-BAR/(?P<graphid>%s)/(?P<resourceid>%s|())$" % (uuid_regex, uuid_regex), api.ExternalResourceDataBAR.as_view(), name="api_external_foobar"),
+
+
+
+
     url(r"^report/(?P<resourceid>%s)$" % uuid_regex, ResourceReportView.as_view(), name="resource_report"),
     url(r"^card/(?P<cardid>%s|())$" % uuid_regex, CardView.as_view(action="update_card"), name="card"),
     url(r"^reorder_cards/", CardView.as_view(action="reorder_cards"), name="reorder_cards"),
@@ -230,7 +237,6 @@ urlpatterns = [
     url(r"^sync/(?P<surveyid>%s|())$" % uuid_regex, api.Sync.as_view(), name="sync"),
     url(r"^checksyncstatus/(?P<synclogid>%s|())$" % uuid_regex, api.CheckSyncStatus.as_view(), name="checksyncstatus"),
     url(r"^graphs/(?P<graph_id>%s)$" % (uuid_regex), api.Graphs.as_view(), name="graphs_api"),
-    url(r"^resourcesFOO/(?P<graphid>%s)$" % (uuid_regex), api.Resources.as_view(), name="resources_graphid"),
     url(r"^resources/(?P<graphid>%s)/(?P<resourceid>%s|())$" % (uuid_regex, uuid_regex), api.Resources.as_view(), name="resources_graphid"),
     url(r"^resources/(?P<slug>[-\w]+)/(?P<resourceid>%s|())$" % uuid_regex, api.Resources.as_view(), name="resources_slug"),
     url(r"^resources/(?P<resourceid>%s|())$" % uuid_regex, api.Resources.as_view(), name="resources"),
