@@ -721,6 +721,15 @@ define([
                 }
             }
         });
+        self.showCoordinateFeature = function() {
+            var selectedFeatureIds = self.selectedFeatureIds();
+            var featureId = selectedFeatureIds[0];
+            if (featureId) {
+                var feature = self.draw.get(featureId);
+                self.fitFeatures([feature]);
+            }
+        };
+
         self.coordinateEditing = ko.observable(false);
         self.newX = ko.observable();
         self.newY = ko.observable();
