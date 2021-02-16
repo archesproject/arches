@@ -532,7 +532,7 @@ define([
                 featureIds.push(feature.id);
             });
             self.updateTiles();
-            self.popup.remove();
+            if (self.popup) self.popup.remove();
             self.draw.changeMode('simple_select', {
                 featureIds: featureIds
             });
@@ -677,24 +677,48 @@ define([
         }).extend({ throttle: 100 });
         self.rawCoordinates.subscribe(function(rawCoordinates) {
             var selectedFeatureId = self.selectedFeatureIds()[0];
-            if (self.coordinateEditing() && selectedFeatureId) {
-                var drawFeatures = getDrawFeatures();
-                drawFeatures.forEach(function(feature) {
-                    if (feature.id === selectedFeatureId) {
-                        if (feature.geometry.type === 'Polygon') {
-                            rawCoordinates.push(rawCoordinates[0]);
-                            feature.geometry.coordinates[0] = rawCoordinates;
-                        } else if (feature.geometry.type === 'Point')
-                            feature.geometry.coordinates = rawCoordinates[0];
-                        else
-                            feature.geometry.coordinates = rawCoordinates;
+            if (self.coordinateEditing()) {
+                if (selectedFeatureId) {
+                    var drawFeatures = getDrawFeatures();
+                    drawFeatures.forEach(function(feature) {
+                        if (feature.id === selectedFeatureId) {
+                            if (feature.geometry.type === 'Polygon') {
+                                rawCoordinates.push(rawCoordinates[0]);
+                                feature.geometry.coordinates[0] = rawCoordinates;
+                            } else if (feature.geometry.type === 'Point')
+                                feature.geometry.coordinates = rawCoordinates[0];
+                            else
+                                feature.geometry.coordinates = rawCoordinates;
+                        }
+                    });
+                    self.draw.set({
+                        type: 'FeatureCollection',
+                        features: drawFeatures
+                    });
+                    self.updateTiles();
+                } else if (rawCoordinates.length >= self.minCoordinates()) {
+                    var coordinates = [];
+                    var geomType = self.coordinateGeomType();
+                    switch (geomType) {
+                    case 'Polygon':
+                        rawCoordinates.push(rawCoordinates[0]);
+                        coordinates = [rawCoordinates];
+                        break;
+                    case 'Point':
+                        coordinates = rawCoordinates[0];
+                        break;
+                    default:
+                        coordinates = rawCoordinates;
+                        break;
                     }
-                });
-                self.draw.set({
-                    type: 'FeatureCollection',
-                    features: drawFeatures
-                });
-                self.updateTiles();
+                    addSelectFeatures([{
+                        type: "Feature",
+                        geometry: {
+                            type: geomType,
+                            coordinates: coordinates
+                        }
+                    }]);
+                }
             }
         });
         self.coordinateEditing = ko.observable(false);
