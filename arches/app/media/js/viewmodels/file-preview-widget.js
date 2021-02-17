@@ -21,7 +21,15 @@ define([
     OBSERVATIONS_GRAPH_ID = "d41455df-033e-11eb-9978-02e99e44e93e";
 
     OBSERVATIONS_CSV_COLUMN_NAME_TO_NODE_IDS = {
-        'ObserverName*': { 
+        'ObservationDate*': { 
+            node_id: "d7628ae4-3f2f-11eb-a2e2-73ab08a728ea",
+            visible: true,
+         }, 
+        'SpeciesName*': { 
+            node_id: "fca0475a-04fc-11eb-9978-02e99e44e93e",
+            visible: true,
+         }, 
+         'ObserverName*': { 
             node_id: "0da1fe5e-04fd-11eb-9978-02e99e44e93e"
          }, 
         'ObserverContact*': { 
@@ -29,10 +37,6 @@ define([
          }, 
         'ObserverAffiliation': { 
             node_id: "21f08600-04fd-11eb-9978-02e99e44e93e"
-         }, 
-        'SpeciesName*': { 
-            node_id: "fca0475a-04fc-11eb-9978-02e99e44e93e",
-            visibile: true,
          }, 
         'Positive Observation': { 
             node_id: "abdaf060-37ef-11eb-a206-acde48001122"
@@ -42,10 +46,6 @@ define([
          }, 
         'ID_Confidence': { 
             node_id: ""
-         }, 
-        'ObservationDate*': { 
-            node_id: "d7628ae4-3f2f-11eb-a2e2-73ab08a728ea",
-            visibile: true,
          }, 
         'NoPlantsObsvd*': { 
             node_id: "347a1450-3be2-11eb-8a94-acde48001122"
@@ -131,9 +131,9 @@ define([
         this.uploadMultiple = ko.observable(true);
 
         this.addedFiles = ko.observableArray();
-        // this.addedFiles.subscribe(function(file) {
-        //     self.selectedFile(file[0])
-        // });
+        this.addedFiles.subscribe(function(file) {
+            self.selectedFile(file[0])
+        });
         this.selectedFile = ko.observable();
 
         this.resourceModelNodeData = ko.observable();
@@ -141,6 +141,12 @@ define([
         this.fileData = ko.observableArray();
         this.fileData.subscribe(function() {
             self.value(self.fileData())
+
+            self.addedFiles.removeAll();
+            
+            self.fileData().forEach(function(fileDatum) {
+                self.addedFiles.push(fileDatum.file)
+            });
         });
 
 
@@ -149,7 +155,6 @@ define([
         if (self.value()) {
             self.fileData(self.value())
         }
-
 
         this.dropzoneOptions = {
             url: "arches.urls.root",

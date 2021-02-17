@@ -239,10 +239,10 @@
                     <thead>
                         <tr> 
                             <!-- ko foreach: { data: Object.keys(OBSERVATIONS_CSV_COLUMN_NAME_TO_NODE_IDS), as: 'key' } -->
-                                <!-- ko if: OBSERVATIONS_CSV_COLUMN_NAME_TO_NODE_IDS[key]['visible'] -->
+                            <!-- ko if: OBSERVATIONS_CSV_COLUMN_NAME_TO_NODE_IDS[key]['visible'] -->
                                 <th 
                                     scope="column" 
-                                    data-bind="text: name"
+                                    data-bind="text: key"
                                     style="
                                         padding: 0px 10px;
                                     "
@@ -253,37 +253,44 @@
                         </tr>
                     </thead>
                     <tbody>
-                        <!-- ko foreach: parsedFileData() -->
-                            <tr
-                                data-bind="style: { backgroundColor: $data['meta']['errors']() && 'red'  }"
-                            >
-                                <!-- ko foreach: Object.values($parent.resourceModelNodeData()) -->
-                                    <!-- ko if: visible -->
+                        <!-- ko foreach: fileData() -->
+                            <!-- ko foreach: $data.data -->
+                                <tr
+                                    data-bind="{
+                                        style: { backgroundColor: $data['errors']().length ? 'red' : 'cornflowerblue'  },
+                                    }"
+                                >
+                                    <!-- ko foreach: { data: Object.keys(OBSERVATIONS_CSV_COLUMN_NAME_TO_NODE_IDS), as: 'key' } -->
+                                        <!-- ko if: OBSERVATIONS_CSV_COLUMN_NAME_TO_NODE_IDS[key]['visible'] -->
+                                        <td>
+                                            <div>
+                                                <span data-bind="{text:(function(){
+                                                    var nodeId = OBSERVATIONS_CSV_COLUMN_NAME_TO_NODE_IDS[key]['node_id'];
+                                                    return $parent['row_data'][nodeId];
+                                                })()}"></span>
+                                            </div>
+                                        </td>
+                                        <!-- /ko -->
+                                    <!-- /ko -->
                                     <td>
-                                        <div>
-                                            <span data-bind="{text: $parent[$data.nodeid]}"></span>
+                                        <div
+                                            style="display: flex;"
+                                        >
+                                            <button class="btn btn-link">
+                                                <i class="fa fa-info"></i>
+                                            </button>
+                                            <button class="btn btn-link">
+                                                <i class="fa fa-trash"></i>
+                                            </button>
                                         </div>
                                     </td>
-                                    <!-- /ko -->
-                                <!-- /ko -->
-                                <td>
-                                    <div
-                                        style="display: flex;"
-                                    >
-                                        <button class="btn btn-link">
-                                            <i class="fa fa-info"></i>
-                                        </button>
-                                        <button class="btn btn-link">
-                                            <i class="fa fa-trash"></i>
-                                        </button>
-                                    </div>
-                                </td>
-                            </tr>
-
+                                </tr>
+                            <!-- /ko -->
                         <!-- /ko -->
                     </tbody>
                 </table>
             </div>
+            
             <button data-bind="click: buttonFOO">BUTTON FOO</button>
         </div>
         <!-- /ko -->
