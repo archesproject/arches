@@ -140,55 +140,14 @@ define([
 
         this.fileData = ko.observableArray();
         this.fileData.subscribe(function() {
-            // var value = {
-            //     nodeId: self.node.id,
-            //     data: self.parsedFileData(),
-            //     addedFiles: self.addedFiles(),
-            // };
-
             self.value(self.fileData())
         });
 
 
         this.createdResources = ko.observableArray();
 
-
-
-
-
         if (self.value()) {
-            // var uploadedFiles = {};
             self.fileData(self.value())
-
-            console.log(self.value())
-
-            // if (self.value().data) {
-            //     self.value().data.forEach(function(foo) {
-            //         self.parsedFileData.push(foo);
-    
-            //         var fileId = foo.file_id;
-    
-            //         if (!uploadedFiles[fileId]) {
-            //             uploadedFiles[fileId] = foo.meta.file;
-            //         }
-    
-            //         self.addedFiles(Object.values(uploadedFiles));
-            //     });
-            // }
-            // else {
-            //     Object.values(self.value()).forEach(function(foo) {
-            //         self.parsedFileData.push(foo);
-    
-            //         var fileId = foo.meta.file.upload.uuid;
-    
-            //         if (!uploadedFiles[fileId]) {
-            //             uploadedFiles[fileId] = foo.meta.file;
-            //         }
-    
-            //         self.addedFiles(Object.values(uploadedFiles));
-            //     });
-            // }
-
         }
 
 

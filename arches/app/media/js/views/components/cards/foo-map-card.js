@@ -456,6 +456,7 @@ define([
                     fileDatum.data.forEach(function(parsedRow) {
                         if (parsedRow.location_data) {
                             parsedRow.location_data.features.forEach(function(feature) {
+                                feature.id = parsedRow.row_id;
                                 self.draw.add(feature);
                                 bounds.extend(feature.geometry.coordinates);
                             });
@@ -478,26 +479,30 @@ define([
                     function(feature) { return feature.properties.id; }
                 );
                 
-
-
-                
                 if (hoverFeature) {
                     hoverFeature.id = hoverFeature.properties.id
 
-                    var foo = self.fileData().data.find(function(bar) {
-                        return bar.meta.id === hoverFeature.properties.id;
-                    });
+                    var featureData = self.fileData().reduce(function(acc, fileDatum) {
+                        acc = fileDatum.data.find(function(parsedRow) {
+                            return parsedRow.row_id === hoverFeature.id;
+                        });
 
+                        return acc;
+                    }, null)
 
                     self.popup = new mapboxgl.Popup()
                         .setLngLat(e.lngLat)
                         .setHTML(self.popupTemplate)
                         .addTo(map);
                     ko.applyBindingsToDescendants(
-                        foo,
+                        featureData,
                         self.popup._content
                     );
-                    if (map.getStyle()) map.setFeatureState(hoverFeature, { selected: true });
+
+                    if (map.getStyle()) {
+                        map.setFeatureState(hoverFeature, { selected: true });
+                    }
+
                     self.popup.on('close', function() {
                         if (map.getStyle()) map.setFeatureState(hoverFeature, { selected: false });
                         self.popup = undefined;
