@@ -522,14 +522,12 @@ class Graphs(APIBase):
 class ExternalResourceDataFOO(APIBase):
     def post(self, request, node_id=None):
         if node_id:
-            return self.bar(request, node_id)
+            return self.parse_and_validate_resource(request, node_id)
         else:
-            return self.foo(request)
+            return self.parse_and_validate_resources(request)
 
-    def foo(self, request):
-
-
-
+    def parse_and_validate_resources(self, request):
+        datatype_factory = DataTypeFactory()
 
         column_name_to_node_id_map = json.loads(
             request.POST.get('column_name_to_node_id_map')
@@ -540,53 +538,45 @@ class ExternalResourceDataFOO(APIBase):
 
         parsed_rows = []
 
-        datatype_factory = DataTypeFactory()
-
-
         for row_dict in csv.DictReader(decoded_file):
-            parsed_row = {}
+            row_data = {}
+            parsed_row_data = {}
             errors = {}
 
             for key, value in row_dict.items():
                 node_data = column_name_to_node_id_map[key]
 
-                if node_data:
-                    # edge case for converting columns into complex node values
-                    if isinstance(node_data, dict):
-                        if (node_data['flag'] == 'format_location'):
-                            if not parsed_row.get(node_data['node_id']):
-                                parsed_row[node_data['node_id']] = {
-                                    "type": "FeatureCollection",
-                                    "features": [{
-                                        "type": "Feature",
-                                        "properties": {},
-                                        "geometry": {
-                                            "type": "Point", 
-                                            "coordinates": [0, 0]
-                                        }
-                                    }]
-                                }
+                if node_data['node_id']:
+                    row_data[node_data['node_id']] = value
 
-                            # why reverse x/y order?                            
-                            if 'x' in node_data['args']:
-                                parsed_row[node_data['node_id']]['features'][0]['geometry']['coordinates'][1] = float(value)
-                            if 'y' in node_data['args']:
-                                parsed_row[node_data['node_id']]['features'][0]['geometry']['coordinates'][0] = float(value)
-                    
+                    # edge case for converting columns into complex node values
+                    if (node_data.get('flag') == 'format_location'):
+                        if not parsed_row_data.get(node_data['node_id']):
+                            parsed_row_data[node_data['node_id']] = {
+                                "type": "FeatureCollection",
+                                "features": [{
+                                    "type": "Feature",
+                                    "properties": {},
+                                    "geometry": {
+                                        "type": "Point", 
+                                        "coordinates": [0, 0]
+                                    }
+                                }]
+                            }
+
+                        if 'x' in node_data['args']:
+                            parsed_row_data[node_data['node_id']]['features'][0]['geometry']['coordinates'][1] = float(value)
+                        if 'y' in node_data['args']:
+                            parsed_row_data[node_data['node_id']]['features'][0]['geometry']['coordinates'][0] = float(value)
                     else:
-                        node_id = node_data  # node_data is a uuid string
+                        node_id = node_data['node_id']
 
                         node = models.Node.objects.get(pk=node_id)
                         datatype = datatype_factory.get_instance(node.datatype)
 
-
-      
-
                         if isinstance(datatype, (ConceptDataType, ConceptListDataType)):
                             value_data = get_valueids_from_concept_label(value)
 
-
-    
                             # `get_valueids_from_concept_label` returns a list including concepts 
                             # where the value is a partial match let's filter for the exact value
                             exact_match = None
@@ -596,8 +586,10 @@ class ExternalResourceDataFOO(APIBase):
                                     exact_match = value_datum
 
                             value = exact_match['id']  # value_id
-
                         
+                            if isinstance(datatype, ConceptListDataType):
+                                value = [value]
+
                         # GET RID OF TRY AFTER DOMAIN VALUE REFACTOR!
                         try:
                             validation_errors = datatype.validate(value, node=node)
@@ -611,14 +603,20 @@ class ExternalResourceDataFOO(APIBase):
                         except Exception as e:
                             print(str(e))
 
-                        parsed_row[node_id] = value
+                        parsed_row_data[node_id] = value
 
-            parsed_row['errors'] = errors
-            parsed_rows.append(parsed_row)
-        
-        return JSONResponse({'data': parsed_rows})
+            parsed_rows.append({
+                'row_data': row_data,
+                'parsed_data': parsed_row_data,
+                'errors': errors,
+            })
+                
+        return JSONResponse({
+            'node_ids_to_column_names_map': { v['node_id']:k for k,v in column_name_to_node_id_map.items() },
+            'data': parsed_rows
+        })
 
-    def bar(self, request, node_id):
+    def parse_and_validate_resource(self, request, node_id):
         cell_value = json.loads(
             request.POST.get('cell_value')
         )

@@ -19,32 +19,61 @@ define([
 
 
     OBSERVATIONS_GRAPH_ID = "d41455df-033e-11eb-9978-02e99e44e93e";
-    
-
-    VISIBLE_COLUMN_IDS = [
-        "fca0475a-04fc-11eb-9978-02e99e44e93e",  /* species */
-        "d7628ae4-3f2f-11eb-a2e2-73ab08a728ea",  /* date of observation */
-
-    ]
 
     OBSERVATIONS_CSV_COLUMN_NAME_TO_NODE_IDS = {
-        'ObserverName*': "0da1fe5e-04fd-11eb-9978-02e99e44e93e", 
-        'ObserverContact*': "12bd77bb-04fd-11eb-9978-02e99e44e93e", 
-        'ObserverAffiliation': "21f08600-04fd-11eb-9978-02e99e44e93e", 
-        'SpeciesName*': "fca0475a-04fc-11eb-9978-02e99e44e93e", 
-        'Positive Observation': "abdaf060-37ef-11eb-a206-acde48001122", 
-        'SpDetermine': "", 
-        'ID_Confidence': "", 
-        'ObservationDate*': "d7628ae4-3f2f-11eb-a2e2-73ab08a728ea", 
-        'NoPlantsObsvd*': "347a1450-3be2-11eb-8a94-acde48001122", 
-        'Phenology': "347a1388-3be2-11eb-8a94-acde48001122", 
-        'Collection': "", 
-        'NoAnimalsObs': "fd0dd8bc-3be1-11eb-8a94-acde48001122", 
-        'AnimalAgeClass': "fd0dd812-3be1-11eb-8a94-acde48001122", 
-        'AnimalSiteUse*': "fd0dd6b4-3be1-11eb-8a94-acde48001122", 
-        'AnimalBehavior*': "fd0dd5c4-3be1-11eb-8a94-acde48001122", 
-        'AnimalDetectionMethod*': "fd0dd768-3be1-11eb-8a94-acde48001122", 
-        'LocationDescription': "e9f6767e-033f-11eb-9978-02e99e44e93e", 
+        'ObserverName*': { 
+            node_id: "0da1fe5e-04fd-11eb-9978-02e99e44e93e"
+         }, 
+        'ObserverContact*': { 
+            node_id: "12bd77bb-04fd-11eb-9978-02e99e44e93e"
+         }, 
+        'ObserverAffiliation': { 
+            node_id: "21f08600-04fd-11eb-9978-02e99e44e93e"
+         }, 
+        'SpeciesName*': { 
+            node_id: "fca0475a-04fc-11eb-9978-02e99e44e93e",
+            visibile: true,
+         }, 
+        'Positive Observation': { 
+            node_id: "abdaf060-37ef-11eb-a206-acde48001122"
+         }, 
+        'SpDetermine': { 
+            node_id: ""
+         }, 
+        'ID_Confidence': { 
+            node_id: ""
+         }, 
+        'ObservationDate*': { 
+            node_id: "d7628ae4-3f2f-11eb-a2e2-73ab08a728ea",
+            visibile: true,
+         }, 
+        'NoPlantsObsvd*': { 
+            node_id: "347a1450-3be2-11eb-8a94-acde48001122"
+         }, 
+        'Phenology': { 
+            node_id: "347a1388-3be2-11eb-8a94-acde48001122"
+         }, 
+        'Collection': { 
+            node_id: ""
+         }, 
+        'NoAnimalsObs': { 
+            node_id: "fd0dd8bc-3be1-11eb-8a94-acde48001122"
+         }, 
+        'AnimalAgeClass': { 
+            node_id: "fd0dd812-3be1-11eb-8a94-acde48001122"
+         }, 
+        'AnimalSiteUse*': { 
+            node_id: "fd0dd6b4-3be1-11eb-8a94-acde48001122"
+         }, 
+        'AnimalBehavior*': { 
+            node_id: "fd0dd5c4-3be1-11eb-8a94-acde48001122"
+         }, 
+        'AnimalDetectionMethod*': { 
+            node_id: "fd0dd768-3be1-11eb-8a94-acde48001122"
+         }, 
+        'LocationDescription': { 
+            node_id: "e9f6767e-033f-11eb-9978-02e99e44e93e"
+         }, 
         'X_Coordinate*': {
             flag: 'format_location', 
             args: ['x'], 
@@ -55,15 +84,33 @@ define([
             args: ['y'], 
             node_id: 'df79c02a-033f-11eb-9978-02e99e44e93e'
         }, 
-        'CoordSource*': "fc55d878-033f-11eb-9978-02e99e44e93e", 
-        'CoordAccuracy': "084ba470-050a-11eb-9978-02e99e44e93e", 
-        'SurveyEffort*': "cd7dac4e-3be1-11eb-8a94-acde48001122", 
-        'HabitatDesc': "a9cb687e-0340-11eb-9978-02e99e44e93e", 
-        'SiteQuality': "b08729f0-0340-11eb-9978-02e99e44e93e", 
-        'LandUse': "b94ac2ae-0340-11eb-9978-02e99e44e93e", 
-        'Disturbances': "bffb3b10-0340-11eb-9978-02e99e44e93e", 
-        'Threats': "c8b1ce90-0340-11eb-9978-02e99e44e93e", 
-        'Comments': "bffb3b10-0340-11eb-9978-02e99e44e93e"
+        'CoordSource*': { 
+            node_id: "fc55d878-033f-11eb-9978-02e99e44e93e"
+         }, 
+        'CoordAccuracy': { 
+            node_id: "084ba470-050a-11eb-9978-02e99e44e93e"
+         }, 
+        'SurveyEffort*': { 
+            node_id: "cd7dac4e-3be1-11eb-8a94-acde48001122"
+         }, 
+        'HabitatDesc': { 
+            node_id: "a9cb687e-0340-11eb-9978-02e99e44e93e"
+         }, 
+        'SiteQuality': { 
+            node_id: "b08729f0-0340-11eb-9978-02e99e44e93e"
+         }, 
+        'LandUse': { 
+            node_id: "b94ac2ae-0340-11eb-9978-02e99e44e93e"
+         }, 
+        'Disturbances': { 
+            node_id: "bffb3b10-0340-11eb-9978-02e99e44e93e"
+         }, 
+        'Threats': { 
+            node_id: "c8b1ce90-0340-11eb-9978-02e99e44e93e"
+         }, 
+        'Comments': { 
+            node_id: "bffb3b10-0340-11eb-9978-02e99e44e93e"
+        }
     }
 
 

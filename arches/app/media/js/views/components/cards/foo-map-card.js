@@ -525,8 +525,13 @@ define([
                     map.queryRenderedFeatures(e.point),
                     function(feature) { return feature.properties.id; }
                 );
+                
 
+
+                
                 if (hoverFeature) {
+                    hoverFeature.id = hoverFeature.properties.id
+
                     var foo = self.fileData().data.find(function(bar) {
                         return bar.meta.id === hoverFeature.properties.id;
                     });
@@ -537,12 +542,12 @@ define([
                         .setHTML(self.popupTemplate)
                         .addTo(map);
                     ko.applyBindingsToDescendants(
-                        {'foo': foo},
+                        foo,
                         self.popup._content
                     );
-                    if (map.getStyle() && hoverFeature.id) map.setFeatureState(feature, { selected: true });
+                    if (map.getStyle()) map.setFeatureState(hoverFeature, { selected: true });
                     self.popup.on('close', function() {
-                        if (map.getStyle() && feature.id) map.setFeatureState(feature, { selected: false });
+                        if (map.getStyle()) map.setFeatureState(hoverFeature, { selected: false });
                         self.popup = undefined;
                     });
                 }
