@@ -815,6 +815,7 @@ define([
             var selectedFeatureIds = self.selectedFeatureIds();
             var featureId = selectedFeatureIds[0];
             self.focusLatestY(false);
+            self.coordinates([]);
             self.newX(undefined);
             self.newY(undefined);
             if (editing) {
@@ -834,8 +835,6 @@ define([
                 _.each(self.featureLookup, function(value) {
                     value.selectedTool(null);
                 });
-            } else {
-                self.coordinates([]);
             }
         });
         self.hideNewCoordinates = ko.computed(function() {
