@@ -406,6 +406,7 @@ class MVT(APIBase):
                     arc = self.EARTHCIRCUM / ((1 << int(zoom)) * self.PIXELSPERTILE)
                     distance = arc * float(config["clusterDistance"])
                     min_points = int(config["clusterMinPoints"])
+                    distance = settings.CLUSTER_DISTANCE_MAX if distance > settings.CLUSTER_DISTANCE_MAX else distance
                     cursor.execute(
                         """WITH clusters(tileid, resourceinstanceid, nodeid, geom, cid)
                         AS (

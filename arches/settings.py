@@ -607,6 +607,7 @@ CELERY_BEAT_SCHEDULE = {
 
 AUTO_REFRESH_GEOM_VIEW = True
 TILE_CACHE_TIMEOUT = 600  # seconds
+CLUSTER_DISTANCE_MAX = 5000 #meters
 GRAPH_MODEL_CACHE_TIMEOUT = None  # seconds * hours * days = ~1mo
 
 CANTALOUPE_DIR = os.path.join(ROOT_DIR, "cantaloupe")
