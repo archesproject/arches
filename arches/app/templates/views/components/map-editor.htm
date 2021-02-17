@@ -105,7 +105,66 @@
             </div>
             <!-- /ko-->
 
-            <div class="card" data-bind="visible: geoJSONString() === undefined">
+            <!-- ko if: coordinateEditing() -->
+            <div class="card map-coordinate-editor">
+                <div class="map-coordinate-editor-header">
+                    {% trans 'Edit Coordinates' %}
+                </div>
+                <div class="map-coordinate-editor-crs-selector">
+                    <dt>Coordinate Reference:</dt>
+                    <select data-bind="
+                        options: coordinateReferences,
+                        optionsText: 'name',
+                        optionsValue: 'proj4',
+                        value: selectedCoordinateReference,
+                        valueAllowUnset: false,
+                        chosen: {
+                            'width': '55%',
+                            'disable_search_threshold': 10,
+                            'allow_single_deselect': false
+                        }
+                    "></select>
+                </div>
+                <hr/>
+                <div class="map-coordinate-editor-list" data-bind="sortable: {
+                    data: coordinates
+                }">
+                    <div class="map-coordinate-editor-pair">
+                        <!-- ko if: !$parent.hideNewCoordinates() -->
+                        <i class="fa fa-list map-coordinate-editor-drag-handler"></i>
+                        <!-- /ko-->
+                        <input type="number" class="coordinate-input form-control input-lg widget-input" data-bind="valueUpdate: 'keyup', value: $data[0]"></input>
+                        <!-- ko if: $parent.coordinates().length-1 === $index() -->
+                        <input type="number" class="coordinate-input form-control input-lg widget-input" data-bind="hasFocus: $parent.focusLatestY, valueUpdate: 'keyup', value: $data[1]"></input>
+                        <!-- /ko-->
+                        <!-- ko if: $parent.coordinates().length-1 !== $index() -->
+                        <input type="number" class="coordinate-input form-control input-lg widget-input" data-bind="valueUpdate: 'keyup', value: $data[1]"></input>
+                        <!-- /ko-->
+                        <!-- ko if: $parent.allowDeleteCoordinates() -->
+                        <a href="javascript:void(0);" class="map-coordinate-editor-delete-button" data-bind="click: function() {
+                            $parent.coordinates.remove($data);
+                        }"><i class="fa fa-trash"></i></a>
+                        <!-- /ko-->
+                        <hr/>
+                    </div>
+                </div>
+                <!-- ko if: !hideNewCoordinates() -->
+                <div class="map-coordinate-editor-pair map-coordinate-editor-new-coordinates">
+                    <i class="fa fa-plus"></i>
+                    <input type="number" class="coordinate-input form-control input-lg widget-input" data-bind="hasFocus: true, valueUpdate: 'keyup', value: newX"></input>
+                    <input type="number" class="coordinate-input form-control input-lg widget-input" data-bind="valueUpdate: 'keyup', value: newY"></input>
+                </div>
+                <!-- /ko-->
+                <div>
+                    <button class="btn btn-shim btn-labeled btn-lg fa fa-search btn-mint" data-bind="click: showCoordinateFeature">{% trans 'Show Feature' %}</button>
+                    <button class="btn btn-shim btn-labeled btn-lg fa fa-check btn-primary" data-bind="click: function() {
+                        self.coordinateEditing(false);
+                    }">{% trans 'Done' %}</button>
+                </div>
+            </div>
+            <!-- /ko-->
+
+            <div class="card" data-bind="visible: geoJSONString() === undefined && !coordinateEditing()">
                 {% block form_header %}
                 <!-- ko if: card.model.helpenabled -->
                 <span>
@@ -207,6 +266,21 @@
                                                 <i class="fa fa-pencil map-card-feature-edit"></i>
                                                 {% trans "Edit GeoJSON" %}
                                             </a>
+                                            |
+                                            <!-- ko if: self.canEditCoordinates() -->
+                                            <a href="javascript:void(0);" data-bind="click: function() {
+                                                self.coordinateEditing(true);
+                                            }">
+                                                <i class="fa fa-list map-card-feature-edit"></i>
+                                                {% trans "Edit Coordinates" %}
+                                            </a>
+                                            <!-- /ko -->
+                                            <!-- ko if: !self.canEditCoordinates() -->
+                                            <span>
+                                                <i class="fa fa-list map-card-feature-edit"></i>
+                                                {% trans "Edit Coordinates" %}
+                                            </span>
+                                            <!-- /ko -->
                                             <!-- ko if: self.featureLookup[widget.node_id()].features().length > 0 -->
                                             |
                                             <a href="javascript:void(0);" data-bind="click: function() {
@@ -277,9 +351,9 @@
                         <!-- /ko -->
                     <!-- /ko -->
                     <!-- ko if: !tile.tileid -->
-                    <button 
-                        class="btn btn-shim btn-labeled btn-lg fa fa-plus" 
-                        data-bind="click: function() { if (card.isWritable && !self.preview) { self.saveTile() }}, 
+                    <button
+                        class="btn btn-shim btn-labeled btn-lg fa fa-plus"
+                        data-bind="click: function() { if (card.isWritable && !self.preview) { self.saveTile() }},
                         css: { disabled: (!card.isWritable || self.preview), 'btn-mint': card.isWritable }"
                     >{% trans 'Add'  %}</button>
                     <!-- /ko -->
