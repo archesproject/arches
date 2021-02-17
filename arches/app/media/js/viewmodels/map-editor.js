@@ -675,7 +675,7 @@ define([
         self.rawCoordinates = ko.computed(function() {
             return self.coordinates().map(function(coords) {
                 var sourceCRS = self.selectedCoordinateReference();
-                return proj4(sourceCRS, geographic, [window.Number(coords[0]()), window.Number(coords[1]())]);
+                return proj4(sourceCRS, geographic, [Number(coords[0]()), Number(coords[1]())]);
             });
         }).extend({ throttle: 100 });
         self.rawCoordinates.subscribe(function(rawCoordinates) {
@@ -781,7 +781,7 @@ define([
         };
         var transformCoordinatePair = function(coords, sourceCRS) {
             var targetCRS = self.selectedCoordinateReference();
-            var transformedCoordinates = proj4(sourceCRS, targetCRS, [coords[0](), coords[1]()]);
+            var transformedCoordinates = proj4(sourceCRS, targetCRS, [Number(coords[0]()), Number(coords[1]())]);
             coords[0](transformedCoordinates[0]);
             coords[1](transformedCoordinates[1]);
         };
