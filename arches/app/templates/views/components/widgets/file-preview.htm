@@ -257,7 +257,7 @@
                             <!-- ko foreach: $data.data -->
                                 <tr
                                     data-bind="{
-                                        style: { backgroundColor: $data['errors']().length ? 'red' : 'cornflowerblue'  },
+                                        style: { backgroundColor: !_.isEmpty($data['errors']()) ? 'red' : 'cornflowerblue'  },
                                     }"
                                 >
                                     <!-- ko foreach: { data: Object.keys(OBSERVATIONS_CSV_COLUMN_NAME_TO_NODE_IDS), as: 'key' } -->
@@ -290,7 +290,7 @@
                     </tbody>
                 </table>
             </div>
-            
+
             <button data-bind="click: buttonFOO">BUTTON FOO</button>
         </div>
         <!-- /ko -->

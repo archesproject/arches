@@ -588,7 +588,7 @@ class ExternalResourceDataValidation(APIBase):
                             value = exact_match['id']  # value_id
                         
                             if isinstance(datatype, ConceptListDataType):
-                                value = [value]
+                                value = value
 
                         # GET RID OF TRY AFTER DOMAIN VALUE REFACTOR!
                         try:

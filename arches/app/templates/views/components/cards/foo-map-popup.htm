@@ -2,17 +2,44 @@
 {% load template_tags %}
 
 
-<div>
+<div
+    style="height: 400px; overflow: scroll;"
+>
     <table>
         <tbody>
             <!-- ko foreach: { data: Object.keys(OBSERVATIONS_CSV_COLUMN_NAME_TO_NODE_IDS), as: 'key' } -->
-            <tr>
-                <td data-bind="text: key"></td>
-                    <td data-bind="
+            <tr
+                data-bind="style: {backgroundColor: (function() {
+                    var nodeId = OBSERVATIONS_CSV_COLUMN_NAME_TO_NODE_IDS[key]['node_id'];
+                    return $parent.errors()[nodeId] ? 'red' : 'cornflowerblue';
+                })()}"
+            >   
+                <td>
+                    <span data-bind="text: key"></span>
+                </td>
+                <td>
+                    <!-- ko if: $parent.errors()[OBSERVATIONS_CSV_COLUMN_NAME_TO_NODE_IDS[key]['node_id']] -->
+                    <span>
+                        <button class="btn btn-link" type="button" data-toggle="collapse" data-target="#errorsCollapse" aria-expanded="false" aria-controls="errorsCollapse">
+                            <i class="fa fa-question-circle"></i>
+                        </button>
+                        <div class="collapse" id="errorsCollapse">
+                            <div class="card card-body">
+                                <ul>
+                                    <!-- ko foreach: $parent.errors()[OBSERVATIONS_CSV_COLUMN_NAME_TO_NODE_IDS[key]['node_id']]['errors'] -->
+                                        <li data-bind="text: $data.message"></li>
+                                    <!-- /ko -->
+                                </ul>
+                            </div>
+                        </div>
+                    </span>
+                    <!-- /ko -->
+                    <span data-bind="
                         text: (function() {
+                            var nodeId = OBSERVATIONS_CSV_COLUMN_NAME_TO_NODE_IDS[key]['node_id'];
+                            var data = $parent['row_data'][nodeId];
+                            
                             /* hack to format location */
-                            var data = $parent['row_data'][OBSERVATIONS_CSV_COLUMN_NAME_TO_NODE_IDS[key]['node_id']];
-
                             if (data instanceof Object) {
                                 if (OBSERVATIONS_CSV_COLUMN_NAME_TO_NODE_IDS[key]['args'].includes('x')) {
                                     return data['features'][0]['geometry']['coordinates'][1];
@@ -21,11 +48,12 @@
                                     return data['features'][0]['geometry']['coordinates'][0];
                                 }
                             }
-                            
+
                             return data;
                         })()
-                    "></td>
-                </tr>
+                    "></span>
+                </td>
+            </tr>
             <!-- /ko -->
         </tbody>
     </table>
