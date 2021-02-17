@@ -558,18 +558,17 @@ class ExternalResourceDataValidation(APIBase):
                 node_data = column_name_to_node_id_map[key]
 
                 if node_data['node_id']:
-                    row_data[node_data['node_id']] = value
-
                     # edge case for converting columns into complex node values
                     if (node_data.get('flag') == 'format_location'):
-
                         if 'x' in node_data['args']:
                             location_data['features'][0]['geometry']['coordinates'][1] = float(value)
                         if 'y' in node_data['args']:
                             location_data['features'][0]['geometry']['coordinates'][0] = float(value)
                         
+                        row_data[node_data['node_id']] = location_data
                         parsed_row_data[node_data['node_id']] = location_data  # should be correct after all iterations
                     else:
+                        row_data[node_data['node_id']] = value
                         node_id = node_data['node_id']
 
                         node = models.Node.objects.get(pk=node_id)

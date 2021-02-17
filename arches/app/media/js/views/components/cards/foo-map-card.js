@@ -418,28 +418,28 @@ define([
         var self = this;
         ko.utils.extend(self, new foo(params));
 
-        this.foo_features = ko.observable();
         this.fileData = ko.observable();
 
         if (params.tile && params.card) {
-            // console.log(self, params)
             var fileListWidget = params.card.widgets().find(function(widget) {
                 return widget.datatype.datatype === 'file-list';
             });
 
             var fileWidgetData = params.tile.data[fileListWidget.node_id()];
 
+            /* sets cached value to tile to persist data through map reload during value change */ 
             if (!fileWidgetData() && ko.unwrap(fileListWidget._value)) {
                 params.tile.data[fileListWidget.node_id()](ko.unwrap(fileListWidget._value));
             }
 
             fileWidgetData.subscribe(function(value) {
-                if (value) { fileListWidget._value = value; }
+                if (value) { 
+                    fileListWidget._value = value; 
+                }
+
+                self.fileData(fileWidgetData())
             });
 
-            fileListWidget._foo = 'bar'
-
-            self.fileData(fileWidgetData())
         }
 
         self.map.subscribe(function(map) {

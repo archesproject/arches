@@ -131,9 +131,9 @@ define([
         this.uploadMultiple = ko.observable(true);
 
         this.addedFiles = ko.observableArray();
-        this.addedFiles.subscribe(function(file) {
-            self.selectedFile(file[0])
-        });
+        // this.addedFiles.subscribe(function(file) {
+        //     self.selectedFile(file[0])
+        // });
         this.selectedFile = ko.observable();
 
         this.resourceModelNodeData = ko.observable();
