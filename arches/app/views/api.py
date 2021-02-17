@@ -519,7 +519,7 @@ class Graphs(APIBase):
 
 
 
-class ExternalResourceDataFOO(APIBase):
+class ExternalResourceDataValidation(APIBase):
     def post(self, request, node_id=None):
         if node_id:
             return self.parse_and_validate_resource(request, node_id)
@@ -542,6 +542,17 @@ class ExternalResourceDataFOO(APIBase):
             row_data = {}
             parsed_row_data = {}
             errors = {}
+            location_data = {
+                "type": "FeatureCollection",
+                "features": [{
+                    "type": "Feature",
+                    "properties": {},
+                    "geometry": {
+                        "type": "Point", 
+                        "coordinates": [0, 0]
+                    }
+                }]
+            }
 
             for key, value in row_dict.items():
                 node_data = column_name_to_node_id_map[key]
@@ -551,23 +562,13 @@ class ExternalResourceDataFOO(APIBase):
 
                     # edge case for converting columns into complex node values
                     if (node_data.get('flag') == 'format_location'):
-                        if not parsed_row_data.get(node_data['node_id']):
-                            parsed_row_data[node_data['node_id']] = {
-                                "type": "FeatureCollection",
-                                "features": [{
-                                    "type": "Feature",
-                                    "properties": {},
-                                    "geometry": {
-                                        "type": "Point", 
-                                        "coordinates": [0, 0]
-                                    }
-                                }]
-                            }
 
                         if 'x' in node_data['args']:
-                            parsed_row_data[node_data['node_id']]['features'][0]['geometry']['coordinates'][1] = float(value)
+                            location_data['features'][0]['geometry']['coordinates'][1] = float(value)
                         if 'y' in node_data['args']:
-                            parsed_row_data[node_data['node_id']]['features'][0]['geometry']['coordinates'][0] = float(value)
+                            location_data['features'][0]['geometry']['coordinates'][0] = float(value)
+                        
+                        parsed_row_data[node_data['node_id']] = location_data  # should be correct after all iterations
                     else:
                         node_id = node_data['node_id']
 
@@ -605,8 +606,11 @@ class ExternalResourceDataFOO(APIBase):
 
                         parsed_row_data[node_id] = value
 
+            # import pdb; pdb.set_trace()
             parsed_rows.append({
+                'row_id': str(uuid.uuid4()),
                 'row_data': row_data,
+                'location_data': location_data,
                 'parsed_data': parsed_row_data,
                 'errors': errors,
             })

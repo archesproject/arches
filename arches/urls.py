@@ -192,7 +192,7 @@ urlpatterns = [
     url(r"^resource/(?P<resourceid>%s)/tiles$" % uuid_regex, ResourceTiles.as_view(), name="resource_tiles"),
 
 
-    url(r"^resource-data$", api.ExternalResourceDataFOO.as_view(), name="api_external_resource_data"),
+    url(r"^resource-data$", api.ExternalResourceDataValidation.as_view(), name="api_external_resource_data"),
     url(r"^resource-data-BAR/(?P<graphid>%s)$" % (uuid_regex), api.ExternalResourceDataBAR.as_view(), name="api_external_foobar"),
     # url(r"^resource-data-BAR/(?P<graphid>%s)/(?P<resourceid>%s|())$" % (uuid_regex, uuid_regex), api.ExternalResourceDataBAR.as_view(), name="api_external_foobar"),
 

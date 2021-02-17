@@ -421,17 +421,6 @@ define([
         this.foo_features = ko.observable();
         this.fileData = ko.observable();
 
-
-        // this.boofar = ko.observable();
-        // this.boofar.subscribe(function(foo) {
-        //     var fileListWidget = params.card.widgets().find(function(widget) {
-        //         return widget.datatype.datatype === 'file-list';
-        //     });
-
-        //     fileListWidget._boofar = foo;
-        // });
-
-        
         if (params.tile && params.card) {
             // console.log(self, params)
             var fileListWidget = params.card.widgets().find(function(widget) {
@@ -451,66 +440,29 @@ define([
             fileListWidget._foo = 'bar'
 
             self.fileData(fileWidgetData())
-
-
-            var fileData = fileWidgetData();
-            if (fileData) {
-                var nodeId = fileData.nodeId;
-
-                var features = fileData.data.reduce(function(acc, parsedRow) {
-                    Object.values(parsedRow).forEach(function(cellValue) {
-                        if (cellValue instanceof Object && cellValue['features']) {
-                            cellValue.features.forEach(function(feature) {
-                                feature.id = parsedRow['meta']['id'];
-                                acc.push(feature);
-                            });
-                        }
-                    })
-                    return acc;
-                }, []);
-
-                self.foo_features(features)
-
-                // self.featureLookup[nodeId] = {
-                //     features: features,
-                //     selectedTool: ko.observable(),
-                //     dropErrors: ko.observableArray()
-                // };
-                // self.featureLookup[nodeId].selectedTool.subscribe(function(tool) {
-                //     if (self.draw) {
-                //         if (tool === '') {
-                //             self.draw.trash();
-                //             self.draw.changeMode('simple_select');
-                //         } else if (tool) {
-                //             _.each(self.featureLookup, function(value, key) {
-                //                 if (key !== nodeId) {
-                //                     value.selectedTool(null);
-                //                 }
-                //             });
-                //             self.newNodeId = nodeId;
-                //         }
-                //         self.setDrawTool(tool);
-                //     }
-                // });
-            }
         }
 
         self.map.subscribe(function(map) {
             if (!self.draw && params.draw) {
                 self.draw = params.draw;
             }
-
-            if (self.foo_features()) {
-                var barfoo = {"type": "FeatureCollection", 'features': []};
-
+            
+            var fileData = ko.unwrap(self.fileData);
+            
+            if (fileData) {
                 var bounds = new mapboxgl.LngLatBounds();
 
-                self.foo_features().forEach(function(feature) {
-                    self.draw.add(feature);
-                    barfoo.features.push(feature)
-                    bounds.extend(feature.geometry.coordinates)
+                fileData.forEach(function(fileDatum) {
+                    fileDatum.data.forEach(function(parsedRow) {
+                        if (parsedRow.location_data) {
+                            parsedRow.location_data.features.forEach(function(feature) {
+                                self.draw.add(feature);
+                                bounds.extend(feature.geometry.coordinates);
+                            });
+                        }
+                    });
                 });
-                
+
                 map.fitBounds(
                     bounds, 
                     { 

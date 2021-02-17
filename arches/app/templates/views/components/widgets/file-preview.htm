@@ -238,8 +238,8 @@
                 <table>
                     <thead>
                         <tr> 
-                            <!-- ko foreach: Object.values(resourceModelNodeData()) -->
-                                <!-- ko if: visible -->
+                            <!-- ko foreach: { data: Object.keys(OBSERVATIONS_CSV_COLUMN_NAME_TO_NODE_IDS), as: 'key' } -->
+                                <!-- ko if: OBSERVATIONS_CSV_COLUMN_NAME_TO_NODE_IDS[key]['visible'] -->
                                 <th 
                                     scope="column" 
                                     data-bind="text: name"

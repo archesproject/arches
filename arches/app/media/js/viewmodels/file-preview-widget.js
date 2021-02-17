@@ -138,15 +138,15 @@ define([
 
         this.resourceModelNodeData = ko.observable();
 
-        this.parsedFileData = ko.observableArray();
-        this.parsedFileData.subscribe(function() {
-            var value = {
-                nodeId: self.node.id,
-                data: self.parsedFileData(),
-                addedFiles: self.addedFiles(),
-            };
+        this.fileData = ko.observableArray();
+        this.fileData.subscribe(function() {
+            // var value = {
+            //     nodeId: self.node.id,
+            //     data: self.parsedFileData(),
+            //     addedFiles: self.addedFiles(),
+            // };
 
-            self.value(value)
+            self.value(self.fileData())
         });
 
 
@@ -157,34 +157,37 @@ define([
 
 
         if (self.value()) {
-            var uploadedFiles = {};
+            // var uploadedFiles = {};
+            self.fileData(self.value())
 
-            if (self.value().data) {
-                self.value().data.forEach(function(foo) {
-                    self.parsedFileData.push(foo);
+            console.log(self.value())
+
+            // if (self.value().data) {
+            //     self.value().data.forEach(function(foo) {
+            //         self.parsedFileData.push(foo);
     
-                    var fileId = foo.meta.file.upload.uuid;
+            //         var fileId = foo.file_id;
     
-                    if (!uploadedFiles[fileId]) {
-                        uploadedFiles[fileId] = foo.meta.file;
-                    }
+            //         if (!uploadedFiles[fileId]) {
+            //             uploadedFiles[fileId] = foo.meta.file;
+            //         }
     
-                    self.addedFiles(Object.values(uploadedFiles));
-                });
-            }
-            else {
-                Object.values(self.value()).forEach(function(foo) {
-                    self.parsedFileData.push(foo);
+            //         self.addedFiles(Object.values(uploadedFiles));
+            //     });
+            // }
+            // else {
+            //     Object.values(self.value()).forEach(function(foo) {
+            //         self.parsedFileData.push(foo);
     
-                    var fileId = foo.meta.file.upload.uuid;
+            //         var fileId = foo.meta.file.upload.uuid;
     
-                    if (!uploadedFiles[fileId]) {
-                        uploadedFiles[fileId] = foo.meta.file;
-                    }
+            //         if (!uploadedFiles[fileId]) {
+            //             uploadedFiles[fileId] = foo.meta.file;
+            //         }
     
-                    self.addedFiles(Object.values(uploadedFiles));
-                });
-            }
+            //         self.addedFiles(Object.values(uploadedFiles));
+            //     });
+            // }
 
         }
 
@@ -239,12 +242,6 @@ define([
                 dataType: "json",
                 url: arches.urls.graph_nodes(OBSERVATIONS_GRAPH_ID),
                 success: function (response) {
-                    Object.values(response).forEach(function(nodeData) {
-                        nodeData['visible'] = VISIBLE_COLUMN_IDS.some(function(columnId) { 
-                            return columnId === nodeData.nodeid; 
-                        });
-                    });
-
                     self.resourceModelNodeData(response);
                 }
             });
@@ -268,18 +265,14 @@ define([
                 data: formData,
                 success: function (response) {
                     response.data.forEach(function(parsedRow) {
-                        parsedRow['meta'] = {
-                            'id': uuid.generate(),
-                            'file': file,
-                            'errors': ko.observable(parsedRow['errors']),
-                        };
-
-                        delete parsedRow['errors'];
-
-                        self.parsedFileData.push(parsedRow);
+                        parsedRow['errors'] = ko.observable(parsedRow['errors']);
+                        parsedRow['file_id'] = file.upload.uuid;
                     });
 
-                    self.addedFiles.push(file);
+                    response['file'] = file;
+                    response['created_resources'] = {};
+
+                    self.fileData.push(response);
                 }
             });
         };
