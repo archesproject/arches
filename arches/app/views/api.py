@@ -429,7 +429,7 @@ class MVT(APIBase):
                             'id'
                         ) FROM (
                             SELECT resourceinstanceid::text,
-                                id,
+                                row_number() over () as id,
                                 1 as total,
                                 ST_AsMVTGeom(
                                     geom,
