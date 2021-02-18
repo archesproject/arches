@@ -322,14 +322,15 @@ class TileCsvWriter(Writer):
 
         return csvs_for_export
 
+
 class NCsvWriter(Writer):
     def __init__(self, **kwargs):
         super(NCsvWriter, self).__init__(**kwargs)
-    
+
     def write_resources(self, graph_id=None, resourceinstanceids=None, **kwargs):
         super(NCsvWriter, self).write_resources(graph_id=graph_id, resourceinstanceids=resourceinstanceids, **kwargs)
-        
-        tiles = list(Tile.objects.filter(resourceinstance__graph_id = graph_id).order_by('nodegroup_id').values())
+
+        tiles = list(Tile.objects.filter(resourceinstance__graph_id=graph_id).order_by("nodegroup_id").values())
         csvs_for_export = []
 
         def group_tiles(tiles, key):
@@ -341,21 +342,22 @@ class NCsvWriter(Writer):
             for tile in tiles:
                 if str(tile[key]) in new_tiles.keys():
                     new_tiles[str(tile[key])].append(tile)
-  
+
             return new_tiles
 
         # group by nodegroup_id
-        tiles = group_tiles(tiles, 'nodegroup_id')
-        
+        tiles = group_tiles(tiles, "nodegroup_id")
+
         def lookup_node_name(nodeid):
             try:
                 node_name = Node.objects.get(nodeid=nodeid).name
             except:
                 node_name = nodeid
-            
+
             return node_name
 
         node_datatypes = {}
+
         def lookup_node_value(value, nodeid):
             try:
                 datatype = node_datatypes[nodeid]
@@ -367,48 +369,53 @@ class NCsvWriter(Writer):
                 try:
                     value = node_datatypes[nodeid].transform_export_values(value)
                 except:
-                    print('There was an error transforming value: {0} of datatype: {1} for node: {2}'.format(value, str(node_datatypes[nodeid]).split('.')[4].split(' object')[0], nodeid))
-            
+                    print(
+                        "There was an error transforming value: {0} of datatype: {1} for node: {2}".format(
+                            value, str(node_datatypes[nodeid]).split(".")[4].split(" object")[0], nodeid
+                        )
+                    )
+
             return value
 
-        semantic_nodes = [str(n[0]) for n in Node.objects.filter(datatype='semantic').values_list('nodeid')]
+        semantic_nodes = [str(n[0]) for n in Node.objects.filter(datatype="semantic").values_list("nodeid")]
+
         def flatten_tile(tile):
-            for nodeid in tile['data']:
+            for nodeid in tile["data"]:
                 if nodeid not in semantic_nodes:
                     node_name = lookup_node_name(nodeid)
-                    node_value = lookup_node_value(tile['data'][nodeid], nodeid)
+                    node_value = lookup_node_value(tile["data"][nodeid], nodeid)
                     tile[node_name] = node_value
-            del tile['data']
-            
+            del tile["data"]
+
             return tile
 
         for nodegroupid, nodegroup_tiles in tiles.items():
             flattened_tiles = []
             fieldnames = []
             for tile in nodegroup_tiles:
-                tile['tileid'] = str(tile['tileid'])
-                tile['resourceinstance_id'] = str(tile['resourceinstance_id'])
-                tile['parenttile_id'] = str(tile['parenttile_id'])
-                tile['nodegroup_id'] = str(tile['nodegroup_id'])
+                tile["tileid"] = str(tile["tileid"])
+                tile["resourceinstance_id"] = str(tile["resourceinstance_id"])
+                tile["parenttile_id"] = str(tile["parenttile_id"])
+                tile["nodegroup_id"] = str(tile["nodegroup_id"])
                 flattened_tile = flatten_tile(tile)
                 flattened_tiles.append(flattened_tile)
-                
+
                 for fieldname in flattened_tile:
                     if fieldname not in fieldnames:
                         fieldnames.append(fieldname)
 
-            tiles[nodegroupid] = sorted(flattened_tiles, key=lambda k: k['resourceinstance_id'])
+            tiles[nodegroupid] = sorted(flattened_tiles, key=lambda k: k["resourceinstance_id"])
 
             ncsv_file = []
             dest = StringIO()
             csvwriter = csv.DictWriter(dest, delimiter=",", fieldnames=fieldnames)
             csvwriter.writeheader()
-            csv_name = os.path.join("{0}.{1}".format(Card.objects.get(nodegroup_id=nodegroupid).name, 'csv'))
+            csv_name = os.path.join("{0}.{1}".format(Card.objects.get(nodegroup_id=nodegroupid).name, "csv"))
             for v in tiles[nodegroupid]:
                 csvwriter.writerow(v)
             csvs_for_export.append({"name": csv_name, "outputfile": dest})
-        
-        return csvs_for_export       
+
+        return csvs_for_export
 
 
 class CsvReader(Reader):
