@@ -33,7 +33,7 @@ class BaseDataType(object):
 
     def after_update_all(self, tile=None):
         """
-        Refreshes mv_geojson_geoms materialized view after save.
+        Refreshes geojson_geometries table after save.
         """
         pass
 
