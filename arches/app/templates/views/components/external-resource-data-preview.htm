@@ -226,7 +226,7 @@
 
         <!-- ko if: resourceModelNodeData() && addedFiles().length > 0-->
         <div>
-            <div>Observations Resource Model</div>
+            <div>Observations Preview</div>
     
             <div
                 style="
@@ -297,7 +297,7 @@
                 </table>
             </div>
 
-            <button data-bind="click: buttonFOO">BUTTON FOO</button>
+            <button data-bind="click: createResources">{% trans 'Load Resources' %}</button>
         </div>
         <!-- /ko -->
 
@@ -305,7 +305,7 @@
 
         <!-- ko if: resourceModelNodeData() && addedFiles().length > 0-->
         <div>
-            <div>Observations Resource Model</div>
+            <div>Observations Linked to Source</div>
     
             <div
                 style="

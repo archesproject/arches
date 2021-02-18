@@ -143,8 +143,6 @@ define([
     var ExternalResourceDataPreviewViewModel = function(params) {
         var self = this;
 
-        console.log("!!", params)
-
         params.configKeys = ['acceptedFiles', 'maxFilesize', 'maxFiles'];
         FileWidgetViewModel.apply(this, [params]);
 
@@ -264,7 +262,9 @@ define([
             });
         };
 
-        this.buttonFOO = function() {
+        this.createResources = function() {
+            params.loading(true);
+
             $.ajax({
                 dataType: "json",
                 type: 'POST',
@@ -275,8 +275,8 @@ define([
                 }),
                 url: arches.urls.api_external_foobar(graphid=OBSERVATIONS_GRAPH_ID),
                 success: function(response) {
-                    console.log(response, self)
                     self.fileData(response['file_data']);
+                    params.loading(false);
                 },
             });
         }
