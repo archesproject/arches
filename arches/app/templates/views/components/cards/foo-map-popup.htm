@@ -3,7 +3,7 @@
 
 
 <div
-    style="height: 400px; overflow: scroll;"
+    style="height: 300px; overflow: scroll;"
 >
     <table>
         <tbody>
@@ -18,22 +18,6 @@
                     <span data-bind="text: key"></span>
                 </td>
                 <td>
-                    <!-- ko if: $parent.errors()[OBSERVATIONS_CSV_COLUMN_NAME_TO_NODE_IDS[key]['node_id']] -->
-                    <span>
-                        <button class="btn btn-link" type="button" data-toggle="collapse" data-target="#errorsCollapse" aria-expanded="false" aria-controls="errorsCollapse">
-                            <i class="fa fa-question-circle"></i>
-                        </button>
-                        <div class="collapse" id="errorsCollapse">
-                            <div class="card card-body">
-                                <ul>
-                                    <!-- ko foreach: $parent.errors()[OBSERVATIONS_CSV_COLUMN_NAME_TO_NODE_IDS[key]['node_id']]['errors'] -->
-                                        <li data-bind="text: $data.message"></li>
-                                    <!-- /ko -->
-                                </ul>
-                            </div>
-                        </div>
-                    </span>
-                    <!-- /ko -->
                     <span data-bind="
                         text: (function() {
                             var nodeId = OBSERVATIONS_CSV_COLUMN_NAME_TO_NODE_IDS[key]['node_id'];
@@ -52,6 +36,22 @@
                             return data;
                         })()
                     "></span>
+                    <!-- ko if: $parent.errors()[OBSERVATIONS_CSV_COLUMN_NAME_TO_NODE_IDS[key]['node_id']] -->
+                    <span>
+                        <button class="btn btn-link" type="button" data-toggle="collapse" data-target="#errorsCollapse" aria-expanded="false" aria-controls="errorsCollapse">
+                            <i class="fa fa-question-circle"></i>
+                        </button>
+                        <div class="collapse" id="errorsCollapse">
+                            <div class="card card-body">
+                                <ul>
+                                    <!-- ko foreach: $parent.errors()[OBSERVATIONS_CSV_COLUMN_NAME_TO_NODE_IDS[key]['node_id']]['errors'] -->
+                                        <li data-bind="text: $data.message"></li>
+                                    <!-- /ko -->
+                                </ul>
+                            </div>
+                        </div>
+                    </span>
+                    <!-- /ko -->
                 </td>
             </tr>
             <!-- /ko -->

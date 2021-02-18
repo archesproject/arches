@@ -529,8 +529,8 @@ class ExternalResourceDataValidation(APIBase):
     def parse_and_validate_resources(self, request):
         datatype_factory = DataTypeFactory()
 
-        column_name_to_node_id_map = json.loads(
-            request.POST.get('column_name_to_node_id_map')
+        column_name_to_node_data_map = json.loads(
+            request.POST.get('column_name_to_node_data_map')
         )
 
         uploaded_file = request.FILES.get('uploaded_file')
@@ -555,7 +555,7 @@ class ExternalResourceDataValidation(APIBase):
             }
 
             for key, value in row_dict.items():
-                node_data = column_name_to_node_id_map[key]
+                node_data = column_name_to_node_data_map[key]
 
                 if node_data['node_id']:
                     # edge case for converting columns into complex node values
@@ -588,7 +588,7 @@ class ExternalResourceDataValidation(APIBase):
                             value = exact_match['id']  # value_id
                         
                             if isinstance(datatype, ConceptListDataType):
-                                value = value
+                                value = [value]
 
                         # GET RID OF TRY AFTER DOMAIN VALUE REFACTOR!
                         try:
@@ -615,7 +615,7 @@ class ExternalResourceDataValidation(APIBase):
             })
                 
         return JSONResponse({
-            'node_ids_to_column_names_map': { v['node_id']:k for k,v in column_name_to_node_id_map.items() },
+            'node_ids_to_column_names_map': { v['node_id']:k for k,v in column_name_to_node_data_map.items() },
             'data': parsed_rows
         })
 
@@ -651,25 +651,49 @@ class ExternalResourceDataValidation(APIBase):
 class ExternalResourceDataBAR(APIBase):
     def post(self, request, graphid=None):
         try:
-            foo = json.loads(request.body)
+            body = json.loads(request.body)
+            file_data = body['file_data']
+            column_name_to_node_data_map = body['column_name_to_node_data_map']
 
-            if foo.get('foo'):
-                # graph = models.GraphModel.objects.get(pk=graphid)
+            nodegroup_data = {}
 
-                for bar in foo['foo']:
+            for node_data in column_name_to_node_data_map.values():
+                nodegroup_id = node_data.get('nodegroup_id')
+
+                if nodegroup_id:
+                    if not nodegroup_data.get(nodegroup_id):
+                        nodegroup_data[nodegroup_id] = []
+
+                    nodegroup_data[nodegroup_id].append(node_data['node_id'])
+
+            for file_datum in file_data:
+                for row_data in file_datum['data']:
                     resource_instance = Resource(graph_id=graphid)
                     resource_instance.save()
 
-                    bar.pop('meta')
+                    parsed_data = row_data['parsed_data']
 
-                    tile = TileProxyModel(
-                        data=bar,
-                        resourceinstance=resource_instance,
-                        nodegroup_id = 'f7c974a0-29f4-11eb-8487-aae9fe8789ac',  # Related Observations
-                    )
-                    tile.save()
+                    foo = {}
 
-                return JSONResponse({'foo': foo}, status=200)
+                    for nodegroup_id in nodegroup_data.keys():
+                        if not foo.get(nodegroup_id):
+                            foo[nodegroup_id] = {}
+
+                        for node_id in nodegroup_data[nodegroup_id]:
+                            foo[nodegroup_id][node_id] = parsed_data.get(node_id)
+
+                    for nodegroup_id in foo.keys():
+                        tile = TileProxyModel(
+                            data=foo[nodegroup_id],
+                            resourceinstance=resource_instance,
+                            nodegroup_id=nodegroup_id,
+                            # nodegroup_id = 'f7c974a0-29f4-11eb-8487-aae9fe8789ac',  # Related Observations
+                        )
+
+                        tile.save()
+
+
+            return JSONResponse({'foo': foo}, status=200)
             
         except Exception as e:
             if settings.DEBUG is True:
