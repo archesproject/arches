@@ -256,9 +256,7 @@
                         <!-- ko foreach: fileData() -->
                             <!-- ko foreach: $data.data -->
 
-                                <!-- ko if: (function() { 
-                                    return !$parent.created_resources[$data['row_id']]
-                                })() -->
+                                <!-- ko if: !$parent.created_resources[$data['row_id']] -->
                                 <tr
                                     data-bind="{
                                         style: { backgroundColor: !_.isEmpty(ko.unwrap($data['errors'])) ? 'red' : 'cornflowerblue'  },
@@ -304,9 +302,10 @@
         <!-- /ko -->
 
 
-        <!-- ko if: createdResources().length > 0-->
+
+        <!-- ko if: resourceModelNodeData() && addedFiles().length > 0-->
         <div>
-            <div>Created Resources</div>
+            <div>Observations Resource Model</div>
     
             <div
                 style="
@@ -318,11 +317,11 @@
                 <table>
                     <thead>
                         <tr> 
-                            <!-- ko foreach: Object.values(resourceModelNodeData()) -->
-                                <!-- ko if: visible -->
+                            <!-- ko foreach: { data: Object.keys(OBSERVATIONS_CSV_COLUMN_NAME_TO_NODE_IDS), as: 'key' } -->
+                            <!-- ko if: OBSERVATIONS_CSV_COLUMN_NAME_TO_NODE_IDS[key]['visible'] -->
                                 <th 
                                     scope="column" 
-                                    data-bind="text: name"
+                                    data-bind="text: key"
                                     style="
                                         padding: 0px 10px;
                                     "
@@ -333,43 +332,52 @@
                         </tr>
                     </thead>
                     <tbody>
-                        <!-- ko foreach: createdResources() -->
-                            <tr>
-                                <!-- ko foreach: Object.values($parent.resourceModelNodeData()) -->
-                                    <!-- ko if: visible -->
+                        <!-- ko foreach: fileData() -->
+                            <!-- ko foreach: $data.data -->
+
+                                <!-- ko if: $parent.created_resources[$data['row_id']] -->
+                                <tr
+                                    data-bind="{
+                                        style: { backgroundColor: !_.isEmpty(ko.unwrap($data['errors'])) ? 'red' : 'cornflowerblue'  },
+                                    }"
+                                >
+                                    <!-- ko foreach: { data: Object.keys(OBSERVATIONS_CSV_COLUMN_NAME_TO_NODE_IDS), as: 'key' } -->
+                                        <!-- ko if: OBSERVATIONS_CSV_COLUMN_NAME_TO_NODE_IDS[key]['visible'] -->
+                                        <td>
+                                            <div>
+                                                <span data-bind="{text:(function(){
+                                                    var nodeId = OBSERVATIONS_CSV_COLUMN_NAME_TO_NODE_IDS[key]['node_id'];
+
+                                                    console.log($parent, $parents[1])
+                                                    return $parent['row_data'][nodeId];
+                                                })()}"></span>
+                                            </div>
+                                        </td>
+                                        <!-- /ko -->
+                                    <!-- /ko -->
                                     <td>
                                         <div
-                                            style="
-                                                padding: 10px;
-                                            "
+                                            style="display: flex;"
                                         >
-                                            <span data-bind="{text: $parent[$data.nodeid]}"></span>
+                                            <button class="btn btn-link">
+                                                <i class="fa fa-info"></i>
+                                            </button>
+                                            <button class="btn btn-link">
+                                                <i class="fa fa-trash"></i>
+                                            </button>
                                         </div>
                                     </td>
-                                    <!-- /ko -->
+                                </tr>
                                 <!-- /ko -->
-                                <td>
-                                    <div
-                                        style="display: flex;"
-                                    >
-                                        <button class="btn btn-link">
-                                            <i class="fa fa-info"></i>
-                                        </button>
-                                        <button class="btn btn-link">
-                                            <i class="fa fa-trash"></i>
-                                        </button>
-                                    </div>
-                                </td>
-                            </tr>
 
+                            <!-- /ko -->
                         <!-- /ko -->
                     </tbody>
                 </table>
             </div>
         </div>
         <!-- /ko -->
-    
-    
+
     </div>
 
 </div>

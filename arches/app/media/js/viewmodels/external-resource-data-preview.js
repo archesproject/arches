@@ -167,7 +167,6 @@ define([
 
         this.fileData = ko.observableArray();
         this.fileData.subscribe(function() {
-            // self.value(self.fileData())
             params.fileData(self.fileData())
 
             self.addedFiles.removeAll();
@@ -179,10 +178,6 @@ define([
 
 
         this.createdResources = ko.observableArray();
-
-        if (self.value()) {
-            self.fileData(self.value())
-        }
 
         this.dropzoneOptions = {
             url: "arches.urls.root",
