@@ -336,11 +336,7 @@
                             <!-- ko foreach: $data.data -->
 
                                 <!-- ko if: $parent.created_resources[$data['row_id']] -->
-                                <tr
-                                    data-bind="{
-                                        style: { backgroundColor: !_.isEmpty(ko.unwrap($data['errors'])) ? 'red' : 'cornflowerblue'  },
-                                    }"
-                                >
+                                <tr>
                                     <!-- ko foreach: { data: Object.keys(OBSERVATIONS_CSV_COLUMN_NAME_TO_NODE_IDS), as: 'key' } -->
                                         <!-- ko if: OBSERVATIONS_CSV_COLUMN_NAME_TO_NODE_IDS[key]['visible'] -->
                                         <td>

@@ -146,6 +146,9 @@ define([
         params.configKeys = ['acceptedFiles', 'maxFilesize', 'maxFiles'];
         FileWidgetViewModel.apply(this, [params]);
 
+        this.acceptedFiles = ko.observable('.csv');
+        this.maxFilesize = ko.observable(4);
+
 
         this.unique_id = uuid.generate();
         this.uniqueidClass = ko.computed(function() {
@@ -167,10 +170,15 @@ define([
         this.fileData.subscribe(function() {
             params.fileData(self.fileData())
 
-            self.addedFiles.removeAll();
-            
             self.fileData().forEach(function(fileDatum) {
-                self.addedFiles.push(fileDatum.file)
+                var match = ko.utils.arrayFirst(self.addedFiles(), function(file) {
+                    return file.file_id === fileDatum.file.file_id; 
+                });
+
+                if (!match) {
+                    self.addedFiles.push(fileDatum.file)
+
+                }
             });
         });
 
