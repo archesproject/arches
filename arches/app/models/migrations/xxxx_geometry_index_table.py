@@ -110,6 +110,7 @@ class Migration(migrations.Migration):
             $$ LANGUAGE plpgsql;
 
             CREATE INDEX geojson_geometries_gix ON geojson_geometries USING GIST (geom);
+            SELECT refresh_geojson_geometries();
             """,
             """
             DROP INDEX geojson_geometries_gix;
