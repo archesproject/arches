@@ -5,14 +5,14 @@ define([
     'arches',
     'dropzone',
     'uuid',
-    'viewmodels/widget',
+    'viewmodels/file-widget',
     'bindings/dropzone'
-], function($, ko, _, arches, Dropzone, uuid, WidgetViewModel) {
+], function($, ko, _, arches, Dropzone, uuid, FileWidgetViewModel) {
     /**
      * A viewmodel used for viewing and uploading external resource data 
      *
      * @constructor
-     * @name ExternalResourceDataViewModel
+     * @name ExternalResourceDataPreviewViewModel
      *
      * @param  {string} params - a configuration object
      */
@@ -140,11 +140,11 @@ define([
 
 
 
-    var ExternalResourceDataViewModel = function(params) {
+    var ExternalResourceDataPreviewViewModel = function(params) {
         var self = this;
 
         params.configKeys = ['acceptedFiles', 'maxFilesize', 'maxFiles'];
-        WidgetViewModel.apply(this, [params]);
+        FileWidgetViewModel.apply(this, [params]);
 
 
         this.unique_id = uuid.generate();
@@ -267,16 +267,6 @@ define([
         };
 
         this.buttonFOO = function() {
-            console.log(self, params)
-            // params.node.loading = ko.observable(true)
-
-
-            // self.createdResources(
-            //     self.parsedFileData.removeAll()
-            // );
-
-
-
             $.ajax({
                 dataType: "json",
                 type: 'POST',
@@ -287,11 +277,8 @@ define([
                 }),
                 url: arches.urls.api_external_foobar(graphid=OBSERVATIONS_GRAPH_ID),
                 success: function(response) {
-                    console.log(response)
-
-                    self.createdResources(
-                        self.parsedFileData.removeAll()
-                    );
+                    console.log(response, self)
+                    self.fileData(response['file_data']);
                 },
             });
         }
@@ -368,5 +355,12 @@ define([
         this.initialize();
     };
 
-    return ExternalResourceDataViewModel;
+    ko.components.register('external-resource-data-preview', {
+        viewModel: ExternalResourceDataPreviewViewModel,
+        template: {
+            require: 'text!templates/views/components/external-resource-data-preview.htm'
+        }
+    });
+
+    return ExternalResourceDataPreviewViewModel;
 });

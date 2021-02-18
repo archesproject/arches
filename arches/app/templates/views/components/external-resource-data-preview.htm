@@ -255,9 +255,13 @@
                     <tbody>
                         <!-- ko foreach: fileData() -->
                             <!-- ko foreach: $data.data -->
+
+                                <!-- ko if: (function() { 
+                                    return !$parent.created_resources[$data['row_id']]
+                                })() -->
                                 <tr
                                     data-bind="{
-                                        style: { backgroundColor: !_.isEmpty($data['errors']()) ? 'red' : 'cornflowerblue'  },
+                                        style: { backgroundColor: !_.isEmpty(ko.unwrap($data['errors'])) ? 'red' : 'cornflowerblue'  },
                                     }"
                                 >
                                     <!-- ko foreach: { data: Object.keys(OBSERVATIONS_CSV_COLUMN_NAME_TO_NODE_IDS), as: 'key' } -->
@@ -266,6 +270,8 @@
                                             <div>
                                                 <span data-bind="{text:(function(){
                                                     var nodeId = OBSERVATIONS_CSV_COLUMN_NAME_TO_NODE_IDS[key]['node_id'];
+
+                                                    console.log($parent, $parents[1])
                                                     return $parent['row_data'][nodeId];
                                                 })()}"></span>
                                             </div>
@@ -285,6 +291,8 @@
                                         </div>
                                     </td>
                                 </tr>
+                                <!-- /ko -->
+
                             <!-- /ko -->
                         <!-- /ko -->
                     </tbody>

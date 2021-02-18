@@ -10,9 +10,10 @@ define([
     'viewmodels/card-component',
     'viewmodels/map-editor',
     'viewmodels/map-filter',
+    'viewmodels/external-resource-data-preview',
     'views/components/cards/select-related-feature-layers',
     'text!templates/views/components/cards/foo-map-popup.htm'
-], function($, arches, ko, koMapping, geojsonExtent, mapboxgl, uuid, fooRRMAP, CardComponentViewModel, MapEditorViewModel, MapFilterViewModel, selectFeatureLayersFactory, popupTemplate) {
+], function($, arches, ko, koMapping, geojsonExtent, mapboxgl, uuid, fooRRMAP, CardComponentViewModel, MapEditorViewModel, MapFilterViewModel, ExternalResourceDataPreview, selectFeatureLayersFactory, popupTemplate) {
 
 
     var foo = function(params) {
@@ -418,6 +419,7 @@ define([
         var self = this;
         ko.utils.extend(self, new foo(params));
 
+
         this.fileData = ko.observable();
 
         if (params.tile && params.card) {
@@ -425,20 +427,20 @@ define([
                 return widget.datatype.datatype === 'file-list';
             });
 
-            var fileWidgetData = params.tile.data[fileListWidget.node_id()];
+            // var fileWidgetData = params.tile.data[fileListWidget.node_id()];
 
-            /* sets cached value to tile to persist data through map reload during value change */ 
-            if (!fileWidgetData() && ko.unwrap(fileListWidget._value)) {
-                params.tile.data[fileListWidget.node_id()](ko.unwrap(fileListWidget._value));
-            }
+            // /* sets cached value to tile to persist data through map reload during value change */ 
+            // if (!fileWidgetData() && ko.unwrap(fileListWidget._value)) {
+            //     params.tile.data[fileListWidget.node_id()](ko.unwrap(fileListWidget._value));
+            // }
 
-            fileWidgetData.subscribe(function(value) {
-                if (value) { 
-                    fileListWidget._value = value; 
-                }
-
-                self.fileData(fileWidgetData())
-            });
+            // fileWidgetData.subscribe(function(value) {
+            //     if (value) { 
+            //         fileListWidget._value = value; 
+            //     }
+                
+            //     self.fileData(fileWidgetData())
+            // });
 
         }
 

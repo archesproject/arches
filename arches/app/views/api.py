@@ -673,18 +673,18 @@ class ExternalResourceDataBAR(APIBase):
 
                     parsed_data = row_data['parsed_data']
 
-                    foo = {}
+                    tile_data = {}
 
                     for nodegroup_id in nodegroup_data.keys():
-                        if not foo.get(nodegroup_id):
-                            foo[nodegroup_id] = {}
+                        if not tile_data.get(nodegroup_id):
+                            tile_data[nodegroup_id] = {}
 
                         for node_id in nodegroup_data[nodegroup_id]:
-                            foo[nodegroup_id][node_id] = parsed_data.get(node_id)
+                            tile_data[nodegroup_id][node_id] = parsed_data.get(node_id)
 
-                    for nodegroup_id in foo.keys():
+                    for nodegroup_id in tile_data.keys():
                         tile = TileProxyModel(
-                            data=foo[nodegroup_id],
+                            data=tile_data[nodegroup_id],
                             resourceinstance=resource_instance,
                             nodegroup_id=nodegroup_id,
                             # nodegroup_id = 'f7c974a0-29f4-11eb-8487-aae9fe8789ac',  # Related Observations
@@ -692,8 +692,12 @@ class ExternalResourceDataBAR(APIBase):
 
                         tile.save()
 
+                        file_datum['created_resources'][row_data['row_id']] = tile_data
 
-            return JSONResponse({'foo': foo}, status=200)
+
+            return JSONResponse({
+                'file_data': file_data,
+            }, status=200)
             
         except Exception as e:
             if settings.DEBUG is True:
