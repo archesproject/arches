@@ -1394,6 +1394,7 @@ class VwAnnotation(models.Model):
         managed = False
         db_table = "vw_annotations"
 
+
 class GeoJSONGeometry(models.Model):
     tile = models.ForeignKey(TileModel, on_delete=models.CASCADE, db_column="tileid")
     resourceinstance = models.ForeignKey(ResourceInstance, on_delete=models.CASCADE, db_column="resourceinstanceid")

@@ -8,35 +8,37 @@ import django.db.models.deletion
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('models', '7043_sort_results'),
+        ("models", "7043_sort_results"),
     ]
 
     operations = [
         migrations.CreateModel(
-            name='GeoJSONGeometry',
+            name="GeoJSONGeometry",
             fields=[
-                ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('geom', django.contrib.gis.db.models.fields.GeometryField(srid=3857)),
+                ("id", models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name="ID")),
+                ("geom", django.contrib.gis.db.models.fields.GeometryField(srid=3857)),
             ],
             options={
-                'db_table': 'geojson_geometries',
-                'managed': True,
+                "db_table": "geojson_geometries",
+                "managed": True,
             },
         ),
         migrations.AddField(
-            model_name='geojsongeometry',
-            name='node',
-            field=models.ForeignKey(db_column='nodeid', on_delete=django.db.models.deletion.CASCADE, to='models.Node'),
+            model_name="geojsongeometry",
+            name="node",
+            field=models.ForeignKey(db_column="nodeid", on_delete=django.db.models.deletion.CASCADE, to="models.Node"),
         ),
         migrations.AddField(
-            model_name='geojsongeometry',
-            name='resourceinstance',
-            field=models.ForeignKey(db_column='resourceinstanceid', on_delete=django.db.models.deletion.CASCADE, to='models.ResourceInstance'),
+            model_name="geojsongeometry",
+            name="resourceinstance",
+            field=models.ForeignKey(
+                db_column="resourceinstanceid", on_delete=django.db.models.deletion.CASCADE, to="models.ResourceInstance"
+            ),
         ),
         migrations.AddField(
-            model_name='geojsongeometry',
-            name='tile',
-            field=models.ForeignKey(db_column='tileid', on_delete=django.db.models.deletion.CASCADE, to='models.TileModel'),
+            model_name="geojsongeometry",
+            name="tile",
+            field=models.ForeignKey(db_column="tileid", on_delete=django.db.models.deletion.CASCADE, to="models.TileModel"),
         ),
         migrations.RunSQL(
             """
@@ -116,5 +118,5 @@ class Migration(migrations.Migration):
             DROP INDEX geojson_geometries_gix;
             DROP FUNCTION refresh_geojson_geometries, refresh_tile_geojson_geometries;
             """,
-        )
+        ),
     ]
