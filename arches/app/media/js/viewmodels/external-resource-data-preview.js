@@ -169,6 +169,7 @@ define([
         this.fileData = ko.observableArray();
         this.fileData.subscribe(function() {
             params.fileData(self.fileData())
+            console.log("!!", self, params)
 
             self.fileData().forEach(function(fileDatum) {
                 var match = ko.utils.arrayFirst(self.addedFiles(), function(file) {

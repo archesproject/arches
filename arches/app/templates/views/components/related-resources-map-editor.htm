@@ -38,8 +38,11 @@
         <!-- /ko -->
     </div>
 
-    <div style="display:none" data-bind="text: console.log($parent, $data)"></div>
-    <external-resource-data-preview params="{fileData: self.fileData, loading: self.loading}" ></external-resource-data-preview>
+    <!-- <div data-bind="visible: foo()"> -->
+
+        <div style="display:none" data-bind="text: console.log(';;', $parent, $data)"></div>
+        <external-resource-data-preview params="{fileData: self.fileData, loading: self.loading}" ></external-resource-data-preview>
+    <!-- </div> -->
 
 
 
