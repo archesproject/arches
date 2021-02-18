@@ -13336,8 +13336,14 @@ a.jstree-anchor.permissions-widget {
 }
 .map-coordinate-editor-pair input {
     margin: 0 5px;
-    width: 140px;
+    width: 120px;
     display: inline-block;
+}
+.coordinate-entry-label {
+    display: inline-block;
+    width: 15px;
+    text-align: right;
+    font-weight: bold;
 }
 .map-coordinate-editor hr {
     margin: 10px 4px 5px;
@@ -13347,6 +13353,7 @@ a.jstree-anchor.permissions-widget {
 }
 .map-coordinate-editor-drag-handler {
     cursor: grab;
+    font-size: 16px;
 }
 .map-coordinate-editor-pair.ui-sortable-helper,
 .map-coordinate-editor-pair.ui-sortable-helper .map-coordinate-editor-drag-handler {
