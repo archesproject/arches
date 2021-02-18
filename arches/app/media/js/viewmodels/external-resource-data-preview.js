@@ -143,6 +143,8 @@ define([
     var ExternalResourceDataPreviewViewModel = function(params) {
         var self = this;
 
+        console.log("!!", params)
+
         params.configKeys = ['acceptedFiles', 'maxFilesize', 'maxFiles'];
         FileWidgetViewModel.apply(this, [params]);
 
@@ -165,7 +167,8 @@ define([
 
         this.fileData = ko.observableArray();
         this.fileData.subscribe(function() {
-            self.value(self.fileData())
+            // self.value(self.fileData())
+            params.fileData(self.fileData())
 
             self.addedFiles.removeAll();
             

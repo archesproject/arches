@@ -12,7 +12,7 @@ define([
     'viewmodels/map-filter',
     'viewmodels/external-resource-data-preview',
     'views/components/cards/select-related-feature-layers',
-    'text!templates/views/components/cards/foo-map-popup.htm'
+    'text!templates/views/components/cards/external-resource-data-preview-popup.htm'
 ], function($, arches, ko, koMapping, geojsonExtent, mapboxgl, uuid, fooRRMAP, CardComponentViewModel, MapEditorViewModel, MapFilterViewModel, ExternalResourceDataPreview, selectFeatureLayersFactory, popupTemplate) {
 
 
@@ -419,60 +419,36 @@ define([
         var self = this;
         ko.utils.extend(self, new foo(params));
 
-
         this.fileData = ko.observable();
 
-        if (params.tile && params.card) {
-            var fileListWidget = params.card.widgets().find(function(widget) {
-                return widget.datatype.datatype === 'file-list';
+        self.fileData.subscribe(function(fileData) {
+            var bounds = new mapboxgl.LngLatBounds();
+
+            fileData.forEach(function(fileDatum) {
+                fileDatum.data.forEach(function(parsedRow) {
+                    if (parsedRow.location_data) {
+                        parsedRow.location_data.features.forEach(function(feature) {
+                            feature.id = parsedRow.row_id;
+                            self.draw.add(feature);
+                            bounds.extend(feature.geometry.coordinates);
+                        });
+                    }
+                });
             });
 
-            // var fileWidgetData = params.tile.data[fileListWidget.node_id()];
+            self.map().fitBounds(
+                bounds, 
+                { 
+                    padding: { top: 120, right: 540, bottom: 120, left: 120 },
+                    linear: true,
+                }
+            );
+        });
 
-            // /* sets cached value to tile to persist data through map reload during value change */ 
-            // if (!fileWidgetData() && ko.unwrap(fileListWidget._value)) {
-            //     params.tile.data[fileListWidget.node_id()](ko.unwrap(fileListWidget._value));
-            // }
-
-            // fileWidgetData.subscribe(function(value) {
-            //     if (value) { 
-            //         fileListWidget._value = value; 
-            //     }
-                
-            //     self.fileData(fileWidgetData())
-            // });
-
-        }
 
         self.map.subscribe(function(map) {
             if (!self.draw && params.draw) {
                 self.draw = params.draw;
-            }
-            
-            var fileData = ko.unwrap(self.fileData);
-            
-            if (fileData) {
-                var bounds = new mapboxgl.LngLatBounds();
-
-                fileData.forEach(function(fileDatum) {
-                    fileDatum.data.forEach(function(parsedRow) {
-                        if (parsedRow.location_data) {
-                            parsedRow.location_data.features.forEach(function(feature) {
-                                feature.id = parsedRow.row_id;
-                                self.draw.add(feature);
-                                bounds.extend(feature.geometry.coordinates);
-                            });
-                        }
-                    });
-                });
-
-                map.fitBounds(
-                    bounds, 
-                    { 
-                        padding: { top: 120, right: 540, bottom: 120, left: 120 },
-                        linear: true,
-                    }
-                );
             }
 
             map.on('click', function(e) {
@@ -482,7 +458,7 @@ define([
                 );
                 
                 if (hoverFeature) {
-                    hoverFeature.id = hoverFeature.properties.id
+                    hoverFeature.id = hoverFeature.properties.id;
 
                     var featureData = self.fileData().reduce(function(acc, fileDatum) {
                         acc = fileDatum.data.find(function(parsedRow) {
@@ -513,6 +489,13 @@ define([
             });
         });
     }
+
+    ko.components.register('external-resource-data-preview-map', {
+        viewModel: viewModel,
+        template: {
+            require: 'text!templates/views/components/cards/related-resources-map.htm'
+        }
+    });
 
     return viewModel;
 });

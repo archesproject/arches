@@ -26,15 +26,5 @@ define([
             require: 'text!widget-templates/file'
         }
     });
-    
-    // return ko.components.register('file-widget', {
-    //     viewModel: function(params) {
-    //         params.configKeys = ['acceptedFiles', 'maxFilesize'];
-    //         FilePreviewWidgetViewModel.apply(this, [params]);
-    //     },
-    //     template: {
-    //         require: 'text!widget-templates/file-preview'
-    //     }
-    // });
 
 });
