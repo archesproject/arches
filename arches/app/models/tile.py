@@ -336,7 +336,6 @@ class Tile(models.TileModel):
         except AttributeError:  # no user - probably importing data
             user = None
 
-
         # if user is not None:
         #     self.validate([])
 
