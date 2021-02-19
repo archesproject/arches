@@ -991,10 +991,39 @@ class RelatedResourcesView(BaseManagerView):
             notes = ''
             dateto = None
             datefrom = None
+
             relationshiptype = ''
-            
+
+            # relationshiptype = Concept().get(
+            #     id="00000000-0000-0000-0000-000000000007",  #  default resource relationship
+            # )
+
+
             root_resourceinstanceid = [json.loads(request.body).get('root_resourceinstanceid')]
             instances_to_relate = json.loads(request.body).get('instances_to_relate')
+
+            root_resource_instance = models.ResourceInstance.objects.get(
+                resourceinstanceid=json.loads(request.body).get('root_resourceinstanceid')
+            )
+            root_resource_instance_nodes = models.Node.objects.filter(graph_id=root_resource_instance.graph_id)
+            root_resource_instance_top_node = [node for node in root_resource_instance_nodes if node.istopnode == True][0]
+
+
+            child_node_ids_to_relate = []
+
+            for resourceinstance_id in instances_to_relate:
+                resource_instance = models.ResourceInstance.objects.get(resourceinstanceid=resourceinstance_id)
+                resource_instance_nodes = models.Node.objects.filter(graph_id=resource_instance.graph_id)
+                resource_instance_top_node = [node for node in resource_instance_nodes if node.istopnode == True][0]
+
+                resource_instance_top_node.set_relatable_resources([root_resource_instance_top_node.pk])
+                child_node_ids_to_relate.append(resource_instance_top_node.pk)
+
+            root_resource_instance_top_node.set_relatable_resources(child_node_ids_to_relate)
+
+
+
+
 
         def get_relatable_resources(graphid):
             """
@@ -1002,6 +1031,8 @@ class RelatedResourcesView(BaseManagerView):
             """
             nodes = models.Node.objects.filter(graph_id=graphid)
             top_node = [node for node in nodes if node.istopnode == True][0]
+
+
             relatable_resources = [str(node.graph_id) for node in top_node.get_relatable_resources()]
             return relatable_resources
 
@@ -1012,12 +1043,13 @@ class RelatedResourcesView(BaseManagerView):
             relatable_from = get_relatable_resources(resource_instance_from.graph_id)
             relatable_to_is_valid = str(resource_instance_to.graph_id) in relatable_from
             relatable_from_is_valid = str(resource_instance_from.graph_id) in relatable_to
+
             return relatable_to_is_valid is True and relatable_from_is_valid is True
 
         for instanceid in instances_to_relate:
             permitted = confirm_relationship_permitted(instanceid, root_resourceinstanceid[0])
-            if True is True:
-            # if permitted is True:
+            # if True is True:
+            if permitted is True:
                 rr = models.ResourceXResource(
                     resourceinstanceidfrom=Resource(root_resourceinstanceid[0]),
                     resourceinstanceidto=Resource(instanceid),

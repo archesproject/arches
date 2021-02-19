@@ -697,6 +697,7 @@ class ExternalResourceDataBAR(APIBase):
                         'row_id': row_data['row_id'],
                         'tile_data': tile_data,
                     }
+                    
 
                     
             return JSONResponse({
