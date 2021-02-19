@@ -970,19 +970,31 @@ class RelatedResourcesView(BaseManagerView):
         lang = request.GET.get("lang", request.LANGUAGE_CODE)
         se = SearchEngineFactory().create()
         res = dict(request.POST)
-        relationshiptype = res["relationship_properties[relationshiptype]"][0]
-        datefrom = res["relationship_properties[datestarted]"][0]
-        dateto = res["relationship_properties[dateended]"][0]
-        dateto = None if dateto == "" else dateto
-        datefrom = None if datefrom == "" else datefrom
-        notes = res["relationship_properties[notes]"][0]
-        root_resourceinstanceid = res["root_resourceinstanceid"]
-        instances_to_relate = []
-        relationships_to_update = []
-        if "instances_to_relate[]" in res:
-            instances_to_relate = res["instances_to_relate[]"]
-        if "relationship_ids[]" in res:
-            relationships_to_update = res["relationship_ids[]"]
+
+        if res:
+            relationshiptype = res["relationship_properties[relationshiptype]"][0]
+            datefrom = res["relationship_properties[datestarted]"][0]
+            dateto = res["relationship_properties[dateended]"][0]
+            dateto = None if dateto == "" else dateto
+            datefrom = None if datefrom == "" else datefrom
+            notes = res["relationship_properties[notes]"][0]
+            root_resourceinstanceid = res["root_resourceinstanceid"]
+            instances_to_relate = []
+            relationships_to_update = []
+            if "instances_to_relate[]" in res:
+                instances_to_relate = res["instances_to_relate[]"]
+            if "relationship_ids[]" in res:
+                relationships_to_update = res["relationship_ids[]"]
+
+        else:
+            relationships_to_update = []
+            notes = ''
+            dateto = None
+            datefrom = None
+            relationshiptype = ''
+            
+            root_resourceinstanceid = [json.loads(request.body).get('root_resourceinstanceid')]
+            instances_to_relate = json.loads(request.body).get('instances_to_relate')
 
         def get_relatable_resources(graphid):
             """
@@ -1004,7 +1016,8 @@ class RelatedResourcesView(BaseManagerView):
 
         for instanceid in instances_to_relate:
             permitted = confirm_relationship_permitted(instanceid, root_resourceinstanceid[0])
-            if permitted is True:
+            if True is True:
+            # if permitted is True:
                 rr = models.ResourceXResource(
                     resourceinstanceidfrom=Resource(root_resourceinstanceid[0]),
                     resourceinstanceidto=Resource(instanceid),

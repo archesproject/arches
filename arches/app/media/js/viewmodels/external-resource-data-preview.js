@@ -273,6 +273,7 @@ define([
 
         this.createResources = function() {
             params.loading(true);
+            console.log(self, params)
 
             $.ajax({
                 dataType: "json",
@@ -284,10 +285,59 @@ define([
                 }),
                 url: arches.urls.api_external_foobar(graphid=OBSERVATIONS_GRAPH_ID),
                 success: function(response) {
+                    console.log("!!!!!!!", response)
                     self.fileData(response['file_data']);
+
+
+                    var resourceInstanceIds = response['file_data'].reduce(function(acc, fileDatum) {
+                        Object.values(fileDatum.created_resources).forEach(function(resourceData) {
+                            acc.push(resourceData['resourceinstance_id']);
+                        });
+                        return acc;
+                    }, []);
+
+                    console.log("@!", resourceInstanceIds, arches)
+
+                    // params.tile.save()
+
+                    self.relateResources(resourceInstanceIds);
+
                     params.loading(false);
                 },
             });
+        }
+
+        this.relateResources = function(resourceInstanceIds) {
+            params.loading(true);
+            // console.log(self, params, arches)
+
+
+            params.tile.save().then(function(foo) {
+                console.log(foo)
+
+
+
+                $.ajax({
+                    dataType: "json",
+                    type: 'POST',
+                    contentType: "application/json",
+                    data: JSON.stringify({
+                        instances_to_relate: resourceInstanceIds,
+                        root_resourceinstanceid: foo.resourceinstance_id,
+                    }),
+                    url: arches.urls.related_resources + foo.resourceinstance_id + `?paginate=false`,
+                    success: function(response) {
+                        console.log("@@@@@@@@@@", response)
+                        // self.fileData(response['file_data']);
+                        // params.tile.save()
+    
+                        params.loading(false);
+                    },
+                });
+
+            })
+
+
         }
 
         this.validateNodeData = function(parsedFile, nodeId, cellValue) {

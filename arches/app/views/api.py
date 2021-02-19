@@ -692,11 +692,16 @@ class ExternalResourceDataBAR(APIBase):
 
                         tile.save()
 
-                        file_datum['created_resources'][row_data['row_id']] = tile_data
+                    file_datum['created_resources'][row_data['row_id']] = {
+                        'resourceinstance_id': str(resource_instance.pk),
+                        'row_id': row_data['row_id'],
+                        'tile_data': tile_data,
+                    }
 
-
+                    
             return JSONResponse({
                 'file_data': file_data,
+
             }, status=200)
             
         except Exception as e:

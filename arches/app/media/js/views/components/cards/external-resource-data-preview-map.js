@@ -6,6 +6,10 @@ define([
     'viewmodels/external-resource-data-preview',
     'text!templates/views/components/cards/external-resource-data-preview-popup.htm'
 ], function($, arches, ko, mapboxgl, ExternalResourceDataPreview, popupTemplate) {
+    /* 
+        Used to connect the external-resource-data-preview component 
+        with the related-resources-map-card
+    */ 
     var viewModel = function(params) {
         var self = this;
 
