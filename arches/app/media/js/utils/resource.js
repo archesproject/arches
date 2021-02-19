@@ -151,6 +151,19 @@ define(['arches'], function(arches) {
                 }
             }
             return undefined;
+        },
+        getRelatedInstances: function(resourceid, targetGraphId) {
+            var url = arches.urls.related_resources + resourceid;
+            var params = {"resourceinstance_graphid": targetGraphId, "paginate": false};
+            return window.fetch(url + "?" + new window.URLSearchParams(params).toString())
+                .then(function(response) {
+                    if (response.ok) {
+                        return response.json();
+                    }
+                })
+                .then(function(json) {
+                    return json;
+                });
         }
     };
     return resourceUtils;
