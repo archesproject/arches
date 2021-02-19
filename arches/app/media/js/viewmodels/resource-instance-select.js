@@ -311,21 +311,34 @@ define([
                         return {};
                     } else {
                         url(arches.urls.search_results);
-                        var data = { 'paging-filter': page };
-                        var graphids = self.resourceTypesToDisplayInDropDown.map(function(graphid) {
-                            return {
-                                "graphid": graphid,
-                                "inverted": false
-                            };
+                        var queryString = new URLSearchParams();
+                        if (!!params.node && !!params.node.config.useSearchStringOnly){
+                            var searchUrl = new URL(params.node.config.searchString());
+                            queryString = new URLSearchParams(searchUrl.search);
+                        } 
+                        queryString.set('paging-filter', page);
+
+                        // merge resource type filters
+                        var resourceFiltersString = queryString.get('resource-type-filter') || "[]";
+                        var resourceFilters = JSON.parse(resourceFiltersString);
+                        self.resourceTypesToDisplayInDropDown.forEach(function(graphid){
+                            if(!(resourceFiltersString.includes(graphid))){
+                                resourceFilters.push({
+                                    "graphid": graphid,
+                                    "inverted": false
+                                });
+                            }
                         });
-                        if(graphids.length > 0) {
-                            data['resource-type-filter'] = JSON.stringify(graphids);
+                        if(resourceFilters.length > 0) {
+                            queryString.set('resource-type-filter', JSON.stringify(resourceFilters));
                         }
-                        if (term) {
+
+                        if(term) {
                             if(typeof params.termFilter === 'function'){
                                 params.termFilter(term, data);
                             } else {
-                                data['term-filter'] = JSON.stringify([{
+                                var termFilter = JSON.parse(queryString.get('term-filter')) || [];
+                                termFilter.push({
                                     "inverted": false,
                                     "type": "string",
                                     "context": "",
@@ -333,10 +346,11 @@ define([
                                     "id": term,
                                     "text": term,
                                     "value": term
-                                }]);
+                                });
+                                queryString.set('term-filter', JSON.stringify(termFilter));
                             }
                         }
-                        return data;
+                        return queryString.toString();
                     }
                 },
                 results: function(data, page) {
