@@ -811,9 +811,9 @@ class Command(BaseCommand):
         def cache_graphs():
             management.call_command("cache", operation="graphs")
 
-        def update_resource_materialized_view():
+        def update_resource_geojson_geometries():
             with connection.cursor() as cursor:
-                cursor.execute("REFRESH MATERIALIZED VIEW mv_geojson_geoms;")
+                cursor.execute("SELECT * FROM refresh_geojson_geometries();")
 
         def load_apps(package_dir):
             package_apps = glob.glob(os.path.join(package_dir, "apps", "*"))
@@ -914,7 +914,7 @@ class Command(BaseCommand):
             for css_file in css_files:
                 shutil.copy(css_file, css_dest)
         print("Refreshing the resource view")
-        update_resource_materialized_view()
+        update_resource_geojson_geometries()
         print("loading post sql")
         load_sql(package_location, "post_sql")
         if defer_indexing is True:
