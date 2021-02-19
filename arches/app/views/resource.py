@@ -970,60 +970,19 @@ class RelatedResourcesView(BaseManagerView):
         lang = request.GET.get("lang", request.LANGUAGE_CODE)
         se = SearchEngineFactory().create()
         res = dict(request.POST)
-
-        if res:
-            relationshiptype = res["relationship_properties[relationshiptype]"][0]
-            datefrom = res["relationship_properties[datestarted]"][0]
-            dateto = res["relationship_properties[dateended]"][0]
-            dateto = None if dateto == "" else dateto
-            datefrom = None if datefrom == "" else datefrom
-            notes = res["relationship_properties[notes]"][0]
-            root_resourceinstanceid = res["root_resourceinstanceid"]
-            instances_to_relate = []
-            relationships_to_update = []
-            if "instances_to_relate[]" in res:
-                instances_to_relate = res["instances_to_relate[]"]
-            if "relationship_ids[]" in res:
-                relationships_to_update = res["relationship_ids[]"]
-
-        else:
-            relationships_to_update = []
-            notes = ''
-            dateto = None
-            datefrom = None
-
-            relationshiptype = ''
-
-            # relationshiptype = Concept().get(
-            #     id="00000000-0000-0000-0000-000000000007",  #  default resource relationship
-            # )
-
-
-            root_resourceinstanceid = [json.loads(request.body).get('root_resourceinstanceid')]
-            instances_to_relate = json.loads(request.body).get('instances_to_relate')
-
-            root_resource_instance = models.ResourceInstance.objects.get(
-                resourceinstanceid=json.loads(request.body).get('root_resourceinstanceid')
-            )
-            root_resource_instance_nodes = models.Node.objects.filter(graph_id=root_resource_instance.graph_id)
-            root_resource_instance_top_node = [node for node in root_resource_instance_nodes if node.istopnode == True][0]
-
-
-            child_node_ids_to_relate = []
-
-            for resourceinstance_id in instances_to_relate:
-                resource_instance = models.ResourceInstance.objects.get(resourceinstanceid=resourceinstance_id)
-                resource_instance_nodes = models.Node.objects.filter(graph_id=resource_instance.graph_id)
-                resource_instance_top_node = [node for node in resource_instance_nodes if node.istopnode == True][0]
-
-                resource_instance_top_node.set_relatable_resources([root_resource_instance_top_node.pk])
-                child_node_ids_to_relate.append(resource_instance_top_node.pk)
-
-            root_resource_instance_top_node.set_relatable_resources(child_node_ids_to_relate)
-
-
-
-
+        relationshiptype = res["relationship_properties[relationshiptype]"][0]
+        datefrom = res["relationship_properties[datestarted]"][0]
+        dateto = res["relationship_properties[dateended]"][0]
+        dateto = None if dateto == "" else dateto
+        datefrom = None if datefrom == "" else datefrom
+        notes = res["relationship_properties[notes]"][0]
+        root_resourceinstanceid = res["root_resourceinstanceid"]
+        instances_to_relate = []
+        relationships_to_update = []
+        if "instances_to_relate[]" in res:
+            instances_to_relate = res["instances_to_relate[]"]
+        if "relationship_ids[]" in res:
+            relationships_to_update = res["relationship_ids[]"]
 
         def get_relatable_resources(graphid):
             """
@@ -1031,8 +990,6 @@ class RelatedResourcesView(BaseManagerView):
             """
             nodes = models.Node.objects.filter(graph_id=graphid)
             top_node = [node for node in nodes if node.istopnode == True][0]
-
-
             relatable_resources = [str(node.graph_id) for node in top_node.get_relatable_resources()]
             return relatable_resources
 
@@ -1043,12 +1000,10 @@ class RelatedResourcesView(BaseManagerView):
             relatable_from = get_relatable_resources(resource_instance_from.graph_id)
             relatable_to_is_valid = str(resource_instance_to.graph_id) in relatable_from
             relatable_from_is_valid = str(resource_instance_from.graph_id) in relatable_to
-
             return relatable_to_is_valid is True and relatable_from_is_valid is True
 
         for instanceid in instances_to_relate:
             permitted = confirm_relationship_permitted(instanceid, root_resourceinstanceid[0])
-            # if True is True:
             if permitted is True:
                 rr = models.ResourceXResource(
                     resourceinstanceidfrom=Resource(root_resourceinstanceid[0]),

@@ -15,11 +15,17 @@ define([
 
         params.popupTemplate = popupTemplate;
         self.popupTemplate = popupTemplate;
+        console.log("THER THER", self, params, ko.unwrap(params.fileData))
+        
 
         this.map = params.map;
         this.fileData = ko.observable();
+        this.fileData.subscribe(function(fileData) {
+            if (!ko.unwrap(params.fileData)) {
 
-        self.fileData.subscribe(function(fileData) {
+                params.fileData(fileData)
+            }
+
             var bounds = new mapboxgl.LngLatBounds();
 
             fileData.forEach(function(fileDatum) {

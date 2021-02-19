@@ -166,8 +166,17 @@ define([
 
         this.resourceModelNodeData = ko.observable();
 
+        this.widget = params.widgets.find(function(widget) {
+            return widget.datatype.datatype = 'resource-instance-list';
+        })
+
+        console.log("WHERE WHERE", params, self)
+
         this.fileData = ko.observableArray();
         this.fileData.subscribe(function() {
+
+            // self.tile.foo = self.fileData();
+            
             params.fileData(self.fileData())
             console.log("!!", self, params)
 
@@ -232,16 +241,21 @@ define([
         };
 
         this.fetchResourceModelNodeData = function() {
+            params.loading(true);
+
             $.ajax({
                 dataType: "json",
                 url: arches.urls.graph_nodes(OBSERVATIONS_GRAPH_ID),
                 success: function (response) {
                     self.resourceModelNodeData(response);
+                    params.loading(false);
                 }
             });
         };
 
         this.parseCSVFile = function(file) {
+            params.loading(true);
+
             var formData = new FormData();
 
             formData.append('uploaded_file', file);
@@ -267,6 +281,7 @@ define([
                     response['created_resources'] = {};
 
                     self.fileData.push(response);
+                    params.loading(false);
                 }
             });
         };
@@ -309,32 +324,41 @@ define([
 
         this.relateResources = function(resourceInstanceIds) {
             params.loading(true);
-            // console.log(self, params, arches)
+            console.log('HERE HERE', self, params)
 
+            var foobar = resourceInstanceIds.map(function(resourceInstanceId) {
+                return {
+                    resourceId: resourceInstanceId,
+                    ontologyProperty: '',
+                    inverseOntologyProperty: '',
+                };
+            })
+
+            params.tile.data[self.widget.node_id()](foobar)
 
             params.tile.save().then(function(foo) {
                 console.log(foo)
 
 
 
-                $.ajax({
-                    dataType: "json",
-                    type: 'POST',
-                    contentType: "application/json",
-                    data: JSON.stringify({
-                        instances_to_relate: resourceInstanceIds,
-                        root_resourceinstanceid: foo.resourceinstance_id,
-                    }),
-                    url: arches.urls.related_resources + foo.resourceinstance_id + `?paginate=false`,
-                    success: function(response) {
-                        console.log("@@@@@@@@@@", response)
-                        // self.fileData(response['file_data']);
-                        // params.tile.save()
+                // $.ajax({
+                //     dataType: "json",
+                //     type: 'POST',
+                //     contentType: "application/json",
+                //     data: JSON.stringify({
+                //         instances_to_relate: resourceInstanceIds,
+                //         root_resourceinstanceid: foo.resourceinstance_id,
+                //     }),
+                //     url: arches.urls.related_resources + foo.resourceinstance_id,
+                //     success: function(response) {
+                //         console.log("@@@@@@@@@@", response, self, params)
+                //         // self.fileData(response['file_data']);
+                //         params.tile.save()
     
+                //     },
+                // });
+                
                         params.loading(false);
-                    },
-                });
-
             })
 
 
