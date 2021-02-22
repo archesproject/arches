@@ -3,7 +3,10 @@
 
 {% block form %}
 <div class="row widget-wrapper file-preview">
-    <div class="form-group">
+    <div 
+        class="form-group"
+        style="display: flex; flex-direction: column;"
+    >
         <label class="control-label widget-input-label" for="" data-bind="text:label"></label>
 
         <!-- ko if: node -->
@@ -225,8 +228,15 @@
 
 
         <!-- ko if: ko.unwrap(uncreatedResourceData).length > 0-->
-        <div>
-            <div>Observations Preview</div>
+        <div
+            style="padding-top: 12px;"
+        >
+            <div
+                class="control-label widget-input-label"
+                style="padding-bottom: 5px;"
+            >
+                {% trans "Resource Preview" %}
+            </div>
     
             <div
                 style="
@@ -257,12 +267,14 @@
 
                                 <tr
                                     data-bind="{
-                                        style: { backgroundColor: !_.isEmpty(ko.unwrap($data['errors'])) ? 'red' : 'cornflowerblue'  },
+                                        style: { backgroundColor: !_.isEmpty(ko.unwrap($data['errors'])) ? 'lightcoral' : 'white'  },
                                     }"
                                 >
                                     <!-- ko foreach: { data: Object.keys(OBSERVATIONS_CSV_COLUMN_NAME_TO_NODE_IDS), as: 'key' } -->
                                         <!-- ko if: OBSERVATIONS_CSV_COLUMN_NAME_TO_NODE_IDS[key]['visible'] -->
-                                        <td>
+                                        <td
+                                            style="padding: 5px"
+                                        >
                                             <div>
                                                 <span data-bind="{text:(function(){
                                                     var nodeId = OBSERVATIONS_CSV_COLUMN_NAME_TO_NODE_IDS[key]['node_id'];
@@ -272,11 +284,16 @@
                                         </td>
                                         <!-- /ko -->
                                     <!-- /ko -->
-                                    <td>
+                                    <td
+                                        style="padding: 5px;"
+                                    >
                                         <div
                                             style="display: flex;"
                                         >
-                                            <button class="btn btn-link">
+                                            <button 
+                                                class="btn btn-link"
+                                                data-bind="click: function() { $parent.foobar($data.row_id) }"
+                                            >
                                                 <i class="fa fa-info"></i>
                                             </button>
                                             <button 
@@ -294,7 +311,7 @@
                 </table>
             </div>
 
-            <button data-bind="click: createResources">{% trans 'Load Resources' %}</button>
+            <button data-bind="click: createResources">{% trans 'Create Related Resources' %}</button>
         </div>
         <!-- /ko -->
 

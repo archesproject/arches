@@ -19,6 +19,12 @@ define([
         this.map = params.map;
         this.fileData = ko.observable();
 
+        this.fileData.subscribe(function(fileData) {
+            if (self.draw) {
+                self.updateMap(fileData)
+            }
+        });
+
         this.updateMap = function(fileData) {
             self.draw.deleteAll();
 
@@ -47,12 +53,6 @@ define([
             }
         }
 
-        this.fileData.subscribe(function(fileData) {
-            if (self.draw) {
-                self.updateMap(fileData)
-            }
-        });
-
         self.map.subscribe(function(map) {
             if (!self.draw && params.draw) {
                 self.draw = params.draw;
@@ -79,23 +79,26 @@ define([
                         return acc;
                     }, null)
 
-                    self.popup = new mapboxgl.Popup()
-                        .setLngLat(e.lngLat)
-                        .setHTML(self.popupTemplate)
-                        .addTo(map);
-                    ko.applyBindingsToDescendants(
-                        featureData,
-                        self.popup._content
-                    );
-
-                    if (map.getStyle()) {
-                        map.setFeatureState(hoverFeature, { selected: true });
+                    if (featureData) {
+                        self.popup = new mapboxgl.Popup()
+                            .setLngLat(e.lngLat)
+                            .setHTML(self.popupTemplate)
+                            .addTo(map);
+                        ko.applyBindingsToDescendants(
+                            featureData,
+                            self.popup._content
+                        );
+    
+                        if (map.getStyle()) {
+                            map.setFeatureState(hoverFeature, { selected: true });
+                        }
+    
+                        self.popup.on('close', function() {
+                            if (map.getStyle()) map.setFeatureState(hoverFeature, { selected: false });
+                            self.popup = undefined;
+                        });
                     }
 
-                    self.popup.on('close', function() {
-                        if (map.getStyle()) map.setFeatureState(hoverFeature, { selected: false });
-                        self.popup = undefined;
-                    });
                 }
             });
         });

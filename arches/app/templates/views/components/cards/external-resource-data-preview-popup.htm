@@ -11,7 +11,12 @@
             <tr
                 data-bind="style: {backgroundColor: (function() {
                     var nodeId = OBSERVATIONS_CSV_COLUMN_NAME_TO_NODE_IDS[key]['node_id'];
-                    return ko.unwrap($parent.errors)[nodeId] ? 'red' : 'cornflowerblue';
+
+                    if ($parent.errors && ko.unwrap($parent.errors)[nodeId]) {
+                        return 'lightcoral';
+                    }
+
+                    return 'white';
                 })()}"
             >   
                 <td>
@@ -36,7 +41,7 @@
                             return data;
                         })()
                     "></span>
-                    <!-- ko if: ko.unwrap($parent.errors)[OBSERVATIONS_CSV_COLUMN_NAME_TO_NODE_IDS[key]['node_id']] -->
+                    <!-- ko if: $parent.errors && ko.unwrap($parent.errors)[OBSERVATIONS_CSV_COLUMN_NAME_TO_NODE_IDS[key]['node_id']] -->
                     <span>
                         <button class="btn btn-link" type="button" data-toggle="collapse" data-target="#errorsCollapse" aria-expanded="false" aria-controls="errorsCollapse">
                             <i class="fa fa-question-circle"></i>
