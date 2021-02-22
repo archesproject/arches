@@ -277,7 +277,7 @@ define([
 
             $.ajax({
                 dataType: "json",
-                url: arches.urls.api_external_resource_data,
+                url: arches.urls.api_external_resource_data_validation,
                 processData: false, /* important! */
                 contentType: false, /* important! */
                 method: 'POST',
@@ -308,7 +308,7 @@ define([
                     'file_data': self.fileData(),
                     'column_name_to_node_data_map': OBSERVATIONS_CSV_COLUMN_NAME_TO_NODE_IDS,
                 }),
-                url: arches.urls.api_external_foobar(graphid=OBSERVATIONS_GRAPH_ID),
+                url: arches.urls.api_external_resource_creation(graphid=OBSERVATIONS_GRAPH_ID),
                 success: function(response) {
                     self.fileData(response['file_data']);
 

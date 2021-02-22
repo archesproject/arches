@@ -590,7 +590,6 @@ class ExternalResourceDataValidation(APIBase):
                             if isinstance(datatype, ConceptListDataType):
                                 value = [value]
 
-                        # GET RID OF TRY AFTER DOMAIN VALUE REFACTOR!
                         try:
                             validation_errors = datatype.validate(value, node=node)
 
@@ -605,7 +604,6 @@ class ExternalResourceDataValidation(APIBase):
 
                         parsed_row_data[node_id] = value
 
-            # import pdb; pdb.set_trace()
             parsed_rows.append({
                 'row_id': str(uuid.uuid4()),
                 'row_data': row_data,
@@ -620,6 +618,8 @@ class ExternalResourceDataValidation(APIBase):
         })
 
     def parse_and_validate_resource(self, request, node_id):
+        # currently not working
+        
         cell_value = json.loads(
             request.POST.get('cell_value')
         )
@@ -648,7 +648,7 @@ class ExternalResourceDataValidation(APIBase):
         return JSONResponse({ 'errors': errors })
 
 
-class ExternalResourceDataBAR(APIBase):
+class ExternalResourceDataCreation(APIBase):
     def post(self, request, graphid=None):
         try:
             body = json.loads(request.body)
@@ -698,11 +698,8 @@ class ExternalResourceDataBAR(APIBase):
                         'tile_data': tile_data,
                     }
                     
-
-                    
             return JSONResponse({
                 'file_data': file_data,
-
             }, status=200)
             
         except Exception as e:

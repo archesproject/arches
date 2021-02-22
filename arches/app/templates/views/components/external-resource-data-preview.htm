@@ -292,12 +292,6 @@
                                         >
                                             <button 
                                                 class="btn btn-link"
-                                                data-bind="click: function() { $parent.foobar($data.row_id) }"
-                                            >
-                                                <i class="fa fa-info"></i>
-                                            </button>
-                                            <button 
-                                                class="btn btn-link"
                                                 data-bind="click: function() { $parent.deleteResourceDatum($data.row_id) }"
                                             >
                                                 <i class="fa fa-trash"></i>
@@ -311,7 +305,7 @@
                 </table>
             </div>
 
-            <button data-bind="click: createResources">{% trans 'Create Related Resources' %}</button>
+            <button data-bind="click: createResources">{% trans 'Create Resources' %}</button>
         </div>
         <!-- /ko -->
 
