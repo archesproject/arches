@@ -14,7 +14,7 @@
             <div 
                 class="file-select-window" 
                 style="min-width: unset;"
-                data-bind="visible: foofoo().length === 0"
+                data-bind="visible: addedFiles().length === 0"
             >
                 <div 
                     class="bord-top pad-ver file-select"
@@ -66,7 +66,7 @@
                 note that data-bind=visible must be in place (instead of ko if:) as DZ instantiates only once;
                 elements with its class name must exist at time of init 
             -->
-            <div data-bind="visible: foofoo().length > 0">
+            <div data-bind="visible: addedFiles().length > 0">
                 <div
                     style="
                         display: flex;
@@ -80,16 +80,16 @@
                         style="padding: 10px 0px;"
                     >
                         <!-- ko if: filter() -->
-                        <span data-bind="text: filteredList().length+' out of '+foofoo().length+' files match filter'"></span>
+                        <span data-bind="text: filteredList().length+' out of '+addedFiles().length+' files match filter'"></span>
                         <!-- /ko -->
 
                         <!-- ko if: (!filter() || filter() == "") -->
-                        <span data-bind="text: foofoo().length + '{% trans " file(s) uploaded" %}'"></span>
+                        <span data-bind="text: addedFiles().length + '{% trans " file(s) uploaded" %}'"></span>
                         <!-- /ko -->
                     </div>
                 </div>
 
-                    <!--ko if: foofoo().length > 1-->
+                    <!--ko if: addedFiles().length > 1-->
                     <input 
                         data-bind="textInput: filter" 
                         type="text" placeholder="{% trans 'find a file...' %}" 
@@ -148,7 +148,7 @@
             </div>
             <div class="dz-previews" data-bind="css: uniqueidClass">
             <!-- ko if: !filter() -->
-                <!-- ko foreach: foofoo() -->
+                <!-- ko foreach: addedFiles() -->
                     <div 
                         class="file-upload-card"
                         style="width: fit-content;"

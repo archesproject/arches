@@ -149,7 +149,6 @@ define([
         this.acceptedFiles = ko.observable('.csv');
         this.maxFilesize = ko.observable(4);
 
-
         this.unique_id = uuid.generate();
         this.uniqueidClass = ko.computed(function() {
             return "unique_id_" + self.unique_id;
@@ -158,40 +157,25 @@ define([
         this.filter = ko.observable("");
         this.uploadMultiple = ko.observable(true);
 
-        this.addedFiles = ko.observableArray();
-        this.addedFiles.subscribe(function(file) {
-            self.selectedFile(file[0])
-        });
-        this.selectedFile = ko.observable();
-
         this.resourceModelNodeData = ko.observable();
 
         this.widget = params.widgets.find(function(widget) {
             return widget.datatype.datatype = 'resource-instance-list';
         })
 
-        console.log("WHERE WHERE", params, self)
-
-
         this.uncreatedResourceData = ko.pureComputed(function() {
-            var foo = [];
-
-            self.fileData().forEach(function(fileDatum) {
+            return self.fileData().reduce(function(acc, fileDatum) {
                 fileDatum.data.forEach(function(resourceData) {
                     if (!fileDatum.created_resources[resourceData.row_id]) {
                         resourceData['file'] = fileDatum.file;
-                        foo.push(resourceData);
+                        acc.push(resourceData);
                     }
                 })
-                
-            });
-
-            console.log("#@*U(#@(*$R#", foo)
-
-            return foo;
+                return acc;
+            }, []);
         });
 
-        this.foofoo = ko.pureComputed(function() {
+        this.addedFiles = ko.pureComputed(function() {
             var files = {};
 
             self.uncreatedResourceData().forEach(function(resourceDatum) {
@@ -203,23 +187,16 @@ define([
             return Object.values(files);
         });
 
-
-
-
-        
-
         this.fileData = ko.observableArray();
         this.fileData.subscribe(function() {
-            self.tile.foo = self.fileData();
+            /* 
+                hanging on tile because it persists through component refresh 
+                safe because it's not persisted to the DB
+            */ 
+            self.tile._cachedFileData = self.fileData();
 
             params.fileData(self.fileData());
-
-            // console.log("FDHUJDISF", self.foofoo())
-
         });
-
-
-        this.createdResources = ko.observableArray();
 
         this.dropzoneOptions = {
             url: "arches.urls.root",
@@ -265,11 +242,12 @@ define([
         this.initialize = function() {
             params.loading(true);
 
-            if (ko.unwrap(params.tile.foo)) {
-                self.fileData(ko.unwrap(params.tile.foo))
+            if (ko.unwrap(params.tile._cachedFileData)) {
+                self.fileData(ko.unwrap(params.tile._cachedFileData))
             }
 
             this.fetchResourceModelNodeData();
+
             params.loading(false);
         };
 
@@ -333,9 +311,7 @@ define([
                 }),
                 url: arches.urls.api_external_foobar(graphid=OBSERVATIONS_GRAPH_ID),
                 success: function(response) {
-                    console.log("!!!!!!!", response)
                     self.fileData(response['file_data']);
-
 
                     var resourceInstanceIds = response['file_data'].reduce(function(acc, fileDatum) {
                         Object.values(fileDatum.created_resources).forEach(function(resourceData) {
@@ -344,34 +320,19 @@ define([
                         return acc;
                     }, []);
 
-                    console.log("@!", resourceInstanceIds, arches)
-
-                    // params.tile.save()
-
-                    // self.relateResources(resourceInstanceIds);
-
-
-                    var foobar = resourceInstanceIds.map(function(resourceInstanceId) {
+                    var widgetData = resourceInstanceIds.map(function(resourceInstanceId) {
                         return {
                             resourceId: resourceInstanceId,
                             ontologyProperty: '',
                             inverseOntologyProperty: '',
                         };
-                    })
+                    });
 
+                    params.tile.data[self.widget.node_id()](widgetData);
 
-
-                    params.tile.data[self.widget.node_id()](foobar)
-
-
-                    params.foo = self.fileData()
-
-
-                    params.tile.save().then(function(foo) {
-                        console.log(foo, self, params)
+                    params.tile.save().then(function() {
                         params.loading(false);
                     })
-
                 },
             });
         }
@@ -435,13 +396,13 @@ define([
         };
 
         this.removeFile = function(file) {
-            self.addedFiles.remove(file)
+            // self.addedFiles.remove(file)
         };
 
         this.reset = function() {
             if (self.dropzone) {
                 self.dropzone.removeAllFiles(true);
-                self.addedFiles.removeAll();
+                // self.addedFiles.removeAll();
             }
         };
 
