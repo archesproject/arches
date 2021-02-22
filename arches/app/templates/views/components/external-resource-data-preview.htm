@@ -14,7 +14,7 @@
             <div 
                 class="file-select-window" 
                 style="min-width: unset;"
-                data-bind="visible: addedFiles().length === 0"
+                data-bind="visible: foofoo().length === 0"
             >
                 <div 
                     class="bord-top pad-ver file-select"
@@ -66,7 +66,7 @@
                 note that data-bind=visible must be in place (instead of ko if:) as DZ instantiates only once;
                 elements with its class name must exist at time of init 
             -->
-            <div data-bind="visible: addedFiles().length > 0">
+            <div data-bind="visible: foofoo().length > 0">
                 <div
                     style="
                         display: flex;
@@ -80,16 +80,16 @@
                         style="padding: 10px 0px;"
                     >
                         <!-- ko if: filter() -->
-                        <span data-bind="text: filteredList().length+' out of '+addedFiles().length+' files match filter'"></span>
+                        <span data-bind="text: filteredList().length+' out of '+foofoo().length+' files match filter'"></span>
                         <!-- /ko -->
 
                         <!-- ko if: (!filter() || filter() == "") -->
-                        <span data-bind="text: addedFiles().length + '{% trans " file(s) uploaded" %}'"></span>
+                        <span data-bind="text: foofoo().length + '{% trans " file(s) uploaded" %}'"></span>
                         <!-- /ko -->
                     </div>
                 </div>
 
-                    <!--ko if: addedFiles().length > 1-->
+                    <!--ko if: foofoo().length > 1-->
                     <input 
                         data-bind="textInput: filter" 
                         type="text" placeholder="{% trans 'find a file...' %}" 
@@ -148,7 +148,7 @@
             </div>
             <div class="dz-previews" data-bind="css: uniqueidClass">
             <!-- ko if: !filter() -->
-                <!-- ko foreach: addedFiles() -->
+                <!-- ko foreach: foofoo() -->
                     <div 
                         class="file-upload-card"
                         style="width: fit-content;"
@@ -224,7 +224,7 @@
         </div>
 
 
-        <!-- ko if: resourceModelNodeData() && addedFiles().length > 0-->
+        <!-- ko if: ko.unwrap(uncreatedResourceData).length > 0-->
         <div>
             <div>Observations Preview</div>
     
@@ -303,76 +303,7 @@
 
 
 
-        <!-- ko if: resourceModelNodeData() && addedFiles().length > 0-->
-        <div>
-            <div>Observations Linked to Source</div>
-    
-            <div
-                style="
-                    width: 100%;
-                    overflow-x: scroll;
-                    padding-bottom: 14px;
-                "
-            >
-                <table>
-                    <thead>
-                        <tr> 
-                            <!-- ko foreach: { data: Object.keys(OBSERVATIONS_CSV_COLUMN_NAME_TO_NODE_IDS), as: 'key' } -->
-                            <!-- ko if: OBSERVATIONS_CSV_COLUMN_NAME_TO_NODE_IDS[key]['visible'] -->
-                                <th 
-                                    scope="column" 
-                                    data-bind="text: key"
-                                    style="
-                                        padding: 0px 10px;
-                                    "
-                                ></th>
-                                <!-- /ko -->
-                            <!-- /ko -->
-                            <th></th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <!-- ko foreach: fileData() -->
-                            <!-- ko foreach: $data.data -->
-
-                                <!-- ko if: $parent.created_resources[$data['row_id']] -->
-                                <tr>
-                                    <!-- ko foreach: { data: Object.keys(OBSERVATIONS_CSV_COLUMN_NAME_TO_NODE_IDS), as: 'key' } -->
-                                        <!-- ko if: OBSERVATIONS_CSV_COLUMN_NAME_TO_NODE_IDS[key]['visible'] -->
-                                        <td>
-                                            <div>
-                                                <span data-bind="{text:(function(){
-                                                    var nodeId = OBSERVATIONS_CSV_COLUMN_NAME_TO_NODE_IDS[key]['node_id'];
-
-                                                    console.log($parent, $parents[1])
-                                                    return $parent['row_data'][nodeId];
-                                                })()}"></span>
-                                            </div>
-                                        </td>
-                                        <!-- /ko -->
-                                    <!-- /ko -->
-                                    <td>
-                                        <div
-                                            style="display: flex;"
-                                        >
-                                            <button class="btn btn-link">
-                                                <i class="fa fa-info"></i>
-                                            </button>
-                                            <button class="btn btn-link">
-                                                <i class="fa fa-trash"></i>
-                                            </button>
-                                        </div>
-                                    </td>
-                                </tr>
-                                <!-- /ko -->
-
-                            <!-- /ko -->
-                        <!-- /ko -->
-                    </tbody>
-                </table>
-            </div>
-        </div>
-        <!-- /ko -->
+ 
 
     </div>
 

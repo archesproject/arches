@@ -43,7 +43,7 @@ define([
             node_id: "21f08600-04fd-11eb-9978-02e99e44e93e",
             nodegroup_id: "f56cd124-04fc-11eb-9978-02e99e44e93e",
         }, 
-        'Positive Observation': { 
+        'Detection Status': { 
             node_id: "abdaf060-37ef-11eb-a206-acde48001122",
             nodegroup_id: "f56cd124-04fc-11eb-9978-02e99e44e93e",
          }, 
@@ -172,24 +172,50 @@ define([
 
         console.log("WHERE WHERE", params, self)
 
-        this.fileData = ko.observableArray();
-        this.fileData.subscribe(function() {
 
-            // self.tile.foo = self.fileData();
-            
-            params.fileData(self.fileData())
-            console.log("!!", self, params)
+        this.uncreatedResourceData = ko.pureComputed(function() {
+            var foo = [];
 
             self.fileData().forEach(function(fileDatum) {
-                var match = ko.utils.arrayFirst(self.addedFiles(), function(file) {
-                    return file.file_id === fileDatum.file.file_id; 
-                });
+                fileDatum.data.forEach(function(resourceData) {
+                    if (!fileDatum.created_resources[resourceData.row_id]) {
+                        resourceData['file'] = fileDatum.file;
+                        foo.push(resourceData);
+                    }
+                })
+                
+            });
 
-                if (!match) {
-                    self.addedFiles.push(fileDatum.file)
+            console.log("#@*U(#@(*$R#", foo)
 
+            return foo;
+        });
+
+        this.foofoo = ko.pureComputed(function() {
+            var files = {};
+
+            self.uncreatedResourceData().forEach(function(resourceDatum) {
+                if (!files[resourceDatum.file_id]) {
+                    files[resourceDatum.file_id] = resourceDatum.file;
                 }
             });
+
+            return Object.values(files);
+        });
+
+
+
+
+        
+
+        this.fileData = ko.observableArray();
+        this.fileData.subscribe(function() {
+            self.tile.foo = self.fileData();
+
+            params.fileData(self.fileData());
+
+            // console.log("FDHUJDISF", self.foofoo())
+
         });
 
 
@@ -237,7 +263,14 @@ define([
         });
 
         this.initialize = function() {
+            params.loading(true);
+
+            if (ko.unwrap(params.tile.foo)) {
+                self.fileData(ko.unwrap(params.tile.foo))
+            }
+
             this.fetchResourceModelNodeData();
+            params.loading(false);
         };
 
         this.fetchResourceModelNodeData = function() {
@@ -315,53 +348,32 @@ define([
 
                     // params.tile.save()
 
-                    self.relateResources(resourceInstanceIds);
+                    // self.relateResources(resourceInstanceIds);
 
-                    params.loading(false);
+
+                    var foobar = resourceInstanceIds.map(function(resourceInstanceId) {
+                        return {
+                            resourceId: resourceInstanceId,
+                            ontologyProperty: '',
+                            inverseOntologyProperty: '',
+                        };
+                    })
+
+
+
+                    params.tile.data[self.widget.node_id()](foobar)
+
+
+                    params.foo = self.fileData()
+
+
+                    params.tile.save().then(function(foo) {
+                        console.log(foo, self, params)
+                        params.loading(false);
+                    })
+
                 },
             });
-        }
-
-        this.relateResources = function(resourceInstanceIds) {
-            params.loading(true);
-            console.log('HERE HERE', self, params)
-
-            var foobar = resourceInstanceIds.map(function(resourceInstanceId) {
-                return {
-                    resourceId: resourceInstanceId,
-                    ontologyProperty: '',
-                    inverseOntologyProperty: '',
-                };
-            })
-
-            params.tile.data[self.widget.node_id()](foobar)
-
-            params.tile.save().then(function(foo) {
-                console.log(foo)
-
-
-
-                // $.ajax({
-                //     dataType: "json",
-                //     type: 'POST',
-                //     contentType: "application/json",
-                //     data: JSON.stringify({
-                //         instances_to_relate: resourceInstanceIds,
-                //         root_resourceinstanceid: foo.resourceinstance_id,
-                //     }),
-                //     url: arches.urls.related_resources + foo.resourceinstance_id,
-                //     success: function(response) {
-                //         console.log("@@@@@@@@@@", response, self, params)
-                //         // self.fileData(response['file_data']);
-                //         params.tile.save()
-    
-                //     },
-                // });
-                
-                        params.loading(false);
-            })
-
-
         }
 
         this.validateNodeData = function(parsedFile, nodeId, cellValue) {

@@ -20,14 +20,10 @@ define([
 
         this.map = params.map;
         this.fileData = ko.observable();
-        this.fileData.subscribe(function(fileData) {
-            if (!ko.unwrap(params.fileData)) {
 
-                params.fileData(fileData)
-            }
-
+        this.boofar = function(fileData) {
             var bounds = new mapboxgl.LngLatBounds();
-
+    
             fileData.forEach(function(fileDatum) {
                 fileDatum.data.forEach(function(parsedRow) {
                     if (parsedRow.location_data) {
@@ -47,11 +43,26 @@ define([
                     linear: true,
                 }
             );
+        }
+
+        this.fileData.subscribe(function(fileData) {
+            // if (!ko.unwrap(params.fileData)) {
+
+            //     params.fileData(fileData)
+            // }
+
+            if (self.draw) {
+                self.boofar(fileData)
+            }
         });
 
         self.map.subscribe(function(map) {
             if (!self.draw && params.draw) {
                 self.draw = params.draw;
+            }
+
+            if (self.fileData()) {
+                self.boofar(self.fileData())
             }
 
             map.on('click', function(e) {
