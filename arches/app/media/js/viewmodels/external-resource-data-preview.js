@@ -299,7 +299,6 @@ define([
 
         this.createResources = function() {
             params.loading(true);
-            console.log(self, params)
 
             $.ajax({
                 dataType: "json",
@@ -392,7 +391,21 @@ define([
         };
 
         this.selectFile = function(file) { 
-            self.selectedFile(file); 
+            // self.selectedFile(file); 
+        };
+
+        this.deleteResourceDatum = function(rowId) {
+            var fileData = self.fileData();
+
+            var filteredFileData = fileData.filter(function(fileDatum) {
+                fileDatum.data = fileDatum.data.filter(function(rowData) {
+                    return rowData.row_id !== rowId;
+                });
+
+                return fileDatum.data.length;
+            });
+            
+            self.fileData(filteredFileData);
         };
 
         this.removeFile = function(file) {

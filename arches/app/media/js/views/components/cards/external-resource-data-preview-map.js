@@ -15,13 +15,13 @@ define([
 
         params.popupTemplate = popupTemplate;
         self.popupTemplate = popupTemplate;
-        console.log("THER THER", self, params, ko.unwrap(params.fileData))
-        
 
         this.map = params.map;
         this.fileData = ko.observable();
 
-        this.boofar = function(fileData) {
+        this.updateMap = function(fileData) {
+            self.draw.deleteAll();
+
             var bounds = new mapboxgl.LngLatBounds();
     
             fileData.forEach(function(fileDatum) {
@@ -36,23 +36,20 @@ define([
                 });
             });
 
-            self.map().fitBounds(
-                bounds, 
-                { 
-                    padding: { top: 120, right: 540, bottom: 120, left: 120 },
-                    linear: true,
-                }
-            );
+            if (fileData.length) {
+                self.map().fitBounds(
+                    bounds, 
+                    { 
+                        padding: { top: 120, right: 540, bottom: 120, left: 120 },
+                        linear: true,
+                    }
+                );
+            }
         }
 
         this.fileData.subscribe(function(fileData) {
-            // if (!ko.unwrap(params.fileData)) {
-
-            //     params.fileData(fileData)
-            // }
-
             if (self.draw) {
-                self.boofar(fileData)
+                self.updateMap(fileData)
             }
         });
 
@@ -62,7 +59,7 @@ define([
             }
 
             if (self.fileData()) {
-                self.boofar(self.fileData())
+                self.updateMap(self.fileData())
             }
 
             map.on('click', function(e) {

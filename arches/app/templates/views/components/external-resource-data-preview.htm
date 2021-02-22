@@ -253,10 +253,8 @@
                         </tr>
                     </thead>
                     <tbody>
-                        <!-- ko foreach: fileData() -->
-                            <!-- ko foreach: $data.data -->
+                        <!-- ko foreach: uncreatedResourceData() -->
 
-                                <!-- ko if: !$parent.created_resources[$data['row_id']] -->
                                 <tr
                                     data-bind="{
                                         style: { backgroundColor: !_.isEmpty(ko.unwrap($data['errors'])) ? 'red' : 'cornflowerblue'  },
@@ -268,8 +266,6 @@
                                             <div>
                                                 <span data-bind="{text:(function(){
                                                     var nodeId = OBSERVATIONS_CSV_COLUMN_NAME_TO_NODE_IDS[key]['node_id'];
-
-                                                    console.log($parent, $parents[1])
                                                     return $parent['row_data'][nodeId];
                                                 })()}"></span>
                                             </div>
@@ -283,15 +279,16 @@
                                             <button class="btn btn-link">
                                                 <i class="fa fa-info"></i>
                                             </button>
-                                            <button class="btn btn-link">
+                                            <button 
+                                                class="btn btn-link"
+                                                data-bind="click: function() { $parent.deleteResourceDatum($data.row_id) }"
+                                            >
                                                 <i class="fa fa-trash"></i>
                                             </button>
                                         </div>
                                     </td>
                                 </tr>
-                                <!-- /ko -->
 
-                            <!-- /ko -->
                         <!-- /ko -->
                     </tbody>
                 </table>
