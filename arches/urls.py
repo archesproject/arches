@@ -190,14 +190,8 @@ urlpatterns = [
     url(r"^resource/related/relatable", RelatedResourcesView.as_view(action="get_relatable_resources"), name="relatable_resources"),
     url(r"^resource/descriptors/(?P<resourceid>%s|())$" % uuid_regex, ResourceDescriptors.as_view(), name="resource_descriptors"),
     url(r"^resource/(?P<resourceid>%s)/tiles$" % uuid_regex, ResourceTiles.as_view(), name="resource_tiles"),
-
-
     url(r"^resource-data-validation$", api.ExternalResourceDataValidation.as_view(), name="api_external_resource_data_validation"),
     url(r"^resource-data-creation/(?P<graphid>%s)$" % (uuid_regex), api.ExternalResourceDataCreation.as_view(), name="api_external_resource_creation"),
-
-
-
-
     url(r"^report/(?P<resourceid>%s)$" % uuid_regex, ResourceReportView.as_view(), name="resource_report"),
     url(r"^card/(?P<cardid>%s|())$" % uuid_regex, CardView.as_view(action="update_card"), name="card"),
     url(r"^reorder_cards/", CardView.as_view(action="reorder_cards"), name="reorder_cards"),

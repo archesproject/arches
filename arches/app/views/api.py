@@ -515,10 +515,6 @@ class Graphs(APIBase):
         return JSONResponse({"datatypes": datatypes, "cards": permitted_cards, "graph": graph, "cardwidgets": cardwidgets})
 
 
-
-
-
-
 class ExternalResourceDataValidation(APIBase):
     def post(self, request, node_id=None):
         if node_id:
@@ -711,7 +707,6 @@ class ExternalResourceDataCreation(APIBase):
                     for message in formatted:
                         print(message)
             return JSONResponse({"error": "resource data could not be saved: %s" % e}, status=500, reason=e)
-
 
 
 @method_decorator(csrf_exempt, name="dispatch")
