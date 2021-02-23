@@ -585,7 +585,8 @@ class ExternalResourceDataValidation(APIBase):
                                 if value_datum['value'] == value:
                                     exact_match = value_datum
 
-                            value = exact_match['id']  # value_id
+                            if exact_match:
+                                value = exact_match['id']  # value_id
                         
                             if isinstance(datatype, ConceptListDataType):
                                 value = [value]
@@ -619,7 +620,7 @@ class ExternalResourceDataValidation(APIBase):
 
     def parse_and_validate_resource(self, request, node_id):
         # currently not working
-        
+
         cell_value = json.loads(
             request.POST.get('cell_value')
         )
