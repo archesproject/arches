@@ -272,10 +272,6 @@ define([
             return '<span>' + parseFloat((bytes / Math.pow(k, i)).toFixed(dm)) + '</span> ' + sizes[i];
         };
 
-        this.selectFile = function(file) { 
-            // self.selectedFile(file); 
-        };
-
         this.deleteResourceDatum = function(rowId) {
             var fileData = self.fileData();
 
@@ -291,13 +287,19 @@ define([
         };
 
         this.removeFile = function(file) {
-            // self.addedFiles.remove(file)
+            var fileData = self.fileData();
+
+            var filteredFileData = fileData.filter(function(fileDatum) {
+                return fileDatum.file.upload.uuid !== file.upload.uuid;
+            });
+            
+            self.fileData(filteredFileData);
         };
 
         this.reset = function() {
             if (self.dropzone) {
                 self.dropzone.removeAllFiles(true);
-                // self.addedFiles.removeAll();
+                self.fileData.removeAll();
             }
         };
 
