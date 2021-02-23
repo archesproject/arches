@@ -64,8 +64,6 @@ from arches.app.search.search_export import SearchResultsExporter
 
 from arches.celery import app
 
-
-
 logger = logging.getLogger(__name__)
 
 
