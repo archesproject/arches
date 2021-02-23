@@ -8,7 +8,7 @@ define([
     'viewmodels/file-widget',
     'bindings/dropzone',
 ], function($, ko, _, arches, Dropzone, uuid, FileWidgetViewModel) {
-    $.getJSON('../media/js/views/components/external-resource-data-preview/CSV_COLUMN_INFORMATION.json', function(columnInformation) {
+    $.getJSON(`${arches.urls.media}js/views/components/external-resource-data-preview/CSV_COLUMN_INFORMATION.json`, function(columnInformation) {
         GRAPH_ID = columnInformation['GRAPH_ID'];
         CSV_COLUMN_NAMES_TO_NODE_IDS = columnInformation['CSV_COLUMN_NAMES_TO_NODE_IDS'];
     })
