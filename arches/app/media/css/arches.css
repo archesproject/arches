@@ -7688,37 +7688,6 @@ span.file-upload-clear-filter {
     font-weight: 400;
 }
 
-
-
-.file-preview th,td {
-    border: 1px solid #ddd;
-}
-
-.file-preview .media-body {
-    width: unset;
-}
-
-.separator {
-    display: flex;
-    align-items: center;
-    text-align: center;
-    margin: 0px 32px;
-}
-.separator::before, .separator::after {
-    content: '';
-    flex: 1;
-    border-bottom: 1px solid #ddd;
-}
-.separator::before {
-    margin-right: 12px;
-}
-.separator::after {
-    margin-left: 12px;
-}
-
-
-
-
 .btn-file-select {
     background: rgb(138, 115, 255);
     color: #fff;
