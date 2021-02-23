@@ -42,12 +42,6 @@
 
 
     <div data-bind="css: card.model.cssclass" style="height: calc(100% - 80px)">    
-        <!-- <div data-bind="visible: foo()"> -->
-
-            <div style="display:none" data-bind="text: console.log(';;', $parent, $data)"></div>
-            <external-resource-data-preview params="{fileData: self.fileData, loading: self.loading, tile: self.tile, widgets: self.widgets}" ></external-resource-data-preview>
-        <!-- </div> -->
-        
         <!-- ko if: reviewer && provisionalTileViewModel.selectedProvisionalEdit() -->
         <div class="edit-message-container">
             <span>{% trans 'Showing edits by' %}</span>
