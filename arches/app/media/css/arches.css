@@ -670,7 +670,7 @@ input[type="checkbox"] {
     padding: 0 25px;
 }
 
-.tabbed-workflow-step-body .card-title, 
+.tabbed-workflow-step-body .card-title,
 .tabbed-workflow-step-body .card-instructions {
     display: none;
 }
@@ -696,7 +696,7 @@ input[type="checkbox"] {
     background-color: #fafafa;
     border-top: 1px solid #ddd;
     padding: 10px 75px 10px 25px;
-    display: flex; 
+    display: flex;
     justify-content: space-between;
 }
 
@@ -723,7 +723,7 @@ input[type="checkbox"] {
 }
 
 .tabbed-workflow-title-bar .btn > i,
-.tabbed-workflow-title-bar .btn > span, 
+.tabbed-workflow-title-bar .btn > span,
 .tabbed-workflow-footer .btn > i,
 .tabbed-workflow-footer .btn > span {
     padding: 0px 2px;
@@ -2390,8 +2390,8 @@ div.final-cons-step-separator>h4 {
 }
 
 .option-input {
-    display: flex; 
-    flex-wrap: wrap; 
+    display: flex;
+    flex-wrap: wrap;
     max-width: 100%;
 }
 
@@ -13312,6 +13312,59 @@ a.jstree-anchor.permissions-widget {
 
 .leaflet-popup-content {
     margin: 0;
+}
+
+.map-coordinate-editor-crs-selector dt,
+.map-coordinate-editor-crs-selector select {
+    display: block;
+    float: left;
+}
+.map-coordinate-editor-crs-selector dt {
+    width: 45%;
+    text-align: right;
+    padding: 5px;
+}
+.map-coordinate-editor-list {
+    padding: 0 5px;
+}
+
+.map-coordinate-editor-list a:focus i {
+    color: #579ddb;
+}
+.map-coordinate-editor-pair {
+    padding: 0px 0;
+}
+.map-coordinate-editor-pair input {
+    margin: 0 5px;
+    width: 120px;
+    display: inline-block;
+}
+.coordinate-entry-label {
+    display: inline-block;
+    width: 15px;
+    text-align: right;
+    font-weight: bold;
+}
+.map-coordinate-editor hr {
+    margin: 10px 4px 5px;
+}
+.map-coordinate-editor .map-coordinate-editor-pair hr {
+    margin: 5px 0;
+}
+.map-coordinate-editor-drag-handler {
+    cursor: grab;
+    font-size: 16px;
+}
+.map-coordinate-editor-pair.ui-sortable-helper,
+.map-coordinate-editor-pair.ui-sortable-helper .map-coordinate-editor-drag-handler {
+    cursor: grabbing;
+}
+.map-coordinate-editor-header {
+    padding: 6px 0;
+    font-size: 1.2em;
+}
+.map-coordinate-editor-pair.map-coordinate-editor-new-coordinates {
+    padding: 0 22px 10px 8px;
 }
 
 @keyframes loader {
