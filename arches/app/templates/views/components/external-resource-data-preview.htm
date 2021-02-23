@@ -248,8 +248,8 @@
                 <table>
                     <thead>
                         <tr> 
-                            <!-- ko foreach: { data: Object.keys(OBSERVATIONS_CSV_COLUMN_NAME_TO_NODE_IDS), as: 'key' } -->
-                            <!-- ko if: OBSERVATIONS_CSV_COLUMN_NAME_TO_NODE_IDS[key]['visible'] -->
+                            <!-- ko foreach: { data: Object.keys(CSV_COLUMN_NAMES_TO_NODE_IDS), as: 'key' } -->
+                            <!-- ko if: CSV_COLUMN_NAMES_TO_NODE_IDS[key]['visible'] -->
                                 <th 
                                     scope="column" 
                                     data-bind="text: key"
@@ -270,14 +270,14 @@
                                         style: { backgroundColor: !_.isEmpty(ko.unwrap($data['errors'])) ? 'lightcoral' : 'white'  },
                                     }"
                                 >
-                                    <!-- ko foreach: { data: Object.keys(OBSERVATIONS_CSV_COLUMN_NAME_TO_NODE_IDS), as: 'key' } -->
-                                        <!-- ko if: OBSERVATIONS_CSV_COLUMN_NAME_TO_NODE_IDS[key]['visible'] -->
+                                    <!-- ko foreach: { data: Object.keys(CSV_COLUMN_NAMES_TO_NODE_IDS), as: 'key' } -->
+                                        <!-- ko if: CSV_COLUMN_NAMES_TO_NODE_IDS[key]['visible'] -->
                                         <td
                                             style="padding: 5px"
                                         >
                                             <div>
                                                 <span data-bind="{text:(function(){
-                                                    var nodeId = OBSERVATIONS_CSV_COLUMN_NAME_TO_NODE_IDS[key]['node_id'];
+                                                    var nodeId = CSV_COLUMN_NAMES_TO_NODE_IDS[key]['node_id'];
                                                     return $parent['row_data'][nodeId];
                                                 })()}"></span>
                                             </div>

@@ -6,8 +6,13 @@ define([
     'dropzone',
     'uuid',
     'viewmodels/file-widget',
-    'bindings/dropzone'
+    'bindings/dropzone',
 ], function($, ko, _, arches, Dropzone, uuid, FileWidgetViewModel) {
+    $.getJSON('../media/js/views/components/external-resource-data-preview/CSV_COLUMN_INFORMATION.json', function(columnInformation) {
+        GRAPH_ID = columnInformation['GRAPH_ID'];
+        CSV_COLUMN_NAMES_TO_NODE_IDS = columnInformation['CSV_COLUMN_NAMES_TO_NODE_IDS'];
+    })
+
     /**
      * A viewmodel used for viewing and uploading external resource data 
      *
@@ -133,7 +138,7 @@ define([
 
             $.ajax({
                 dataType: "json",
-                url: arches.urls.graph_nodes(OBSERVATIONS_GRAPH_ID),
+                url: arches.urls.graph_nodes(GRAPH_ID),
                 success: function (response) {
                     self.resourceModelNodeData(response);
                     params.loading(false);
@@ -149,7 +154,7 @@ define([
             formData.append('uploaded_file', file);
             formData.append(
                 'column_name_to_node_data_map', 
-                JSON.stringify(OBSERVATIONS_CSV_COLUMN_NAME_TO_NODE_IDS)
+                JSON.stringify(CSV_COLUMN_NAMES_TO_NODE_IDS)
             );
 
             $.ajax({
@@ -183,9 +188,9 @@ define([
                 contentType: "application/json",
                 data: JSON.stringify({
                     'file_data': self.fileData(),
-                    'column_name_to_node_data_map': OBSERVATIONS_CSV_COLUMN_NAME_TO_NODE_IDS,
+                    'column_name_to_node_data_map': CSV_COLUMN_NAMES_TO_NODE_IDS,
                 }),
-                url: arches.urls.api_external_resource_creation(graphid=OBSERVATIONS_GRAPH_ID),
+                url: arches.urls.api_external_resource_creation(graphid=GRAPH_ID),
                 success: function(response) {
                     self.fileData(response['file_data']);
 
