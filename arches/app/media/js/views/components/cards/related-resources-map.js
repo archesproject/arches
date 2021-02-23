@@ -14,12 +14,6 @@ define([
     var viewModel = function(params) {
         var self = this;
 
-        // this.foo = ko.observable(false);
-        // this.foo.subscribe(function(bar) {
-        //     console.log(self, params, bar)
-        //     self.activeTab.valueHasMutated();
-        // })
-
         this.widgets = [];
         params.configKeys = [
             'selectRelatedSource',
@@ -412,12 +406,7 @@ define([
                 });
             }
         });
-
-        // if (self.foo()) {
-            ko.utils.extend(self, new fooMapCard(self));
-        // }
     };
-    
     ko.components.register('related-resources-map-card', {
         viewModel: viewModel,
         template: {
