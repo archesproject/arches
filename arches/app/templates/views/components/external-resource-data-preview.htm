@@ -305,7 +305,15 @@
                 </table>
             </div>
 
-            <button data-bind="click: createResources">{% trans 'Create Resources' %}</button>
+            <button 
+                class="btn btn-success"
+                data-bind="{
+                    click: createResources,
+                    enable: !resourceDataHasErrors(),
+                }"
+            >
+                {% trans 'Create Resources' %}
+            </button>
         </div>
         <!-- /ko -->
     </div>

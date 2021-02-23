@@ -57,6 +57,20 @@ define([
             }, []);
         });
 
+        this.resourceDataHasErrors = ko.pureComputed(function() {
+            return self.fileData().reduce(function(bool, fileDatum) {
+                fileDatum.data.forEach(function(resourceData) {
+                    console.log(resourceData.errors())
+                    var errors = ko.unwrap(resourceData.errors);
+
+                    if (!_.isEmpty(errors)) {
+                        bool = true;
+                    }
+                })
+                return bool;
+            }, false);
+        });
+
         this.addedFiles = ko.pureComputed(function() {
             var files = {};
 
