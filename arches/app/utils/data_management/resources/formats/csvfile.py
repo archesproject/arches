@@ -327,60 +327,58 @@ class NCsvWriter(Writer):
     def __init__(self, **kwargs):
         super(NCsvWriter, self).__init__(**kwargs)
 
-
     def group_tiles(self, tiles, key):
-            new_tiles = {}
+        new_tiles = {}
 
-            for tile in tiles:
-                new_tiles[str(tile[key])] = []
+        for tile in tiles:
+            new_tiles[str(tile[key])] = []
 
-            for tile in tiles:
-                if str(tile[key]) in new_tiles.keys():
-                    new_tiles[str(tile[key])].append(tile)
+        for tile in tiles:
+            if str(tile[key]) in new_tiles.keys():
+                new_tiles[str(tile[key])].append(tile)
 
-            return new_tiles
-
+        return new_tiles
 
     def lookup_node_name(self, nodeid):
-            try:
-                node_name = Node.objects.get(nodeid=nodeid).name
-            except Node.DoesNotExist:
-                node_name = nodeid
+        try:
+            node_name = Node.objects.get(nodeid=nodeid).name
+        except Node.DoesNotExist:
+            node_name = nodeid
 
-            return node_name
-
+        return node_name
 
     node_datatypes = {}
+
     def lookup_node_value(self, value, nodeid):
-            if nodeid in self.node_datatypes:
-                datatype = self.node_datatypes[nodeid]
-            else:
-                datatype = DataTypeFactory().get_instance(Node.objects.get(nodeid=nodeid).datatype)
-                self.node_datatypes[nodeid] = datatype
+        if nodeid in self.node_datatypes:
+            datatype = self.node_datatypes[nodeid]
+        else:
+            datatype = DataTypeFactory().get_instance(Node.objects.get(nodeid=nodeid).datatype)
+            self.node_datatypes[nodeid] = datatype
 
-            if value is not None:
-                value = self.node_datatypes[nodeid].transform_export_values(value)
+        if value is not None:
+            value = self.node_datatypes[nodeid].transform_export_values(value)
 
-            return value
-
+        return value
 
     def flatten_tile(self, tile, semantic_nodes):
-            for nodeid in tile["data"]:
-                if nodeid not in semantic_nodes:
-                    node_name = self.lookup_node_name(nodeid)
-                    node_value = self.lookup_node_value(tile["data"][nodeid], nodeid)
-                    tile[node_name] = node_value
-            del tile["data"]
+        for nodeid in tile["data"]:
+            if nodeid not in semantic_nodes:
+                node_name = self.lookup_node_name(nodeid)
+                node_value = self.lookup_node_value(tile["data"][nodeid], nodeid)
+                tile[node_name] = node_value
+        del tile["data"]
 
-            return tile
-
+        return tile
 
     def write_resources(self, graph_id=None, resourceinstanceids=None, **kwargs):
         super(NCsvWriter, self).write_resources(graph_id=graph_id, resourceinstanceids=resourceinstanceids, **kwargs)
 
         csvs_for_export = []
-        
-        tiles = self.group_tiles(list(Tile.objects.filter(resourceinstance__graph_id=graph_id).order_by("nodegroup_id").values()), "nodegroup_id")
+
+        tiles = self.group_tiles(
+            list(Tile.objects.filter(resourceinstance__graph_id=graph_id).order_by("nodegroup_id").values()), "nodegroup_id"
+        )
         semantic_nodes = [str(n[0]) for n in Node.objects.filter(datatype="semantic").values_list("nodeid")]
 
         for nodegroupid, nodegroup_tiles in tiles.items():
