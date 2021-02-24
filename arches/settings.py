@@ -89,7 +89,6 @@ RESOURCE_FORMATTERS = {
     "csv": "arches.app.utils.data_management.resources.formats.csvfile.CsvWriter",
     "json": "arches.app.utils.data_management.resources.formats.archesfile.ArchesFileWriter",
     "tilecsv": "arches.app.utils.data_management.resources.formats.csvfile.TileCsvWriter",
-    "ncsv": "arches.app.utils.data_management.resources.formats.csvfile.NCsvWriter",
     "shp": "arches.app.utils.data_management.resources.formats.shpfile.ShpWriter",
     "xml": "arches.app.utils.data_management.resources.formats.rdffile.RdfWriter",
     "pretty-xml": "arches.app.utils.data_management.resources.formats.rdffile.RdfWriter",
