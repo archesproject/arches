@@ -9,10 +9,11 @@ define([
     'geojson-extent',
     'geojsonhint',
     'togeojson',
+    'proj4',
     'views/components/map',
     'views/components/cards/select-feature-layers',
     'text!templates/views/components/cards/map-popup.htm'
-], function(arches, $, _, ko, koMapping, uuid, MapboxDraw, geojsonExtent, geojsonhint, toGeoJSON, MapComponentViewModel, selectFeatureLayersFactory, popupTemplate) {
+], function(arches, $, _, ko, koMapping, uuid, MapboxDraw, geojsonExtent, geojsonhint, toGeoJSON, proj4, MapComponentViewModel, selectFeatureLayersFactory, popupTemplate) {
     var viewModel = function(params) {
         var self = this;
         var padding = 40;
@@ -272,6 +273,11 @@ define([
         this.deleteFeature = function(feature) {
             if (self.draw) {
                 self.draw.delete(feature.id);
+                self.selectedFeatureIds(
+                    self.selectedFeatureIds().filter(function(id) {
+                        return id !== feature.id;
+                    })
+                );
                 self.updateTiles();
             }
         };
@@ -393,7 +399,13 @@ define([
                 });
                 self.updateTiles();
             });
-            map.on('draw.update', self.updateTiles);
+            map.on('draw.update', function() {
+                self.updateTiles();
+                if (self.coordinateEditing()) {
+                    var editingFeature = self.draw.getSelected().features[0];
+                    if (editingFeature) updateCoordinatesFromFeature(editingFeature);
+                }
+            });
             map.on('draw.delete', self.updateTiles);
             map.on('draw.modechange', function(e) {
                 self.updateTiles();
@@ -532,7 +544,7 @@ define([
                 featureIds.push(feature.id);
             });
             self.updateTiles();
-            self.popup.remove();
+            if (self.popup) self.popup.remove();
             self.draw.changeMode('simple_select', {
                 featureIds: featureIds
             });
@@ -667,6 +679,226 @@ define([
         self.dropZoneFileSelected = function(data, e) {
             self.handleFiles(e.target.files, data.node.nodeid);
         };
+        self.coordinateReferences = arches.preferredCoordinateSystems;
+        self.selectedCoordinateReference = ko.observable(self.coordinateReferences[0].proj4);
+        self.coordinates = ko.observableArray();
+        var geographic = '+proj=longlat +datum=WGS84 +no_defs", "default';
+        self.rawCoordinates = ko.computed(function() {
+            return self.coordinates().map(function(coords) {
+                var sourceCRS = self.selectedCoordinateReference();
+                return proj4(sourceCRS, geographic, [Number(coords[0]()), Number(coords[1]())]);
+            });
+        }).extend({ throttle: 100 });
+        self.rawCoordinates.subscribe(function(rawCoordinates) {
+            var selectedFeatureId = self.selectedFeatureIds()[0];
+            if (self.coordinateEditing()) {
+                if (selectedFeatureId) {
+                    var drawFeatures = getDrawFeatures();
+                    drawFeatures.forEach(function(feature) {
+                        if (feature.id === selectedFeatureId) {
+                            if (feature.geometry.type === 'Polygon') {
+                                rawCoordinates.push(rawCoordinates[0]);
+                                feature.geometry.coordinates[0] = rawCoordinates;
+                            } else if (feature.geometry.type === 'Point')
+                                feature.geometry.coordinates = rawCoordinates[0];
+                            else
+                                feature.geometry.coordinates = rawCoordinates;
+                        }
+                    });
+                    self.draw.set({
+                        type: 'FeatureCollection',
+                        features: drawFeatures
+                    });
+                    self.updateTiles();
+                } else if (rawCoordinates.length >= self.minCoordinates()) {
+                    var coordinates = [];
+                    var geomType = self.coordinateGeomType();
+                    switch (geomType) {
+                    case 'Polygon':
+                        rawCoordinates.push(rawCoordinates[0]);
+                        coordinates = [rawCoordinates];
+                        break;
+                    case 'Point':
+                        coordinates = rawCoordinates[0];
+                        break;
+                    default:
+                        coordinates = rawCoordinates;
+                        break;
+                    }
+                    addSelectFeatures([{
+                        type: "Feature",
+                        geometry: {
+                            type: geomType,
+                            coordinates: coordinates
+                        }
+                    }]);
+                }
+            }
+        });
+        self.showCoordinateFeature = function() {
+            var selectedFeatureIds = self.selectedFeatureIds();
+            var featureId = selectedFeatureIds[0];
+            if (featureId) {
+                var feature = self.draw.get(featureId);
+                self.fitFeatures([feature]);
+            }
+        };
+
+        self.coordinateEditing = ko.observable(false);
+        self.newX = ko.observable();
+        self.newY = ko.observable();
+        var newCoordinatePair = ko.computed(function() {
+            var x = self.newX();
+            var y = self.newY();
+            return [x, y];
+        });
+        self.focusLatestY = ko.observable(true);
+        var getNewCoordinatePair = function(coords) {
+            var newCoords = [
+                ko.observable(coords[0]),
+                ko.observable(coords[1])
+            ];
+            newCoords.forEach(function(value) {
+                value.subscribe(function(newValue) {
+                    if ([undefined, null, ""].includes(newValue)) value(0);
+                });
+            });
+            return newCoords;
+        };
+        newCoordinatePair.subscribe(function(coords) {
+            if (coords[0] && coords[1]) {
+                self.coordinates.push(getNewCoordinatePair(coords));
+                self.newX(undefined);
+                self.newY(undefined);
+                self.focusLatestY(true);
+            }
+        });
+        var updateCoordinatesFromFeature = function(feature) {
+            var sourceCoordinates = [];
+            if (feature.geometry.type === 'Polygon') {
+                sourceCoordinates = [];
+                for (var i = 0; i < feature.geometry.coordinates[0].length - 1; i++) {
+                    sourceCoordinates.push(feature.geometry.coordinates[0][i]);
+                }
+            } else if (feature.geometry.type === 'Point')
+                sourceCoordinates = [feature.geometry.coordinates];
+            else sourceCoordinates = feature.geometry.coordinates;
+            self.coordinateGeomType(feature.geometry.type);
+            self.coordinates(sourceCoordinates.map(function(coords) {
+                var newCoords = getNewCoordinatePair(coords);
+                transformCoordinatePair(newCoords, geographic);
+                return newCoords;
+            }));
+        };
+        var transformCoordinatePair = function(coords, sourceCRS) {
+            var targetCRS = self.selectedCoordinateReference();
+            var transformedCoordinates = proj4(sourceCRS, targetCRS, [Number(coords[0]()), Number(coords[1]())]);
+            coords[0](transformedCoordinates[0]);
+            coords[1](transformedCoordinates[1]);
+        };
+        var previousCRS = self.selectedCoordinateReference();
+        var transformCoordinates = function() {
+            var targetCRS = self.selectedCoordinateReference();
+            self.coordinates().forEach(function(coords) {
+                transformCoordinatePair(coords, previousCRS);
+            });
+            previousCRS = targetCRS;
+        };
+        self.selectedCoordinateReference.subscribe(transformCoordinates);
+
+        self.coordinateGeomType = ko.observable();
+        self.coordinateEditing.subscribe(function(editing) {
+            self.coordinateGeomType(null);
+            var selectedTool = self.selectedTool();
+            switch (selectedTool) {
+            case 'draw_point':
+                self.coordinateGeomType('Point');
+                break;
+            case 'draw_line_string':
+                self.coordinateGeomType('LineString');
+                break;
+            case 'draw_polygon':
+                self.coordinateGeomType('Polygon');
+                break;
+            default:
+                break;
+            }
+            var selectedFeatureIds = self.selectedFeatureIds();
+            var featureId = selectedFeatureIds[0];
+            self.focusLatestY(false);
+            self.coordinates([]);
+            self.newX(undefined);
+            self.newY(undefined);
+            if (editing) {
+                var selectConfig;
+                if (selectedFeatureIds.length > 0) {
+                    selectConfig = {
+                        featureIds: [featureId]
+                    };
+                    self.selectedFeatureIds([featureId]);
+                    var feature = self.draw.get(featureId);
+                    updateCoordinatesFromFeature(feature);
+                }
+                if (selectedTool) {
+                    self.draw.trash();
+                }
+                self.draw.changeMode('simple_select', selectConfig);
+                _.each(self.featureLookup, function(value) {
+                    value.selectedTool(null);
+                });
+            }
+        });
+        self.hideNewCoordinates = ko.computed(function() {
+            var geomType = self.coordinateGeomType();
+            var coordCount = self.coordinates().length;
+            return geomType === 'Point' && coordCount > 0;
+        });
+
+        self.minCoordinates = ko.computed(function() {
+            var geomType = self.coordinateGeomType();
+            var minCoordinates;
+            switch (geomType) {
+            case 'Point':
+                minCoordinates = 1;
+                break;
+            case 'LineString':
+                minCoordinates = 2;
+                break;
+            case 'Polygon':
+                minCoordinates = 3;
+                break;
+            default:
+                break;
+            }
+            return minCoordinates;
+        });
+
+        self.allowDeleteCoordinates = ko.computed(function() {
+            return self.coordinates().length > self.minCoordinates();
+        });
+
+        self.editCoordinates = function() {
+            self.coordinateEditing(true);
+        };
+
+        self.canEditCoordinates = ko.computed(function() {
+            var featureId = self.selectedFeatureIds()[0];
+            if (featureId) {
+                var feature = self.draw.get(featureId);
+                return ['Point', 'LineString', 'Polygon'].includes(feature.geometry.type);
+            } else {
+                var selectedTool = self.selectedTool();
+                return ['draw_point', 'draw_line_string', 'draw_polygon'].includes(selectedTool);
+            }
+        });
+
+        self.selectedFeatureIds.subscribe(function(ids) {
+            if (ids.length === 0) self.coordinateEditing(false);
+            else if (self.canEditCoordinates()) {
+                var feature = self.draw.get(ids[0]);
+                updateCoordinatesFromFeature(feature);
+            }
+        });
     };
     return viewModel;
 });
