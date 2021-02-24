@@ -23,6 +23,7 @@ from arches.app.models.models import (
     FunctionXGraph,
     GraphXMapping,
 )
+from arches.app.models.card import Card
 from arches.app.utils.data_management.resource_graphs import exporter as GraphExporter
 from arches.app.models.resource import Resource
 from arches.app.models.system_settings import settings
@@ -251,73 +252,86 @@ class CsvWriter(Writer):
 class TileCsvWriter(Writer):
     def __init__(self, **kwargs):
         super(TileCsvWriter, self).__init__(**kwargs)
-        self.node_datatypes = {
-            str(nodeid): datatype
-            for nodeid, datatype in Node.objects.values_list("nodeid", "datatype").filter(~Q(datatype="semantic"), graph__isresource=True)
-        }
 
-    def transform_value_for_export(self, datatype, value, concept_export_value_type, node):
-        datatype_instance = self.datatype_factory.get_instance(datatype)
-        value = datatype_instance.transform_export_values(value, concept_export_value_type=concept_export_value_type, node=node)
+    def group_tiles(self, tiles, key):
+        new_tiles = {}
+
+        for tile in tiles:
+            new_tiles[str(tile[key])] = []
+
+        for tile in tiles:
+            if str(tile[key]) in new_tiles.keys():
+                new_tiles[str(tile[key])].append(tile)
+
+        return new_tiles
+
+    def lookup_node_name(self, nodeid):
+        try:
+            node_name = Node.objects.get(nodeid=nodeid).name
+        except Node.DoesNotExist:
+            node_name = nodeid
+
+        return node_name
+
+    node_datatypes = {}
+
+    def lookup_node_value(self, value, nodeid):
+        if nodeid in self.node_datatypes:
+            datatype = self.node_datatypes[nodeid]
+        else:
+            datatype = DataTypeFactory().get_instance(Node.objects.get(nodeid=nodeid).datatype)
+            self.node_datatypes[nodeid] = datatype
+
+        if value is not None:
+            value = self.node_datatypes[nodeid].transform_export_values(value)
+
         return value
+
+    def flatten_tile(self, tile, semantic_nodes):
+        for nodeid in tile["data"]:
+            if nodeid not in semantic_nodes:
+                node_name = self.lookup_node_name(nodeid)
+                node_value = self.lookup_node_value(tile["data"][nodeid], nodeid)
+                tile[node_name] = node_value
+        del tile["data"]
+
+        return tile
 
     def write_resources(self, graph_id=None, resourceinstanceids=None, **kwargs):
         super(TileCsvWriter, self).write_resources(graph_id=graph_id, resourceinstanceids=resourceinstanceids, **kwargs)
 
-        csv_records = []
-        other_group_records = []
-        concept_export_value_lookup = {}
-        csv_header = ["ResourceID"]
-        mapping = {}
-        nodes = Node.objects.filter(graph_id=self.graph_id)
-        for node in nodes:
-            mapping[str(node.nodeid)] = node.name
-        csv_header = ["ResourceID", "ResourceLegacyID", "ResourceModelID", "TileID", "ParentTileID", "NodeGroupID"] + list(mapping.values())
         csvs_for_export = []
 
-        for resourceinstanceid, tiles in self.resourceinstances.items():
-            tiles = sorted(tiles, key=lambda k: k.parenttile_id)
-            for tile in tiles:
-                csv_record = {}
-                csv_record["ResourceID"] = resourceinstanceid
-                csv_record["ResourceModelID"] = self.graph_id
-                csv_record["TileID"] = tile.tileid
-                csv_record["ParentTileID"] = str(tile.parenttile_id)
-                csv_record["NodeGroupID"] = str(tile.nodegroup_id)
-                for k in list(tile.data.keys()):
-                    resource_instance = ResourceInstance.objects.get(resourceinstanceid=resourceinstanceid)
-                    csv_record["ResourceLegacyID"] = (
-                        str(resource_instance.legacyid)
-                        if resource_instance.legacyid is not None
-                        else str(resource_instance.resourceinstanceid)
-                    )
-                    if tile.data[k] != "" and tile.data[k] is not None:
-                        concept_export_value_type = "label"
-                        if k in concept_export_value_lookup:
-                            concept_export_value_type = concept_export_value_lookup[k]
-                        if tile.data[k] is not None:
-                            value = self.transform_value_for_export(self.node_datatypes[k], tile.data[k], concept_export_value_type, k)
-                            csv_record[mapping[k]] = value
-                        del tile.data[k]
-                    else:
-                        del tile.data[k]
+        tiles = self.group_tiles(
+            list(Tile.objects.filter(resourceinstance__graph_id=graph_id).order_by("nodegroup_id").values()), "nodegroup_id"
+        )
+        semantic_nodes = [str(n[0]) for n in Node.objects.filter(datatype="semantic").values_list("nodeid")]
 
-                if csv_record != {"ResourceID": resourceinstanceid}:
-                    csv_records.append(csv_record)
+        for nodegroupid, nodegroup_tiles in tiles.items():
+            flattened_tiles = []
+            fieldnames = []
+            for tile in nodegroup_tiles:
+                tile["tileid"] = str(tile["tileid"])
+                tile["resourceinstance_id"] = str(tile["resourceinstance_id"])
+                tile["parenttile_id"] = str(tile["parenttile_id"])
+                tile["nodegroup_id"] = str(tile["nodegroup_id"])
+                flattened_tile = self.flatten_tile(tile, semantic_nodes)
+                flattened_tiles.append(flattened_tile)
 
-        dest = StringIO()
-        csvwriter = csv.DictWriter(dest, delimiter=",", fieldnames=csv_header)
-        csvwriter.writeheader()
-        all_records = sorted(csv_records, key=lambda k: k["ResourceID"])
-        for csv_record in all_records:
-            if "populated_node_groups" in csv_record:
-                del csv_record["populated_node_groups"]
-            csvwriter.writerow({k: str(v) for k, v in list(csv_record.items())})
+                for fieldname in flattened_tile:
+                    if fieldname not in fieldnames:
+                        fieldnames.append(fieldname)
 
-        csv_name = os.path.join("{0}.{1}".format(self.file_name, "csv"))
-        csvs_for_export.append({"name": csv_name, "outputfile": dest})
-        if self.graph_id is not None:
-            csvs_for_export = csvs_for_export
+            tiles[nodegroupid] = sorted(flattened_tiles, key=lambda k: k["resourceinstance_id"])
+
+            ncsv_file = []
+            dest = StringIO()
+            csvwriter = csv.DictWriter(dest, delimiter=",", fieldnames=fieldnames)
+            csvwriter.writeheader()
+            csv_name = os.path.join("{0}.{1}".format(Card.objects.get(nodegroup_id=nodegroupid).name, "csv"))
+            for v in tiles[nodegroupid]:
+                csvwriter.writerow(v)
+            csvs_for_export.append({"name": csv_name, "outputfile": dest})
 
         return csvs_for_export
 
