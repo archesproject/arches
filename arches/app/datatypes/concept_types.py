@@ -8,7 +8,7 @@ from arches.app.models.system_settings import settings
 from arches.app.datatypes.base import BaseDataType
 from arches.app.datatypes.datatypes import DataTypeFactory, get_value_from_jsonld
 from arches.app.models.concept import get_preflabel_from_valueid, get_preflabel_from_conceptid, get_valueids_from_concept_label
-from arches.app.search.elasticsearch_dsl_builder import Bool, Match, Range, Term, Nested, Exists
+from arches.app.search.elasticsearch_dsl_builder import Bool, Match, Range, Term, Nested, Exists, Terms
 from arches.app.utils.date_utils import ExtendedDateFormat
 # for the RDF graph export helper functions
 from rdflib import Namespace, URIRef, Literal, BNode
@@ -84,6 +84,21 @@ class BaseConceptDataType(BaseDataType):
             )
             document["strings"].append({"string": value.value, "nodegroup_id": tile.nodegroup_id, "provisional": provisional})
 
+    def append_search_filters(self, value, node, query, request):
+        try:
+            if value["op"] == "null" or value["op"] == "not_null":
+                self.append_null_search_filters(value, node, query, request)
+            elif value["val"] != "":
+                match_query = Match(field="tiles.data.%s" % (str(node.pk)), type="phrase", query=value["val"])
+                if "!" in value["op"]:
+                    query.must_not(match_query)
+                    query.filter(Exists(field="tiles.data.%s" % (str(node.pk))))
+                else:
+                    query.must(match_query)
+
+        except KeyError as e:
+            pass
+
 
 class ConceptDataType(BaseConceptDataType):
     def validate(self, value, row_number=None, source="", node=None, nodeid=None):
@@ -130,19 +145,6 @@ class ConceptDataType(BaseConceptDataType):
             return ""
         else:
             return self.get_value(uuid.UUID(data[str(node.nodeid)])).value
-
-    def append_search_filters(self, value, node, query, request):
-        try:
-            if value["val"] != "":
-                match_query = Match(field="tiles.data.%s" % (str(node.pk)), type="phrase", query=value["val"])
-                if "!" in value["op"]:
-                    query.must_not(match_query)
-                    query.filter(Exists(field="tiles.data.%s" % (str(node.pk))))
-                else:
-                    query.must(match_query)
-
-        except KeyError as e:
-            pass
 
     def get_rdf_uri(self, node, data, which="r"):
         if not data:
@@ -270,19 +272,6 @@ class ConceptListDataType(BaseConceptDataType):
                 new_val = self.get_value(uuid.UUID(val))
                 new_values.append(new_val.value)
         return ",".join(new_values)
-
-    def append_search_filters(self, value, node, query, request):
-        try:
-            if value["val"] != "":
-                match_query = Match(field="tiles.data.%s" % (str(node.pk)), type="phrase", query=value["val"])
-                if "!" in value["op"]:
-                    query.must_not(match_query)
-                    query.filter(Exists(field="tiles.data.%s" % (str(node.pk))))
-                else:
-                    query.must(match_query)
-
-        except KeyError as e:
-            pass
 
     def get_rdf_uri(self, node, data, which="r"):
         c = ConceptDataType()

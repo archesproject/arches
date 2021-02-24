@@ -6,16 +6,7 @@ define([
 ], function(ko, _, AlertViewModel) {
     return function(params) {
         var self = this;
-        this.getTiles = function(tile, tiles) {
-            tiles = tiles || [tile];
-            tile.cards.forEach(function(card) {
-                card.tiles().forEach(function(tile) {
-                    tiles.push(tile);
-                    self.getTiles(tile, tiles);
-                });
-            });
-            return tiles;
-        };
+
         this.inResourceEditor = location.pathname.includes(params.pageVm.urls.resource_editor);
         this.configKeys = params.configKeys || [];
         this.showIds = params.showIds || false;
@@ -27,37 +18,79 @@ define([
         this.card.showIds = this.showIds;
         this.tile = params.tile;
         this.reportExpanded = ko.observable(true);
-        if (this.preview) {
-            if (!this.card.newTile) {
-                this.card.newTile = this.card.getNewTile();
+        this.form = params.form;
+        this.provisionalTileViewModel = params.provisionalTileViewModel;
+        this.reviewer = params.reviewer;
+        this.expanded = ko.observable(true);
+        this.showHeaderLine = params.showHeaderLine;
+
+        this.config = this.card.model ? this.card.model.get('config') : {};
+        _.each(this.configKeys, function(key) {
+            self[key] = self.config[key];
+        });
+
+        this.showChildCards = ko.computed(function() {
+            return this.card.widgets().length === 0;
+        }, this);
+
+
+        this.initialize = function() {
+            self.card.showForm(true);
+
+            self.tiles = ko.computed(function() {
+                var tiles = [];
+                if (self.tile) {
+                    return self.getTiles(self.tile);
+                } else {
+                    self.card.tiles().forEach(function(tile) {
+                        self.getTiles(tile, tiles);
+                    });
+                }
+                return tiles;
+            }, self);
+
+            if (self.preview) {
+                if (!self.card.newTile) {
+                    self.card.newTile = self.card.getNewTile();
+                }
+                self.tile = self.card.newTile;
             }
-            this.tile = this.card.newTile;
-        }
+
+            if (self.card.tiles().length > 0) {
+                self.card.showForm(false);
+            }
+
+            if (self.card.preSaveCallback) {
+                self.card.preSaveCallback(self.saveTile);
+            }
+        };
+
         this.revealForm = function(card){
             if (!card.selected()) {card.selected(true);}
             setTimeout(function(){
                 card.showForm(true);
             }, 50);
         };
-        this.form = params.form;
-        this.provisionalTileViewModel = params.provisionalTileViewModel;
-        this.reviewer = params.reviewer;
-        this.expanded = ko.observable(true);
-        this.card.showForm(false);
+
+        this.getTiles = function(tile, tiles) {
+            tiles = tiles || [tile];
+            tile.cards.forEach(function(card) {
+                card.tiles().forEach(function(tile) {
+                    tiles.push(tile);
+                    self.getTiles(tile, tiles);
+                });
+            });
+            return tiles;
+        };
 
         this.beforeMove = function(e) {
             e.cancelDrop = (e.sourceParent!==e.targetParent);
         };
+
         this.startDrag = function(e, ui) {
             ko.utils.domData.get(ui.item[0], 'ko_sortItem').selected(true);
         };
-        this.config = this.card.model ? this.card.model.get('config') : {};
-        _.each(this.configKeys, function(key) {
-            self[key] = self.config[key];
-        });
-        this.showChildCards = ko.computed(function() {
-            return this.card.widgets().length === 0;
-        }, this);
+
         this.getValuesByDatatype = function(type) {
             var values = {};
             if (self.tile && self.form) {
@@ -74,18 +107,7 @@ define([
             }
             return values;
         };
-        this.showHeaderLine = params.showHeaderLine;
-        this.tiles = ko.computed(function() {
-            var tiles = [];
-            if (self.tile) {
-                return self.getTiles(self.tile);
-            } else {
-                self.card.tiles().forEach(function(tile) {
-                    self.getTiles(tile, tiles);
-                });
-            }
-            return tiles;
-        }, this);
+
         this.saveTile = function(callback) {
             self.loading(true);
             self.tile.save(function(response) {
@@ -111,6 +133,7 @@ define([
                 if (typeof callback === 'function') callback();
             });
         };
+
         this.saveTileAddNew = function() {
             self.saveTile(function() {
                 window.setTimeout(function() {
@@ -118,6 +141,7 @@ define([
                 }, 1);
             });
         };
+
         this.deleteTile = function() {
             self.loading(true);
             self.tile.deleteTile(function(response) {
@@ -141,5 +165,16 @@ define([
                 }
             });
         };
+        
+        this.createParentAndChild = function(parenttile, childcard) {
+            if (parenttile.tileid === "") {
+                var callback = function(){childcard.selected(true);};
+                parenttile.save(function() {
+                    return;
+                }, callback);
+            }
+        };
+
+        this.initialize();
     };
 });

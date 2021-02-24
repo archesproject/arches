@@ -68,6 +68,7 @@
             'core-js':'{{ STATIC_URL }}packages/core-js/client/shim.min',
             'dom-4': '{{ STATIC_URL }}packages/dom4/build/dom4',
             'numeral': '{{ STATIC_URL }}packages/numeral/numeral',
+            'togeojson': '{{ STATIC_URL }}packages/@tmcw/togeojson/dist/togeojson.umd',
             {% block paths %}{% endblock paths %}
         },
         packages: [{
@@ -259,6 +260,9 @@
                 icons: "{% url 'icons' %}",
                 ontology_properties: "{% url 'ontology_properties' %}",
                 iiifmanifest: "{% url 'iiifmanifest' %}",
+                manifest_manager: "{% url 'manifest_manager' %}",
+                iiifannotations: "{% url 'iiifannotations' %}",
+                iiifannotationnodes: "{% url 'iiifannotationnodes' %}",
                 {% block urls %}{% endblock urls %}
             },
             geocoderPlaceHolder: "{% trans 'Find an address...' %}",

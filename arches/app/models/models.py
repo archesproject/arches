@@ -166,6 +166,7 @@ class DLanguage(models.Model):
     def __str__(self):
         return f"{self.languageid} ({self.languagename})"
 
+
 class DNodeType(models.Model):
     nodetype = models.TextField(primary_key=True)
     namespace = models.TextField()
@@ -695,19 +696,31 @@ class ResourceXResource(models.Model):
     relationshiptype = models.TextField(blank=True, null=True)
     inverserelationshiptype = models.TextField(blank=True, null=True)
     tileid = models.ForeignKey(
-        "TileModel", db_column="tileid", blank=True, null=True, related_name="resxres_tile_id", on_delete=models.CASCADE,
+        "TileModel",
+        db_column="tileid",
+        blank=True,
+        null=True,
+        related_name="resxres_tile_id",
+        on_delete=models.CASCADE,
     )
-    nodeid = models.ForeignKey("Node", db_column="nodeid", blank=True, null=True, related_name="resxres_node_id", on_delete=models.CASCADE,)
+    nodeid = models.ForeignKey(
+        "Node",
+        db_column="nodeid",
+        blank=True,
+        null=True,
+        related_name="resxres_node_id",
+        on_delete=models.CASCADE,
+    )
     datestarted = models.DateField(blank=True, null=True)
     dateended = models.DateField(blank=True, null=True)
     created = models.DateTimeField()
     modified = models.DateTimeField()
 
-    def delete(self, *args, **kwargs):
-        from arches.app.search.search_engine_factory import SearchEngineInstance as se
-        from arches.app.search.mappings import RESOURCE_RELATIONS_INDEX
-
-        se.delete(index=RESOURCE_RELATIONS_INDEX, id=self.resourcexid)
+    def delete(self, index=True, *args, **kwargs):
+        if index:
+            from arches.app.search.search_engine_factory import SearchEngineInstance as se
+            from arches.app.search.mappings import RESOURCE_RELATIONS_INDEX
+            se.delete(index=RESOURCE_RELATIONS_INDEX, id=self.resourcexid)
 
         # update the resource-instance tile by removing any references to a deleted resource
         deletedResourceId = kwargs.pop("deletedResourceId", None)
@@ -1060,10 +1073,10 @@ class UserProfile(models.Model):
     phone = models.CharField(max_length=16, blank=True)
 
     def is_reviewer(self):
-        """ DEPRECATED Use new pattern:
+        """DEPRECATED Use new pattern:
 
-            from arches.app.utils.permission_backend import user_is_resource_reviewer
-            is_reviewer = user_is_resource_reviewer(user)
+        from arches.app.utils.permission_backend import user_is_resource_reviewer
+        is_reviewer = user_is_resource_reviewer(user)
         """
         pass
 
@@ -1196,8 +1209,7 @@ class UserXNotificationType(models.Model):
 
 @receiver(post_save, sender=UserXNotification)
 def send_email_on_save(sender, instance, **kwargs):
-    """Checks if a notification type needs to send an email, does so if email server exists
-    """
+    """Checks if a notification type needs to send an email, does so if email server exists"""
 
     if instance.notif.notiftype is not None and instance.isread is False:
         if UserXNotificationType.objects.filter(user=instance.recipient, notiftype=instance.notif.notiftype, emailnotify=False).exists():
@@ -1212,7 +1224,7 @@ def send_email_on_save(sender, instance, **kwargs):
                 email_to = instance.recipient.email
             else:
                 email_to = context["email"]
-            subject, from_email, to = instance.notif.notiftype.name, "from@example.com", email_to
+            subject, from_email, to = instance.notif.notiftype.name, settings.DEFAULT_FROM_EMAIL, email_to
             msg = EmailMultiAlternatives(subject, text_content, from_email, [to])
             msg.attach_alternative(html_content, "text/html")
             msg.send()
@@ -1346,6 +1358,14 @@ class IIIFManifest(models.Model):
         db_table = "iiif_manifests"
 
 
+class ManifestImage(models.Model):
+    imageid = models.UUIDField(primary_key=True, default=uuid.uuid1)
+    image = models.ImageField(upload_to="cantaloupe")
+
+    class Meta:
+        managed = True
+        db_table = "manifest_images"
+
 class GroupMapSettings(models.Model):
     group = models.OneToOneField(Group, on_delete=models.CASCADE)
     min_zoom = models.IntegerField(default=0)
@@ -1358,3 +1378,29 @@ class GroupMapSettings(models.Model):
     class Meta:
         managed = True
         db_table = "group_map_settings"
+
+
+class VwAnnotation(models.Model):
+    feature_id = models.UUIDField(primary_key=True)
+    tile = models.ForeignKey(TileModel, on_delete=models.DO_NOTHING, db_column="tileid")
+    tiledata = JSONField()
+    resourceinstance = models.ForeignKey(ResourceInstance, on_delete=models.DO_NOTHING, db_column="resourceinstanceid")
+    nodegroup = models.ForeignKey(NodeGroup, on_delete=models.DO_NOTHING, db_column="nodegroupid")
+    node = models.ForeignKey(Node, on_delete=models.DO_NOTHING, db_column="nodeid")
+    feature = JSONField()
+    canvas = models.TextField()
+
+    class Meta:
+        managed = False
+        db_table = "vw_annotations"
+
+
+class GeoJSONGeometry(models.Model):
+    tile = models.ForeignKey(TileModel, on_delete=models.CASCADE, db_column="tileid")
+    resourceinstance = models.ForeignKey(ResourceInstance, on_delete=models.CASCADE, db_column="resourceinstanceid")
+    node = models.ForeignKey(Node, on_delete=models.CASCADE, db_column="nodeid")
+    geom = models.GeometryField(srid=3857)
+
+    class Meta:
+        managed = True
+        db_table = "geojson_geometries"

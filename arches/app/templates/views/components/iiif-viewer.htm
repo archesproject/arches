@@ -6,10 +6,20 @@
 <div class="workbench-card-sidebar-tab" data-bind="click: function() {
     toggleTab('imageTools');
 }, css: {
-    'active': activeTab() === 'imageTools'
+    'active': activeTab() === 'imageTools',
+    'disabled': !canvas() || expandGallery()
 }">
     <i class="fa fa-image"></i>
     <span class="map-sidebar-text">{% trans "Image" %}</span>
+</div>
+<div class="workbench-card-sidebar-tab" data-bind="click: function() {
+    toggleTab('annotations');
+}, css: {
+    'active': activeTab() === 'annotations',
+    'disabled': !canvas() || expandGallery()
+}">
+    <i class="fa fa-list"></i>
+    <span class="map-sidebar-text">{% trans "Overlays" %}</span>
 </div>
 {% endblock tabs %}
 
@@ -73,9 +83,42 @@
     </div>
 </div>
 <!--/ko -->
+<!--ko if: activeTab() === 'annotations' -->
+<div class="workbench-card-sidepanel-header-container">
+    <h4 class="workbench-card-sidepanel-header" data-bind="click: hideSidePanel">
+        {% trans "Annotation Overlays" %}
+    </h4>
+</div>
+<div class="overlays-listing-container" data-bind="sortable: {
+    data: annotationNodes
+}">
+    <div class="overlay-listing" data-bind="css: {'active-overlay': active}">
+        <div class="overlay-name" data-bind="
+            click: function() {
+                active(!active());
+            }
+        ">
+            <i data-bind="css: icon" class="layer-listing-icon"></i>
+            <span data-bind="text: name"></span>
+        </div>
+        <div class="overlay-opacity-control">
+            <i class="fa fa-adjust"></i>
+            <div class="overlay-opacity-slider">
+                <input type="range" min="0" max="100" step="1" data-bind="value: opacity, valueUpdate: 'input'">
+            </div>
+        </div>
+    </div>
+</div>
+<!--/ko -->
 {% endblock sidepanel %}
 
 {% block content_management %}
+<!-- ko foreach: { data: [$data], as: 'self' } -->
+<!--ko if: ko.unwrap(self.mainMenu) -->
+{% block main_menu %}
+{% endblock main_menu %}
+<!--/ko-->
+<!--ko if: !ko.unwrap(self.mainMenu) -->
 <div class="workbench-card-container" data-bind="css: {
         'gallery-visible': showGallery,
         'gallery-expanded': expandGallery
@@ -95,11 +138,6 @@
         click: toggleGallery,
         text: showGallery() ? '{% trans "hide" %}' : '{% trans "show" %}'
     "></a>
-    
-    <!--ko if: expandGallery() -->
-    <span style="padding-right: 3px; padding-left: 3px;">|</span>
-    <a href="">{% trans "close info" %}</a>
-    <!--/ko -->
 
 </div>
 <!--ko let: {canvasClick: canvasClick, getCanvasService: getCanvasService, selectedCanvas: canvas, getAnnotationCount: getAnnotationCount} -->
@@ -115,16 +153,18 @@
                 <span data-bind="text: manifestName"></span>
             </h3>
 
-            <div class="manifest-details-list" data-bind="foreach: manifestData().metadata || []">
+            <h4>
+                <span data-bind="html: manifestDescription"></span>
+            </h4>
+
+            <div class="manifest-details-list" data-bind="foreach: manifestMetadata">
                 <dt class="manifest-metadata-title" data-bind="text: label"></dt>
                 <!--ko foreach: Array.isArray(value) ? value : [value] -->
                 <dd class="manifest-metadata-value" data-bind="html: $data"></dd>
                 <!--/ko -->
             </div>
-            <h4 data-bind="text: manifestData().attribution || ''"></h4>
-            <!--ko if: manifestData().logo -->
-            <img class="manifest-logo" data-bind="attr: {src: typeof manifestData().logo === 'string' ? manifestData().logo : manifestData().logo['@id']}">
-            <!--/ko -->
+            <h4 data-bind="text: manifestAttribution"></h4>
+            <img class="manifest-logo" data-bind="attr: {src: manifestLogo()}">
         </div>
         <!--/ko -->
 
@@ -145,8 +185,10 @@
                 <button class="btn btn-shim btn-mint btn-labeled btn-lg fa fa-pencil" data-bind="click: getManifestData,
                     disabled: manifestLoading(),
                     css: { 'disabled': manifestLoading() }
-                ">{% trans 'Update manifest' %}</button>
+                ">{% trans 'Load manifest' %}</button>
+                <!--ko if: manifestData() -->
                 <button class="btn btn-shim btn-danger btn-labeled btn-lg fa fa-refresh" data-bind="click: toggleManifestEditor">{% trans 'Cancel' %}</button>
+                <!--/ko -->
                 <!--ko if: manifestLoading() -->
                 <span class="manifest-editor-loading">
                     {% trans "Loading manifest..." %}
@@ -159,8 +201,8 @@
                 <!--/ko -->
             </div>
         </div>
-            
-            
+
+
         <!--/ko -->
         <!--ko if: !editManifest() -->
             <!--ko if: manifestLoading() -->
@@ -170,17 +212,26 @@
             <!--/ko -->
             <!--ko if: !manifestLoading() -->
             <div class="iiif-gallery-panel" style="overflow-x: auto;">
+                {% block gallery_header %}
                 <div class="iiif-gallery-header">
-                    <span class="iiif-gallery-sequence-label" data-bind="click: toggleManifestEditor, text: manifestData() ? manifestName() : '{% trans "No manifest selected..." %}'"></span>
-                    |
-                    {% trans "Filter" %}
-                    <div class="list-filter" data-bind="">
-                        <input type="text" class="form-control" style="width: 100%;" placeholder="{% trans 'Filter images...' %}" data-bind="textInput: filter">
+                    <div>
+                        <span class="iiif-gallery-manifest-label" data-bind="text: manifestData() ? manifestName() : '{% trans "No manifest selected..." %}'"></span>
+                        <span class="iiif-gallery-manifest-label">|</span>
+                        <span>{% trans "Filter" %}</span>
+                        <div class="list-filter" data-bind="">
+                            <input type="text" class="form-control" style="width: 100%;" placeholder="{% trans 'Filter images...' %}" data-bind="textInput: filter">
 
-                        <!-- Clear Search -->
-                        <span class="clear-node-search" data-bind="visible: filter().length > 0, click: function() { filter(''); }"><i class="fa fa-times-circle"></i></span>
+                            <!-- Clear Search -->
+                            <span class="clear-node-search" data-bind="visible: filter().length > 0, click: function() { filter(''); }"><i class="fa fa-times-circle"></i></span>
+                        </div>
+                    </div>
+                    <div style="display: inline-flex; padding: 5px">
+                        <div class="iiif-gallery-sequence-label" data-bind="click: toggleManifestEditor">
+                            {% trans "Switch Manifest" %}
+                        </div>
                     </div>
                 </div>
+                {% endblock gallery_header %}
 
                 <div class="iiif-gallery-sequence">
                     <div class="iiif-gallery-sequence-canvases" data-bind="foreach: canvases">
@@ -196,7 +247,12 @@
                                 <img data-bind="attr: { src: $data.thumbnail || '{% static 'img/photo_missing.png' %}', title: $data.label}">
                             </div>
                             <div class="iiif-gallery-canvas-label">
+                                <!--ko if: getCanvasService($data) === selectedCanvas() -->
+                                <span data-bind="text: $parent.canvasLabel"></span>
+                                <!--/ko -->                                
+                                <!--ko ifnot: getCanvasService($data) === selectedCanvas() -->
                                 <span data-bind="text: label"></span>
+                                <!--/ko -->                                
                                 <span class="annotation-count">
                                     <!--ko if: getAnnotationCount(getCanvasService($data)) -->
                                     <span data-bind="text: getAnnotationCount(getCanvasService($data))"></span> {% trans "Annotation(s)" %}
@@ -215,5 +271,7 @@
     </div>
     <!--/ko -->
 </div>
+<!--/ko -->
+<!--/ko -->
 <!--/ko -->
 {% endblock content_management %}

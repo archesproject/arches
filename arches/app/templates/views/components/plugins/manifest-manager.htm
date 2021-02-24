@@ -1,0 +1,273 @@
+{% extends "views/components/iiif-viewer.htm" %}
+{% load staticfiles %}
+{% load i18n %}
+
+{% block tabs %}
+<div class="workbench-card-sidebar-tab" data-bind="click: function() {
+    toggleTab('manifest');
+}, css: {
+    'active': activeTab() === 'manifest',
+    'disabled': mainMenu()
+}">
+    <i class="fa fa-book"></i>
+    <span class="map-sidebar-text">{% trans "Manifest" %}</span>
+</div>
+<div class="workbench-card-sidebar-tab" data-bind="click: function() {
+    toggleTab('canvas');
+}, css: {'active': activeTab() === 'canvas', 'disabled': !canvas()
+}">
+    <i class="fa fa-book"></i>
+    <span class="map-sidebar-text">{% trans "Canvas" %}</span>
+</div>
+{{ block.super }}
+{% endblock tabs %}
+
+{% block sidepanel %}
+<!--ko foreach: { data: [$data], as: 'self' }-->
+<!--ko if: activeTab() === 'manifest'-->
+<div class="workbench-header-buffer">
+    <div class="workbench-card-sidepanel-header-container">
+        <h4 class="workbench-card-sidepanel-header" data-bind="click: hideSidePanel">{% trans 'Manage Manifest' %}</h4>
+    </div>
+</div>
+
+<div class="iiif-image-tools" style="margin-top: 20px;">
+    <div class="form-group">
+        <div class="row widget-wrapper">
+        <label class="control-label">{% trans "Title" %}</label>
+        <input type="text" placeholder="Manifest Title" class="form-control input-lg" style="height: 36px;"
+            data-bind="textInput: self.manifestName, valueUpdate: 'keyup'">
+        </div>  
+        <div class="row widget-wrapper">  
+        <label class="control-label">{% trans "Description" %}</label>
+        <textarea rows="10" type="text" placeholder='Manifest Description' class="form-control input-lg"
+            data-bind="textInput: self.manifestDescription, valueUpdate: 'keyup'"></textarea>
+        </div>
+        <div class="row widget-wrapper">
+            <label class="control-label">{% trans "Attribution" %}</label>
+            <input type="text" placeholder="Attribution" class="form-control input-lg" style="height: 36px;"
+                data-bind="textInput: self.manifestAttribution, valueUpdate: 'keyup'">
+            </div>  
+        <div class="row widget-wrapper">
+            <label class="control-label">{% trans "Attribution Logo" %}</label>
+            <input type="text" placeholder="Attribution Logo" class="form-control input-lg" style="height: 36px;"
+                data-bind="textInput: self.manifestLogo, valueUpdate: 'keyup'">
+            </div>  
+        <div class="row widget-wrapper">
+        <label class="control-label">{% trans "Metadata" %}</label>
+        <div class="manifest-metadata" style="display: flex;">
+            <div style="display: flex; flex-direction: column; width: 100%;">
+            <div style="padding: 3px">
+                <input type="text" placeholder='Metadata Label' class="form-control input-md" style="height: 36px;" 
+                data-bind="textInput: metadataLabel, valueUpdate: 'keyup'">
+            </div>
+            <div style="padding: 3px">
+                 <input type="text" placeholder='Metadata Value' class="form-control input-md" style="height: 36px;" 
+                data-bind="textInput: metadataValues, valueUpdate: 'keyup'">
+            </div>
+            </div>
+            <div style="height: fit-content; padding-top: 15px; cursor: pointer;" data-bind="click: function(){updateMetadata()}">
+                <i class="fa fa-plus-circle pull-right"></i>
+            </div>
+        </div>
+        <hr>
+        <div data-bind="sortable: {
+                data: manifestMetadata,
+                options: {
+                    start: self.startDrag
+                },
+                beforeMove: self.beforeMove,
+                afterMove: function(){console.log('hi')}
+            }">  
+            <div style="padding-bottom: 2px; display: flex;">
+                <div style="display: flex; flex-direction: column; width: 100%;">
+                <div style="padding: 3px;">
+                    <input type="text" placeholder='Metadata Label' class="form-control input-md" style="height: 36px;" 
+                    data-bind="textInput: $data.label, valueUpdate: 'keyup'">
+                </div>
+                <div style="padding: 3px">
+                    <input type="text" placeholder='Metadata Value' class="form-control input-md" style="height: 36px;" 
+                    data-bind="textInput: $data.value, valueUpdate: 'keyup'">
+                </div>
+                </div>
+                <div style="height: fit-content; padding-top: 15px; cursor: pointer;" data-bind="click: function(){self.removeMetadata($data)}">
+                    <i class="fa fa-minus-circle pull-right"></i>
+                </div>
+            </div>
+        </div>
+        </div>
+    </div>
+
+    
+    <div class="install-buttons" style="display: inline-flex; justify-content: space-between;">
+        <div style="display: flex;">
+        <button class="btn btn-mint btn-md btn-labeled fa fa-pencil" style="width: auto; margin-right: 10px;" data-bind="click: updateManifest, clickBubble: false, disable: !isManifestDirty()">{% trans "Save" %}</button>
+        <button class="btn btn-warning btn-md btn-labeled fa fa-refresh" style="width: auto; margin-right: 10px;" data-bind="click: reset, clickBubble: false, disable: !isManifestDirty()">{% trans "Cancel" %}</button>
+        </div>
+        <!--ko if: manifest-->
+        <button class="btn btn-danger btn-md btn-block btn-labeled btn-workbench fa fa-trash" style="width: auto" data-bind="click: deleteManifest"><span>{% trans "Delete" %}</span></button>
+        <!--/ko-->
+    </div>
+</div>
+<!--/ko-->
+
+<!--ko if: activeTab() === 'canvas'-->
+<div class="workbench-header-buffer">
+    <div class="workbench-card-sidepanel-header-container">
+        <h4 class="workbench-card-sidepanel-header" data-bind="click: hideSidePanel">{% trans 'Manage Canvases' %}</h4>
+    </div>
+</div>
+
+<div class="iiif-image-tools" style="margin-top: 20px;">
+    <!--ko if: canvases().length > 0-->
+    <label class="control-label">{% trans "Canvases" %}</label>
+    <div>{% trans "Select canvas to delete from the manifest" %}</div>
+    <div class="file-workbench-files" data-bind="foreach: canvases">
+        <div class='file-workbench-file' style="display: inline-flex;" data-bind="css: {staged: ko.unwrap($parent.canvas) === $data.images[0].resource.service['@id']}">
+            <input type="checkbox" style="width:15px; height:15px;" data-bind="value: $data, checked: $parent.canvasesForDeletion">
+            <!--ko if: ko.unwrap($parent.canvas) === $data.images[0].resource.service['@id'] -->
+            <span class='file-name manifest-manager-canvas-name' data-bind="text: $parent.canvasLabel, click: $parent.canvasClick, clickBubble: false"></span>
+            <!--/ko-->
+            <!--ko ifnot: ko.unwrap($parent.canvas) === $data.images[0].resource.service['@id'] -->
+            <span class='file-name manifest-manager-canvas-name' data-bind="text: label, click: $parent.canvasClick, clickBubble: false"></span>
+            <!--/ko-->
+        </div>
+    </div>
+
+    <div class="file-workbench-buttons">
+        <button style="width: 50%; margin: 10px 2px 20px 0px;" class="btn btn-md btn-primary" data-bind="click: addAllCanvases"
+        ><i class="fa fa-check-square"></i> {% trans 'Select All' %}</button>
+        <button style="width: 50%; margin: 10px 0px 20px 2px;" class="btn btn-md btn-primary" data-bind="click: clearCanvasSelection, css: {
+            disabled: canvasesForDeletion().length === 0
+        }"><i class="fa fa-eraser"></i> {% trans 'Clear All' %}</button>
+    </div>
+    <div class="file-workbench-selected-buttons" data-bind="visible: canvasesForDeletion().length > 0">
+        <button class="btn btn-lg btn-workbench btn-danger" data-bind="click: deleteCanvases"><i class="fa fa-trash"></i> {% trans 'Delete Selected' %}</button>
+    </div>
+
+    <!--ko if: canvas-->
+    <label class="control-label">{% trans "Selected Image Name" %}</label>
+    <div>
+        <input type="text" placeholder='Image Caption' class="form-control input-lg" style="height: 36px;" 
+        data-bind="textInput: self.canvasLabel, valueUpdate: 'keyup'">
+    </div>
+    <!--/ko-->
+    <!--/ko-->
+        
+    <div class="dropzone-photo-upload" data-bind="dropzone: dropzoneOptions">
+        <div class="file-workbench-buttons">
+            <button class="btn btn-primary btn-lg btn-block btn-labeled btn-workbench fa fa-upload fileinput-button dz-clickable" data-bind="css: uniqueidClass">
+                <span>{% trans "Add Photos" %}</span>
+            </button>
+        </div>
+        <div style="min-height: 100%;">
+            <div id="hidden-dz-previews" style="display:none"></div>
+        </div>
+    </div>
+    <div class="install-buttons" style="display: inline-flex; justify-content: space-between;">
+        <div class="file-workbench-buttons">
+            <button class="btn btn-mint btn-md btn-labeled fa fa-pencil" data-bind="click: updateManifest, clickBubble: false, disable: !isCanvasDirty()">{% trans "Save" %}</button>
+            <button class="btn btn-warning btn-md btn-labeled fa fa-refresh" data-bind="click: reset, clickBubble: false, disable: !isCanvasDirty()">{% trans "Cancel" %}</button>
+        </div>
+    </div>
+</div>
+<!--/ko-->
+<!--/ko-->
+{{ block.super }}
+{% endblock sidepanel %}
+
+{% block main_menu %}
+<div class="bord-top file-select loader-select" style="height: 100%;">
+    <div class="">
+        <h2>{% trans 'IIIF Manifest Manager' %}</h2>
+        <h4>{% trans 'Create a new manifest or modify an existing one' %}</h4>
+        <div style="display: flex; padding: 15px 25px; justify-content: center;">
+        <div style="width: 620px; display:flex; justify-content:space-between;">
+            <div class="r-grid-item relative" style="border: 1px solid #c4c4c4">
+                <div class="" style="display:flex; flex-direction: column; background-color: #fdfdfd">
+                    <h4 class="r-select-title">{% trans 'Select a Manifest' %}</h4>
+                </div>
+                <div>
+                    <div class="r-select-card" style="color: #30517a; background-color: #fdfdfd">
+                        <div class="r-select-circle loader-button" style="top: 55px">
+                            <span><i class="fa fa-pencil r-select-icon"></i></span>
+                        </div>
+                        <div class="r-desc-container">
+                            <p style="color: #30517a; background-color: #fdfdfd" class="r-select-desc">{% trans 'Choose an existing manifest to edit' %}</p> 
+                        </div>  
+                    </div>
+                </div>
+
+                <!-- card Tools -->
+                <div class="r-select-card-footer">
+                    <div class="">
+                        <div data-bind="click: function(){self.mainMenu(false);}" style="border-top: 1px solid #c4c4c4;" class="btn btn-primary btn-resource-select" role="button">
+                        {% trans 'Select' %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="r-grid-item relative" style="border: 1px solid #c4c4c4" data-bind="dropzone: dropzoneOptions4create">
+                <div class="" style="display:flex; flex-direction: column; background-color: #fdfdfd">
+                    <h4 class="r-select-title">{% trans 'Create a New Manifest' %}</h4>
+                </div>
+                <div>
+                    <div class="r-select-card" style="color: #30517a; background-color: #fdfdfd">
+                        <div class="r-select-circle loader-button" style="top: 55px">
+                            <span><i class="fa fa-upload r-select-icon"></i></span>
+                        </div>
+                        <div class="r-desc-container">
+                            <p style="color: #30517a; background-color: #fdfdfd" class="r-select-desc">{% trans 'Drop files here or click below to create a new manifest' %}</p> 
+                        </div>  
+                    </div>
+                </div>
+
+                <!-- card Tools -->
+                <div class="r-select-card-footer" class="dropzone-photo-upload">
+                    <div class="">
+                        <div style="border-top: 1px solid #c4c4c4;" class="btn btn-primary btn-resource-select fileinput-create-button dz-clickable" data-bind="css: uniqueidClass" role="button">
+                        {% trans 'Create' %}
+                        </div>
+                    </div>
+                    <div style="min-height: 100%;">
+                        <div id="hidden-dz-create-previews" style="display:none"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+</div>
+{% endblock main_menu %}
+
+{% block gallery_header %}
+<div class="iiif-gallery-header">
+    <div>
+        <span class="iiif-gallery-manifest-label" data-bind="text: manifestData() ? manifestName() : '{% trans "No manifest selected..." %}'"></span>
+        <span class="iiif-gallery-manifest-label">|</span>
+        <span>{% trans "Filter" %}</span>
+        <div class="list-filter" data-bind="">
+            <input type="text" class="form-control" style="width: 100%;" placeholder="{% trans 'Filter images...' %}" data-bind="textInput: filter">
+
+            <!-- Clear Search -->
+            <span class="clear-node-search" data-bind="visible: filter().length > 0, click: function() { filter(''); }"><i class="fa fa-times-circle"></i></span>
+        </div>
+    </div>
+    <div style="display: inline-flex; padding: 5px">
+        <div class="iiif-gallery-sequence-label" style="padding:0 5px" data-bind="click: toggleManifestEditor">
+            {% trans "Switch Manifest" %}
+        </div>
+        |
+        <div data-bind="dropzone: dropzoneOptions4create" >
+            <div>
+            <div class="iiif-gallery-sequence-label fileinput-create-button dz-clickable" style="padding:0 5px" data-bind="css: uniqueidClass; dropzone: dropzoneOptions4create" role="button">
+                {% trans "Create Manifest" %}
+            </div>
+            </div>
+            <div style="min-height: 100%;">
+                <div id="hidden-dz-create-previews" style="display:none"></div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock gallery_header %}

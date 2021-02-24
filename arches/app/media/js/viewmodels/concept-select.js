@@ -4,20 +4,23 @@ define([
     'viewmodels/widget',
     'arches',
 ], function(ko, $, WidgetViewModel, arches) {
-    var nameLookup = {};
+    var NAME_LOOKUP = {};
+
     var ConceptSelectViewModel = function(params) {
         var self = this;
+
         params.configKeys = ['placeholder', 'defaultValue'];
+        
         this.multiple = params.multiple || false;
         this.allowClear = true;
-
+        this.displayName = ko.observable('');
+        
         WidgetViewModel.apply(this, [params]);
-
-        var displayName = ko.observable('');
 
         this.valueList = ko.computed(function() {
             var valueList = self.value();
-            displayName();
+            self.displayName();
+            
             if (!self.multiple && valueList) {
                 valueList = [valueList];
             }
@@ -28,40 +31,20 @@ define([
         });
 
         this.valueObjects = ko.computed(function() {
-            displayName();
+            self.displayName();
             return self.valueList().map(function(value) {
                 return {
                     id: value,
-                    name: nameLookup[value]
+                    name: NAME_LOOKUP[value]
                 };
             }).filter(function(item) {
                 return item.name;
             });
         });
 
-        var updateName = function() {
-            var names = [];
-            self.valueList().forEach(function(val) {
-                if (val) {
-                    if (nameLookup[val]) {
-                        names.push(nameLookup[val]);
-                        displayName(names.join(', '));
-                    } else {
-                        $.ajax(arches.urls.get_pref_label + '?valueid=' + val, {
-                            dataType: "json"
-                        }).done(function(data) {
-                            nameLookup[val] = data.value;
-                            names.push(data.value);
-                            displayName(names.join(', '));
-                        });
-                    }
-                }
-            });
-        };
-        this.value.subscribe(updateName);
         this.displayValue = ko.computed(function() {
             var val = self.value();
-            var name = displayName();
+            var name = self.displayName();
             var displayVal = null;
 
             if (val) {
@@ -70,14 +53,39 @@ define([
 
             return displayVal;
         });
-        updateName();
+
+        this.value.subscribe(function() {
+            var names = [];
+    
+            self.valueList().forEach(function(val) {
+                if (val) {
+                    if (NAME_LOOKUP[val]) {
+                        names.push(NAME_LOOKUP[val]);
+                        self.displayName(names.join(', '));
+                    } else {
+                        $.ajax(arches.urls.get_pref_label + '?valueid=' + val, {
+                            dataType: "json"
+                        }).done(function(data) {
+                            NAME_LOOKUP[val] = data.value;
+                            names.push(data.value);
+                            self.displayName(names.join(', '));
+                        });
+                    }
+                }
+            });
+        });
+
+        /* flags UI change for previously saved data */
+        if (self.value()) {
+            self.value.valueHasMutated();  
+        }
 
         this.select2Config = {
-            value: this.value,
+            value: self.value,
             clickBubble: true,
-            multiple: this.multiple,
+            multiple: self.multiple,
             closeOnSlect: false,
-            placeholder: this.placeholder,
+            placeholder: self.placeholder,
             allowClear: true,
             ajax: {
                 url: arches.urls.paged_dropdown,
@@ -120,35 +128,64 @@ define([
             },
             isEmpty: ko.computed(function() {
                 return self.value() === '' || !self.value();
-            }, this),
+            }),
             initSelection: function(el, callback) {
                 var valueList = self.valueList();
-                var setSelectionData = function() {
-                    var valueData = self.valueObjects().map(function(item) {
-                        return {
-                            id: item.id,
-                            text: item.name
-                        };
-                    });
-                    valueData = self.multiple ? valueData : valueData[0];
-                    if (valueData) {
-                        callback(valueData);
+                
+                var setSelectionData = function(data) {
+                    var valueData;
+
+                    if (self.multiple) {
+                        if (!(data instanceof Array)) { data = [data]; }
+                        
+                        valueData = data.map(function(valueId) {
+                            return {
+                                id: valueId,
+                                text: NAME_LOOKUP[valueId],
+                            };
+                        });
+
+                        /* add the rest of the previously selected values */ 
+                        valueList.forEach(function(value) {
+                            if (value !== valueData[0].id) {
+                                valueData.push({
+                                    id: value,
+                                    text: NAME_LOOKUP[value],
+                                });
+                            }
+                        });
+
+                        /* keeps valueData obeying valueList as ordering source of truth */ 
+                        if (valueData[0].id !== valueList[0]) {
+                            valueData.reverse();
+                        }
+
                     }
+                    else {
+                        valueData = {
+                            id: data,
+                            text: NAME_LOOKUP[data],
+                        };
+                    }
+
+                    if (valueData) { callback(valueData); }
                 };
+
                 valueList.forEach(function(value) {
                     if (value) {
-                        if (nameLookup[value]) {
-                            setSelectionData();
+                        if (NAME_LOOKUP[value]) {
+                            setSelectionData(value);
                         } else {
                             $.ajax(arches.urls.concept_value + '?valueid=' + value, {
                                 dataType: "json"
                             }).done(function(data) {
-                                nameLookup[value] = data.value;
-                                setSelectionData();
+                                NAME_LOOKUP[value] = data.value;
+                                setSelectionData(value);
                             });
                         }
                     }
                 });
+
             }
         };
     };

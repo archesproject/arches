@@ -79,7 +79,6 @@ ELASTICSEARCH_CUSTOM_INDEXES = []
 KIBANA_URL = "http://localhost:5601/"
 KIBANA_CONFIG_BASEPATH = "kibana"  # must match Kibana config.yml setting (server.basePath) but without the leading slash,
 # also make sure to set server.rewriteBasePath: true
-
 USE_SEMANTIC_RESOURCE_RELATIONSHIPS = True
 ROOT_DIR = os.path.dirname(os.path.abspath(inspect.getfile(inspect.currentframe())))
 PACKAGE_ROOT = ROOT_DIR
@@ -150,9 +149,11 @@ SESSION_COOKIE_NAME = "arches"
 # EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'  #<-- Only need to uncomment this for testing without an actual email server
 # EMAIL_USE_TLS = True
 # EMAIL_HOST = 'smtp.gmail.com'
-# EMAIL_HOST_USER = 'xxxx@xxx.com'
+EMAIL_HOST_USER = "xxxx@xxx.com"
 # EMAIL_HOST_PASSWORD = 'xxxxxxx'
 # EMAIL_PORT = 587
+
+DEFAULT_FROM_EMAIL = EMAIL_HOST_USER
 
 POSTGIS_VERSION = (3, 0, 0)
 
@@ -276,7 +277,7 @@ OAUTH2_PROVIDER = {"ACCESS_TOKEN_EXPIRE_SECONDS": 36000}
 
 # This is the client id you get when you register a new application
 # see https://arches.readthedocs.io/en/stable/api/#authentication
-MOBILE_OAUTH_CLIENT_ID = ""  #'9JCibwrWQ4hwuGn5fu2u1oRZSs9V6gK8Vu8hpRC4'
+MOBILE_OAUTH_CLIENT_ID = ""  # '9JCibwrWQ4hwuGn5fu2u1oRZSs9V6gK8Vu8hpRC4'
 MOBILE_DEFAULT_ONLINE_BASEMAP = {"default": "mapbox://styles/mapbox/streets-v9"}
 MOBILE_IMAGE_SIZE_LIMITS = {
     # These limits are meant to be approximates. Expect to see uploaded sizes range +/- 20%
@@ -375,7 +376,11 @@ except Exception as e:
 LOGGING = {
     "version": 1,
     "disable_existing_loggers": False,
-    "formatters": {"console": {"format": "%(asctime)s %(name)-12s %(levelname)-8s %(message)s",},},
+    "formatters": {
+        "console": {
+            "format": "%(asctime)s %(name)-12s %(levelname)-8s %(message)s",
+        },
+    },
     "handlers": {
         "file": {
             "level": "WARNING",  # DEBUG, INFO, WARNING, ERROR, CRITICAL
@@ -602,7 +607,11 @@ CELERY_BEAT_SCHEDULE = {
 
 AUTO_REFRESH_GEOM_VIEW = True
 TILE_CACHE_TIMEOUT = 600  # seconds
+CLUSTER_DISTANCE_MAX = 5000  # meters
 GRAPH_MODEL_CACHE_TIMEOUT = None  # seconds * hours * days = ~1mo
+
+CANTALOUPE_DIR = os.path.join(ROOT_DIR, "cantaloupe")
+CANTALOUPE_HTTP_ENDPOINT = "http://localhost:8182/"
 
 RENDERERS = [
     {

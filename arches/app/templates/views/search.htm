@@ -58,6 +58,12 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                     <!--ko if: ko.unwrap(sharedStateObject.filterApplied) -->
                     <button class="btn-sm btn btn-mint btn-labeled" style="padding: 2px 9px;" data-bind="click: function() {sharedStateObject.clearQuery();}">{% trans "Clear Filters" %}</button>
                     <!--/ko-->
+                    <span style="width:120px">
+                        <div data-bind="component: {
+                            name: 'sort-results',
+                            params: sharedStateObject
+                        }"></div>
+                    </span>
                 </div>
 
                 <div class="search-results-container">

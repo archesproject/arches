@@ -187,7 +187,7 @@ class SearchResultsExporter(object):
                     label = node.fieldname if use_fieldname is True else node.name
 
                     if compact:
-                        if node.datatype == "geojson-feature-collection":
+                        if node.datatype == "geojson-feature-collection" and node_value:
                             has_geometry = True
                             feature_collections = self.get_feature_collections(tile, node, feature_collections, label, datatype)
                         else:

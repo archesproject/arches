@@ -272,14 +272,14 @@
 
         <div class="card">
             {% block form_header %}
-            <h4 data-bind="text: card.model.name()"></h4>
+            <h4 class="card-title" data-bind="text: card.model.name()"></h4>
 
             <!-- ko if: card.model.helpenabled -->
             <span>
                 <a class="pull-right card-help help editable-help" data-bind="click: function () {card.model.get('helpactive')(true) }" style="cursor:pointer;"> {% trans "Help" %} <i class="fa fa-question-circle"></i></a>
             </span>
             <!-- /ko -->
-            <h5 data-bind="text: card.model.instructions"></h5>
+            <h5 class="card-instructions" data-bind="text: card.model.instructions"></h5>
 
             <!-- ko if: card.isFuncNode && card.isFuncNode()  -->
             <h4 class="is-function-node" data-bind="text: card.isFuncNode()"></h4>
@@ -326,11 +326,9 @@
                             card.canAdd() ? card.selected(true) : card.tiles()[0].selected(true);
                         }
                     }">
-                        <h4 class="card-summary-name">
+                        <h4 class="card-summary-name" style='color: #2f527a'>
                             <span data-bind="text: card.model.name"></span>
-                            <!-- ko if: card.canAdd() && card.parent.tileid -->
-                            <i class="fa fa-plus-circle card-summary-add"></i>
-                            <!-- /ko -->
+                            <i class="fa fa-plus-circle card-summary-add" data-bind="click: function(){$parent.createParentAndChild($parent.tile, card)}"></i>
                         </h4>
                     </a>
                     <ul class="tile-summary-item" data-bind="foreach: {
@@ -367,29 +365,22 @@
             <!-- /ko -->
             {% block form_buttons %}
             <div class="install-buttons">
-                <!-- ko if: !!ko.unwrap(card.altButtons) -->
-                    <!-- ko foreach: {data: card.altButtons, as: 'button'} -->
-                    <button data-bind="text: button.label, click: button.onClick, attr: {'class': button.classes}, css: {disabled: button.disabled}, visible: button.visible" ></button>
-                    <!-- /ko -->
-                <!-- /ko -->
-                
-                <!-- ko if: !ko.unwrap(card.hideDefaultButtons) -->
-
                 <!-- ko if: tile.tileid && self.deleteTile -->
                 <button class="btn btn-shim btn-labeled btn-lg fa fa-trash" data-bind="click: self.deleteTile, css: {disabled: (!card.isWritable && !self.preview), 'btn-warning': card.isWritable }">{% trans 'Delete this record' %}</button>
                 <!-- /ko -->
+
                 <!-- ko if: tile.dirty() -->
                     <!-- ko if: provisionalTileViewModel && !provisionalTileViewModel.tileIsFullyProvisional() && card.isWritable -->
                     <button class="btn btn-shim btn-danger btn-labeled btn-lg fa fa-times" data-bind="click: tile.reset">{% trans 'Cancel edit' %}</button>
                     <!-- /ko -->
+
                     <!-- ko if: tile.tileid -->
                     <button class="btn btn-shim btn-labeled btn-lg fa fa-plus" data-bind="click: self.saveTile, css: {disabled: (!card.isWritable && !self.preview), 'btn-mint': card.isWritable }">{% trans 'Save edit' %}</button>
                     <!-- /ko -->
                 <!-- /ko -->
-                <!-- ko if: !tile.tileid -->
+                
+                <!-- ko if: !tile.tileid && !showChildCards() -->
                 <button class="btn btn-shim btn-labeled btn-lg fa fa-plus" data-bind="click: self.saveTile, css: {disabled: (!card.isWritable && !self.preview), 'btn-mint': card.isWritable }">{% trans 'Add'  %}</button>
-                <!-- /ko -->
-
                 <!-- /ko -->
             </div>
             {% endblock form_buttons %}

@@ -1,6 +1,8 @@
 import json, urllib
 from django.urls import reverse
 from arches.app.models import models
+from arches.app.models.system_settings import settings
+from arches.app.search.elasticsearch_dsl_builder import Dsl, Bool, Terms, Exists, Nested
 from django.utils.translation import ugettext as _
 import logging
 
@@ -29,9 +31,9 @@ class BaseDataType(object):
         """
         pass
 
-    def after_update_all(self):
+    def after_update_all(self, tile=None):
         """
-        Refreshes mv_geojson_geoms materialized view after save.
+        Refreshes geojson_geometries table after save.
         """
         pass
 
@@ -216,6 +218,61 @@ class BaseDataType(object):
         """
         pass
 
+    def append_null_search_filters(self, value, node, query, request):
+        """
+        Appends the search query dsl to search for fields that have not been populated
+        """
+        base_query = Bool()
+        base_query.filter(Terms(field="graph_id", terms=[str(node.graph_id)]))
+
+        null_query = Bool()
+        data_exists_query = Exists(field="tiles.data.%s" % (str(node.pk)))
+        nested_query = Nested(path="tiles", query=data_exists_query)
+        null_query.must(nested_query)
+        if value["op"] == "null":
+            # search for tiles that don't exist
+            exists_query = Bool()
+            exists_query.must_not(null_query)
+            base_query.should(exists_query)
+
+            # search for tiles that do exist, but that have null or [] as values
+            func_query = Dsl()
+            func_query.dsl = {
+                "function_score": {
+                    "min_score": 1,
+                    "query": {"match_all": {}},
+                    "functions": [
+                        {
+                            "script_score": {
+                                "script": {
+                                    "source": """
+                                    int null_docs = 0;
+                                    for(tile in params._source.tiles){
+                                        if(tile.data.containsKey(params.node_id)){
+                                            def val = tile.data.get(params.node_id);
+                                            if (val == null || (val instanceof List && val.length==0)) {
+                                                null_docs++;
+                                            }
+                                        }
+                                    }
+                                    return null_docs;
+                                """,
+                                    "lang": "painless",
+                                    "params": {"node_id": "%s" % (str(node.pk))},
+                                }
+                            }
+                        }
+                    ],
+                    "score_mode": "max",
+                    "boost": 1,
+                    "boost_mode": "replace",
+                }
+            }
+            base_query.should(func_query)
+        elif value["op"] == "not_null":
+            base_query.must(null_query)
+        query.must(base_query)
+
     def handle_request(self, current_tile, request, node):
         """
         Updates files
@@ -229,7 +286,7 @@ class BaseDataType(object):
         """
         pass
 
-    def post_tile_delete(self, tile, nodeid):
+    def post_tile_delete(self, tile, nodeid, index=True):
         """
         Called following the tile.delete operation
 
@@ -298,11 +355,11 @@ class BaseDataType(object):
 
     def ignore_keys(self):
         """
-        Each entry returned in the array is a string, consisting of the combination of two full URIs 
-        separated by a space -- the first is the URI of the property in the ontology, 
-        and the second is the class of the value of the property. 
-        When this key is encountered in incoming data, it will be ignored. 
-        This is useful for either when the data is handled internally by the datatype, 
+        Each entry returned in the array is a string, consisting of the combination of two full URIs
+        separated by a space -- the first is the URI of the property in the ontology,
+        and the second is the class of the value of the property.
+        When this key is encountered in incoming data, it will be ignored.
+        This is useful for either when the data is handled internally by the datatype,
         or when the incoming data has annotations that should not be persisted.
         """
 

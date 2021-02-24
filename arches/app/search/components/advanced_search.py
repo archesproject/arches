@@ -2,7 +2,7 @@ from arches.app.models import models
 from arches.app.models.system_settings import settings
 from arches.app.datatypes.datatypes import DataTypeFactory
 from arches.app.utils.betterJSONSerializer import JSONDeserializer
-from arches.app.search.elasticsearch_dsl_builder import Bool, Nested
+from arches.app.search.elasticsearch_dsl_builder import Bool, Nested, Terms
 from arches.app.search.components.base import BaseSearchFilter
 
 details = {
@@ -30,17 +30,25 @@ class AdvancedSearch(BaseSearchFilter):
         grouped_queries = [grouped_query]
         for index, advanced_filter in enumerate(advanced_filters):
             tile_query = Bool()
+            null_query = Bool()
             for key, val in advanced_filter.items():
                 if key != "op":
                     node = models.Node.objects.get(pk=key)
                     if self.request.user.has_perm("read_nodegroup", node.nodegroup):
                         datatype = datatype_factory.get_instance(node.datatype)
-                        datatype.append_search_filters(val, node, tile_query, self.request)
+                        if ("op" in val and (val["op"] == "null" or val["op"] == "not_null")) or (
+                            "val" in val and (val["val"] == "null" or val["val"] == "not_null")
+                        ):
+                            # don't use a nested query with the null/not null search
+                            datatype.append_search_filters(val, node, null_query, self.request)
+                        else:
+                            datatype.append_search_filters(val, node, tile_query, self.request)
             nested_query = Nested(path="tiles", query=tile_query)
             if advanced_filter["op"] == "or" and index != 0:
                 grouped_query = Bool()
                 grouped_queries.append(grouped_query)
             grouped_query.must(nested_query)
+            grouped_query.must(null_query)
         for grouped_query in grouped_queries:
             advanced_query.should(grouped_query)
         search_query.must(advanced_query)

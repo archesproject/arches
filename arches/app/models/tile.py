@@ -225,7 +225,7 @@ class Tile(models.TileModel):
             existing_tiles = list(models.TileModel.objects.filter(**kwargs).values_list("tileid", flat=True))
 
             # this should only ever return at most one tile
-            if len(existing_tiles) > 0 and self.tileid not in existing_tiles:
+            if len(existing_tiles) > 0 and uuid.UUID(str(self.tileid)) not in existing_tiles:
                 card = models.CardModel.objects.get(nodegroup=self.nodegroup)
                 message = _("Unable to save a tile to a card with cardinality 1 where a tile has previously been saved.")
                 details = _(
@@ -257,7 +257,20 @@ class Tile(models.TileModel):
                         for node in nodes:
                             datatype = self.datatype_factory.get_instance(node.datatype)
                             nodeid = str(node.nodeid)
-                            if datatype.values_match(tile.data[nodeid], self.data[nodeid]):
+                            tile_data = ""
+                            if tile.provisionaledits is None:
+                                # If this is not a provisional tile, the data should
+                                # exist, so we check it normally
+                                tile_data = tile.data[nodeid]
+                            else:
+                                # If it is a provisional tile, we need to check the
+                                # provisional edits for clashing values
+                                for edit_id in tile.provisionaledits.keys():
+                                    edit_data = tile.provisionaledits[str(edit_id)]
+                                    if nodeid in edit_data["value"]:
+                                        tile_data = edit_data["value"][nodeid]
+                                        break
+                            if datatype.values_match(tile_data, self.data[nodeid]):
                                 match = True
                                 duplicate_values.append(datatype.get_display_value(tile, node))
                             else:
@@ -433,6 +446,7 @@ class Tile(models.TileModel):
     def delete(self, *args, **kwargs):
         se = SearchEngineFactory().create()
         request = kwargs.pop("request", None)
+        index = kwargs.pop("index", True)
         provisional_edit_log_details = kwargs.pop("provisional_edit_log_details", None)
         for tile in self.tiles:
             tile.delete(*args, request=request, **kwargs)
@@ -444,29 +458,27 @@ class Tile(models.TileModel):
             user_is_reviewer = True
 
         if user_is_reviewer is True or self.user_owns_provisional(user):
-            query = Query(se)
-            bool_query = Bool()
-            bool_query.filter(Terms(field="tileid", terms=[self.tileid]))
-            query.add_query(bool_query)
-            results = query.search(index=TERMS_INDEX)["hits"]["hits"]
-
-            for result in results:
-                se.delete(index=TERMS_INDEX, id=result["_id"])
+            if index:
+                query = Query(se)
+                bool_query = Bool()
+                bool_query.filter(Terms(field="tileid", terms=[self.tileid]))
+                query.add_query(bool_query)
+                results = query.delete(index=TERMS_INDEX)
 
             self.__preDelete(request)
             self.save_edit(
-                user=request.user, edit_type="tile delete", old_value=self.data, provisional_edit_log_details=provisional_edit_log_details
+                user=user, edit_type="tile delete", old_value=self.data, provisional_edit_log_details=provisional_edit_log_details
             )
             try:
                 super(Tile, self).delete(*args, **kwargs)
-                for nodeid, value in self.data.items():
+                for nodeid in self.data.keys():
                     node = models.Node.objects.get(nodeid=nodeid)
                     datatype = self.datatype_factory.get_instance(node.datatype)
-                    datatype.post_tile_delete(self, nodeid)
-                resource = Resource.objects.get(resourceinstanceid=self.resourceinstance.resourceinstanceid)
-                resource.index()
-            except IntegrityError:
-                logger.error
+                    datatype.post_tile_delete(self, nodeid, index=index)
+                if index:
+                    self.index()
+            except IntegrityError as e:
+                logger.error(e)
 
         else:
             self.apply_provisional_edit(user, data={}, action="delete")
@@ -496,7 +508,7 @@ class Tile(models.TileModel):
         nodegroup = models.NodeGroup.objects.get(pk=self.nodegroup_id)
         for node in nodegroup.node_set.all():
             datatype = self.datatype_factory.get_instance(node.datatype)
-            datatype.after_update_all()
+            datatype.after_update_all(tile=self)
         for tile in self.tiles:
             tile.after_update_all()
 
