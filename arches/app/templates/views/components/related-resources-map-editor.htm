@@ -39,6 +39,9 @@
     </div>
 
     <div data-bind="css: card.model.cssclass" style="height: calc(100% - 80px)">
+        {% if show_external_resource_data_preview %}
+            <external-resource-data-preview params="{fileData: self.fileData, loading: self.loading, tile: self.tile, widgets: self.widgets}" ></external-resource-data-preview>
+        {% endif %}
         <!-- ko if: reviewer && provisionalTileViewModel.selectedProvisionalEdit() -->
         <div class="edit-message-container">
             <span>{% trans 'Showing edits by' %}</span>

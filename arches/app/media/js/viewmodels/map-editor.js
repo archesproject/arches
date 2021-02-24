@@ -454,9 +454,12 @@ define([
 
         this.map.subscribe(setupDraw);
 
-        self.map.subscribe(function() {
+        self.map.subscribe(function(map) {
             if (self.draw && !params.draw) {
                 params.draw = self.draw;
+            }
+            if (map && !params.map) {
+                params.map = map;
             }
         });
 
