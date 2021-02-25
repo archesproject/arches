@@ -1294,7 +1294,7 @@ class FileListDataType(BaseDataType):
                             try:
                                 file_model = models.File.objects.get(pk=file["file_id"])
                             except ObjectDoesNotExist: 
-                                # Do not use get_or_create here because django can create a different file_path
+                                # Do not use get_or_create here because django can create a different file name applied to the file_path
                                 # for the same file_id causing a 'create' when a 'get' was intended
                                 file_model = models.File.objects.create(pk=file["file_id"], path=file_path)
                             if not file_model.tile_id:
