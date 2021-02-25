@@ -410,16 +410,17 @@ class CsvReader(Reader):
     ):
         # errors = businessDataValidator(self.business_data)
         celery_worker_running = task_management.check_if_celery_available()
-        try:
-            mapping_filefieldname_to_nodeid_dict = {n["file_field_name"].upper(): n["arches_nodeid"] for n in mapping["nodes"]}
-            col_header_to_nodeid_dict = {header: mapping_filefieldname_to_nodeid_dict[header.upper()] for header in business_data[1].keys()}
-        except KeyError as e:
-            self.errors.append(
-                {
-                    "type": "WARNING",
-                    "message": f"Match failed between column header and mapping file_field_name. See detail: {e}.",
-                }
-            )
+        # TODO: Fix IndexError raised by col_header_to_nodeid_dict and uncomment below
+        # try:
+        #     mapping_filefieldname_to_nodeid_dict = {n["file_field_name"].upper(): n["arches_nodeid"] for n in mapping["nodes"]}
+        #     col_header_to_nodeid_dict = {header: mapping_filefieldname_to_nodeid_dict[header.upper()] for header in business_data[1].keys()}
+        # except KeyError as e:
+        #     self.errors.append(
+        #         {
+        #             "type": "WARNING",
+        #             "message": f"Match failed between column header and mapping file_field_name. See detail: {e}.",
+        #         }
+        #     )
 
         print("Starting import of business data")
         self.start = time()
