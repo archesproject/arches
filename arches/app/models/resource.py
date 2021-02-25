@@ -189,22 +189,21 @@ class Resource(models.ResourceInstance):
             tiles.extend(resource.tiles)
 
         # need to save the models first before getting the documents for index
-        start = time()
+        # start = time()
         Resource.objects.bulk_create(resources)
         TileModel.objects.bulk_create(tiles)
 
-        print(f"Time to bulk create tiles and resources: {datetime.timedelta(seconds=time() - start)}")
+        # print(f"Time to bulk create tiles and resources: {datetime.timedelta(seconds=time() - start)}")
 
-        start = time()
+        # start = time()
         for resource in resources:
             resource.save_edit(edit_type="create")
 
         resources[0].tiles[0].save_edit(note=f"Bulk created: {len(tiles)} for {len(resources)} resources.", edit_type="bulk_create")
 
-        print("Time to save resource edits: %s" % datetime.timedelta(seconds=time() - start))
+        # print("Time to save resource edits: %s" % datetime.timedelta(seconds=time() - start))
 
         for resource in resources:
-            start = time()
             document, terms = resource.get_documents_to_index(
                 fetchTiles=False, datatype_factory=datatype_factory, node_datatypes=node_datatypes
             )
