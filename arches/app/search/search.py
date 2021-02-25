@@ -24,6 +24,7 @@ import logging
 from datetime import datetime
 from elasticsearch import Elasticsearch, helpers
 from elasticsearch.exceptions import RequestError
+from elasticsearch.helpers import BulkIndexError
 from arches.app.models.system_settings import settings
 from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializer
 
@@ -77,6 +78,14 @@ class SearchEngine(object):
                     data.append(hit)
 
                 return helpers.bulk(self.es, data, refresh=refresh, **kwargs)
+            except BulkIndexError as detail:
+                if detail.errors[0]["delete"]["status"] == 404:
+                    pass
+                else:
+                    self.logger.warning(
+                        "%s: WARNING: failed to delete document by query: %s \nException detail: %s\n" % (datetime.now(), body, detail)
+                    )
+                    raise detail
             except Exception as detail:
                 try:
                     # ignore 404 errors (index_not_found_exception)
