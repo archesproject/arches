@@ -38,7 +38,9 @@
         <!-- /ko -->
     </div>
 
-    <div data-bind="css: card.model.cssclass" style="height: calc(100% - 80px)">        
+    <div data-bind="css: card.model.cssclass" style="height: calc(100% - 80px)">
+        {% block additional_content %}
+        {% endblock additional_content %}
         <!-- ko if: reviewer && provisionalTileViewModel.selectedProvisionalEdit() -->
         <div class="edit-message-container">
             <span>{% trans 'Showing edits by' %}</span>

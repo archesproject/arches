@@ -22,6 +22,7 @@ define([
         if (this.widgets === undefined) { // could be [], so checking specifically for undefined
             this.widgets = params.widgets || [];
         }
+
         this.geojsonWidgets = this.widgets.filter(function(widget){ return widget.datatype.datatype === 'geojson-feature-collection'; });
         this.newNodeId = null;
         this.featureLookup = {};
@@ -48,6 +49,7 @@ define([
                 });
             }
         };
+
 
         var sources = [];
         for (var sourceName in arches.mapSources) {
@@ -174,6 +176,7 @@ define([
             });
             params.fitBoundsOptions = { padding: {top: padding, left: padding + 200, bottom: padding, right: padding + 200} };
         }
+
         params.activeTab = 'editor';
         params.sources = Object.assign({
             "geojson-editor-data": {
@@ -438,7 +441,6 @@ define([
             }
         };
 
-
         if (this.provisionalTileViewModel) {
             this.provisionalTileViewModel.resetAuthoritative();
             this.provisionalTileViewModel.selectedProvisionalEdit.subscribe(function(val){
@@ -463,6 +465,15 @@ define([
         }
 
         this.map.subscribe(setupDraw);
+
+        self.map.subscribe(function(map) {
+            if (self.draw && !params.draw) {
+                params.draw = self.draw;
+            }
+            if (map && !params.map) {
+                params.map = map;
+            }
+        });
 
         if (!params.additionalDrawOptions) {
             params.additionalDrawOptions = [];
