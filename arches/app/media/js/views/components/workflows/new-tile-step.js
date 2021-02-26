@@ -15,7 +15,7 @@ define([
         this.resourceId = ko.observable(ko.unwrap(params.resourceid));
         this.resourceId.subscribe(function(id) {
             params.resourceid(id);
-        })
+        });
 
         var cachedValue = ko.unwrap(params.value);
         if (cachedValue) {
