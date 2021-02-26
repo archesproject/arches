@@ -670,6 +670,18 @@ input[type="checkbox"] {
     padding: 0 25px;
 }
 
+.tabbed-workflow-step-body .create-resource-instance-card-component .card-component {
+    width: unset;
+}
+
+.tabbed-workflow-step-body .new-provisional-edit-card-container .card {
+    padding: 25px 10px;
+}
+
+.tabbed-workflow-step-body .create-resource-instance-card-component .install-buttons {
+    display: unset;
+}
+
 .tabbed-workflow-step-body .card-title,
 .tabbed-workflow-step-body .card-instructions {
     display: none;
