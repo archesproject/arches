@@ -1970,7 +1970,7 @@ div.final-cons-step-separator>h4 {
 }
 
 .workbench-card-container.workbench-card-container-sidepanel-active {
-    margin-right: 475px;
+    margin-right: 400px;
 }
 
 .workbench-card-sidebar {
@@ -9275,6 +9275,10 @@ a.clear-geojson-button:hover {
     font-size: 13px;
 }
 
+.workbench-card-container .mapboxgl-ctrl-geocoder {
+    margin-right: 90px;
+}
+
 .workbench-card-wrapper .mapboxgl-ctrl-top-left .mapboxgl-ctrl {
     visibility: visible;
 }
@@ -10064,17 +10068,28 @@ a.search-query-link-captions:focus {
 }
 
 .search-title {
-    font-size: 17px;
+    font-size: 16px;
     font-weight: 500;
     margin-top: 0px;
     display: inline-block;
     margin-bottom: 0px;
+    width: 130px;
 }
 
 .search-candidate-title,
 .search-candidate-link {
     color: steelblue;
     padding-right: 7px;
+}
+
+.search-listing-footer a {
+    margin-top: -5px;
+    padding: 5px 5px;
+}
+
+.search-listing-footer a:focus {
+    background: #d6d6d6;
+    border-radius: 1px;
 }
 
 .search-control-container.slide {
@@ -10088,6 +10103,13 @@ a.search-query-link-captions:focus {
     flex-direction: column;
     max-width: 400px;
     border-right: solid 1px #dcdcdc;
+}
+
+.clear-filter {
+    padding: 0px 9px !important;
+    height: 30px;
+    border-radius: 2px;
+    border: 1px solid #1ABA8E;
 }
 
 .search-listing-icon {
@@ -12907,9 +12929,12 @@ a.jstree-anchor.permissions-widget {
 
 .map-data-drop-area {
     padding: 15px;
-    border: 1px dashed #808080;
+    border: 1px dashed #bbb;
+    background: #f9f9f9;
+    text-align: center;
     color: #808080;
-    margin: 5px;
+    margin: 5px 0px;
+    border-radius: 1px;
     cursor: pointer;
 }
 
@@ -13348,11 +13373,13 @@ a.jstree-anchor.permissions-widget {
 }
 .map-coordinate-editor-pair input {
     margin: 0 5px;
-    width: 120px;
+    padding: 5px;
+    width: 130px;
     display: inline-block;
 }
 .coordinate-entry-label {
     display: inline-block;
+    color: #888;
     width: 15px;
     text-align: right;
     font-weight: bold;
@@ -13376,7 +13403,7 @@ a.jstree-anchor.permissions-widget {
     font-size: 1.2em;
 }
 .map-coordinate-editor-pair.map-coordinate-editor-new-coordinates {
-    padding: 0 22px 10px 8px;
+    padding: 0 0px 10px 4px;
 }
 
 @keyframes loader {
