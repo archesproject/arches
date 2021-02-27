@@ -13357,9 +13357,10 @@ a.jstree-anchor.permissions-widget {
     float: left;
 }
 .map-coordinate-editor-crs-selector dt {
-    width: 45%;
-    text-align: right;
+    width: 150px;
     padding: 5px;
+    margin-top: 2px;
+    font-weight: 500;
 }
 .map-coordinate-editor-list {
     padding: 0 5px;
@@ -13382,7 +13383,6 @@ a.jstree-anchor.permissions-widget {
     color: #888;
     width: 15px;
     text-align: right;
-    font-weight: bold;
 }
 .map-coordinate-editor hr {
     margin: 10px 4px 5px;
@@ -13404,6 +13404,15 @@ a.jstree-anchor.permissions-widget {
 }
 .map-coordinate-editor-pair.map-coordinate-editor-new-coordinates {
     padding: 0 0px 10px 4px;
+}
+
+.map-coordinate-editor-button-container {
+    position: sticky;
+    bottom: -17px;
+    background: #fff;
+    width: 400px;
+    margin-left: -21px;
+    padding: 10px;
 }
 
 @keyframes loader {
