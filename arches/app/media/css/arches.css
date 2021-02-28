@@ -2079,11 +2079,13 @@ div.final-cons-step-separator>h4 {
     padding: 17px 30px 10px 0px;
     margin-left: 0px;
     margin-top: -16px;
-    position: absolute;
+    position: fixed;
     background: #fff;
     z-index: 20;
     width: 370px;
 }
+
+
 
 .expanded .workbench-card-sidepanel-header-container {
     width: 599px;
@@ -12928,7 +12930,7 @@ a.jstree-anchor.permissions-widget {
 }
 
 .map-data-drop-area {
-    padding: 15px;
+    padding: 25px 15px;
     border: 1px dashed #bbb;
     background: #f9f9f9;
     text-align: center;
@@ -13351,6 +13353,14 @@ a.jstree-anchor.permissions-widget {
     margin: 0;
 }
 
+.map-coordinate-editor-crs-selector {
+    position: fixed;
+    margin-top: 25px;
+    background: #fff;
+    padding-bottom: 8px;
+    border-bottom: 1px solid #ddd;
+}
+
 .map-coordinate-editor-crs-selector dt,
 .map-coordinate-editor-crs-selector select {
     display: block;
@@ -13364,6 +13374,7 @@ a.jstree-anchor.permissions-widget {
 }
 .map-coordinate-editor-list {
     padding: 0 5px;
+    margin-top: 70px;
 }
 
 .map-coordinate-editor-list a:focus i {
@@ -13399,8 +13410,12 @@ a.jstree-anchor.permissions-widget {
     cursor: grabbing;
 }
 .map-coordinate-editor-header {
+    position: fixed;
+    background: #fff;
     padding: 6px 0;
     font-size: 1.2em;
+    width: 370px;
+    margin-top: -6px;
 }
 .map-coordinate-editor-pair.map-coordinate-editor-new-coordinates {
     padding: 0 0px 10px 4px;
