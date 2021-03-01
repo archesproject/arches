@@ -592,7 +592,10 @@ input[type="checkbox"] {
 }
 
 .tabbed-workflow {
+    position: absolute;
+    width: 100%;
     height: 100%;
+    overflow: hidden;
     display: flex;
     flex-direction: column;
 }
@@ -603,7 +606,7 @@ input[type="checkbox"] {
     align-items: center;
     justify-content: space-between;
     border-bottom: 1px solid #ddd;
-    padding: 6px 64px 6px 12px;
+    padding: 6px 12px;
     font-size: medium;
     font-weight: 600;
 }
@@ -659,17 +662,6 @@ input[type="checkbox"] {
     color: grey;
 }
 
-.tabbed-workflow-step-body .padded-workflow-step {
-    width: calc(100vw - 50px);
-    padding: 10px;
-}
-
-.tabbed-workflow-step-body .card-component {
-    margin: unset;
-    width: calc(100vw - 50px);
-    padding: 0 25px;
-}
-
 .tabbed-workflow-step-body .create-resource-instance-card-component .card-component {
     width: unset;
 }
@@ -692,10 +684,6 @@ input[type="checkbox"] {
     border: none !important;
 }
 
-.tabbed-workflow-step-body .workbench-card-wrapper {
-    width: calc(100vw - 50px);
-}
-
 .tabbed-workflow-step-body .install-buttons {
     display: none;
 }
@@ -707,7 +695,7 @@ input[type="checkbox"] {
 .tabbed-workflow-footer {
     background-color: #fafafa;
     border-top: 1px solid #ddd;
-    padding: 10px 75px 10px 25px;
+    padding: 10px 12px;
     display: flex;
     justify-content: space-between;
 }
@@ -887,8 +875,12 @@ div.wf-multi-tile-card-info div {
 }
 
 .workflow-nav-tab-container {
-    width: 100vw;
     overflow-x: scroll;
+}
+
+.tabbed-workflow-step-container {
+    flex: 1 1 auto;
+    overflow-y: scroll;
 }
 
 .workflow-nav-tab-list {

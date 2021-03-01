@@ -1,0 +1,58 @@
+{% load i18n %}
+
+<!-- ko let: { self: $data } -->
+    <!-- ko if: !loading() -->
+    <div data-bind="" class="wf-multi-tile-step-container">
+        <!-- ko if: tile() && card() -->
+        <div class="wf-multi-tile-step-form">
+            <div data-bind="component: {
+                name: cardComponentLookup[card().model.component_id()].componentname,
+                params: {
+                    card: card(),
+                    tile: tile(),
+                    provisionalTileViewModel: provisionalTileViewModel,
+                    reviewer: reviewer,
+                    loading: loading,
+                    form: $data,
+                    pageVm: $root
+                }
+            }"></div>
+            <button class="btn btn-shim btn-labeled btn-lg fa fa-caret-right btn-mint wf-multi-tile-btn-complete" data-bind="click: function(){complete(true)}">{% trans "Continue" %}</button>
+        </div>
+        <div class="wf-multi-tile-step-list">
+            <div><h4 data-bind="text: (itemName())"></h4></div>
+            <!-- ko if: card().tiles().length === 0 -->
+            <div class="wf-multi-tile-step-list-empty">
+                <p data-bind="text: ('No '+itemName()+' added yet. Add one or multiple '+itemName()+'.')"></p>
+            </div>
+            <!-- /ko -->
+            <!-- ko foreach: {data: card().tiles, as: 'tile'} -->
+            <div class="wf-multi-tile-step-card">
+                <div class="wf-multi-tile-card-info">
+                    <div class="workflow-step-icon complete"><span><i class="fa fa-hashtag"></i></span></div>
+                    <div class="wf-multi-tile-card-info-details">
+                        <!-- ko foreach: {data: $parent.card().widgets(), as: 'widget'} -->
+                            <!-- ko component: {
+                                        name: widget.widgetLookup[widget.get("widget_id")()].name,
+                                        params: {
+                                            config: widget.configJSON,
+                                            label: widget.label(),
+                                            node: widget.node,
+                                            value: $parent.data[widget.node_id()],
+                                            state: "report"
+                                        }
+                                    } --><!-- /ko -->
+                        <!-- /ko -->
+                    </div>
+                </div>
+                <div class="wf-multi-tile-step-card-controls">
+                    <span><i class="fa fa-times-circle"></i></span><span class="" data-bind="click: function(){$parent.remove(tile)}">{% trans "Remove" %}</span>
+                    <span><i class="fa fa-pencil"></i></span><span data-bind="click: function(){$parent.edit(tile);}">{% trans "Edit" %}</span>
+                </div>
+            </div>
+            <!-- /ko -->
+        </div>
+        <!-- /ko -->
+    </div>
+    <!-- /ko -->
+<!-- /ko -->
