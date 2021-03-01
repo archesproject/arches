@@ -53,17 +53,21 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 
             <div class="search-control-container" data-bind="css: { 'slide': !sharedStateObject.resultsExpanded() }">
                 <!-- Title Block -->
-                <div class="search-count-container">
-                    <h3 class="search-title" data-bind="text: '{% trans 'Results: ' %}' + total()"></h3>
-                    <!--ko if: ko.unwrap(sharedStateObject.filterApplied) -->
-                    <button class="btn-sm btn btn-mint btn-labeled clear-filter" data-bind="click: function() {sharedStateObject.clearQuery();}">{% trans "Clear Filters" %}</button>
-                    <!--/ko-->
-                    <span style="width:125px">
-                        <div data-bind="component: {
-                            name: 'sort-results',
-                            params: sharedStateObject
-                        }"></div>
-                    </span>
+                <div class="search-tools-container">
+                    <div class="search-count-container">
+                        <h3 class="search-title" data-bind="text: '{% trans 'Results: ' %}' + total()"></h3>
+                    </div>
+                    <div class="search-controls-container">
+                        <!--ko if: ko.unwrap(sharedStateObject.filterApplied) -->
+                        <button class="btn-sm btn btn-mint btn-labeled clear-filter" data-bind="click: function() {sharedStateObject.clearQuery();}">{% trans "Clear Filters" %}</button>
+                        <!--/ko-->
+                        <span style="width:125px">
+                            <div data-bind="component: {
+                                name: 'sort-results',
+                                params: sharedStateObject
+                            }"></div>
+                        </span>
+                    </div>
                 </div>
 
                 <div class="search-results-container">
@@ -74,7 +78,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                     }"></div>
                     <div class="margin-bottom-30"></div>
 
-                    <div data-bind="component: {
+                    <div class="search-footer" data-bind="component: {
                         name: 'paging-filter',
                         params: sharedStateObject
                     }"></div>

@@ -10057,16 +10057,33 @@ a.search-query-link-captions:focus {
     z-index: 5;
 }
 
-.search-count-container {
-    padding: 10px 20px;
+.search-tools-container {
     background: #f4f4f4;
     border-bottom: 1px solid #ddd;
+    position: fixed;
+    height: 50px;
+    z-index: 3;
+    width: 399px;
+    padding: 4px 0px;
+}
+
+.search-tools-container .clear-filter {
+    margin-right: 5px;
+}
+
+.search-count-container {
+    padding: 10px 5px 10px 10px;
     text-align-last: justify;
     height: 40px;
     display: inline-flex;
-    width: 100%;
     justify-content: space-between;
     align-items: center;
+}
+
+.search-controls-container {
+    display: inline-flex;
+    float: right;
+    padding: 4px 10px;
 }
 
 .search-title {
@@ -10075,7 +10092,6 @@ a.search-query-link-captions:focus {
     margin-top: 0px;
     display: inline-block;
     margin-bottom: 0px;
-    width: 130px;
 }
 
 .search-candidate-title,
@@ -10109,6 +10125,7 @@ a.search-query-link-captions:focus {
 
 .clear-filter {
     padding: 0px 9px !important;
+    margin-top: 1px;
     height: 30px;
     border-radius: 2px;
     border: 1px solid #1ABA8E;
@@ -10117,6 +10134,24 @@ a.search-query-link-captions:focus {
 .search-listing-icon {
     transform: translate(0, -2px);
     font-size: 12px;
+}
+
+.search-footer {
+    position: fixed;
+    bottom: 0px;
+    background: #f4f4f4;
+    width: 449px;
+    left: 0px;
+    border-top: 1px solid #ddd;
+    height: 50px;
+}
+
+.mainnav-lg .search-footer {
+    left: 170px;
+}
+
+.search-footer .pagination {
+    margin-top: 10px;
 }
 
 .pagination>li>a.disabled {
@@ -10207,7 +10242,7 @@ ul.pagination {
 }
 
 .search-results-container {
-    padding: 19px;
+    padding: 60px 10px;
 }
 
 .calendar {
@@ -10317,7 +10352,7 @@ ul.pagination {
 }
 
 .search-listing {
-    width: 360px;
+    width: 370px;
     background: #fff;
     border: 1px solid #ddd;
     margin-bottom: 10px;
