@@ -10065,6 +10065,8 @@ a.search-query-link-captions:focus {
     z-index: 3;
     width: 399px;
     padding: 4px 0px;
+    margin-top: -1px;
+    border-top: 1px solid #ddd;
 }
 
 .search-tools-container .clear-filter {
@@ -10242,7 +10244,12 @@ ul.pagination {
 }
 
 .search-results-container {
-    padding: 60px 10px;
+    padding: 10px 10px 110px 10px;
+    position: fixed;
+    top: 190px;
+    overflow-y: scroll;
+    height: calc(100% - 130px);
+    width: 400px;
 }
 
 .calendar {
