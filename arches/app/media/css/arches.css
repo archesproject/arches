@@ -10244,11 +10244,11 @@ ul.pagination {
 }
 
 .search-results-container {
-    padding: 10px 10px 110px 10px;
+    padding: 10px 10px 5px 10px;
     position: fixed;
     top: 190px;
+    bottom: 50px;
     overflow-y: scroll;
-    height: calc(100% - 130px);
     width: 400px;
 }
 
