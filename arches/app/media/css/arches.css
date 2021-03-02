@@ -704,6 +704,7 @@ input[type="checkbox"] {
     display: flex;
     align-items: center;
     border-right: 1px solid #ddd;
+    padding-left: 12px;
     padding-right: 24px;
     margin-right: 18px;
 }
@@ -884,7 +885,7 @@ div.wf-multi-tile-card-info div {
 }
 
 .workflow-nav-tab-list {
-    padding: 0px 55px 0px 10px;
+    padding: 0px 10px 0px 10px;
     background-color: #fafafa;
     display: flex;
     min-width: max-content;

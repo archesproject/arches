@@ -11,10 +11,25 @@ define([
 
     function MultipleTileStepViewModel(params) {
         var self = this;
+
         NewTileStepViewModel.apply(this, [params]);
-        
+
         this.itemName = ko.observable();
-        params.title() != undefined ? this.itemName(params.title()) : this.itemName('Items');
+
+        if (ko.unwrap(params.title)) {
+            this.itemName(ko.unwrap(params.title));
+        }
+        else {
+            this.itemName('Items');
+        }
+
+
+        this.add = function(foo) {
+            console.log(foo);
+        };
+
+
+
 
         this.remove = function(tile) {
             tile.deleteTile( function(response) {
@@ -30,7 +45,7 @@ define([
 
         this.edit = function(tile) { self.tile(tile); };
 
-        self.onSaveSuccess = function(tile) {
+        this.onSaveSuccess = function(tile) {
             params.resourceid(tile.resourceinstance_id);
             params.tileid(tile.tileid);
             self.resourceId(tile.resourceinstance_id);
