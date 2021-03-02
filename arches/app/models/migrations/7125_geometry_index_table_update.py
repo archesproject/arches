@@ -77,6 +77,7 @@ CREATE OR REPLACE FUNCTION refresh_tile_geojson_geometries(refreshtileid UUID) R
 $$ LANGUAGE plpgsql;
 """
 
+
 class Migration(migrations.Migration):
 
     dependencies = [
