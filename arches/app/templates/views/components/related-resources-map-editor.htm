@@ -38,7 +38,9 @@
         <!-- /ko -->
     </div>
 
-    <div data-bind="css: card.model.cssclass" style="height: calc(100% - 80px)">        
+    <div data-bind="css: card.model.cssclass" style="height: calc(100% - 80px)">
+        {% block additional_content %}
+        {% endblock additional_content %}
         <!-- ko if: reviewer && provisionalTileViewModel.selectedProvisionalEdit() -->
         <div class="edit-message-container">
             <span>{% trans 'Showing edits by' %}</span>
@@ -297,7 +299,7 @@
                                                 self.fitFeatures(self.featureLookup[widget.node_id()].features());
                                             }">
                                                 <i class="fa fa-search map-card-feature-edit"></i>
-                                                {% trans "Zoom to all features" %}
+                                                {% trans "Zoom to all" %}
                                             </a>
                                             <!-- /ko -->
                                         </div>

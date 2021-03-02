@@ -448,11 +448,8 @@ define([
 
                 map.on('dragend', function() {
                     var center = map.getCenter();
+                    
                     self.centerX(parseFloat(center.lng));
-                });
-
-                map.on('dragend', function() {
-                    var center = map.getCenter();
                     self.centerY(parseFloat(center.lat));
                 });
 
