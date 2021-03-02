@@ -42,6 +42,7 @@ define([
         };
 
         this.initialize = function() {
+            console.log("ComponentBasedStep initialize", self, params)
             var cachedValue = ko.unwrap(params.value);
 
             if (cachedValue && cachedValue.pageLayout.sections) {
