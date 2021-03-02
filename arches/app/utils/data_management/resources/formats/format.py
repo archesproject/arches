@@ -77,7 +77,7 @@ class Reader(object):
         try:
             return self.node_lookup[nodeid]
         except:
-            print('looking up node')
+            print("looking up node")
             self.node_lookup[nodeid] = models.Node.objects.get(nodeid=nodeid)
             return self.node_lookup[nodeid]
 
