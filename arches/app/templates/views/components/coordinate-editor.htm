@@ -1,7 +1,7 @@
 {% load i18n %}
 
 <!-- ko if: coordinateEditing() -->
-<div class="card map-coordinate-editor">
+<div class="card map-coordinate-editor .fixed">
     <div class="map-coordinate-editor-header">
         {% trans 'Edit Coordinates' %}
     </div>
@@ -14,7 +14,7 @@
             value: selectedCoordinateReference,
             valueAllowUnset: false,
             chosen: {
-                'width': '55%',
+                'width': '210px',
                 'disable_search_threshold': 10,
                 'allow_single_deselect': false
             }
@@ -26,7 +26,7 @@
     }">
         <div class="map-coordinate-editor-pair">
             <!-- ko if: !$parent.hideNewCoordinates() -->
-            <i class="fa fa-list map-coordinate-editor-drag-handler"></i>
+            <i class="fa fa-unsorted map-coordinate-editor-drag-handler"></i>
             <!-- /ko-->
             <span class="coordinate-entry-label">X:</span>
             <input type="number" step="any" class="coordinate-input form-control input-lg widget-input" data-bind="valueUpdate: 'keyup', value: $data[0]"></input>
@@ -54,7 +54,7 @@
         <input type="number" step="any" class="coordinate-input form-control input-lg widget-input" data-bind="valueUpdate: 'keyup', value: newY"></input>
     </div>
     <!-- /ko-->
-    <div>
+    <div class="map-coordinate-editor-button-container">
         <button class="btn btn-shim btn-labeled btn-lg fa fa-search btn-mint" data-bind="click: showCoordinateFeature">{% trans 'Show Feature' %}</button>
         <button class="btn btn-shim btn-labeled btn-lg fa fa-check btn-primary" data-bind="click: function() {
             self.coordinateEditing(false);

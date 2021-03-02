@@ -1970,7 +1970,7 @@ div.final-cons-step-separator>h4 {
 }
 
 .workbench-card-container.workbench-card-container-sidepanel-active {
-    margin-right: 475px;
+    margin-right: 400px;
 }
 
 .workbench-card-sidebar {
@@ -2079,11 +2079,13 @@ div.final-cons-step-separator>h4 {
     padding: 17px 30px 10px 0px;
     margin-left: 0px;
     margin-top: -16px;
-    position: absolute;
+    position: fixed;
     background: #fff;
     z-index: 20;
     width: 370px;
 }
+
+
 
 .expanded .workbench-card-sidepanel-header-container {
     width: 599px;
@@ -9275,6 +9277,10 @@ a.clear-geojson-button:hover {
     font-size: 13px;
 }
 
+.workbench-card-container .mapboxgl-ctrl-geocoder {
+    margin-right: 90px;
+}
+
 .workbench-card-wrapper .mapboxgl-ctrl-top-left .mapboxgl-ctrl {
     visibility: visible;
 }
@@ -10051,20 +10057,39 @@ a.search-query-link-captions:focus {
     z-index: 5;
 }
 
-.search-count-container {
-    padding: 10px 20px;
+.search-tools-container {
     background: #f4f4f4;
     border-bottom: 1px solid #ddd;
+    position: fixed;
+    height: 50px;
+    z-index: 3;
+    width: 399px;
+    padding: 4px 0px;
+    margin-top: -1px;
+    border-top: 1px solid #ddd;
+}
+
+.search-tools-container .clear-filter {
+    margin-right: 5px;
+}
+
+.search-count-container {
+    padding: 10px 5px 10px 10px;
     text-align-last: justify;
     height: 40px;
     display: inline-flex;
-    width: 100%;
     justify-content: space-between;
     align-items: center;
 }
 
+.search-controls-container {
+    display: inline-flex;
+    float: right;
+    padding: 4px 10px;
+}
+
 .search-title {
-    font-size: 17px;
+    font-size: 16px;
     font-weight: 500;
     margin-top: 0px;
     display: inline-block;
@@ -10075,6 +10100,16 @@ a.search-query-link-captions:focus {
 .search-candidate-link {
     color: steelblue;
     padding-right: 7px;
+}
+
+.search-listing-footer a {
+    margin-top: -5px;
+    padding: 5px 5px;
+}
+
+.search-listing-footer a:focus {
+    background: #d6d6d6;
+    border-radius: 1px;
 }
 
 .search-control-container.slide {
@@ -10090,9 +10125,35 @@ a.search-query-link-captions:focus {
     border-right: solid 1px #dcdcdc;
 }
 
+.clear-filter {
+    padding: 0px 9px !important;
+    margin-top: 1px;
+    height: 30px;
+    border-radius: 2px;
+    border: 1px solid #1ABA8E;
+}
+
 .search-listing-icon {
     transform: translate(0, -2px);
     font-size: 12px;
+}
+
+.search-footer {
+    position: fixed;
+    bottom: 0px;
+    background: #f4f4f4;
+    width: 449px;
+    left: 0px;
+    border-top: 1px solid #ddd;
+    height: 50px;
+}
+
+.mainnav-lg .search-footer {
+    left: 170px;
+}
+
+.search-footer .pagination {
+    margin-top: 10px;
 }
 
 .pagination>li>a.disabled {
@@ -10183,7 +10244,12 @@ ul.pagination {
 }
 
 .search-results-container {
-    padding: 19px;
+    padding: 10px 10px 5px 10px;
+    position: fixed;
+    top: 190px;
+    bottom: 50px;
+    overflow-y: scroll;
+    width: 400px;
 }
 
 .calendar {
@@ -10293,7 +10359,7 @@ ul.pagination {
 }
 
 .search-listing {
-    width: 360px;
+    width: 370px;
     background: #fff;
     border: 1px solid #ddd;
     margin-bottom: 10px;
@@ -12906,10 +12972,13 @@ a.jstree-anchor.permissions-widget {
 }
 
 .map-data-drop-area {
-    padding: 15px;
-    border: 1px dashed #808080;
+    padding: 25px 15px;
+    border: 1px dashed #bbb;
+    background: #f9f9f9;
+    text-align: center;
     color: #808080;
-    margin: 5px;
+    margin: 5px 0px;
+    border-radius: 1px;
     cursor: pointer;
 }
 
@@ -13326,18 +13395,28 @@ a.jstree-anchor.permissions-widget {
     margin: 0;
 }
 
+.map-coordinate-editor-crs-selector {
+    position: fixed;
+    margin-top: 25px;
+    background: #fff;
+    padding-bottom: 8px;
+    border-bottom: 1px solid #ddd;
+}
+
 .map-coordinate-editor-crs-selector dt,
 .map-coordinate-editor-crs-selector select {
     display: block;
     float: left;
 }
 .map-coordinate-editor-crs-selector dt {
-    width: 45%;
-    text-align: right;
+    width: 150px;
     padding: 5px;
+    margin-top: 2px;
+    font-weight: 500;
 }
 .map-coordinate-editor-list {
     padding: 0 5px;
+    margin-top: 70px;
 }
 
 .map-coordinate-editor-list a:focus i {
@@ -13348,14 +13427,15 @@ a.jstree-anchor.permissions-widget {
 }
 .map-coordinate-editor-pair input {
     margin: 0 5px;
-    width: 120px;
+    padding: 5px;
+    width: 130px;
     display: inline-block;
 }
 .coordinate-entry-label {
     display: inline-block;
+    color: #888;
     width: 15px;
     text-align: right;
-    font-weight: bold;
 }
 .map-coordinate-editor hr {
     margin: 10px 4px 5px;
@@ -13372,11 +13452,24 @@ a.jstree-anchor.permissions-widget {
     cursor: grabbing;
 }
 .map-coordinate-editor-header {
+    position: fixed;
+    background: #fff;
     padding: 6px 0;
     font-size: 1.2em;
+    width: 370px;
+    margin-top: -6px;
 }
 .map-coordinate-editor-pair.map-coordinate-editor-new-coordinates {
-    padding: 0 22px 10px 8px;
+    padding: 0 0px 10px 4px;
+}
+
+.map-coordinate-editor-button-container {
+    position: sticky;
+    bottom: -17px;
+    background: #fff;
+    width: 400px;
+    margin-left: -21px;
+    padding: 10px;
 }
 
 @keyframes loader {
