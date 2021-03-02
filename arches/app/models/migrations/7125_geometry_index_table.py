@@ -55,18 +55,20 @@ class Migration(migrations.Migration):
                         SELECT t.tileid,
                             t.resourceinstanceid,
                             n.nodeid,
-                            ST_Transform(
-                                ST_SetSRID(
-                                    st_geomfromgeojson(
-                                        (
-                                            json_array_elements(
-                                                t.tiledata::json->n.nodeid::text->'features'
-                                            )->'geometry'
-                                        )::text
+                            ST_Force2D(
+                                ST_Transform(
+                                    ST_SetSRID(
+                                        st_geomfromgeojson(
+                                            (
+                                                json_array_elements(
+                                                    t.tiledata::json->n.nodeid::text->'features'
+                                                )->'geometry'
+                                            )::text
+                                        ),
+                                        4326
                                     ),
-                                    4326
-                                ),
-                                3857
+                                    3857
+                                )
                             ) AS geom
                         FROM tiles t
                             LEFT JOIN nodes n ON t.nodegroupid = n.nodegroupid
@@ -89,18 +91,20 @@ class Migration(migrations.Migration):
                         SELECT t.tileid,
                             t.resourceinstanceid,
                             n.nodeid,
-                            ST_Transform(
-                                ST_SetSRID(
-                                    st_geomfromgeojson(
-                                        (
-                                            json_array_elements(
-                                                t.tiledata::json->n.nodeid::text->'features'
-                                            )->'geometry'
-                                        )::text
+                            ST_Force2D(
+                                ST_Transform(
+                                    ST_SetSRID(
+                                        st_geomfromgeojson(
+                                            (
+                                                json_array_elements(
+                                                    t.tiledata::json->n.nodeid::text->'features'
+                                                )->'geometry'
+                                            )::text
+                                        ),
+                                        4326
                                     ),
-                                    4326
-                                ),
-                                3857
+                                    3857
+                                )
                             ) AS geom
                         FROM tiles t
                             LEFT JOIN nodes n ON t.nodegroupid = n.nodegroupid
