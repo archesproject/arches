@@ -404,8 +404,9 @@ class MVT(APIBase):
             with connection.cursor() as cursor:
                 if int(zoom) <= int(config["clusterMaxZoom"]):
                     arc = self.EARTHCIRCUM / ((1 << int(zoom)) * self.PIXELSPERTILE)
-                    distance = arc * int(config["clusterDistance"])
+                    distance = arc * float(config["clusterDistance"])
                     min_points = int(config["clusterMinPoints"])
+                    distance = settings.CLUSTER_DISTANCE_MAX if distance > settings.CLUSTER_DISTANCE_MAX else distance
                     cursor.execute(
                         """WITH clusters(tileid, resourceinstanceid, nodeid, geom, cid)
                         AS (
@@ -416,7 +417,7 @@ class MVT(APIBase):
                                     resourceinstanceid,
                                     nodeid,
                                     geom
-                                FROM mv_geojson_geoms
+                                FROM geojson_geometries
                                 WHERE nodeid = %s and resourceinstanceid not in %s
                             ) m
                         )
@@ -460,7 +461,7 @@ class MVT(APIBase):
                 else:
                     cursor.execute(
                         """SELECT ST_AsMVT(tile, %s, 4096, 'geom', 'id') FROM (SELECT tileid,
-                            row_number() over () as id,
+                            id,
                             resourceinstanceid,
                             nodeid,
                             ST_AsMVTGeom(
@@ -468,7 +469,7 @@ class MVT(APIBase):
                                 TileBBox(%s, %s, %s, 3857)
                             ) AS geom,
                             1 AS total
-                        FROM mv_geojson_geoms
+                        FROM geojson_geometries
                         WHERE nodeid = %s and resourceinstanceid not in %s) AS tile;""",
                         [nodeid, zoom, x, y, nodeid, resource_ids],
                     )
