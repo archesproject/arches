@@ -89,15 +89,12 @@ class BaseConceptDataType(BaseDataType):
             if value["op"] == "null" or value["op"] == "not_null":
                 self.append_null_search_filters(value, node, query, request)
             elif value["val"] != "":
-                base_query = Bool()
-                base_query.filter(Terms(field="graph_id", terms=[str(node.graph_id)]))
-                match_query = Nested(path="tiles", query=Match(field="tiles.data.%s" % (str(node.pk)), type="phrase", query=value["val"]))
+                match_query = Match(field="tiles.data.%s" % (str(node.pk)), type="phrase", query=value["val"])
                 if "!" in value["op"]:
-                    base_query.must_not(match_query)
-                    # base_query.filter(Exists(field="tiles.data.%s" % (str(node.pk))))
+                    query.must_not(match_query)
+                    query.filter(Exists(field="tiles.data.%s" % (str(node.pk))))
                 else:
-                    base_query.must(match_query)
-                query.must(base_query)
+                    query.must(match_query)
 
         except KeyError as e:
             pass

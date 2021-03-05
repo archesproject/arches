@@ -14,42 +14,15 @@
                 <div class="workflow-name" data-bind="text: workflowName() + ' Workflow'">{% trans "Insert Workflow Name" %}</div>
             </div>
 
-            <div>
-                <!--ko if: activeStep()._index+1 !== steps.length -->
-                <button 
-                    data-bind="
-                        click: finishWorkflow, 
-                        css:{disabled: canFinish() === false}
-                    " 
-                    class="btn btn-success"
-                >
-                    <i class="ion-android-cloud-done"></i>
-                    <span>
-                        {% trans "Finish Workflow" %}
-                    </span>
-                </button>
-                <!--/ko-->
-                <!--ko if: activeStep()._index+1 === steps.length -->
-                <button 
-                    disabled 
-                    class="btn btn-success"
-                >
-                    <i class="ion-android-cloud-done"></i>
-                    <span>
-                        {% trans "Workflow Finished!" %}
-                    </span>
-                </button>
-                <!--/ko-->
-                <button 
-                    data-bind="click: quitWorkflow" 
-                    class="btn btn-danger"
-                >
-                    <i class=" ion-android-cancel"></i>
-                    <span>
-                        {% trans "Quit Workflow" %}
-                    </span>
-                </button>
-            </div>
+            <button 
+                data-bind="click: quitWorkflow" 
+                class="btn btn-danger"
+            >
+                <i class=" ion-android-cancel"></i>
+                <span>
+                    {% trans "Quit Workflow" %}
+                </span>
+            </button>
         </div>
         
         <div class="workflow-nav-tab-container">
@@ -69,10 +42,27 @@
                             data-bind="{
                                 css: { 
                                     active: step.active(), 
-                                    inactive: !step.active() && $parent.canStepBecomeActive(step),
-                                    disabled: !step.active() && !$parent.canStepBecomeActive(step),
+                                    inactive: (
+                                        !step.active() 
+                                        && (
+                                            step.complete()
+                                            || ( step._index <= $parent.furthestValidStepIndex() )
+                                        )
+
+                                    ),
+                                    disabled: (
+                                        !step.active() 
+                                        && step._index > $parent.furthestValidStepIndex()
+                                    ),
                                 },
-                                click: function() { if ($parent.canStepBecomeActive(step)) { $parent.activeStep(step) }},
+                                click: function() { 
+                                    if (
+                                        !step.active() 
+                                        && step._index <= $parent.furthestValidStepIndex()
+                                    ) { 
+                                        $parent.activeStep(step) 
+                                    }
+                                },
                             }" 
                         >
                             <div style="display: flex; flex-direction: row; justify-content: center; align-items: center;">
@@ -83,7 +73,7 @@
                                         click: $parent.back, 
                                         clickBubble: false ,
                                         css: {
-                                            disabled: !$parent.canStepBecomeActive($parent.steps[step._index - 1]),
+                                            disabled: $parent.activeStep()._index === 0,
                                         },
                                         visible: step.active() && step._index !== 0,
                                     }"
@@ -100,7 +90,10 @@
                                         click: $parent.next, 
                                         clickBubble: false,
                                         css: {
-                                            disabled: !$parent.canStepBecomeActive($parent.steps[step._index + 1]),
+                                            disabled: (
+                                                ( $parent.activeStep().required() && !$parent.activeStep().complete() )
+                                                || $parent.activeStep()._index === $parent.steps.length - 1
+                                            ),
                                         },
                                         visible: step.active() && step._index !== $parent.steps.length - 1,
                                     }"
@@ -159,7 +152,7 @@
                     data-bind="
                         click: back,
                         css: {
-                            disabled: !canStepBecomeActive(steps[activeStep()._index - 1]),
+                            disabled: activeStep()._index === 0,
                         }
                     "
                 >
@@ -168,31 +161,44 @@
                         {% trans  "Previous Step" %}
                     </span>
                 </button>
-
-                <button 
-                    class="btn btn-success"
-                    data-bind="click: activeStep().save"
+                <!-- ko if: activeStep().hasDirtyTile() -->
+                <button
+                    class="btn btn-danger"
+                    data-bind="{
+                        css: {
+                            disabled: !activeStep().hasDirtyTile(),
+                        },
+                        click: activeStep().clear
+                    }"
                 >
-                    <i class="ion-android-cloud-done"></i>
+                    <i class="fa fa-undo"></i>
                     <span>
-                        {% trans  "Save" %}
+                        {% trans  "Undo" %}
                     </span>
                 </button>
                 <button
-                    class="btn btn-danger"
-                    data-bind="click: activeStep().clear"
+                    class="btn btn-success"
+                    data-bind="
+                        click: function() {
+                            activeStep().save();
+                            next();
+                        },
+                    "
                 >
-                    <i class="fa fa-times-circle"></i>
+                    <i class="ion-android-cloud-done"></i>
                     <span>
-                        {% trans  "Clear" %}
+                        {% trans  "Save and Continue" %}
                     </span>
+                    <i class="fa fa-caret-right"></i>
                 </button>
-                <button 
+                <!-- /ko -->
+                <!-- ko ifnot: activeStep().hasDirtyTile() -->
+                <button
                     class="btn btn-primary"
                     data-bind="
                         click: next,
                         css: {
-                            disabled: !canStepBecomeActive(steps[activeStep()._index + 1]),
+                            disabled: activeStep().required() && !activeStep().complete() || activeStep()._index === steps.length - 1,
                         }
                     "
                 >
@@ -201,6 +207,7 @@
                     </span>
                     <i class="fa fa-caret-right"></i>
                 </button>
+                <!-- /ko -->
             </div>
 
         </div>

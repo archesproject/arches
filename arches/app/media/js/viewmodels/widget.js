@@ -38,7 +38,12 @@ define([
         this.results = params.results || null;
         this.hideEmptyNodes = params.hideEmptyNodes;
         this.displayValue = ko.computed(function() {
-            return ko.unwrap(self.value);
+            if (self.value.value) {
+                return ko.unwrap(self.value.value);
+            }
+            else {
+                return ko.unwrap(self.value);
+            }
         });
         this.disabled = params.disabled || ko.observable(false);
         this.node = params.node || null;

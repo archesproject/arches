@@ -81,6 +81,9 @@ class Query(Dsl):
     def exclude(self, exclude):
         self.dsl["_source"]["excludes"].append(exclude)
 
+    def sort(self, field, dsl):
+        self.dsl["sort"] = [{field: dsl}]
+
     def min_score(self, min_score):
         self.dsl["min_score"] = min_score
 

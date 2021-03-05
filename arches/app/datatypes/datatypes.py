@@ -115,16 +115,13 @@ class StringDataType(BaseDataType):
             if value["op"] == "null" or value["op"] == "not_null":
                 self.append_null_search_filters(value, node, query, request)
             elif value["val"] != "":
-                base_query = Bool()
-                base_query.filter(Terms(field="graph_id", terms=[str(node.graph_id)]))
-                data_field = "tiles.data.%s" % (str(node.pk))
                 match_type = "phrase_prefix" if "~" in value["op"] else "phrase"
-                match_query = Nested(path="tiles", query=Match(field=data_field, query=value["val"], type=match_type))
+                match_query = Match(field="tiles.data.%s" % (str(node.pk)), query=value["val"], type=match_type)
                 if "!" in value["op"]:
-                    base_query.must_not(match_query)
+                    query.must_not(match_query)
+                    query.filter(Exists(field="tiles.data.%s" % (str(node.pk))))
                 else:
-                    base_query.must(match_query)
-                query.must(base_query)
+                    query.must(match_query)
         except KeyError as e:
             pass
 
@@ -197,16 +194,13 @@ class NumberDataType(BaseDataType):
             if value["op"] == "null" or value["op"] == "not_null":
                 self.append_null_search_filters(value, node, query, request)
             elif value["val"] != "":
-                base_query = Bool()
-                base_query.filter(Terms(field="graph_id", terms=[str(node.graph_id)]))
                 if value["op"] != "eq":
                     operators = {"gte": None, "lte": None, "lt": None, "gt": None}
                     operators[value["op"]] = value["val"]
                 else:
                     operators = {"gte": value["val"], "lte": value["val"]}
-                search_query = Nested(path="tiles", query=Range(field="tiles.data.%s" % (str(node.pk)), **operators))
-                base_query.must(search_query)
-                query.must(base_query)
+                search_query = Range(field="tiles.data.%s" % (str(node.pk)), **operators)
+                query.must(search_query)
         except KeyError:
             pass
 
@@ -237,7 +231,8 @@ class NumberDataType(BaseDataType):
             pass
 
     def default_es_mapping(self):
-        return {"type": "double"}
+        mapping = {"type": "double"}
+        return mapping
 
 
 class BooleanDataType(BaseDataType):
@@ -259,32 +254,13 @@ class BooleanDataType(BaseDataType):
     def append_search_filters(self, value, node, query, request):
         try:
             if value["val"] == "null" or value["val"] == "not_null":
+                value["op"] = value["val"]
                 self.append_null_search_filters(value, node, query, request)
             elif value["val"] != "" and value["val"] is not None:
-                base_query = Bool()
-                base_query.filter(Terms(field="graph_id", terms=[str(node.graph_id)]))
                 term = True if value["val"] == "t" else False
-                term_query = Nested(path="tiles", query=Term(field="tiles.data.%s" % (str(node.pk)), term=term))
-                base_query.must(term_query)
-                query.must(base_query)
+                query.must(Term(field="tiles.data.%s" % (str(node.pk)), term=term))
         except KeyError as e:
             pass
-
-    def append_null_search_filters(self, value, node, query, request):
-        """
-        Appends the search query dsl to search for fields that haven't been populated
-        """
-        base_query = Bool()
-        null_query = Bool()
-        data_exists_query = Exists(field="tiles.data.%s" % (str(node.pk)))
-        nested_query = Nested(path="tiles", query=data_exists_query)
-        null_query.must(nested_query)
-        base_query.filter(Terms(field="graph_id", terms=[str(node.graph_id)]))
-        if value["val"] == "null":
-            base_query.must_not(null_query)
-        elif value["val"] == "not_null":
-            base_query.must(null_query)
-        query.must(base_query)
 
     def to_rdf(self, edge_info, edge):
         # returns an in-memory graph object, containing the domain resource, its
@@ -308,7 +284,8 @@ class BooleanDataType(BaseDataType):
             pass
 
     def default_es_mapping(self):
-        return {"type": "boolean"}
+        mapping = {"type": "boolean"}
+        return mapping
 
 
 class DateDataType(BaseDataType):
@@ -367,8 +344,6 @@ class DateDataType(BaseDataType):
             if value["op"] == "null" or value["op"] == "not_null":
                 self.append_null_search_filters(value, node, query, request)
             elif value["val"] != "" and value["val"] is not None:
-                base_query = Bool()
-                base_query.filter(Terms(field="graph_id", terms=[str(node.graph_id)]))
                 try:
                     date_value = datetime.strptime(value["val"], "%Y-%m-%d %H:%M:%S%z").astimezone().isoformat()
                 except ValueError:
@@ -378,13 +353,12 @@ class DateDataType(BaseDataType):
                     operators[value["op"]] = date_value
                 else:
                     operators = {"gte": date_value, "lte": date_value}
-                search_query = Nested(path="tiles", query=Range(field="tiles.data.%s" % (str(node.pk)), **operators))
-                base_query.must(search_query)
-                query.must(base_query)
+                search_query = Range(field="tiles.data.%s" % (str(node.pk)), **operators)
+                query.must(search_query)
         except KeyError:
             pass
 
-    def after_update_all(self):
+    def after_update_all(self, tile=None):
         config = cache.get("time_wheel_config_anonymous")
         if config is not None:
             cache.delete("time_wheel_config_anonymous")
@@ -412,7 +386,8 @@ class DateDataType(BaseDataType):
 
     def default_es_mapping(self):
         es_date_formats = "||".join(settings.DATE_FORMATS["Elasticsearch"])
-        return {"type": "date", "format": es_date_formats}
+        mapping = {"type": "date", "format": es_date_formats}
+        return mapping
 
     def get_display_value(self, tile, node):
         data = self.get_tile_data(tile)
@@ -482,15 +457,10 @@ class EDTFDataType(BaseDataType):
 
     def append_search_filters(self, value, node, query, request):
         def add_date_to_doc(query, edtf):
-            base_query = Bool()
-            base_query.filter(Terms(field="graph_id", terms=[str(node.graph_id)]))
             if value["op"] == "eq":
                 if edtf.lower != edtf.upper:
                     raise Exception(_('Only dates that specify an exact year, month, and day can be used with the "=" operator'))
-                match_query = Nested(
-                    path="tiles", query=Match(field="tiles.data.%s.dates.date" % (str(node.pk)), query=edtf.lower, type="phrase_prefix")
-                )
-                base_query.should(match_query)
+                query.should(Match(field="tiles.data.%s.dates.date" % (str(node.pk)), query=edtf.lower, type="phrase_prefix"))
             else:
                 if value["op"] == "overlaps":
                     operators = {"gte": edtf.lower, "lte": edtf.upper}
@@ -506,17 +476,11 @@ class EDTFDataType(BaseDataType):
                     operators = {value["op"]: edtf.lower or edtf.upper}
 
                 try:
-                    base_query.should(Nested(path="tiles", query=Range(field="tiles.data.%s.dates.date" % (str(node.pk)), **operators)))
-                    base_query.should(
-                        Nested(
-                            path="tiles",
-                            query=Range(field="tiles.data.%s.date_ranges.date_range" % (str(node.pk)), relation="intersects", **operators),
-                        )
-                    )
+                    query.should(Range(field="tiles.data.%s.dates.date" % (str(node.pk)), **operators))
+                    query.should(Range(field="tiles.data.%s.date_ranges.date_range" % (str(node.pk)), relation="intersects", **operators))
                 except RangeDSLException:
                     if edtf.lower is None and edtf.upper is None:
                         raise Exception(_("Invalid date specified."))
-            query.must(base_query)
 
         if value["op"] == "null" or value["op"] == "not_null":
             self.append_null_search_filters(value, node, query, request)
@@ -529,7 +493,8 @@ class EDTFDataType(BaseDataType):
                 add_date_to_doc(query, edtf)
 
     def default_es_mapping(self):
-        return {"properties": {"value": {"type": "text", "fields": {"keyword": {"ignore_above": 256, "type": "keyword"}}}}}
+        mapping = {"properties": {"value": {"type": "text", "fields": {"keyword": {"ignore_above": 256, "type": "keyword"}}}}}
+        return mapping
 
 
 class GeojsonFeatureCollectionDataType(BaseDataType):
@@ -1079,18 +1044,15 @@ class GeojsonFeatureCollectionDataType(BaseDataType):
             "addtomap": node.config["addToMap"],
         }
 
-    def after_update_all(self):
-        from arches.app.tasks import refresh_materialized_view, log_error
-
-        celery_worker_running = task_management.check_if_celery_available()
-        if celery_worker_running is True:
-            res = refresh_materialized_view.apply_async((), link_error=log_error.s())
-        elif settings.AUTO_REFRESH_GEOM_VIEW:
-            with connection.cursor() as cursor:
-                sql = """
-                    REFRESH MATERIALIZED VIEW mv_geojson_geoms;
-                """
-                cursor.execute(sql)
+    def after_update_all(self, tile=None):
+        with connection.cursor() as cursor:
+            if tile is not None:
+                cursor.execute(
+                    "SELECT * FROM refresh_tile_geojson_geometries(%s);",
+                    [tile.pk],
+                )
+            else:
+                cursor.execute("SELECT * FROM refresh_geojson_geometries();")
 
     def default_es_mapping(self):
         # let ES dyanamically map this datatype
@@ -1284,41 +1246,26 @@ class FileListDataType(BaseDataType):
 
     def transform_value_for_tile(self, value, **kwargs):
         """
-        # TODO: Following commented code can be used if user does not already have file in final location using django ORM:
+        Accepts a comma delimited string of file paths as 'value' to create a file datatype value
+        with corresponding file record in the files table for each path. Only the basename of each path is used, so
+        the accuracy of the full path is not important. However the name of each file must match the name of a file in
+        the directory from which Arches will request files. By default, this is the 'uploadedfiles' directory
+        in a project.
 
-        request = HttpRequest()
-        # request.FILES['file-list_' + str(nodeid)] = None
-        files = []
-        # request_list = []
-
-        for val in value.split(','):
-            val_dict = {}
-            val_dict['content'] = val
-            val_dict['name'] = val.split('/')[-1].split('.')[0]
-            val_dict['url'] = None
-            # val_dict['size'] = None
-            # val_dict['width'] = None
-            # val_dict['height'] = None
-            files.append(val_dict)
-            f = open(val, 'rb')
-            django_file = InMemoryUploadedFile(f,'file',val.split('/')[-1].split('.')[0],None,None,None)
-            request.FILES.appendlist('file-list_' + str(nodeid), django_file)
-        print request.FILES
-        value = files
         """
 
         mime = MimeTypes()
         tile_data = []
         for file_path in value.split(","):
+            tile_file = {}
             try:
                 file_stats = os.stat(file_path)
                 tile_file["lastModified"] = file_stats.st_mtime
                 tile_file["size"] = file_stats.st_size
-            except Exception:
+            except FileNotFoundError as e:
                 pass
-            tile_file = {}
-            tile_file["status"] = ""
-            tile_file["name"] = file_path.split("/")[-1]
+            tile_file["status"] = "uploaded"
+            tile_file["name"] = os.path.basename(file_path)
             tile_file["type"] = mime.guess_type(file_path)[0]
             tile_file["type"] = "" if tile_file["type"] is None else tile_file["type"]
             file_path = "uploadedfiles/" + str(tile_file["name"])
@@ -1337,12 +1284,25 @@ class FileListDataType(BaseDataType):
         if tile.data[nodeid]:
             for file in tile.data[nodeid]:
                 try:
-                    file_model = models.File.objects.get(pk=file["file_id"])
-                    if not file_model.tile_id:
-                        file_model.tile = tile
-                        file_model.save()
-                except ObjectDoesNotExist:
-                    logger.warning(_("A file is not available for this tile"))
+                    if file["file_id"]:
+                        if file["url"] == "/files/{}".format(file["file_id"]):
+                            val = uuid.UUID(file["file_id"])  # to test if file_id is uuid
+                            file_path = "uploadedfiles/" + file["name"]
+                            try:
+                                file_model = models.File.objects.get(pk=file["file_id"])
+                            except ObjectDoesNotExist:
+                                # Do not use get_or_create here because django can create a different file name applied to the file_path
+                                # for the same file_id causing a 'create' when a 'get' was intended
+                                file_model = models.File.objects.create(pk=file["file_id"], path=file_path)
+                            if not file_model.tile_id:
+                                file_model.tile = tile
+                                file_model.save()
+                        else:
+                            logger.warning(_("The file url is invalid"))
+                    else:
+                        logger.warning(_("A file is not available for this tile"))
+                except ValueError:
+                    logger.warning(_("This file's fileid is not a valid UUID"))
 
     def transform_export_values(self, value, *args, **kwargs):
         return ",".join([settings.MEDIA_URL + "uploadedfiles/" + str(file["name"]) for file in value])
@@ -1571,14 +1531,12 @@ class DomainDataType(BaseDomainDataType):
             if value["op"] == "null" or value["op"] == "not_null":
                 self.append_null_search_filters(value, node, query, request)
             elif value["val"] != "":
-                base_query = Bool()
-                base_query.filter(Terms(field="graph_id", terms=[str(node.graph_id)]))
-                search_query = Nested(path="tiles", query=Match(field="tiles.data.%s" % (str(node.pk)), type="phrase", query=value["val"]))
+                search_query = Match(field="tiles.data.%s" % (str(node.pk)), type="phrase", query=value["val"])
                 if "!" in value["op"]:
-                    base_query.must_not(search_query)
+                    query.must_not(search_query)
+                    query.filter(Exists(field="tiles.data.%s" % (str(node.pk))))
                 else:
-                    base_query.must(search_query)
-                query.must(base_query)
+                    query.must(search_query)
 
         except KeyError as e:
             pass
@@ -1678,15 +1636,13 @@ class DomainListDataType(BaseDomainDataType):
         try:
             if value["op"] == "null" or value["op"] == "not_null":
                 self.append_null_search_filters(value, node, query, request)
-            elif value["val"] != "":
-                base_query = Bool()
-                base_query.filter(Terms(field="graph_id", terms=[str(node.graph_id)]))
-                search_query = Nested(path="tiles", query=Match(field="tiles.data.%s" % (str(node.pk)), type="phrase", query=value["val"]))
+            elif value["val"] != "" and value["val"] != []:
+                search_query = Match(field="tiles.data.%s" % (str(node.pk)), type="phrase", query=value["val"])
                 if "!" in value["op"]:
-                    base_query.must_not(search_query)
+                    query.must_not(search_query)
+                    query.filter(Exists(field="tiles.data.%s" % (str(node.pk))))
                 else:
-                    base_query.must(search_query)
-                query.must(base_query)
+                    query.must(search_query)
         except KeyError as e:
             pass
 
@@ -1899,16 +1855,13 @@ class ResourceInstanceDataType(BaseDataType):
             if value["op"] == "null" or value["op"] == "not_null":
                 self.append_null_search_filters(value, node, query, request)
             elif value["val"] != "" and value["val"] != []:
-                base_query = Bool()
-                base_query.filter(Terms(field="graph_id", terms=[str(node.graph_id)]))
-                search_query = Nested(
-                    path="tiles", query=Terms(field="tiles.data.%s.resourceId.keyword" % (str(node.pk)), terms=value["val"])
-                )
+                # search_query = Match(field="tiles.data.%s.resourceId" % (str(node.pk)), type="phrase", query=value["val"])
+                search_query = Terms(field="tiles.data.%s.resourceId.keyword" % (str(node.pk)), terms=value["val"])
                 if "!" in value["op"]:
-                    base_query.must_not(search_query)
+                    query.must_not(search_query)
+                    query.filter(Exists(field="tiles.data.%s" % (str(node.pk))))
                 else:
-                    base_query.must(search_query)
-                query.must(base_query)
+                    query.must(search_query)
         except KeyError as e:
             pass
 
@@ -1969,7 +1922,7 @@ class ResourceInstanceDataType(BaseDataType):
         return True
 
     def default_es_mapping(self):
-        return {
+        mapping = {
             "properties": {
                 "resourceId": {"type": "text", "fields": {"keyword": {"ignore_above": 256, "type": "keyword"}}},
                 "ontologyProperty": {"type": "text", "fields": {"keyword": {"ignore_above": 256, "type": "keyword"}}},
@@ -1977,6 +1930,7 @@ class ResourceInstanceDataType(BaseDataType):
                 "resourceXresourceId": {"type": "text", "fields": {"keyword": {"ignore_above": 256, "type": "keyword"}}},
             }
         }
+        return mapping
 
 
 class ResourceInstanceListDataType(ResourceInstanceDataType):
