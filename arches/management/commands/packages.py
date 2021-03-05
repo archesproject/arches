@@ -967,7 +967,9 @@ class Command(BaseCommand):
                 for graph in models.GraphModel.objects.filter(isresource=True).exclude(pk=settings.SYSTEM_SETTINGS_RESOURCE_MODEL_ID)
             ]
         if graphid is False and file_format != "json":
-            utils.print_message("Exporting data for all graphs is currently only supported for the json format. Please specify a graphid with the -g flag.")
+            utils.print_message(
+                "Exporting data for all graphs is currently only supported for the json format. Please specify a graphid with the -g flag."
+            )
             sys.exit()
         if graphid:
             graphids.append(graphid)
