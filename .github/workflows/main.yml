@@ -36,7 +36,6 @@ jobs:
       - name: Install Java, GDAL, and other system dependencies
         run: |
           sudo apt-get install libxml2-dev libpq-dev openjdk-8-jdk python-dev libgdal-dev
-          sudo apt -y install libgconf2-4
           echo Postgres and ES dependencies installed
 
       - uses: ankane/setup-elasticsearch@v1
