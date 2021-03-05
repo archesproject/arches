@@ -225,7 +225,7 @@ class Tile(models.TileModel):
             existing_tiles = list(models.TileModel.objects.filter(**kwargs).values_list("tileid", flat=True))
 
             # this should only ever return at most one tile
-            if len(existing_tiles) > 0 and self.tileid not in existing_tiles:
+            if len(existing_tiles) > 0 and uuid.UUID(str(self.tileid)) not in existing_tiles:
                 card = models.CardModel.objects.get(nodegroup=self.nodegroup)
                 message = _("Unable to save a tile to a card with cardinality 1 where a tile has previously been saved.")
                 details = _(
@@ -257,7 +257,20 @@ class Tile(models.TileModel):
                         for node in nodes:
                             datatype = self.datatype_factory.get_instance(node.datatype)
                             nodeid = str(node.nodeid)
-                            if datatype.values_match(tile.data[nodeid], self.data[nodeid]):
+                            tile_data = ""
+                            if tile.provisionaledits is None:
+                                # If this is not a provisional tile, the data should
+                                # exist, so we check it normally
+                                tile_data = tile.data[nodeid]
+                            else:
+                                # If it is a provisional tile, we need to check the
+                                # provisional edits for clashing values
+                                for edit_id in tile.provisionaledits.keys():
+                                    edit_data = tile.provisionaledits[str(edit_id)]
+                                    if nodeid in edit_data["value"]:
+                                        tile_data = edit_data["value"][nodeid]
+                                        break
+                            if datatype.values_match(tile_data, self.data[nodeid]):
                                 match = True
                                 duplicate_values.append(datatype.get_display_value(tile, node))
                             else:
@@ -495,7 +508,7 @@ class Tile(models.TileModel):
         nodegroup = models.NodeGroup.objects.get(pk=self.nodegroup_id)
         for node in nodegroup.node_set.all():
             datatype = self.datatype_factory.get_instance(node.datatype)
-            datatype.after_update_all()
+            datatype.after_update_all(tile=self)
         for tile in self.tiles:
             tile.after_update_all()
 

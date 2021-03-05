@@ -105,7 +105,9 @@
             </div>
             <!-- /ko-->
 
-            <div class="card" data-bind="visible: geoJSONString() === undefined">
+            {% include 'views/components/coordinate-editor.htm' %}
+
+            <div class="card" data-bind="visible: geoJSONString() === undefined && !coordinateEditing()">
                 {% block form_header %}
                 <!-- ko if: card.model.helpenabled -->
                 <span>
@@ -207,13 +209,28 @@
                                                 <i class="fa fa-pencil map-card-feature-edit"></i>
                                                 {% trans "Edit GeoJSON" %}
                                             </a>
+                                            |
+                                            <!-- ko if: self.canEditCoordinates() -->
+                                            <a href="javascript:void(0);" data-bind="click: function() {
+                                                self.coordinateEditing(true);
+                                            }">
+                                                <i class="fa fa-list map-card-feature-edit"></i>
+                                                {% trans "Edit Coordinates" %}
+                                            </a>
+                                            <!-- /ko -->
+                                            <!-- ko if: !self.canEditCoordinates() -->
+                                            <span>
+                                                <i class="fa fa-list map-card-feature-edit"></i>
+                                                {% trans "Edit Coordinates" %}
+                                            </span>
+                                            <!-- /ko -->
                                             <!-- ko if: self.featureLookup[widget.node_id()].features().length > 0 -->
                                             |
                                             <a href="javascript:void(0);" data-bind="click: function() {
                                                 self.fitFeatures(self.featureLookup[widget.node_id()].features());
                                             }">
                                                 <i class="fa fa-search map-card-feature-edit"></i>
-                                                {% trans "Zoom to all features" %}
+                                                {% trans "Zoom to all" %}
                                             </a>
                                             <!-- /ko -->
                                         </div>
@@ -277,9 +294,9 @@
                         <!-- /ko -->
                     <!-- /ko -->
                     <!-- ko if: !tile.tileid -->
-                    <button 
-                        class="btn btn-shim btn-labeled btn-lg fa fa-plus" 
-                        data-bind="click: function() { if (card.isWritable && !self.preview) { self.saveTile() }}, 
+                    <button
+                        class="btn btn-shim btn-labeled btn-lg fa fa-plus"
+                        data-bind="click: function() { if (card.isWritable && !self.preview) { self.saveTile() }},
                         css: { disabled: (!card.isWritable || self.preview), 'btn-mint': card.isWritable }"
                     >{% trans 'Add'  %}</button>
                     <!-- /ko -->

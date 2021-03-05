@@ -12,18 +12,22 @@ define([
     function viewModel(params) {
         var self = this;
 
-        this.resourceId = ko.observable();
+        this.resourceId = ko.observable(ko.unwrap(params.resourceid));
+        this.resourceId.subscribe(function(id) {
+            params.resourceid(id);
+        });
 
         var cachedValue = ko.unwrap(params.value);
         if (cachedValue) {
-            self.resourceId(cachedValue.resourceid);
-            params.tileid(cachedValue.tileid);
+            if (cachedValue.tileid) {
+                params.tileid(cachedValue.tileid);
+            }
+            if (cachedValue.resourceid) {
+                self.resourceId(cachedValue.resourceid);
+            }
         }
-
-        if (ko.unwrap(params.resourceid)) {
-            self.resourceId(ko.unwrap(params.resourceid));
-        } 
-        else if (ko.unwrap(params.workflow.resourceId)) {
+        
+        if (!self.resourceId() && params.workflow && ko.unwrap(params.workflow.resourceId)) {
             self.resourceId(ko.unwrap(params.workflow.resourceId));
         } 
 
@@ -32,14 +36,27 @@ define([
         };
 
         this.card = ko.observable();
+
         this.tile = ko.observable();
+        this.tile.subscribe(function(tile) {
+            if (tile && params.hasDirtyTile) {
+                tile.dirty.subscribe(function() {
+                    /* 
+                        for proper function, need to interact with card dirty state inside tile subscription 
+                    */
+                    if (self.card()) {
+                        params.hasDirtyTile(self.card().isDirty());
+                    }
+                });
+            }
+        });
         
         this.loading = params.loading || ko.observable(false);
         this.alert = params.alert || ko.observable(null);
         
         this.complete = params.complete || ko.observable();
         this.complete.subscribe(function(isComplete) {
-            if (isComplete) {
+            if (isComplete && params.value) {
                 params.value(params.defineStateProperties());
             }
         });
@@ -118,17 +135,13 @@ define([
     
                 self.card.subscribe(function(card){
                     if (card) {
-                        if (params.preSaveCallback && !ko.unwrap(params.preSaveCallback)) {
+                        card.context = 'workflow';
+
+                        if (params.preSaveCallback) {
                             card.preSaveCallback = params.preSaveCallback;
                         }
-                        if (params.postSaveCallback && !ko.unwrap(params.postSaveCallback)) {
+                        if (params.postSaveCallback) {
                             card.postSaveCallback = params.postSaveCallback;
-                        }
-                        if (params.preClearCallback && !ko.unwrap(params.preClearCallback)) {
-                            card.preClearCallback = params.preClearCallback;
-                        }
-                        if (params.postClearCallback && !ko.unwrap(params.postClearCallback)) {
-                            card.postClearCallback = params.postClearCallback;
                         }
                     }
                     if (ko.unwrap(card.widgets) && params.hiddenNodes) {
@@ -222,36 +235,49 @@ define([
              * Keep in mind that anything extending newTileStep that overrides this method should include similar logic to handle for wastebin if there is a wastebin use case for that particular step in the workflow.
             **/
             var wastebin = !!(ko.unwrap(params.wastebin)) ? koMapping.toJS(params.wastebin) : undefined;
-            if (wastebin && ko.unwrap(wastebin.hasOwnProperty('resourceid'))) {
-                wastebin.resourceid = ko.unwrap(params.resourceid);
+            var resourceId = ko.unwrap(params.resourceid);
+
+            if (resourceId) {
+                if (wastebin && 'resources' in wastebin) {
+                    wastebin.resources.push(resourceId);
+                }
+                if (wastebin && 'resourceid' in wastebin) {
+                    wastebin.resourceid = resourceId;
+                }
             }
-            if (wastebin && ko.unwrap(wastebin.hasOwnProperty('tile'))) {
+            if (wastebin && 'tile' in wastebin) {
                 if (!!ko.unwrap(params.tile)) {
                     wastebin.tile = koMapping.toJS(params.tile().data);
                     wastebin.tile.tileid = (ko.unwrap(params.tile)).tileid;
                     wastebin.tile.resourceinstance_id = (ko.unwrap(params.tile)).resourceinstance_id;
                 }
             }
+            
+            ko.mapping.fromJS(wastebin, {}, params.wastebin);
+            
             return {
-                resourceid: ko.unwrap(params.resourceid),
+                resourceid: resourceId,
                 tile: !!(ko.unwrap(params.tile)) ? koMapping.toJS(params.tile().data) : undefined,
                 tileid: !!(ko.unwrap(params.tile)) ? ko.unwrap(params.tile().tileid): undefined,
                 wastebin: wastebin
             };
         };
+        /* calling on init to give workflow access to wastebin on load */ 
+        params.defineStateProperties();
 
         self.onSaveSuccess = function(tiles) {
             var tile;
             
             if (tiles.length > 0 || typeof tiles == 'object') {
                 tile = tiles[0] || tiles;
-                params.resourceid(tile.resourceinstance_id);
-                params.tileid(tile.tileid);
 
+                params.tileid(tile.tileid);
                 self.resourceId(tile.resourceinstance_id);
             }
 
-            params.value(params.defineStateProperties());
+            if (params.value) {
+                params.value(params.defineStateProperties());
+            }
             
             if (self.completeOnSave === true) { self.complete(true); }
         };

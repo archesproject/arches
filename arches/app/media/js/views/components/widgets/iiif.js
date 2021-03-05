@@ -71,6 +71,14 @@ define([
                 if (manifest !== self.manifest())
                     self.manifest(manifest);
             });
+
+            this.displayValue = ko.computed(function() {
+                var value = koMapping.toJS(this.value);
+                if (!value || !value.features) {
+                    return 0;
+                }
+                return value.features.length;
+            }, this);    
         },
         template: { require: 'text!templates/views/components/widgets/iiif.htm' }
     });

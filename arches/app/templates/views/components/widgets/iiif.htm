@@ -37,3 +37,7 @@
 </div>
 <!-- /ko -->
 {% endblock report %}
+
+{% block display_value %}
+<span data-bind="text: displayValue()"></span> {% trans "annotation(s)" %}
+{% endblock display_value %}

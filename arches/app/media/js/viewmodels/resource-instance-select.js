@@ -214,16 +214,19 @@ define([
             if (graph) {
                 ontologyProperty = graph.config.ontologyProperty;
                 inverseOntologyProperty = graph.config.inverseOntologyProperty;
+
+                if (self.node && (!ontologyProperty || !inverseOntologyProperty) ) {
+                    var ontologyProperties = self.node.config.graphs().find(function(nodeConfigGraph) {
+                        return nodeConfigGraph.graphid === graph.graphid;
+                    });
+
+                    if (ontologyProperties) {
+                        ontologyProperty = ontologyProperty || ontologyProperties.ontologyProperty;
+                        inverseOntologyProperty = inverseOntologyProperty || ontologyProperties.inverseOntologyProperty;
+                    }
+                }
             }
             
-            if (self.node && (!ontologyProperty || !inverseOntologyProperty) ) {
-                var ontologyProperties = self.node.config.graphs().find(function(nodeConfigGraph) {
-                    return nodeConfigGraph.graphid === graph.graphid;
-                });
-
-                ontologyProperty = ontologyProperty || ontologyProperties.ontologyProperty;
-                inverseOntologyProperty = inverseOntologyProperty || ontologyProperties.inverseOntologyProperty;
-            }
 
             var ret = {
                 "resourceId": ko.observable(id),
