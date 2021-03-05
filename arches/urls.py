@@ -249,6 +249,7 @@ urlpatterns = [
     ),
     url(r"^images$", api.Images.as_view(), name="images"),
     url(r"^ontology_properties$", api.OntologyProperty.as_view(), name="ontology_properties"),
+    url(r"^validate/(?P<itemtype>[-\w]+)/(?P<itemid>[-\w]+)", api.Validator.as_view(), name="validate"),
     url(r"^tileserver/(?P<path>.*)$", TileserverProxyView.as_view()),
     url(r"^history/$", ResourceActivityStreamCollectionView.as_view(), name="as_stream_collection"),
     url(r"^history/(?P<page>[0-9]+)$", ResourceActivityStreamPageView.as_view(), name="as_stream_page"),

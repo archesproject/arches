@@ -421,6 +421,22 @@ class Resource(models.ResourceInstance):
         # delete resource index
         se.delete(index=RESOURCES_INDEX, id=resourceinstanceid)
 
+    def validate(self, verbose=False):
+        """
+        Keyword Arguments: 
+        verbose -- False(defult) to only show the first error thrown in any tile, True to show all the errors in all the tiles
+        """
+
+        from arches.app.models.tile import Tile, TileValidationError
+        
+        errors = []
+        for tile in Tile.objects.filter(resourceinstance=self):
+            try:
+                tile.validate(raise_early=(not verbose))
+            except TileValidationError as err:
+                errors += err.message if isinstance(err.message, list) else [err.message]
+        return errors
+
     def get_related_resources(
         self, lang="en-US", limit=settings.RELATED_RESOURCES_EXPORT_LIMIT, start=0, page=0, user=None, resourceinstance_graphid=None,
     ):

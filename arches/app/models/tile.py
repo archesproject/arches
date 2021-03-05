@@ -309,16 +309,28 @@ class Tile(models.TileModel):
             message += (", ").join(missing_nodes)
             raise TileValidationError(message)
 
-    def validate(self, errors=None):
+    def validate(self, errors=None, raise_early=True):
+        """
+        Keyword Arguments: 
+        errors -- supply and list to have errors appened on to
+        raise_early -- True(default) to raise an error on the first value in the tile that throws an error
+            otherwise throw an error only after all nodes in a tile have been validated
+        """
+
+        tile_errors = []
         for nodeid, value in self.data.items():
             node = models.Node.objects.get(nodeid=nodeid)
             datatype = self.datatype_factory.get_instance(node.datatype)
             error = datatype.validate(value, node=node)
+            tile_errors += error
             for error_instance in error:
                 if error_instance["type"] == "ERROR":
-                    raise TileValidationError(_("{0}".format(error_instance["message"])))
+                    if raise_early:
+                        raise TileValidationError(_("{0}".format(error_instance["message"])))
             if errors is not None:
                 errors += error
+        if not raise_early:
+            raise TileValidationError(tile_errors)
         return errors
 
     def get_tile_data(self, user_id=None):
