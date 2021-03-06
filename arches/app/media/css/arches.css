@@ -8177,7 +8177,7 @@ a.mega-dropdown-toggle.disabled {
 }
 
 .create-resource-instance-card-component.rr-table-pop {
-    height: 100%;
+    height: 100vh;
     width: 100%;
     padding: 0px;
     background: #fff;
@@ -8296,6 +8296,13 @@ a.mega-dropdown-toggle.disabled {
 
 .mainnav-lg .workbench-card-sidepanel .create-resource-instance-card-component.rr-table-pop .install-buttons {
     left: 520px;
+}
+
+.tabbed-workflow-step-body .create-resource-instance-card-component.rr-table-pop {
+    position: fixed;
+    top: 96px;
+    left: 50px;
+    width: calc(100% - 50px);
 }
 
 .unselectable {
