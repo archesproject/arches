@@ -8231,10 +8231,16 @@ a.mega-dropdown-toggle.disabled {
 }
 
 .workbench-card-sidepanel .create-resource-instance-card-component.rr-table-pop {
-    padding: 20px;
-    top: 0px;
+    top: 50px;
     z-index: 30;
     height: 100vh;
+    position: fixed;
+    left: 50px;
+    width: calc(100% - 50px);
+}
+
+.mainnav-lg .workbench-card-sidepanel .create-resource-instance-card-component.rr-table-pop {
+    left: 220px;
 }
 
 .workbench-card-sidepanel .create-resource-instance-card-component.rr-table-pop .card-component {
@@ -8282,6 +8288,15 @@ a.mega-dropdown-toggle.disabled {
     width: 220px;
 }
 
+.workbench-card-sidepanel .create-resource-instance-card-component.rr-table-pop .install-buttons {
+    width: calc(100% - 350px) !important;
+    left: 350px;
+    text-align: right;
+}
+
+.mainnav-lg .workbench-card-sidepanel .create-resource-instance-card-component.rr-table-pop .install-buttons {
+    left: 520px;
+}
 
 .unselectable {
     color: #ff0000;
