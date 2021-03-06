@@ -8167,15 +8167,55 @@ a.mega-dropdown-toggle.disabled {
 .create-resource-instance-card-component.rr-table-pop {
     height: 100%;
     width: 100%;
-    padding: 80px;
-    background: rgba(0,0,0,0.5);
+    padding: 0px;
+    background: #fff;
     top: 0px;
     left: 0px;
-    border: 1px solid #000;
+    overflow-x: hidden;
 }
 
 .create-resource-instance-card-component.rr-table-pop .rp-edit-buttons {
     display: none;
+}
+
+.resource-instance-card-component-container {
+    display: flex;
+    overflow-x: hidden;
+}
+
+.resource-instance-card-component-container .card-component {
+    width: 100%;
+    position: absolute;
+    top: 50px;
+    padding-top: 0px !important;
+}
+
+.resource-instance-card-component-toc {
+    width: 300px;
+    border-right: 1px solid #ddd;
+    height: 100vh;
+    background: #fbfbfb;
+}
+
+.resource-instance-card-component-content {
+    flex: 2 0 0;
+}
+
+.resource-instance-card-menu-item {
+    height: 50px;
+    background: #f8f8f8;
+    padding: 15px 10px;
+    border-bottom: 1px solid #ddd;
+    font-size: 13px;
+}
+
+.resource-instance-card-menu-item:not(.selected):hover {
+    cursor: pointer;
+    background: #fff;
+}
+
+.resource-instance-card-menu-item.selected {
+    background: #fff;
 }
 
 .workbench-card-sidepanel .create-resource-instance-card-component.rr-table-pop {
@@ -12688,11 +12728,13 @@ a.jstree-anchor.permissions-widget {
     height: 95%;
     overflow-y: auto;
     top: 10px;
-    left: 15px;
+    left: -100%;
     width: calc(100% - 25px);
-    border: 1px solid #ddd;
-    border-radius: 2px;
     padding-bottom: 20px;
+}
+
+.create-resource-instance-card-component .card-component {
+    border: none;
 }
 
 .workbench-card-sidepanel .create-resource-instance-card-component {
