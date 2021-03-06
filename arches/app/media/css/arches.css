@@ -8164,6 +8164,18 @@ a.mega-dropdown-toggle.disabled {
     white-space: nowrap;
 }
 
+.create-resource-instance-card-component {
+    position: absolute;
+    background: #fcfcfc;
+    z-index: 11;
+    height: 95%;
+    overflow-y: auto;
+    top: 10px;
+    left: -100%;
+    width: calc(100% - 25px);
+    padding-bottom: 20px;
+}
+
 .create-resource-instance-card-component.rr-table-pop {
     height: 100%;
     width: 100%;
@@ -12721,17 +12733,7 @@ a.jstree-anchor.permissions-widget {
     font-size: 18px;
 }
 
-.create-resource-instance-card-component {
-    position: absolute;
-    background: #fcfcfc;
-    z-index: 11;
-    height: 95%;
-    overflow-y: auto;
-    top: 10px;
-    left: -100%;
-    width: calc(100% - 25px);
-    padding-bottom: 20px;
-}
+
 
 .create-resource-instance-card-component .card-component {
     border: none;
@@ -12760,8 +12762,7 @@ a.jstree-anchor.permissions-widget {
 .create-instance-header .close-new-step {
     position: absolute;
     right: 10px;
-    top: 15px;
-    font-size: 17px;
+    top: 5px;
 }
 
 .create-instance-header .close-new-step:hover {

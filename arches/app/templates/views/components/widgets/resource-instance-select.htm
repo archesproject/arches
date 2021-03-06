@@ -168,8 +168,8 @@
                     <span>{% trans "New" %}</span>
                     <span data-bind="text: $parent.graphLookup[graphid].name"></span>
                 </div>
-                <div data-bind="click: function(){$parent.close()}, clickBubble: false" class="close-new-step">
-                    <i class="fa fa-times-circle"></i>
+                <div class="close-new-step">
+                    <button class="btn btn-labeled btn-lg fa fa-arrow-right btn-primary" data-bind="click: function(){$parent.close()}, clickBubble: false">Return</button>
                 </div>
             </div>
 
