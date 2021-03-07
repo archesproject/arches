@@ -8182,8 +8182,11 @@ a.mega-dropdown-toggle.disabled {
     padding: 0px;
     background: #fff;
     top: 0px;
-    left: 0px;
+    left: 0%;
     overflow-x: hidden;
+    /*-webkit-transform: translate3d(100%, 0, 0);
+    transform: translate3d(100%, 0, 0);*/
+    transition: all 1s linear;
 }
 
 .create-resource-instance-card-component.rr-table-pop .rp-edit-buttons {
@@ -8216,7 +8219,7 @@ a.mega-dropdown-toggle.disabled {
 .resource-instance-card-menu-item {
     height: 50px;
     background: #f8f8f8;
-    padding: 15px 10px;
+    padding: 15px;
     border-bottom: 1px solid #ddd;
     font-size: 13px;
 }
@@ -8228,6 +8231,7 @@ a.mega-dropdown-toggle.disabled {
 
 .resource-instance-card-menu-item.selected {
     background: #fff;
+    margin-right: -1px;
 }
 
 .workbench-card-sidepanel .create-resource-instance-card-component.rr-table-pop {
@@ -8291,7 +8295,7 @@ a.mega-dropdown-toggle.disabled {
 .workbench-card-sidepanel .create-resource-instance-card-component.rr-table-pop .install-buttons {
     width: calc(100% - 350px) !important;
     left: 350px;
-    text-align: right;
+    text-align: left;
 }
 
 .mainnav-lg .workbench-card-sidepanel .create-resource-instance-card-component.rr-table-pop .install-buttons {
@@ -12777,7 +12781,16 @@ a.jstree-anchor.permissions-widget {
     background: #f1f1f1;
     position: relative;
     border-bottom: 1px solid #ddd;
-    padding: 17px;
+    padding: 15px;
+    font-size: 15px;
+}
+
+.create-instance-menu-header {
+    height: 50px;
+    background: #ebebeb;
+    position: relative;
+    border-bottom: 1px solid #ddd;
+    padding: 15px;
     font-size: 15px;
 }
 
