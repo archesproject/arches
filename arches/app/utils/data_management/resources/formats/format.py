@@ -145,7 +145,9 @@ class Reader(object):
                     or relation["resourceinstanceto_graphid"] == "None"
                 ):
                     try:
-                        relation["resourceinstanceto_graphid"] = models.ResourceInstance.objects.get(resourceinstanceid=resourceinstanceto).graph_id
+                        relation["resourceinstanceto_graphid"] = models.ResourceInstance.objects.get(
+                            resourceinstanceid=resourceinstanceto
+                        ).graph_id
                     except ObjectDoesNotExist:
                         relation["resourceinstanceto_graphid"] = None
                 if relation["datestarted"] == "" or relation["datestarted"] == "None":
