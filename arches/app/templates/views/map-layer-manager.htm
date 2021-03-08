@@ -197,14 +197,15 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                                                             </div>
 
                                                             <div class="form-group">
-                                                                <label class="col-sm-3 control-label" data-bind="text: selection().isoverlay ? '{% trans "Add to map by default:" %}' : '{% trans "Default basemap:" %}'"></label>
-                                                                <div class="col-sm-9">
-                                                                    <span class="switch switch-small service-switch-shim" data-bind="css: {
-                                                                            'on': selection().addtomap()
-                                                                        }, click: function () {
-                                                                            selection().addtomap(!selection().addtomap());
-                                                                        }">
-                                                                        <small></small>
+                                                                <div>
+                                                                    <label class="control-label" data-bind="text: selection().isoverlay ? '{% trans "Add to map by default:" %}' : '{% trans "Default basemap:" %}'"></label>
+                                                                    
+                                                                    <span class="switch switch-small service-switch-shim" style="margin-top: 0px;"data-bind="css: {
+                                                                                'on': selection().addtomap()
+                                                                            }, click: function () {
+                                                                                selection().addtomap(!selection().addtomap());
+                                                                            }">
+                                                                            <small></small>
                                                                     </span>
                                                                 </div>
                                                             </div>

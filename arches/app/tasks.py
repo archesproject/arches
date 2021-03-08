@@ -89,10 +89,10 @@ def export_search_results(self, userid, request_values, format):
 
 
 @shared_task(bind=True)
-def refresh_materialized_view(self):
+def refresh_geojson_geometries(self):
     with connection.cursor() as cursor:
         sql = """
-            REFRESH MATERIALIZED VIEW mv_geojson_geoms;
+            SELECT * FROM refresh_geojson_geometries();
         """
         cursor.execute(sql)
     response = {"taskid": self.request.id}
