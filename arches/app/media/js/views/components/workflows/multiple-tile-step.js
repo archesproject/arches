@@ -17,7 +17,7 @@ define([
 
         console.log("MultipleTileStepViewModel", self, params)
 
-
+        // params.urls = arches.urls
 
         ComponentBasedStepViewModel.apply(this, [params]);
         // NewTileStepViewModel.apply(this, [params]);
