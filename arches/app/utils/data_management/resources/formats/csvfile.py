@@ -231,6 +231,7 @@ class CsvWriter(Writer):
                 "resourceinstancefrom_graphid",
                 "resourceinstanceto_graphid",
                 "nodeid",
+                "tileid",
                 "datestarted",
                 "dateended",
                 "notes",
