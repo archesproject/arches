@@ -127,24 +127,31 @@ class Reader(object):
 
             resourceinstancefrom = validate_resourceinstanceid(relation["resourceinstanceidfrom"], "resourceinstanceidfrom")
             resourceinstanceto = validate_resourceinstanceid(relation["resourceinstanceidto"], "resourceinstanceidto")
-            if (
-                "resourceinstancefrom_graphid" not in relation
-                or relation["resourceinstancefrom_graphid"] == ""
-                or relation["resourceinstancefrom_graphid"] == "None"
-            ):
-                relation["resourceinstancefrom_graphid"] = models.ResourceInstance.objects.get(
-                    resourceinstanceid=resourceinstancefrom
-                ).graph_id
-            if (
-                "resourceinstanceto_graphid" not in relation
-                or relation["resourceinstanceto_graphid"] == ""
-                or relation["resourceinstanceto_graphid"] == "None"
-            ):
-                relation["resourceinstanceto_graphid"] = models.ResourceInstance.objects.get(resourceinstanceid=resourceinstanceto).graph_id
-            if relation["datestarted"] == "" or relation["datestarted"] == "None":
-                relation["datestarted"] = None
-            if relation["dateended"] == "" or relation["dateended"] == "None":
-                relation["dateended"] = None
+            if resourceinstancefrom is not None and resourceinstanceto is not None:
+                if (
+                    "resourceinstancefrom_graphid" not in relation
+                    or relation["resourceinstancefrom_graphid"] == ""
+                    or relation["resourceinstancefrom_graphid"] == "None"
+                ):
+                    try:
+                        relation["resourceinstancefrom_graphid"] = models.ResourceInstance.objects.get(
+                            resourceinstanceid=resourceinstancefrom
+                        ).graph_id
+                    except ObjectDoesNotExist:
+                        relation["resourceinstancefrom_graphid"] = None
+                if (
+                    "resourceinstanceto_graphid" not in relation
+                    or relation["resourceinstanceto_graphid"] == ""
+                    or relation["resourceinstanceto_graphid"] == "None"
+                ):
+                    try:
+                        relation["resourceinstanceto_graphid"] = models.ResourceInstance.objects.get(resourceinstanceid=resourceinstanceto).graph_id
+                    except ObjectDoesNotExist:
+                        relation["resourceinstanceto_graphid"] = None
+                if relation["datestarted"] == "" or relation["datestarted"] == "None":
+                    relation["datestarted"] = None
+                if relation["dateended"] == "" or relation["dateended"] == "None":
+                    relation["dateended"] = None
                 if "nodeid" not in relation or relation["nodeid"] == "" or relation["nodeid"] == "None":
                     relation["nodeid"] = None
                 if "tileid" not in relation or relation["tileid"] == "" or relation["tileid"] == "None":
