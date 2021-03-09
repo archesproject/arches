@@ -9,7 +9,7 @@ define([
     'viewmodels/provisional-tile',
     'viewmodels/alert'
 ], function(_, $, arches, ko, koMapping, GraphModel, CardViewModel, ProvisionalTileViewModel) {
-    function ComponentFOO(componentConfig, loading) {
+    function ComponentFOO(componentConfig, loading, title) {
         var self = this;
 
         var params = componentConfig.parameters;  /* CLEAN THIS OUT */
@@ -172,7 +172,20 @@ define([
         };
 
         this.initializeMultipleTileBasedComponent = function() {
-            this.itemName = ko.observable();
+            this.itemName = ko.observable(ko.unwrap(title) ? ko.unwrap(title) : 'Items');
+
+            this.addedTiles = ko.observableArray();
+
+            this.addTile = function() {
+                this.addedTiles.push(self.tile());
+                self.tile(self.card().getNewTile());
+                self.tile().reset();
+                console.log(self)
+            }
+
+            this.createResourceInstance = function(e) {
+                // console.log(self, e)
+            }
 
             self.initializeTileBasedComponent();
         };
@@ -236,7 +249,7 @@ define([
 
                 layoutSection.componentConfigs.forEach(function(componentFOOData) {
                     componentFOONames.push(componentFOOData.uniqueInstanceName);
-                    self.componentFOOLookup[componentFOOData.uniqueInstanceName] = new ComponentFOO(componentFOOData, self.loading);
+                    self.componentFOOLookup[componentFOOData.uniqueInstanceName] = new ComponentFOO(componentFOOData, self.loading, params.title);
                 });
 
                 var sectionInfo = [layoutSection.sectionTitle, componentFOONames];

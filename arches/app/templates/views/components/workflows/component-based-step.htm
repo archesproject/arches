@@ -20,32 +20,33 @@
             <!-- ko with: $parents[1].componentFOOLookup[componentFOOName] -->
                 <!-- ko if: manageMultipleTiles -->
                 <!-- ko let: { self: $data } -->
-                    <!-- ko if: !loading() -->
                     <div data-bind="" class="wf-multi-tile-step-container">
-                        <!-- ko if: tile() && card() -->
                         <div class="wf-multi-tile-step-form">
                             <div data-bind="component: {
                                 name: cardComponentLookup[card().model.component_id()].componentname,
                                 params: {
-                                    card: card(),
-                                    tile: tile(),
-                                    provisionalTileViewModel: provisionalTileViewModel,
-                                    reviewer: reviewer,
-                                    loading: loading,
+                                    ...componentParameters,
                                     form: $data,
                                     pageVm: $root
                                 }
                             }"></div>
-                            <button class="btn btn-shim btn-labeled btn-lg fa fa-caret-right btn-mint wf-multi-tile-btn-complete" data-bind="click: function(){complete(true)}">{% trans "Continue" %}</button>
+
+                            <button 
+                                class="btn btn-success" 
+                                data-bind="click: addTile"
+                            >
+                                {% trans "Create" %}
+                            </button>
+
                         </div>
                         <div class="wf-multi-tile-step-list">
                             <div><h4 data-bind="text: (itemName())"></h4></div>
-                            <!-- ko if: card().tiles().length === 0 -->
+                            <!-- ko if: addedTiles().length === 0 -->
                             <div class="wf-multi-tile-step-list-empty">
                                 <p data-bind="text: ('No '+itemName()+' added yet. Add one or multiple '+itemName()+'.')"></p>
                             </div>
                             <!-- /ko -->
-                            <!-- ko foreach: {data: card().tiles, as: 'tile'} -->
+                            <!-- ko foreach: {data: addedTiles, as: 'tile'} -->
                             <div class="wf-multi-tile-step-card">
                                 <div class="wf-multi-tile-card-info">
                                     <div class="workflow-step-icon complete"><span><i class="fa fa-hashtag"></i></span></div>
@@ -71,9 +72,7 @@
                             </div>
                             <!-- /ko -->
                         </div>
-                        <!-- /ko -->
                     </div>
-                    <!-- /ko -->
                 <!-- /ko -->
                 <!-- /ko -->
                 <!-- ko if: !manageMultipleTiles -->
