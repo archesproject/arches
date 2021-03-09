@@ -235,19 +235,23 @@ define([
             var warnings = []
 
             self.steps.forEach(function(step) {
-                if (step.wastebin && ko.unwrap(step.wastebin.resources)) {
-                    var resources = ko.mapping.toJS(step.wastebin.resources);
-                    resources.forEach(function(resource) {
-                        warnings.push(resource.description);
-                        resourcesToDelete.push(resource);
-                    })
-                }
-                if (step.wastebin && ko.unwrap(step.wastebin.resourceid)) {
-                    warnings.push(ko.unwrap(step.wastebin.description));
-                    resourcesToDelete.push(ko.mapping.toJS(step.wastebin));
-                } else if (step.wastebin && ko.unwrap(step.wastebin.tile)) {
-                    warnings.push(ko.unwrap(step.wastebin.description));
-                    tilesToDelete.push(ko.mapping.toJS(step.wastebin));
+                var wastebin = step.wastebin;
+
+                if (wastebin) {
+                    if (ko.unwrap(wastebin.resources)) {
+                        var resources = ko.mapping.toJS(wastebin.resources);
+                        resources.forEach(function(resource) {
+                            warnings.push(resource.description);
+                            resourcesToDelete.push(resource);
+                        })
+                    }
+                    if (ko.unwrap(wastebin.resourceid)) {
+                        warnings.push(ko.unwrap(wastebin.description));
+                        resourcesToDelete.push(ko.mapping.toJS(wastebin));
+                    } else if (ko.unwrap(wastebin.tile)) {
+                        warnings.push(ko.unwrap(wastebin.description));
+                        tilesToDelete.push(ko.mapping.toJS(wastebin));
+                    }
                 }
             });
 

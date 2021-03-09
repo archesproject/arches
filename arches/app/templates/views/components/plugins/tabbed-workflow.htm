@@ -14,43 +14,15 @@
                 <div class="workflow-name" data-bind="text: workflowName() + ' Workflow'">{% trans "Insert Workflow Name" %}</div>
             </div>
 
-            <div>
-                <!--ko if: activeStep()._index === steps.length - 1 -->
-                <button 
-                    disabled 
-                    class="btn btn-success"
-                >
-                    <i class="ion-android-cloud-done"></i>
-                    <span>
-                        {% trans "Workflow Finished!" %}
-                    </span>
-                </button>
-                <!--/ko-->
-                <!--ko if: activeStep()._index !== steps.length - 1 -->
-                <button 
-                    data-bind="
-                        click: finishWorkflow, 
-                        css:{disabled: !isWorkflowFinished()}
-                    " 
-                    class="btn btn-success"
-                >
-                    <i class="ion-android-cloud-done"></i>
-                    <span>
-                        {% trans "Finish Workflow" %}
-                    </span>
-                </button>
-                <!--/ko-->
-
-                <button 
-                    data-bind="click: quitWorkflow" 
-                    class="btn btn-danger"
-                >
-                    <i class=" ion-android-cancel"></i>
-                    <span>
-                        {% trans "Quit Workflow" %}
-                    </span>
-                </button>
-            </div>
+            <button 
+                data-bind="click: quitWorkflow" 
+                class="btn btn-danger"
+            >
+                <i class=" ion-android-cancel"></i>
+                <span>
+                    {% trans "Quit Workflow" %}
+                </span>
+            </button>
         </div>
         
         <div class="workflow-nav-tab-container">
@@ -184,18 +156,7 @@
                         {% trans  "Previous Step" %}
                     </span>
                 </button>
-
-                <button 
-                    class="btn btn-success"
-                    data-bind="{
-                        click: activeStep().save
-                    }"
-                >
-                    <i class="ion-android-cloud-done"></i>
-                    <span>
-                        {% trans  "Save" %}
-                    </span>
-                </button>
+                <!-- ko if: activeStep().hasDirtyTile() -->
                 <button
                     class="btn btn-danger"
                     data-bind="{
@@ -211,6 +172,23 @@
                     </span>
                 </button>
                 <button
+                    class="btn btn-success"
+                    data-bind="
+                        click: function() {
+                            activeStep().save();
+                            next();
+                        },
+                    "
+                >
+                    <i class="ion-android-cloud-done"></i>
+                    <span>
+                        {% trans  "Save and Continue" %}
+                    </span>
+                    <i class="fa fa-caret-right"></i>
+                </button>
+                <!-- /ko -->
+                <!-- ko ifnot: activeStep().hasDirtyTile() -->
+                <button
                     class="btn btn-primary"
                     data-bind="
                         click: next,
@@ -224,6 +202,7 @@
                     </span>
                     <i class="fa fa-caret-right"></i>
                 </button>
+                <!-- /ko -->
             </div>
 
         </div>

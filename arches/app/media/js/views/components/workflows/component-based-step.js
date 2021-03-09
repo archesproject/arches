@@ -331,6 +331,7 @@ define([
                 pageLayout: koMapping.toJS(self.pageLayout),
             };
         };
+        params.defineStateProperties();
 
         this.initialize();
     }
