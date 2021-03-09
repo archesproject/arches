@@ -312,8 +312,8 @@ define([
                     } else {
                         url(arches.urls.search_results);
                         var queryString = new URLSearchParams();
-                        if (!!params.node && !!params.node.config.useSearchStringOnly){
-                            var searchUrl = new URL(params.node.config.searchString());
+                        if (!!params.node && ko.unwrap(params.node.config.searchString) !== ""){
+                            var searchUrl = new URL(ko.unwrap(params.node.config.searchString));
                             queryString = new URLSearchParams(searchUrl.search);
                         } 
                         queryString.set('paging-filter', page);
