@@ -682,9 +682,9 @@ input[type="checkbox"] {
     display: unset;
 }
 
-.tabbed-workflow-step-body .card-title,
-.tabbed-workflow-step-body .card-instructions {
-    display: none;
+.tabbed-workflow-step-body .display-in-workflow-step.install-buttons {
+    bottom: 53px;
+    display: unset;
 }
 
 .tabbed-workflow-step-body > div {
