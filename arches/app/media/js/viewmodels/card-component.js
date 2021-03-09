@@ -7,11 +7,7 @@ define([
     return function(params) {
         var self = this;
 
-        console.log('CARD COMPONENT', self, params)
-
-        var pageVm = ko.unwrap(params.pageVm);
-
-        this.inResourceEditor = location.pathname.includes(pageVm.urls.resource_editor);
+        this.inResourceEditor = location.pathname.includes(params.pageVm.urls.resource_editor);
         this.configKeys = params.configKeys || [];
         this.showIds = params.showIds || false;
         this.state = params.state || 'form';

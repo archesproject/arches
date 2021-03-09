@@ -1,9 +1,5 @@
 {% load i18n %}
-<div style="display:none" data-bind="text: console.log('DEFAULT.HTM', $data, $parent)"></div>
 <!-- ko foreach: { data: [$data], as: 'self' } -->
-
-
-
 
 <!-- ko if: state === 'editor-tree' && card.model.visible() -->
 {% block editor_tree %}

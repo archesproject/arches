@@ -2,9 +2,6 @@
 <div
     style="height: 100%; padding: 10px 24px;"
 >
-    <div style="display:none" data-bind="text: console.log($data, $parent)"></div>
-
-
     <!-- ko foreach: { data: pageLayout(), as: 'layoutSection'} -->
     <div
         style="padding: 10px 0;"
@@ -23,7 +20,7 @@
                     <div data-bind="" class="wf-multi-tile-step-container">
                         <div class="wf-multi-tile-step-form">
                             <div data-bind="component: {
-                                name: cardComponentLookup[card().model.component_id()].componentname,
+                                name: componentName,
                                 params: {
                                     ...componentParameters,
                                     form: $data,
