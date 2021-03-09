@@ -25,18 +25,28 @@ define([
         this.componentName = componentConfig.componentName;
         this.componentParameters = componentConfig.parameters;
 
-        this.card = ko.observable();
-        this.tile = ko.observable();
+        this.manageTile = componentConfig.manageTile || false;
+        this.manageMultipleTiles = componentConfig.manageMultipleTiles || false;
 
         // this.loading = ko.observable(loading());  /* MUST NOT be able to set parent loading state */
 
         this.loading = loading;
 
-        this.topCards = [];
-
         this.initialize = function() {
+            if (this.manageTile) {
+                self.initializeTileBasedComponent();
+            }
+            else if (this.manageMultipleTiles) {
+                self.initializeMultipleTileBasedComponent();
+            }
+        };
+
+        this.initializeTileBasedComponent = function() {
+            self.tile = ko.observable();
+            self.card = ko.observable();
+            self.topCards = ko.observable();
+
             var url = arches.urls.api_card + this.getCardResourceIdOrGraphId();
-    
             $.getJSON(url, function(data) {
                 var handlers = {
                     'after-update': [],
@@ -159,6 +169,12 @@ define([
                 console.log("REALLY?00011", self, componentConfig)
                 loading(false)
             });
+        };
+
+        this.initializeMultipleTileBasedComponent = function() {
+            this.itemName = ko.observable();
+
+            self.initializeTileBasedComponent();
         };
 
         this.getCardResourceIdOrGraphId = function() { // override for different cases
