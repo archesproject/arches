@@ -432,11 +432,27 @@ ul.cons-splash-list > li > a:focus, ul.cons-splash-list > li > a:hover {
     font-size: 55px;
 }
 
-.app-info-block h2 {
+.app-info-block-header {
+    font-size: 20px;
+}
+
+.app-info-block-title {
     font-size: 32px;
     font-weight: 300;
     color: #25476A;
 }
+
+
+
+/*.app-info-block h2 {
+    font-size: 20px;
+}
+
+.app-info-block h3 {
+    font-size: 32px;
+    font-weight: 300;
+    color: #25476A;
+}*/
 
 .app-info-block .container {
     padding-top: 40px;
