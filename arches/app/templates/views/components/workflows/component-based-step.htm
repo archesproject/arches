@@ -34,7 +34,6 @@
                             overflow: hidden;
                         "
                     >
-                        <div style="display:none" data-bind="text: console.log('$*#$UY(*R&U#*($U(*', $data, $parent)"></div>
                         <div data-bind="component: {
                             name: componentName,
                             params: {
@@ -45,17 +44,32 @@
                         }"></div>
 
                         <!-- ko if: manageMultipleTiles -->
-                        <button 
-                            class="btn btn-success" 
+                        <div
                             style="
                                 position: relative;
                                 bottom: 84px;
                                 left: 532px;
+                                display: flex;
                             "
-                            data-bind="click: bar"
                         >
-                            {% trans "Save" %}
-                        </button>
+                            <div style="display:none" data-bind="text: console.log('$*#$UY(*R&U#*($U(*', $data, $parent)"></div>
+
+                            <!-- ko if: editingData() || fooDirty() -->
+                            <button 
+                                class="btn btn-danger" 
+                                data-bind="click: reset"
+                            >
+                                {% trans "Clear" %}
+                            </button>
+                            <!-- /ko -->
+
+                            <button 
+                                class="btn btn-success" 
+                                data-bind="click: bar"
+                            >
+                                {% trans "Save" %}
+                            </button>
+                        </div>
                         <!-- /ko -->
 
                     </div>
@@ -80,7 +94,7 @@
                             <h4 data-bind="text: (itemName())"></h4>
                         </div>
 
-                        <!-- ko if: addedTileData().length === 0 -->
+                        <!-- ko if: addedData().length === 0 -->
                         <div class="wf-multi-tile-step-list-empty">
                             <p data-bind="text: ('No '+itemName()+' added yet. Add one or multiple '+itemName()+'.')"></p>
                         </div>
@@ -100,7 +114,7 @@
                                     right: 6px;
                                 "
                             >
-                                <!-- ko foreach: {data: addedTileData, as: 'tile'} -->
+                                <!-- ko foreach: {data: addedData, as: 'tile'} -->
                                     <div class="wf-multi-tile-step-card">
                                         <div class="wf-multi-tile-card-info">
                                             <div class="workflow-step-icon complete"><span><i class="fa fa-hashtag"></i></span></div>
@@ -123,7 +137,7 @@
                                         </div>
                                         <div class="wf-multi-tile-step-card-controls">
                                             <div 
-                                                data-bind="click: function(){$parent.addedTileData.remove($data)}"
+                                                data-bind="click: function(){$parent.addedData.remove($data)}"
                                             >
                                                 <i class="fa fa-times-circle"></i>
                                                 <span>
