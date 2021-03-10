@@ -29,7 +29,10 @@
                     height: 100%;
                 ">
                     <div
-                        style="width: 60%;"
+                        style="
+                            width: 60%;
+                            overflow: hidden;
+                        "
                     >
                         <div data-bind="component: {
                             name: componentName,
@@ -43,6 +46,11 @@
                         <!-- ko if: manageMultipleTiles -->
                         <button 
                             class="btn btn-success" 
+                            style="
+                                position: relative;
+                                bottom: 84px;
+                                left: 532px;
+                            "
                             data-bind="click: addTile"
                         >
                             {% trans "Save" %}
@@ -60,6 +68,7 @@
                             border-radius: 2px;
                             background-color: #eee;
                             margin-top: 14px;
+                            margin-right: 14px;
                             display: flex;
                             flex-direction: column;
                         "

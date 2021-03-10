@@ -159,35 +159,9 @@ define([
             this.itemName = ko.observable(ko.unwrap(title) ? ko.unwrap(title) : 'Items');
 
             this.addTile = function() {
-
-                var oldTile = self.tile();
-                var oldTileData = koMapping.toJS(oldTile.data);
-
-                // oldTile.tileid = uuid.generate();
-
-                console.log("OLD TILE", oldTile, oldTileData)
-                
-                this.addedTileData.unshift(oldTileData);
-                
-                // // var newTile = self.card().getNewTile(true)  /* true flag forces new Tile each time */
-
-                // Object.keys(newTile.data).forEach(function(key) {
-                //     newTile[key] = ko.observable(ko.unwrap(newTile[key]))
-                // })
-
-                // console.log("NEW TILE", newTile, self.card(), oldTile)
-
-                // self.card(...self.card())
-                // self.tile(newTile);  
-
-
-                // oldTile.reset();
-
+                var tileData = koMapping.toJS(self.tile().data);
+                this.addedTileData.unshift(tileData);
                 self.tile().reset();
-
-
-                // self.card.valueHasMutated();
-                console.log(self)
             }
 
             self.initializeTileBasedComponent();
