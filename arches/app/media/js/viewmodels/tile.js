@@ -68,6 +68,7 @@ define([
             koMapping.toJSON(params.tile.data)
         );
 
+        console.log("HDIFOHDSI", self, params, params.tile.data)
         this.data = koMapping.fromJS(params.tile.data);
         this.provisionaledits = ko.observable(params.tile.provisionaledits);
         this.datatypeLookup = getDatatypeLookup(params);

@@ -322,33 +322,40 @@ define([
                     }
                 });
             },
-            getNewTile: function() {
-                if (!this.newTile) this.newTile = new TileViewModel({
-                    tile: {
-                        tileid: '',
-                        resourceinstance_id: ko.unwrap(params.resourceId),
-                        nodegroup_id: ko.unwrap(self.model.nodegroup_id),
-                        parenttile_id: self.parent ? self.parent.tileid : null,
-                        data: _.reduce(self.widgets(), function(data, widget) {
-                            data[widget.node_id()] = null;
-                            return data;
-                        }, {})
-                    },
-                    card: self,
-                    graphModel: params.graphModel,
-                    resourceId: params.resourceId,
-                    displayname: params.displayname,
-                    handlers: params.handlers,
-                    userisreviewer: params.userisreviewer,
-                    cards: params.cards,
-                    tiles: params.tiles,
-                    selection: selection,
-                    scrollTo: scrollTo,
-                    filter: filter,
-                    provisionalTileViewModel: params.provisionalTileViewModel,
-                    loading: loading,
-                    cardwidgets: params.cardwidgets,
-                });
+            getNewTile: function(force) {
+                if (
+                    force || !this.newTile
+                ) {
+                    var newTile = new TileViewModel({
+                        tile: {
+                            tileid: '',
+                            resourceinstance_id: ko.unwrap(params.resourceId),
+                            nodegroup_id: ko.unwrap(self.model.nodegroup_id),
+                            parenttile_id: self.parent ? self.parent.tileid : null,
+                            data: _.reduce(self.widgets(), function(data, widget) {
+                                data[widget.node_id()] = null;
+                                return data;
+                            }, {})
+                        },
+                        card: self,
+                        graphModel: params.graphModel,
+                        resourceId: params.resourceId,
+                        displayname: params.displayname,
+                        handlers: params.handlers,
+                        userisreviewer: params.userisreviewer,
+                        cards: params.cards,
+                        tiles: params.tiles,
+                        selection: selection,
+                        scrollTo: scrollTo,
+                        filter: filter,
+                        provisionalTileViewModel: params.provisionalTileViewModel,
+                        loading: loading,
+                        cardwidgets: params.cardwidgets,
+                    });
+
+                    this.newTile = newTile;
+                    return newTile;
+                }
                 return this.newTile;
             },
             isFuncNode: function() {

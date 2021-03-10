@@ -4,11 +4,12 @@ define([
     'arches',
     'knockout',
     'knockout-mapping',
+    'uuid',
     'models/graph',
     'viewmodels/card',
     'viewmodels/provisional-tile',
     'viewmodels/alert'
-], function(_, $, arches, ko, koMapping, GraphModel, CardViewModel, ProvisionalTileViewModel) {
+], function(_, $, arches, ko, koMapping, uuid, GraphModel, CardViewModel, ProvisionalTileViewModel) {
     function ComponentFOO(componentConfig, loading, title) {
         var self = this;
 
@@ -98,26 +99,6 @@ define([
                     });
                 });
     
-                self.card.subscribe(function(card){
-                    if (card) {
-                        card.context = 'workflow';
-    
-                        if (params.preSaveCallback) {
-                            card.preSaveCallback = params.preSaveCallback;
-                        }
-                        if (params.postSaveCallback) {
-                            card.postSaveCallback = params.postSaveCallback;
-                        }
-                    }
-                    if (ko.unwrap(card.widgets) && params.hiddenNodes) {
-                        card.widgets().forEach(function(widget){
-                            if (params.hiddenNodes.indexOf(widget.node_id()) > -1) {
-                                widget.visible(false);
-                            }
-                        });
-                    }
-                });
-    
                 self.topCards.forEach(function(topCard) {
                     topCard.topCards = self.topCards;
                 });
@@ -172,19 +153,41 @@ define([
         };
 
         this.initializeMultipleTileBasedComponent = function() {
+            this.manageTile = true;
+            this.addedTileData = ko.observableArray();
+
             this.itemName = ko.observable(ko.unwrap(title) ? ko.unwrap(title) : 'Items');
 
-            this.addedTiles = ko.observableArray();
-
             this.addTile = function() {
-                this.addedTiles.push(self.tile());
-                self.tile(self.card().getNewTile());
-                self.tile().reset();
-                console.log(self)
-            }
 
-            this.createResourceInstance = function(e) {
-                // console.log(self, e)
+                var oldTile = self.tile();
+                var oldTileData = koMapping.toJS(oldTile.data);
+
+                // oldTile.tileid = uuid.generate();
+
+                console.log("OLD TILE", oldTile, oldTileData)
+                
+                this.addedTileData.push(oldTileData);
+                
+                // // var newTile = self.card().getNewTile(true)  /* true flag forces new Tile each time */
+
+                // Object.keys(newTile.data).forEach(function(key) {
+                //     newTile[key] = ko.observable(ko.unwrap(newTile[key]))
+                // })
+
+                // console.log("NEW TILE", newTile, self.card(), oldTile)
+
+                // self.card(...self.card())
+                // self.tile(newTile);  
+
+
+                // oldTile.reset();
+
+                self.tile().reset();
+
+
+                // self.card.valueHasMutated();
+                console.log(self)
             }
 
             self.initializeTileBasedComponent();
