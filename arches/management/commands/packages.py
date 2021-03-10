@@ -989,7 +989,7 @@ class Command(BaseCommand):
                             ),
                             "w",
                         ) as f:
-                            if file_format == 'tilexl':
+                            if file_format == "tilexl":
                                 file["outputfile"].save(os.path.join(data_dest, file["name"]))
                             else:
                                 file["outputfile"].seek(0)

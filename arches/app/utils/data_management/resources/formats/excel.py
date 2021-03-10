@@ -17,25 +17,18 @@ class ExcelWriter(TileCsvWriter):
         wb = Workbook()
 
         for csv in csvs:
-            #create a tab/worksheet for every csv file
-            ws = wb.create_sheet(title=csv['name'].split('.csv')[0])
-            for row in csv['outputfile'].getvalue().split('\r\n'):
-                ws.append(row.split(','))
-        #delete default blank first sheet in workbook
-        del wb['Sheet']
-        
-        #save virtual workbook so
+            # create a tab/worksheet for every csv file
+            ws = wb.create_sheet(title=csv["name"].split(".csv")[0])
+            for row in csv["outputfile"].getvalue().split("\r\n"):
+                ws.append(row.split(","))
+        # delete default blank first sheet in workbook
+        del wb["Sheet"]
+
+        # save virtual workbook so
         virtual_workbook = BytesIO()
         wb.save(virtual_workbook)
-        
+
         excel_file_for_export = []
-        excel_file_for_export.append({"name": self.file_name + '.xlsx', "outputfile": wb})
-        
+        excel_file_for_export.append({"name": self.file_name + ".xlsx", "outputfile": wb})
+
         return excel_file_for_export
-
-
-
-
-
-
-
