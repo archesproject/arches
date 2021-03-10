@@ -173,7 +173,7 @@ define([
         this.initializeMultipleTileBasedComponent = function() {
             this.manageTile = true;
 
-            this.addedData = ko.observableArray();
+            self.addedData = ko.observableArray();
 
             this.hasData = ko.pureComputed(function() {
                 return Boolean(self.addedData().length);
@@ -246,9 +246,19 @@ define([
     function viewModel(params) {
         var self = this;
 
+
         this.value = params.value || ko.observable();
 
+        this.hasDirtyTile = params.hasDirtyTile || ko.observable(false);
+        this.clearCallback = params.clearCallback;
+        this.clearCallback(function() {
+            self.reset();
+        });
 
+        this.hasData = ko.observable(false);
+        this.hasData.subscribe(function(hasData) {
+            self.hasDirtyTile(hasData);
+        })
 
         // REFACTOR TO INCLUDE ALL COMPONENTS
         this.loading = params.loading || ko.observable();
@@ -270,12 +280,26 @@ define([
             `componentFOOLookup` is an object where we pair a `uniqueInstanceName` key to `ComponentFOO`
             class objects.
         */ 
-        this.componentFOOLookup = {};
+        this.componentFOOLookup = ko.observable({});
 
         /* END source-of-truth for page data */
         
 
 
+        this.reset = function() {
+            self.loading(true);
+
+            Object.values(self.componentFOOLookup()).forEach(function(componentFOO) {
+                console.log(componentFOO)
+                componentFOO.addedData.removeAll();
+                componentFOO.reset();
+            });
+            // self.pageLayout.destroyAll();
+            // self.componentFOOLookup({});
+            // self.initialize();
+
+            self.loading(false);
+        };
 
         this.initialize = function() {
             ko.toJS(params.layoutSections).forEach(function(layoutSection) {
@@ -283,7 +307,25 @@ define([
 
                 layoutSection.componentConfigs.forEach(function(componentFOOData) {
                     componentFOONames.push(componentFOOData.uniqueInstanceName);
-                    self.componentFOOLookup[componentFOOData.uniqueInstanceName] = new ComponentFOO(componentFOOData, self.loading, params.title);
+
+                    var componentFOOLookup = self.componentFOOLookup();
+
+                    var componentFOO = new ComponentFOO(componentFOOData, self.loading, params.title);
+
+                    componentFOO.hasData.subscribe(function() {
+                        var hasData = Object.values(self.componentFOOLookup()).reduce(function(acc, componentFOOBAR) {
+                            if (componentFOOBAR.hasData()) {
+                                acc = true;
+                            } 
+                            return acc;
+                        }, false);
+
+                        self.hasData(hasData);
+                    });
+
+                    componentFOOLookup[componentFOOData.uniqueInstanceName] = componentFOO;
+
+                    self.componentFOOLookup(componentFOOLookup);
                 });
 
                 var sectionInfo = [layoutSection.sectionTitle, componentFOONames];
@@ -305,48 +347,48 @@ define([
 
         };
 
-        this.updatePageLayout = function(layoutSections) {
-            self.pageLayout.sections([]); /* clear page section data */
+        // this.updatePageLayout = function(layoutSections) {
+        //     self.pageLayout.sections([]); /* clear page section data */
 
-            var requiredComponentData = {};
+        //     var requiredComponentData = {};
 
-            var hasAllRequiredComponentData = function(requiredComponentData) {
-                return Object.values(requiredComponentData).reduce(function(acc, value) {
-                    if (!value()) { acc = false; }
-                    return acc;
-                }, true);
-            };
+        //     var hasAllRequiredComponentData = function(requiredComponentData) {
+        //         return Object.values(requiredComponentData).reduce(function(acc, value) {
+        //             if (!value()) { acc = false; }
+        //             return acc;
+        //         }, true);
+        //     };
 
-            ko.toJS(layoutSections).forEach(function(layoutSection) {
-                var section = new Section(layoutSection.sectionTitle);
+        //     ko.toJS(layoutSections).forEach(function(layoutSection) {
+        //         var section = new Section(layoutSection.sectionTitle);
 
-                layoutSection.componentConfigs.forEach(function(componentConfigData) {
-                    var componentConfig = new ComponentConfig(componentConfigData, self.rootPageVm);
+        //         layoutSection.componentConfigs.forEach(function(componentConfigData) {
+        //             var componentConfig = new ComponentConfig(componentConfigData, self.rootPageVm);
 
-                    /* save value on update */ 
-                    componentConfig.value.subscribe(function() {
-                        params.value(params.defineStateProperties());
-                    });
+        //             /* save value on update */ 
+        //             componentConfig.value.subscribe(function() {
+        //                 params.value(params.defineStateProperties());
+        //             });
 
 
-                    // WATCHES REQUIRED VALUES AND AUTO_COMPLETES CARD
-                    // /* if a component is marked as 'required' let's add a subscription to track its value */ 
-                    // if (componentConfig.required()) {
-                    //     requiredComponentData[componentConfig.uniqueInstanceName()] = ko.observable(componentConfig.value());
+        //             // WATCHES REQUIRED VALUES AND AUTO_COMPLETES CARD
+        //             // /* if a component is marked as 'required' let's add a subscription to track its value */ 
+        //             // if (componentConfig.required()) {
+        //             //     requiredComponentData[componentConfig.uniqueInstanceName()] = ko.observable(componentConfig.value());
 
-                    //     componentConfig.value.subscribe(function(value) {
-                    //         requiredComponentData[componentConfig.uniqueInstanceName()](value);
-                    //         hasAllRequiredComponentData(requiredComponentData) ? self.complete(true) : self.complete(false);
-                    //     });
-                    // }
+        //             //     componentConfig.value.subscribe(function(value) {
+        //             //         requiredComponentData[componentConfig.uniqueInstanceName()](value);
+        //             //         hasAllRequiredComponentData(requiredComponentData) ? self.complete(true) : self.complete(false);
+        //             //     });
+        //             // }
 
-                    section.componentConfigs.push(componentConfig);
-                });
+        //             section.componentConfigs.push(componentConfig);
+        //         });
 
-                self.pageLayout.sections.push(section);
-                hasAllRequiredComponentData(requiredComponentData) ? self.complete(true) : self.complete(false);
-            });
-        };
+        //         self.pageLayout.sections.push(section);
+        //         hasAllRequiredComponentData(requiredComponentData) ? self.complete(true) : self.complete(false);
+        //     });
+        // };
 
         // this.quit = function() {
         //     // this.complete(false);

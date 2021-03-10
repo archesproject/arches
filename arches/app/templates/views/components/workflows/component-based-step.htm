@@ -23,7 +23,7 @@
         <!-- ko foreach: { data: layoutSection[1], as: 'componentFOOName'} -->
             <!-- ko if: !$parents[1].loading() -->
 
-            <!-- ko with: $parents[1].componentFOOLookup[componentFOOName] -->
+            <!-- ko with: $parents[1].componentFOOLookup()[componentFOOName] -->
                 <div style="
                     display: flex;
                     height: 100%;
