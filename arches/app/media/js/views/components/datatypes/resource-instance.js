@@ -115,6 +115,25 @@ define([
                     }
                 });
 
+                this.config.searchString.subscribe(function(searchString){
+                    if(searchString !== ''){
+                        var searchUrl = new URL(ko.unwrap(searchString));
+                        var queryString = new URLSearchParams(searchUrl.search);
+                        window.fetch('/search/get_dsl?' + queryString.toString())
+                            .then(function(response){
+                                if(response.ok) {
+                                    return response.json();
+                                }
+                                throw("error");
+                            })
+                            .then(function(json) {
+                                self.config.searchDsl(json.query);
+                            });
+                    } else {
+                        self.config.searchDsl('');
+                    }
+                });
+
                 this.formatLabel = function(name, ontologyProperty, inverseOntologyProperty){
                     if (self.graphIsSemantic) {
                         return name + ' (' + ontologyUtils.makeFriendly(ontologyProperty) + '/' + ontologyUtils.makeFriendly(inverseOntologyProperty) + ')';
