@@ -7,6 +7,8 @@ define([
     return function(params) {
         var self = this;
 
+        console.log("IN CARD COMPONENT", self, params)
+
         this.inResourceEditor = location.pathname.includes(params.pageVm.urls.resource_editor);
         this.configKeys = params.configKeys || [];
         this.showIds = params.showIds || false;

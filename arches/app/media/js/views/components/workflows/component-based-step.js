@@ -156,27 +156,40 @@ define([
             this.manageTile = true;
             this.addedTileData = ko.observableArray();
 
+            this.editingData = ko.observable(false);
+
             this.itemName = ko.observable(ko.unwrap(title) ? ko.unwrap(title) : 'Items');
 
-            this.addTile = function() {
+            this.addData = function() {
+
+            }
+
+            this.bar = function() {
+                loading(true)
                 var tileData = koMapping.toJS(self.tile().data);
-                this.addedTileData.unshift(tileData);
+
+                if (self.editingData()) {
+                    self.addedTileData.replace(self.editingData(), tileData);
+                    self.editingData(false);
+                }
+                else {
+                    this.addedTileData.unshift(tileData);
+                }
+
                 self.tile().reset();
+                loading(false)
             }
 
             this.foo = function(data) {
-                console.log(data, componentConfig)
+                loading(true)
+
+                self.editingData(data);
 
                 var tile = self.tile();
                 tile.data = koMapping.fromJS(data);
-                console.log(tile)
                 self.tile(tile);
 
-                // self.tile().data = koMapping.fromJS(data);
-                // self.tile()._tileData = ko.observable(data);
-                // self.tile().reset();
-                // componentConfig.parameters.tile.data = koMapping.fromJS(data);
-                self.card.valueHasMutated();
+                loading(false)
             }
 
             self.initializeTileBasedComponent();
