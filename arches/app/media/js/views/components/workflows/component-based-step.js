@@ -167,7 +167,7 @@ define([
 
                 console.log("OLD TILE", oldTile, oldTileData)
                 
-                this.addedTileData.push(oldTileData);
+                this.addedTileData.unshift(oldTileData);
                 
                 // // var newTile = self.card().getNewTile(true)  /* true flag forces new Tile each time */
 
