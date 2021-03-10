@@ -130,7 +130,6 @@ define([
         this.clearCallback = ko.observable();
 
         this.clear = function() {
-            console.log('djsifofadsj9f0ajs0fas', self)
             if (self.hasDirtyTile()) {
                 if (ko.unwrap(self.tile)) {
                     self.tile().reset();

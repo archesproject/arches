@@ -44,23 +44,14 @@ define([
 
         this.initializeTileBasedComponent = function() {
             self.tile = ko.observable();
-            self.fooDirty = ko.observable();
-            
-            self.tile.subscribe(function(tile) {
-                
-                tile.dirty.subscribe(function(dirty) {
-                    console.log("DIRY")
-                    self.fooDirty(dirty);
-                });
-            });
 
-            // self.fooDirty = ko.pureComputed(function() {
-            //     if (self.tile()) {
-            //         return self.tile().dirty();
-            //     }
+            self.fooDirty = ko.pureComputed(function() {
+                if (self.tile()) {
+                    return self.tile().dirty();
+                }
 
-            //     return false;
-            // })
+                return false;
+            })
 
             self.card = ko.observable();
             self.topCards = ko.observable();
@@ -165,7 +156,6 @@ define([
                 componentConfig.parameters.provisionalTileViewModel = self.provisionalTileViewModel;
                 componentConfig.parameters.reviewer = data.userisreviewer;
                 
-                console.log("REALLY?00011", self, componentConfig)
                 loading(false)
             });
         };
@@ -285,19 +275,14 @@ define([
         /* END source-of-truth for page data */
         
 
-
         this.reset = function() {
             self.loading(true);
 
             Object.values(self.componentFOOLookup()).forEach(function(componentFOO) {
-                console.log(componentFOO)
                 componentFOO.addedData.removeAll();
                 componentFOO.reset();
             });
-            // self.pageLayout.destroyAll();
-            // self.componentFOOLookup({});
-            // self.initialize();
-
+            
             self.loading(false);
         };
 
@@ -332,69 +317,7 @@ define([
 
                 self.pageLayout.push(sectionInfo);
             });
-
-
-            // var cachedValue = ko.unwrap(params.value);
-
-            // if (cachedValue && cachedValue.pageLayout.sections) {
-            //     this.updatePageLayout(cachedValue.pageLayout.sections);
-            // }
-            // else {
-            // }
-
-
-            // this.updatePageLayout(params.layoutSections);
-
         };
-
-        // this.updatePageLayout = function(layoutSections) {
-        //     self.pageLayout.sections([]); /* clear page section data */
-
-        //     var requiredComponentData = {};
-
-        //     var hasAllRequiredComponentData = function(requiredComponentData) {
-        //         return Object.values(requiredComponentData).reduce(function(acc, value) {
-        //             if (!value()) { acc = false; }
-        //             return acc;
-        //         }, true);
-        //     };
-
-        //     ko.toJS(layoutSections).forEach(function(layoutSection) {
-        //         var section = new Section(layoutSection.sectionTitle);
-
-        //         layoutSection.componentConfigs.forEach(function(componentConfigData) {
-        //             var componentConfig = new ComponentConfig(componentConfigData, self.rootPageVm);
-
-        //             /* save value on update */ 
-        //             componentConfig.value.subscribe(function() {
-        //                 params.value(params.defineStateProperties());
-        //             });
-
-
-        //             // WATCHES REQUIRED VALUES AND AUTO_COMPLETES CARD
-        //             // /* if a component is marked as 'required' let's add a subscription to track its value */ 
-        //             // if (componentConfig.required()) {
-        //             //     requiredComponentData[componentConfig.uniqueInstanceName()] = ko.observable(componentConfig.value());
-
-        //             //     componentConfig.value.subscribe(function(value) {
-        //             //         requiredComponentData[componentConfig.uniqueInstanceName()](value);
-        //             //         hasAllRequiredComponentData(requiredComponentData) ? self.complete(true) : self.complete(false);
-        //             //     });
-        //             // }
-
-        //             section.componentConfigs.push(componentConfig);
-        //         });
-
-        //         self.pageLayout.sections.push(section);
-        //         hasAllRequiredComponentData(requiredComponentData) ? self.complete(true) : self.complete(false);
-        //     });
-        // };
-
-        // this.quit = function() {
-        //     // this.complete(false);
-        //     // self.updatePageLayout(koMapping.toJS(params.layoutSections));
-        //     // self.setStateProperties();
-        // };
 
         // params.defineStateProperties = function(){
         //     // Collects those properties that you want to set to the state.
