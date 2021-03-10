@@ -164,6 +164,21 @@ define([
                 self.tile().reset();
             }
 
+            this.foo = function(data) {
+                console.log(data, componentConfig)
+
+                var tile = self.tile();
+                tile.data = koMapping.fromJS(data);
+                console.log(tile)
+                self.tile(tile);
+
+                // self.tile().data = koMapping.fromJS(data);
+                // self.tile()._tileData = ko.observable(data);
+                // self.tile().reset();
+                // componentConfig.parameters.tile.data = koMapping.fromJS(data);
+                self.card.valueHasMutated();
+            }
+
             self.initializeTileBasedComponent();
         };
 
