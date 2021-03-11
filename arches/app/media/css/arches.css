@@ -13019,6 +13019,11 @@ a.jstree-anchor.permissions-widget {
     width: calc(100% - 75px);
 }
 
+.workbench-card-wrapper .workbench-card-container-wrapper.wide {
+    height: 100%;
+    width: 100%;
+}
+
 .workbench-card-container.gallery-visible {
     padding-bottom: 160px;
 }
