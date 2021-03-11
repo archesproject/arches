@@ -113,7 +113,9 @@ define([
                 currently SYNCHRONOUS, however async localStore interaction is
                 covered by value subscription. This should be refactored when we can.
             */ 
-            var preSaveCallback = ko.unwrap(self.preSaveCallback);
+
+           var preSaveCallback = ko.unwrap(self.preSaveCallback);
+           console.log('workflow step save', preSaveCallback)
             if (preSaveCallback) {
                 preSaveCallback();
             }

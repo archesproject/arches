@@ -10,18 +10,12 @@ define([
     'viewmodels/provisional-tile',
     'viewmodels/alert'
 ], function(_, $, arches, ko, koMapping, uuid, GraphModel, CardViewModel, ProvisionalTileViewModel) {
-    function ComponentFOO(componentConfig, loading, title) {
+    function ComponentFOO(componentConfig, loading, title, previouslyPersistedComponentData) {
         var self = this;
 
         var params = componentConfig.parameters;  /* CLEAN THIS OUT */
 
         this.resourceId = ko.observable();
-        if (ko.unwrap(params.resourceid)) {
-            self.resourceId(ko.unwrap(params.resourceid));
-        } 
-        else if (params.workflow && ko.unwrap(params.workflow.resourceId)) {
-            self.resourceId(ko.unwrap(params.workflow.resourceId));
-        } 
 
         this.componentName = componentConfig.componentName;
         this.componentParameters = componentConfig.parameters;
@@ -34,11 +28,24 @@ define([
         this.loading = loading;
 
         this.initialize = function() {
+            if (ko.unwrap(params.resourceid)) {
+                self.resourceId(ko.unwrap(params.resourceid));
+            } 
+            else if (params.workflow && ko.unwrap(params.workflow.resourceId)) {
+                self.resourceId(ko.unwrap(params.workflow.resourceId));
+            } 
+
+            if (previouslyPersistedComponentData) {
+                console.log('COMPONENT DATA HERE BOSS', previouslyPersistedComponentData)
+            }
+
+
+
             if (this.manageTile) {
-                self.initializeTileBasedComponent();
+                self.initializeTileBasedComponent(previouslyPersistedComponentData);
             }
             else if (this.manageMultipleTiles) {
-                self.initializeMultipleTileBasedComponent();
+                self.initializeMultipleTileBasedComponent(previouslyPersistedComponentData);
             }
         };
 
@@ -160,14 +167,59 @@ define([
             });
         };
 
-        this.initializeMultipleTileBasedComponent = function() {
+        this.initializeMultipleTileBasedComponent = function(previouslyPersistedData) {
+            loading(true);
+
             this.manageTile = true;
 
             self.addedData = ko.observableArray();
+            self.savedData = ko.observableArray();
 
-            this.hasData = ko.pureComputed(function() {
-                return Boolean(self.addedData().length);
+            self.createdTiles = ko.observable({});
+
+            self.hasUnsavedData = ko.computed(function() {
+
+                // if (!self.addedData().length && !self.savedData.length) {
+                //     return false;
+                // }
+
+
+                var isAllSavedDataInAddedData = self.savedData().reduce(function(acc, savedDatum) {
+                    var addedDataIndex = self.addedData.indexOf(savedDatum.data);
+
+                    if (addedDataIndex === -1) {
+                        acc = false;
+                    }
+
+                    return acc;
+
+                }, true);
+
+                console.log('hasUnsaveData', isAllSavedDataInAddedData ,  self.savedData().length, self.addedData().length)
+                /* we can assume that an array of equal length to savedData, containing all values of savedData, is valid */ 
+                if (
+                    !isAllSavedDataInAddedData 
+                    || !( self.savedData().length === self.addedData().length ) 
+                ) {
+                    return true;
+                }
+
+                return false;
             });
+
+            if (previouslyPersistedData) {
+                previouslyPersistedData.forEach(function(previouslyPersistedDatum) {
+                    /* only pushing node data here */ 
+                    console.log("PREVIOUSLY PERSISTED DATUM", previouslyPersistedDatum)
+
+                    /* add tileid to nodeData for reference */ 
+                    previouslyPersistedDatum.data.tileid = previouslyPersistedDatum.tileid;
+
+                    self.addedData.push(previouslyPersistedDatum.data);
+                    self.savedData.push(previouslyPersistedDatum);
+                });
+            }
+
 
             this.editingData = ko.observable(false);
 
@@ -206,10 +258,56 @@ define([
                 loading(false)
             }
 
+            this.save = function() {
+                self.tile().reset();
+
+                console.log("AAAAA ADDED DATA", self.addedData())
+
+                self.addedData().forEach(function(data) {
+
+                    var tile = self.tile();
+                    /* force the value of current tile data observables */ 
+                    Object.keys(tile.data).forEach(function(key) {
+                        if (ko.isObservable(tile.data[key])) {
+                            tile.data[key](data[key]);
+                        }
+                    });
+
+                    if (data.tileid) {
+                        tile.tileid = data.tileid;
+                    }
+
+                    console.log("TILE HERE BOSS", tile, tile.tileid)
+
+                    tile.save(function(){/* onFail */}, function(savedTiledata) {
+                        console.log("TILE SAVED HERE BOSS", savedTiledata, self)
+
+                        var previouslySavedTileData = ko.utils.arrayFirst(self.savedData(), function(savedDatum) {
+                            return savedDatum.tileid === savedTiledata.tileid;
+                        });
+
+                        if (previouslySavedTileData) {
+
+                        } else {
+                            self.savedData.unshift(savedTiledata);
+                        }
+                    });
+
+                    self.tile(self.card().getNewTile())
+
+                });
+
+                // setTimeout(function() {
+                //     self.addedData.removeAll();
+                // }, 100)
+
+                loading(false)
+            };
+
             this.reset = function() {
                 self.editingData(false);
                 self.tile().reset();
-            };
+            }
 
             self.initializeTileBasedComponent();
         };
@@ -236,23 +334,31 @@ define([
     function viewModel(params) {
         var self = this;
 
+        console.log("INCOMING", params)
 
-        this.value = params.value || ko.observable();
 
-        this.hasDirtyTile = params.hasDirtyTile || ko.observable(false);
+        // this.value = params.value || ko.observable();
+
+
         this.clearCallback = params.clearCallback;
         this.clearCallback(function() {
             self.reset();
         });
 
-        this.hasData = ko.observable(false);
-        this.hasData.subscribe(function(hasData) {
-            self.hasDirtyTile(hasData);
+        this.dataToPersist = ko.observable({});
+        self.dataToPersist.subscribe(function(foo) {
+            console.log("DATA TO PERSIST", foo)
+            params.value(foo);
+        })
+
+        this.hasUnsavedData = ko.observable(false);
+        this.hasUnsavedData.subscribe(function(hasUnsavedData) {
+            console.log("IN HAS UNSAVED DATA SUB", hasUnsavedData)
+            params.hasDirtyTile(hasUnsavedData);
         })
 
         // REFACTOR TO INCLUDE ALL COMPONENTS
         this.loading = params.loading || ko.observable();
-        this.loading(true);
         
         this.complete = params.complete || ko.observable(false);
 
@@ -286,7 +392,27 @@ define([
             self.loading(false);
         };
 
+        console.log(self, params)
+        params.preSaveCallback(function() {
+            self.loading(true);
+
+            Object.values(self.componentFOOLookup()).forEach(function(componentFOOBAR) {
+                if (componentFOOBAR.hasUnsavedData()) {
+                    componentFOOBAR.save();
+                } 
+            });
+        });
+
+        params.postSaveCallback(function() {
+            self.hasUnsavedData(false);
+            self.loading(false);
+        });
+
         this.initialize = function() {
+            self.loading(true);
+
+            var previouslyPersistedData = ko.unwrap(params.value);
+
             ko.toJS(params.layoutSections).forEach(function(layoutSection) {
                 var componentFOONames = [];
 
@@ -295,17 +421,49 @@ define([
 
                     var componentFOOLookup = self.componentFOOLookup();
 
-                    var componentFOO = new ComponentFOO(componentFOOData, self.loading, params.title);
+                    var previouslyPersistedComponentData;
+                    if (previouslyPersistedData && previouslyPersistedData[componentFOOData.uniqueInstanceName]) {
+                        previouslyPersistedComponentData = previouslyPersistedData[componentFOOData.uniqueInstanceName];
+                    }
 
-                    componentFOO.hasData.subscribe(function() {
-                        var hasData = Object.values(self.componentFOOLookup()).reduce(function(acc, componentFOOBAR) {
-                            if (componentFOOBAR.hasData()) {
-                                acc = true;
-                            } 
-                            return acc;
-                        }, false);
+                    var componentFOO = new ComponentFOO(componentFOOData, self.loading, params.title, previouslyPersistedComponentData);
 
-                        self.hasData(hasData);
+                    componentFOO.savedData.subscribe(function() {
+                        console.log('maybe not here')
+                        var dataToPersist = self.dataToPersist();
+                        dataToPersist[componentFOOData.uniqueInstanceName] = koMapping.toJS(componentFOO.savedData());
+                        self.dataToPersist(dataToPersist);
+                    });
+
+
+                    // self.hasUnsavedData(
+                    //     componentFOO.hasUnsavedData()
+                    // );
+
+                    // var ddd = function() {
+                    //     var hasUnsavedData = Object.values(self.componentFOOLookup()).reduce(function(acc, componentFOOBAR) {
+                    //         if (componentFOOBAR.hasUnsavedData()) {
+                    //             acc = true;
+                    //         } 
+                    //         return acc;
+                    //     }, false);
+
+                    //     console.log("AAAAAAAAA", hasUnsavedData, Object.values(self.componentFOOLookup()))
+
+                    //     if (hasUnsavedData) {
+
+                    //         self.hasUnsavedData('hasUnsavedData');
+                    //     }
+
+                    // };
+
+                    // ddd();
+
+                    componentFOO.hasUnsavedData.subscribe(function(foo) {
+                        console.log('IN COM UNSAV DDD SUB')
+                        self.hasUnsavedData(foo)
+                        // ddd();
+
                     });
 
                     componentFOOLookup[componentFOOData.uniqueInstanceName] = componentFOO;
@@ -316,6 +474,7 @@ define([
                 var sectionInfo = [layoutSection.sectionTitle, componentFOONames];
 
                 self.pageLayout.push(sectionInfo);
+
             });
         };
 
