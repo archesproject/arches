@@ -210,8 +210,6 @@ define([
 
                 var ccc = self.editingData();
 
-                console.log('(SDDSDS', ccc, tileData)
-
                 tileData.tileid = ccc.tileid;
 
                 if (ccc) {
@@ -244,35 +242,23 @@ define([
             }
 
             this.save = function() {
+                /* save new tiles */ 
                 self.addedData().forEach(function(data) {
                     var tile = self.tile();
+
                     /* force the value of current tile data observables */ 
                     Object.keys(tile.data).forEach(function(key) {
                         if (ko.isObservable(tile.data[key])) {
                             tile.data[key](data[key]);
                         }
                     });
-
                     
-                    if (data.tileid) {
-                        console.log("@AY",)
-                        // tile.tileid = data.tileid;
-                        // ajdsfioajdsf0i
-                    }
-                    else {
-                        /* save new tiles */ 
-                        console.log("()())(()", data)
+                    /* if it already has a tileid here, it's a previously saved tile */ 
+                    if (!data.tileid) {
                         tile.save(
                             function(){/* onFail */}, 
                             function(savedTileData) {
-                                
-    
-                                // if (previouslySavedTileData) {
-                                //     console.log('SAVED ', savedTileData)
-                                //     self.savedData.replace(previouslySavedTileData, savedTileData)
-                                // } else {
-                                    self.savedData.unshift(savedTileData);
-                                // }
+                                self.savedData.unshift(savedTileData);
                             },
                         );
                     }
@@ -301,20 +287,13 @@ define([
                             }
                         });
 
-                        console.log("NANI?", tile, self.addedData())
-
                         tile.save(
                             function(){},
                             function(savedTileData) {
-                                console.log('()D()())(SDF()DSFDFDSFDS', savedTileData)
-
-
                                 var foo = ko.utils.arrayFirst(self.savedData(), function(savedDatum) {
                                     return savedDatum.tileid === savedTileData.tileid;
                                 });
 
-                                console.log('foo', foo)
-            
                                 self.savedData.replace(foo, savedTileData);
                                 self.addedData.replace(foo.data, savedTileData.data);
                             },
@@ -322,11 +301,7 @@ define([
 
                         self.tile(self.card().getNewTile());
                     }
-
-
-                    
                 });
-
 
                 removedTiles.forEach(function(data) {
                     var tile = self.tile();
@@ -336,7 +311,6 @@ define([
                 });
 
                 self.savedData.removeAll(removedTiles);
-
             };
 
             this.reset = function() {
@@ -481,31 +455,31 @@ define([
             });
         };
 
-        // params.defineStateProperties = function(){
-        //     // Collects those properties that you want to set to the state.
-        //     /** 
-        //      * Wastebin
-        //      * Note that wastebin as set on the workflow step params is inclusive; only things identified by those keys (e.g. tile, resourceid) will be deleted on quit. Otherwise if no wastebin params given, nothing will be deleted on quit.
-        //      * 
-        //      * -- If the workflow edits/creates one and only one new resource, resourceid need only be named in the first step's params' wastebin like so: wastebin: {resourceid:null}
-        //      * This will automatically cascade/delete all tiles generated from this resource.
-        //      * 
-        //      * -- If not every step's generated tile belongs to the same resource or you want to selectively delete a tile from a step, {tile:null} should be declared in every step's params' wastebin where you want the tile from that step to be deleted on quit.
-        //      * 
-        //      * Overriding this method:
-        //      * Keep in mind that anything extending newStep that overrides this method should include similar logic to handle for wastebin if there is a wastebin use case for that particular step in the workflow.
-        //     **/
-        //     var wastebin;
-        //     if (ko.unwrap(params.wastebin)) {
-        //         wastebin = koMapping.toJS(params.wastebin);
-        //     }
+        params.defineStateProperties = function(){
+            // Collects those properties that you want to set to the state.
+            /** 
+             * Wastebin
+             * Note that wastebin as set on the workflow step params is inclusive; only things identified by those keys (e.g. tile, resourceid) will be deleted on quit. Otherwise if no wastebin params given, nothing will be deleted on quit.
+             * 
+             * -- If the workflow edits/creates one and only one new resource, resourceid need only be named in the first step's params' wastebin like so: wastebin: {resourceid:null}
+             * This will automatically cascade/delete all tiles generated from this resource.
+             * 
+             * -- If not every step's generated tile belongs to the same resource or you want to selectively delete a tile from a step, {tile:null} should be declared in every step's params' wastebin where you want the tile from that step to be deleted on quit.
+             * 
+             * Overriding this method:
+             * Keep in mind that anything extending newStep that overrides this method should include similar logic to handle for wastebin if there is a wastebin use case for that particular step in the workflow.
+            **/
+            var wastebin;
+            if (ko.unwrap(params.wastebin)) {
+                wastebin = koMapping.toJS(params.wastebin);
+            }
 
-        //     return {
-        //         wastebin: wastebin,
-        //         pageLayout: koMapping.toJS(self.pageLayout),
-        //     };
-        // };
-        // params.defineStateProperties();
+            return {
+                wastebin: wastebin,
+                pageLayout: koMapping.toJS(self.pageLayout),
+            };
+        };
+        params.defineStateProperties();
 
         this.initialize();
     }
