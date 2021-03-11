@@ -115,7 +115,6 @@ define([
             */ 
 
            var preSaveCallback = ko.unwrap(self.preSaveCallback);
-           console.log('workflow step save', preSaveCallback)
             if (preSaveCallback) {
                 preSaveCallback();
             }

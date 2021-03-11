@@ -166,7 +166,6 @@ define([
                 });
             },
             save: function(onFail, onSuccess) {
-                console.log("IN TILE SAVE")
                 loading(true);
                 delete self.formData.data;
                 if (params.provisionalTileViewModel && params.provisionalTileViewModel.selectedProvisionalEdit()) {

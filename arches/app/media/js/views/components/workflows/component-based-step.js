@@ -23,11 +23,34 @@ define([
         this.manageTile = componentConfig.manageTile || false;
         this.manageMultipleTiles = componentConfig.manageMultipleTiles || false;
 
+        this.addedData = ko.observableArray();
+        this.savedData = ko.observableArray();
+
         // this.loading = ko.observable(loading());  /* MUST NOT be able to set parent loading state */
 
         this.loading = loading;
 
+        this.hasUnsavedData = ko.computed(function() {
+            var isAllSavedDataInAddedData = self.savedData().reduce(function(acc, savedDatum) {
+                if (self.addedData.indexOf(savedDatum.data) === -1) { acc = false; }
+                return acc;
+            }, true);
+
+            /* we can assume that an array of equal length to savedData, containing all values of savedData, is valid */ 
+            if (
+                !isAllSavedDataInAddedData || !( self.savedData().length === self.addedData().length ) 
+            ) {
+                return true;
+            }
+
+            return false;
+        });
+
+
+
         this.initialize = function() {
+            loading(true);
+
             if (ko.unwrap(params.resourceid)) {
                 self.resourceId(ko.unwrap(params.resourceid));
             } 
@@ -162,45 +185,14 @@ define([
         };
 
         this.initializeMultipleTileBasedComponent = function(previouslyPersistedData) {
-            loading(true);
-
             this.manageTile = true;
-
-            self.addedData = ko.observableArray();
-            self.savedData = ko.observableArray();
-
-            self.createdTiles = ko.observable({});
-
-            self.hasUnsavedData = ko.computed(function() {
-                var isAllSavedDataInAddedData = self.savedData().reduce(function(acc, savedDatum) {
-                    var addedDataIndex = self.addedData.indexOf(savedDatum.data);
-
-                    if (addedDataIndex === -1) {
-                        acc = false;
-                    }
-
-                    return acc;
-
-                }, true);
-
-                /* we can assume that an array of equal length to savedData, containing all values of savedData, is valid */ 
-                if (
-                    !isAllSavedDataInAddedData 
-                    || !( self.savedData().length === self.addedData().length ) 
-                ) {
-                    return true;
-                }
-
-                return false;
-            });
 
             if (previouslyPersistedData) {
                 previouslyPersistedData.forEach(function(previouslyPersistedDatum) {
-                    /*
-                        only pushing node data here.
-                        add tileid to nodeData for reference.
-                    */ 
-                    previouslyPersistedDatum.data.tileid = previouslyPersistedDatum.tileid;
+                    if (previouslyPersistedDatum.tileid) {
+                        /* add tileid to nodeData for reference. */ 
+                        previouslyPersistedDatum.data.tileid = previouslyPersistedDatum.tileid;
+                    }
 
                     self.addedData.push(previouslyPersistedDatum.data);
                     self.savedData.push(previouslyPersistedDatum);
@@ -246,10 +238,7 @@ define([
             }
 
             this.save = function() {
-                self.tile().reset();
-
                 self.addedData().forEach(function(data) {
-
                     var tile = self.tile();
                     /* force the value of current tile data observables */ 
                     Object.keys(tile.data).forEach(function(key) {
@@ -277,8 +266,6 @@ define([
                     self.tile(self.card().getNewTile())
 
                 });
-                
-                loading(false)
             };
 
             this.reset = function() {
