@@ -1865,6 +1865,47 @@ div.final-cons-step-separator>h4 {
     text-overflow: ellipsis;
 }
 
+.manifest-manager-nav-tab {
+    height: 50px;
+    min-width: 220px;
+    padding: 10px 20px;
+    border-right: 1px solid #f1f1f1;
+    background-color: #ddd;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
+.manifest-manager-nav-tab.active {
+    background-color: #f6f6f6;
+    font-weight: 600;
+    border-left: 1px solid #ddd;
+    border-right: 1px solid #ddd;
+}
+
+.manifest-manager-main-menu-circle {
+    width: 75px;
+    height: 75px;
+    display: inline-block;
+    text-align: center;
+    padding: 20px;
+    border-radius: 50%;
+    background-color: #ccc;
+}
+
+.manifest-manager .dropzone-photo-upload {
+    margin-top: 15px;
+}
+
+.manifest-manager .loader-select {
+    height: 100%;
+    padding-top: 125px;
+}
+
+.manifest-manager .rr-splash-description {
+    width: 700px;
+}
+
 .basemap-listing,
 .overlay-listing,
 .legend-listing {
