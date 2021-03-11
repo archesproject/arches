@@ -208,8 +208,14 @@ define([
                 loading(true)
                 var tileData = koMapping.toJS(self.tile().data);
 
-                if (self.editingData()) {
-                    self.addedData.replace(self.editingData(), tileData);
+                var ccc = self.editingData();
+
+                console.log('(SDDSDS', ccc, tileData)
+
+                tileData.tileid = ccc.tileid;
+
+                if (ccc) {
+                    self.addedData.replace(ccc, tileData);
                     self.editingData(false);
                 }
                 else {
@@ -247,25 +253,90 @@ define([
                         }
                     });
 
+                    
                     if (data.tileid) {
-                        tile.tileid = data.tileid;
+                        console.log("@AY",)
+                        // tile.tileid = data.tileid;
+                        // ajdsfioajdsf0i
                     }
+                    else {
+                        /* save new tiles */ 
+                        console.log("()())(()", data)
+                        tile.save(
+                            function(){/* onFail */}, 
+                            function(savedTileData) {
+                                
+    
+                                // if (previouslySavedTileData) {
+                                //     console.log('SAVED ', savedTileData)
+                                //     self.savedData.replace(previouslySavedTileData, savedTileData)
+                                // } else {
+                                    self.savedData.unshift(savedTileData);
+                                // }
+                            },
+                        );
+                    }
+                    self.tile(self.card().getNewTile());
+                });
 
-                    tile.save(function(){/* onFail */}, function(savedTiledata) {
-                        var previouslySavedTileData = ko.utils.arrayFirst(self.savedData(), function(savedDatum) {
-                            return savedDatum.tileid === savedTiledata.tileid;
-                        });
+                var removedTiles = [];
 
-                        if (previouslySavedTileData) {
+                self.savedData().forEach(function(data) {
+                    var tile = self.tile();
+                    tile.tileid = data.tileid;
 
-                        } else {
-                            self.savedData.unshift(savedTiledata);
-                        }
+                    var editedData = ko.utils.arrayFirst(self.addedData(), function(addedDatum) {
+                        return addedDatum.tileid === data.tileid;
                     });
 
-                    self.tile(self.card().getNewTile())
+                    if (!editedData) {
+                        /* means we removed the tile from the list */
+                        removedTiles.push(data)
+                    }
+                    else {
+                        /* force the value of current tile data observables */ 
+                        Object.keys(tile.data).forEach(function(key) {
+                            if (ko.isObservable(tile.data[key])) {
+                                tile.data[key](editedData[key]);
+                            }
+                        });
 
+                        console.log("NANI?", tile, self.addedData())
+
+                        tile.save(
+                            function(){},
+                            function(savedTileData) {
+                                console.log('()D()())(SDF()DSFDFDSFDS', savedTileData)
+
+
+                                var foo = ko.utils.arrayFirst(self.savedData(), function(savedDatum) {
+                                    return savedDatum.tileid === savedTileData.tileid;
+                                });
+
+                                console.log('foo', foo)
+            
+                                self.savedData.replace(foo, savedTileData);
+                                self.addedData.replace(foo.data, savedTileData.data);
+                            },
+                        )
+
+                        self.tile(self.card().getNewTile());
+                    }
+
+
+                    
                 });
+
+
+                removedTiles.forEach(function(data) {
+                    var tile = self.tile();
+                    tile.tileid = data.tileid;
+
+                    tile.deleteTile();
+                });
+
+                self.savedData.removeAll(removedTiles);
+
             };
 
             this.reset = function() {
