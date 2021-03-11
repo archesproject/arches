@@ -10,7 +10,7 @@
     'disabled': mainMenu()
 }">
     <i class="fa fa-book"></i>
-    <span class="map-sidebar-text">{% trans "Manifest" %}</span>
+    <span class="map-sidebar-text">{% trans "Service" %}</span>
 </div>
 <div class="workbench-card-sidebar-tab" data-bind="click: function() {
     toggleTab('canvas');
@@ -27,7 +27,7 @@
 <!--ko if: activeTab() === 'manifest'-->
 <div class="workbench-header-buffer">
     <div class="workbench-card-sidepanel-header-container">
-        <h4 class="workbench-card-sidepanel-header" data-bind="click: hideSidePanel">{% trans 'Manage Manifest' %}</h4>
+        <h4 class="workbench-card-sidepanel-header" data-bind="click: hideSidePanel">{% trans 'Manage Image Service' %}</h4>
     </div>
 </div>
 
@@ -121,7 +121,7 @@
 <div class="iiif-image-tools" style="margin-top: 20px;">
     <!--ko if: canvases().length > 0-->
     <label class="control-label">{% trans "Canvases" %}</label>
-    <div>{% trans "Select canvas to delete from the manifest" %}</div>
+    <div>{% trans "Select canvas to delete from the image service" %}</div>
     <div class="file-workbench-files" data-bind="foreach: canvases">
         <div class='file-workbench-file' style="display: inline-flex;" data-bind="css: {staged: ko.unwrap($parent.canvas) === $data.images[0].resource.service['@id']}">
             <input type="checkbox" style="width:15px; height:15px;" data-bind="value: $data, checked: $parent.canvasesForDeletion">
@@ -255,13 +255,13 @@
     </div>
     <div style="display: inline-flex; padding: 5px">
         <div class="iiif-gallery-sequence-label" style="padding:0 5px" data-bind="click: toggleManifestEditor">
-            {% trans "Switch Manifest" %}
+            {% trans "Switch Image Service" %}
         </div>
         |
         <div data-bind="dropzone: dropzoneOptions4create" >
             <div>
             <div class="iiif-gallery-sequence-label fileinput-create-button dz-clickable" style="padding:0 5px" data-bind="css: uniqueidClass; dropzone: dropzoneOptions4create" role="button">
-                {% trans "Create Manifest" %}
+                {% trans "Create Image Service" %}
             </div>
             </div>
             <div style="min-height: 100%;">
