@@ -316,6 +316,21 @@ define([
             this.reset = function() {
                 self.editingData(false);
                 self.tile().reset();
+
+                self.addedData.removeAll();
+                self.savedData.removeAll();
+
+                if (previouslyPersistedData) {
+                    previouslyPersistedData.forEach(function(previouslyPersistedDatum) {
+                        if (previouslyPersistedDatum.tileid) {
+                            /* add tileid to nodeData for reference. */ 
+                            previouslyPersistedDatum.data.tileid = previouslyPersistedDatum.tileid;
+                        }
+    
+                        self.addedData.push(previouslyPersistedDatum.data);
+                        self.savedData.push(previouslyPersistedDatum);
+                    });
+                }
             }
 
             self.initializeTileBasedComponent();
@@ -385,10 +400,11 @@ define([
             self.loading(true);
 
             Object.values(self.componentFOOLookup()).forEach(function(componentFOO) {
-                componentFOO.addedData.removeAll();
+                // componentFOO.addedData.removeAll();
                 componentFOO.reset();
             });
-            
+
+            self.hasUnsavedData(false);
             self.loading(false);
         };
 
