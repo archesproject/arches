@@ -35,12 +35,6 @@ define([
                 self.resourceId(ko.unwrap(params.workflow.resourceId));
             } 
 
-            if (previouslyPersistedComponentData) {
-                console.log('COMPONENT DATA HERE BOSS', previouslyPersistedComponentData)
-            }
-
-
-
             if (this.manageTile) {
                 self.initializeTileBasedComponent(previouslyPersistedComponentData);
             }
@@ -178,12 +172,6 @@ define([
             self.createdTiles = ko.observable({});
 
             self.hasUnsavedData = ko.computed(function() {
-
-                // if (!self.addedData().length && !self.savedData.length) {
-                //     return false;
-                // }
-
-
                 var isAllSavedDataInAddedData = self.savedData().reduce(function(acc, savedDatum) {
                     var addedDataIndex = self.addedData.indexOf(savedDatum.data);
 
@@ -195,7 +183,6 @@ define([
 
                 }, true);
 
-                console.log('hasUnsaveData', isAllSavedDataInAddedData ,  self.savedData().length, self.addedData().length)
                 /* we can assume that an array of equal length to savedData, containing all values of savedData, is valid */ 
                 if (
                     !isAllSavedDataInAddedData 
@@ -209,10 +196,10 @@ define([
 
             if (previouslyPersistedData) {
                 previouslyPersistedData.forEach(function(previouslyPersistedDatum) {
-                    /* only pushing node data here */ 
-                    console.log("PREVIOUSLY PERSISTED DATUM", previouslyPersistedDatum)
-
-                    /* add tileid to nodeData for reference */ 
+                    /*
+                        only pushing node data here.
+                        add tileid to nodeData for reference.
+                    */ 
                     previouslyPersistedDatum.data.tileid = previouslyPersistedDatum.tileid;
 
                     self.addedData.push(previouslyPersistedDatum.data);
@@ -261,8 +248,6 @@ define([
             this.save = function() {
                 self.tile().reset();
 
-                console.log("AAAAA ADDED DATA", self.addedData())
-
                 self.addedData().forEach(function(data) {
 
                     var tile = self.tile();
@@ -277,11 +262,7 @@ define([
                         tile.tileid = data.tileid;
                     }
 
-                    console.log("TILE HERE BOSS", tile, tile.tileid)
-
                     tile.save(function(){/* onFail */}, function(savedTiledata) {
-                        console.log("TILE SAVED HERE BOSS", savedTiledata, self)
-
                         var previouslySavedTileData = ko.utils.arrayFirst(self.savedData(), function(savedDatum) {
                             return savedDatum.tileid === savedTiledata.tileid;
                         });
@@ -296,11 +277,7 @@ define([
                     self.tile(self.card().getNewTile())
 
                 });
-
-                // setTimeout(function() {
-                //     self.addedData.removeAll();
-                // }, 100)
-
+                
                 loading(false)
             };
 
@@ -334,12 +311,6 @@ define([
     function viewModel(params) {
         var self = this;
 
-        console.log("INCOMING", params)
-
-
-        // this.value = params.value || ko.observable();
-
-
         this.clearCallback = params.clearCallback;
         this.clearCallback(function() {
             self.reset();
@@ -347,19 +318,16 @@ define([
 
         this.dataToPersist = ko.observable({});
         self.dataToPersist.subscribe(function(foo) {
-            console.log("DATA TO PERSIST", foo)
             params.value(foo);
         })
 
         this.hasUnsavedData = ko.observable(false);
         this.hasUnsavedData.subscribe(function(hasUnsavedData) {
-            console.log("IN HAS UNSAVED DATA SUB", hasUnsavedData)
             params.hasDirtyTile(hasUnsavedData);
         })
 
         // REFACTOR TO INCLUDE ALL COMPONENTS
         this.loading = params.loading || ko.observable();
-        
         this.complete = params.complete || ko.observable(false);
 
         /* BEGIN source-of-truth for page data */
@@ -392,7 +360,6 @@ define([
             self.loading(false);
         };
 
-        console.log(self, params)
         params.preSaveCallback(function() {
             self.loading(true);
 
@@ -429,41 +396,20 @@ define([
                     var componentFOO = new ComponentFOO(componentFOOData, self.loading, params.title, previouslyPersistedComponentData);
 
                     componentFOO.savedData.subscribe(function() {
-                        console.log('maybe not here')
                         var dataToPersist = self.dataToPersist();
                         dataToPersist[componentFOOData.uniqueInstanceName] = koMapping.toJS(componentFOO.savedData());
                         self.dataToPersist(dataToPersist);
                     });
 
-
-                    // self.hasUnsavedData(
-                    //     componentFOO.hasUnsavedData()
-                    // );
-
-                    // var ddd = function() {
-                    //     var hasUnsavedData = Object.values(self.componentFOOLookup()).reduce(function(acc, componentFOOBAR) {
-                    //         if (componentFOOBAR.hasUnsavedData()) {
-                    //             acc = true;
-                    //         } 
-                    //         return acc;
-                    //     }, false);
-
-                    //     console.log("AAAAAAAAA", hasUnsavedData, Object.values(self.componentFOOLookup()))
-
-                    //     if (hasUnsavedData) {
-
-                    //         self.hasUnsavedData('hasUnsavedData');
-                    //     }
-
-                    // };
-
-                    // ddd();
-
                     componentFOO.hasUnsavedData.subscribe(function(foo) {
-                        console.log('IN COM UNSAV DDD SUB')
-                        self.hasUnsavedData(foo)
-                        // ddd();
+                        var hasUnsavedData = Object.values(self.componentFOOLookup()).reduce(function(acc, componentFOOBAR) {
+                            if (componentFOOBAR.hasUnsavedData()) {
+                                acc = true;
+                            } 
+                            return acc;
+                        }, false);
 
+                        self.hasUnsavedData(hasUnsavedData);
                     });
 
                     componentFOOLookup[componentFOOData.uniqueInstanceName] = componentFOO;
@@ -474,7 +420,6 @@ define([
                 var sectionInfo = [layoutSection.sectionTitle, componentFOONames];
 
                 self.pageLayout.push(sectionInfo);
-
             });
         };
 
