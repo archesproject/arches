@@ -44,30 +44,30 @@
                         }"></div>
 
                         <!-- ko if: manageMultipleTiles -->
-                        <div
-                            style="
-                                position: relative;
-                                bottom: 84px;
-                                left: 532px;
-                                display: flex;
-                            "
-                        >
                             <!-- ko if: editingData() || fooDirty() -->
-                            <button 
-                                class="btn btn-danger" 
-                                data-bind="click: reset"
+                            <div
+                                style="
+                                    display: flex;
+                                    justify-content: flex-end;
+                                    padding: 0 18px;
+                                "
                             >
-                                {% trans "Clear" %}
-                            </button>
-                            <!-- /ko -->
+                                <button 
+                                    class="btn btn-danger" 
+                                    style="margin-right: 8px;"
+                                    data-bind="click: reset"
+                                >
+                                    {% trans "Clear" %}
+                                </button>
 
-                            <button 
-                                class="btn btn-success" 
-                                data-bind="click: bar"
-                            >
-                                {% trans "Save" %}
-                            </button>
-                        </div>
+                                <button 
+                                    class="btn btn-success" 
+                                    data-bind="click: bar"
+                                >
+                                    {% trans "Save" %}
+                                </button>
+                            </div>
+                            <!-- /ko -->
                         <!-- /ko -->
 
                     </div>
