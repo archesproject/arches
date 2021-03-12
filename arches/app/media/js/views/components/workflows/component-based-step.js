@@ -206,7 +206,7 @@ define([
                 if (!self.manageMultipleTiles) {
                     self.save = function() {
                             self.tile().save(
-                                function(){},
+                                function(){/* onFail */},
                                 function(savedTileData) {
                                     self.savedData.unshift(savedTileData);
                                 },
@@ -328,7 +328,7 @@ define([
                         });
 
                         tile.save(
-                            function(){},
+                            function(){/* onFail */},
                             function(savedTileData) {
                                 var previousTileData = ko.utils.arrayFirst(self.savedData(), function(savedDatum) {
                                     return savedDatum.tileid === savedTileData.tileid;
