@@ -10,12 +10,12 @@ define([
     'viewmodels/provisional-tile',
     'viewmodels/alert'
 ], function(_, $, arches, ko, koMapping, uuid, GraphModel, CardViewModel, ProvisionalTileViewModel) {
-    function WorkflowComponentAbstract(componentConfig, loading, title, previouslyPersistedComponentData) {
+    function WorkflowComponentAbstract(componentConfig, loading, title, previouslyPersistedComponentData, resourceId) {
         var self = this;
 
         var params = componentConfig.parameters;  /* CLEAN THIS OUT */
 
-        this.resourceId = ko.observable();
+        this.resourceId = resourceId;
 
         this.componentName = componentConfig.componentName;
         this.componentParameters = componentConfig.parameters;
@@ -46,14 +46,7 @@ define([
         });
 
         this.initialize = function() {
-            loading(true);
-
-            if (ko.unwrap(params.resourceid)) {
-                self.resourceId(ko.unwrap(params.resourceid));
-            } 
-            else if (params.workflow && ko.unwrap(params.workflow.resourceId)) {
-                self.resourceId(ko.unwrap(params.workflow.resourceId));
-            } 
+            self.loading(true);
 
             if (this.tilesManaged === "one") {
                 self.initializeTileBasedComponent(previouslyPersistedComponentData);
@@ -61,6 +54,7 @@ define([
             else if (this.tilesManaged === "many") {
                 self.initializeMultipleTileBasedComponent(previouslyPersistedComponentData);
             }
+
         };
 
         this.initializeTileBasedComponent = function(previouslyPersistedData) {
@@ -216,9 +210,13 @@ define([
                     self.reset = function() {
                         self.tile().reset();
                     };
+
                 }
-                
-                loading(false)
+
+                if (self.card() && self.tile()) {
+
+                    loading(false);
+                }
             });
         };
 
@@ -280,6 +278,8 @@ define([
             }
 
             this.save = function() {
+                self.loading(true);
+
                 /* save new tiles */ 
                 self.addedData().forEach(function(data) {
                     var tile = self.tile();
@@ -398,6 +398,8 @@ define([
     function viewModel(params) {
         var self = this;
 
+        this.resourceId = ko.observable();
+
         this.dataToPersist = ko.observable({});
         self.dataToPersist.subscribe(function(data) {
             params.value(data);
@@ -409,7 +411,7 @@ define([
         })
 
         // REFACTOR TO INCLUDE ALL COMPONENTS
-        this.loading = params.loading || ko.observable(true);
+        this.loading = params.loading || ko.observable();
         this.complete = params.complete || ko.observable(false);
 
         /* BEGIN source-of-truth for page data */
@@ -431,10 +433,18 @@ define([
         /* END source-of-truth for page data */
 
         this.initialize = function() {
+            if (ko.unwrap(params.resourceid)) {
+                self.resourceId(ko.unwrap(params.resourceid));
+            } 
+            else if (params.workflow && ko.unwrap(params.workflow.resourceId)) {
+                self.resourceId(ko.unwrap(params.workflow.resourceId));
+            } 
+
             params.clearCallback(self.reset);
 
             params.preSaveCallback(function() {
                 self.loading(true);
+
                 Object.values(self.workflowComponentAbstractLookup()).forEach(function(workflowComponentAbstract) {
                     if (workflowComponentAbstract.hasUnsavedData()) {
                         workflowComponentAbstract.save();
@@ -445,6 +455,8 @@ define([
             params.postSaveCallback(function() {
                 self.hasUnsavedData(false);
             });
+
+            self.loading(true);
 
             var previouslyPersistedData = ko.unwrap(params.value);
 
@@ -461,7 +473,7 @@ define([
                         previouslyPersistedComponentData = previouslyPersistedData[workflowComponentAbtractData.uniqueInstanceName];
                     }
 
-                    var workflowComponentAbstract = new WorkflowComponentAbstract(workflowComponentAbtractData, self.loading, params.title, previouslyPersistedComponentData);
+                    var workflowComponentAbstract = new WorkflowComponentAbstract(workflowComponentAbtractData, self.loading, params.title, previouslyPersistedComponentData, self.resourceId);
 
                     workflowComponentAbstract.savedData.subscribe(function() {
                         var dataToPersist = self.dataToPersist();

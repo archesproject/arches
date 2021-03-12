@@ -72,7 +72,7 @@
                         <!-- /ko -->
                     </div>
 
-                    <!-- ko if: tilesManaged === "many" -->
+                    <!-- ko if: tilesManaged === "many" && card() -->
                     <div 
                         style="
                             width: 80%;
@@ -118,9 +118,6 @@
                                             <div class="workflow-step-icon complete"><span><i class="fa fa-hashtag"></i></span></div>
                                             <div class="wf-multi-tile-card-info-details">
                                                 <!-- ko foreach: {data: $parent.card().widgets(), as: 'widget'} -->
-                                                    <div>
-                                                        <!-- <div style="display:none" data-bind="text: console.log($data, $parent, $parents[1])"></div> -->
-                                                    </div>
                                                     <!-- ko component: {
                                                         name: widget.widgetLookup[widget.get("widget_id")()].name,
                                                         params: {
