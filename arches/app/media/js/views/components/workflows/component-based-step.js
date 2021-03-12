@@ -20,8 +20,7 @@ define([
         this.componentName = componentConfig.componentName;
         this.componentParameters = componentConfig.parameters;
 
-        this.manageTile = componentConfig.manageTile || false;
-        this.manageMultipleTiles = componentConfig.manageMultipleTiles || false;
+        this.tilesManaged = componentConfig.tilesManaged;
 
         this.addedData = ko.observableArray();
         this.savedData = ko.observableArray();
@@ -56,10 +55,10 @@ define([
                 self.resourceId(ko.unwrap(params.workflow.resourceId));
             } 
 
-            if (this.manageTile) {
+            if (this.tilesManaged === "one") {
                 self.initializeTileBasedComponent(previouslyPersistedComponentData);
             }
-            else if (this.manageMultipleTiles) {
+            else if (this.tilesManaged === "many") {
                 self.initializeMultipleTileBasedComponent(previouslyPersistedComponentData);
             }
         };
@@ -67,7 +66,7 @@ define([
         this.initializeTileBasedComponent = function(previouslyPersistedData) {
             self.tile = ko.observable();
 
-            if (!self.manageMultipleTiles) {
+            if (!self.tilesManaged === "many") {
                 self.tile.subscribe(function(sd) {
                     if (sd) {
                         if (previouslyPersistedData) {
@@ -92,13 +91,14 @@ define([
                 }
 
                 return false;
-            })
-            self.isDirty.subscribe(function() {
-                if (!self.manageMultipleTiles) {
+            });
+
+            if (!self.tilesManaged === "many") {
+                self.isDirty.subscribe(function() {
                     self.addedData.removeAll();
                     self.addedData.push(self.tile().data);
-                }
-            });
+                });
+            }
 
             self.card = ko.observable();
             self.topCards = ko.observable();
@@ -203,7 +203,7 @@ define([
                 componentConfig.parameters.provisionalTileViewModel = self.provisionalTileViewModel;
                 componentConfig.parameters.reviewer = data.userisreviewer;
 
-                if (!self.manageMultipleTiles) {
+                if (!self.tilesManaged === "many") {
                     self.save = function() {
                             self.tile().save(
                                 function(){/* onFail */},
@@ -223,8 +223,6 @@ define([
         };
 
         this.initializeMultipleTileBasedComponent = function(previouslyPersistedData) {
-            this.manageTile = true;
-
             if (previouslyPersistedData) {
                 previouslyPersistedData.forEach(function(previouslyPersistedDatum) {
                     if (previouslyPersistedDatum.tileid) {
@@ -400,11 +398,6 @@ define([
     function viewModel(params) {
         var self = this;
 
-        this.clearCallback = params.clearCallback;
-        this.clearCallback(function() {
-            self.reset();
-        });
-
         this.dataToPersist = ko.observable({});
         self.dataToPersist.subscribe(function(data) {
             params.value(data);
@@ -416,7 +409,7 @@ define([
         })
 
         // REFACTOR TO INCLUDE ALL COMPONENTS
-        this.loading = params.loading || ko.observable();
+        this.loading = params.loading || ko.observable(true);
         this.complete = params.complete || ko.observable(false);
 
         /* BEGIN source-of-truth for page data */
@@ -437,34 +430,21 @@ define([
 
         /* END source-of-truth for page data */
 
-        this.reset = function() {
-            self.loading(true);
-
-            Object.values(self.workflowComponentAbstractLookup()).forEach(function(workflowComponentAbstract) {
-                workflowComponentAbstract.reset();
-            });
-
-            self.hasUnsavedData(false);
-            self.loading(false);
-        };
-
-        params.preSaveCallback(function() {
-            self.loading(true);
-
-            Object.values(self.workflowComponentAbstractLookup()).forEach(function(workflowComponentAbstract) {
-                if (workflowComponentAbstract.hasUnsavedData()) {
-                    workflowComponentAbstract.save();
-                } 
-            });
-        });
-
-        params.postSaveCallback(function() {
-            self.hasUnsavedData(false);
-            self.loading(false);
-        });
-
         this.initialize = function() {
-            self.loading(true);
+            params.clearCallback(self.reset);
+
+            params.preSaveCallback(function() {
+                self.loading(true);
+                Object.values(self.workflowComponentAbstractLookup()).forEach(function(workflowComponentAbstract) {
+                    if (workflowComponentAbstract.hasUnsavedData()) {
+                        workflowComponentAbstract.save();
+                    } 
+                });
+            });
+    
+            params.postSaveCallback(function() {
+                self.hasUnsavedData(false);
+            });
 
             var previouslyPersistedData = ko.unwrap(params.value);
 
@@ -509,6 +489,17 @@ define([
 
                 self.pageLayout.push(sectionInfo);
             });
+        };
+
+        this.reset = function() {
+            self.loading(true);
+
+            Object.values(self.workflowComponentAbstractLookup()).forEach(function(workflowComponentAbstract) {
+                workflowComponentAbstract.reset();
+            });
+            self.hasUnsavedData(false);
+
+            self.loading(false);
         };
 
         params.defineStateProperties = function(){

@@ -43,7 +43,7 @@
                             }
                         }"></div>
 
-                        <!-- ko if: manageMultipleTiles -->
+                        <!-- ko if: tilesManaged === "many" -->
                             <!-- ko if: editingData() || isDirty() -->
                             <div
                                 style="
@@ -62,16 +62,17 @@
 
                                 <button 
                                     class="btn btn-success" 
-                                    data-bind="click: addOrUpdateEntry"
-                                >
-                                    {% trans "Save" %}
-                                </button>
+                                    data-bind="{
+                                        click: addOrUpdateEntry,
+                                        text: editingData() ? 'Save' : 'Add'
+                                    }"
+                                ></button>
                             </div>
                             <!-- /ko -->
                         <!-- /ko -->
                     </div>
 
-                    <!-- ko if: manageMultipleTiles -->
+                    <!-- ko if: tilesManaged === "many" -->
                     <div 
                         style="
                             width: 80%;
