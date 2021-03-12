@@ -1432,6 +1432,7 @@ ul.tabbed-report-tab-list {
 .workbench-card-container-sidepanel-active .thumbnail-container {
     display: flex;
     justify-content: space-between;
+    width: calc(100% - 400px);
 }
 
 .show-thumbnails-btn {
