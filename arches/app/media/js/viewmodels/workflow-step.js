@@ -113,8 +113,7 @@ define([
                 currently SYNCHRONOUS, however async localStore interaction is
                 covered by value subscription. This should be refactored when we can.
             */ 
-
-           var preSaveCallback = ko.unwrap(self.preSaveCallback);
+            var preSaveCallback = ko.unwrap(self.preSaveCallback);
             if (preSaveCallback) {
                 preSaveCallback();
             }
@@ -136,7 +135,9 @@ define([
                     self.tile().reset();
                 }
 
-                self.clearCallback()();
+                if (ko.unwrap(self.clearCallback)) {
+                    self.clearCallback()();
+                }
             }
         }
 
