@@ -20,18 +20,18 @@
             ></h4>
         </div>
         <!-- /ko -->
-        <!-- ko foreach: { data: layoutSection[1], as: 'componentFOOName'} -->
+        <!-- ko foreach: { data: layoutSection[1], as: 'uniqueInstanceName'} -->
             <!-- ko if: !$parents[1].loading() -->
 
-            <!-- ko with: $parents[1].componentFOOLookup()[componentFOOName] -->
+            <!-- ko with: $parents[1].workflowComponentAbstractLookup()[uniqueInstanceName] -->
                 <div style="
                     display: flex;
                     height: 100%;
                 ">
                     <div
                         style="
-                            width: 60%;
                             overflow: hidden;
+                            width: 100%;
                         "
                     >
                         <div data-bind="component: {
@@ -44,7 +44,7 @@
                         }"></div>
 
                         <!-- ko if: manageMultipleTiles -->
-                            <!-- ko if: editingData() || fooDirty() -->
+                            <!-- ko if: editingData() || isDirty() -->
                             <div
                                 style="
                                     display: flex;
@@ -62,20 +62,19 @@
 
                                 <button 
                                     class="btn btn-success" 
-                                    data-bind="click: bar"
+                                    data-bind="click: addOrUpdateEntry"
                                 >
                                     {% trans "Save" %}
                                 </button>
                             </div>
                             <!-- /ko -->
                         <!-- /ko -->
-
                     </div>
 
                     <!-- ko if: manageMultipleTiles -->
                     <div 
                         style="
-                            width: 40%;
+                            width: 80%;
                             padding: 12px;
                             border: 1px solid #ddd;
                             border-radius: 2px;
@@ -143,7 +142,7 @@
                                                     {% trans "Remove" %}
                                                 </span>
                                             </div>
-                                            <div data-bind="click: function(){$parent.foo($data)}">
+                                            <div data-bind="click: function(){$parent.loadEntryIntoEditor($data)}">
                                                 <i class="fa fa-pencil"></i>
                                                 <span>
                                                     {% trans "Edit" %}
