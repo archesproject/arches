@@ -13009,6 +13009,7 @@ a.jstree-anchor.permissions-widget {
 .workbench-card-wrapper .workbench-card-container-wrapper {
     height: 100%;
     width: calc(100% - 75px);
+    position: absolute;
 }
 
 .workbench-card-container.gallery-visible {
