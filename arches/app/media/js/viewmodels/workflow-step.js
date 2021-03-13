@@ -126,9 +126,18 @@ define([
             }
         };
 
+
+        this.clearCallback = ko.observable();
+
         this.clear = function() {
             if (self.hasDirtyTile()) {
-                self.tile().reset();
+                if (ko.unwrap(self.tile)) {
+                    self.tile().reset();
+                }
+
+                if (ko.unwrap(self.clearCallback)) {
+                    self.clearCallback()();
+                }
             }
         }
 
