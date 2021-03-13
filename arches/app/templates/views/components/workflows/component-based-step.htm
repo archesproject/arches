@@ -34,6 +34,9 @@
                             width: 100%;
                         "
                     >
+
+                    <!-- ko if: card() && tile() -->
+                        <div style="display:none" data-bind="text: console.log('!!!!!!!', $data, $parent)"></div>
                         <div data-bind="component: {
                             name: componentName,
                             params: {
@@ -42,6 +45,7 @@
                                 pageVm: $root
                             }
                         }"></div>
+                        <!-- /ko -->
 
                         <!-- ko if: tilesManaged === "many" -->
                             <!-- ko if: editingData() || isDirty() -->

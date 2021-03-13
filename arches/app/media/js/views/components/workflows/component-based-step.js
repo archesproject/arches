@@ -13,20 +13,16 @@ define([
     function WorkflowComponentAbstract(componentConfig, loading, title, previouslyPersistedComponentData, resourceId) {
         var self = this;
 
-        var params = componentConfig.parameters;  /* CLEAN THIS OUT */
-
         this.resourceId = resourceId;
-
+        
         this.componentName = componentConfig.componentName;
         this.componentParameters = componentConfig.parameters;
-
         this.tilesManaged = componentConfig.tilesManaged;
 
         this.addedData = ko.observableArray();
         this.savedData = ko.observableArray();
 
         // this.loading = ko.observable(loading());  /* MUST NOT be able to set parent loading state */
-
         this.loading = loading;
 
         this.hasUnsavedData = ko.computed(function() {
@@ -48,6 +44,8 @@ define([
         this.initialize = function() {
             self.loading(true);
 
+            console.log("INIT", self, componentConfig, self.loading())
+
             if (this.tilesManaged === "one") {
                 self.initializeTileBasedComponent(previouslyPersistedComponentData);
             }
@@ -59,6 +57,8 @@ define([
 
         this.initializeTileBasedComponent = function(previouslyPersistedData) {
             self.tile = ko.observable();
+
+            self.loading(true)
 
             if (!self.tilesManaged === "many") {
                 self.tile.subscribe(function(sd) {
@@ -132,7 +132,7 @@ define([
                     });
                     return !nodegroup || !nodegroup.parentnodegroup_id;
                 }).map(function(card) {
-                    params.nodegroupid = params.nodegroupid || card.nodegroup_id;
+                    componentConfig.parameters.nodegroupid = componentConfig.parameters.nodegroupid || card.nodegroup_id;
                     return new CardViewModel({
                         card: card,
                         graphModel: graphModel,
@@ -172,30 +172,24 @@ define([
                 };
     
                 self.flattenTree(self.topCards, []).forEach(function(item) {
-                    if (item.constructor.name === 'CardViewModel' && item.nodegroupid === ko.unwrap(params.nodegroupid)) {
-                        if (ko.unwrap(params.parenttileid) && item.parent && ko.unwrap(params.parenttileid) !== item.parent.tileid) {
+                    if (item.constructor.name === 'CardViewModel' && item.nodegroupid === ko.unwrap(componentConfig.parameters.nodegroupid)) {
+                        if (ko.unwrap(componentConfig.parameters.parenttileid) && item.parent && ko.unwrap(componentConfig.parameters.parenttileid) !== item.parent.tileid) {
                             return;
                         }
                         if (self.customCardLabel) item.model.name(ko.unwrap(self.customCardLabel));
                         self.card(item);
-                        if (ko.unwrap(params.tileid)) {
+                        if (ko.unwrap(componentConfig.parameters.tileid)) {
                             ko.unwrap(item.tiles).forEach(function(tile) {
-                                if (tile.tileid === ko.unwrap(params.tileid)) {
+                                if (tile.tileid === ko.unwrap(componentConfig.parameters.tileid)) {
                                     self.tile(tile);
                                 }
                             });
-                        } else if (ko.unwrap(params.createTile) !== false) {
+                        } else if (ko.unwrap(componentConfig.parameters.createTile) !== false) {
                             self.tile(item.getNewTile());
                         }
                     }
                 });
     
-                
-                componentConfig.parameters.card = self.card();
-                componentConfig.parameters.tile = self.tile();
-                componentConfig.parameters.loading = loading;
-                componentConfig.parameters.provisionalTileViewModel = self.provisionalTileViewModel;
-                componentConfig.parameters.reviewer = data.userisreviewer;
 
                 if (!self.tilesManaged === "many") {
                     self.save = function() {
@@ -213,9 +207,16 @@ define([
 
                 }
 
+                console.log("AAAddddddAAAAA", componentConfig, self.loading())
                 if (self.card() && self.tile()) {
+                    console.log("AAAAAAAA", componentConfig, self.loading())
+                    componentConfig.parameters.card = self.card();
+                    componentConfig.parameters.tile = self.tile();
+                    componentConfig.parameters.loading = loading;
+                    componentConfig.parameters.provisionalTileViewModel = self.provisionalTileViewModel;
+                    componentConfig.parameters.reviewer = data.userisreviewer;
 
-                    loading(false);
+                    self.loading(false);
                 }
             });
         };
@@ -233,13 +234,12 @@ define([
                 });
             }
 
-
             this.editingData = ko.observable(false);
 
             this.itemName = ko.observable(ko.unwrap(title) ? ko.unwrap(title) : 'Items');
 
             this.addOrUpdateEntry = function() {
-                loading(true)
+                // self.loading(true)
 
                 var tileData = koMapping.toJS(self.tile().data);
 
@@ -257,11 +257,11 @@ define([
 
                 self.tile().reset();
 
-                loading(false)
+                // self.loading(false)
             }
 
             this.loadEntryIntoEditor = function(data) {
-                loading(true)
+                // self.loading(true)
 
                 self.editingData(data);
 
@@ -274,7 +274,7 @@ define([
                     }
                 });
 
-                loading(false)
+                // self.loading(false)
             }
 
             this.save = function() {
@@ -306,6 +306,8 @@ define([
                 var removedTiles = [];
 
                 self.savedData().forEach(function(data) {
+
+                    // BUG HERE MAYBE
                     var tile = self.tile();
                     tile.tileid = data.tileid;
 
@@ -341,8 +343,6 @@ define([
                     }
                 });
 
-                self.tile().reset();
-
                 removedTiles.forEach(function(data) {
                     var tile = self.tile();
                     tile.tileid = data.tileid;
@@ -351,6 +351,8 @@ define([
                 });
 
                 self.savedData.removeAll(removedTiles);
+
+                self.tile().reset();
             };
 
             this.reset = function() {
@@ -433,6 +435,8 @@ define([
         /* END source-of-truth for page data */
 
         this.initialize = function() {
+            self.loading(true);
+
             if (ko.unwrap(params.resourceid)) {
                 self.resourceId(ko.unwrap(params.resourceid));
             } 
@@ -455,8 +459,6 @@ define([
             params.postSaveCallback(function() {
                 self.hasUnsavedData(false);
             });
-
-            self.loading(true);
 
             var previouslyPersistedData = ko.unwrap(params.value);
 
