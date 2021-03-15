@@ -17,6 +17,8 @@ define([
             this.metadataLabel = ko.observable('');
             this.metadataValues = ko.observable('');
             this.mainMenu = ko.observable(true);
+            this.editService = ko.observable(false);
+            this.createService = ko.observable(true);
             this.alert = params.alert;
             this.addCanvas = function(canvas) { //the function name needs to be better
                 self.canvasesForDeletion.push(canvas);
@@ -29,7 +31,10 @@ define([
             };
 
             IIIFViewerViewmodel.apply(this, [params]);
-
+            this.showTabs(false);
+            this.mainMenu.subscribe(function(val){
+                val || self.showTabs(true);
+            });
             this.isManifestDirty = ko.computed(function() {
                 return ((ko.unwrap(self.manifestName) !== self.origManifestName) ||
                         (ko.unwrap(self.manifestDescription) !== self.origManifestDescription) ||
@@ -204,6 +209,12 @@ define([
                 self.submitToManifest();
             };
 
+            this.manifestSelectConfig.placeholder = 'Select an Image Service';
+            this.manifest.subscribe(function(val){
+                self.getManifestData(val);
+                self.mainMenu(false);
+            });
+          
             this.dropzoneOptions4create = {
                 url: "arches.urls.root",
                 dictDefaultMessage: '',
