@@ -19,13 +19,13 @@ class ExcelWriter(TileCsvWriter):
 
         for csv_file in csv_files:
             # create a tab/worksheet for every csv file
-            ws = wb.create_sheet(title=csv_file["name"].split(".csv")[0])
+            csv_file_name, extension = os.path.splitext(csv_file["name"])
+            ws = wb.create_sheet(title=csv_file_name)
             for row in csv.reader(csv_file["outputfile"].getvalue().split("\r\n")):
                 ws.append(row)
         # delete default blank first sheet in workbook
         del wb["Sheet"]
 
-        # save virtual workbook so
         virtual_workbook = BytesIO()
         wb.save(virtual_workbook)
 
