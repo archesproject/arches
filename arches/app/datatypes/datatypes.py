@@ -320,10 +320,15 @@ class DateDataType(BaseDataType):
             value = value[0]
         valid_date_format, valid = self.get_valid_date_format(value)
         if valid:
-            value = datetime.strptime(value, valid_date_format).astimezone().isoformat(timespec="milliseconds")
+            v = datetime.strptime(value, valid_date_format)
         else:
             v = datetime.strptime(value, settings.DATE_IMPORT_EXPORT_FORMAT)
-            value = v.astimezone().isoformat(timespec="milliseconds")
+        if not sys.platform == "win32":
+            v = v.astimezone()
+        else: # current python bug causes error on Windows machines when calling .astimezone() on a datetime before 1970 (start of epoch)
+            if datetime >= datetime.fromtimestamp(0):
+            v = v.astimezone()
+        value = v.isoformat(timespec="milliseconds")
         return value
 
     def transform_export_values(self, value, *args, **kwargs):
