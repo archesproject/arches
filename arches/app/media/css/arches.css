@@ -666,10 +666,6 @@ input[type="checkbox"] {
     width: unset;
 }
 
-.tabbed-workflow-step-body .new-provisional-edit-card-container .card {
-    padding: 25px 10px;
-}
-
 .tabbed-workflow-step-body .create-resource-instance-card-component .install-buttons {
     display: unset;
 }
