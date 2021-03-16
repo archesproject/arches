@@ -1126,7 +1126,7 @@ ul.tabbed-report-tab-list {
     cursor: pointer;
 }
 
-.card-component-panel .workbench-tile-picker-label {
+.workbench-tile-picker-label {
     font-weight: 600;
     color: #666;
     margin-left: 10px;
