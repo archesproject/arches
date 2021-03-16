@@ -287,7 +287,7 @@ class TileCsvWriter(Writer):
             self.node_datatypes[nodeid] = datatype
 
         if value is not None:
-            value = self.node_datatypes[nodeid].transform_export_values(value)
+            value = self.node_datatypes[nodeid].transform_export_values(value, concept_export_value_type="label", node=nodeid)
 
         return value
 
