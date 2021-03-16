@@ -27,7 +27,7 @@ class Migration(migrations.Migration):
             'views/components/plugins/manifest-manager',
             'manifest-manager',
             '{"show": false}',
-            'manifest-manager',
+            'image-service-manager',
             1);
         """
     reverse_sql = """
