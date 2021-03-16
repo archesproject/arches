@@ -5,6 +5,7 @@ import base64
 import re
 import logging
 import os
+import sys
 from pathlib import Path
 import ast
 from distutils import util
@@ -320,10 +321,12 @@ class DateDataType(BaseDataType):
             value = value[0]
         valid_date_format, valid = self.get_valid_date_format(value)
         if valid:
-            value = datetime.strptime(value, valid_date_format).astimezone().isoformat(timespec="milliseconds")
+            v = datetime.strptime(value, valid_date_format)
         else:
             v = datetime.strptime(value, settings.DATE_IMPORT_EXPORT_FORMAT)
-            value = v.astimezone().isoformat(timespec="milliseconds")
+        if (not sys.platform.startswith("win")) or (v >= datetime.fromtimestamp(0)): # The .astimezone() function throws an error on Windows for dates before 1970
+            v = v.astimezone()
+        value = v.isoformat(timespec="milliseconds")
         return value
 
     def transform_export_values(self, value, *args, **kwargs):
