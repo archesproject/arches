@@ -276,7 +276,7 @@ urlpatterns = [
     url(r"^iiifannotations$", api.IIIFAnnotations.as_view(), name="iiifannotations"),
     url(r"^iiifannotationnodes$", api.IIIFAnnotationNodes.as_view(), name="iiifannotationnodes"),
     url(r"^manifest/(?P<id>[0-9]+)$", api.Manifest.as_view(), name="manifest"),
-    url(r"^manifest-manager", ManifestManagerView.as_view(), name="manifest_manager"),
+    url(r"^image-service-manager", ManifestManagerView.as_view(), name="manifest_manager"),
 ]
 
 if settings.DEBUG:

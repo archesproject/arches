@@ -592,7 +592,10 @@ input[type="checkbox"] {
 }
 
 .tabbed-workflow {
+    position: absolute;
+    width: 100%;
     height: 100%;
+    overflow: hidden;
     display: flex;
     flex-direction: column;
 }
@@ -603,7 +606,7 @@ input[type="checkbox"] {
     align-items: center;
     justify-content: space-between;
     border-bottom: 1px solid #ddd;
-    padding: 6px 64px 6px 12px;
+    padding: 6px 12px;
     font-size: medium;
     font-weight: 600;
 }
@@ -659,17 +662,6 @@ input[type="checkbox"] {
     color: grey;
 }
 
-.tabbed-workflow-step-body .padded-workflow-step {
-    width: calc(100vw - 50px);
-    padding: 10px;
-}
-
-.tabbed-workflow-step-body .card-component {
-    margin: unset;
-    width: calc(100vw - 50px);
-    padding: 0 25px;
-}
-
 .tabbed-workflow-step-body .create-resource-instance-card-component .card-component {
     width: unset;
 }
@@ -687,13 +679,14 @@ input[type="checkbox"] {
     display: none;
 }
 
+.tabbed-workflow-step-body .display-in-workflow-step.install-buttons {
+    bottom: 53px;
+    display: unset;
+}
+
 .tabbed-workflow-step-body > div {
     background-color: #fff !important;
     border: none !important;
-}
-
-.tabbed-workflow-step-body .workbench-card-wrapper {
-    width: calc(100vw - 50px);
 }
 
 .tabbed-workflow-step-body .install-buttons {
@@ -707,7 +700,7 @@ input[type="checkbox"] {
 .tabbed-workflow-footer {
     background-color: #fafafa;
     border-top: 1px solid #ddd;
-    padding: 10px 75px 10px 25px;
+    padding: 10px 12px;
     display: flex;
     justify-content: space-between;
 }
@@ -716,6 +709,7 @@ input[type="checkbox"] {
     display: flex;
     align-items: center;
     border-right: 1px solid #ddd;
+    padding-left: 12px;
     padding-right: 24px;
     margin-right: 18px;
 }
@@ -887,12 +881,17 @@ div.wf-multi-tile-card-info div {
 }
 
 .workflow-nav-tab-container {
-    width: 100vw;
     overflow-x: scroll;
+    min-height: 45px;
+}
+
+.tabbed-workflow-step-container {
+    flex: 1 1 auto;
+    overflow-y: scroll;
 }
 
 .workflow-nav-tab-list {
-    padding: 0px 55px 0px 10px;
+    padding: 0px 10px 0px 10px;
     background-color: #fafafa;
     display: flex;
     min-width: max-content;
@@ -905,14 +904,12 @@ div.wf-multi-tile-card-info div {
 .workflow-nav-tab {
     min-width: 220px;
     padding: 10px 20px;
-    border-right: 1px solid #ddd;
+    border-left: 1px solid #ddd;
 }
 
 .workflow-nav-tab.active {
     background-color: #fff;
     font-weight: 600;
-    border-left: 1px solid #ddd;
-    border-right: 1px solid #ddd;
 }
 
 .workflow-nav-tab.inactive {
@@ -1858,6 +1855,55 @@ div.final-cons-step-separator>h4 {
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
+}
+
+.manifest-manager-nav-tab {
+    height: 50px;
+    min-width: 220px;
+    padding: 10px 20px;
+    border-right: 1px solid #f1f1f1;
+    background-color: #ddd;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
+.manifest-manager-nav-tab.active {
+    background-color: #f6f6f6;
+    font-weight: 600;
+    border-left: 1px solid #ddd;
+    border-right: 1px solid #ddd;
+}
+
+.manifest-manager-nav-tab .tab-label {
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+    cursor: pointer;
+}
+
+.manifest-manager-main-menu-circle {
+    width: 75px;
+    height: 75px;
+    display: inline-block;
+    text-align: center;
+    padding: 20px;
+    border-radius: 50%;
+    background-color: #ccc;
+}
+
+.manifest-manager .dropzone-photo-upload {
+    margin-top: 15px;
+}
+
+.manifest-manager .loader-select {
+    height: 100%;
+    padding-top: 125px;
+}
+
+.manifest-manager .rr-splash-description {
+    width: 700px;
 }
 
 .basemap-listing,
@@ -10244,9 +10290,7 @@ ul.pagination {
 }
 
 .search-results-container {
-    padding: 10px 10px 5px 10px;
-    position: fixed;
-    top: 190px;
+    padding: 60px 10px;
     bottom: 50px;
     overflow-y: scroll;
     width: 400px;
@@ -13014,6 +13058,11 @@ a.jstree-anchor.permissions-widget {
 .workbench-card-wrapper .workbench-card-container-wrapper {
     height: 100%;
     width: calc(100% - 75px);
+}
+
+.workbench-card-wrapper .workbench-card-container-wrapper.wide {
+    height: 100%;
+    width: 100%;
 }
 
 .workbench-card-container.gallery-visible {
