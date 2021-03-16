@@ -181,16 +181,16 @@
     <ul class="nav nav-tabs">
             <li>
                 <div class='manifest-manager-nav-tab' data-bind="click: function(){createService(true); editService(false)}, css: { active: createService }">
-                    <div style="display: flex; flex-direction: row; justify-content: center; align-items: center;">
-                        Create New Service
+                    <div class='tab-label'>
+                        {% trans 'Create New Service' %}
                     </div>
                 </div>
             </li>
             <li>
             <div class='manifest-manager-nav-tab' data-bind=
                 "click: function(){createService(false); editService(true)}, css: { active: editService }">
-                <div style="display: flex; flex-direction: row; justify-content: center; align-items: center;">
-                    Edit a service
+                <div class='tab-label'>
+                    {% trans 'Edit a service' %}
                 </div>
             </div>
         </li>
