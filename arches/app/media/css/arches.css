@@ -882,6 +882,7 @@ div.wf-multi-tile-card-info div {
 
 .workflow-nav-tab-container {
     overflow-x: scroll;
+    min-height: 45px;
 }
 
 .tabbed-workflow-step-container {
