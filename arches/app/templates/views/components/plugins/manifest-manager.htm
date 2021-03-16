@@ -181,16 +181,16 @@
     <ul class="nav nav-tabs">
             <li>
                 <div class='manifest-manager-nav-tab' data-bind="click: function(){createService(true); editService(false)}, css: { active: createService }">
-                    <div style="display: flex; flex-direction: row; justify-content: center; align-items: center;">
-                        Create New Service
+                    <div class='tab-label'>
+                        {% trans 'Create New Service' %}
                     </div>
                 </div>
             </li>
             <li>
             <div class='manifest-manager-nav-tab' data-bind=
                 "click: function(){createService(false); editService(true)}, css: { active: editService }">
-                <div style="display: flex; flex-direction: row; justify-content: center; align-items: center;">
-                    Edit a service
+                <div class='tab-label'>
+                    {% trans 'Edit a service' %}
                 </div>
             </div>
         </li>
@@ -200,7 +200,7 @@
 <div class="manifest-manager" style="height: 100%;">
 
 <!--ko if: createService -->
-<div class="file-select loader-select" style="height: 100%;">
+<div data-bind="dropzone: dropzoneOptions4create" class="file-select loader-select" style="height: 100%;">
     <div style="display:flex; flex-direction: column; align-items: center;">
         <div class="manifest-manager-main-menu-circle loader-button">
             <span><i style="color: #000" class="fa fa-cloud-upload r-select-icon"></i></span>
@@ -209,7 +209,7 @@
         <h4>{% trans 'Import digital images and create a new image service' %}</h4>
         <div style="display: flex; padding: 15px 25px; flex-direction: column; justify-content: center; align-items: center;">
         <div style="display:flex; flex-direction: column;">
-            <div data-bind="dropzone: dropzoneOptions4create">
+            <div>
                 <div class="dropzone-photo-upload">
                     <div style="border-top: 1px solid #c4c4c4; margin-bottom: 15px;" class="btn btn-rr btn-labeled btn-lg fa fa-image fileinput-create-button dz-clickable" data-bind="css: uniqueidClass" role="button">
                     {% trans 'Select Images' %}
@@ -220,9 +220,8 @@
                 </div>
             </div>
         </div>
-        <h5 class="rr-splash-description">Create a new service by uploading one or more images. Images will be uploaded and processes so that you can
-            view, annotate, and share them with others</h5>
-    </div>
+        <h5 class="rr-splash-description">{% trans 'Create a new service by uploading one or more images. Images will be uploaded and processes so that you can view, annotate, and share them with others' %}</h5>
+        </div>
 </div>
 </div>
 <!-- /ko -->
@@ -244,8 +243,7 @@
                     }">
             </div>
         </div>
-        <h5 class="rr-splash-description">Update the information and images related to an existing Image Service.
-            Or copy and paste in the URL of a IIIF Manifest to add a service from an external service</h5>
+        <h5 class="rr-splash-description">{% trans 'Update the information and images related to an existing Image Service. Or copy and paste in the URL of a IIIF Manifest to add a service from an external service' %}</h5>
     </div>
 </div>
 </div>

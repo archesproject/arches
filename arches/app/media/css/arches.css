@@ -1874,6 +1874,14 @@ div.final-cons-step-separator>h4 {
     border-right: 1px solid #ddd;
 }
 
+.manifest-manager-nav-tab .tab-label {
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+    cursor: pointer;
+}
+
 .manifest-manager-main-menu-circle {
     width: 75px;
     height: 75px;
