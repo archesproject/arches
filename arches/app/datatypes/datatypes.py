@@ -324,7 +324,9 @@ class DateDataType(BaseDataType):
             v = datetime.strptime(value, valid_date_format)
         else:
             v = datetime.strptime(value, settings.DATE_IMPORT_EXPORT_FORMAT)
-        if (not sys.platform.startswith("win")) or (v >= datetime.fromtimestamp(0)): # The .astimezone() function throws an error on Windows for dates before 1970
+        if (not sys.platform.startswith("win")) or (
+            v >= datetime.fromtimestamp(0)
+        ):  # The .astimezone() function throws an error on Windows for dates before 1970
             v = v.astimezone()
         value = v.isoformat(timespec="milliseconds")
         return value
