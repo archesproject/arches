@@ -47,7 +47,7 @@
                         }"></div>
 
                         <!-- ko if: componentData['tilesManaged'] === "many" -->
-                            <!-- ko if: editingData() || isDirty() -->
+                            <!-- ko if: currentlyEditedData() || isDirty() -->
                             <div
                                 style="
                                     display: flex;
@@ -67,7 +67,7 @@
                                     class="btn btn-success" 
                                     data-bind="{
                                         click: addOrUpdateEntry,
-                                        text: editingData() ? 'Save' : 'Add'
+                                        text: currentlyEditedData() ? 'Save' : 'Add'
                                     }"
                                 ></button>
                             </div>
