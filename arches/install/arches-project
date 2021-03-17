@@ -53,9 +53,12 @@ class ArchesCommand(TemplateCommand):
         # this is used in the package.json file generated when "arches-project create" is called
         # if this is not a final released version of arches (for developers) then arches_version will be blank
         # and the arches dependency defined in the generated package.json file will point to "master"
+        complete_version = get_complete_version()
         options["arches_version"] = "master"
-        if get_complete_version()[3] == 'final':
-            options["arches_version"] = __version__
+        if complete_version[3] == 'final':
+            options["arches_version"] = f"stable/{__version__}"
+        elif complete_version[3] == 'beta':
+            options["arches_version"] = f"stable/{complete_version[0]}.{complete_version[1]}.x"
 
         super(ArchesCommand, self).handle('project', project_name, target, **options)
 
