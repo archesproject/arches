@@ -10,14 +10,330 @@ define([
     'viewmodels/provisional-tile',
     'viewmodels/alert'
 ], function(_, $, arches, ko, koMapping, uuid, GraphModel, CardViewModel, ProvisionalTileViewModel) {
-    function WorkflowComponentAbstract(componentConfig, loading, title, previouslyPersistedComponentData, resourceId) {
+    function TileBasedComponent(previouslyPersistedComponentData, tilesManaged, componentConfig, loading) {
+        var self = this;
+        this.tilesManaged = tilesManaged;
+
+        this.tile = ko.observable();
+
+        if (!self.tilesManaged === "many") {
+            self.tile.subscribe(function(sd) {
+                if (sd) {
+                    if (previouslyPersistedComponentData) {
+                        var tile = self.tile();
+
+                        /* force the value of current tile data observables */ 
+                        Object.keys(tile.data).forEach(function(key) {
+                            if (ko.isObservable(tile.data[key])) {
+                                tile.data[key](previouslyPersistedComponentData[0].data[key]);
+                            }
+                        });
+
+                        tile._tileData(koMapping.toJSON(tile.data));
+                    }
+                }
+            })
+        }
+
+        self.isDirty = ko.computed(function() {
+            if (self.tile()) {
+                return self.tile().dirty();
+            }
+
+            return false;
+        });
+
+        if (!self.tilesManaged === "many") {
+            self.isDirty.subscribe(function() {
+                self.addedData.removeAll();
+                self.addedData.push(self.tile().data);
+            });
+        }
+
+        self.card = ko.observable();
+        self.topCards = ko.observable();
+
+        var url = arches.urls.api_card + this.getCardResourceIdOrGraphId();
+        $.getJSON(url, function(data) {
+            var handlers = {
+                'after-update': [],
+                'tile-reset': []
+            };
+            var displayname = ko.observable(data.displayname);
+            var createLookup = function(list, idKey) {
+                return _.reduce(list, function(lookup, item) {
+                    lookup[item[idKey]] = item;
+                    return lookup;
+                }, {});
+            };
+
+            self.reviewer = data.userisreviewer;
+            self.provisionalTileViewModel = new ProvisionalTileViewModel({
+                tile: self.tile,
+                reviewer: data.userisreviewer
+            });
+
+            var graphModel = new GraphModel({
+                data: {
+                    nodes: data.nodes,
+                    nodegroups: data.nodegroups,
+                    edges: []
+                },
+                datatypes: data.datatypes
+            });
+
+            self.topCards = _.filter(data.cards, function(card) {
+                var nodegroup = _.find(data.nodegroups, function(group) {
+                    return group.nodegroupid === card.nodegroup_id;
+                });
+                return !nodegroup || !nodegroup.parentnodegroup_id;
+            }).map(function(card) {
+                componentConfig.parameters.nodegroupid = componentConfig.parameters.nodegroupid || card.nodegroup_id;
+                return new CardViewModel({
+                    card: card,
+                    graphModel: graphModel,
+                    tile: null,
+                    resourceId: self.resourceId,
+                    displayname: displayname,
+                    handlers: handlers,
+                    cards: data.cards,
+                    tiles: data.tiles,
+                    provisionalTileViewModel: self.provisionalTileViewModel,
+                    cardwidgets: data.cardwidgets,
+                    userisreviewer: data.userisreviewer,
+                    loading: self.loading
+                });
+            });
+
+            self.topCards.forEach(function(topCard) {
+                topCard.topCards = self.topCards;
+            });
+
+            self.widgetLookup = createLookup(
+                data.widgets,
+                'widgetid'
+            );
+            self.cardComponentLookup = createLookup(
+                data['card_components'],
+                'componentid'
+            );
+            self.nodeLookup = createLookup(
+                graphModel.get('nodes')(),
+                'nodeid'
+            );
+            self.on = function(eventName, handler) {
+                if (handlers[eventName]) {
+                    handlers[eventName].push(handler);
+                }
+            };
+
+            self.flattenTree(self.topCards, []).forEach(function(item) {
+                if (item.constructor.name === 'CardViewModel' && item.nodegroupid === ko.unwrap(componentConfig.parameters.nodegroupid)) {
+                    if (ko.unwrap(componentConfig.parameters.parenttileid) && item.parent && ko.unwrap(componentConfig.parameters.parenttileid) !== item.parent.tileid) {
+                        return;
+                    }
+                    if (self.customCardLabel) item.model.name(ko.unwrap(self.customCardLabel));
+                    self.card(item);
+                    if (ko.unwrap(componentConfig.parameters.tileid)) {
+                        ko.unwrap(item.tiles).forEach(function(tile) {
+                            if (tile.tileid === ko.unwrap(componentConfig.parameters.tileid)) {
+                                self.tile(tile);
+                            }
+                        });
+                    } else if (ko.unwrap(componentConfig.parameters.createTile) !== false) {
+                        self.tile(item.getNewTile());
+                    }
+                }
+            });
+
+
+            if (!self.tilesManaged === "many") {
+                self.save = function() {
+                        self.tile().save(
+                            function(){/* onFail */},
+                            function(savedTileData) {
+                                self.savedData.unshift(savedTileData);
+                            },
+                        )
+                };
+
+                self.reset = function() {
+                    self.tile().reset();
+                };
+            }
+
+            componentConfig.parameters.card = self.card();
+            componentConfig.parameters.tile = self.tile();
+            componentConfig.parameters.loading = loading;
+            componentConfig.parameters.provisionalTileViewModel = self.provisionalTileViewModel;
+            componentConfig.parameters.reviewer = data.userisreviewer;
+
+            self.loading(false);
+        });
+    };
+
+
+    function MultipleTileBasedComponent(previouslyPersistedComponentData, loading, title, tilesManaged, componentConfig) {
+        var self = this;
+
+        TileBasedComponent.apply(this, [previouslyPersistedComponentData, tilesManaged, componentConfig, loading] );
+
+        this.loading = loading;
+
+        if (previouslyPersistedComponentData) {
+            previouslyPersistedComponentData.forEach(function(previouslyPersistedDatum) {
+                if (previouslyPersistedDatum.tileid) {
+                    /* add tileid to nodeData for reference. */ 
+                    previouslyPersistedDatum.data.tileid = previouslyPersistedDatum.tileid;
+                }
+
+                self.addedData.push(previouslyPersistedDatum.data);
+                self.savedData.push(previouslyPersistedDatum);
+            });
+        }
+
+        this.editingData = ko.observable(false);
+
+        this.itemName = ko.observable(ko.unwrap(title) ? ko.unwrap(title) : 'Items');
+
+        this.addOrUpdateEntry = function() {
+            var tileData = koMapping.toJS(self.tile().data);
+
+            var editingData = self.editingData();
+
+            tileData.tileid = editingData.tileid;
+
+            if (editingData) {
+                self.addedData.replace(editingData, tileData);
+                self.editingData(false);
+            }
+            else {
+                this.addedData.unshift(tileData);
+            }
+
+            self.tile().reset();
+        }
+
+        this.loadEntryIntoEditor = function(data) {
+            self.editingData(data);
+
+            var tile = self.tile();
+
+            /* force the value of current tile data observables */ 
+            Object.keys(tile.data).forEach(function(key) {
+                if (ko.isObservable(tile.data[key])) {
+                    tile.data[key](data[key]);
+                }
+            });
+        }
+
+        this.save = function() {
+            self.loading(true);
+
+            /* save new tiles */ 
+            self.addedData().forEach(function(data) {
+                var tile = self.tile();
+
+                /* force the value of current tile data observables */ 
+                Object.keys(tile.data).forEach(function(key) {
+                    if (ko.isObservable(tile.data[key])) {
+                        tile.data[key](data[key]);
+                    }
+                });
+                
+                /* if it already has a tileid here, it's a previously saved tile */ 
+                if (!data.tileid) {
+                    tile.save(
+                        function(){/* onFail */}, 
+                        function(savedTileData) {
+                            self.savedData.unshift(savedTileData);
+                        },
+                    );
+                }
+                self.tile(self.card().getNewTile());
+            });
+
+            var removedTiles = [];
+
+            self.savedData().forEach(function(data) {
+                var tile = self.tile();
+                tile.tileid = data.tileid;
+
+                var editedData = ko.utils.arrayFirst(self.addedData(), function(addedDatum) {
+                    return addedDatum.tileid === data.tileid;
+                });
+
+                if (!editedData) {
+                    /* means we removed the tile from the list */
+                    removedTiles.push(data)
+                }
+                else {
+                    /* force the value of current tile data observables */ 
+                    Object.keys(tile.data).forEach(function(key) {
+                        if (ko.isObservable(tile.data[key])) {
+                            tile.data[key](editedData[key]);
+                        }
+                    });
+
+                    tile.save(
+                        function(){/* onFail */},
+                        function(savedTileData) {
+                            var previousTileData = ko.utils.arrayFirst(self.savedData(), function(savedDatum) {
+                                return savedDatum.tileid === savedTileData.tileid;
+                            });
+
+                            self.savedData.replace(previousTileData, savedTileData);
+                            self.addedData.replace(previousTileData.data, savedTileData.data);
+                        },
+                    )
+
+                    self.tile(self.card().getNewTile());
+                }
+            });
+
+            removedTiles.forEach(function(data) {
+                var tile = self.tile();
+                tile.tileid = data.tileid;
+
+                tile.deleteTile();
+            });
+
+            self.savedData.removeAll(removedTiles);
+
+            self.editingData(false);
+            self.tile().reset();
+        };
+
+        this.reset = function() {
+            self.editingData(false);
+            self.tile().reset();
+
+            self.addedData.removeAll();
+            self.savedData.removeAll();
+
+            if (previouslyPersistedComponentData) {
+                previouslyPersistedComponentData.forEach(function(previouslyPersistedDatum) {
+                    if (previouslyPersistedDatum.tileid) {
+                        /* add tileid to nodeData for reference. */ 
+                        previouslyPersistedDatum.data.tileid = previouslyPersistedDatum.tileid;
+                    }
+
+                    self.addedData.push(previouslyPersistedDatum.data);
+                    self.savedData.push(previouslyPersistedDatum);
+                });
+            }
+        }
+    };
+
+
+    function WorkflowComponentAbstract(componentConfig, title, previouslyPersistedComponentData, resourceId) {
         var self = this;
 
         this.resourceId = resourceId;
         
+        this.tilesManaged = componentConfig.tilesManaged;
         this.componentName = componentConfig.componentName;
         this.componentParameters = componentConfig.parameters;
-        this.tilesManaged = componentConfig.tilesManaged;
 
         this.addedData = ko.observableArray();
         this.savedData = ko.observableArray();
@@ -43,344 +359,15 @@ define([
         this.initialize = function() {
             self.loading(true);
 
-            console.log("INIT", self, componentConfig, self.loading())
-
             if (this.tilesManaged === "one") {
-                self.initializeTileBasedComponent(previouslyPersistedComponentData);
+                TileBasedComponent.apply(this, [previouslyPersistedComponentData, this.tilesManaged, componentConfig, this.loading] );
             }
             else if (this.tilesManaged === "many") {
-                self.initializeMultipleTileBasedComponent(previouslyPersistedComponentData);
+                MultipleTileBasedComponent.apply(this, [previouslyPersistedComponentData, this.loading, title, this.tilesManaged, componentConfig] );
             }
-
         };
 
-        this.initializeTileBasedComponent = function(previouslyPersistedData) {
-            self.tile = ko.observable();
-
-            // self.loading(true)
-
-            if (!self.tilesManaged === "many") {
-                self.tile.subscribe(function(sd) {
-                    if (sd) {
-                        if (previouslyPersistedData) {
-                            var tile = self.tile();
-    
-                            /* force the value of current tile data observables */ 
-                            Object.keys(tile.data).forEach(function(key) {
-                                if (ko.isObservable(tile.data[key])) {
-                                    tile.data[key](previouslyPersistedData[0].data[key]);
-                                }
-                            });
-    
-                            tile._tileData(koMapping.toJSON(tile.data));
-                        }
-                    }
-                })
-            }
-
-            self.isDirty = ko.computed(function() {
-                if (self.tile()) {
-                    return self.tile().dirty();
-                }
-
-                return false;
-            });
-
-            if (!self.tilesManaged === "many") {
-                self.isDirty.subscribe(function() {
-                    self.addedData.removeAll();
-                    self.addedData.push(self.tile().data);
-                });
-            }
-
-            self.card = ko.observable();
-            self.topCards = ko.observable();
-
-            var url = arches.urls.api_card + this.getCardResourceIdOrGraphId();
-            $.getJSON(url, function(data) {
-                /* important to ensure load is set here to keep components from rendering before they're ready */
-                // self.loading(true);  
-
-                var handlers = {
-                    'after-update': [],
-                    'tile-reset': []
-                };
-                var displayname = ko.observable(data.displayname);
-                var createLookup = function(list, idKey) {
-                    return _.reduce(list, function(lookup, item) {
-                        lookup[item[idKey]] = item;
-                        return lookup;
-                    }, {});
-                };
-    
-                self.reviewer = data.userisreviewer;
-                self.provisionalTileViewModel = new ProvisionalTileViewModel({
-                    tile: self.tile,
-                    reviewer: data.userisreviewer
-                });
-    
-                var graphModel = new GraphModel({
-                    data: {
-                        nodes: data.nodes,
-                        nodegroups: data.nodegroups,
-                        edges: []
-                    },
-                    datatypes: data.datatypes
-                });
-    
-                self.topCards = _.filter(data.cards, function(card) {
-                    var nodegroup = _.find(data.nodegroups, function(group) {
-                        return group.nodegroupid === card.nodegroup_id;
-                    });
-                    return !nodegroup || !nodegroup.parentnodegroup_id;
-                }).map(function(card) {
-                    componentConfig.parameters.nodegroupid = componentConfig.parameters.nodegroupid || card.nodegroup_id;
-                    return new CardViewModel({
-                        card: card,
-                        graphModel: graphModel,
-                        tile: null,
-                        resourceId: self.resourceId,
-                        displayname: displayname,
-                        handlers: handlers,
-                        cards: data.cards,
-                        tiles: data.tiles,
-                        provisionalTileViewModel: self.provisionalTileViewModel,
-                        cardwidgets: data.cardwidgets,
-                        userisreviewer: data.userisreviewer,
-                        loading: self.loading
-                    });
-                });
-    
-                self.topCards.forEach(function(topCard) {
-                    topCard.topCards = self.topCards;
-                });
-    
-                self.widgetLookup = createLookup(
-                    data.widgets,
-                    'widgetid'
-                );
-                self.cardComponentLookup = createLookup(
-                    data['card_components'],
-                    'componentid'
-                );
-                self.nodeLookup = createLookup(
-                    graphModel.get('nodes')(),
-                    'nodeid'
-                );
-                self.on = function(eventName, handler) {
-                    if (handlers[eventName]) {
-                        handlers[eventName].push(handler);
-                    }
-                };
-    
-                self.flattenTree(self.topCards, []).forEach(function(item) {
-                    if (item.constructor.name === 'CardViewModel' && item.nodegroupid === ko.unwrap(componentConfig.parameters.nodegroupid)) {
-                        if (ko.unwrap(componentConfig.parameters.parenttileid) && item.parent && ko.unwrap(componentConfig.parameters.parenttileid) !== item.parent.tileid) {
-                            return;
-                        }
-                        if (self.customCardLabel) item.model.name(ko.unwrap(self.customCardLabel));
-                        self.card(item);
-                        if (ko.unwrap(componentConfig.parameters.tileid)) {
-                            ko.unwrap(item.tiles).forEach(function(tile) {
-                                if (tile.tileid === ko.unwrap(componentConfig.parameters.tileid)) {
-                                    self.tile(tile);
-                                }
-                            });
-                        } else if (ko.unwrap(componentConfig.parameters.createTile) !== false) {
-                            self.tile(item.getNewTile());
-                        }
-                    }
-                });
-    
-
-                if (!self.tilesManaged === "many") {
-                console.log("AAAddddddAAAAA", componentConfig, self.loading())
-
-                    self.save = function() {
-                            self.tile().save(
-                                function(){/* onFail */},
-                                function(savedTileData) {
-                                    self.savedData.unshift(savedTileData);
-                                },
-                            )
-                    };
-
-                    self.reset = function() {
-                        self.tile().reset();
-                    };
-                }
-
-                // if (self.card() && self.tile()) {
-                    console.log("AAAAAAAA", componentConfig, self.loading())
-                    componentConfig.parameters.card = self.card();
-                    componentConfig.parameters.tile = self.tile();
-                    componentConfig.parameters.loading = loading;
-                    componentConfig.parameters.provisionalTileViewModel = self.provisionalTileViewModel;
-                    componentConfig.parameters.reviewer = data.userisreviewer;
-
-                    self.loading(false);
-                // }
-            });
-        };
-
-        this.initializeMultipleTileBasedComponent = function(previouslyPersistedData) {
-            if (previouslyPersistedData) {
-                previouslyPersistedData.forEach(function(previouslyPersistedDatum) {
-                    if (previouslyPersistedDatum.tileid) {
-                        /* add tileid to nodeData for reference. */ 
-                        previouslyPersistedDatum.data.tileid = previouslyPersistedDatum.tileid;
-                    }
-
-                    self.addedData.push(previouslyPersistedDatum.data);
-                    self.savedData.push(previouslyPersistedDatum);
-                });
-            }
-
-            this.editingData = ko.observable(false);
-
-            this.itemName = ko.observable(ko.unwrap(title) ? ko.unwrap(title) : 'Items');
-
-            this.addOrUpdateEntry = function() {
-                // self.loading(true)
-
-                var tileData = koMapping.toJS(self.tile().data);
-
-                var editingData = self.editingData();
-
-                tileData.tileid = editingData.tileid;
-
-                if (editingData) {
-                    self.addedData.replace(editingData, tileData);
-                    self.editingData(false);
-                }
-                else {
-                    this.addedData.unshift(tileData);
-                }
-
-                self.tile().reset();
-
-                // self.loading(false)
-            }
-
-            this.loadEntryIntoEditor = function(data) {
-                // self.loading(true)
-
-                self.editingData(data);
-
-                var tile = self.tile();
-
-                /* force the value of current tile data observables */ 
-                Object.keys(tile.data).forEach(function(key) {
-                    if (ko.isObservable(tile.data[key])) {
-                        tile.data[key](data[key]);
-                    }
-                });
-
-                // self.loading(false)
-            }
-
-            this.save = function() {
-                self.loading(true);
-
-                /* save new tiles */ 
-                self.addedData().forEach(function(data) {
-                    var tile = self.tile();
-
-                    /* force the value of current tile data observables */ 
-                    Object.keys(tile.data).forEach(function(key) {
-                        if (ko.isObservable(tile.data[key])) {
-                            tile.data[key](data[key]);
-                        }
-                    });
-                    
-                    /* if it already has a tileid here, it's a previously saved tile */ 
-                    if (!data.tileid) {
-                        tile.save(
-                            function(){/* onFail */}, 
-                            function(savedTileData) {
-                                self.savedData.unshift(savedTileData);
-                            },
-                        );
-                    }
-                    self.tile(self.card().getNewTile());
-                });
-
-                var removedTiles = [];
-
-                self.savedData().forEach(function(data) {
-
-                    // BUG HERE MAYBE
-                    var tile = self.tile();
-                    tile.tileid = data.tileid;
-
-                    var editedData = ko.utils.arrayFirst(self.addedData(), function(addedDatum) {
-                        return addedDatum.tileid === data.tileid;
-                    });
-
-                    if (!editedData) {
-                        /* means we removed the tile from the list */
-                        removedTiles.push(data)
-                    }
-                    else {
-                        /* force the value of current tile data observables */ 
-                        Object.keys(tile.data).forEach(function(key) {
-                            if (ko.isObservable(tile.data[key])) {
-                                tile.data[key](editedData[key]);
-                            }
-                        });
-
-                        tile.save(
-                            function(){/* onFail */},
-                            function(savedTileData) {
-                                var previousTileData = ko.utils.arrayFirst(self.savedData(), function(savedDatum) {
-                                    return savedDatum.tileid === savedTileData.tileid;
-                                });
-
-                                self.savedData.replace(previousTileData, savedTileData);
-                                self.addedData.replace(previousTileData.data, savedTileData.data);
-                            },
-                        )
-
-                        self.tile(self.card().getNewTile());
-                    }
-                });
-
-                removedTiles.forEach(function(data) {
-                    var tile = self.tile();
-                    tile.tileid = data.tileid;
-
-                    tile.deleteTile();
-                });
-
-                self.savedData.removeAll(removedTiles);
-
-                self.tile().reset();
-            };
-
-            this.reset = function() {
-                self.editingData(false);
-                self.tile().reset();
-
-                self.addedData.removeAll();
-                self.savedData.removeAll();
-
-                if (previouslyPersistedData) {
-                    previouslyPersistedData.forEach(function(previouslyPersistedDatum) {
-                        if (previouslyPersistedDatum.tileid) {
-                            /* add tileid to nodeData for reference. */ 
-                            previouslyPersistedDatum.data.tileid = previouslyPersistedDatum.tileid;
-                        }
-    
-                        self.addedData.push(previouslyPersistedDatum.data);
-                        self.savedData.push(previouslyPersistedDatum);
-                    });
-                }
-            }
-
-            self.initializeTileBasedComponent();
-        };
-
-        this.getCardResourceIdOrGraphId = function() { // override for different cases
+        this.getCardResourceIdOrGraphId = function() {
             return (ko.unwrap(this.resourceId) || ko.unwrap(componentConfig.parameters.graphid));
         };
 
@@ -398,6 +385,7 @@ define([
 
         this.initialize();
     }
+
 
     function viewModel(params) {
         var self = this;
@@ -456,6 +444,11 @@ define([
             });
 
             return isLoading;
+        });
+        this.loading.subscribe(function(loading) {
+            if (ko.isObservable(params.loading)) {
+                params.loading(loading);
+            }
         })
 
         this.initialize = function() {
