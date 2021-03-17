@@ -10,6 +10,38 @@ define([
     'viewmodels/provisional-tile',
     'viewmodels/alert'
 ], function(_, $, arches, ko, koMapping, uuid, GraphModel, CardViewModel, ProvisionalTileViewModel) {
+    function NonTileBasedComponent() {
+        var self = this;
+
+        this.value = ko.observable();
+        this.value.subscribe(function(value) {
+            self.addedData.remove(function(datum) {
+                return datum[0] === self.componentData.uniqueInstanceName
+            });
+
+            self.addedData.push([self.componentData.uniqueInstanceName, value]);
+        });
+
+        this.initialize = function() {
+            if (self.previouslyPersistedComponentData) {
+                self.value(self.previouslyPersistedComponentData[0][1]);
+            }
+            
+            self.loading(false);
+        };
+
+        this.save = function() {
+            self.savedData(self.addedData());
+        };
+
+        this.reset = function() {
+            self.value(self.previouslyPersistedComponentData ? self.previouslyPersistedComponentData[0][1] : null)
+        };
+
+        this.initialize();
+    };
+
+
     function TileBasedComponent() {
         var self = this;
 
@@ -351,11 +383,14 @@ define([
         this.initialize = function() {
             self.loading(true);
 
-            if (componentData.tilesManaged === "one") {
-                TileBasedComponent.apply(this);
+            if (!componentData.tilesManaged || componentData.tilesManaged === "none") {
+                NonTileBasedComponent.apply(self);
+            }
+            else if (componentData.tilesManaged === "one") {
+                TileBasedComponent.apply(self);
             }
             else if (componentData.tilesManaged === "many") {
-                MultipleTileBasedComponent.apply(this, [title] );
+                MultipleTileBasedComponent.apply(self, [title] );
             }
         };
 
@@ -504,6 +539,8 @@ define([
                     workflowComponentAbstract.save();
                 } 
             });
+
+            self.complete(true);
         };
 
         this.reset = function() {

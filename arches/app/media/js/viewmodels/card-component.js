@@ -7,8 +7,6 @@ define([
     return function(params) {
         var self = this;
 
-        console.log('CARD COMPONENT', self, params)
-
         if (!params.card && params.form.card) {
             params.card = params.form.card()
         }

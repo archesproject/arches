@@ -1,6 +1,6 @@
 {% load i18n %}
 <div
-    style="height: 100%; padding: 10px 12px;"
+    style="padding: 20px;"
 >
     <!-- ko foreach: { data: pageLayout(), as: 'layoutSection'} -->
     <div
@@ -11,18 +11,16 @@
         "
     >
         <!-- ko if: layoutSection[0] -->
-        <div
-            style="padding: 0 18px;"
-        >
+        <div style="padding: 2px;">
             <h4
                 style="font-weight: unset;"
                 data-bind="text: layoutSection[0]"
             ></h4>
         </div>
         <!-- /ko -->
+
         <!-- ko foreach: { data: layoutSection[1], as: 'uniqueInstanceName'} -->
             <!-- ko if: !$parents[1].loading() -->
-
 
             <!-- ko with: $parents[1].workflowComponentAbstractLookup()[uniqueInstanceName] -->
                 <div style="
@@ -35,14 +33,13 @@
                             width: 100%;
                         "
                     >
-                        <div style="display:none" data-bind="text: console.log('!!!!!!!', $data, $parent, $parents[2].loading())"></div>
-
                         <div data-bind="component: {
                             name: componentData['componentName'],
                             params: {
                                 ...componentData['parameters'],
                                 form: $data,
-                                pageVm: $root
+                                pageVm: $root,
+                                value: $data.value
                             }
                         }"></div>
 
