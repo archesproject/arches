@@ -423,12 +423,12 @@ class Resource(models.ResourceInstance):
 
     def validate(self, verbose=False):
         """
-        Keyword Arguments: 
+        Keyword Arguments:
         verbose -- False(defult) to only show the first error thrown in any tile, True to show all the errors in all the tiles
         """
 
         from arches.app.models.tile import Tile, TileValidationError
-        
+
         errors = []
         for tile in Tile.objects.filter(resourceinstance=self):
             try:

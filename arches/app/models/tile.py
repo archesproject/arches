@@ -311,7 +311,7 @@ class Tile(models.TileModel):
 
     def validate(self, errors=None, raise_early=True):
         """
-        Keyword Arguments: 
+        Keyword Arguments:
         errors -- supply and list to have errors appened on to
         raise_early -- True(default) to raise an error on the first value in the tile that throws an error
             otherwise throw an error only after all nodes in a tile have been validated
