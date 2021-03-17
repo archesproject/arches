@@ -38,15 +38,15 @@
                         <div style="display:none" data-bind="text: console.log('!!!!!!!', $data, $parent, $parents[2].loading())"></div>
 
                         <div data-bind="component: {
-                            name: componentName,
+                            name: componentData['componentName'],
                             params: {
-                                ...componentParameters,
+                                ...componentData['parameters'],
                                 form: $data,
                                 pageVm: $root
                             }
                         }"></div>
 
-                        <!-- ko if: tilesManaged === "many" -->
+                        <!-- ko if: componentData['tilesManaged'] === "many" -->
                             <!-- ko if: editingData() || isDirty() -->
                             <div
                                 style="
@@ -75,7 +75,7 @@
                         <!-- /ko -->
                     </div>
 
-                        <!-- ko if: tilesManaged === "many" -->
+                        <!-- ko if: componentData['tilesManaged'] === "many" -->
                         <div 
                             style="
                                 width: 80%;
