@@ -882,6 +882,7 @@ div.wf-multi-tile-card-info div {
 
 .workflow-nav-tab-container {
     overflow-x: scroll;
+    min-height: 45px;
 }
 
 .tabbed-workflow-step-container {
@@ -1872,6 +1873,14 @@ div.final-cons-step-separator>h4 {
     font-weight: 600;
     border-left: 1px solid #ddd;
     border-right: 1px solid #ddd;
+}
+
+.manifest-manager-nav-tab .tab-label {
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+    cursor: pointer;
 }
 
 .manifest-manager-main-menu-circle {
