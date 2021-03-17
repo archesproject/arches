@@ -9,6 +9,10 @@ define([
 
         console.log('CARD COMPONENT', self, params)
 
+        if (!params.card && params.form.card) {
+            params.card = params.form.card()
+        }
+
         this.inResourceEditor = location.pathname.includes(params.pageVm.urls.resource_editor);
         this.configKeys = params.configKeys || [];
         this.showIds = params.showIds || false;

@@ -168,14 +168,16 @@ define([
         };
         drawFeatures = getDrawFeatures();
 
-        if (drawFeatures.length > 0) {
-            params.usePosition = false;
-            params.bounds = geojsonExtent({
-                type: 'FeatureCollection',
-                features: drawFeatures
-            });
+        // if (drawFeatures.length > 0) {
+            params.bounds = ko.observable()
+            console.log("BBBB", self, params)
+            // params.usePosition = false;
+            // params.bounds = geojsonExtent({
+            //     type: 'FeatureCollection',
+            //     features: drawFeatures
+            // });
             params.fitBoundsOptions = { padding: {top: padding, left: padding + 200, bottom: padding, right: padding + 200} };
-        }
+        // }
 
         params.activeTab = 'editor';
         params.sources = Object.assign({
