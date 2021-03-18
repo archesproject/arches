@@ -145,11 +145,6 @@ define([
         params.y = this.centerY;
         params.zoom = this.zoom;
         
-        this.bounds = params.bounds;
-        this.bounds.subscribe(function(bounds) {
-            console.log(bounds)
-        })
-        
         this.hoverId = ko.observable();
         this.nodeids = getNodeIds();
         this.nodeDetails = ko.observableArray();
@@ -279,7 +274,6 @@ define([
 
         MapEditorViewModel.apply(this, [params]);
         this.popupTemplate = popupTemplate;
-
         this.relateResource = function(resourceData, widget) {
             var id = widget.node_id();
             var resourceinstanceid = ko.unwrap(resourceData.resourceinstanceid);
