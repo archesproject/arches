@@ -335,7 +335,7 @@ class DateDataType(BaseDataType):
         return value
 
     def backup_astimezone(self, dt):
-        if dt.tzinfo == None:
+        if dt.tzinfo is None:
             converted_dt = dt.replace(tzinfo=tzlocal())
         else:
             converted_dt = (dt - dt.utcoffset()).replace(tzinfo=tzlocal())
