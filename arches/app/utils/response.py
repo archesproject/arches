@@ -25,7 +25,7 @@ class JSONResponse(HttpResponse):
         if stream is not None:
             options["stream"] = stream
         if indent is not None:
-            if str.isdigit(indent):
+            if str.isdigit(str(indent)):
                 indent = int(indent)
             else:
                 indent = None
