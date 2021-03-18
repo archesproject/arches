@@ -613,6 +613,7 @@ input[type="checkbox"] {
 
 .tabbed-workflow-step-body {
     background-color: #fff;
+    display: flex;
     height: 100%;
     overflow-y: auto;
 }

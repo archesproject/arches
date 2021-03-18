@@ -1,6 +1,9 @@
 {% load i18n %}
 <div
-    style="padding: 20px;"
+    style="
+        padding: 20px;
+        width: 100%;
+    "
 >
     <!-- ko foreach: { data: pageLayout(), as: 'layoutSection'} -->
     <div
@@ -44,7 +47,7 @@
                         }"></div>
 
                         <!-- ko if: componentData['tilesManaged'] === "many" -->
-                            <!-- ko if: currentlyEditedData() || isDirty() -->
+                            <!-- ko if: currentlyEditedData() -->
                             <div
                                 style="
                                     display: flex;

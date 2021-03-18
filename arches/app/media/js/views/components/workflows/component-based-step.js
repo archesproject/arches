@@ -53,32 +53,34 @@ define([
             if (self.tile()) {
                 return self.tile().dirty();
             }
-
             return false;
         });
 
         this.initialize = function() {
-            if (!self.componentData.tilesManaged === "many") {
+            if (self.componentData.tilesManaged === "one") {
                 self.tile.subscribe(function(tile) {
                     if (tile) {
                         if (self.previouslyPersistedComponentData) {
-                            var tile = self.tile();
-    
+                            self.savedData(self.previouslyPersistedComponentData);
+                            self.addedData.push(self.previouslyPersistedComponentData[0].data);
+
                             /* force the value of current tile data observables */ 
                             Object.keys(tile.data).forEach(function(key) {
                                 if (ko.isObservable(tile.data[key])) {
                                     tile.data[key](self.previouslyPersistedComponentData[0].data[key]);
                                 }
                             });
-    
+
                             tile._tileData(koMapping.toJSON(tile.data));
                         }
                     }
-                })
-    
-                self.isDirty.subscribe(function() {
-                    self.addedData.removeAll();
-                    self.addedData.push(self.tile().data);
+                });
+
+                self.isDirty.subscribe(function(dirty) {
+                    if (dirty && !self.loading()) {
+                        self.addedData.removeAll();
+                        self.addedData.push(ko.toJS(self.tile().data));
+                    }
                 });
             }
     
@@ -194,6 +196,23 @@ define([
     
                 self.loading(false);
             });
+        };
+
+        this.save = function() {
+            self.tile().save(
+                function(){ /* onFail */ },
+                function(savedTileData) {
+                    self.savedData.removeAll();
+                    self.savedData.unshift(savedTileData);
+                },
+            );
+        };
+
+        this.reset = function() {
+            self.tile().reset();
+
+            self.addedData.removeAll();
+            self.addedData.unshift(self.savedData()[0].data);
         };
 
         this.initialize();
@@ -540,14 +559,14 @@ define([
                 } 
             });
 
-            self.complete(true);
+            // self.complete(true);
         };
 
         this.reset = function() {
             Object.values(self.workflowComponentAbstractLookup()).forEach(function(workflowComponentAbstract) {
                 workflowComponentAbstract.reset();
             });
-            self.hasUnsavedData(false);
+            // self.hasUnsavedData(false);
         };
 
         params.defineStateProperties = function(){
