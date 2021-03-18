@@ -10,7 +10,7 @@ define([
     'viewmodels/provisional-tile',
     'viewmodels/alert'
 ], function(_, $, arches, ko, koMapping, uuid, GraphModel, CardViewModel, ProvisionalTileViewModel) {
-    function NonTileBasedComponent() {
+    function NonTileBasedComponent(complete) {
         var self = this;
 
         this.value = ko.observable();
@@ -31,6 +31,7 @@ define([
         };
 
         this.save = function() {
+            complete(true);
             self.savedData(self.addedData());
         };
 
@@ -382,7 +383,7 @@ define([
     };
 
 
-    function WorkflowComponentAbstract(componentData, previouslyPersistedComponentData, resourceId, title) {
+    function WorkflowComponentAbstract(componentData, previouslyPersistedComponentData, resourceId, title, complete) {
         var self = this;
 
         this.resourceId = resourceId;
@@ -412,7 +413,7 @@ define([
 
         this.initialize = function() {
             if (!componentData.tilesManaged || componentData.tilesManaged === "none") {
-                NonTileBasedComponent.apply(self);
+                NonTileBasedComponent.apply(self, [complete]);
             }
             else if (componentData.tilesManaged === "one") {
                 TileBasedComponent.apply(self);
@@ -528,7 +529,8 @@ define([
                 workflowComponentAbtractData, 
                 previouslyPersistedComponentData, 
                 self.resourceId,
-                params.title
+                params.title, 
+                self.complete
             );
 
             workflowComponentAbstract.savedData.subscribe(function() {
@@ -571,7 +573,6 @@ define([
             Object.values(self.workflowComponentAbstractLookup()).forEach(function(workflowComponentAbstract) {
                 workflowComponentAbstract.reset();
             });
-            // self.hasUnsavedData(false);
         };
 
         params.defineStateProperties = function(){
