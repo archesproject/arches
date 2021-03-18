@@ -47,7 +47,7 @@
                         }"></div>
 
                         <!-- ko if: componentData['tilesManaged'] === "many" -->
-                            <!-- ko if: currentlyEditedData() -->
+                            <!-- ko if: currentlyEditedData() || isDirty() -->
                             <div
                                 style="
                                     display: flex;
