@@ -145,10 +145,10 @@ define([
         params.y = this.centerY;
         params.zoom = this.zoom;
         
-        // this.bounds = params.bounds;
-        // this.bounds.subscribe(function(bounds) {
-        //     console.log(bounds)
-        // })
+        this.bounds = params.bounds;
+        this.bounds.subscribe(function(bounds) {
+            console.log(bounds)
+        })
         
         this.hoverId = ko.observable();
         this.nodeids = getNodeIds();
@@ -277,7 +277,6 @@ define([
 
         params.fitBounds = resourceBounds;
 
-        console.log("cccc", params)
         MapEditorViewModel.apply(this, [params]);
         this.popupTemplate = popupTemplate;
 
