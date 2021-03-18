@@ -3,15 +3,12 @@
     style="
         padding: 20px;
         width: 100%;
+        height: 100%;
     "
 >
     <!-- ko foreach: { data: pageLayout(), as: 'layoutSection'} -->
     <div
-        style="
-            height: 100%;
-            display: flex;
-            flex-direction: column;
-        "
+        data-bind="style: { 'height': $parent.pageLayout().length === 1 && '100%' }"
     >
         <!-- ko if: layoutSection[0] -->
         <div style="padding: 2px;">
@@ -58,7 +55,7 @@
                                 <button 
                                     class="btn btn-danger" 
                                     style="margin-right: 8px;"
-                                    data-bind="click: reset"
+                                    data-bind="click: clearForm"
                                 >
                                     {% trans "Clear" %}
                                 </button>

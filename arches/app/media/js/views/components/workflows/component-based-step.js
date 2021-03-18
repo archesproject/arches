@@ -36,6 +36,7 @@ define([
 
         this.reset = function() {
             self.value(self.previouslyPersistedComponentData ? self.previouslyPersistedComponentData[0][1] : null)
+            self.addedData.removeAll();
         };
 
         this.initialize();
@@ -347,6 +348,16 @@ define([
             self.tile().reset();
         };
 
+        this.clearForm = function() {
+            var tile = self.tile();
+
+            Object.keys(tile.data).forEach(function(key) {
+                if (ko.isObservable(tile.data[key])) {
+                    tile.data[key](null);
+                }
+            });
+        };
+
         this.reset = function() {
             self.currentlyEditedData(null);
             self.tile().reset();
@@ -378,7 +389,7 @@ define([
         this.componentData = componentData;
         this.previouslyPersistedComponentData = previouslyPersistedComponentData;
 
-        this.loading = ko.observable();
+        this.loading = ko.observable(true);
 
         this.addedData = ko.observableArray();
         this.savedData = ko.observableArray();
@@ -400,8 +411,6 @@ define([
         });
 
         this.initialize = function() {
-            self.loading(true);
-
             if (!componentData.tilesManaged || componentData.tilesManaged === "none") {
                 NonTileBasedComponent.apply(self);
             }
@@ -467,25 +476,21 @@ define([
             }
 
             Object.values(self.workflowComponentAbstractLookup()).forEach(function(workflowComponentAbstract) {
-                if (
-                    workflowComponentAbstract.componentData.tilesManaged === 'one'
-                    || workflowComponentAbstract.componentData.tilesManaged === 'many'
-                ) {
-                    if (workflowComponentAbstract.loading()) {
-                        isLoading = true;
-                    }
+                if (workflowComponentAbstract.loading()) {
+                    isLoading = true;
                 }
             });
 
             return isLoading;
         });
-        this.loading.subscribe(function(loading) {
-            if (ko.isObservable(params.loading)) {
-                params.loading(loading);
-            }
-        })
 
         this.initialize = function() {
+            if (ko.isObservable(params.loading)) {
+                this.loading.subscribe(function(loading) {
+                    params.loading(loading);
+                })
+            };
+            
             params.clearCallback(self.reset);
 
             params.preSaveCallback(self.save);
