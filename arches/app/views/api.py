@@ -1236,7 +1236,7 @@ class NodeValue(APIBase):
 class Validator(APIBase):
     """
     Class for validating existing objects in the system using GET (resource instances, tiles, etc...)
-    or for validating new objects using POST.  
+    or for validating new objects using POST.
 
     arches-json format is assumed when posting a new resource instance for validation
     """
@@ -1253,7 +1253,7 @@ class Validator(APIBase):
     def validate_tile(self, tile, verbose):
         errors = []
         ret = {}
-        
+
         try:
             tile.validate(raise_early=(not verbose))
         except TileValidationError as err:
@@ -1308,12 +1308,12 @@ class Validator(APIBase):
         indent = request.GET.get("indent", None)
         verbose = False if request.GET.get("verbose", "false").startswith("f") else True
         data = JSONDeserializer().deserialize(request.body)
-        
+
         if itemtype == "resource":
             resource = Resource()
-            for tiledata in data['tiles']:
+            for tiledata in data["tiles"]:
                 resource.tiles.append(TileProxyModel(tiledata))
-                
+
             return JSONResponse(self.validate_resource(resource, verbose), indent=indent)
 
         if itemtype == "tile":
