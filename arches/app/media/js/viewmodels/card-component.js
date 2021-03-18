@@ -8,7 +8,7 @@ define([
         var self = this;
 
         if (!params.card && params.form.card) {
-            params.card = params.form.card()
+            params.card = params.form.card();
         }
 
         this.inResourceEditor = location.pathname.includes(params.pageVm.urls.resource_editor);
