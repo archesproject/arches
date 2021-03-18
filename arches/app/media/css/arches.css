@@ -878,6 +878,7 @@ div.wf-multi-tile-card-info div {
 
 .workflow-nav-tab-container {
     overflow-x: scroll;
+    min-height: 45px;
 }
 
 .tabbed-workflow-step-container {
@@ -1851,6 +1852,55 @@ div.final-cons-step-separator>h4 {
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
+}
+
+.manifest-manager-nav-tab {
+    height: 50px;
+    min-width: 220px;
+    padding: 10px 20px;
+    border-right: 1px solid #f1f1f1;
+    background-color: #ddd;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
+.manifest-manager-nav-tab.active {
+    background-color: #f6f6f6;
+    font-weight: 600;
+    border-left: 1px solid #ddd;
+    border-right: 1px solid #ddd;
+}
+
+.manifest-manager-nav-tab .tab-label {
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+    cursor: pointer;
+}
+
+.manifest-manager-main-menu-circle {
+    width: 75px;
+    height: 75px;
+    display: inline-block;
+    text-align: center;
+    padding: 20px;
+    border-radius: 50%;
+    background-color: #ccc;
+}
+
+.manifest-manager .dropzone-photo-upload {
+    margin-top: 15px;
+}
+
+.manifest-manager .loader-select {
+    height: 100%;
+    padding-top: 125px;
+}
+
+.manifest-manager .rr-splash-description {
+    width: 700px;
 }
 
 .basemap-listing,
@@ -13006,6 +13056,11 @@ a.jstree-anchor.permissions-widget {
     height: 100%;
     width: calc(100% - 75px);
     position: absolute;
+}
+
+.workbench-card-wrapper .workbench-card-container-wrapper.wide {
+    height: 100%;
+    width: 100%;
 }
 
 .workbench-card-container.gallery-visible {

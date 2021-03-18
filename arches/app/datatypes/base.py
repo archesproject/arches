@@ -252,6 +252,7 @@ class BaseDataType(object):
                                             def val = tile.data.get(params.node_id);
                                             if (val == null || (val instanceof List && val.length==0)) {
                                                 null_docs++;
+                                                break;
                                             }
                                         }
                                     }
