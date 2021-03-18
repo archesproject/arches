@@ -430,7 +430,11 @@ class Resource(models.ResourceInstance):
         from arches.app.models.tile import Tile, TileValidationError
 
         errors = []
-        for tile in Tile.objects.filter(resourceinstance=self):
+        tiles = self.tiles
+        if len(self.tiles) == 0:
+            tiles = Tile.objects.filter(resourceinstance=self)
+
+        for tile in tiles:
             try:
                 tile.validate(raise_early=(not verbose))
             except TileValidationError as err:
