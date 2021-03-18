@@ -5,7 +5,6 @@ import base64
 import re
 import logging
 import os
-import sys
 from pathlib import Path
 import ast
 import time
