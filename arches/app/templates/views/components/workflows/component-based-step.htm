@@ -1,25 +1,24 @@
 {% load i18n %}
 <div
-    style="height: 100%; padding: 10px 12px;"
+    style="
+        padding: 20px;
+        width: 100%;
+        height: 100%;
+    "
 >
     <!-- ko foreach: { data: pageLayout(), as: 'layoutSection'} -->
     <div
-        style="
-            height: 100%;
-            display: flex;
-            flex-direction: column;
-        "
+        data-bind="style: { 'height': $parent.pageLayout().length === 1 && '100%' }"
     >
         <!-- ko if: layoutSection[0] -->
-        <div
-            style="padding: 0 18px;"
-        >
+        <div style="padding: 2px;">
             <h4
                 style="font-weight: unset;"
                 data-bind="text: layoutSection[0]"
             ></h4>
         </div>
         <!-- /ko -->
+
         <!-- ko foreach: { data: layoutSection[1], as: 'uniqueInstanceName'} -->
             <!-- ko if: !$parents[1].loading() -->
 
@@ -35,16 +34,17 @@
                         "
                     >
                         <div data-bind="component: {
-                            name: componentName,
+                            name: componentData['componentName'],
                             params: {
-                                ...componentParameters,
+                                ...componentData['parameters'],
                                 form: $data,
-                                pageVm: $root
+                                pageVm: $root,
+                                value: $data.value
                             }
                         }"></div>
 
-                        <!-- ko if: manageMultipleTiles -->
-                            <!-- ko if: editingData() || isDirty() -->
+                        <!-- ko if: componentData['tilesManaged'] === "many" -->
+                            <!-- ko if: currentlyEditedData() || isDirty() -->
                             <div
                                 style="
                                     display: flex;
@@ -55,107 +55,104 @@
                                 <button 
                                     class="btn btn-danger" 
                                     style="margin-right: 8px;"
-                                    data-bind="click: reset"
+                                    data-bind="click: clearForm"
                                 >
                                     {% trans "Clear" %}
                                 </button>
 
                                 <button 
                                     class="btn btn-success" 
-                                    data-bind="click: addOrUpdateEntry"
-                                >
-                                    {% trans "Save" %}
-                                </button>
+                                    data-bind="{
+                                        click: addOrUpdateEntry,
+                                        text: currentlyEditedData() ? 'Save' : 'Add'
+                                    }"
+                                ></button>
                             </div>
                             <!-- /ko -->
                         <!-- /ko -->
                     </div>
 
-                    <!-- ko if: manageMultipleTiles -->
-                    <div 
-                        style="
-                            width: 80%;
-                            padding: 12px;
-                            border: 1px solid #ddd;
-                            border-radius: 2px;
-                            background-color: #eee;
-                            margin-top: 14px;
-                            margin-right: 14px;
-                            display: flex;
-                            flex-direction: column;
-                        "
-                    >
-                        <div
-                            style="padding: 0 8px;"
-                        >
-                            <h4 data-bind="text: (itemName())"></h4>
-                        </div>
-
-                        <!-- ko if: addedData().length === 0 -->
-                        <div class="wf-multi-tile-step-list-empty">
-                            <p data-bind="text: ('No '+itemName()+' added yet. Add one or multiple '+itemName()+'.')"></p>
-                        </div>
-                        <!-- /ko -->
-
-                        <div
+                        <!-- ko if: componentData['tilesManaged'] === "many" -->
+                        <div 
                             style="
-                                position: relative;
-                                overflow-y: scroll;
-                                flex: auto;
+                                width: 80%;
+                                padding: 12px;
+                                border: 1px solid #ddd;
+                                border-radius: 2px;
+                                background-color: #eee;
+                                margin-top: 14px;
+                                margin-right: 14px;
+                                display: flex;
+                                flex-direction: column;
                             "
                         >
                             <div
+                                style="padding: 0 8px;"
+                            >
+                                <h4 data-bind="text: (itemName())"></h4>
+                            </div>
+
+                            <!-- ko if: addedData().length === 0 -->
+                            <div class="wf-multi-tile-step-list-empty">
+                                <p data-bind="text: ('No '+itemName()+' added yet. Add one or multiple '+itemName()+'.')"></p>
+                            </div>
+                            <!-- /ko -->
+
+                            <div
                                 style="
-                                    position: absolute;
-                                    left: 6px;
-                                    right: 6px;
+                                    position: relative;
+                                    overflow-y: scroll;
+                                    flex: auto;
                                 "
                             >
-                                <!-- ko foreach: {data: addedData, as: 'tile'} -->
-                                    <div class="wf-multi-tile-step-card">
-                                        <div class="wf-multi-tile-card-info">
-                                            <div class="workflow-step-icon complete"><span><i class="fa fa-hashtag"></i></span></div>
-                                            <div class="wf-multi-tile-card-info-details">
-                                                <!-- ko foreach: {data: $parent.card().widgets(), as: 'widget'} -->
-                                                    <div>
-                                                        <!-- <div style="display:none" data-bind="text: console.log($data, $parent, $parents[1])"></div> -->
-                                                    </div>
-                                                    <!-- ko component: {
-                                                        name: widget.widgetLookup[widget.get("widget_id")()].name,
-                                                        params: {
-                                                            config: widget.configJSON,
-                                                            label: widget.label(),
-                                                            node: widget.node,
-                                                            value: ko.observable($parent[widget.node_id()]),
-                                                            state: "report",
-                                                        }
-                                                    } --><!-- /ko -->
-                                                <!-- /ko -->
+                                <div
+                                    style="
+                                        position: absolute;
+                                        left: 6px;
+                                        right: 6px;
+                                    "
+                                >
+                                    <!-- ko foreach: {data: addedData, as: 'tile'} -->
+                                        <div class="wf-multi-tile-step-card">
+                                            <div class="wf-multi-tile-card-info">
+                                                <div class="workflow-step-icon complete"><span><i class="fa fa-hashtag"></i></span></div>
+                                                <div class="wf-multi-tile-card-info-details">
+                                                    <!-- ko foreach: {data: $parent.card().widgets(), as: 'widget'} -->
+                                                        <!-- ko component: {
+                                                            name: widget.widgetLookup[widget.get("widget_id")()].name,
+                                                            params: {
+                                                                config: widget.configJSON,
+                                                                label: widget.label(),
+                                                                node: widget.node,
+                                                                value: ko.observable($parent[widget.node_id()]),
+                                                                state: "report",
+                                                            }
+                                                        } --><!-- /ko -->
+                                                    <!-- /ko -->
+                                                </div>
+                                            </div>
+                                            <div class="wf-multi-tile-step-card-controls">
+                                                <div 
+                                                    data-bind="click: function(){$parent.addedData.remove($data)}"
+                                                >
+                                                    <i class="fa fa-times-circle"></i>
+                                                    <span>
+                                                        {% trans "Remove" %}
+                                                    </span>
+                                                </div>
+                                                <div data-bind="click: function(){$parent.loadEntryIntoEditor($data)}">
+                                                    <i class="fa fa-pencil"></i>
+                                                    <span>
+                                                        {% trans "Edit" %}
+                                                    </span>
+                                                </div>
                                             </div>
                                         </div>
-                                        <div class="wf-multi-tile-step-card-controls">
-                                            <div 
-                                                data-bind="click: function(){$parent.addedData.remove($data)}"
-                                            >
-                                                <i class="fa fa-times-circle"></i>
-                                                <span>
-                                                    {% trans "Remove" %}
-                                                </span>
-                                            </div>
-                                            <div data-bind="click: function(){$parent.loadEntryIntoEditor($data)}">
-                                                <i class="fa fa-pencil"></i>
-                                                <span>
-                                                    {% trans "Edit" %}
-                                                </span>
-                                            </div>
-                                        </div>
-                                    </div>
-                                <!-- /ko -->
+                                    <!-- /ko -->
+                                </div>
                             </div>
                         </div>
-                    </div>
-
-                    <!-- /ko -->
+                        <!-- /ko -->
                 </div>
             <!-- /ko -->
             
