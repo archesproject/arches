@@ -273,7 +273,7 @@ define([
         params.fitBounds = resourceBounds;
         MapEditorViewModel.apply(this, [params]);
         this.popupTemplate = popupTemplate;
-        
+
         this.relateResource = function(resourceData, widget) {
             var id = widget.node_id();
             var resourceinstanceid = ko.unwrap(resourceData.resourceinstanceid);
