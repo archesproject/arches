@@ -8,8 +8,10 @@ import os
 import sys
 from pathlib import Path
 import ast
+import time
 from distutils import util
 from datetime import datetime
+from dateutil.tz import tzlocal
 from mimetypes import MimeTypes
 from arches.app.datatypes.base import BaseDataType
 from arches.app.models import models
@@ -324,12 +326,21 @@ class DateDataType(BaseDataType):
             v = datetime.strptime(value, valid_date_format)
         else:
             v = datetime.strptime(value, settings.DATE_IMPORT_EXPORT_FORMAT)
-        if (not sys.platform.startswith("win")) or (
-            v >= datetime.fromtimestamp(0)
-        ):  # The .astimezone() function throws an error on Windows for dates before 1970
+        # The .astimezone() function throws an error on Windows for dates before 1970
+        try:
             v = v.astimezone()
+        except:
+            v = self.backup_astimezone(v)
         value = v.isoformat(timespec="milliseconds")
         return value
+
+    def backup_astimezone(self, dt):
+        if dt.tzinfo == None:
+            converted_dt = dt.replace(tzinfo=tzlocal())
+        else:
+            converted_dt = (dt - dt.utcoffset()).replace(tzinfo=tzlocal())
+            converted_dt = converted_dt + converted_dt.utcoffset()
+        return converted_dt
 
     def transform_export_values(self, value, *args, **kwargs):
         valid_date_format, valid = self.get_valid_date_format(value)
