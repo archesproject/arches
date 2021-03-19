@@ -1,19 +1,18 @@
-define(['knockout', 'viewmodels/widget'], function (ko, WidgetViewModel) {
+define(['knockout', 'viewmodels/widget'], function(ko, WidgetViewModel) {
     var name = 'urldatatype';
     ko.components.register(name, {
         viewModel: function(params) {
-            var self = this;
             params.configKeys = ['url_placeholder','url_label_placeholder','link_color'];
             params.valueProperties = ['url', 'url_label'];
             WidgetViewModel.apply(this, [params]);
 
-            this.url_preview_text = ko.pureComputed(function() {
+            this.urlPreviewText = ko.pureComputed(function() {
                 if (this.url()) {
                     if (this.url_label && this.url_label()) {
                         return this.url_label();
                     } else if (this.url && this.url()) {
                         return this.url();
-                    };
+                    }
                 }
             }, this);
         },

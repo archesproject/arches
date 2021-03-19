@@ -24,7 +24,7 @@
             <label class="control-label widget-input-label" for="">Preview</label>
             <div style='margin-bottom:2px'>
                 <a target="_blank" data-bind="attr: {href: url}, style: { color: link_color }">
-                    <span data-bind="text: url_preview_text()"></span>
+                    <span data-bind="text: urlPreviewText()"></span>
                 </a>
             </div>
         </div>
@@ -63,7 +63,7 @@
 <dd>
     <div style='margin-bottom:2px'>
         <a data-bind="attr: {href: url}, style: { color: link_color }">
-            <span data-bind="text: url_preview_text()"></span>
+            <span data-bind="text: urlPreviewText()"></span>
         </a>
     </div>
 </dd>
@@ -71,6 +71,6 @@
 
 {% block display_value %}
 <a data-bind="attr: {href: url}, style: { color: link_color }">
-    <span data-bind="text: url_preview_text()"></span>
+    <span data-bind="text: urlPreviewText()"></span>
 </a>
 {% endblock display_value %}

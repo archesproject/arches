@@ -119,7 +119,7 @@ class URLDataType(BaseDataType):
         terms = []
         if nodevalue.get("url") is not None:
             if nodevalue.get("url_label") is not None:
-                if settings.WORDS_PER_SEARCH_TERM == None or (len(nodevalue["url_label"].split(" ")) < settings.WORDS_PER_SEARCH_TERM):
+                if settings.WORDS_PER_SEARCH_TERM is None or (len(nodevalue["url_label"].split(" ")) < settings.WORDS_PER_SEARCH_TERM):
                     terms.append(nodevalue["url_label"])
             # terms.append(nodevalue['url'])       FIXME: URLs searchable?
         return terms

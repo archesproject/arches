@@ -30,7 +30,7 @@ class Migration(migrations.Migration):
             WHERE widgetid = 'ca0c43ff-af73-4349-bafd-53ff9f22eebd';
 
             DELETE FROM public.d_data_types
-	        WHERE datatype = 'url';
+            WHERE datatype = 'url';
             """,
         )
     ]
