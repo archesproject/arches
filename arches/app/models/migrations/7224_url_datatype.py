@@ -1,9 +1,10 @@
 from django.db import migrations, models
 
+
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('models', '7131_update_annotations_view'),
+        ("models", "7131_update_annotations_view"),
     ]
 
     operations = [
@@ -24,13 +25,12 @@ class Migration(migrations.Migration):
                     "link_color": "#0055a0"
                 }',null,'url');
             """,
-
             """
             DELETE FROM public.widgets
             WHERE widgetid = 'ca0c43ff-af73-4349-bafd-53ff9f22eebd';
 
             DELETE FROM public.d_data_types
 	        WHERE datatype = 'url';
-            """
+            """,
         )
     ]
