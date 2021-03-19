@@ -2,36 +2,38 @@
 
 <!-- ko if: bufferNodeId() -->
 <div class="card">
-    <div>
+    <div class="add-buffer-feature-header">
         {% trans 'Add Buffer Feature' %}
     </div>
-    <div>
-        {% trans 'Distance:' %}
+    <div class="add-buffer-feature-input">
+        <div>{% trans 'Distance:' %}</div>
         <input type="number" step="any" class="form-control input-lg widget-input" data-bind="valueUpdate: 'keyup', value: bufferDistance"></input>
     </div>
-    <div>
-        {% trans 'Units:' %}
+    <div class="add-buffer-feature-input">
+        <div>{% trans 'Units:' %}</div>
         <select data-bind="
             options: [{
-                text: 'm'
+                text: '{% trans 'meters' %}',
+                value: 'm'
             }, {
-                text: 'ft'
+                text: '{% trans 'feet' %}',
+                value: 'ft'
             }],
             optionsText: 'text',
-            optionsValue: 'text',
+            optionsValue: 'value',
             value: bufferUnits,
             valueAllowUnset: false,
             chosen: {
-                'width': '210px',
+                'width': '100%',
                 'disable_search_threshold': 10,
                 'allow_single_deselect': false
             }
         "></select>
     </div>
     <!-- ko if: allowAddNew -->
-    <div>
-        {% trans 'Add as new ' %}"<span data-bind="text: card.model.get('name')"></span>"?
+    <div class="add-buffer-feature-input">
         <input type="checkbox" data-bind="checked: bufferAddNew">
+        <span class="add-buffer-as-new-label">{% trans 'Add as new ' %}"<span data-bind="text: card.model.get('name')"></span>"?</span>
     </div>
     <!-- /ko-->
     <div class="map-coordinate-editor-button-container">
