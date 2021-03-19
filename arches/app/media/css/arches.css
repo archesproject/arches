@@ -666,10 +666,6 @@ input[type="checkbox"] {
     width: unset;
 }
 
-.tabbed-workflow-step-body .new-provisional-edit-card-container .card {
-    padding: 25px 10px;
-}
-
 .tabbed-workflow-step-body .create-resource-instance-card-component .install-buttons {
     display: unset;
 }
@@ -1127,7 +1123,7 @@ ul.tabbed-report-tab-list {
     cursor: pointer;
 }
 
-.card-component-panel .workbench-tile-picker-label {
+.workbench-tile-picker-label {
     font-weight: 600;
     color: #666;
     margin-left: 10px;
@@ -1433,6 +1429,7 @@ ul.tabbed-report-tab-list {
 .workbench-card-container-sidepanel-active .thumbnail-container {
     display: flex;
     justify-content: space-between;
+    width: calc(100% - 400px);
 }
 
 .show-thumbnails-btn {
@@ -12970,7 +12967,7 @@ a.jstree-anchor.permissions-widget {
 .show-gallery-control.gallery-expanded {
     top: 0;
     left: 0;
-    right: 74px;
+    right: 0;
     bottom: auto;
     border-bottom: solid 1px rgb(221, 221, 221);
     z-index: 2000;
@@ -12978,11 +12975,11 @@ a.jstree-anchor.permissions-widget {
 }
 
 .workbench-card-container-sidepanel-active .show-gallery-control.gallery-expanded {
-    right: 475px;
+    right: 400px;
 }
 
 .iiif-viewer-gallery {
-    right: 75px;
+    right: 0;
     left: 0;
 }
 
@@ -12993,7 +12990,7 @@ a.jstree-anchor.permissions-widget {
 }
 
 .workbench-card-container-sidepanel-active .iiif-viewer-gallery {
-    right: 475px;
+    right: 400px;
 }
 
 .workbench-card-container-sidepanel-active .workbench-card-container {
@@ -13058,6 +13055,7 @@ a.jstree-anchor.permissions-widget {
 .workbench-card-wrapper .workbench-card-container-wrapper {
     height: 100%;
     width: calc(100% - 75px);
+    position: absolute;
 }
 
 .workbench-card-wrapper .workbench-card-container-wrapper.wide {

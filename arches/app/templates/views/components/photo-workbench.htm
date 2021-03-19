@@ -273,7 +273,7 @@
             {% block form_buttons %}
             <!-- ko foreach: { data: card.tiles(), as: 'tile'} -->
                 <!--ko if: $parent.getUrl(tile) && tile.selected()-->
-            <div class="install-buttons">
+            <div class="display-in-workflow-step install-buttons">
                 <!-- ko if: tile && self.deleteTile -->
                 <button class="btn btn-shim btn-labeled btn-lg fa fa-trash" data-bind="click: $parent.removeTile, css: {
                     disabled: (!$parent.card.isWritable && !self.preview),
