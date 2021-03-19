@@ -1,0 +1,45 @@
+{% load i18n %}
+
+<!-- ko if: bufferNodeId() -->
+<div class="card">
+    <div>
+        {% trans 'Add Buffer Feature' %}
+    </div>
+    <div>
+        {% trans 'Distance:' %}
+        <input type="number" step="any" class="form-control input-lg widget-input" data-bind="valueUpdate: 'keyup', value: bufferDistance"></input>
+    </div>
+    <div>
+        {% trans 'Units:' %}
+        <select data-bind="
+            options: [{
+                text: 'm'
+            }, {
+                text: 'ft'
+            }],
+            optionsText: 'text',
+            optionsValue: 'text',
+            value: bufferUnits,
+            valueAllowUnset: false,
+            chosen: {
+                'width': '210px',
+                'disable_search_threshold': 10,
+                'allow_single_deselect': false
+            }
+        "></select>
+    </div>
+    <!-- ko if: allowAddNew -->
+    <div>
+        {% trans 'Add as new ' %}"<span data-bind="text: card.model.get('name')"></span>"?
+        <input type="checkbox" data-bind="checked: bufferAddNew">
+    </div>
+    <!-- /ko-->
+    <div class="map-coordinate-editor-button-container">
+        <button class="btn btn-shim btn-labeled btn-lg fa fa-search btn-mint" data-bind="click: function() {
+            bufferNodeId(null);
+        }">{% trans 'Cancel' %}</button>
+        <button class="btn btn-shim btn-labeled btn-lg fa fa-check btn-primary" data-bind="click: addBufferResult">{% trans 'Add Feature' %}</button>
+    </div>
+</div>
+<!-- /ko-->
+
