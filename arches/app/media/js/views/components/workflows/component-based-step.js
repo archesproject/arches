@@ -206,6 +206,7 @@ define([
                 function(savedTileData) {
                     self.savedData.removeAll();
                     self.savedData.unshift(savedTileData);
+                    self.complete(true);
                 },
             );
         };
@@ -274,6 +275,13 @@ define([
 
         this.save = function() {
             self.loading(true);
+            var processedTiles = ko.observableArray([]);
+            processedTiles.subscribe(function(tiles){
+                var allData = self.addedData().length + self.savedData().length;
+                if (tiles.length <= allData) {
+                    self.complete(true);
+                }
+            })
 
             /* save new tiles */ 
             self.addedData().forEach(function(data) {
@@ -292,6 +300,7 @@ define([
                         function(){/* onFail */}, 
                         function(savedTileData) {
                             self.savedData.unshift(savedTileData);
+                            processedTiles.push(savedTileData);
                         },
                     );
                 }
@@ -329,6 +338,7 @@ define([
 
                             self.savedData.replace(previousTileData, savedTileData);
                             self.addedData.replace(previousTileData.data, savedTileData.data);
+                            processedTiles.push(savedTileData);
                         },
                     )
 
@@ -341,6 +351,7 @@ define([
                 tile.tileid = data.tileid;
 
                 tile.deleteTile();
+                processedTiles.push(data)
             });
 
             self.savedData.removeAll(removedTiles);
@@ -385,7 +396,7 @@ define([
 
     function WorkflowComponentAbstract(componentData, previouslyPersistedComponentData, resourceId, title, complete) {
         var self = this;
-
+        this.complete = complete;
         this.resourceId = resourceId;
         this.componentData = componentData;
         this.previouslyPersistedComponentData = previouslyPersistedComponentData;
