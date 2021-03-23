@@ -656,10 +656,20 @@ input[type="checkbox"] {
 }
 
 .tabbed-workflow-step-information-box {
-    padding: 10px 20px 20px 20px;
+    padding: 10px 35px 20px 35px;
     background-color: #fafafa;
     border: 1px solid #ddd;
     color: grey;
+    margin: -21px -21px 0px -21px;
+    position: relative;
+}
+
+.tabbed-workflow-step-information-box h4 {
+    font-size: 14px;
+    margin-bottom: 5px;
+}
+
+.tabbed-workflow-step-information-box span {
     margin-bottom: 10px;
 }
 
@@ -737,6 +747,18 @@ input[type="checkbox"] {
     margin-left: -25px;
 }
 
+.tabbed-workflow-step-body .card-component {
+    border: none;
+    padding: 0px;
+    margin: 0px 15px;
+}
+
+.padded-workflow-step .card-component {
+    border: none;
+    padding: 0px;
+    margin: 0px 15px;
+}
+
 .padded-workflow-step,
 .workflow-step-body .card-component {
     padding: 20px 35px 82px 40px;
@@ -793,6 +815,10 @@ input[type="checkbox"] {
     height: 100%;
     width: 500px;
     overflow-y: scroll;
+}
+
+.wf-multi-tile-step-list-container {
+    
 }
 
 .wf-multi-tile-step-list-empty {
@@ -2145,7 +2171,7 @@ div.final-cons-step-separator>h4 {
 .workbench-card-sidepanel-header {
     cursor: pointer;
     color: rgb(33, 62, 95);
-    font-size: 19px;
+    font-size: 15px;
 }
 
 .workbench-card-sidepanel-header:before {
