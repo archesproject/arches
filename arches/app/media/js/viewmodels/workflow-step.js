@@ -100,8 +100,12 @@ define([
 
             /* cached informationBox logic */ 
             if (config.informationboxdata) {
+                var isHidden = true;
+                if (self.getInformationBoxHiddenStateFromLocalStorage()){
+                    isHidden = self.getInformationBoxHiddenStateFromLocalStorage();
+                }
                 self.informationBoxData({
-                    hidden: self.getInformationBoxHiddenStateFromLocalStorage(),
+                    hidden: isHidden,
                     heading: config.informationboxdata['heading'],
                     text: config.informationboxdata['text'],
                 })
