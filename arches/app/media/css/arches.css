@@ -723,6 +723,7 @@ input[type="checkbox"] {
 .tabbed-workflow-footer .btn,
 .tabbed-workflow-title-bar .btn {
     border-radius: 2px;
+    padding: 8px 15px;
 }
 
 .tabbed-workflow-title-bar .btn > i,
@@ -7609,6 +7610,7 @@ div .switch label:hover,
 .dz-previews {
     border: 1px solid #ddd;
     overflow-y: scroll;
+    width: 100%;
 }
 
 .file-upload-filter {
