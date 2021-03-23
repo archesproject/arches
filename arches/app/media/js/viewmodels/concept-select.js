@@ -75,11 +75,6 @@ define([
             });
         });
 
-        /* flags UI change for previously saved data */
-        if (self.value()) {
-            self.value.valueHasMutated();  
-        }
-
         this.select2Config = {
             value: self.value,
             clickBubble: true,
