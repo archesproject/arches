@@ -660,6 +660,7 @@ input[type="checkbox"] {
     background-color: #fafafa;
     border: 1px solid #ddd;
     color: grey;
+    margin-bottom: 10px;
 }
 
 .tabbed-workflow-step-body .create-resource-instance-card-component .card-component {
