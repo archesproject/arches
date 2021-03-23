@@ -207,7 +207,7 @@ define([
                     self.savedData.removeAll();
                     self.savedData.unshift(savedTileData);
                     self.complete(true);
-                },
+                }
             );
         };
 
