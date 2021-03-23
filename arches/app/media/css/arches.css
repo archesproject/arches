@@ -13520,6 +13520,22 @@ a.jstree-anchor.permissions-widget {
     padding: 10px;
 }
 
+.add-buffer-as-new-label {
+    display: inline-block;
+    position: relative;
+    top: -12px;
+    left: 5px;
+}
+
+.add-buffer-feature-header {
+    padding: 6px 0;
+    font-size: 1.2em;
+}
+
+.add-buffer-feature-input {
+    padding: 5px 0;
+}
+
 @keyframes loader {
     0% {
         background: #ddd;
