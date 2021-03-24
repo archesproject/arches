@@ -657,16 +657,23 @@ input[type="checkbox"] {
 
 .tabbed-workflow-step-information-box {
     padding: 10px 35px 20px 35px;
-    background-color: #fafafa;
+    background-color: #eaeaea;
     border: 1px solid #ddd;
     color: grey;
-    margin: -21px -21px 0px -21px;
+    margin: -16px -21px 0px -21px;
+    height: 100px;
+    overflow-y: scroll;
     position: relative;
+}
+
+.btn-workflow-tile {
+    padding: 8px 20px;
+    min-width: 100px;
 }
 
 .tabbed-workflow-step-information-box h4 {
     font-size: 14px;
-    margin-bottom: 5px;
+    margin-bottom: 2px;
 }
 
 .tabbed-workflow-step-information-box span {
@@ -750,7 +757,7 @@ input[type="checkbox"] {
 .tabbed-workflow-step-body .card-component {
     border: none;
     padding: 0px;
-    margin: 0px 15px;
+    margin: 10px 35px;
 }
 
 .padded-workflow-step .card-component {
@@ -818,7 +825,24 @@ input[type="checkbox"] {
 }
 
 .wf-multi-tile-step-list-container {
-    
+
+}
+
+.wf-step-multi-tile-container {
+    width: 60%;
+    padding: 30px;
+    border: 1px solid #ddd;
+    border-radius: 2px;
+    background-color: #f1f1f1;
+    margin-top: 0px;
+    margin-right: 0px;
+    display: flex;
+    flex-direction: column;
+}
+
+.wf-step-multi-tile-container h4 {
+    font-size: 14px;
+    font-weight: 500;
 }
 
 .wf-multi-tile-step-list-empty {
@@ -927,13 +951,18 @@ div.wf-multi-tile-card-info div {
 }
 .workflow-nav-tab {
     min-width: 220px;
-    padding: 10px 20px;
+    padding: 12px 20px;
     border-left: 1px solid #ddd;
+    height: 45px;
 }
 
 .workflow-nav-tab.active {
     background-color: #fff;
     font-weight: 600;
+}
+
+.workflow-nav-tab-list-item:last-child {
+    border-right: 1px solid #ddd;
 }
 
 .workflow-nav-tab.inactive {
@@ -6631,6 +6660,7 @@ ul div .card-tree-list span .card-tree-list-item .card-tree-list-icon {
 .new-provisional-edit-card-container .card {
     width: 100%;
     padding-top: 15px;
+    margin: 0px 15px;
 }
 
 .new-provisional-edit-entry {

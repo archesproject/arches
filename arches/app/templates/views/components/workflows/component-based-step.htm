@@ -53,7 +53,7 @@
                                 "
                             >
                                 <button 
-                                    class="btn btn-danger" 
+                                    class="btn btn-danger btn-workflow-tile" 
                                     style="margin-right: 8px;"
                                     data-bind="click: clearForm"
                                 >
@@ -61,7 +61,7 @@
                                 </button>
 
                                 <button 
-                                    class="btn btn-success" 
+                                    class="btn btn-success btn-workflow-tile" 
                                     data-bind="{
                                         click: addOrUpdateEntry,
                                         text: currentlyEditedData() ? 'Save' : 'Add'
@@ -73,24 +73,10 @@
                     </div>
 
                         <!-- ko if: componentData['tilesManaged'] === "many" -->
-                        <div 
-                            style="
-                                width: 80%;
-                                padding: 12px;
-                                border: 1px solid #ddd;
-                                border-radius: 2px;
-                                background-color: #eee;
-                                margin-top: 14px;
-                                margin-right: 14px;
-                                display: flex;
-                                flex-direction: column;
-                            "
-                        >
-                            <div
-                                style="padding: 0 8px;"
-                            >
-                                <h4 data-bind="text: (itemName())"></h4>
-                            </div>
+                        <div class="wf-step-multi-tile-container">
+                            
+                            <h4 data-bind="text: (itemName())"></h4>
+                            
 
                             <!-- ko if: addedData().length === 0 -->
                             <div class="wf-multi-tile-step-list-empty">
