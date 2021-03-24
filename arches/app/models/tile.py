@@ -552,6 +552,9 @@ class Tile(models.TileModel):
             parent_tile.tiles = []
             for nodegroup in models.NodeGroup.objects.filter(parentnodegroup_id=node.nodegroup.parentnodegroup_id):
                 parent_tile.tiles.append(Tile.get_blank_tile_from_nodegroup_id(nodegroup.pk, resourceid=resourceid, parenttile=parent_tile))
+            for node in models.Node.objects.filter(nodegroup_id=node.nodegroup.parentnodegroup_id):
+                if node.datatype != "semantic":
+                    parent_tile.data[str(node.nodeid)] = None
             return parent_tile
         else:
             return Tile.get_blank_tile_from_nodegroup_id(node.nodegroup_id, resourceid=resourceid)
