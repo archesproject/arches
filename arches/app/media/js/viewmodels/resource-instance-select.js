@@ -58,6 +58,14 @@ define([
         this.resourceTypesToDisplayInDropDown = !!params.graphids ? ko.toJS(params.graphids) : [];
         this.displayOntologyTable = this.renderContext !== 'search' && !!params.node;
 
+        this.waitingForGraphToDownload = ko.observable(false);
+        this.counter = Object.keys(self.graphLookup).length;
+        ko.unwrap(params.node.config.graphs).forEach(function(graph){
+            if (!Object.keys(self.graphLookup).includes(graph.graphid)){
+                self.waitingForGraphToDownload(true);
+                self.counter += 1;
+            }
+        });
         var downloadGraph = function(graphid){
             if (graphid in self.graphLookup){
                 return Promise.resolve(self.graphLookup[graphid]);
@@ -70,7 +78,9 @@ define([
                         return response.json();
                     })
                     .then(function(json){
-                        return self.graphLookup[graphid] = json.graph;
+                        self.graphLookup[graphid] = json.graph;
+                        self.waitingForGraphToDownload(Object.keys(self.graphLookup).length < self.counter);
+                        return json.graph;
                     });
             }
         };
@@ -245,6 +255,7 @@ define([
         this.select2Config = {
             value: self.renderContext === 'search' ? self.value : resourceToAdd,
             clickBubble: true,
+            disabled: this.waitingForGraphToDownload,
             multiple: !self.displayOntologyTable ? params.multiple : false,
             placeholder: this.placeholder() || arches.translations.riSelectPlaceholder,
             closeOnSelect: true,
