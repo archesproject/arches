@@ -960,12 +960,15 @@ div.wf-multi-tile-card-info div {
 .workflow-nav-tab {
     min-width: 220px;
     padding: 12px 20px;
-    border-left: 1px solid #ddd;
+    border-left: 1px solid #BBD1EA;
+    background: #F7F9FB;
+    border-bottom: 1px solid #BBD1EA;
     height: 45px;
 }
 
 .workflow-nav-tab.active {
     background-color: #fff;
+    border-bottom: 1px solid #fff;
     font-weight: 600;
     padding-top: 10px;
 }
