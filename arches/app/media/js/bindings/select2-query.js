@@ -56,7 +56,7 @@ define([
                         $(el).select2("enable");
                     }
                 });
-            };
+            }
 
             $(el).on("select2-opening", function() {
                 if (select2Config.clickBubble) {
