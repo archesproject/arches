@@ -597,6 +597,8 @@ class Tile(models.TileModel):
                 tile.save()
             else:
                 tile.save()
+                if not nodegroupid:
+                    nodegroupid = models.Node.objects.get(pk=nodeid).nodegroup_id
                 if nodegroupid and resourceinstanceid:
                     tile = Tile.update_node_value(nodeid, value, nodegroupid=nodegroupid, resourceinstanceid=resourceinstanceid)
         return tile
