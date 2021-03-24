@@ -537,6 +537,8 @@ class Resources(APIBase):
 
         allowed_formats = ["json", "json-ld", "arches-json"]
         format = request.GET.get("format", "json-ld")
+        user = request.user
+        perm = "read_nodegroup"
 
         if format not in allowed_formats:
             return JSONResponse(status=406, reason="incorrect format specified, only %s formats allowed" % allowed_formats)
@@ -558,6 +560,8 @@ class Resources(APIBase):
                     "resource": resource.to_json(
                         compact=compact,
                         hide_empty_nodes=hide_empty_nodes,
+                        user=user,
+                        perm=perm,
                     ),
                     "displaydescription": resource.displaydescription,
                     "displayname": resource.displayname,
@@ -573,7 +577,7 @@ class Resources(APIBase):
                 include_tiles = bool(request.GET.get("includetiles", "true").lower() == "true")  # default True
 
                 if include_tiles:
-                    out.load_tiles()
+                    out.load_tiles(user, perm)
 
             elif format == "json-ld":
                 try:
