@@ -671,6 +671,14 @@ input[type="checkbox"] {
     min-width: 100px;
 }
 
+.btn-workflow-tile.btn-success {
+    border: 1px solid #508A14;
+}
+
+.btn-workflow-tile.btn-danger {
+    border: 1px solid #B02107;
+}
+
 .tabbed-workflow-step-information-box h4 {
     font-size: 14px;
     margin-bottom: 2px;
@@ -756,7 +764,7 @@ input[type="checkbox"] {
 
 .tabbed-workflow-step-body .card-component {
     border: none;
-    padding: 0px;
+   /* padding: 0px;*/
     margin: 10px 35px;
 }
 
@@ -959,6 +967,7 @@ div.wf-multi-tile-card-info div {
 .workflow-nav-tab.active {
     background-color: #fff;
     font-weight: 600;
+    padding-top: 10px;
 }
 
 .workflow-nav-tab-list-item:last-child {
@@ -2448,6 +2457,11 @@ div.final-cons-step-separator>h4 {
 .map-card-zoom-tool {
     float: right;
     padding: 10px;
+}
+
+.map-card-zoom-tool a {
+    display: inline-block;
+    padding: 0px 3px;
 }
 
 #map-settings {
@@ -6659,8 +6673,6 @@ ul div .card-tree-list span .card-tree-list-item .card-tree-list-icon {
 
 .new-provisional-edit-card-container .card {
     width: 100%;
-    padding-top: 15px;
-    margin: 0px 15px;
 }
 
 .new-provisional-edit-entry {
@@ -13501,6 +13513,10 @@ a.jstree-anchor.permissions-widget {
     margin: 0;
 }
 
+.map-coordinate-editor {
+    margin-top: 15px;
+}
+
 .map-coordinate-editor-crs-selector {
     position: fixed;
     margin-top: 25px;
@@ -13574,8 +13590,7 @@ a.jstree-anchor.permissions-widget {
     bottom: -17px;
     background: #fff;
     width: 400px;
-    margin-left: -21px;
-    padding: 10px;
+    padding: 10px 5px;
 }
 
 .add-buffer-as-new-label {
