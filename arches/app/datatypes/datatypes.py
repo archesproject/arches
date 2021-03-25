@@ -337,7 +337,7 @@ class DateDataType(BaseDataType):
             new_year = 1971
             while not is_same_calendar(year, new_year):
                 new_year += 1
-                if new_year > 2020: # should never happen but don't want a infinite loop
+                if new_year > 2020:  # should never happen but don't want a infinite loop
                     raise Exception("Backup timezone conversion failed: no matching year found")
             return new_year
 
