@@ -341,12 +341,14 @@ class DateDataType(BaseDataType):
                     # should never happen but don't want a infinite loop
                     raise Exception("Backup timezone conversion failed: no matching year found")
             return new_year
+
         def is_same_calendar(year1, year2):
             year1_weekday_1 = datetime.strptime(str(year1) + "-01-01", "%Y-%m-%d").strftime("%w")
             year1_weekday_2 = datetime.strptime(str(year1) + "-03-01", "%Y-%m-%d").strftime("%w")
             year2_weekday_1 = datetime.strptime(str(year2) + "-01-01", "%Y-%m-%d").strftime("%w")
             year2_weekday_2 = datetime.strptime(str(year2) + "-03-01", "%Y-%m-%d").strftime("%w")
             return (year1_weekday_1 == year2_weekday_1) and (year1_weekday_2 == year2_weekday_2)
+
         converted_dt = dt.replace(year=same_calendar(dt.year)).astimezone().replace(year=dt.year)
         return converted_dt
 
