@@ -10,7 +10,6 @@ import ast
 import time
 from distutils import util
 from datetime import datetime
-from dateutil.tz import tzlocal
 from mimetypes import MimeTypes
 from arches.app.datatypes.base import BaseDataType
 from arches.app.models import models
@@ -334,11 +333,21 @@ class DateDataType(BaseDataType):
         return value
 
     def backup_astimezone(self, dt):
-        if dt.tzinfo is None:
-            converted_dt = dt.replace(tzinfo=tzlocal())
-        else:
-            converted_dt = (dt - dt.utcoffset()).replace(tzinfo=tzlocal())
-            converted_dt = converted_dt + converted_dt.utcoffset()
+        def same_calendar(year):
+            new_year = 1971
+            while not is_same_calendar(year, new_year):
+                new_year += 1
+                if new_year > 2020:
+                    # should never happen but don't want a infinite loop
+                    raise Exception("Backup timezone conversion failed: no matching year found")
+            return new_year
+        def is_same_calendar(year1, year2):
+            year1_weekday_1 = datetime.strptime(str(year1) + "-01-01", "%Y-%m-%d").strftime("%w")
+            year1_weekday_2 = datetime.strptime(str(year1) + "-03-01", "%Y-%m-%d").strftime("%w")
+            year2_weekday_1 = datetime.strptime(str(year2) + "-01-01", "%Y-%m-%d").strftime("%w")
+            year2_weekday_2 = datetime.strptime(str(year2) + "-03-01", "%Y-%m-%d").strftime("%w")
+            return (year1_weekday_1 == year2_weekday_1) and (year1_weekday_2 == year2_weekday_2)
+        converted_dt = dt.replace(year=same_calendar(dt.year)).astimezone().replace(year=dt.year)
         return converted_dt
 
     def transform_export_values(self, value, *args, **kwargs):
