@@ -337,16 +337,15 @@ class DateDataType(BaseDataType):
             new_year = 1971
             while not is_same_calendar(year, new_year):
                 new_year += 1
-                if new_year > 2020:
-                    # should never happen but don't want a infinite loop
+                if new_year > 2020: # should never happen but don't want a infinite loop
                     raise Exception("Backup timezone conversion failed: no matching year found")
             return new_year
 
         def is_same_calendar(year1, year2):
-            year1_weekday_1 = datetime.strptime(str(year1) + "-01-01", "%Y-%m-%d").strftime("%w")
-            year1_weekday_2 = datetime.strptime(str(year1) + "-03-01", "%Y-%m-%d").strftime("%w")
-            year2_weekday_1 = datetime.strptime(str(year2) + "-01-01", "%Y-%m-%d").strftime("%w")
-            year2_weekday_2 = datetime.strptime(str(year2) + "-03-01", "%Y-%m-%d").strftime("%w")
+            year1_weekday_1 = datetime.strptime(str(year1) + "-01-01", "%Y-%m-%d").weekday()
+            year1_weekday_2 = datetime.strptime(str(year1) + "-03-01", "%Y-%m-%d").weekday()
+            year2_weekday_1 = datetime.strptime(str(year2) + "-01-01", "%Y-%m-%d").weekday()
+            year2_weekday_2 = datetime.strptime(str(year2) + "-03-01", "%Y-%m-%d").weekday()
             return (year1_weekday_1 == year2_weekday_1) and (year1_weekday_2 == year2_weekday_2)
 
         converted_dt = dt.replace(year=same_calendar(dt.year)).astimezone().replace(year=dt.year)
