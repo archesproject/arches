@@ -734,7 +734,10 @@ footer .footer-links {
     color: #fff;
 }
 
-.splash-link-address:focus, .splash-link-address:hover {
+.splash-link-address:focus,
+.splash-link-address:hover,
+.link-spacing:focus,
+.link-spacing:hover {
     color: #7AD02F;
     text-decoration: underline;
 }
