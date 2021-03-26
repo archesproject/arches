@@ -675,13 +675,8 @@ footer .footer-links {
 }
 
 .splash-img {
-    display: inline-flex;
-    margin: auto;
-    justify-content: center;
-}
-
-.splash-img img {
-    max-width: 90%;
+    border: none;
+    padding: 0 20px;
 }
 
 .search-screen {
