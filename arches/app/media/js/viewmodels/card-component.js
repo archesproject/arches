@@ -165,8 +165,8 @@ define([
             });
         };
 
-        if (params.fooSave) {
-            params.fooSave(self.saveTile);
+        if (params.saveFunction) {
+            params.saveFunction(self.saveTile);
         }
 
         this.saveTileAddNew = function() {

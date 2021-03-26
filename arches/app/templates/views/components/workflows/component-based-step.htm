@@ -33,12 +33,6 @@
                             width: 100%;
                         "
                     >
-
-
-                        <div style="display:none" data-bind="text: console.log('herehere', componentData, $data, $parent)"></div>
-
-
-
                         <!-- ko if: !loading() && !saving() -->
                         <div data-bind="component: {
                             name: componentData['componentName'],
@@ -46,7 +40,6 @@
                                 ...componentData['parameters'],
                                 form: $data,
                                 pageVm: $root,
-                                value: $data.value
                             }
                         }"></div>
                         <!-- /ko -->

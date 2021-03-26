@@ -258,8 +258,8 @@ define([
             });
         };
 
-        if (params.fooSave) {
-            params.fooSave(self.saveTiles);
+        if (params.saveFunction) {
+            params.saveFunction(self.saveTiles);
         }
 
 

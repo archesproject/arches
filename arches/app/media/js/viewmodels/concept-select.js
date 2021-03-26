@@ -17,12 +17,6 @@ define([
 
         WidgetViewModel.apply(this, [params]);
 
-        // if (params.value()) {
-        //     self.value(params.value());
-        //     self.value.valueHasMutated()
-        // }
-        
-
         this.valueList = ko.computed(function() {
             var valueList = self.value();
             self.displayName();
@@ -79,11 +73,6 @@ define([
                 }
             });
         });
-
-        /* flags UI change for previously saved data */
-        if (self.value()) {
-            self.value.valueHasMutated();  
-        }
 
         this.select2Config = {
             value: self.value,
