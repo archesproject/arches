@@ -33,6 +33,13 @@
                             width: 100%;
                         "
                     >
+
+
+                        <div style="display:none" data-bind="text: console.log('herehere', componentData, $data, $parent)"></div>
+
+
+
+                        <!-- ko if: !loading() && !saving() -->
                         <div data-bind="component: {
                             name: componentData['componentName'],
                             params: {
@@ -42,9 +49,10 @@
                                 value: $data.value
                             }
                         }"></div>
+                        <!-- /ko -->
 
                         <!-- ko if: componentData['tilesManaged'] === "many" -->
-                            <!-- ko if: currentlyEditedData() || isDirty() -->
+                            <!-- ko if: isDirty() -->
                             <div
                                 style="
                                     display: flex;
@@ -55,7 +63,7 @@
                                 <button 
                                     class="btn btn-workflow-tile btn-danger" 
                                     style="margin-right: 8px;"
-                                    data-bind="click: clearForm"
+                                    data-bind="click: clearEditor"
                                 >
                                     {% trans "Clear" %}
                                 </button>
@@ -63,8 +71,8 @@
                                 <button 
                                     class="btn btn-workflow-tile btn-success" 
                                     data-bind="{
-                                        click: addOrUpdateEntry,
-                                        text: currentlyEditedData() ? 'Save' : 'Add'
+                                        click: addOrUpdateTile,
+                                        text: tileLoadedInEditor() ? 'Save' : 'Add'
                                     }"
                                 ></button>
                             </div>
@@ -78,7 +86,7 @@
                             <h4 data-bind="text: (itemName())"></h4>
                             
 
-                            <!-- ko if: addedData().length === 0 -->
+                            <!-- ko if: !tiles() || tiles().length === 0 -->
                             <div class="wf-multi-tile-step-list-empty">
                                 <p data-bind="text: ('No '+itemName()+' added yet. Add one or multiple '+itemName()+'.')"></p>
                             </div>
@@ -98,19 +106,19 @@
                                         right: 6px;
                                     "
                                 >
-                                    <!-- ko foreach: {data: addedData, as: 'tile'} -->
+                                    <!-- ko foreach: {data: tiles(), as: 'tile'} -->
                                         <div class="wf-multi-tile-step-card">
                                             <div class="wf-multi-tile-card-info">
                                                 <div class="workflow-step-icon complete"><span><i class="fa fa-hashtag"></i></span></div>
                                                 <div class="wf-multi-tile-card-info-details">
-                                                    <!-- ko foreach: {data: $parent.card().widgets(), as: 'widget'} -->
+                                                    <!-- ko foreach: {data: tile.parent.widgets(), as: 'widget'} -->
                                                         <!-- ko component: {
                                                             name: widget.widgetLookup[widget.get("widget_id")()].name,
                                                             params: {
                                                                 config: widget.configJSON,
                                                                 label: widget.label(),
                                                                 node: widget.node,
-                                                                value: ko.observable($parent[widget.node_id()]),
+                                                                value: tile.data[widget.node_id()],
                                                                 state: "report",
                                                             }
                                                         } --><!-- /ko -->
@@ -119,14 +127,14 @@
                                             </div>
                                             <div class="wf-multi-tile-step-card-controls">
                                                 <div 
-                                                    data-bind="click: function(){$parent.addedData.remove($data)}"
+                                                    data-bind="click: function(){$parent.removeTile(tile)}"
                                                 >
                                                     <i class="fa fa-times-circle"></i>
                                                     <span>
                                                         {% trans "Remove" %}
                                                     </span>
                                                 </div>
-                                                <div data-bind="click: function(){$parent.loadEntryIntoEditor($data)}">
+                                                <div data-bind="click: function(){$parent.loadTileIntoEditor(tile)}">
                                                     <i class="fa fa-pencil"></i>
                                                     <span>
                                                         {% trans "Edit" %}

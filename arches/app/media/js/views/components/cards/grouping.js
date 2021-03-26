@@ -26,6 +26,8 @@ define([
         this.tiles = [];
         this.widgetInstanceDataLookup = {};
 
+        console.log("DDDDDDD", self, params)
+
         /*
             'sortedWidgetIds' originally referred to entries in the
             card_x_node_x_widget table. This has been changed, and
@@ -146,6 +148,13 @@ define([
                 return tiles;
             }
         }, this);
+        if (ko.isObservable(params.tiles)) {
+            params.tiles(self.groupedTiles());
+
+            self.groupedTiles.subscribe(function(tiles) {
+                params.tiles(tiles);
+            });
+        }
 
         this.hasTiles = ko.computed(function() {
             return _.some(this.groupedCards(), function(card) {
@@ -187,10 +196,15 @@ define([
         };
 
         this.dirty = ko.computed(function() {
-            return _.find(this.groupedTiles(), function(tile) {
+            return Boolean(_.find(self.groupedTiles(), function(tile) {
                 return tile.dirty();
-            }, this);
-        }, this);
+            }));
+        });
+        if (ko.isObservable(params.dirty)) {
+            this.dirty.subscribe(function(dirty) {
+                params.dirty(dirty);
+            })
+        }
 
         this.previouslySaved = ko.computed(function() {
             return !!(_.find(this.groupedTiles(), function(tile) {
@@ -199,11 +213,13 @@ define([
         }, this);
 
         this.saveTiles = function(){
-            var self = this;
+            // var self = this;
             var errors = ko.observableArray().extend({ rateLimit: 250 });
-            var tiles = this.groupedTiles();
-            var tile = this.groupedTiles()[0];
-            this.saving = true;
+            var tiles = self.groupedTiles();
+            var tile = self.groupedTiles()[0];
+            self.saving = true;
+            console.log("@@@@@@", self.tiles[0].data, tiles[0].data)
+
             tile.save(function(response) {
                 errors.push(response);
                 self.saving = false;
@@ -222,6 +238,7 @@ define([
                     self.groupedCardIds.valueHasMutated();
                     self.selectGroupCard();
                     if (params.form.onSaveSuccess) {
+                        console.log("@@@@@@", self.tiles[0].data)
                         params.form.onSaveSuccess(self.tiles);
                     }
                     self.loading(false);
@@ -240,6 +257,11 @@ define([
                 }
             });
         };
+
+        if (params.fooSave) {
+            params.fooSave(self.saveTiles);
+        }
+
 
         this.deleteTiles = function(){
             params.loading(true);

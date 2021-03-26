@@ -322,8 +322,9 @@ define([
                     }
                 });
             },
-            getNewTile: function() {
-                if (!this.newTile) this.newTile = new TileViewModel({
+            getNewTile: function(forceNewTile) {
+                console.log("AAA", forceNewTile, self, params)
+                if (!this.newTile || forceNewTile) this.newTile = new TileViewModel({
                     tile: {
                         tileid: '',
                         resourceinstance_id: ko.unwrap(params.resourceId),

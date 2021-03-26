@@ -8,8 +8,9 @@ define([
     'models/graph',
     'viewmodels/card',
     'viewmodels/provisional-tile',
+    'viewmodels/tile',
     'viewmodels/alert'
-], function(_, $, arches, ko, koMapping, uuid, GraphModel, CardViewModel, ProvisionalTileViewModel) {
+], function(_, $, arches, ko, koMapping, uuid, GraphModel, CardViewModel, ProvisionalTileViewModel, fooTileVM) {
     function NonTileBasedComponent(complete) {
         var self = this;
 
@@ -48,40 +49,61 @@ define([
         var self = this;
 
         this.tile = ko.observable();
+        this.tiles = ko.observable();
+
         this.card = ko.observable();
         this.topCards = ko.observable();
 
-        self.isDirty = ko.computed(function() {
-            if (self.tile()) {
-                return self.tile().dirty();
-            }
-            return false;
-        });
+        self.isDirty = ko.observable();
+
+        self.fooSave = ko.observable();
+        self.saving = ko.observable();
+
+        this.fff = function(data) {
+                /* a flat object of the previously saved data for all tiles */ 
+                var foobar = data.reduce(function(acc, componentData) {
+                    var parsedData = JSON.parse(componentData);
+    
+                    Object.keys(parsedData).forEach(function(key) {
+                        acc[key] = parsedData[key];
+                    });
+    
+                    return acc;
+                }, {});
+
+                console.log("FOFOFOF", self, foobar, data, self.savedData())
+
+    
+                self.tiles().forEach(function(fooTile) {
+        
+                    console.log("A@#@#@@#@@#@#", self.loading())
+                    /* force the value of current tile data observables */ 
+                    Object.keys(fooTile.data).forEach(function(key) {
+                        if (ko.isObservable(fooTile.data[key])) {
+                            // console.log("SSSSSSSS", key, foobar, foobar[key])
+                            fooTile.data[key](foobar[key]);
+                        }
+                    });
+    
+                    fooTile._tileData(koMapping.toJSON(fooTile.data));
+                });
+        }
 
         this.initialize = function() {
             if (self.componentData.tilesManaged === "one") {
-                self.tile.subscribe(function(tile) {
-                    if (tile) {
-                        if (self.previouslyPersistedComponentData) {
-                            self.savedData(self.previouslyPersistedComponentData);
-                            self.addedData.push(self.previouslyPersistedComponentData[0].data);
-
-                            /* force the value of current tile data observables */ 
-                            Object.keys(tile.data).forEach(function(key) {
-                                if (ko.isObservable(tile.data[key])) {
-                                    tile.data[key](self.previouslyPersistedComponentData[0].data[key]);
-                                }
-                            });
-
-                            tile._tileData(koMapping.toJSON(tile.data));
-                        }
-                    }
+                self.isDirty.subscribe(function(dirty) {
+                    self.hasUnsavedData(dirty)
                 });
 
-                self.isDirty.subscribe(function(dirty) {
-                    if (dirty && !self.loading()) {
-                        self.addedData.removeAll();
-                        self.addedData.push(ko.toJS(self.tile().data));
+                self.tiles.subscribe(function(zzz) {
+                    if (zzz && !self.saving()) {
+                        if (self.savedData().length) {  /* if the refresh after tile save */
+                            self.fff(self.savedData());
+                        }
+                        else if (self.previouslyPersistedComponentData) { /* if previously saved data */
+                            self.fff(self.previouslyPersistedComponentData);
+                        }
+                       
                     }
                 });
             }
@@ -113,6 +135,8 @@ define([
                     },
                     datatypes: data.datatypes
                 });
+
+                self.graphModel = graphModel;
     
                 self.topCards = _.filter(data.cards, function(card) {
                     var nodegroup = _.find(data.nodegroups, function(group) {
@@ -195,21 +219,43 @@ define([
                 self.componentData.parameters.loading = self.loading;
                 self.componentData.parameters.provisionalTileViewModel = self.provisionalTileViewModel;
                 self.componentData.parameters.reviewer = data.userisreviewer;
+                self.componentData.parameters.dirty = self.isDirty;
+                self.componentData.parameters.fooSave = self.fooSave;
+                self.componentData.parameters.tiles = self.tiles;
     
                 self.loading(false);
             });
         };
 
         this.save = function() {
-            self.tile().save(
-                function(){ /* onFail */ },
-                function(savedTileData) {
-                    self.savedData.removeAll();
-                    self.savedData.unshift(savedTileData);
-                    self.complete(true);
-                },
-            );
+            self.saving(true);
+
+            var saveFunction = self.fooSave();
+
+            if (saveFunction) {
+                saveFunction();
+            }
+
         };
+
+        this.onSaveSuccess = function(foo) {
+            console.log("REALLY?", foo, self.loading())
+            
+            if (!(foo instanceof Array)) { foo = [foo]; }
+            
+            var baz = foo.map(function(bar) {
+                console.log(ko.toJSON(bar.data), bar._tileData())
+                return bar._tileData();
+            })
+            
+            // console.log("REALLY?", baz,)
+            // // self.savedData.removeAll();
+            self.savedData(baz);
+            self.saving(false)
+
+
+            // self.complete(true);
+        }
 
         this.reset = function() {
             self.tile().reset();
@@ -224,170 +270,219 @@ define([
 
     function MultipleTileBasedComponent(title) {
         var self = this;
-
-        this.currentlyEditedData = ko.observable(null);
-        this.itemName = ko.observable(ko.unwrap(title) ? ko.unwrap(title) : 'Items');
-
         TileBasedComponent.apply(this);
 
-        this.initialize = function() {
-            if (self.previouslyPersistedComponentData) {
-                self.previouslyPersistedComponentData.forEach(function(previouslyPersistedDatum) {
-                    if (previouslyPersistedDatum.tileid) {
-                        /* add tileid to nodeData for reference. */ 
-                        previouslyPersistedDatum.data.tileid = previouslyPersistedDatum.tileid;
+        this.tileLoadedInEditor = ko.observable();
+
+        this.itemName = ko.observable(ko.unwrap(title) ? ko.unwrap(title) : 'Items');
+
+        this.hasDirtyTiles = ko.computed(function() {
+            var tiles = self.tiles();
+            var hasDirtyTiles = false;
+
+            if (!tiles) { 
+                hasDirtyTiles = true; 
+            }
+            else if (self.savedData().length ) {
+                if (self.savedData().length !== tiles.length) {
+                    hasDirtyTiles = true;
+                }
+
+                self.savedData().forEach(function(savedDatum) {
+                    var matchingTile = tiles.find(function(tile) {
+                        return tile.tileid === savedDatum.tileid;
+                    });
+
+                    if (!matchingTile) {
+                        hasDirtyTiles = true;
                     }
-    
-                    self.addedData.push(previouslyPersistedDatum.data);
-                    self.savedData.push(previouslyPersistedDatum);
+                    else if (!_.isEqual(savedDatum.data, koMapping.toJS(matchingTile.data))) {
+                        hasDirtyTiles = true;
+                    }
                 });
             }
+            else if (!self.previouslyPersistedComponentData && tiles.length) {
+                hasDirtyTiles = true;
+            }
+            else if (self.previouslyPersistedComponentData) {
+                if (self.previouslyPersistedComponentData.length !== tiles.length) {
+                    hasDirtyTiles = true;
+                }
+
+                self.previouslyPersistedComponentData.forEach(function(persistedComponentData) {
+                    var matchingTile = tiles.find(function(tile) {
+                        return tile.tileid === persistedComponentData.tileid;
+                    });
+
+                    if (!matchingTile) {
+                        hasDirtyTiles = true;
+                    }
+                    else if (!_.isEqual(persistedComponentData.data, koMapping.toJS(matchingTile.data))) {
+                        hasDirtyTiles = true;
+                    }
+                });
+            }
+            else if (self.isDirty()) {
+                hasDirtyTiles = true;
+            }
+
+            return hasDirtyTiles;
+        });
+        self.hasDirtyTiles.subscribe(function(hasDirtyTiles) {
+            self.hasUnsavedData(hasDirtyTiles);
+        });
+        
+        this.initialize = function() {
+            self.loading(true);
+
+            var savingSubscription = self.saving.subscribe(function(saving) {
+                if (!saving) {
+                    self.initialize();
+                    savingSubscription.dispose(); /* self-disposing subscription only runs once */ 
+                }
+            });
+
+            var multiTileInitSubscription = self.tiles.subscribe(function(tiles) {
+                /* 
+                    at this point in load `self.tiles()` contains a reference to the empty
+                    tile we're using to map values to other tiles. This removes the empty
+                    mapping tile from being tracked
+                */ 
+                if (tiles.length === 1 && !tiles[0].tileid) {
+                    var savedTiles = [];
+
+                    if (self.savedData().length) {
+                        var savedData = self.savedData();
+
+                        savedData.forEach(function(savedDatum) {
+                            var newTile = self.card().getNewTile(true);
+
+                            newTile.tileid = savedDatum.tileid;
+                            newTile.data = koMapping.fromJS(savedDatum.data);
+                            
+                            savedTiles.unshift(newTile);
+                        });
+                    }
+
+                    self.tiles(savedTiles);
+                    multiTileInitSubscription.dispose();  /* self-disposing subscription only runs once */ 
+                }
+            });
+
+            /* load previously persisted data */ 
+            var multiTilePersistedDataSubscription = self.tiles.subscribe(function(tiles) {
+                if (self.previouslyPersistedComponentData && (!tiles || !tiles.length)) {
+                    var persistedTiles = [];
+
+                    self.previouslyPersistedComponentData.forEach(function(persistedComponentData) {
+                        var newTile = self.card().getNewTile(true);
+
+                        newTile.tileid = persistedComponentData.tileid;
+                        newTile.data = koMapping.fromJS(persistedComponentData.data);
+
+                        persistedTiles.unshift(newTile);
+                    });
+
+                    self.tiles(persistedTiles);
+                    multiTilePersistedDataSubscription.dispose();  /* self-disposing subscription only runs once */ 
+                }
+            });
+
         };
 
-        this.addOrUpdateEntry = function() {
-            var tileData = koMapping.toJS(self.tile().data);
-            var currentlyEditedData = self.currentlyEditedData();
-            
-            if (currentlyEditedData) {
-                tileData.tileid = currentlyEditedData.tileid;
-                self.addedData.replace(currentlyEditedData, tileData);
-                self.currentlyEditedData(null);
+        this.addOrUpdateTile = function() {
+            var tiles = self.tiles();
+            self.tiles(null);
+
+            /* breaks observable chain */ 
+            var tileData = koMapping.fromJSON(
+                koMapping.toJSON(self.tile().data)
+            );
+
+            var tileLoadedInEditor = self.tileLoadedInEditor();
+
+            if (tileLoadedInEditor) {
+                var index = _.findIndex(tiles, tileLoadedInEditor);
+                
+                if (index > -1) {
+                    tileLoadedInEditor.data = tileData;
+                    tiles[index] = tileLoadedInEditor;
+                }
+
+                
+                self.tileLoadedInEditor(null);
             }
             else {
-                self.addedData.unshift(tileData);
+                var newTile = self.card().getNewTile(true);
+                newTile.data = tileData;
+
+                tiles.unshift(newTile);
             }
 
+            self.tiles(tiles);
             self.tile().reset();
         };
 
-        this.loadEntryIntoEditor = function(data) {
-            self.currentlyEditedData(data);
+        this.loadTileIntoEditor = function(data) {
+            self.tileLoadedInEditor(data)
 
             var tile = self.tile();
 
             /* force the value of current tile data observables */ 
             Object.keys(tile.data).forEach(function(key) {
                 if (ko.isObservable(tile.data[key])) {
-                    tile.data[key](data[key]);
+                    tile.data[key](data.data[key]());
                 }
             });
+        };
+
+        this.removeTile = function(data) {
+            var filteredTiles = self.tiles().filter(function(tile) { return tile !== data });
+            self.tiles(filteredTiles);
         };
 
         this.save = function() {
-            self.loading(true);
-            var processedTiles = ko.observableArray([]);
-            processedTiles.subscribe(function(tiles){
-                var allData = self.addedData().length + self.savedData().length;
-                if (tiles.length <= allData) {
-                    self.complete(true);
-                }
-            })
+            self.saving(true);
+            self.savedData.removeAll();
+            
+            var unorderedSavedData = ko.observableArray();
 
-            /* save new tiles */ 
-            self.addedData().forEach(function(data) {
-                var tile = self.tile();
-
-                /* force the value of current tile data observables */ 
-                Object.keys(tile.data).forEach(function(key) {
-                    if (ko.isObservable(tile.data[key])) {
-                        tile.data[key](data[key]);
+            self.tiles().forEach(function(tile) {
+                tile.save(
+                    function(){/* onFail */}, 
+                    function(savedTileData) {
+                        unorderedSavedData.push(savedTileData);
                     }
-                });
-                
-                /* if it already has a tileid here, it's a previously saved tile */ 
-                if (!data.tileid) {
-                    tile.save(
-                        function(){/* onFail */}, 
-                        function(savedTileData) {
-                            self.savedData.unshift(savedTileData);
-                            processedTiles.push(savedTileData);
-                        },
-                    );
-                }
-                self.tile(self.card().getNewTile());
+                );
             });
 
-            var removedTiles = [];
+            var saveSubscription = unorderedSavedData.subscribe(function(savedData) {
+                if (savedData.length === self.tiles().length) {
+                    self.loading(true);
+                    self.saving(false);
 
-            self.savedData().forEach(function(data) {
-                var tile = self.tile();
-                tile.tileid = data.tileid;
-
-                var editedData = ko.utils.arrayFirst(self.addedData(), function(addedDatum) {
-                    return addedDatum.tileid === data.tileid;
-                });
-
-                if (!editedData) {
-                    /* means we removed the tile from the list */
-                    removedTiles.push(data)
-                }
-                else {
-                    /* force the value of current tile data observables */ 
-                    Object.keys(tile.data).forEach(function(key) {
-                        if (ko.isObservable(tile.data[key])) {
-                            tile.data[key](editedData[key]);
-                        }
+                    orderedSavedData = self.tiles().map(function(tile) {
+                        return savedData.find(function(zzz) {
+                            return zzz.tileid === tile.tileid;
+                        })
                     });
 
-                    tile.save(
-                        function(){/* onFail */},
-                        function(savedTileData) {
-                            var previousTileData = ko.utils.arrayFirst(self.savedData(), function(savedDatum) {
-                                return savedDatum.tileid === savedTileData.tileid;
-                            });
+                    self.savedData(orderedSavedData.reverse());
 
-                            self.savedData.replace(previousTileData, savedTileData);
-                            self.addedData.replace(previousTileData.data, savedTileData.data);
-                            processedTiles.push(savedTileData);
-                        },
-                    )
-
-                    self.tile(self.card().getNewTile());
+                    saveSubscription.dispose();  /* self-disposing subscription only runs once */ 
                 }
-            });
-
-            removedTiles.forEach(function(data) {
-                var tile = self.tile();
-                tile.tileid = data.tileid;
-
-                tile.deleteTile();
-                processedTiles.push(data)
-            });
-
-            self.savedData.removeAll(removedTiles);
-
-            self.currentlyEditedData(null);
-            self.tile().reset();
+            })
         };
 
-        this.clearForm = function() {
-            var tile = self.tile();
-
-            Object.keys(tile.data).forEach(function(key) {
-                if (ko.isObservable(tile.data[key])) {
-                    tile.data[key](null);
-                }
-            });
+        this.clearEditor = function() {
+            self.tile().reset()
         };
 
         this.reset = function() {
-            self.currentlyEditedData(null);
+            self.tileLoadedInEditor(null);
             self.tile().reset();
-
-            self.addedData.removeAll();
-            self.savedData.removeAll();
-
-            if (self.previouslyPersistedComponentData) {
-                self.previouslyPersistedComponentData.forEach(function(previouslyPersistedDatum) {
-                    if (previouslyPersistedDatum.tileid) {
-                        /* add tileid to nodeData for reference. */ 
-                        previouslyPersistedDatum.data.tileid = previouslyPersistedDatum.tileid;
-                    }
-
-                    self.addedData.push(previouslyPersistedDatum.data);
-                    self.savedData.push(previouslyPersistedDatum);
-                });
-            }
+            self.initialize();
+            self.loading(false);
         };
 
         this.initialize();
@@ -396,6 +491,7 @@ define([
 
     function WorkflowComponentAbstract(componentData, previouslyPersistedComponentData, resourceId, title, complete) {
         var self = this;
+
         this.complete = complete;
         this.resourceId = resourceId;
         this.componentData = componentData;
@@ -406,21 +502,7 @@ define([
         this.addedData = ko.observableArray();
         this.savedData = ko.observableArray();
 
-        this.hasUnsavedData = ko.computed(function() {
-            var isAllSavedDataInAddedData = self.savedData().reduce(function(acc, savedDatum) {
-                if (self.addedData.indexOf(savedDatum.data) === -1) { acc = false; }
-                return acc;
-            }, true);
-
-            /* we can assume that an array of equal length to savedData, containing all values of savedData, is valid */ 
-            if (
-                !isAllSavedDataInAddedData || !( self.savedData().length === self.addedData().length ) 
-            ) {
-                return true;
-            }
-
-            return false;
-        });
+        this.hasUnsavedData = ko.observable();
 
         this.initialize = function() {
             if (!componentData.tilesManaged || componentData.tilesManaged === "none") {
@@ -546,7 +628,7 @@ define([
 
             workflowComponentAbstract.savedData.subscribe(function() {
                 var dataToPersist = self.dataToPersist();
-                dataToPersist[workflowComponentAbtractData.uniqueInstanceName] = koMapping.toJS(workflowComponentAbstract.savedData());
+                dataToPersist[workflowComponentAbtractData.uniqueInstanceName] = workflowComponentAbstract.savedData();
                 self.dataToPersist(dataToPersist);
             });
 
@@ -576,8 +658,6 @@ define([
                     workflowComponentAbstract.save();
                 } 
             });
-
-            // self.complete(true);
         };
 
         this.reset = function() {

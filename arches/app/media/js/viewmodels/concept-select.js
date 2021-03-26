@@ -14,8 +14,14 @@ define([
         this.multiple = params.multiple || false;
         this.allowClear = true;
         this.displayName = ko.observable('');
-        
+
         WidgetViewModel.apply(this, [params]);
+
+        // if (params.value()) {
+        //     self.value(params.value());
+        //     self.value.valueHasMutated()
+        // }
+        
 
         this.valueList = ko.computed(function() {
             var valueList = self.value();
@@ -56,7 +62,6 @@ define([
 
         this.value.subscribe(function() {
             var names = [];
-    
             self.valueList().forEach(function(val) {
                 if (val) {
                     if (NAME_LOOKUP[val]) {

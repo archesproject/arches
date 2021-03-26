@@ -62,6 +62,8 @@ define([
         var filter = params.filter || ko.observable();
         var loading = params.loading || ko.observable();
 
+        console.log("TILEVIEWMOVEL", params)
+
         _.extend(this, params.tile);
 
         this._tileData = ko.observable(
