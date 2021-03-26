@@ -656,10 +656,35 @@ input[type="checkbox"] {
 }
 
 .tabbed-workflow-step-information-box {
-    padding: 10px 20px 20px 20px;
-    background-color: #fafafa;
+    padding: 10px 35px 20px 35px;
+    background-color: #eaeaea;
     border: 1px solid #ddd;
     color: grey;
+    margin: -16px -21px 0px -21px;
+    height: 100px;
+    overflow-y: scroll;
+    position: relative;
+}
+
+.btn-workflow-tile {
+    padding: 8px 20px;
+    min-width: 100px;
+}
+
+.btn-workflow-tile.btn-success {
+    border: 1px solid #508A14;
+}
+
+.btn-workflow-tile.btn-danger {
+    border: 1px solid #B02107;
+}
+
+.tabbed-workflow-step-information-box h4 {
+    font-size: 14px;
+    margin-bottom: 2px;
+}
+
+.tabbed-workflow-step-information-box span {
     margin-bottom: 10px;
 }
 
@@ -723,6 +748,7 @@ input[type="checkbox"] {
 .tabbed-workflow-footer .btn,
 .tabbed-workflow-title-bar .btn {
     border-radius: 2px;
+    padding: 8px 15px;
 }
 
 .tabbed-workflow-title-bar .btn > i,
@@ -734,6 +760,18 @@ input[type="checkbox"] {
 
 .workflow-step-body .workbench-card-wrapper {
     margin-left: -25px;
+}
+
+.tabbed-workflow-step-body .card-component {
+    border: none;
+   /* padding: 0px;*/
+    margin: 10px 35px;
+}
+
+.padded-workflow-step .card-component {
+    border: none;
+    padding: 0px;
+    margin: 0px 15px;
 }
 
 .padded-workflow-step,
@@ -792,6 +830,27 @@ input[type="checkbox"] {
     height: 100%;
     width: 500px;
     overflow-y: scroll;
+}
+
+.wf-multi-tile-step-list-container {
+
+}
+
+.wf-step-multi-tile-container {
+    width: 60%;
+    padding: 30px;
+    border: 1px solid #ddd;
+    border-radius: 2px;
+    background-color: #f1f1f1;
+    margin-top: 0px;
+    margin-right: 0px;
+    display: flex;
+    flex-direction: column;
+}
+
+.wf-step-multi-tile-container h4 {
+    font-size: 14px;
+    font-weight: 500;
 }
 
 .wf-multi-tile-step-list-empty {
@@ -900,13 +959,22 @@ div.wf-multi-tile-card-info div {
 }
 .workflow-nav-tab {
     min-width: 220px;
-    padding: 10px 20px;
-    border-left: 1px solid #ddd;
+    padding: 12px 20px;
+    border-left: 1px solid #BBD1EA;
+    background: #F7F9FB;
+    border-bottom: 1px solid #BBD1EA;
+    height: 45px;
 }
 
 .workflow-nav-tab.active {
     background-color: #fff;
+    border-bottom: 1px solid #fff;
     font-weight: 600;
+    padding-top: 10px;
+}
+
+.workflow-nav-tab-list-item:last-child {
+    border-right: 1px solid #ddd;
 }
 
 .workflow-nav-tab.inactive {
@@ -2144,7 +2212,7 @@ div.final-cons-step-separator>h4 {
 .workbench-card-sidepanel-header {
     cursor: pointer;
     color: rgb(33, 62, 95);
-    font-size: 19px;
+    font-size: 15px;
 }
 
 .workbench-card-sidepanel-header:before {
@@ -2392,6 +2460,11 @@ div.final-cons-step-separator>h4 {
 .map-card-zoom-tool {
     float: right;
     padding: 10px;
+}
+
+.map-card-zoom-tool a {
+    display: inline-block;
+    padding: 0px 3px;
 }
 
 #map-settings {
@@ -6603,7 +6676,6 @@ ul div .card-tree-list span .card-tree-list-item .card-tree-list-icon {
 
 .new-provisional-edit-card-container .card {
     width: 100%;
-    padding-top: 15px;
 }
 
 .new-provisional-edit-entry {
@@ -7609,6 +7681,7 @@ div .switch label:hover,
 .dz-previews {
     border: 1px solid #ddd;
     overflow-y: scroll;
+    width: 100%;
 }
 
 .file-upload-filter {
@@ -13443,6 +13516,10 @@ a.jstree-anchor.permissions-widget {
     margin: 0;
 }
 
+.map-coordinate-editor {
+    margin-top: 15px;
+}
+
 .map-coordinate-editor-crs-selector {
     position: fixed;
     margin-top: 25px;
@@ -13516,8 +13593,7 @@ a.jstree-anchor.permissions-widget {
     bottom: -17px;
     background: #fff;
     width: 400px;
-    margin-left: -21px;
-    padding: 10px;
+    padding: 10px 5px;
 }
 
 .add-buffer-as-new-label {

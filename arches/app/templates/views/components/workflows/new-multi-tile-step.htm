@@ -20,7 +20,9 @@
             <button class="btn btn-shim btn-labeled btn-lg fa fa-caret-right btn-mint wf-multi-tile-btn-complete" data-bind="click: function(){complete(true)}">{% trans "Continue" %}</button>
         </div>
         <div class="wf-multi-tile-step-list">
-            <div><h4 data-bind="text: (itemName())"></h4></div>
+            <div class="wf-multi-tile-step-list-container">
+                <h4 data-bind="text: (itemName())"></h4>
+            </div>
             <!-- ko if: card().tiles().length === 0 -->
             <div class="wf-multi-tile-step-list-empty">
                 <p data-bind="text: ('No '+itemName()+' added yet. Add one or multiple '+itemName()+'.')"></p>
