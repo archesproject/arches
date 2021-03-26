@@ -25,6 +25,10 @@ class JSONResponse(HttpResponse):
         if stream is not None:
             options["stream"] = stream
         if indent is not None:
+            if str.isdigit(str(indent)):
+                indent = int(indent)
+            else:
+                indent = None
             options["indent"] = indent
         if selected_fields is not None:
             options["selected_fields"] = selected_fields

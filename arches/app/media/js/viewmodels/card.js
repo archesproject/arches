@@ -273,7 +273,7 @@ define([
                     }
                 },
                 owner: this
-            }),
+            }).extend({ throttle: 1 }),
             showForm: ko.observable(false),
             showSummary: ko.pureComputed(function(){
                 return self.canAdd() && self.showForm() === false && self.selected();
@@ -400,7 +400,7 @@ define([
             // Returns true if a tile is dirty and dirty state is not triggered by default values.
             var tile = self.newTile;
 
-            /* corner case for accessing previously saved tiles within workflows */ 
+            /* corner case for accessing previously saved tiles within workflows */
             if (
                 !tile
                 && self.context === 'workflow'

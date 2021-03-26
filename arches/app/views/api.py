@@ -37,7 +37,7 @@ from arches.app.models.graph import Graph
 from arches.app.models.mobile_survey import MobileSurvey
 from arches.app.models.resource import Resource
 from arches.app.models.system_settings import settings
-from arches.app.models.tile import Tile as TileProxyModel
+from arches.app.models.tile import Tile as TileProxyModel, TileValidationError
 from arches.app.views.tile import TileData as TileView
 from arches.app.utils.skos import SKOSWriter
 from arches.app.utils.response import JSONResponse
@@ -1231,3 +1231,53 @@ class NodeValue(APIBase):
             response = JSONResponse(_("User does not have permission to edit this node."), status=403)
 
         return response
+
+
+class Validator(APIBase):
+    """
+    Class for validating objects (resource instances, tiles, etc...) individually
+    """
+
+    def get(self, request, itemtype=None, itemid=None):
+        valid_item_types = ["resource", "tile"]
+
+        ret = {"valid": None}
+        indent = request.GET.get("indent", None)
+        verbose = False if request.GET.get("verbose", "false").startswith("f") else True
+
+        if itemtype not in valid_item_types:
+            return JSONResponse(
+                {"message": f"items to validate can only be of the following types: {valid_item_types} -- eg: .../item_type/item_id"},
+                status=400,
+            )
+
+        if itemtype == "resource":
+            try:
+                resource = Resource.objects.get(pk=itemid)
+            except:
+                return JSONResponse(status=404)
+
+            errors = resource.validate(verbose=verbose)
+            ret["valid"] = len(errors) == 0
+            if verbose:
+                ret["errors"] = errors
+            return JSONResponse(ret, indent=indent)
+
+        if itemtype == "tile":
+            errors = []
+            try:
+                tile = TileProxyModel.objects.get(pk=itemid)
+            except:
+                return JSONResponse(status=404)
+
+            try:
+                tile.validate(raise_early=(not verbose))
+            except TileValidationError as err:
+                errors += err.message if isinstance(err.message, list) else [err.message]
+
+            ret["valid"] = len(errors) == 0
+            if verbose:
+                ret["errors"] = errors
+            return JSONResponse(ret, indent=indent)
+
+        return JSONResponse(status=400)
