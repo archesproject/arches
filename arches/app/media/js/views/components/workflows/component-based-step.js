@@ -21,6 +21,7 @@ define([
             });
 
             self.addedData.push([self.componentData.uniqueInstanceName, value]);
+            self.hasUnsavedData(value);
         });
 
         this.initialize = function() {
@@ -56,7 +57,6 @@ define([
         self.isDirty = ko.observable();
 
         self.saveFunction = ko.observable();
-        self.saving = ko.observable();
 
         this.loadData = function(data) {
             /* a flat object of the previously saved data for all tiles */ 
@@ -216,7 +216,6 @@ define([
                 self.componentData.parameters.dirty = self.isDirty;
                 self.componentData.parameters.saveFunction = self.saveFunction;
                 self.componentData.parameters.tiles = self.tiles;
-                self.componentData.parameters.value = self.value;
     
                 self.loading(false);
             });
@@ -489,7 +488,7 @@ define([
         this.hasUnsavedData = ko.observable();
 
         this.loading = ko.observable(true);
-
+        this.saving = ko.observable();
 
         this.initialize = function() {
             if (!componentData.tilesManaged || componentData.tilesManaged === "none") {
