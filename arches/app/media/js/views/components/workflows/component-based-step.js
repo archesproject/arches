@@ -7,7 +7,7 @@ define([
     'models/graph',
     'viewmodels/card',
     'viewmodels/provisional-tile',
-    'viewmodels/alert'
+    'viewmodels/alert',
 ], function(_, $, arches, ko, koMapping, GraphModel, CardViewModel, ProvisionalTileViewModel) {
     function NonTileBasedComponent() {
         var self = this;
@@ -88,6 +88,12 @@ define([
                 self.isDirty.subscribe(function(dirty) {
                     self.hasUnsavedData(dirty);
                 });
+
+                self.tile.subscribe(function(tile) {
+                    if (!self.tiles()) {
+                        self.tiles([tile])
+                    } 
+                })
 
                 self.tiles.subscribe(function(tiles) {
                     if (tiles && !self.saving()) {
@@ -177,19 +183,7 @@ define([
                     }
                 };
     
-                var flattenTree = function(parents, flatList) {
-                    _.each(ko.unwrap(parents), function(parent) {
-                        flatList.push(parent);
-                        var childrenKey = parent.tiles ? 'tiles' : 'cards';
-                        flattenTree(
-                            ko.unwrap(parent[childrenKey]),
-                            flatList
-                        );
-                    });
-                    return flatList;
-                };
-    
-                flattenTree(self.topCards, []).forEach(function(item) {
+                self.flattenTree(self.topCards, []).forEach(function(item) {
                     if (item.constructor.name === 'CardViewModel' && item.nodegroupid === ko.unwrap(self.componentData.parameters.nodegroupid)) {
                         if (ko.unwrap(self.componentData.parameters.parenttileid) && item.parent && ko.unwrap(self.componentData.parameters.parenttileid) !== item.parent.tileid) {
                             return;
@@ -247,6 +241,34 @@ define([
             self.tiles().forEach(function(tile) {
                 tile.reset();
             });
+        };
+
+        this.flattenTree = function(parents, flatList) {
+            _.each(ko.unwrap(parents), function(parent) {
+                flatList.push(parent);
+                var childrenKey = parent.tiles ? 'tiles' : 'cards';
+                self.flattenTree(
+                    ko.unwrap(parent[childrenKey]),
+                    flatList
+                );
+            });
+            return flatList;
+        };
+
+        this.getTiles = function(nodegroupId, tileId) {
+            var tiles = [];
+            this.flattenTree(self.topCards, []).forEach(function(item) {
+                if (item.constructor.name === 'CardViewModel' && item.nodegroupid === nodegroupId) {
+                    tiles = tiles.concat(ko.unwrap(item.tiles));
+                }
+            });
+            if (tileId) {
+                tiles = tiles.filter(function(tile) {
+                    return tile.tileid === tileId;
+                });
+            }
+
+            return tiles;
         };
 
         this.initialize();
@@ -491,6 +513,10 @@ define([
         this.saving = ko.observable();
 
         this.initialize = function() {
+            if (componentData.componentPath) {
+                require([componentData.componentPath]);
+            }
+
             if (!componentData.tilesManaged || componentData.tilesManaged === "none") {
                 NonTileBasedComponent.apply(self);
             }

@@ -400,15 +400,6 @@ define([
             // Returns true if a tile is dirty and dirty state is not triggered by default values.
             var tile = self.newTile;
 
-            /* corner case for accessing previously saved tiles within workflows */
-            if (
-                !tile
-                && self.context === 'workflow'
-                && self.tiles()[0]
-            ) {
-                tile = self.tiles()[0];
-            }
-
             if(tile) {
                 if(tile.dirty()) {
                     var res = {};

@@ -34,7 +34,9 @@
                         "
                     >
                         <!-- ko if: !loading() && !saving() -->
-                        <div data-bind="component: {
+                        <div 
+                        style=""
+                        data-bind="component: {
                             name: componentData['componentName'],
                             params: {
                                 ...componentData['parameters'],

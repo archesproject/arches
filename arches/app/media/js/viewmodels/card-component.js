@@ -168,6 +168,9 @@ define([
         if (params.saveFunction) {
             params.saveFunction(self.saveTile);
         }
+        else if (params.form && params.form.saveFunction) {
+            params.form.saveFunction(self.saveTile);
+        }
 
         this.saveTileAddNew = function() {
             self.saveTile(function() {
