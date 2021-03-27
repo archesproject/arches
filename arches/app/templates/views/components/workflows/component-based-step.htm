@@ -31,11 +31,12 @@
                         style="
                             overflow: hidden;
                             width: 100%;
+                            height: inherit;
                         "
                     >
                         <!-- ko if: !loading() && !saving() -->
                         <div 
-                        style=""
+                        style="height: inherit; display: unset;"
                         data-bind="component: {
                             name: componentData['componentName'],
                             params: {

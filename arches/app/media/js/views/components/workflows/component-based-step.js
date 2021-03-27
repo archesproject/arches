@@ -329,9 +329,9 @@ define([
                     }
                 });
             }
-            else if (self.isDirty()) {
-                hasDirtyTiles = true;
-            }
+            // else if (self.isDirty()) {
+            //     hasDirtyTiles = true;
+            // }
 
             return hasDirtyTiles;
         });
