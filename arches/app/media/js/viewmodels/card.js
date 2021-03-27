@@ -323,7 +323,6 @@ define([
                 });
             },
             getNewTile: function(forceNewTile) {
-                console.log("AAA", forceNewTile, self, params)
                 if (!this.newTile || forceNewTile) this.newTile = new TileViewModel({
                     tile: {
                         tileid: '',

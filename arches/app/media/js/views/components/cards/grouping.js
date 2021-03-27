@@ -26,8 +26,6 @@ define([
         this.tiles = [];
         this.widgetInstanceDataLookup = {};
 
-        console.log("DDDDDDD", self, params)
-
         /*
             'sortedWidgetIds' originally referred to entries in the
             card_x_node_x_widget table. This has been changed, and
@@ -218,7 +216,6 @@ define([
             var tiles = self.groupedTiles();
             var tile = self.groupedTiles()[0];
             self.saving = true;
-            console.log("@@@@@@", self.tiles[0].data, tiles[0].data)
 
             tile.save(function(response) {
                 errors.push(response);
@@ -238,7 +235,6 @@ define([
                     self.groupedCardIds.valueHasMutated();
                     self.selectGroupCard();
                     if (params.form.onSaveSuccess) {
-                        console.log("@@@@@@", self.tiles[0].data)
                         params.form.onSaveSuccess(self.tiles);
                     }
                     self.loading(false);

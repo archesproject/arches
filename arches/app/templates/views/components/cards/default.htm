@@ -290,7 +290,6 @@
             <!-- ko if: card.widgets().length > 0 -->
             {% block form_widgets %}
             <form class="widgets" style="margin-bottom: 20px;">
-                <div style="display:none" data-bind="text: console.log($data, $parent, self)"></div>
                 <div data-bind="foreach: {
                         data:card.widgets, as: 'widget'
                     }">
