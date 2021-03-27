@@ -4,14 +4,12 @@ define([
     'arches',
     'knockout',
     'knockout-mapping',
-    'uuid',
     'models/graph',
     'viewmodels/card',
     'viewmodels/provisional-tile',
-    'viewmodels/tile',
     'viewmodels/alert'
-], function(_, $, arches, ko, koMapping, uuid, GraphModel, CardViewModel, ProvisionalTileViewModel, fooTileVM) {
-    function NonTileBasedComponent(complete) {
+], function(_, $, arches, ko, koMapping, GraphModel, CardViewModel, ProvisionalTileViewModel) {
+    function NonTileBasedComponent() {
         var self = this;
 
         this.addedData = ko.observableArray();
@@ -29,12 +27,11 @@ define([
             if (self.previouslyPersistedComponentData) {
                 self.value(self.previouslyPersistedComponentData[0][1]);
             }
-            
             self.loading(false);
         };
 
         this.save = function() {
-            complete(true);
+            self.complete(true);
             self.savedData(self.addedData());
         };
 
@@ -226,11 +223,15 @@ define([
         };
 
         this.save = function() {
+            self.complete(false);
+
             self.saving(true);
 
             var saveFunction = self.saveFunction();
 
             if (saveFunction) { saveFunction(); }
+
+            self.complete(true);
         };
 
         this.onSaveSuccess = function(savedData) {
@@ -427,6 +428,7 @@ define([
         };
 
         this.save = function() {
+            self.complete(false);
             self.saving(true);
             self.savedData.removeAll();
             
@@ -443,6 +445,7 @@ define([
 
             var saveSubscription = unorderedSavedData.subscribe(function(savedData) {
                 if (savedData.length === self.tiles().length) {
+                    self.complete(true);
                     self.loading(true);
                     self.saving(false);
 
@@ -481,16 +484,16 @@ define([
         this.resourceId = resourceId;
         this.componentData = componentData;
         this.previouslyPersistedComponentData = previouslyPersistedComponentData;
+        
+        this.savedData = ko.observableArray();
+        this.hasUnsavedData = ko.observable();
 
         this.loading = ko.observable(true);
 
-        this.savedData = ko.observableArray();
-
-        this.hasUnsavedData = ko.observable();
 
         this.initialize = function() {
             if (!componentData.tilesManaged || componentData.tilesManaged === "none") {
-                NonTileBasedComponent.apply(self, [complete]);
+                NonTileBasedComponent.apply(self);
             }
             else if (componentData.tilesManaged === "one") {
                 TileBasedComponent.apply(self);
