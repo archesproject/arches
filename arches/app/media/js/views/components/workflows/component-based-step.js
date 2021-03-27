@@ -91,9 +91,9 @@ define([
 
                 self.tile.subscribe(function(tile) {
                     if (!self.tiles()) {
-                        self.tiles([tile])
+                        self.tiles([tile]);
                     } 
-                })
+                });
 
                 self.tiles.subscribe(function(tiles) {
                     if (tiles && !self.saving()) {
