@@ -86,7 +86,7 @@ define([
         this.initialize = function() {
             if (self.componentData.tilesManaged === "one") {
                 self.isDirty.subscribe(function(dirty) {
-                    self.hasUnsavedData(dirty)
+                    self.hasUnsavedData(dirty);
                 });
 
                 self.tiles.subscribe(function(tiles) {
@@ -241,7 +241,7 @@ define([
             }));
 
             self.saving(false);
-        }
+        };
 
         this.reset = function() {
             self.tiles().forEach(function(tile) {
@@ -409,7 +409,7 @@ define([
         };
 
         this.loadTileIntoEditor = function(data) {
-            self.tileLoadedInEditor(data)
+            self.tileLoadedInEditor(data);
 
             var tile = self.tile();
 
@@ -422,7 +422,7 @@ define([
         };
 
         this.removeTile = function(data) {
-            var filteredTiles = self.tiles().filter(function(tile) { return tile !== data });
+            var filteredTiles = self.tiles().filter(function(tile) { return tile !== data; });
             self.tiles(filteredTiles);
         };
 
@@ -448,21 +448,21 @@ define([
                     self.loading(true);
                     self.saving(false);
 
-                    orderedSavedData = self.tiles().map(function(tile) {
+                    var orderedSavedData = self.tiles().map(function(tile) {
                         return savedData.find(function(zzz) {
                             return zzz.tileid === tile.tileid;
-                        })
+                        });
                     });
 
                     self.savedData(orderedSavedData.reverse());
 
                     saveSubscription.dispose();  /* self-disposing subscription only runs once */ 
                 }
-            })
+            });
         };
 
         this.clearEditor = function() {
-            self.tile().reset()
+            self.tile().reset();
         };
 
         this.reset = function() {

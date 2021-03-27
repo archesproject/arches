@@ -57,7 +57,7 @@ define([
 
                 self.tiles.subscribe(function(tiles) {
                     params.tiles(tiles);
-                })
+                });
             }
 
             self.dirty = ko.computed(function() {
@@ -76,7 +76,7 @@ define([
             if (ko.isObservable(params.dirty)) {
                 self.dirty.subscribe(function(dirty) {
                     params.dirty(dirty);
-                })
+                });
             }
 
 
