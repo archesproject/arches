@@ -513,10 +513,6 @@ define([
         this.saving = ko.observable();
 
         this.initialize = function() {
-            if (componentData.componentPath) {
-                require([componentData.componentPath]);
-            }
-
             if (!componentData.tilesManaged || componentData.tilesManaged === "none") {
                 NonTileBasedComponent.apply(self);
             }
