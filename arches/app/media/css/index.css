@@ -517,7 +517,6 @@ footer .footer-links {
 }
 
 .copyright-container {
-    height: 80px;
     background: #041B33;
     color: #fff;
     padding: 30px 70px;
@@ -842,6 +841,13 @@ footer .footer-links {
     }
     .tp-caption p {
         font-size: 12.5px !important;
+    }
+}
+
+@media screen and (max-height: 375px) {
+    .v5-splash-caption, .image-attribution {
+        /*display: none;*/
+        padding: 0 10px !important;
     }
 }
 
