@@ -757,7 +757,6 @@ footer .footer-links {
 
 @media screen and (max-height: 640px) {
     .down-button {
-        /*display: none;*/
         bottom: 11.7vh;
     }
     .down-button-icon {
