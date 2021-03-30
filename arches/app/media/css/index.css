@@ -755,6 +755,20 @@ footer .footer-links {
     bottom: 20vh;
 }
 
+@media screen and (max-height: 640px) {
+    .down-button {
+        /*display: none;*/
+        bottom: 11.7vh;
+    }
+    .down-button-icon {
+        font-size: 2em;
+        padding-top: 1vh;
+        padding-left: 2vh;
+        height: 7vh;
+        width: 7vh;
+    }
+}
+
 @media (min-width: 768px) {
     .one-page-header .navbar-nav>li> .fa-chevron-circle-down {
         color: #eee;
