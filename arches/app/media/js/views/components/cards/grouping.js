@@ -146,6 +146,13 @@ define([
                 return tiles;
             }
         }, this);
+        if (ko.isObservable(params.tiles)) {
+            params.tiles(self.groupedTiles());
+
+            self.groupedTiles.subscribe(function(tiles) {
+                params.tiles(tiles);
+            });
+        }
 
         this.hasTiles = ko.computed(function() {
             return _.some(this.groupedCards(), function(card) {
@@ -187,10 +194,15 @@ define([
         };
 
         this.dirty = ko.computed(function() {
-            return _.find(this.groupedTiles(), function(tile) {
+            return Boolean(_.find(self.groupedTiles(), function(tile) {
                 return tile.dirty();
-            }, this);
-        }, this);
+            }));
+        });
+        if (ko.isObservable(params.dirty)) {
+            this.dirty.subscribe(function(dirty) {
+                params.dirty(dirty);
+            })
+        }
 
         this.previouslySaved = ko.computed(function() {
             return !!(_.find(this.groupedTiles(), function(tile) {
@@ -199,11 +211,12 @@ define([
         }, this);
 
         this.saveTiles = function(){
-            var self = this;
+            // var self = this;
             var errors = ko.observableArray().extend({ rateLimit: 250 });
-            var tiles = this.groupedTiles();
-            var tile = this.groupedTiles()[0];
-            this.saving = true;
+            var tiles = self.groupedTiles();
+            var tile = self.groupedTiles()[0];
+            self.saving = true;
+
             tile.save(function(response) {
                 errors.push(response);
                 self.saving = false;
@@ -240,6 +253,11 @@ define([
                 }
             });
         };
+
+        if (params.saveFunction) {
+            params.saveFunction(self.saveTiles);
+        }
+
 
         this.deleteTiles = function(){
             params.loading(true);
