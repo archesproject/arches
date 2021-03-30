@@ -60,12 +60,14 @@ define([
 
         this.waitingForGraphToDownload = ko.observable(false);
         this.counter = Object.keys(self.graphLookup).length;
-        ko.unwrap(params.node.config.graphs).forEach(function(graph){
-            if (!Object.keys(self.graphLookup).includes(graph.graphid)){
-                self.waitingForGraphToDownload(true);
-                self.counter += 1;
-            }
-        });
+        if (params.node) {
+            ko.unwrap(params.node.config.graphs).forEach(function(graph){
+                if (!Object.keys(self.graphLookup).includes(graph.graphid)){
+                    self.waitingForGraphToDownload(true);
+                    self.counter += 1;
+                }
+            });
+        }
         var downloadGraph = function(graphid){
             if (graphid in self.graphLookup){
                 return Promise.resolve(self.graphLookup[graphid]);

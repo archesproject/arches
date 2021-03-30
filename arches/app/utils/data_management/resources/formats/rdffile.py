@@ -138,6 +138,8 @@ class RdfWriter(Writer):
                 pkg["range_tile_data"] = tile.data[str(edge.rangenode_id)]
             if str(edge.domainnode_id) in tile.data:
                 pkg["domain_tile_data"] = tile.data[str(edge.domainnode_id)]
+            elif tile.parenttile is not None and str(edge.domainnode_id) in tile.parenttile.data:
+                pkg["domain_tile_data"] = tile.parenttile.data[str(edge.domainnode_id)]
 
             rng_dt = self.datatype_factory.get_instance(pkg["r_datatype"])
             pkg["d_uri"] = dom_dt.get_rdf_uri(domainnode, pkg["domain_tile_data"], "d")
