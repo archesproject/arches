@@ -768,6 +768,12 @@ footer .footer-links {
     }
 }
 
+@media screen and (max-height: 640px) {
+    .down-button {
+        display: none;
+    }
+}
+
 @media (min-width: 768px) {
     .one-page-header .navbar-nav>li> .fa-chevron-circle-down {
         color: #eee;
