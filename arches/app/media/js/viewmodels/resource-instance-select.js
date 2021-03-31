@@ -115,7 +115,7 @@ define([
         this.resourceInstanceDisplayName = params.form && params.form.displayname ? params.form.displayname() : '';
         this.makeFriendly = ontologyUtils.makeFriendly;
         this.getSelect2ConfigForOntologyProperties = ontologyUtils.getSelect2ConfigForOntologyProperties;
-        self.newTileStep = ko.observable();
+        self.newResourceInstance = ko.observable();
         this.resourceReportUrl = arches.urls.resource_report;
         this.resourceEditorUrl = arches.urls.resource_editor;
         this.selectedResourceRelationship = ko.observable(null);
@@ -138,11 +138,11 @@ define([
         this.displayValue = ko.observable('');
         
         //
-        // this.close is only called if newTileStep is True and the user 
+        // this.close is only called if newResourceInstance is True and the user 
         // decides not to add the new resource instance, and closes the window without adding it
         //
         this.close = function(){
-            this.newTileStep(null);
+            this.newResourceInstance(null);
         };
         
         
@@ -282,7 +282,7 @@ define([
                                 resourceid: ko.observable(),
                                 tileid: ko.observable()
                             };
-                            self.newTileStep(params);
+                            self.newResourceInstance(params);
                             params.complete.subscribe(function() {
                                 window.fetch(arches.urls.search_results + "?id=" + params.resourceid())
                                     .then(function(response){
@@ -297,7 +297,7 @@ define([
                                         setValue(ret);
                                     })
                                     .finally(function(){
-                                        self.newTileStep(null);
+                                        self.newResourceInstance(null);
                                         window.setTimeout(function() {
                                             resourceToAdd("");
                                         }, 250);

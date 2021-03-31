@@ -17,7 +17,7 @@ define([
             params.resourceid(id);
         });
 
-        var cachedValue = ko.unwrap(params.value);
+        /*var cachedValue = ko.unwrap(params.value);
         if (cachedValue) {
             if (cachedValue.tileid) {
                 params.tileid(cachedValue.tileid);
@@ -25,7 +25,7 @@ define([
             if (cachedValue.resourceid) {
                 self.resourceId(cachedValue.resourceid);
             }
-        }
+        }*/
         
         if (!self.resourceId() && params.workflow && ko.unwrap(params.workflow.resourceId)) {
             self.resourceId(ko.unwrap(params.workflow.resourceId));
@@ -58,6 +58,10 @@ define([
                 params.value(params.defineStateProperties());
             }
         });
+
+        this.graphName = params.graphName;
+        this.close = params.close;
+        this.newResourceInstance = params.newResourceInstance;
 
         this.completeOnSave = params.completeOnSave === false ? false : true;
 
