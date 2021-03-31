@@ -13,8 +13,8 @@ define([
             } catch(e) {
                 // pass
             }
-        };
-    };
+        }
+    }
 
     ko.components.register('final-step', {
         viewModel: viewModel,
