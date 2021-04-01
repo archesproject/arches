@@ -108,16 +108,18 @@
                                                 <div class="workflow-step-icon complete"><span><i class="fa fa-hashtag"></i></span></div>
                                                 <div class="wf-multi-tile-card-info-details">
                                                     <!-- ko foreach: {data: tile.parent.widgets(), as: 'widget'} -->
-                                                        <!-- ko component: {
-                                                            name: widget.widgetLookup[widget.get("widget_id")()].name,
-                                                            params: {
-                                                                config: widget.configJSON,
-                                                                label: widget.label(),
-                                                                node: widget.node,
-                                                                value: tile.data[widget.node_id()],
-                                                                state: "report",
-                                                            }
-                                                        } --><!-- /ko -->
+                                                        <!-- ko if: widget.visible -->
+                                                            <!-- ko component: {
+                                                                name: widget.widgetLookup[widget.get("widget_id")()].name,
+                                                                params: {
+                                                                    config: widget.configJSON,
+                                                                    label: widget.label(),
+                                                                    node: widget.node,
+                                                                    value: tile.data[widget.node_id()],
+                                                                    state: "report",
+                                                                }
+                                                            } --><!-- /ko -->
+                                                        <!-- /ko -->
                                                     <!-- /ko -->
                                                 </div>
                                             </div>
