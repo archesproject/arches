@@ -718,7 +718,7 @@ class ResourceReportView(MapBaseManagerView):
             context["nav"]["print"] = True
 
         return render(request, "views/resource/report.htm", context)
-    
+
     def _load_resource_data(self, request, resourceid, resource, graph, templates):
         resource_models = (
             models.GraphModel.objects.filter(isresource=True).exclude(isactive=False).exclude(pk=settings.SYSTEM_SETTINGS_RESOURCE_MODEL_ID)
@@ -851,9 +851,9 @@ class ResourceReportView(MapBaseManagerView):
 
     def _load_basic_data(self, resourceid, resource, graph, templates):
         context = self.get_context_data(
-            main_script="views/resource/report", 
+            main_script="views/resource/report",
             resourceid=resourceid,
-            graph_id=resource.graph_id, 
+            graph_id=resource.graph_id,
             graph=graph,
             graph_json=JSONSerializer().serialize(
                 graph,

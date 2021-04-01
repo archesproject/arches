@@ -10,8 +10,8 @@ class Migration(migrations.Migration):
     operations = [
         migrations.RunSQL(
             """
-                ALTER TABLE report_templates 
-                ADD COLUMN preload_resource_data BOOLEAN NOT NULL 
+                ALTER TABLE report_templates
+                ADD COLUMN preload_resource_data BOOLEAN NOT NULL
                 DEFAULT TRUE;
             """
         )
