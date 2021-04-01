@@ -138,6 +138,7 @@ class ResourceEditorView(MapBaseManagerView):
 
         creator = None
         user_created_instance = None
+
         if resourceid is None:
             resource_instance = None
             graph = models.GraphModel.objects.get(pk=graphid)
@@ -148,6 +149,7 @@ class ResourceEditorView(MapBaseManagerView):
             instance_creator = get_instance_creator(resource_instance, request.user)
             creator = instance_creator["creatorid"]
             user_created_instance = instance_creator["user_can_edit_instance_permissions"]
+
         nodes = graph.node_set.all()
         resource_graphs = (
             models.GraphModel.objects.exclude(pk=settings.SYSTEM_SETTINGS_RESOURCE_MODEL_ID)
@@ -266,6 +268,7 @@ class ResourceEditorView(MapBaseManagerView):
 
         context["nav"]["title"] = ""
         context["nav"]["menu"] = nav_menu
+
         if resourceid == settings.RESOURCE_INSTANCE_ID:
             context["nav"]["help"] = {"title": _("Managing System Settings"), "template": "system-settings-help"}
         else:
@@ -732,7 +735,31 @@ class ResourceReportView(MapBaseManagerView):
 
     def get(self, request, resourceid=None):
         resource = Resource.objects.get(pk=resourceid)
+        graph = Graph.objects.get(graphid=resource.graph_id)
+        templates = models.ReportTemplate.objects.all()
 
+        context = self._load_resource_data(
+            request=request,
+            resourceid=resourceid,
+            resource=resource,
+            graph=graph,
+            templates=templates,
+        ) if graph.template.preload_resource_data else self._load_basic_data(
+            resourceid=resourceid,
+            resource=resource,
+            graph=graph,
+            templates=templates,
+        )
+
+        if graph.iconclass:
+            context["nav"]["icon"] = graph.iconclass
+            context["nav"]["title"] = graph.name
+            context["nav"]["res_edit"] = True
+            context["nav"]["print"] = True
+
+        return render(request, "views/resource/report.htm", context)
+
+    def _load_resource_data(self, request, resourceid, resource, graph, templates):
         resource_models = (
             models.GraphModel.objects.filter(isresource=True).exclude(isactive=False).exclude(pk=settings.SYSTEM_SETTINGS_RESOURCE_MODEL_ID)
         )
@@ -780,7 +807,6 @@ class ResourceReportView(MapBaseManagerView):
             )
 
         datatypes = models.DDataType.objects.all()
-        graph = Graph.objects.get(graphid=resource.graph_id)
 
         permitted_cards = []
 
@@ -808,7 +834,6 @@ class ResourceReportView(MapBaseManagerView):
             )
 
         widgets = models.Widget.objects.all()
-        templates = models.ReportTemplate.objects.all()
         card_components = models.CardComponent.objects.all()
 
         try:
@@ -819,7 +844,7 @@ class ResourceReportView(MapBaseManagerView):
         except AttributeError:
             raise Http404(_("No active report template is available for this resource."))
 
-        context = self.get_context_data(
+        return self.get_context_data(
             main_script="views/resource/report",
             report_templates=templates,
             templates_json=JSONSerializer().serialize(templates, sort_keys=False, exclude=["name", "description"]),
@@ -864,14 +889,45 @@ class ResourceReportView(MapBaseManagerView):
             hide_empty_nodes=settings.HIDE_EMPTY_NODES_IN_REPORT,
         )
 
-        if graph.iconclass:
-            context["nav"]["icon"] = graph.iconclass
-        context["nav"]["title"] = graph.name
-        context["nav"]["res_edit"] = True
-        context["nav"]["print"] = True
-        context["nav"]["print"] = True
+    def _load_basic_data(self, resourceid, resource, graph, templates):
+        context = self.get_context_data(
+            main_script="views/resource/report", 
+            resourceid=resourceid,
+            graph_id=resource.graph_id, 
+            graph=graph,
+            graph_json=JSONSerializer().serialize(
+                graph,
+                sort_keys=False,
+                exclude=[
+                    "functions",
+                    "relatable_resource_model_ids",
+                    "domain_connections",
+                    "edges",
+                    "is_editable",
+                    "description",
+                    "iconclass",
+                    "subtitle",
+                    "author",
+                ],
+            ),
+            hide_empty_nodes=settings.HIDE_EMPTY_NODES_IN_REPORT,
+            report_templates=templates,
+            templates_json=JSONSerializer().serialize(templates, sort_keys=False, exclude=["name", "description"]),
+        )
 
-        return render(request, "views/resource/report.htm", context)
+        context['tiles'] = '[]'
+        context['templates'] = '[]'
+        context['templates_json'] = '[]'
+        context['datatypes'] = '[]'
+        context['datatypes_json'] = '[]'
+        context['cards'] = '[]'
+        context['related_resources'] = '[]'
+        context['cardwidgets'] = '[]'
+        context['card_components'] = '[]'
+        context['card_components_json'] = '[]'
+
+        return context
+
 
 
 @method_decorator(can_read_resource_instance, name="dispatch")
