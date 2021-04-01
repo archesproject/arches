@@ -693,46 +693,6 @@ class ResourceDescriptors(View):
 
 @method_decorator(can_read_resource_instance, name="dispatch")
 class ResourceReportView(MapBaseManagerView):
-    def _generate_related_resources_summary(self, related_resources, resource_relationships, resource_models):
-        related_resource_summary = [
-            {"graphid": str(resource_model.graphid), "name": resource_model.name, "resources": []} for resource_model in resource_models
-        ]
-
-        resource_relationship_types = {
-            resource_relationship_type["id"]: resource_relationship_type["text"]
-            for resource_relationship_type in get_resource_relationship_types()["values"]
-        }
-
-        for related_resource in related_resources:
-            for summary in related_resource_summary:
-                if related_resource["graph_id"] == summary["graphid"]:
-                    relationship_summary = []
-                    for resource_relationship in resource_relationships:
-                        if related_resource["resourceinstanceid"] == resource_relationship["resourceinstanceidto"]:
-                            rr_type = (
-                                resource_relationship_types[resource_relationship["relationshiptype"]]
-                                if resource_relationship["relationshiptype"] in resource_relationship_types
-                                else resource_relationship["relationshiptype"]
-                            )
-                            relationship_summary.append(rr_type)
-                        elif related_resource["resourceinstanceid"] == resource_relationship["resourceinstanceidfrom"]:
-                            rr_type = (
-                                resource_relationship_types[resource_relationship["inverserelationshiptype"]]
-                                if resource_relationship["inverserelationshiptype"] in resource_relationship_types
-                                else resource_relationship["inverserelationshiptype"]
-                            )
-                            relationship_summary.append(rr_type)
-
-                    summary["resources"].append(
-                        {
-                            "instance_id": related_resource["resourceinstanceid"],
-                            "displayname": related_resource["displayname"],
-                            "relationships": relationship_summary,
-                        }
-                    )
-
-        return related_resource_summary
-
     def get(self, request, resourceid=None):
         resource = Resource.objects.get(pk=resourceid)
         graph = Graph.objects.get(graphid=resource.graph_id)
@@ -758,7 +718,7 @@ class ResourceReportView(MapBaseManagerView):
             context["nav"]["print"] = True
 
         return render(request, "views/resource/report.htm", context)
-
+    
     def _load_resource_data(self, request, resourceid, resource, graph, templates):
         resource_models = (
             models.GraphModel.objects.filter(isresource=True).exclude(isactive=False).exclude(pk=settings.SYSTEM_SETTINGS_RESOURCE_MODEL_ID)
@@ -927,6 +887,46 @@ class ResourceReportView(MapBaseManagerView):
         context['card_components_json'] = '[]'
 
         return context
+
+    def _generate_related_resources_summary(self, related_resources, resource_relationships, resource_models):
+        related_resource_summary = [
+            {"graphid": str(resource_model.graphid), "name": resource_model.name, "resources": []} for resource_model in resource_models
+        ]
+
+        resource_relationship_types = {
+            resource_relationship_type["id"]: resource_relationship_type["text"]
+            for resource_relationship_type in get_resource_relationship_types()["values"]
+        }
+
+        for related_resource in related_resources:
+            for summary in related_resource_summary:
+                if related_resource["graph_id"] == summary["graphid"]:
+                    relationship_summary = []
+                    for resource_relationship in resource_relationships:
+                        if related_resource["resourceinstanceid"] == resource_relationship["resourceinstanceidto"]:
+                            rr_type = (
+                                resource_relationship_types[resource_relationship["relationshiptype"]]
+                                if resource_relationship["relationshiptype"] in resource_relationship_types
+                                else resource_relationship["relationshiptype"]
+                            )
+                            relationship_summary.append(rr_type)
+                        elif related_resource["resourceinstanceid"] == resource_relationship["resourceinstanceidfrom"]:
+                            rr_type = (
+                                resource_relationship_types[resource_relationship["inverserelationshiptype"]]
+                                if resource_relationship["inverserelationshiptype"] in resource_relationship_types
+                                else resource_relationship["inverserelationshiptype"]
+                            )
+                            relationship_summary.append(rr_type)
+
+                    summary["resources"].append(
+                        {
+                            "instance_id": related_resource["resourceinstanceid"],
+                            "displayname": related_resource["displayname"],
+                            "relationships": relationship_summary,
+                        }
+                    )
+
+        return related_resource_summary
 
 
 
