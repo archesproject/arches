@@ -698,17 +698,21 @@ class ResourceReportView(MapBaseManagerView):
         graph = Graph.objects.get(graphid=resource.graph_id)
         templates = models.ReportTemplate.objects.all()
 
-        context = self._load_resource_data(
-            request=request,
-            resourceid=resourceid,
-            resource=resource,
-            graph=graph,
-            templates=templates,
-        ) if graph.template.preload_resource_data else self._load_basic_data(
-            resourceid=resourceid,
-            resource=resource,
-            graph=graph,
-            templates=templates,
+        context = (
+            self._load_resource_data(
+                request=request,
+                resourceid=resourceid,
+                resource=resource,
+                graph=graph,
+                templates=templates,
+            )
+            if graph.template.preload_resource_data
+            else self._load_basic_data(
+                resourceid=resourceid,
+                resource=resource,
+                graph=graph,
+                templates=templates,
+            )
         )
 
         if graph.iconclass:
@@ -875,16 +879,16 @@ class ResourceReportView(MapBaseManagerView):
             templates_json=JSONSerializer().serialize(templates, sort_keys=False, exclude=["name", "description"]),
         )
 
-        context['tiles'] = '[]'
-        context['templates'] = '[]'
-        context['templates_json'] = '[]'
-        context['datatypes'] = '[]'
-        context['datatypes_json'] = '[]'
-        context['cards'] = '[]'
-        context['related_resources'] = '[]'
-        context['cardwidgets'] = '[]'
-        context['card_components'] = '[]'
-        context['card_components_json'] = '[]'
+        context["tiles"] = "[]"
+        context["templates"] = "[]"
+        context["templates_json"] = "[]"
+        context["datatypes"] = "[]"
+        context["datatypes_json"] = "[]"
+        context["cards"] = "[]"
+        context["related_resources"] = "[]"
+        context["cardwidgets"] = "[]"
+        context["card_components"] = "[]"
+        context["card_components_json"] = "[]"
 
         return context
 
