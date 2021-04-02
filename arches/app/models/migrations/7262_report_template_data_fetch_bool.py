@@ -8,11 +8,9 @@ class Migration(migrations.Migration):
     ]
 
     operations = [
-        migrations.RunSQL(
-            """
-                ALTER TABLE report_templates
-                ADD COLUMN preload_resource_data BOOLEAN NOT NULL
-                DEFAULT TRUE;
-            """
-        )
+        migrations.AddField(
+            model_name='reporttemplate',
+            name='preload_resource_data',
+            field=models.BooleanField(default=True),
+        ),
     ]
