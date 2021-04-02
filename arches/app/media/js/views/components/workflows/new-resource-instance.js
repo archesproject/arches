@@ -17,21 +17,7 @@ define([
             params.resourceid(id);
         });
 
-        /*var cachedValue = ko.unwrap(params.value);
-        if (cachedValue) {
-            if (cachedValue.tileid) {
-                params.tileid(cachedValue.tileid);
-            }
-            if (cachedValue.resourceid) {
-                self.resourceId(cachedValue.resourceid);
-            }
-        }*/
-        
-        if (!self.resourceId() && params.workflow && ko.unwrap(params.workflow.resourceId)) {
-            self.resourceId(ko.unwrap(params.workflow.resourceId));
-        } 
-
-        this.getCardResourceIdOrGraphId = function() { // override for different cases
+        this.getCardResourceIdOrGraphId = function() {
             return (ko.unwrap(this.resourceId) || ko.unwrap(params.graphid));
         };
 
@@ -40,10 +26,8 @@ define([
         this.tile = ko.observable();
         this.tile.subscribe(function(tile) {
             if (tile && params.hasDirtyTile) {
+                console.log("line 41 ran");
                 tile.dirty.subscribe(function(val) {
-                    /* 
-                        for proper function, need to interact with card dirty state inside tile subscription 
-                    */
                     ((self.card() && self.card().isDirty()) || val) ? params.hasDirtyTile(true) : params.hasDirtyTile(false);
                 });
             }
@@ -53,17 +37,7 @@ define([
         this.alert = params.alert || ko.observable(null);
         
         this.complete = params.complete || ko.observable();
-        this.complete.subscribe(function(isComplete) {
-            if (isComplete && params.value) {
-                params.value(params.defineStateProperties());
-            }
-        });
-
         this.graphName = params.graphName;
-        this.close = params.close;
-        this.newResourceInstance = params.newResourceInstance;
-
-        this.completeOnSave = params.completeOnSave === false ? false : true;
 
         this.loading(true);
 
@@ -97,13 +71,13 @@ define([
                         return lookup;
                     }, {});
                 };
-    
+
                 self.reviewer = data.userisreviewer;
                 self.provisionalTileViewModel = new ProvisionalTileViewModel({
                     tile: self.tile,
                     reviewer: data.userisreviewer
                 });
-    
+
                 var graphModel = new GraphModel({
                     data: {
                         nodes: data.nodes,
@@ -112,7 +86,7 @@ define([
                     },
                     datatypes: data.datatypes
                 });
-    
+
                 var topCards = _.filter(data.cards, function(card) {
                     var nodegroup = _.find(data.nodegroups, function(group) {
                         return group.nodegroupid === card.nodegroup_id;
@@ -120,6 +94,7 @@ define([
                     return !nodegroup || !nodegroup.parentnodegroup_id;
                 }).map(function(card) {
                     params.nodegroupid = params.nodegroupid || card.nodegroup_id;
+                    console.log("params.nodegroup set:\n", params.nodegroupid, "\nonce it is set it never changes");
                     return new CardViewModel({
                         card: card,
                         graphModel: graphModel,
@@ -135,30 +110,21 @@ define([
                         loading: self.loading
                     });
                 });
-                
-                self.card.subscribe(function(card){
+
+                /*self.card.subscribe(function(card){
                     if (card) {
                         card.context = 'workflow';
 
                         if (params.preSaveCallback) {
+                            console.log("preSaveCallBack set")
                             card.preSaveCallback = params.preSaveCallback;
                         }
                         if (params.postSaveCallback) {
+                            console.log("postSaveCallBack set")
                             card.postSaveCallback = params.postSaveCallback;
                         }
                     }
-                    if (ko.unwrap(card.widgets) && params.hiddenNodes) {
-                        card.widgets().forEach(function(widget){
-                            if (params.hiddenNodes.indexOf(widget.node_id()) > -1) {
-                                widget.visible(false);
-                            }
-                        });
-                    }
-                });
-                
-                topCards.forEach(function(topCard) {
-                    topCard.topCards = self.topCards;
-                });
+                });*/
 
                 self.topCards(topCards);
     
@@ -179,44 +145,45 @@ define([
                         handlers[eventName].push(handler);
                     }
                 };
-    
-                flattenTree(self.topCards, []).forEach(function(item) {
-                    if (item.constructor.name === 'CardViewModel' && item.nodegroupid === ko.unwrap(params.nodegroupid)) {
-                        if (ko.unwrap(params.parenttileid) && item.parent && ko.unwrap(params.parenttileid) !== item.parent.tileid) {
-                            return;
+
+                if (!ko.unwrap(self.resourceId)) {
+                    self.foo(params.nodegroupid, params.tileid);
+                } else if (ko.unwrap(self.resourceId)) {
+                    console.log("getting tile data")
+                    flattenTree(data.tiles, []).forEach(function(item) { //do I need to flatten?
+                        if (item.nodegroup_id === self.card().nodegroupid) {
+                            self.tile(item);
+                            params.tileid(item.tileid);
                         }
-                        if (self.customCardLabel) item.model.name(ko.unwrap(self.customCardLabel));
-                        self.card(item);
-                        if (ko.unwrap(params.tileid)) {
-                            ko.unwrap(item.tiles).forEach(function(tile) {
-                                if (tile.tileid === ko.unwrap(params.tileid)) {
-                                    self.tile(tile);
-                                }
-                            });
-                        } else if (ko.unwrap(params.createTile) !== false) {
-                            self.tile(item.getNewTile());
-                        }
-                    }
-                });
+                    });
+                    self.foo(self.card().nodegroupid, null);
+                };
                 self.loading(false);
-                // commented the line below because it causes steps to automatically advance on page reload
-                // self.complete(!!ko.unwrap(params.tileid));
             });
         };
 
-        self.getTiles = function(nodegroupId, tileId) {
-            var tiles = [];
-            flattenTree(self.topCards, []).forEach(function(item) {
-                if (item.constructor.name === 'CardViewModel' && item.nodegroupid === nodegroupId) {
-                    tiles = tiles.concat(ko.unwrap(item.tiles));
+        self.foo = function(nodegroupid, tileid) {
+            flattenTree(self.topCards, []).forEach(function(item) { //do I need to flatten?
+                if (item.constructor.name === 'CardViewModel' && item.nodegroupid === nodegroupid) {
+                    if (ko.unwrap(params.parenttileid) && item.parent && ko.unwrap(params.parenttileid) !== item.parent.tileid) {
+                        return;
+                    }
+                    if (self.customCardLabel) item.model.name(ko.unwrap(self.customCardLabel));
+                    self.card(item);
+
+                    if (ko.unwrap(params.tileid)) {
+                        ko.unwrap(item.tiles).forEach(function(tile) {
+                            console.log("adding the tiles to the tile")
+                            if (tile.tileid === ko.unwrap(params.tileid)) {
+                                self.tile(tile);
+                            }
+                        }); //this should go, I need better check for next line.
+                    } else if (ko.unwrap(params.createTile) !== false) {
+                        console.log("getting a new tile")
+                        self.tile(item.getNewTile());
+                    }
                 }
-            });
-            if (tileId) {
-                tiles = tiles.filter(function(tile) {
-                    return tile.tileid === tileId;
-                });
-            }
-            return tiles;
+            })
         };
 
         params.tile = self.tile;
@@ -225,73 +192,28 @@ define([
             this.getJSON();
         }
 
-        params.defineStateProperties = function(){
-            // Collects those properties that you want to set to the state.
-            /** 
-             * Wastebin
-             * Note that wastebin as set on the workflow step params is inclusive; only things identified by those keys (e.g. tile, resourceid) will be deleted on quit. Otherwise if no wastebin params given, nothing will be deleted on quit.
-             * 
-             * -- If the workflow edits/creates one and only one new resource, resourceid need only be named in the first step's params' wastebin like so: wastebin: {resourceid:null}
-             * This will automatically cascade/delete all tiles generated from this resource.
-             * 
-             * -- If not every step's generated tile belongs to the same resource or you want to selectively delete a tile from a step, {tile:null} should be declared in every step's params' wastebin where you want the tile from that step to be deleted on quit.
-             * 
-             * Overriding this method:
-             * Keep in mind that anything extending newTileStep that overrides this method should include similar logic to handle for wastebin if there is a wastebin use case for that particular step in the workflow.
-            **/
-            var wastebin = !!(ko.unwrap(params.wastebin)) ? koMapping.toJS(params.wastebin) : undefined;
-            var resourceId = ko.unwrap(params.resourceid);
+        self.loadCard = function(card){
+            self.card(card);
+            params.nodegroupid = self.card().nodegroupid;
+            self.getJSON();
+        }
 
-            if (resourceId) {
-                if (wastebin && 'resources' in wastebin) {
-                    wastebin.resources.push(resourceId);
-                }
-                if (wastebin && 'resourceid' in wastebin) {
-                    wastebin.resourceid = resourceId;
-                }
-            }
-            if (wastebin && 'tile' in wastebin) {
-                if (!!ko.unwrap(params.tile)) {
-                    wastebin.tile = koMapping.toJS(params.tile().data);
-                    wastebin.tile.tileid = (ko.unwrap(params.tile)).tileid;
-                    wastebin.tile.resourceinstance_id = (ko.unwrap(params.tile)).resourceinstance_id;
-                }
-            }
-            
-            ko.mapping.fromJS(wastebin, {}, params.wastebin);
-            
-            return {
-                resourceid: resourceId,
-                tile: !!(ko.unwrap(params.tile)) ? koMapping.toJS(params.tile().data) : undefined,
-                tileid: !!(ko.unwrap(params.tile)) ? ko.unwrap(params.tile().tileid): undefined,
-                wastebin: wastebin
-            };
-        };
-        /* calling on init to give workflow access to wastebin on load */ 
-        params.defineStateProperties();
+        self.close = function(){
+            self.complete(true);
+        }
 
         self.onSaveSuccess = function(tiles) {
             var tile;
-            
             if (tiles.length > 0 || typeof tiles == 'object') {
                 tile = tiles[0] || tiles;
 
-                params.tileid(tile.tileid);
                 self.resourceId(tile.resourceinstance_id);
             }
 
-            if (params.value) {
-                params.value(params.defineStateProperties());
-            }
-            
             if (self.completeOnSave === true) { self.complete(true); }
         };
-
-        self.loadCard = function(card){
-            self.card(card);
-        }
-
     }
+
     ko.components.register('new-resource-instance', {
         viewModel: viewModel,
         template: {
