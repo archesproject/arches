@@ -94,7 +94,6 @@ define([
                     return !nodegroup || !nodegroup.parentnodegroup_id;
                 }).map(function(card) {
                     params.nodegroupid = params.nodegroupid || card.nodegroup_id;
-                    console.log("params.nodegroup set:\n", params.nodegroupid, "\nonce it is set it never changes");
                     return new CardViewModel({
                         card: card,
                         graphModel: graphModel,
@@ -110,21 +109,6 @@ define([
                         loading: self.loading
                     });
                 });
-
-                /*self.card.subscribe(function(card){
-                    if (card) {
-                        card.context = 'workflow';
-
-                        if (params.preSaveCallback) {
-                            console.log("preSaveCallBack set")
-                            card.preSaveCallback = params.preSaveCallback;
-                        }
-                        if (params.postSaveCallback) {
-                            console.log("postSaveCallBack set")
-                            card.postSaveCallback = params.postSaveCallback;
-                        }
-                    }
-                });*/
 
                 self.topCards(topCards);
     
@@ -145,41 +129,27 @@ define([
                         handlers[eventName].push(handler);
                     }
                 };
-
-                if (!ko.unwrap(self.resourceId)) {
-                    self.foo(params.nodegroupid, params.tileid);
-                } else if (ko.unwrap(self.resourceId)) {
-                    console.log("getting tile data")
-                    flattenTree(data.tiles, []).forEach(function(item) { //do I need to flatten?
-                        if (item.nodegroup_id === self.card().nodegroupid) {
-                            self.tile(item);
-                            params.tileid(item.tileid);
-                        }
-                    });
-                    self.foo(self.card().nodegroupid, null);
-                };
+                self.foo();
                 self.loading(false);
             });
         };
 
-        self.foo = function(nodegroupid, tileid) {
+        self.foo = function() {
             flattenTree(self.topCards, []).forEach(function(item) { //do I need to flatten?
-                if (item.constructor.name === 'CardViewModel' && item.nodegroupid === nodegroupid) {
+                if (item.constructor.name === 'CardViewModel' && item.nodegroupid === params.nodegroupid) {
                     if (ko.unwrap(params.parenttileid) && item.parent && ko.unwrap(params.parenttileid) !== item.parent.tileid) {
                         return;
                     }
                     if (self.customCardLabel) item.model.name(ko.unwrap(self.customCardLabel));
                     self.card(item);
 
-                    if (ko.unwrap(params.tileid)) {
-                        ko.unwrap(item.tiles).forEach(function(tile) {
-                            console.log("adding the tiles to the tile")
-                            if (tile.tileid === ko.unwrap(params.tileid)) {
+                    if (ko.unwrap(self.resourceId) && item.tiles().length > 0) {
+                        flattenTree(item.tiles(), []).forEach(function(tile) { //do I need to flatten?
+                            if (tile.nodegroup_id === params.nodegroupid) {
                                 self.tile(tile);
                             }
-                        }); //this should go, I need better check for next line.
+                        });                        
                     } else if (ko.unwrap(params.createTile) !== false) {
-                        console.log("getting a new tile")
                         self.tile(item.getNewTile());
                     }
                 }
@@ -195,7 +165,7 @@ define([
         self.loadCard = function(card){
             self.card(card);
             params.nodegroupid = self.card().nodegroupid;
-            self.getJSON();
+            self.foo();
         }
 
         self.close = function(){
@@ -207,6 +177,7 @@ define([
             if (tiles.length > 0 || typeof tiles == 'object') {
                 tile = tiles[0] || tiles;
 
+                self.tile(tile);
                 self.resourceId(tile.resourceinstance_id);
             }
 
