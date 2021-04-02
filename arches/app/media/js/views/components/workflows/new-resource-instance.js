@@ -172,6 +172,10 @@ define([
             self.complete(true);
         }
 
+        self.onDeleteSuccess = function(tiles) {
+            self.tile(self.card().getNewTile());
+        }
+
         self.onSaveSuccess = function(tiles) {
             var tile;
             if (tiles.length > 0 || typeof tiles == 'object') {
