@@ -6,9 +6,8 @@ define([
     'knockout-mapping',
     'models/graph',
     'viewmodels/card',
-    'viewmodels/provisional-tile',
-    'viewmodels/alert'
-], function(_, $, arches, ko, koMapping, GraphModel, CardViewModel, ProvisionalTileViewModel, AlertViewModel) {
+    'viewmodels/provisional-tile'
+], function(_, $, arches, ko, koMapping, GraphModel, CardViewModel, ProvisionalTileViewModel) {
     function viewModel(params) {
         var self = this;
 
@@ -42,17 +41,6 @@ define([
         this.loading(true);
 
         this.customCardLabel = params.customCardLabel || false;
-        var flattenTree = function(parents, flatList) {
-            _.each(ko.unwrap(parents), function(parent) {
-                flatList.push(parent);
-                var childrenKey = parent.tiles ? 'tiles' : 'cards';
-                flattenTree(
-                    ko.unwrap(parent[childrenKey]),
-                    flatList
-                );
-            });
-            return flatList;
-        };
 
         self.topCards = ko.observableArray();
 
@@ -163,11 +151,10 @@ define([
                             }
                         });                        
                     } else if (ko.unwrap(params.createTile) !== false) {
-                        console.log("getting a new tile!")
                         self.tile(item.getNewTile());
                     }
                 }
-            })
+            });
         };
 
         params.tile = self.tile;
@@ -180,16 +167,15 @@ define([
             self.card(card);
             params.nodegroupid = self.card().nodegroupid;
             self.foo();
-        }
+        };
 
         self.close = function(){
             self.complete(true);
-        }
+        };
 
-        self.onDeleteSuccess = function(tiles) {
-            console.log("getting a new tile!")
+        self.onDeleteSuccess = function() {
             self.tile(self.card().getNewTile());
-        }
+        };
 
         self.onSaveSuccess = function(tiles) {
             var tile;
