@@ -88,10 +88,19 @@ define([
                 });
 
                 var topCards = _.filter(data.cards, function(card) {
-                    var nodegroup = _.find(data.nodegroups, function(group) {
-                        return group.nodegroupid === card.nodegroup_id;
+                    var selectedNodegroup = _.find(data.nodegroups, function(nodegroup) {
+                        return nodegroup.nodegroupid === card.nodegroup_id;
                     });
-                    return !nodegroup || !nodegroup.parentnodegroup_id;
+                    var selectedNodes = _.filter(data.nodes, function(node){
+                        return node.nodegroup_id === card.nodegroup_id && node.datatype !== 'semantic';
+                    });
+                    var isVisible = _.some(selectedNodes, function(node) {
+                        var cardwidget = _.find(data.cardwidgets, function(cardwidget){
+                            return node.nodeid === cardwidget.node_id;
+                        });
+                        return (cardwidget? cardwidget.visible : false);
+                    });
+                    return !(selectedNodegroup && selectedNodegroup.parentnodegroup_id) && isVisible;
                 }).map(function(card) {
                     params.nodegroupid = params.nodegroupid || card.nodegroup_id;
                     return new CardViewModel({
@@ -135,7 +144,7 @@ define([
         };
 
         self.foo = function() {
-            flattenTree(self.topCards, []).forEach(function(item) { //do I need to flatten?
+            self.topCards().forEach(function(item) { //do I need to flatten?
                 if (item.constructor.name === 'CardViewModel' && item.nodegroupid === params.nodegroupid) {
                     if (ko.unwrap(params.parenttileid) && item.parent && ko.unwrap(params.parenttileid) !== item.parent.tileid) {
                         return;
@@ -144,12 +153,13 @@ define([
                     self.card(item);
 
                     if (ko.unwrap(self.resourceId) && item.tiles().length > 0) {
-                        flattenTree(item.tiles(), []).forEach(function(tile) { //do I need to flatten?
+                        item.tiles().forEach(function(tile) { //do I need to flatten?
                             if (tile.nodegroup_id === params.nodegroupid) {
                                 self.tile(tile);
                             }
                         });                        
                     } else if (ko.unwrap(params.createTile) !== false) {
+                        console.log("getting a new tile!")
                         self.tile(item.getNewTile());
                     }
                 }
@@ -173,6 +183,7 @@ define([
         }
 
         self.onDeleteSuccess = function(tiles) {
+            console.log("getting a new tile!")
             self.tile(self.card().getNewTile());
         }
 
