@@ -119,6 +119,10 @@ define([
                     });
                 });
 
+                topCards.forEach(function(topCard) {
+                    topCard.topCards = self.topCards;
+                });
+
                 self.topCards(topCards);
     
                 self.widgetLookup = createLookup(
