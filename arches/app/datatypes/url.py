@@ -91,10 +91,10 @@ class URLDataType(BaseDataType):
 
     def transform_value_for_tile(self, value):
         """
-        Used, for example, during import for transforming incomming data to 
-        
+        Used, for example, during import for transforming incomming data to
+
         Arguments
-        value -- can either be a url string like "http://archesproject.org" or 
+        value -- can either be a url string like "http://archesproject.org" or
         a json string like '{"url": "", "url_label": ""}'
         """
 
