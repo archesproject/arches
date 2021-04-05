@@ -33,7 +33,14 @@ define(['jquery',
             this.configState = {};
             this.configKeys.subscribe(function(val){
                 var config;
-                self.defaultConfig = JSON.parse(reportLookup[self.templateId()].defaultconfig);
+
+                if (reportLookup[self.templateId()]) {
+                    self.defaultConfig = JSON.parse(reportLookup[self.templateId()].defaultconfig);
+                }
+                else {
+                    self.defaultConfig = {};
+                }
+
                 if (val.length) {
                     self.configState = {};
                     config = self.get('config');
