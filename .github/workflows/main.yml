@@ -35,6 +35,7 @@ jobs:
 
       - name: Install Java, GDAL, and other system dependencies
         run: |
+          sudo apt update
           sudo apt-get install libxml2-dev libpq-dev openjdk-8-jdk libgdal-dev
           echo Postgres and ES dependencies installed
 
