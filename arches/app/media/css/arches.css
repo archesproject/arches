@@ -2085,6 +2085,10 @@ div.final-cons-step-separator>h4 {
     margin-right: 400px;
 }
 
+.workbench-card-container-wrapper.workbench-card-container-sidepanel-active {
+    z-index: 249;
+}
+
 .workbench-card-sidebar {
     position: absolute;
     right: 0;
@@ -8378,6 +8382,8 @@ a.mega-dropdown-toggle.disabled {
     margin-left: 0px;
     margin-right: 0px;
     border-radius: 0px;
+    padding: 20px;
+    width: 100%;
 }
 
 .workbench-card-sidepanel .create-resource-instance-card-component.rr-table-pop .card-component .install-buttons {
@@ -8417,13 +8423,6 @@ a.mega-dropdown-toggle.disabled {
 
 .mainnav-lg .workbench-card-sidepanel .create-resource-instance-card-component.rr-table-pop .install-buttons {
     left: 520px;
-}
-
-.tabbed-workflow-step-body .create-resource-instance-card-component.rr-table-pop {
-    position: fixed;
-    top: 96px;
-    left: 50px;
-    width: calc(100% - 50px);
 }
 
 .unselectable {
@@ -13213,6 +13212,12 @@ a.jstree-anchor.permissions-widget {
 .workbench-card-wrapper .workbench-card-container-wrapper.wide {
     height: 100%;
     width: 100%;
+}
+
+.workbench-card-wrapper .workbench-card-container-wrapper.workbench-card-container-sidepanel-active{
+    height: 100%;
+    width: calc(100% - 75px);
+    position: absolute;
 }
 
 .workbench-card-container.gallery-visible {
