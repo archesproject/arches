@@ -263,6 +263,7 @@
                 manifest_manager: "{% url 'manifest_manager' %}",
                 iiifannotations: "{% url 'iiifannotations' %}",
                 iiifannotationnodes: "{% url 'iiifannotationnodes' %}",
+                validatejson: "{% url 'validatejson' 'aaaa'%}".replace('aaaa', ''),
                 {% block urls %}{% endblock urls %}
             },
             geocoderPlaceHolder: "{% trans 'Find an address...' %}",
