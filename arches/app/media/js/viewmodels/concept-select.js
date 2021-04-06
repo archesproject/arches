@@ -14,7 +14,7 @@ define([
         this.multiple = params.multiple || false;
         this.allowClear = true;
         this.displayName = ko.observable('');
-        
+
         WidgetViewModel.apply(this, [params]);
 
         this.valueList = ko.computed(function() {
@@ -56,7 +56,6 @@ define([
 
         this.value.subscribe(function() {
             var names = [];
-    
             self.valueList().forEach(function(val) {
                 if (val) {
                     if (NAME_LOOKUP[val]) {
@@ -74,11 +73,6 @@ define([
                 }
             });
         });
-
-        /* flags UI change for previously saved data */
-        if (self.value()) {
-            self.value.valueHasMutated();  
-        }
 
         this.select2Config = {
             value: self.value,

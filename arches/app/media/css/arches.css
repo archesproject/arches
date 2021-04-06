@@ -2085,6 +2085,10 @@ div.final-cons-step-separator>h4 {
     margin-right: 400px;
 }
 
+.workbench-card-container-wrapper.workbench-card-container-sidepanel-active {
+    z-index: 249;
+}
+
 .workbench-card-sidebar {
     position: absolute;
     right: 0;
@@ -4671,7 +4675,6 @@ ul .collapse li:last-of-type {
     -ms-flex: 1;
     -webkit-flex: 1;
     flex: 1;
-    min-height: 100%;
 }
 
 .content-panel {
@@ -8281,29 +8284,91 @@ a.mega-dropdown-toggle.disabled {
     white-space: nowrap;
 }
 
+.create-resource-instance-card-component {
+    position: absolute;
+    background: #fcfcfc;
+    z-index: 11;
+    height: 95%;
+    overflow-y: auto;
+    top: 10px;
+    left: -100%;
+    width: calc(100% - 25px);
+    padding-bottom: 20px;
+}
+
 .create-resource-instance-card-component.rr-table-pop {
-    height: 100%;
+    height: 100vh;
     width: 100%;
-    padding: 80px;
-    background: rgba(0,0,0,0.5);
+    padding: 0px;
+    background: #fff;
     top: 0px;
-    left: 0px;
-    border: 1px solid #000;
+    left: 0%;
+    overflow-x: hidden;
+    /*-webkit-transform: translate3d(100%, 0, 0);
+    transform: translate3d(100%, 0, 0);*/
+    transition: all 1s linear;
 }
 
 .create-resource-instance-card-component.rr-table-pop .rp-edit-buttons {
     display: none;
 }
 
+.resource-instance-card-component-container {
+    display: flex;
+    overflow-x: hidden;
+}
+
+.resource-instance-card-component-container .card-component {
+    width: 100%;
+    position: absolute;
+    top: 50px;
+    padding-top: 0px !important;
+}
+
+.resource-instance-card-component-toc {
+    width: 300px;
+    border-right: 1px solid #ddd;
+    height: 100vh;
+    background: #fbfbfb;
+}
+
+.resource-instance-card-component-content {
+    flex: 2 0 0;
+}
+
+.resource-instance-card-menu-item {
+    height: 50px;
+    background: #f8f8f8;
+    padding: 15px;
+    border-bottom: 1px solid #ddd;
+    font-size: 13px;
+}
+
+.resource-instance-card-menu-item:not(.selected):hover {
+    cursor: pointer;
+    background: #fff;
+}
+
+.resource-instance-card-menu-item.selected {
+    background: #fff;
+    margin-right: -1px;
+}
+
 .workbench-card-sidepanel .create-resource-instance-card-component.rr-table-pop {
-    padding: 20px;
-    top: 0px;
+    top: 50px;
     z-index: 30;
     height: 100vh;
+    position: fixed;
+    left: 50px;
+    width: calc(100% - 50px);
+}
+
+.mainnav-lg .workbench-card-sidepanel .create-resource-instance-card-component.rr-table-pop {
+    left: 220px;
 }
 
 .workbench-card-sidepanel .create-resource-instance-card-component.rr-table-pop .card-component {
-    margin-top: 0px;
+    margin-top: 15px;
     margin-left: 0px;
     margin-right: 0px;
     border-radius: 0px;
@@ -8312,10 +8377,12 @@ a.mega-dropdown-toggle.disabled {
 }
 
 .create-resource-instance-card-component.rr-table-pop .card-component {
-    margin-top: 0px;
+    margin-top: 15px;
     margin-left: 0px;
     margin-right: 0px;
     border-radius: 0px;
+    padding: 20px;
+    width: 100%;
 }
 
 .workbench-card-sidepanel .create-resource-instance-card-component.rr-table-pop .card-component .install-buttons {
@@ -8347,6 +8414,15 @@ a.mega-dropdown-toggle.disabled {
     width: 220px;
 }
 
+.workbench-card-sidepanel .create-resource-instance-card-component.rr-table-pop .install-buttons {
+    width: calc(100% - 350px) !important;
+    left: 350px;
+    text-align: left;
+}
+
+.mainnav-lg .workbench-card-sidepanel .create-resource-instance-card-component.rr-table-pop .install-buttons {
+    left: 520px;
+}
 
 .unselectable {
     color: #ff0000;
@@ -12796,18 +12872,10 @@ a.jstree-anchor.permissions-widget {
     font-size: 18px;
 }
 
-.create-resource-instance-card-component {
-    position: absolute;
-    background: #fcfcfc;
-    z-index: 11;
-    height: 95%;
-    overflow-y: auto;
-    top: 10px;
-    left: 15px;
-    width: calc(100% - 25px);
-    border: 1px solid #ddd;
-    border-radius: 2px;
-    padding-bottom: 20px;
+
+
+.create-resource-instance-card-component .card-component {
+    border: none;
 }
 
 .workbench-card-sidepanel .create-resource-instance-card-component {
@@ -12826,15 +12894,23 @@ a.jstree-anchor.permissions-widget {
     background: #f1f1f1;
     position: relative;
     border-bottom: 1px solid #ddd;
-    padding: 17px;
+    padding: 15px;
+    font-size: 15px;
+}
+
+.create-instance-menu-header {
+    height: 50px;
+    background: #ebebeb;
+    position: relative;
+    border-bottom: 1px solid #ddd;
+    padding: 15px;
     font-size: 15px;
 }
 
 .create-instance-header .close-new-step {
     position: absolute;
     right: 10px;
-    top: 15px;
-    font-size: 17px;
+    top: 5px;
 }
 
 .create-instance-header .close-new-step:hover {
@@ -13135,6 +13211,12 @@ a.jstree-anchor.permissions-widget {
 .workbench-card-wrapper .workbench-card-container-wrapper.wide {
     height: 100%;
     width: 100%;
+}
+
+.workbench-card-wrapper .workbench-card-container-wrapper.workbench-card-container-sidepanel-active{
+    height: 100%;
+    width: calc(100% - 75px);
+    position: absolute;
 }
 
 .workbench-card-container.gallery-visible {
