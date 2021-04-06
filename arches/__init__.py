@@ -6,7 +6,7 @@ try:
 except ModuleNotFoundError as e:
     print(e)
 
-VERSION = (5, 1, 2, "final", 0)  # VERSION[3] options = "alpha", "beta", "rc", or "final"
+VERSION = (5, 1, 3, "final", 0)  # VERSION[3] options = "alpha", "beta", "rc", or "final"
 
 __version__ = get_version(VERSION)
 
