@@ -1192,7 +1192,7 @@ class FileListDataType(BaseDataType):
         data = self.get_tile_data(tile)
         files = data[str(node.pk)]
         if files is not None:
-            file_urls = " | ".join([file['url'] for file in files])
+            file_urls = " | ".join([file["url"] for file in files])
 
         return file_urls
 
