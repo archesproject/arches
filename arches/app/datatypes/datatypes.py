@@ -1191,12 +1191,10 @@ class FileListDataType(BaseDataType):
     def get_display_value(self, tile, node):
         data = self.get_tile_data(tile)
         files = data[str(node.pk)]
-        file_list_str = ""
         if files is not None:
-            for f in files:
-                file_list_str = file_list_str + f["name"] + " | "
+            file_urls = " | ".join([file['url'] for file in files])
 
-        return file_list_str
+        return file_urls
 
     def handle_request(self, current_tile, request, node):
         # this does not get called when saving data from the mobile app
