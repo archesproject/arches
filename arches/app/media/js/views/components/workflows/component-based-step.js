@@ -634,6 +634,12 @@ define([
                 self.complete
             );
 
+            /* 
+                maps WorkflowStep to WorkflowComponentAbstract,
+                should be factored out on integration with WorkflowStep
+            */
+            _.extend(workflowComponentAbstract, params);  
+
             workflowComponentAbstract.savedData.subscribe(function() {
                 var dataToPersist = self.dataToPersist();
                 dataToPersist[workflowComponentAbtractData.uniqueInstanceName] = workflowComponentAbstract.savedData();
