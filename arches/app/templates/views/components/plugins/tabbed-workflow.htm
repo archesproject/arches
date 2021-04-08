@@ -142,20 +142,17 @@
             </div>
 
             <div class="tabbed-workflow-footer-button-container">
+                <!-- ko if: activeStep()._index > 0 -->
                 <button 
                     class="btn btn-primary"
-                    data-bind="
-                        click: back,
-                        css: {
-                            disabled: activeStep()._index === 0,
-                        }
-                    "
+                    data-bind="click: back"
                 >
                     <i class="fa fa-caret-left"></i>
                     <span>
                         {% trans  "Previous Step" %}
                     </span>
                 </button>
+                <!-- /ko -->
                 <!-- ko if: activeStep().hasDirtyTile() -->
                 <button
                     class="btn btn-danger"
@@ -187,12 +184,13 @@
                 </button>
                 <!-- /ko -->
                 <!-- ko ifnot: activeStep().hasDirtyTile() -->
+                <!-- ko if: activeStep()._index < steps.length - 1 -->
                 <button
                     class="btn btn-primary"
                     data-bind="
                         click: next,
                         css: {
-                            disabled: activeStep().required() && !activeStep().complete() || activeStep()._index === steps.length - 1,
+                            disabled: activeStep().required() && !activeStep().complete(),
                         }
                     "
                 >
@@ -201,6 +199,7 @@
                     </span>
                     <i class="fa fa-caret-right"></i>
                 </button>
+                <!-- /ko -->
                 <!-- /ko -->
             </div>
 
