@@ -273,7 +273,7 @@ define([
                     }
                 },
                 owner: this
-            }),
+            }).extend({ throttle: 1 }),
             showForm: ko.observable(false),
             showSummary: ko.pureComputed(function(){
                 return self.canAdd() && self.showForm() === false && self.selected();
@@ -322,8 +322,8 @@ define([
                     }
                 });
             },
-            getNewTile: function() {
-                if (!this.newTile) this.newTile = new TileViewModel({
+            getNewTile: function(forceNewTile) {
+                if (!this.newTile || forceNewTile) this.newTile = new TileViewModel({
                     tile: {
                         tileid: '',
                         resourceinstance_id: ko.unwrap(params.resourceId),
@@ -399,15 +399,6 @@ define([
         this.isDirty = function(){
             // Returns true if a tile is dirty and dirty state is not triggered by default values.
             var tile = self.newTile;
-
-            /* corner case for accessing previously saved tiles within workflows */ 
-            if (
-                !tile
-                && self.context === 'workflow'
-                && self.tiles()[0]
-            ) {
-                tile = self.tiles()[0];
-            }
 
             if(tile) {
                 if(tile.dirty()) {

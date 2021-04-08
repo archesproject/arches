@@ -75,6 +75,7 @@ class Command(BaseCommand):
             component=details["component"],
             componentname=details["componentname"],
             defaultconfig=details["defaultconfig"],
+            preload_resource_data=details.get("preload_resource_data", True),
         )
 
         instance.save()

@@ -100,8 +100,12 @@ define([
 
             /* cached informationBox logic */ 
             if (config.informationboxdata) {
+                var isHidden = true;
+                if (self.getInformationBoxHiddenStateFromLocalStorage()){
+                    isHidden = self.getInformationBoxHiddenStateFromLocalStorage();
+                }
                 self.informationBoxData({
-                    hidden: self.getInformationBoxHiddenStateFromLocalStorage(),
+                    hidden: isHidden,
                     heading: config.informationboxdata['heading'],
                     text: config.informationboxdata['text'],
                 })
@@ -126,9 +130,18 @@ define([
             }
         };
 
+
+        this.clearCallback = ko.observable();
+
         this.clear = function() {
             if (self.hasDirtyTile()) {
-                self.tile().reset();
+                if (ko.unwrap(self.tile)) {
+                    self.tile().reset();
+                }
+
+                if (ko.unwrap(self.clearCallback)) {
+                    self.clearCallback()();
+                }
             }
         }
 

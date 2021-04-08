@@ -40,13 +40,11 @@ define([
         this.tile = ko.observable();
         this.tile.subscribe(function(tile) {
             if (tile && params.hasDirtyTile) {
-                tile.dirty.subscribe(function() {
+                tile.dirty.subscribe(function(val) {
                     /* 
                         for proper function, need to interact with card dirty state inside tile subscription 
                     */
-                    if (self.card()) {
-                        params.hasDirtyTile(self.card().isDirty());
-                    }
+                    ((self.card() && self.card().isDirty()) || val) ? params.hasDirtyTile(true) : params.hasDirtyTile(false);
                 });
             }
         });

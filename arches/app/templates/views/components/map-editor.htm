@@ -84,7 +84,7 @@
                     mode: { name: 'javascript', json: true },
                     lineNumbers: true
                 }"></div>
-                <div class="install-buttons">
+                <div class="display-in-workflow-step install-buttons">
                     <button class="btn btn-shim btn-danger btn-labeled btn-lg fa fa-times" data-bind="click: function () {
                         geoJSONString(undefined);
                     }">{% trans 'Cancel' %}</button>
@@ -107,7 +107,9 @@
 
             {% include 'views/components/coordinate-editor.htm' %}
 
-            <div class="card" data-bind="visible: geoJSONString() === undefined && !coordinateEditing()">
+            {% include 'views/components/buffer-editor.htm' %}
+
+            <div class="card" data-bind="visible: geoJSONString() === undefined && !coordinateEditing() && !bufferNodeId()">
                 {% block form_header %}
                 <!-- ko if: card.model.helpenabled -->
                 <span>
@@ -224,6 +226,21 @@
                                                 {% trans "Edit Coordinates" %}
                                             </span>
                                             <!-- /ko -->
+                                            |
+                                            <!-- ko if: self.bufferFeature() -->
+                                            <a href="javascript:void(0);" data-bind="click: function() {
+                                                self.bufferNodeId(widget.node_id());
+                                            }">
+                                                <i class="fa fa-list map-card-feature-edit"></i>
+                                                {% trans "Add Buffer" %}
+                                            </a>
+                                            <!-- /ko -->
+                                            <!-- ko if: !self.bufferFeature() -->
+                                            <span>
+                                                <i class="fa fa-list map-card-feature-edit"></i>
+                                                {% trans "Add Buffer" %}
+                                            </span>
+                                            <!-- /ko -->
                                             <!-- ko if: self.featureLookup[widget.node_id()].features().length > 0 -->
                                             |
                                             <a href="javascript:void(0);" data-bind="click: function() {
@@ -296,7 +313,10 @@
                     <!-- ko if: !tile.tileid -->
                     <button
                         class="btn btn-shim btn-labeled btn-lg fa fa-plus"
-                        data-bind="click: function() { if (card.isWritable && !self.preview) { self.saveTile() }},
+                        data-bind="click: function() { if (card.isWritable && !self.preview) {
+                            self.updateTiles();
+                            self.saveTile();
+                        }},
                         css: { disabled: (!card.isWritable || self.preview), 'btn-mint': card.isWritable }"
                     >{% trans 'Add'  %}</button>
                     <!-- /ko -->

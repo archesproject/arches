@@ -9,6 +9,7 @@ define([
         var self = this;
 
         this.activeTab = ko.observable(params.activeTab);
+        this.showTabs = ko.observable(true);
         this.hideSidePanel = function() {
             self.activeTab(undefined);
         };

@@ -112,7 +112,9 @@ class LabelBasedGraph(object):
         return graph.as_json(include_empty_nodes=bool(not hide_empty_nodes)) if as_json else graph
 
     @classmethod
-    def from_resource(cls, resource, datatype_factory=None, node_cache=None, compact=False, hide_empty_nodes=False, as_json=True):
+    def from_resource(
+        cls, resource, datatype_factory=None, node_cache=None, compact=False, hide_empty_nodes=False, as_json=True, user=None, perm=None
+    ):
         """
         Generates a label-based graph from a given resource
         """
@@ -123,7 +125,7 @@ class LabelBasedGraph(object):
             node_cache = {}
 
         if not resource.tiles:
-            resource.load_tiles()
+            resource.load_tiles(user, perm)
 
         node_ids_to_tiles_reference = cls.generate_node_ids_to_tiles_reference(resource=resource)
 
