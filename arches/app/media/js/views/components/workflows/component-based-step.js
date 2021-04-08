@@ -498,13 +498,15 @@ define([
     };
 
 
-    function WorkflowComponentAbstract(componentData, previouslyPersistedComponentData, resourceId, title, complete) {
+    function WorkflowComponentAbstract(componentData, previouslyPersistedComponentData, externalStepData, resourceId, title, complete) {
         var self = this;
 
         this.complete = complete;
         this.resourceId = resourceId;
         this.componentData = componentData;
+
         this.previouslyPersistedComponentData = previouslyPersistedComponentData;
+        this.externalStepData = externalStepData;
         
         this.savedData = ko.observableArray();
         this.hasUnsavedData = ko.observable();
@@ -629,6 +631,7 @@ define([
             var workflowComponentAbstract = new WorkflowComponentAbstract(
                 workflowComponentAbtractData, 
                 previouslyPersistedComponentData, 
+                params.externalStepData,
                 self.resourceId,
                 params.title, 
                 self.complete
