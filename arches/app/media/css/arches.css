@@ -10253,7 +10253,7 @@ a.search-query-link-captions:focus {
 .search-tools-container {
     background: #f4f4f4;
     border-bottom: 1px solid #ddd;
-    position: fixed;
+    /* position: fixed; */
     height: 50px;
     z-index: 3;
     width: 399px;
