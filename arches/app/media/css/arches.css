@@ -10111,7 +10111,7 @@ a.clear-geojson-button:hover {
 }
 
 .ss-grid-item {
-    position: sticky;
+    /* position: sticky; */
     border: 1px solid #ddd;
     width: 224px;
     height: 164px;
@@ -10125,6 +10125,7 @@ a.clear-geojson-button:hover {
     -o-background-size: cover;
     background-size: cover;
     background-color: white;
+    margin-bottom: -160px;
 }
 
 .search-caption-activeWrap {
