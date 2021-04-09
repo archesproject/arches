@@ -287,7 +287,7 @@ define([
                     'ep-alert-red',
                     self.warning[0],
                     self.warning[1],
-                    null,
+                    function(){}, //does nothing when canceled
                     function(){
                         resourcesToDelete.forEach(function(resource){deleteObject('resource', resource.resourceid);});
                         tilesToDelete.forEach(function(tile){deleteObject('tile', tile.tile);});
