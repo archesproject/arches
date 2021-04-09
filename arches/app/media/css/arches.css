@@ -10148,7 +10148,7 @@ a.clear-geojson-button:hover {
 }
 
 .search-caption-activeWrap {
-    position: absolute;
+    /* position: absolute; */
     z-index: 2;
     height: 100%;
     width: 100%;
