@@ -4,7 +4,7 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('models', '7125_geometry_index_table_update'),
+        ('models', '7131_update_annotations_view'),
     ]
 
     operations = [

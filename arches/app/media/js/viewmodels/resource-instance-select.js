@@ -328,6 +328,7 @@ define([
                         if (!!params.node && ko.unwrap(params.node.config.searchString) !== ""){
                             var searchUrl = new URL(ko.unwrap(params.node.config.searchString));
                             queryString = new URLSearchParams(searchUrl.search);
+                            self.allowInstanceCreation = false;
                         } 
                         queryString.set('paging-filter', page);
 
