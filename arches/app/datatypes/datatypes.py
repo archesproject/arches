@@ -7,6 +7,7 @@ import logging
 import os
 from pathlib import Path
 import ast
+import time
 from distutils import util
 from datetime import datetime
 from mimetypes import MimeTypes
@@ -321,11 +322,35 @@ class DateDataType(BaseDataType):
             value = value[0]
         valid_date_format, valid = self.get_valid_date_format(value)
         if valid:
-            value = datetime.strptime(value, valid_date_format).astimezone().isoformat(timespec="milliseconds")
+            v = datetime.strptime(value, valid_date_format)
         else:
             v = datetime.strptime(value, settings.DATE_IMPORT_EXPORT_FORMAT)
-            value = v.astimezone().isoformat(timespec="milliseconds")
+        # The .astimezone() function throws an error on Windows for dates before 1970
+        try:
+            v = v.astimezone()
+        except:
+            v = self.backup_astimezone(v)
+        value = v.isoformat(timespec="milliseconds")
         return value
+
+    def backup_astimezone(self, dt):
+        def same_calendar(year):
+            new_year = 1971
+            while not is_same_calendar(year, new_year):
+                new_year += 1
+                if new_year > 2020:  # should never happen but don't want a infinite loop
+                    raise Exception("Backup timezone conversion failed: no matching year found")
+            return new_year
+
+        def is_same_calendar(year1, year2):
+            year1_weekday_1 = datetime.strptime(str(year1) + "-01-01", "%Y-%m-%d").weekday()
+            year1_weekday_2 = datetime.strptime(str(year1) + "-03-01", "%Y-%m-%d").weekday()
+            year2_weekday_1 = datetime.strptime(str(year2) + "-01-01", "%Y-%m-%d").weekday()
+            year2_weekday_2 = datetime.strptime(str(year2) + "-03-01", "%Y-%m-%d").weekday()
+            return (year1_weekday_1 == year2_weekday_1) and (year1_weekday_2 == year2_weekday_2)
+
+        converted_dt = dt.replace(year=same_calendar(dt.year)).astimezone().replace(year=dt.year)
+        return converted_dt
 
     def transform_export_values(self, value, *args, **kwargs):
         valid_date_format, valid = self.get_valid_date_format(value)
@@ -1167,12 +1192,11 @@ class FileListDataType(BaseDataType):
     def get_display_value(self, tile, node):
         data = self.get_tile_data(tile)
         files = data[str(node.pk)]
-        file_list_str = ""
+        file_urls = ""
         if files is not None:
-            for f in files:
-                file_list_str = file_list_str + f["name"] + " | "
+            file_urls = " | ".join([file["url"] for file in files])
 
-        return file_list_str
+        return file_urls
 
     def handle_request(self, current_tile, request, node):
         # this does not get called when saving data from the mobile app

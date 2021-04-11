@@ -152,13 +152,15 @@ class Resource(models.ResourceInstance):
 
         return root_ontology_class
 
-    def load_tiles(self):
+    def load_tiles(self, user=None, perm=None):
         """
         Loads the resource's tiles array with all the tiles from the database as a flat list
 
         """
 
         self.tiles = list(models.TileModel.objects.filter(resourceinstance=self))
+        if user:
+            self.tiles = [tile for tile in self.tiles if tile.nodegroup_id is not None and user.has_perm(perm, tile.nodegroup)]
 
     # # flatten out the nested tiles into a single array
     def get_flattened_tiles(self):
@@ -430,7 +432,11 @@ class Resource(models.ResourceInstance):
         from arches.app.models.tile import Tile, TileValidationError
 
         errors = []
-        for tile in Tile.objects.filter(resourceinstance=self):
+        tiles = self.tiles
+        if len(self.tiles) == 0:
+            tiles = Tile.objects.filter(resourceinstance=self)
+
+        for tile in tiles:
             try:
                 tile.validate(raise_early=(not verbose))
             except TileValidationError as err:
@@ -568,7 +574,7 @@ class Resource(models.ResourceInstance):
 
         return JSONSerializer().serializeToPython(ret)
 
-    def to_json(self, compact=True, hide_empty_nodes=False):
+    def to_json(self, compact=True, hide_empty_nodes=False, user=None, perm=None):
         """
         Returns resource represented as disambiguated JSON graph
 
@@ -576,7 +582,7 @@ class Resource(models.ResourceInstance):
         compact -- type bool: hide superfluous node data
         hide_empty_nodes -- type bool: hide nodes without data
         """
-        return LabelBasedGraph.from_resource(resource=self, compact=compact, hide_empty_nodes=hide_empty_nodes)
+        return LabelBasedGraph.from_resource(resource=self, compact=compact, hide_empty_nodes=hide_empty_nodes, user=user, perm=perm)
 
     @staticmethod
     def to_json__bulk(resources, compact=True, hide_empty_nodes=False):

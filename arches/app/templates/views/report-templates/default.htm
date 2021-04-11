@@ -23,13 +23,12 @@
 
 
 <!-- Report Content -->
-<div class="rp-report-container-preview" style="margin-bottom: 15px;">
+<div class="rp-report-container-preview">
 
     {% block header %}
     {% endblock header %}
 
     {% block body %}
-
     <!--ko if: hasProvisionalData() && (editorContext === false) -->
     <div class="report-provisional-flag">{% trans 'This resource has provisional edits (not displayed in this report) that are pending review' %}</div>
     <!--/ko-->
@@ -61,9 +60,10 @@
             <!-- /ko -->
         </div>
     </div>
-
     {% endblock body %}
     
+    
+    {% block related_resources %}
     <div class="rp-report-section relative report-related-resources">
         <div class="rp-report-section-title">
             <h4 class="rp-section-title">{% trans 'Related Resources' %}</h4>
@@ -110,6 +110,10 @@
         <!-- /ko -->
         <!-- /ko -->    
     </div>  
+    {% endblock related_resources %}
+
+    {% block footer %}
+    {% endblock footer %}
 </div>
 {% endblock report %}
 <!-- /ko -->

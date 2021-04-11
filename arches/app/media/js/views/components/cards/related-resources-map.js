@@ -181,8 +181,14 @@ define([
                                         }
                                     })
                                     .then(function(json) {
-                                        var details = json.results.hits.hits[0]._source
-                                        self.relatedResourceDetails[resourceinstanceid] = {graphid: details.graph_id, resourceinstanceid: resourceinstanceid, displayname: details.displayname};
+                                        var details = json.results.hits.hits[0]._source;
+
+                                        self.relatedResourceDetails[resourceinstanceid] = {
+                                            graphid: details.graph_id, 
+                                            resourceinstanceid: resourceinstanceid, 
+                                            displayname: details.displayname,
+                                            geometries: details.geometries,
+                                        };
                                         self.tile.data[nodeid].valueHasMutated();
                                     });
                             }
@@ -379,6 +385,13 @@ define([
         };
 
         this.drawAvailable.subscribe(function(val){
+            if (!params.draw) {
+                params.draw = self.draw;
+            }
+            if (!params.map) {
+                params.map = self.map();
+            }
+
             var bufferSrcId = 'geojson-search-buffer-data';
             self.widget = self.widgets.find(function(widget){
                 return widget.datatype.datatype === 'resource-instance' || widget.datatype.datatype === 'resource-instance-list';

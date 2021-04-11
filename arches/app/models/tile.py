@@ -540,15 +540,13 @@ class Tile(models.TileModel):
     @staticmethod
     def get_blank_tile(nodeid, resourceid=None):
         parent_nodegroup = None
-
         node = models.Node.objects.get(pk=nodeid)
         if node.nodegroup.parentnodegroup_id is not None:
             parent_nodegroup = node.nodegroup.parentnodegroup
-            parent_tile = Tile()
-            parent_tile.data = {}
+            parent_tile = Tile.get_blank_tile_from_nodegroup_id(
+                nodegroup_id=node.nodegroup.parentnodegroup_id, resourceid=resourceid, parenttile=None
+            )
             parent_tile.tileid = None
-            parent_tile.nodegroup_id = node.nodegroup.parentnodegroup_id
-            parent_tile.resourceinstance_id = resourceid
             parent_tile.tiles = []
             for nodegroup in models.NodeGroup.objects.filter(parentnodegroup_id=node.nodegroup.parentnodegroup_id):
                 parent_tile.tiles.append(Tile.get_blank_tile_from_nodegroup_id(nodegroup.pk, resourceid=resourceid, parenttile=parent_tile))
@@ -565,7 +563,8 @@ class Tile(models.TileModel):
         tile.data = {}
 
         for node in models.Node.objects.filter(nodegroup=nodegroup_id):
-            tile.data[str(node.nodeid)] = None
+            if node.datatype != "semantic":
+                tile.data[str(node.nodeid)] = None
 
         return tile
 
@@ -597,6 +596,8 @@ class Tile(models.TileModel):
                 tile.save()
             else:
                 tile.save()
+                if not nodegroupid:
+                    nodegroupid = models.Node.objects.get(pk=nodeid).nodegroup_id
                 if nodegroupid and resourceinstanceid:
                     tile = Tile.update_node_value(nodeid, value, nodegroupid=nodegroupid, resourceinstanceid=resourceinstanceid)
         return tile

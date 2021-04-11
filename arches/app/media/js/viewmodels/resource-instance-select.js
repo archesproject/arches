@@ -8,7 +8,7 @@ define([
 ], function(ko, _, WidgetViewModel, arches, ResourceSummary, ontologyUtils) {
     var resourceLookup = {};
     var graphCache = {};
-    require(['views/components/workflows/new-tile-step']);
+    require(['views/components/workflows/new-resource-instance']);
     
     /**
     * A viewmodel used for generic alert messages
@@ -58,6 +58,16 @@ define([
         this.resourceTypesToDisplayInDropDown = !!params.graphids ? ko.toJS(params.graphids) : [];
         this.displayOntologyTable = this.renderContext !== 'search' && !!params.node;
 
+        this.waitingForGraphToDownload = ko.observable(false);
+        this.counter = Object.keys(self.graphLookup).length;
+        if (params.node) {
+            ko.unwrap(params.node.config.graphs).forEach(function(graph){
+                if (!Object.keys(self.graphLookup).includes(graph.graphid)){
+                    self.waitingForGraphToDownload(true);
+                    self.counter += 1;
+                }
+            });
+        }
         var downloadGraph = function(graphid){
             if (graphid in self.graphLookup){
                 return Promise.resolve(self.graphLookup[graphid]);
@@ -70,7 +80,9 @@ define([
                         return response.json();
                     })
                     .then(function(json){
-                        return self.graphLookup[graphid] = json.graph;
+                        self.graphLookup[graphid] = json.graph;
+                        self.waitingForGraphToDownload(Object.keys(self.graphLookup).length < self.counter);
+                        return json.graph;
                     });
             }
         };
@@ -103,7 +115,7 @@ define([
         this.resourceInstanceDisplayName = params.form && params.form.displayname ? params.form.displayname() : '';
         this.makeFriendly = ontologyUtils.makeFriendly;
         this.getSelect2ConfigForOntologyProperties = ontologyUtils.getSelect2ConfigForOntologyProperties;
-        self.newTileStep = ko.observable();
+        self.newResourceInstance = ko.observable();
         this.resourceReportUrl = arches.urls.resource_report;
         this.resourceEditorUrl = arches.urls.resource_editor;
         this.selectedResourceRelationship = ko.observable(null);
@@ -126,11 +138,11 @@ define([
         this.displayValue = ko.observable('');
         
         //
-        // this.close is only called if newTileStep is True and the user 
+        // this.close is only called if newResourceInstance is True and the user 
         // decides not to add the new resource instance, and closes the window without adding it
         //
         this.close = function(){
-            this.newTileStep(null);
+            this.newResourceInstance(null);
         };
         
         
@@ -245,6 +257,7 @@ define([
         this.select2Config = {
             value: self.renderContext === 'search' ? self.value : resourceToAdd,
             clickBubble: true,
+            disabled: this.waitingForGraphToDownload,
             multiple: !self.displayOntologyTable ? params.multiple : false,
             placeholder: this.placeholder() || arches.translations.riSelectPlaceholder,
             closeOnSelect: true,
@@ -269,7 +282,7 @@ define([
                                 resourceid: ko.observable(),
                                 tileid: ko.observable()
                             };
-                            self.newTileStep(params);
+                            self.newResourceInstance(params);
                             params.complete.subscribe(function() {
                                 window.fetch(arches.urls.search_results + "?id=" + params.resourceid())
                                     .then(function(response){
@@ -284,7 +297,7 @@ define([
                                         setValue(ret);
                                     })
                                     .finally(function(){
-                                        self.newTileStep(null);
+                                        self.newResourceInstance(null);
                                         window.setTimeout(function() {
                                             resourceToAdd("");
                                         }, 250);

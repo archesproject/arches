@@ -54,7 +54,9 @@
 
             {% include 'views/components/coordinate-editor.htm' %}
 
-            <div class="card" data-bind="visible: geoJSONString() === undefined && !coordinateEditing()">
+            {% include 'views/components/buffer-editor.htm' %}
+
+            <div class="card" data-bind="visible: geoJSONString() === undefined && !coordinateEditing() && !bufferNodeId()">
                 <div class="row widget-wrapper">
                     <div class="form-group">
                         <div class="col-xs-12">
@@ -146,6 +148,21 @@
                                     <span>
                                         <i class="fa fa-list map-card-feature-edit"></i>
                                         {% trans "Edit Coordinates" %}
+                                    </span>
+                                    <!-- /ko -->
+                                    |
+                                    <!-- ko if: self.bufferFeature() -->
+                                    <a href="javascript:void(0);" data-bind="click: function() {
+                                        self.bufferNodeId(widget.node_id());
+                                    }">
+                                        <i class="fa fa-list map-card-feature-edit"></i>
+                                        {% trans "Add Buffer" %}
+                                    </a>
+                                    <!-- /ko -->
+                                    <!-- ko if: !self.bufferFeature() -->
+                                    <span>
+                                        <i class="fa fa-list map-card-feature-edit"></i>
+                                        {% trans "Add Buffer" %}
                                     </span>
                                     <!-- /ko -->
                                     <!-- ko if: self.featureLookup[widget.node_id()].features().length > 0 -->

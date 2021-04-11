@@ -27,7 +27,6 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 
 {% block main_content %}
 <div class='scroll-y'>
-
     <div class='resource-report' data-bind='component: {
         name: reportLookup[report.get("template_id")()].componentname,
         params: {
@@ -35,11 +34,20 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
         }
     }'></div>
 
-    <footer id="footer" style="background: #f8f8f8;">
-        <div class="pull-left" style="padding-left: 10px;">
+    <footer 
+        id="footer" 
+        style="
+            background: #f8f8f8; 
+            position: relative;
+            display: flex;
+            justify-content: space-between;
+            padding-right: 50px;
+        "
+    >
+        <div>
             {% blocktrans %}Arches {{ version }}{% endblocktrans %}
         </div>
-        <div class="pull-right pad-rgt">
+        <div>
             <a href="http://archesproject.org" target="_blank">http://archesproject.org</a>
         </div>
     </footer>
