@@ -49,10 +49,35 @@ define([
         
         this.value = ko.observable();
         this.value.subscribe(function(value) {
+            var getResourceIdFromComponentData = function(componentData) {
+                /* iterates over each component in layout */
+                return Object.values(componentData).reduce(function(acc, componentDatum) {
+                    /* most components store data for a single tile */ 
+                    if (componentDatum instanceof Array && componentDatum.length === 1) {
+                        componentDatum = componentDatum[0];
+                    }
+                    
+                    if (!acc && componentDatum.resourceInstanceId) {
+                        return componentDatum.resourceInstanceId;
+                    }
+
+                    return acc;
+                }, null);
+            };
+
             /* if we have defined that this is part of a single-resource workflow, and that this step creates the desired resource */ 
             if (self.shouldtrackresource && !ko.unwrap(config.workflow.resourceId)) {
                 if (value) {
-                    config.workflow.resourceId(value.resourceid);
+                    var resourceId;
+                     
+                    if (value.resourceid) {  /* legacy newTileStep */
+                        resourceId = value.resourceid
+                    }
+                    else {  /* component-based-step */
+                        resourceId = getResourceIdFromComponentData(value);
+                    }
+
+                    config.workflow.resourceId(resourceId);
                 } 
                 else {
                     config.workflow.resourceId(null);

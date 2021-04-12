@@ -60,11 +60,11 @@ define([
 
         this.loadData = function(data) {
             /* a flat object of the previously saved data for all tiles */ 
-            var dataLookup = data.reduce(function(acc, componentData) {
-                var parsedData = JSON.parse(componentData);
+            var tileDataLookup = data.reduce(function(acc, componentData) {
+                var parsedTileData = JSON.parse(componentData.tileData);
 
-                Object.keys(parsedData).forEach(function(key) {
-                    acc[key] = parsedData[key];
+                Object.keys(parsedTileData).forEach(function(key) {
+                    acc[key] = parsedTileData[key];
                 });
 
                 return acc;
@@ -75,11 +75,14 @@ define([
                 /* force the value of current tile data observables */ 
                 Object.keys(tile.data).forEach(function(key) {
                     if (ko.isObservable(tile.data[key])) {
-                        tile.data[key](dataLookup[key]);
+                        tile.data[key](tileDataLookup[key]);
                     }
                 });
-
                 tile._tileData(koMapping.toJSON(tile.data));
+
+                tile.nodegroup_id = data.nodegroupId;
+                tile.tileid = data.tileId;
+                tile.resourceinstance_id = data.resourceInstanceId;
             });
         };
 
@@ -223,18 +226,22 @@ define([
             var saveFunction = self.saveFunction();
 
             if (saveFunction) { saveFunction(); }
-
-            self.complete(true);
         };
 
         this.onSaveSuccess = function(savedData) {
             if (!(savedData instanceof Array)) { savedData = [savedData]; }
             
             self.savedData(savedData.map(function(savedDatum) {
-                return savedDatum._tileData();
+                return {
+                    tileData: savedDatum._tileData(),
+                    tileId: savedDatum.tileid,
+                    nodegroupId: savedDatum.nodegroup_id,
+                    resourceInstanceId: savedDatum.resourceinstance_id,
+                };
             }));
 
             self.saving(false);
+            self.complete(true);
         };
 
         this.reset = function() {
