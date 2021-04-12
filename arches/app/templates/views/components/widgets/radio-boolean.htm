@@ -10,7 +10,7 @@
           <!-- /ko -->
       </div></div>
       <div class="col-xs-12">
-        <div style="pad-hor">
+        <div class="pad-hor">
         <label data-bind="css: { 'active': value() === true, 'disabled': disabled }, click: function(e){setValue(true)}" class="form-radio form-normal form-text">
             <input type="radio" name="stat-w-label" data-bind="checked: value() === true"><span data-bind="text:node.config.trueLabel"></span>
         </label>
@@ -28,7 +28,7 @@
     {% trans "Default Value" %}
 </div>
 <div class="col-xs-12" style="display:flex; flex-direction: column; height: 50px">
-  <div style="pad-hor">
+  <div class="pad-hor">
       <label data-bind="css: { 'active': defaultValue() === true }, click: function(e){setDefaultValue(true)}" class="form-radio form-normal form-text">
           <input type="radio" name="stat-w-label" data-bind="checked: defaultValue() === true"><span data-bind="text: node.config.trueLabel"></span>
       </label>
