@@ -114,7 +114,7 @@
                                     <div class="media-right" data-bind="click: $parent.removeFile">
                                         <button class="btn btn-xs btn-danger btn-file-cancel"><i class="ion ion-close"></i></button>
                                     </div>
-                                    <div class="">
+                                    <div>
                                         <span class="text-sm" data-bind="html: $parent.formatSize($data)"></span>
                                     </div>
                                 </div>
@@ -166,7 +166,7 @@
 
 <!-- ko foreach: reportFiles() -->
 <dd>
-    <a class="" data-bind="attr: {href: url}">
+    <a data-bind="attr: {href: url}">
         <i class="ion ion-forward"></i>
         <span data-bind="text: name"></span>
     </a>
@@ -178,7 +178,7 @@
     <div id="report-image-grid" class="report-image-grid">
         <!-- ko foreach: reportImages() -->
         <div class="rp-image-grid-item">
-            <a id="" class="" target="_blank" data-bind="attr: {href: url}">
+            <a target="_blank" data-bind="attr: {href: url}">
                 <img class="img-responsive" data-bind="attr: {src: url, alt: name}">
             </a>
         </div>
