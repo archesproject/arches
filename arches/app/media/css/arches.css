@@ -10256,7 +10256,7 @@ a.search-query-link-captions:focus {
     border-bottom: 1px solid #ddd;
     /* position: fixed; */
     height: 50px;
-    z-index: 3;
+    /* z-index: 3; */
     width: 399px;
     padding: 4px 0px;
     margin-top: -1px;
