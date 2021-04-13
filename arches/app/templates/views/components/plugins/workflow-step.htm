@@ -7,8 +7,8 @@
             class='tabbed-workflow-step-information-box-container'
             data-bind="
                 css: {
-                    seen: informationBoxData().hidden,
-                    unseen: !informationBoxData().hidden,
+                    seen: informationBoxData().displayed,
+                    unseen: !informationBoxData().displayed,
                 }
             "
         >

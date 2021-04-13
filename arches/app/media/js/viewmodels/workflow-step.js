@@ -125,12 +125,12 @@ define([
 
             /* cached informationBox logic */ 
             if (config.informationboxdata) {
-                var isHidden = true;
-                if (self.getInformationBoxHiddenStateFromLocalStorage() !== undefined){
-                    isHidden = self.getInformationBoxHiddenStateFromLocalStorage();
+                var isDisplayed = true;
+                if (self.getInformationBoxDisplayedStateFromLocalStorage() !== undefined){
+                    isDisplayed = self.getInformationBoxDisplayedStateFromLocalStorage();
                 }
                 self.informationBoxData({
-                    hidden: isHidden,
+                    displayed: isDisplayed,
                     heading: config.informationboxdata['heading'],
                     text: config.informationboxdata['text'],
                 })
@@ -210,23 +210,20 @@ define([
 
         this.toggleInformationBox = function() {
             var informationBoxData = self.informationBoxData();
-            var isHidden = informationBoxData['hidden'];
+            var isDisplayed = informationBoxData['displayed'];
 
-            informationBoxData['hidden'] = !isHidden;
+            informationBoxData['displayed'] = !isDisplayed;
             self.informationBoxData(informationBoxData);
 
-            //self.setToLocalStorage('informationBoxHidden', !isHidden);
-            self.setMetadataToLocalStorage('informationBoxHidden', !isHidden);
+            self.setMetadataToLocalStorage('informationBoxDisplayed', !isDisplayed);
         };
 
-        this.getInformationBoxHiddenStateFromLocalStorage = function() {
-            //return self.getFromLocalStorage('informationBoxHidden')
-            return self.getMetadataFromLocalStorage('informationBoxHidden')
+        this.getInformationBoxDisplayedStateFromLocalStorage = function() {
+            return self.getMetadataFromLocalStorage('informationBoxDisplayed')
         };
 
         this.getMetadataFromLocalStorage = function(key) {
             var workflowsMetadataLocalStorageData = JSON.parse(localStorage.getItem('workflow-metadata')) || {};
-            //var workflowName = ko.unwrap(config.workflow.workflowName);
             var pathArray = window.location.pathname.split('/');
             var workflowName = pathArray[pathArray.length - 1];
             var stepName = ko.unwrap(config.name);
@@ -237,15 +234,13 @@ define([
 
         this.setMetadataToLocalStorage = function(key, value) {
             var workflowMetaDataLocalStorageData = JSON.parse(localStorage.getItem('workflow-metadata')) || {};
-
-            //var workflowName = ko.unwrap(config.workflow.workflowName);
             var pathArray = window.location.pathname.split('/');
             var workflowName = pathArray[pathArray.length - 1];
             if (!workflowMetaDataLocalStorageData[workflowName]) {
                 workflowMetaDataLocalStorageData[workflowName] = {};
             };
 
-            stepName = ko.unwrap(config.name);
+            var stepName = ko.unwrap(config.name);
             if (!workflowMetaDataLocalStorageData[workflowName][stepName]) {
                 workflowMetaDataLocalStorageData[workflowName][stepName] = {};
             };
