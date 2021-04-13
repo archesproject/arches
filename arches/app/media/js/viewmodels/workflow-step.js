@@ -126,7 +126,7 @@ define([
             /* cached informationBox logic */ 
             if (config.informationboxdata) {
                 var isHidden = true;
-                if (self.getInformationBoxHiddenStateFromLocalStorage()){
+                if (self.getInformationBoxHiddenStateFromLocalStorage() !== undefined){
                     isHidden = self.getInformationBoxHiddenStateFromLocalStorage();
                 }
                 self.informationBoxData({
@@ -134,6 +134,7 @@ define([
                     heading: config.informationboxdata['heading'],
                     text: config.informationboxdata['text'],
                 })
+                console.log(self.informationBoxData())
             }
         };
         
@@ -214,11 +215,47 @@ define([
             informationBoxData['hidden'] = !isHidden;
             self.informationBoxData(informationBoxData);
 
-            self.setToLocalStorage('informationBoxHidden', !isHidden);
+            //self.setToLocalStorage('informationBoxHidden', !isHidden);
+            self.setMetadataToLocalStorage('informationBoxHidden', !isHidden);
         };
 
         this.getInformationBoxHiddenStateFromLocalStorage = function() {
-            return self.getFromLocalStorage('informationBoxHidden')
+            //return self.getFromLocalStorage('informationBoxHidden')
+            return self.getMetadataFromLocalStorage('informationBoxHidden')
+        };
+
+        this.getMetadataFromLocalStorage = function(key) {
+            var workflowsMetadataLocalStorageData = JSON.parse(localStorage.getItem('workflow-metadata')) || {};
+            //var workflowName = ko.unwrap(config.workflow.workflowName);
+            var pathArray = window.location.pathname.split('/');
+            var workflowName = pathArray[pathArray.length - 1];
+            var stepName = ko.unwrap(config.name);
+            if (workflowsMetadataLocalStorageData[workflowName] && workflowsMetadataLocalStorageData[workflowName][stepName]) {
+                return workflowsMetadataLocalStorageData[workflowName][stepName][key];
+            }
+        };
+
+        this.setMetadataToLocalStorage = function(key, value) {
+            var workflowMetaDataLocalStorageData = JSON.parse(localStorage.getItem('workflow-metadata')) || {};
+
+            //var workflowName = ko.unwrap(config.workflow.workflowName);
+            var pathArray = window.location.pathname.split('/');
+            var workflowName = pathArray[pathArray.length - 1];
+            if (!workflowMetaDataLocalStorageData[workflowName]) {
+                workflowMetaDataLocalStorageData[workflowName] = {};
+            };
+
+            stepName = ko.unwrap(config.name);
+            if (!workflowMetaDataLocalStorageData[workflowName][stepName]) {
+                workflowMetaDataLocalStorageData[workflowName][stepName] = {};
+            };
+            
+            workflowMetaDataLocalStorageData[workflowName][stepName][key] = value;
+
+            localStorage.setItem(
+                'workflow-metadata',
+                JSON.stringify(workflowMetaDataLocalStorageData)
+            );
         };
 
         _.extend(this, config);
