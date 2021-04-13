@@ -134,7 +134,6 @@ define([
                     heading: config.informationboxdata['heading'],
                     text: config.informationboxdata['text'],
                 })
-                console.log(self.informationBoxData())
             }
         };
         
