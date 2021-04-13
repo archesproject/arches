@@ -3730,17 +3730,13 @@ ul.nav.nav-tabs.nav-justified {
 }
 
 .settings-panel-heading {
-    /* position: fixed;
-    top: 115px; */
     height: 50px;
-    /* width: 100%; */
     background: #25476a;
     margin-top: -10px;
     margin-bottom: 20px;
     margin-left: -25px;
     margin-right: -20px;
     padding-left: 25px;
-    /* z-index: 10; */
 }
 
 .card-settings-panel-heading {
@@ -3760,7 +3756,7 @@ ul.nav.nav-tabs.nav-justified {
 }
 
 .settings-panel-heading+div {
-    /*margin-top: 13px;*/
+    margin-top: 13px;
 }
 
 .graph-crm-class {
@@ -10111,7 +10107,6 @@ a.clear-geojson-button:hover {
 }
 
 .ss-grid-item {
-    /* position: sticky; */
     border: 1px solid #ddd;
     width: 224px;
     height: 164px;
@@ -10148,7 +10143,6 @@ a.clear-geojson-button:hover {
 }
 
 .search-caption-activeWrap {
-    /* position: absolute; */
     z-index: 2;
     height: 100%;
     width: 100%;
@@ -10254,9 +10248,7 @@ a.search-query-link-captions:focus {
 .search-tools-container {
     background: #f4f4f4;
     border-bottom: 1px solid #ddd;
-    /* position: fixed; */
     height: 50px;
-    /* z-index: 3; */
     width: 399px;
     padding: 4px 0px;
     margin-top: -1px;
