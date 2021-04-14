@@ -2516,6 +2516,16 @@ div.final-cons-step-separator>h4 {
     margin: 0;
 }
 
+.tab-content.barfoo {
+    display: flex;
+    flex: 1 1 auto;
+    height: 0;
+}
+
+.bazbaz {
+    width: 100%;
+}
+
 .panel .panel-heading,
 .panel>:first-child {
     border-top-left-radius: 0;
@@ -3726,6 +3736,18 @@ ul.nav.nav-tabs.nav-justified {
     flex-direction: column;
 }
 
+.foobar { /* WRONg PLACE */
+    /* 
+        Flexbox recalculates height on component load. This hack 
+        allows us the to assign a hard-pixel height to a flexy 
+        element, thus allowing scrolling behavior. 
+        See https://stackoverflow.com/a/14965123
+    */
+    display: flex;
+    flex: 1 1 auto;
+    height: 0; 
+}
+
 .settings-panel-heading {
     background: #25476a;
     color: #fff;
@@ -3777,8 +3799,6 @@ ul.nav.nav-tabs.nav-justified {
     padding: 20px;
     display: flex;
     flex-direction: column;
-    height: calc(100vh - 155px);  /* 155px is height of 3 navbars that render above */
-    overflow-y: scroll;
 }
 
 .graph-designer-header {
@@ -12503,8 +12523,10 @@ ul.select2-choices:after {
 }
 
 .left-panel-inner-container {
-    min-width: 300px;
     height: 100%;
+    min-width: 300px;
+    display: flex;
+    flex-direction: column;
 }
 
 .left-panel {
@@ -12512,14 +12534,14 @@ ul.select2-choices:after {
     overflow: hidden;
     z-index: 3;
 }
-
+/* 
 .designer-tree {
     height: calc(100vh - 225px);
-}
+} */
 
 .left-panel-overflow {
-    width: inherit;
     background: #ecf0f5;
+    height: calc(100% - 75px);  /* 75px is height of .jstree .header */
     overflow-y: auto;
     overflow-x: hidden;
 }
