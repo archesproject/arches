@@ -3757,6 +3757,15 @@ ul.nav.nav-tabs.nav-justified {
     align-items: center;
 }
 
+.settings-panel-body {
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    flex: 1 1 auto;
+    height: 0;
+    overflow-y: scroll;
+}
+
 .graph-crm-class {
     font-size: 15px;
     color: #ddd;
@@ -3791,12 +3800,6 @@ ul.nav.nav-tabs.nav-justified {
 }
 
 .top-node-panel {
-    display: flex;
-    flex-direction: column;
-}
-
-.graph-designer-top-node-panel {
-    padding: 20px;
     display: flex;
     flex-direction: column;
 }
