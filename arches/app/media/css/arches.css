@@ -745,8 +745,13 @@ input[type="checkbox"] {
     display: none;
 }
 
-.tabbed-workflow-footer .btn,
 .tabbed-workflow-title-bar .btn {
+    border-radius: 2px;
+    padding: 8px 15px;
+    margin-left: 5px;
+}
+
+.tabbed-workflow-footer .btn {
     border-radius: 2px;
     padding: 8px 15px;
 }

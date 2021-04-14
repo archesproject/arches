@@ -14,15 +14,32 @@
                 <div class="workflow-name" data-bind="text: workflowName() + ' Workflow'">{% trans "Insert Workflow Name" %}</div>
             </div>
 
-            <button 
-                data-bind="click: quitWorkflow" 
-                class="btn btn-danger"
-            >
-                <i class=" ion-android-cancel"></i>
+            <div style="
+                display: inline-flex;
+                width: 335px;
+                justify-content: flex-end;"
+                >
+                <!-- ko if: activeStep()._index === steps.length - 1 -->
+                <button 
+                    data-bind="click: function(){window.location.assign(quitUrl)}" 
+                    class="btn btn-success"
+                >
+                <i class="fa fa-check"></i>
                 <span>
-                    {% trans "Quit Workflow" %}
+                    {% trans "Complete Workflow" %}
                 </span>
-            </button>
+                </button>
+                <!-- /ko -->
+                <button 
+                    data-bind="click: quitWorkflow" 
+                    class="btn btn-danger"
+                >
+                    <i class=" ion-android-cancel"></i>
+                    <span>
+                        {% trans "Delete Workflow" %}
+                    </span>
+                </button>
+            </div>
         </div>
         
         <div class="workflow-nav-tab-container">
