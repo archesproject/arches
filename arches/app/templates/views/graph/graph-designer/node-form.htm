@@ -1,6 +1,6 @@
 {% load i18n %}
 
-<div id="external-page-content">
+<div style="height: 100%;" id="external-page-content">
     <div class="settings-panel">
 
         <div class="settings-panel-heading">
@@ -19,7 +19,13 @@
         </div>
 
         <!-- Settings Forms -->
-        <div class="top-node-panel">
+        <div 
+            style="
+                padding: 20px;
+                flex-direction: column;
+            "
+            class="settings-panel-body"
+        >
 
             <div class="graph-designer-header">{% trans 'Node Identifiers' %}</div>
             <!-- ko if: node() -->

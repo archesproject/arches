@@ -202,7 +202,11 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                 </div>
             </div>
 
-            <div class="flex panel-config" data-bind="visible: activeTab() === 'card'">
+            <div 
+                style="flex-direction: row-reverse;"
+                class="settings-panel-body" 
+                data-bind="visible: activeTab() === 'card'"
+            >
                 <!--Middle Panel -->
                 <!-- ko if: cardTree.selection -->
                 <div class="middle-column-container graph-designer branch-library card-configuration" data-bind="css: {'expanded': selectedCard() && selectedCard().model.helpenabled() && cardTree.selection().constructor.name === 'CardViewModel' }" style="">
@@ -246,6 +250,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                 
                 <!-- Card Manager -->
                 <div 
+                    style="flex: 2;"
                     class="flex tab-pane fade-in graph-designer" 
                     data-bind="css: { active: activeTab() === 'card' }"
                 >

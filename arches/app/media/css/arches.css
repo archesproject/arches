@@ -3734,6 +3734,8 @@ ul.nav.nav-tabs.nav-justified {
     background-color: #ffffff;
     display: flex;
     flex-direction: column;
+    flex: 1 1 auto;
+    width: 0;
 }
 
 .foobar { /* WRONg PLACE */
@@ -3748,6 +3750,12 @@ ul.nav.nav-tabs.nav-justified {
     height: 0; 
 }
 
+.settings-panel {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+}
+
 .settings-panel-heading {
     background: #25476a;
     color: #fff;
@@ -3758,9 +3766,7 @@ ul.nav.nav-tabs.nav-justified {
 }
 
 .settings-panel-body {
-    padding: 20px;
     display: flex;
-    flex-direction: column;
     flex: 1 1 auto;
     height: 0;
     overflow-y: scroll;
@@ -3780,6 +3786,10 @@ ul.nav.nav-tabs.nav-justified {
 
 .graph-designer {
     background: #fbfbfb;
+}
+
+.graph-designer-graph-content {
+    width: 100%;
 }
 
 .graph-designer-graph-content .graph-designer-title {
@@ -3802,6 +3812,7 @@ ul.nav.nav-tabs.nav-justified {
 .top-node-panel {
     display: flex;
     flex-direction: column;
+    padding: 20px;
 }
 
 .graph-designer-header {
@@ -6978,6 +6989,9 @@ ul div .card-tree-list span .card-tree-list-item .card-tree-list-icon {
 }
 
 .middle-column-container {
+    flex: 1;
+    padding: 12px;
+    padding-left: unset;
     background: #fbfbfb;
     color: #666;
     border-right: solid 1px #dddddd;
@@ -6999,7 +7013,6 @@ ul div .card-tree-list span .card-tree-list-item .card-tree-list-icon {
     border-left: 1px solid #ddd;
     background: #f4f4f4;
     color: #2d3c4b;
-    height: 100%;
 }
 
 .panel-config .toggle-container {
@@ -7279,7 +7292,6 @@ ul div .card-tree-list span .card-tree-list-item .card-tree-list-icon {
     border-width: 1px;
     border-color: #ccc;
     background-color: #f9f9f9;
-    min-width: 900px;
 }
 
 .node-subname {
