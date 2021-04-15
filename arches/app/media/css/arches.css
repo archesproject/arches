@@ -3765,7 +3765,7 @@ ul.nav.nav-tabs.nav-justified {
 }
 
 .settings-panel-heading+div {
-    margin-top: 13px;
+    /* margin-top: 13px; */
 }
 
 .graph-crm-class {
