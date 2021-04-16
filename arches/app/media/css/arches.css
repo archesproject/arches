@@ -3725,7 +3725,6 @@ ul.nav.nav-tabs.nav-justified {
     display: flex;
     flex-direction: column;
     flex: 1 1 auto;
-    width: 0;
 }
 
 .set-variable-pixel-height { /* WRONg PLACE */
