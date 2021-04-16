@@ -3767,6 +3767,7 @@ ul.nav.nav-tabs.nav-justified {
 
 .settings-panel-body {
     display: flex;
+    flex-direction: column;
     flex: 1 1 auto;
     height: 0;
     overflow-y: scroll;
@@ -6991,11 +6992,12 @@ ul div .card-tree-list span .card-tree-list-item .card-tree-list-icon {
 .middle-column-container {
     flex: 1;
     padding: 12px;
-    padding-left: unset;
     background: #fbfbfb;
     color: #666;
-    border-right: solid 1px #dddddd;
     overflow-y: auto;
+    border-right: solid 1px #ddd;
+    border-left: 1px solid #ddd;
+    min-width: 200px;
 }
 
 
@@ -12601,12 +12603,11 @@ ul.select2-choices:after {
     padding: 0px;
     border-radius: 3px;
     background-color: white;
-    z-index: 10;
+    overflow-y: scroll;
 }
 
 .graph-designer .card-component-panel {
     background: #fafafa;
-    margin-top: 50px;
 }
 
 .card-component-panel h3 {

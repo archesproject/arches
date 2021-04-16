@@ -178,7 +178,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                 </div>
 
                 <!-- Settings, Node Form, and Branch List -->
-                <div class="tab-pane fade-in flex" data-bind="visible: viewState() === 'design'">
+                <div style="width: 100%;" class="tab-pane fade-in flex" data-bind="visible: viewState() === 'design'">
                     <!--ko if: selectedNode() -->
                     <div class="graph-designer-graph-content" data-bind="visible: selectedNode().nodeid == graph.root.nodeid()">
                         {% include 'views/graph/graph-designer/graph-settings.htm' %}
@@ -250,7 +250,10 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                 
                 <!-- Card Manager -->
                 <div 
-                    style="flex: 2;"
+                    style="
+                        flex: 2;
+                        overflow: hidden;
+                    "
                     class="flex tab-pane fade-in graph-designer" 
                     data-bind="css: { active: activeTab() === 'card' }"
                 >
