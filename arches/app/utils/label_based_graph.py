@@ -32,9 +32,12 @@ class LabelBasedNode(object):
 
     def as_json(self, compact=False, include_empty_nodes=True):
         display_data = {}
+
         for child_node in self.child_nodes:
             formatted_node = child_node.as_json(compact=compact, include_empty_nodes=include_empty_nodes)
+
             formatted_node_name, formatted_node_value = formatted_node.popitem()
+
             if include_empty_nodes or not child_node.is_empty():
                 previous_val = display_data.get(formatted_node_name)
                 cardinality = child_node.cardinality
@@ -214,6 +217,7 @@ class LabelBasedGraph(object):
         # if an input_tile doesn't have any nodes, it should associate itself
         for associated_tile in node_ids_to_tiles_reference.get(str(input_node.pk), [input_tile]):
             parent_tile = associated_tile.parenttile
+
             if associated_tile == input_tile or parent_tile == input_tile:
                 label_based_node = LabelBasedNode(
                     name=input_node.name,
@@ -242,4 +246,5 @@ class LabelBasedGraph(object):
                         node_cache=node_cache,
                         datatype_factory=datatype_factory,
                     )
+
         return parent_tree
