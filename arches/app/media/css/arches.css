@@ -2516,16 +2516,6 @@ div.final-cons-step-separator>h4 {
     margin: 0;
 }
 
-.tab-content.barfoo {
-    display: flex;
-    flex: 1 1 auto;
-    height: 0;
-}
-
-.bazbaz {
-    width: 100%;
-}
-
 .panel .panel-heading,
 .panel>:first-child {
     border-top-left-radius: 0;
@@ -3738,11 +3728,11 @@ ul.nav.nav-tabs.nav-justified {
     width: 0;
 }
 
-.foobar { /* WRONg PLACE */
+.set-variable-pixel-height { /* WRONg PLACE */
     /* 
         Flexbox recalculates height on component load. This hack 
         allows us the to assign a hard-pixel height to a flexy 
-        element, thus allowing scrolling behavior. 
+        element, thus allowing pixel calculations on variable height.
         See https://stackoverflow.com/a/14965123
     */
     display: flex;
@@ -3765,17 +3755,9 @@ ul.nav.nav-tabs.nav-justified {
     align-items: center;
 }
 
-<<<<<<< HEAD
 .settings-panel-body {
-    display: flex;
     flex-direction: column;
-    flex: 1 1 auto;
-    height: 0;
     overflow-y: scroll;
-=======
-.settings-panel-heading+div {
-    /* margin-top: 13px; */
->>>>>>> 565a425ad7804520aa362dfce4efee0bfb177e5d
 }
 
 .graph-crm-class {

@@ -106,9 +106,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 
     </div>
 
-    <div style="min-height: 100px; background-color: green;"></div>
-
-    <div class="foobar">
+    <div class="set-variable-pixel-height">
 
         <!-- Left Panel -->
         <div class="left-panel graph-designer" data-bind="resizableSidepanel:true">
@@ -136,20 +134,20 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                     </ul>
                 </div>
 
-                <div class="tab-content barfoo">
-                    <div class="tab-pane fade in bazbaz" data-bind="css: { active: activeTab() === 'graph' }">
+                <div class="tab-content set-variable-pixel-height">
+                    <div style="width: 100%" class="tab-pane fade in" data-bind="css: { active: activeTab() === 'graph' }">
                         <div style="height:100%;" class="" data-bind="with: graphTree">
                             {% include 'views/graph/graph-designer/graph-tree.htm' %}
                         </div>
                     </div>
     
-                    <div class="tab-pane fade in bazbaz" data-bind="css: { active: activeTab() === 'card' }">
+                    <div style="width: 100%" class="tab-pane fade in" data-bind="css: { active: activeTab() === 'card' }">
                         <div style="height:100%;" class="jstree jstree-default" data-bind="visible: true, with: cardTree" style="display: none;">
                             {% include 'views/graph/graph-designer/card-tree.htm' %}
                         </div>
                     </div>
     
-                    <div class="tab-pane fade in bazbaz" data-bind="css: { active: activeTab() === 'permissions' }">
+                    <div style="width: 100%" class="tab-pane fade in" data-bind="css: { active: activeTab() === 'permissions' }">
                         <div style="height:100%;" class="jstree jstree-default" data-bind="visible: true, with: permissionTree" style="display: none;">
                             {% include 'views/graph/graph-designer/card-tree-permissions.htm' %}
                         </div>
@@ -204,7 +202,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 
             <div 
                 style="flex-direction: row-reverse;"
-                class="settings-panel-body" 
+                class="settings-panel-body set-variable-pixel-height" 
                 data-bind="visible: activeTab() === 'card'"
             >
                 <!--Middle Panel -->
