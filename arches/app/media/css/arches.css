@@ -3765,12 +3765,17 @@ ul.nav.nav-tabs.nav-justified {
     align-items: center;
 }
 
+<<<<<<< HEAD
 .settings-panel-body {
     display: flex;
     flex-direction: column;
     flex: 1 1 auto;
     height: 0;
     overflow-y: scroll;
+=======
+.settings-panel-heading+div {
+    /* margin-top: 13px; */
+>>>>>>> 565a425ad7804520aa362dfce4efee0bfb177e5d
 }
 
 .graph-crm-class {
@@ -10118,7 +10123,6 @@ a.clear-geojson-button:hover {
 }
 
 .ss-grid-item {
-    position: sticky;
     border: 1px solid #ddd;
     width: 224px;
     height: 164px;
@@ -10132,6 +10136,7 @@ a.clear-geojson-button:hover {
     -o-background-size: cover;
     background-size: cover;
     background-color: white;
+    margin-bottom: -160px;
 }
 
 .search-caption-activeWrap {
@@ -10154,7 +10159,6 @@ a.clear-geojson-button:hover {
 }
 
 .search-caption-activeWrap {
-    position: absolute;
     z-index: 2;
     height: 100%;
     width: 100%;
@@ -10260,9 +10264,7 @@ a.search-query-link-captions:focus {
 .search-tools-container {
     background: #f4f4f4;
     border-bottom: 1px solid #ddd;
-    position: fixed;
     height: 50px;
-    z-index: 3;
     width: 399px;
     padding: 4px 0px;
     margin-top: -1px;
@@ -10444,7 +10446,7 @@ ul.pagination {
 }
 
 .search-results-container {
-    padding: 60px 10px;
+    padding: 10px 10px 60px 10px;
     bottom: 50px;
     overflow-y: scroll;
     width: 400px;
@@ -11283,8 +11285,8 @@ table.table.dataTable {
 }
 
 .search-popup-panel {
-    position: fixed;
-    top: 101px;
+    position: absolute;
+    top: 0;
     right: 0px;
     z-index: 900;
     background-color: #fff;
