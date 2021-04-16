@@ -12534,10 +12534,6 @@ ul.select2-choices:after {
     overflow: hidden;
     z-index: 3;
 }
-/* 
-.designer-tree {
-    height: calc(100vh - 225px);
-} */
 
 .left-panel-overflow {
     background: #ecf0f5;
