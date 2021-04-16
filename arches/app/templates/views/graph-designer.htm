@@ -106,7 +106,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 
     </div>
 
-    <div class="flex">
+    <div class="set-variable-pixel-height">
 
         <!-- Left Panel -->
         <div class="left-panel graph-designer" data-bind="resizableSidepanel:true">
@@ -134,21 +134,21 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                     </ul>
                 </div>
 
-                <div class="tab-content">
-                    <div class="tab-pane fade in" data-bind="css: { active: activeTab() === 'graph' }">
-                        <div class="" data-bind="with: graphTree">
+                <div class="tab-content set-variable-pixel-height">
+                    <div style="width: 100%" class="tab-pane fade in" data-bind="css: { active: activeTab() === 'graph' }">
+                        <div style="height:100%;" class="" data-bind="with: graphTree">
                             {% include 'views/graph/graph-designer/graph-tree.htm' %}
                         </div>
                     </div>
     
-                    <div class="tab-pane fade in" data-bind="css: { active: activeTab() === 'card' }">
-                        <div class="jstree jstree-default" data-bind="visible: true, with: cardTree" style="display: none;">
+                    <div style="width: 100%" class="tab-pane fade in" data-bind="css: { active: activeTab() === 'card' }">
+                        <div style="height:100%;" class="jstree jstree-default" data-bind="visible: true, with: cardTree" style="display: none;">
                             {% include 'views/graph/graph-designer/card-tree.htm' %}
                         </div>
                     </div>
     
-                    <div class="tab-pane fade in" data-bind="css: { active: activeTab() === 'permissions' }">
-                        <div class="jstree jstree-default" data-bind="visible: true, with: permissionTree" style="display: none;">
+                    <div style="width: 100%" class="tab-pane fade in" data-bind="css: { active: activeTab() === 'permissions' }">
+                        <div style="height:100%;" class="jstree jstree-default" data-bind="visible: true, with: permissionTree" style="display: none;">
                             {% include 'views/graph/graph-designer/card-tree-permissions.htm' %}
                         </div>
                     </div>
@@ -157,8 +157,8 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
         </div>
 
         <!-- Main Content Panel -->
-        <div class="flex node-configuration">
-            <div class="flex" data-bind="visible: activeTab() === 'graph'">
+        <div class="node-configuration">
+            <div style="height: 100%" class="flex" data-bind="visible: activeTab() === 'graph'">
                 <!--Branch Library -->
                 <div id="branch-library" class="middle-column-container graph-designer branch-library" data-bind="visible: graphTree.branchListVisible" style="display: none;">
                     <div>
@@ -176,7 +176,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                 </div>
 
                 <!-- Settings, Node Form, and Branch List -->
-                <div class="tab-pane fade in flex" style="position: relative;" data-bind="visible: viewState() === 'design'">
+                <div style="width: 100%;" class="tab-pane fade in flex" data-bind="visible: viewState() === 'design'">
                     <!--ko if: selectedNode() -->
                     <div class="graph-designer-graph-content" data-bind="visible: selectedNode().nodeid == graph.root.nodeid()">
                         {% include 'views/graph/graph-designer/graph-settings.htm' %}
@@ -190,7 +190,21 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
             </div>
 
             <!--ko if: activeTab() === 'card' -->
-            <div class="flex panel-config" data-bind="visible: activeTab() === 'card'">
+
+            <!-- Card Header -->
+            <div class="settings-panel-heading">
+                <div class="graph-designer-title">
+                    <div class="name">
+                        <span class="">{% trans "Card Designer" %}</span>
+                    </div>
+                </div>
+            </div>
+
+            <div 
+                style="flex-direction: row-reverse;"
+                class="settings-panel-body set-variable-pixel-height" 
+                data-bind="visible: activeTab() === 'card'"
+            >
                 <!--Middle Panel -->
                 <!-- ko if: cardTree.selection -->
                 <div class="middle-column-container graph-designer branch-library card-configuration" data-bind="css: {'expanded': selectedCard() && selectedCard().model.helpenabled() && cardTree.selection().constructor.name === 'CardViewModel' }" style="">
@@ -233,17 +247,15 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                 </div>
                 
                 <!-- Card Manager -->
-                <div class="flex tab-pane fade in graph-designer" data-bind="css: { active: activeTab() === 'card' }">
-
-                    <!-- Card Header -->
-                    <div class="card-settings-panel-heading">
-                        <div class="graph-designer-title">
-                            <div class="name">
-                                <span class="">{% trans "Card Designer" %}</span>
-                            </div>
-                        </div>
-                    </div>
-
+                <div 
+                    style="
+                        flex: 2;
+                        width: 0;
+                        overflow: hidden;
+                    "
+                    class="flex tab-pane fade in graph-designer" 
+                    data-bind="css: { active: activeTab() === 'card' }"
+                >
                     <!-- ko if: selectedCard() -->
                     <div class="card-component-panel">
                         <!-- ko component: {

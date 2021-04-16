@@ -2997,10 +2997,6 @@ a.select2-search-choice-close {
     margin-left: 1px;
 }
 
-.middle-column-container.card-configuration {
-    padding: 60px 15px;
-}
-
 .middle-column-container.card-configuration.expanded {
     flex-basis: 450px;
 }
@@ -3726,46 +3722,41 @@ ul.nav.nav-tabs.nav-justified {
 
 .node-configuration {
     background-color: #ffffff;
-    overflow-y: auto;
-    overflow-x: hidden;
+    display: flex;
+    flex-direction: column;
+    flex: 1 1 auto;
+}
+
+.set-variable-pixel-height { /* WRONg PLACE */
+    /* 
+        Flexbox recalculates height on component load. This hack 
+        allows us the to assign a hard-pixel height to a flexy 
+        element, thus allowing pixel calculations on variable height.
+        See https://stackoverflow.com/a/14965123
+    */
+    display: flex;
+    flex: 1 1 auto;
+    height: 0; 
 }
 
 .settings-panel {
-    padding: 10px 20px 150px 25px;
+    display: flex;
+    flex-direction: column;
+    height: 100%;
 }
 
 .settings-panel-heading {
-    position: fixed;
-    top: 115px;
-    height: 50px;
-    width: 100%;
     background: #25476a;
-    margin-top: -10px;
-    margin-bottom: 20px;
-    margin-left: -25px;
-    margin-right: -20px;
-    padding-left: 25px;
-    z-index: 10;
-}
-
-.card-settings-panel-heading {
-    position: fixed;
-    top: 115px;
-    height: 50px;
-    width: 100%;
-    background: #25476a;
-    margin-top: -10px;
-    margin-bottom: 20px;
-    margin-left: 0px;
-    margin-right: 0px;
-    padding-left: 25px;
-    padding-top: 10px;
     color: #fff;
-    z-index: 100;
+    padding-left: 15px;
+    min-height: 50px;
+    display: flex;
+    align-items: center;
 }
 
-.settings-panel-heading+div {
-    /* margin-top: 13px; */
+.settings-panel-body {
+    flex-direction: column;
+    overflow-y: scroll;
 }
 
 .graph-crm-class {
@@ -3791,23 +3782,24 @@ ul.nav.nav-tabs.nav-justified {
 .graph-designer-graph-content .graph-designer-title {
     font-size: 17px;
     font-weight: 500;
-    margin-top: 2px;
-    margin-bottom: 5px;
     color: #fff;
-    padding: 10px 0 5px 0px;
     display: flex;
     flex-direction: row;
     align-items: center;
 }
 
+.graph-designer-title i {
+    padding-right: 5px;
+}
+
 .graph-designer-title .name {
-    padding-left: 5px;
     font-size: 17px;
-    margin-top: 2px;
 }
 
 .top-node-panel {
-    margin-top: 60px;
+    display: flex;
+    flex-direction: column;
+    padding: 20px;
 }
 
 .graph-designer-header {
@@ -6984,14 +6976,14 @@ ul div .card-tree-list span .card-tree-list-item .card-tree-list-icon {
 }
 
 .middle-column-container {
-    -ms-flex: 0 0 300px;
-    -webkit-flex: 0 0 300px;
-    flex: 0 0 300px;
+    flex: 1;
+    padding: 12px;
     background: #fbfbfb;
-    padding: 4px 7px 44px 7px;
     color: #666;
-    border-right: solid 1px #dddddd;
     overflow-y: auto;
+    border-right: solid 1px #ddd;
+    border-left: 1px solid #ddd;
+    min-width: 200px;
 }
 
 
@@ -7008,10 +7000,7 @@ ul div .card-tree-list span .card-tree-list-item .card-tree-list-icon {
     border-right: transparent;
     border-left: 1px solid #ddd;
     background: #f4f4f4;
-    /*#2d3c4b*/
     color: #2d3c4b;
-    /*#f1f1f1*/
-    height: 100%;
 }
 
 .panel-config .toggle-container {
@@ -7291,7 +7280,6 @@ ul div .card-tree-list span .card-tree-list-item .card-tree-list-icon {
     border-width: 1px;
     border-color: #ccc;
     background-color: #f9f9f9;
-    min-width: 900px;
 }
 
 .node-subname {
@@ -12535,22 +12523,21 @@ ul.select2-choices:after {
 }
 
 .left-panel-inner-container {
-    min-width: 300px;
     height: 100%;
+    min-width: 300px;
+    display: flex;
+    flex-direction: column;
 }
 
 .left-panel {
+    flex: 0 0 300px;
     overflow: hidden;
     z-index: 3;
 }
 
-.designer-tree {
-    height: calc(100vh - 225px);
-}
-
 .left-panel-overflow {
-    width: inherit;
     background: #ecf0f5;
+    height: calc(100% - 75px);  /* 75px is height of .jstree .header */
     overflow-y: auto;
     overflow-x: hidden;
 }
@@ -12595,12 +12582,11 @@ ul.select2-choices:after {
     padding: 0px;
     border-radius: 3px;
     background-color: white;
-    z-index: 10;
+    overflow-y: scroll;
 }
 
 .graph-designer .card-component-panel {
     background: #fafafa;
-    margin-top: 50px;
 }
 
 .card-component-panel h3 {
