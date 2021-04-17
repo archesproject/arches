@@ -70,9 +70,8 @@ define([
                 return acc;
             }, {});
 
-
             self.tiles().forEach(function(tile) {
-                /* force the value of current tile data observables */ 
+                /* force the value of current tile data observables */
                 Object.keys(tile.data).forEach(function(key) {
                     if (ko.isObservable(tile.data[key])) {
                         tile.data[key](tileDataLookup[key]);
@@ -80,9 +79,14 @@ define([
                 });
                 tile._tileData(koMapping.toJSON(tile.data));
 
-                tile.nodegroup_id = data.nodegroupId;
-                tile.tileid = data.tileId;
-                tile.resourceinstance_id = data.resourceInstanceId;
+                data.forEach(function(datum){                    
+                    if (JSON.stringify(Object.keys(koMapping.toJS(tile.data)).sort()) 
+                        === JSON.stringify(Object.keys(JSON.parse(datum.tileData)).sort())) {
+                        tile.nodegroup_id = datum.nodegroupId;
+                        tile.tileid = datum.tileId;
+                        tile.resourceinstance_id = datum.resourceInstanceId;        
+                    }
+                })*
             });
         };
 
