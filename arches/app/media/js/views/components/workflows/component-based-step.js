@@ -86,7 +86,7 @@ define([
                         tile.tileid = datum.tileId;
                         tile.resourceinstance_id = datum.resourceInstanceId;        
                     }
-                })*
+                })
             });
         };
 
