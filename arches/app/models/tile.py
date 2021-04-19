@@ -318,15 +318,15 @@ class Tile(models.TileModel):
         """
 
         tile_errors = []
+        
         for nodeid, value in self.data.items():
             node = models.Node.objects.get(nodeid=nodeid)
             datatype = self.datatype_factory.get_instance(node.datatype)
             error = datatype.validate(value, node=node)
             tile_errors += error
             for error_instance in error:
-                if error_instance["type"] == "ERROR":
-                    if raise_early:
-                        raise TileValidationError(_("{0}".format(error_instance["message"])))
+                if raise_early:
+                    raise TileValidationError(_("{0}".format(error_instance["message"])))
             if errors is not None:
                 errors += error
         if not raise_early:
