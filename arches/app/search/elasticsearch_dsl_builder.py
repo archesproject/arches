@@ -342,6 +342,7 @@ class Exists(Dsl):
         self.field = kwargs.pop("field", "")
         self.dsl = {"exists": {"field": self.field}}
 
+
 class Ids(Dsl):
     """
     https://www.elastic.co/guide/en/elasticsearch/reference/current/query-dsl-ids-query.html
@@ -356,7 +357,7 @@ class Ids(Dsl):
         if not isinstance(self.ids, list):
             self.ids = [self.ids]
         self.dsl = {"ids": {"values": self.ids}}
-    
+
 
 class Aggregation(Dsl):
     """
