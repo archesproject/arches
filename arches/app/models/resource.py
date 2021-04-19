@@ -423,6 +423,11 @@ class Resource(models.ResourceInstance):
         # delete resource index
         se.delete(index=RESOURCES_INDEX, id=resourceinstanceid)
 
+        # delete resources from custom indexes
+        for index in settings.ELASTICSEARCH_CUSTOM_INDEXES:
+            es_index = import_class_from_string(index["module"])(index["name"])
+            es_index.delete_resources(resources=self)
+
     def get_related_resources(
         self, lang="en-US", limit=settings.RELATED_RESOURCES_EXPORT_LIMIT, start=0, page=0, user=None, resourceinstance_graphid=None,
     ):
