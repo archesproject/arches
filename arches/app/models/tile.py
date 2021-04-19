@@ -318,7 +318,7 @@ class Tile(models.TileModel):
         """
 
         tile_errors = []
-        
+
         for nodeid, value in self.data.items():
             node = models.Node.objects.get(nodeid=nodeid)
             datatype = self.datatype_factory.get_instance(node.datatype)
