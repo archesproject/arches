@@ -90,7 +90,7 @@ class LabelBasedGraph(object):
         cls,
         tile,
         node_ids_to_tiles_reference,
-        nodegroup_cardinality_reference,
+        nodegroup_cardinality_reference=None,
         datatype_factory=None,
         node_cache=None,
         compact=False,

@@ -100,8 +100,7 @@ class LabelBasedGraphTests(TestCase):
 
     def test_generate_node_ids_to_tiles_reference(self):
         mock_tile = mock.Mock(data={self.node_1.node_id: "test_val"})
-        node_ids_to_tiles_reference = LabelBasedGraph.generate_node_ids_to_tiles_reference(resource=mock.Mock(tiles=[mock_tile]))
-
+        node_ids_to_tiles_reference, nodeid_list = LabelBasedGraph.generate_node_ids_to_tiles_reference(resource=mock.Mock(tiles=[mock_tile]))
         self.assertEqual(mock_tile, node_ids_to_tiles_reference.get(self.node_1.node_id)[0])
 
     @mock.patch.object(LabelBasedGraph, "_build_graph", side_effect=None)
