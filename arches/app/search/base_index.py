@@ -107,7 +107,7 @@ class BaseIndex(object):
 
     def delete_resources(self, resources=None):
         """
-        Deletes documents from an indexed based on the passed in list of resources
+        Deletes documents from an index based on the passed in list of resources
         Delete by query, so this is a single operation
 
         Keyword Arguments:
