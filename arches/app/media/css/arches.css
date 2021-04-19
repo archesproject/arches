@@ -994,14 +994,13 @@ div.wf-multi-tile-card-info div {
 .workflow-nav-tab-arrow {
     display: flex;
     align-items: center;
-    cursor: pointer;
     padding: 4px;
     padding-top: 6px;
     font-size: 15px;
 }
 
 .workflow-nav-tab-arrow.disabled {
-    color: #a9a9a9;
+    color: lightgrey;
     cursor: default;
 }
 

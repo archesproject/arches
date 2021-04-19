@@ -86,9 +86,7 @@
                                 <span
                                     style="margin-right: 4px;"
                                     class="workflow-nav-tab-arrow"
-                                    data-bind="{ 
-                                        click: $parent.back, 
-                                        clickBubble: false ,
+                                    data-bind="{
                                         css: {
                                             disabled: $parent.activeStep()._index === 0,
                                         },
@@ -103,13 +101,10 @@
                                 <span
                                     style="margin-left: 4px;"
                                     class="workflow-nav-tab-arrow"
-                                    data-bind="{ 
-                                        click: $parent.next, 
-                                        clickBubble: false,
+                                    data-bind="{
                                         css: {
                                             disabled: (
                                                 ( $parent.activeStep().required() && !$parent.activeStep().complete() )
-                                                || $parent.activeStep()._index === $parent.steps.length - 1
                                             ),
                                         },
                                         visible: step.active() && step._index !== $parent.steps.length - 1,
