@@ -1762,11 +1762,7 @@ class ResourceInstanceDataType(BaseDataType):
                 try:
                     models.ResourceInstance.objects.get(pk=resourceid)
                 except ObjectDoesNotExist:
-                    message = _(
-                        "The related resource with id '{0}' is not in the system.".format(
-                            resourceid
-                        )
-                    )
+                    message = _("The related resource with id '{0}' is not in the system.".format(resourceid))
                     error_type = "WARNING"
                     if strict:
                         error_type = "ERROR"
