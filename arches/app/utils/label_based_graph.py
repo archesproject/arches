@@ -10,7 +10,7 @@ NON_DATA_COLLECTING_NODE = "NON_DATA_COLLECTING_NODE"
 
 
 class LabelBasedNode(object):
-    def __init__(self, name, node_id, tile_id, cardinality, value):
+    def __init__(self, name, node_id, tile_id, value, cardinality=None):
         self.name = name
         self.node_id = node_id
         self.tile_id = tile_id
@@ -44,7 +44,7 @@ class LabelBasedNode(object):
 
                 # let's handle multiple identical node names
                 if not previous_val:
-                    create_new_array = cardinality == 'n' and self.tile_id != child_node.tile_id
+                    create_new_array = cardinality == "n" and self.tile_id != child_node.tile_id
                     display_data[formatted_node_name] = [formatted_node_value] if create_new_array else formatted_node_value
                 elif isinstance(previous_val, list):
                     display_data[formatted_node_name].append(formatted_node_value)
@@ -87,7 +87,15 @@ class LabelBasedGraph(object):
 
     @classmethod
     def from_tile(
-        cls, tile, node_ids_to_tiles_reference, nodegroup_cardinality_reference, datatype_factory=None, node_cache=None, compact=False, hide_empty_nodes=False, as_json=True
+        cls,
+        tile,
+        node_ids_to_tiles_reference,
+        nodegroup_cardinality_reference=None,
+        datatype_factory=None,
+        node_cache=None,
+        compact=False,
+        hide_empty_nodes=False,
+        as_json=True,
     ):
         """
         Generates a label-based graph from a given tile
@@ -134,9 +142,9 @@ class LabelBasedGraph(object):
             resource.load_tiles(user, perm)
 
         node_ids_to_tiles_reference, nodegroupids = cls.generate_node_ids_to_tiles_reference(resource=resource)
-        nodegroup_cardinality = models.NodeGroup.objects.filter(pk__in=nodegroupids).values('nodegroupid', 'cardinality')
-        nodegroup_cardinality_reference = {str(nodegroup['nodegroupid']):nodegroup['cardinality'] for nodegroup in nodegroup_cardinality}
-        root_label_based_node = LabelBasedNode(name=None, node_id=None, tile_id=None, cardinality=None, value=None)
+        nodegroup_cardinality = models.NodeGroup.objects.filter(pk__in=nodegroupids).values("nodegroupid", "cardinality")
+        nodegroup_cardinality_reference = {str(nodegroup["nodegroupid"]): nodegroup["cardinality"] for nodegroup in nodegroup_cardinality}
+        root_label_based_node = LabelBasedNode(name=None, node_id=None, tile_id=None, value=None, cardinality=None)
 
         for tile in resource.tiles:
             label_based_graph = LabelBasedGraph.from_tile(
@@ -213,7 +221,9 @@ class LabelBasedGraph(object):
         return display_value
 
     @classmethod
-    def _build_graph(cls, input_node, input_tile, parent_tree, node_ids_to_tiles_reference, nodegroup_cardinality_reference, node_cache, datatype_factory):
+    def _build_graph(
+        cls, input_node, input_tile, parent_tree, node_ids_to_tiles_reference, nodegroup_cardinality_reference, node_cache, datatype_factory
+    ):
         # if an input_tile doesn't have any nodes, it should associate itself
         for associated_tile in node_ids_to_tiles_reference.get(str(input_node.pk), [input_tile]):
             parent_tile = associated_tile.parenttile
@@ -223,8 +233,8 @@ class LabelBasedGraph(object):
                     name=input_node.name,
                     node_id=str(input_node.pk),
                     tile_id=str(associated_tile.pk),
-                    cardinality=nodegroup_cardinality_reference[str(associated_tile.nodegroup_id)],
                     value=cls._get_display_value(tile=associated_tile, node=input_node, datatype_factory=datatype_factory),
+                    cardinality=nodegroup_cardinality_reference[str(associated_tile.nodegroup_id)],
                 )
 
                 if not parent_tree:  # if top node and
