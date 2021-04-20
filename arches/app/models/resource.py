@@ -432,7 +432,7 @@ class Resource(models.ResourceInstance):
         """
         Keyword Arguments:
         verbose -- False(default) to only show the first error thrown in any tile, True to show all the errors in all the tiles
-        strict -- False(default), True to use a more complete check on the datatype 
+        strict -- False(default), True to use a more complete check on the datatype
             (eg: check for the existance of a referenced resoure on the resource-instance datatype)
         """
 

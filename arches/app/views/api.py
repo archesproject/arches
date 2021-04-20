@@ -1286,8 +1286,8 @@ class Validator(APIBase):
             )
 
         indent = request.GET.get("indent", None)
-        verbose = False if request.GET.get("verbose", "false").startswith("f") else True # default is False
-        strict = True if request.GET.get("strict", "true").startswith("t") else False # default is True
+        verbose = False if request.GET.get("verbose", "false").startswith("f") else True  # default is False
+        strict = True if request.GET.get("strict", "true").startswith("t") else False  # default is True
 
         if itemtype == "resource":
             try:
@@ -1318,8 +1318,8 @@ class Validator(APIBase):
             )
 
         indent = request.GET.get("indent", None)
-        verbose = False if request.GET.get("verbose", "false").startswith("f") else True # default is False
-        strict = True if request.GET.get("strict", "true").startswith("t") else False # default is True
+        verbose = False if request.GET.get("verbose", "false").startswith("f") else True  # default is False
+        strict = True if request.GET.get("strict", "true").startswith("t") else False  # default is True
         data = JSONDeserializer().deserialize(request.body)
 
         if itemtype == "resource":

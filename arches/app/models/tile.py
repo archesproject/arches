@@ -315,7 +315,7 @@ class Tile(models.TileModel):
         errors -- supply and list to have errors appened on to
         raise_early -- True(default) to raise an error on the first value in the tile that throws an error
             otherwise throw an error only after all nodes in a tile have been validated
-        strict -- False(default), True to use a more complete check on the datatype 
+        strict -- False(default), True to use a more complete check on the datatype
             (eg: check for the existance of a referenced resoure on the resource-instance datatype)
         """
 
