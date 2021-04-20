@@ -80,6 +80,7 @@ class DataTypeFactory(object):
             self.datatype_instances = DataTypeFactory._datatype_instances
         return datatype_instance
 
+
 class StringDataType(BaseDataType):
     def validate(self, value, row_number=None, source=None, node=None, nodeid=None, strict=False):
         errors = []
