@@ -1,4 +1,3 @@
-from pprint import pprint as pp
 import csv
 import pickle
 import datetime
@@ -919,6 +918,7 @@ class CsvReader(Reader):
                                 target_tile_cardinality = "1"
                             else:
                                 target_tile_cardinality = "n"
+
                             if str(target_tile.nodegroup_id) not in populated_nodegroups[resourceinstanceid]:
                                 target_tile.nodegroup_id = str(target_tile.nodegroup_id)
                                 # Check if we are populating a parent tile by inspecting the target_tile.data array.
