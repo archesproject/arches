@@ -423,10 +423,12 @@ class Resource(models.ResourceInstance):
         # delete resource index
         se.delete(index=RESOURCES_INDEX, id=resourceinstanceid)
 
-    def validate(self, verbose=False):
+    def validate(self, verbose=False, strict=False):
         """
         Keyword Arguments:
-        verbose -- False(defult) to only show the first error thrown in any tile, True to show all the errors in all the tiles
+        verbose -- False(default) to only show the first error thrown in any tile, True to show all the errors in all the tiles
+        strict -- False(default), True to use a more complete check on the datatype 
+            (eg: check for the existance of a referenced resoure on the resource-instance datatype)
         """
 
         from arches.app.models.tile import Tile, TileValidationError
@@ -438,7 +440,7 @@ class Resource(models.ResourceInstance):
 
         for tile in tiles:
             try:
-                tile.validate(raise_early=(not verbose))
+                tile.validate(raise_early=(not verbose), strict=strict)
             except TileValidationError as err:
                 errors += err.message if isinstance(err.message, list) else [err.message]
         return errors

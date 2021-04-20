@@ -1244,10 +1244,16 @@ class Validator(APIBase):
     or for validating new objects using POST.
 
     arches-json format is assumed when posting a new resource instance for validation
+
+    Querystring parameters:
+    indent -- set to an integer value to format the json to be indented that number of characters
+    verbose -- (default is False), set to True to return more information about the validation result
+    strict -- (default is True), set to True to force the datatype to perform a more complete check
+            (eg: check for the existance of a referenced resoure on the resource-instance datatype)
     """
 
-    def validate_resource(self, resource, verbose):
-        errors = resource.validate(verbose=verbose)
+    def validate_resource(self, resource, verbose, strict):
+        errors = resource.validate(verbose=verbose, strict=strict)
         ret = {}
 
         ret["valid"] = len(errors) == 0
@@ -1255,12 +1261,12 @@ class Validator(APIBase):
             ret["errors"] = errors
         return ret
 
-    def validate_tile(self, tile, verbose):
+    def validate_tile(self, tile, verbose, strict):
         errors = []
         ret = {}
 
         try:
-            tile.validate(raise_early=(not verbose))
+            tile.validate(raise_early=(not verbose), strict=strict)
         except TileValidationError as err:
             errors += err.message if isinstance(err.message, list) else [err.message]
         except BaseException as err:
@@ -1280,7 +1286,8 @@ class Validator(APIBase):
             )
 
         indent = request.GET.get("indent", None)
-        verbose = False if request.GET.get("verbose", "false").startswith("f") else True
+        verbose = False if request.GET.get("verbose", "false").startswith("f") else True # default is False
+        strict = True if request.GET.get("strict", "true").startswith("t") else False # default is True
 
         if itemtype == "resource":
             try:
@@ -1288,7 +1295,7 @@ class Validator(APIBase):
             except:
                 return JSONResponse(status=404)
 
-            return JSONResponse(self.validate_resource(resource, verbose), indent=indent)
+            return JSONResponse(self.validate_resource(resource, verbose, strict), indent=indent)
 
         if itemtype == "tile":
             errors = []
@@ -1298,7 +1305,7 @@ class Validator(APIBase):
             except:
                 return JSONResponse(status=404)
 
-            return JSONResponse(self.validate_tile(tile, verbose), indent=indent)
+            return JSONResponse(self.validate_tile(tile, verbose, strict), indent=indent)
 
         return JSONResponse(status=400)
 
@@ -1311,7 +1318,8 @@ class Validator(APIBase):
             )
 
         indent = request.GET.get("indent", None)
-        verbose = False if request.GET.get("verbose", "false").startswith("f") else True
+        verbose = False if request.GET.get("verbose", "false").startswith("f") else True # default is False
+        strict = True if request.GET.get("strict", "true").startswith("t") else False # default is True
         data = JSONDeserializer().deserialize(request.body)
 
         if itemtype == "resource":
@@ -1319,10 +1327,10 @@ class Validator(APIBase):
             for tiledata in data["tiles"]:
                 resource.tiles.append(TileProxyModel(tiledata))
 
-            return JSONResponse(self.validate_resource(resource, verbose), indent=indent)
+            return JSONResponse(self.validate_resource(resource, verbose, strict), indent=indent)
 
         if itemtype == "tile":
             tile = TileProxyModel(data)
-            return JSONResponse(self.validate_tile(tile, verbose), indent=indent)
+            return JSONResponse(self.validate_tile(tile, verbose, strict), indent=indent)
 
         return JSONResponse(status=400)
