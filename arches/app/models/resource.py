@@ -479,10 +479,17 @@ class Resource(models.ResourceInstance):
             bool_filter.should(Terms(field="resourceinstanceidto", terms=resourceinstanceid))
 
             if resourceinstance_graphid:
-                graph_id_filter = Bool()
-                graph_id_filter.should(Terms(field="resourceinstancefrom_graphid", terms=resourceinstance_graphid))
-                graph_id_filter.should(Terms(field="resourceinstanceto_graphid", terms=resourceinstance_graphid))
-                bool_filter.must(graph_id_filter)
+                graph_filter = Bool()
+                to_graph_id_filter = Bool()
+                to_graph_id_filter.filter(Terms(field="resourceinstancefrom_graphid", terms=str(self.graph_id)))
+                to_graph_id_filter.filter(Terms(field="resourceinstanceto_graphid", terms=resourceinstance_graphid))
+                graph_filter.should(to_graph_id_filter)
+
+                from_graph_id_filter = Bool()
+                from_graph_id_filter.filter(Terms(field="resourceinstancefrom_graphid", terms=resourceinstance_graphid))
+                from_graph_id_filter.filter(Terms(field="resourceinstanceto_graphid", terms=str(self.graph_id)))
+                graph_filter.should(from_graph_id_filter)
+                bool_filter.must(graph_filter)
 
             query.add_query(bool_filter)
 
@@ -491,6 +498,8 @@ class Resource(models.ResourceInstance):
         resource_relations = get_relations(
             resourceinstanceid=self.resourceinstanceid, start=start, limit=limit, resourceinstance_graphid=resourceinstance_graphid,
         )
+
+        
 
         ret["total"] = resource_relations["hits"]["total"]
         instanceids = set()
