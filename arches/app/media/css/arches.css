@@ -2142,9 +2142,14 @@ div.final-cons-step-separator>h4 {
     border-color: #E53211;
 }
 
-.install-buttons .btn-warning:hover {
+.install-buttons .btn-warning:hover,
+.install-buttons .btn-warning:focus {
     background: #E53211;
     border-color: #B02107;
+}
+
+.install-buttons .btn-warning:focus {
+    text-decoration: underline;
 }
 
 .install-buttons .btn-danger {
@@ -7683,6 +7688,7 @@ div .switch label:hover,
     /* margin-right: 5px; */
     padding: 5px 10px;
     width: 250px;
+
 }
 
 span.file-upload-clear-filter {
@@ -7715,9 +7721,19 @@ span.file-upload-clear-filter {
 }
 
 .btn-file-upload-reset {
-    color: #489EED;
+    color: #10599E;
     font-size: 12px;
-    float: right;
+}
+
+.btn-file-upload-reset:hover, .btn-file-upload-reset:focus {
+    text-decoration: underline;
+}
+
+.btn-file-upload-reset:focus,
+.file-upload-filter:focus,
+.btn-file-upload-limit:focus,
+.file-download:focus {
+    outline: #006600 solid 3px !important;
 }
 
 .file-upload-card-detail-right {
@@ -7731,7 +7747,7 @@ span.file-upload-clear-filter {
 }
 
 .btn-file-upload-limit {
-    color: #489EED;
+    color: #10599E;
     font-size: 12px;
     float: left;
 }
