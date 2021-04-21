@@ -12836,6 +12836,7 @@ a.jstree-anchor.permissions-widget {
 .rr-splash-description {
     font-size: 15px;
     color: #999;
+    font-weight: 500;
 }
 
 .rr-splash-description:last-child {
@@ -13290,7 +13291,7 @@ a.jstree-anchor.permissions-widget {
     padding-left: 20px;
     padding-top: 15px;
     position: sticky;
-    top: 0px;
+    top: 5px;
     margin-left: -10px;
     margin-top: 0px;
     margin-bottom: 5px;
@@ -13309,10 +13310,19 @@ a.jstree-anchor.permissions-widget {
 
 .manifest-metadata-title {
     margin-top: 8px;
+    font-weight: 600;
 }
 
 .manifest-metadata-value {
     line-height: 1.2;
+    color: #585858;
+}
+
+.manifest-metadata-value h4 {
+    padding-top: 10px;
+    font-size: 15px;
+    color: #2f527a;
+    font-weight: 600;
 }
 
 .manifest-details {
@@ -13330,16 +13340,27 @@ a.jstree-anchor.permissions-widget {
 
 .manifest-details h3 {
     width: 225px;
+    font-size: 16px;
+    font-weight: 500;
 }
 
 .manifest-details h4 {
     padding-left: 0px;
+    font-size: 13px;
+    font-weight: 400;
+    color: #585858;
 }
 
 .manifest-details-list,
 .manifest-logo {
     padding-left: 0px;
-    margin-top: -5px;
+    margin-top: 5px;
+}
+
+.manifest-details-list h4 {
+    padding-top: 10px;
+    font-size: 15px;
+    color: rgb(47, 82, 122);
 }
 
 .manifest-logo {
