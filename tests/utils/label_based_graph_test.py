@@ -115,25 +115,28 @@ class LabelBasedGraphTests(TestCase):
 
 
 @mock.patch("arches.app.utils.label_based_graph.models.Node")
+@mock.patch("arches.app.utils.label_based_graph.models.NodeGroup")
 class LabelBasedGraph_FromResourceTests(TestCase):
     @classmethod
     def setUp(cls):
-        cls.grouping_node = models.Node(datatype="semantic", name="Test Node Grouping")
+        cls.nodegroup = models.NodeGroup()
+        cls.grouping_node = models.Node(datatype="semantic", name="Test Node Grouping", nodegroup=cls.nodegroup)
         cls.string_node = models.Node(datatype="string", name="Test Node")
-
         cls.grouping_tile = models.TileModel(data={}, nodegroup_id=str(cls.grouping_node.pk))
         cls.string_tile = models.TileModel(data={str(cls.string_node.pk): "value_1"}, nodegroup_id=str(cls.string_node.pk))
 
+        cls.grouping_node.nodegroupid = cls.grouping_node.nodeid
+        cls.string_node.nodegroupid = cls.string_node.nodeid
         # le'ts mock Resource since it's minimally used
         # and complex to get `displayname`
         cls.test_resource = mock.Mock(displayname="Test Resource", tiles=[])
 
-    def test_smoke(self, mock_Node):
+    def test_smoke(self, mock_Node, mock_NodeGroup):
         label_based_graph = LabelBasedGraph.from_resource(resource=self.test_resource, compact=False, hide_empty_nodes=False)
 
         self.assertEqual(label_based_graph, {})
 
-    def test_handles_node_with_single_value(self, mock_Node):
+    def test_handles_node_with_single_value(self, mock_Node, mock_NodeGroup):
         mock_Node.objects.get.return_value = self.string_node
 
         self.test_resource.tiles.append(self.string_tile)
@@ -151,7 +154,7 @@ class LabelBasedGraph_FromResourceTests(TestCase):
             },
         )
 
-    def test_handles_node_with_multiple_values(self, mock_Node):
+    def test_handles_node_with_multiple_values(self, mock_Node, mock_NodeGroup):
         mock_Node.objects.get.return_value = self.string_node
 
         duplicate_node_tile = models.TileModel(data={str(self.string_node.pk): "value_2"}, nodegroup_id=str(self.string_node.pk))
@@ -179,7 +182,7 @@ class LabelBasedGraph_FromResourceTests(TestCase):
             },
         )
 
-    def test_handles_empty_semantic_node(self, mock_Node):
+    def test_handles_empty_semantic_node(self, mock_Node, mock_NodeGroup):
         mock_Node.objects.get.return_value = self.grouping_node
 
         self.test_resource.tiles.append(self.grouping_tile)
@@ -197,7 +200,7 @@ class LabelBasedGraph_FromResourceTests(TestCase):
             },
         )
 
-    def test_semantic_node_with_child(self, mock_Node):
+    def test_semantic_node_with_child(self, mock_Node, mock_NodeGroup):
         mock_Node.objects.get.return_value = self.grouping_node
 
         self.grouping_node.get_direct_child_nodes = mock.Mock(return_value=[self.string_node])
@@ -223,7 +226,7 @@ class LabelBasedGraph_FromResourceTests(TestCase):
             },
         )
 
-    def test_handles_node_grouped_in_separate_card(self, mock_Node):
+    def test_handles_node_grouped_in_separate_card(self, mock_Node, mock_NodeGroup):
         mock_Node.objects.get.side_effect = [self.grouping_node, self.string_node]
 
         self.grouping_node.get_direct_child_nodes = mock.Mock(return_value=[self.string_node])
