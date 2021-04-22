@@ -1212,6 +1212,7 @@ ul.tabbed-report-tab-list {
     display: flex;
     flex-direction: column;
     justify-content: space-between;
+    margin-top: 5px;
 }
 
 .file-workbench-filter {
@@ -1268,6 +1269,12 @@ ul.tabbed-report-tab-list {
     display: inline-flex;
     justify-content: space-between;
     width: 100%;
+}
+
+.file-workbench-links {
+    display: inline-flex;
+    justify-content: space-between;
+    font-size: 12px;
 }
 
 .btn-workbench {
@@ -1812,7 +1819,7 @@ div.final-cons-step-separator>h4 {
     background: #f9f9f9;
     text-align: center;
     color: #808080;
-    margin: 5px 0px;
+    margin: 5px 0px 30px 0px;
     border-radius: 2px;
     cursor: pointer;
 }
@@ -13288,6 +13295,18 @@ a.jstree-anchor.permissions-widget {
     width: inherit;
 }
 
+.iiif-input {
+    width: 316px;
+    max-width: 316px;
+    min-height: 36px;
+}
+
+.iiif-manifest-metadata-panel .iiif-input {
+    width: 280px;
+    max-width: 280px;
+    min-height: 36px;
+}
+
 
 .gallery-expanded .iiif-gallery-panel {
     padding-left: 15px;
@@ -13333,6 +13352,7 @@ a.jstree-anchor.permissions-widget {
 .manifest-metadata-value {
     line-height: 1.2;
     color: #585858;
+    overflow-wrap: break-word;
 }
 
 .manifest-metadata-value h4 {
@@ -13340,6 +13360,10 @@ a.jstree-anchor.permissions-widget {
     font-size: 15px;
     color: #2f527a;
     font-weight: 600;
+}
+
+.manifest-metadata-value a {
+    color: #4682b4;
 }
 
 .manifest-details {
@@ -13478,9 +13502,14 @@ a.jstree-anchor.permissions-widget {
 
 .iiif-canvas-links-panel a {
     font-size: 12px;
-    color: steelblue;
+    color: #4682b4;
     margin-right: 5px;
+    font-weight: 600;
     cursor: pointer;
+}
+
+.iiif-canvas-links-panel a:hover {
+    color: #12548A;
 }
 
 .iiif-image-tools {
