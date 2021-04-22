@@ -54,7 +54,7 @@ define([
             return displayVal;
         });
 
-        this.value.subscribe(function() {
+        this.setNames = function() {
             var names = [];
             self.valueList().forEach(function(val) {
                 if (val) {
@@ -72,6 +72,11 @@ define([
                     }
                 }
             });
+        }
+        this.setNames();
+
+        this.value.subscribe(function() {
+            this.setNames();
         });
 
         this.select2Config = {
