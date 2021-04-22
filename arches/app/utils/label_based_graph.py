@@ -44,8 +44,8 @@ class LabelBasedNode(object):
 
                 # let's handle multiple identical node names
                 if not previous_val:
-                    create_new_array = cardinality == "n" and self.tile_id != child_node.tile_id
-                    display_data[formatted_node_name] = [formatted_node_value] if create_new_array else formatted_node_value
+                    should_create_new_array = cardinality == "n" and self.tile_id != child_node.tile_id
+                    display_data[formatted_node_name] = [formatted_node_value] if should_create_new_array else formatted_node_value
                 elif isinstance(previous_val, list):
                     display_data[formatted_node_name].append(formatted_node_value)
                 else:
