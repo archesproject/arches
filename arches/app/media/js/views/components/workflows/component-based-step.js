@@ -189,7 +189,11 @@ define([
                         handlers[eventName].push(handler);
                     }
                 };
-    
+
+                if (self.externalStepData[self.componentData.parameters.parenttilesourcestep]){
+                    self.componentData.parameters.parenttileid = self.externalStepData[self.componentData.parameters.parenttilesourcestep].data.tileid;
+                }
+
                 self.flattenTree(self.topCards, []).forEach(function(item) {
                     if (item.constructor.name === 'CardViewModel' && item.nodegroupid === ko.unwrap(self.componentData.parameters.nodegroupid)) {
                         if (ko.unwrap(self.componentData.parameters.parenttileid) && item.parent && ko.unwrap(self.componentData.parameters.parenttileid) !== item.parent.tileid) {
