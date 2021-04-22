@@ -135,16 +135,15 @@
         </div>
     </div>
 
-    <div class="file-workbench-buttons">
-        <button style="width: 50%; margin: 10px 2px 5px 0px; height: 36px;" class="btn btn-md btn-primary" data-bind="click: addAllCanvases"
-        ><i class="fa fa-check-square"></i> {% trans 'Select All' %}</button>
-        <button style="width: 50%; margin: 10px 0px 5px 2px; height: 36px;" class="btn btn-md btn-primary" data-bind="click: clearCanvasSelection, css: {
-            disabled: canvasesForDeletion().length === 0
-        }"><i class="fa fa-eraser"></i> {% trans 'Clear All' %}</button>
+    <div class="iiif-canvas-links-panel">
+        <a class="" data-bind="click: addAllCanvases"> {% trans 'Select All' %}</a>
+        <a class="" data-bind="click: clearCanvasSelection, css: {disabled: canvasesForDeletion().length === 0}"> {% trans 'Clear All' %}</a>
+
+        <div class="file-workbench-selected-buttons" data-bind="visible: canvasesForDeletion().length > 0">
+            <button class="btn btn-lg btn-workbench btn-danger" data-bind="click: deleteCanvases"><i class="fa fa-trash"></i> {% trans 'Delete Selected' %}</button>
+        </div>
     </div>
-    <div class="file-workbench-selected-buttons" data-bind="visible: canvasesForDeletion().length > 0">
-        <button class="btn btn-lg btn-workbench btn-danger" data-bind="click: deleteCanvases"><i class="fa fa-trash"></i> {% trans 'Delete Selected' %}</button>
-    </div>
+    
 
     <!--ko if: canvas-->
     <label class="control-label">{% trans "Selected Image Name" %}</label>

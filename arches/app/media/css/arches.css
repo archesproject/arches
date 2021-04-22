@@ -1211,7 +1211,6 @@ ul.tabbed-report-tab-list {
 .file-workbench-selected-buttons {
     display: flex;
     flex-direction: column;
-    height: 87px;
     justify-content: space-between;
 }
 
@@ -13471,6 +13470,17 @@ a.jstree-anchor.permissions-widget {
 
 .gallery-expanded .iiif-gallery-manifest-label {
     display:none;
+}
+
+.iiif-canvas-links-panel {
+    margin-bottom: 10px;
+}
+
+.iiif-canvas-links-panel a {
+    font-size: 12px;
+    color: steelblue;
+    margin-right: 5px;
+    cursor: pointer;
 }
 
 .iiif-image-tools {
