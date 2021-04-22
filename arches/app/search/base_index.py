@@ -6,7 +6,7 @@ from arches.app.models.resource import Resource
 from arches.app.models.system_settings import settings
 from arches.app.utils import import_class_from_string
 from arches.app.search.search_engine_factory import SearchEngineFactory
-from arches.app.search.elasticsearch_dsl_builder import Query, Term
+from arches.app.search.elasticsearch_dsl_builder import Query, Term, Ids
 
 
 class BaseIndex(object):
@@ -104,6 +104,27 @@ class BaseIndex(object):
         print(
             f"    Status: {status}, In Database: {result_summary['database']}, Indexed: {result_summary['indexed']}, Took: {(datetime.now() - start).seconds} seconds"
         )
+
+    def delete_resources(self, resources=None):
+        """
+        Deletes documents from an index based on the passed in list of resources
+        Delete by query, so this is a single operation
+
+        Keyword Arguments:
+        resources -- a single resource instance or a list of resource instances
+        """
+
+        q = Query(se=self.se)
+        if not isinstance(resources, list):
+            resourcelist = [resources]
+        else:
+            resourcelist = resources
+        list_of_ids_to_delete = []
+        for resource in resourcelist:
+            list_of_ids_to_delete.append(resource.pk)
+        ids_query = Ids(ids=list_of_ids_to_delete)
+        q.add_query(ids_query)
+        q.delete(index=self.index_name)
 
     def delete_index(self):
         """

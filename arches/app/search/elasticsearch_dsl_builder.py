@@ -343,6 +343,22 @@ class Exists(Dsl):
         self.dsl = {"exists": {"field": self.field}}
 
 
+class Ids(Dsl):
+    """
+    https://www.elastic.co/guide/en/elasticsearch/reference/current/query-dsl-ids-query.html
+
+    Keyword Arguments:
+    ids -- a single document id as a string, or a list of document ids
+
+    """
+
+    def __init__(self, **kwargs):
+        self.ids = kwargs.pop("ids", None)
+        if not isinstance(self.ids, list):
+            self.ids = [self.ids]
+        self.dsl = {"ids": {"values": self.ids}}
+
+
 class Aggregation(Dsl):
     """
     https://www.elastic.co/guide/en/elasticsearch/reference/current/search-aggregations.html
