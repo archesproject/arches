@@ -72,7 +72,7 @@ define([
                     }
                 }
             });
-        }
+        };
         this.setNames();
 
         this.value.subscribe(function() {
