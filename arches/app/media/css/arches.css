@@ -1807,8 +1807,20 @@ div.final-cons-step-separator>h4 {
     width: 100%;
 }
 
-.dropzone-photo-upload {
-    margin-top: 40px;
+.iiif-image-tools .dropzone-photo-upload {
+    padding: 25px 15px;
+    border: 1px dashed #bbb;
+    background: #f9f9f9;
+    text-align: center;
+    color: #808080;
+    margin: 5px 0px;
+    border-radius: 2px;
+    cursor: pointer;
+}
+
+.iiif-image-tools .dropzone-photo-upload:hover {
+    border-color: #787878;
+    background: #f2f2f2;
 }
 
 .photo-workbench-photos {
@@ -13108,6 +13120,7 @@ a.jstree-anchor.permissions-widget {
     right: 0;
     bottom: auto;
     border-bottom: solid 1px rgb(221, 221, 221);
+    border-top: none;
     z-index: 2000;
     padding: 15px 0 15px 30px;
 }
@@ -13182,6 +13195,11 @@ a.jstree-anchor.permissions-widget {
 .show-gallery-control h3 {
     display: inline-block;
     margin: 0 2px;
+    font-size: 15px;
+}
+
+.show-gallery-control a {
+    font-size: 12px;
 }
 
 .gallery-expanded .iiif-gallery-content {
@@ -13461,6 +13479,7 @@ a.jstree-anchor.permissions-widget {
     color: rgb(30, 63, 94);
     font-size: 1.1em;
 }
+
 
 .iiif-image-tool-slider {
     padding-bottom: 20px;
