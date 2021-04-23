@@ -462,8 +462,13 @@ define([
             });
         };
 
+        this.tilesToRemove = ko.observableArray();
+
         this.removeTile = function(data) {
             var filteredTiles = self.tiles().filter(function(tile) { return tile !== data; });
+            if (data.tileid) {
+                self.tilesToRemove.push(data);
+            };
             self.tiles(filteredTiles);
         };
 
@@ -480,6 +485,21 @@ define([
                     function(savedTileData) {
                         unorderedSavedData.push(savedTileData);
                     }
+                );
+            });
+
+            self.tilesToRemove().forEach(function(tile) {
+                tile.deleteTile(
+                    function(response) {
+                        self.alert(new AlertViewModel(
+                            'ep-alert-red', 
+                            response.responseJSON.title,
+                            response.responseJSON.message,
+                            null, 
+                            function(){ return; }
+                        ));
+                    },
+                    self.tilesToRemove.remove(tile)
                 );
             });
 
