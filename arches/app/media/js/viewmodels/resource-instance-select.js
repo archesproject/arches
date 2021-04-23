@@ -36,7 +36,8 @@ define([
     var ResourceInstanceSelectViewModel = function(params) {
         var self = this;
         this.graphLookup = graphCache;
-        params.configKeys = ['placeholder'];
+        params.configKeys = ['placeholder', 'defaultResourceInstance'];
+        // params.valueProperties = ['resourceId', 'ontologyProperty', 'inverseOntologyProperty', 'resourceXresourceId'];
         this.preview = arches.graphs.length > 0;
         this.allowInstanceCreation = params.allowInstanceCreation === false ? false : true;
         this.renderContext = params.renderContext;
@@ -135,6 +136,28 @@ define([
         
         WidgetViewModel.apply(this, [params]);
 
+        // if a default resource instance is defined, then show them in the ui
+        // by pushing them to the value variable
+        if (ko.isObservable(this.defaultResourceInstance)) {
+            var ret = [];
+            self.defaultResourceInstance().forEach(function(val){
+                var ri = {
+                    "resourceId": ko.observable(val.resourceId),
+                    "ontologyProperty": ko.observable(val.ontologyProperty),
+                    "inverseOntologyProperty": ko.observable(val.inverseOntologyProperty),
+                    "resourceXresourceId": ""
+                };
+                ri.ontologyProperty.subscribe(function(){
+                    self.defaultResourceInstance(self.value());
+                });
+                ri.inverseOntologyProperty.subscribe(function(){
+                    self.defaultResourceInstance(self.value());
+                });
+                ret.push(ri); 
+            });
+            this.value(ret);
+        }
+
         this.displayValue = ko.observable('');
         
         //
@@ -155,6 +178,9 @@ define([
                 self.value(valueObject);
             } else {
                 self.value([valueObject]);
+            }
+            if (!!params.configForm) {
+                self.defaultResourceInstance(self.value());
             }
         };
         
@@ -248,8 +274,24 @@ define([
             };            
             Object.defineProperty(ret, 'resourceName', {value: ko.observable(esSource.displayname)});
             Object.defineProperty(ret, 'ontologyClass', {value: ko.observable(esSource.root_ontology_class)});
+            if (!!params.configForm) {
+                ret.ontologyProperty.subscribe(function(){
+                    // self.value.valueHasMutated();
+                    // var x = self.value();
+                    // self.value([]);
+                    // self.value(x);
+                    self.defaultResourceInstance(self.value());
+
+                });
+                ret.inverseOntologyProperty.subscribe(function(){
+                    self.defaultResourceInstance(self.value());
+                });
+            }
+            
             return ret;
         };
+
+
 
         var url = ko.observable(arches.urls.search_results);
         this.url = url;
