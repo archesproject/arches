@@ -12576,12 +12576,15 @@ ul.select2-choices:after {
     border-radius: 3px;
 }
 
+.graph-designer .card-component-panel {
+    overflow-y: scroll;
+}
+
 .card-component-panel {
     width: 100%;
     padding: 0px;
     border-radius: 3px;
     background-color: white;
-    overflow-y: scroll;
 }
 
 .graph-designer .card-component-panel {
