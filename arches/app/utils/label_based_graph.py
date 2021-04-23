@@ -83,7 +83,6 @@ class LabelBasedGraph(object):
                 tile_list.append(tile)
                 node_ids_to_tiles_reference[node_id] = tile_list
 
-
         nodegroup_cardinality = models.NodeGroup.objects.filter(pk__in=nodegroupids).values("nodegroupid", "cardinality")
         nodegroup_cardinality_reference = {str(nodegroup["nodegroupid"]): nodegroup["cardinality"] for nodegroup in nodegroup_cardinality}
 
@@ -145,7 +144,10 @@ class LabelBasedGraph(object):
         if not resource.tiles:
             resource.load_tiles(user, perm)
 
-        node_ids_to_tiles_reference, nodegroup_cardinality_reference = cls.generate_node_ids_to_tiles_reference_and_nodegroup_cardinality_reference(resource=resource)
+        (
+            node_ids_to_tiles_reference,
+            nodegroup_cardinality_reference,
+        ) = cls.generate_node_ids_to_tiles_reference_and_nodegroup_cardinality_reference(resource=resource)
 
         root_label_based_node = LabelBasedNode(name=None, node_id=None, tile_id=None, value=None, cardinality=None)
 

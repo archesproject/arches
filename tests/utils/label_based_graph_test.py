@@ -103,18 +103,16 @@ class LabelBasedGraphTests(TestCase):
     @mock.patch("arches.app.utils.label_based_graph.models.NodeGroup")
     def test_generate_node_ids_to_tiles_reference_and_nodegroup_cardinality_reference(self, mock_NodeGroup):
         mock_tile = mock.Mock(data={self.node_1.node_id: "test_val"}, nodegroup_id=self.node_1.node_id)
-        mock_cardinality = '1'
+        mock_cardinality = "1"
 
-        mock_NodeGroup.objects.filter.return_value.values.return_value = [ 
-            { 
-                'nodegroupid': mock_tile.nodegroup_id, 
-                'cardinality': mock_cardinality 
-            } 
+        mock_NodeGroup.objects.filter.return_value.values.return_value = [
+            {"nodegroupid": mock_tile.nodegroup_id, "cardinality": mock_cardinality}
         ]
 
-        node_ids_to_tiles_reference, nodegroup_cardinality_reference = LabelBasedGraph.generate_node_ids_to_tiles_reference_and_nodegroup_cardinality_reference(
-            resource=mock.Mock(tiles=[mock_tile])
-        )
+        (
+            node_ids_to_tiles_reference,
+            nodegroup_cardinality_reference,
+        ) = LabelBasedGraph.generate_node_ids_to_tiles_reference_and_nodegroup_cardinality_reference(resource=mock.Mock(tiles=[mock_tile]))
 
         self.assertEqual(mock_tile, node_ids_to_tiles_reference.get(self.node_1.node_id)[0])
         self.assertEqual(nodegroup_cardinality_reference, {mock_tile.nodegroup_id: mock_cardinality})
@@ -139,7 +137,7 @@ class LabelBasedGraph_FromResourceTests(TestCase):
 
         cls.grouping_node.nodegroupid = cls.grouping_node.nodeid
         cls.string_node.nodegroupid = cls.string_node.nodeid
-        
+
         # let's mock Resource since it's minimally used
         # and complex to get `displayname`
         cls.test_resource = mock.Mock(displayname="Test Resource", tiles=[])
@@ -151,11 +149,8 @@ class LabelBasedGraph_FromResourceTests(TestCase):
 
     def test_handles_node_with_single_value(self, mock_Node, mock_NodeGroup):
         mock_Node.objects.get.return_value = self.string_node
-        mock_NodeGroup.objects.filter.return_value.values.return_value = [ 
-            { 
-                'nodegroupid': self.string_tile.nodegroup_id, 
-                'cardinality': '1' 
-            } 
+        mock_NodeGroup.objects.filter.return_value.values.return_value = [
+            {"nodegroupid": self.string_tile.nodegroup_id, "cardinality": "1"}
         ]
 
         self.test_resource.tiles.append(self.string_tile)
@@ -175,11 +170,8 @@ class LabelBasedGraph_FromResourceTests(TestCase):
 
     def test_handles_node_with_multiple_values(self, mock_Node, mock_NodeGroup):
         mock_Node.objects.get.return_value = self.string_node
-        mock_NodeGroup.objects.filter.return_value.values.return_value = [ 
-            { 
-                'nodegroupid': self.string_tile.nodegroup_id, 
-                'cardinality': '1' 
-            } 
+        mock_NodeGroup.objects.filter.return_value.values.return_value = [
+            {"nodegroupid": self.string_tile.nodegroup_id, "cardinality": "1"}
         ]
 
         duplicate_node_tile = models.TileModel(data={str(self.string_node.pk): "value_2"}, nodegroup_id=str(self.string_node.pk))
@@ -209,13 +201,9 @@ class LabelBasedGraph_FromResourceTests(TestCase):
 
     def test_handles_empty_semantic_node(self, mock_Node, mock_NodeGroup):
         mock_Node.objects.get.return_value = self.grouping_node
-        mock_NodeGroup.objects.filter.return_value.values.return_value = [ 
-            { 
-                'nodegroupid': self.grouping_tile.nodegroup_id, 
-                'cardinality': '1' 
-            } 
+        mock_NodeGroup.objects.filter.return_value.values.return_value = [
+            {"nodegroupid": self.grouping_tile.nodegroup_id, "cardinality": "1"}
         ]
-
 
         self.test_resource.tiles.append(self.grouping_tile)
 
@@ -234,11 +222,8 @@ class LabelBasedGraph_FromResourceTests(TestCase):
 
     def test_semantic_node_with_child(self, mock_Node, mock_NodeGroup):
         mock_Node.objects.get.return_value = self.grouping_node
-        mock_NodeGroup.objects.filter.return_value.values.return_value = [ 
-            { 
-                'nodegroupid': self.grouping_tile.nodegroup_id, 
-                'cardinality': '1' 
-            } 
+        mock_NodeGroup.objects.filter.return_value.values.return_value = [
+            {"nodegroupid": self.grouping_tile.nodegroup_id, "cardinality": "1"}
         ]
 
         self.grouping_node.get_direct_child_nodes = mock.Mock(return_value=[self.string_node])
@@ -266,15 +251,9 @@ class LabelBasedGraph_FromResourceTests(TestCase):
 
     def test_handles_node_grouped_in_separate_card(self, mock_Node, mock_NodeGroup):
         mock_Node.objects.get.side_effect = [self.grouping_node, self.string_node]
-        mock_NodeGroup.objects.filter.return_value.values.return_value = [ 
-            { 
-                'nodegroupid': self.grouping_tile.nodegroup_id, 
-                'cardinality': '1' 
-            }, 
-            { 
-                'nodegroupid': self.string_tile.nodegroup_id, 
-                'cardinality': '1' 
-            } 
+        mock_NodeGroup.objects.filter.return_value.values.return_value = [
+            {"nodegroupid": self.grouping_tile.nodegroup_id, "cardinality": "1"},
+            {"nodegroupid": self.string_tile.nodegroup_id, "cardinality": "1"},
         ]
 
         self.grouping_node.get_direct_child_nodes = mock.Mock(return_value=[self.string_node])
