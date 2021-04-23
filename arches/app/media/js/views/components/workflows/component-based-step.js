@@ -86,7 +86,7 @@ define([
                         tile.tileid = datum.tileId;
                         tile.resourceinstance_id = datum.resourceInstanceId;        
                     }
-                })
+                });
             });
         };
 
@@ -190,6 +190,10 @@ define([
                     }
                 };
 
+                /*
+                    If a step modifies a child tile, get the correct parent tile id from the step that created the parent tile. 
+                    This requires that your step has a parameter 'parenttilesourcestep' that identifies the step with the parent tile.
+                */
                 if (self.externalStepData[self.componentData.parameters.parenttilesourcestep]){
                     self.componentData.parameters.parenttileid = self.externalStepData[self.componentData.parameters.parenttilesourcestep].data.tileid;
                 }
