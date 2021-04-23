@@ -63,7 +63,7 @@ class LabelBasedNode(object):
 
 class LabelBasedGraph(object):
     @staticmethod
-    def generate_node_ids_to_tiles_reference(resource):
+    def generate_node_ids_to_tiles_reference_and_nodegroup_cardinality_reference(resource):
         """
         Builds a reference of all nodes in a in a given resource,
         paired with a list of tiles in which they exist
@@ -83,7 +83,11 @@ class LabelBasedGraph(object):
                 tile_list.append(tile)
                 node_ids_to_tiles_reference[node_id] = tile_list
 
-        return node_ids_to_tiles_reference, list(nodegroupids)
+
+        nodegroup_cardinality = models.NodeGroup.objects.filter(pk__in=nodegroupids).values("nodegroupid", "cardinality")
+        nodegroup_cardinality_reference = {str(nodegroup["nodegroupid"]): nodegroup["cardinality"] for nodegroup in nodegroup_cardinality}
+
+        return node_ids_to_tiles_reference, nodegroup_cardinality_reference
 
     @classmethod
     def from_tile(
@@ -141,9 +145,8 @@ class LabelBasedGraph(object):
         if not resource.tiles:
             resource.load_tiles(user, perm)
 
-        node_ids_to_tiles_reference, nodegroupids = cls.generate_node_ids_to_tiles_reference(resource=resource)
-        nodegroup_cardinality = models.NodeGroup.objects.filter(pk__in=nodegroupids).values("nodegroupid", "cardinality")
-        nodegroup_cardinality_reference = {str(nodegroup["nodegroupid"]): nodegroup["cardinality"] for nodegroup in nodegroup_cardinality}
+        node_ids_to_tiles_reference, nodegroup_cardinality_reference = cls.generate_node_ids_to_tiles_reference_and_nodegroup_cardinality_reference(resource=resource)
+
         root_label_based_node = LabelBasedNode(name=None, node_id=None, tile_id=None, value=None, cardinality=None)
 
         for tile in resource.tiles:
