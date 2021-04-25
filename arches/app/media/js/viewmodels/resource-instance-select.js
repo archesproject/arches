@@ -140,6 +140,9 @@ define([
         // by pushing them to the value variable
         if (ko.isObservable(this.defaultResourceInstance)) {
             var ret = [];
+            if (!(Array.isArray(self.defaultResourceInstance()))) {
+                self.defaultResourceInstance([]);
+            }
             self.defaultResourceInstance().forEach(function(val){
                 var ri = {
                     "resourceId": ko.observable(val.resourceId),
@@ -155,7 +158,10 @@ define([
                 });
                 ret.push(ri); 
             });
-            this.value(ret);
+            // only set the default values if the tile has never been saved before OR if this is the config form
+            if ((this.tile && !this.tile.noDefaults && ko.unwrap(this.tile.tileid) == "" && ret.length > 0) || !!params.configForm) {
+                this.value(ret);
+            }
         }
 
         this.displayValue = ko.observable('');

@@ -1,4 +1,4 @@
-define(['arches'], function(arches) {
+define(['arches', 'knockout'], function(arches, ko) {
     var ontologyUtils = {
         /**
          * makeFriendly - makes a shortened name from an fully qalified name
@@ -8,6 +8,7 @@ define(['arches'], function(arches) {
          * @return {string}
          */
         makeFriendly: function(ontolgoyName) {
+            ontolgoyName = ko.unwrap(ontolgoyName);
             if (!!ontolgoyName) {
                 var parts = ontolgoyName.split("/");
                 return parts[parts.length - 1];
