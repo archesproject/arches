@@ -50,7 +50,11 @@ define([
         this.quitUrl = arches.urls.home;
 
         this.wastebinWarning = function(val){
-            return [[arches.translations.workflowWastbinWarning.replace("${val}", val)],[arches.translations.workflowWastbinWarning2]];
+            if (val === '') {
+                return [[arches.translations.workflowWastbinWarning3],[arches.translations.workflowWastbinWarning2]];
+            } else {
+                return [[arches.translations.workflowWastbinWarning.replace("${val}", val)],[arches.translations.workflowWastbinWarning2]];
+            }
         };
         this.warning = '';
 
@@ -287,7 +291,7 @@ define([
                     'ep-alert-red',
                     self.warning[0],
                     self.warning[1],
-                    null,
+                    function(){}, //does nothing when canceled
                     function(){
                         resourcesToDelete.forEach(function(resource){deleteObject('resource', resource.resourceid);});
                         tilesToDelete.forEach(function(tile){deleteObject('tile', tile.tile);});

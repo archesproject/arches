@@ -101,7 +101,7 @@ class BaseConceptDataType(BaseDataType):
 
 
 class ConceptDataType(BaseConceptDataType):
-    def validate(self, value, row_number=None, source="", node=None, nodeid=None):
+    def validate(self, value, row_number=None, source="", node=None, nodeid=None, strict=False):
         errors = []
         # first check to see if the validator has been passed a valid UUID,
         # which should be the case at this point. return error if not.
@@ -239,7 +239,7 @@ class ConceptDataType(BaseConceptDataType):
 
 
 class ConceptListDataType(BaseConceptDataType):
-    def validate(self, value, row_number=None, source="", node=None, nodeid=None):
+    def validate(self, value, row_number=None, source="", node=None, nodeid=None, strict=False):
         errors = []
 
         # iterate list of values and use the concept validation on each one
