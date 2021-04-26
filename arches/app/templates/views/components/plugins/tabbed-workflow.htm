@@ -19,7 +19,7 @@
                 width: 335px;
                 justify-content: flex-end;"
                 >
-                <!-- ko if: activeStep()._index === steps.length - 1 -->
+                <!-- ko if: (activeStep()._index === steps.length - 1) || isWorkflowFinished() -->
                 <button 
                     data-bind="click: function(){window.location.assign(quitUrl)}" 
                     class="btn btn-success"
