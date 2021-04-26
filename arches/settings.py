@@ -614,6 +614,8 @@ GRAPH_MODEL_CACHE_TIMEOUT = None  # seconds * hours * days = ~1mo
 CANTALOUPE_DIR = os.path.join(ROOT_DIR, "cantaloupe")
 CANTALOUPE_HTTP_ENDPOINT = "http://localhost:8182/"
 
+ACCESSIBILITY_MODE = False
+
 RENDERERS = [
     {
         "name": "imagereader",

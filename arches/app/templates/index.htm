@@ -42,6 +42,9 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
     <link href="{% static 'css/unify.css' %}" rel="stylesheet">
     <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/font-awesome/4.2.0/css/font-awesome.min.css">
     <link href="{% static 'css/index.css' %}" rel="stylesheet">
+    {% if app_settings.ACCESSIBILITY_MODE %}
+    <link href="{% static 'css/accessibility.css' %}" rel="stylesheet">
+    {% endif %}
 </head>
 
 <body>
@@ -332,7 +335,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
         </article>
     </main>
 
-    
+
 
     <!-- Footer -->
     <footer>
@@ -433,7 +436,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 <script src="{% static 'packages/requirejs/require.js' %}"></script>
 
 <script>
-    
+
     require.config({
         baseUrl: '{{ STATIC_URL }}js',
         paths: {
@@ -475,7 +478,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                 deps: ['jquery'],
             }
         }
-    }); 
+    });
     require(
         ['jquery',
             'knockout',
@@ -528,7 +531,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                 var ViewModel = function () {
                      // place observables here
                 };
-    
+
                 // need to have this to prevent mismatched anonymous define error in require.js
                 setTimeout(function () {
                     ko.applyBindings(new ViewModel());
