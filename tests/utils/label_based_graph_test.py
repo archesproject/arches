@@ -61,12 +61,7 @@ class LabelBasedNodeTests(TestCase):
 
         self.assertEqual(
             self.test_node.as_json(compact=True),
-            {
-                self.test_node.name: {
-                    self.child_node_1.name: self.child_node_1.value, 
-                    VALUE_KEY: self.test_node.value
-                }
-            }
+            {self.test_node.name: {self.child_node_1.name: self.child_node_1.value, VALUE_KEY: self.test_node.value}},
         )
 
     def test_as_json_single_child_node(self):
