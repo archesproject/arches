@@ -37,7 +37,6 @@ define([
         var self = this;
         this.graphLookup = graphCache;
         params.configKeys = ['placeholder', 'defaultResourceInstance'];
-        // params.valueProperties = ['resourceId', 'ontologyProperty', 'inverseOntologyProperty', 'resourceXresourceId'];
         this.preview = arches.graphs.length > 0;
         this.allowInstanceCreation = params.allowInstanceCreation === false ? false : true;
         this.renderContext = params.renderContext;
@@ -270,7 +269,6 @@ define([
                     }
                 }
             }
-            
 
             var ret = {
                 "resourceId": ko.observable(id),
@@ -291,7 +289,6 @@ define([
             
             return ret;
         };
-
 
 
         var url = ko.observable(arches.urls.search_results);
