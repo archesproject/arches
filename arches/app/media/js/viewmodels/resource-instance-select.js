@@ -282,12 +282,7 @@ define([
             Object.defineProperty(ret, 'ontologyClass', {value: ko.observable(esSource.root_ontology_class)});
             if (!!params.configForm) {
                 ret.ontologyProperty.subscribe(function(){
-                    // self.value.valueHasMutated();
-                    // var x = self.value();
-                    // self.value([]);
-                    // self.value(x);
                     self.defaultResourceInstance(self.value());
-
                 });
                 ret.inverseOntologyProperty.subscribe(function(){
                     self.defaultResourceInstance(self.value());
