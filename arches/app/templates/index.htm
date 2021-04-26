@@ -168,7 +168,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                                 <!-- NEW LAYER -->
                                 <div class="tp-caption sft start text-bold v5-splash-caption" delay="4500" data-hoffset="0" data-y="400" data-speed="800" data-start="100" data-easing="Back.easeInOut" data-endspeed="300" data-x="0">
                                     <h2>{% blocktrans %}Arches {{version}}{% endblocktrans %}</h2>
-                                    <p>{% trans "TEST A web and mobile platform for" %}</p>
+                                    <p>{% trans "A web and mobile platform for" %}</p>
                                     <p>{% trans "managing your most important resource information" %}</p>
                                 </div>
 
@@ -442,8 +442,8 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
         paths: {
             'templates': '{% url "templates" ""%}'.replace(/\/$/, ""),
             'text': '{{ STATIC_URL }}packages/requirejs-text/text',
-            'jquery-lib': '{{ STATIC_URL }}plugins/revolution-slider/rs-plugin/js/jquery2.2.3/jquery.min',
-            'jquery': '{{ STATIC_URL }}plugins/revolution-slider/rs-plugin/js/jqmigrate1.4.0/jquery-migrate.min',
+            'jquery-lib': '{{ STATIC_URL }}packages/jquery/dist/jquery.min',
+            'jquery': '{{ STATIC_URL }}packages/jquery-migrate/dist/jquery-migrate.min',
             'jquery-ui': '{{ STATIC_URL }}packages/jqueryui/jquery-ui.min',
             'underscore': '{{ STATIC_URL }}packages/underscore/underscore-min',
             'chosen': '{{ STATIC_URL }}packages/chosen-js/chosen.jquery.min',
