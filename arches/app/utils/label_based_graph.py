@@ -51,7 +51,10 @@ class LabelBasedNode(object):
                 else:
                     display_data[formatted_node_name] = [previous_val, formatted_node_value]
 
-        if compact and not display_data:  # if compact and no child nodes
+        if compact and display_data:
+            if self.value is not NON_DATA_COLLECTING_NODE:
+                display_data[VALUE_KEY] = self.value
+        elif compact and not display_data:  # if compact and no child nodes
             display_data = self.value
         elif not compact:
             display_data[NODE_ID_KEY] = self.node_id
