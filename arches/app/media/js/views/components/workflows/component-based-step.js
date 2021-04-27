@@ -468,7 +468,7 @@ define([
             var filteredTiles = self.tiles().filter(function(tile) { return tile !== data; });
             if (data.tileid) {
                 self.tilesToRemove.push(data);
-            };
+            }
             self.tiles(filteredTiles);
         };
 
@@ -501,7 +501,7 @@ define([
                         ));
                     },
                     function() {
-                        self.tilesToRemove.remove(tile)
+                        self.tilesToRemove.remove(tile);
                         if ( self.tilesToRemove().length === 0 ) {
                             self.complete(true);
                             self.loading(true);
