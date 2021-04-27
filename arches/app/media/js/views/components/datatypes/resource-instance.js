@@ -119,7 +119,7 @@ define([
                     if(searchString !== ''){
                         var searchUrl = new URL(ko.unwrap(searchString));
                         var queryString = new URLSearchParams(searchUrl.search);
-                        window.fetch('/search/get_dsl?' + queryString.toString())
+                        window.fetch(arches.urls.get_dsl + '?' + queryString.toString())
                             .then(function(response){
                                 if(response.ok) {
                                     return response.json();
