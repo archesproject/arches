@@ -1211,8 +1211,8 @@ ul.tabbed-report-tab-list {
 .file-workbench-selected-buttons {
     display: flex;
     flex-direction: column;
-    height: 87px;
     justify-content: space-between;
+    margin-top: 5px;
 }
 
 .file-workbench-filter {
@@ -1269,6 +1269,12 @@ ul.tabbed-report-tab-list {
     display: inline-flex;
     justify-content: space-between;
     width: 100%;
+}
+
+.file-workbench-links {
+    display: inline-flex;
+    justify-content: space-between;
+    font-size: 12px;
 }
 
 .btn-workbench {
@@ -1807,8 +1813,20 @@ div.final-cons-step-separator>h4 {
     width: 100%;
 }
 
-.dropzone-photo-upload {
-    margin-top: 40px;
+.iiif-image-tools .dropzone-photo-upload {
+    padding: 25px 15px;
+    border: 1px dashed #bbb;
+    background: #f9f9f9;
+    text-align: center;
+    color: #808080;
+    margin: 5px 0px 30px 0px;
+    border-radius: 2px;
+    cursor: pointer;
+}
+
+.iiif-image-tools .dropzone-photo-upload:hover {
+    border-color: #787878;
+    background: #f2f2f2;
 }
 
 .photo-workbench-photos {
@@ -6437,10 +6455,6 @@ th.notif-type {
     margin-bottom: 0px;
 }
 
-#node-listing .panel {
-    box-shadow: none;
-}
-
 .card-tree-container {
     margin-right: -9px;
     margin-left: -9px;
@@ -7142,21 +7156,11 @@ ul div .card-tree-list span .card-tree-list-item .card-tree-list-icon {
     margin-top: 3px;
 }
 
-.menu-title-shim {
-    top: 40px;
-}
-
 .clear-node-search {
     position: absolute;
     top: 6px;
     right: 10px;
     font-size: 14px;
-}
-
-.node-list {
-    position: absolute;
-    top: 42px;
-    width: 200px;
 }
 
 .new-card.disabled {
@@ -8452,21 +8456,6 @@ a.mega-dropdown-toggle.disabled {
     position: absolute;
     left: 205px;
     top: 5px;
-}
-
-.form-data-card-library {
-    display: flex;
-    flex-direction: column;
-}
-
-.form-data-card-library .panel-heading,
-.form-data-card-library .menu-title-shim {
-    flex: 0 0 auto;
-}
-
-.form-data-card-library .report-image-grid {
-    margin: 0;
-    flex: 1 100%;
 }
 
 .rp-report-container {
@@ -12576,12 +12565,15 @@ ul.select2-choices:after {
     border-radius: 3px;
 }
 
+.graph-designer .card-component-panel {
+    overflow-y: scroll;
+}
+
 .card-component-panel {
     width: 100%;
     padding: 0px;
     border-radius: 3px;
     background-color: white;
-    overflow-y: scroll;
 }
 
 .graph-designer .card-component-panel {
@@ -12836,6 +12828,7 @@ a.jstree-anchor.permissions-widget {
 .rr-splash-description {
     font-size: 15px;
     color: #999;
+    font-weight: 500;
 }
 
 .rr-splash-description:last-child {
@@ -13107,6 +13100,7 @@ a.jstree-anchor.permissions-widget {
     right: 0;
     bottom: auto;
     border-bottom: solid 1px rgb(221, 221, 221);
+    border-top: none;
     z-index: 2000;
     padding: 15px 0 15px 30px;
 }
@@ -13181,6 +13175,11 @@ a.jstree-anchor.permissions-widget {
 .show-gallery-control h3 {
     display: inline-block;
     margin: 0 2px;
+    font-size: 15px;
+}
+
+.show-gallery-control a {
+    font-size: 12px;
 }
 
 .gallery-expanded .iiif-gallery-content {
@@ -13270,6 +13269,18 @@ a.jstree-anchor.permissions-widget {
     width: inherit;
 }
 
+.iiif-input {
+    width: 316px;
+    max-width: 316px;
+    min-height: 36px;
+}
+
+.iiif-manifest-metadata-panel .iiif-input {
+    width: 280px;
+    max-width: 280px;
+    min-height: 36px;
+}
+
 
 .gallery-expanded .iiif-gallery-panel {
     padding-left: 15px;
@@ -13290,7 +13301,7 @@ a.jstree-anchor.permissions-widget {
     padding-left: 20px;
     padding-top: 15px;
     position: sticky;
-    top: 0px;
+    top: 5px;
     margin-left: -10px;
     margin-top: 0px;
     margin-bottom: 5px;
@@ -13309,10 +13320,24 @@ a.jstree-anchor.permissions-widget {
 
 .manifest-metadata-title {
     margin-top: 8px;
+    font-weight: 600;
 }
 
 .manifest-metadata-value {
     line-height: 1.2;
+    color: #585858;
+    overflow-wrap: break-word;
+}
+
+.manifest-metadata-value h4 {
+    padding-top: 10px;
+    font-size: 15px;
+    color: #2f527a;
+    font-weight: 600;
+}
+
+.manifest-metadata-value a {
+    color: #4682b4;
 }
 
 .manifest-details {
@@ -13330,16 +13355,27 @@ a.jstree-anchor.permissions-widget {
 
 .manifest-details h3 {
     width: 225px;
+    font-size: 16px;
+    font-weight: 500;
 }
 
 .manifest-details h4 {
     padding-left: 0px;
+    font-size: 13px;
+    font-weight: 400;
+    color: #585858;
 }
 
 .manifest-details-list,
 .manifest-logo {
     padding-left: 0px;
-    margin-top: -5px;
+    margin-top: 5px;
+}
+
+.manifest-attribution-key {
+    padding-top: 10px;
+    font-size: 15px !important;
+    color: #2f527a !important;
 }
 
 .manifest-logo {
@@ -13350,6 +13386,29 @@ a.jstree-anchor.permissions-widget {
     font-size: 1.2em;
     padding: 3px;
 }
+
+.iiif-manifest-metadata-panel {
+    padding: 5px 8px;
+    display: flex;
+    background: #f9f9f9;
+    border: 1px solid #ddd;
+    margin-bottom: 5px;
+}
+
+.manifest-metadata-panel-drag {
+    background: #e6e6e6;
+    margin: -5px 5px -5px -10px;
+}
+
+.manifest-metadata-panel-drag i {
+    padding: 42px 4px;
+    font-size: 18px;
+    color: #585858;
+}
+
+.manifest-metadata-panel-drag:hover {
+    cursor: pointer;
+} 
 
 .iiif-gallery-header .list-filter {
     display: inline-block;
@@ -13411,12 +13470,29 @@ a.jstree-anchor.permissions-widget {
     display:none;
 }
 
+.iiif-canvas-links-panel {
+    margin-bottom: 10px;
+}
+
+.iiif-canvas-links-panel a {
+    font-size: 12px;
+    color: #4682b4;
+    margin-right: 5px;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+.iiif-canvas-links-panel a:hover {
+    color: #12548A;
+}
+
 .iiif-image-tools {
     margin-top: 55px;
     padding: 10px;
     color: rgb(30, 63, 94);
     font-size: 1.1em;
 }
+
 
 .iiif-image-tool-slider {
     padding-bottom: 20px;
