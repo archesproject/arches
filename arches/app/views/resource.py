@@ -698,7 +698,7 @@ class ResourceReportView(MapBaseManagerView):
         graph = Graph.objects.get(graphid=resource.graph_id)
         templates = models.ReportTemplate.objects.all()
 
-        context = (
+        response = (
             self._load_resource_data(
                 request=request,
                 resourceid=resourceid,
@@ -715,13 +715,8 @@ class ResourceReportView(MapBaseManagerView):
             )
         )
 
-        if graph.iconclass:
-            context["nav"]["icon"] = graph.iconclass
-            context["nav"]["title"] = graph.name
-            context["nav"]["res_edit"] = True
-            context["nav"]["print"] = True
+        return response
 
-        return render(request, "views/resource/report.htm", context)
 
     def _load_resource_data(self, request, resourceid, resource, graph, templates):
         resource_models = (
@@ -808,7 +803,7 @@ class ResourceReportView(MapBaseManagerView):
         except AttributeError:
             raise Http404(_("No active report template is available for this resource."))
 
-        return self.get_context_data(
+        context = self.get_context_data(
             main_script="views/resource/report",
             report_templates=templates,
             templates_json=JSONSerializer().serialize(templates, sort_keys=False, exclude=["name", "description"]),
@@ -852,6 +847,13 @@ class ResourceReportView(MapBaseManagerView):
             version=__version__,
             hide_empty_nodes=settings.HIDE_EMPTY_NODES_IN_REPORT,
         )
+        if graph.iconclass:
+            context["nav"]["icon"] = graph.iconclass
+        context["nav"]["title"] = graph.name
+        context["nav"]["res_edit"] = True
+        context["nav"]["print"] = True
+
+        return render(request, "views/resource/report.htm", context)
 
     def _load_basic_data(self, resourceid, resource, graph, templates):
         context = self.get_context_data(
