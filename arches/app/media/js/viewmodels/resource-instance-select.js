@@ -39,6 +39,9 @@ define([
         params.configKeys = ['placeholder', 'defaultResourceInstance'];
         this.preview = arches.graphs.length > 0;
         this.allowInstanceCreation = params.allowInstanceCreation === false ? false : true;
+        if (!!params.configForm) {
+            this.allowInstanceCreation = false;
+        }
         this.renderContext = params.renderContext;
 
         /* 
