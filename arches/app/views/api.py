@@ -45,6 +45,7 @@ from arches.app.utils.decorators import can_read_concept, group_required
 from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializer
 from arches.app.utils.data_management.resources.exporter import ResourceExporter
 from arches.app.utils.data_management.resources.formats.rdffile import JsonLdReader
+from arches.app.utils.data_management.resources.formats.archesfile import ArchesFileReader
 from arches.app.utils.permission_backend import (
     user_can_read_resource,
     user_can_edit_resource,
@@ -699,36 +700,70 @@ class Resources(APIBase):
         except Exception:
             indent = None
 
+        allowed_formats = ["arches-json", "json-ld"]
+        format = request.GET.get("format", "json-ld")
+        if format not in allowed_formats:
+            return JSONResponse(status=406, reason="incorrect format specified, only %s formats allowed" % allowed_formats)
+
+
         if not user_can_edit_resource(user=request.user, resourceid=resourceid):
             return JSONResponse(status=403)
         else:
             with transaction.atomic():
                 try:
-                    # DELETE
-                    resource_instance = Resource.objects.get(pk=resourceid)
-                    resource_instance.delete()
-                except models.ResourceInstance.DoesNotExist:
-                    pass
+                    if format == "json-ld":
+                        try:
+                            # DELETE
+                            resource_instance = Resource.objects.get(pk=resourceid)
+                            resource_instance.delete()
+                        except models.ResourceInstance.DoesNotExist:
+                            pass
 
-                try:
-                    # POST
-                    data = JSONDeserializer().deserialize(request.body)
-                    reader = JsonLdReader()
-                    if slug is not None:
-                        graphid = models.GraphModel.objects.get(slug=slug).pk
-                    reader.read_resource(data, resourceid=resourceid, graphid=graphid)
-                    if reader.errors:
-                        response = []
-                        for value in reader.errors.values():
-                            response.append(value.message)
-                        return JSONResponse({"error": response}, indent=indent, status=400)
-                    else:
-                        response = []
-                        for resource in reader.resources:
-                            with transaction.atomic():
-                                resource.save(request=request)
-                            response.append(JSONDeserializer().deserialize(self.get(request, resource.resourceinstanceid).content))
-                        return JSONResponse(response, indent=indent, status=201)
+                        # POST
+                        data = JSONDeserializer().deserialize(request.body)
+                        reader = JsonLdReader()
+                        if slug is not None:
+                            graphid = models.GraphModel.objects.get(slug=slug).pk
+                        reader.read_resource(data, resourceid=resourceid, graphid=graphid)
+                        if reader.errors:
+                            response = []
+                            for value in reader.errors.values():
+                                response.append(value.message)
+                            return JSONResponse({"error": response}, indent=indent, status=400)
+                        else:
+                            response = []
+                            for resource in reader.resources:
+                                with transaction.atomic():
+                                    resource.save(request=request)
+                                response.append(JSONDeserializer().deserialize(self.get(request, resource.resourceinstanceid).content))
+                            return JSONResponse(response, indent=indent, status=201)
+                            
+                    elif format == "arches-json":
+                        reader = ArchesFileReader()
+                        archesresource = JSONDeserializer().deserialize(request.body)
+
+                        resource = {
+                            "resourceinstance": {
+                                "graph_id": archesresource["graph_id"],
+                                "resourceinstanceid": archesresource["resourceinstanceid"],
+                                "legacyid": archesresource["legacyid"],
+                            },
+                            "tiles": archesresource["tiles"],
+                        }
+
+                        reader.import_business_data({"resources": [resource]})
+
+                        if reader.errors:
+                            response = []
+                            for value in reader.errors.values():
+                                response.append(value.message)
+                            return JSONResponse({"error": response}, indent=indent, status=400)
+                        else:
+                            response = []
+                            response.append(JSONDeserializer().deserialize(self.get(request, resourceid).content))
+                            return JSONResponse(response, indent=indent, status=201)
+
+
                 except models.ResourceInstance.DoesNotExist:
                     return JSONResponse(status=404)
                 except Exception as e:
