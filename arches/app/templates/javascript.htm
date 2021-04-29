@@ -69,6 +69,7 @@
             'dom-4': '{{ STATIC_URL }}packages/dom4/build/dom4',
             'numeral': '{{ STATIC_URL }}packages/numeral/numeral',
             'togeojson': '{{ STATIC_URL }}packages/@tmcw/togeojson/dist/togeojson.umd',
+            'cytoscape': '{{ STATIC_URL }}packages/cytoscape/dist/cytoscape.min',
             {% block paths %}{% endblock paths %}
         },
         packages: [{
@@ -386,6 +387,7 @@
                 'reNetworkReponseError': '{% trans "Network response was not ok" %}',
                 'workflowWastbinWarning': '{% trans "You are about to delete ${val}." %}',
                 'workflowWastbinWarning2': '{% trans "Are you sure you want to continue?" %}',
+                'workflowWastbinWarning3': '{% trans "You are about to quit the workflow." %}',
                 'termSearchConcept': '{% trans "Concepts" %}',
                 'termSearchTerm': '{% trans "Term Matches" %}',
                 'timeWheelDateMatches': '{% trans "${total} date values" %}',

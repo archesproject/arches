@@ -19,7 +19,7 @@ details = {
 
 
 class SampleDataType(BaseDataType):
-    def validate(self, value, row_number=None, source=None):
+    def validate(self, value, row_number=None, source=None, node=None, nodeid=None, strict=False):
         errors = []
         try:
             value.upper()

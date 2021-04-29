@@ -922,7 +922,10 @@ class CsvReader(Reader):
                             if str(target_tile.nodegroup_id) not in populated_nodegroups[resourceinstanceid]:
                                 target_tile.nodegroup_id = str(target_tile.nodegroup_id)
                                 # Check if we are populating a parent tile by inspecting the target_tile.data array.
-                                if target_tile.data != {}:
+                                source_data_has_target_tile_nodes = (
+                                    len(set([list(obj.keys())[0] for obj in source_data]) & set(target_tile.data.keys())) > 0
+                                )
+                                if source_data_has_target_tile_nodes:
                                     # Iterate through the target_tile nodes and begin populating by iterating througth source_data array.
                                     # The idea is to populate as much of the target_tile as possible,
                                     # before moving on to the next target_tile.
