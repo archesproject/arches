@@ -1796,9 +1796,10 @@ class ResourceInstanceDataType(BaseDataType):
 
     def get_display_value(self, tile, node):
         from arches.app.models.resource import Resource
+
         data = self.get_tile_data(tile)
         nodevalue = self.get_id_list(data[str(node.nodeid)])
-        
+
         items = []
         for resourceXresource in nodevalue:
             resourceid = resourceXresource["resourceId"]
@@ -1808,9 +1809,7 @@ class ResourceInstanceDataType(BaseDataType):
                 if displayname is not None:
                     items.append(displayname)
             except:
-                logger.info(
-                    f"Resource with id \"{resourceid}\" not in the system."
-                )
+                logger.info(f'Resource with id "{resourceid}" not in the system.')
         return ", ".join(items)
 
     def append_to_document(self, document, nodevalue, nodeid, tile, provisional=False):
