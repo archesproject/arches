@@ -124,7 +124,7 @@ define([
             });
 
             /* cached informationBox logic */
-            this.setupInformationBox(ko.unwrap(config.workflow.workflowName));
+            this.setupInformationBox();
         };
         
         this.save = function() {
@@ -208,7 +208,7 @@ define([
         };
 
         this.setupInformationBox = function() {
-            if (config.informationBoxDisplayed) {
+            if (config.informationBoxDisplayed && config.informationboxdata) {
                 var isDisplayed = true;
                 if (config.informationBoxDisplayed() !== undefined){
                     isDisplayed = config.informationBoxDisplayed();
