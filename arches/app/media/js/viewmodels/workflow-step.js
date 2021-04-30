@@ -204,31 +204,14 @@ define([
             informationBoxData['displayed'] = !isDisplayed;
             self.informationBoxData(informationBoxData);
 
-            self.setMetadataToLocalStorage('informationBoxDisplayed', !isDisplayed);
+            config.informationBoxDisplayed(!isDisplayed);
         };
 
-        this.getInformationBoxDisplayedStateFromLocalStorage = function() {
-            return self.getMetadataFromLocalStorage('informationBoxDisplayed')
-        };
-
-        this.getMetadataFromLocalStorage = function(key) {
-            var workflowsMetadataLocalStorageData = JSON.parse(localStorage.getItem('workflow-metadata')) || {};
-            var workflowName = ko.unwrap(config.workflow.workflowName);
-            var stepName = ko.unwrap(config.name);
-            if (workflowsMetadataLocalStorageData[workflowName] && workflowsMetadataLocalStorageData[workflowName][stepName]) {
-                return workflowsMetadataLocalStorageData[workflowName][stepName][key];
-            }
-        };
-
-        config.workflow.workflowName.subscribe(function(workflowName){
-            self.setupInformationBox(workflowName);
-        })
-
-        this.setupInformationBox = function(workflowName) {
-            if (config.informationboxdata && workflowName) {
+        this.setupInformationBox = function() {
+            if (config.informationBoxDisplayed) {
                 var isDisplayed = true;
-                if (self.getInformationBoxDisplayedStateFromLocalStorage() !== undefined){
-                    isDisplayed = self.getInformationBoxDisplayedStateFromLocalStorage();
+                if (config.informationBoxDisplayed() !== undefined){
+                    isDisplayed = config.informationBoxDisplayed();
                 }
                 self.informationBoxData({
                     displayed: isDisplayed,
@@ -237,25 +220,6 @@ define([
                 })
             }
         }
-        this.setMetadataToLocalStorage = function(key, value) {
-            var workflowMetaDataLocalStorageData = JSON.parse(localStorage.getItem('workflow-metadata')) || {};
-            var workflowName = ko.unwrap(config.workflow.workflowName);
-            if (!workflowMetaDataLocalStorageData[workflowName]) {
-                workflowMetaDataLocalStorageData[workflowName] = {};
-            };
-
-            var stepName = ko.unwrap(config.name);
-            if (!workflowMetaDataLocalStorageData[workflowName][stepName]) {
-                workflowMetaDataLocalStorageData[workflowName][stepName] = {};
-            };
-            
-            workflowMetaDataLocalStorageData[workflowName][stepName][key] = value;
-
-            localStorage.setItem(
-                'workflow-metadata',
-                JSON.stringify(workflowMetaDataLocalStorageData)
-            );
-        };
 
         _.extend(this, config);
 
