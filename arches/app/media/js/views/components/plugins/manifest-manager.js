@@ -222,6 +222,7 @@ define([
                 }
                 else {
                     self.remoteManifest(true);
+                    self.hideSidePanel();
                 }
             }); 
           
