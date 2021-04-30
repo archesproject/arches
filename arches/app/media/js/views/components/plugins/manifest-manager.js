@@ -216,7 +216,7 @@ define([
                 self.mainMenu(false);
             });
 
-            this.manifest.subscribe(function(val){
+            this.manifest.subscribe(function(){
                 if (self.manifest().charAt(0) == '/') {
                     self.remoteManifest(false);
                 }
