@@ -38,21 +38,16 @@ define([
 
         this.ready = ko.observable(false);
 
-        this.nameReady = ko.computed(function(){
-            return self.ready() && self.workflowName();
-        })
-
-        this.nameReady.subscribe(function(ready) {
-            if (ready){
+        this.workflowName = ko.observable();
+        this.workflowName.subscribe(function(workflowName) {
+            if (workflowName && self.ready()) {
                 var components = _.unique(self.steps.map(function(step) {return step.component;}));
-                require(components, function() { self.initialize(); });    
+                require(components, function() { self.initialize(); });
             }
         });
 
         this.loading = config.loading || ko.observable(false);
-
         
-        this.workflowName = ko.observable();
         this.alert = config.alert || ko.observable(null);
         this.quitUrl = arches.urls.home;
 
