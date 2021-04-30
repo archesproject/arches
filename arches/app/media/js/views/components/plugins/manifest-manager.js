@@ -219,6 +219,7 @@ define([
             this.manifestData.subscribe(function(val){
                 if (self.manifest().charAt(0) == '/') {
                     self.remoteManifest(false);
+                    self.hideSidePanel();
                 }
                 else {
                     self.remoteManifest(true);
