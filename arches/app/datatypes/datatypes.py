@@ -1774,7 +1774,7 @@ class ResourceInstanceDataType(BaseDataType):
                 se.delete(index=RESOURCE_RELATIONS_INDEX, id=related["resourceXresourceId"])
 
     def get_display_value(self, tile, node):
-        from arches.app.models.resource import Resource #import here rather than top to avoid circular import
+        from arches.app.models.resource import Resource  # import here rather than top to avoid circular import
 
         data = self.get_tile_data(tile)
         nodevalue = self.get_id_list(data[str(node.nodeid)])
