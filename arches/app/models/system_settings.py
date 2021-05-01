@@ -111,7 +111,7 @@ class SystemSettings(LazySettings):
 
             setup_node(node)
 
-        n_cardinality_collector_node_names = [] 
+        n_cardinality_collector_node_names = []
 
         # set any values saved in the instance of the Arches System Settings Graph
         for tile in models.TileModel.objects.filter(resourceinstance__graph_id=self.SYSTEM_SETTINGS_RESOURCE_MODEL_ID):
@@ -134,7 +134,7 @@ class SystemSettings(LazySettings):
                     if node.datatype != "semantic":
                         obj[node.name] = tile.data[str(node.nodeid)]
 
-                # this check will ensure that if an existing list of values exists in settings.py 
+                # this check will ensure that if an existing list of values exists in settings.py
                 # that those values won't get appended with what's in the database
                 val = getattr(self, collector_nodename)
                 if collector_nodename in n_cardinality_collector_node_names:
