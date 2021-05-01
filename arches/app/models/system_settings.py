@@ -151,4 +151,3 @@ class SystemSettings(LazySettings):
         return nodes
 
 settings = SystemSettings()
-
