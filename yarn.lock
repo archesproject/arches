@@ -197,6 +197,11 @@
   resolved "https://registry.yarnpkg.com/@sindresorhus/is/-/is-0.7.0.tgz#9a06f4f137ee84d7df0460c1fdb1135ffa6c50fd"
   integrity sha512-ONhaKPIufzzrlNbqtWFFd+jlnemX6lJAgq9ZeiZtS7I1PIf/la7CW4m83rTXRnVnsMbW2k56pGYu7AUFJD9Pow==
 
+"@stencil/core@^2.5.0":
+  version "2.5.2"
+  resolved "https://registry.yarnpkg.com/@stencil/core/-/core-2.5.2.tgz#ad00d495ee37bbed4044524d59c7f22de15ab4a7"
+  integrity sha512-bgjPXkSzzg1WnTgVUm6m5ZzpKt602WmA/QljODAW1xVN40OHJdbGblzF/F6MFzqv2c5Cy30CB41arc8qADIdcQ==
+
 "@tmcw/togeojson@^4.3.0":
   version "4.3.0"
   resolved "https://registry.yarnpkg.com/@tmcw/togeojson/-/togeojson-4.3.0.tgz#8a9697b276d52ddc174d7fd559397f98d7c953af"
@@ -2066,10 +2071,12 @@ into-stream@^3.1.0:
     from2 "^2.1.1"
     p-is-promise "^1.1.0"
 
-ionicons@~2.0.1:
-  version "2.0.1"
-  resolved "https://registry.yarnpkg.com/ionicons/-/ionicons-2.0.1.tgz#ca398113293ea870244f538f0aabbd4b5b209a3e"
-  integrity sha1-yjmBEyk+qHAkT1OPCqu9S1sgmj4=
+ionicons@~5.5.1:
+  version "5.5.1"
+  resolved "https://registry.yarnpkg.com/ionicons/-/ionicons-5.5.1.tgz#c337b2a0871c18910dea5c72384b0f0a393abf15"
+  integrity sha512-1auVisfaXmkmxINer8Q3kJGHP1vSxk86hf7By95eJ+Av9+oBcNuAEBfSe3jaMaGRVxVw8U/2j23MFq7R3c0HPg==
+  dependencies:
+    "@stencil/core" "^2.5.0"
 
 is-arguments@^1.0.4:
   version "1.0.4"
