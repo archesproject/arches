@@ -123,18 +123,8 @@ define([
                 self.setToLocalStorage('value', value);
             });
 
-            /* cached informationBox logic */ 
-            if (config.informationboxdata) {
-                var isHidden = true;
-                if (self.getInformationBoxHiddenStateFromLocalStorage()){
-                    isHidden = self.getInformationBoxHiddenStateFromLocalStorage();
-                }
-                self.informationBoxData({
-                    hidden: isHidden,
-                    heading: config.informationboxdata['heading'],
-                    text: config.informationboxdata['text'],
-                })
-            }
+            /* cached informationBox logic */
+            this.setupInformationBox();
         };
         
         this.save = function() {
@@ -209,17 +199,27 @@ define([
 
         this.toggleInformationBox = function() {
             var informationBoxData = self.informationBoxData();
-            var isHidden = informationBoxData['hidden'];
+            var isDisplayed = informationBoxData['displayed'];
 
-            informationBoxData['hidden'] = !isHidden;
+            informationBoxData['displayed'] = !isDisplayed;
             self.informationBoxData(informationBoxData);
 
-            self.setToLocalStorage('informationBoxHidden', !isHidden);
+            config.informationBoxDisplayed(!isDisplayed);
         };
 
-        this.getInformationBoxHiddenStateFromLocalStorage = function() {
-            return self.getFromLocalStorage('informationBoxHidden')
-        };
+        this.setupInformationBox = function() {
+            if (config.informationBoxDisplayed && config.informationboxdata) {
+                var isDisplayed = true;
+                if (config.informationBoxDisplayed() !== undefined){
+                    isDisplayed = config.informationBoxDisplayed();
+                }
+                self.informationBoxData({
+                    displayed: isDisplayed,
+                    heading: config.informationboxdata['heading'],
+                    text: config.informationboxdata['text'],
+                })
+            }
+        }
 
         _.extend(this, config);
 

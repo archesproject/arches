@@ -37,15 +37,17 @@ define([
         });
 
         this.ready = ko.observable(false);
-        this.ready.subscribe(function() {
-            var components = _.unique(self.steps.map(function(step) {return step.component;}));
-            require(components, function() { self.initialize(); });
+
+        this.workflowName = ko.observable();
+        this.workflowName.subscribe(function(workflowName) {
+            if (workflowName && self.ready()) {
+                var components = _.unique(self.steps.map(function(step) {return step.component;}));
+                require(components, function() { self.initialize(); });
+            }
         });
 
         this.loading = config.loading || ko.observable(false);
-
         
-        this.workflowName = ko.observable();
         this.alert = config.alert || ko.observable(null);
         this.quitUrl = arches.urls.home;
 
@@ -103,6 +105,38 @@ define([
             }
         };
 
+        this.getInformationBoxDisplayedStateFromLocalStorage = function(stepName) {
+            return self.getMetadataFromLocalStorage(stepName, 'informationBoxDisplayed');
+        };
+
+        this.getMetadataFromLocalStorage = function(stepName, key) {
+            var workflowsMetadataLocalStorageData = JSON.parse(localStorage.getItem('workflow-metadata')) || {};
+            var workflowName = ko.unwrap(self.workflowName);
+            if (workflowsMetadataLocalStorageData[workflowName] && workflowsMetadataLocalStorageData[workflowName][stepName]) {
+                return workflowsMetadataLocalStorageData[workflowName][stepName][key];
+            }
+        };
+
+        this.setMetadataToLocalStorage = function(stepName, key, value) {
+            var workflowMetaDataLocalStorageData = JSON.parse(localStorage.getItem('workflow-metadata')) || {};
+            var workflowName = ko.unwrap(self.workflowName);
+
+            if (!workflowMetaDataLocalStorageData[workflowName]) {
+                workflowMetaDataLocalStorageData[workflowName] = {};
+            };
+
+            if (!workflowMetaDataLocalStorageData[workflowName][stepName]) {
+                workflowMetaDataLocalStorageData[workflowName][stepName] = {};
+            };
+            
+            workflowMetaDataLocalStorageData[workflowName][stepName][key] = value;
+
+            localStorage.setItem(
+                'workflow-metadata',
+                JSON.stringify(workflowMetaDataLocalStorageData)
+            );
+        };
+
         this.createSteps = function(cachedStepIds) {
             self.steps.forEach(function(step, i) {
                 if (!(self.steps[i] instanceof Step)) {
@@ -112,6 +146,11 @@ define([
 
                     /* if stepIds exist for this workflow in localStorage, set correct value */ 
                     if (cachedStepIds) { step.id = cachedStepIds[i]; }
+
+                    step.informationBoxDisplayed = ko.observable(self.getInformationBoxDisplayedStateFromLocalStorage(step.name));
+                    step.informationBoxDisplayed.subscribe(function(val){
+                        self.setMetadataToLocalStorage(ko.unwrap(step.name), 'informationBoxDisplayed', val);
+                    })
 
                     var newStep = new Step(step);
                     self.steps[i] = newStep;
