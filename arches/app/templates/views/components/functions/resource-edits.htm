@@ -1,0 +1,69 @@
+{% load i18n %}
+
+<div class="primary-descriptors-container">
+<label for="modulename">Module name</label>
+<input type="text" id="modulename" data-bind="textInput: config.modulename">
+
+<!--ko let: {graphTree: $data.graphTree, self: $data}-->
+<div style="height: 100%;" class="jstree jstree-default">
+    <div class="header" style="padding-bottom: 55px">
+        <!-- Layer Filter -->
+        <div class="list-filter" data-bind="">
+            <input type="text" class="form-control" style="width: 100%;"
+                placeholder="{% trans 'Find a node by name or datatype' %}"
+                data-bind="textInput: graphTree.filter, event: {keypress: graphTree.filterEnterKeyHandler}">
+
+            <!-- Clear Search -->
+            <span class="clear-node-search"
+                data-bind="visible: graphTree.filter().length > 0, click: function() { graphTree.filter(''); }"><i
+                    class="fa fa-times-circle"></i></span>
+        </div>
+        <div>
+            <a class="tree-display-tool" data-bind="click: graphTree.expandAll"><i class="ion-plus"></i>{% trans ' Expand' %}</a>
+            <a class="tree-display-tool" data-bind="click: graphTree.collapseAll"><i class="ion-minus"></i>{% trans ' Collapse'%}</a>
+        </div>
+    </div>
+    <div class="left-panel-overflow graph-designer-node-tree">
+        <!-- <div data-bind="sortable: $data"> -->
+        <ul class="jstree-container-ul jstree-children" aria-expanded="true">
+            <div class="" data-bind="template: {
+                name: 'graph-tree',
+                foreach: graphTree.graphModel.tree,
+                as: 'node'
+            }"></div>
+        </ul>
+        <!-- </div> -->
+    </div>
+</div>
+<!-- /ko -->
+
+<template id="graph-tree">
+    <li role="treeitem" class="jstree-node"
+        data-bind="css: {'jstree-open': (node.childNodes().length > 0 && node.expanded), 'jstree-closed' : (node.childNodes().length > 0 && !node.expanded()), 'jstree-leaf': node.childNodes().length === 0}, scrollTo: graphTree.scrollTo() == node, container: '.graph-designer-node-tree'">
+        <i class="jstree-icon jstree-ocl" role="presentation"
+            data-bind="click: function(){node.expanded(!node.expanded())}"></i>
+        <!-- ko if: self.nodeCollectsData(node) -->
+        <div style="top: -4px; left: -5px;" class="form-checkbox form-normal form-primary" data-bind="css: {
+                    'active': self.nodeIsChecked($data)
+                },
+                click: graphTree.selectItem.bind(graphTree),
+                ">
+            <input type="checkbox" data-bind="checked: self.nodeIsChecked($data)">
+        </div>
+        <!-- /ko -->
+        <a style="margin-left: -6px;" class="jstree-anchor relative" href="#" tabindex="-1"
+            data-bind="click: graphTree.selectItem.bind(graphTree), css:{'child-selected': graphTree.isChildSelected(node), 'filtered': graphTree.filter().length > 0 && !node.filtered()}">
+            <i data-bind="css: node.iconclass" role="presentation"></i>
+            <span data-bind="text: graphTree.getDisplayName(node)"></span>
+        </a>
+            
+        <ul class="jstree-children" aria-expanded="true" data-bind="if: node.childNodes().length > 0">
+            <div data-bind="template: {
+                name: 'graph-tree',
+                foreach: node.childNodes,
+                as: 'node'
+            }">
+            </div>
+        </ul>
+    </li>
+</template>
