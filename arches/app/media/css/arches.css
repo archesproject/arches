@@ -8301,7 +8301,7 @@ a.mega-dropdown-toggle.disabled {
     left: 0%;
     overflow-x: hidden;
     transform: translate(100%,0);
-    transition: all 0.5s ease-out;
+    transition: all 0.3s ease-out;
 }
 
 .create-resource-instance-card-component.rr-table-pop .rp-edit-buttons {
