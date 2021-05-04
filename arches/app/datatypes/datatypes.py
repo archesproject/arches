@@ -1776,17 +1776,20 @@ class ResourceInstanceDataType(BaseDataType):
     def get_display_value(self, tile, node):
         from arches.app.models.resource import Resource  # import here rather than top to avoid circular import
 
+        resourceid = None
         data = self.get_tile_data(tile)
         nodevalue = self.get_id_list(data[str(node.nodeid)])
 
         items = []
         for resourceXresource in nodevalue:
-            resourceid = resourceXresource["resourceId"]
             try:
+                resourceid = resourceXresource["resourceId"]
                 related_resource = Resource.objects.get(pk=resourceid)
                 displayname = related_resource.displayname
                 if displayname is not None:
                     items.append(displayname)
+            except (TypeError, KeyError):
+                pass
             except:
                 logger.info(f'Resource with id "{resourceid}" not in the system.')
         return ", ".join(items)
