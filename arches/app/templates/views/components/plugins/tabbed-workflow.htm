@@ -140,11 +140,11 @@
                         component: { 
                             name: 'views/components/simple-switch', 
                             params: {
-                                value: activeStep().informationBoxData()['hidden'], 
+                                value: activeStep().informationBoxData()['displayed'], 
                                 config:{
                                     label: '{% trans "Detailed Step Information" %}',
                                     setvalue: activeStep().toggleInformationBox,
-                                    getvalue: activeStep().informationBoxData()['hidden'],
+                                    getvalue: activeStep().informationBoxData()['displayed'],
                                 }
                             }
                         }
