@@ -137,15 +137,14 @@
 <!-- /ko -->
 
 
-<!-- ko if: newResourceInstance -->
-<div class="create-resource-instance-card-component rr-table-pop" data-bind="with: newResourceInstance">
+<div class="create-resource-instance-card-component rr-table-pop"
+    data-bind="with: newResourceInstance, style: {transform: !!newResourceInstance() ? 'translate(0,0)' : 'translate(100%,0)'}">
     <!-- ko component: {
         name: 'new-resource-instance',
         params: {...$data, graphName: $parent.graphLookup[graphid].name}
     } --><!--/ko -->
 </div>
 
-<!-- /ko -->
 
 <!-- ko if: reportResourceId-->
 <div class="create-resource-instance-card-component rr-table-pop">
