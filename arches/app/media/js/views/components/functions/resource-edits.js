@@ -8,41 +8,37 @@ function(ko, FunctionViewModel, GraphModel, GraphTree) {
     return ko.components.register('views/components/functions/resource-edits', {
         viewModel: function(params) {
             var self = this;
-            var nodegroups = {};
             FunctionViewModel.apply(this, arguments);
             this.selectedNodes = ko.observableArray();
             this.graphModel = new GraphModel({'data':this.graph});
             this.graphTree = new GraphTree({
                 graphModel: this.graphModel
             });
-
-            this.items = this.graphTree.items;
-
             this.graphTree.selectItem = function(selectedNode){
-                if (self.nodeIsChecked(selectedNode)){
-                    var newSelectedNodes = [];
-                    self.selectedNodes().forEach(function(node){
-                        if (node !== selectedNode) {
-                            newSelectedNodes.push(node);
-                        }
-                    });
-                    self.selectedNodes(newSelectedNodes);
-                } else {
-                    self.selectedNodes.push(selectedNode);
+                if(self.nodeCollectsData(selectedNode)){
+                    selectedNode.selected(!selectedNode.selected())
                 }
             };
-
-            this.nodeIsChecked = function(node){
-                return self.selectedNodes().find(function(selectedNode){
-                    return node === selectedNode;
-                });
-            };
+            
+            this.items = this.graphTree.items;
+            this.items().forEach(function(node) {
+                var selected = this.config.selected_nodes().find(function(selected_nodeid){
+                    return node.id === selected_nodeid;
+                })
+                node.selected(!!selected)
+            }, this);
 
             this.nodeCollectsData = function(node) {
                 return self.graphModel.get('widgets').find(function(widget){
                     return node.id === widget.node_id;
                 });
             };
+
+            this.selectedNodes = ko.computed(function(){
+                return this.items().filter(function(node){
+                    return node.selected();
+                })
+            }, this);
 
             this.selectedNodes.subscribe(function(nodes){
                 console.log(nodes);
@@ -54,10 +50,6 @@ function(ko, FunctionViewModel, GraphModel, GraphTree) {
                 });
                 this.config.selected_nodes(nodeids);
                 this.config.triggering_nodegroups(nodegroups);
-            }, this);
-            
-            this.graphModel.on('select-node', function(node) {
-                this.graphTree.expandParentNode(node);
             }, this);
 
         },
