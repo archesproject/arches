@@ -13757,6 +13757,23 @@ a.jstree-anchor.permissions-widget {
     padding: 5px 0;
 }
 
+.tag-list {
+    display: flex;
+    padding: 10px;
+    border: solid 1px #ececec;
+    flex-wrap: wrap;
+    align-content: space-around;
+    min-height: 35px;
+    margin-bottom: 20px;
+}
+
+.tag-list div{
+    background-color: #f9f9f9;
+    margin: 5px;
+    padding: 15px;
+    border: solid 1px #ececec;
+}
+
 @keyframes loader {
     0% {
         background: #ddd;

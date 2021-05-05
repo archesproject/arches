@@ -40,6 +40,16 @@ function(ko, FunctionViewModel, GraphModel, GraphTree) {
                 })
             }, this);
 
+            this.selectedNodeNames = ko.computed(function() {
+                var nodenames = [];
+                this.items().reduce(function(previousnode, currentnode){
+                    if(currentnode.selected()) {
+                        nodenames.push(currentnode.name());
+                    }
+                }, nodenames)
+                return nodenames;
+            }, this);
+
             this.selectedNodes.subscribe(function(nodes){
                 console.log(nodes);
                 var nodeids = [];

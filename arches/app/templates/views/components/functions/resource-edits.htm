@@ -1,16 +1,27 @@
 {% load i18n %}
 
-<div class="primary-descriptors-container">
-    <div class="row widget-wrapper">
-        <div class="form-group">
-            <label class="control-label">Dotted path to module and class (eg: arches.app.models.resouce.Resource)</label>
-            <div class="col-xs-12">
-                <input type="text" data-bind="textInput: config.modulename" class="form-control input-lg widget-input">
-            </div>
+
+<div class="row widget-wrapper">
+    <div>
+        <h4>{% trans "How does this function work?" %}</h4>
+        <p>{% trans "Create a module file that has a class that inherits from 'arches.app.functions.base.BaseFunction' 
+            then implement any of the default methods.  Put the dotted path to your module and class in the box below.  
+            Next select nodes that will be used to trigger your function." %}</p>
+    </div>
+    <div style="margin-bottom: 15px;">
+        <label class="control-label">{% trans "Dotted path to module and class (eg: arches.app.models.resouce.Resource)" %}</label>
+        <div>
+            <input type="text" data-bind="textInput: config.modulename" class="form-control input-lg widget-input">
         </div>
     </div>
-    <div class="row widget-wrapper" style="height: calc(100vh - 300px);">
-        <label class="control-label">Select nodes to track</label>
+    <div>
+        <label class="control-label">{% trans "Nodes currently being tracked:" %}</label>
+        <div class="tag-list" data-bind="foreach: selectedNodeNames">
+            <div data-bind="text: $data"></div>
+        </div>
+    </div>
+    <div style="height: calc(100vh - 520px);">
+        <label class="control-label">{% trans "Select nodes to track" %}</label>
         <!--ko let: {graphTree: $data.graphTree, self: $data}-->
         <div style="height: 100%;" class="jstree jstree-default">
             <div class="header" style="padding-bottom: 55px">
@@ -45,6 +56,7 @@
         <!-- /ko -->
     </div>
 </div>
+
 
 <template id="graph-tree">
     <li role="treeitem" class="jstree-node"
