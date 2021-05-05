@@ -1,0 +1,16 @@
+{% extends "views/components/workbench.htm" %}
+{% load staticfiles %}
+{% load i18n %}
+
+{% block tabs %}
+{% endblock tabs %}
+
+{% block sidepanel %}
+{% endblock sidepanel %}
+
+{% block content_management %}
+<div style="height:100%; width:100%;" data-bind="cytoscape: {
+    afterRender: viz,
+    config: cytoscapeConfig
+}"></div>
+{% endblock content_management %}
