@@ -1707,52 +1707,6 @@ class ResourceInstanceDataType(BaseDataType):
             nodevalue = [nodevalue]
         return nodevalue
 
-    def disambiguate(self, nodevalue):
-        ret = []
-        if nodevalue is not None:
-            resourceXresourceList = self.get_id_list(nodevalue)
-            for resourceXresource in resourceXresourceList:
-                resourceid = None
-                displayname = ""
-                if isinstance(resourceXresource, str):
-                    resourceXresourceId = resourceXresource
-                else:
-                    resourceXresourceId = resourceXresource["resourceXresourceId"]
-                if not resourceXresourceId:
-                    continue
-                try:
-                    rr = models.ResourceXResource.objects.get(pk=resourceXresourceId)
-                    resourceid = str(rr.resourceinstanceidto_id)
-                    resource_document = se.search(index=RESOURCES_INDEX, id=resourceid)
-                    displayname = resource_document["_source"]["displayname"]
-                except NotFoundError as e:
-                    try:
-                        from arches.app.models.resource import Resource
-
-                        displayname = Resource.objects.get(pk=resourceid).displayname
-                    except ObjectDoesNotExist:
-                        rr = None
-                        logger.info(
-                            f"Resource with resourceXresourceId {resourceXresourceId} not available. This message may appear during resource load, \
-                                in which case the problem will be resolved once the related resource is loaded"
-                        )
-                except ObjectDoesNotExist:
-                    rr = None
-                    logger.info(
-                        f"Resource with resourceXresourceId {resourceXresourceId} not available. This message may appear during resource load, \
-                            in which case the problem will be resolved once the related resource is loaded"
-                    )
-                if rr is not None:
-                    ret.append(
-                        {
-                            "resourceName": displayname,
-                            "resourceId": resourceid,
-                            "ontologyProperty": rr.relationshiptype,
-                            "inverseOntologyProperty": rr.inverserelationshiptype,
-                        }
-                    )
-        return ret
-
     def validate(self, value, row_number=None, source="", node=None, nodeid=None, strict=False):
         errors = []
         if value is not None:
@@ -1841,10 +1795,25 @@ class ResourceInstanceDataType(BaseDataType):
                 se.delete(index=RESOURCE_RELATIONS_INDEX, id=related["resourceXresourceId"])
 
     def get_display_value(self, tile, node):
+        from arches.app.models.resource import Resource  # import here rather than top to avoid circular import
+
+        resourceid = None
         data = self.get_tile_data(tile)
-        nodevalue = data[str(node.nodeid)]
-        items = self.disambiguate(nodevalue)
-        return ", ".join([item["resourceName"] for item in items])
+        nodevalue = self.get_id_list(data[str(node.nodeid)])
+
+        items = []
+        for resourceXresource in nodevalue:
+            try:
+                resourceid = resourceXresource["resourceId"]
+                related_resource = Resource.objects.get(pk=resourceid)
+                displayname = related_resource.displayname
+                if displayname is not None:
+                    items.append(displayname)
+            except (TypeError, KeyError):
+                pass
+            except:
+                logger.info(f'Resource with id "{resourceid}" not in the system.')
+        return ", ".join(items)
 
     def append_to_document(self, document, nodevalue, nodeid, tile, provisional=False):
         if type(nodevalue) != list and nodevalue is not None:

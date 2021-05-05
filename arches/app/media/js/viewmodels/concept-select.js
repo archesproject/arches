@@ -76,7 +76,7 @@ define([
         this.setNames();
 
         this.value.subscribe(function() {
-            this.setNames();
+            self.setNames();
         });
 
         this.select2Config = {

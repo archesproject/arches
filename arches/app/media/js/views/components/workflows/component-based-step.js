@@ -8,7 +8,7 @@ define([
     'viewmodels/card',
     'viewmodels/provisional-tile',
     'viewmodels/alert',
-], function(_, $, arches, ko, koMapping, GraphModel, CardViewModel, ProvisionalTileViewModel) {
+], function(_, $, arches, ko, koMapping, GraphModel, CardViewModel, ProvisionalTileViewModel, AlertViewModel) {
     function NonTileBasedComponent() {
         var self = this;
 
@@ -363,8 +363,8 @@ define([
 
             var savingSubscription = self.saving.subscribe(function(saving) {
                 if (!saving) {
+                    savingSubscription.dispose(); /* self-disposing subscription only runs once */
                     self.initialize();
-                    savingSubscription.dispose(); /* self-disposing subscription only runs once */ 
                 }
             });
 
@@ -373,7 +373,7 @@ define([
                     at this point in load `self.tiles()` contains a reference to the empty
                     tile we're using to map values to other tiles. This removes the empty
                     mapping tile from being tracked
-                */ 
+                */
                 if (tiles.length === 1 && !tiles[0].tileid) {
                     var savedTiles = [];
 
@@ -390,8 +390,8 @@ define([
                         });
                     }
 
-                    self.tiles(savedTiles);
                     multiTileInitSubscription.dispose();  /* self-disposing subscription only runs once */ 
+                    self.tiles(savedTiles);
                 }
             });
 
@@ -409,8 +409,8 @@ define([
                         persistedTiles.unshift(newTile);
                     });
 
-                    self.tiles(persistedTiles);
                     multiTilePersistedDataSubscription.dispose();  /* self-disposing subscription only runs once */ 
+                    self.tiles(persistedTiles);
                 }
             });
 
@@ -462,8 +462,13 @@ define([
             });
         };
 
+        this.tilesToRemove = ko.observableArray();
+
         this.removeTile = function(data) {
             var filteredTiles = self.tiles().filter(function(tile) { return tile !== data; });
+            if (data.tileid) {
+                self.tilesToRemove.push(data);
+            }
             self.tiles(filteredTiles);
         };
 
@@ -471,6 +476,7 @@ define([
             self.complete(false);
             self.saving(true);
             self.savedData.removeAll();
+            self.previouslyPersistedComponentData = [];
             
             var unorderedSavedData = ko.observableArray();
 
@@ -479,6 +485,28 @@ define([
                     function(){/* onFail */}, 
                     function(savedTileData) {
                         unorderedSavedData.push(savedTileData);
+                    }
+                );
+            });
+
+            self.tilesToRemove().forEach(function(tile) {
+                tile.deleteTile(
+                    function(response) {
+                        self.alert(new AlertViewModel(
+                            'ep-alert-red', 
+                            response.responseJSON.title,
+                            response.responseJSON.message,
+                            null, 
+                            function(){ return; }
+                        ));
+                    },
+                    function() {
+                        self.tilesToRemove.remove(tile);
+                        if ( self.tilesToRemove().length === 0 ) {
+                            self.complete(true);
+                            self.loading(true);
+                            self.saving(false);
+                        }
                     }
                 );
             });
@@ -565,6 +593,7 @@ define([
         } 
 
         this.complete = params.complete || ko.observable(false);
+        this.alert = params.alert || ko.observable();
 
         this.dataToPersist = ko.observable({});
         self.dataToPersist.subscribe(function(data) {
