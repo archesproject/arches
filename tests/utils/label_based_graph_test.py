@@ -56,6 +56,14 @@ class LabelBasedNodeTests(TestCase):
     def test_as_json_compact(self):
         self.assertEqual(self.test_node.as_json(compact=True), {self.test_node.name: self.test_node.value})
 
+    def test_as_json_compact_data_collecting_node_with_child(self):
+        self.test_node.child_nodes.append(self.child_node_1)
+
+        self.assertEqual(
+            self.test_node.as_json(compact=True),
+            {self.test_node.name: {self.child_node_1.name: self.child_node_1.value, VALUE_KEY: self.test_node.value}},
+        )
+
     def test_as_json_single_child_node(self):
         self.test_node.child_nodes.append(self.child_node_1)
 
