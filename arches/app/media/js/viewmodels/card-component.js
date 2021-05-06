@@ -1,9 +1,10 @@
 define([
+    'arches',
     'knockout',
     'underscore',
     'viewmodels/alert',
     'bindings/scrollTo'
-], function(ko, _, AlertViewModel) {
+], function(arches, ko, _, AlertViewModel) {
     return function(params) {
         var self = this;
 
@@ -11,6 +12,7 @@ define([
             params.card = params.form.card();
         }
 
+        this.lang = arches.lang;
         this.inResourceEditor = location.pathname.includes(params.pageVm.urls.resource_editor);
         this.configKeys = params.configKeys || [];
         this.showIds = params.showIds || false;

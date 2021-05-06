@@ -26,6 +26,7 @@ define([
     var GraphDesignerView = BaseManagerView.extend({
         initialize: function(options) {
             var viewModel = options.viewModel;
+            viewModel.lang = arches.lang;
             viewModel.graphid = ko.observable(data.graphid);
             viewModel.activeTab = ko.observable('graph');
             viewModel.viewState = ko.observable('design');

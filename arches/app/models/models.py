@@ -15,6 +15,7 @@ import uuid
 import datetime
 import logging
 from datetime import timedelta
+from arches.app.utils.language import default_lang_node_json
 from arches.app.utils.module_importer import get_class_from_modulename
 from django.forms.models import model_to_dict
 from django.contrib.gis.db import models
@@ -41,7 +42,7 @@ from django.conf import settings
 
 class CardModel(models.Model):
     cardid = models.UUIDField(primary_key=True, default=uuid.uuid1)  # This field type is a guess.
-    name = models.TextField(blank=True, null=True)
+    name = JSONField(blank=True, null=True, default=default_lang_node_json)
     description = models.TextField(blank=True, null=True)
     instructions = models.TextField(blank=True, null=True)
     cssclass = models.TextField(blank=True, null=True)

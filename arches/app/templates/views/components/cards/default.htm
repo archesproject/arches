@@ -17,7 +17,7 @@
         <!-- ko if: card.isFuncNode() -->
         <i class="fa fa-code" role="presentation" data-bind="css:{'filtered': card.highlight(), 'has-provisional-edits fa-file': card.doesChildHaveProvisionalEdits()}"></i>
         <!-- /ko -->
-        <span style="padding-right: 5px;" data-bind="text: card.model.name"></span>
+        <span style="padding-right: 5px;" data-bind="text: card.model.name[lang]"></span>
         <!-- ko if: card.canAdd() -->
         <i class="fa fa-plus-circle add-new-tile" role="presentation" data-bind="css:{'jstree-clicked': card.selected}, click: function(){card.showForm(true);}, clickBubble: false" data-toggle="tooltip" data-original-title="{% trans 'Add Gnu' %}"></i>
         <!-- /ko -->
@@ -38,7 +38,7 @@
                     <strong style="margin-right: 10px;">
                         {% block editor_tree_node_content %}
                         <!-- ko if: card.widgets().length > 0 && card.widgets()[0].visible -->
-                        <span data-bind="text: card.widgets()[0].label || card.model.name"></span>:
+                        <span data-bind="text: card.widgets()[0].label || card.model.name[lang]"></span>:
                         <div style="display: inline;" data-bind="component: {
                             name: self.form.widgetLookup[card.widgets()[0].widget_id()].name,
                             params: {
@@ -54,7 +54,7 @@
                         }"></div>
                         <!-- /ko -->
                         <!-- ko if: card.widgets().length === 0 || !card.widgets()[0].visible -->
-                        <span data-bind="text: card.model.name"></span>
+                        <span data-bind="text: card.model.name[lang]"></span>
                         <!-- /ko -->
                         {% endblock editor_tree_node_content %}
                     </strong>
@@ -90,7 +90,7 @@
     <i class="jstree-icon jstree-ocl" role="presentation" data-bind="click: function(){card.expanded(!card.expanded())}"></i>
     <a class="jstree-anchor" href="#" tabindex="-1" data-bind="css:{'filtered': card.highlight(), 'jstree-clicked': card.selected, 'child-selected': card.isChildSelected(), 'func-node': card.isFuncNode()}, click: function () { card.selected(true) },">
         <i class="fa fa-file-o" role="presentation"></i>
-        <span data-bind="text: card.model.name"></span>
+        <span data-bind="text: card.model.name[lang]"></span>
         <!-- ko if: card.showIds -->
         <span style="font-weight:bold" data-bind="text: ': ' + card.model.nodegroup_id()"></span>
         <!-- /ko -->
@@ -156,7 +156,7 @@
     <i class="jstree-icon jstree-ocl" role="presentation" data-bind="click: function(){card.expanded(!card.expanded())}"></i>
     <a class="jstree-anchor permissions-card" href="#" tabindex="-1" data-bind="css:{'jstree-clicked': card.selected, 'child-selected': card.isChildSelected(), 'filtered': card.highlight()}, click: function () { card.selectChildCards() },">
         <i class="fa fa-file-o" role="presentation"></i>
-        <span style="padding-right: 5px;" data-bind="text: card.model.name">
+        <span style="padding-right: 5px;" data-bind="text: card.model.name[lang]">
         </span>
         <span class="node-permissions">
             <!-- ko if: card.perms -->
@@ -272,7 +272,7 @@
 
         <div class="card">
             {% block form_header %}
-            <h4 class="card-title" data-bind="text: card.model.name()"></h4>
+            <h4 class="card-title" data-bind="text: card.model.name[lang]"></h4>
 
             <!-- ko if: card.model.helpenabled -->
             <span>
@@ -327,7 +327,7 @@
                         }
                     }">
                         <h4 class="card-summary-name" style='color: #2f527a'>
-                            <span data-bind="text: card.model.name"></span>
+                            <span data-bind="text: card.model.name[lang]"></span>
                             <i class="fa fa-plus-circle card-summary-add" data-bind="click: function(){$parent.createParentAndChild($parent.tile, card)}"></i>
                         </h4>
                     </a>
@@ -338,7 +338,7 @@
                         <li class="tile-summary">
                             <a href="#" data-bind="click: function () { tile.selected(true) }">
                                 <!-- ko if: card.widgets().length > 0 -->
-                                <span data-bind="text: card.widgets()[0].label || card.model.name" class="tile-summary-label"></span>:
+                                <span data-bind="text: card.widgets()[0].label || card.model.name[lang]" class="tile-summary-label"></span>:
                                 <div style="display: inline;" data-bind="component: {
                                     name: self.form.widgetLookup[card.widgets()[0].widget_id()].name,
                                     params: {
@@ -353,7 +353,7 @@
                                 }"></div>
                                 <!-- /ko -->
                                 <!-- ko if: card.widgets().length === 0 -->
-                                <span data-bind="text: card.model.name"></span>
+                                <span data-bind="text: card.model.name[lang]"></span>
                                 <!-- /ko -->
                             </a>
                         </li>

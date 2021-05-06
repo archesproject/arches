@@ -57,7 +57,7 @@ define([
             this.set('cardid', this.cardid);
             this.set('nodegroup_id', this.nodegroup_id);
             this.set('cardinality', this.cardinality);
-            this.set('name', this.name);
+            this.set('name', koMapping.fromJS(this.name));
             this.set('instructions', this.instructions);
             this.set('cssclass', this.cssclass);
             this.set('helptext', this.helptext);
@@ -238,7 +238,6 @@ define([
                         });
                     }
                     break;
-                case 'name':
                 case 'nodegroup_id':
                 case 'instructions':
                 case 'cssclass':
@@ -252,6 +251,10 @@ define([
                 case 'sortorder':
                 case 'component_id':
                     this.get(key)(value);
+                    break;
+                case 'name':
+                    this.set(key, koMapping.fromJS(value));
+                    this.name = this.get(key);
                     break;
                 case 'ontology_properties':
                 case 'tiles':
@@ -362,6 +365,8 @@ define([
                         } else {
                             ret[key] = this.attributes[key]();
                         }
+                    } else if (key === 'name') {
+                        ret[key] = koMapping.toJS(this.attributes[key]);
                     } else {
                         ret[key] = this.attributes[key];
                     }
