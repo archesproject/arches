@@ -161,6 +161,7 @@ class JSONSerializer(object):
         """
         # avoid a circular import
         from django.db.models.fields.related import ManyToManyField, ForeignKey
+        from translated_fields import TranslatedField
 
         opts = instance._meta
         data = {}
@@ -173,6 +174,8 @@ class JSONSerializer(object):
                 continue
             data[property_name] = self.handle_object(getattr(instance, property_name))
         for f in chain(opts.concrete_fields, opts.private_fields, opts.many_to_many):
+            if isinstance(f, TranslatedField):
+                print('in TranslatedField')
             if not getattr(f, "editable", False):
                 continue
             if fields and f.name not in fields:

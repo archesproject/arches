@@ -39,6 +39,8 @@ admin.site.register(
         models.SearchComponent,
         models.IIIFManifest,
         models.GroupMapSettings,
+        models.CardModel,
+        models.CardXNodeXWidget
     ]
 )
 

@@ -120,8 +120,12 @@ class Card(models.CardModel):
 
         if args:
             if isinstance(args[0], dict):
+                # import ipdb; ipdb.set_trace()
+                if "cardid" in args[0]:
+                    c = Card.objects.get(pk=args[0]["cardid"])
+                    self.__dict__.update(c.__dict__)
                 for key, value in args[0].items():
-                    if key not in ("cards", "widgets", "nodes", "is_editable", "nodegroup", "constraints"):
+                    if key not in ("cards", "widgets", "nodes", "is_editable", "nodegroup", "constraints", "graph_id"):
                         setattr(self, key, value)
 
                 if "cards" in args[0]:
@@ -132,6 +136,8 @@ class Card(models.CardModel):
                     self.update_constraints(args[0]["constraints"])
 
                 if "widgets" in args[0]:
+                    # import ipdb; ipdb.set_trace()
+
                     for widget in args[0]["widgets"]:
                         cardxnodexwidgetid = widget.get("id", None)
                         node_id = widget.get("node_id", None)
@@ -139,12 +145,13 @@ class Card(models.CardModel):
                         widget_id = widget.get("widget_id", None)
                         if cardxnodexwidgetid is None and (node_id is not None and card_id is not None and widget_id is not None):
                             try:
-                                wm = models.CardXNodeXWidget.objects.get(node_id=node_id, card_id=card_id)
-                                cardxnodexwidgetid = wm.pk
+                                widget_model = models.CardXNodeXWidget.objects.get(node_id=node_id, card_id=card_id)
+                                cardxnodexwidgetid = widget_model.pk
                             except:
                                 pass
-                        widget_model = models.CardXNodeXWidget()
-                        widget_model.pk = cardxnodexwidgetid
+                        else:
+                            widget_model = models.CardXNodeXWidget.objects.get(pk=cardxnodexwidgetid)
+                        # widget_model.pk = cardxnodexwidgetid
                         widget_model.node_id = node_id
                         widget_model.card_id = card_id
                         widget_model.widget_id = widget_id
@@ -164,6 +171,7 @@ class Card(models.CardModel):
                             node_model.config = node.get("config", None)
                             node_model.isrequired = node.get("isrequired", node_model.isrequired)
                             self.nodes.append(node_model)
+                print("helpn")
 
             else:
                 self.widgets = list(self.cardxnodexwidget_set.all())

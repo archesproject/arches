@@ -38,10 +38,26 @@ from guardian.shortcuts import assign_perm
 # so make sure the only settings we use in this file are ones that are static (fixed at run time)
 from django.conf import settings
 
+from translated_fields import TranslatedField, to_attribute
+
+def fallback_to_default(name, field):
+    def getter(self):
+        return getattr(
+            self,
+            to_attribute(name),
+        ) or getattr(
+            self,
+            # First language acts as fallback:
+            to_attribute(name, settings.LANGUAGE_CODE),
+        )
+    return getter
 
 class CardModel(models.Model):
     cardid = models.UUIDField(primary_key=True, default=uuid.uuid1)  # This field type is a guess.
-    name = models.TextField(blank=True, null=True)
+    name = TranslatedField(
+        models.TextField(blank=True, null=True),
+        attrgetter=fallback_to_default
+    )
     description = models.TextField(blank=True, null=True)
     instructions = models.TextField(blank=True, null=True)
     cssclass = models.TextField(blank=True, null=True)
@@ -67,6 +83,26 @@ class CardModel(models.Model):
     class Meta:
         managed = True
         db_table = "cards"
+
+    def serialize(self, fields=None, exclude=None):
+        ret = {
+            "cardid": self.cardid,
+            "name": self.name,
+            "description": self.description,
+            "instructions": self.instructions,
+            "cssclass": self.cssclass,
+            "helpenabled": self.helpenabled,
+            "helptitle": self.helptitle,
+            "helptext": self.helptext,
+            "nodegroup_id": self.nodegroup_id,
+            "graph_id": self.graph_id,
+            "active": self.active,
+            "visible": self.visible,
+            "sortorder": self.sortorder,
+            "component_id": self.component_id,
+            "config": self.config
+        }
+        return ret
 
 
 class ConstraintModel(models.Model):
@@ -113,10 +149,31 @@ class CardXNodeXWidget(models.Model):
     node = models.ForeignKey("Node", db_column="nodeid", on_delete=models.CASCADE)
     card = models.ForeignKey("CardModel", db_column="cardid", on_delete=models.CASCADE)
     widget = models.ForeignKey("Widget", db_column="widgetid", on_delete=models.CASCADE)
-    config = JSONField(blank=True, null=True, db_column="config")
-    label = models.TextField(blank=True, null=True)
+    # config = JSONField(blank=True, null=True, db_column="config")
+    config = TranslatedField(
+        JSONField(blank=True, null=True),
+        attrgetter=fallback_to_default
+    )
+    # label = models.TextField(blank=True, null=True)
+    label = TranslatedField(
+        models.TextField(blank=True, null=True),
+        attrgetter=fallback_to_default
+    )
     visible = models.BooleanField(default=True)
     sortorder = models.IntegerField(blank=True, null=True, default=None)
+
+    def serialize(self, fields=None, exclude=None):
+        ret = {
+            "id": self.id,
+            "node_id": self.node_id,
+            "card_id": self.card_id,
+            "widget_id": self.widget_id,
+            "config": self.config,
+            "label": self.label,
+            "visible": self.visible,
+            "sortorder": self.sortorder
+        }
+        return ret
 
     class Meta:
         managed = True
