@@ -18,7 +18,7 @@ class Migration(migrations.Migration):
 
     reverse_sql = """
         UPDATE public.cards
-	        SET name=name->>'%s';
+	        SET name=name::jsonb->>'%s'::text;
     """ % settings.LANGUAGE_CODE
 
     operations = [
