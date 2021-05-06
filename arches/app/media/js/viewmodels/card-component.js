@@ -7,6 +7,10 @@ define([
     return function(params) {
         var self = this;
 
+        if (!params.card && params.form.card) {
+            params.card = params.form.card();
+        }
+
         this.inResourceEditor = location.pathname.includes(params.pageVm.urls.resource_editor);
         this.configKeys = params.configKeys || [];
         this.showIds = params.showIds || false;
@@ -48,6 +52,33 @@ define([
                 }
                 return tiles;
             }, self);
+            if (ko.isObservable(params.tiles)) {
+                params.tiles(self.tiles());
+
+                self.tiles.subscribe(function(tiles) {
+                    params.tiles(tiles);
+                });
+            }
+
+            self.dirty = ko.computed(function() {
+                if (!ko.unwrap(self.tiles)) {
+                    return true;
+                } 
+                else {
+                    return ko.unwrap(self.tiles).reduce(function(acc, tile) {
+                        if (tile.dirty()) {
+                            acc = true;
+                        }
+                        return acc;
+                    }, false);
+                }
+            });
+            if (ko.isObservable(params.dirty)) {
+                self.dirty.subscribe(function(dirty) {
+                    params.dirty(dirty);
+                });
+            }
+
 
             if (self.preview) {
                 if (!self.card.newTile) {
@@ -133,6 +164,13 @@ define([
                 if (typeof callback === 'function') callback();
             });
         };
+
+        if (params.saveFunction) {
+            params.saveFunction(self.saveTile);
+        }
+        else if (params.form && params.form.saveFunction) {
+            params.form.saveFunction(self.saveTile);
+        }
 
         this.saveTileAddNew = function() {
             self.saveTile(function() {

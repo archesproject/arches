@@ -22,6 +22,7 @@ define([
         if (this.widgets === undefined) { // could be [], so checking specifically for undefined
             this.widgets = params.widgets || [];
         }
+
         this.geojsonWidgets = this.widgets.filter(function(widget){ return widget.datatype.datatype === 'geojson-feature-collection'; });
         this.newNodeId = null;
         this.featureLookup = {};
@@ -31,6 +32,12 @@ define([
         this.selectSource = this.selectSource || ko.observable();
         this.selectSourceLayer = this.selectSourceLayer || ko.observable();
         this.drawAvailable = ko.observable(false);
+        this.bufferNodeId = ko.observable();
+        this.bufferDistance = ko.observable(0);
+        this.bufferUnits = ko.observable('m');
+        this.bufferResult = ko.observable();
+        this.bufferAddNew = ko.observable(false);
+        this.allowAddNew = this.card && this.card.canAdd() && this.tile !== this.card.newTile;
 
         var selectSource = this.selectSource();
         var selectSourceLayer = this.selectSourceLayer();
@@ -48,6 +55,7 @@ define([
                 });
             }
         };
+
 
         var sources = [];
         for (var sourceName in arches.mapSources) {
@@ -174,6 +182,7 @@ define([
             });
             params.fitBoundsOptions = { padding: {top: padding, left: padding + 200, bottom: padding, right: padding + 200} };
         }
+
         params.activeTab = 'editor';
         params.sources = Object.assign({
             "geojson-editor-data": {
@@ -344,10 +353,14 @@ define([
             var geoJSONString = self.geoJSONString();
             var geoJSONErrors = self.geoJSONErrors();
             if (geoJSONErrors.length === 0) return JSON.parse(geoJSONString);
-            else return {
+            var fc = {
                 type: 'FeatureCollection',
                 features: []
             };
+            if (self.bufferNodeId() && self.bufferResult()) {
+                fc.features.push(self.bufferResult());
+            }
+            return fc;
         }).extend({ rateLimit: 100 });
         geoJSONLayerData.subscribe(function(data) {
             var map = self.map();
@@ -402,6 +415,7 @@ define([
                     var editingFeature = self.draw.getSelected().features[0];
                     if (editingFeature) updateCoordinatesFromFeature(editingFeature);
                 }
+                if (self.bufferNodeId()) self.updateBufferFeature();
             });
             map.on('draw.delete', self.updateTiles);
             map.on('draw.modechange', function(e) {
@@ -438,7 +452,6 @@ define([
             }
         };
 
-
         if (this.provisionalTileViewModel) {
             this.provisionalTileViewModel.resetAuthoritative();
             this.provisionalTileViewModel.selectedProvisionalEdit.subscribe(function(val){
@@ -463,6 +476,15 @@ define([
         }
 
         this.map.subscribe(setupDraw);
+
+        self.map.subscribe(function(map) {
+            if (self.draw && !params.draw) {
+                params.draw = self.draw;
+            }
+            if (map && !params.map) {
+                params.map = map;
+            }
+        });
 
         if (!params.additionalDrawOptions) {
             params.additionalDrawOptions = [];
@@ -888,6 +910,99 @@ define([
                 updateCoordinatesFromFeature(feature);
             }
         });
+
+        self.bufferFeature = ko.computed(function() {
+            return self.selectedFeatureIds()[0];
+        });
+        var getBufferFeature = function() {
+            var featureId = self.bufferFeature();
+            if (featureId) {
+                return self.draw.get(featureId);
+            }
+        };
+        self.bufferParams = ko.computed(function() {
+            var bufferFeature = getBufferFeature();
+            if (bufferFeature && self.bufferNodeId()) return {
+                "geometry": bufferFeature.geometry,
+                "buffer": {
+                    "width": parseFloat(self.bufferDistance()),
+                    "unit": self.bufferUnits()
+                }
+            };
+        });
+
+        self.bufferFeature.subscribe(function(bufferFeature) {
+            if (!bufferFeature) self.bufferNodeId(false);
+        });
+        self.updateBufferFeature = function() {
+            var bufferParams = self.bufferParams();
+            var bufferFeature = getBufferFeature();
+            if (bufferParams && bufferFeature) {
+                bufferParams.geometry = bufferFeature.geometry;
+                window.fetch(
+                    arches.urls.buffer +
+                    '?filter=' +
+                    JSON.stringify(bufferParams)
+                ).then(function(response) {
+                    if (response.ok) {
+                        return response.json();
+                    }
+                }).then(function(json) {
+                    var bufferFeature = getBufferFeature();
+                    self.bufferResult({
+                        type: 'Feature',
+                        id: uuid.generate(),
+                        geometry: json,
+                        properties: {
+                            nodeId: bufferFeature.properties.nodeId
+                        }
+                    });
+                });
+            } else self.bufferResult(undefined);
+
+        };
+        self.bufferParams.subscribe(self.updateBufferFeature);
+
+
+        if (self.card) {
+            self.card.map = self.map;
+        }
+
+        self.addBufferResult = function() {
+            var bufferResult = self.bufferResult();
+            if (self.bufferAddNew()) {
+                var dirty = ko.unwrap(self.tile.dirty);
+                var nodeId = self.bufferNodeId();
+                var addBufferResultAsNew = function() {
+                    var updateNewTile = self.card.selected.subscribe(function() {
+                        var fc = {
+                            "type": "FeatureCollection",
+                            "features": [bufferResult]
+                        };
+                        self.card.getNewTile().data[nodeId](fc);
+                        self.card.map.subscribe(function(map) {
+                            map.fitBounds(
+                                geojsonExtent(fc),
+                                {
+                                    duration: 0,
+                                    padding: padding
+                                }
+                            );
+                        });
+                        updateNewTile.dispose();
+                    });
+                    self.card.selected(true);
+                };
+                if (dirty) self.saveTile(addBufferResultAsNew);
+                else addBufferResultAsNew();
+            } else {
+                self.draw.add(bufferResult);
+                self.bufferNodeId(false);
+                self.updateTiles();
+                self.editFeature(bufferResult);
+                self.fitFeatures([bufferResult]);
+            }
+        };
     };
     return viewModel;
 });

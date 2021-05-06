@@ -967,7 +967,9 @@ class Command(BaseCommand):
                 for graph in models.GraphModel.objects.filter(isresource=True).exclude(pk=settings.SYSTEM_SETTINGS_RESOURCE_MODEL_ID)
             ]
         if graphid is False and file_format != "json":
-            utils.print_message("Exporting data for all graphs is currently only supported for the json format")
+            utils.print_message(
+                "Exporting data for all graphs is currently only supported for the json format. Please specify a graphid with the -g flag."
+            )
             sys.exit()
         if graphid:
             graphids.append(graphid)
@@ -987,8 +989,11 @@ class Command(BaseCommand):
                             ),
                             "w",
                         ) as f:
-                            file["outputfile"].seek(0)
-                            shutil.copyfileobj(file["outputfile"], f, 16 * 1024)
+                            if file_format == "tilexl":
+                                file["outputfile"].save(os.path.join(data_dest, file["name"]))
+                            else:
+                                file["outputfile"].seek(0)
+                                shutil.copyfileobj(file["outputfile"], f, 16 * 1024)
                 except KeyError:
                     utils.print_message("{0} is not a valid export file format.".format(file_format))
                     sys.exit()

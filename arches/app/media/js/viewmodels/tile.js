@@ -257,6 +257,8 @@ define([
         if (!self.noDefaults && self.parent instanceof CardViewModel) {
             var widgets = ko.unwrap(self.parent.widgets) || [];
 
+            var hasDefaultValue = false;
+
             widgets.forEach(function(widget) {
                 Object.keys(self.data).forEach(function(nodeId) {
                     if (nodeId === widget.node_id()) {
@@ -264,12 +266,15 @@ define([
 
                         if (defaultValue) {
                             self.data[nodeId](defaultValue);
+                            hasDefaultValue = true;
                         }
                     }
                 });
             });
 
-            self._tileData(koMapping.toJSON(self.data));
+            if (hasDefaultValue) {
+                self._tileData(koMapping.toJSON(self.data));
+            }
         }
 
         this.selected.subscribe(function(selected) {

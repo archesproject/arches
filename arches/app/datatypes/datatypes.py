@@ -7,6 +7,7 @@ import logging
 import os
 from pathlib import Path
 import ast
+import time
 from distutils import util
 from datetime import datetime
 from mimetypes import MimeTypes
@@ -79,8 +80,9 @@ class DataTypeFactory(object):
             self.datatype_instances = DataTypeFactory._datatype_instances
         return datatype_instance
 
+
 class StringDataType(BaseDataType):
-    def validate(self, value, row_number=None, source=None, node=None, nodeid=None):
+    def validate(self, value, row_number=None, source=None, node=None, nodeid=None, strict=False):
         errors = []
         try:
             if value is not None:
@@ -148,7 +150,7 @@ class StringDataType(BaseDataType):
 
 
 class NumberDataType(BaseDataType):
-    def validate(self, value, row_number=None, source="", node=None, nodeid=None):
+    def validate(self, value, row_number=None, source="", node=None, nodeid=None, strict=False):
         errors = []
 
         try:
@@ -236,7 +238,7 @@ class NumberDataType(BaseDataType):
 
 
 class BooleanDataType(BaseDataType):
-    def validate(self, value, row_number=None, source="", node=None, nodeid=None):
+    def validate(self, value, row_number=None, source="", node=None, nodeid=None, strict=False):
         errors = []
         try:
             if value is not None:
@@ -289,7 +291,7 @@ class BooleanDataType(BaseDataType):
 
 
 class DateDataType(BaseDataType):
-    def validate(self, value, row_number=None, source="", node=None, nodeid=None):
+    def validate(self, value, row_number=None, source="", node=None, nodeid=None, strict=False):
         errors = []
         if value is not None:
             valid_date_format, valid = self.get_valid_date_format(value)
@@ -320,11 +322,35 @@ class DateDataType(BaseDataType):
             value = value[0]
         valid_date_format, valid = self.get_valid_date_format(value)
         if valid:
-            value = datetime.strptime(value, valid_date_format).astimezone().isoformat(timespec="milliseconds")
+            v = datetime.strptime(value, valid_date_format)
         else:
             v = datetime.strptime(value, settings.DATE_IMPORT_EXPORT_FORMAT)
-            value = v.astimezone().isoformat(timespec="milliseconds")
+        # The .astimezone() function throws an error on Windows for dates before 1970
+        try:
+            v = v.astimezone()
+        except:
+            v = self.backup_astimezone(v)
+        value = v.isoformat(timespec="milliseconds")
         return value
+
+    def backup_astimezone(self, dt):
+        def same_calendar(year):
+            new_year = 1971
+            while not is_same_calendar(year, new_year):
+                new_year += 1
+                if new_year > 2020:  # should never happen but don't want a infinite loop
+                    raise Exception("Backup timezone conversion failed: no matching year found")
+            return new_year
+
+        def is_same_calendar(year1, year2):
+            year1_weekday_1 = datetime.strptime(str(year1) + "-01-01", "%Y-%m-%d").weekday()
+            year1_weekday_2 = datetime.strptime(str(year1) + "-03-01", "%Y-%m-%d").weekday()
+            year2_weekday_1 = datetime.strptime(str(year2) + "-01-01", "%Y-%m-%d").weekday()
+            year2_weekday_2 = datetime.strptime(str(year2) + "-03-01", "%Y-%m-%d").weekday()
+            return (year1_weekday_1 == year2_weekday_1) and (year1_weekday_2 == year2_weekday_2)
+
+        converted_dt = dt.replace(year=same_calendar(dt.year)).astimezone().replace(year=dt.year)
+        return converted_dt
 
     def transform_export_values(self, value, *args, **kwargs):
         valid_date_format, valid = self.get_valid_date_format(value)
@@ -402,7 +428,7 @@ class DateDataType(BaseDataType):
 
 
 class EDTFDataType(BaseDataType):
-    def validate(self, value, row_number=None, source="", node=None, nodeid=None):
+    def validate(self, value, row_number=None, source="", node=None, nodeid=None, strict=False):
         errors = []
         if value is not None:
             if not ExtendedDateFormat(value).is_valid():
@@ -498,7 +524,7 @@ class EDTFDataType(BaseDataType):
 
 
 class GeojsonFeatureCollectionDataType(BaseDataType):
-    def validate(self, value, row_number=None, source=None, node=None, nodeid=None):
+    def validate(self, value, row_number=None, source=None, node=None, nodeid=None, strict=False):
         errors = []
         coord_limit = 1500
         coordinate_count = 0
@@ -1098,7 +1124,7 @@ class FileListDataType(BaseDataType):
         super(FileListDataType, self).__init__(model=model)
         self.node_lookup = {}
 
-    def validate(self, value, row_number=None, source=None, node=None, nodeid=None):
+    def validate(self, value, row_number=None, source=None, node=None, nodeid=None, strict=False):
         if node:
             self.node_lookup[str(node.pk)] = node
         elif nodeid:
@@ -1166,12 +1192,11 @@ class FileListDataType(BaseDataType):
     def get_display_value(self, tile, node):
         data = self.get_tile_data(tile)
         files = data[str(node.pk)]
-        file_list_str = ""
+        file_urls = ""
         if files is not None:
-            for f in files:
-                file_list_str = file_list_str + f["name"] + " | "
+            file_urls = " | ".join([file["url"] for file in files])
 
-        return file_list_str
+        return file_urls
 
     def handle_request(self, current_tile, request, node):
         # this does not get called when saving data from the mobile app
@@ -1288,7 +1313,12 @@ class FileListDataType(BaseDataType):
                         if file["url"] == "/files/{}".format(file["file_id"]):
                             val = uuid.UUID(file["file_id"])  # to test if file_id is uuid
                             file_path = "uploadedfiles/" + file["name"]
-                            file_model, created = models.File.objects.get_or_create(pk=file["file_id"], path=file_path)
+                            try:
+                                file_model = models.File.objects.get(pk=file["file_id"])
+                            except ObjectDoesNotExist:
+                                # Do not use get_or_create here because django can create a different file name applied to the file_path
+                                # for the same file_id causing a 'create' when a 'get' was intended
+                                file_model = models.File.objects.create(pk=file["file_id"], path=file_path)
                             if not file_model.tile_id:
                                 file_model.tile = tile
                                 file_model.save()
@@ -1464,7 +1494,7 @@ class BaseDomainDataType(BaseDataType):
 
 
 class DomainDataType(BaseDomainDataType):
-    def validate(self, value, row_number=None, source="", node=None, nodeid=None):
+    def validate(self, value, row_number=None, source="", node=None, nodeid=None, strict=False):
         errors = []
         key = "id"
         if value is not None:
@@ -1570,7 +1600,7 @@ class DomainListDataType(BaseDomainDataType):
                 value = value.split(",")
         return value
 
-    def validate(self, values, row_number=None, source="", node=None, nodeid=None):
+    def validate(self, values, row_number=None, source="", node=None, nodeid=None, strict=False):
         domainDataType = DomainDataType()
         errors = []
         if values is not None:
@@ -1723,7 +1753,7 @@ class ResourceInstanceDataType(BaseDataType):
                     )
         return ret
 
-    def validate(self, value, row_number=None, source="", node=None, nodeid=None):
+    def validate(self, value, row_number=None, source="", node=None, nodeid=None, strict=False):
         errors = []
         if value is not None:
             resourceXresourceIds = self.get_id_list(value)
@@ -1732,12 +1762,11 @@ class ResourceInstanceDataType(BaseDataType):
                 try:
                     models.ResourceInstance.objects.get(pk=resourceid)
                 except ObjectDoesNotExist:
-                    message = _(
-                        "Resource id: {0} is not in the system. This relationship will be added once resource {0} is loaded.".format(
-                            resourceid
-                        )
-                    )
-                    errors.append({"type": "WARNING", "message": message})
+                    message = _("The related resource with id '{0}' is not in the system.".format(resourceid))
+                    error_type = "WARNING"
+                    if strict:
+                        error_type = "ERROR"
+                    errors.append({"type": error_type, "message": message})
         return errors
 
     def pre_tile_save(self, tile, nodeid):
@@ -1935,7 +1964,7 @@ class ResourceInstanceListDataType(ResourceInstanceDataType):
 
 
 class NodeValueDataType(BaseDataType):
-    def validate(self, value, row_number=None, source="", node=None, nodeid=None):
+    def validate(self, value, row_number=None, source="", node=None, nodeid=None, strict=False):
         errors = []
         if value:
             try:
@@ -1963,7 +1992,7 @@ class NodeValueDataType(BaseDataType):
 
 
 class AnnotationDataType(BaseDataType):
-    def validate(self, value, source=None, node=None):
+    def validate(self, value, source=None, node=None, strict=False):
         errors = []
         return errors
 

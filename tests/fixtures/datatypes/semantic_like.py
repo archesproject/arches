@@ -21,7 +21,7 @@ details = {
 
 class SemanticLikeDataType(BaseDataType):
 
-    def validate(self, value, row_number=None, source=None, node=None):
+    def validate(self, value, row_number=None, source=None, node=None, strict=False):
         return []
 
     def is_a_literal_in_rdf(self):

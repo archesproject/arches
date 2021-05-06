@@ -9,14 +9,14 @@
     'active': activeTab() === 'manifest',
     'disabled': mainMenu()
 }">
-    <i class="fa fa-book"></i>
-    <span class="map-sidebar-text">{% trans "Manifest" %}</span>
+    <i class="fa fa-tags"></i>
+    <span class="map-sidebar-text">{% trans "Service" %}</span>
 </div>
 <div class="workbench-card-sidebar-tab" data-bind="click: function() {
     toggleTab('canvas');
 }, css: {'active': activeTab() === 'canvas', 'disabled': !canvas()
 }">
-    <i class="fa fa-book"></i>
+    <i class="fa fa-cloud-upload"></i>
     <span class="map-sidebar-text">{% trans "Canvas" %}</span>
 </div>
 {{ block.super }}
@@ -27,7 +27,7 @@
 <!--ko if: activeTab() === 'manifest'-->
 <div class="workbench-header-buffer">
     <div class="workbench-card-sidepanel-header-container">
-        <h4 class="workbench-card-sidepanel-header" data-bind="click: hideSidePanel">{% trans 'Manage Manifest' %}</h4>
+        <h4 class="workbench-card-sidepanel-header" data-bind="click: hideSidePanel">{% trans 'Manage Image Service' %}</h4>
     </div>
 </div>
 
@@ -58,12 +58,12 @@
         <div class="manifest-metadata" style="display: flex;">
             <div style="display: flex; flex-direction: column; width: 100%;">
             <div style="padding: 3px">
-                <input type="text" placeholder='Metadata Label' class="form-control input-md" style="height: 36px;" 
+                <input type="text" placeholder='Metadata Label' class="form-control input-md iiif-input" style="height: 36px;" 
                 data-bind="textInput: metadataLabel, valueUpdate: 'keyup'">
             </div>
             <div style="padding: 3px">
-                 <input type="text" placeholder='Metadata Value' class="form-control input-md" style="height: 36px;" 
-                data-bind="textInput: metadataValues, valueUpdate: 'keyup'">
+                 <textarea placeholder='Metadata Value' class="form-control input-md iiif-input" style="height: 36px;" 
+                data-bind="textInput: metadataValues, valueUpdate: 'keyup'"></textarea>
             </div>
             </div>
             <div style="height: fit-content; padding-top: 15px; cursor: pointer;" data-bind="click: function(){updateMetadata()}">
@@ -79,15 +79,16 @@
                 beforeMove: self.beforeMove,
                 afterMove: function(){console.log('hi')}
             }">  
-            <div style="padding-bottom: 2px; display: flex;">
+            <div class="iiif-manifest-metadata-panel" style="">
+                <div class="manifest-metadata-panel-drag"><i class="fa fa-ellipsis-v"></i></div>
                 <div style="display: flex; flex-direction: column; width: 100%;">
                 <div style="padding: 3px;">
-                    <input type="text" placeholder='Metadata Label' class="form-control input-md" style="height: 36px;" 
+                    <input type="text" placeholder='Metadata Label' class="form-control input-md iiif-input" style="height: 36px;" 
                     data-bind="textInput: $data.label, valueUpdate: 'keyup'">
                 </div>
                 <div style="padding: 3px">
-                    <input type="text" placeholder='Metadata Value' class="form-control input-md" style="height: 36px;" 
-                    data-bind="textInput: $data.value, valueUpdate: 'keyup'">
+                    <textarea type="text" placeholder='Metadata Value' class="form-control input-md iiif-input" style="height: 36px;" 
+                    data-bind="textInput: $data.value, valueUpdate: 'keyup'"></textarea>
                 </div>
                 </div>
                 <div style="height: fit-content; padding-top: 15px; cursor: pointer;" data-bind="click: function(){self.removeMetadata($data)}">
@@ -114,14 +115,14 @@
 <!--ko if: activeTab() === 'canvas'-->
 <div class="workbench-header-buffer">
     <div class="workbench-card-sidepanel-header-container">
-        <h4 class="workbench-card-sidepanel-header" data-bind="click: hideSidePanel">{% trans 'Manage Canvases' %}</h4>
+        <h4 class="workbench-card-sidepanel-header" data-bind="click: hideSidePanel">{% trans 'Manage Image Canvases' %}</h4>
     </div>
 </div>
 
 <div class="iiif-image-tools" style="margin-top: 20px;">
     <!--ko if: canvases().length > 0-->
-    <label class="control-label">{% trans "Canvases" %}</label>
-    <div>{% trans "Select canvas to delete from the manifest" %}</div>
+    <label class="control-label">{% trans "Images" %}</label>
+    <div>{% trans "Select image to delete from the image service" %}</div>
     <div class="file-workbench-files" data-bind="foreach: canvases">
         <div class='file-workbench-file' style="display: inline-flex;" data-bind="css: {staged: ko.unwrap($parent.canvas) === $data.images[0].resource.service['@id']}">
             <input type="checkbox" style="width:15px; height:15px;" data-bind="value: $data, checked: $parent.canvasesForDeletion">
@@ -134,16 +135,27 @@
         </div>
     </div>
 
-    <div class="file-workbench-buttons">
-        <button style="width: 50%; margin: 10px 2px 20px 0px;" class="btn btn-md btn-primary" data-bind="click: addAllCanvases"
-        ><i class="fa fa-check-square"></i> {% trans 'Select All' %}</button>
-        <button style="width: 50%; margin: 10px 0px 20px 2px;" class="btn btn-md btn-primary" data-bind="click: clearCanvasSelection, css: {
-            disabled: canvasesForDeletion().length === 0
-        }"><i class="fa fa-eraser"></i> {% trans 'Clear All' %}</button>
+    <div class="iiif-canvas-links-panel">
+        <a class="" data-bind="click: addAllCanvases"> {% trans 'Select All' %}</a>
+        <a class="" data-bind="click: clearCanvasSelection, css: {disabled: canvasesForDeletion().length === 0}"> {% trans 'Clear All' %}</a>
+
+        <div class="file-workbench-selected-buttons" data-bind="visible: canvasesForDeletion().length > 0">
+            <button class="btn btn-lg btn-workbench btn-danger" data-bind="click: deleteCanvases"><i class="fa fa-trash"></i> {% trans 'Delete Selected' %}</button>
+        </div>
     </div>
-    <div class="file-workbench-selected-buttons" data-bind="visible: canvasesForDeletion().length > 0">
-        <button class="btn btn-lg btn-workbench btn-danger" data-bind="click: deleteCanvases"><i class="fa fa-trash"></i> {% trans 'Delete Selected' %}</button>
+    <!--/ko-->
+
+    <div class="dropzone-photo-upload" data-bind="dropzone: dropzoneOptions">
+        <div class="file-workbench-links">
+            <a class="fileinput-button dz-clickable" data-bind="css: uniqueidClass">
+                <span>{% trans "Drag or " %}</span><span class="text-bold">{% trans "click here " %}</span><span>{% trans "to upload photos" %}</span>
+            </a>
+        </div>
+        <div style="min-height: 100%;">
+            <div id="hidden-dz-previews" style="display:none"></div>
+        </div>
     </div>
+    
 
     <!--ko if: canvas-->
     <label class="control-label">{% trans "Selected Image Name" %}</label>
@@ -152,18 +164,9 @@
         data-bind="textInput: self.canvasLabel, valueUpdate: 'keyup'">
     </div>
     <!--/ko-->
-    <!--/ko-->
+    
         
-    <div class="dropzone-photo-upload" data-bind="dropzone: dropzoneOptions">
-        <div class="file-workbench-buttons">
-            <button class="btn btn-primary btn-lg btn-block btn-labeled btn-workbench fa fa-upload fileinput-button dz-clickable" data-bind="css: uniqueidClass">
-                <span>{% trans "Add Photos" %}</span>
-            </button>
-        </div>
-        <div style="min-height: 100%;">
-            <div id="hidden-dz-previews" style="display:none"></div>
-        </div>
-    </div>
+    
     <div class="install-buttons" style="display: inline-flex; justify-content: space-between;">
         <div class="file-workbench-buttons">
             <button class="btn btn-mint btn-md btn-labeled fa fa-pencil" data-bind="click: updateManifest, clickBubble: false, disable: !isCanvasDirty()">{% trans "Save" %}</button>
@@ -177,57 +180,42 @@
 {% endblock sidepanel %}
 
 {% block main_menu %}
-<div class="bord-top file-select loader-select" style="height: 100%;">
-    <div class="">
-        <h2>{% trans 'IIIF Manifest Manager' %}</h2>
-        <h4>{% trans 'Create a new manifest or modify an existing one' %}</h4>
-        <div style="display: flex; padding: 15px 25px; justify-content: center;">
-        <div style="width: 620px; display:flex; justify-content:space-between;">
-            <div class="r-grid-item relative" style="border: 1px solid #c4c4c4">
-                <div class="" style="display:flex; flex-direction: column; background-color: #fdfdfd">
-                    <h4 class="r-select-title">{% trans 'Select a Manifest' %}</h4>
-                </div>
-                <div>
-                    <div class="r-select-card" style="color: #30517a; background-color: #fdfdfd">
-                        <div class="r-select-circle loader-button" style="top: 55px">
-                            <span><i class="fa fa-pencil r-select-icon"></i></span>
-                        </div>
-                        <div class="r-desc-container">
-                            <p style="color: #30517a; background-color: #fdfdfd" class="r-select-desc">{% trans 'Choose an existing manifest to edit' %}</p> 
-                        </div>  
+<div>
+    <ul class="nav nav-tabs">
+            <li>
+                <div class='manifest-manager-nav-tab' data-bind="click: function(){createService(true); editService(false)}, css: { active: createService }">
+                    <div class='tab-label'>
+                        {% trans 'Create New Service' %}
                     </div>
                 </div>
-
-                <!-- card Tools -->
-                <div class="r-select-card-footer">
-                    <div class="">
-                        <div data-bind="click: function(){self.mainMenu(false);}" style="border-top: 1px solid #c4c4c4;" class="btn btn-primary btn-resource-select" role="button">
-                        {% trans 'Select' %}
-                        </div>
-                    </div>
+            </li>
+            <li>
+            <div class='manifest-manager-nav-tab' data-bind=
+                "click: function(){createService(false); editService(true)}, css: { active: editService }">
+                <div class='tab-label'>
+                    {% trans 'Edit a service' %}
                 </div>
             </div>
-            <div class="r-grid-item relative" style="border: 1px solid #c4c4c4" data-bind="dropzone: dropzoneOptions4create">
-                <div class="" style="display:flex; flex-direction: column; background-color: #fdfdfd">
-                    <h4 class="r-select-title">{% trans 'Create a New Manifest' %}</h4>
-                </div>
-                <div>
-                    <div class="r-select-card" style="color: #30517a; background-color: #fdfdfd">
-                        <div class="r-select-circle loader-button" style="top: 55px">
-                            <span><i class="fa fa-upload r-select-icon"></i></span>
-                        </div>
-                        <div class="r-desc-container">
-                            <p style="color: #30517a; background-color: #fdfdfd" class="r-select-desc">{% trans 'Drop files here or click below to create a new manifest' %}</p> 
-                        </div>  
-                    </div>
-                </div>
+        </li>
+    </ul>
+</div>
 
-                <!-- card Tools -->
-                <div class="r-select-card-footer" class="dropzone-photo-upload">
-                    <div class="">
-                        <div style="border-top: 1px solid #c4c4c4;" class="btn btn-primary btn-resource-select fileinput-create-button dz-clickable" data-bind="css: uniqueidClass" role="button">
-                        {% trans 'Create' %}
-                        </div>
+<div class="manifest-manager" style="height: 100%;">
+
+<!--ko if: createService -->
+<div data-bind="dropzone: dropzoneOptions4create" class="file-select loader-select" style="height: 100%;">
+    <div style="display:flex; flex-direction: column; align-items: center;">
+        <div class="manifest-manager-main-menu-circle loader-button">
+            <span><i style="color: #000" class="fa fa-cloud-upload r-select-icon"></i></span>
+        </div> 
+        <h2>{% trans 'Drag & Drop Your Images Here' %}</h2>
+        <h4>{% trans 'Import digital images and create a new image service' %}</h4>
+        <div style="display: flex; padding: 15px 25px; flex-direction: column; justify-content: center; align-items: center;">
+        <div style="display:flex; flex-direction: column;">
+            <div>
+                <div class="dropzone-photo-upload">
+                    <div style="border-top: 1px solid #c4c4c4; margin-bottom: 15px;" class="btn btn-rr btn-labeled btn-lg fa fa-image fileinput-create-button dz-clickable" data-bind="css: uniqueidClass" role="button">
+                    {% trans 'Select Images' %}
                     </div>
                     <div style="min-height: 100%;">
                         <div id="hidden-dz-create-previews" style="display:none"></div>
@@ -235,8 +223,34 @@
                 </div>
             </div>
         </div>
+        <h5 class="rr-splash-description">{% trans 'Create a new service by uploading one or more images. Images will be uploaded and processes so that you can view, annotate, and share them with others' %}</h5>
+        </div>
+</div>
+</div>
+<!-- /ko -->
+
+<!--ko if: editService -->
+<div class="file-select loader-select" style="height: 100%;">
+    <div style="display:flex; flex-direction: column; align-items: center;">
+        <div class="manifest-manager-main-menu-circle loader-button">
+            <span><i style="color: #000" class="fa fa-picture-o r-select-icon"></i></span>
+        </div> 
+        <h2>{% trans 'Edit an existing Image Service' %}</h2>
+        <div style="display: flex; padding: 15px 25px; flex-direction: column; justify-content: center; align-items: center;">
+        <div style="display:flex; flex-direction: column; width: 300px">
+            <div class="manifest-editor-input">
+                <input class="form-control input-lg widget-input"
+                    data-bind="value: manifest,
+                    select2Query: {
+                        select2Config: manifestSelectConfig
+                    }">
+            </div>
+        </div>
+        <h5 class="rr-splash-description">{% trans 'Update the information and images related to an existing Image Service. Or copy and paste in the URL of a IIIF Manifest to add a service from an external service' %}</h5>
     </div>
 </div>
+</div>
+<!--/ko-->
 </div>
 {% endblock main_menu %}
 
@@ -255,13 +269,13 @@
     </div>
     <div style="display: inline-flex; padding: 5px">
         <div class="iiif-gallery-sequence-label" style="padding:0 5px" data-bind="click: toggleManifestEditor">
-            {% trans "Switch Manifest" %}
+            {% trans "Switch Image Service" %}
         </div>
         |
         <div data-bind="dropzone: dropzoneOptions4create" >
             <div>
             <div class="iiif-gallery-sequence-label fileinput-create-button dz-clickable" style="padding:0 5px" data-bind="css: uniqueidClass; dropzone: dropzoneOptions4create" role="button">
-                {% trans "Create Manifest" %}
+                {% trans "Create Image Service" %}
             </div>
             </div>
             <div style="min-height: 100%;">

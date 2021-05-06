@@ -16,7 +16,7 @@
 </div>
 <!-- /ko -->
 <!-- ko if: self.displayOntologyTable -->
-<div class="row widget-wrapper" data-bind="visible: !newTileStep()">
+<div class="row widget-wrapper" data-bind="visible: !newResourceInstance()">
     <div class="form-group">
         <label class="control-label widget-input-label" data-bind="text:label">
         </label>
@@ -137,22 +137,14 @@
 <!-- /ko -->
 
 
-<!-- ko if: newTileStep -->
-<div class="create-resource-instance-card-component rr-table-pop" data-bind="with: newTileStep">
-    <div class="create-instance-header" style="display: flex; justify-content: space-between;">
-        <div class="new-instance-model-name">
-            <span>{% trans "New" %}</span>
-            <span data-bind="text: $parent.graphLookup[graphid].name"></span>
-        </div>
-        <div data-bind="click: function(){$parent.close()}, clickBubble: false" class="close-new-step">
-            <i class="fa fa-times-circle"></i>
-        </div>
-    </div>
-  <!-- ko component: {
-  name: 'new-tile-step',
-  params: $data
-} --><!--/ko -->
+<!-- ko if: newResourceInstance -->
+<div class="create-resource-instance-card-component rr-table-pop" data-bind="with: newResourceInstance">
+    <!-- ko component: {
+        name: 'new-resource-instance',
+        params: {...$data, graphName: $parent.graphLookup[graphid].name}
+    } --><!--/ko -->
 </div>
+
 <!-- /ko -->
 
 <!-- ko if: reportResourceId-->
@@ -191,7 +183,7 @@
 <dt data-bind="text: label"></dt>
 <!-- ko foreach: value -->
 <dd>
-    <a data-bind="text: resourceName, attr: { href: $parent.resourceReportUrl+resourceId() }" target="_blank"></a>
+    <a data-bind="text: resourceName, attr: { href: $parent.resourceReportUrl+ko.unwrap(resourceId) }" target="_blank"></a>
 </dd>
 <!-- /ko -->
 <!-- ko if: (!!value() && value().length === 0) || value() === null -->

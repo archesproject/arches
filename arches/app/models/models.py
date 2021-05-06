@@ -618,6 +618,7 @@ class Relation(models.Model):
 
 class ReportTemplate(models.Model):
     templateid = models.UUIDField(primary_key=True, default=uuid.uuid1)
+    preload_resource_data = models.BooleanField(default=True)
     name = models.TextField(blank=True, null=True)
     description = models.TextField(blank=True, null=True)
     component = models.TextField()

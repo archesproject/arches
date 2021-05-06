@@ -49,10 +49,35 @@ define([
         
         this.value = ko.observable();
         this.value.subscribe(function(value) {
+            var getResourceIdFromComponentData = function(componentData) {
+                /* iterates over each component in layout */
+                return Object.values(componentData).reduce(function(acc, componentDatum) {
+                    /* most components store data for a single tile */ 
+                    if (componentDatum instanceof Array && componentDatum.length === 1) {
+                        componentDatum = componentDatum[0];
+                    }
+                    
+                    if (!acc && componentDatum.resourceInstanceId) {
+                        return componentDatum.resourceInstanceId;
+                    }
+
+                    return acc;
+                }, null);
+            };
+
             /* if we have defined that this is part of a single-resource workflow, and that this step creates the desired resource */ 
             if (self.shouldtrackresource && !ko.unwrap(config.workflow.resourceId)) {
                 if (value) {
-                    config.workflow.resourceId(value.resourceid);
+                    var resourceId;
+                     
+                    if (value.resourceid) {  /* legacy newTileStep */
+                        resourceId = value.resourceid
+                    }
+                    else {  /* component-based-step */
+                        resourceId = getResourceIdFromComponentData(value);
+                    }
+
+                    config.workflow.resourceId(resourceId);
                 } 
                 else {
                     config.workflow.resourceId(null);
@@ -100,8 +125,12 @@ define([
 
             /* cached informationBox logic */ 
             if (config.informationboxdata) {
+                var isHidden = true;
+                if (self.getInformationBoxHiddenStateFromLocalStorage()){
+                    isHidden = self.getInformationBoxHiddenStateFromLocalStorage();
+                }
                 self.informationBoxData({
-                    hidden: self.getInformationBoxHiddenStateFromLocalStorage(),
+                    hidden: isHidden,
                     heading: config.informationboxdata['heading'],
                     text: config.informationboxdata['text'],
                 })
@@ -126,9 +155,18 @@ define([
             }
         };
 
+
+        this.clearCallback = ko.observable();
+
         this.clear = function() {
             if (self.hasDirtyTile()) {
-                self.tile().reset();
+                if (ko.unwrap(self.tile)) {
+                    self.tile().reset();
+                }
+
+                if (ko.unwrap(self.clearCallback)) {
+                    self.clearCallback()();
+                }
             }
         }
 

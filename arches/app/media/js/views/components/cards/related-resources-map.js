@@ -50,10 +50,12 @@ define([
         if (self.form && self.tile) self.card.widgets().forEach(function(widget) {
             var id = widget.node_id();
             var type = ko.unwrap(self.form.nodeLookup[id].datatype);
+
             if (type === 'resource-instance' || type === 'resource-instance-list' || type === 'geojson-feature-collection') {
                 self.widgets.push(widget);
             }
         });
+
         var getNodeIds = function(){
             var nodeids = [];
             if (self.selectRelatedSource()) {
@@ -72,15 +74,29 @@ define([
         };
 
         /* 
-            get/set logic to ensure all data values are equal between parent and children
+            set/get logic to ensure all data values are equal between parent and children
         */
-        this.basemap = ko.observable((function() {
-            for (var widget of self.widgets) {
-                if (widget.config.basemap) {
-                    return widget.config.basemap();
-                }
+
+       this.basemap = ko.observable();
+       this.overlayConfigs = ko.observable();
+       this.centerX = ko.observable();
+       this.centerY = ko.observable();
+
+       for (var widget of self.widgets) {
+            if (widget.config.basemap) {
+               self.basemap(widget.config.basemap());
             }
-        })());  // IIFE
+            if (widget.config.overlayConfigs) {
+                self.overlayConfigs(widget.config.overlayConfigs());
+            }
+            if (widget.config.centerX) {
+                self.centerX(widget.config.centerX());
+            }
+            if (widget.config.centerY) {
+                self.centerY(widget.config.centerY());
+            }
+        }
+
         this.basemap.subscribe(function(map) {
             for (var widget of self.widgets) {
                 if (widget.config.basemap) {
@@ -88,14 +104,6 @@ define([
                 }
             }
         });
-                
-        this.overlayConfigs = ko.observable((function() {
-            for (var widget of self.widgets) {
-                if (widget.config.overlayConfigs) {
-                    return widget.config.overlayConfigs();
-                }
-            }
-        })());  // IIFE
         this.overlayConfigs.subscribe(function(configs) {
             for (var widget of self.widgets) {
                 if (widget.config.overlayConfigs) {
@@ -103,14 +111,6 @@ define([
                 }
             }
         });
-
-        this.centerX = ko.observable((function() {
-            for (var widget of self.widgets) {
-                if (widget.config.centerX) {
-                    return widget.config.centerX();
-                }
-            }
-        })());  // IIFE
         this.centerX.subscribe(function(x) {
             for (var widget of self.widgets) {
                 if (widget.config.centerX) {
@@ -118,14 +118,6 @@ define([
                 }
             }
         });
-        
-        this.centerY = ko.observable((function() {
-            for (var widget of self.widgets) {
-                if (widget.config.centerY) {
-                    return widget.config.centerY();
-                }
-            }
-        })());  // IIFE
         this.centerY.subscribe(function(y) {
             for (var widget of self.widgets) {
                 if (widget.config.centerY) {
@@ -134,7 +126,6 @@ define([
             }
         });
         
-        // local set/get
         this.zoom = ko.observable(this.overviewzoom());
         this.zoom.subscribe(function(zoom) {
             self.config.overviewzoom(zoom);
@@ -145,6 +136,8 @@ define([
                 }
             }
         });
+
+        /* end local set/get */ 
         
         params.basemap = this.basemap;
         params.overlayConfigs = this.overlayConfigs;
@@ -188,8 +181,14 @@ define([
                                         }
                                     })
                                     .then(function(json) {
-                                        var details = json.results.hits.hits[0]._source
-                                        self.relatedResourceDetails[resourceinstanceid] = {graphid: details.graph_id, resourceinstanceid: resourceinstanceid, displayname: details.displayname};
+                                        var details = json.results.hits.hits[0]._source;
+
+                                        self.relatedResourceDetails[resourceinstanceid] = {
+                                            graphid: details.graph_id, 
+                                            resourceinstanceid: resourceinstanceid, 
+                                            displayname: details.displayname,
+                                            geometries: details.geometries,
+                                        };
                                         self.tile.data[nodeid].valueHasMutated();
                                     });
                             }
@@ -217,6 +216,7 @@ define([
             });
             return ids;
         });
+
         var updateResourceBounds = function(ids) {
             if (ids.length > 0) {
                 $.getJSON({
@@ -231,6 +231,7 @@ define([
         };
         updateResourceBounds(selectedResourceIds());
         selectedResourceIds.subscribe(updateResourceBounds);
+
         var zoomToData = true;
         resourceBounds.subscribe(function(bounds) {
             var map = self.map();
@@ -384,6 +385,13 @@ define([
         };
 
         this.drawAvailable.subscribe(function(val){
+            if (!params.draw) {
+                params.draw = self.draw;
+            }
+            if (!params.map) {
+                params.map = self.map();
+            }
+
             var bufferSrcId = 'geojson-search-buffer-data';
             self.widget = self.widgets.find(function(widget){
                 return widget.datatype.datatype === 'resource-instance' || widget.datatype.datatype === 'resource-instance-list';
@@ -410,7 +418,6 @@ define([
                 });
             }
         });
-
     };
     ko.components.register('related-resources-map-card', {
         viewModel: viewModel,

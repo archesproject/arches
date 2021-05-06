@@ -14,40 +14,29 @@
                 <div class="workflow-name" data-bind="text: workflowName() + ' Workflow'">{% trans "Insert Workflow Name" %}</div>
             </div>
 
-            <div>
-                <!--ko if: activeStep()._index === steps.length - 1 -->
+            <div style="
+                display: inline-flex;
+                width: 335px;
+                justify-content: flex-end;"
+                >
+                <!-- ko if: activeStep()._index === steps.length - 1 -->
                 <button 
-                    disabled 
+                    data-bind="click: function(){window.location.assign(quitUrl)}" 
                     class="btn btn-success"
                 >
-                    <i class="ion-android-cloud-done"></i>
-                    <span>
-                        {% trans "Workflow Finished!" %}
-                    </span>
+                <i class="fa fa-check"></i>
+                <span>
+                    {% trans "Complete Workflow" %}
+                </span>
                 </button>
-                <!--/ko-->
-                <!--ko if: activeStep()._index !== steps.length - 1 -->
-                <button 
-                    data-bind="
-                        click: finishWorkflow, 
-                        css:{disabled: !isWorkflowFinished()}
-                    " 
-                    class="btn btn-success"
-                >
-                    <i class="ion-android-cloud-done"></i>
-                    <span>
-                        {% trans "Finish Workflow" %}
-                    </span>
-                </button>
-                <!--/ko-->
-
+                <!-- /ko -->
                 <button 
                     data-bind="click: quitWorkflow" 
                     class="btn btn-danger"
                 >
                     <i class=" ion-android-cancel"></i>
                     <span>
-                        {% trans "Quit Workflow" %}
+                        {% trans "Delete Workflow" %}
                     </span>
                 </button>
             </div>
@@ -97,9 +86,7 @@
                                 <span
                                     style="margin-right: 4px;"
                                     class="workflow-nav-tab-arrow"
-                                    data-bind="{ 
-                                        click: $parent.back, 
-                                        clickBubble: false ,
+                                    data-bind="{
                                         css: {
                                             disabled: $parent.activeStep()._index === 0,
                                         },
@@ -114,13 +101,10 @@
                                 <span
                                     style="margin-left: 4px;"
                                     class="workflow-nav-tab-arrow"
-                                    data-bind="{ 
-                                        click: $parent.next, 
-                                        clickBubble: false,
+                                    data-bind="{
                                         css: {
                                             disabled: (
                                                 ( $parent.activeStep().required() && !$parent.activeStep().complete() )
-                                                || $parent.activeStep()._index === $parent.steps.length - 1
                                             ),
                                         },
                                         visible: step.active() && step._index !== $parent.steps.length - 1,
@@ -135,12 +119,7 @@
             </ul>
         </div>
         
-        <div 
-            style="
-                flex: 1;
-                overflow-y: scroll;
-            "
-        >
+        <div class="tabbed-workflow-step-container">
             <workflow-step params='step: activeStep()' ></workflow-step>
         </div>
 
@@ -175,32 +154,18 @@
             </div>
 
             <div class="tabbed-workflow-footer-button-container">
+                <!-- ko if: activeStep()._index > 0 -->
                 <button 
                     class="btn btn-primary"
-                    data-bind="
-                        click: back,
-                        css: {
-                            disabled: activeStep()._index === 0,
-                        }
-                    "
+                    data-bind="click: back"
                 >
                     <i class="fa fa-caret-left"></i>
                     <span>
                         {% trans  "Previous Step" %}
                     </span>
                 </button>
-
-                <button 
-                    class="btn btn-success"
-                    data-bind="{
-                        click: activeStep().save
-                    }"
-                >
-                    <i class="ion-android-cloud-done"></i>
-                    <span>
-                        {% trans  "Save" %}
-                    </span>
-                </button>
+                <!-- /ko -->
+                <!-- ko if: activeStep().hasDirtyTile() -->
                 <button
                     class="btn btn-danger"
                     data-bind="{
@@ -216,11 +181,28 @@
                     </span>
                 </button>
                 <button
+                    class="btn btn-success"
+                    data-bind="
+                        click: function() {
+                            activeStep().save();
+                        },
+                    "
+                >
+                    <i class="ion-android-cloud-done"></i>
+                    <span>
+                        {% trans  "Save and Continue" %}
+                    </span>
+                    <i class="fa fa-caret-right"></i>
+                </button>
+                <!-- /ko -->
+                <!-- ko ifnot: activeStep().hasDirtyTile() -->
+                <!-- ko if: activeStep()._index < steps.length - 1 -->
+                <button
                     class="btn btn-primary"
                     data-bind="
                         click: next,
                         css: {
-                            disabled: activeStep().required() && !activeStep().complete() || activeStep()._index === steps.length - 1,
+                            disabled: activeStep().required() && !activeStep().complete(),
                         }
                     "
                 >
@@ -229,6 +211,8 @@
                     </span>
                     <i class="fa fa-caret-right"></i>
                 </button>
+                <!-- /ko -->
+                <!-- /ko -->
             </div>
 
         </div>

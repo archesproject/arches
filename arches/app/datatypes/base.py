@@ -13,7 +13,22 @@ class BaseDataType(object):
     def __init__(self, model=None):
         self.datatype_model = model
 
-    def validate(self, value, row_number=None, source=None, node=None, nodeid=None):
+    def validate(self, value, row_number=None, source=None, node=None, nodeid=None, strict=False):
+        """
+        Used to validate data in a node of given datatype
+
+        Arguments:
+        value -- (required) the value of the node being validated
+
+        Keyword Arguments:
+        row_number -- (optional) this is specific to csv import and should be removed
+        source -- (optional) this is specific to csv import and should be removed
+        node -- (optional) the node instance being validated
+        node -- (optional) the node id of the instance begin validated
+        strict -- False (default), set to True to force the datatype to perform a more complete check
+            (eg: check for the existance of a referenced resoure on the resource-instance datatype)
+        """
+
         return []
 
     def create_error_message(self, value, source, row_number, message):
@@ -252,6 +267,7 @@ class BaseDataType(object):
                                             def val = tile.data.get(params.node_id);
                                             if (val == null || (val instanceof List && val.length==0)) {
                                                 null_docs++;
+                                                break;
                                             }
                                         }
                                     }

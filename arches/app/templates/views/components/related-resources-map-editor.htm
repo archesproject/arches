@@ -38,7 +38,9 @@
         <!-- /ko -->
     </div>
 
-    <div data-bind="css: card.model.cssclass" style="height: calc(100% - 80px)">        
+    <div data-bind="css: card.model.cssclass" style="height: calc(100% - 80px)">
+        {% block additional_content %}
+        {% endblock additional_content %}
         <!-- ko if: reviewer && provisionalTileViewModel.selectedProvisionalEdit() -->
         <div class="edit-message-container">
             <span>{% trans 'Showing edits by' %}</span>
@@ -99,7 +101,7 @@
                     mode: { name: 'javascript', json: true },
                     lineNumbers: true
                 }"></div>
-                <div class="install-buttons">
+                <div class="display-in-workflow-step install-buttons">
                     <button class="btn btn-shim btn-danger btn-labeled btn-lg fa fa-times" data-bind="click: function () {
                         geoJSONString(undefined);
                     }">{% trans 'Cancel' %}</button>
@@ -127,30 +129,6 @@
                     data:card.widgets, as: 'widget'
                 }">
                 <!-- ko if: ko.unwrap(self.form.nodeLookup[widget.node_id()].datatype) === 'geojson-feature-collection' -->
-                    <!--ko if: self.featureLookup[widget.node_id()].features -->
-                    <div class="rr-map-card-intersect-panel">
-                    <div class='control-label widget-input-label'>{% trans "Select a feature to perform intersection" %}</div>
-                    <table class="table">
-                        <tbody>
-                        <!-- ko foreach: {data: self.featureLookup[widget.node_id()].features, as: 'feature'} -->
-                        <tr class="map-card-feature-item" data-bind="css: {'active': self.mapFilter.searchGeometries().length && self.mapFilter.searchGeometries().find(function(x){return x.id === feature.id})};">
-                            <td>
-                                <span class="map-card-feature-name" data-bind="text: feature.geometry.type"></span>
-                            </td>
-                            <td class="map-card-feature-tool intersect">
-                                <a href="javascript:void(0);" data-bind="
-                                click: function(){self.mapFilter.makeSearchFeature(feature)}">
-                                    <i class="fa fa-pencil map-card-feature-edit"></i>
-                                    {% trans "Intersect" %}
-                                </a>
-                            </td>
-                        </tr>
-                        <!-- /ko -->
-                        </tbody>
-                    </table>
-                    </div>
-                    <!-- /ko -->
-
                     <div class="rr-map-card-intersect-panel">
                         <div class='control-label widget-input-label'>{% trans "Buffer Intersecting Feature" %}</div>
                         <div class="buffer-control" style="padding-left: 0px">
@@ -168,10 +146,34 @@
                             </div>
                         </div>
                     </div>
+
+                    <!--ko if: self.featureLookup[widget.node_id()].features -->
+                    <div class="rr-map-card-intersect-panel">
+                        <div class='control-label widget-input-label'>{% trans "Select a feature to perform intersection" %}</div>
+                        <table class="table">
+                            <tbody>
+                            <!-- ko foreach: {data: self.featureLookup[widget.node_id()].features, as: 'feature'} -->
+                            <tr class="map-card-feature-item" data-bind="css: {'active': self.mapFilter.searchGeometries().length && self.mapFilter.searchGeometries().find(function(x){return x.id === feature.id})};">
+                                <td>
+                                    <span class="map-card-feature-name" data-bind="text: feature.geometry.type"></span>
+                                </td>
+                                <td class="map-card-feature-tool intersect">
+                                    <a href="javascript:void(0);" data-bind="
+                                    click: function(){self.mapFilter.makeSearchFeature(feature)}">
+                                        <i class="fa fa-pencil map-card-feature-edit"></i>
+                                        {% trans "Intersect" %}
+                                    </a>
+                                </td>
+                            </tr>
+                            <!-- /ko -->
+                            </tbody>
+                        </table>
+                        </div>
+                        <!-- /ko -->
                     <!-- /ko -->
                 </div>
 
-                <div class="install-buttons">
+                <div class="display-in-workflow-step install-buttons">
                     <button class="btn btn-shim btn-danger btn-labeled btn-lg fa fa-times" data-bind="click: function () {
                         showRelatedQuery(false);
                     }">{% trans 'Close' %}</button>
@@ -297,7 +299,7 @@
                                                 self.fitFeatures(self.featureLookup[widget.node_id()].features());
                                             }">
                                                 <i class="fa fa-search map-card-feature-edit"></i>
-                                                {% trans "Zoom to all features" %}
+                                                {% trans "Zoom to all" %}
                                             </a>
                                             <!-- /ko -->
                                         </div>

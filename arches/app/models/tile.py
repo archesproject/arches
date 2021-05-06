@@ -309,16 +309,31 @@ class Tile(models.TileModel):
             message += (", ").join(missing_nodes)
             raise TileValidationError(message)
 
-    def validate(self, errors=None):
+    def validate(self, errors=None, raise_early=True, strict=False):
+        """
+        Keyword Arguments:
+        errors -- supply and list to have errors appened on to
+        raise_early -- True(default) to raise an error on the first value in the tile that throws an error
+            otherwise throw an error only after all nodes in a tile have been validated
+        strict -- False(default), True to use a more complete check on the datatype
+            (eg: check for the existance of a referenced resoure on the resource-instance datatype)
+        """
+
+        tile_errors = []
+
         for nodeid, value in self.data.items():
             node = models.Node.objects.get(nodeid=nodeid)
             datatype = self.datatype_factory.get_instance(node.datatype)
-            error = datatype.validate(value, node=node)
+            error = datatype.validate(value, node=node, strict=strict)
+            tile_errors += error
             for error_instance in error:
                 if error_instance["type"] == "ERROR":
-                    raise TileValidationError(_("{0}".format(error_instance["message"])))
+                    if raise_early:
+                        raise TileValidationError(_("{0}".format(error_instance["message"])))
             if errors is not None:
                 errors += error
+        if not raise_early:
+            raise TileValidationError(tile_errors)
         return errors
 
     def get_tile_data(self, user_id=None):
@@ -528,15 +543,13 @@ class Tile(models.TileModel):
     @staticmethod
     def get_blank_tile(nodeid, resourceid=None):
         parent_nodegroup = None
-
         node = models.Node.objects.get(pk=nodeid)
         if node.nodegroup.parentnodegroup_id is not None:
             parent_nodegroup = node.nodegroup.parentnodegroup
-            parent_tile = Tile()
-            parent_tile.data = {}
+            parent_tile = Tile.get_blank_tile_from_nodegroup_id(
+                nodegroup_id=node.nodegroup.parentnodegroup_id, resourceid=resourceid, parenttile=None
+            )
             parent_tile.tileid = None
-            parent_tile.nodegroup_id = node.nodegroup.parentnodegroup_id
-            parent_tile.resourceinstance_id = resourceid
             parent_tile.tiles = []
             for nodegroup in models.NodeGroup.objects.filter(parentnodegroup_id=node.nodegroup.parentnodegroup_id):
                 parent_tile.tiles.append(Tile.get_blank_tile_from_nodegroup_id(nodegroup.pk, resourceid=resourceid, parenttile=parent_tile))
@@ -553,7 +566,8 @@ class Tile(models.TileModel):
         tile.data = {}
 
         for node in models.Node.objects.filter(nodegroup=nodegroup_id):
-            tile.data[str(node.nodeid)] = None
+            if node.datatype != "semantic":
+                tile.data[str(node.nodeid)] = None
 
         return tile
 
@@ -585,6 +599,8 @@ class Tile(models.TileModel):
                 tile.save()
             else:
                 tile.save()
+                if not nodegroupid:
+                    nodegroupid = models.Node.objects.get(pk=nodeid).nodegroup_id
                 if nodegroupid and resourceinstanceid:
                     tile = Tile.update_node_value(nodeid, value, nodegroupid=nodegroupid, resourceinstanceid=resourceinstanceid)
         return tile

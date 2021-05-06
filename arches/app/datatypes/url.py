@@ -1,0 +1,253 @@
+"""
+Copyright (C) 2019 J. Paul Getty Trust
+
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU Affero General Public License as
+published by the Free Software Foundation, either version 3 of the
+License, or (at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU Affero General Public License for more details.
+
+You should have received a copy of the GNU Affero General Public License
+along with this program.  If not, see <https://www.gnu.org/licenses/>.
+"""
+
+import re
+import json
+from arches.app.models.system_settings import settings
+from arches.app.datatypes.base import BaseDataType
+from arches.app.models.models import Widget
+from arches.app.search.elasticsearch_dsl_builder import Match, Exists, Term
+
+from rdflib import ConjunctiveGraph as Graph
+from rdflib import URIRef, Literal, Namespace
+from rdflib.namespace import RDF, RDFS, XSD, DC, DCTERMS
+
+archesproject = Namespace(settings.ARCHES_NAMESPACE_FOR_DATA_EXPORT)
+cidoc_nm = Namespace("http://www.cidoc-crm.org/cidoc-crm/")
+
+import logging
+
+logger = logging.getLogger(__name__)
+
+default_widget_name = "urldatatype"
+default_url_widget = None
+try:
+    default_url_widget = Widget.objects.get(name=default_widget_name)
+except Widget.DoesNotExist as e:
+    logger.warn("Setting 'url' datatype's default widget to None ({0} widget not found).".format(default_widget_name))
+
+details = {
+    "datatype": "url",
+    "iconclass": "fa fa-location-arrow",
+    "modulename": "url.py",
+    "classname": "URLDataType",
+    "defaultwidget": default_url_widget,
+    "defaultconfig": None,
+    "configcomponent": "views/components/datatypes/url",
+    "configname": "url-datatype-config",
+    "isgeometric": False,
+    "issearchable": True,
+}
+
+
+class FailRegexURLMatch(Exception):
+    pass
+
+
+class URLDataType(BaseDataType):
+    """
+    URL Datatype to store an optionally labelled hyperlink to a (typically) external resource
+    """
+
+    URL_REGEX = re.compile(r"https?:\/\/(www\.)?[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_\+.~#?&//=]*)")
+
+    def validate(self, value, row_number=None, source=None, node=None, nodeid=None):
+        errors = []
+        try:
+            if value.get("url") is not None:
+                # check URL conforms to URL structure
+                url_test = self.URL_REGEX.match(value["url"])
+                if url_test is None:
+                    raise FailRegexURLMatch
+        except FailRegexURLMatch:
+            errors.append(
+                {
+                    "type": "ERROR",
+                    "message": "datatype: {0} value: {1} {2} {3} - {4}. {5}".format(
+                        self.datatype_model.datatype,
+                        value,
+                        source,
+                        row_number,
+                        "this is not a valid HTTP/HTTPS URL",
+                        "This data was not imported.",
+                    ),
+                }
+            )
+        return errors
+
+    def transform_value_for_tile(self, value):
+        """
+        Used, for example, during import for transforming incomming data to
+
+        Arguments
+        value -- can either be a url string like "http://archesproject.org" or
+        a json string like '{"url": "", "url_label": ""}'
+        """
+
+        ret = {"url": "", "url_label": ""}
+
+        try:
+            ret = json.loads(value)
+        except BaseException:
+            if isinstance(value, dict):
+                ret = value
+            else:
+                ret["url"] = value
+
+        return ret
+
+    def get_display_value(self, tile, node):
+        data = self.get_tile_data(tile)
+        if data:
+            display_value = data.get(str(node.nodeid))
+
+            if display_value:
+                return json.dumps(display_value)
+
+    def append_to_document(self, document, nodevalue, nodeid, tile, provisional=False):
+        if nodevalue.get("url") is not None:
+            if nodevalue.get("url_label") is not None:
+                val = {
+                    "string": nodevalue["url_label"],
+                    "nodegroup_id": tile.nodegroup_id,
+                    "provisional": provisional,
+                }
+                document["strings"].append(val)
+
+            # FIXME: URLs searchable?
+            val = {
+                "string": nodevalue["url"],
+                "nodegroup_id": tile.nodegroup_id,
+                "provisional": provisional,
+            }
+            document["strings"].append(val)
+
+    def get_search_terms(self, nodevalue, nodeid=None):
+        terms = []
+        if nodevalue.get("url") is not None:
+            if nodevalue.get("url_label") is not None:
+                if settings.WORDS_PER_SEARCH_TERM is None or (len(nodevalue["url_label"].split(" ")) < settings.WORDS_PER_SEARCH_TERM):
+                    terms.append(nodevalue["url_label"])
+            # terms.append(nodevalue['url'])       FIXME: URLs searchable?
+        return terms
+
+    def append_search_filters(self, value, node, query, request):
+        # Match the label in the same manner as a String datatype
+
+        try:
+            if value["val"] != "":
+                match_type = "phrase_prefix" if "~" in value["op"] else "phrase"
+                if "~" in value["op"]:
+                    match_query = Match(
+                        field="tiles.data.%s.url" % (str(node.pk)),
+                        query=value["val"],
+                        type=match_type,
+                    )
+                if "=" in value["op"]:
+                    match_query = Term(field="tiles.data.%s.url.keyword" % (str(node.pk)), term=value["val"])
+                if "!" in value["op"]:
+                    query.must_not(match_query)
+                    query.filter(Exists(field="tiles.data.%s" % (str(node.pk))))
+                else:
+                    query.must(match_query)
+        except KeyError as e:
+            pass
+
+    def get_rdf_uri(self, node, data, which="r"):
+        return URIRef(data["url"])
+
+    def accepts_rdf_uri(self, uri):
+        return self.URL_REGEX.match(uri) and not (
+            uri.startswith("urn:uuid:") or uri.startswith(settings.ARCHES_NAMESPACE_FOR_DATA_EXPORT + "resources/")
+        )
+
+    def is_a_literal_in_rdf(self):
+        # Should this be a terminating node? Should be True if it is...
+        return False
+
+    def ignore_keys(self):
+        # We process label into the datatype, so downstream processing should ignore it.
+        return ["http://www.w3.org/2000/01/rdf-schema#label http://www.w3.org/2000/01/rdf-schema#Literal"]
+
+    def to_rdf(self, edge_info, edge):
+        # returns an in-memory graph object, containing the domain resource, its
+        # type and the string as a string literal
+        g = Graph()
+        if edge_info["range_tile_data"] is not None and edge_info["range_tile_data"].get("url") is not None:
+            g.add((edge_info["d_uri"], RDF.type, URIRef(edge.domainnode.ontologyclass)))
+            g.add(
+                (
+                    edge_info["d_uri"],
+                    URIRef(edge.ontologyproperty),
+                    URIRef(edge_info["range_tile_data"]["url"]),
+                )
+            )
+            if edge_info["range_tile_data"].get("url_label") is not None:
+                g.add(
+                    (
+                        URIRef(edge_info["range_tile_data"]["url"]),
+                        RDFS.label,
+                        Literal(edge_info["range_tile_data"]["url_label"]),
+                    )
+                )
+        return g
+
+    def from_rdf(self, json_ld_node):
+        """
+        The json-ld representation of this datatype should look like the following (once expanded)
+          {
+            "http://www.w3.org/2000/01/rdf-schema#label": [
+              {
+                "@value": "Link to spectro report"
+              }
+            ],
+            "@id": "https://host/url/to/link"
+          }
+        """
+
+        value = {}
+        if type(json_ld_node) == list:
+            url_node = json_ld_node[0]
+        else:
+            url_node = json_ld_node
+        try:
+            value["url"] = url_node["@id"]
+            value["url_label"] = None
+            if "http://www.w3.org/2000/01/rdf-schema#label" in url_node:
+                value["url_label"] = url_node["http://www.w3.org/2000/01/rdf-schema#label"][0]["@value"]
+        except (IndexError, AttributeError, KeyError) as e:
+            print(f"Broke trying to import url datatype: {json_ld_node}")
+            return None
+        return value
+
+    def default_es_mapping(self):
+        """
+        Default mapping if not specified is a text field
+        """
+
+        return {
+            "properties": {
+                "url": {
+                    "type": "text",
+                    "fields": {"keyword": {"ignore_above": 256, "type": "keyword"}},
+                },
+                "url_label": {
+                    "type": "text",
+                    "fields": {"keyword": {"ignore_above": 256, "type": "keyword"}},
+                },
+            }
+        }
