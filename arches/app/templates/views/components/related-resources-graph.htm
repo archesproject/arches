@@ -74,8 +74,10 @@
 {% endblock sidepanel %}
 
 {% block content_management %}
+<!--ko if: cytoscapeConfig() -->
 <div style="height:100%; width:100%;" data-bind="cytoscape: {
     afterRender: viz,
     config: cytoscapeConfig
 }"></div>
+<!--/ko -->
 {% endblock content_management %}
