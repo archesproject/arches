@@ -43,14 +43,8 @@ define([
                         "font-size": "12px",
                         "text-valign": "center",
                         "text-halign": "center",
-                        "background-color": "#CCCCCC",
                         "border-color": "black",
                         "border-width": 1
-                    }
-                }, {
-                    "selector": "node.focus",
-                    "style": {
-                        "font-weight": "bold"
                     }
                 }, {
                     "selector": "node.focus",
