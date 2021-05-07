@@ -15,6 +15,7 @@ import uuid
 import datetime
 import logging
 from datetime import timedelta
+from arches.app.utils.language import default_lang_node_json
 from arches.app.utils.module_importer import get_class_from_modulename
 from django.forms.models import model_to_dict
 from django.contrib.gis.db import models
@@ -39,9 +40,188 @@ from guardian.shortcuts import assign_perm
 from django.conf import settings
 
 
+
+from arches.app.models.system_settings import settings
+from django.utils.translation import get_language
+from django.contrib.postgres.fields.jsonb import JsonAdapter
+class JSONBSet(object):
+    # operator = "jsonb_set(%s, %s, %s)"
+
+    def __init__(self, attname, value):
+        self.sql = "jsonb_set(" + attname + ", %s, %s)"
+        # self.attname = attname
+        self.value = value
+
+    def as_sql(self, compiler, connection):
+        lang = f"{{{get_language()}}}"
+        # sql = self.operator % (self.attname, None, None)
+        params = (lang, json.dumps(self.value))
+        return self.sql, params
+
+
+class TranlatedJSONField(JSONField):
+    def __init__(self, *args, **kwargs):
+        self._full = ""
+        super().__init__(*args, **kwargs)
+        
+    def inst_getter(self):
+        return self.full
+
+    @property
+    def full(self):
+        """I'm the 'x' property."""
+        return self._full
+
+    @full.setter
+    def full(self, value):
+        self._full = value
+
+    @full.deleter
+    def full(self):
+        del self._full
+
+    def contribute_to_class(self, cls, name, private_only=False, **kwargs):
+        super().contribute_to_class(cls, name, private_only=private_only, **kwargs)
+        full_json = '%s_full' % self.name
+        # import ipdb; ipdb.sset_trace()
+        
+        setattr(cls, full_json, None)
+        # setattr(self, full_json, self.inst_getter)
+    # def contribute_to_class(self, cls, name, private_only=False, **kwargs):
+    #     super().contribute_to_class(cls, name, private_only=private_only, **kwargs)
+
+    #     f = self._field.__class__(
+    #         *args, **dict(kwargs, **self._specific.get(language_code, {}))
+    #     )
+    #     f._translated_field_language_code = language_code
+    #     f.creation_counter = self.creation_counter + index
+    #     f.verbose_name = _verbose_name_maybe_language_code(
+    #         verbose_name, language_code
+    #     )
+    #     attr = to_attribute(name, language_code)
+    #     f.contribute_to_class(cls, attr)
+    #     fields.append(attr)
+
+    #     setattr(cls, name, self)
+    #     self.fields = fields
+    #     self.short_description = verbose_name
+
+    #     self._getter = _optional_keywords(self._attrgetter, name, field=self)
+    #     self._setter = _optional_keywords(self._attrsetter, name, field=self)
+
+    # def get_attname(self):
+    #     return '%s_full' % self.name
+
+    # def get_attname_column(self):
+    #     attname = self.get_attname()
+    #     column = self.db_column or attname
+    #     return attname, column
+
+    def default_lang_node_json(value=None, lang=None):
+        ret = {}
+        ret[settings.LANGUAGE_CODE] = ""
+        for lang in settings.LANGUAGES:
+            ret[lang[0]] = ""
+
+        if value is not None:
+            available_languages = [settings.LANGUAGE_CODE] if len(settings.LANGUAGES) == 0 else [lang[0] for lang in settings.LANGUAGES]
+            if lang is None:
+                lang = get_language()
+            if lang in available_languages:
+                ret[lang] = value
+            else:
+                raise Exception("The language code supplied is not enabled in settings.LANGUAGES or settings.LANGUAGE_CODE")
+        print(ret)
+        return ret
+        
+    def from_db_value(self, value, expression, connection):
+        print('asdl')
+        print(value)
+        import ipdb; ipdb.sset_trace()
+        
+        # try:
+        #     if "Node_2" in value['de']:
+        #         import ipdb; ipdb.sset_trace()
+        # except:
+        #     pass
+        if value is None:
+            return value
+
+        try:
+            ret = json.loads(value)
+        except TypeError:
+            ret = value
+
+        # full_json = '%s_full' % self.name
+        # setattr(self.model, full_json, ret)
+        self.namefull = ret
+
+        try:
+            return ret[get_language()]
+        except KeyError as e:
+            try:
+                return ret[settings.LANGUAGE_CODE]
+            except KeyError as e:
+                try:
+                    return list(ret.values())[0]
+                except:
+                    print('error')
+                    return ""
+
+
+        # if get_language() in ret:
+        #     return ret[get_language()]
+        # elif settings.LANGUAGE_CODE in ret:
+        #     return ret[get_language()]
+        #     ret.keys()[0]
+        #     return ret[ret.keys()[0]]
+
+    # def value_from_object(self, obj):
+    #     """Return the value of this field in the given model instance."""
+    #     return getattr(obj, self.attname)
+
+    # def pre_save(self, model_instance, add):
+    #     """Return field's value just before saving."""
+    #     # import ipdb; ipdb.sset_trace()
+    #     self.current_value = getattr(model_instance, self.attname)
+    #     return getattr(model_instance, self.attname)
+
+    # def get_prep_value(self, value):
+    #     """Perform preliminary non-db specific value checks and conversions."""
+    #     # if isinstance(value, Promise):
+    #     #     value = value._proxy____cast()
+    #     # value = json.dumps({"en": value})
+    #     lang = get_language()
+    #     value[lang] = value
+    #     return json.dumps(value)
+
+
+    def get_db_prep_value(self, value, connection, prepared=False):
+        """
+        Return field's value prepared for interacting with the database backend.
+        Used by the default implementations of get_db_prep_save().
+        """
+        print(f'in get_db_prep_value:{value}')
+        print(f'is JsonAdapter: {isinstance(value, JsonAdapter)}')
+
+        # import ipdb; ipdb.sset_trace()s
+        if not prepared:
+            try:
+                json.loads(value)
+            except ValueError as e:
+                value = JSONBSet(self.attname, value)
+            except TypeError as e:
+                value = JSONBSet(self.attname, str(value))
+            
+        # if not prepared:
+        #     value = self.get_prep_value(value)
+        print(value)
+        return value
+
+
 class CardModel(models.Model):
     cardid = models.UUIDField(primary_key=True, default=uuid.uuid1)  # This field type is a guess.
-    name = models.TextField(blank=True, null=True)
+    name = TranlatedJSONField(blank=True, null=True, default=default_lang_node_json)
     description = models.TextField(blank=True, null=True)
     instructions = models.TextField(blank=True, null=True)
     cssclass = models.TextField(blank=True, null=True)
@@ -64,6 +244,9 @@ class CardModel(models.Model):
         else:
             return not TileModel.objects.filter(nodegroup=self.nodegroup).exists()
 
+    def name_full_2(self):
+        return self.name
+    
     class Meta:
         managed = True
         db_table = "cards"
