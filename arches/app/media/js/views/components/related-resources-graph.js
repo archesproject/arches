@@ -17,13 +17,6 @@ define([
 
             WorkbenchViewmodel.apply(this, [params]);
 
-            var updateCytoscapeConfig = function(elements, style) {
-                self.cytoscapeConfig({
-                    elements: elements,
-                    layout: layout,
-                    style: style
-                });
-            };
             var getResourceRelations = function(resourceId) {
                 var url = arches.urls.related_resources + resourceId + '?paginate=false';
                 return window.fetch(url);
@@ -42,7 +35,7 @@ define([
                     selected: data.focus
                 };
             };
-            var getStyle = function(data) {
+            var getStyle = function() {
                 var styles = [{
                     "selector": "node",
                     "style": {
@@ -82,6 +75,14 @@ define([
                 }
                 return styles;
             };
+            var updateCytoscapeConfig = function(elements, style) {
+                self.cytoscapeConfig({
+                    selectionType: 'single',
+                    elements: elements,
+                    layout: layout,
+                    style: getStyle()
+                });
+            };
             var updateFocusResource = function() {
                 var resourceId = self.focusResourceId();
                 if (resourceId) {
@@ -98,13 +99,12 @@ define([
                             }
                             resourceTypeLookup = result.node_config_lookup;
                             result.resource_instance.focus = true;
-                            var style = getStyle(result);
                             var elements = [dataToElement(result.resource_instance)]
                                 .concat(
                                     result.related_resources.concat(result.resource_relationships)
                                         .map(dataToElement)
                                 );
-                            updateCytoscapeConfig(elements, style);
+                            updateCytoscapeConfig(elements);
                         });
                 }
             };
@@ -112,6 +112,10 @@ define([
             this.focusResourceId.subscribe(updateFocusResource);
             this.viz.subscribe(function(viz) {
                 if (!viz) self.cytoscapeConfig(null);
+                // prevents multiple selection
+                else viz.on('select', 'node, edge', function(e) {
+                    viz.elements().not(e.target).unselect();
+                });
             });
 
             updateFocusResource();
