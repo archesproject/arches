@@ -309,19 +309,22 @@ class Tile(models.TileModel):
             message += (", ").join(missing_nodes)
             raise TileValidationError(message)
 
-    def validate(self, errors=None, raise_early=True):
+    def validate(self, errors=None, raise_early=True, strict=False):
         """
         Keyword Arguments:
         errors -- supply and list to have errors appened on to
         raise_early -- True(default) to raise an error on the first value in the tile that throws an error
             otherwise throw an error only after all nodes in a tile have been validated
+        strict -- False(default), True to use a more complete check on the datatype
+            (eg: check for the existance of a referenced resoure on the resource-instance datatype)
         """
 
         tile_errors = []
+
         for nodeid, value in self.data.items():
             node = models.Node.objects.get(nodeid=nodeid)
             datatype = self.datatype_factory.get_instance(node.datatype)
-            error = datatype.validate(value, node=node)
+            error = datatype.validate(value, node=node, strict=strict)
             tile_errors += error
             for error_instance in error:
                 if error_instance["type"] == "ERROR":

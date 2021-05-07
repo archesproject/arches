@@ -8,7 +8,7 @@ define([
     'viewmodels/card',
     'viewmodels/provisional-tile',
     'viewmodels/alert',
-], function(_, $, arches, ko, koMapping, GraphModel, CardViewModel, ProvisionalTileViewModel) {
+], function(_, $, arches, ko, koMapping, GraphModel, CardViewModel, ProvisionalTileViewModel, AlertViewModel) {
     function NonTileBasedComponent() {
         var self = this;
 
@@ -60,26 +60,33 @@ define([
 
         this.loadData = function(data) {
             /* a flat object of the previously saved data for all tiles */ 
-            var dataLookup = data.reduce(function(acc, componentData) {
-                var parsedData = JSON.parse(componentData);
+            var tileDataLookup = data.reduce(function(acc, componentData) {
+                var parsedTileData = JSON.parse(componentData.tileData);
 
-                Object.keys(parsedData).forEach(function(key) {
-                    acc[key] = parsedData[key];
+                Object.keys(parsedTileData).forEach(function(key) {
+                    acc[key] = parsedTileData[key];
                 });
 
                 return acc;
             }, {});
 
-
             self.tiles().forEach(function(tile) {
-                /* force the value of current tile data observables */ 
+                /* force the value of current tile data observables */
                 Object.keys(tile.data).forEach(function(key) {
                     if (ko.isObservable(tile.data[key])) {
-                        tile.data[key](dataLookup[key]);
+                        tile.data[key](tileDataLookup[key]);
                     }
                 });
-
                 tile._tileData(koMapping.toJSON(tile.data));
+
+                data.forEach(function(datum){                    
+                    if (JSON.stringify(Object.keys(koMapping.toJS(tile.data)).sort()) 
+                        === JSON.stringify(Object.keys(JSON.parse(datum.tileData)).sort())) {
+                        tile.nodegroup_id = datum.nodegroupId;
+                        tile.tileid = datum.tileId;
+                        tile.resourceinstance_id = datum.resourceInstanceId;        
+                    }
+                });
             });
         };
 
@@ -182,7 +189,15 @@ define([
                         handlers[eventName].push(handler);
                     }
                 };
-    
+
+                /*
+                    If a step modifies a child tile, get the correct parent tile id from the step that created the parent tile. 
+                    This requires that your step has a parameter 'parenttilesourcestep' that identifies the step with the parent tile.
+                */
+                if (self.externalStepData[self.componentData.parameters.parenttilesourcestep]){
+                    self.componentData.parameters.parenttileid = self.externalStepData[self.componentData.parameters.parenttilesourcestep].data.tileid;
+                }
+
                 self.flattenTree(self.topCards, []).forEach(function(item) {
                     if (item.constructor.name === 'CardViewModel' && item.nodegroupid === ko.unwrap(self.componentData.parameters.nodegroupid)) {
                         if (ko.unwrap(self.componentData.parameters.parenttileid) && item.parent && ko.unwrap(self.componentData.parameters.parenttileid) !== item.parent.tileid) {
@@ -223,18 +238,22 @@ define([
             var saveFunction = self.saveFunction();
 
             if (saveFunction) { saveFunction(); }
-
-            self.complete(true);
         };
 
         this.onSaveSuccess = function(savedData) {
             if (!(savedData instanceof Array)) { savedData = [savedData]; }
             
             self.savedData(savedData.map(function(savedDatum) {
-                return savedDatum._tileData();
+                return {
+                    tileData: savedDatum._tileData(),
+                    tileId: savedDatum.tileid,
+                    nodegroupId: savedDatum.nodegroup_id,
+                    resourceInstanceId: savedDatum.resourceinstance_id,
+                };
             }));
 
             self.saving(false);
+            self.complete(true);
         };
 
         this.reset = function() {
@@ -344,8 +363,8 @@ define([
 
             var savingSubscription = self.saving.subscribe(function(saving) {
                 if (!saving) {
+                    savingSubscription.dispose(); /* self-disposing subscription only runs once */
                     self.initialize();
-                    savingSubscription.dispose(); /* self-disposing subscription only runs once */ 
                 }
             });
 
@@ -354,7 +373,7 @@ define([
                     at this point in load `self.tiles()` contains a reference to the empty
                     tile we're using to map values to other tiles. This removes the empty
                     mapping tile from being tracked
-                */ 
+                */
                 if (tiles.length === 1 && !tiles[0].tileid) {
                     var savedTiles = [];
 
@@ -371,8 +390,8 @@ define([
                         });
                     }
 
-                    self.tiles(savedTiles);
                     multiTileInitSubscription.dispose();  /* self-disposing subscription only runs once */ 
+                    self.tiles(savedTiles);
                 }
             });
 
@@ -390,8 +409,8 @@ define([
                         persistedTiles.unshift(newTile);
                     });
 
-                    self.tiles(persistedTiles);
                     multiTilePersistedDataSubscription.dispose();  /* self-disposing subscription only runs once */ 
+                    self.tiles(persistedTiles);
                 }
             });
 
@@ -443,8 +462,13 @@ define([
             });
         };
 
+        this.tilesToRemove = ko.observableArray();
+
         this.removeTile = function(data) {
             var filteredTiles = self.tiles().filter(function(tile) { return tile !== data; });
+            if (data.tileid) {
+                self.tilesToRemove.push(data);
+            }
             self.tiles(filteredTiles);
         };
 
@@ -452,6 +476,7 @@ define([
             self.complete(false);
             self.saving(true);
             self.savedData.removeAll();
+            self.previouslyPersistedComponentData = [];
             
             var unorderedSavedData = ko.observableArray();
 
@@ -460,6 +485,28 @@ define([
                     function(){/* onFail */}, 
                     function(savedTileData) {
                         unorderedSavedData.push(savedTileData);
+                    }
+                );
+            });
+
+            self.tilesToRemove().forEach(function(tile) {
+                tile.deleteTile(
+                    function(response) {
+                        self.alert(new AlertViewModel(
+                            'ep-alert-red', 
+                            response.responseJSON.title,
+                            response.responseJSON.message,
+                            null, 
+                            function(){ return; }
+                        ));
+                    },
+                    function() {
+                        self.tilesToRemove.remove(tile);
+                        if ( self.tilesToRemove().length === 0 ) {
+                            self.complete(true);
+                            self.loading(true);
+                            self.saving(false);
+                        }
                     }
                 );
             });
@@ -498,13 +545,15 @@ define([
     };
 
 
-    function WorkflowComponentAbstract(componentData, previouslyPersistedComponentData, resourceId, title, complete) {
+    function WorkflowComponentAbstract(componentData, previouslyPersistedComponentData, externalStepData, resourceId, title, complete) {
         var self = this;
 
         this.complete = complete;
         this.resourceId = resourceId;
         this.componentData = componentData;
+
         this.previouslyPersistedComponentData = previouslyPersistedComponentData;
+        this.externalStepData = externalStepData;
         
         this.savedData = ko.observableArray();
         this.hasUnsavedData = ko.observable();
@@ -544,6 +593,7 @@ define([
         } 
 
         this.complete = params.complete || ko.observable(false);
+        this.alert = params.alert || ko.observable();
 
         this.dataToPersist = ko.observable({});
         self.dataToPersist.subscribe(function(data) {
@@ -629,6 +679,7 @@ define([
             var workflowComponentAbstract = new WorkflowComponentAbstract(
                 workflowComponentAbtractData, 
                 previouslyPersistedComponentData, 
+                params.externalStepData,
                 self.resourceId,
                 params.title, 
                 self.complete

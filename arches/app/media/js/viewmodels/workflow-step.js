@@ -49,10 +49,35 @@ define([
         
         this.value = ko.observable();
         this.value.subscribe(function(value) {
+            var getResourceIdFromComponentData = function(componentData) {
+                /* iterates over each component in layout */
+                return Object.values(componentData).reduce(function(acc, componentDatum) {
+                    /* most components store data for a single tile */ 
+                    if (componentDatum instanceof Array && componentDatum.length === 1) {
+                        componentDatum = componentDatum[0];
+                    }
+                    
+                    if (!acc && componentDatum.resourceInstanceId) {
+                        return componentDatum.resourceInstanceId;
+                    }
+
+                    return acc;
+                }, null);
+            };
+
             /* if we have defined that this is part of a single-resource workflow, and that this step creates the desired resource */ 
             if (self.shouldtrackresource && !ko.unwrap(config.workflow.resourceId)) {
                 if (value) {
-                    config.workflow.resourceId(value.resourceid);
+                    var resourceId;
+                     
+                    if (value.resourceid) {  /* legacy newTileStep */
+                        resourceId = value.resourceid
+                    }
+                    else {  /* component-based-step */
+                        resourceId = getResourceIdFromComponentData(value);
+                    }
+
+                    config.workflow.resourceId(resourceId);
                 } 
                 else {
                     config.workflow.resourceId(null);
@@ -98,18 +123,8 @@ define([
                 self.setToLocalStorage('value', value);
             });
 
-            /* cached informationBox logic */ 
-            if (config.informationboxdata) {
-                var isHidden = true;
-                if (self.getInformationBoxHiddenStateFromLocalStorage()){
-                    isHidden = self.getInformationBoxHiddenStateFromLocalStorage();
-                }
-                self.informationBoxData({
-                    hidden: isHidden,
-                    heading: config.informationboxdata['heading'],
-                    text: config.informationboxdata['text'],
-                })
-            }
+            /* cached informationBox logic */
+            this.setupInformationBox();
         };
         
         this.save = function() {
@@ -184,17 +199,27 @@ define([
 
         this.toggleInformationBox = function() {
             var informationBoxData = self.informationBoxData();
-            var isHidden = informationBoxData['hidden'];
+            var isDisplayed = informationBoxData['displayed'];
 
-            informationBoxData['hidden'] = !isHidden;
+            informationBoxData['displayed'] = !isDisplayed;
             self.informationBoxData(informationBoxData);
 
-            self.setToLocalStorage('informationBoxHidden', !isHidden);
+            config.informationBoxDisplayed(!isDisplayed);
         };
 
-        this.getInformationBoxHiddenStateFromLocalStorage = function() {
-            return self.getFromLocalStorage('informationBoxHidden')
-        };
+        this.setupInformationBox = function() {
+            if (config.informationBoxDisplayed && config.informationboxdata) {
+                var isDisplayed = true;
+                if (config.informationBoxDisplayed() !== undefined){
+                    isDisplayed = config.informationBoxDisplayed();
+                }
+                self.informationBoxData({
+                    displayed: isDisplayed,
+                    heading: config.informationboxdata['heading'],
+                    text: config.informationboxdata['text'],
+                })
+            }
+        }
 
         _.extend(this, config);
 

@@ -80,8 +80,9 @@ class DataTypeFactory(object):
             self.datatype_instances = DataTypeFactory._datatype_instances
         return datatype_instance
 
+
 class StringDataType(BaseDataType):
-    def validate(self, value, row_number=None, source=None, node=None, nodeid=None):
+    def validate(self, value, row_number=None, source=None, node=None, nodeid=None, strict=False):
         errors = []
         try:
             if value is not None:
@@ -149,7 +150,7 @@ class StringDataType(BaseDataType):
 
 
 class NumberDataType(BaseDataType):
-    def validate(self, value, row_number=None, source="", node=None, nodeid=None):
+    def validate(self, value, row_number=None, source="", node=None, nodeid=None, strict=False):
         errors = []
 
         try:
@@ -237,7 +238,7 @@ class NumberDataType(BaseDataType):
 
 
 class BooleanDataType(BaseDataType):
-    def validate(self, value, row_number=None, source="", node=None, nodeid=None):
+    def validate(self, value, row_number=None, source="", node=None, nodeid=None, strict=False):
         errors = []
         try:
             if value is not None:
@@ -290,7 +291,7 @@ class BooleanDataType(BaseDataType):
 
 
 class DateDataType(BaseDataType):
-    def validate(self, value, row_number=None, source="", node=None, nodeid=None):
+    def validate(self, value, row_number=None, source="", node=None, nodeid=None, strict=False):
         errors = []
         if value is not None:
             valid_date_format, valid = self.get_valid_date_format(value)
@@ -427,7 +428,7 @@ class DateDataType(BaseDataType):
 
 
 class EDTFDataType(BaseDataType):
-    def validate(self, value, row_number=None, source="", node=None, nodeid=None):
+    def validate(self, value, row_number=None, source="", node=None, nodeid=None, strict=False):
         errors = []
         if value is not None:
             if not ExtendedDateFormat(value).is_valid():
@@ -523,7 +524,7 @@ class EDTFDataType(BaseDataType):
 
 
 class GeojsonFeatureCollectionDataType(BaseDataType):
-    def validate(self, value, row_number=None, source=None, node=None, nodeid=None):
+    def validate(self, value, row_number=None, source=None, node=None, nodeid=None, strict=False):
         errors = []
         coord_limit = 1500
         coordinate_count = 0
@@ -1123,7 +1124,7 @@ class FileListDataType(BaseDataType):
         super(FileListDataType, self).__init__(model=model)
         self.node_lookup = {}
 
-    def validate(self, value, row_number=None, source=None, node=None, nodeid=None):
+    def validate(self, value, row_number=None, source=None, node=None, nodeid=None, strict=False):
         if node:
             self.node_lookup[str(node.pk)] = node
         elif nodeid:
@@ -1191,12 +1192,11 @@ class FileListDataType(BaseDataType):
     def get_display_value(self, tile, node):
         data = self.get_tile_data(tile)
         files = data[str(node.pk)]
-        file_list_str = ""
+        file_urls = ""
         if files is not None:
-            for f in files:
-                file_list_str = file_list_str + f["name"] + " | "
+            file_urls = " | ".join([file["url"] for file in files])
 
-        return file_list_str
+        return file_urls
 
     def handle_request(self, current_tile, request, node):
         # this does not get called when saving data from the mobile app
@@ -1494,7 +1494,7 @@ class BaseDomainDataType(BaseDataType):
 
 
 class DomainDataType(BaseDomainDataType):
-    def validate(self, value, row_number=None, source="", node=None, nodeid=None):
+    def validate(self, value, row_number=None, source="", node=None, nodeid=None, strict=False):
         errors = []
         key = "id"
         if value is not None:
@@ -1600,7 +1600,7 @@ class DomainListDataType(BaseDomainDataType):
                 value = value.split(",")
         return value
 
-    def validate(self, values, row_number=None, source="", node=None, nodeid=None):
+    def validate(self, values, row_number=None, source="", node=None, nodeid=None, strict=False):
         domainDataType = DomainDataType()
         errors = []
         if values is not None:
@@ -1707,53 +1707,7 @@ class ResourceInstanceDataType(BaseDataType):
             nodevalue = [nodevalue]
         return nodevalue
 
-    def disambiguate(self, nodevalue):
-        ret = []
-        if nodevalue is not None:
-            resourceXresourceList = self.get_id_list(nodevalue)
-            for resourceXresource in resourceXresourceList:
-                resourceid = None
-                displayname = ""
-                if isinstance(resourceXresource, str):
-                    resourceXresourceId = resourceXresource
-                else:
-                    resourceXresourceId = resourceXresource["resourceXresourceId"]
-                if not resourceXresourceId:
-                    continue
-                try:
-                    rr = models.ResourceXResource.objects.get(pk=resourceXresourceId)
-                    resourceid = str(rr.resourceinstanceidto_id)
-                    resource_document = se.search(index=RESOURCES_INDEX, id=resourceid)
-                    displayname = resource_document["_source"]["displayname"]
-                except NotFoundError as e:
-                    try:
-                        from arches.app.models.resource import Resource
-
-                        displayname = Resource.objects.get(pk=resourceid).displayname
-                    except ObjectDoesNotExist:
-                        rr = None
-                        logger.info(
-                            f"Resource with resourceXresourceId {resourceXresourceId} not available. This message may appear during resource load, \
-                                in which case the problem will be resolved once the related resource is loaded"
-                        )
-                except ObjectDoesNotExist:
-                    rr = None
-                    logger.info(
-                        f"Resource with resourceXresourceId {resourceXresourceId} not available. This message may appear during resource load, \
-                            in which case the problem will be resolved once the related resource is loaded"
-                    )
-                if rr is not None:
-                    ret.append(
-                        {
-                            "resourceName": displayname,
-                            "resourceId": resourceid,
-                            "ontologyProperty": rr.relationshiptype,
-                            "inverseOntologyProperty": rr.inverserelationshiptype,
-                        }
-                    )
-        return ret
-
-    def validate(self, value, row_number=None, source="", node=None, nodeid=None):
+    def validate(self, value, row_number=None, source="", node=None, nodeid=None, strict=False):
         errors = []
         if value is not None:
             resourceXresourceIds = self.get_id_list(value)
@@ -1762,12 +1716,11 @@ class ResourceInstanceDataType(BaseDataType):
                 try:
                     models.ResourceInstance.objects.get(pk=resourceid)
                 except ObjectDoesNotExist:
-                    message = _(
-                        "Resource id: {0} is not in the system. This relationship will be added once resource {0} is loaded.".format(
-                            resourceid
-                        )
-                    )
-                    errors.append({"type": "WARNING", "message": message})
+                    message = _("The related resource with id '{0}' is not in the system.".format(resourceid))
+                    error_type = "WARNING"
+                    if strict:
+                        error_type = "ERROR"
+                    errors.append({"type": error_type, "message": message})
         return errors
 
     def pre_tile_save(self, tile, nodeid):
@@ -1842,10 +1795,25 @@ class ResourceInstanceDataType(BaseDataType):
                 se.delete(index=RESOURCE_RELATIONS_INDEX, id=related["resourceXresourceId"])
 
     def get_display_value(self, tile, node):
+        from arches.app.models.resource import Resource  # import here rather than top to avoid circular import
+
+        resourceid = None
         data = self.get_tile_data(tile)
-        nodevalue = data[str(node.nodeid)]
-        items = self.disambiguate(nodevalue)
-        return ", ".join([item["resourceName"] for item in items])
+        nodevalue = self.get_id_list(data[str(node.nodeid)])
+
+        items = []
+        for resourceXresource in nodevalue:
+            try:
+                resourceid = resourceXresource["resourceId"]
+                related_resource = Resource.objects.get(pk=resourceid)
+                displayname = related_resource.displayname
+                if displayname is not None:
+                    items.append(displayname)
+            except (TypeError, KeyError):
+                pass
+            except:
+                logger.info(f'Resource with id "{resourceid}" not in the system.')
+        return ", ".join(items)
 
     def append_to_document(self, document, nodevalue, nodeid, tile, provisional=False):
         if type(nodevalue) != list and nodevalue is not None:
@@ -1965,7 +1933,7 @@ class ResourceInstanceListDataType(ResourceInstanceDataType):
 
 
 class NodeValueDataType(BaseDataType):
-    def validate(self, value, row_number=None, source="", node=None, nodeid=None):
+    def validate(self, value, row_number=None, source="", node=None, nodeid=None, strict=False):
         errors = []
         if value:
             try:
@@ -1993,7 +1961,7 @@ class NodeValueDataType(BaseDataType):
 
 
 class AnnotationDataType(BaseDataType):
-    def validate(self, value, source=None, node=None):
+    def validate(self, value, source=None, node=None, strict=False):
         errors = []
         return errors
 
