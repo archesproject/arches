@@ -75,7 +75,7 @@ define([
                 }
                 return styles;
             };
-            var updateCytoscapeConfig = function(elements, style) {
+            var updateCytoscapeConfig = function(elements) {
                 self.cytoscapeConfig({
                     selectionType: 'single',
                     elements: elements,
