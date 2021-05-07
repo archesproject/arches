@@ -14,6 +14,7 @@ define([
             this.viz = ko.observable();
             this.cytoscapeConfig = ko.observable();
             this.focusResourceId = ko.observable(params.resourceId);
+            this.selection = ko.observable();
 
             WorkbenchViewmodel.apply(this, [params]);
 
@@ -93,6 +94,7 @@ define([
                             }
                             resourceTypeLookup = result.node_config_lookup;
                             result.resource_instance.focus = true;
+                            self.selection(result.resource_instance);
                             var elements = [dataToElement(result.resource_instance)]
                                 .concat(
                                     result.related_resources.concat(result.resource_relationships)
@@ -105,11 +107,21 @@ define([
 
             this.focusResourceId.subscribe(updateFocusResource);
             this.viz.subscribe(function(viz) {
-                if (!viz) self.cytoscapeConfig(null);
-                // prevents multiple selection
-                else viz.on('select', 'node, edge', function(e) {
-                    viz.elements().not(e.target).unselect();
-                });
+                if (!viz) {
+                    self.cytoscapeConfig(null);
+                    self.selection(null);
+                }
+                else {
+                    viz.on('select', 'node, edge', function(e) {
+                        // prevents multiple selection
+                        viz.elements().not(e.target).unselect();
+
+                        self.selection(e.target.data());
+                    });
+                    viz.on('unselect', 'node, edge', function(e) {
+                        self.selection(null);
+                    });
+                }
             });
 
             updateFocusResource();
