@@ -3,9 +3,74 @@
 {% load i18n %}
 
 {% block tabs %}
+<div class="workbench-card-sidebar-tab" data-bind="click: function() {
+    toggleTab('information');
+}, css: {
+    'active': activeTab() === 'information'
+}">
+    <i class="fa fa-info"></i>
+    <span class="map-sidebar-text">{% trans "Info" %}</span>
+</div>
+<div class="workbench-card-sidebar-tab" data-bind="click: function() {
+    toggleTab('search');
+}, css: {
+    'active': activeTab() === 'search'
+}">
+    <i class="fa fa-search"></i>
+    <span class="map-sidebar-text">{% trans "Search" %}</span>
+</div>
+<div class="workbench-card-sidebar-tab" data-bind="click: function() {
+    toggleTab('analyze');
+}, css: {
+    'active': activeTab() === 'analyze'
+}">
+    <i class="fa fa-line-chart"></i>
+    <span class="map-sidebar-text">{% trans "Analyze" %}</span>
+</div>
+<div class="workbench-card-sidebar-tab" data-bind="click: function() {
+    toggleTab('settings');
+}, css: {
+    'active': activeTab() === 'settings'
+}">
+    <i class="fa fa-cog"></i>
+    <span class="map-sidebar-text">{% trans "Settings" %}</span>
+</div>
+<div class="workbench-card-sidebar-tab" data-bind="click: function() {
+    toggleTab('legend');
+}, css: {
+    'active': activeTab() === 'legend'
+}">
+    <i class="fa fa-list"></i>
+    <span class="map-sidebar-text">{% trans "Legend" %}</span>
+</div>
 {% endblock tabs %}
 
 {% block sidepanel %}
+<!--ko if: activeTab() === 'information' -->
+<div class="workbench-card-sidepanel-header-container">
+    <h4 class="workbench-card-sidepanel-header" data-bind="click: hideSidePanel">{% trans "Resource Information" %}</h4>
+</div>
+<!--/ko -->
+<!--ko if: activeTab() === 'search' -->
+<div class="workbench-card-sidepanel-header-container">
+    <h4 class="workbench-card-sidepanel-header" data-bind="click: hideSidePanel">{% trans "Search Network" %}</h4>
+</div>
+<!--/ko -->
+<!--ko if: activeTab() === 'analyze' -->
+<div class="workbench-card-sidepanel-header-container">
+    <h4 class="workbench-card-sidepanel-header" data-bind="click: hideSidePanel">{% trans "Analyze Network" %}</h4>
+</div>
+<!--/ko -->
+<!--ko if: activeTab() === 'settings' -->
+<div class="workbench-card-sidepanel-header-container">
+    <h4 class="workbench-card-sidepanel-header" data-bind="click: hideSidePanel">{% trans "Settings" %}</h4>
+</div>
+<!--/ko -->
+<!--ko if: activeTab() === 'legend' -->
+<div class="workbench-card-sidepanel-header-container">
+    <h4 class="workbench-card-sidepanel-header" data-bind="click: hideSidePanel">{% trans "Legend" %}</h4>
+</div>
+<!--/ko -->
 {% endblock sidepanel %}
 
 {% block content_management %}
