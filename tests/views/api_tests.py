@@ -34,6 +34,8 @@ from arches.app.models.resource import Resource
 from arches.app.models.tile import Tile
 from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializer
 
+from django.contrib.auth.models import User, Group, AnonymousUser
+
 # these tests can be run from the command line via
 # python manage.py test tests/views/api_tests.py --pattern="*.py" --settings="tests.test_settings"
 
@@ -49,20 +51,26 @@ class APITests(ArchesTestCase):
     def setUpClass(cls):
         geojson_nodeid = "3ebc6785-fa61-11e6-8c85-14109fd34195"
         cls.loadOntology()
-        with open(os.path.join("tests/fixtures/resource_graphs/unique_graph_shape.json"), "rU") as f:
-            json = JSONDeserializer().deserialize(f)
-            cls.unique_graph = Graph(json["graph"][0])
-            cls.unique_graph.save()
+        # with open(os.path.join("tests/fixtures/resource_graphs/unique_graph_shape.json"), "rU") as f:
+        #     json = JSONDeserializer().deserialize(f)
+        #     cls.unique_graph = Graph(json["graph"][0])
+        #     cls.unique_graph.save()
 
-        with open(os.path.join("tests/fixtures/resource_graphs/ambiguous_graph_shape.json"), "rU") as f:
-            json = JSONDeserializer().deserialize(f)
-            cls.ambiguous_graph = Graph(json["graph"][0])
-            cls.ambiguous_graph.save()
+        # with open(os.path.join("tests/fixtures/resource_graphs/ambiguous_graph_shape.json"), "rU") as f:
+        #     json = JSONDeserializer().deserialize(f)
+        #     cls.ambiguous_graph = Graph(json["graph"][0])
+        #     cls.ambiguous_graph.save()
 
-        with open(os.path.join("tests/fixtures/resource_graphs/phase_type_assignment.json"), "rU") as f:
-            json = JSONDeserializer().deserialize(f)
-            cls.phase_type_assignment_graph = Graph(json["graph"][0])
-            cls.phase_type_assignment_graph.save()
+        # with open(os.path.join("tests/fixtures/resource_graphs/phase_type_assignment.json"), "rU") as f:
+        #     json = JSONDeserializer().deserialize(f)
+        #     cls.phase_type_assignment_graph = Graph(json["graph"][0])
+        #     cls.phase_type_assignment_graph.save()
+        
+        cls.factory = RequestFactory()
+        cls.client = Client()
+        cls.user = User.objects.create_user("test", "test@archesproject.org", "password")
+        
+
 
     def test_api_base_view(self):
         """
@@ -82,3 +90,145 @@ class APITests(ArchesTestCase):
         request.user = None
         response = view(request)
         self.assertEqual(request.GET.get("ver"), "2.1")
+
+
+    def test_api_resources_put_archesjson(self):
+        """
+        Test that resources PUT accepts arches-json format data.
+
+        """
+
+        # test update a ResourceTestModel resource 
+        test_resource = {
+            "displaydescription": "undefined",
+            "displayname": "undefined",
+            "graph_id": "c9b37a14-17b3-11eb-a708-acde48001122",
+            "legacyid": "ARCHES",
+            "map_popup": "undefined",
+            "resourceinstanceid": "c29e5caf-6c8d-422b-a2ac-f5f5d99e4dae",
+            "tiles": [
+                {
+                    "data": {
+                        "c9b37b7c-17b3-11eb-a708-acde48001122": "Foo ResourceTestModel"
+                    },
+                    "nodegroup_id": "c9b37b7c-17b3-11eb-a708-acde48001122",
+                    "resourceinstance_id": "c29e5caf-6c8d-422b-a2ac-f5f5d99e4dae",
+                    "sortorder": 0,
+                    "tileid": "9b7b8897-d4a0-4735-b1fe-9d82d9890740"
+                },
+                {
+                    "data": {
+                        "c9b37f96-17b3-11eb-a708-acde48001122": {
+                            "features": [
+                                {
+                                    "geometry": {
+                                        "coordinates": [
+                                            [
+                                                [
+                                                    -1.7933273753688184,
+                                                    51.56492920592859
+                                                ],
+                                                [
+                                                    -1.7932521887532005,
+                                                    51.564204760266338
+                                                ],
+                                                [
+                                                    -1.7899815709831444,
+                                                    51.563854217899379
+                                                ],
+                                                [
+                                                    -1.7899815709831444,
+                                                    51.564882467846988
+                                                ],
+                                                [
+                                                    -1.7933273753688184,
+                                                    51.56492920592859
+                                                ]
+                                            ]
+                                        ],
+                                        "type": "Polygon"
+                                    },
+                                    "id": "b11df9f801aa89ba1250ffc6843801e2",
+                                    "properties": {
+                                        "nodeId": "c9b37f96-17b3-11eb-a708-acde48001122"
+                                    },
+                                    "type": "Feature"
+                                }
+                            ],
+                            "type": "FeatureCollection"
+                        }
+                    },
+                    "nodegroup_id": "c9b37f96-17b3-11eb-a708-acde48001122",
+                    "resourceinstance_id": "c29e5caf-6c8d-422b-a2ac-f5f5d99e4dae",
+                    "sortorder": 0,
+                    "tileid": "16d2eb37-d5df-43d4-a930-937fcacd9db1"
+                },
+                {
+                    "data": {
+                        "c9b38568-17b3-11eb-a708-acde48001122": "2021-05-06"
+                    },
+                    "nodegroup_id": "c9b38568-17b3-11eb-a708-acde48001122",
+                    "resourceinstance_id": "c29e5caf-6c8d-422b-a2ac-f5f5d99e4dae",
+                    "sortorder": 0,
+                    "tileid": "b729b441-3240-420f-9a39-98244c8244e8"
+                },
+                {
+                    "data": {
+                        "c9b38aea-17b3-11eb-a708-acde48001122": "Foo ResourceTestModel Sensitive"
+                    },
+                    "nodegroup_id": "c9b38aea-17b3-11eb-a708-acde48001122",
+                    "resourceinstance_id": "c29e5caf-6c8d-422b-a2ac-f5f5d99e4dae",
+                    "sortorder": 0,
+                    "tileid": "e7f0a6db-045e-4aee-b490-c7d2f0d36b14"
+                },
+                {
+                    "data": {
+                        "c9b3828e-17b3-11eb-a708-acde48001122": "2021-05-06"
+                    },
+                    "nodegroup_id": "c9b3828e-17b3-11eb-a708-acde48001122",
+                    "resourceinstance_id": "c29e5caf-6c8d-422b-a2ac-f5f5d99e4dae",
+                    "sortorder": 0,
+                    "tileid": "71d169e7-bcf4-4354-ac90-0ea9f7fb3f4c"
+                }
+            ]
+        }
+        payload = JSONSerializer().serialize(test_resource)
+        content_type = "application/json"
+
+        factory = RequestFactory(HTTP_X_ARCHES_VER="2.1")
+        view = APIBase.as_view()
+
+
+
+
+
+
+        #==THIS CALLS YOUR FUNCTION CODE!!===="inspired by the elegant auth_tests"==================================================================================================
+
+        self.client.login(username="admin", password="admin")
+        resp = {"success": False}
+        raw_resp = self.client.put(reverse("resources", 
+                                            kwargs={"resourceid":"c29e5caf-6c8d-422b-a2ac-f5f5d99e4dae"})
+                                            +"?format=arches-json",
+                                            payload, 
+                                            content_type)
+        resp = JSONDeserializer().deserialize(raw_resp.content)
+
+        self.assertTrue(resp["success"])
+
+       
+        request.user = self.user
+        response = view(request)
+        
+        print("\n*************************************************************\n")
+        print(response)
+        print("\n*************************************************************\n")
+        
+        self.assertFalse(response.status_code == 405) # method not allowed
+
+        self.assertFalse(response.status_code == 404) # Not Found
+        self.assertFalse(response.status_code == 200) # Success
+        self.assertFalse(response.status_code == 401) # Unauthorised
+        self.assertFalse(response.status_code == 403) # Forbidden
+
+        self.assertFalse(response.status_code == 418) # I'm a Teapot
