@@ -283,8 +283,11 @@ class Command(BaseCommand):
                 options["create_concepts"],
                 use_multiprocessing=options["use_multiprocessing"],
                 force=options["yes"],
-                prevent_indexing=options["prevent_indexing"],
+                prevent_indexing=(options["prevent_indexing"] or options["bulk_load"]),
             )
+            if options["prevent_indexing"] is False and options["bulk_load"] is True:
+                utils.print_message("indexing database")
+                management.call_command("es", "reindex_database")
 
         if options["operation"] == "import_node_value_data":
             self.import_node_value_data(options["source"], options["overwrite"])
