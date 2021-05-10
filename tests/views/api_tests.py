@@ -66,10 +66,15 @@ class APITests(ArchesTestCase):
         #     cls.phase_type_assignment_graph = Graph(json["graph"][0])
         #     cls.phase_type_assignment_graph.save()
         
-        cls.factory = RequestFactory()
-        cls.client = Client()
+        # cls.factory = RequestFactory()
+        # cls.client = Client()
         cls.user = User.objects.create_user("test", "test@archesproject.org", "password")
         
+
+        # # Looks like we need to load the resource graph.. this is from resource_tests.py
+        from django.core import management
+        test_pkg_path = os.path.join(test_settings.TEST_ROOT, "fixtures", "testing_prj", "testing_prj", "pkg")
+        management.call_command("packages", operation="load_package", source=test_pkg_path, yes=True)
 
 
     def test_api_base_view(self):
@@ -92,9 +97,9 @@ class APITests(ArchesTestCase):
         self.assertEqual(request.GET.get("ver"), "2.1")
 
 
-    def test_api_resources_put_archesjson(self):
+    def test_api_resources_post_archesjson(self):
         """
-        Test that resources PUT accepts arches-json format data.
+        Test that resources POST accepts arches-json format data.
 
         """
 
@@ -192,10 +197,23 @@ class APITests(ArchesTestCase):
                 }
             ]
         }
-        payload = JSONSerializer().serialize(test_resource)
+        test_resource_simple = {
+            "displaydescription": "Test Resource Desc",
+            "displayname": "Test Resource dname",
+            "graph_id": "c9b37a14-17b3-11eb-a708-acde48001122",
+            "legacyid": "ARCHES",
+            "map_popup": "undefined",
+            "resourceinstanceid": "c29e5caf-6c8d-422b-a2ac-f5f5d99e4dae", 
+            "tiles": []          
+        }
+
+        # KH - Try with simple payload? Try with complex payload?
+        #payload = JSONSerializer().serialize(test_resource)
+        payload = JSONSerializer().serialize(test_resource_simple)
+        
         content_type = "application/json"
 
-        factory = RequestFactory(HTTP_X_ARCHES_VER="2.1")
+        # KH - What is this 'as_view'? I', not using it, should I be?
         view = APIBase.as_view()
 
 
@@ -207,28 +225,34 @@ class APITests(ArchesTestCase):
 
         self.client.login(username="admin", password="admin")
         resp = {"success": False}
-        raw_resp = self.client.put(reverse("resources", 
+        raw_resp = self.client.post(reverse("resources", 
                                             kwargs={"resourceid":"c29e5caf-6c8d-422b-a2ac-f5f5d99e4dae"})
                                             +"?format=arches-json",
                                             payload, 
                                             content_type)
+        print("\n**POST CALL ON c29e5caf-6c8d-422b-a2ac-f5f5d99e4dae***********************************************************\n")
+        print(raw_resp)
+        print("\n*************************************************************\n")
+        
+        # KH - can we trust this? Is it doing what we think it's doing?
+        self.assertTrue(raw_resp.status_code == 201) # resource created.
+
+        # KH - What are you going to do with this now ya got it?
         resp = JSONDeserializer().deserialize(raw_resp.content)
-
-        self.assertTrue(resp["success"])
-
-       
-        request.user = self.user
-        response = view(request)
-        
+        print("\n**Response ON c29e5caf-6c8d-422b-a2ac-f5f5d99e4dae***********************************************************\n")
+        print(resp)
         print("\n*************************************************************\n")
-        print(response)
-        print("\n*************************************************************\n")
+
+        # KH - We gonna GET to check it's in there?
+        raw_resp2 = self.client.get(reverse("resources", 
+                                    kwargs={"resourceid":"c29e5caf-6c8d-422b-a2ac-f5f5d99e4dae"})
+                                    +"?format=arches-json")
         
-        self.assertFalse(response.status_code == 405) # method not allowed
-
-        self.assertFalse(response.status_code == 404) # Not Found
-        self.assertFalse(response.status_code == 200) # Success
-        self.assertFalse(response.status_code == 401) # Unauthorised
-        self.assertFalse(response.status_code == 403) # Forbidden
-
-        self.assertFalse(response.status_code == 418) # I'm a Teapot
+        # KH - can we trust this? Is it doing what we think it's doing?
+        self.assertTrue(raw_resp2.status_code == 200) # Success, we got one.
+        
+        print("\n**GET CALL ON c29e5caf-6c8d-422b-a2ac-f5f5d99e4dae***********************************************************\n")
+        # KH - What are you going to do with this now ya got it?
+        resp2 = JSONDeserializer().deserialize(raw_resp2.content)
+        print(resp2)
+        print("\n*************************************************************\n")
