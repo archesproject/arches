@@ -716,7 +716,7 @@ class Command(BaseCommand):
             else:
                 for path in business_data:
                     if path not in erring_csvs:
-                        self.import_business_data(path, overwrite=True, bulk_load=bulk_load, prevent_indexing=prevent_indexing)
+                        self.import_business_data(path, overwrite=True, bulk_load=bulk_load, prevent_indexing=(bulk_load or prevent_indexing))
 
             relations = glob.glob(os.path.join(package_dir, "business_data", "relations", "*.relations"))
             for relation in relations:
