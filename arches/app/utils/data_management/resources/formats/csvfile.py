@@ -479,15 +479,11 @@ class CsvReader(Reader):
             try:
                 resourceinstanceid = uuid.UUID(resourceid)
                 # If resourceid is a UUID check if it is already an arches resource.
-                try:
-                    ret = Resource.objects.filter(resourceinstanceid=resourceid)
-                    # If resourceid is an arches resource and overwrite is true, delete the existing arches resource.
-                    if overwrite == "overwrite":
-                        Resource.objects.get(pk=str(ret[0].resourceinstanceid)).delete()
-                    resourceinstanceid = resourceinstanceid
-                # If resourceid is not a UUID create one.
-                except:
-                    resourceinstanceid = resourceinstanceid
+                if overwrite == "overwrite":
+                    try:
+                        Resource.objects.get(pk=resourceid).delete()
+                    except:
+                        pass
             except:
                 # Get resources with the given legacyid
                 ret = Resource.objects.filter(legacyid=resourceid)
@@ -536,9 +532,6 @@ class CsvReader(Reader):
                     )
                 }
                 display_nodes = get_display_nodes(graphid)
-                all_nodes = Node.objects.filter(graph_id=graphid)
-                node_list = {str(node.pk): node for node in all_nodes}
-                datatype_factory = DataTypeFactory()
                 concepts_to_create = {}
                 new_concepts = {}
                 required_nodes = {}
@@ -598,7 +591,7 @@ class CsvReader(Reader):
                     for arches_nodeid, concepts in new_concepts.items():
                         collectionid = str(uuid.uuid4())
                         topconceptid = str(uuid.uuid4())
-                        node = Node.objects.get(nodeid=arches_nodeid)
+                        node = self.lookup_node(arches_nodeid)
 
                         # if node.datatype is concept or concept-list create concepts and collections
                         if node.datatype in ["concept", "concept-list"]:
@@ -768,7 +761,7 @@ class CsvReader(Reader):
                     request = ""
                     if datatype != "":
                         errors = []
-                        datatype_instance = datatype_factory.get_instance(datatype)
+                        datatype_instance = self.datatype_factory.get_instance(datatype)
                         if datatype in ["concept", "domain-value", "concept-list", "domain-value-list"]:
                             try:
                                 uuid.UUID(value)
@@ -776,7 +769,7 @@ class CsvReader(Reader):
                                 if datatype in ["domain-value", "domain-value-list"]:
                                     collection_id = nodeid
                                 else:
-                                    collection_id = Node.objects.get(nodeid=nodeid).config["rdmCollection"]
+                                    collection_id = self.lookup_node(nodeid).config["rdmCollection"]
                                 if collection_id is not None:
                                     value = concept_lookup.lookup_labelid_from_label(value, collection_id)
                         try:
@@ -820,7 +813,7 @@ class CsvReader(Reader):
                     # return deepcopy(blank_tile)
                     return pickle.loads(pickle.dumps(blank_tile, -1))
 
-                def check_required_nodes(tile, parent_tile, required_nodes, all_nodes):
+                def check_required_nodes(tile, parent_tile, required_nodes):
                     # Check that each required node in a tile is populated.
                     if settings.BYPASS_REQUIRED_VALUE_TILE_VALIDATION:
                         return
@@ -834,21 +827,16 @@ class CsvReader(Reader):
                                     errors.append(
                                         {
                                             "type": "WARNING",
-                                            "message": "The {0} node is required and must be populated in \
-                                            order to populate the {1} nodes. \
+                                            "message": "The {0} node ({1}) is required and must be populated. \
                                             This data was not imported.".format(
                                                 required_nodes[target_k],
-                                                ", ".join(
-                                                    all_nodes.filter(nodegroup_id=str(target_tile.nodegroup_id)).values_list(
-                                                        "name", flat=True
-                                                    )
-                                                ),
+                                                target_k,
                                             ),
                                         }
                                     )
                         elif bool(tile.tiles):
                             for tile in tile.tiles:
-                                check_required_nodes(tile, parent_tile, required_nodes, all_nodes)
+                                check_required_nodes(tile, parent_tile, required_nodes)
                     if len(errors) > 0:
                         self.errors += errors
 
@@ -885,7 +873,7 @@ class CsvReader(Reader):
                     if len(missing_display_nodes) > 0:
                         errors = []
                         for mdn in missing_display_nodes:
-                            mdn_name = all_nodes.filter(nodeid=mdn).values_list("name", flat=True)[0]
+                            mdn_name = self.lookup_node(mdn).name
                             try:
                                 missing_display_values[mdn_name].append(row_number.split("on line ")[-1])
                             except:
@@ -894,7 +882,8 @@ class CsvReader(Reader):
                     if len(source_data) > 0:
                         if list(source_data[0].keys()):
                             try:
-                                target_resource_model = all_nodes.get(nodeid=list(source_data[0].keys())[0]).graph_id
+                                nodeid = list(source_data[0].keys())[0]
+                                target_resource_model = self.lookup_node(nodeid).graph_id
                             except ObjectDoesNotExist as e:
                                 print("*" * 80)
                                 print(
@@ -1056,7 +1045,7 @@ class CsvReader(Reader):
                         if target_tile is not None and len(source_data) > 0:
                             populate_tile(source_data, target_tile)
                             # Check that required nodes are populated. If not remove tile from populated_tiles array.
-                            check_required_nodes(target_tile, target_tile, required_nodes, all_nodes)
+                            check_required_nodes(target_tile, target_tile, required_nodes)
 
                     previous_row_resourceid = row["ResourceID"]
                     legacyid = row["ResourceID"]

@@ -70,6 +70,16 @@ class Reader(object):
     def __init__(self):
         self.errors = []
         self.datatype_factory = DataTypeFactory()
+        self.node_lookup = {}
+
+    def lookup_node(self, nodeid):
+        # return models.Node.objects.get(nodeid=nodeid)
+        try:
+            return self.node_lookup[nodeid]
+        except:
+            print("looking up node")
+            self.node_lookup[nodeid] = models.Node.objects.get(nodeid=nodeid)
+            return self.node_lookup[nodeid]
 
     def validate_datatypes(self, record):
         pass
