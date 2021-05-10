@@ -94,11 +94,8 @@ def get_graphs_for_export(graphids=None):
             sys.exit()
 
     for graph in resource_graphs:
-        # import ipdb; ipdb.sset_trace()
         for card in graph.cards.values():
-            
-            print(isinstance(card.name, str))
-            card.name = card.name_full_2()
+            card.name = card.name.value
 
     resource_graph_query =JSONSerializer().serializeToPython(resource_graphs, exclude=["widgets"]) 
 
