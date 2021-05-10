@@ -201,7 +201,7 @@ class CsvWriter(Writer):
                 if "populated_node_groups" in csv_record:
                     del csv_record["populated_node_groups"]
                 csvwriter.writerow({k: str(v) for k, v in list(csv_record.items())})
-        elif self.single_file == True:
+        elif self.single_file is True:
             all_records = csv_records + other_group_records
             all_records = sorted(all_records, key=lambda k: k["ResourceID"])
             dest = StringIO()
