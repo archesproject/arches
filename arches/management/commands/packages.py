@@ -709,7 +709,7 @@ class Command(BaseCommand):
                 # assumes resources in csv do not depend on data being loaded prior from json in same dir
                 chord(
                     [
-                        import_business_data.s(data_source=path, overwrite=True, bulk_load=bulk_load, prevent_indexing=prevent_indexing)
+                        import_business_data.s(data_source=path, overwrite=True, bulk_load=bulk_load, prevent_indexing=(bulk_load or prevent_indexing))
                         for path in valid_resource_paths
                     ]
                 )(package_load_complete.signature(kwargs={"valid_resource_paths": valid_resource_paths}).on_error(on_chord_error.s()))
