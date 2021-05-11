@@ -3745,15 +3745,15 @@ ul.nav.nav-tabs.nav-justified {
 }
 
 .set-variable-pixel-height { /* WRONg PLACE */
-    /* 
-        Flexbox recalculates height on component load. This hack 
-        allows us the to assign a hard-pixel height to a flexy 
+    /*
+        Flexbox recalculates height on component load. This hack
+        allows us the to assign a hard-pixel height to a flexy
         element, thus allowing pixel calculations on variable height.
         See https://stackoverflow.com/a/14965123
     */
     display: flex;
     flex: 1 1 auto;
-    height: 0; 
+    height: 0;
 }
 
 .settings-panel {
@@ -13407,7 +13407,7 @@ a.jstree-anchor.permissions-widget {
 
 .manifest-metadata-panel-drag:hover {
     cursor: pointer;
-} 
+}
 
 .iiif-gallery-header .list-filter {
     display: inline-block;
@@ -13754,6 +13754,10 @@ a.jstree-anchor.permissions-widget {
 
 .add-buffer-feature-input {
     padding: 5px 0;
+}
+
+.related-resources-filter {
+    height: 100%;
 }
 
 @keyframes loader {
