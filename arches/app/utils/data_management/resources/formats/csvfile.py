@@ -173,7 +173,6 @@ class CsvWriter(Writer):
                     csv_record["populated_node_groups"].append(tile.nodegroup_id)
 
                 if other_group_record != {"ResourceID": resourceinstanceid}:
-                    other_group_record["TileID"] = tile.tileid
                     other_group_records.append(other_group_record)
 
             if csv_record != {"ResourceID": resourceinstanceid}:
@@ -195,16 +194,13 @@ class CsvWriter(Writer):
             csvwriter = csv.DictWriter(dest, delimiter=",", fieldnames=csv_header)
             csvwriter.writeheader()
             csvs_for_export.append(
-                {
-                    "name": csv_name.split(".")[0] + "_groups." + csv_name.split(".")[1],
-                    "outputfile": dest,
-                }
+                {"name": csv_name.split(".")[0] + "_groups." + csv_name.split(".")[1], "outputfile": dest,}
             )
             for csv_record in other_group_records:
                 if "populated_node_groups" in csv_record:
                     del csv_record["populated_node_groups"]
                 csvwriter.writerow({k: str(v) for k, v in list(csv_record.items())})
-        elif self.single_file is True:
+        elif self.single_file == True:
             all_records = csv_records + other_group_records
             all_records = sorted(all_records, key=lambda k: k["ResourceID"])
             dest = StringIO()
@@ -432,17 +428,6 @@ class CsvReader(Reader):
     ):
         # errors = businessDataValidator(self.business_data)
         celery_worker_running = task_management.check_if_celery_available()
-        # TODO: Fix IndexError raised by col_header_to_nodeid_dict and uncomment below
-        # try:
-        #     mapping_filefieldname_to_nodeid_dict = {n["file_field_name"].upper(): n["arches_nodeid"] for n in mapping["nodes"]}
-        #     col_header_to_nodeid_dict = {header: mapping_filefieldname_to_nodeid_dict[header.upper()] for header in business_data[1].keys()}
-        # except KeyError as e:
-        #     self.errors.append(
-        #         {
-        #             "type": "WARNING",
-        #             "message": f"Match failed between column header and mapping file_field_name. See detail: {e}.",
-        #         }
-        #     )
 
         print("Starting import of business data")
         self.start = time()
@@ -482,11 +467,15 @@ class CsvReader(Reader):
             try:
                 resourceinstanceid = uuid.UUID(resourceid)
                 # If resourceid is a UUID check if it is already an arches resource.
-                if overwrite == "overwrite":
-                    try:
-                        Resource.objects.get(pk=resourceid).delete()
-                    except:
-                        pass
+                try:
+                    ret = Resource.objects.filter(resourceinstanceid=resourceid)
+                    # If resourceid is an arches resource and overwrite is true, delete the existing arches resource.
+                    if overwrite == "overwrite":
+                        Resource.objects.get(pk=str(ret[0].resourceinstanceid)).delete()
+                    resourceinstanceid = resourceinstanceid
+                # If resourceid is not a UUID create one.
+                except:
+                    resourceinstanceid = resourceinstanceid
             except:
                 # Get resources with the given legacyid
                 ret = Resource.objects.filter(legacyid=resourceid)
@@ -535,6 +524,9 @@ class CsvReader(Reader):
                     )
                 }
                 display_nodes = get_display_nodes(graphid)
+                all_nodes = Node.objects.filter(graph_id=graphid)
+                node_list = {str(node.pk): node for node in all_nodes}
+                datatype_factory = DataTypeFactory()
                 concepts_to_create = {}
                 new_concepts = {}
                 required_nodes = {}
@@ -594,7 +586,7 @@ class CsvReader(Reader):
                     for arches_nodeid, concepts in new_concepts.items():
                         collectionid = str(uuid.uuid4())
                         topconceptid = str(uuid.uuid4())
-                        node = self.lookup_node(arches_nodeid)
+                        node = Node.objects.get(nodeid=arches_nodeid)
 
                         # if node.datatype is concept or concept-list create concepts and collections
                         if node.datatype in ["concept", "concept-list"]:
@@ -735,7 +727,6 @@ class CsvReader(Reader):
                                     blanktilecache[str(key)] = blank_tile
 
                 def column_names_to_targetids(row, mapping, row_number):
-                    # TODO: utilize col_header_to_nodeid_dict at start of method to make this a dict lookup instead of loop
                     errors = []
                     new_row = []
                     if "ADDITIONAL" in row or "MISSING" in row:
@@ -764,7 +755,7 @@ class CsvReader(Reader):
                     request = ""
                     if datatype != "":
                         errors = []
-                        datatype_instance = self.datatype_factory.get_instance(datatype)
+                        datatype_instance = datatype_factory.get_instance(datatype)
                         if datatype in ["concept", "domain-value", "concept-list", "domain-value-list"]:
                             try:
                                 uuid.UUID(value)
@@ -772,7 +763,7 @@ class CsvReader(Reader):
                                 if datatype in ["domain-value", "domain-value-list"]:
                                     collection_id = nodeid
                                 else:
-                                    collection_id = self.lookup_node(nodeid).config["rdmCollection"]
+                                    collection_id = Node.objects.get(nodeid=nodeid).config["rdmCollection"]
                                 if collection_id is not None:
                                     value = concept_lookup.lookup_labelid_from_label(value, collection_id)
                         try:
@@ -816,7 +807,7 @@ class CsvReader(Reader):
                     # return deepcopy(blank_tile)
                     return pickle.loads(pickle.dumps(blank_tile, -1))
 
-                def check_required_nodes(tile, parent_tile, required_nodes):
+                def check_required_nodes(tile, parent_tile, required_nodes, all_nodes):
                     # Check that each required node in a tile is populated.
                     if settings.BYPASS_REQUIRED_VALUE_TILE_VALIDATION:
                         return
@@ -830,16 +821,21 @@ class CsvReader(Reader):
                                     errors.append(
                                         {
                                             "type": "WARNING",
-                                            "message": "The {0} node ({1}) is required and must be populated. \
+                                            "message": "The {0} node is required and must be populated in \
+                                            order to populate the {1} nodes. \
                                             This data was not imported.".format(
                                                 required_nodes[target_k],
-                                                target_k,
+                                                ", ".join(
+                                                    all_nodes.filter(nodegroup_id=str(target_tile.nodegroup_id)).values_list(
+                                                        "name", flat=True
+                                                    )
+                                                ),
                                             ),
                                         }
                                     )
                         elif bool(tile.tiles):
                             for tile in tile.tiles:
-                                check_required_nodes(tile, parent_tile, required_nodes)
+                                check_required_nodes(tile, parent_tile, required_nodes, all_nodes)
                     if len(errors) > 0:
                         self.errors += errors
 
@@ -876,7 +872,7 @@ class CsvReader(Reader):
                     if len(missing_display_nodes) > 0:
                         errors = []
                         for mdn in missing_display_nodes:
-                            mdn_name = self.lookup_node(mdn).name
+                            mdn_name = all_nodes.filter(nodeid=mdn).values_list("name", flat=True)[0]
                             try:
                                 missing_display_values[mdn_name].append(row_number.split("on line ")[-1])
                             except:
@@ -885,8 +881,7 @@ class CsvReader(Reader):
                     if len(source_data) > 0:
                         if list(source_data[0].keys()):
                             try:
-                                nodeid = list(source_data[0].keys())[0]
-                                target_resource_model = self.lookup_node(nodeid).graph_id
+                                target_resource_model = all_nodes.get(nodeid=list(source_data[0].keys())[0]).graph_id
                             except ObjectDoesNotExist as e:
                                 print("*" * 80)
                                 print(
@@ -927,35 +922,28 @@ class CsvReader(Reader):
                             if str(target_tile.nodegroup_id) not in populated_nodegroups[resourceinstanceid]:
                                 target_tile.nodegroup_id = str(target_tile.nodegroup_id)
                                 # Check if we are populating a parent tile by inspecting the target_tile.data array.
-                                source_dict = {k: v for s in source_data for k, v in s.items()}
-
-                                if target_tile.data != {}:
+                                source_data_has_target_tile_nodes = (
+                                    len(set([list(obj.keys())[0] for obj in source_data]) & set(target_tile.data.keys())) > 0
+                                )
+                                if source_data_has_target_tile_nodes:
                                     # Iterate through the target_tile nodes and begin populating by iterating througth source_data array.
                                     # The idea is to populate as much of the target_tile as possible,
                                     # before moving on to the next target_tile.
                                     for target_key in list(target_tile.data.keys()):
-                                        s_tile_value = source_dict.get(target_key, None)
-                                        if s_tile_value is not None and target_tile.data[target_key] is None:
-                                            # If match populate target_tile node with transformed value.
-                                            try:
-                                                value = transform_value(node_datatypes[target_key], s_tile_value, row_number, target_key)
-
-                                                target_tile.data[target_key] = value["value"]
-                                                found = list(filter(lambda x: x.get(target_key, "not found") != "not found", source_data))
-                                                if len(found) > 0:
-                                                    found = found[0]
-                                                    i = source_data.index(found)
-                                                    del source_dict[target_key]
-                                                    del source_data[i]
-                                            except KeyError:  # semantic datatype
-                                                pass
-                                        elif s_tile_value is None:
-                                            found = list(filter(lambda x: x.get(target_key, "not found") != "not found", source_data))
-                                            if len(found) > 0:
-                                                found = found[0]
-                                                i = source_data.index(found)
-                                                del source_dict[target_key]
-                                                del source_data[i]
+                                        for source_tile in source_data:
+                                            for source_key in list(source_tile.keys()):
+                                                # Check for source and target key match.
+                                                if source_key == target_key:
+                                                    if target_tile.data[source_key] is None:
+                                                        # If match populate target_tile node with transformed value.
+                                                        value = transform_value(
+                                                            node_datatypes[source_key], source_tile[source_key], row_number, source_key
+                                                        )
+                                                        target_tile.data[source_key] = value["value"]
+                                                        # target_tile.request = value['request']
+                                                        # Delete key from source_tile so
+                                                        # we do not populate another tile based on the same data.
+                                                        del source_tile[source_key]
                                     # Cleanup source_data array to remove source_tiles that are now '{}' from the code above.
                                     source_data[:] = [item for item in source_data if item != {}]
 
@@ -983,41 +971,28 @@ class CsvReader(Reader):
                                             if str(prototype_tile_copy.nodegroup_id) not in populated_child_nodegroups:
                                                 prototype_tile_copy.nodegroup_id = str(prototype_tile_copy.nodegroup_id)
                                                 for target_key in list(prototype_tile_copy.data.keys()):
-                                                    s_tile_value = source_dict.get(target_key, None)
-                                                    if s_tile_value is not None and prototype_tile_copy.data[target_key] is None:
-                                                        try:
-                                                            value = transform_value(
-                                                                node_datatypes[target_key], s_tile_value, row_number, target_key
-                                                            )
-                                                            prototype_tile_copy.data[target_key] = value["value"]
-                                                            found = list(
-                                                                filter(lambda x: x.get(target_key, "not found") != "not found", source_data)
-                                                            )
-                                                            if len(found) > 0:
-                                                                found = found[0]
-                                                                i = source_data.index(found)
-                                                                del source_dict[target_key]
-                                                                del source_data[i]
-                                                        except KeyError:  # semantic datatype
-                                                            pass
-                                                    elif s_tile_value is None:
-                                                        found = list(
-                                                            filter(lambda x: x.get(target_key, "not found") != "not found", source_data)
-                                                        )
-                                                        if len(found) > 0:
-                                                            found = found[0]
-                                                            i = source_data.index(found)
-                                                            del source_dict[target_key]
-                                                            del source_data[i]
-                                                    elif prototype_tile_copy.data[target_key] is not None:
-                                                        populate_child_tiles(source_data)
+                                                    for source_column in source_data:
+                                                        for source_key in list(source_column.keys()):
+                                                            if source_key == target_key:
+                                                                if prototype_tile_copy.data[source_key] is None:
+                                                                    value = transform_value(
+                                                                        node_datatypes[source_key],
+                                                                        source_column[source_key],
+                                                                        row_number,
+                                                                        source_key,
+                                                                    )
+                                                                    prototype_tile_copy.data[source_key] = value["value"]
+                                                                    # print(prototype_tile_copy.data[source_key]
+                                                                    # print('&'*80
+                                                                    # target_tile.request = value['request']
+                                                                    del source_column[source_key]
+                                                                else:
+                                                                    populate_child_tiles(source_data)
 
                                             if prototype_tile_copy.data != {}:
                                                 if len([item for item in list(prototype_tile_copy.data.values()) if item is not None]) > 0:
                                                     if str(prototype_tile_copy.nodegroup_id) not in populated_child_nodegroups:
                                                         populated_child_tiles.append(prototype_tile_copy)
-                                                        if bulk:
-                                                            populated_tiles.append(prototype_tile_copy)
 
                                             if prototype_tile_copy is not None:
                                                 if child_tile_cardinality == "1" and "NodeGroupID" not in row:
@@ -1048,7 +1023,7 @@ class CsvReader(Reader):
                         if target_tile is not None and len(source_data) > 0:
                             populate_tile(source_data, target_tile)
                             # Check that required nodes are populated. If not remove tile from populated_tiles array.
-                            check_required_nodes(target_tile, target_tile, required_nodes)
+                            check_required_nodes(target_tile, target_tile, required_nodes, all_nodes)
 
                     previous_row_resourceid = row["ResourceID"]
                     legacyid = row["ResourceID"]
