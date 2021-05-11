@@ -118,7 +118,7 @@ define([
 
                         self.selection(e.target.data());
                     });
-                    viz.on('unselect', 'node, edge', function(e) {
+                    viz.on('unselect', 'node, edge', function() {
                         self.selection(null);
                     });
                 }
