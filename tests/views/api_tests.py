@@ -64,9 +64,7 @@ class APITests(ArchesTestCase):
         with open(os.path.join("tests/fixtures/resource_graphs/phase_type_assignment.json"), "rU") as f:
             json = JSONDeserializer().deserialize(f)
             cls.phase_type_assignment_graph = Graph(json["graph"][0])
-            cls.phase_type_assignment_graph.save()
-
-        cls.user = User.objects.create_user("test", "test@archesproject.org", "password")        
+            cls.phase_type_assignment_graph.save()   
 
         # Load the resource graph.
         test_pkg_path = os.path.join(test_settings.TEST_ROOT, "fixtures", "testing_prj", "testing_prj", "pkg")
