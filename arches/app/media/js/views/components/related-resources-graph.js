@@ -13,7 +13,7 @@ define([
 
             this.viz = ko.observable();
             this.cytoscapeConfig = ko.observable();
-            this.focusResourceId = ko.observable(params.resourceId);
+            this.focusResourceId = ko.isObservable(params.resourceId) ? params.resourceId : ko.observable(params.resourceId);
             this.selection = ko.observable();
 
             WorkbenchViewmodel.apply(this, [params]);
