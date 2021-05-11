@@ -594,6 +594,7 @@ define([
 
         this.complete = params.complete || ko.observable(false);
         this.alert = params.alert || ko.observable();
+        this.componentBasedStepClass = ko.unwrap(params.workflowstepclass);
 
         this.dataToPersist = ko.observable({});
         self.dataToPersist.subscribe(function(data) {
