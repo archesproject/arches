@@ -77,9 +77,11 @@ define([
                                         return graph;
                                     };
                                 });
+                                graph.collapsed = ko.observable(true);
                                 graph.cards = ko.computed(function() {
                                     var facetFilterText = this.facetFilterText().toLowerCase();
                                     if (facetFilterText) {
+                                        graph.collapsed(false);
                                         return _.filter(graphCards, function(card) {
                                             return card.name.toLowerCase().indexOf(facetFilterText) > -1;
                                         });
