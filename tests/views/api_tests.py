@@ -126,51 +126,51 @@ class APITests(ArchesTestCase):
 
 
 
-        #==Act : GET confirmation that resource does not exist in database=========================================
+        #==Act : GET confirmation that resource does not exist in database=================================
         try:
             resp_get = self.client.get(reverse("resources", 
                                         kwargs={"resourceid":"c29e5caf-6c8d-422b-a2ac-f5f5d99e4dae"})
                                         +"?format=arches-json")
         except Exception as e: 
-        #==Assert==================================================================================================
+        #==Assert==========================================================================================
             self.assertTrue(str(e) == "Resource matching query does not exist.") # Check exception message.
 
 
-        #==Act : POST resource to database=========================================================================
+        #==Act : POST resource to database=================================================================
         resp_post = self.client.post(reverse("resources", 
                                             kwargs={"resourceid":"c29e5caf-6c8d-422b-a2ac-f5f5d99e4dae"})
                                             +"?format=arches-json",
                                             payload, 
                                             content_type)
-        #==Assert==================================================================================================
+        #==Assert==========================================================================================
         self.assertTrue(resp_post.status_code == 201) # resource created.
         
 
-        #==Act : GET confirmation that resource does now exist in database=========================================
+        #==Act : GET confirmation that resource does now exist in database=================================
         resp_get_confirm = self.client.get(reverse("resources", 
                                     kwargs={"resourceid":"c29e5caf-6c8d-422b-a2ac-f5f5d99e4dae"})
                                     +"?format=arches-json")        
-        #==Assert==================================================================================================
+        #==Assert==========================================================================================
         self.assertTrue(resp_get_confirm.status_code == 200) # Success, we got one.        
         data_get_confirm = JSONDeserializer().deserialize(resp_get_confirm.content)
         self.assertTrue(data_get_confirm["legacyid"]=="ARCHES_api") # Success, we got the right one.
         
 
-        #==Act : PUT resource changes to database==================================================================
+        #==Act : PUT resource changes to database==========================================================
         resp_put = self.client.put(reverse("resources", 
                                             kwargs={"resourceid":"c29e5caf-6c8d-422b-a2ac-f5f5d99e4dae"})
                                             +"?format=arches-json",
                                             payload_modified, 
                                             content_type)
-        #==Assert==================================================================================================
+        #==Assert==========================================================================================
         self.assertTrue(resp_put.status_code == 201) # resource created.
 
 
-        #==Act : GET confirmation that resource is now changed in database=========================================
+        #==Act : GET confirmation that resource is now changed in database=================================
         resp_get_confirm_mod = self.client.get(reverse("resources", 
                                     kwargs={"resourceid":"c29e5caf-6c8d-422b-a2ac-f5f5d99e4dae"})
                                     +"?format=arches-json")        
-        #==Assert==================================================================================================
+        #==Assert==========================================================================================
         self.assertTrue(resp_get_confirm_mod.status_code == 200) # Success, we got one.     
         data_get_confirm_mod = JSONDeserializer().deserialize(resp_get_confirm_mod.content)
         self.assertTrue(data_get_confirm_mod["legacyid"]=="ARCHES_api_MOD") # Success, we got the right one.
