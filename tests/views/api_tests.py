@@ -124,6 +124,8 @@ class APITests(ArchesTestCase):
 
         self.client.login(username="admin", password="admin")
 
+
+
         #==Act : GET confirmation that resource does not exist in database=========================================
         try:
             resp_get = self.client.get(reverse("resources", 
@@ -134,7 +136,6 @@ class APITests(ArchesTestCase):
             self.assertTrue(str(e) == "Resource matching query does not exist.") # Check exception message.
 
 
-
         #==Act : POST resource to database=========================================================================
         resp_post = self.client.post(reverse("resources", 
                                             kwargs={"resourceid":"c29e5caf-6c8d-422b-a2ac-f5f5d99e4dae"})
@@ -143,8 +144,6 @@ class APITests(ArchesTestCase):
                                             content_type)
         #==Assert==================================================================================================
         self.assertTrue(resp_post.status_code == 201) # resource created.
-
-
         
 
         #==Act : GET confirmation that resource does now exist in database=========================================
@@ -155,7 +154,6 @@ class APITests(ArchesTestCase):
         self.assertTrue(resp_get_confirm.status_code == 200) # Success, we got one.        
         data_get_confirm = JSONDeserializer().deserialize(resp_get_confirm.content)
         self.assertTrue(data_get_confirm["legacyid"]=="ARCHES_api") # Success, we got the right one.
-
         
 
         #==Act : PUT resource changes to database==================================================================
@@ -166,7 +164,6 @@ class APITests(ArchesTestCase):
                                             content_type)
         #==Assert==================================================================================================
         self.assertTrue(resp_put.status_code == 201) # resource created.
-
 
 
         #==Act : GET confirmation that resource is now changed in database=========================================
