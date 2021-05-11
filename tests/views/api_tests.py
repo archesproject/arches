@@ -218,12 +218,36 @@ class APITests(ArchesTestCase):
 
 
 
-
-
-
         #==THIS CALLS YOUR FUNCTION CODE!!===="inspired by the elegant auth_tests"==================================================================================================
 
         self.client.login(username="admin", password="admin")
+
+        try:
+
+            # KH - We gonna GET to check it's not in there?
+            raw_resp0 = self.client.get(reverse("resources", 
+                                        kwargs={"resourceid":"c29e5caf-6c8d-422b-a2ac-f5f5d99e4dae"})
+                                        +"?format=arches-json")
+
+            print("\n**GET Response ON c29e5caf-6c8d-422b-a2ac-f5f5d99e4dae***********************************************************\n")
+            print(raw_resp0)
+            print("\n*************************************************************\n")
+            # KH - can we trust this? Is it doing what we think it's doing?
+            # self.assertTrue(raw_resp0.status_code == 404) # Success, we not got one.
+        except Exception as e: 
+            print("\n*************************************************************\n")
+            print("GET unable to find that which was absent " + str(e))
+            print(type(e))
+            print(e.args)
+            print("\n*************************************************************\n")
+            self.assertTrue(str(e) == "Resource matching query does not exist.")
+
+
+
+
+
+
+
         resp = {"success": False}
         raw_resp = self.client.post(reverse("resources", 
                                             kwargs={"resourceid":"c29e5caf-6c8d-422b-a2ac-f5f5d99e4dae"})
