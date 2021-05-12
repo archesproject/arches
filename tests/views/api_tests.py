@@ -144,7 +144,7 @@ class APITests(ArchesTestCase):
                                             payload, 
                                             content_type)
         #==Assert==========================================================================================
-        self.assertTrue(resp_post.status_code == 201) # resource created.
+        self.assertEqual(resp_post.status_code, 201) # resource created.
         
 
         #==Act : GET confirmation that resource does now exist in database=================================
@@ -152,9 +152,9 @@ class APITests(ArchesTestCase):
                                     kwargs={"resourceid":"c29e5caf-6c8d-422b-a2ac-f5f5d99e4dae"})
                                     +"?format=arches-json")        
         #==Assert==========================================================================================
-        self.assertTrue(resp_get_confirm.status_code == 200) # Success, we got one.        
+        self.assertEqual(resp_get_confirm.status_code, 200) # Success, we got one.        
         data_get_confirm = JSONDeserializer().deserialize(resp_get_confirm.content)
-        self.assertTrue(data_get_confirm["legacyid"]=="ARCHES_api") # Success, we got the right one.
+        self.assertEqual(data_get_confirm["legacyid"], "ARCHES_api") # Success, we got the right one.
         
 
         #==Act : PUT resource changes to database==========================================================
@@ -164,7 +164,7 @@ class APITests(ArchesTestCase):
                                             payload_modified, 
                                             content_type)
         #==Assert==========================================================================================
-        self.assertTrue(resp_put.status_code == 201) # resource created.
+        self.assertEqual(resp_put.status_code, 201) # resource created.
 
 
         #==Act : GET confirmation that resource is now changed in database=================================
@@ -172,16 +172,16 @@ class APITests(ArchesTestCase):
                                     kwargs={"resourceid":"c29e5caf-6c8d-422b-a2ac-f5f5d99e4dae"})
                                     +"?format=arches-json")        
         #==Assert==========================================================================================
-        self.assertTrue(resp_get_confirm_mod.status_code == 200) # Success, we got one.     
+        self.assertEqual(resp_get_confirm_mod.status_code, 200) # Success, we got one.     
         data_get_confirm_mod = JSONDeserializer().deserialize(resp_get_confirm_mod.content)
-        self.assertTrue(data_get_confirm_mod["legacyid"]=="ARCHES_api_MOD") # Success, we got the right one.
+        self.assertEqual(data_get_confirm_mod["legacyid"], "ARCHES_api_MOD") # Success, we got the right one.
 
 
         #==Act : DELETE resource from database=============================================================
         resp_delete = self.client.delete(reverse("resources", 
                                     kwargs={"resourceid":"c29e5caf-6c8d-422b-a2ac-f5f5d99e4dae"}))        
         #==Assert==========================================================================================
-        self.assertTrue(resp_delete.status_code == 200) # Success, we got rid of one.     
+        self.assertEqual(resp_delete.status_code, 200) # Success, we got rid of one.     
 
 
         #==Act : GET confirmation that resource does not exist in database=================================
