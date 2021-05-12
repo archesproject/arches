@@ -171,7 +171,7 @@ define([
                 allStepsLocalStorageData[self.id()] = {};
             }
             
-            allStepsLocalStorageData[self.id()][key] = value;
+            allStepsLocalStorageData[self.id()][key] = koMapping.toJSON(value);
 
             localStorage.setItem(
                 STEPS_LABEL, 
@@ -183,7 +183,7 @@ define([
             var allStepsLocalStorageData = JSON.parse(localStorage.getItem(STEPS_LABEL)) || {};
 
             if (allStepsLocalStorageData[self.id()]) {
-                return allStepsLocalStorageData[self.id()][key];
+                return JSON.parse(allStepsLocalStorageData[self.id()][key]);
             }
         };
 
