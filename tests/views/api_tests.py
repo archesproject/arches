@@ -30,6 +30,7 @@ from django.urls import reverse
 from django.core import management
 from django.test.client import RequestFactory, Client
 from arches.app.views.api import APIBase
+from arches.app.models import models
 from arches.app.models.graph import Graph
 from arches.app.models.resource import Resource
 from arches.app.models.tile import Tile
@@ -66,7 +67,7 @@ class APITests(ArchesTestCase):
             cls.phase_type_assignment_graph = Graph(json["graph"][0])
             cls.phase_type_assignment_graph.save()   
 
-        # Load the resource graph.
+        # Load the test package to provide resources graph.
         test_pkg_path = os.path.join(test_settings.TEST_ROOT, "fixtures", "testing_prj", "testing_prj", "pkg")
         management.call_command("packages", operation="load_package", source=test_pkg_path, yes=True)
 
@@ -94,9 +95,10 @@ class APITests(ArchesTestCase):
     def test_api_resources_archesjson(self):
         """
         Test that resources POST and PUT accept arches-json format data.
+        Uses GET and DELETE in testing.
 
         """
-        #==Arrange==================================================================================================
+        #==Arrange=========================================================================================
 
         test_resource_simple = {
             "displaydescription": "Test Resource Desc",
@@ -127,13 +129,12 @@ class APITests(ArchesTestCase):
 
 
         #==Act : GET confirmation that resource does not exist in database=================================
-        try:
+        with self.assertRaises(models.ResourceInstance.DoesNotExist) as context:
             resp_get = self.client.get(reverse("resources", 
-                                        kwargs={"resourceid":"c29e5caf-6c8d-422b-a2ac-f5f5d99e4dae"})
-                                        +"?format=arches-json")
-        except Exception as e: 
+                            kwargs={"resourceid":"c29e5caf-6c8d-422b-a2ac-f5f5d99e4dae"})
+                            +"?format=arches-json")
         #==Assert==========================================================================================
-            self.assertTrue(str(e) == "Resource matching query does not exist.") # Check exception message.
+        self.assertTrue("Resource matching query does not exist." in str(context.exception)) # Check exception message.
 
 
         #==Act : POST resource to database=================================================================
@@ -174,3 +175,19 @@ class APITests(ArchesTestCase):
         self.assertTrue(resp_get_confirm_mod.status_code == 200) # Success, we got one.     
         data_get_confirm_mod = JSONDeserializer().deserialize(resp_get_confirm_mod.content)
         self.assertTrue(data_get_confirm_mod["legacyid"]=="ARCHES_api_MOD") # Success, we got the right one.
+
+
+        #==Act : DELETE resource from database=============================================================
+        resp_delete = self.client.delete(reverse("resources", 
+                                    kwargs={"resourceid":"c29e5caf-6c8d-422b-a2ac-f5f5d99e4dae"}))        
+        #==Assert==========================================================================================
+        self.assertTrue(resp_delete.status_code == 200) # Success, we got rid of one.     
+
+
+        #==Act : GET confirmation that resource does not exist in database=================================
+        with self.assertRaises(models.ResourceInstance.DoesNotExist) as context_del:
+            resp_get_deleted = self.client.get(reverse("resources", 
+                            kwargs={"resourceid":"c29e5caf-6c8d-422b-a2ac-f5f5d99e4dae"})
+                            +"?format=arches-json")
+        #==Assert==========================================================================================
+        self.assertTrue("Resource matching query does not exist." in str(context_del.exception)) # Check exception message.
