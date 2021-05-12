@@ -27,6 +27,8 @@ define([
 
         this.hasDirtyTile = ko.observable(false);
 
+        this.saving = ko.observable(false);
+
         this.complete = ko.observable(false);
         this.required = ko.observable(ko.unwrap(config.required));
         this.autoAdvance = ko.observable(true);
@@ -39,10 +41,12 @@ define([
         var externalStepSourceData = ko.unwrap(config.externalstepdata) || {};
         Object.keys(externalStepSourceData).forEach(function(key) {
             if (key !== '__ko_mapping__') {
-                self.externalStepData[key] = {
-                    stepName: externalStepSourceData[key],
-                    data: config.workflow.getStepData(externalStepSourceData[key]),
-                };
+                config.workflow.getStepData(externalStepSourceData[key]).then(function(data) {
+                    self.externalStepData[key] = {
+                        stepName: externalStepSourceData[key],
+                        data: data,
+                    };
+                });
             }
         });
         delete config.externalstepdata;
@@ -193,7 +197,9 @@ define([
 
         this.getExternalStepData = function() {
             Object.keys(self.externalStepData).forEach(function(key) {
-                self.externalStepData[key]['data'] = config.workflow.getStepData(externalStepSourceData[key]);
+                config.workflow.getStepData(externalStepSourceData[key]).then(function(data) {
+                    self.externalStepData[key]['data'] = data;
+                });
             });
         };
 
