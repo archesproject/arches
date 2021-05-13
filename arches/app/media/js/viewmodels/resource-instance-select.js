@@ -341,7 +341,7 @@ define([
                         if(graphids.length > 0) {
                             data['resource-type-filter'] = JSON.stringify(graphids);
                         }
-                        if (term) {
+                        if (term || typeof params.termFilter === 'function') {
                             if(typeof params.termFilter === 'function'){
                                 params.termFilter(term, data);
                             } else {
