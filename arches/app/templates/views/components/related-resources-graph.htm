@@ -2,6 +2,8 @@
 {% load staticfiles %}
 {% load i18n %}
 
+{% block workbench_wrapper_classes %}related-resources-graph-workbench{% endblock workbench_wrapper_classes %}
+
 {% block tabs %}
 <div class="workbench-card-sidebar-tab" data-bind="click: function() {
     toggleTab('information');
@@ -75,7 +77,35 @@
 
 {% block content_management %}
 <!--ko if: cytoscapeConfig() -->
-<div style="height:100%; width:100%;" data-bind="cytoscape: {
+<div class="related-resources-graph-controls">
+    <span class="ion-information-circled" data-bind="click: function() { selectionMode('information'); }, css: {
+        'active-graph-control': selectionMode() === 'information'
+    }"></span>
+    <span class="ion-plus" data-bind="click: function() { selectionMode('expand'); }, css: {
+        'active-graph-control': selectionMode() === 'expand'
+    }"></span>
+    <span class="ion-asterisk" data-bind="click: function() { selectionMode('focus'); }, css: {
+        'active-graph-control': selectionMode() === 'focus'
+    }"></span>
+    <span class="ion-eye-disabled" data-bind="click: function() { selectionMode('delete'); }, css: {
+        'active-graph-control': selectionMode() === 'delete'
+    }"></span>
+</div>
+<div class="related-resources-graph-controls-instructions">
+<!--ko if: selectionMode() === 'information' -->
+{% trans "Click a node/edge for info" %}
+<!--/ko -->
+<!--ko if: selectionMode() === 'expand' -->
+{% trans "Click a node to show more relationships" %}
+<!--/ko -->
+<!--ko if: selectionMode() === 'focus' -->
+{% trans "Click a node refocus" %}
+<!--/ko -->
+<!--ko if: selectionMode() === 'delete' -->
+{% trans "Click a node/edge to remove" %}
+<!--/ko -->
+</div>
+<div class="related-resources-graph-cytoscape" data-bind="cytoscape: {
     afterRender: viz,
     config: cytoscapeConfig
 }"></div>

@@ -7,14 +7,18 @@ define([
     return ko.components.register('related-resources-graph', {
         viewModel: function(params) {
             var self = this;
-            var layout = {
-                name: "random"
-            };
+            var layout = { name: "circle" };
 
             this.viz = ko.observable();
             this.cytoscapeConfig = ko.observable();
             this.focusResourceId = ko.isObservable(params.resourceId) ? params.resourceId : ko.observable(params.resourceId);
             this.selection = ko.observable();
+            // modes:
+            // 'information'
+            // 'expand'
+            // 'focus'
+            // 'delete'
+            this.selectionMode = ko.observable('information');
 
             WorkbenchViewmodel.apply(this, [params]);
 
@@ -122,6 +126,11 @@ define([
                         self.selection(null);
                     });
                 }
+            });
+
+            this.activeTab.subscribe(function() {
+                var viz = self.viz();
+                if (viz) viz.resize();
             });
 
             updateFocusResource();
