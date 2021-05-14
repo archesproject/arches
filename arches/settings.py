@@ -263,6 +263,7 @@ STATICFILES_DIRS = (
 STATICFILES_FINDERS = (
     "django.contrib.staticfiles.finders.FileSystemFinder",
     "django.contrib.staticfiles.finders.AppDirectoriesFinder",
+    "compressor.finders.CompressorFinder",
     #    'django.contrib.staticfiles.finders.DefaultStorageFinder',
 )
 
@@ -340,7 +341,8 @@ INSTALLED_APPS = (
     "revproxy",
     "corsheaders",
     "oauth2_provider",
-    "django_celery_results"
+    "django_celery_results",
+    "compressor",
     # 'debug_toolbar'
 )
 
@@ -613,6 +615,8 @@ GRAPH_MODEL_CACHE_TIMEOUT = None  # seconds * hours * days = ~1mo
 
 CANTALOUPE_DIR = os.path.join(ROOT_DIR, "cantaloupe")
 CANTALOUPE_HTTP_ENDPOINT = "http://localhost:8182/"
+
+COMPRESS_PRECOMPILERS = (("text/x-scss", "django_libsass.SassCompiler"),)
 
 RENDERERS = [
     {
