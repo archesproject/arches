@@ -89,6 +89,7 @@ INSTALLED_APPS = (
     'corsheaders',
     'oauth2_provider',
     'django_celery_results',
+    'compressor',
     '{{ project_name }}',
 )
 
@@ -96,7 +97,7 @@ ALLOWED_HOSTS = []
 
 SYSTEM_SETTINGS_LOCAL_PATH = os.path.join(APP_ROOT, 'system_settings', 'System_Settings.json')
 WSGI_APPLICATION = '{{ project_name }}.wsgi.application'
-STATIC_ROOT = '/var/www/media'
+STATIC_ROOT = ''
 
 RESOURCE_IMPORT_LOG = os.path.join(APP_ROOT, 'logs', 'resource_import.log')
 DEFAULT_RESOURCE_IMPORT_USER = {'username': 'admin', 'userid': 1}
