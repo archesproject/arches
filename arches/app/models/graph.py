@@ -152,7 +152,6 @@ class Graph(models.GraphModel):
         )
         if not is_resource:
             nodegroup = models.NodeGroup.objects.create(pk=newid)
-            import ipdb; ipdb.sset_trace()
             models.CardModel.objects.create(nodegroup=nodegroup, name=default_lang_node_json(value=name), graph=graph)
         root = models.Node.objects.create(
             pk=newid,
