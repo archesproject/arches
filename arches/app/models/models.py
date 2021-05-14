@@ -91,7 +91,7 @@ class TranlatedJSONField(JSONField):
         return None
 
     def to_python(self, value):
-        import ipdb; ipdb.sset_trace()
+        # import ipdb; ipdb.sset_trace()
         if isinstance(value, L10n_Field):
             return value
         if value is None:
@@ -101,7 +101,7 @@ class TranlatedJSONField(JSONField):
 
     def get_prep_value(self, value):
         # import ipdb; ipdb.sset_trace()
-        print(f'in get_prep_value, value={value}')
+        # print(f'in get_prep_value, value={value}')
         if isinstance(value, str):
             try:
                 json.loads(value)
@@ -114,7 +114,7 @@ class TranlatedJSONField(JSONField):
         return value
 
     def get_db_prep_value(self, value, connection, prepared=False):
-        print(f'in get_db_prep_value, value={value}')
+        # print(f'in get_db_prep_value, value={value}')
         return super().get_db_prep_value(value, connection, prepared)
 
 class CardModel(models.Model):
