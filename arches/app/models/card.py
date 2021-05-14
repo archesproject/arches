@@ -153,7 +153,7 @@ class Card(models.CardModel):
                         widget_model.node_id = node_id
                         widget_model.card_id = card_id
                         widget_model.widget_id = widget_id
-                        widget_model.config = widget.get("config", 'taco')
+                        widget_model.config = widget.get("config", {})
                         widget_model.label = widget.get("label", "")
                         widget_model.visible = widget.get("visible", None)
                         widget_model.sortorder = widget.get("sortorder", None)
@@ -169,7 +169,6 @@ class Card(models.CardModel):
                             node_model.config = node.get("config", None)
                             node_model.isrequired = node.get("isrequired", node_model.isrequired)
                             self.nodes.append(node_model)
-                print("helpn")
 
             else:
                 self.widgets = list(self.cardxnodexwidget_set.all())
