@@ -149,31 +149,31 @@ class CardXNodeXWidget(models.Model):
     node = models.ForeignKey("Node", db_column="nodeid", on_delete=models.CASCADE)
     card = models.ForeignKey("CardModel", db_column="cardid", on_delete=models.CASCADE)
     widget = models.ForeignKey("Widget", db_column="widgetid", on_delete=models.CASCADE)
-    # config = JSONField(blank=True, null=True, db_column="config")
-    config = TranslatedField(
-        JSONField(blank=True, null=True),
-        attrgetter=fallback_to_default
-    )
-    # label = models.TextField(blank=True, null=True)
-    label = TranslatedField(
-        models.TextField(blank=True, null=True),
-        attrgetter=fallback_to_default
-    )
+    config = JSONField(blank=True, null=True, db_column="config")
+    # config = TranslatedField(
+    #     JSONField(blank=True, null=True),
+    #     attrgetter=fallback_to_default
+    # )
+    label = models.TextField(blank=True, null=True)
+    # label = TranslatedField(
+    #     models.TextField(blank=True, null=True),
+    #     attrgetter=fallback_to_default
+    # )
     visible = models.BooleanField(default=True)
     sortorder = models.IntegerField(blank=True, null=True, default=None)
 
-    def serialize(self, fields=None, exclude=None):
-        ret = {
-            "id": self.id,
-            "node_id": self.node_id,
-            "card_id": self.card_id,
-            "widget_id": self.widget_id,
-            "config": self.config,
-            "label": self.label,
-            "visible": self.visible,
-            "sortorder": self.sortorder
-        }
-        return ret
+    # def serialize(self, fields=None, exclude=None):
+    #     ret = {
+    #         "id": self.id,
+    #         "node_id": self.node_id,
+    #         "card_id": self.card_id,
+    #         "widget_id": self.widget_id,
+    #         "config": self.config,
+    #         "label": self.label,
+    #         "visible": self.visible,
+    #         "sortorder": self.sortorder
+    #     }
+    #     return ret
 
     class Meta:
         managed = True

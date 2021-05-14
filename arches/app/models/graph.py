@@ -31,7 +31,7 @@ from arches.app.models.system_settings import settings
 from arches.app.datatypes.datatypes import DataTypeFactory
 from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializer
 from arches.app.search.search_engine_factory import SearchEngineFactory
-from django.utils.translation import ugettext as _
+from django.utils.translation import get_language, ugettext as _
 from pyld.jsonld import compact, JsonLdError
 
 logger = logging.getLogger(__name__)
@@ -821,7 +821,7 @@ class Graph(models.GraphModel):
         if new_node.nodegroup_id != old_node.nodegroup_id:
             if new_node.is_collector:
                 # add a card
-                new_card = models.CardModel(name=new_node.name, nodegroup=new_node.nodegroup)
+                new_card = models.CardModel(**{f"name_{get_language()}":new_node.name}, nodegroup=new_node.nodegroup)
                 self.add_card(new_card)
             else:
                 self._nodegroups_to_delete = [old_node.nodegroup]
@@ -829,7 +829,7 @@ class Graph(models.GraphModel):
                 self.cards = {card_id: card for card_id, card in self.cards.items() if card.nodegroup_id != old_node.nodegroup_id}
 
         try:
-            new_card = models.CardModel.objects.get(name=old_node.name, nodegroup=new_node.nodegroup)
+            new_card = models.CardModel.objects.get(**{f"name_{get_language()}": old_node.name}, nodegroup=new_node.nodegroup)
             for cardid, card in self.cards.items():
                 if cardid == new_card.cardid:
                     card.name = new_node.name
