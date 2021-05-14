@@ -691,9 +691,9 @@ class Graph(models.GraphModel):
         node_ids = sorted(copy_of_self.nodes, key=lambda node_id: copy_of_self.nodes[node_id].is_collector, reverse=True)
 
         for nodeid, node in copy_of_self.nodes.items():
-            if node.datatype == 'geojson-feature-collection':
-                node.config['advancedStyle'] = ''
-                node.config['advancedStyling'] = False
+            if node.datatype == "geojson-feature-collection":
+                node.config["advancedStyle"] = ""
+                node.config["advancedStyling"] = False
         copy_of_self.pk = uuid.uuid1()
         node_map = {}
         card_map = {}
