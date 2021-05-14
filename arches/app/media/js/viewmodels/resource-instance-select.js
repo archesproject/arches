@@ -283,25 +283,32 @@ define([
                                 tileid: ko.observable()
                             };
                             self.newResourceInstance(params);
+                            var clearNewInstance = function() {
+                                self.newResourceInstance(null);
+                                window.setTimeout(function() {
+                                    resourceToAdd("");
+                                }, 250);
+                            };
                             params.complete.subscribe(function() {
-                                window.fetch(arches.urls.search_results + "?id=" + params.resourceid())
-                                    .then(function(response){
-                                        if(response.ok) {
-                                            return response.json();
-                                        }
-                                        throw("error");
-                                    })
-                                    .then(function(json) {
-                                        var item = json.results.hits.hits[0];
-                                        var ret = makeObject(params.resourceid(), item._source);
-                                        setValue(ret);
-                                    })
-                                    .finally(function(){
-                                        self.newResourceInstance(null);
-                                        window.setTimeout(function() {
-                                            resourceToAdd("");
-                                        }, 250);
-                                    });
+                                if (params.resourceid()) {
+                                    window.fetch(arches.urls.search_results + "?id=" + params.resourceid())
+                                        .then(function(response){
+                                            if(response.ok) {
+                                                return response.json();
+                                            }
+                                            throw("error");
+                                        })
+                                        .then(function(json) {
+                                            var item = json.results.hits.hits[0];
+                                            var ret = makeObject(params.resourceid(), item._source);
+                                            setValue(ret);
+                                        })
+                                        .finally(function(){
+                                            clearNewInstance();
+                                        });
+                                } else {
+                                    clearNewInstance();
+                                }
                             });
                         }
                     }
@@ -334,7 +341,7 @@ define([
                         if(graphids.length > 0) {
                             data['resource-type-filter'] = JSON.stringify(graphids);
                         }
-                        if (term) {
+                        if (term || typeof params.termFilter === 'function') {
                             if(typeof params.termFilter === 'function'){
                                 params.termFilter(term, data);
                             } else {
