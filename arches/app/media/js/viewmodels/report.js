@@ -7,6 +7,12 @@ define(['knockout', 'knockout-mapping', 'underscore', 'moment', 'bindings/let', 
         this.configForm = params.configForm || false;
         this.configType = params.configType || 'header';
         this.editorContext = params.editorContext || false;
+        this.shouldUseCustomSearchResultTemplate = ko.observable(false);
+
+        this.toggleUseCustomSearchResultTemplate = function() {
+            self.shouldUseCustomSearchResultTemplate(!self.shouldUseCustomSearchResultTemplate());
+            console.log(self.shouldUseCustomSearchResultTemplate())
+        };
 
         this.configState = params.report.configState || ko.observable({});
         this.configJSON = params.report.configJSON || ko.observable({});

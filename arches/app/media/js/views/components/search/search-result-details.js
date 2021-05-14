@@ -24,6 +24,7 @@ define([
                 this.report = null;
                 this.ready = ko.observable(false);
 
+
                 var setSearchResults = function(){
                     options.searchResultsVm = self.getFilter('search-results');
                     options.searchResultsVm.details = self;
@@ -78,6 +79,13 @@ define([
                         "resourceid": source.resourceinstanceid
                     };
                     self.loading(true);
+
+
+
+                    console.log("A", self, graph, tileData)
+
+
+
                     if (graph) processReportData(
                         tileData,
                         graph
