@@ -830,9 +830,7 @@ class Graph(models.GraphModel):
                 self.cards = {card_id: card for card_id, card in self.cards.items() if card.nodegroup_id != old_node.nodegroup_id}
 
         try:
-            print('trying to find new_card')
             new_card = models.CardModel.objects.get(name=old_node.name, nodegroup=new_node.nodegroup)
-            print('found new_card')
             for cardid, card in self.cards.items():
                 if cardid == new_card.cardid:
                     card.name = new_node.name
@@ -1267,7 +1265,6 @@ class Graph(models.GraphModel):
         check_if_editable = "is_editable" not in exclude
         ret["is_editable"] = self.is_editable() if check_if_editable else ret.pop("is_editable", None)
         ret["cards"] = self.get_cards(check_if_editable=check_if_editable) if "cards" not in exclude else ret.pop("cards", None)
-        
 
         if "widgets" not in exclude:
             ret["widgets"] = self.get_widgets()

@@ -142,9 +142,6 @@ class CardModel(models.Model):
         else:
             return not TileModel.objects.filter(nodegroup=self.nodegroup).exists()
 
-    def name_full_2(self):
-        return self.name
-    
     class Meta:
         managed = True
         db_table = "cards"
