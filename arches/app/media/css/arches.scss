@@ -13783,29 +13783,29 @@ a.jstree-anchor.permissions-widget {
 
 .related-resources-graph-workbench {
     $sidebar-width: 400px;
+    $controls-height: 36px;
+    $controls-top: 10px;
+    $controls-grey: rgb(155, 155, 155);
+    $controls-border: 1px solid $controls-grey;
+    $controls-background: #e0e0e0;
+    $controls-right: 10px;
+
     .related-resources-graph-cytoscape {
         height: 100%;
     }
     .workbench-card-container-sidepanel-active {
         padding-right: $sidebar-width;
     }
-
-    $control-right: 10px;
     .related-resources-graph-controls,
     .related-resources-graph-controls-instructions {
         z-index: 10000;
         position: absolute;
-        right: $control-right;
+        right: $controls-right;
     }
     .workbench-card-container-sidepanel-active .related-resources-graph-controls,
     .workbench-card-container-sidepanel-active .related-resources-graph-controls-instructions {
-        padding-right: $sidebar-width + $control-right;
+        padding-right: $sidebar-width + $controls-right;
     }
-
-    $controls-height: 36px;
-    $controls-top: 10px;
-    $controls-grey: rgb(153, 153, 153);
-    $controls-border: 1px solid $controls-grey;
     .related-resources-graph-controls {
         top: $controls-top;
         height: $controls-height;
@@ -13820,11 +13820,14 @@ a.jstree-anchor.permissions-widget {
             box-sizing: border-box;
             position: relative;
             color: $controls-grey;
-            background-color: rgb(242, 242, 242);
+            background-color: $controls-background;
         }
         span.active-graph-control {
             color: rgb(42, 68, 106);
-            background-color: white;
+            background-color: lighten($controls-background, 15%);
+        }
+        span:hover {
+            background-color: lighten($controls-background, 8%);
         }
         span:last-child {
             border-right: $controls-border;
@@ -13838,11 +13841,13 @@ a.jstree-anchor.permissions-widget {
             text-align: center;
         }
     }
-
     .related-resources-graph-controls-instructions {
-        color: rgb(153, 142, 237);
+        background-color: rgba(256, 256, 256, 0.9);
+        padding: 3px;
+        border-radius: 3px;
+        color: rgb(132, 123, 207);
         font-weight: 500;
-        margin-top: 5px;
+        margin-top: 2px;
         top: $controls-height + $controls-top;
     }
 }

@@ -8,17 +8,14 @@ define([
         viewModel: function(params) {
             var self = this;
             var layout = { name: "circle" };
+            var fitPadding = 100;
 
             this.viz = ko.observable();
             this.cytoscapeConfig = ko.observable();
             this.focusResourceId = ko.isObservable(params.resourceId) ? params.resourceId : ko.observable(params.resourceId);
             this.selection = ko.observable();
-            // modes:
-            // 'information'
-            // 'expand'
-            // 'focus'
-            // 'delete'
             this.selectionMode = ko.observable('information');
+            this.informationElement = ko.observable();
 
             WorkbenchViewmodel.apply(this, [params]);
 
@@ -28,9 +25,11 @@ define([
             };
             var resourceTypeLookup = {};
             var dataToElement = function(data) {
-                data.id = data.resourceinstanceid;
                 data.source = data.resourceinstanceidfrom;
                 data.target = data.resourceinstanceidto;
+                if (data.source) {
+                    data.id = data.source + data.target;
+                } else data.id = data.resourceinstanceid;
                 var classes = [];
                 if (data.graph_id) classes.push(resourceTypeLookup[data.graph_id].className);
                 if (data.focus) classes.push('focus');
@@ -39,6 +38,27 @@ define([
                     classes: classes,
                     selected: data.focus
                 };
+            };
+            var expandNode = function(node) {
+                if (node.id) getResourceRelations(node.id)
+                    .then(function(response) {
+                        return response.json();
+                    })
+                    .then(function(result) {
+                        var viz = self.viz();
+                        var elements = result.related_resources.concat(result.resource_relationships)
+                            .map(dataToElement)
+                            .filter(function(element) {
+                                var elements = viz.getElementById(element.data.id);
+                                if (element.source) elements = elements.concat(
+                                    viz.getElementById(element.source + element.target),
+                                    viz.getElementById(element.target + element.source)
+                                );
+                                return elements.length === 0;
+                            });
+                        viz.add(elements);
+                        viz.fit(null, fitPadding);
+                    });
             };
             var getStyle = function() {
                 var styles = [{
@@ -131,6 +151,37 @@ define([
             this.activeTab.subscribe(function() {
                 var viz = self.viz();
                 if (viz) viz.resize();
+            });
+
+            this.selection.subscribe(function(selection) {
+                var mode = self.selectionMode();
+                var viz = self.viz();
+                if (selection) switch (mode) {
+                case 'expand':
+                    expandNode(selection);
+                    break;
+                case 'delete':
+                    var element = viz.getElementById(selection.id);
+                    viz.remove(element);
+                    viz.fit(null, fitPadding);
+                    break;
+                case 'focus':
+                    self.focusResourceId(selection.id);
+                    self.informationElement(selection);
+                    break;
+                default:
+                    self.informationElement(selection);
+                    break;
+                }
+            });
+
+            self.informationElement.subscribe(function() {
+                self.activeTab('information');
+            });
+
+            this.selectionMode.subscribe(function() {
+                var viz = self.viz();
+                viz.elements().unselect();
             });
 
             updateFocusResource();
