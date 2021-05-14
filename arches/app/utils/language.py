@@ -16,6 +16,5 @@ def default_lang_node_json(value=None, lang=None):
             ret[lang] = value
         else:
             raise Exception("The language code supplied is not enabled in settings.LANGUAGES or settings.LANGUAGE_CODE")
-    
-    print(ret)
+   
     return ret
