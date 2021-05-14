@@ -136,8 +136,6 @@ class Card(models.CardModel):
                     self.update_constraints(args[0]["constraints"])
 
                 if "widgets" in args[0]:
-                    # import ipdb; ipdb.set_trace()
-
                     for widget in args[0]["widgets"]:
                         cardxnodexwidgetid = widget.get("id", None)
                         node_id = widget.get("node_id", None)
@@ -151,7 +149,7 @@ class Card(models.CardModel):
                                 pass
                         widget_model = models.CardXNodeXWidget()
                         widget_model.pk = cardxnodexwidgetid
-                        
+
                         widget_model.node_id = node_id
                         widget_model.card_id = card_id
                         widget_model.widget_id = widget_id
