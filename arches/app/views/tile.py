@@ -158,7 +158,6 @@ class TileData(View):
                             except Exception as e:
                                 return self.handle_save_error(e, tile_id)
 
-                            tile.after_update_all()
                             update_system_settings_cache(tile)
 
                     except Exception as e:
@@ -242,7 +241,7 @@ class TileData(View):
                             )
                         else:
                             tile.delete(request=request)
-                        tile.after_update_all()
+
                         update_system_settings_cache(tile)
                         return JSONResponse(tile)
                     else:

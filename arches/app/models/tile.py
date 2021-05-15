@@ -348,19 +348,6 @@ class Tile(models.TileModel):
 
         return data
 
-    def datatype_post_save_actions(self, request=None):
-        userid = None
-        if request is not None:
-            userid = str(request.user.id)
-            if hasattr(request.user, "userprofile") is not True:
-                models.UserProfile.objects.create(user=request.user)
-        tile_data = self.get_tile_data(userid)
-        for nodeid, value in list(tile_data.items()):
-            node = models.Node.objects.get(nodeid=nodeid)
-            datatype = self.datatype_factory.get_instance(node.datatype)
-            if request is not None:
-                datatype.handle_request(self, request, node)
-
     def save(self, *args, **kwargs):
         request = kwargs.pop("request", None)
         index = kwargs.pop("index", True)
@@ -381,11 +368,14 @@ class Tile(models.TileModel):
             user = None
 
         with transaction.atomic():
-            for nodeid, value in self.data.items():
-                node = models.Node.objects.get(nodeid=nodeid)
+            nodegroup = models.NodeGroup.objects.get(pk=self.nodegroup_id)
+            nodes = nodegroup.node_set.all()
+            for node in nodes:
                 datatype = self.datatype_factory.get_instance(node.datatype)
-                datatype.pre_tile_save(self, nodeid)
+                datatype.pre_tile_save(self, node.nodeid)
+            
             self.__preSave(request)
+            
             self.check_for_missing_nodes(request)
             self.check_for_constraint_violation()
             self.check_tile_cardinality_violation()
@@ -425,11 +415,23 @@ class Tile(models.TileModel):
                 self.validate([])
 
             super(Tile, self).save(*args, **kwargs)
+            
+            if request is not None:
+                if hasattr(request.user, "userprofile") is not True:
+                    models.UserProfile.objects.create(user=request.user)
+                for node in nodes:
+                    datatype = self.datatype_factory.get_instance(node.datatype)
+                    datatype.handle_request(self, request, node)
+
+            for node in nodes:
+                datatype = self.datatype_factory.get_instance(node.datatype)
+                datatype.after_update_all(tile=self)
+
+            self.__postSave(request)
+
             # We have to save the edit log record after calling save so that the
             # resource's displayname changes are avaliable
             user = {} if user is None else user
-            self.datatype_post_save_actions(request)
-            self.__postSave(request)
             if creating_new_tile is True:
                 self.save_edit(
                     user=user,
@@ -486,12 +488,17 @@ class Tile(models.TileModel):
             )
             try:
                 super(Tile, self).delete(*args, **kwargs)
-                for nodeid in self.data.keys():
-                    node = models.Node.objects.get(nodeid=nodeid)
+                
+                nodegroup = models.NodeGroup.objects.get(pk=self.nodegroup_id)
+                nodes = nodegroup.node_set.all()
+                for node in nodes:
                     datatype = self.datatype_factory.get_instance(node.datatype)
-                    datatype.post_tile_delete(self, nodeid, index=index)
+                    datatype.post_tile_delete(self, node.nodeid, index=index)
+                    datatype.after_update_all(tile=self)
+
                 if index:
                     self.index()
+
             except IntegrityError as e:
                 logger.error(e)
 
