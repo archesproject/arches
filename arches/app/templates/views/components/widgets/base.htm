@@ -30,7 +30,9 @@
         margin: 10px 0 15px 0;
     "
     data-bind="
-        click: $parent.toggleShouldUseCustomSearchResultTemplate
+        click: function() {
+            $parent.toggleShouldUseCustomSearchResultTemplate($parents[1].graphSettingsViewModel)
+        }
     "
 >
     <input 

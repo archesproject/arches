@@ -62,8 +62,14 @@ define([
         }
 
         this.disposables = [];
+        
+
+        console.log(
+            "widget", self, params
+        )
 
         var subscribeConfigObservable = function(obs, key) {
+            console.log("ssa", key, obs)
             self[key] = obs;
 
             var forwardSubscription = self[key].subscribe(function(val) {

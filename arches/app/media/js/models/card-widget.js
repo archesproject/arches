@@ -50,6 +50,7 @@ define([
                 this.icon = this.datatype.iconclass;
             }
             if (this.datatype && this.datatype.defaultwidget_id) {
+                // console.log("MAYBE", self, attributes, options, widgets[defaults.widget_id])
                 defaults.widget_id = this.datatype.defaultwidget_id;
                 defaults.config = JSON.parse(widgets[defaults.widget_id].defaultconfig);
             }
