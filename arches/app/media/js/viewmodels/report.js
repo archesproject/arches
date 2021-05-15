@@ -17,10 +17,15 @@ define(['knockout', 'knockout-mapping', 'underscore', 'moment', 'bindings/let', 
         console.log("IN REPORT VM", self, params)
 
         this.toggleShouldUseCustomSearchResultTemplate = function(graphSettingsViewModel) {
-            var shouldUseCustomSearchResultTemplate = !self.shouldUseCustomSearchResultTemplate();
 
-            self.shouldUseCustomSearchResultTemplate(shouldUseCustomSearchResultTemplate);
-            graphSettingsViewModel.updateCustomSearchResultDetailsTemplatePreference(shouldUseCustomSearchResultTemplate);
+
+            // INSTAAD< SET THIS STUFF ON REPORT TEMPLATE
+
+
+            // var shouldUseCustomSearchResultTemplate = !self.shouldUseCustomSearchResultTemplate();
+
+            // self.shouldUseCustomSearchResultTemplate(shouldUseCustomSearchResultTemplate);
+            // graphSettingsViewModel.updateCustomSearchResultDetailsTemplatePreference(shouldUseCustomSearchResultTemplate);
         };
 
         this.hasProvisionalData = ko.pureComputed(function() {

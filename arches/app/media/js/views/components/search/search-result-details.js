@@ -80,12 +80,6 @@ define([
                     };
                     self.loading(true);
 
-
-
-                    console.log("A", self, graph, tileData)
-
-
-
                     if (graph) processReportData(
                         tileData,
                         graph
