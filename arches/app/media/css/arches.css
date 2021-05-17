@@ -8349,6 +8349,15 @@ a.mega-dropdown-toggle.disabled {
     margin-right: -1px;
 }
 
+.resource-instance-card-component-content .workbench-card-wrapper {
+    height: calc(100vh - 100px);
+}
+
+.resource-instance-card-component-content .workbench-card-wrapper .workbench-card-sidepanel {
+    height: calc(100vh - 100px);
+}
+
+
 .workbench-card-sidepanel .create-resource-instance-card-component.rr-table-pop {
     top: 50px;
     z-index: 30;
