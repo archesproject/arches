@@ -16,14 +16,17 @@ define([
         viewModel: BaseFilter.extend({
             initialize: function(options) {
                 var self = this;
+
                 options.name = 'Search Result Details';
                 this.requiredFilters = ['search-results'];
-                BaseFilter.prototype.initialize.call(this, options);
-                this.loading = ko.observable(false);
-                this.options = options;
-                this.report = null;
-                this.ready = ko.observable(false);
 
+                BaseFilter.prototype.initialize.call(this, options);
+
+                this.options = options;
+                this.reportLookup = reportLookup;
+                this.report = null;
+                this.loading = ko.observable(false);
+                this.ready = ko.observable(false);
 
                 var setSearchResults = function(){
                     options.searchResultsVm = self.getFilter('search-results');
@@ -43,33 +46,47 @@ define([
 
                 var graphCache = {};
                 var processReportData = function(data, graph) {
-                    data.cards = _.filter(graph.cards, function(card) {
-                        var nodegroup = _.find(graph.graph.nodegroups, function(group) {
-                            return group.nodegroupid === card.nodegroup_id;
-                        });
-                        return !nodegroup || !nodegroup.parentnodegroup_id;
-                    }).map(function(card) {
-                        return new CardViewModel({
-                            card: card,
-                            graphModel: graph.graphModel,
-                            resourceId: data.resourceid,
-                            displayname: data.displayname,
-                            cards: graph.cards,
-                            tiles: data.tiles,
-                            cardwidgets: graph.cardwidgets
-                        });
-                    });
+                    // data.cards = _.filter(graph.cards, function(card) {
+                    //     var nodegroup = _.find(graph.graph.nodegroups, function(group) {
+                    //         return group.nodegroupid === card.nodegroup_id;
+                    //     });
+                    //     return !nodegroup || !nodegroup.parentnodegroup_id;
+                    // }).map(function(card) {
+                    //     return new CardViewModel({
+                    //         card: card,
+                    //         graphModel: graph.graphModel,
+                    //         resourceId: data.resourceid,
+                    //         displayname: data.displayname,
+                    //         cards: graph.cards,
+                    //         tiles: data.tiles,
+                    //         cardwidgets: graph.cardwidgets
+                    //     });
+                    // });
 
-                    self.reportLookup = reportLookup;
-                    data.templates = reportLookup;
-                    data.cardComponents = cardComponents;
-                    self.report = new ReportModel(_.extend(data, {
-                        graphModel: graph.graphModel,
-                        graph: graph.graph,
-                        datatypes: graph.datatypes
-                    }));
+                    // data.templates = reportLookup;
+                    // data.cardComponents = cardComponents;
+
+                    self.report = {
+                        /* basic data to avoid loading report model */ 
+                        get: function(identifier) {
+                            var foo = {
+                                'template_id': ko.observable(graph.graph.template_id),
+                                'resourceid': data.resourceid,
+                            }
+
+                            return foo[identifier];
+                        }
+                    }
+
+                    // self.report = new ReportModel(_.extend(data, {
+                    //     graphModel: graph.graphModel,
+                    //     graph: graph.graph,
+                    //     datatypes: graph.datatypes
+                    // }));
+
                     self.loading(false);
                 };
+
                 this.setupReport = function(graphId, source) {
                     var graph = graphCache[graphId];
                     var tileData = {
@@ -80,16 +97,19 @@ define([
                     };
                     self.loading(true);
 
-                    if (graph) processReportData(
-                        tileData,
-                        graph
-                    );
+                    console.log("A", self, graph, tileData, source, reportLookup)
+
+                    if (graph) {
+                        processReportData(tileData, graph);
+                    }
                     else {
-                        $.getJSON(arches.urls.graphs_api + graphId, function(data) {
+                        $.getJSON(arches.urls.graphs_api + graphId + "?context=search-result-details", function(data) {
                             var graphModel = new GraphModel({
                                 data: data.graph,
                                 datatypes: data.datatypes
                             });
+
+                            console.log("B", data, graphCache)
 
                             graph = {
                                 graphModel: graphModel,
@@ -99,6 +119,7 @@ define([
                                 cardwidgets: data.cardwidgets
                             };
                             graphCache[graphId] = graph;
+
                             processReportData(tileData, graph);
                         });
                     }

@@ -12,22 +12,6 @@ define(['knockout', 'knockout-mapping', 'underscore', 'moment', 'bindings/let', 
         this.configObservables = params.configObservables || {};
         this.configKeys = params.configKeys || [];
         
-        this.shouldUseCustomSearchResultTemplate = ko.observable(self.report.graph.config['shouldUseCustomSearchResultTemplate']);
-
-        console.log("IN REPORT VM", self, params)
-
-        this.toggleShouldUseCustomSearchResultTemplate = function(graphSettingsViewModel) {
-
-
-            // INSTAAD< SET THIS STUFF ON REPORT TEMPLATE
-
-
-            // var shouldUseCustomSearchResultTemplate = !self.shouldUseCustomSearchResultTemplate();
-
-            // self.shouldUseCustomSearchResultTemplate(shouldUseCustomSearchResultTemplate);
-            // graphSettingsViewModel.updateCustomSearchResultDetailsTemplatePreference(shouldUseCustomSearchResultTemplate);
-        };
-
         this.hasProvisionalData = ko.pureComputed(function() {
             return _.some(self.tiles(), function(tile){
                 return _.keys(ko.unwrap(tile.provisionaledits)).length > 0;

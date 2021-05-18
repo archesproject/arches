@@ -248,6 +248,8 @@ def search_results(request):
     se = SearchEngineFactory().create()
     search_results_object = {"query": Query(se)}
 
+
+
     include_provisional = get_provisional_type(request)
     permitted_nodegroups = get_permitted_nodegroups(request.user)
 
