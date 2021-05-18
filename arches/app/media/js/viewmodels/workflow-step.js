@@ -171,7 +171,7 @@ define([
                 allStepsLocalStorageData[self.id()] = {};
             }
             
-            allStepsLocalStorageData[self.id()][key] = koMapping.toJSON(value);
+            allStepsLocalStorageData[self.id()][key] = value ? koMapping.toJSON(value) : value;
 
             localStorage.setItem(
                 STEPS_LABEL, 
