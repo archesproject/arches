@@ -83,10 +83,6 @@ function($, _, BaseFilter, bootstrap, arches, select2, ko, koMapping, viewdata) 
 
             showResourceDetails: function(graphId, result) {
                 var self = this;
-
-
-                console.log('AAAAAAA', self, graphId, result)
-
                 return function(){
                     self.details.setupReport(graphId, result._source);
                     if (self.selectedTab() !== 'search-result-details') {

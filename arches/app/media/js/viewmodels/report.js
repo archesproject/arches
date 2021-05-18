@@ -7,11 +7,12 @@ define(['knockout', 'knockout-mapping', 'underscore', 'moment', 'bindings/let', 
         this.configForm = params.configForm || false;
         this.configType = params.configType || 'header';
         this.editorContext = params.editorContext || false;
+
         this.configState = params.report.configState || ko.observable({});
         this.configJSON = params.report.configJSON || ko.observable({});
         this.configObservables = params.configObservables || {};
         this.configKeys = params.configKeys || [];
-        
+
         this.hasProvisionalData = ko.pureComputed(function() {
             return _.some(self.tiles(), function(tile){
                 return _.keys(ko.unwrap(tile.provisionaledits)).length > 0;

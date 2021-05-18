@@ -15,9 +15,9 @@ define([
     var viewModel = function(params){
         var self = this;
         var CardViewModel = require('viewmodels/card');
-        this.loading = ko.observable(true);
+        this.loading = ko.observable(false);
         this.reportLookup = reportLookup;
-        this.report = params.report || ko.observable();
+        // this.report = params.report || ko.observable();
         this.graphId = params.graphId || ko.observable();
         this.dataSource = params.source || ko.observable();
         this.resourceId = params.resourceId;
@@ -54,6 +54,7 @@ define([
         this.setupReport = function(resId, graphId, source) {
             var qs = '?json=True';
             var graph = !!graphId ? arches.graphCache[graphId] : null;
+            self.loading(true);
             if (graph) processReportData(
                 {
                     "tiles": source.tiles,
@@ -64,7 +65,6 @@ define([
                 graph
             );
             else {
-                console.log("HMM", resId, qs)
                 $.getJSON(arches.urls.resource_report + resId + qs, function(data) {
                     var graphModel = new GraphModel({
                         data: data.graph,
@@ -84,7 +84,7 @@ define([
             }
         };
 
-        if(ko.unwrap(this.resourceId)){
+        if(this.resourceId !== null){
             this.setupReport(this.resourceId(), this.graphId(), this.dataSource());
         }
 
