@@ -46,44 +46,56 @@ define([
 
                 var graphCache = {};
                 var processReportData = function(data, graph) {
-                    // data.cards = _.filter(graph.cards, function(card) {
-                    //     var nodegroup = _.find(graph.graph.nodegroups, function(group) {
-                    //         return group.nodegroupid === card.nodegroup_id;
-                    //     });
-                    //     return !nodegroup || !nodegroup.parentnodegroup_id;
-                    // }).map(function(card) {
-                    //     return new CardViewModel({
-                    //         card: card,
-                    //         graphModel: graph.graphModel,
-                    //         resourceId: data.resourceid,
-                    //         displayname: data.displayname,
-                    //         cards: graph.cards,
-                    //         tiles: data.tiles,
-                    //         cardwidgets: graph.cardwidgets
-                    //     });
-                    // });
+                    var report;
 
-                    // data.templates = reportLookup;
-                    // data.cardComponents = cardComponents;
+                    var reportFetchesOwnData = Boolean(
+                        reportLookup[graph.graph.template_id] 
+                        && !JSON.parse(reportLookup[graph.graph.template_id]['preload_resource_data'].toLowerCase())
+                    )
 
-                    self.report = {
-                        /* basic data to avoid loading report model */ 
-                        get: function(identifier) {
-                            var foo = {
-                                'template_id': ko.observable(graph.graph.template_id),
-                                'resourceid': data.resourceid,
+                    /* if report template fetches its own data, let's avoid any unneccesary heavy logic */ 
+                    if (reportFetchesOwnData) {
+                        report = {
+                            /* basic data to avoid loading report model */ 
+                            get: function(identifier) {
+                                var lookup = {
+                                    'template_id': ko.observable(graph.graph.template_id),
+                                    'resourceid': data.resourceid,
+                                }
+    
+                                return lookup[identifier];
                             }
-
-                            return foo[identifier];
                         }
                     }
+                    else {
+                        data.cards = _.filter(graph.cards, function(card) {
+                            var nodegroup = _.find(graph.graph.nodegroups, function(group) {
+                                return group.nodegroupid === card.nodegroup_id;
+                            });
+                            return !nodegroup || !nodegroup.parentnodegroup_id;
+                        }).map(function(card) {
+                            return new CardViewModel({
+                                card: card,
+                                graphModel: graph.graphModel,
+                                resourceId: data.resourceid,
+                                displayname: data.displayname,
+                                cards: graph.cards,
+                                tiles: data.tiles,
+                                cardwidgets: graph.cardwidgets
+                            });
+                        });
+    
+                        data.templates = reportLookup;
+                        data.cardComponents = cardComponents;
 
-                    // self.report = new ReportModel(_.extend(data, {
-                    //     graphModel: graph.graphModel,
-                    //     graph: graph.graph,
-                    //     datatypes: graph.datatypes
-                    // }));
+                        report = new ReportModel(_.extend(data, {
+                            graphModel: graph.graphModel,
+                            graph: graph.graph,
+                            datatypes: graph.datatypes
+                        }));
+                    }
 
+                    self.report = report;
                     self.loading(false);
                 };
 
@@ -97,8 +109,6 @@ define([
                     };
                     self.loading(true);
 
-                    console.log("A", self, graph, tileData, source, reportLookup)
-
                     if (graph) {
                         processReportData(tileData, graph);
                     }
@@ -108,8 +118,6 @@ define([
                                 data: data.graph,
                                 datatypes: data.datatypes
                             });
-
-                            console.log("B", data, graphCache)
 
                             graph = {
                                 graphModel: graphModel,
