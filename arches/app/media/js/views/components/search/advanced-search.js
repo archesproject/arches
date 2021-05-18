@@ -102,7 +102,7 @@ define([
                         this.updateQuery();
                     }, this);
 
-                    options.loading(false)
+                    options.loading(false);
                 });
 
                 this.filters[componentName](this);
