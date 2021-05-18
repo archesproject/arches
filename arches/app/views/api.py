@@ -8,7 +8,6 @@ import sys
 import uuid
 import traceback
 from io import StringIO
-from arches.app.utils import response
 from oauth2_provider.views import ProtectedResourceView
 from pyld.jsonld import compact, frame, from_rdf
 from rdflib import RDF

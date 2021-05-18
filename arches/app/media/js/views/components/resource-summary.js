@@ -17,7 +17,6 @@ define([
         var CardViewModel = require('viewmodels/card');
         this.loading = ko.observable(false);
         this.reportLookup = reportLookup;
-        // this.report = params.report || ko.observable();
         this.graphId = params.graphId || ko.observable();
         this.dataSource = params.source || ko.observable();
         this.resourceId = params.resourceId;
