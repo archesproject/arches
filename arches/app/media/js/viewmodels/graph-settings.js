@@ -40,19 +40,6 @@ define([
         var ontologyClass = self.rootnode.ontologyclass;
         var ontologyClassFriendlyName = self.rootnode.ontologyclass_friendlyname;
 
-        self.hasUpdatedCustomSearchResultDetailsTemplatePreference = ko.observable(false);
-
-        self.updateCustomSearchResultDetailsTemplatePreference = function(preference) {
-            self.graph.config['shouldUseCustomSearchResultTemplate'] = preference;
-            self.rootnode.config['shouldUseCustomSearchResultTemplate'] = preference;
-
-            self.graph.root.config = koMapping.toJS(self.rootnode.config);
-            
-            self.hasUpdatedCustomSearchResultDetailsTemplatePreference(!self.hasUpdatedCustomSearchResultDetailsTemplatePreference());
-        };
-
-        console.log("IN GAPH SETTINGS", self, params)
-
         self.jsonData = ko.computed(function() {
             var relatableResourceIds = _.filter(self.resource_data(), function(resource){
                 return resource.isRelatable();
@@ -112,7 +99,6 @@ define([
                 })
                 .always(function(){
                     self.contentLoading(false);
-                    self.hasUpdatedCustomSearchResultDetailsTemplatePreference(false);
                 });
         };
 
