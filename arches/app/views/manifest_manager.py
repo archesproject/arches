@@ -290,7 +290,6 @@ class ManifestManagerView(View):
 class IIIFServerProxyView(ProxyView):
     upstream = settings.CANTALOUPE_HTTP_ENDPOINT
 
-
     def get_request_headers(self):
         headers = super(IIIFServerProxyView, self).get_request_headers()
         if settings.CANTALOUPE_HTTP_ENDPOINT is None:
