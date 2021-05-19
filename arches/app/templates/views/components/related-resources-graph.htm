@@ -72,6 +72,14 @@
 <div class="workbench-card-sidepanel-header-container">
     <h4 class="workbench-card-sidepanel-header" data-bind="click: hideSidePanel">{% trans "Legend" %}</h4>
 </div>
+<div class="legend-listing-container" data-bind="foreach: legendEntries">
+    <div class="legend-listing">
+        <div class="legend-name">
+            <i data-bind="css: iconclass, style: {color: fillColor}" class="layer-listing-icon"></i>
+            <span data-bind="text: name"></span>
+        </div>
+    </div>
+</div>
 <!--/ko -->
 {% endblock sidepanel %}
 

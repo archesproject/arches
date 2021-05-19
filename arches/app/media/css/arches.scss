@@ -13850,6 +13850,9 @@ a.jstree-anchor.permissions-widget {
         margin-top: 2px;
         top: $controls-height + $controls-top;
     }
+    .legend-listing {
+        cursor: default;
+    }
 }
 
 @keyframes loader {

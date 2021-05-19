@@ -16,6 +16,7 @@ define([
             this.selection = ko.observable();
             this.selectionMode = ko.observable('information');
             this.informationElement = ko.observable();
+            this.legendEntries = ko.observableArray();
 
             WorkbenchViewmodel.apply(this, [params]);
 
@@ -57,10 +58,12 @@ define([
                                 return elements.length === 0;
                             });
                         viz.add(elements);
+                        viz.layout(layout).run();
                         viz.fit(null, fitPadding);
                     });
             };
             var getStyle = function() {
+                self.legendEntries([]);
                 var styles = [{
                     "selector": "node",
                     "style": {
@@ -91,6 +94,7 @@ define([
                         }
                     };
                     styles.push(style);
+                    self.legendEntries.push(resourceTypeLookup[resourceId]);
                 }
                 return styles;
             };
@@ -158,7 +162,8 @@ define([
                 var viz = self.viz();
                 if (selection) switch (mode) {
                 case 'expand':
-                    expandNode(selection);
+                    if (selection.source) viz.elements().unselect();
+                    else expandNode(selection);
                     break;
                 case 'delete':
                     var element = viz.getElementById(selection.id);
@@ -166,8 +171,11 @@ define([
                     viz.fit(null, fitPadding);
                     break;
                 case 'focus':
-                    self.focusResourceId(selection.id);
-                    self.informationElement(selection);
+                    if (selection.source) viz.elements().unselect();
+                    else {
+                        self.focusResourceId(selection.id);
+                        self.informationElement(selection);
+                    }
                     break;
                 default:
                     self.informationElement(selection);
