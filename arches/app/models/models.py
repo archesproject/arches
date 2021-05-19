@@ -1361,7 +1361,7 @@ class IIIFManifest(models.Model):
 
 class ManifestImage(models.Model):
     imageid = models.UUIDField(primary_key=True, default=uuid.uuid1)
-    image = models.ImageField(upload_to="cantaloupe")
+    image = models.ImageField(upload_to="uploadedfiles")
 
     class Meta:
         managed = True
