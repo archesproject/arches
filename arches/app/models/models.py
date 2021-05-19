@@ -83,7 +83,7 @@ class L10n_Field(object):
         return str(self)
 
 
-class TranlatedJSONField(JSONField):
+class TranlatedTextField(models.TextField):
     def from_db_value(self, value, expression, connection):
         # import ipdb; ipdb.sset_trace()
         if value is not None:
@@ -119,7 +119,7 @@ class TranlatedJSONField(JSONField):
 
 class CardModel(models.Model):
     cardid = models.UUIDField(primary_key=True, default=uuid.uuid1)  # This field type is a guess.
-    name = TranlatedJSONField(blank=True, null=True, default=default_lang_node_json)
+    name = TranlatedTextField(blank=True, null=True)
     description = models.TextField(blank=True, null=True)
     instructions = models.TextField(blank=True, null=True)
     cssclass = models.TextField(blank=True, null=True)

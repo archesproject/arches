@@ -27,6 +27,6 @@ class Migration(migrations.Migration):
         migrations.AlterField(
             model_name='cardmodel',
             name='name',
-            field=arches.app.models.models.TranlatedJSONField(blank=True, default=arches.app.utils.language.default_lang_node_json, null=True),
+            field=arches.app.models.models.TranlatedTextField(blank=True, null=True),
         ),
     ]
