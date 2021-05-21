@@ -43,6 +43,10 @@ define([
             config.workflow.setLock(stepName, locked);
         };
 
+        this.locked.subscribe(function(val){
+            self.setToLocalStorage("locked", val);
+        });
+
         var externalStepSourceData = ko.unwrap(config.externalstepdata) || {};
         Object.keys(externalStepSourceData).forEach(function(key) {
             if (key !== '__ko_mapping__') {
@@ -120,6 +124,11 @@ define([
                 self.id(uuid.generate());
             }
 
+            var locked = self.getFromLocalStorage('locked');
+            if (locked) {
+                self.locked(locked);
+            }
+
             /* cached value logic */ 
             var cachedValue = self.getFromLocalStorage('value');
             if (cachedValue) {
@@ -187,7 +196,7 @@ define([
         this.getFromLocalStorage = function(key) {
             var allStepsLocalStorageData = JSON.parse(localStorage.getItem(STEPS_LABEL)) || {};
 
-            if (allStepsLocalStorageData[self.id()]) {
+            if (allStepsLocalStorageData[self.id()] && allStepsLocalStorageData[self.id()][key]) {
                 return JSON.parse(allStepsLocalStorageData[self.id()][key]);
             }
         };
