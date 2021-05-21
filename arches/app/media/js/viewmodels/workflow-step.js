@@ -37,6 +37,11 @@ define([
         this.postSaveCallback = ko.observable();
 
         this.externalStepData = {};
+        this.locked = ko.observable();
+
+        this.setLock = function(stepName, locked) {
+            config.workflow.setLock(stepName, locked);
+        };
 
         var externalStepSourceData = ko.unwrap(config.externalstepdata) || {};
         Object.keys(externalStepSourceData).forEach(function(key) {

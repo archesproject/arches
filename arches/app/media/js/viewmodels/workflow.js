@@ -186,6 +186,13 @@ define([
             }
         };
 
+        this.setLock = function(stepName, locked) {
+            var step = self.steps.find(function(step) { return ko.unwrap(step.name) === ko.unwrap(stepName) });
+            if (step) {
+                step.locked(locked);
+            }
+        }
+
         this.getStepIdFromUrl = function() {
             var searchParams = new URLSearchParams(window.location.search);
             return searchParams.get(STEP_ID_LABEL);
