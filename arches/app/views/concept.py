@@ -152,7 +152,9 @@ def concept(request, conceptid):
             if value.category == "label":
                 labels.append(value)
             if value.type == "image":
-                value.full_image_url = ((settings.FORCE_SCRIPT_NAME if settings.FORCE_SCRIPT_NAME is not None else "") + settings.MEDIA_URL + value.value).replace("//", "/")
+                value.full_image_url = (
+                    (settings.FORCE_SCRIPT_NAME if settings.FORCE_SCRIPT_NAME is not None else "") + settings.MEDIA_URL + value.value
+                ).replace("//", "/")
 
         if (mode == "semantic" or mode == "") and (
             concept_graph.nodetype == "Concept" or concept_graph.nodetype == "ConceptScheme" or concept_graph.nodetype == "EntityType"
