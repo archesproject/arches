@@ -491,11 +491,9 @@ class Graphs(APIBase):
         if graph is None:
             graph = Graph.objects.get(graphid=graph_id)
 
-        resp = {
-            'graph': JSONSerializer().serializeToPython(graph, sort_keys=False, exclude=["is_editable", "functions"])
-        }
+        resp = {"graph": JSONSerializer().serializeToPython(graph, sort_keys=False, exclude=["is_editable", "functions"])}
 
-        if request.GET.get('context') is 'search-result-details' and graph.template.preload_resource_data:
+        if request.GET.get("context") is "search-result-details" and graph.template.preload_resource_data:
             cards = CardProxyModel.objects.filter(graph_id=graph_id).order_by("sortorder")
             permitted_cards = []
 
@@ -503,11 +501,13 @@ class Graphs(APIBase):
                 if user.has_perm(perm, card.nodegroup):
                     card.filter_by_perm(user, perm)
                     permitted_cards.append(card)
-                    
+
             resp["datatypes"] = models.DDataType.objects.all()
             resp["cards"] = JSONSerializer().serializeToPython(permitted_cards, sort_keys=False, exclude=["is_editable"])
             resp["cardwidgets"] = [
-                widget for widgets in [card.cardxnodexwidget_set.order_by("sortorder").all() for card in permitted_cards] for widget in widgets
+                widget
+                for widgets in [card.cardxnodexwidget_set.order_by("sortorder").all() for card in permitted_cards]
+                for widget in widgets
             ]
 
         return JSONResponse(resp)
