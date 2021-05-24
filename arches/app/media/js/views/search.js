@@ -126,9 +126,10 @@ define([
                 this.doQuery();
             }, this);
 
-            BaseManagerView.prototype.initialize.call(this, options);
+            this.viewModel.loading(true);
+            this.firstLoadComplete = ko.observable(false);  /* logic to not call `loading(complete)` too early in page load */
 
-            this.doQuery();
+            BaseManagerView.prototype.initialize.call(this, options);
         },
 
         doQuery: function() {
@@ -166,7 +167,13 @@ define([
                     }
                 },
                 complete: function(request, status) {
-                    this.viewModel.loading(false);
+                    if (!this.firstLoadComplete()) {
+                        this.firstLoadComplete(true);
+                    }
+                    else {
+                        this.viewModel.loading(false);
+                    }
+
                     this.updateRequest = undefined;
                     window.history.pushState({}, '', '?' + $.param(queryString).split('+').join('%20'));
                 }
