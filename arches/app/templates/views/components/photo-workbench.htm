@@ -33,9 +33,9 @@
 
     <div style="position: absolute; bottom: 0px; width: 100%;" data-bind="style: {display: !!self.displayContent() ? 'inherit' : 'none'}">
         <div class="thumbnail-gallery-container" data-bind="slide: showThumbnails, duration: 100, direction: {direction: 'down'}, easing: 'slide'">
-            <div class='show-thumbnails-btn open' data-bind="click: function(){showThumbnails(!showThumbnails())}, text: '{% trans "close" %}'"></div>
+            <div class='show-thumbnails-btn open' data-bind="click: function(){showThumbnails(!showThumbnails())}, text: '{% trans "Close" %}'"></div>
             <div class="thumbnail-container" data-bind="gallery: photoGallery.pan, duration: 400, scrolldistance: 100, thumbnailclass: 'gallery-thumbnails'">
-                <div class="thumbnail-gallery-controls left" data-bind="click: function(){photoGallery.updatePan('left')}"><i class="fa fa-angle-left"></i></div>
+                <div class="thumbnail-gallery-controls right" data-bind="click: function(){photoGallery.updatePan('left')}"><i class="fa fa-angle-left"></i></div>
                 <div class="gallery-thumbnails">
                     <!-- ko foreach: { data: card.tiles(), as: 'tile'} -->
                     <div style='position: relative'>
@@ -54,7 +54,7 @@
                     </div>
                     <!-- /ko -->
                 </div>
-                <div class="thumbnail-gallery-controls right" data-bind="click: function(){photoGallery.updatePan('right')}"><i class="fa fa-angle-right"></i></div>
+                <div class="thumbnail-gallery-controls left" data-bind="click: function(){photoGallery.updatePan('right')}"><i class="fa fa-angle-right"></i></div>
             </div>
         </div>
 
