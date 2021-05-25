@@ -28,6 +28,9 @@ define([
             options = options ? options : {};
             options.viewModel = (options && options.viewModel) ? options.viewModel : {};
 
+
+            console.log('base manager init', this, options, data)
+
             data.graphs.sort(function (left, right) {
                 return left.name.toLowerCase() == right.name.toLowerCase() ? 0 : (left.name.toLowerCase() < right.name.toLowerCase() ? -1 : 1);
             });

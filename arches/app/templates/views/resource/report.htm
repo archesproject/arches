@@ -27,12 +27,8 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 
 {% block main_content %}
 <div class='scroll-y'>
-    <div class='resource-report' data-bind='component: {
-        name: reportLookup[report.get("template_id")()].componentname,
-        params: {
-            report: report
-        }
-    }'></div>
+
+    <div style="display:none" data-bind="text: console.log('hm,mmmm', this, $data, $root)"></div>
 
     <footer 
         id="footer" 
@@ -55,22 +51,17 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 {% endblock main_content %}
 
 {% block pre_require_js %}
-{{ block.super }}
-<script>{% autoescape off %}
-define('resource-report-data', [], function () {
-    return {
-        templates: {{templates_json}},
-        datatypes: {{ datatypes_json }},
-        cards: {{cards}},
-        tiles: {{tiles}},
-        graph: {{graph_json}},
-        related_resources: {{related_resources}},
-        displayname: "{{displayname | escapejs}}",
-        cardComponents: {{card_components_json}},
-        resourceid: '{{resourceid}}',
-        cardwidgets: {{cardwidgets}},
-        hideEmptyNodes: JSON.parse('{{hide_empty_nodes}}'.toLowerCase())
-    };
-});
-{% endautoescape %}</script>
+    {{ block.super }}
+
+    <script>
+        {% autoescape off %}
+        require(['knockout', 'viewmodels/report'], function(ko, ReportViewModel) {
+            ReportViewModel.apply(this, [{
+                'resource_instance_id': "{{ resource_instance_id }}",
+                'graph_id': "{{ graph_id }}",
+                'report_template_id': "{{ report_template_id }}",
+            }]);
+        });
+        {% endautoescape %}
+    </script>
 {% endblock pre_require_js %}
