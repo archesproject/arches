@@ -44,6 +44,8 @@ from django.conf import settings
 from arches.app.models.system_settings import settings
 from django.utils.translation import get_language
 from django.contrib.postgres.fields.jsonb import JsonAdapter
+import polib
+
 class JSONBSet(object):
     def __init__(self, attname, value):
         self.sql = "jsonb_set(" + attname + ", %s, %s)"
@@ -59,6 +61,8 @@ class L10n_Field(object):
         self.value = value
 
     def __str__(self):
+        return self.value
+
         if self.value is None:
             return self.value
 
@@ -86,6 +90,11 @@ class L10n_Field(object):
 class TranlatedTextField(models.TextField):
     def from_db_value(self, value, expression, connection):
         # import ipdb; ipdb.sset_trace()
+        if get_language() == "es":
+            po = polib.pofile(os.path.join(settings.APP_ROOT, "locale", "es", "LC_MESSAGES", "django.po"))
+            for entry in po.translated_entries():
+                if entry.msgid == value:
+                    return L10n_Field(entry.msgstr)
         if value is not None:
             return L10n_Field(value)
         return None
@@ -102,6 +111,13 @@ class TranlatedTextField(models.TextField):
     def get_prep_value(self, value):
         # import ipdb; ipdb.sset_trace()
         # print(f'in get_prep_value, value={value}')
+        if get_language() == "es":
+            po = polib.pofile(os.path.join(settings.APP_ROOT, "locale", "es", "LC_MESSAGES", "django.po"))
+            for entry in po.translated_entries():
+                if entry.msgid == value:
+                    return L10n_Field(entry.msgstr)
+                    
+        return value
         if isinstance(value, str):
             try:
                 json.loads(value)
@@ -114,7 +130,7 @@ class TranlatedTextField(models.TextField):
         return value
 
     def get_db_prep_value(self, value, connection, prepared=False):
-        # print(f'in get_db_prep_value, value={value}')
+        print(f'in get_db_prep_value, value={value}')
         return super().get_db_prep_value(value, connection, prepared)
 
 class CardModel(models.Model):
