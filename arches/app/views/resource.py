@@ -544,7 +544,7 @@ class ResourceActivityStreamPageView(BaseManagerView):
         current_page = 1
         page_size = 100
         if hasattr(settings, "ACTIVITY_STREAM_PAGE_SIZE"):
-            page_size = int(setting.ACTIVITY_STREAM_PAGE_SIZE)
+            page_size = int(settings.ACTIVITY_STREAM_PAGE_SIZE)
         st = 0
         end = 100
         if page is not None:
@@ -591,7 +591,7 @@ class ResourceActivityStreamCollectionView(BaseManagerView):
     def get(self, request):
         page_size = 100
         if hasattr(settings, "ACTIVITY_STREAM_PAGE_SIZE"):
-            page_size = int(setting.ACTIVITY_STREAM_PAGE_SIZE)
+            page_size = int(settings.ACTIVITY_STREAM_PAGE_SIZE)
 
         totalItems = models.EditLog.objects.all().exclude(resourceclassid=settings.SYSTEM_SETTINGS_RESOURCE_MODEL_ID).count()
 

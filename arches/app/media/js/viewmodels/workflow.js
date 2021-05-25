@@ -168,7 +168,22 @@ define([
         this.getStepData = function(stepName) {
             /* ONLY to be used as intermediary for when a step needs data from a different step in the workflow */
             var step = self.steps.find(function(step) { return ko.unwrap(step.name) === ko.unwrap(stepName) });
-            if (step) { return step.value(); }
+
+            if (step) { 
+                return new Promise(function(resolve) {
+                    if (step.saving()) {
+                        var savingSubscription = step.saving.subscribe(function(saving) {
+                            if (!saving) {
+                                savingSubscription.dispose(); /* self-disposing subscription */
+                                resolve(step.value()); 
+                            }
+                        });
+                    }
+                    else {
+                        resolve(step.value());
+                    }
+                });
+            }
         };
 
         this.getStepIdFromUrl = function() {
