@@ -283,8 +283,11 @@ class Command(BaseCommand):
                 options["create_concepts"],
                 use_multiprocessing=options["use_multiprocessing"],
                 force=options["yes"],
-                prevent_indexing=options["prevent_indexing"],
+                prevent_indexing=(options["prevent_indexing"] or options["bulk_load"]),
             )
+            if options["prevent_indexing"] is False and options["bulk_load"] is True:
+                utils.print_message("indexing database")
+                management.call_command("es", "reindex_database")
 
         if options["operation"] == "import_node_value_data":
             self.import_node_value_data(options["source"], options["overwrite"])
@@ -706,17 +709,23 @@ class Command(BaseCommand):
                 # assumes resources in csv do not depend on data being loaded prior from json in same dir
                 chord(
                     [
-                        import_business_data.s(data_source=path, overwrite=True, bulk_load=bulk_load, prevent_indexing=prevent_indexing)
+                        import_business_data.s(
+                            data_source=path, overwrite=True, bulk_load=bulk_load, prevent_indexing=(bulk_load or prevent_indexing)
+                        )
                         for path in valid_resource_paths
                     ]
-                )(package_load_complete.signature(kwargs={"valid_resource_paths": valid_resource_paths}).on_error(on_chord_error.s()))
+                )(
+                    package_load_complete.signature(kwargs={"valid_resource_paths": valid_resource_paths}).on_error(on_chord_error.s())
+                )  # TODO add a task to index on pkg load complete
             else:
                 for path in business_data:
                     if path not in erring_csvs:
-                        self.import_business_data(path, overwrite=True, bulk_load=bulk_load, prevent_indexing=prevent_indexing)
+                        self.import_business_data(
+                            path, overwrite=True, bulk_load=bulk_load, prevent_indexing=(bulk_load or prevent_indexing)
+                        )
 
             relations = glob.glob(os.path.join(package_dir, "business_data", "relations", "*.relations"))
-            for relation in relations:
+            for relation in relations:  # TODO: create a celery task for this on import_business_data complete
                 self.import_business_data_relations(relation)
 
             uploaded_files = glob.glob(os.path.join(package_dir, "business_data", "files", "*"))
@@ -917,7 +926,7 @@ class Command(BaseCommand):
         update_resource_geojson_geometries()
         print("loading post sql")
         load_sql(package_location, "post_sql")
-        if defer_indexing is True:
+        if defer_indexing is True and celery_worker_running is False:
             print("indexing database")
             management.call_command("es", "reindex_database")
         if celery_worker_running:
