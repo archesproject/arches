@@ -15,7 +15,7 @@ class Migration(migrations.Migration):
             name="unique_nodename_nodegroup",
         ),
         migrations.AddConstraint(
-            model_name='node',
-            constraint=models.UniqueConstraint(fields=('name', 'nodegroup'), name='unique_nodename_nodegroup'),
+            model_name="node",
+            constraint=models.UniqueConstraint(fields=("name", "nodegroup"), name="unique_nodename_nodegroup"),
         ),
     ]
