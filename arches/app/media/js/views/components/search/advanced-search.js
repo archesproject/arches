@@ -101,6 +101,8 @@ define([
                     filterUpdated.subscribe(function() {
                         this.updateQuery();
                     }, this);
+
+                    options.loading(false);
                 });
 
                 this.filters[componentName](this);
