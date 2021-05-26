@@ -705,8 +705,8 @@ class ResourceReportView(MapBaseManagerView):
             graphname=graph.name,
             report_templates=models.ReportTemplate.objects.all(),
         )
-        context['report_template_id'] = graph.template_id
-        
+        context["report_template_id"] = graph.template_id
+
         return render(request, "views/resource/foo.htm", context)
 
 
