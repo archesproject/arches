@@ -1,0 +1,45 @@
+{% extends "base-manager.htm" %}
+{% load staticfiles %}
+{% load i18n %}
+
+{% block main_content %}
+    <div 
+        style="height: calc(100vh - 50px)" 
+        class="foo" 
+    >
+        <div 
+            data-bind="component: {
+                name: $data.bar ? $data.bar().componentname : 'foo'
+            }"
+        ></div>
+    </div>
+{% endblock main_content %}
+
+{% block pre_require_js %}
+
+    <script>
+        {% autoescape off %}
+        require(['knockout', 'viewmodels/foo'], function(ko, FooViewModel) {
+            var foo = document.querySelector('.foo');
+
+            var dd = new FooViewModel({
+                'resource_instance_id': "{{ resourceid }}",
+                'graph_id': "{{ graphid }}",
+                'report_template_id': "{{ report_template_id }}",
+            })
+
+            // ko.components.register("foo",{
+            //     viewModel: function() { },
+            //     template: '<strong>DatePicker stub is showing!</strong>'
+            // });
+
+
+            ko.cleanNode(foo);
+            ko.applyBindings(dd, foo);
+        });
+        {% endautoescape %}
+    </script>
+
+    {{ block.super }}
+
+{% endblock pre_require_js %}

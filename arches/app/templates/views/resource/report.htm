@@ -26,9 +26,10 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 
 
 {% block main_content %}
+<!-- ko if: !loading() -->
 <div class='scroll-y'>
 
-    <div style="display:none" data-bind="text: console.log('hm,mmmm', this, $data, $root)"></div>
+    <div style="display:none" data-bind="text: console.log('hm,mmmm', this, $data,  $root)"></div>
 
     <footer 
         id="footer" 
@@ -48,6 +49,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
         </div>
     </footer>
 </div>
+<!-- /ko -->
 {% endblock main_content %}
 
 {% block pre_require_js %}
@@ -57,8 +59,8 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
         {% autoescape off %}
         require(['knockout', 'viewmodels/report'], function(ko, ReportViewModel) {
             ReportViewModel.apply(this, [{
-                'resource_instance_id': "{{ resource_instance_id }}",
-                'graph_id': "{{ graph_id }}",
+                'resource_instance_id': "{{ resourceid }}",
+                'graph_id': "{{ graphid }}",
                 'report_template_id': "{{ report_template_id }}",
             }]);
         });
