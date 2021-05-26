@@ -694,6 +694,7 @@ class ResourceDescriptors(View):
 @method_decorator(can_read_resource_instance, name="dispatch")
 class ResourceReportView(MapBaseManagerView):
     def get(self, request, resourceid=None):
+<<<<<<< HEAD
         resource = Resource.objects.get(pk=resourceid)
         graph = Graph.objects.get(graphid=resource.graph_id)
 
@@ -708,6 +709,19 @@ class ResourceReportView(MapBaseManagerView):
         context['report_template_id'] = graph.template_id
         
         return render(request, "views/resource/foo.htm", context)
+=======
+        context = self.get_context_data(main_script="views/resource")
+
+        resource = Resource.objects.get(pk=resourceid)
+        graph = Graph.objects.get(graphid=resource.graph_id)
+
+        context["resource_instance_id"] = resourceid
+        context["graph_id"] = resource.graph_id
+        context["report_template_id"] = graph.template_id
+
+        return render(request, "views/resource/report.htm", context)
+>>>>>>> edf8e7c02da9c62dd3ec348e6c27eb85e95100f1
+
 
 @method_decorator(can_read_resource_instance, name="dispatch")
 class RelatedResourcesView(BaseManagerView):
