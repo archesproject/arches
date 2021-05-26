@@ -6,16 +6,16 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('models', '7442_delete_manifest_images_table'),
+        ("models", "7442_delete_manifest_images_table"),
     ]
 
     operations = [
         migrations.RemoveConstraint(
-            model_name='node',
-            name='unique_nodename_nodegroup',
+            model_name="node",
+            name="unique_nodename_nodegroup",
         ),
         migrations.AddConstraint(
-            model_name='node',
-            constraint=models.UniqueConstraint(fields=('name', 'nodegroupid'), name='unique_nodename_nodegroup'),
+            model_name="node",
+            constraint=models.UniqueConstraint(fields=("name", "nodegroupid"), name="unique_nodename_nodegroup"),
         ),
     ]
