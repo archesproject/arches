@@ -323,7 +323,7 @@ class Command(BaseCommand):
                 options["yes"],
                 options["dev"],
                 defer_indexing,
-                options["prevent_indexing"]
+                options["prevent_indexing"],
             )
 
         if options["operation"] in ["create", "create_package"]:
@@ -507,7 +507,7 @@ class Command(BaseCommand):
         yes=False,
         dev=False,
         defer_indexing=True,
-        prevent_indexing=False
+        prevent_indexing=False,
     ):
 
         celery_worker_running = task_management.check_if_celery_available()
