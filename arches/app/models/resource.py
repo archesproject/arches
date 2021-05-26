@@ -170,7 +170,7 @@ class Resource(models.ResourceInstance):
         return tiles
 
     @staticmethod
-    def bulk_save(resources, flat=False, prevent_indexing=False):
+    def bulk_save(resources, prevent_indexing=False):
         """
         Saves and indexes a list of resources
 
@@ -188,8 +188,7 @@ class Resource(models.ResourceInstance):
         term_list = []
 
         for resource in resources:
-            if flat is False:
-                resource.tiles = resource.get_flattened_tiles()
+            resource.tiles = resource.get_flattened_tiles()
             tiles.extend(resource.tiles)
 
         # need to save the models first before getting the documents for index
