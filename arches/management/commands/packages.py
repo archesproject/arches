@@ -323,6 +323,7 @@ class Command(BaseCommand):
                 options["yes"],
                 options["dev"],
                 defer_indexing,
+                options["prevent_indexing"]
             )
 
         if options["operation"] in ["create", "create_package"]:
@@ -506,6 +507,7 @@ class Command(BaseCommand):
         yes=False,
         dev=False,
         defer_indexing=True,
+        prevent_indexing=False
     ):
 
         celery_worker_running = task_management.check_if_celery_available()
@@ -926,7 +928,7 @@ class Command(BaseCommand):
         update_resource_geojson_geometries()
         print("loading post sql")
         load_sql(package_location, "post_sql")
-        if defer_indexing is True and celery_worker_running is False:
+        if defer_indexing is True and celery_worker_running is False and prevent_indexing is False:
             print("indexing database")
             management.call_command("es", "reindex_database")
         if celery_worker_running:
