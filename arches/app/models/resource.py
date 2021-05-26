@@ -176,7 +176,6 @@ class Resource(models.ResourceInstance):
 
         Arguments:
         resources -- a list of resource models
-        flat -- boolean value whether incoming resource.tiles list already flat or instead nested
         prevent_indexing -- prevents any kind of indexing within scope of this method
 
         """
