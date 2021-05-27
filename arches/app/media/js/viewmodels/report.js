@@ -11,17 +11,21 @@ define([
     var ReportViewModel = function(params) {
         var self = this;
 
-        var foo = document.querySelector('#foo');
-        var bar = reportLookup[params.report_template_id]
+        var reportData = reportLookup[params.report_template_id];
+        var shouldPreloadResourceData = Boolean(reportData.preload_resource_data.toLowerCase() === 'true');
 
-        ko.components.get(reportLookup[params.report_template_id].componentname, function(component) {
-            console.log("dsiof", component)
-            console.log("report vm init", self, params, reportLookup, bar, foo,)
 
-            ko.virtualElements.setDomNodeChildren(foo, component.template);
+        if (shouldPreloadResourceData) {
+            console.log("@@", reportData)
+        }
+
+        var reportContainer = document.querySelector('#report-container');
+
+        ko.components.get(reportData.componentname, function(component) {
+            ko.virtualElements.setDomNodeChildren(reportContainer, component.template);
     
-            ko.cleanNode(foo)
-            ko.applyBindings(component.createViewModel(), foo)
+            ko.cleanNode(reportContainer);
+            ko.applyBindings(component.createViewModel(), reportContainer);
         });
         
 
