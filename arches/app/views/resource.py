@@ -695,16 +695,14 @@ class ResourceDescriptors(View):
 class ResourceReportView(MapBaseManagerView):
     def get(self, request, resourceid=None):
         resource = Resource.objects.get(pk=resourceid)
-        graph = Graph.objects.get(graphid=resource.graph_id)
 
         context = self.get_context_data(
             main_script="views/resource",
             resourceid=resourceid,
-            graphid=graph.graphid,
-            graphiconclass=graph.iconclass,
-            graphname=graph.name,
             report_templates=models.ReportTemplate.objects.all(),
         )
+
+        graph = Graph.objects.get(graphid=resource.graph_id)
         context["report_template_id"] = graph.template_id
 
         context["nav"]["icon"] = "fa fa-bookmark"
