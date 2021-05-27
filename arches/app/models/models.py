@@ -537,7 +537,7 @@ class Node(models.Model):
         managed = True
         db_table = "nodes"
         constraints = [
-            models.UniqueConstraint(fields=["name", "nodegroupid"], name="unique_nodename_nodegroup"),
+            models.UniqueConstraint(fields=["name", "nodegroup"], name="unique_nodename_nodegroup"),
         ]
 
 
