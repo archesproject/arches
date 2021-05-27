@@ -7,11 +7,16 @@
         style="height: calc(100vh - 50px)" 
         class="foo" 
     >
+        <!-- ko if: !ko.unwrap($data.loading) -->
         <div 
             data-bind="component: {
-                name: $data.bar ? $data.bar().componentname : 'foo'
+                name: $data.reportMetadata ? $data.reportMetadata().componentname : 'foo',
+                params: {
+                    'foo': 'bar'
+                }
             }"
         ></div>
+        <!-- /ko -->
     </div>
 {% endblock main_content %}
 
@@ -27,12 +32,6 @@
                 'graph_id': "{{ graphid }}",
                 'report_template_id': "{{ report_template_id }}",
             })
-
-            // ko.components.register("foo",{
-            //     viewModel: function() { },
-            //     template: '<strong>DatePicker stub is showing!</strong>'
-            // });
-
 
             ko.cleanNode(foo);
             ko.applyBindings(dd, foo);
