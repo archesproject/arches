@@ -18,10 +18,6 @@ define([
             console.log("dsiof", component)
             console.log("report vm init", self, params, reportLookup, bar, foo,)
 
-            
-            // component.template.forEach(function(qux) {
-            //     foo.append(qux)
-            // });
             ko.virtualElements.setDomNodeChildren(foo, component.template);
     
             ko.cleanNode(foo)
