@@ -7724,18 +7724,6 @@ span.file-upload-clear-filter {
     font-size: 12px;
 }
 
-.btn-file-upload-reset:hover, .btn-file-upload-reset:focus {
-    text-decoration: underline;
-}
-
-.btn-file-select:focus,
-.btn-file-upload-reset:focus,
-.file-upload-filter:focus,
-.btn-file-upload-limit:focus,
-.file-download:focus {
-    outline: #006600 solid 3px !important;
-}
-
 .file-upload-card-detail-right {
     min-width: 85px;
     float: right;
