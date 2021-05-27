@@ -5,12 +5,12 @@ define([
     'backbone',
     'views/page-view',
     'view-data',
-    'report-templates',
     'bindings/datatable',
     'uuid',
     'core-js',
     'dom-4',
-    'views/components/language-switcher'
+    'views/components/language-switcher',
+    'views/resource/report'
 ], function($, _, ko, Backbone, PageView, data) {
 
     var BaseManager = PageView.extend({

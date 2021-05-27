@@ -11,7 +11,23 @@ define([
     var ReportViewModel = function(params) {
         var self = this;
 
-        console.log("report vm init", self, params, reportLookup, reportLookup[params.report_template_id])
+        var foo = document.querySelector('#foo');
+        var bar = reportLookup[params.report_template_id]
+
+        ko.components.get(reportLookup[params.report_template_id].componentname, function(component) {
+            console.log("dsiof", component)
+            console.log("report vm init", self, params, reportLookup, bar, foo,)
+
+            
+            // component.template.forEach(function(qux) {
+            //     foo.append(qux)
+            // });
+            ko.virtualElements.setDomNodeChildren(foo, component.template);
+    
+            ko.cleanNode(foo)
+            ko.applyBindings(component.createViewModel(), foo)
+        });
+        
 
         // this.report = params.report || null;
         // this.summary = params.summary || false;
