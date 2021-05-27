@@ -655,7 +655,7 @@ define([
     
             params.postSaveCallback(function() {
                 self.hasUnsavedData(false);
-                // self.saving(false);
+                self.saving(false);
             });
 
             ko.toJS(params.layoutSections).forEach(function(layoutSection) {
