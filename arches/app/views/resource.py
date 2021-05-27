@@ -696,6 +696,7 @@ class ResourceReportView(MapBaseManagerView):
     def get(self, request, resourceid=None):
         resource = Resource.objects.get(pk=resourceid)
         graph = Graph.objects.get(graphid=resource.graph_id)
+        template = models.ReportTemplate.objects.get(pk=graph.template_id)
 
         context = self.get_context_data(
             main_script="views/resource",
@@ -705,9 +706,13 @@ class ResourceReportView(MapBaseManagerView):
             graphname=graph.name,
             report_templates=models.ReportTemplate.objects.all(),
         )
-        context["report_template_id"] = graph.template_id
+        context["report_template_id"] = template.pk
+        context["report_template_componentname"] = template.componentname
 
-        return render(request, "views/resource/foo.htm", context)
+        context["nav"]["icon"] = "fa fa-bookmark"
+        context["nav"]["title"] = _("Resource Report")
+
+        return render(request, "views/resource/report.htm", context)
 
 
 @method_decorator(can_read_resource_instance, name="dispatch")

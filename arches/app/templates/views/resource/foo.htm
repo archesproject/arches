@@ -10,7 +10,7 @@
         <!-- ko if: !ko.unwrap($data.loading) -->
         <div 
             data-bind="component: {
-                name: $data.reportMetadata ? $data.reportMetadata().componentname : 'foo',
+                name: '{{ report_template_componentname }}',
                 params: {
                     'foo': 'bar'
                 }
@@ -24,17 +24,8 @@
 
     <script>
         {% autoescape off %}
-        require(['knockout', 'viewmodels/foo'], function(ko, FooViewModel) {
-            var foo = document.querySelector('.foo');
+        require(['knockout', 'report-templates'], function(ko, FooViewModel) {
 
-            var dd = new FooViewModel({
-                'resource_instance_id': "{{ resourceid }}",
-                'graph_id': "{{ graphid }}",
-                'report_template_id': "{{ report_template_id }}",
-            })
-
-            ko.cleanNode(foo);
-            ko.applyBindings(dd, foo);
         });
         {% endautoescape %}
     </script>

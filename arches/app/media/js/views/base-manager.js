@@ -5,6 +5,7 @@ define([
     'backbone',
     'views/page-view',
     'view-data',
+    'report-templates',
     'bindings/datatable',
     'uuid',
     'core-js',
