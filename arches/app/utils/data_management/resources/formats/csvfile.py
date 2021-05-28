@@ -1023,7 +1023,22 @@ class CsvReader(Reader):
 
                         # mock_request_object = HttpRequest()
 
-                        if target_tile is not None and len(source_data) > 0:
+                        # identify whether a tile for this nodegroup on this resource already exists
+                        preexisting_tile_for_nodegroup = list(filter(lambda t: str(t.resourceinstance_id) == str(row["ResourceID"]) and str(t.nodegroup_id) == str(target_tile.nodegroup_id), populated_tiles))
+                        if len(preexisting_tile_for_nodegroup) > 0:
+                            preexisting_tile_for_nodegroup = preexisting_tile_for_nodegroup[0]
+                        else:
+                            preexisting_tile_for_nodegroup = False
+                        
+                        # aggregates a tile of the nodegroup associated with source_data (via get_blank_tile) onto the pre-existing tile who would be its parent
+                        if target_tile.nodegroup.cardinality == "1" and preexisting_tile_for_nodegroup and len(source_data) > 0:
+                            target_tile = get_blank_tile(source_data, child_only=True)
+                            populate_tile(source_data, target_tile, appending_to_parent=True)
+                            target_tile.parenttile = preexisting_tile_for_nodegroup
+                            preexisting_tile_for_nodegroup.tiles.append(target_tile)
+
+                        # populates a tile from parent-level nodegroup because parent cardinality is N or because none exists yet on resource
+                        elif target_tile is not None and len(source_data) > 0:
                             populate_tile(source_data, target_tile)
                             # Check that required nodes are populated. If not remove tile from populated_tiles array.
                             check_required_nodes(target_tile, target_tile, required_nodes, all_nodes)
