@@ -792,15 +792,19 @@ class CsvReader(Reader):
                     return {"value": value, "request": request}
 
                 def get_blank_tile(source_data, child_only=False, resourceid=None):
-
                     def get_existing_parent_tile(node):
                         parent_tile = None
                         if node.nodegroup.parentnodegroup_id is not None:
                             parent_nodegroup = node.nodegroup.parentnodegroup
                             # check if parenttile exists in db if "1" cardinality
-                            if parent_nodegroup.cardinality == "1" and Tile.objects.filter(nodegroup=parent_nodegroup, resourceinstance_id=resourceid).exists():
+                            if (
+                                parent_nodegroup.cardinality == "1"
+                                and Tile.objects.filter(nodegroup=parent_nodegroup, resourceinstance_id=resourceid).exists()
+                            ):
                                 parent_tile = Tile.objects.get(nodegroup=parent_nodegroup, resourceinstance_id=resourceid)
-                                nodegroups = NodeGroup.objects.filter(parentnodegroup_id=node.nodegroup.parentnodegroup_id).values_list('nodegroup_id', flat=True)
+                                nodegroups = NodeGroup.objects.filter(parentnodegroup_id=node.nodegroup.parentnodegroup_id).values_list(
+                                    "nodegroup_id", flat=True
+                                )
                                 existing_tile_nodegroupids = [t.nodegroup_id for t in parent_tile.tiles]
                                 missing_nodegroups = list(filter(lambda ng: ng not in existing_tile_nodegroupids, nodegroups))
                                 if len(missing_nodegroups) > 0:
@@ -1043,12 +1047,18 @@ class CsvReader(Reader):
                         # mock_request_object = HttpRequest()
 
                         # identify whether a tile for this nodegroup on this resource already exists
-                        preexisting_tile_for_nodegroup = list(filter(lambda t: str(t.resourceinstance_id) == str(row["ResourceID"]) and str(t.nodegroup_id) == str(target_tile.nodegroup_id), populated_tiles))
+                        preexisting_tile_for_nodegroup = list(
+                            filter(
+                                lambda t: str(t.resourceinstance_id) == str(row["ResourceID"])
+                                and str(t.nodegroup_id) == str(target_tile.nodegroup_id),
+                                populated_tiles,
+                            )
+                        )
                         if len(preexisting_tile_for_nodegroup) > 0:
                             preexisting_tile_for_nodegroup = preexisting_tile_for_nodegroup[0]
                         else:
                             preexisting_tile_for_nodegroup = False
-                        
+
                         # aggregates a tile of the nodegroup associated with source_data (via get_blank_tile) onto the pre-existing tile who would be its parent
                         if target_tile.nodegroup.cardinality == "1" and preexisting_tile_for_nodegroup and len(source_data) > 0:
                             target_tile = get_blank_tile(source_data, child_only=True)
