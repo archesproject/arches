@@ -941,6 +941,32 @@ div.wf-multi-tile-card-info div {
 }
 
 .workflow-nav-tab-container {
+    display: flex;
+    justify-content: space-between;
+    width: inherit;
+}
+
+.workflow-tab-controls {
+    min-width: 30px;
+    display: flex;
+    background-color: #eceef0;
+    align-items: center;
+    font-size: 30px;
+    justify-content: center;
+    border-bottom: solid 1px #ddd;
+    color: #555;
+    cursor: pointer;
+}
+
+.workflow-tab-controls.left {
+    border-left: solid 1px #ddd;
+}
+
+.workflow-tab-controls.right {
+    border-right: solid 1px #ddd;
+}
+
+.workflow-nav-tabs {
     overflow-x: scroll;
     min-height: 45px;
 }
@@ -951,7 +977,6 @@ div.wf-multi-tile-card-info div {
 }
 
 .workflow-nav-tab-list {
-    padding: 0px 10px 0px 10px;
     background-color: #fafafa;
     display: flex;
     min-width: max-content;
