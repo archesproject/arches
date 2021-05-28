@@ -567,13 +567,9 @@ class Tile(models.TileModel):
         tile.nodegroup_id = nodegroup_id
         tile.resourceinstance_id = resourceid
         tile.parenttile = parenttile
-        tile.data = {}
+        tile.data = {str(node.nodeid): None for node in models.Node.objects.filter(nodegroup=nodegroup_id) if node.datatype != "semantic"}
         tile.tileid = None
         tile.tiles = []
-
-        for node in models.Node.objects.filter(nodegroup=nodegroup_id):
-            if node.datatype != "semantic":
-                tile.data[str(node.nodeid)] = None
 
         return tile
 
