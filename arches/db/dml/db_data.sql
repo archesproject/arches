@@ -2056,26 +2056,6 @@ INSERT INTO icons(name, cssclass)
     VALUES ('fire-extinguisher', 'fa fa-fire-extinguisher');
 
 
--- INSERT INTO tile_instances(tileinstanceid, tilegroupid, tileinstancedata, cardid,
---             resourceclassid, resourceinstanceid)
---     VALUES ('40000000-0000-0000-0000-000000000000', '', '{
---                 "20000000-0000-0000-0000-000000000003": "1",
---                 "20000000-0000-0000-0000-000000000002": "Map Key",
---                 "20000000-0000-0000-0000-000000000004": "23984ll2399494"
---             }', '30000000-0000-0000-0000-000000000000',
---             '20000000-0000-0000-0000-000000000000', '40000000-0000-0000-0000-000000000000');
-
--- TODO: these are purely for testing, replace with real data
--- INSERT INTO functions VALUES (public.uuid_generate_v1mc(), 'card', '', 'Card Function 1', 'Card Function 1');
--- INSERT INTO functions VALUES (public.uuid_generate_v1mc(), 'card', '', 'Card Function 2', 'Card Function 2');
--- INSERT INTO functions VALUES (public.uuid_generate_v1mc(), 'card', '', 'Card Function 3', 'Card Function 3');
--- INSERT INTO functions VALUES (public.uuid_generate_v1mc(), 'string', '', 'String Function 1', 'String Function 1');
--- INSERT INTO functions VALUES (public.uuid_generate_v1mc(), 'string', '', 'String Function 2', 'String Function 2');
--- INSERT INTO functions VALUES (public.uuid_generate_v1mc(), 'string', '', 'String Function 3', 'String Function 3');
--- INSERT INTO functions VALUES (public.uuid_generate_v1mc(), 'concept', '', 'Domain Function 1', 'Domain Function 1');
--- INSERT INTO functions VALUES (public.uuid_generate_v1mc(), 'concept', '', 'Domain Function 2', 'Domain Function 2');
--- INSERT INTO functions VALUES (public.uuid_generate_v1mc(), 'concept', '', 'Domain Function 3', 'Domain Function 3');
-
 
 INSERT INTO functions(functionid, modulename, classname, functiontype, name, description, defaultconfig, component)
     VALUES ('60000000-0000-0000-0000-000000000000', 'local_file_storage.py', 'LocalFileStorageFunction', 'node', 'Local File Upload', 'Sets the default storage mechanism for uploaded files', '{}', 'views/components/functions/local-file-storage');
@@ -2108,12 +2088,6 @@ INSERT INTO map_sources(name, source)
                "tiles": ["https://vector.mapzen.com/osm/all/{z}/{x}/{y}.mvt?api_key=vector-tiles-LM25tq4"]
        }');
 
--- INSERT INTO map_sources(name, source)
---   VALUES ('stamen-terrain', '{
---       "type": "raster",
---       "tiles": ["http://tile.stamen.com/terrain/{z}/{x}/{y}.jpg"],
---       "tileSize": 256
---   }');
 
 INSERT INTO map_sources(name, source)
   VALUES ('geocode-point', '{
@@ -2132,15 +2106,6 @@ VALUES ('search-query', '{
         "features": []
     }
 }');
-
--- INSERT INTO map_layers(maplayerid, name, layerdefinitions, isoverlay, icon, activated, addtomap)
---     VALUES (public.uuid_generate_v1mc(), 'stamen-terrain', '[{
---         "id": "stamen-terrain",
---         "type": "raster",
---         "source": "stamen-terrain",
---         "minzoom": 0,
---         "maxzoom": 22
---     }]', FALSE, 'fa fa-road', TRUE, FALSE);
 
 INSERT INTO map_layers(maplayerid, name, layerdefinitions, isoverlay, icon, activated, addtomap)
     VALUES (public.uuid_generate_v1mc(), 'satellite', '[{
