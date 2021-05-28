@@ -19,7 +19,8 @@ define([
             this.mainMenu = ko.observable(true);
             this.editService = ko.observable(false);
             this.createService = ko.observable(true);
-            this.alert = params.alert;
+            this.remoteManifest = ko.observable(true);
+            this.alert = params.alert || ko.observable(); 
             this.addCanvas = function(canvas) { //the function name needs to be better
                 self.canvasesForDeletion.push(canvas);
                 self.canvas(canvas.images[0].resource.service['@id']);
@@ -214,6 +215,22 @@ define([
                 self.getManifestData(val);
                 self.mainMenu(false);
             });
+
+            this.manifestData.subscribe(function(manifestData) {
+                if (params.manifestData && ko.isObservable(params.manifestData)) {
+                    params.manifestData(manifestData);
+                }
+            });
+
+            this.manifest.subscribe(function(){
+                if (self.manifest().charAt(0) == '/') {
+                    self.remoteManifest(false);
+                }
+                else {
+                    self.remoteManifest(true);
+                }
+                self.hideSidePanel();
+            }); 
           
             this.dropzoneOptions4create = {
                 url: "arches.urls.root",

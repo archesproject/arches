@@ -27,6 +27,8 @@ define([
 
         this.hasDirtyTile = ko.observable(false);
 
+        this.saving = ko.observable(false);
+
         this.complete = ko.observable(false);
         this.required = ko.observable(ko.unwrap(config.required));
         this.autoAdvance = ko.observable(true);
@@ -39,10 +41,12 @@ define([
         var externalStepSourceData = ko.unwrap(config.externalstepdata) || {};
         Object.keys(externalStepSourceData).forEach(function(key) {
             if (key !== '__ko_mapping__') {
-                self.externalStepData[key] = {
-                    stepName: externalStepSourceData[key],
-                    data: config.workflow.getStepData(externalStepSourceData[key]),
-                };
+                config.workflow.getStepData(externalStepSourceData[key]).then(function(data) {
+                    self.externalStepData[key] = {
+                        stepName: externalStepSourceData[key],
+                        data: data,
+                    };
+                });
             }
         });
         delete config.externalstepdata;
@@ -123,18 +127,8 @@ define([
                 self.setToLocalStorage('value', value);
             });
 
-            /* cached informationBox logic */ 
-            if (config.informationboxdata) {
-                var isHidden = true;
-                if (self.getInformationBoxHiddenStateFromLocalStorage()){
-                    isHidden = self.getInformationBoxHiddenStateFromLocalStorage();
-                }
-                self.informationBoxData({
-                    hidden: isHidden,
-                    heading: config.informationboxdata['heading'],
-                    text: config.informationboxdata['text'],
-                })
-            }
+            /* cached informationBox logic */
+            this.setupInformationBox();
         };
         
         this.save = function() {
@@ -177,7 +171,7 @@ define([
                 allStepsLocalStorageData[self.id()] = {};
             }
             
-            allStepsLocalStorageData[self.id()][key] = value;
+            allStepsLocalStorageData[self.id()][key] = value ? koMapping.toJSON(value) : value;
 
             localStorage.setItem(
                 STEPS_LABEL, 
@@ -189,7 +183,7 @@ define([
             var allStepsLocalStorageData = JSON.parse(localStorage.getItem(STEPS_LABEL)) || {};
 
             if (allStepsLocalStorageData[self.id()]) {
-                return allStepsLocalStorageData[self.id()][key];
+                return JSON.parse(allStepsLocalStorageData[self.id()][key]);
             }
         };
 
@@ -203,23 +197,35 @@ define([
 
         this.getExternalStepData = function() {
             Object.keys(self.externalStepData).forEach(function(key) {
-                self.externalStepData[key]['data'] = config.workflow.getStepData(externalStepSourceData[key]);
+                config.workflow.getStepData(externalStepSourceData[key]).then(function(data) {
+                    self.externalStepData[key]['data'] = data;
+                });
             });
         };
 
         this.toggleInformationBox = function() {
             var informationBoxData = self.informationBoxData();
-            var isHidden = informationBoxData['hidden'];
+            var isDisplayed = informationBoxData['displayed'];
 
-            informationBoxData['hidden'] = !isHidden;
+            informationBoxData['displayed'] = !isDisplayed;
             self.informationBoxData(informationBoxData);
 
-            self.setToLocalStorage('informationBoxHidden', !isHidden);
+            config.informationBoxDisplayed(!isDisplayed);
         };
 
-        this.getInformationBoxHiddenStateFromLocalStorage = function() {
-            return self.getFromLocalStorage('informationBoxHidden')
-        };
+        this.setupInformationBox = function() {
+            if (config.informationBoxDisplayed && config.informationboxdata) {
+                var isDisplayed = true;
+                if (config.informationBoxDisplayed() !== undefined){
+                    isDisplayed = config.informationBoxDisplayed();
+                }
+                self.informationBoxData({
+                    displayed: isDisplayed,
+                    heading: config.informationboxdata['heading'],
+                    text: config.informationboxdata['text'],
+                })
+            }
+        }
 
         _.extend(this, config);
 

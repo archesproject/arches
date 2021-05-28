@@ -8,7 +8,7 @@ define([
     'viewmodels/card',
     'viewmodels/provisional-tile',
     'viewmodels/alert',
-], function(_, $, arches, ko, koMapping, GraphModel, CardViewModel, ProvisionalTileViewModel) {
+], function(_, $, arches, ko, koMapping, GraphModel, CardViewModel, ProvisionalTileViewModel, AlertViewModel) {
     function NonTileBasedComponent() {
         var self = this;
 
@@ -32,6 +32,8 @@ define([
         };
 
         this.save = function() {
+            self.saving(true);
+
             self.complete(true);
             self.savedData(self.addedData());
         };
@@ -363,8 +365,8 @@ define([
 
             var savingSubscription = self.saving.subscribe(function(saving) {
                 if (!saving) {
+                    savingSubscription.dispose(); /* self-disposing subscription only runs once */
                     self.initialize();
-                    savingSubscription.dispose(); /* self-disposing subscription only runs once */ 
                 }
             });
 
@@ -373,7 +375,7 @@ define([
                     at this point in load `self.tiles()` contains a reference to the empty
                     tile we're using to map values to other tiles. This removes the empty
                     mapping tile from being tracked
-                */ 
+                */
                 if (tiles.length === 1 && !tiles[0].tileid) {
                     var savedTiles = [];
 
@@ -390,8 +392,8 @@ define([
                         });
                     }
 
-                    self.tiles(savedTiles);
                     multiTileInitSubscription.dispose();  /* self-disposing subscription only runs once */ 
+                    self.tiles(savedTiles);
                 }
             });
 
@@ -409,8 +411,8 @@ define([
                         persistedTiles.unshift(newTile);
                     });
 
-                    self.tiles(persistedTiles);
                     multiTilePersistedDataSubscription.dispose();  /* self-disposing subscription only runs once */ 
+                    self.tiles(persistedTiles);
                 }
             });
 
@@ -462,8 +464,13 @@ define([
             });
         };
 
+        this.tilesToRemove = ko.observableArray();
+
         this.removeTile = function(data) {
             var filteredTiles = self.tiles().filter(function(tile) { return tile !== data; });
+            if (data.tileid) {
+                self.tilesToRemove.push(data);
+            }
             self.tiles(filteredTiles);
         };
 
@@ -471,6 +478,7 @@ define([
             self.complete(false);
             self.saving(true);
             self.savedData.removeAll();
+            self.previouslyPersistedComponentData = [];
             
             var unorderedSavedData = ko.observableArray();
 
@@ -479,6 +487,28 @@ define([
                     function(){/* onFail */}, 
                     function(savedTileData) {
                         unorderedSavedData.push(savedTileData);
+                    }
+                );
+            });
+
+            self.tilesToRemove().forEach(function(tile) {
+                tile.deleteTile(
+                    function(response) {
+                        self.alert(new AlertViewModel(
+                            'ep-alert-red', 
+                            response.responseJSON.title,
+                            response.responseJSON.message,
+                            null, 
+                            function(){ return; }
+                        ));
+                    },
+                    function() {
+                        self.tilesToRemove.remove(tile);
+                        if ( self.tilesToRemove().length === 0 ) {
+                            self.complete(true);
+                            self.loading(true);
+                            self.saving(false);
+                        }
                     }
                 );
             });
@@ -517,9 +547,10 @@ define([
     };
 
 
-    function WorkflowComponentAbstract(componentData, previouslyPersistedComponentData, externalStepData, resourceId, title, complete) {
+    function WorkflowComponentAbstract(componentData, previouslyPersistedComponentData, externalStepData, resourceId, title, complete, saving) {
         var self = this;
 
+        this.saving = saving;
         this.complete = complete;
         this.resourceId = resourceId;
         this.componentData = componentData;
@@ -531,7 +562,6 @@ define([
         this.hasUnsavedData = ko.observable();
 
         this.loading = ko.observable(true);
-        this.saving = ko.observable();
 
         this.initialize = function() {
             if (!componentData.tilesManaged || componentData.tilesManaged === "none") {
@@ -564,7 +594,10 @@ define([
             self.resourceId(ko.unwrap(params.workflow.resourceId));
         } 
 
+        this.saving = params.saving || ko.observable(false);
         this.complete = params.complete || ko.observable(false);
+        this.alert = params.alert || ko.observable();
+        this.componentBasedStepClass = ko.unwrap(params.workflowstepclass);
 
         this.dataToPersist = ko.observable({});
         self.dataToPersist.subscribe(function(data) {
@@ -620,6 +653,7 @@ define([
     
             params.postSaveCallback(function() {
                 self.hasUnsavedData(false);
+                self.saving(false);
             });
 
             ko.toJS(params.layoutSections).forEach(function(layoutSection) {
@@ -653,7 +687,8 @@ define([
                 params.externalStepData,
                 self.resourceId,
                 params.title, 
-                self.complete
+                self.complete,
+                self.saving,
             );
 
             workflowComponentAbstract.savedData.subscribe(function() {
