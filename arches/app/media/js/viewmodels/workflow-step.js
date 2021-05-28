@@ -60,7 +60,7 @@ define([
                     if (!acc && componentDatum instanceof Array && componentDatum.length === 1) {
                         if (componentDatum[0].resourceInstanceId) {
                             return componentDatum[0].resourceInstanceId;
-                        } else if (componentDatum[0][1].resourceInstanceId) {
+                        } else if (componentDatum[0] instanceof Array && componentDatum[0][1].resourceInstanceId) {
                             return componentDatum[0][1].resourceInstanceId;
                         }
                     }
