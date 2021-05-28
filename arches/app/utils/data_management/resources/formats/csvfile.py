@@ -902,7 +902,7 @@ class CsvReader(Reader):
                         if "NodeGroupID" in row and row["NodeGroupID"] is not None:
                             target_tile.nodegroupid = row["NodeGroupID"]
 
-                        def populate_tile(source_data, tile_to_populate):
+                        def populate_tile(source_data, tile_to_populate, appending_to_parent=False):
                             """
                             source_data = [{nodeid:value},{nodeid:value},{nodeid:value} . . .]
                             All nodes in source_data belong to the same resource.
@@ -922,7 +922,7 @@ class CsvReader(Reader):
                             else:
                                 target_tile_cardinality = "n"
 
-                            if str(tile_to_populate.nodegroup_id) not in populated_nodegroups[resourceinstanceid]:
+                            if str(tile_to_populate.nodegroup_id) not in populated_nodegroups[resourceinstanceid] or appending_to_parent:
                                 tile_to_populate.nodegroup_id = str(tile_to_populate.nodegroup_id)
                                 # Check if we are populating a parent tile by inspecting the target_tile.data array.
                                 source_data_has_target_tile_nodes = (
@@ -1007,7 +1007,7 @@ class CsvReader(Reader):
 
                                     tile_to_populate.tiles = populated_child_tiles
 
-                                if not tile_to_populate.is_blank():
+                                if not tile_to_populate.is_blank() and not appending_to_parent:
                                     populated_tiles.append(tile_to_populate)
 
                                 if len(source_data) > 0:
