@@ -791,28 +791,7 @@ class CsvReader(Reader):
 
                     return {"value": value, "request": request}
 
-                def get_blank_tile(source_data, child_only=False, resourceid=None):
-                    def get_existing_parent_tile(node):
-                        parent_tile = None
-                        if node.nodegroup.parentnodegroup_id is not None:
-                            parent_nodegroup = node.nodegroup.parentnodegroup
-                            # check if parenttile exists in db if "1" cardinality
-                            if (
-                                parent_nodegroup.cardinality == "1"
-                                and Tile.objects.filter(nodegroup=parent_nodegroup, resourceinstance_id=resourceid).exists()
-                            ):
-                                parent_tile = Tile.objects.get(nodegroup=parent_nodegroup, resourceinstance_id=resourceid)
-                                nodegroups = NodeGroup.objects.filter(parentnodegroup_id=node.nodegroup.parentnodegroup_id).values_list(
-                                    "nodegroup_id", flat=True
-                                )
-                                existing_tile_nodegroupids = [t.nodegroup_id for t in parent_tile.tiles]
-                                missing_nodegroups = list(filter(lambda ng: ng not in existing_tile_nodegroupids, nodegroups))
-                                if len(missing_nodegroups) > 0:
-                                    for ng in missing_nodegroups:
-                                        new_tile = Tile.get_blank_tile_from_nodegroup_id(ng, resourceid=resourceid, parenttile=parent_tile)
-                                        parent_tile.tiles.append(new_tile)
-                        return parent_tile
-
+                def get_blank_tile(source_data, child_only=False):
                     if len(source_data) > 0:
                         if source_data[0] != {}:
                             key = str(list(source_data[0].keys())[0])
@@ -820,10 +799,8 @@ class CsvReader(Reader):
                             if child_only:
                                 blank_tile = Tile.get_blank_tile_from_nodegroup_id(str(source_node.nodegroup_id))
                             elif key not in blanktilecache:
-                                blank_tile = get_existing_parent_tile(source_node)
-                                if blank_tile is None:
-                                    blank_tile = Tile.get_blank_tile(key)
-                                    cache(blank_tile)
+                                blank_tile = Tile.get_blank_tile(key)
+                                cache(blank_tile)
                             else:
                                 blank_tile = blanktilecache[key]
                         else:
@@ -919,7 +896,7 @@ class CsvReader(Reader):
                                 if celery_worker_running is False:  # prevents celery chord from breaking on WorkerLostError
                                     sys.exit()
 
-                        target_tile = get_blank_tile(source_data, resourceid=str(row["ResourceID"]))
+                        target_tile = get_blank_tile(source_data)
                         if "TileID" in row and row["TileID"] is not None:
                             target_tile.tileid = row["TileID"]
                         if "NodeGroupID" in row and row["NodeGroupID"] is not None:
