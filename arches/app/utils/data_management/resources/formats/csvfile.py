@@ -952,7 +952,7 @@ class CsvReader(Reader):
                                     len(set([list(obj.keys())[0] for obj in source_data]) & set(tile_to_populate.data.keys())) > 0
                                 )
                                 if source_data_has_target_tile_nodes:
-                                    # Iterate through the tile_to_populate nodes and begin populating by iterating througth source_data array.
+                                    # Iterate through tile_to_populate nodes and begin populating by iterating througth source_data array.
                                     # The idea is to populate as much of the tile_to_populate as possible,
                                     # before moving on to the next tile_to_populate.
                                     for target_key in list(tile_to_populate.data.keys()):
@@ -1059,14 +1059,16 @@ class CsvReader(Reader):
                         else:
                             preexisting_tile_for_nodegroup = False
 
-                        # aggregates a tile of the nodegroup associated with source_data (via get_blank_tile) onto the pre-existing tile who would be its parent
+                        # aggregates a tile of the nodegroup associated with source_data (via get_blank_tile)
+                        # onto the pre-existing tile who would be its parent
                         if target_tile.nodegroup.cardinality == "1" and preexisting_tile_for_nodegroup and len(source_data) > 0:
                             target_tile = get_blank_tile(source_data, child_only=True)
                             populate_tile(source_data, target_tile, appending_to_parent=True)
                             target_tile.parenttile = preexisting_tile_for_nodegroup
                             preexisting_tile_for_nodegroup.tiles.append(target_tile)
 
-                        # populates a tile from parent-level nodegroup because parent cardinality is N or because none exists yet on resource
+                        # populates a tile from parent-level nodegroup because
+                        # parent cardinality is N or because none exists yet on resource
                         elif target_tile is not None and len(source_data) > 0:
                             populate_tile(source_data, target_tile)
                             # Check that required nodes are populated. If not remove tile from populated_tiles array.
