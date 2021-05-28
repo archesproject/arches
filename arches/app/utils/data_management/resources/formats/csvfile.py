@@ -791,11 +791,14 @@ class CsvReader(Reader):
 
                     return {"value": value, "request": request}
 
-                def get_blank_tile(source_data):
+                def get_blank_tile(source_data, child_only=False):
                     if len(source_data) > 0:
                         if source_data[0] != {}:
                             key = str(list(source_data[0].keys())[0])
-                            if key not in blanktilecache:
+                            source_node = node_dict[key]
+                            if child_only:
+                                    blank_tile = Tile.get_blank_tile_from_nodegroup_id(str(source_node.nodegroup_id))
+                            elif key not in blanktilecache:
                                 blank_tile = Tile.get_blank_tile(key)
                                 cache(blank_tile)
                             else:
