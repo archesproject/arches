@@ -51,7 +51,7 @@ class APITests(ArchesTestCase):
     @classmethod
     def setUpClass(cls):
         geojson_nodeid = "3ebc6785-fa61-11e6-8c85-14109fd34195"
-        cls.loadOntology()        
+        cls.loadOntology()
         with open(os.path.join("tests/fixtures/resource_graphs/unique_graph_shape.json"), "rU") as f:
             json = JSONDeserializer().deserialize(f)
             cls.unique_graph = Graph(json["graph"][0])
@@ -65,12 +65,11 @@ class APITests(ArchesTestCase):
         with open(os.path.join("tests/fixtures/resource_graphs/phase_type_assignment.json"), "rU") as f:
             json = JSONDeserializer().deserialize(f)
             cls.phase_type_assignment_graph = Graph(json["graph"][0])
-            cls.phase_type_assignment_graph.save()   
+            cls.phase_type_assignment_graph.save()
 
         # Load the test package to provide resources graph.
         test_pkg_path = os.path.join(test_settings.TEST_ROOT, "fixtures", "testing_prj", "testing_prj", "pkg")
         management.call_command("packages", operation="load_package", source=test_pkg_path, yes=True)
-
 
     def test_api_base_view(self):
         """
@@ -91,14 +90,13 @@ class APITests(ArchesTestCase):
         response = view(request)
         self.assertEqual(request.GET.get("ver"), "2.1")
 
-
     def test_api_resources_archesjson(self):
         """
         Test that resources POST and PUT accept arches-json format data.
         Uses GET and DELETE in testing.
 
         """
-        #==Arrange=========================================================================================
+        # ==Arrange=========================================================================================
 
         test_resource_simple = {
             "displaydescription": "Test Resource Desc",
@@ -106,8 +104,8 @@ class APITests(ArchesTestCase):
             "graph_id": "c9b37a14-17b3-11eb-a708-acde48001122",
             "legacyid": "ARCHES_api",
             "map_popup": "undefined",
-            "resourceinstanceid": "c29e5caf-6c8d-422b-a2ac-f5f5d99e4dae", 
-            "tiles": []          
+            "resourceinstanceid": "c29e5caf-6c8d-422b-a2ac-f5f5d99e4dae",
+            "tiles": [],
         }
         test_resource_simple_modified = {
             "displaydescription": "Test Resource Desc",
@@ -115,79 +113,70 @@ class APITests(ArchesTestCase):
             "graph_id": "c9b37a14-17b3-11eb-a708-acde48001122",
             "legacyid": "ARCHES_api_MOD",
             "map_popup": "undefined",
-            "resourceinstanceid": "c29e5caf-6c8d-422b-a2ac-f5f5d99e4dae", 
-            "tiles": []          
+            "resourceinstanceid": "c29e5caf-6c8d-422b-a2ac-f5f5d99e4dae",
+            "tiles": [],
         }
 
         payload = JSONSerializer().serialize(test_resource_simple)
         payload_modified = JSONSerializer().serialize(test_resource_simple_modified)
-        
+
         content_type = "application/json"
 
         self.client.login(username="admin", password="admin")
 
-
-
-        #==Act : GET confirmation that resource does not exist in database=================================
+        # ==Act : GET confirmation that resource does not exist in database=================================
         with self.assertRaises(models.ResourceInstance.DoesNotExist) as context:
-            resp_get = self.client.get(reverse("resources", 
-                            kwargs={"resourceid":"c29e5caf-6c8d-422b-a2ac-f5f5d99e4dae"})
-                            +"?format=arches-json")
-        #==Assert==========================================================================================
-        self.assertTrue("Resource matching query does not exist." in str(context.exception)) # Check exception message.
+            resp_get = self.client.get(
+                reverse("resources", kwargs={"resourceid": "c29e5caf-6c8d-422b-a2ac-f5f5d99e4dae"}) + "?format=arches-json"
+            )
+        # ==Assert==========================================================================================
+        self.assertTrue("Resource matching query does not exist." in str(context.exception))  # Check exception message.
 
+        # ==Act : POST resource to database=================================================================
+        resp_post = self.client.post(
+            reverse("resources", kwargs={"resourceid": "c29e5caf-6c8d-422b-a2ac-f5f5d99e4dae"}) + "?format=arches-json",
+            payload,
+            content_type,
+        )
+        # ==Assert==========================================================================================
+        self.assertEqual(resp_post.status_code, 201)  # resource created.
 
-        #==Act : POST resource to database=================================================================
-        resp_post = self.client.post(reverse("resources", 
-                                            kwargs={"resourceid":"c29e5caf-6c8d-422b-a2ac-f5f5d99e4dae"})
-                                            +"?format=arches-json",
-                                            payload, 
-                                            content_type)
-        #==Assert==========================================================================================
-        self.assertEqual(resp_post.status_code, 201) # resource created.
-        
-
-        #==Act : GET confirmation that resource does now exist in database=================================
-        resp_get_confirm = self.client.get(reverse("resources", 
-                                    kwargs={"resourceid":"c29e5caf-6c8d-422b-a2ac-f5f5d99e4dae"})
-                                    +"?format=arches-json")        
-        #==Assert==========================================================================================
-        self.assertEqual(resp_get_confirm.status_code, 200) # Success, we got one.        
+        # ==Act : GET confirmation that resource does now exist in database=================================
+        resp_get_confirm = self.client.get(
+            reverse("resources", kwargs={"resourceid": "c29e5caf-6c8d-422b-a2ac-f5f5d99e4dae"}) + "?format=arches-json"
+        )
+        # ==Assert==========================================================================================
+        self.assertEqual(resp_get_confirm.status_code, 200)  # Success, we got one.
         data_get_confirm = JSONDeserializer().deserialize(resp_get_confirm.content)
-        self.assertEqual(data_get_confirm["legacyid"], "ARCHES_api") # Success, we got the right one.
-        
+        self.assertEqual(data_get_confirm["legacyid"], "ARCHES_api")  # Success, we got the right one.
 
-        #==Act : PUT resource changes to database==========================================================
-        resp_put = self.client.put(reverse("resources", 
-                                            kwargs={"resourceid":"c29e5caf-6c8d-422b-a2ac-f5f5d99e4dae"})
-                                            +"?format=arches-json",
-                                            payload_modified, 
-                                            content_type)
-        #==Assert==========================================================================================
-        self.assertEqual(resp_put.status_code, 201) # resource created.
+        # ==Act : PUT resource changes to database==========================================================
+        resp_put = self.client.put(
+            reverse("resources", kwargs={"resourceid": "c29e5caf-6c8d-422b-a2ac-f5f5d99e4dae"}) + "?format=arches-json",
+            payload_modified,
+            content_type,
+        )
+        # ==Assert==========================================================================================
+        self.assertEqual(resp_put.status_code, 201)  # resource created.
 
-
-        #==Act : GET confirmation that resource is now changed in database=================================
-        resp_get_confirm_mod = self.client.get(reverse("resources", 
-                                    kwargs={"resourceid":"c29e5caf-6c8d-422b-a2ac-f5f5d99e4dae"})
-                                    +"?format=arches-json")        
-        #==Assert==========================================================================================
-        self.assertEqual(resp_get_confirm_mod.status_code, 200) # Success, we got one.     
+        # ==Act : GET confirmation that resource is now changed in database=================================
+        resp_get_confirm_mod = self.client.get(
+            reverse("resources", kwargs={"resourceid": "c29e5caf-6c8d-422b-a2ac-f5f5d99e4dae"}) + "?format=arches-json"
+        )
+        # ==Assert==========================================================================================
+        self.assertEqual(resp_get_confirm_mod.status_code, 200)  # Success, we got one.
         data_get_confirm_mod = JSONDeserializer().deserialize(resp_get_confirm_mod.content)
-        self.assertEqual(data_get_confirm_mod["legacyid"], "ARCHES_api_MOD") # Success, we got the right one.
+        self.assertEqual(data_get_confirm_mod["legacyid"], "ARCHES_api_MOD")  # Success, we got the right one.
 
+        # ==Act : DELETE resource from database=============================================================
+        resp_delete = self.client.delete(reverse("resources", kwargs={"resourceid": "c29e5caf-6c8d-422b-a2ac-f5f5d99e4dae"}))
+        # ==Assert==========================================================================================
+        self.assertEqual(resp_delete.status_code, 200)  # Success, we got rid of one.
 
-        #==Act : DELETE resource from database=============================================================
-        resp_delete = self.client.delete(reverse("resources", 
-                                    kwargs={"resourceid":"c29e5caf-6c8d-422b-a2ac-f5f5d99e4dae"}))        
-        #==Assert==========================================================================================
-        self.assertEqual(resp_delete.status_code, 200) # Success, we got rid of one.     
-
-
-        #==Act : GET confirmation that resource does not exist in database=================================
+        # ==Act : GET confirmation that resource does not exist in database=================================
         with self.assertRaises(models.ResourceInstance.DoesNotExist) as context_del:
-            resp_get_deleted = self.client.get(reverse("resources", 
-                            kwargs={"resourceid":"c29e5caf-6c8d-422b-a2ac-f5f5d99e4dae"})
-                            +"?format=arches-json")
-        #==Assert==========================================================================================
-        self.assertTrue("Resource matching query does not exist." in str(context_del.exception)) # Check exception message.
+            resp_get_deleted = self.client.get(
+                reverse("resources", kwargs={"resourceid": "c29e5caf-6c8d-422b-a2ac-f5f5d99e4dae"}) + "?format=arches-json"
+            )
+        # ==Assert==========================================================================================
+        self.assertTrue("Resource matching query does not exist." in str(context_del.exception))  # Check exception message.

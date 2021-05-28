@@ -705,7 +705,6 @@ class Resources(APIBase):
         if format not in allowed_formats:
             return JSONResponse(status=406, reason="incorrect format specified, only %s formats allowed" % allowed_formats)
 
-
         if not user_can_edit_resource(user=request.user, resourceid=resourceid):
             return JSONResponse(status=403)
         else:
@@ -737,7 +736,7 @@ class Resources(APIBase):
                                     resource.save(request=request)
                                 response.append(JSONDeserializer().deserialize(self.get(request, resource.resourceinstanceid).content))
                             return JSONResponse(response, indent=indent, status=201)
-                            
+
                     elif format == "arches-json":
                         reader = ArchesFileReader()
                         archesresource = JSONDeserializer().deserialize(request.body)
@@ -763,7 +762,6 @@ class Resources(APIBase):
                             response.append(JSONDeserializer().deserialize(self.get(request, resourceid).content))
                             return JSONResponse(response, indent=indent, status=201)
 
-
                 except models.ResourceInstance.DoesNotExist:
                     return JSONResponse(status=404)
                 except Exception as e:
@@ -777,7 +775,7 @@ class Resources(APIBase):
         allowed_formats = ["arches-json", "json-ld"]
         format = request.GET.get("format", "json-ld")
         if format not in allowed_formats:
-            return JSONResponse(status=406, reason="incorrect format specified, only %s formats allowed" % allowed_formats)            
+            return JSONResponse(status=406, reason="incorrect format specified, only %s formats allowed" % allowed_formats)
 
         try:
             if user_can_edit_resource(user=request.user, resourceid=resourceid):
@@ -799,7 +797,7 @@ class Resources(APIBase):
                                 resource.save(request=request)
                             response.append(JSONDeserializer().deserialize(self.get(request, resource.resourceinstanceid).content))
                         return JSONResponse(response, indent=indent, status=201)
-            
+
                 elif format == "arches-json":
                     reader = ArchesFileReader()
                     archesresource = JSONDeserializer().deserialize(request.body)
@@ -823,7 +821,7 @@ class Resources(APIBase):
                     else:
                         response = []
                         response.append(JSONDeserializer().deserialize(self.get(request, resourceid).content))
-                        return JSONResponse(response, indent=indent, status=201)    
+                        return JSONResponse(response, indent=indent, status=201)
 
             else:
                 return JSONResponse(status=403)
