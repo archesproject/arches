@@ -391,7 +391,7 @@ class CsvReader(Reader):
                     newresourceinstance.delete()
                     save_count = save_count - 1
                 except Exception as e:
-                    msg = "%s: WARNING: failed to index document in resource: %s %s. Exception detail:\n%s\n" % (
+                    msg = "%s: WARNING: failed to save document in resource: %s %s. Exception detail:\n%s\n" % (
                         datetime.datetime.now(),
                         resourceinstanceid,
                         row_number,
