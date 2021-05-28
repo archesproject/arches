@@ -525,7 +525,7 @@ class CsvReader(Reader):
                 }
                 display_nodes = get_display_nodes(graphid)
                 all_nodes = Node.objects.filter(graph_id=graphid)
-                node_list = {str(node.pk): node for node in all_nodes}
+                node_dict = {str(node.pk): node for node in all_nodes}
                 datatype_factory = DataTypeFactory()
                 concepts_to_create = {}
                 new_concepts = {}
