@@ -902,7 +902,7 @@ class CsvReader(Reader):
                         if "NodeGroupID" in row and row["NodeGroupID"] is not None:
                             target_tile.nodegroupid = row["NodeGroupID"]
 
-                        def populate_tile(source_data, target_tile):
+                        def populate_tile(source_data, tile_to_populate):
                             """
                             source_data = [{nodeid:value},{nodeid:value},{nodeid:value} . . .]
                             All nodes in source_data belong to the same resource.
@@ -911,39 +911,39 @@ class CsvReader(Reader):
                             """
                             need_new_tile = False
                             # Set target tileid to None because this will be a new tile, a new tileid will be created on save.
-                            target_tile.tileid = uuid.uuid4()
+                            tile_to_populate.tileid = uuid.uuid4()
                             if "TileID" in row and row["TileID"] is not None:
-                                target_tile.tileid = row["TileID"]
-                            target_tile.resourceinstance_id = resourceinstanceid
+                                tile_to_populate.tileid = row["TileID"]
+                            tile_to_populate.resourceinstance_id = resourceinstanceid
                             # Check the cardinality of the tile and check if it has been populated.
                             # If cardinality is one and the tile is populated the tile should not be populated again.
-                            if str(target_tile.nodegroup_id) in single_cardinality_nodegroups and "TileiD" not in row:
+                            if str(tile_to_populate.nodegroup_id) in single_cardinality_nodegroups and "TileiD" not in row:
                                 target_tile_cardinality = "1"
                             else:
                                 target_tile_cardinality = "n"
 
-                            if str(target_tile.nodegroup_id) not in populated_nodegroups[resourceinstanceid]:
-                                target_tile.nodegroup_id = str(target_tile.nodegroup_id)
+                            if str(tile_to_populate.nodegroup_id) not in populated_nodegroups[resourceinstanceid]:
+                                tile_to_populate.nodegroup_id = str(tile_to_populate.nodegroup_id)
                                 # Check if we are populating a parent tile by inspecting the target_tile.data array.
                                 source_data_has_target_tile_nodes = (
-                                    len(set([list(obj.keys())[0] for obj in source_data]) & set(target_tile.data.keys())) > 0
+                                    len(set([list(obj.keys())[0] for obj in source_data]) & set(tile_to_populate.data.keys())) > 0
                                 )
                                 if source_data_has_target_tile_nodes:
-                                    # Iterate through the target_tile nodes and begin populating by iterating througth source_data array.
-                                    # The idea is to populate as much of the target_tile as possible,
-                                    # before moving on to the next target_tile.
-                                    for target_key in list(target_tile.data.keys()):
+                                    # Iterate through the tile_to_populate nodes and begin populating by iterating througth source_data array.
+                                    # The idea is to populate as much of the tile_to_populate as possible,
+                                    # before moving on to the next tile_to_populate.
+                                    for target_key in list(tile_to_populate.data.keys()):
                                         for source_tile in source_data:
                                             for source_key in list(source_tile.keys()):
                                                 # Check for source and target key match.
                                                 if source_key == target_key:
-                                                    if target_tile.data[source_key] is None:
+                                                    if tile_to_populate.data[source_key] is None:
                                                         # If match populate target_tile node with transformed value.
                                                         value = transform_value(
                                                             node_datatypes[source_key], source_tile[source_key], row_number, source_key
                                                         )
-                                                        target_tile.data[source_key] = value["value"]
-                                                        # target_tile.request = value['request']
+                                                        tile_to_populate.data[source_key] = value["value"]
+                                                        # tile_to_populate.request = value['request']
                                                         # Delete key from source_tile so
                                                         # we do not populate another tile based on the same data.
                                                         del source_tile[source_key]
@@ -951,10 +951,10 @@ class CsvReader(Reader):
                                     source_data[:] = [item for item in source_data if item != {}]
 
                                 # Check if we are populating a child tile(s) by inspecting the target_tiles.tiles array.
-                                elif target_tile.tiles is not None:
+                                elif tile_to_populate.tiles is not None:
                                     populated_child_tiles = []
                                     populated_child_nodegroups = []
-                                    for childtile in target_tile.tiles:
+                                    for childtile in tile_to_populate.tiles:
                                         if str(childtile.nodegroup_id) in single_cardinality_nodegroups:
                                             child_tile_cardinality = "1"
                                         else:
@@ -964,7 +964,7 @@ class CsvReader(Reader):
                                             prototype_tile_copy = pickle.loads(pickle.dumps(childtile, -1))
                                             tileid = row["TileID"] if "TileID" in row else uuid.uuid4()
                                             prototype_tile_copy.tileid = tileid
-                                            prototype_tile_copy.parenttile = target_tile
+                                            prototype_tile_copy.parenttile = tile_to_populate
                                             parenttileid = (
                                                 row["ParentTileID"] if "ParentTileID" in row and row["ParentTileID"] is not None else None
                                             )
@@ -987,7 +987,7 @@ class CsvReader(Reader):
                                                                     prototype_tile_copy.data[source_key] = value["value"]
                                                                     # print(prototype_tile_copy.data[source_key]
                                                                     # print('&'*80
-                                                                    # target_tile.request = value['request']
+                                                                    # tile_to_populate.request = value['request']
                                                                     del source_column[source_key]
                                                                 else:
                                                                     populate_child_tiles(source_data)
@@ -1005,16 +1005,16 @@ class CsvReader(Reader):
 
                                         populate_child_tiles(source_data)
 
-                                    target_tile.tiles = populated_child_tiles
+                                    tile_to_populate.tiles = populated_child_tiles
 
-                                if not target_tile.is_blank():
-                                    populated_tiles.append(target_tile)
+                                if not tile_to_populate.is_blank():
+                                    populated_tiles.append(tile_to_populate)
 
                                 if len(source_data) > 0:
                                     need_new_tile = True
 
                                 if target_tile_cardinality == "1" and "NodeGroupID" not in row:
-                                    populated_nodegroups[resourceinstanceid].append(str(target_tile.nodegroup_id))
+                                    populated_nodegroups[resourceinstanceid].append(str(tile_to_populate.nodegroup_id))
 
                                 if need_new_tile:
                                     new_tile = get_blank_tile(source_data)
