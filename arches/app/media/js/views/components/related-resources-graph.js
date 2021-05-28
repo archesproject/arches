@@ -7,7 +7,10 @@ define([
     return ko.components.register('related-resources-graph', {
         viewModel: function(params) {
             var self = this;
-            var layout = { name: "circle" };
+            var layout = {
+                name: "circle",
+                animate: true
+            };
             var fitPadding = 100;
 
             this.viz = ko.observable();
@@ -15,8 +18,42 @@ define([
             this.focusResourceId = ko.isObservable(params.resourceId) ? params.resourceId : ko.observable(params.resourceId);
             this.selection = ko.observable();
             this.selectionMode = ko.observable('information');
+            this.elements = ko.observableArray();
             this.informationElement = ko.observable();
             this.legendEntries = ko.observableArray();
+            this.informationElementRelationships = ko.computed(function() {
+                var relationships = [];
+                var informationElement = self.informationElement();
+                var viz = self.viz();
+                self.elements();
+                if (informationElement && viz && !informationElement.source) {
+                    var sourceEdges = viz.edges('[source = "' + informationElement.id + '"]');
+                    var targetEdges = viz.edges('[target = "' + informationElement.id + '"]');
+                    var prepLabel = function(label) {
+                        try {
+                            var url = new window.URL(label);
+                        } catch (e) {
+                            return label;
+                        }
+                        return url.pathname.split('/')[url.pathname.split('/').length - 1];
+                    };
+                    sourceEdges.forEach(function(edge) {
+                        relationships.push({
+                            name: edge.target().data().displayname,
+                            type: prepLabel(edge.data().relationshiptype_label),
+                            id: edge.target().id()
+                        });
+                    });
+                    targetEdges.forEach(function(edge) {
+                        relationships.push({
+                            name: edge.source().data().displayname,
+                            type: prepLabel(edge.data().relationshiptype_label),
+                            id: edge.source().id()
+                        });
+                    });
+                }
+                return relationships;
+            });
 
             WorkbenchViewmodel.apply(this, [params]);
 
@@ -30,7 +67,10 @@ define([
                 data.target = data.resourceinstanceidto;
                 if (data.source) {
                     data.id = data.source + data.target;
-                } else data.id = data.resourceinstanceid;
+                } else {
+                    data.id = data.resourceinstanceid;
+                    data.totalRelations = data.total_relations.value;
+                }
                 var classes = [];
                 if (data.graph_id) classes.push(resourceTypeLookup[data.graph_id].className);
                 if (data.focus) classes.push('focus');
@@ -40,7 +80,7 @@ define([
                     selected: data.focus
                 };
             };
-            var expandNode = function(node) {
+            this.expandNode = function(node) {
                 if (node.id) getResourceRelations(node.id)
                     .then(function(response) {
                         return response.json();
@@ -58,6 +98,7 @@ define([
                                 return elements.length === 0;
                             });
                         viz.add(elements);
+                        self.elements(viz.elements());
                         viz.layout(layout).run();
                         viz.fit(null, fitPadding);
                     });
@@ -122,13 +163,17 @@ define([
                             }
                             resourceTypeLookup = result.node_config_lookup;
                             result.resource_instance.focus = true;
-                            self.selection(result.resource_instance);
+                            result.resource_instance['total_relations'] = {
+                                value: result.resource_relationships.length
+                            };
                             var elements = [dataToElement(result.resource_instance)]
                                 .concat(
                                     result.related_resources.concat(result.resource_relationships)
                                         .map(dataToElement)
                                 );
+                            self.selection(elements[0].data);
                             updateCytoscapeConfig(elements);
+                            self.elements(self.viz().elements());
                         });
                 }
             };
@@ -163,11 +208,19 @@ define([
                 if (selection) switch (mode) {
                 case 'expand':
                     if (selection.source) viz.elements().unselect();
-                    else expandNode(selection);
+                    else self.expandNode(selection);
                     break;
                 case 'delete':
                     var element = viz.getElementById(selection.id);
+                    if (!selection.source) viz.edges().forEach(function(edge) {
+                        if (edge.source().id() === selection.id ||
+                            edge.target().id() === selection.id) {
+                            viz.remove(edge);
+                            self.elements.remove(edge);
+                        }
+                    });
                     viz.remove(element);
+                    self.elements.remove(element);
                     viz.fit(null, fitPadding);
                     break;
                 case 'focus':

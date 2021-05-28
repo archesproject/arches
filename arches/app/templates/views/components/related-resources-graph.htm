@@ -52,6 +52,32 @@
 <div class="workbench-card-sidepanel-header-container">
     <h4 class="workbench-card-sidepanel-header" data-bind="click: hideSidePanel">{% trans "Resource Information" %}</h4>
 </div>
+<div class="related-resource-graph-information-content" data-bind="using: informationElement">
+    <!--ko if: $data.source -->
+    edge
+    <!--/ko -->
+    <!--ko if: !$data.source -->
+    <div data-bind="text: displayname" class="node-display-name-header"></div>
+    <div class="relationships-list-header">{% trans "Relationships" %}</div>
+    <div class="relationships-list" data-bind="foreach: $parent.informationElementRelationships">
+        <div class="relationships-list-item">
+            <span data-bind="text: type" class="relationships-list-item-type"></span>
+            <span class="relationships-list-item-name">
+                (<span data-bind="text: name"></span>)
+            </span>
+        </div>
+    </div>
+    <div class="realtionships-list-count">
+        <span data-bind="text: $parent.informationElementRelationships().length"></span> / <span data-bind="text: totalRelations"></span>
+        {% trans "relationships shown" %}
+        <!--ko if: $parent.informationElementRelationships().length !== totalRelations -->
+        <a href="javascript:void(0);" data-bind="click: function() {
+            $parent.expandNode($data);
+        }">{% trans "show more" %}</a>
+        <!--/ko -->
+    </div>
+    <!--/ko -->
+</div>
 <!--/ko -->
 <!--ko if: activeTab() === 'search' -->
 <div class="workbench-card-sidepanel-header-container">

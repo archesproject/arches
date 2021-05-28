@@ -13785,10 +13785,11 @@ a.jstree-anchor.permissions-widget {
     $sidebar-width: 400px;
     $controls-height: 36px;
     $controls-top: 10px;
-    $controls-grey: rgb(155, 155, 155);
+    $controls-grey: #9b9b9b;
     $controls-border: 1px solid $controls-grey;
     $controls-background: #e0e0e0;
     $controls-right: 10px;
+    $accent-color: #9b97e3;
 
     .related-resources-graph-cytoscape {
         height: 100%;
@@ -13823,7 +13824,7 @@ a.jstree-anchor.permissions-widget {
             background-color: $controls-background;
         }
         span.active-graph-control {
-            color: rgb(42, 68, 106);
+            color: #2a446a;
             background-color: lighten($controls-background, 15%);
         }
         span:hover {
@@ -13845,13 +13846,35 @@ a.jstree-anchor.permissions-widget {
         background-color: rgba(256, 256, 256, 0.9);
         padding: 3px;
         border-radius: 3px;
-        color: rgb(132, 123, 207);
+        color: $accent-color;
         font-weight: 500;
         margin-top: 2px;
         top: $controls-height + $controls-top;
     }
+    .related-resource-graph-information-content {
+        margin-top: 60px;
+    }
     .legend-listing {
         cursor: default;
+    }
+    .node-display-name-header {
+        text-align: center;
+        padding: 12px 0;
+        color: white;
+        background-color: $accent-color;
+        border: 1px solid darken($accent-color, 50%);
+        font-weight: bold;
+        font-size: 1.3em;
+    }
+    .relationships-list {
+        .relationships-list-item {
+            .relationships-list-item-type {
+
+            }
+            .relationships-list-item-name {
+
+            }
+        }
     }
 }
 
