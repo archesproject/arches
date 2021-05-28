@@ -1122,11 +1122,14 @@ class ResourceReport(APIBase):
 
         if not template.preload_resource_data:
             resource = resource.to_json()
-        
-        return JSONResponse({
-            'resource_instance': resource,
-            'template': template,
-        })
+
+        return JSONResponse(
+            {
+                "resource_instance": resource,
+                "template": template,
+            }
+        )
+
 
 @method_decorator(csrf_exempt, name="dispatch")
 class Tile(APIBase):
