@@ -10,10 +10,8 @@ define([
         this.loading = ko.observable(true);
 
         this.resourceid = params.resourceid;
-        this.template = ko.observable({});
-        this.template.subscribe(function(foo) {
-            console.log(foo)
-        })
+        this.template = ko.observable();
+        this.reportData = ko.observable({'foo': 'bar'});
 
         var url = arches.urls.api_resource_report(this.resourceid);
 
@@ -36,9 +34,13 @@ define([
     ko.components.register('foo', {
         viewModel: Foo,
         template: `
-            <div data-bind="if: !$data.loading()">
-                <div data-bind='component: $data.template().componentname'
-                ></div>
+            <div data-bind='if: !$data.loading()'>
+                <div data-bind='
+                    component: { 
+                        name: $data.template().componentname,
+                        params: $data.reportData()
+                    }
+                '></div>
             </div>
         `
     });

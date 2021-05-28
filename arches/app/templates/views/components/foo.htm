@@ -3,21 +3,18 @@
 {% load i18n %}
 
 {% block main_content %}
-    <div>
-        <div data-bind="component: {
-            name: 'foo',
-            params: {
-                resourceid: '{{ resourceid }}'
-            }
-        }"></div>
-
-    </div>
+    <div data-bind="component: {
+        name: 'foo',
+        params: {
+            resourceid: '{{ resourceid }}'
+        }
+    }"></div>
 {% endblock main_content %}
 
 {% block javascript %}
     {{ block.super }}
 
     <script>
-        require(['views/components/foo']);
+        require(['views/components/foo', 'report-templates']);
     </script>
 {% endblock javascript %}
