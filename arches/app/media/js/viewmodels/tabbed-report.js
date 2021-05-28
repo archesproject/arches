@@ -9,8 +9,9 @@ define([
 ], function($, _, ko, koMapping, ReportViewModel, arches) {
     return function(params) {
         params.configKeys = ['tabs', 'activeTabIndex'];
-        ReportViewModel.apply(this, [params]);
         var self = this;
+
+        console.log(self, params)
         if (this.activeTabIndex() > self.tabs().length - 1) {
             this.activeTabIndex(0);
         }

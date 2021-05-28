@@ -1,0 +1,23 @@
+{% extends "base-manager.htm" %}
+{% load staticfiles %}
+{% load i18n %}
+
+{% block main_content %}
+    <div>
+        <div data-bind="component: {
+            name: 'foo',
+            params: {
+                resourceid: '{{ resourceid }}'
+            }
+        }"></div>
+
+    </div>
+{% endblock main_content %}
+
+{% block javascript %}
+    {{ block.super }}
+
+    <script>
+        require(['views/components/foo']);
+    </script>
+{% endblock javascript %}

@@ -14,9 +14,11 @@ define([
         var reportData = reportLookup[params.report_template_id];
         var shouldPreloadResourceData = Boolean(reportData.preload_resource_data.toLowerCase() === 'true');
 
-
         if (shouldPreloadResourceData) {
             console.log("@@", reportData)
+
+
+            _.extend(self, new ReportModel())
         }
 
         var reportContainer = document.querySelector('#report-container');
@@ -25,7 +27,7 @@ define([
             ko.virtualElements.setDomNodeChildren(reportContainer, component.template);
     
             ko.cleanNode(reportContainer);
-            ko.applyBindings(component.createViewModel(), reportContainer);
+            ko.applyBindings(component.createViewModel({'foo': 'bar'}), reportContainer);
         });
         
 

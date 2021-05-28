@@ -3,20 +3,44 @@ define([
     'jquery',
     'knockout',
     'knockout-mapping',
-    'leaflet',
-    'views/components/workbench',
-    'text!templates/views/components/iiif-popup.htm',
-    'leaflet-iiif',
-    'leaflet-fullscreen',
-    'bindings/select2-query',
-    'bindings/leaflet'
-], function(arches, $, ko, koMapping, L, WorkbenchViewmodel, iiifPopup) {
+], function(arches, $, ko, koMapping) {
     var Foo = function(params) {
+        var self = this;
 
+        this.loading = ko.observable(true);
+
+        this.resourceid = params.resourceid;
+        this.template = ko.observable({});
+        this.template.subscribe(function(foo) {
+            console.log(foo)
+        })
+
+        var url = arches.urls.api_resource_report(this.resourceid);
+
+        window.fetch(url)
+            .then(function(response){
+                if (response.ok) {
+                    return response.json();
+                }
+                else {
+                    throw new Error(arches.translations.reNetworkReponseError);
+                }
+            })
+            .then(function(responseJson) {
+                self.template(responseJson.template);
+                self.loading(false);
+            });
+
+        console.log('foo component', this, params, )
     };
     ko.components.register('foo', {
         viewModel: Foo,
-        template: '<div></div>'
+        template: `
+            <div data-bind="if: !$data.loading()">
+                <div data-bind='component: $data.template().componentname'
+                ></div>
+            </div>
+        `
     });
     return Foo;
 });

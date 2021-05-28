@@ -12,12 +12,12 @@ require([
     'bindings/chosen',
     'card-components'
 ], function($, _, ko, arches, BaseManagerView, ReportModel, GraphModel, CardModel, CardViewModel, reportLookup) {
+    console.log("YEAH")
     var foo = ko.components.register('report', {
         viewModel: BaseManagerView.extend({
             initialize: function(options){
 
                 this.loading = ko.observable(false)
-                console.log("YEAH")
             }
         }),
         template: { require: 'text!templates/views/resource/report.htm' }

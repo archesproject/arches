@@ -1109,6 +1109,25 @@ class OntologyProperty(APIBase):
         return JSONResponse(ret)
 
 
+class ResourceReport(APIBase):
+    def get(self, request, resourceid):
+        try:
+            # needs validation?
+            resource = Resource.objects.get(pk=resourceid)
+        except Exception as e:
+            return JSONResponse(str(e), status=404)
+
+        graph = Graph.objects.get(graphid=resource.graph_id)
+        template = models.ReportTemplate.objects.get(pk=graph.template_id)
+
+        if not template.preload_resource_data:
+            resource = resource.to_json()
+        
+        return JSONResponse({
+            'resource_instance': resource,
+            'template': template,
+        })
+
 @method_decorator(csrf_exempt, name="dispatch")
 class Tile(APIBase):
     def get(self, request, tileid):

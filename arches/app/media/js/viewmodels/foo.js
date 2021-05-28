@@ -1,22 +1,26 @@
 define([
     'knockout', 
-    'knockout-mapping', 
+    'knockout-mapping',
     'underscore', 
+    'views/base-manager', 
     'moment', 
     'report-templates',
     'models/report',
     'bindings/let', 
     'views/components/simple-switch',
-    'views/components/foo'
-], function(ko, koMapping, _, moment, reportLookup, ReportModel) {
-    var FooViewModel = function(params) {
-        var self = this;
-        this.reportMetadata = ko.observable(reportLookup[params.report_template_id])
+], function(ko, koMapping, _, BaseManagerView, moment, reportLookup, ReportModel) {
+    var FooViewModel = BaseManagerView.extend({
+        initialize: function(params) {
+            _.extend(this, params.viewModel);
+            
+            var self = this;
 
-        this.loading = ko.observable(true)
-        this.loading = ko.observable(false)
-
-        console.log(self.reportMetadata())
-    };
+    
+            console.log('foo vm', self, params, reportLookup)
+    
+        }
+    });
+    
+    
     return FooViewModel;
 });

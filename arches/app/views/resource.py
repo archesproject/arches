@@ -694,21 +694,16 @@ class ResourceDescriptors(View):
 @method_decorator(can_read_resource_instance, name="dispatch")
 class ResourceReportView(MapBaseManagerView):
     def get(self, request, resourceid=None):
-        resource = Resource.objects.get(pk=resourceid)
-
         context = self.get_context_data(
             main_script="views/resource",
             resourceid=resourceid,
             report_templates=models.ReportTemplate.objects.all(),
         )
 
-        graph = Graph.objects.get(graphid=resource.graph_id)
-        context["report_template_id"] = graph.template_id
-
         context["nav"]["icon"] = "fa fa-bookmark"
         context["nav"]["title"] = _("Resource Report")
 
-        return render(request, "views/resource/report.htm", context)
+        return render(request, "views/components/foo.htm", context)
 
 
 @method_decorator(can_read_resource_instance, name="dispatch")
