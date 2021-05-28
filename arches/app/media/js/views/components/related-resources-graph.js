@@ -29,27 +29,31 @@ define([
                 if (informationElement && viz && !informationElement.source) {
                     var sourceEdges = viz.edges('[source = "' + informationElement.id + '"]');
                     var targetEdges = viz.edges('[target = "' + informationElement.id + '"]');
-                    var prepLabel = function(label) {
+                    var addRelationship = function(edge, nodeType) {
+                        var edgeData = edge.data();
+                        var nodeData = edge[nodeType]().data();
+                        var label;
+
+                        // strips URL from relationship labels, if present, for presentation
                         try {
-                            var url = new window.URL(label);
+                            var url = new window.URL(edgeData.relationshiptype_label);
+                            label = url.pathname.split('/')[url.pathname.split('/').length - 1];
                         } catch (e) {
-                            return label;
+                            label = edgeData.relationshiptype_label;
                         }
-                        return url.pathname.split('/')[url.pathname.split('/').length - 1];
+
+                        relationships.push({
+                            label: label,
+                            node: nodeData,
+                            edge: edgeData,
+                            informationElement: self.informationElement
+                        });
                     };
                     sourceEdges.forEach(function(edge) {
-                        relationships.push({
-                            name: edge.target().data().displayname,
-                            type: prepLabel(edge.data().relationshiptype_label),
-                            id: edge.target().id()
-                        });
+                        addRelationship(edge, 'target');
                     });
                     targetEdges.forEach(function(edge) {
-                        relationships.push({
-                            name: edge.source().data().displayname,
-                            type: prepLabel(edge.data().relationshiptype_label),
-                            id: edge.source().id()
-                        });
+                        addRelationship(edge, 'source');
                     });
                 }
                 return relationships;

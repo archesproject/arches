@@ -13890,9 +13890,11 @@ a.jstree-anchor.permissions-widget {
             .relationships-list-item-type {
                 font-size: 1.2em;
                 color: rgb(29, 61, 116);
+                cursor: pointer;
             }
             .relationships-list-item-name {
                 padding-left: 10px;
+                cursor: pointer;
                 span {
                     color: darken($accent-color, 20%);
                 }

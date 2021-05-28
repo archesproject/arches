@@ -61,9 +61,13 @@
     <div class="relationships-list-header">{% trans "Relationships" %}</div>
     <div class="relationships-list" data-bind="foreach: $parent.informationElementRelationships">
         <div class="relationships-list-item">
-            <span data-bind="text: type" class="relationships-list-item-type"></span>
-            <span class="relationships-list-item-name">
-                (<span data-bind="text: name"></span>)
+            <span data-bind="text: label, click: function() {
+                informationElement(edge);
+            }" class="relationships-list-item-type"></span>
+            <span class="relationships-list-item-name" data-bind="click: function() {
+                informationElement(node);
+            }">
+                (<span data-bind="text: node.displayname"></span>)
             </span>
         </div>
     </div>
