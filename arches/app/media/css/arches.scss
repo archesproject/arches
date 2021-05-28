@@ -13874,14 +13874,41 @@ a.jstree-anchor.permissions-widget {
         font-weight: bold;
         font-size: 1.3em;
     }
+    .relationships-list-header {
+        padding: 5px 0;
+        color: rgb(120, 120, 120);
+        font-size: 1.3em;
+        font-weight: 600;
+    }
     .relationships-list {
+        height: 200px;
+        border: 1px solid rgb(221, 221, 221);
+        overflow-y: auto;
         .relationships-list-item {
+            padding: 8px;
+            font-size: 1.1em;
             .relationships-list-item-type {
-
+                font-size: 1.2em;
+                color: rgb(29, 61, 116);
             }
             .relationships-list-item-name {
-
+                padding-left: 10px;
+                span {
+                    color: darken($accent-color, 20%);
+                }
             }
+        }
+        .relationships-list-item:nth-of-type(odd) {
+            background-color: rgb(246, 250, 254);
+        }
+    }
+    .realtionships-list-count {
+        color: rgb(120, 120, 120);
+        font-size: 1.1em;
+        padding: 5px 0;
+        a {
+            color: darken($accent-color, 20%);
+            padding-left: 5px;
         }
     }
 }
