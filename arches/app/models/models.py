@@ -537,7 +537,7 @@ class Node(models.Model):
         managed = True
         db_table = "nodes"
         constraints = [
-            models.UniqueConstraint(fields=["name", "nodegroupid"], name="unique_nodename_nodegroup"),
+            models.UniqueConstraint(fields=["name", "nodegroup"], name="unique_nodename_nodegroup"),
         ]
 
 
@@ -1357,15 +1357,6 @@ class IIIFManifest(models.Model):
     class Meta:
         managed = True
         db_table = "iiif_manifests"
-
-
-class ManifestImage(models.Model):
-    imageid = models.UUIDField(primary_key=True, default=uuid.uuid1)
-    image = models.ImageField(upload_to="cantaloupe")
-
-    class Meta:
-        managed = True
-        db_table = "manifest_images"
 
 class GroupMapSettings(models.Model):
     group = models.OneToOneField(Group, on_delete=models.CASCADE)
