@@ -75,7 +75,7 @@ define([
             if (graphid in self.graphLookup){
                 return Promise.resolve(self.graphLookup[graphid]);
             } else {
-                return fetch(arches.urls.graphs_api + graphid)
+                return window.fetch(arches.urls.graphs_api + graphid)
                     .then(function(response){
                         if (!response.ok) {
                             throw new Error(arches.translations.reNetworkReponseError);
