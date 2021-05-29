@@ -1715,28 +1715,24 @@ class ResourceInstanceDataType(BaseDataType):
             for resourceXresourceId in resourceXresourceIds:
                 resourceid = resourceXresourceId["resourceId"]
                 try:
-                    if node.config['searchString'] != "":
-                        dsl = node.config['searchDsl']
+                    if node.config["searchString"] != "":
+                        dsl = node.config["searchDsl"]
                         if dsl:
                             query = Query(se)
                             bool_query = Bool()
                             ri_query = Dsl(dsl)
                             bool_query.must(ri_query)
-                            ids_query = Dsl({
-                                "ids": {
-                                    "values": [resourceid]
-                                }
-                            })
+                            ids_query = Dsl({"ids": {"values": [resourceid]}})
                             bool_query.must(ids_query)
                             query.add_query(bool_query)
                             try:
                                 results = query.search(index=RESOURCES_INDEX)
-                                count = results['hits']['total']['value']
+                                count = results["hits"]["total"]["value"]
                                 assert count == 1
                             except:
                                 raise ObjectDoesNotExist()
-                    if len(node.config['graphs']) > 0:
-                        graphids = map(lambda x: x['graphid'], node.config['graphs'])
+                    if len(node.config["graphs"]) > 0:
+                        graphids = map(lambda x: x["graphid"], node.config["graphs"])
                         if not models.ResourceInstance.objects.filter(pk=resourceid, graph_id__in=graphids).exists():
                             raise ObjectDoesNotExist()
                 except ObjectDoesNotExist:

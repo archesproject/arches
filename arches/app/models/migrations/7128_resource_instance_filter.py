@@ -4,11 +4,12 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('models', '7442_delete_manifest_images_table'),
+        ("models", "7442_delete_manifest_images_table"),
     ]
 
     operations = [
-        migrations.RunSQL("""
+        migrations.RunSQL(
+            """
             UPDATE d_data_types
             SET defaultconfig = defaultconfig || '{"searchString": "", "searchDsl": ""}'::jsonb
             WHERE datatype = 'resource-instance' OR datatype = 'resource-instance-list';
@@ -20,7 +21,8 @@ class Migration(migrations.Migration):
             UPDATE public.widgets
             SET defaultconfig = defaultconfig || '{"defaultResourceInstance": []}'::jsonb
             WHERE name = 'resource-instance-select-widget' or name = 'resource-instance-multiselect-widget';
-        ""","""
+        """,
+            """
             UPDATE nodes
             SET config = config - 'searchString' - 'searchDsl'
             WHERE datatype = 'resource-instance' OR datatype = 'resource-instance-list';
@@ -32,5 +34,6 @@ class Migration(migrations.Migration):
             UPDATE public.widgets
             SET defaultconfig = defaultconfig - 'defaultResourceInstance'
             WHERE name = 'resource-instance-select-widget' or name = 'resource-instance-multiselect-widget';
-        """)
+        """,
+        )
     ]

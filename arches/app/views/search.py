@@ -239,9 +239,11 @@ def append_instance_permission_filter_dsl(request, search_results_object):
         has_access.must_not(nested_term_filter)
         search_results_object["query"].add_query(has_access)
 
+
 def get_dsl_from_search_string(request):
     dsl = search_results(request, returnDsl=True).dsl
     return JSONResponse(dsl)
+
 
 def search_results(request, returnDsl=False):
     for_export = request.GET.get("export")
