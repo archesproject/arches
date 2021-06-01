@@ -291,7 +291,7 @@ class Command(BaseCommand):
                 force=options["yes"],
                 prevent_indexing=defer_indexing,
             )
-            if options["prevent_indexing"] is False and options["bulk_load"] is True:
+            if defer_indexing and not celery_worker_running:
                 utils.print_message("indexing database")
                 management.call_command("es", "reindex_database")
 
