@@ -289,7 +289,7 @@ class Command(BaseCommand):
                 options["create_concepts"],
                 use_multiprocessing=options["use_multiprocessing"],
                 force=options["yes"],
-                prevent_indexing=(options["prevent_indexing"] or options["bulk_load"]),
+                prevent_indexing=defer_indexing,
             )
             if options["prevent_indexing"] is False and options["bulk_load"] is True:
                 utils.print_message("indexing database")
