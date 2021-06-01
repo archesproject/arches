@@ -257,8 +257,8 @@ define([
         if (!self.noDefaults && self.parent instanceof CardViewModel) {
             var widgets = ko.unwrap(self.parent.widgets) || [];
 
+            var _tileDataTemp = JSON.parse(self._tileData());
             var hasDefaultValue = false;
-
             widgets.forEach(function(widget) {
                 Object.keys(self.data).forEach(function(nodeId) {
                     if (nodeId === widget.node_id()) {
@@ -266,6 +266,7 @@ define([
 
                         if (defaultValue) {
                             self.data[nodeId](defaultValue);
+                            _tileDataTemp[nodeId] = defaultValue;
                             hasDefaultValue = true;
                         }
                     }
@@ -273,7 +274,7 @@ define([
             });
 
             if (hasDefaultValue) {
-                self._tileData(koMapping.toJSON(self.data));
+                self._tileData(JSON.stringify(_tileDataTemp));
             }
         }
 

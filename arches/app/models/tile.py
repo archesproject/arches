@@ -549,8 +549,6 @@ class Tile(models.TileModel):
             parent_tile = Tile.get_blank_tile_from_nodegroup_id(
                 nodegroup_id=node.nodegroup.parentnodegroup_id, resourceid=resourceid, parenttile=None
             )
-            parent_tile.tileid = None
-            parent_tile.tiles = []
             for nodegroup in models.NodeGroup.objects.filter(parentnodegroup_id=node.nodegroup.parentnodegroup_id):
                 parent_tile.tiles.append(Tile.get_blank_tile_from_nodegroup_id(nodegroup.pk, resourceid=resourceid, parenttile=parent_tile))
             return parent_tile
@@ -563,11 +561,9 @@ class Tile(models.TileModel):
         tile.nodegroup_id = nodegroup_id
         tile.resourceinstance_id = resourceid
         tile.parenttile = parenttile
-        tile.data = {}
-
-        for node in models.Node.objects.filter(nodegroup=nodegroup_id):
-            if node.datatype != "semantic":
-                tile.data[str(node.nodeid)] = None
+        tile.data = {str(node.nodeid): None for node in models.Node.objects.filter(nodegroup=nodegroup_id) if node.datatype != "semantic"}
+        tile.tileid = None
+        tile.tiles = []
 
         return tile
 
