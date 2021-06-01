@@ -10,12 +10,18 @@
         justify-content: space-between;
     "
 >
-    <div data-bind='
-        component: { 
-            name: $data.template().componentname,
-            params: $data.reportData()
-        }
-    '></div>
+    <div 
+        style="
+            overflow-y: scroll;
+            height: 100%;
+        "
+        data-bind='
+            component: { 
+                name: $data.template().componentname,
+                params: $data.reportData()
+            }
+        '
+    ></div>
 
     <footer 
         style="
