@@ -670,7 +670,7 @@ class Command(BaseCommand):
             load_mapbox_styles(basemap_styles, True)
             load_mapbox_styles(overlay_styles, False)
 
-        def load_business_data(package_dir, prevent_indexing):
+        def load_business_data(package_dir, defer_indexing, overwrite="overwrite"):
             config_paths = glob.glob(os.path.join(package_dir, "package_config.json"))
             configs = {}
             if len(config_paths) > 0:
