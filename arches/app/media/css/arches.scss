@@ -2204,6 +2204,13 @@ div.final-cons-step-separator>h4 {
     width: 399px;
 }
 
+.workbench-card-sidepanel .resource-instance-card-component-content .install-buttons {
+    bottom: auto;
+    border: none;
+    background: white;
+    padding: unset;
+}
+
 .graph-designer .workbench-card-sidepanel .install-buttons {
     margin-right: 375px;
 }

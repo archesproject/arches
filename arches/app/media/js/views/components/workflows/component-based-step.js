@@ -605,9 +605,11 @@ define([
         })
 
         this.hasUnsavedData = ko.observable(false);
+        params.hasDirtyTile(false);
+        
         this.hasUnsavedData.subscribe(function(hasUnsavedData) {
             params.hasDirtyTile(hasUnsavedData);
-        })
+        });
 
         /* 
             `pageLayout` is an observableArray of arrays representing section Information ( `sectionInfo` ).
