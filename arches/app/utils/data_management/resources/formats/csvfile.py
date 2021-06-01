@@ -432,17 +432,19 @@ class CsvReader(Reader):
     ):
         # errors = businessDataValidator(self.business_data)
         celery_worker_running = task_management.check_if_celery_available()
-        # TODO: Fix IndexError raised by col_header_to_nodeid_dict and uncomment below
-        # try:
-        #     mapping_filefieldname_to_nodeid_dict = {n["file_field_name"].upper(): n["arches_nodeid"] for n in mapping["nodes"]}
-        #     col_header_to_nodeid_dict = {header: mapping_filefieldname_to_nodeid_dict[header.upper()] for header in business_data[1].keys()}
-        # except KeyError as e:
-        #     self.errors.append(
-        #         {
-        #             "type": "WARNING",
-        #             "message": f"Match failed between column header and mapping file_field_name. See detail: {e}.",
-        #         }
-        #     )
+        try:
+            mapping_filefieldname_to_nodeid_dict = {n["file_field_name"].upper(): n["arches_nodeid"] for n in mapping["nodes"]}
+            headers = [k.upper() for k in business_data[1].keys() if k.upper() != "RESOURCEID"]
+            col_header_to_nodeid_dict = {header: mapping_filefieldname_to_nodeid_dict[header.upper()] for header in headers}
+        except KeyError as e:
+            missing_headers_from_mapping = [header for header in headers if header.upper() not in mapping_filefieldname_to_nodeid_dict]
+            self.errors.append(
+                {
+                    "type": "WARNING",
+                    "message": f"Some data unable to be imported: {str(len(missing_headers_from_mapping))} column names from .csv could not be found as file_field_name values in your .mapping file:\n {missing_headers_from_mapping}.",
+                }
+            )
+            col_header_to_nodeid_dict = {header: mapping_filefieldname_to_nodeid_dict[header.upper()] for header in headers if header.upper() in mapping_filefieldname_to_nodeid_dict}
 
         print("Starting import of business data")
         self.start = time()
@@ -738,9 +740,7 @@ class CsvReader(Reader):
                                     blanktilecache[str(key)] = blank_tile
 
                 def column_names_to_targetids(row, mapping, row_number):
-                    # TODO: utilize col_header_to_nodeid_dict at start of method to make this a dict lookup instead of loop
                     errors = []
-                    new_row = []
                     if "ADDITIONAL" in row or "MISSING" in row:
                         errors.append(
                             {
@@ -752,11 +752,7 @@ class CsvReader(Reader):
                         )
                         if len(errors) > 0:
                             self.errors += errors
-                    for key, value in row.items():
-                        if value != "":
-                            for row in mapping["nodes"]:
-                                if key.upper() == row["file_field_name"].upper():
-                                    new_row.append({row["arches_nodeid"]: value})
+                    new_row = [{col_header_to_nodeid_dict[key.upper()]: value} for key, value in row.items() if value != "" and key.upper() != 'RESOURCEID']
                     return new_row
 
                 def transform_value(datatype, value, source, nodeid):
