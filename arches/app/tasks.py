@@ -100,14 +100,14 @@ def refresh_geojson_geometries(self):
 
 @shared_task(bind=True)
 def import_business_data(
-    self, data_source="", overwrite="overwrite", bulk_load=False, create_concepts=False, create_collections=False, prevent_indexing=False
+    self, data_source="", overwrite="", bulk_load=False, create_concepts=False, create_collections=False, prevent_indexing=False
 ):
     management.call_command(
         "packages",
         operation="import_business_data",
         source=data_source,
         bulk_load=bulk_load,
-        overwrite=overwrite,
+        overwrite=True,
         defer_indexing=prevent_indexing,
     )
 
