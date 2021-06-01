@@ -341,7 +341,7 @@ class Command(BaseCommand):
                 options["stage"],
                 options["yes"],
                 options["dev"],
-                defer_indexing
+                defer_indexing,
             )
 
         if options["operation"] in ["create", "create_package"]:
@@ -524,7 +524,7 @@ class Command(BaseCommand):
         stage_concepts="keep",
         yes=False,
         dev=False,
-        defer_indexing=True
+        defer_indexing=True,
     ):
 
         celery_worker_running = task_management.check_if_celery_available()
@@ -728,9 +728,7 @@ class Command(BaseCommand):
                 # assumes resources in csv do not depend on data being loaded prior from json in same dir
                 chord(
                     [
-                        import_business_data.s(
-                            data_source=path, overwrite=overwrite, bulk_load=bulk_load, prevent_indexing=False
-                        )
+                        import_business_data.s(data_source=path, overwrite=overwrite, bulk_load=bulk_load, prevent_indexing=False)
                         for path in valid_resource_paths
                     ]
                 )(
@@ -739,9 +737,7 @@ class Command(BaseCommand):
             else:
                 for path in business_data:
                     if path not in erring_csvs:
-                        self.import_business_data(
-                            path, overwrite=overwrite, bulk_load=bulk_load, prevent_indexing=defer_indexing
-                        )
+                        self.import_business_data(path, overwrite=overwrite, bulk_load=bulk_load, prevent_indexing=defer_indexing)
 
             relations = glob.glob(os.path.join(package_dir, "business_data", "relations", "*.relations"))
             for relation in relations:  # TODO: create a celery task for this on import_business_data complete
