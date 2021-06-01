@@ -180,11 +180,7 @@ class Resource(models.ResourceInstance):
 
         """
 
-        datatype_factory = DataTypeFactory()
-        node_datatypes = {str(nodeid): datatype for nodeid, datatype in models.Node.objects.values_list("nodeid", "datatype")}
         tiles = []
-        documents = []
-        term_list = []
 
         for resource in resources:
             resource.tiles = resource.get_flattened_tiles()
@@ -200,6 +196,10 @@ class Resource(models.ResourceInstance):
         resources[0].tiles[0].save_edit(note=f"Bulk created: {len(tiles)} for {len(resources)} resources.", edit_type="bulk_create")
 
         if prevent_indexing is False:
+            datatype_factory = DataTypeFactory()
+            node_datatypes = {str(nodeid): datatype for nodeid, datatype in models.Node.objects.values_list("nodeid", "datatype")}
+            documents = []
+            term_list = []
             for resource in resources:
                 document, terms = resource.get_documents_to_index(
                     fetchTiles=False, datatype_factory=datatype_factory, node_datatypes=node_datatypes
