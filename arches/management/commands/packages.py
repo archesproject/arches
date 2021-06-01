@@ -928,7 +928,7 @@ class Command(BaseCommand):
         update_resource_geojson_geometries()
         print("loading post sql")
         load_sql(package_location, "post_sql")
-        if defer_indexing is True and celery_worker_running is False and prevent_indexing is False:
+        if defer_indexing is True and celery_worker_running is False:
             print("indexing database")
             management.call_command("es", "reindex_database")
         if celery_worker_running:
