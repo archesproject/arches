@@ -137,7 +137,10 @@ class Command(BaseCommand):
 
         if options["operation"] == "index_resources_by_type":
             index_database_util.index_resources_by_type(
-                resource_types=options["resource_types"], clear_index=options["clear_index"], batch_size=options["batch_size"], quiet=options["quiet"]
+                resource_types=options["resource_types"],
+                clear_index=options["clear_index"],
+                batch_size=options["batch_size"],
+                quiet=options["quiet"],
             )
 
         if options["operation"] == "index_resource_relations":
