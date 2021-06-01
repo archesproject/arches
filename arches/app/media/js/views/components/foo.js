@@ -9,9 +9,11 @@ define([
 
         this.loading = ko.observable(true);
 
+        this.version = arches.version;
+
         this.resourceid = params.resourceid;
         this.template = ko.observable();
-        this.reportData = ko.observable({'foo': 'bar'});
+        this.reportData = ko.observable();
 
         var url = arches.urls.api_resource_report(this.resourceid);
 
@@ -26,23 +28,16 @@ define([
             })
             .then(function(responseJson) {
                 self.template(responseJson.template);
+                self.reportData(responseJson.resource_instance);
+
                 self.loading(false);
             });
 
-        console.log('foo component', this, params, )
+        console.log('foo component', this, params, arches)
     };
     ko.components.register('foo', {
         viewModel: Foo,
-        template: `
-            <div data-bind='if: !$data.loading()'>
-                <div data-bind='
-                    component: { 
-                        name: $data.template().componentname,
-                        params: $data.reportData()
-                    }
-                '></div>
-            </div>
-        `
+        template: { require: 'text!templates/views/components/foo.htm' }
     });
     return Foo;
 });

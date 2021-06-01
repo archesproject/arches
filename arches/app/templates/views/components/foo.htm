@@ -1,20 +1,35 @@
-{% extends "base-manager.htm" %}
 {% load staticfiles %}
 {% load i18n %}
 
-{% block main_content %}
-    <div data-bind="component: {
-        name: 'foo',
-        params: {
-            resourceid: '{{ resourceid }}'
+<div 
+    data-bind='if: !$data.loading()'
+    style="
+        height: calc(100vh - 50px);
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+    "
+>
+    <div data-bind='
+        component: { 
+            name: $data.template().componentname,
+            params: $data.reportData()
         }
-    }"></div>
-{% endblock main_content %}
+    '></div>
 
-{% block javascript %}
-    {{ block.super }}
-
-    <script>
-        require(['views/components/foo', 'report-templates']);
-    </script>
-{% endblock javascript %}
+    <footer 
+        style="
+            background: #f8f8f8; 
+            display: flex;
+            height: 50px;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 20px;
+        "
+    >
+        <div data-bind="text: '{% trans 'Arches' %}' + ' ' + $data.version"></div>
+        <div>
+            <a href="http://archesproject.org" target="_blank">http://archesproject.org</a>
+        </div>
+    </footer>
+</div>

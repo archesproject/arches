@@ -1120,11 +1120,8 @@ class ResourceReport(APIBase):
         graph = Graph.objects.get(graphid=resource.graph_id)
         template = models.ReportTemplate.objects.get(pk=graph.template_id)
 
-        if not template.preload_resource_data:
-            resource = resource.to_json()
-        
         return JSONResponse({
-            'resource_instance': resource,
+            'resource_instance': resource.to_json(),
             'template': template,
         })
 

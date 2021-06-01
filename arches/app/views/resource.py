@@ -35,7 +35,6 @@ from django.urls import reverse
 from django.utils.decorators import method_decorator
 from django.utils.translation import ugettext as _
 from django.views.generic import View
-from arches import __version__
 from arches.app.models import models
 from arches.app.models.card import Card
 from arches.app.models.graph import Graph
@@ -703,7 +702,7 @@ class ResourceReportView(MapBaseManagerView):
         context["nav"]["icon"] = "fa fa-bookmark"
         context["nav"]["title"] = _("Resource Report")
 
-        return render(request, "views/components/foo.htm", context)
+        return render(request, "views/components/foo-loader.htm", context)
 
 
 @method_decorator(can_read_resource_instance, name="dispatch")
