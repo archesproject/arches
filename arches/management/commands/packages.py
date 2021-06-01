@@ -944,7 +944,7 @@ class Command(BaseCommand):
         if defer_indexing is True and celery_worker_running is False:
             print("indexing database")
             management.call_command("es", "reindex_database")
-        if celery_worker_running:
+        elif celery_worker_running:
             print("Celery detected: Resource instances loading. Log in to arches to be notified on completion.")
         else:
             print("package load complete")
