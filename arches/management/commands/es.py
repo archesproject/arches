@@ -79,7 +79,12 @@ class Command(BaseCommand):
         )
 
         parser.add_argument(
-            "-rt", "--resource_type", action="store", dest="resource_types", default="", help="UUID of resource_model to index resources of."
+            "-rt",
+            "--resource_type",
+            action="store",
+            dest="resource_types",
+            default="",
+            help="UUID of resource_model to index resources of.",
         )
 
         parser.add_argument(
