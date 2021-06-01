@@ -519,8 +519,7 @@ class Command(BaseCommand):
         stage_concepts="keep",
         yes=False,
         dev=False,
-        defer_indexing=True,
-        prevent_indexing=False,
+        defer_indexing=True
     ):
 
         celery_worker_running = task_management.check_if_celery_available()
