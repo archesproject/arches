@@ -335,8 +335,7 @@ class Command(BaseCommand):
                 options["stage"],
                 options["yes"],
                 options["dev"],
-                defer_indexing,
-                options["prevent_indexing"],
+                defer_indexing
             )
 
         if options["operation"] in ["create", "create_package"]:
