@@ -725,7 +725,7 @@ class Command(BaseCommand):
                 chord(
                     [
                         import_business_data.s(
-                            data_source=path, overwrite=True, bulk_load=bulk_load, prevent_indexing=False
+                            data_source=path, overwrite=overwrite, bulk_load=bulk_load, prevent_indexing=False
                         )
                         for path in valid_resource_paths
                     ]
