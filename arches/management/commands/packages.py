@@ -302,6 +302,11 @@ class Command(BaseCommand):
                 # index relations if new relations created
                 if relation_count != models.ResourceXResource.objects.count():
                     management.call_command("es", "index_resource_relations")
+                # index resources of this model only
+                path = utils.get_valid_path(options["config_file"])
+                mapping = json.load(open(path, "r"))
+                graphid = mapping["resource_model_id"]
+                management.call_command("es", "index_resources_by_type", resource_types=[graphid])
 
         if options["operation"] == "import_node_value_data":
             self.import_node_value_data(options["source"], options["overwrite"])
