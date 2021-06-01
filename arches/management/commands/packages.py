@@ -281,6 +281,9 @@ class Command(BaseCommand):
                 elif str(options["defer_indexing"])[0].lower() == "f":
                     defer_indexing = False
 
+            concept_count = models.Value.objects.count()
+            relation_count = models.ResourceXResource.objects.count()
+
             self.import_business_data(
                 options["source"],
                 options["config_file"],
@@ -292,8 +295,12 @@ class Command(BaseCommand):
                 prevent_indexing=defer_indexing,
             )
             if defer_indexing and not celery_worker_running:
-                utils.print_message("indexing database")
-                management.call_command("es", "reindex_database")
+                # index concepts if new concepts created
+                if concept_count != models.Value.objects.count():
+                    management.call_command("es", "index_concepts")
+                # index relations if new relations created
+                if relation_count != models.ResourceXResource.objects.count():
+                    management.call_command("es", "index_resource_relations")
 
         if options["operation"] == "import_node_value_data":
             self.import_node_value_data(options["source"], options["overwrite"])
