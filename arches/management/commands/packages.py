@@ -1057,17 +1057,17 @@ class Command(BaseCommand):
         if data_source.endswith(".jsonl"):
             print(
                 """
-WARNING: Support for loading JSONL files is still experimental. Be aware that
-the format of logging and console messages has not been updated."""
+                WARNING: Support for loading JSONL files is still experimental. Be aware that
+                the format of logging and console messages has not been updated."""
             )
             if use_multiprocessing is True:
                 print(
                     """
-WARNING: Support for multiprocessing files is still experimental. While using
-multiprocessing to import resources, you will not be able to use ctrl+c (etc.)
-to cancel the operation. You will need to manually kill all of the processes
-with or just close the terminal. Also, be aware that print statements
-will be very jumbled."""
+                    WARNING: Support for multiprocessing files is still experimental. While using
+                    multiprocessing to import resources, you will not be able to use ctrl+c (etc.)
+                    to cancel the operation. You will need to manually kill all of the processes
+                    with or just close the terminal. Also, be aware that print statements
+                    will be very jumbled."""
                 )
                 if not force:
                     confirm = input("continue? Y/n ")
