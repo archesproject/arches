@@ -551,7 +551,7 @@ class CsvReader(Reader):
                     required_nodes[str(node[0])] = node[1]
 
                 # This code can probably be moved into it's own module.
-                resourceids = []
+                resourceids = set()
                 non_contiguous_resource_ids = []
                 previous_row_for_validation = None
 
@@ -560,7 +560,7 @@ class CsvReader(Reader):
                     if row["ResourceID"] != previous_row_for_validation and row["ResourceID"] in resourceids:
                         non_contiguous_resource_ids.append(row["ResourceID"])
                     else:
-                        resourceids.append(row["ResourceID"])
+                        resourceids.add(row["ResourceID"])
                     previous_row_for_validation = row["ResourceID"]
 
                     if create_concepts == True:
