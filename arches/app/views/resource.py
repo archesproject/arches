@@ -697,6 +697,8 @@ class ResourceReportView(MapBaseManagerView):
             main_script="views/resource",
             resourceid=resourceid,
             report_templates=models.ReportTemplate.objects.all(),
+            card_components=models.CardComponent.objects.all(),
+            widgets=models.Widget.objects.all(),
         )
 
         context["nav"]["icon"] = "fa fa-bookmark"

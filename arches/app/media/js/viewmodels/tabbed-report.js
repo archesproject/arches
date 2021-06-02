@@ -3,15 +3,19 @@ define([
     'underscore',
     'knockout',
     'knockout-mapping',
-    'viewmodels/report',
     'arches',
     'bindings/chosen'
-], function($, _, ko, koMapping, ReportViewModel, arches) {
+], function($, _, ko, koMapping, arches) {
     return function(params) {
         params.configKeys = ['tabs', 'activeTabIndex'];
         var self = this;
 
-        console.log(self, params)
+        this.activeTabIndex = ko.observable(params.report.get('config').activeTabIndex)
+        this.tabs = ko.observableArray(params.report.get('config').tabs)
+        
+        _.extend(self, params)
+
+        console.log('tabbed-rport', self, params)
         if (this.activeTabIndex() > self.tabs().length - 1) {
             this.activeTabIndex(0);
         }
@@ -34,11 +38,14 @@ define([
         }
 
         this.activeTab = ko.observable(self.tabs()[ko.unwrap(this.activeTabIndex)]);
-        this.report.configJSON.subscribe(function(){
-            if (self.tabs.indexOf(self.activeTab()) === -1) {
-                self.activeTab(self.tabs()[ko.unwrap(this.activeTabIndex)]);
-            }
-        });
+
+        console.log("DDDD", self, params)
+
+        // this.report.configJSON.subscribe(function(){
+        //     if (self.tabs.indexOf(self.activeTab()) === -1) {
+        //         self.activeTab(self.tabs()[ko.unwrap(this.activeTabIndex)]);
+        //     }
+        // });
         this.topcards = ko.unwrap(self.report.cards).map(function(card){
             return {name: card.model.name(), nodegroupid: card.nodegroupid};
         });
@@ -52,7 +59,7 @@ define([
             var cardList = [];
             ko.unwrap(self.report.cards).forEach(function(card) {
                 if (self.activeTabIndex() !== undefined && self.tabs().length > 0 && self.tabs().length -1 >= self.activeTabIndex()) {
-                    self.tabs()[self.activeTabIndex()]["nodegroup_ids"]().forEach( function(tabNodegroupId) {
+                    ko.unwrap(self.tabs()[self.activeTabIndex()]["nodegroup_ids"]).forEach( function(tabNodegroupId) {
                         if (card.nodegroupid === tabNodegroupId) {
                             cardList.push(card);
                         }

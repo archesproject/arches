@@ -19,9 +19,11 @@
             component: { 
                 name: $data.template().componentname,
                 params: {
-                    report: $data.reportData(),
+                    report: $data.report(),
                     reportDate: $data.reportDate,
                     hideEmptyNodes: $data.hideEmptyNodes,
+                    hasProvisionalData: $data.hasProvisionalData,
+                    reportLookup: $data.reportLookup
                 }
             }
         '

@@ -10,7 +10,7 @@ define([
     'core-js',
     'dom-4',
     'views/components/language-switcher',
-    'models/report'
+    'views/components/foo',
 ], function($, _, ko, Backbone, PageView, data) {
 
     var BaseManager = PageView.extend({

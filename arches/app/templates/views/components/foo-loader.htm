@@ -10,11 +10,3 @@
         }
     }"></div>
 {% endblock main_content %}
-
-{% block javascript %}
-    {{ block.super }}
-
-    <script>
-        require(['views/components/foo', 'report-templates', 'models/report']);
-    </script>
-{% endblock javascript %}
