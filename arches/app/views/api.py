@@ -1123,6 +1123,7 @@ class ResourceReport(APIBase):
         graph = Graph.objects.get(graphid=resource.graph_id)
         template = models.ReportTemplate.objects.get(pk=graph.template_id)
 
+<<<<<<< HEAD
         if template.preload_resource_data:
             response = self._load_resource_data(
                 request=request,
@@ -1311,6 +1312,18 @@ class ResourceReport(APIBase):
         # response["nav"]["print"] = True
 
         return response
+=======
+        if not template.preload_resource_data:
+            resource = resource.to_json()
+
+        return JSONResponse(
+            {
+                "resource_instance": resource,
+                "template": template,
+            }
+        )
+
+>>>>>>> 4f763ed9c0a5b32bf11d1160db35c285eadf2b67
 
 @method_decorator(csrf_exempt, name="dispatch")
 class Tile(APIBase):
