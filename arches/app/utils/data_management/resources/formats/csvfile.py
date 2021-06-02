@@ -432,9 +432,9 @@ class CsvReader(Reader):
     ):
         # errors = businessDataValidator(self.business_data)
         celery_worker_running = task_management.check_if_celery_available()
+        mapping_filefieldname_to_nodeid_dict = {n["file_field_name"].upper(): n["arches_nodeid"] for n in mapping["nodes"]}
+        headers = [k.upper() for k in business_data[0].keys() if k.upper() != "RESOURCEID"]
         try:
-            mapping_filefieldname_to_nodeid_dict = {n["file_field_name"].upper(): n["arches_nodeid"] for n in mapping["nodes"]}
-            headers = [k.upper() for k in business_data[1].keys() if k.upper() != "RESOURCEID"]
             col_header_to_nodeid_dict = {header: mapping_filefieldname_to_nodeid_dict[header.upper()] for header in headers}
         except KeyError as e:
             missing_headers_from_mapping = [header for header in headers if header.upper() not in mapping_filefieldname_to_nodeid_dict]
