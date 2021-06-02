@@ -1129,6 +1129,7 @@ ul.tabbed-report-tab-list {
 }
 
 .tab-banner {
+    height: 50px;
     background: #5fa2dd;
     padding: 5px 20px 7px 20px;
 }
@@ -11985,7 +11986,9 @@ a.filter-tools:hover {
 }
 
 .report-title-bar {
-    display: block;
+    /* position: absolute;
+    z-index: 99;
+    width: calc(100vw - 50px); */
 }
 
 .editor-report {

@@ -20,138 +20,107 @@ define([
         this.resourceid = params.resourceid;
 
         this.template = ko.observable();
-
-        /* maybe refactor to one report structure */ 
         this.report = ko.observable();
-        this.reportData = ko.observable();
-        this.reportData.subscribe(function(reportData) {
-            console.log(reportData)
-        });
 
         this.reportDate = moment().format('MMMM D, YYYY');
 
-        /* BEGIN legacy */
+        this.initialize = function() {
+            var url = arches.urls.api_resource_report(self.resourceid);
 
-        this.tiles = ko.computed(function() {
-            var tiles = [];
-            if (ko.unwrap(self.report)) {
-                console.log(self.report())
-                ko.unwrap(self.report().cards).forEach(function(card) {
-                    getCardTiles(card, tiles);
-                });
-            }
-            return tiles;
-        });
-
-        this.hasProvisionalData = ko.pureComputed(function() {
-            return _.some(self.tiles(), function(tile){
-                return _.keys(ko.unwrap(tile.provisionaledits)).length > 0;
-            });
-        });
-
-        var getCardTiles = function(card, tiles) {
-            var cardTiles = ko.unwrap(card.tiles);
-            cardTiles.forEach(function(tile) {
-                tiles.push(tile);
-                tile.cards.forEach(function(card) {
-                    getCardTiles(card, tiles);
-                });
-            });
-        };
-
-         this.hideEmptyNodes = ko.observable();
-
-        /* END legacy */ 
-
-        var url = arches.urls.api_resource_report(this.resourceid);
-
-        window.fetch(url)
-            .then(function(response){
+            window.fetch(url).then(function(response){
                 if (response.ok) {
                     return response.json();
                 }
                 else {
                     throw new Error(arches.translations.reNetworkReponseError);
                 }
-            })
-            .then(function(responseJson) {
-
-                console.log("AAAAAA", responseJson)
-                var graphModel = new GraphModel({
-                    data: JSON.parse(responseJson.graph_json),
-                    datatypes: JSON.parse(responseJson.datatypes_json),
-                });
-
-                graph = {
-                    graphModel: graphModel,
-                    cards: JSON.parse(responseJson.cards),
-                    graph: JSON.parse(responseJson.graph_json),
-                    datatypes: JSON.parse(responseJson.datatypes_json),
-                    cardwidgets: JSON.parse(responseJson.cardwidgets)
-                };
-                
-
-                responseJson.cards = _.filter(graph.cards, function(card) {
-                    var nodegroup = _.find(graph.graph.nodegroups, function(group) {
-                        return group.nodegroupid === card.nodegroup_id;
-                    });
-                    return !nodegroup || !nodegroup.parentnodegroup_id;
-                }).map(function(card) {
-                    return new CardViewModel({
-                        card: card,
-                        graphModel: graph.graphModel,
-                        resourceId: self.resourceid,
-                        displayname: responseJson.displayname,
-                        cards: graph.cards,
-                        tiles: JSON.parse(responseJson.tiles),
-                        cardwidgets: graph.cardwidgets
-                    });
-                });
-    
-                responseJson.templates = reportLookup;
-                responseJson.cardComponents = cardComponents;
-
-                self.report(new ReportModel(_.extend(responseJson, {
-                    graphModel: graph.graphModel,
-                    graph: graph.graph,
-                    datatypes: graph.datatypes
-                })));
-
-
-
-
-
-
-                // var cards = JSON.parse(responseJson.cards).reduce(function(acc, card) {
-                //     acc.push(new CardViewModel(card));
-                //     return acc;
-                // }, []);
-
-                console.log("foo", self, self.tiles(), self.hasProvisionalData())
+            }).then(function(responseJson) {
                 var template = responseJson.template
                 self.template(template);
-
-
-
-
-
+    
                 if (template.preload_resource_data) {
-
-
-                    this.hideEmptyNodes = ko.observable(responseJson.hide_empty_nodes); 
-
- 
-
-
+                    self.preloadResourceData(responseJson)
                 }
                 else {
-                    self.reportData(responseJson.resource_instance);
+                    self.report(responseJson.resource_instance);
                 }
-
+    
                 self.loading(false);
             });
+        };
+        
+        this.preloadResourceData = function(responseJson) {
+            self.tiles = ko.computed(function() {
+                var tiles = [];
+                if (ko.unwrap(self.report)) {
+                    ko.unwrap(self.report().cards).forEach(function(card) {
+                        getCardTiles(card, tiles);
+                    });
+                }
+                return tiles;
+            });
+    
+            self.hasProvisionalData = ko.pureComputed(function() {
+                return _.some(self.tiles(), function(tile){
+                    return _.keys(ko.unwrap(tile.provisionaledits)).length > 0;
+                });
+            });
+    
+            var getCardTiles = function(card, tiles) {
+                var cardTiles = ko.unwrap(card.tiles);
+                cardTiles.forEach(function(tile) {
+                    tiles.push(tile);
+                    tile.cards.forEach(function(card) {
+                        getCardTiles(card, tiles);
+                    });
+                });
+            };
+    
+            self.hideEmptyNodes = ko.observable();
 
-        console.log('foo component', this, params, arches)
+            var graphModel = new GraphModel({
+                data: JSON.parse(responseJson.graph_json),
+                datatypes: JSON.parse(responseJson.datatypes_json),
+            });
+
+            graph = {
+                graphModel: graphModel,
+                cards: JSON.parse(responseJson.cards),
+                graph: JSON.parse(responseJson.graph_json),
+                datatypes: JSON.parse(responseJson.datatypes_json),
+                cardwidgets: JSON.parse(responseJson.cardwidgets)
+            };
+
+            responseJson.cards = _.filter(graph.cards, function(card) {
+                var nodegroup = _.find(graph.graph.nodegroups, function(group) {
+                    return group.nodegroupid === card.nodegroup_id;
+                });
+                return !nodegroup || !nodegroup.parentnodegroup_id;
+            }).map(function(card) {
+                return new CardViewModel({
+                    card: card,
+                    graphModel: graph.graphModel,
+                    resourceId: self.resourceid,
+                    displayname: responseJson.displayname,
+                    cards: graph.cards,
+                    tiles: JSON.parse(responseJson.tiles),
+                    cardwidgets: graph.cardwidgets
+                });
+            });
+
+            responseJson.templates = reportLookup;
+            responseJson.cardComponents = cardComponents;
+
+            self.report(new ReportModel(_.extend(responseJson, {
+                graphModel: graph.graphModel,
+                graph: graph.graph,
+                datatypes: graph.datatypes
+            })));
+
+            self.hideEmptyNodes(responseJson.hide_empty_nodes); 
+        };
+
+        this.initialize();
     };
     ko.components.register('foo', {
         viewModel: Foo,
