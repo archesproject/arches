@@ -22,6 +22,7 @@ module.exports = {
         "Promise": false,
         "setTimeout": false,
         "URL": false,
-        "URLSearchParams": false
+        "URLSearchParams": false,
+        "fetch": false
     }
 };
