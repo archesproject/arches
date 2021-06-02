@@ -109,14 +109,18 @@ define([
             };
             var getStyle = function() {
                 self.legendEntries([]);
+                var nodeSize = 86;
+                var lineColor = '#606060';
                 var styles = [{
                     "selector": "node",
                     "style": {
                         "content": "data(displayname)",
-                        "font-size": "12px",
+                        "font-size": "18px",
+                        "width": nodeSize,
+                        "height": nodeSize,
                         "text-valign": "center",
                         "text-halign": "center",
-                        "border-color": "black",
+                        "border-color": lineColor,
                         "border-width": 1
                     }
                 }, {
@@ -127,7 +131,18 @@ define([
                 }, {
                     "selector": "node:selected",
                     "style": {
-                        "border-width": 3
+                        "border-width": 5
+                    }
+                }, {
+                    "selector": "edge",
+                    "style": {
+                        "line-color": lineColor
+                    }
+                }, {
+                    "selector": "edge:selected",
+                    "style": {
+                        "width": 6,
+                        "line-color": lineColor
                     }
                 }];
                 for (var resourceId in resourceTypeLookup) {

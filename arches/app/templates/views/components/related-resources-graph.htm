@@ -21,6 +21,7 @@
     <i class="fa fa-search"></i>
     <span class="map-sidebar-text">{% trans "Search" %}</span>
 </div>
+{% comment %} Uncomment this section to show additional tabs...
 <div class="workbench-card-sidebar-tab" data-bind="click: function() {
     toggleTab('analyze');
 }, css: {
@@ -37,6 +38,7 @@
     <i class="fa fa-cog"></i>
     <span class="map-sidebar-text">{% trans "Settings" %}</span>
 </div>
+{% endcomment %}
 <div class="workbench-card-sidebar-tab" data-bind="click: function() {
     toggleTab('legend');
 }, css: {
