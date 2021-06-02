@@ -942,7 +942,6 @@ div.wf-multi-tile-card-info div {
 
 .workflow-nav-tab-container {
     display: flex;
-    justify-content: space-between;
     width: inherit;
 }
 
@@ -953,17 +952,9 @@ div.wf-multi-tile-card-info div {
     align-items: center;
     font-size: 30px;
     justify-content: center;
-    border-bottom: solid 1px #ddd;
+    border: solid 1px #ddd;
     color: #555;
     cursor: pointer;
-}
-
-.workflow-tab-controls.left {
-    border-left: solid 1px #ddd;
-}
-
-.workflow-tab-controls.right {
-    border-right: solid 1px #ddd;
 }
 
 .workflow-nav-tabs {
