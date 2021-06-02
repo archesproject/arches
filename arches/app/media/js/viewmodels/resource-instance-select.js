@@ -257,7 +257,7 @@ define([
         this.select2Config = {
             value: self.renderContext === 'search' ? self.value : resourceToAdd,
             clickBubble: true,
-            disabled: this.waitingForGraphToDownload,
+            disabled: this.disabled() ? this.disabled : this.waitingForGraphToDownload,
             multiple: !self.displayOntologyTable ? params.multiple : false,
             placeholder: this.placeholder() || arches.translations.riSelectPlaceholder,
             closeOnSelect: true,
