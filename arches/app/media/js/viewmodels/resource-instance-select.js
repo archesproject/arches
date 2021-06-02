@@ -32,10 +32,11 @@ define([
     *        }
     *    }]);
     * };
-    */
+     */
     var ResourceInstanceSelectViewModel = function(params) {
         var self = this;
         this.graphLookup = graphCache;
+        this.graphLookupKeys = ko.observable(Object.keys(this.graphLookup)); // used for informing the widget when to disable/enable the dropdown
         params.configKeys = ['placeholder', 'defaultResourceInstance'];
         this.preview = arches.graphs.length > 0;
         this.allowInstanceCreation = params.allowInstanceCreation === false ? false : true;
@@ -54,23 +55,22 @@ define([
 
         this.multiple = params.multiple || false;
         this.value = params.value || undefined;
-
         this.selectedItem = params.selectedItem || ko.observable();
         this.rootOntologyClass = '';
         this.graphIsSemantic = false;
-        this.resourceTypesToDisplayInDropDown = !!params.graphids ? ko.toJS(params.graphids) : [];
+        this.resourceTypesToDisplayInDropDown = ko.observableArray(!!params.graphids ? ko.toJS(params.graphids) : []);
         this.displayOntologyTable = this.renderContext !== 'search' && !!params.node;
 
-        this.waitingForGraphToDownload = ko.observable(false);
-        this.counter = Object.keys(self.graphLookup).length;
-        if (params.node) {
-            ko.unwrap(params.node.config.graphs).forEach(function(graph){
-                if (!Object.keys(self.graphLookup).includes(graph.graphid)){
-                    self.waitingForGraphToDownload(true);
-                    self.counter += 1;
-                }
-            });
-        }
+        this.waitingForGraphToDownload = ko.computed(function(){
+            if (!!params.node && this.resourceTypesToDisplayInDropDown().length > 0){
+                var found = this.resourceTypesToDisplayInDropDown().find(function(graphid){
+                    return this.graphLookupKeys().includes(graphid);
+                }, this);
+                return !found;
+            }
+            return false;
+        }, this);
+
         var downloadGraph = function(graphid){
             if (graphid in self.graphLookup){
                 return Promise.resolve(self.graphLookup[graphid]);
@@ -84,7 +84,7 @@ define([
                     })
                     .then(function(json){
                         self.graphLookup[graphid] = json.graph;
-                        self.waitingForGraphToDownload(Object.keys(self.graphLookup).length < self.counter);
+                        self.graphLookupKeys(Object.keys(self.graphLookup));
                         return json.graph;
                     });
             }
@@ -105,12 +105,12 @@ define([
             }
             if (params.state !== 'report') {
                 ko.unwrap(params.node.config.graphs).forEach(function(graph){
-                    this.resourceTypesToDisplayInDropDown.push(graph.graphid);
                     downloadGraph(graph.graphid);
                 }, this);
+                this.resourceTypesToDisplayInDropDown(ko.unwrap(params.node.config.graphs).map(function(graph){return graph.graphid;}));
             }
-        } else if(this.resourceTypesToDisplayInDropDown.length > 0) {
-            this.resourceTypesToDisplayInDropDown.forEach(function(graphid){
+        } else if(this.resourceTypesToDisplayInDropDown().length > 0) {
+            this.resourceTypesToDisplayInDropDown().forEach(function(graphid){
                 downloadGraph(graphid);
             });
         }
@@ -385,7 +385,7 @@ define([
                         // merge resource type filters
                         var resourceFiltersString = queryString.get('resource-type-filter') || "[]";
                         var resourceFilters = JSON.parse(resourceFiltersString);
-                        self.resourceTypesToDisplayInDropDown.forEach(function(graphid){
+                        self.resourceTypesToDisplayInDropDown().forEach(function(graphid){
                             if(!(resourceFiltersString.includes(graphid))){
                                 resourceFilters.push({
                                     "graphid": graphid,
@@ -418,7 +418,7 @@ define([
                 },
                 results: function(data, page) {
                     if (!data['paging-filter'].paginator.has_next && self.renderContext !== 'search') {
-                        self.resourceTypesToDisplayInDropDown.forEach(function(graphid) {
+                        self.resourceTypesToDisplayInDropDown().forEach(function(graphid) {
                             var graph = self.graphLookup[graphid];
                             var val = {
                                 name: graph.name,
