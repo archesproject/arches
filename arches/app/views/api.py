@@ -1266,26 +1266,26 @@ class ResourceReport(APIBase):
         #     ),
         #     resourceid=resourceid,
         #     displayname=resource.displayname,
-        #     
+        #
         # )
 
         response = {}
 
-        response['hide_empty_nodes'] = settings.HIDE_EMPTY_NODES_IN_REPORT
+        response["hide_empty_nodes"] = settings.HIDE_EMPTY_NODES_IN_REPORT
 
-        response['displayname'] = resource.displayname
+        response["displayname"] = resource.displayname
 
-        response['template'] = template
+        response["template"] = template
 
-        response['cards'] = JSONSerializer().serialize(
+        response["cards"] = JSONSerializer().serialize(
             permitted_cards,
             sort_keys=False,
             exclude=["is_editable", "description", "instructions", "helpenabled", "helptext", "helptitle", "ontologyproperty"],
         )
 
-        response['cardwidgets'] = JSONSerializer().serialize(cardwidgets)
+        response["cardwidgets"] = JSONSerializer().serialize(cardwidgets)
 
-        response['datatypes_json'] = JSONSerializer().serialize(
+        response["datatypes_json"] = JSONSerializer().serialize(
             datatypes, exclude=["modulename", "issearchable", "configcomponent", "configname", "iconclass"]
         )
 
@@ -1307,7 +1307,7 @@ class ResourceReport(APIBase):
             ],
         )
 
-        response['tiles'] = JSONSerializer().serialize(permitted_tiles, sort_keys=False)
+        response["tiles"] = JSONSerializer().serialize(permitted_tiles, sort_keys=False)
 
         # response["nav"] = {}
 
