@@ -21,7 +21,7 @@ define(['jquery',
 
             console.log('report model init', self, options)
 
-            this.templateId = ko.observable(self.get('graph').template_id);
+            this.templateId = options.templateId ? options.templateId : ko.observable(self.get('graph').template_id);
             this.cards = options.cards || [];
             this.preview = options.preview;
             this.userisreviewer = options.userisreviewer;

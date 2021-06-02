@@ -18,7 +18,11 @@
         data-bind='
             component: { 
                 name: $data.template().componentname,
-                params: $data.reportData()
+                params: {
+                    report: $data.reportData(),
+                    reportDate: $data.reportDate,
+                    hideEmptyNodes: $data.hideEmptyNodes,
+                }
             }
         '
     ></div>

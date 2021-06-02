@@ -15,12 +15,13 @@ from rdflib.namespace import SKOS, DCTERMS
 from revproxy.views import ProxyView
 from slugify import slugify
 from urllib import parse
+from distutils.util import strtobool
 from django.contrib.auth import authenticate
 from django.shortcuts import render
 from django.views.generic import View
 from django.db import transaction, connection
 from django.db.models import Q
-from django.http import Http404, HttpResponse
+from django.http import Http404, HttpResponse, response
 from django.http.request import QueryDict
 from django.core import management
 from django.core.cache import cache
@@ -30,6 +31,7 @@ from django.utils.translation import ugettext as _
 from django.core.files.base import ContentFile
 from django.views.decorators.csrf import csrf_exempt
 from django.utils.decorators import method_decorator
+from arches import __version__
 from arches.app.models import models
 from arches.app.models.concept import Concept
 from arches.app.models.card import Card as CardProxyModel
@@ -39,6 +41,7 @@ from arches.app.models.resource import Resource
 from arches.app.models.system_settings import settings
 from arches.app.models.tile import Tile as TileProxyModel, TileValidationError
 from arches.app.views.tile import TileData as TileView
+from arches.app.views.resource import RelatedResourcesView
 from arches.app.utils.skos import SKOSWriter
 from arches.app.utils.response import JSONResponse
 from arches.app.utils.decorators import can_read_concept, group_required
@@ -1120,10 +1123,194 @@ class ResourceReport(APIBase):
         graph = Graph.objects.get(graphid=resource.graph_id)
         template = models.ReportTemplate.objects.get(pk=graph.template_id)
 
-        return JSONResponse({
-            'resource_instance': resource.to_json(),
-            'template': template,
-        })
+        if template.preload_resource_data:
+            response = self._load_resource_data(
+                request=request,
+                resourceid=resourceid,
+                resource=resource,
+                graph=graph,
+                template=template,
+            )
+        else:
+            response = {
+                'resource_instance': resource.to_json(),
+                'template': template,
+            }
+
+        return JSONResponse(response)
+
+
+    def _load_resource_data(self, request, resourceid, resource, graph, template):
+        resource_models = (
+            models.GraphModel.objects.filter(isresource=True).exclude(isactive=False).exclude(pk=settings.SYSTEM_SETTINGS_RESOURCE_MODEL_ID)
+        )
+
+        if strtobool(request.GET.get("json", "false")):
+            get_params = request.GET.copy()
+            get_params.update({"paginate": "false"})
+            request.GET = get_params
+
+            related_resources_response = RelatedResourcesView().get(request, resourceid)
+            related_resources = json.loads(related_resources_response.content)
+
+            related_resources_summary = self._generate_related_resources_summary(
+                related_resources=related_resources["related_resources"],
+                resource_relationships=related_resources["resource_relationships"],
+                resource_models=resource_models,
+            )
+        else:
+            related_resources_summary = {}
+
+            for resource_model in resource_models:
+                get_params = request.GET.copy()
+                get_params.update({"resourceinstance_graphid": str(resource_model.graphid)})
+                request.GET = get_params
+
+                related_resources_response = RelatedResourcesView().get(request, resourceid).content
+                related_resources_summary[str(resource_model.pk)] = json.loads(related_resources_response)
+
+        permitted_tiles = []
+        perm = "read_nodegroup"
+
+        for tile in TileProxyModel.objects.filter(resourceinstance=resource).order_by("sortorder"):
+            if request.user.has_perm(perm, tile.nodegroup):
+                tile.filter_by_perm(request.user, perm)
+                permitted_tiles.append(tile)
+
+        if strtobool(request.GET.get("json", "false")) and strtobool(request.GET.get("exclude_graph", "false")):
+            return JSONResponse(
+                {
+                    "tiles": permitted_tiles,
+                    "related_resources": related_resources_summary,
+                    "displayname": resource.displayname,
+                    "resourceid": resourceid,
+                }
+            )
+
+        datatypes = models.DDataType.objects.all()
+
+        permitted_cards = []
+
+        for card in CardProxyModel.objects.filter(graph_id=resource.graph_id).order_by("sortorder"):
+            if request.user.has_perm(perm, card.nodegroup):
+                card.filter_by_perm(request.user, perm)
+                permitted_cards.append(card)
+
+        cardwidgets = [
+            widget for widgets in [card.cardxnodexwidget_set.order_by("sortorder").all() for card in permitted_cards] for widget in widgets
+        ]
+
+        if strtobool(request.GET.get("json", "false")) and not strtobool(request.GET.get("exclude_graph", "false")):
+            return JSONResponse(
+                {
+                    "datatypes": datatypes,
+                    "cards": permitted_cards,
+                    "tiles": permitted_tiles,
+                    "graph": graph,
+                    "related_resources": related_resources_summary,
+                    "displayname": resource.displayname,
+                    "resourceid": resourceid,
+                    "cardwidgets": cardwidgets,
+                }
+            )
+
+        templates = models.ReportTemplate.objects.all()
+        widgets = models.Widget.objects.all()
+        card_components = models.CardComponent.objects.all()
+
+        try:
+            map_layers = models.MapLayer.objects.all()
+            map_markers = models.MapMarker.objects.all()
+            map_sources = models.MapSource.objects.all()
+            geocoding_providers = models.Geocoder.objects.all()
+        except AttributeError:
+            raise Http404(_("No active report template is available for this resource."))
+
+        # context = self.get_context_data(
+        #     main_script="views/resource/report",
+        #     report_templates=templates,
+        #     templates_json=JSONSerializer().serialize(templates, sort_keys=False, exclude=["name", "description"]),
+        #     card_components=card_components,
+        #     card_components_json=JSONSerializer().serialize(card_components),
+        #     cardwidgets=JSONSerializer().serialize(cardwidgets),
+        #     tiles=JSONSerializer().serialize(permitted_tiles, sort_keys=False),
+            # cards=JSONSerializer().serialize(
+            #     permitted_cards,
+            #     sort_keys=False,
+            #     exclude=["is_editable", "description", "instructions", "helpenabled", "helptext", "helptitle", "ontologyproperty"],
+            # ),
+        #     datatypes_json=JSONSerializer().serialize(
+        #         datatypes, exclude=["modulename", "issearchable", "configcomponent", "configname", "iconclass"]
+        #     ),
+        #     geocoding_providers=geocoding_providers,
+        #     related_resources=JSONSerializer().serialize(related_resources_summary, sort_keys=False),
+        #     widgets=widgets,
+        #     map_layers=map_layers,
+        #     map_markers=map_markers,
+        #     map_sources=map_sources,
+        #     graph_id=graph.graphid,
+        #     graph_name=graph.name,
+        #     graph_json=JSONSerializer().serialize(
+        #         graph,
+        #         sort_keys=False,
+        #         exclude=[
+        #             "functions",
+        #             "relatable_resource_model_ids",
+        #             "domain_connections",
+        #             "edges",
+        #             "is_editable",
+        #             "description",
+        #             "iconclass",
+        #             "subtitle",
+        #             "author",
+        #         ],
+        #     ),
+        #     resourceid=resourceid,
+        #     displayname=resource.displayname,
+        #     hide_empty_nodes=settings.HIDE_EMPTY_NODES_IN_REPORT,
+        # )
+
+        response = {}
+
+        response['template'] = template
+        response['cards'] = JSONSerializer().serialize(
+            permitted_cards,
+            sort_keys=False,
+            exclude=["is_editable", "description", "instructions", "helpenabled", "helptext", "helptitle", "ontologyproperty"],
+        )
+
+        response['datatypes_json'] = JSONSerializer().serialize(
+            datatypes, exclude=["modulename", "issearchable", "configcomponent", "configname", "iconclass"]
+        )
+
+        response['graph_id'] = graph.graphid
+        response['graph_name'] = graph.name
+        response['graph_json'] = JSONSerializer().serialize(
+            graph,
+            sort_keys=False,
+            exclude=[
+                "functions",
+                "relatable_resource_model_ids",
+                "domain_connections",
+                "edges",
+                "is_editable",
+                "description",
+                "iconclass",
+                "subtitle",
+                "author",
+            ],
+        )
+
+        # response["nav"] = {}
+
+        # if graph.iconclass:
+        #     response["nav"]["icon"] = graph.iconclass
+            
+        # response["nav"]["title"] = graph.name
+        # response["nav"]["res_edit"] = True
+        # response["nav"]["print"] = True
+
+        return response
 
 @method_decorator(csrf_exempt, name="dispatch")
 class Tile(APIBase):

@@ -9,7 +9,8 @@ define([
     'uuid',
     'core-js',
     'dom-4',
-    'views/components/language-switcher'
+    'views/components/language-switcher',
+    'models/report'
 ], function($, _, ko, Backbone, PageView, data) {
 
     var BaseManager = PageView.extend({
