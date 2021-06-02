@@ -1133,12 +1133,11 @@ class ResourceReport(APIBase):
             )
         else:
             response = {
-                'resource_instance': resource.to_json(),
-                'template': template,
+                "resource_instance": resource.to_json(),
+                "template": template,
             }
 
         return JSONResponse(response)
-
 
     def _load_resource_data(self, request, resourceid, resource, graph, template):
         resource_models = (
@@ -1234,11 +1233,11 @@ class ResourceReport(APIBase):
         #     card_components_json=JSONSerializer().serialize(card_components),
         #     cardwidgets=JSONSerializer().serialize(cardwidgets),
         #     tiles=JSONSerializer().serialize(permitted_tiles, sort_keys=False),
-            # cards=JSONSerializer().serialize(
-            #     permitted_cards,
-            #     sort_keys=False,
-            #     exclude=["is_editable", "description", "instructions", "helpenabled", "helptext", "helptitle", "ontologyproperty"],
-            # ),
+        # cards=JSONSerializer().serialize(
+        #     permitted_cards,
+        #     sort_keys=False,
+        #     exclude=["is_editable", "description", "instructions", "helpenabled", "helptext", "helptitle", "ontologyproperty"],
+        # ),
         #     datatypes_json=JSONSerializer().serialize(
         #         datatypes, exclude=["modulename", "issearchable", "configcomponent", "configname", "iconclass"]
         #     ),
@@ -1272,20 +1271,20 @@ class ResourceReport(APIBase):
 
         response = {}
 
-        response['template'] = template
-        response['cards'] = JSONSerializer().serialize(
+        response["template"] = template
+        response["cards"] = JSONSerializer().serialize(
             permitted_cards,
             sort_keys=False,
             exclude=["is_editable", "description", "instructions", "helpenabled", "helptext", "helptitle", "ontologyproperty"],
         )
 
-        response['datatypes_json'] = JSONSerializer().serialize(
+        response["datatypes_json"] = JSONSerializer().serialize(
             datatypes, exclude=["modulename", "issearchable", "configcomponent", "configname", "iconclass"]
         )
 
-        response['graph_id'] = graph.graphid
-        response['graph_name'] = graph.name
-        response['graph_json'] = JSONSerializer().serialize(
+        response["graph_id"] = graph.graphid
+        response["graph_name"] = graph.name
+        response["graph_json"] = JSONSerializer().serialize(
             graph,
             sort_keys=False,
             exclude=[
@@ -1305,12 +1304,13 @@ class ResourceReport(APIBase):
 
         # if graph.iconclass:
         #     response["nav"]["icon"] = graph.iconclass
-            
+
         # response["nav"]["title"] = graph.name
         # response["nav"]["res_edit"] = True
         # response["nav"]["print"] = True
 
         return response
+
 
 @method_decorator(csrf_exempt, name="dispatch")
 class Tile(APIBase):
