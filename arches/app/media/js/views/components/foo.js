@@ -31,7 +31,6 @@ define([
         this.reportDate = moment().format('MMMM D, YYYY');
 
         /* BEGIN legacy */
-        this.hideEmptyNodes = ko.observable();  /* not working */
 
         this.tiles = ko.computed(function() {
             var tiles = [];
@@ -50,22 +49,6 @@ define([
             });
         });
 
-        console.log("AAAAA", self, params)
-        // this.configJSON = ko.computed(function(){
-        //     self.configKeys.forEach(function(config) {
-        //         self[config] = self.configState[config];
-        //     });
-
-        //     var report = self.report();
-
-        //     report.configJSON(koMapping.toJS(report.configState));
-
-        //     self.report(report);
-
-        //     return report.configJSON;
-
-        // }).extend({deferred: true});
-
         var getCardTiles = function(card, tiles) {
             var cardTiles = ko.unwrap(card.tiles);
             cardTiles.forEach(function(tile) {
@@ -75,6 +58,8 @@ define([
                 });
             });
         };
+
+         this.hideEmptyNodes = ko.observable();
 
         /* END legacy */ 
 
@@ -153,7 +138,9 @@ define([
                 if (template.preload_resource_data) {
 
 
+                    this.hideEmptyNodes = ko.observable(responseJson.hide_empty_nodes); 
 
+ 
 
 
                 }
