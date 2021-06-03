@@ -12,21 +12,21 @@ define([
     'arches',
     'resource-editor-data',
     'report-templates',
+    'views/components/foo',
     'bindings/resizable-sidepanel',
     'bindings/sortable',
     'widgets',
     'card-components',
     'views/resource/related-resources-manager',
     'views/resource/permissions-manager',
-    'moment',
-], function($, _, ko, BaseManagerView, AlertViewModel, JsonErrorAlertViewModel, GraphModel, ReportModel, CardViewModel, ProvisionalTileViewModel, arches, data, reportLookup) {
+], function($, _, ko, BaseManagerView, AlertViewModel, JsonErrorAlertViewModel, GraphModel, ReportModel, CardViewModel, ProvisionalTileViewModel, arches, data, reportLookup, Foo) {
     var handlers = {
         'after-update': [],
         'tile-reset': []
     };
     var tiles = data.tiles;
     var filter = ko.observable('');
-    var loading = ko.observable(false);
+    var loading = ko.observable(true);
     var selection = ko.observable('root');
     var scrollTo = ko.observable();
     var displayname = ko.observable(data.displayname);
@@ -250,7 +250,13 @@ define([
     });
 
     vm.report = null;
-    vm.report = new ReportModel(_.extend(data, {graphModel: graphModel, cards: vm.topCards}));
+
+    var foo = new Foo({ resourceid: resourceId() });
+    foo.report.subscribe(function(bar) {
+        _.extend(bar, foo)
+        vm.report = bar;
+        loading(false)
+    });
 
     vm.resourceId.subscribe(function(){
         //switches the url from 'create-resource' once the resource id is available

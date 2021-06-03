@@ -23,6 +23,10 @@ define([
         this.resourceId.subscribe(function(resId) {
             this.setupReport(resId, this.graphId(), this.dataSource());
         }, this);
+
+
+
+        // NEED TO REFACTOR TO USE FOO COMPONENT
         var processReportData = function(data, graph) {
             data.cards = _.filter(graph.cards, function(card) {
                 var nodegroup = _.find(graph.graph.nodegroups, function(group) {

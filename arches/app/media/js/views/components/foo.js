@@ -16,6 +16,8 @@ define([
 
         this.loading = ko.observable(true);
 
+        console.log("foo", params)
+
         this.version = arches.version;
         this.resourceid = params.resourceid;
 

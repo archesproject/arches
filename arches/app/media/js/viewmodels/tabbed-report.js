@@ -10,6 +10,10 @@ define([
         params.configKeys = ['tabs', 'activeTabIndex'];
         var self = this;
 
+        this.reportDate = params.report.reportDate;
+        this.hideEmptyNodes = params.report.hideEmptyNodes;
+        this.hasProvisionalData = params.report.hasProvisionalData;
+
         this.activeTabIndex = ko.observable(params.report.get('config').activeTabIndex)
         this.tabs = ko.observableArray(params.report.get('config').tabs)
         
