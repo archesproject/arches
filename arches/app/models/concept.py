@@ -159,9 +159,7 @@ class Concept(object):
 
                 if len(include) > 0:
                     values = models.Value.objects.filter(concept=self.id)
-                    for value in values:
-                        if value.valuetype.category in include:
-                            self.values.append(ConceptValue(value))
+                    self.values.extend([ConceptValue(value) for value in values if value.valuetype.category in include])
 
             hassubconcepts = models.Relation.objects.filter(Q(conceptfrom=self.id), pathway_filter, ~Q(relationtype="related"))[0:1]
             if len(hassubconcepts) > 0:
