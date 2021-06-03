@@ -25,7 +25,6 @@ define([
         this.tile = ko.observable();
         this.tile.subscribe(function(tile) {
             if (tile && params.hasDirtyTile) {
-                console.log("line 41 ran");
                 tile.dirty.subscribe(function(val) {
                     ((self.card() && self.card().isDirty()) || val) ? params.hasDirtyTile(true) : params.hasDirtyTile(false);
                 });
@@ -190,10 +189,10 @@ define([
         };
     }
 
-    ko.components.register('new-resource-instance', {
+    ko.components.register('related-instance-creator', {
         viewModel: viewModel,
         template: {
-            require: 'text!templates/views/components/workflows/new-resource-instance.htm'
+            require: 'text!templates/views/components/related-instance-creator.htm'
         }
     });
     return viewModel;
