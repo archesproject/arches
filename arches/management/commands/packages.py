@@ -653,7 +653,7 @@ class Command(BaseCommand):
             load_mapbox_styles(basemap_styles, True)
             load_mapbox_styles(overlay_styles, False)
 
-        def load_business_data(package_dir, defer_indexing):
+        def load_business_data(package_dir, prevent_indexing):
             config_paths = glob.glob(os.path.join(package_dir, "package_config.json"))
             configs = {}
             if len(config_paths) > 0:
@@ -713,7 +713,7 @@ class Command(BaseCommand):
             else:
                 for path in business_data:
                     if path not in erring_csvs:
-                        self.import_business_data(path, overwrite=True, bulk_load=bulk_load, prevent_indexing=defer_indexing)
+                        self.import_business_data(path, overwrite=True, bulk_load=bulk_load, prevent_indexing=prevent_indexing)
 
             relations = glob.glob(os.path.join(package_dir, "business_data", "relations", "*.relations"))
             for relation in relations:

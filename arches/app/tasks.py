@@ -108,7 +108,7 @@ def import_business_data(
         source=data_source,
         bulk_load=bulk_load,
         overwrite=True,
-        defer_indexing=prevent_indexing,
+        prevent_indexing=prevent_indexing,
     )
 
 
