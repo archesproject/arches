@@ -756,8 +756,7 @@ class CsvReader(Reader):
                         )
                         if len(errors) > 0:
                             self.errors += errors
-                    new_row = [{col_header_to_nodeid_dict[key.upper()]: value} for key, value in row.items() if value != "" and key.upper() != 'RESOURCEID' and key.upper() in col_header_to_nodeid_dict]
-                    return new_row
+                    return [{col_header_to_nodeid_dict[key.upper()]: value} for key, value in row.items() if value != "" and key.upper() != 'RESOURCEID' and key.upper() in col_header_to_nodeid_dict]
 
                 def transform_value(datatype, value, source, nodeid):
                     """
