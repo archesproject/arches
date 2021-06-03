@@ -712,7 +712,7 @@ class Command(BaseCommand):
                     ]
                 )(
                     package_load_complete.signature(kwargs={"valid_resource_paths": valid_resource_paths}).on_error(on_chord_error.s())
-                )  # TODO add a task to index on pkg load complete
+                )
             else:
                 for path in business_data:
                     if path not in erring_csvs:
