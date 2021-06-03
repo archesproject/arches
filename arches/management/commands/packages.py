@@ -653,7 +653,7 @@ class Command(BaseCommand):
             load_mapbox_styles(basemap_styles, True)
             load_mapbox_styles(overlay_styles, False)
 
-        def load_business_data(package_dir, prevent_indexing):
+        def load_business_data(package_dir, defer_indexing):
             config_paths = glob.glob(os.path.join(package_dir, "package_config.json"))
             configs = {}
             if len(config_paths) > 0:
@@ -706,14 +706,14 @@ class Command(BaseCommand):
                 # assumes resources in csv do not depend on data being loaded prior from json in same dir
                 chord(
                     [
-                        import_business_data.s(data_source=path, overwrite=True, bulk_load=bulk_load, prevent_indexing=prevent_indexing)
+                        import_business_data.s(data_source=path, overwrite=True, bulk_load=bulk_load, prevent_indexing=False)
                         for path in valid_resource_paths
                     ]
                 )(package_load_complete.signature(kwargs={"valid_resource_paths": valid_resource_paths}).on_error(on_chord_error.s()))
             else:
                 for path in business_data:
                     if path not in erring_csvs:
-                        self.import_business_data(path, overwrite=True, bulk_load=bulk_load, prevent_indexing=prevent_indexing)
+                        self.import_business_data(path, overwrite=True, bulk_load=bulk_load, prevent_indexing=defer_indexing)
 
             relations = glob.glob(os.path.join(package_dir, "business_data", "relations", "*.relations"))
             for relation in relations:
@@ -917,10 +917,10 @@ class Command(BaseCommand):
         update_resource_geojson_geometries()
         print("loading post sql")
         load_sql(package_location, "post_sql")
-        if defer_indexing is True:
+        if defer_indexing is True and celery_worker_running is False:
             print("indexing database")
             management.call_command("es", "reindex_database")
-        if celery_worker_running:
+        elif celery_worker_running:
             print("Celery detected: Resource instances loading. Log in to arches to be notified on completion.")
         else:
             print("package load complete")
@@ -1033,17 +1033,17 @@ class Command(BaseCommand):
         if data_source.endswith(".jsonl"):
             print(
                 """
-WARNING: Support for loading JSONL files is still experimental. Be aware that
-the format of logging and console messages has not been updated."""
+                WARNING: Support for loading JSONL files is still experimental. Be aware that
+                the format of logging and console messages has not been updated."""
             )
             if use_multiprocessing is True:
                 print(
                     """
-WARNING: Support for multiprocessing files is still experimental. While using
-multiprocessing to import resources, you will not be able to use ctrl+c (etc.)
-to cancel the operation. You will need to manually kill all of the processes
-with or just close the terminal. Also, be aware that print statements
-will be very jumbled."""
+                    WARNING: Support for multiprocessing files is still experimental. While using
+                    multiprocessing to import resources, you will not be able to use ctrl+c (etc.)
+                    to cancel the operation. You will need to manually kill all of the processes
+                    with or just close the terminal. Also, be aware that print statements
+                    will be very jumbled."""
                 )
                 if not force:
                     confirm = input("continue? Y/n ")
