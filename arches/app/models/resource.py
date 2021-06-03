@@ -290,8 +290,8 @@ class Resource(models.ResourceInstance):
                     datatype_instance = datatype_factory.get_instance(datatype)
                     datatype_instance.append_to_document(document, nodevalue, nodeid, tile)
                     node_terms = datatype_instance.get_search_terms(nodevalue, nodeid)
-                    for index, term in enumerate(node_terms):
-                        terms.append(
+                    terms.extend(
+                        [
                             {
                                 "_id": str(nodeid) + str(tile.tileid) + str(index),
                                 "_source": {
@@ -303,7 +303,9 @@ class Resource(models.ResourceInstance):
                                     "provisional": False,
                                 },
                             }
-                        )
+                            for index, term in enumerate(node_terms)
+                        ]
+                    )
 
             if tile.provisionaledits is not None:
                 provisionaledits = tile.provisionaledits
@@ -318,8 +320,8 @@ class Resource(models.ResourceInstance):
                                     datatype_instance = datatype_factory.get_instance(datatype)
                                     datatype_instance.append_to_document(document, nodevalue, nodeid, tile, True)
                                     node_terms = datatype_instance.get_search_terms(nodevalue, nodeid)
-                                    for index, term in enumerate(node_terms):
-                                        terms.append(
+                                    terms.extend(
+                                        [
                                             {
                                                 "_id": str(nodeid) + str(tile.tileid) + str(index),
                                                 "_source": {
@@ -331,7 +333,9 @@ class Resource(models.ResourceInstance):
                                                     "provisional": True,
                                                 },
                                             }
-                                        )
+                                            for index, term in enumerate(node_terms)
+                                        ]
+                                    )
 
         return document, terms
 
