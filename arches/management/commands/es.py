@@ -79,7 +79,12 @@ class Command(BaseCommand):
         )
 
         parser.add_argument(
-            "-rt", "--resource_type", action="store", dest="resource_types", default="", help="UUID of resource_model to index resources of."
+            "-rt",
+            "--resource_type",
+            action="store",
+            dest="resource_types",
+            default="",
+            help="UUID of resource_model to index resources of.",
         )
 
         parser.add_argument(
@@ -143,7 +148,10 @@ class Command(BaseCommand):
 
         if options["operation"] == "index_resources_by_type":
             index_database_util.index_resources_by_type(
-                resource_types=options["resource_types"], clear_index=options["clear_index"], batch_size=options["batch_size"], quiet=options["quiet"]
+                resource_types=options["resource_types"],
+                clear_index=options["clear_index"],
+                batch_size=options["batch_size"],
+                quiet=options["quiet"],
             )
 
         if options["operation"] == "index_resource_relations":

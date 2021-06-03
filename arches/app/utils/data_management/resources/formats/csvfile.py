@@ -448,7 +448,11 @@ class CsvReader(Reader):
                     "message": f"Some data unable to be imported: {str(len(missing_headers_from_mapping))} column names from .csv could not be found as file_field_name values in your .mapping file:\n {missing_headers_from_mapping}.",
                 }
             )
-            col_header_to_nodeid_dict = {header: mapping_filefieldname_to_nodeid_dict[header.upper()] for header in headers if header.upper() in mapping_filefieldname_to_nodeid_dict}
+            col_header_to_nodeid_dict = {
+                header: mapping_filefieldname_to_nodeid_dict[header.upper()]
+                for header in headers
+                if header.upper() in mapping_filefieldname_to_nodeid_dict
+            }
 
         print("Starting import of business data")
         self.start = time()
@@ -756,7 +760,11 @@ class CsvReader(Reader):
                         )
                         if len(errors) > 0:
                             self.errors += errors
-                    return [{col_header_to_nodeid_dict[key.upper()]: value} for key, value in row.items() if value != "" and key.upper() != 'RESOURCEID' and key.upper() in col_header_to_nodeid_dict]
+                    return [
+                        {col_header_to_nodeid_dict[key.upper()]: value}
+                        for key, value in row.items()
+                        if value != "" and key.upper() != "RESOURCEID" and key.upper() in col_header_to_nodeid_dict
+                    ]
 
                 def transform_value(datatype, value, source, nodeid):
                     """
@@ -962,10 +970,14 @@ class CsvReader(Reader):
                                             if s_tile_value is not None and tile_to_populate.data[target_key] is None:
                                                 # If match populate tile_to_populate node with transformed value.
                                                 try:
-                                                    value = transform_value(node_datatypes[target_key], s_tile_value, row_number, target_key)
+                                                    value = transform_value(
+                                                        node_datatypes[target_key], s_tile_value, row_number, target_key
+                                                    )
 
                                                     tile_to_populate.data[target_key] = value["value"]
-                                                    found = list(filter(lambda x: x.get(target_key, "not found") != "not found", source_data))
+                                                    found = list(
+                                                        filter(lambda x: x.get(target_key, "not found") != "not found", source_data)
+                                                    )
                                                     if len(found) > 0:
                                                         found = found[0]
                                                         i = source_data.index(found)
@@ -1034,7 +1046,9 @@ class CsvReader(Reader):
                                                                 )
                                                                 prototype_tile_copy.data[target_key] = value["value"]
                                                                 found = list(
-                                                                    filter(lambda x: x.get(target_key, "not found") != "not found", source_data)
+                                                                    filter(
+                                                                        lambda x: x.get(target_key, "not found") != "not found", source_data
+                                                                    )
                                                                 )
                                                                 if len(found) > 0:
                                                                     found = found[0]
