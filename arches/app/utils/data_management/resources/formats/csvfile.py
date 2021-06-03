@@ -1058,9 +1058,11 @@ class CsvReader(Reader):
                                             if prototype_tile_copy.data != {}:
                                                 if len([item for item in list(prototype_tile_copy.data.values()) if item is not None]) > 0:
                                                     if str(prototype_tile_copy.nodegroup_id) not in populated_child_nodegroups:
-                                                        populated_child_tiles.append(prototype_tile_copy)
                                                         if bulk:
+                                                            prototype_tile_copy.tiles = []
                                                             populated_tiles.append(prototype_tile_copy)
+                                                        else:
+                                                            populated_child_tiles.append(prototype_tile_copy)
 
                                             if prototype_tile_copy is not None:
                                                 if child_tile_cardinality == "1" and "NodeGroupID" not in row:
@@ -1070,9 +1072,13 @@ class CsvReader(Reader):
 
                                         populate_child_tiles(source_data)
 
-                                    tile_to_populate.tiles = populated_child_tiles
+                                    if not bulk:
+                                        tile_to_populate.tiles = populated_child_tiles
 
-                                if not tile_to_populate.is_blank() and not appending_to_parent:
+                                # bulk alone being true here is because a parent tile without children would fail (not tile.is_blank())
+                                if bulk or (not tile_to_populate.is_blank() and not appending_to_parent):
+                                    if bulk:
+                                        tile_to_populate.tiles = []
                                     populated_tiles.append(tile_to_populate)
 
                                 if len(source_data) > 0:
@@ -1105,8 +1111,8 @@ class CsvReader(Reader):
                         # onto the pre-existing tile who would be its parent
                         if target_tile.nodegroup.cardinality == "1" and preexisting_tile_for_nodegroup and len(source_data) > 0:
                             target_tile = get_blank_tile(source_data, child_only=True)
-                            populate_tile(source_data, target_tile, appending_to_parent=True)
                             target_tile.parenttile = preexisting_tile_for_nodegroup
+                            populate_tile(source_data, target_tile, appending_to_parent=True)
                             if not bulk:
                                 preexisting_tile_for_nodegroup.tiles.append(target_tile)
 
