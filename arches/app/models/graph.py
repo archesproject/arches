@@ -460,9 +460,7 @@ class Graph(models.GraphModel):
         tree = {"node": root if root else self.root, "children": [], "parent_edge": None}
 
         def find_child_edges(tree):
-            for edge_id, edge in self.edges.items():
-                if edge.domainnode == tree["node"]:
-                    tree["children"].append(find_child_edges({"node": edge.rangenode, "children": [], "parent_edge": edge}))
+            tree["children"].extend([find_child_edges({"node": edge.rangenode, "children": [], "parent_edge": edge}) for edge in self.edges.values() if edge.domainnode == tree["node"]])
 
             return tree
 
@@ -1240,12 +1238,7 @@ class Graph(models.GraphModel):
         get the widget data (if any) associated with this graph
 
         """
-        widgets = []
-        for widget in self.widgets.values():
-            widget_dict = JSONSerializer().serializeToPython(widget)
-            widgets.append(widget_dict)
-
-        return widgets
+        return [JSONSerializer().serializeToPython(widget) for widget in self.widgets.values()]
 
     def serialize(self, fields=None, exclude=None):
         """
