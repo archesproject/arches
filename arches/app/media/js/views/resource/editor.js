@@ -26,7 +26,7 @@ define([
     };
     var tiles = data.tiles;
     var filter = ko.observable('');
-    var loading = ko.observable(true);
+    var loading = ko.observable(false);
     var selection = ko.observable('root');
     var scrollTo = ko.observable();
     var displayname = ko.observable(data.displayname);

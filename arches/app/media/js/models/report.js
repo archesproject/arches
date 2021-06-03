@@ -39,6 +39,8 @@ define(['jquery',
             this.configKeys.subscribe(function(val){
                 var config;
 
+                console.log(reportLookup, options)
+
                 if (self.reportLookup[self.templateId()]) {
                     self.defaultConfig = JSON.parse(self.reportLookup[self.templateId()].defaultconfig);
                 }

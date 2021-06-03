@@ -27,8 +27,16 @@ define([
         this.reportDate = moment().format('MMMM D, YYYY');
 
         this.initialize = function() {
-            var url = arches.urls.api_resource_report(self.resourceid);
+            if (ko.unwrap(self.resourceid)) {
+                var url = arches.urls.api_resource_report(self.resourceid);
+                self.fetchResourceData(url);
+            }
+            else {
+                self.loading(false);
+            }
+        };
 
+        this.fetchResourceData = function(url) {
             window.fetch(url).then(function(response){
                 if (response.ok) {
                     return response.json();

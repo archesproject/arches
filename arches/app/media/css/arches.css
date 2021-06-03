@@ -1054,6 +1054,7 @@ div.wf-multi-tile-card-info div {
 /* general styling for all tabs */
 
 .tabbed-report-tab-list {
+    background-color: #ebeef0;
     display: flex;
     flex-direction: row;
     list-style-type: none;
