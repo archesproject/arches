@@ -243,7 +243,6 @@ class Command(BaseCommand):
     def handle(self, *args, **options):
         print("operation: " + options["operation"])
         package_name = settings.PACKAGE_NAME
-        celery_worker_running = task_management.check_if_celery_available()
 
         if options["operation"] == "setup":
             self.setup(package_name, es_install_location=options["dest_dir"])
@@ -282,8 +281,13 @@ class Command(BaseCommand):
                 elif str(options["defer_indexing"])[0].lower() == "f":
                     defer_indexing = False
 
-            concept_count = models.Value.objects.count()
-            relation_count = models.ResourceXResource.objects.count()
+            if defer_indexing:
+                concept_count = models.Value.objects.count()
+                relation_count = models.ResourceXResource.objects.count()
+                path = utils.get_valid_path(options["config_file"])
+                mapping = json.load(open(path, "r"))
+                graphid = mapping["resource_model_id"]
+                defer_indexing = models.ResourceInstance.objects.filter(graph_id=graphid).count() == 0
 
             self.import_business_data(
                 options["source"],
@@ -295,7 +299,7 @@ class Command(BaseCommand):
                 force=options["yes"],
                 prevent_indexing=defer_indexing,
             )
-            if defer_indexing and not celery_worker_running:
+            if defer_indexing:
                 # index concepts if new concepts created
                 if concept_count != models.Value.objects.count():
                     management.call_command("es", "index_concepts")
@@ -303,9 +307,6 @@ class Command(BaseCommand):
                 if relation_count != models.ResourceXResource.objects.count():
                     management.call_command("es", "index_resource_relations")
                 # index resources of this model only
-                path = utils.get_valid_path(options["config_file"])
-                mapping = json.load(open(path, "r"))
-                graphid = mapping["resource_model_id"]
                 management.call_command("es", "index_resources_by_type", resource_types=[graphid])
 
         if options["operation"] == "import_node_value_data":
