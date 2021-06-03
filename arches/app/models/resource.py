@@ -170,13 +170,13 @@ class Resource(models.ResourceInstance):
         return tiles
 
     @staticmethod
-    def bulk_save(resources, prevent_indexing=False):
+    def bulk_save(resources, index=True):
         """
         Saves and indexes a list of resources
 
         Arguments:
         resources -- a list of resource models
-        prevent_indexing -- prevents any kind of indexing within scope of this method
+        index -- True(default) to index the resource, otherwise don't index the resource
 
         """
 
@@ -195,7 +195,7 @@ class Resource(models.ResourceInstance):
 
         resources[0].tiles[0].save_edit(note=f"Bulk created: {len(tiles)} for {len(resources)} resources.", edit_type="bulk_create")
 
-        if prevent_indexing is False:
+        if index is True:
             datatype_factory = DataTypeFactory()
             node_datatypes = {str(nodeid): datatype for nodeid, datatype in models.Node.objects.values_list("nodeid", "datatype")}
             documents = []
