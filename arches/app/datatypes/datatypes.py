@@ -1172,17 +1172,20 @@ class FileListDataType(BaseDataType):
 
     def append_to_document(self, document, nodevalue, nodeid, tile, provisional=False):
         try:
-            document["strings"].extend(
-                [{"string": f["name"], "nodegroup_id": tile.nodegroup_id, "provisional": provisional} for f in tile.data[str(nodeid)]]
-            )
-        except KeyError:
-            for pe in list(tile.provisionaledits.values()):
-                document["strings"].extend(
-                    [{"string": f["name"], "nodegroup_id": tile.nodegroup_id, "provisional": provisional} for f in pe["value"][nodeid]]
-                )
+            for f in tile.data[str(nodeid)]:
+                val = {"string": f["name"], "nodegroup_id": tile.nodegroup_id, "provisional": provisional}
+                document["strings"].append(val)
+        except KeyError as e:
+            for k, pe in tile.provisionaledits.items():
+                for f in pe["value"][nodeid]:
+                    val = {"string": f["name"], "nodegroup_id": tile.nodegroup_id, "provisional": provisional}
+                    document["strings"].append(val)
 
     def get_search_terms(self, nodevalue, nodeid):
-        terms = [file_obj["name"] for file_obj in nodevalue if file_obj["name"] is not None]
+        terms = []
+        for file_obj in nodevalue:
+            if file_obj["name"] is not None:
+                terms.append(file_obj["name"])
 
         return terms
 
