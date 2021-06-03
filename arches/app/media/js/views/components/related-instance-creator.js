@@ -129,12 +129,12 @@ define([
                         handlers[eventName].push(handler);
                     }
                 };
-                self.foo();
+                self.assignTile();
                 self.loading(false);
             });
         };
 
-        self.foo = function() {
+        self.assignTile = function() {
             self.topCards().forEach(function(item) { //do I need to flatten?
                 if (item.constructor.name === 'CardViewModel' && item.nodegroupid === params.nodegroupid) {
                     if (ko.unwrap(params.parenttileid) && item.parent && ko.unwrap(params.parenttileid) !== item.parent.tileid) {
@@ -165,7 +165,7 @@ define([
         self.loadCard = function(card){
             self.card(card);
             params.nodegroupid = self.card().nodegroupid;
-            self.foo();
+            self.assignTile();
         };
 
         self.close = function(){
