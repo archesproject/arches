@@ -445,7 +445,8 @@ class CsvReader(Reader):
             self.errors.append(
                 {
                     "type": "WARNING",
-                    "message": f"Some data unable to be imported: {str(len(missing_headers_from_mapping))} column names from .csv could not be found as file_field_name values in your .mapping file:\n {missing_headers_from_mapping}.",
+                    "message": f"""Some data unable to be imported: {str(len(missing_headers_from_mapping))} column names 
+                    from .csv could not be found as file_field_name values in your .mapping file:\n {missing_headers_from_mapping}.""",
                 }
             )
             col_header_to_nodeid_dict = {
@@ -946,7 +947,7 @@ class CsvReader(Reader):
                                 source_dict = {k: v for s in source_data for k, v in s.items()}
 
                                 if source_data_has_target_tile_nodes:
-                                    # Iterate through the tile_to_populate nodes and begin populating by iterating througth source_data array.
+                                    # Iterate through the tile nodes and begin populating by iterating through source_data array.
                                     # The idea is to populate as much of the tile_to_populate as possible,
                                     # before moving on to the next tile_to_populate.
                                     for target_key in list(tile_to_populate.data.keys()):
