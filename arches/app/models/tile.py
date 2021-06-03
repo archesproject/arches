@@ -512,8 +512,7 @@ class Tile(models.TileModel):
         tiles = []
 
         def flatten_tiles(obj):
-            for tile in obj.tiles:
-                tiles.append(flatten_tiles(tile))
+            tiles.extend([flatten_tiles(tile) for tile in obj.tiles])
             return obj
 
         tiles.append(flatten_tiles(self))
