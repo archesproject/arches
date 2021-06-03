@@ -251,11 +251,7 @@ class ConceptListDataType(BaseConceptDataType):
         return errors
 
     def transform_value_for_tile(self, value):
-        ret = []
-        for val in csv.reader([value], delimiter=",", quotechar='"'):
-            for v in val:
-                ret.append(v.strip())
-        return ret
+        return [v.strip() for val in csv.reader([value], delimiter=",", quotechar='"') for v in val]
 
     def transform_export_values(self, value, *args, **kwargs):
         new_values = []
