@@ -445,7 +445,7 @@ class CsvReader(Reader):
             self.errors.append(
                 {
                     "type": "WARNING",
-                    "message": f"""Some data unable to be imported: {str(len(missing_headers_from_mapping))} column names 
+                    "message": f"""Some data unable to be imported: {str(len(missing_headers_from_mapping))} column names
                     from .csv could not be found as file_field_name values in your .mapping file:\n {missing_headers_from_mapping}.""",
                 }
             )
