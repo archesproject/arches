@@ -125,8 +125,7 @@ class Card(models.CardModel):
                         setattr(self, key, value)
 
                 if "cards" in args[0]:
-                    for card in args[0]["cards"]:
-                        self.cards.append(Card(card))
+                    self.cards.extend([Card(card) for card in args[0]["cards"]])
 
                 if "constraints":
                     self.update_constraints(args[0]["constraints"])
