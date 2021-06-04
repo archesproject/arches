@@ -158,16 +158,14 @@ class Resource(models.ResourceInstance):
 
         """
 
-        self.tiles = list(models.TileModel.objects.filter(resourceinstance=self))
         if user:
             self.tiles = [tile for tile in self.tiles if tile.nodegroup_id is not None and user.has_perm(perm, tile.nodegroup)]
+        else:
+            self.tiles = list(models.TileModel.objects.filter(resourceinstance=self))
 
     # # flatten out the nested tiles into a single array
     def get_flattened_tiles(self):
-        tiles = []
-        for tile in self.tiles:
-            tiles.extend(tile.get_flattened_tiles())
-        return tiles
+        return [flat_tile for tile in self.tiles for flat_tile in tile.get_flattened_tiles()]
 
     @staticmethod
     def bulk_save(resources, flat=False):
@@ -186,10 +184,10 @@ class Resource(models.ResourceInstance):
         documents = []
         term_list = []
 
-        for resource in resources:
-            if flat is False:
-                resource.tiles = resource.get_flattened_tiles()
-            tiles.extend(resource.tiles)
+        if flat is False:
+            tiles = [tile for resource in resources for tile in resource.get_flattened_tiles()]
+        else:
+            tiles = [tile for resource in resources for tile in resource.tiles]
 
         # need to save the models first before getting the documents for index
         Resource.objects.bulk_create(resources)
@@ -207,8 +205,7 @@ class Resource(models.ResourceInstance):
 
             documents.append(se.create_bulk_item(index=RESOURCES_INDEX, id=document["resourceinstanceid"], data=document))
 
-            for term in terms:
-                term_list.append(se.create_bulk_item(index=TERMS_INDEX, id=term["_id"], data=term["_source"]))
+            term_list.extend([se.create_bulk_item(index=TERMS_INDEX, id=term["_id"], data=term["_source"]) for term in terms])
 
         se.bulk_index(documents)
         se.bulk_index(term_list)
