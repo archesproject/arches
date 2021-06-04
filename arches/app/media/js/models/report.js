@@ -19,9 +19,7 @@ define(['jquery',
         initialize: function(options) {
             var self = this;
 
-            
-            this.reportLookup = reportLookup || options.templates;
-            console.log('report model init', self, options, self.reportLookup)
+            console.log('report model init', self, options)
 
             this.templateId = ko.observable(self.get('graph').template_id);
             this.cards = options.cards || [];
@@ -39,10 +37,8 @@ define(['jquery',
             this.configKeys.subscribe(function(val){
                 var config;
 
-                console.log(reportLookup, options)
-
-                if (self.reportLookup[self.templateId()]) {
-                    self.defaultConfig = JSON.parse(self.reportLookup[self.templateId()].defaultconfig);
+                if (reportLookup[self.templateId()]) {
+                    self.defaultConfig = JSON.parse(reportLookup[self.templateId()].defaultconfig);
                 }
                 else {
                     self.defaultConfig = {};
@@ -104,7 +100,7 @@ define(['jquery',
                         write: function(value) {
                             var key;
                             var configKeys = [];
-                            var defaultConfig = JSON.parse(self.reportLookup[value].defaultconfig);
+                            var defaultConfig = JSON.parse(reportLookup[value].defaultconfig);
                             for (key in defaultConfig) {
                                 defaultConfig[key] = ko.observable(defaultConfig[key]);
                             }
