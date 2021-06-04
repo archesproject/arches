@@ -55,8 +55,35 @@
     <h4 class="workbench-card-sidepanel-header" data-bind="click: hideSidePanel">{% trans "Resource Information" %}</h4>
 </div>
 <div class="related-resource-graph-information-content" data-bind="using: informationElement">
-    <!--ko if: $data.source -->
-    edge
+    <!--ko if: $parent.edgeInformation() -->
+    <div class="edge-node-information">
+        <div class="edge-node-graph-color" data-bind="style: {backgroundColor: $parent.edgeInformation().sourceGraph.fillColor}"></div>
+        <div class="edge-node-title">
+            <div class="edge-node-display-name" data-bind="text: $parent.edgeInformation().source.displayname, click: function() {
+                $parent.informationElement($parent.edgeInformation().source);
+            }"></div>
+            <div class="edge-node-graph-name" data-bind="text: $parent.edgeInformation().sourceGraph.name"></div>
+        </div>
+    </div>
+    <div class="edge-relationship-information">
+        <div class="edge-relationship-arrow">
+            <div></div>
+        </div>
+        <div class="edge-relationship-details">
+            <div class="edge-relationship-prefix">{% trans "Has relationship" %}</div>
+            <div class="edge-relationship-label" data-bind="text: $parent.edgeInformation().label"></div>
+            <div class="edge-relationship-sufix">{% trans "with" %}</div>
+        </div>
+    </div>
+    <div class="edge-node-information">
+        <div class="edge-node-graph-color" data-bind="style: {backgroundColor: $parent.edgeInformation().targetGraph.fillColor}"></div>
+        <div class="edge-node-title">
+            <div class="edge-node-display-name" data-bind="text: $parent.edgeInformation().target.displayname, click: function() {
+                $parent.informationElement($parent.edgeInformation().target);
+            }"></div>
+            <div class="edge-node-graph-name" data-bind="text: $parent.edgeInformation().targetGraph.name"></div>
+        </div>
+    </div>
     <!--/ko -->
     <!--ko if: !$data.source -->
     <div data-bind="text: displayname" class="node-display-name-header"></div>

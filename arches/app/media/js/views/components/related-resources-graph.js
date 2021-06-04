@@ -21,6 +21,17 @@ define([
             this.elements = ko.observableArray();
             this.informationElement = ko.observable();
             this.legendEntries = ko.observableArray();
+            // strips URL from relationship labels, if present, for presentation
+            var getRelationshipLabel = function(edgeData) {
+                var label;
+                try {
+                    var url = new window.URL(edgeData.relationshiptype_label);
+                    label = url.pathname.split('/')[url.pathname.split('/').length - 1];
+                } catch (e) {
+                    label = edgeData.relationshiptype_label;
+                }
+                return label;
+            };
             this.informationElementRelationships = ko.computed(function() {
                 var relationships = [];
                 var informationElement = self.informationElement();
@@ -32,15 +43,7 @@ define([
                     var addRelationship = function(edge, nodeType) {
                         var edgeData = edge.data();
                         var nodeData = edge[nodeType]().data();
-                        var label;
-
-                        // strips URL from relationship labels, if present, for presentation
-                        try {
-                            var url = new window.URL(edgeData.relationshiptype_label);
-                            label = url.pathname.split('/')[url.pathname.split('/').length - 1];
-                        } catch (e) {
-                            label = edgeData.relationshiptype_label;
-                        }
+                        var label = getRelationshipLabel(edgeData);
 
                         relationships.push({
                             label: label,
@@ -57,6 +60,21 @@ define([
                     });
                 }
                 return relationships;
+            });
+            this.edgeInformation = ko.computed(function() {
+                var informationElement = self.informationElement();
+                var viz = self.viz();
+                if (informationElement && viz && informationElement.source) {
+                    var sourceData = viz.getElementById(informationElement.source).data();
+                    var targetData = viz.getElementById(informationElement.target).data();
+                    return {
+                        label: getRelationshipLabel(informationElement),
+                        source: sourceData,
+                        sourceGraph: resourceTypeLookup[sourceData['graph_id']],
+                        target: targetData,
+                        targetGraph: resourceTypeLookup[targetData['graph_id']]
+                    };
+                }
             });
 
             WorkbenchViewmodel.apply(this, [params]);

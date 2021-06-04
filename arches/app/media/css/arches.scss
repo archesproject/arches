@@ -13861,6 +13861,76 @@ a.jstree-anchor.permissions-widget {
     }
     .related-resource-graph-information-content {
         margin-top: 60px;
+        .edge-node-information {
+            position: relative;
+            .edge-node-graph-color {
+                position: absolute;
+                width: 50px;
+                height: 50px;
+                border-radius: 100%;
+                border: solid black 1px;
+                margin: 10px;
+            }
+            .edge-node-title {
+                margin-left: 74px;
+                min-height: 70px;
+                padding: 16px 0;
+                .edge-node-display-name {
+                    color: #213e5f;
+                    cursor: pointer;
+                    font-size: 15px;
+                    font-weight: 600;
+                }
+                .edge-node-graph-name {
+                    font-size: 13px;
+                }
+            }
+        }
+        .edge-relationship-information {
+            $edge-label-height: 150px;
+            position: relative;
+            .edge-relationship-arrow {
+                display: inline-block;
+                position: absolute;
+                margin-left: 14px;
+                div {
+                    position: relative;
+                    background: #aaa;
+                    width: 2px;
+                    margin-left: 20px;
+                    height: $edge-label-height - 10;
+                }
+                div:before {
+                    content: "";
+                    position: absolute;
+                    width: 0px;
+                    height: 0px;
+                    border: 5px solid transparent;
+                    bottom: -15px;
+                    border-top: 15px solid #aaa;
+                    left: -4px;
+                }
+            }
+            .edge-relationship-details {
+                height: $edge-label-height;
+                margin-left: 74px;
+                border: 1px solid #aaa;
+                .edge-relationship-prefix,
+                .edge-relationship-sufix {
+                    padding: 10px;
+                    background-color: rgb(221, 221, 221);
+                }
+                .edge-relationship-label {
+                    height: 72px;
+                    color: #213e5f;
+                    font-size: 14px;
+                    padding: 25px 0;
+                    text-align: center;
+                    border-bottom: 1px solid #aaa;
+                    border-top: 1px solid #aaa;
+                }
+            }
+        }
     }
     .legend-listing {
         cursor: default;
