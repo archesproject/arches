@@ -22,6 +22,8 @@ define([
         this.template = ko.observable();
         this.report = ko.observable();
 
+        console.log('in foo component')
+
         this.initialize = function() {
             if (ko.unwrap(self.resourceid)) {
                 var url = arches.urls.api_resource_report(self.resourceid);

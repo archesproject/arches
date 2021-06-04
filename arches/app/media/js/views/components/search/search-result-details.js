@@ -9,8 +9,9 @@ define([
     'report-templates',
     'views/components/search/base-filter',
     'card-components',
+    'views/components/foo',
     'bindings/chosen'
-], function($, _, ko, arches, ReportModel, GraphModel, CardViewModel, reportLookup, BaseFilter, cardComponents) {
+], function($, _, ko, arches, ReportModel, GraphModel, CardViewModel, reportLookup, BaseFilter, cardComponents, Foo) {
     var componentName = 'search-result-details';
     return ko.components.register(componentName, {
         viewModel: BaseFilter.extend({
@@ -24,7 +25,17 @@ define([
 
                 this.options = options;
                 this.reportLookup = reportLookup;
-                this.report = null;
+
+                this.resourceInstanceId = ko.observable();
+                // this.report = ko.observable();
+                // this.report.subscribe(function(report) {
+                //     console.log("AAAA", report)
+                //     if (report) {
+                //         self.loading(false);
+                //     }
+                // });
+
+
                 this.loading = ko.observable(false);
                 this.ready = ko.observable(false);
 
@@ -45,72 +56,82 @@ define([
                 this.query(query);
 
                 var graphCache = {};
-                var processReportData = function(data, graph) {
-                    var report;
 
-                    var reportFetchesOwnData = Boolean(
-                        reportLookup[graph.graph.template_id] 
-                        && !JSON.parse(reportLookup[graph.graph.template_id]['preload_resource_data'].toLowerCase())
-                    )
+                this.processReportData = function(data, graph, resourceInstanceId) {
+                    // var report;
 
-                    /* if report template fetches its own data, let's avoid any unneccesary heavy logic */ 
-                    if (reportFetchesOwnData) {
-                        report = {
-                            /* basic data to avoid loading report model */ 
-                            get: function(identifier) {
-                                var lookup = {
-                                    'template_id': ko.observable(graph.graph.template_id),
-                                    'resourceid': data.resourceid,
-                                }
+                    // var foo = new Foo({ resourceid: resourceInstanceId });
+
+                    // setTimeout(function() {self.report(foo.report())}, 1000)
+
+                    // console.log("process report data", self, this, options, foo)
+
+                    // var reportFetchesOwnData = Boolean(
+                    //     reportLookup[graph.graph.template_id] 
+                    //     && !JSON.parse(reportLookup[graph.graph.template_id]['preload_resource_data'].toLowerCase())
+                    // )
+
+                    // /* if report template fetches its own data, let's avoid any unneccesary heavy logic */ 
+                    // if (reportFetchesOwnData) {
+                    //     report = {
+                    //         /* basic data to avoid loading report model */ 
+                    //         get: function(identifier) {
+                    //             var lookup = {
+                    //                 'template_id': ko.observable(graph.graph.template_id),
+                    //                 'resourceid': data.resourceid,
+                    //             }
     
-                                return lookup[identifier];
-                            }
-                        }
-                    }
-                    else {
-                        data.cards = _.filter(graph.cards, function(card) {
-                            var nodegroup = _.find(graph.graph.nodegroups, function(group) {
-                                return group.nodegroupid === card.nodegroup_id;
-                            });
-                            return !nodegroup || !nodegroup.parentnodegroup_id;
-                        }).map(function(card) {
-                            return new CardViewModel({
-                                card: card,
-                                graphModel: graph.graphModel,
-                                resourceId: data.resourceid,
-                                displayname: data.displayname,
-                                cards: graph.cards,
-                                tiles: data.tiles,
-                                cardwidgets: graph.cardwidgets
-                            });
-                        });
+                    //             return lookup[identifier];
+                    //         }
+                    //     }
+                    // }
+                    // else {
+                    //     data.cards = _.filter(graph.cards, function(card) {
+                    //         var nodegroup = _.find(graph.graph.nodegroups, function(group) {
+                    //             return group.nodegroupid === card.nodegroup_id;
+                    //         });
+                    //         return !nodegroup || !nodegroup.parentnodegroup_id;
+                    //     }).map(function(card) {
+                    //         return new CardViewModel({
+                    //             card: card,
+                    //             graphModel: graph.graphModel,
+                    //             resourceId: data.resourceid,
+                    //             displayname: data.displayname,
+                    //             cards: graph.cards,
+                    //             tiles: data.tiles,
+                    //             cardwidgets: graph.cardwidgets
+                    //         });
+                    //     });
     
-                        data.templates = reportLookup;
-                        data.cardComponents = cardComponents;
+                    //     data.templates = reportLookup;
+                    //     data.cardComponents = cardComponents;
 
-                        report = new ReportModel(_.extend(data, {
-                            graphModel: graph.graphModel,
-                            graph: graph.graph,
-                            datatypes: graph.datatypes
-                        }));
-                    }
+                    //     report = new ReportModel(_.extend(data, {
+                    //         graphModel: graph.graphModel,
+                    //         graph: graph.graph,
+                    //         datatypes: graph.datatypes
+                    //     }));
+                    // }
 
-                    self.report = report;
+                    // self.report = report;
                     self.loading(false);
                 };
 
-                this.setupReport = function(graphId, source) {
+                this.setupReport = function(graphId, resourceInstanceId, source) {
+                    self.loading(true);
+
+                    self.resourceInstanceId(resourceInstanceId);
+
                     var graph = graphCache[graphId];
                     var tileData = {
                         "tiles": source.tiles,
                         "related_resources": [],
                         "displayname": source.displayname,
-                        "resourceid": source.resourceinstanceid
+                        "resourceid": resourceInstanceId
                     };
-                    self.loading(true);
 
                     if (graph) {
-                        processReportData(tileData, graph);
+                        self.processReportData(tileData, graph, resourceInstanceId);
                     }
                     else {
                         $.getJSON(arches.urls.graphs_api + graphId + "?context=search-result-details", function(data) {
@@ -128,7 +149,7 @@ define([
                             };
                             graphCache[graphId] = graph;
 
-                            processReportData(tileData, graph);
+                            self.processReportData(tileData, graph, resourceInstanceId);
                         });
                     }
                 };

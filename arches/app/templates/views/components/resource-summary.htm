@@ -4,6 +4,7 @@
 <div class='loading-mask'></div>
 <!--/ko-->
 <!-- ko if: !loading() && report -->
+<div style="display:none" data-bind="text: console.log($data, $parent)"></div>
 <div class='resource-report' data-bind='component: {
     name: reportLookup[report.get("template_id")()].componentname,
     params: {
