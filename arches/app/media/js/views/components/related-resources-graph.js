@@ -9,7 +9,8 @@ define([
             var self = this;
             var layout = {
                 name: "cose",
-                animate: true
+                animate: true,
+                animationThreshold: 10
             };
             var fitPadding = 100;
 
