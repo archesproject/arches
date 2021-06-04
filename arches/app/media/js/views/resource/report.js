@@ -6,10 +6,10 @@ require([
     'views/base-manager',
     'views/components/foo'
 ], function($, _, ko, arches, BaseManagerView) {
-    var ddd = BaseManagerView.extend({
+    var View = BaseManagerView.extend({
         initialize: function(options){
             BaseManagerView.prototype.initialize.call(this, options);
         }
     });
-    return new ddd()
+    return new View();
 });

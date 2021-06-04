@@ -18,6 +18,7 @@ define([
     'card-components',
     'views/resource/related-resources-manager',
     'views/resource/permissions-manager',
+    'moment',
 ], function($, _, ko, BaseManagerView, AlertViewModel, JsonErrorAlertViewModel, GraphModel, ReportModel, CardViewModel, ProvisionalTileViewModel, arches, data, reportLookup) {
     var handlers = {
         'after-update': [],
