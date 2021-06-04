@@ -22,6 +22,27 @@ define([
             this.elements = ko.observableArray();
             this.informationElement = ko.observable();
             this.legendEntries = ko.observableArray();
+            this.nodeSearchFilter = ko.observable('');
+            this.expandedSearchId = ko.observable();
+            this.searchNodes = ko.computed(function() {
+                var filter = self.nodeSearchFilter();
+                var elements = self.elements();
+                var viz = self.viz();
+                var filteredNodes = [];
+                elements.forEach(function(element) {
+                    if (element.isNode()) {
+                        var data = element.data();
+                        if (!data.shownRelationsCount) data.shownRelationsCount = ko.observable();
+                        if (data.displayname.toLowerCase().indexOf(filter) !== -1) {
+                            data.graph = resourceTypeLookup[data.graph_id];
+                            data.shownRelationsCount(viz.edges('[source = "' + data.id + '"]').length +
+                                viz.edges('[target = "' + data.id + '"]'). length);
+                            filteredNodes.push(data);
+                        }
+                    }
+                });
+                return filteredNodes;
+            });
             // strips URL from relationship labels, if present, for presentation
             var getRelationshipLabel = function(edgeData) {
                 var label;

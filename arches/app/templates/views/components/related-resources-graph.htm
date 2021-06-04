@@ -118,6 +118,30 @@
 <div class="workbench-card-sidepanel-header-container">
     <h4 class="workbench-card-sidepanel-header" data-bind="click: hideSidePanel">{% trans "Search Network" %}</h4>
 </div>
+<div class="related-reasources-search-container">
+    <input type="text" class="form-control" placeholder="{% trans "Filter..." %}" data-bind="value: nodeSearchFilter, valueUpdate: 'afterkeydown'">
+    <span class="clear-node-search" data-bind="click: function() { nodeSearchFilter(''); }, visible: nodeSearchFilter() !== ''"><i class="fa fa-times-circle"></i></span>
+</div>
+<div class="related-reasources-search-list" data-bind="foreach: searchNodes">
+    <div class="edge-node-information">
+        <div class="edge-node-graph-color" data-bind="style: {backgroundColor: graph.fillColor}"></div>
+        <div class="edge-node-title">
+            <div class="edge-node-display-name" data-bind="text: displayname, click: function() {
+                $parent.informationElement($data);
+            }"></div>
+            <div class="edge-node-graph-name" data-bind="text: graph.name"></div>
+            <div class="realtionships-list-count">
+                <span data-bind="text: shownRelationsCount"></span> / <span data-bind="text: totalRelations"></span>
+                {% trans "relationships shown" %}
+                <!--ko if: shownRelationsCount() !== totalRelations -->
+                <a href="javascript:void(0);" data-bind="click: function() {
+                    $parent.expandNode($data);
+                }">{% trans "Load more" %}</a>
+                <!--/ko -->
+            </div>
+        </div>
+    </div>
+</div>
 <!--/ko -->
 <!--ko if: activeTab() === 'analyze' -->
 <div class="workbench-card-sidepanel-header-container">

@@ -13859,33 +13859,33 @@ a.jstree-anchor.permissions-widget {
         margin-top: 2px;
         top: $controls-height + $controls-top;
     }
-    .related-resource-graph-information-content {
-        margin-top: 60px;
-        .edge-node-information {
-            position: relative;
-            .edge-node-graph-color {
-                position: absolute;
-                width: 50px;
-                height: 50px;
-                border-radius: 100%;
-                border: solid black 1px;
-                margin: 10px;
+    .edge-node-information {
+        position: relative;
+        .edge-node-graph-color {
+            position: absolute;
+            width: 50px;
+            height: 50px;
+            border-radius: 100%;
+            border: solid black 1px;
+            margin: 10px;
+        }
+        .edge-node-title {
+            margin-left: 74px;
+            min-height: 70px;
+            padding: 16px 0;
+            .edge-node-display-name {
+                color: #213e5f;
+                cursor: pointer;
+                font-size: 15px;
+                font-weight: 600;
             }
-            .edge-node-title {
-                margin-left: 74px;
-                min-height: 70px;
-                padding: 16px 0;
-                .edge-node-display-name {
-                    color: #213e5f;
-                    cursor: pointer;
-                    font-size: 15px;
-                    font-weight: 600;
-                }
-                .edge-node-graph-name {
-                    font-size: 13px;
-                }
+            .edge-node-graph-name {
+                font-size: 13px;
             }
         }
+    }
+    .related-resource-graph-information-content {
+        margin-top: 60px;
         .edge-relationship-information {
             $edge-label-height: 150px;
             position: relative;
@@ -13981,6 +13981,20 @@ a.jstree-anchor.permissions-widget {
         a {
             color: darken($accent-color, 20%);
             padding-left: 5px;
+        }
+    }
+    .related-reasources-search-container {
+        margin-top: 60px;
+        position: relative;
+    }
+    .related-reasources-search-list {
+        height: calc(100% - 110px);
+        margin-top: 16px;
+        border: solid 1px #aaa;
+        overflow-y: auto;
+        .edge-node-information {
+            background-color: rgb(247, 247, 247);
+            border-bottom: 1px solid #aaa;
         }
     }
 }
