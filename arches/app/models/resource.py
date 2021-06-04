@@ -167,13 +167,12 @@ class Resource(models.ResourceInstance):
         return [flat_tile for tile in self.tiles for flat_tile in tile.get_flattened_tiles()]
 
     @staticmethod
-    def bulk_save(resources, prevent_indexing=False):
+    def bulk_save(resources):
         """
         Saves and indexes a list of resources
 
         Arguments:
         resources -- a list of resource models
-        prevent_indexing -- prevents any kind of indexing within scope of this method
 
         """
 

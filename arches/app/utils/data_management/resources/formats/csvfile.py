@@ -372,7 +372,7 @@ class CsvReader(Reader):
             if bulk:
                 resources.append(newresourceinstance)
                 if len(resources) >= settings.BULK_IMPORT_BATCH_SIZE:
-                    Resource.bulk_save(resources=resources, prevent_indexing=prevent_indexing)
+                    Resource.bulk_save(resources=resources)
                     del resources[:]  # clear out the array
             else:
                 try:
