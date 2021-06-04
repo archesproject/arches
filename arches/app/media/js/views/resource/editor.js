@@ -19,6 +19,7 @@ define([
     'views/resource/related-resources-manager',
     'views/resource/permissions-manager',
     'moment',
+    'views/components/foo'
 ], function($, _, ko, BaseManagerView, AlertViewModel, JsonErrorAlertViewModel, GraphModel, ReportModel, CardViewModel, ProvisionalTileViewModel, arches, data, reportLookup) {
     var handlers = {
         'after-update': [],
@@ -248,9 +249,6 @@ define([
     vm.selectedTile.subscribe(function() {
         $('.main-panel')[0].scrollTop = 0;
     });
-
-    vm.report = null;
-    vm.report = new ReportModel(_.extend(data, {graphModel: graphModel, cards: vm.topCards}));
 
     vm.resourceId.subscribe(function(){
         //switches the url from 'create-resource' once the resource id is available
