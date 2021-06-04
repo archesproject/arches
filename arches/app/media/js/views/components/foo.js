@@ -95,8 +95,6 @@ define([
                 datatypes: JSON.parse(responseJson.datatypes_json),
             });
 
-            // responseJson.cards = JSON.parse(responseJson.cards);
-
             graph = {
                 graphModel: graphModel,
                 cards: JSON.parse(responseJson.cards),
@@ -125,11 +123,17 @@ define([
             // responseJson.templates = reportLookup;
             // responseJson.cardComponents = cardComponents;
 
-            self.report(new ReportModel(_.extend(responseJson, {
+            var report = new ReportModel(_.extend(responseJson, {
                 graphModel: graph.graphModel,
                 graph: graph.graph,
                 datatypes: graph.datatypes
-            })));
+            }));
+
+            report['hideEmptyNodes'] = responseJson.hide_empty_nodes;
+
+            self.report(report);
+
+            console.log("AAAA", self.report())
 
             // self.hideEmptyNodes(responseJson.hide_empty_nodes); 
         };
