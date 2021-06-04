@@ -1177,7 +1177,11 @@ class FileListDataType(BaseDataType):
             )
         except KeyError:
             document["strings"].extend(
-                [{"string": f["name"], "nodegroup_id": tile.nodegroup_id, "provisional": provisional} for pe in tile.provisionaledits.values() for f in pe["value"][nodeid]]
+                [
+                    {"string": f["name"], "nodegroup_id": tile.nodegroup_id, "provisional": provisional}
+                    for pe in tile.provisionaledits.values()
+                    for f in pe["value"][nodeid]
+                ]
             )
 
     def get_search_terms(self, nodevalue, nodeid):

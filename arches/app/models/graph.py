@@ -460,7 +460,13 @@ class Graph(models.GraphModel):
         tree = {"node": root if root else self.root, "children": [], "parent_edge": None}
 
         def find_child_edges(tree):
-            tree["children"].extend([find_child_edges({"node": edge.rangenode, "children": [], "parent_edge": edge}) for edge in self.edges.values() if edge.domainnode == tree["node"]])
+            tree["children"].extend(
+                [
+                    find_child_edges({"node": edge.rangenode, "children": [], "parent_edge": edge})
+                    for edge in self.edges.values()
+                    if edge.domainnode == tree["node"]
+                ]
+            )
 
             return tree
 
