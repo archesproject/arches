@@ -8,7 +8,7 @@ define([
         viewModel: function(params) {
             var self = this;
             var layout = {
-                name: "circle",
+                name: "cose",
                 animate: true
             };
             var fitPadding = 100;
