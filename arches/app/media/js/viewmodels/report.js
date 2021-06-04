@@ -1,8 +1,6 @@
 define(['knockout', 'knockout-mapping', 'underscore', 'moment', 'bindings/let', 'views/components/simple-switch'], function(ko, koMapping, _, moment) {
     var ReportViewModel = function(params) {
         var self = this;
-        console.log('report vm', self, params)
-
         
         this.report = params.report || null;
         this.summary = params.summary || false;

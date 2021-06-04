@@ -19,8 +19,6 @@ define(['jquery',
         initialize: function(options) {
             var self = this;
 
-            console.log('report model init', self, options)
-
             this.templateId = ko.observable(self.get('graph').template_id);
             this.cards = options.cards || [];
             this.preview = options.preview;
