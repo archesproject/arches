@@ -281,7 +281,7 @@ class Command(BaseCommand):
                 elif str(options["defer_indexing"])[0].lower() == "f":
                     defer_indexing = False
 
-            defer_indexing = (defer_indexing and not options["bulk_load"])
+            defer_indexing = defer_indexing and not options["bulk_load"]
             if defer_indexing:
                 concept_count = models.Value.objects.count()
                 relation_count = models.ResourceXResource.objects.count()
