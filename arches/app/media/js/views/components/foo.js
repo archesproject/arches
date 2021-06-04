@@ -18,6 +18,7 @@ define([
 
         this.version = arches.version;
         this.resourceid = params.resourceid;
+        this.summary = Boolean(params.summary);
 
         this.template = ko.observable();
         this.report = ko.observable();
@@ -73,6 +74,8 @@ define([
                 cardwidgets: JSON.parse(responseJson.cardwidgets)
             };
 
+            responseJson.tiles = JSON.parse(responseJson.tiles);
+
             responseJson.cards = _.filter(graph.cards, function(card) {
                 var nodegroup = _.find(graph.graph.nodegroups, function(group) {
                     return group.nodegroupid === card.nodegroup_id;
@@ -85,12 +88,13 @@ define([
                     resourceId: self.resourceid,
                     displayname: responseJson.displayname,
                     cards: graph.cards,
-                    tiles: JSON.parse(responseJson.tiles),
+                    tiles: responseJson.tiles,
                     cardwidgets: graph.cardwidgets
                 });
             });
 
             var report = new ReportModel(_.extend(responseJson, {
+                resourceid: self.resourceid,
                 graphModel: graph.graphModel,
                 graph: graph.graph,
                 datatypes: graph.datatypes
