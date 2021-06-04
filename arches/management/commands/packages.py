@@ -732,9 +732,7 @@ class Command(BaseCommand):
                         import_business_data.s(data_source=path, overwrite=True, bulk_load=bulk_load, prevent_indexing=False)
                         for path in valid_resource_paths
                     ]
-                )(
-                    package_load_complete.signature(kwargs={"valid_resource_paths": valid_resource_paths}).on_error(on_chord_error.s())
-                )
+                )(package_load_complete.signature(kwargs={"valid_resource_paths": valid_resource_paths}).on_error(on_chord_error.s()))
             else:
                 for path in business_data:
                     if path not in erring_csvs:
