@@ -18,7 +18,6 @@ define(['jquery',
 
         initialize: function(options) {
             var self = this;
-
             this.templateId = ko.observable(self.get('graph').template_id);
             this.cards = options.cards || [];
             this.preview = options.preview;

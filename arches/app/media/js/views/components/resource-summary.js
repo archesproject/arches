@@ -1,16 +1,8 @@
 define([
     'knockout',
-    'jquery',
-    'underscore',
-    'models/graph',
-    'arches',
-    'report-templates',
-    'models/report',
-    'card-components',
-], function(ko, $, _, GraphModel, arches, reportLookup, ReportModel, cardComponents) {
+], function(ko) {
     var viewModel = function(){
         this.loading = ko.observable(true);
-        console.log(this)
     };
     ko.components.register('resource-summary', {
         viewModel: viewModel,
