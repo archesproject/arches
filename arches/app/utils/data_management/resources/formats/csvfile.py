@@ -173,7 +173,6 @@ class CsvWriter(Writer):
                     csv_record["populated_node_groups"].append(tile.nodegroup_id)
 
                 if other_group_record != {"ResourceID": resourceinstanceid}:
-                    other_group_record["TileID"] = tile.tileid
                     other_group_records.append(other_group_record)
 
             if csv_record != {"ResourceID": resourceinstanceid}:
