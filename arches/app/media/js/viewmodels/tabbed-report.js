@@ -7,19 +7,15 @@ define([
     'bindings/chosen'
 ], function($, _, ko, koMapping, arches) {
     return function(params) {
-        params.configKeys = ['tabs', 'activeTabIndex'];
         var self = this;
 
-        this.reportDate = params.report.reportDate;
-        this.hideEmptyNodes = params.report.hideEmptyNodes;
-        this.hasProvisionalData = params.report.hasProvisionalData;
+        this.reportDate = params.reportDate;
+        this.tabs = ko.observable(params.report.get('config').tabs);
+        this.activeTabIndex = ko.observable(params.report.get('config').activeTabIndex);
 
-        this.activeTabIndex = ko.observable(params.report.get('config').activeTabIndex)
-        this.tabs = ko.observableArray(params.report.get('config').tabs)
-        
-        _.extend(self, params)
+        this.report = params.report;
 
-        console.log('tabbed-rport', self, params)
+        console.log('tabbedreport', self, params)
         if (this.activeTabIndex() > self.tabs().length - 1) {
             this.activeTabIndex(0);
         }
@@ -42,9 +38,6 @@ define([
         }
 
         this.activeTab = ko.observable(self.tabs()[ko.unwrap(this.activeTabIndex)]);
-
-        console.log("DDDD", self, params)
-
         // this.report.configJSON.subscribe(function(){
         //     if (self.tabs.indexOf(self.activeTab()) === -1) {
         //         self.activeTab(self.tabs()[ko.unwrap(this.activeTabIndex)]);
@@ -63,7 +56,7 @@ define([
             var cardList = [];
             ko.unwrap(self.report.cards).forEach(function(card) {
                 if (self.activeTabIndex() !== undefined && self.tabs().length > 0 && self.tabs().length -1 >= self.activeTabIndex()) {
-                    ko.unwrap(self.tabs()[self.activeTabIndex()]["nodegroup_ids"]).forEach( function(tabNodegroupId) {
+                    self.tabs()[self.activeTabIndex()]["nodegroup_ids"].forEach( function(tabNodegroupId) {
                         if (card.nodegroupid === tabNodegroupId) {
                             cardList.push(card);
                         }

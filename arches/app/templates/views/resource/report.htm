@@ -40,8 +40,10 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
         "
         data-bind='
             component: { 
-                name: $data.template(),
+                name: $data.templateComponentName(),
                 params: {
+                    reportDate: $data.reportDate,
+                    report: $data.report(),
                 }
             }
         '
