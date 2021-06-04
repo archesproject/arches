@@ -164,10 +164,7 @@ class Resource(models.ResourceInstance):
 
     # # flatten out the nested tiles into a single array
     def get_flattened_tiles(self):
-        tiles = []
-        for tile in self.tiles:
-            tiles.extend(tile.get_flattened_tiles())
-        return tiles
+        return [flat_tile for tile in self.tiles for flat_tile in tile.get_flattened_tiles()]
 
     @staticmethod
     def bulk_save(resources):
@@ -185,9 +182,7 @@ class Resource(models.ResourceInstance):
         documents = []
         term_list = []
 
-        for resource in resources:
-            resource.tiles = resource.get_flattened_tiles()
-            tiles.extend(resource.tiles)
+        tiles = [tile for resource in resources for tile in resource.get_flattened_tiles()]
 
         # need to save the models first before getting the documents for index
         start = time()
