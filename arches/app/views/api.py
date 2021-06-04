@@ -21,7 +21,7 @@ from django.shortcuts import render
 from django.views.generic import View
 from django.db import transaction, connection
 from django.db.models import Q
-from django.http import Http404, HttpResponse, response
+from django.http import Http404, HttpResponse
 from django.http.request import QueryDict
 from django.core import management
 from django.core.cache import cache
@@ -31,7 +31,6 @@ from django.utils.translation import ugettext as _
 from django.core.files.base import ContentFile
 from django.views.decorators.csrf import csrf_exempt
 from django.utils.decorators import method_decorator
-from arches import __version__
 from arches.app.models import models
 from arches.app.models.concept import Concept
 from arches.app.models.card import Card as CardProxyModel
@@ -496,7 +495,9 @@ class Graphs(APIBase):
 
         resp = {"graph": JSONSerializer().serializeToPython(graph, sort_keys=False, exclude=["is_editable", "functions"])}
 
-        if request.GET.get("context") is "search-result-details" and graph.template.preload_resource_data:
+        if request.GET.get("context") is "search-result-details" and not graph.template.preload_resource_data:
+            return JSONResponse(resp)
+        else:
             cards = CardProxyModel.objects.filter(graph_id=graph_id).order_by("sortorder")
             permitted_cards = []
 
@@ -513,7 +514,7 @@ class Graphs(APIBase):
                 for widget in widgets
             ]
 
-        return JSONResponse(resp)
+            return JSONResponse(resp)
 
 
 @method_decorator(csrf_exempt, name="dispatch")
@@ -1225,50 +1226,6 @@ class ResourceReport(APIBase):
         except AttributeError:
             raise Http404(_("No active report template is available for this resource."))
 
-        # context = self.get_context_data(
-        #     main_script="views/resource/report",
-        #     report_templates=templates,
-        #     templates_json=JSONSerializer().serialize(templates, sort_keys=False, exclude=["name", "description"]),
-        #     card_components=card_components,
-        #     card_components_json=JSONSerializer().serialize(card_components),
-        #     cardwidgets=JSONSerializer().serialize(cardwidgets),
-        #     tiles=JSONSerializer().serialize(permitted_tiles, sort_keys=False),
-        # cards=JSONSerializer().serialize(
-        #     permitted_cards,
-        #     sort_keys=False,
-        #     exclude=["is_editable", "description", "instructions", "helpenabled", "helptext", "helptitle", "ontologyproperty"],
-        # ),
-        #     datatypes_json=JSONSerializer().serialize(
-        #         datatypes, exclude=["modulename", "issearchable", "configcomponent", "configname", "iconclass"]
-        #     ),
-        #     geocoding_providers=geocoding_providers,
-        #     related_resources=JSONSerializer().serialize(related_resources_summary, sort_keys=False),
-        #     widgets=widgets,
-        #     map_layers=map_layers,
-        #     map_markers=map_markers,
-        #     map_sources=map_sources,
-        #     graph_id=graph.graphid,
-        #     graph_name=graph.name,
-        #     graph_json=JSONSerializer().serialize(
-        #         graph,
-        #         sort_keys=False,
-        #         exclude=[
-        #             "functions",
-        #             "relatable_resource_model_ids",
-        #             "domain_connections",
-        #             "edges",
-        #             "is_editable",
-        #             "description",
-        #             "iconclass",
-        #             "subtitle",
-        #             "author",
-        #         ],
-        #     ),
-        #     resourceid=resourceid,
-        #     displayname=resource.displayname,
-        #
-        # )
-
         response = {}
 
         response["hide_empty_nodes"] = settings.HIDE_EMPTY_NODES_IN_REPORT
@@ -1308,15 +1265,6 @@ class ResourceReport(APIBase):
         )
 
         response["tiles"] = JSONSerializer().serialize(permitted_tiles, sort_keys=False)
-
-        # response["nav"] = {}
-
-        # if graph.iconclass:
-        #     response["nav"]["icon"] = graph.iconclass
-
-        # response["nav"]["title"] = graph.name
-        # response["nav"]["res_edit"] = True
-        # response["nav"]["print"] = True
 
         return response
 
