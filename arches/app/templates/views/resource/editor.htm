@@ -141,7 +141,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
             <!--/ko -->
 
             <!--ko if: selection() === 'root' -->
-                <!--ko if: resourceId() && !loading() -->
+                <!--ko if: resourceId() -->
                 <div class='resource-report editor-report' data-bind='component: {
                     name: reportLookup[report.get("template_id")()].componentname,
                     params: {

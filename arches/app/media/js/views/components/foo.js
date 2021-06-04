@@ -14,7 +14,7 @@ define([
     var Foo = function(params) {
         var self = this;
 
-        this.loading = ko.observable(true);
+        this.loading = ko.observable(false);
 
         console.log("foo", params)
 

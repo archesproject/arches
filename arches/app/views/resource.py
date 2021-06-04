@@ -694,7 +694,7 @@ class ResourceDescriptors(View):
 class ResourceReportView(MapBaseManagerView):
     def get(self, request, resourceid=None):
         context = self.get_context_data(
-            main_script="views/resource",
+            main_script="views/resource/report",
             resourceid=resourceid,
             report_templates=models.ReportTemplate.objects.all(),
             card_components=models.CardComponent.objects.all(),
@@ -704,7 +704,7 @@ class ResourceReportView(MapBaseManagerView):
         context["nav"]["icon"] = "fa fa-bookmark"
         context["nav"]["title"] = _("Resource Report")
 
-        return render(request, "views/components/foo-loader.htm", context)
+        return render(request, "views/resource/report.htm", context)
 
 
 @method_decorator(can_read_resource_instance, name="dispatch")

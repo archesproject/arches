@@ -26,13 +26,26 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 
 
 {% block main_content %}
-<div>
-    
-    <div 
-        id="report-container"
-        style="height: calc(100vh - 100px); /* 100px = top-bar + footer */" 
-    ></div>
-    
+<!-- BEGIN pass data from backend to front -->
+<div style="display:none" id='resourceId' data-value="{{ resourceid }}"></div>
+<!-- END pass data from backend to front -->
 
+<!-- ko if: !loading() -->
+<div>
+    <div style="display:none" data-bind="text: console.log($data)"></div>
+    <div 
+        style="
+            overflow-y: scroll;
+            height: 100%;
+        "
+        data-bind='
+            component: { 
+                name: $data.template(),
+                params: {
+                }
+            }
+        '
+    ></div>
 </div>
+<!-- /ko -->
 {% endblock main_content %}
