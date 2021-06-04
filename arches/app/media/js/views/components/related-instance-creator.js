@@ -151,6 +151,9 @@ define([
                         });                        
                     } else if (ko.unwrap(params.createTile) !== false) {
                         self.tile(item.getNewTile());
+                        if (self.resourceId()) {
+                            self.tile().resourceinstance_id = self.resourceId();
+                        }
                     }
                 }
             });
