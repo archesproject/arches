@@ -170,14 +170,13 @@ class Resource(models.ResourceInstance):
         return tiles
 
     @staticmethod
-    def bulk_save(resources, flat=False, prevent_indexing=False):
+    def bulk_save(resources, flat=False):
         """
         Saves and indexes a list of resources
 
         Arguments:
         resources -- a list of resource models
         flat -- boolean value whether incoming resource.tiles list already flat or instead nested
-        prevent_indexing -- prevents any kind of indexing within scope of this method
 
         """
 
@@ -201,19 +200,18 @@ class Resource(models.ResourceInstance):
 
         resources[0].tiles[0].save_edit(note=f"Bulk created: {len(tiles)} for {len(resources)} resources.", edit_type="bulk_create")
 
-        if prevent_indexing is False:
-            for resource in resources:
-                document, terms = resource.get_documents_to_index(
-                    fetchTiles=False, datatype_factory=datatype_factory, node_datatypes=node_datatypes
-                )
+        for resource in resources:
+            document, terms = resource.get_documents_to_index(
+                fetchTiles=False, datatype_factory=datatype_factory, node_datatypes=node_datatypes
+            )
 
-                documents.append(se.create_bulk_item(index=RESOURCES_INDEX, id=document["resourceinstanceid"], data=document))
+            documents.append(se.create_bulk_item(index=RESOURCES_INDEX, id=document["resourceinstanceid"], data=document))
 
-                for term in terms:
-                    term_list.append(se.create_bulk_item(index=TERMS_INDEX, id=term["_id"], data=term["_source"]))
+            for term in terms:
+                term_list.append(se.create_bulk_item(index=TERMS_INDEX, id=term["_id"], data=term["_source"]))
 
-            se.bulk_index(documents)
-            se.bulk_index(term_list)
+        se.bulk_index(documents)
+        se.bulk_index(term_list)
 
     def index(self):
         """
