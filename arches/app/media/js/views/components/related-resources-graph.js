@@ -249,13 +249,17 @@ define([
                     break;
                 case 'delete':
                     var element = viz.getElementById(selection.id);
+                    var informationElement = self.informationElement();
+                    var informationElementId = informationElement ? informationElement.id : null;
                     if (!selection.source) viz.edges().forEach(function(edge) {
                         if (edge.source().id() === selection.id ||
                             edge.target().id() === selection.id) {
+                            if (edge.id() === informationElementId) self.informationElement(null);
                             viz.remove(edge);
                             self.elements.remove(edge);
                         }
                     });
+                    if (selection.id === informationElementId) self.informationElement(null);
                     viz.remove(element);
                     self.elements.remove(element);
                     viz.fit(null, fitPadding);
@@ -273,8 +277,18 @@ define([
                 }
             });
 
-            self.informationElement.subscribe(function() {
-                self.activeTab('information');
+            self.informationElement.subscribe(function(data) {
+                var viz = self.viz();
+                if (data) {
+                    if (viz) {
+                        var element = viz.getElementById(data.id);
+                        if (!element.selected()) {
+                            self.selectionMode('information');
+                            element.select();
+                        }
+                    }
+                    self.activeTab('information');
+                }
             });
 
             this.selectionMode.subscribe(function() {
