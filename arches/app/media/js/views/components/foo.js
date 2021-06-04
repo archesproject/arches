@@ -16,20 +16,30 @@ define([
 
         this.loading = ko.observable(true);
 
-        console.log("foo", params)
-
-        // this.version = arches.version;
+        this.version = arches.version;
         this.resourceid = params.resourceid;
 
         this.template = ko.observable();
         this.report = ko.observable();
 
-        this.reportDate = moment().format('MMMM D, YYYY');
-
         this.initialize = function() {
             if (ko.unwrap(self.resourceid)) {
                 var url = arches.urls.api_resource_report(self.resourceid);
-                self.fetchResourceData(url);
+
+                self.fetchResourceData(url).then(function(responseJson) {
+                    var template = responseJson.template
+                    self.template(template);
+                    
+                    if (template.preload_resource_data) {
+                        self.preloadResourceData(responseJson)
+                    }
+                    else {
+                        self.report(responseJson.resource_instance);
+                    }
+        
+                    self.loading(false);
+                });
+
             }
             else {
                 self.loading(false);
@@ -37,59 +47,17 @@ define([
         };
 
         this.fetchResourceData = function(url) {
-            window.fetch(url).then(function(response){
+            return window.fetch(url).then(function(response){
                 if (response.ok) {
                     return response.json();
                 }
                 else {
                     throw new Error(arches.translations.reNetworkReponseError);
                 }
-            }).then(function(responseJson) {
-                var template = responseJson.template
-                self.template(template);
-                
-                console.log('ss', responseJson)
-                if (template.preload_resource_data) {
-                    self.preloadResourceData(responseJson)
-                }
-                else {
-                    // self.report(responseJson.resource_instance);
-                }
-    
-                self.loading(false);
             });
         };
         
         this.preloadResourceData = function(responseJson) {
-            console.log("proelaod data", responseJson)
-            // self.tiles = ko.computed(function() {
-            //     var tiles = [];
-            //     if (ko.unwrap(self.report)) {
-            //         ko.unwrap(self.report().cards).forEach(function(card) {
-            //             getCardTiles(card, tiles);
-            //         });
-            //     }
-            //     return tiles;
-            // });
-    
-            // self.hasProvisionalData = ko.pureComputed(function() {
-            //     return _.some(self.tiles(), function(tile){
-            //         return _.keys(ko.unwrap(tile.provisionaledits)).length > 0;
-            //     });
-            // });
-    
-            // var getCardTiles = function(card, tiles) {
-            //     var cardTiles = ko.unwrap(card.tiles);
-            //     cardTiles.forEach(function(tile) {
-            //         tiles.push(tile);
-            //         tile.cards.forEach(function(card) {
-            //             getCardTiles(card, tiles);
-            //         });
-            //     });
-            // };
-    
-            // self.hideEmptyNodes = ko.observable();
-
             var graphModel = new GraphModel({
                 data: JSON.parse(responseJson.graph_json),
                 datatypes: JSON.parse(responseJson.datatypes_json),
@@ -120,9 +88,6 @@ define([
                 });
             });
 
-            // responseJson.templates = reportLookup;
-            // responseJson.cardComponents = cardComponents;
-
             var report = new ReportModel(_.extend(responseJson, {
                 graphModel: graph.graphModel,
                 graph: graph.graph,
@@ -132,10 +97,6 @@ define([
             report['hideEmptyNodes'] = responseJson.hide_empty_nodes;
 
             self.report(report);
-
-            console.log("AAAA", self.report())
-
-            // self.hideEmptyNodes(responseJson.hide_empty_nodes); 
         };
 
         this.initialize();
