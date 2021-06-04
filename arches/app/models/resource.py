@@ -187,23 +187,22 @@ class Resource(models.ResourceInstance):
 
         resources[0].tiles[0].save_edit(note=f"Bulk created: {len(tiles)} for {len(resources)} resources.", edit_type="bulk_create")
 
-        if prevent_indexing is False:
-            datatype_factory = DataTypeFactory()
-            node_datatypes = {str(nodeid): datatype for nodeid, datatype in models.Node.objects.values_list("nodeid", "datatype")}
-            documents = []
-            term_list = []
-            for resource in resources:
-                document, terms = resource.get_documents_to_index(
-                    fetchTiles=False, datatype_factory=datatype_factory, node_datatypes=node_datatypes
-                )
+        datatype_factory = DataTypeFactory()
+        node_datatypes = {str(nodeid): datatype for nodeid, datatype in models.Node.objects.values_list("nodeid", "datatype")}
+        documents = []
+        term_list = []
+        for resource in resources:
+            document, terms = resource.get_documents_to_index(
+                fetchTiles=False, datatype_factory=datatype_factory, node_datatypes=node_datatypes
+            )
 
-                documents.append(se.create_bulk_item(index=RESOURCES_INDEX, id=document["resourceinstanceid"], data=document))
+            documents.append(se.create_bulk_item(index=RESOURCES_INDEX, id=document["resourceinstanceid"], data=document))
 
-                for term in terms:
-                    term_list.append(se.create_bulk_item(index=TERMS_INDEX, id=term["_id"], data=term["_source"]))
+            for term in terms:
+                term_list.append(se.create_bulk_item(index=TERMS_INDEX, id=term["_id"], data=term["_source"]))
 
-            se.bulk_index(documents)
-            se.bulk_index(term_list)
+        se.bulk_index(documents)
+        se.bulk_index(term_list)
 
     def index(self):
         """
