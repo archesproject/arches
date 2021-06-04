@@ -26,28 +26,14 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 
 
 {% block main_content %}
-<!-- BEGIN pass data from backend to front -->
-<div style="display:none" id='resourceId' data-value="{{ resourceid }}"></div>
-<!-- END pass data from backend to front -->
-
-<!-- ko if: !loading() -->
-<div>
-    <div style="display:none" data-bind="text: console.log($data)"></div>
-    <div 
-        style="
-            overflow-y: scroll;
-            height: 100%;
-        "
-        data-bind='
-            component: { 
-                name: $data.templateComponentName(),
-                params: {
-                    reportDate: $data.reportDate,
-                    report: $data.report(),
-                }
+<div 
+    data-bind="
+        component: { 
+            name: 'foo',
+            params: {
+                resourceid: '{{ resourceid }}'
             }
-        '
-    ></div>
-</div>
-<!-- /ko -->
+        }
+    "
+></div>
 {% endblock main_content %}

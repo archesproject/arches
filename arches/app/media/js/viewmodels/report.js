@@ -1,83 +1,58 @@
-define([
-    'knockout', 
-    'knockout-mapping', 
-    'underscore', 
-    'moment', 
-    'report-templates',
-    'models/report',
-    'bindings/let', 
-    'views/components/simple-switch'
-], function(ko, koMapping, _, moment, reportLookup, ReportModel) {
+define(['knockout', 'knockout-mapping', 'underscore', 'moment', 'bindings/let', 'views/components/simple-switch'], function(ko, koMapping, _, moment) {
     var ReportViewModel = function(params) {
+
+        
         var self = this;
+        console.log('report vm', self, params)
 
-        var reportData = reportLookup[params.report_template_id];
-        var shouldPreloadResourceData = Boolean(reportData.preload_resource_data.toLowerCase() === 'true');
+        
+        this.report = params.report || null;
+        this.summary = params.summary || false;
+        this.reportDate = moment().format('MMMM D, YYYY');
+        this.configForm = params.configForm || false;
+        this.configType = params.configType || 'header';
+        this.editorContext = params.editorContext || false;
 
-        if (shouldPreloadResourceData) {
-            console.log("@@", reportData)
+        this.configState = params.report.configState || ko.observable({});
+        this.configJSON = params.report.configJSON || ko.observable({});
+        this.configObservables = params.configObservables || {};
+        this.configKeys = params.configKeys || [];
 
-
-            _.extend(self, new ReportModel())
-        }
-
-        var reportContainer = document.querySelector('#report-container');
-
-        ko.components.get(reportData.componentname, function(component) {
-            ko.virtualElements.setDomNodeChildren(reportContainer, component.template);
-    
-            ko.cleanNode(reportContainer);
-            ko.applyBindings(component.createViewModel({'foo': 'bar'}), reportContainer);
+        this.hasProvisionalData = ko.pureComputed(function() {
+            return _.some(self.tiles(), function(tile){
+                return _.keys(ko.unwrap(tile.provisionaledits)).length > 0;
+            });
         });
         
+        this.hideEmptyNodes = ko.observable(params.report.hideEmptyNodes);
 
-        // this.report = params.report || null;
-        // this.summary = params.summary || false;
-        // this.reportDate = moment().format('MMMM D, YYYY');
-        // this.configForm = params.configForm || false;
-        // this.configType = params.configType || 'header';
-        // this.editorContext = params.editorContext || false;
+        this.configJSON = ko.computed(function(){
+            self.configKeys.forEach(function(config) {
+                self[config] = self.configState[config];
+            });
+            self.report.configJSON(koMapping.toJS(self.report.configState));
+            return self.report.configJSON;
+        }).extend({deferred: true});
 
-        // this.configState = params.report.configState || ko.observable({});
-        // this.configJSON = params.report.configJSON || ko.observable({});
-        // this.configObservables = params.configObservables || {};
-        // this.configKeys = params.configKeys || [];
+        var getCardTiles = function(card, tiles) {
+            var cardTiles = ko.unwrap(card.tiles);
+            cardTiles.forEach(function(tile) {
+                tiles.push(tile);
+                tile.cards.forEach(function(card) {
+                    getCardTiles(card, tiles);
+                });
+            });
+        };
 
-        // this.hasProvisionalData = ko.pureComputed(function() {
-        //     return _.some(self.tiles(), function(tile){
-        //         return _.keys(ko.unwrap(tile.provisionaledits)).length > 0;
-        //     });
-        // });
-        
-        // this.hideEmptyNodes = ko.observable(params.report.hideEmptyNodes);
-
-        // this.configJSON = ko.computed(function(){
-        //     self.configKeys.forEach(function(config) {
-        //         self[config] = self.configState[config];
-        //     });
-        //     self.report.configJSON(koMapping.toJS(self.report.configState));
-        //     return self.report.configJSON;
-        // }).extend({deferred: true});
-
-        // var getCardTiles = function(card, tiles) {
-        //     var cardTiles = ko.unwrap(card.tiles);
-        //     cardTiles.forEach(function(tile) {
-        //         tiles.push(tile);
-        //         tile.cards.forEach(function(card) {
-        //             getCardTiles(card, tiles);
-        //         });
-        //     });
-        // };
-
-        // this.tiles = ko.computed(function() {
-        //     var tiles = [];
-        //     if (self.report) {
-        //         ko.unwrap(self.report.cards).forEach(function(card) {
-        //             getCardTiles(card, tiles);
-        //         });
-        //     }
-        //     return tiles;
-        // });
+        this.tiles = ko.computed(function() {
+            var tiles = [];
+            if (self.report) {
+                ko.unwrap(self.report.cards).forEach(function(card) {
+                    getCardTiles(card, tiles);
+                });
+            }
+            return tiles;
+        });
     };
     return ReportViewModel;
 });

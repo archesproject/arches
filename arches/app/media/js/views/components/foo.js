@@ -14,11 +14,11 @@ define([
     var Foo = function(params) {
         var self = this;
 
-        this.loading = ko.observable(false);
+        this.loading = ko.observable(true);
 
         console.log("foo", params)
 
-        this.version = arches.version;
+        // this.version = arches.version;
         this.resourceid = params.resourceid;
 
         this.template = ko.observable();
@@ -47,12 +47,13 @@ define([
             }).then(function(responseJson) {
                 var template = responseJson.template
                 self.template(template);
-    
+                
+                console.log('ss', responseJson)
                 if (template.preload_resource_data) {
                     self.preloadResourceData(responseJson)
                 }
                 else {
-                    self.report(responseJson.resource_instance);
+                    // self.report(responseJson.resource_instance);
                 }
     
                 self.loading(false);
@@ -60,38 +61,41 @@ define([
         };
         
         this.preloadResourceData = function(responseJson) {
-            self.tiles = ko.computed(function() {
-                var tiles = [];
-                if (ko.unwrap(self.report)) {
-                    ko.unwrap(self.report().cards).forEach(function(card) {
-                        getCardTiles(card, tiles);
-                    });
-                }
-                return tiles;
-            });
+            console.log("proelaod data", responseJson)
+            // self.tiles = ko.computed(function() {
+            //     var tiles = [];
+            //     if (ko.unwrap(self.report)) {
+            //         ko.unwrap(self.report().cards).forEach(function(card) {
+            //             getCardTiles(card, tiles);
+            //         });
+            //     }
+            //     return tiles;
+            // });
     
-            self.hasProvisionalData = ko.pureComputed(function() {
-                return _.some(self.tiles(), function(tile){
-                    return _.keys(ko.unwrap(tile.provisionaledits)).length > 0;
-                });
-            });
+            // self.hasProvisionalData = ko.pureComputed(function() {
+            //     return _.some(self.tiles(), function(tile){
+            //         return _.keys(ko.unwrap(tile.provisionaledits)).length > 0;
+            //     });
+            // });
     
-            var getCardTiles = function(card, tiles) {
-                var cardTiles = ko.unwrap(card.tiles);
-                cardTiles.forEach(function(tile) {
-                    tiles.push(tile);
-                    tile.cards.forEach(function(card) {
-                        getCardTiles(card, tiles);
-                    });
-                });
-            };
+            // var getCardTiles = function(card, tiles) {
+            //     var cardTiles = ko.unwrap(card.tiles);
+            //     cardTiles.forEach(function(tile) {
+            //         tiles.push(tile);
+            //         tile.cards.forEach(function(card) {
+            //             getCardTiles(card, tiles);
+            //         });
+            //     });
+            // };
     
-            self.hideEmptyNodes = ko.observable();
+            // self.hideEmptyNodes = ko.observable();
 
             var graphModel = new GraphModel({
                 data: JSON.parse(responseJson.graph_json),
                 datatypes: JSON.parse(responseJson.datatypes_json),
             });
+
+            // responseJson.cards = JSON.parse(responseJson.cards);
 
             graph = {
                 graphModel: graphModel,
@@ -118,8 +122,8 @@ define([
                 });
             });
 
-            responseJson.templates = reportLookup;
-            responseJson.cardComponents = cardComponents;
+            // responseJson.templates = reportLookup;
+            // responseJson.cardComponents = cardComponents;
 
             self.report(new ReportModel(_.extend(responseJson, {
                 graphModel: graph.graphModel,
@@ -127,7 +131,7 @@ define([
                 datatypes: graph.datatypes
             })));
 
-            self.hideEmptyNodes(responseJson.hide_empty_nodes); 
+            // self.hideEmptyNodes(responseJson.hide_empty_nodes); 
         };
 
         this.initialize();

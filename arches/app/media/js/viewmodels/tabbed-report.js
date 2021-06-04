@@ -4,18 +4,16 @@ define([
     'knockout',
     'knockout-mapping',
     'arches',
-    'bindings/chosen'
-], function($, _, ko, koMapping, arches) {
+    'viewmodels/report',
+    'bindings/chosen',
+], function($, _, ko, koMapping, arches, ReportViewModel) {
     return function(params) {
         var self = this;
 
-        this.reportDate = params.reportDate;
-        this.tabs = ko.observable(params.report.get('config').tabs);
-        this.activeTabIndex = ko.observable(params.report.get('config').activeTabIndex);
+        params.configKeys = ['tabs', 'activeTabIndex'];
 
-        this.report = params.report;
+        ReportViewModel.apply(this, [params]);
 
-        console.log('tabbedreport', self, params)
         if (this.activeTabIndex() > self.tabs().length - 1) {
             this.activeTabIndex(0);
         }
@@ -38,11 +36,11 @@ define([
         }
 
         this.activeTab = ko.observable(self.tabs()[ko.unwrap(this.activeTabIndex)]);
-        // this.report.configJSON.subscribe(function(){
-        //     if (self.tabs.indexOf(self.activeTab()) === -1) {
-        //         self.activeTab(self.tabs()[ko.unwrap(this.activeTabIndex)]);
-        //     }
-        // });
+        this.report.configJSON.subscribe(function(){
+            if (self.tabs.indexOf(self.activeTab()) === -1) {
+                self.activeTab(self.tabs()[ko.unwrap(self.activeTabIndex)]);
+            }
+        });
         this.topcards = ko.unwrap(self.report.cards).map(function(card){
             return {name: card.model.name(), nodegroupid: card.nodegroupid};
         });
@@ -56,7 +54,7 @@ define([
             var cardList = [];
             ko.unwrap(self.report.cards).forEach(function(card) {
                 if (self.activeTabIndex() !== undefined && self.tabs().length > 0 && self.tabs().length -1 >= self.activeTabIndex()) {
-                    self.tabs()[self.activeTabIndex()]["nodegroup_ids"].forEach( function(tabNodegroupId) {
+                    self.tabs()[self.activeTabIndex()]["nodegroup_ids"]().forEach( function(tabNodegroupId) {
                         if (card.nodegroupid === tabNodegroupId) {
                             cardList.push(card);
                         }
