@@ -1482,22 +1482,21 @@ ul.tabbed-report-tab-list {
     width: 35px;
     height: 105px;
     display: flex;
-    background-color: rgba(242, 242, 242, 0.65);
+    background-color: rgba(0, 0, 0, 0.95);
     align-items: center;
     font-size: 41px;
     justify-content: center;
-    border-top: 1px solid #ddd;
-    border-bottom: solid 1px #ddd;
-    color: #555;
+    border-top: 1px solid #000;
+    color: #eee;
     cursor: pointer;
 }
 
 .thumbnail-gallery-controls.left {
-    border-left: solid 1px #ddd;
+    border-left: solid 1px #343434;
 }
 
 .thumbnail-gallery-controls.right {
-    border-right: solid 1px #ddd;
+    border-right: solid 1px #343434;
 }
 
 .thumbnail-container {
@@ -1517,10 +1516,12 @@ ul.tabbed-report-tab-list {
     font-size: 14px;
     margin-left: 35px;
     width: 130px;
-    color: #222;
+    color: #eee;
     font-weight: 600;
-    background-color: rgba(242, 242, 242, 0.65);
+    background-color: rgba(0, 0, 0, 0.75);
     text-align: center;
+    border-top-right-radius: 2px;
+    border-top-left-radius: 2px;
 }
 
 .show-thumbnails-btn:hover {
@@ -1763,18 +1764,18 @@ div.final-cons-step-separator>h4 {
     display: inline-flex;
     align-items: center;
     text-align: center;
-    background-color: rgba(142, 142, 142, 0.65);
+    background-color: rgba(0, 0, 0, 0.85);
     height: 105px;
     overflow-x: auto;
     overflow-y: hidden;
     width: 100%;
-    border-top: solid 1px #bbb;
+    border-top: solid 1px #000;
 }
 
 .gallery-thumbnails img {
     height: 80px;
     margin: 3px 6px;
-    border: solid 1.5px #bbb;
+    border: solid 1.5px #eee;
 }
 
 .gallery-thumbnails img:hover {
@@ -1842,7 +1843,7 @@ div.final-cons-step-separator>h4 {
     border: solid 1px #ddd;
     display: flex;
     flex-direction: column;
-    margin: 5px 10px 10px 10px;
+    margin: 40px 10px 10px 10px;
 }
 
 .photo-workbench-photo {
@@ -2201,6 +2202,13 @@ div.final-cons-step-separator>h4 {
     padding: 10px 35px;
     right: 0;
     width: 399px;
+}
+
+.workbench-card-sidepanel .resource-instance-card-component-content .install-buttons {
+    bottom: auto;
+    border: none;
+    background: white;
+    padding: unset;
 }
 
 .graph-designer .workbench-card-sidepanel .install-buttons {

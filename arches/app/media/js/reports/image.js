@@ -28,7 +28,7 @@ define([
                                     _.contains(nodes, key)
                                 ) {
                                     imgs.push({
-                                        src: item.url,
+                                        src: (arches.urls.url_subpath + ko.unwrap(item.url)).replace('//', '/'),
                                         alt: item.name
                                     });
                                 }
