@@ -4,13 +4,15 @@
 
 {% block header %}
 <!-- ko if: tabs()[activeTabIndex()]  -->
-<ul class="tabbed-report-tab-list">
-<!-- ko foreach: {data: tabs, as: 'tab'}  -->
-<li data-bind="click: function(){ $parent.setActiveTab($index()) }, css: { 'active': ko.unwrap($parent.activeTabIndex) === $index() }" class="report-tab">
-    <a><span><i data-bind="attr: {class: ('fa '+ ko.unwrap(tab.icon))}"></i></span></a>
-</li>
-<!-- /ko -->
+<div>
+    <ul class="tabbed-report-tab-list">
+    <!-- ko foreach: {data: tabs, as: 'tab'}  -->
+    <li data-bind="click: function(){ $parent.setActiveTab($index()) }, css: { 'active': ko.unwrap($parent.activeTabIndex) === $index() }" class="report-tab">
+        <a><span><i data-bind="attr: {class: ('fa '+ ko.unwrap(tab.icon))}"></i></span></a>
+    </li>
+    <!-- /ko -->
 </ul>
+</div>
 <div class="tab-banner">
     <div style="display: flex; flex-direction: row">
         <span><i data-bind="class: report.get('iconclass') || 'fa fa-file-o'"></i></span>

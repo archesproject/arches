@@ -17,7 +17,6 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 """
 
 
-from arches import __version__
 from arches.app.models import models
 from arches.app.models.system_settings import settings
 from arches.app.models.resource import Resource
@@ -73,7 +72,6 @@ class BaseManagerView(TemplateView):
         context["user_is_reviewer"] = user_is_resource_reviewer(self.request.user)
         context["app_name"] = settings.APP_NAME
         context["show_language_swtich"] = settings.SHOW_LANGUAGE_SWITCH
-        context["version"] = __version__
         return context
 
 
