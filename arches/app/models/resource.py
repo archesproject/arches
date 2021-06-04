@@ -198,8 +198,7 @@ class Resource(models.ResourceInstance):
 
             documents.append(se.create_bulk_item(index=RESOURCES_INDEX, id=document["resourceinstanceid"], data=document))
 
-            for term in terms:
-                term_list.append(se.create_bulk_item(index=TERMS_INDEX, id=term["_id"], data=term["_source"]))
+            term_list.extend([se.create_bulk_item(index=TERMS_INDEX, id=term["_id"], data=term["_source"]) for term in terms])
 
         se.bulk_index(documents)
         se.bulk_index(term_list)
