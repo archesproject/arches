@@ -56,14 +56,14 @@ define([
                     
                 // });
 
-                this.report = ko.observable();
+                this.responseJson = ko.observable();
 
 
 
                 
-                this.setupReport = function(graphId, resourceInstanceId, source, report) {
+                this.setupReport = function(graphId, resourceInstanceId, source, responseJson) {
                     self.foo();
-                    self.report(report);
+                    self.responseJson(responseJson);
                     // self.loading(true);
                     self.resourceInstanceId(resourceInstanceId);
 

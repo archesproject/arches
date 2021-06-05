@@ -1,8 +1,11 @@
 {% load staticfiles %}
 {% load i18n %}
 
+<!--ko if: loading() -->
+<div class='loading-mask'></div>
+<!--/ko-->
+<!-- ko ifnot: loading() -->
 <div 
-    data-bind='if: !$data.loading()'
     style="
         height: calc(100vh - 50px);
         display: flex;
@@ -42,3 +45,4 @@
         </div>
     </footer>
 </div>
+<!-- /ko -->

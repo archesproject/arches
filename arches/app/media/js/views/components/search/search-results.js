@@ -87,9 +87,9 @@ function($, _, BaseFilter, bootstrap, arches, select2, ko, koMapping, viewdata) 
                 var self = this;
                 return function(){
 
-                    var report = self.fooCache[resourceInstanceId];
+                    var responseJson = self.fooCache[resourceInstanceId];
 
-                    self.details.setupReport(graphId, resourceInstanceId, result._source, report);
+                    self.details.setupReport(graphId, resourceInstanceId, result._source, responseJson);
                     if (self.selectedTab() !== 'search-result-details') {
                         self.selectedTab('search-result-details');
                     }
@@ -115,9 +115,7 @@ function($, _, BaseFilter, bootstrap, arches, select2, ko, koMapping, viewdata) 
                                 throw new Error(arches.translations.reNetworkReponseError);
                             }
                         }).then(function(responseJson) {
-                            console.log("@@#@", responseJson)
                             self.fooCache[result['_id']] = responseJson
-                            console.log(self.fooCache)
                         })
 
 

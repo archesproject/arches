@@ -26,19 +26,41 @@ define([
         console.log('in foo component', self, params)
 
         this.initialize = function() {
-            if (ko.unwrap(params.report)) {
-                console.log("in params report if", params.report());
+            if (ko.unwrap(params.responseJson)) {
 
-                self.template(params.report().template);
+
+                console.log("in params responseJson if", params.responseJson());
+
+                self.template(params.responseJson().template);
 
                 if (
-                    params.report().template.preload_resource_data
-                    && !params.report()['hasPreloadedResourceData']
+                    params.responseJson().template.preload_resource_data
+                    && !params.responseJson()['hasPreloadedResourceData']
                 ) {
-                    self.preloadResourceData(params.report())
+                    self.preloadResourceData(params.responseJson())
                 }
                 else {
-                    self.report(params.report());
+                    var graphModel = new GraphModel({
+                        data: JSON.parse(params.responseJson().graph_json),
+                        datatypes: JSON.parse(params.responseJson().datatypes_json),
+                    });
+        
+                    graph = {
+                        graphModel: graphModel,
+                        cards: params.responseJson().cards,
+                        graph: JSON.parse(params.responseJson().graph_json),
+                        datatypes: JSON.parse(params.responseJson().datatypes_json),
+                        cardwidgets: JSON.parse(params.responseJson().cardwidgets)
+                    };
+
+                    var fooReport = new ReportModel(_.extend(params.responseJson(), {
+                        resourceid: self.resourceid,
+                        graphModel: graph.graphModel,
+                        graph: graph.graph,
+                        datatypes: graph.datatypes
+                    }));
+                    
+                    self.report(fooReport);
                 }
                 
                 self.loading(false)
