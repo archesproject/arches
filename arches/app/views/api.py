@@ -1227,29 +1227,29 @@ class ResourceReport(APIBase):
             raise Http404(_("No active report template is available for this resource."))
 
         response = {
-            'report_templates': templates,
-            'templates_json': JSONSerializer().serialize(templates, sort_keys=False, exclude=["name", "description"]),
-            'card_components': card_components,
-            'card_components_json': JSONSerializer().serialize(card_components),
-            'cardwidgets': JSONSerializer().serialize(cardwidgets),
-            'tiles': JSONSerializer().serialize(permitted_tiles, sort_keys=False),
-            'cards': JSONSerializer().serialize(
+            "report_templates": templates,
+            "templates_json": JSONSerializer().serialize(templates, sort_keys=False, exclude=["name", "description"]),
+            "card_components": card_components,
+            "card_components_json": JSONSerializer().serialize(card_components),
+            "cardwidgets": JSONSerializer().serialize(cardwidgets),
+            "tiles": JSONSerializer().serialize(permitted_tiles, sort_keys=False),
+            "cards": JSONSerializer().serialize(
                 permitted_cards,
                 sort_keys=False,
                 exclude=["is_editable", "description", "instructions", "helpenabled", "helptext", "helptitle", "ontologyproperty"],
             ),
-            'datatypes_json': JSONSerializer().serialize(
+            "datatypes_json": JSONSerializer().serialize(
                 datatypes, exclude=["modulename", "issearchable", "configcomponent", "configname", "iconclass"]
             ),
-            'geocoding_providers': geocoding_providers,
-            'related_resources': JSONSerializer().serialize(related_resources_summary, sort_keys=False),
-            'widgets': widgets,
-            'map_layers': map_layers,
-            'map_markers': map_markers,
-            'map_sources': map_sources,
-            'graph_id': graph.graphid,
-            'graph_name': graph.name,
-            'graph_json': JSONSerializer().serialize(
+            "geocoding_providers": geocoding_providers,
+            "related_resources": JSONSerializer().serialize(related_resources_summary, sort_keys=False),
+            "widgets": widgets,
+            "map_layers": map_layers,
+            "map_markers": map_markers,
+            "map_sources": map_sources,
+            "graph_id": graph.graphid,
+            "graph_name": graph.name,
+            "graph_json": JSONSerializer().serialize(
                 graph,
                 sort_keys=False,
                 exclude=[
@@ -1269,7 +1269,7 @@ class ResourceReport(APIBase):
         response["hide_empty_nodes"] = settings.HIDE_EMPTY_NODES_IN_REPORT
         response["displayname"] = resource.displayname
         response["template"] = template
-        response["resource_instance"] = resource.to_json(),
+        response["resource_instance"] = (resource.to_json(),)
 
         return response
 
