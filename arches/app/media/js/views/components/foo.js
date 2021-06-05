@@ -23,10 +23,28 @@ define([
         this.template = ko.observable();
         this.report = ko.observable();
 
-        console.log('in foo component')
+        console.log('in foo component', self, params)
 
         this.initialize = function() {
-            if (ko.unwrap(self.resourceid)) {
+            if (ko.unwrap(params.report)) {
+                console.log("in params report if", params.report());
+
+                self.template(params.report().template);
+
+                if (
+                    params.report().template.preload_resource_data
+                    && !params.report()['hasPreloadedResourceData']
+                ) {
+                    self.preloadResourceData(params.report())
+                }
+                else {
+                    self.report(params.report());
+                }
+                
+                self.loading(false)
+
+            }
+            else if (ko.unwrap(self.resourceid)) {
                 var url = arches.urls.api_resource_report(self.resourceid);
 
                 self.fetchResourceData(url).then(function(responseJson) {
@@ -101,6 +119,8 @@ define([
             }));
 
             report['hideEmptyNodes'] = responseJson.hide_empty_nodes;
+
+            responseJson['hasPreloadedResourceData'] = true;
 
             self.report(report);
         };

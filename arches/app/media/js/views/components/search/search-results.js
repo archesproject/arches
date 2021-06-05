@@ -30,6 +30,8 @@ function($, _, BaseFilter, bootstrap, arches, select2, ko, koMapping, viewdata) 
                 this.relationshipCandidates = ko.observableArray();
                 this.selectedResourceId = ko.observable(null);
 
+                this.fooCache = {};
+
                 this.showRelationships.subscribe(function(res) {
                     this.selectedResourceId(res.resourceinstanceid);
                 }, this);
@@ -81,10 +83,13 @@ function($, _, BaseFilter, bootstrap, arches, select2, ko, koMapping, viewdata) 
                 };
             },
 
-            showResourceDetails: function(graphId, resourceInstanceId, result) {
+            showResourceSummaryReport: function(graphId, resourceInstanceId, result) {
                 var self = this;
                 return function(){
-                    self.details.setupReport(graphId, resourceInstanceId, result._source);
+
+                    var report = self.fooCache[resourceInstanceId];
+
+                    self.details.setupReport(graphId, resourceInstanceId, result._source, report);
                     if (self.selectedTab() !== 'search-result-details') {
                         self.selectedTab('search-result-details');
                     }
@@ -95,10 +100,27 @@ function($, _, BaseFilter, bootstrap, arches, select2, ko, koMapping, viewdata) 
                 var self = this;
                 var data = $('div[name="search-result-data"]').data();
 
+                
                 if (!!this.searchResults.results){
                     this.results.removeAll();
                     this.selectedResourceId(null);
                     this.searchResults.results.hits.hits.forEach(function(result){
+
+                        var url = arches.urls.api_resource_report(result['_id']);
+                        window.fetch(url).then(function(response){
+                            if (response.ok) {
+                                return response.json();
+                            }
+                            else {
+                                throw new Error(arches.translations.reNetworkReponseError);
+                            }
+                        }).then(function(responseJson) {
+                            console.log("@@#@", responseJson)
+                            self.fooCache[result['_id']] = responseJson
+                            console.log(self.fooCache)
+                        })
+
+
                         var graphdata = _.find(viewdata.graphs, function(graphdata){
                             return result._source.graph_id === graphdata.graphid;
                         });
@@ -115,7 +137,7 @@ function($, _, BaseFilter, bootstrap, arches, select2, ko, koMapping, viewdata) 
                             geometries: ko.observableArray(result._source.geometries),
                             iconclass: graphdata ? graphdata.iconclass : '',
                             showrelated: this.showRelatedResources(result._source.resourceinstanceid),
-                            showDetails: this.showResourceDetails(result._source.graph_id, result._source.resourceinstanceid, result),
+                            showDetails: this.showResourceSummaryReport(result._source.graph_id, result._source.resourceinstanceid, result),
                             mouseoverInstance: this.mouseoverInstance(result._source.resourceinstanceid),
                             relationshipcandidacy: this.toggleRelationshipCandidacy(result._source.resourceinstanceid),
                             ontologyclass: result._source.root_ontology_class,

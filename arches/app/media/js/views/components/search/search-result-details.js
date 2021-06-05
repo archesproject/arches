@@ -44,35 +44,55 @@ define([
 
                 var graphCache = {};
 
-                this.setupReport = function(graphId, resourceInstanceId, source) {
-                    self.loading(true);
+                var fooCache = {};
+
+                this.foo = function() {
+                    console.log(self.searchResults.results)
+                };
+
+                // /* roundabout searchResults subscription */ 
+                // this.loading.subscribe(function() {
+                //     console.log('g', self, options, self.searchResults.results)
+                    
+                // });
+
+                this.report = ko.observable();
+
+
+
+                
+                this.setupReport = function(graphId, resourceInstanceId, source, report) {
+                    self.foo();
+                    self.report(report);
+                    // self.loading(true);
                     self.resourceInstanceId(resourceInstanceId);
 
-                    var graph = graphCache[graphId];
+                    // var graph = graphCache[graphId];
 
-                    if (!graph) {
-                        $.getJSON(arches.urls.graphs_api + graphId + "?context=search-result-details", function(data) {
-                            var graphModel = new GraphModel({
-                                data: data.graph,
-                                datatypes: data.datatypes
-                            });
 
-                            graph = {
-                                graphModel: graphModel,
-                                cards: data.cards,
-                                graph: data.graph,
-                                datatypes: data.datatypes,
-                                cardwidgets: data.cardwidgets
-                            };
+                    // if (!graph) {
+                    //     $.getJSON(arches.urls.graphs_api + graphId + "?context=search-result-details", function(data) {
+                    //         var graphModel = new GraphModel({
+                    //             data: data.graph,
+                    //             datatypes: data.datatypes
+                    //         });
 
-                            graphCache[graphId] = graph;
+                    //         graph = {
+                    //             graphModel: graphModel,
+                    //             cards: data.cards,
+                    //             graph: data.graph,
+                    //             datatypes: data.datatypes,
+                    //             cardwidgets: data.cardwidgets
+                    //         };
 
-                            self.loading(false);
-                        });
-                    }
-                    else {
-                        self.loading(false);
-                    }
+                    //         graphCache[graphId] = graph;
+
+                    //         // self.loading(false);
+                    //     });
+                    // }
+                    // else {
+                    //     // self.loading(false);
+                    // }
                 };
             }
         }),

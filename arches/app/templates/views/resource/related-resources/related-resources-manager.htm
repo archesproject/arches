@@ -33,13 +33,11 @@
             <i class="fa fa-times-circle"></i>
         </div>
     </div>
-    <div style="display:none" data-bind="text: console.log($data, $parent)"></div>
+    <div style="display:none" data-bind="text: console.log('rsm', $data, $data.searchResults.name, $parent)"></div>
     <div class="create-instance-panel" data-bind="component: {
-        name: 'resource-summary',
+        name: 'foo',
         params: {
-            resourceId: reportResourceId,
-            graphId: reportGraphId,
-            source: null
+            summary: true,
         }
     }"></div>
 </div>
