@@ -40,7 +40,7 @@ from arches.app.models.resource import Resource
 from arches.app.models.system_settings import settings
 from arches.app.models.tile import Tile as TileProxyModel, TileValidationError
 from arches.app.views.tile import TileData as TileView
-from arches.app.views.resource import RelatedResourcesView
+from arches.app.views.resource import RelatedResourcesView, get_resource_relationship_types
 from arches.app.utils.skos import SKOSWriter
 from arches.app.utils.response import JSONResponse
 from arches.app.utils.decorators import can_read_concept, group_required
@@ -1226,48 +1226,92 @@ class ResourceReport(APIBase):
         except AttributeError:
             raise Http404(_("No active report template is available for this resource."))
 
-        response = {}
+        response = {
+            'report_templates': templates,
+            'templates_json': JSONSerializer().serialize(templates, sort_keys=False, exclude=["name", "description"]),
+            'card_components': card_components,
+            'card_components_json': JSONSerializer().serialize(card_components),
+            'cardwidgets': JSONSerializer().serialize(cardwidgets),
+            'tiles': JSONSerializer().serialize(permitted_tiles, sort_keys=False),
+            'cards': JSONSerializer().serialize(
+                permitted_cards,
+                sort_keys=False,
+                exclude=["is_editable", "description", "instructions", "helpenabled", "helptext", "helptitle", "ontologyproperty"],
+            ),
+            'datatypes_json': JSONSerializer().serialize(
+                datatypes, exclude=["modulename", "issearchable", "configcomponent", "configname", "iconclass"]
+            ),
+            'geocoding_providers': geocoding_providers,
+            'related_resources': JSONSerializer().serialize(related_resources_summary, sort_keys=False),
+            'widgets': widgets,
+            'map_layers': map_layers,
+            'map_markers': map_markers,
+            'map_sources': map_sources,
+            'graph_id': graph.graphid,
+            'graph_name': graph.name,
+            'graph_json': JSONSerializer().serialize(
+                graph,
+                sort_keys=False,
+                exclude=[
+                    "functions",
+                    "relatable_resource_model_ids",
+                    "domain_connections",
+                    "edges",
+                    "is_editable",
+                    "description",
+                    "iconclass",
+                    "subtitle",
+                    "author",
+                ],
+            ),
+        }
 
         response["hide_empty_nodes"] = settings.HIDE_EMPTY_NODES_IN_REPORT
-
         response["displayname"] = resource.displayname
-
         response["template"] = template
-
-        response["cards"] = JSONSerializer().serialize(
-            permitted_cards,
-            sort_keys=False,
-            exclude=["is_editable", "description", "instructions", "helpenabled", "helptext", "helptitle", "ontologyproperty"],
-        )
-
-        response["cardwidgets"] = JSONSerializer().serialize(cardwidgets)
-
-        response["datatypes_json"] = JSONSerializer().serialize(
-            datatypes, exclude=["modulename", "issearchable", "configcomponent", "configname", "iconclass"]
-        )
-
-        response["graph_id"] = graph.graphid
-        response["graph_name"] = graph.name
-        response["graph_json"] = JSONSerializer().serialize(
-            graph,
-            sort_keys=False,
-            exclude=[
-                "functions",
-                "relatable_resource_model_ids",
-                "domain_connections",
-                "edges",
-                "is_editable",
-                "description",
-                "iconclass",
-                "subtitle",
-                "author",
-            ],
-        )
-
-        response["tiles"] = JSONSerializer().serialize(permitted_tiles, sort_keys=False)
+        response["resource_instance"] = resource.to_json(),
 
         return response
 
+    def _generate_related_resources_summary(self, related_resources, resource_relationships, resource_models):
+        related_resource_summary = [
+            {"graphid": str(resource_model.graphid), "name": resource_model.name, "resources": []} for resource_model in resource_models
+        ]
+
+        resource_relationship_types = {
+            resource_relationship_type["id"]: resource_relationship_type["text"]
+            for resource_relationship_type in get_resource_relationship_types()["values"]
+        }
+
+        for related_resource in related_resources:
+            for summary in related_resource_summary:
+                if related_resource["graph_id"] == summary["graphid"]:
+                    relationship_summary = []
+                    for resource_relationship in resource_relationships:
+                        if related_resource["resourceinstanceid"] == resource_relationship["resourceinstanceidto"]:
+                            rr_type = (
+                                resource_relationship_types[resource_relationship["relationshiptype"]]
+                                if resource_relationship["relationshiptype"] in resource_relationship_types
+                                else resource_relationship["relationshiptype"]
+                            )
+                            relationship_summary.append(rr_type)
+                        elif related_resource["resourceinstanceid"] == resource_relationship["resourceinstanceidfrom"]:
+                            rr_type = (
+                                resource_relationship_types[resource_relationship["inverserelationshiptype"]]
+                                if resource_relationship["inverserelationshiptype"] in resource_relationship_types
+                                else resource_relationship["inverserelationshiptype"]
+                            )
+                            relationship_summary.append(rr_type)
+
+                    summary["resources"].append(
+                        {
+                            "instance_id": related_resource["resourceinstanceid"],
+                            "displayname": related_resource["displayname"],
+                            "relationships": relationship_summary,
+                        }
+                    )
+
+        return related_resource_summary
 
 @method_decorator(csrf_exempt, name="dispatch")
 class Tile(APIBase):

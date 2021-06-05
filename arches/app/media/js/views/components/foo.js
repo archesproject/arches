@@ -30,7 +30,7 @@ define([
                 var url = arches.urls.api_resource_report(self.resourceid);
 
                 self.fetchResourceData(url).then(function(responseJson) {
-                    var template = responseJson.template
+                    var template = responseJson.template;
                     self.template(template);
                     
                     if (template.preload_resource_data) {

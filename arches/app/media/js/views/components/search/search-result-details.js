@@ -4,11 +4,10 @@ define([
     'knockout',
     'arches',
     'models/graph',
-    'report-templates',
     'views/components/search/base-filter',
     'views/components/foo',
     'bindings/chosen'
-], function($, _, ko, arches, GraphModel, reportLookup, BaseFilter) {
+], function($, _, ko, arches, GraphModel, BaseFilter) {
     var componentName = 'search-result-details';
     return ko.components.register(componentName, {
         viewModel: BaseFilter.extend({
@@ -21,7 +20,6 @@ define([
                 BaseFilter.prototype.initialize.call(this, options);
 
                 this.options = options;
-                this.reportLookup = reportLookup;
 
                 this.resourceInstanceId = ko.observable();
 
