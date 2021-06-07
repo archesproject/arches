@@ -695,4 +695,5 @@ except ImportError as e:
         from arches.settings_local import *
     except ImportError as e:
         pass
-    
+
+# silky hack
