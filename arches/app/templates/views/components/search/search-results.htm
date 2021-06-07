@@ -23,7 +23,7 @@
             <a class="search-candidate-link" href="" data-bind="click: showDetails"><i class="fa fa-info-circle"></i> {% trans "Details" %} </a>
             <!-- /ko -->
 
-            {% if user|can_edit_resource_instance %}
+            {% if user_can_edit %}
             <!--ko if: canEdit -->
             <a class="search-candidate-link" href="" data-bind="click: $parent.editResource.bind($parent)"><i class="ion-ios-refresh-empty"></i> {% trans "Edit" %} </a>
             <!--/ko-->
