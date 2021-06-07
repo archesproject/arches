@@ -22,6 +22,7 @@ from arches.app.models.models import (
     ResourceInstance,
     FunctionXGraph,
     GraphXMapping,
+    TileModel,
 )
 from arches.app.models.card import Card
 from arches.app.utils.data_management.resource_graphs import exporter as GraphExporter
@@ -256,6 +257,13 @@ class CsvWriter(Writer):
 class TileCsvWriter(Writer):
     def __init__(self, **kwargs):
         super(TileCsvWriter, self).__init__(**kwargs)
+        self.node_datatypes = {}
+        self.datatype_factory = DataTypeFactory()
+
+        nodes = Node.objects.all().values('nodeid', 'name')
+        self.node_name_lookup = {}
+        for node in nodes:
+            self.node_name_lookup[node['nodeid']] = node['name']
 
     def group_tiles(self, tiles, key):
         new_tiles = {}
@@ -271,19 +279,17 @@ class TileCsvWriter(Writer):
 
     def lookup_node_name(self, nodeid):
         try:
-            node_name = Node.objects.get(nodeid=nodeid).name
-        except Node.DoesNotExist:
+            node_name = self.node_name_lookup[nodeid]
+        except KeyError:
             node_name = nodeid
 
         return node_name
-
-    node_datatypes = {}
 
     def lookup_node_value(self, value, nodeid):
         if nodeid in self.node_datatypes:
             datatype = self.node_datatypes[nodeid]
         else:
-            datatype = DataTypeFactory().get_instance(Node.objects.get(nodeid=nodeid).datatype)
+            datatype = self.datatype_factory.get_instance(Node.objects.get(nodeid=nodeid).datatype)
             self.node_datatypes[nodeid] = datatype
 
         if value is not None:
@@ -306,9 +312,14 @@ class TileCsvWriter(Writer):
 
         csvs_for_export = []
 
-        tiles = self.group_tiles(
-            list(Tile.objects.filter(resourceinstance__graph_id=graph_id).order_by("nodegroup_id").values()), "nodegroup_id"
-        )
+        if graph_id:
+            tiles = self.group_tiles(
+                list(TileModel.objects.filter(resourceinstance__graph_id=graph_id).order_by("nodegroup_id").values()), "nodegroup_id"
+            )
+        else:
+            tiles = self.group_tiles(
+                list(TileModel.objects.filter(resourceinstance_id__in=resourceinstanceids).order_by("nodegroup_id").values()), "nodegroup_id"
+            )
         semantic_nodes = [str(n[0]) for n in Node.objects.filter(datatype="semantic").values_list("nodeid")]
 
         for nodegroupid, nodegroup_tiles in tiles.items():
