@@ -19,6 +19,7 @@
                         value: value,
                         multiple: multiple,
                         placeholder: placeholder,
+                        'aria-label': placeholder,
                         allowClear: true
                     }
                 }">
@@ -34,6 +35,7 @@
     </div>
     <div class="col-xs-12 pad-no crud-widget-container">
         <input placeholder="{% trans "Placeholder" %}"
+            aria-label="{% trans "Placeholder" %}"
             class="form-control input-md widget-input"
             data-bind="value: placeholder, valueUpdate: 'keyup'">
     </div>
@@ -52,6 +54,7 @@
                             value: defaultValue,
                             multiple: multiple,
                             placeholder: '{% trans "Select default value" %}',
+                            aria-label: '{% trans "Select default value" %}',
                             allowClear: true
                         }
                     }">
