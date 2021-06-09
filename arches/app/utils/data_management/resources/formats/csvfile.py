@@ -260,10 +260,10 @@ class TileCsvWriter(Writer):
         self.node_datatypes = {}
         self.datatype_factory = DataTypeFactory()
 
-        nodes = Node.objects.all().values('nodeid', 'name')
+        nodes = Node.objects.all().values("nodeid", "name")
         self.node_name_lookup = {}
         for node in nodes:
-            self.node_name_lookup[node['nodeid']] = node['name']
+            self.node_name_lookup[node["nodeid"]] = node["name"]
 
     def group_tiles(self, tiles, key):
         new_tiles = {}
@@ -318,7 +318,8 @@ class TileCsvWriter(Writer):
             )
         else:
             tiles = self.group_tiles(
-                list(TileModel.objects.filter(resourceinstance_id__in=resourceinstanceids).order_by("nodegroup_id").values()), "nodegroup_id"
+                list(TileModel.objects.filter(resourceinstance_id__in=resourceinstanceids).order_by("nodegroup_id").values()),
+                "nodegroup_id",
             )
         semantic_nodes = [str(n[0]) for n in Node.objects.filter(datatype="semantic").values_list("nodeid")]
 
