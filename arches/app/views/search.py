@@ -47,8 +47,6 @@ import arches.app.utils.task_management as task_management
 import arches.app.tasks as tasks
 from io import StringIO
 
-from arches.app.views.api import ResourceReport
-
 logger = logging.getLogger(__name__)
 
 class SearchView(MapBaseManagerView):
@@ -309,17 +307,6 @@ def search_results(request):
                 search_filter.post_search_hook(search_results_object, results, permitted_nodegroups)
 
         ret["results"] = results
-
-        reportAPI = ResourceReport()
-        foo = {}
-
-        import json
-
-        for hit in results['hits']['hits']:
-            bar = reportAPI.get(request, hit['_id'])
-            foo[hit['_id']] = json.loads(bar.content)
-
-        ret['foo'] = foo
 
         for key, value in list(search_results_object.items()):
             ret[key] = value

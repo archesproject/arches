@@ -84,9 +84,9 @@ define([
                 });
 
             }
-            else {
-                self.loading(false);
-            }
+            // else {
+            //     self.loading(false);
+            // }
         };
 
         this.fetchResourceData = function(url) {

@@ -1191,7 +1191,7 @@ class ResourceReport(APIBase):
 
         permitted_cards = []
 
-        for card in CardProxyModel.objects.filter(graph_id=resource.graph_id).prefetch_related('nodegroup').order_by("sortorder"):
+        for card in CardProxyModel.objects.filter(graph_id=resource.graph_id).prefetch_related('nodegroup', 'graph', 'graph__ontology').order_by("sortorder"):
             if request.user.has_perm(perm, card.nodegroup):
                 card.filter_by_perm(request.user, perm)
                 permitted_cards.append(card)
@@ -1199,20 +1199,6 @@ class ResourceReport(APIBase):
         cardwidgets = [
             widget for widgets in [card.cardxnodexwidget_set.order_by("sortorder").all() for card in permitted_cards] for widget in widgets
         ]
-
-        if strtobool(request.GET.get("json", "false")) and not strtobool(request.GET.get("exclude_graph", "false")):
-            return JSONResponse(
-                {
-                    "datatypes": datatypes,
-                    "cards": permitted_cards,
-                    "tiles": permitted_tiles,
-                    "graph": graph,
-                    "related_resources": related_resources_summary,
-                    "displayname": resource.displayname,
-                    "resourceid": resourceid,
-                    "cardwidgets": cardwidgets,
-                }
-            )
 
         templates = models.ReportTemplate.objects.all()
         widgets = models.Widget.objects.all()

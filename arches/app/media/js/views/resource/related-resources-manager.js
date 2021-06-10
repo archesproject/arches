@@ -155,6 +155,7 @@ define([
                 };
 
                 var getNodeData = function(nodeid, relationship) {
+                    console.log("get node data")
                     $.ajax({
                         url: arches.urls.api_nodes(nodeid),
                         context: this,
@@ -231,6 +232,7 @@ define([
                             self.totalRelationships(rr.total.value);
                         },
                         get: function(newPage) {
+                            console.log("createResource")
                             var page = newPage || 1;
                             $.ajax({
                                 url: arches.urls.related_resources + resourceinstanceid,
@@ -261,6 +263,7 @@ define([
                                 root_resourceinstanceid: resourceinstanceid,
                                 relationship_ids: relationshipIds
                             };
+                            console.log('save resource')
                             $.ajax({
                                 url: arches.urls.related_resources,
                                 data: payload,
@@ -280,6 +283,7 @@ define([
                                 resourcexids: relationshipIds,
                                 root_resourceinstanceid: resourceinstanceid
                             };
+                            console.log("del resource")
                             $.ajax({
                                 url: arches.urls.related_resources + '?' + $.param(payload),
                                 type: 'DELETE',
@@ -381,6 +385,7 @@ define([
                         dataType: 'json',
                         quietMillis: 250,
                         data: function(term, page) {
+                            console.log("select2config")
                             //TODO This regex isn't working, but it would nice fix it so that we can do more robust url checking
                             // var expression = /[-a-zA-Z0-9@:%_\+.~#?&//=]{2,256}\.[a-z]{2,4}\b(\/[-a-zA-Z0-9@:%_\+.~#?&//=]*)?/gi;
                             // var regex = new RegExp(expression);
@@ -425,6 +430,7 @@ define([
                         }
                     },
                     onSelect: function(item) {
+                        console.log("onselect")
                         $.ajax(arches.urls.related_resource_candidates, {
                             dataType: 'json',
                             data: { resourceids: item._id }
@@ -510,7 +516,9 @@ define([
 
             updateTile: function(options, relationship) {
                 var self = this;
-                self.loading(true);
+
+                console.log('update tile')
+                // self.loading(true);
                 window.fetch(arches.urls.api_tiles(relationship.tileid()), {
                     method: 'GET',
                     credentials: 'include',
@@ -539,6 +547,8 @@ define([
                             tiledata[relationship.nodeid()] = newResourceRelations;
                         }
 
+                        console.log('fetch tiles')
+
                         window.fetch(arches.urls.api_tiles(relationship.tileid()), {
                             method: 'POST',
                             credentials: 'include',
@@ -551,10 +561,12 @@ define([
                                 if (response.ok) {
                                     relationship._json(JSON.stringify(koMapping.toJS(relationship)));
                                     if (!!options.delete) {
-                                        window.setTimeout(function() {
+
+                                        // window.setTimeout(function() {
+                                            console.log("BUH")
                                             self.newPage(1);
                                             self.loading(false);
-                                        }, 1000);
+                                        // }, 1000);
                                     }
                                 }
                             })
