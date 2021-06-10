@@ -259,7 +259,7 @@ class Card(models.CardModel):
         ret["widgets"] = self.widgets
         if "widgets" not in exclude:
 
-            widgets = models.DDataType.objects.all().prefetch_related('defaultwidget')
+            widgets = models.DDataType.objects.all().prefetch_related("defaultwidget")
 
             for node in ret["nodes"]:
                 found = False

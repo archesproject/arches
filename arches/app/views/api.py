@@ -1172,7 +1172,7 @@ class ResourceReport(APIBase):
         permitted_tiles = []
         perm = "read_nodegroup"
 
-        for tile in TileProxyModel.objects.filter(resourceinstance=resource).prefetch_related('nodegroup').order_by("sortorder"):
+        for tile in TileProxyModel.objects.filter(resourceinstance=resource).prefetch_related("nodegroup").order_by("sortorder"):
             if request.user.has_perm(perm, tile.nodegroup):
                 tile.filter_by_perm(request.user, perm)
                 permitted_tiles.append(tile)
@@ -1191,7 +1191,11 @@ class ResourceReport(APIBase):
 
         permitted_cards = []
 
-        for card in CardProxyModel.objects.filter(graph_id=resource.graph_id).prefetch_related('nodegroup', 'graph', 'graph__ontology').order_by("sortorder"):
+        for card in (
+            CardProxyModel.objects.filter(graph_id=resource.graph_id)
+            .prefetch_related("nodegroup", "graph", "graph__ontology")
+            .order_by("sortorder")
+        ):
             if request.user.has_perm(perm, card.nodegroup):
                 card.filter_by_perm(request.user, perm)
                 permitted_cards.append(card)
@@ -1255,7 +1259,7 @@ class ResourceReport(APIBase):
         response["hide_empty_nodes"] = settings.HIDE_EMPTY_NODES_IN_REPORT
         response["displayname"] = resource.displayname
         response["template"] = template
-        response["resource_instance"] = (resource.to_json())
+        response["resource_instance"] = resource.to_json()
 
         return response
 
