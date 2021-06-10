@@ -129,6 +129,8 @@ define([
             this.viewModel.loading(true);
             this.firstLoadComplete = ko.observable(false);  /* logic to not call `loading(complete)` too early in page load */
 
+            this.viewModel.sharedStateObject.fooCache = {};
+
             BaseManagerView.prototype.initialize.call(this, options);
         },
 
@@ -139,12 +141,43 @@ define([
             }
 
             this.viewModel.loading(true);
+
+            console.log("ajax made")
             this.updateRequest = $.ajax({
                 type: "GET",
                 url: arches.urls.search_results,
                 data: queryString,
                 context: this,
                 success: function(response) {
+
+
+                    console.log("GGGGGGG", response)
+
+                    // if (response.results.hits) {
+                    //     response.results.hits.hits.forEach(function(hit) {
+
+
+                    //         var url = arches.urls.api_resource_report(hit['_id']);
+                    //         window.fetch(url).then(function(response){
+                    //             if (response.ok) {
+                    //                 return response.json();
+                    //             }
+                    //             else {
+                    //                 throw new Error(arches.translations.reNetworkReponseError);
+                    //             }
+                    //         }).then(function(responseJson) {
+
+                    //             console.log("AAADDDD", self, this)
+                    //             this.viewModel.sharedStateObject.fooCache[hit['_id']] = responseJson
+                    //         })
+
+
+                    //     })
+                    // }
+
+
+
+
                     _.each(this.viewModel.sharedStateObject.searchResults, function(value, key, results) {
                         if (key !== 'timestamp') {
                             delete this.viewModel.sharedStateObject.searchResults[key];

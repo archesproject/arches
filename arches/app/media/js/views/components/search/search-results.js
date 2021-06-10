@@ -30,7 +30,8 @@ function($, _, BaseFilter, bootstrap, arches, select2, ko, koMapping, viewdata) 
                 this.relationshipCandidates = ko.observableArray();
                 this.selectedResourceId = ko.observable(null);
 
-                this.fooCache = {};
+
+                console.log("IN SEECH RESULTS", self, options)
 
                 this.showRelationships.subscribe(function(res) {
                     this.selectedResourceId(res.resourceinstanceid);
@@ -87,6 +88,8 @@ function($, _, BaseFilter, bootstrap, arches, select2, ko, koMapping, viewdata) 
                 var self = this;
                 return function(){
 
+                    console.log("in showResourceSummaryReport", self.fooCache)
+
                     var responseJson = self.fooCache[resourceInstanceId];
 
                     self.details.setupReport(graphId, resourceInstanceId, result._source, responseJson);
@@ -105,20 +108,6 @@ function($, _, BaseFilter, bootstrap, arches, select2, ko, koMapping, viewdata) 
                     this.results.removeAll();
                     this.selectedResourceId(null);
                     this.searchResults.results.hits.hits.forEach(function(result){
-
-                        var url = arches.urls.api_resource_report(result['_id']);
-                        window.fetch(url).then(function(response){
-                            if (response.ok) {
-                                return response.json();
-                            }
-                            else {
-                                throw new Error(arches.translations.reNetworkReponseError);
-                            }
-                        }).then(function(responseJson) {
-                            self.fooCache[result['_id']] = responseJson
-                        })
-
-
                         var graphdata = _.find(viewdata.graphs, function(graphdata){
                             return result._source.graph_id === graphdata.graphid;
                         });
