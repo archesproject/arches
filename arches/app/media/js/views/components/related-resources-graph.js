@@ -29,7 +29,7 @@ define([
                 var elements = self.elements();
                 var viz = self.viz();
                 var filteredNodes = [];
-                elements.forEach(function(element) {
+                if (viz) elements.forEach(function(element) {
                     if (element.isNode()) {
                         var data = element.data();
                         if (!data.shownRelationsCount) data.shownRelationsCount = ko.observable();
