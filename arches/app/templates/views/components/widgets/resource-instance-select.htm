@@ -193,12 +193,6 @@
     <!-- ko if: self.displayOntologyTable -->
     <div class="row widget-wrapper" data-bind="visible: !newResourceInstance()">
         <div class="form-group">
-            <label class="control-label widget-input-label" data-bind="text:label">
-            </label>
-            <!-- ko if: node -->
-            <i data-bind="css: {'ion-asterisk widget-label-required': node.isrequired}"></i>
-            <!-- /ko -->
-    
             <div class="row" style="margin: 0px;">
                 <div class="col-xs-12 resource-instance-wrapper">
                     <input style="width:30%; display:inline-block;" data-bind="
@@ -208,7 +202,6 @@
                             }
                         ">
                 </div>
-    
             </div>
         </div>
     
