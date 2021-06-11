@@ -138,7 +138,7 @@ define([
                 this.updateRequest.abort();
             }
 
-            this.viewModel.loading(true);
+            // this.viewModel.loading(true);
 
             console.log("ajax made")
             this.updateRequest = $.ajax({
@@ -172,6 +172,9 @@ define([
 
                     //     })
                     // }
+
+                    // this.viewModel.loading(false);
+
 
 
 
