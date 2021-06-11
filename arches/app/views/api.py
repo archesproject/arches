@@ -1177,15 +1177,15 @@ class ResourceReport(APIBase):
                 tile.filter_by_perm(request.user, perm)
                 permitted_tiles.append(tile)
 
-        if strtobool(request.GET.get("json", "false")) and strtobool(request.GET.get("exclude_graph", "false")):
-            return JSONResponse(
-                {
-                    "tiles": permitted_tiles,
-                    "related_resources": related_resources_summary,
-                    "displayname": resource.displayname,
-                    "resourceid": resourceid,
-                }
-            )
+        # if strtobool(request.GET.get("json", "false")) and strtobool(request.GET.get("exclude_graph", "false")):
+        #     return JSONResponse(
+        #         {
+        #             "tiles": permitted_tiles,
+        #             "related_resources": related_resources_summary,
+        #             "displayname": resource.displayname,
+        #             "resourceid": resourceid,
+        #         }
+        #     )
 
         datatypes = models.DDataType.objects.all()
 
