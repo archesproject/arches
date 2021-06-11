@@ -62,7 +62,7 @@ class AdvancedSearch(BaseSearchFilter):
             .exclude(isactive=False)
         )
         searchable_datatypes = [d.pk for d in models.DDataType.objects.filter(issearchable=True)]
-        searchable_nodes = models.Node.objects.select_related('graph').filter(
+        searchable_nodes = models.Node.objects.select_related("graph").filter(
             graph__isresource=True, graph__isactive=True, datatype__in=searchable_datatypes, issearchable=True
         )
         resource_cards = models.CardModel.objects.filter(graph__isresource=True, graph__isactive=True).select_related("nodegroup")

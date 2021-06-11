@@ -745,7 +745,7 @@ class RelatedResourcesView(BaseManagerView):
 
         if self.action == "get_candidates":
             resourceid = request.GET.get("resourceids", "")
-            resources = Resource.objects.filter(resourceinstanceid=resourceid).prefetch_related('graph__functions')
+            resources = Resource.objects.filter(resourceinstanceid=resourceid).prefetch_related("graph__functions")
             ret = []
 
             for resource in resources:
