@@ -115,7 +115,7 @@ class Graph(models.GraphModel):
                     for key, value in models.GraphModel.objects.get(pk=args[0]).__dict__.items():
                         setattr(self, key, value)
 
-                nodes = self.node_set.all().prefetch_related('nodegroup')
+                nodes = self.node_set.all().prefetch_related("nodegroup")
                 edges = self.edge_set.all()
                 cards = self.cardmodel_set.all()
                 edge_dicts = json.loads(JSONSerializer().serialize(edges))
