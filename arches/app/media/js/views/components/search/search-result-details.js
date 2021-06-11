@@ -44,7 +44,7 @@ define([
 
                 var graphCache = {};
 
-                var fooCache = {};
+                // var fooCache = {};
 
                 this.foo = function() {
                     console.log(self.searchResults.results)
@@ -56,14 +56,23 @@ define([
                     
                 // });
 
-                this.responseJson = ko.observable();
+                // this.responseJson = ko.observable();
+
+
+                console.log("search result details load", self, options, arches)
+
+                this.genericResourceReportData = ko.observable()
+
+                $.getJSON(arches.urls.api_generic_resource_report_data, function(resp) {
+                    self.genericResourceReportData(resp)
+                })
 
 
 
                 
-                this.setupReport = function(graphId, resourceInstanceId, source, responseJson) {
-                    self.foo();
-                    self.responseJson(responseJson);
+                this.setupReport = function(graphId, resourceInstanceId, source) {
+                    // self.foo();
+                    // self.responseJson(responseJson);
                     // self.loading(true);
                     self.resourceInstanceId(resourceInstanceId);
 

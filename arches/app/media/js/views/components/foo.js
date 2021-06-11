@@ -23,58 +23,75 @@ define([
         this.template = ko.observable();
         this.report = ko.observable();
 
-        console.log('in foo component', self, params)
+        // Object.keys(params.genericResourceReportData).forEach(function(key) {
+        //     this[key] = params.genericResourceReportData[key] 
+        // })
+
+        if (params.genericResourceReportData) {
+
+            console.log('in foo component', self, params)
+        }
+
 
         this.initialize = function() {
-            if (ko.unwrap(params.responseJson)) {
+            // if (ko.unwrap(params.responseJson)) {
 
 
-                console.log("in params responseJson if", params.responseJson());
+            //     console.log("in params responseJson if", params.responseJson());
 
-                self.template(params.responseJson().template);
+            //     self.template(params.responseJson().template);
 
-                if (
-                    params.responseJson().template.preload_resource_data
-                    && !params.responseJson()['hasPreloadedResourceData']
-                ) {
-                    self.preloadResourceData(params.responseJson())
-                }
-                else {
-                    var graphModel = new GraphModel({
-                        data: JSON.parse(params.responseJson().graph_json),
-                        datatypes: JSON.parse(params.responseJson().datatypes_json),
-                    });
+            //     if (
+            //         params.responseJson().template.preload_resource_data
+            //         && !params.responseJson()['hasPreloadedResourceData']
+            //     ) {
+            //         self.preloadResourceData(params.responseJson())
+            //     }
+            //     else {
+            //         var graphModel = new GraphModel({
+            //             data: JSON.parse(params.responseJson().graph_json),
+            //             datatypes: JSON.parse(params.responseJson().datatypes_json),
+            //         });
         
-                    graph = {
-                        graphModel: graphModel,
-                        cards: params.responseJson().cards,
-                        graph: JSON.parse(params.responseJson().graph_json),
-                        datatypes: JSON.parse(params.responseJson().datatypes_json),
-                        cardwidgets: JSON.parse(params.responseJson().cardwidgets)
-                    };
+            //         graph = {
+            //             graphModel: graphModel,
+            //             cards: params.responseJson().cards,
+            //             graph: JSON.parse(params.responseJson().graph_json),
+            //             datatypes: JSON.parse(params.responseJson().datatypes_json),
+            //             cardwidgets: JSON.parse(params.responseJson().cardwidgets)
+            //         };
 
-                    var fooReport = new ReportModel(_.extend(params.responseJson(), {
-                        resourceid: self.resourceid,
-                        graphModel: graph.graphModel,
-                        graph: graph.graph,
-                        datatypes: graph.datatypes
-                    }));
+            //         var fooReport = new ReportModel(_.extend(params.responseJson(), {
+            //             resourceid: self.resourceid,
+            //             graphModel: graph.graphModel,
+            //             graph: graph.graph,
+            //             datatypes: graph.datatypes
+            //         }));
                     
-                    self.report(fooReport);
-                }
+            //         self.report(fooReport);
+            //     }
                 
-                self.loading(false)
+            //     self.loading(false)
 
-            }
-            else if (ko.unwrap(self.resourceid)) {
+            // }
+            if (ko.unwrap(self.resourceid)) {
                 var url = arches.urls.api_resource_report(self.resourceid);
 
                 self.fetchResourceData(url).then(function(responseJson) {
+
+
+
+
+
+                    console.log("AAAAAAA", responseJson, params.genericResourceReportData)
+
+
+
                     var template = responseJson.template;
                     self.template(template);
                     
                     if (template.preload_resource_data) {
-                        self.preloadResourceData(responseJson)
+                        self.preloadResourceData(responseJson, params.genericResourceReportData)
                     }
                     else {
                         self.report(responseJson.resource_instance);
@@ -100,17 +117,17 @@ define([
             });
         };
         
-        this.preloadResourceData = function(responseJson) {
+        this.preloadResourceData = function(responseJson, genericResourceReportData) {
             var graphModel = new GraphModel({
                 data: JSON.parse(responseJson.graph_json),
-                datatypes: JSON.parse(responseJson.datatypes_json),
+                datatypes: JSON.parse(genericResourceReportData.datatypes_json),
             });
 
             graph = {
                 graphModel: graphModel,
                 cards: JSON.parse(responseJson.cards),
                 graph: JSON.parse(responseJson.graph_json),
-                datatypes: JSON.parse(responseJson.datatypes_json),
+                datatypes: JSON.parse(genericResourceReportData.datatypes_json),
                 cardwidgets: JSON.parse(responseJson.cardwidgets)
             };
 
@@ -133,7 +150,10 @@ define([
                 });
             });
 
-            var report = new ReportModel(_.extend(responseJson, {
+            var fooData = { ...responseJson, ...genericResourceReportData}
+
+
+            var report = new ReportModel(_.extend(fooData, {
                 resourceid: self.resourceid,
                 graphModel: graph.graphModel,
                 graph: graph.graph,
@@ -142,7 +162,7 @@ define([
 
             report['hideEmptyNodes'] = responseJson.hide_empty_nodes;
 
-            responseJson['hasPreloadedResourceData'] = true;
+            console.log('sdfsdf', report)
 
             self.report(report);
         };

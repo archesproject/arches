@@ -495,7 +495,7 @@ class Graphs(APIBase):
 
         resp = {"graph": JSONSerializer().serializeToPython(graph, sort_keys=False, exclude=["is_editable", "functions"])}
 
-        if request.GET.get("context") is "search-result-details" and not graph.template.preload_resource_data:
+        if request.GET.get("context") == "search-result-details" and not graph.template.preload_resource_data:
             return JSONResponse(resp)
         else:
             cards = CardProxyModel.objects.filter(graph_id=graph_id).order_by("sortorder")
@@ -1113,24 +1113,58 @@ class OntologyProperty(APIBase):
         return JSONResponse(ret)
 
 
+
 class ResourceReport(APIBase):
-    def get(self, request, resourceid):
-        try:
-            # needs validation?
-            resource = Resource.objects.get(pk=resourceid)
-        except Exception as e:
-            return JSONResponse(str(e), status=404)
+    def get(self, request, resourceid, generic_resource_report_data=None):
+        # try:
+        #     # needs validation?
+        #     resource = Resource.objects.get(pk=resourceid)
 
-        graph = Graph.objects.get(graphid=resource.graph_id)
-        template = models.ReportTemplate.objects.get(pk=graph.template_id)
+        # except Exception as e:
+        #     return JSONResponse(str(e), status=404)
 
-        if template.preload_resource_data:
+        # graph = cache.get(resource.graph_id)
+        # if not graph:
+        #     graph = Graph.objects.get(graphid=resource.graph_id)
+        #     cache.set(resource.graph_id, graph)
+
+
+        # template = cache.get(graph.template_id)
+        # if not template:
+        #     template = models.ReportTemplate.objects.get(pk=graph.template_id)
+        #     cache.set(graph.template_id, template)
+
+        # if template.preload_resource_data:
+        baz = ResourceSpecificResourceReportData()
+        qux = baz.get(request, resourceid=resourceid)
+        return qux
+
+            # response = self._load_resource_specific_resource_data(
+            #     resourceid=resourceid,
+            #     resource=resource,
+            #     graph=graph,
+            #     template=template,
+            # )
+        # else:
+        #     response = {
+        #         "template": template,
+        #     }
+
+        # return JSONResponse(response)
+        # if not generic_resource_report_data:
+        #     foo = GenericResourceReportData()
+        #     bar = foo.get(request)
+
+        #     generic_resource_report_data = json.loads(bar.content)
+
+        # template = generic_resource_report_data['graph_template']
+        # resource = generic_resource_report_data['resource']
+
+        if template['preload_resource_data']:
             response = self._load_resource_data(
                 request=request,
                 resourceid=resourceid,
-                resource=resource,
-                graph=graph,
-                template=template,
+                generic_resource_report_data=generic_resource_report_data,
             )
         else:
             response = {
@@ -1140,65 +1174,11 @@ class ResourceReport(APIBase):
 
         return JSONResponse(response)
 
-    def _load_resource_data(self, request, resourceid, resource, graph, template):
-        resource_models = (
-            models.GraphModel.objects.filter(isresource=True).exclude(isactive=False).exclude(pk=settings.SYSTEM_SETTINGS_RESOURCE_MODEL_ID)
-        )
 
-        if strtobool(request.GET.get("json", "false")):
-            get_params = request.GET.copy()
-            get_params.update({"paginate": "false"})
-            request.GET = get_params
 
-            related_resources_response = RelatedResourcesView().get(request, resourceid)
-            related_resources = json.loads(related_resources_response.content)
-
-            related_resources_summary = self._generate_related_resources_summary(
-                related_resources=related_resources["related_resources"],
-                resource_relationships=related_resources["resource_relationships"],
-                resource_models=resource_models,
-            )
-        else:
-            related_resources_summary = {}
-
-            for resource_model in resource_models:
-                get_params = request.GET.copy()
-                get_params.update({"resourceinstance_graphid": str(resource_model.graphid)})
-                request.GET = get_params
-
-                related_resources_response = RelatedResourcesView().get(request, resourceid).content
-                related_resources_summary[str(resource_model.pk)] = json.loads(related_resources_response)
-
-        permitted_tiles = []
-        perm = "read_nodegroup"
-
-        for tile in TileProxyModel.objects.filter(resourceinstance=resource).prefetch_related('nodegroup').order_by("sortorder"):
-            if request.user.has_perm(perm, tile.nodegroup):
-                tile.filter_by_perm(request.user, perm)
-                permitted_tiles.append(tile)
-
-        # if strtobool(request.GET.get("json", "false")) and strtobool(request.GET.get("exclude_graph", "false")):
-        #     return JSONResponse(
-        #         {
-        #             "tiles": permitted_tiles,
-        #             "related_resources": related_resources_summary,
-        #             "displayname": resource.displayname,
-        #             "resourceid": resourceid,
-        #         }
-        #     )
-
+class GenericResourceReportData(APIBase):
+    def get(self, request):
         datatypes = models.DDataType.objects.all()
-
-        permitted_cards = []
-
-        for card in CardProxyModel.objects.filter(graph_id=resource.graph_id).prefetch_related('nodegroup', 'graph', 'graph__ontology').order_by("sortorder"):
-            if request.user.has_perm(perm, card.nodegroup):
-                card.filter_by_perm(request.user, perm)
-                permitted_cards.append(card)
-
-        cardwidgets = [
-            widget for widgets in [card.cardxnodexwidget_set.order_by("sortorder").all() for card in permitted_cards] for widget in widgets
-        ]
 
         templates = models.ReportTemplate.objects.all()
         widgets = models.Widget.objects.all()
@@ -1212,30 +1192,115 @@ class ResourceReport(APIBase):
         except AttributeError:
             raise Http404(_("No active report template is available for this resource."))
 
-        response = {
-            "report_templates": templates,
-            "templates_json": JSONSerializer().serialize(templates, sort_keys=False, exclude=["name", "description"]),
-            "card_components": card_components,
-            "card_components_json": JSONSerializer().serialize(card_components),
-            "cardwidgets": JSONSerializer().serialize(cardwidgets),
-            "tiles": JSONSerializer().serialize(permitted_tiles, sort_keys=False),
-            "cards": JSONSerializer().serialize(
-                permitted_cards,
-                sort_keys=False,
-                exclude=["is_editable", "description", "instructions", "helpenabled", "helptext", "helptitle", "ontologyproperty"],
-            ),
-            "datatypes_json": JSONSerializer().serialize(
-                datatypes, exclude=["modulename", "issearchable", "configcomponent", "configname", "iconclass"]
-            ),
-            "geocoding_providers": geocoding_providers,
-            "related_resources": JSONSerializer().serialize(related_resources_summary, sort_keys=False),
-            "widgets": widgets,
-            "map_layers": map_layers,
-            "map_markers": map_markers,
-            "map_sources": map_sources,
-            "graph_id": graph.graphid,
-            "graph_name": graph.name,
-            "graph_json": JSONSerializer().serialize(
+        templates_json = JSONSerializer().serialize(templates, sort_keys=False, exclude=["name", "description"])
+
+        card_components_json = JSONSerializer().serialize(card_components)
+
+        datatypes_json = JSONSerializer().serialize(
+            datatypes, exclude=["modulename", "issearchable", "configcomponent", "configname", "iconclass"]
+        )
+
+        return JSONResponse({
+            'datatypes': datatypes,
+            'templates': templates,
+            'widgets': widgets,
+            'card_components': card_components,
+            'map_layers': map_layers,
+            'map_markers': map_markers,
+            'map_sources': map_sources,
+            'geocoding_providers': geocoding_providers,
+            'templates_json': templates_json,
+            'card_components_json': card_components_json,
+            'datatypes_json': datatypes_json,
+            "hide_empty_nodes": settings.HIDE_EMPTY_NODES_IN_REPORT,
+        })
+
+
+
+class ResourceSpecificResourceReportData(APIBase):
+    def get(self, request, resourceid):
+        try:
+            # needs validation?
+            resource = cache.get(resourceid)
+            if not resource:
+                resource = Resource.objects.get(pk=resourceid)
+                cache.set(resourceid, resource)
+
+        except Exception as e:
+            return JSONResponse(str(e), status=404)
+
+        graph = cache.get(resource.graph_id)
+        if not graph:
+            graph = Graph.objects.get(graphid=resource.graph_id)
+            cache.set(resource.graph_id, graph)
+
+
+        template = cache.get(graph.template_id)
+        if not template:
+            template = models.ReportTemplate.objects.get(pk=graph.template_id)
+            cache.set(graph.template_id, template)
+
+        if template.preload_resource_data:
+            response = self._load_resource_specific_resource_data(
+                request=request,
+                resourceid=resourceid,
+                resource=resource,
+                graph=graph,
+                template=template,
+            )
+        else:
+            response = {
+                "resource_json": resource.to_json(),
+                "template": template,
+            }
+
+        return JSONResponse(response)
+
+    def _load_resource_specific_resource_data(self, request, resourceid, resource, graph, template):
+        resource_models = (
+            models.GraphModel.objects.filter(isresource=True).exclude(isactive=False).exclude(pk=settings.SYSTEM_SETTINGS_RESOURCE_MODEL_ID)
+        )
+
+        resource_tiles = TileProxyModel.objects.filter(resourceinstance=resource).order_by("sortorder")
+
+        graph_cards = CardProxyModel.objects.filter(graph_id=resource.graph_id).order_by("sortorder")
+
+
+        related_resources_summary = {}
+
+        for resource_model in resource_models:
+            get_params = request.GET.copy()
+            get_params.update({"resourceinstance_graphid": str(resource_model.graphid)})
+            request.GET = get_params
+
+            related_resources_response = RelatedResourcesView().get(request, resourceid).content
+            related_resources_summary[str(resource_model.graphid)] = json.loads(related_resources_response)
+
+        permitted_tiles = []
+        perm = "read_nodegroup"
+
+        for tile in resource_tiles:
+            if request.user.has_perm(perm, tile.nodegroup):
+                tile.filter_by_perm(request.user, perm)
+                permitted_tiles.append(tile)
+
+        
+        permitted_cards = []
+
+        for card in graph_cards:
+            if request.user.has_perm(perm, card.nodegroup):
+                card.filter_by_perm(request.user, perm)
+                permitted_cards.append(card)
+
+        cardwidgets = [
+            widget for widgets in [card.cardxnodexwidget_set.order_by("sortorder").all() for card in permitted_cards] for widget in widgets
+        ]
+
+        card_widgets_json = JSONSerializer().serialize(cardwidgets)
+
+        graph_json = cache.get('{}_json'.format(graph.pk))
+        if not graph_json:
+            graph_json = JSONSerializer().serialize(
                 graph,
                 sort_keys=False,
                 exclude=[
@@ -1249,55 +1314,61 @@ class ResourceReport(APIBase):
                     "subtitle",
                     "author",
                 ],
+            )
+            cache.set('{}_json'.format(graph.pk), graph_json)
+
+        return {
+            "graph_json": graph_json,
+            "template": template,
+            "cardwidgets": card_widgets_json,
+            "tiles": JSONSerializer().serialize(permitted_tiles, sort_keys=False),
+            "cards": JSONSerializer().serialize(
+                permitted_cards,
+                sort_keys=False,
+                exclude=["is_editable", "description", "instructions", "helpenabled", "helptext", "helptitle", "ontologyproperty"],
             ),
+            "related_resources": JSONSerializer().serialize(related_resources_summary, sort_keys=False),
         }
 
-        response["hide_empty_nodes"] = settings.HIDE_EMPTY_NODES_IN_REPORT
-        response["displayname"] = resource.displayname
-        response["template"] = template
-        response["resource_instance"] = (resource.to_json())
+    # def _generate_related_resources_summary(self, related_resources, resource_relationships, resource_models):
+    #     related_resource_summary = [
+    #         {"graphid": str(resource_model.graphid), "name": resource_model.name, "resources": []} for resource_model in resource_models
+    #     ]
 
-        return response
+    #     resource_relationship_types = {
+    #         resource_relationship_type["id"]: resource_relationship_type["text"]
+    #         for resource_relationship_type in get_resource_relationship_types()["values"]
+    #     }
 
-    def _generate_related_resources_summary(self, related_resources, resource_relationships, resource_models):
-        related_resource_summary = [
-            {"graphid": str(resource_model.graphid), "name": resource_model.name, "resources": []} for resource_model in resource_models
-        ]
+    #     for related_resource in related_resources:
+    #         for summary in related_resource_summary:
+    #             if related_resource["graph_id"] == summary["graphid"]:
+    #                 relationship_summary = []
+    #                 for resource_relationship in resource_relationships:
+    #                     if related_resource["resourceinstanceid"] == resource_relationship["resourceinstanceidto"]:
+    #                         rr_type = (
+    #                             resource_relationship_types[resource_relationship["relationshiptype"]]
+    #                             if resource_relationship["relationshiptype"] in resource_relationship_types
+    #                             else resource_relationship["relationshiptype"]
+    #                         )
+    #                         relationship_summary.append(rr_type)
+    #                     elif related_resource["resourceinstanceid"] == resource_relationship["resourceinstanceidfrom"]:
+    #                         rr_type = (
+    #                             resource_relationship_types[resource_relationship["inverserelationshiptype"]]
+    #                             if resource_relationship["inverserelationshiptype"] in resource_relationship_types
+    #                             else resource_relationship["inverserelationshiptype"]
+    #                         )
+    #                         relationship_summary.append(rr_type)
 
-        resource_relationship_types = {
-            resource_relationship_type["id"]: resource_relationship_type["text"]
-            for resource_relationship_type in get_resource_relationship_types()["values"]
-        }
+    #                 summary["resources"].append(
+    #                     {
+    #                         "instance_id": related_resource["resourceinstanceid"],
+    #                         "displayname": related_resource["displayname"],
+    #                         "relationships": relationship_summary,
+    #                     }
+    #                 )
 
-        for related_resource in related_resources:
-            for summary in related_resource_summary:
-                if related_resource["graph_id"] == summary["graphid"]:
-                    relationship_summary = []
-                    for resource_relationship in resource_relationships:
-                        if related_resource["resourceinstanceid"] == resource_relationship["resourceinstanceidto"]:
-                            rr_type = (
-                                resource_relationship_types[resource_relationship["relationshiptype"]]
-                                if resource_relationship["relationshiptype"] in resource_relationship_types
-                                else resource_relationship["relationshiptype"]
-                            )
-                            relationship_summary.append(rr_type)
-                        elif related_resource["resourceinstanceid"] == resource_relationship["resourceinstanceidfrom"]:
-                            rr_type = (
-                                resource_relationship_types[resource_relationship["inverserelationshiptype"]]
-                                if resource_relationship["inverserelationshiptype"] in resource_relationship_types
-                                else resource_relationship["inverserelationshiptype"]
-                            )
-                            relationship_summary.append(rr_type)
-
-                    summary["resources"].append(
-                        {
-                            "instance_id": related_resource["resourceinstanceid"],
-                            "displayname": related_resource["displayname"],
-                            "relationships": relationship_summary,
-                        }
-                    )
-
-        return related_resource_summary
+    #     return related_resource_summary
 
 @method_decorator(csrf_exempt, name="dispatch")
 class Tile(APIBase):

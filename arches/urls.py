@@ -236,6 +236,7 @@ urlpatterns = [
     url(r"^api/instance_permissions/$", api.InstancePermission.as_view(), name="api_instance_permissions"),
     url(r"^api/node_value/$", api.NodeValue.as_view(), name="api_node_value"),
     url(r"^api/resource_report/(?P<resourceid>%s|())$" % (uuid_regex), api.ResourceReport.as_view(), name="api_resource_report"),
+    url(r"^api/generic_resource_report_data$", api.GenericResourceReportData.as_view(), name="api_generic_resource_report_data"),
     url(r"^api/search/export_results$", api.SearchExport.as_view(), name="api_export_results"),
     url(r"^rdm/concepts/(?P<conceptid>%s|())$" % uuid_regex, api.Concepts.as_view(), name="concepts"),
     url(r"^plugins/(?P<pluginid>%s)$" % uuid_regex, PluginView.as_view(), name="plugins"),

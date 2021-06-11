@@ -62,7 +62,7 @@ class CardModel(models.Model):
         if settings.OVERRIDE_RESOURCE_MODEL_LOCK is True:
             return True
         else:
-            return not TileModel.objects.filter(nodegroup=self.nodegroup).exists()
+            return not TileModel.objects.filter(nodegroup_id=self.nodegroup_id).exists()
 
     class Meta:
         managed = True

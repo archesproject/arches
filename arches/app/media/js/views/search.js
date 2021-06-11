@@ -127,29 +127,23 @@ define([
             }, this);
 
             this.viewModel.loading(true);
-            this.viewModel.sharedStateObject.fooCache = {};
 
             BaseManagerView.prototype.initialize.call(this, options);
         },
 
         doQuery: function() {
             var queryString = JSON.parse(this.queryString());
+
             if (this.updateRequest) {
                 this.updateRequest.abort();
             }
 
-            // this.viewModel.loading(true);
-
-            console.log("ajax made")
             this.updateRequest = $.ajax({
                 type: "GET",
                 url: arches.urls.search_results,
                 data: queryString,
                 context: this,
                 success: function(response) {
-
-
-                    console.log("GGGGGGG", response)
 
                     // if (response.results.hits) {
                     //     response.results.hits.hits.forEach(function(hit) {

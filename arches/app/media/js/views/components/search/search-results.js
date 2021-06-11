@@ -87,12 +87,7 @@ function($, _, BaseFilter, bootstrap, arches, select2, ko, koMapping, viewdata) 
             showResourceSummaryReport: function(graphId, resourceInstanceId, result) {
                 var self = this;
                 return function(){
-
-                    console.log("in showResourceSummaryReport", self.fooCache)
-
-                    var responseJson = self.fooCache[resourceInstanceId];
-
-                    self.details.setupReport(graphId, resourceInstanceId, result._source, responseJson);
+                    self.details.setupReport(graphId, resourceInstanceId, result._source);
                     if (self.selectedTab() !== 'search-result-details') {
                         self.selectedTab('search-result-details');
                     }

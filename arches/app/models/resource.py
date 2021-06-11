@@ -71,7 +71,7 @@ class Resource(models.ResourceInstance):
     def get_descriptor(self, descriptor):
         module = importlib.import_module("arches.app.functions.primary_descriptors")
         PrimaryDescriptorsFunction = getattr(module, "PrimaryDescriptorsFunction")()
-        functionConfig = models.FunctionXGraph.objects.prefetch_related('function').filter(graph_id=self.graph_id, function__functiontype="primarydescriptors")
+        functionConfig = models.FunctionXGraph.objects.select_related('function').filter(graph_id=self.graph_id, function__functiontype="primarydescriptors")
         if len(functionConfig) == 1:
             return PrimaryDescriptorsFunction.get_primary_descriptor_from_nodes(self, functionConfig[0].config[descriptor])
         else:

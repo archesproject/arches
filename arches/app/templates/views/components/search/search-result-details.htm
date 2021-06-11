@@ -12,8 +12,9 @@
         <div class='resource-report' data-bind='component: {
             name: "foo",
             params: {
+                foobar: "foobar",
                 resourceid: resourceInstanceId(),
-                responseJson: responseJson,
+                genericResourceReportData: genericResourceReportData(),
                 summary: true
             }
         }'></div>
