@@ -781,12 +781,19 @@ class RelatedResourcesView(BaseManagerView):
                 start = int(request.GET.get("start", 0))
 
                 related_resources = resource.get_related_resources(
-                    lang=lang, start=start, page=page, user=request.user, resourceinstance_graphid=resourceinstance_graphid, graphs=self.graphs
+                    lang=lang,
+                    start=start,
+                    page=page,
+                    user=request.user,
+                    resourceinstance_graphid=resourceinstance_graphid,
+                    graphs=self.graphs,
                 )
 
                 ret = self.paginate_related_resources(related_resources=related_resources, page=page, request=request)
             else:
-                ret = resource.get_related_resources(lang=lang, user=request.user, resourceinstance_graphid=resourceinstance_graphid, graphs=self.graphs)
+                ret = resource.get_related_resources(
+                    lang=lang, user=request.user, resourceinstance_graphid=resourceinstance_graphid, graphs=self.graphs
+                )
 
         return JSONResponse(ret)
 
