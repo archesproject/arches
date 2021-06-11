@@ -9,7 +9,8 @@ define([
             var self = this;
             var layout = {
                 name: "cola",
-                animate: true
+                animate: true,
+                directed: true
             };
             var fitPadding = 100;
 
