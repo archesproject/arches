@@ -12,7 +12,6 @@ define([
                 animate: true,
                 directed: true
             };
-            var fitPadding = 100;
 
             this.viz = ko.observable();
             this.cytoscapeConfig = ko.observable();
@@ -129,6 +128,10 @@ define([
                     selected: data.focus
                 };
             };
+            this.refreshLayout = function() {
+                var viz = self.viz();
+                if (viz) viz.layout(layout).run();
+            };
             this.expandNode = function(node) {
                 if (node.id) getResourceRelations(node.id)
                     .then(function(response) {
@@ -158,7 +161,6 @@ define([
                             });
                         });
                         vizLayout.run();
-                        viz.fit(null, fitPadding);
                     });
             };
             var getStyle = function() {
@@ -313,7 +315,6 @@ define([
                     if (selection.id === informationElementId) self.informationElement(null);
                     viz.remove(element);
                     self.elements.remove(element);
-                    viz.fit(null, fitPadding);
                     break;
                 case 'focus':
                     if (selection.source) viz.elements().unselect();

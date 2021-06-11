@@ -182,6 +182,7 @@
     <span class="ion-eye-disabled" data-bind="click: function() { selectionMode('delete'); }, css: {
         'active-graph-control': selectionMode() === 'delete'
     }"></span>
+    <span class="ion-refresh" data-bind="click: refreshLayout"></span>
 </div>
 <div class="related-resources-graph-controls-instructions">
 <!--ko if: selectionMode() === 'information' -->
