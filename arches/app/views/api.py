@@ -1113,7 +1113,6 @@ class OntologyProperty(APIBase):
         return JSONResponse(ret)
 
 
-
 class ResourceReport(APIBase):
     def get(self, request, resourceid, generic_resource_report_data=None):
         # try:
@@ -1128,7 +1127,6 @@ class ResourceReport(APIBase):
         #     graph = Graph.objects.get(graphid=resource.graph_id)
         #     cache.set(resource.graph_id, graph)
 
-
         # template = cache.get(graph.template_id)
         # if not template:
         #     template = models.ReportTemplate.objects.get(pk=graph.template_id)
@@ -1139,12 +1137,12 @@ class ResourceReport(APIBase):
         qux = baz.get(request, resourceid=resourceid)
         return qux
 
-            # response = self._load_resource_specific_resource_data(
-            #     resourceid=resourceid,
-            #     resource=resource,
-            #     graph=graph,
-            #     template=template,
-            # )
+        # response = self._load_resource_specific_resource_data(
+        #     resourceid=resourceid,
+        #     resource=resource,
+        #     graph=graph,
+        #     template=template,
+        # )
         # else:
         #     response = {
         #         "template": template,
@@ -1160,7 +1158,7 @@ class ResourceReport(APIBase):
         # template = generic_resource_report_data['graph_template']
         # resource = generic_resource_report_data['resource']
 
-        if template['preload_resource_data']:
+        if template["preload_resource_data"]:
             response = self._load_resource_data(
                 request=request,
                 resourceid=resourceid,
@@ -1173,7 +1171,6 @@ class ResourceReport(APIBase):
             }
 
         return JSONResponse(response)
-
 
 
 class GenericResourceReportData(APIBase):
@@ -1200,21 +1197,22 @@ class GenericResourceReportData(APIBase):
             datatypes, exclude=["modulename", "issearchable", "configcomponent", "configname", "iconclass"]
         )
 
-        return JSONResponse({
-            'datatypes': datatypes,
-            'templates': templates,
-            'widgets': widgets,
-            'card_components': card_components,
-            'map_layers': map_layers,
-            'map_markers': map_markers,
-            'map_sources': map_sources,
-            'geocoding_providers': geocoding_providers,
-            'templates_json': templates_json,
-            'card_components_json': card_components_json,
-            'datatypes_json': datatypes_json,
-            "hide_empty_nodes": settings.HIDE_EMPTY_NODES_IN_REPORT,
-        })
-
+        return JSONResponse(
+            {
+                "datatypes": datatypes,
+                "templates": templates,
+                "widgets": widgets,
+                "card_components": card_components,
+                "map_layers": map_layers,
+                "map_markers": map_markers,
+                "map_sources": map_sources,
+                "geocoding_providers": geocoding_providers,
+                "templates_json": templates_json,
+                "card_components_json": card_components_json,
+                "datatypes_json": datatypes_json,
+                "hide_empty_nodes": settings.HIDE_EMPTY_NODES_IN_REPORT,
+            }
+        )
 
 
 class ResourceSpecificResourceReportData(APIBase):
@@ -1233,7 +1231,6 @@ class ResourceSpecificResourceReportData(APIBase):
         if not graph:
             graph = Graph.objects.get(graphid=resource.graph_id)
             cache.set(resource.graph_id, graph)
-
 
         template = cache.get(graph.template_id)
         if not template:
@@ -1265,7 +1262,6 @@ class ResourceSpecificResourceReportData(APIBase):
 
         graph_cards = CardProxyModel.objects.filter(graph_id=resource.graph_id).select_related('graph').order_by("sortorder")
 
-
         related_resources_summary = {}
 
         for resource_model in resource_models:
@@ -1284,7 +1280,6 @@ class ResourceSpecificResourceReportData(APIBase):
                 tile.filter_by_perm(request.user, perm)
                 permitted_tiles.append(tile)
 
-        
         permitted_cards = []
 
         for card in graph_cards:
@@ -1298,7 +1293,7 @@ class ResourceSpecificResourceReportData(APIBase):
 
         card_widgets_json = JSONSerializer().serialize(cardwidgets)
 
-        graph_json = cache.get('{}_json'.format(graph.pk))
+        graph_json = cache.get("{}_json".format(graph.pk))
         if not graph_json:
             graph_json = JSONSerializer().serialize(
                 graph,
@@ -1315,7 +1310,7 @@ class ResourceSpecificResourceReportData(APIBase):
                     "author",
                 ],
             )
-            cache.set('{}_json'.format(graph.pk), graph_json)
+            cache.set("{}_json".format(graph.pk), graph_json)
 
         return {
             "graph_json": graph_json,
@@ -1369,6 +1364,7 @@ class ResourceSpecificResourceReportData(APIBase):
     #                 )
 
     #     return related_resource_summary
+
 
 @method_decorator(csrf_exempt, name="dispatch")
 class Tile(APIBase):
