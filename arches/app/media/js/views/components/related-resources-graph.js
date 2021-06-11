@@ -140,9 +140,18 @@ define([
                                 );
                                 return elements.length === 0;
                             });
+                        viz.nodes().forEach(function(node) {
+                            node.lock();
+                        });
                         viz.add(elements);
                         self.elements(viz.elements());
-                        viz.layout(layout).run();
+                        var vizLayout = viz.layout(layout);
+                        vizLayout.on("layoutstop", function() {
+                            viz.nodes().forEach(function(node) {
+                                node.unlock();
+                            });
+                        });
+                        vizLayout.run();
                         viz.fit(null, fitPadding);
                     });
             };
