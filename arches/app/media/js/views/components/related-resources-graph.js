@@ -16,7 +16,9 @@ define([
 
             this.viz = ko.observable();
             this.cytoscapeConfig = ko.observable();
-            this.focusResourceId = ko.isObservable(params.resourceId) ? params.resourceId : ko.observable(params.resourceId);
+            this.focusResourceId = ko.isObservable(params.resourceId) ?
+                params.resourceId :
+                ko.observable(params.resourceId);
             this.selection = ko.observable();
             this.selectionMode = ko.observable('information');
             this.elements = ko.observableArray();
@@ -35,8 +37,9 @@ define([
                         if (!data.shownRelationsCount) data.shownRelationsCount = ko.observable();
                         if (data.displayname.toLowerCase().indexOf(filter) !== -1) {
                             data.graph = resourceTypeLookup[data.graph_id];
+                            // excludes target relationships back to node, to prevent duplicates
                             data.shownRelationsCount(viz.edges('[source = "' + data.id + '"]').length +
-                                viz.edges('[target = "' + data.id + '"]'). length);
+                                viz.edges('[target = "' + data.id + '"][source != "' + data.id + '"]'). length);
                             filteredNodes.push(data);
                         }
                     }
@@ -78,7 +81,9 @@ define([
                         addRelationship(edge, 'target');
                     });
                     targetEdges.forEach(function(edge) {
-                        addRelationship(edge, 'source');
+                        // excludes target relationships back to node, to prevent duplicates
+                        if (edge.source().id() !== edge.target().id())
+                            addRelationship(edge, 'source');
                     });
                 }
                 return relationships;
@@ -232,11 +237,12 @@ define([
                         })
                         .then(function(result) {
                             var i = 0;
-                            for (var resourceId in result.node_config_lookup) {
-                                result.node_config_lookup[resourceId].className = 'resource-type-' + i;
+                            var lookup = result['node_config_lookup'];
+                            for (var resourceId in lookup) {
+                                lookup[resourceId].className = 'resource-type-' + i;
                                 i++;
                             }
-                            resourceTypeLookup = result.node_config_lookup;
+                            resourceTypeLookup = lookup;
                             result.resource_instance.focus = true;
                             result.resource_instance['total_relations'] = {
                                 value: result.resource_relationships.length
