@@ -1,8 +1,10 @@
 define([
     'knockout',
     'underscore',
-    'cytoscape'
-], function(ko, _, cytoscape) {
+    'cytoscape',
+    'cytoscape-cola'
+], function (ko, _, cytoscape, cola) {
+    cytoscape.use(cola);
     ko.bindingHandlers.cytoscape = {
         init: function(element, valueAccessor) {
             var defaults = {

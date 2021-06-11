@@ -8,9 +8,8 @@ define([
         viewModel: function(params) {
             var self = this;
             var layout = {
-                name: "cose",
-                animate: true,
-                animationThreshold: 10
+                name: "cola",
+                animate: true
             };
             var fitPadding = 100;
 
@@ -209,7 +208,14 @@ define([
             var updateFocusResource = function() {
                 var resourceId = self.focusResourceId();
                 if (resourceId) {
-                    self.viz(null);
+                    var viz = self.viz();
+                    if (viz) {
+                        var element = viz.getElementById(resourceId);
+                        if (element) self.informationElement(element.data());
+                    }
+
+                    // self.viz(null);
+                    self.selection(null);
                     getResourceRelations(resourceId)
                         .then(function(response) {
                             return response.json();
@@ -231,7 +237,14 @@ define([
                                         .map(dataToElement)
                                 );
                             self.selection(elements[0].data);
-                            updateCytoscapeConfig(elements);
+                            if (!viz) {
+                                updateCytoscapeConfig(elements);
+                            } else {
+                                viz.remove('*');
+                                viz.add(elements);
+                                viz.style(getStyle());
+                                viz.layout(layout).run();
+                            }
                             self.elements(self.viz().elements());
                         });
                 }
@@ -290,7 +303,6 @@ define([
                     if (selection.source) viz.elements().unselect();
                     else {
                         self.focusResourceId(selection.id);
-                        self.informationElement(selection);
                     }
                     break;
                 default:
