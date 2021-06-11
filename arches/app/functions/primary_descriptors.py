@@ -7,17 +7,23 @@ from django.utils.translation import ugettext as _
 
 
 class PrimaryDescriptorsFunction(BaseFunction):
+
+    foo_tiles = list(models.TileModel.objects.all())
+    
     def get_primary_descriptor_from_nodes(self, resource, config):
         datatype_factory = None
         try:
             if "nodegroup_id" in config and config["nodegroup_id"] != "" and config["nodegroup_id"] is not None:
-                tiles = models.TileModel.objects.filter(nodegroup_id=uuid.UUID(config["nodegroup_id"]), sortorder=0).filter(
-                    resourceinstance_id=resource.resourceinstanceid
-                )
+                tiles = [tile for tile in self.foo_tiles if tile.nodegroup_id == uuid.UUID(config["nodegroup_id"]) and tile.sortorder == 0 and tile.resourceinstance_id == resource.resourceinstanceid]
+
+                # tiles = self.foo_tiles.filter(nodegroup_id=uuid.UUID(config["nodegroup_id"]), sortorder=0).filter(
+                #     resourceinstance_id=resource.resourceinstanceid
+                # )
                 if len(tiles) == 0:
-                    tiles = models.TileModel.objects.filter(nodegroup_id=uuid.UUID(config["nodegroup_id"])).filter(
-                        resourceinstance_id=resource.resourceinstanceid
-                    )
+                    tiles = [tile for tile in self.foo_tiles if tile.nodegroup_id == uuid.UUID(config["nodegroup_id"]) and tile.resourceinstance_id == resource.resourceinstanceid]
+                    # tiles = self.foo_tiles.filter(nodegroup_id=uuid.UUID(config["nodegroup_id"])).filter(
+                    #     resourceinstance_id=resource.resourceinstanceid
+                    # )
                 for tile in tiles:
                     for node in models.Node.objects.filter(nodegroup_id=uuid.UUID(config["nodegroup_id"])):
                         data = {}

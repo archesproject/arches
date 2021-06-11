@@ -118,6 +118,8 @@ class Card(models.CardModel):
         self.ontologyproperty = None
         self.constraints = []
 
+        self.foo_widgets = list(models.DDataType.objects.all())
+
         if args:
             if isinstance(args[0], dict):
                 for key, value in args[0].items():
@@ -170,7 +172,7 @@ class Card(models.CardModel):
 
                 sub_groups = models.NodeGroup.objects.filter(parentnodegroup=self.nodegroup)
                 for sub_group in sub_groups:
-                    self.cards.extend(Card.objects.filter(nodegroup=sub_group))
+                    self.cards.extend(Card.objects.select_related('nodegroup').filter(nodegroup=sub_group))
 
                 self.cardinality = self.nodegroup.cardinality
 
@@ -232,11 +234,13 @@ class Card(models.CardModel):
                 return None
         return self
 
-    def serialize(self, fields=None, exclude=None):
+    def serialize(self, fields=None, exclude=None, foo=None):
         """
         serialize to a different form than used by the internal class structure
 
         """
+
+        # import pdb; pdb.set_trace()
 
         exclude = [] if exclude is None else exclude
         ret = JSONSerializer().handle_model(self, fields, exclude)
@@ -259,7 +263,7 @@ class Card(models.CardModel):
         ret["widgets"] = self.widgets
         if "widgets" not in exclude:
 
-            widgets = list(models.DDataType.objects.all())
+            widgets = self.foo_widgets
 
             for node in ret["nodes"]:
                 found = False

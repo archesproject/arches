@@ -55,6 +55,8 @@ from arches.app.datatypes.datatypes import DataTypeFactory
 logger = logging.getLogger(__name__)
 
 
+foo_func_x_graph = list(models.FunctionXGraph.objects.all().select_related('function'))
+
 class Resource(models.ResourceInstance):
     class Meta:
         proxy = True
@@ -68,10 +70,13 @@ class Resource(models.ResourceInstance):
         # end from models.ResourceInstance
         self.tiles = []
 
+        # self.foo_config = list(models.FunctionXGraph.objects.select_related('function').filter(graph_id=self.graph_id, function__functiontype="primarydescriptors"))
+        self.foo_config = [bar for bar in foo_func_x_graph if bar.graph_id == self.graph_id and bar.function.functiontype == "primarydescriptors"]
+
     def get_descriptor(self, descriptor):
         module = importlib.import_module("arches.app.functions.primary_descriptors")
         PrimaryDescriptorsFunction = getattr(module, "PrimaryDescriptorsFunction")()
-        functionConfig = models.FunctionXGraph.objects.select_related('function').filter(graph_id=self.graph_id, function__functiontype="primarydescriptors")
+        functionConfig = self.foo_config
         if len(functionConfig) == 1:
             return PrimaryDescriptorsFunction.get_primary_descriptor_from_nodes(self, functionConfig[0].config[descriptor])
         else:
@@ -451,18 +456,19 @@ class Resource(models.ResourceInstance):
         return errors
 
     def get_related_resources(
-        self, lang="en-US", limit=settings.RELATED_RESOURCES_EXPORT_LIMIT, start=0, page=0, user=None, resourceinstance_graphid=None,
+        self, lang="en-US", limit=settings.RELATED_RESOURCES_EXPORT_LIMIT, start=0, page=0, user=None, resourceinstance_graphid=None, graphs=None
     ):
         """
         Returns an object that lists the related resources, the relationship types, and a reference to the current resource
 
         """
-        graphs = (
-            models.GraphModel.objects.all()
-            .exclude(pk=settings.SYSTEM_SETTINGS_RESOURCE_MODEL_ID)
-            .exclude(isresource=False)
-            .exclude(isactive=False)
-        )
+        if not graphs:
+            graphs = list(
+                models.GraphModel.objects.all()
+                .exclude(pk=settings.SYSTEM_SETTINGS_RESOURCE_MODEL_ID)
+                .exclude(isresource=False)
+                .exclude(isactive=False)
+            )
 
         graph_lookup = {
             str(graph.graphid): {"name": graph.name, "iconclass": graph.iconclass, "fillColor": graph.color} for graph in graphs
