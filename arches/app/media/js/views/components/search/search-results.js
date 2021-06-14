@@ -59,6 +59,8 @@ function($, _, BaseFilter, bootstrap, arches, select2, ko, koMapping, viewdata, 
                         }
                     }
                 }, this);
+
+                this.bulkFooCache = ko.observable({});
             },
 
             mouseoverInstance: function() {
@@ -88,6 +90,12 @@ function($, _, BaseFilter, bootstrap, arches, select2, ko, koMapping, viewdata, 
             showResourceSummaryReport: function(graphId, resourceInstanceId, result) {
                 var self = this;
                 return function(){
+
+
+
+                    console.log("BNBBBB", self.bulkFooCache(), graphId, resourceInstanceId)
+
+
                     self.details.setupReport(graphId, resourceInstanceId, result._source);
                     if (self.selectedTab() !== 'search-result-details') {
                         self.selectedTab('search-result-details');
@@ -104,24 +112,32 @@ function($, _, BaseFilter, bootstrap, arches, select2, ko, koMapping, viewdata, 
                     this.results.removeAll();
                     this.selectedResourceId(null);
 
+                    var graphIdsToFetch = this.searchResults.results.hits.hits.reduce(function(acc, hit) {
+                        var graphId = hit['_source']['graph_id'];
+
+                        if (!self.bulkFooCache()[graphId]) {
+                            acc.push(graphId);
+                        }
+
+                        return acc;
+                    }, []);
                     
-                    var resourceIds = this.searchResults.results.hits.hits.map(function(hit) {
-                        return hit['_id'];
-                    });
-                    
-                    console.log("ADFDSFDSFDSFDSF", this.searchResults, resourceIds)
+                    if (graphIdsToFetch.length > 0) {
+                        var url = arches.urls.api_bulk_foo + `?graph_ids=${graphIdsToFetch}`;
+    
+                        $.getJSON(url, function(resp) {
+                            bulkFooCache = self.bulkFooCache();
 
-                    var url = arches.urls.api_bulk_foo + `?resource_ids=${resourceIds}`;
+                            Object.keys(resp).forEach(function(graphId) {
+                                bulkFooCache[graphId] = resp[graphId];
+                            });
 
-                    $.getJSON(url, function(resp) {
-                        console.log("SDS", resp)
-                    })
-
+                            self.bulkFooCache(bulkFooCache);
+                            console.log("SDS", self.bulkFooCache())
+                        });
+                    }
 
                     this.searchResults.results.hits.hits.forEach(function(result){
-
-
-                        
                         var graphdata = _.find(viewdata.graphs, function(graphdata){
                             return result._source.graph_id === graphdata.graphid;
                         });

@@ -1376,13 +1376,10 @@ class ResourceSpecificResourceReportData(APIBase):
 
 class BulkFoo(APIBase):
     def get(self, request):
-        resource_ids = request.GET.get('resource_ids').split(',')
-        exclude = request.GET.get('exclude')
-
-        resources = Resource.objects.filter(pk__in=resource_ids)
-        graph_ids = [ resource.graph_id for resource in resources ]
-
-
+        # correct input is two ordered lists
+        # of resource_id and corresponding graph_id
+        graph_ids = request.GET.get('graph_ids').split(',')
+        exclude = request.GET.get('exclude', [])
 
         if not graph_ids:
             raise Exception()
@@ -1393,20 +1390,24 @@ class BulkFoo(APIBase):
         graph_lookup = {}  
 
         for graph_id in graph_ids_set:
-            graph = cache.get('graph_{}'.format(graph_id))
+            graph = cache.get('serialized_graph_{}'.format(graph_id))
 
             if graph:
-                graph_lookup[graph.pk] = graph
+                graph_lookup[graph['graphid']] = graph
             else:
                 graph_ids_not_in_cache.append(graph_id)
 
         if graph_ids_not_in_cache:
             graphs_from_database = list(Graph.objects.filter(pk__in=graph_ids_not_in_cache))
 
-
             for graph in graphs_from_database:
-                # cache.set('graph_{}'.format(graph.pk))
-                graph_lookup[graph.pk] = graph
+                serialized_graph = JSONSerializer().serializeToPython(
+                    graph, 
+                    sort_keys=False, 
+                    exclude=["is_editable", "functions"]
+                )
+                cache.set('serialized_graph_{}'.format(graph.pk), serialized_graph)
+                graph_lookup[str(graph.pk)] = serialized_graph
 
         cards = CardProxyModel.objects.filter(graph_id__in=graph_ids_set).select_related('nodegroup').order_by("sortorder")
 
@@ -1418,12 +1419,15 @@ class BulkFoo(APIBase):
                 card.filter_by_perm(request.user, perm)
                 permitted_cards.append(card)
 
+        if 'datatypes' not in exclude:
+            datatypes = models.DDataType.objects.all()
+
         resp = {}
 
-        for resource in resources:
-            graph = graph_lookup[resource.graph_id]
+        for graph_id in graph_ids_set:
+            graph = graph_lookup[graph_id]
 
-            graph_cards = [ card for card in permitted_cards if card.graph_id == graph.pk ]
+            graph_cards = [ card for card in permitted_cards if str(card.graph_id) == graph['graphid'] ]
 
             cardwidgets = [
                 widget
@@ -1431,11 +1435,14 @@ class BulkFoo(APIBase):
                 for widget in widgets
             ]
 
-            resp[resource.pk] = {
-                'graph': JSONSerializer().serializeToPython(graph, sort_keys=False, exclude=["is_editable", "functions"]),
+            resp[graph_id] = {
+                'graph': graph,
                 'cards': JSONSerializer().serializeToPython(graph_cards, sort_keys=False, exclude=["is_editable"]),
                 'cardwidgets': cardwidgets,
             }
+
+            if 'datatypes' not in exclude:
+                resp[graph_id]['datatypes'] = datatypes
 
         return JSONResponse(resp)
 
