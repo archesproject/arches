@@ -1376,7 +1376,7 @@ class ResourceSpecificResourceReportData(APIBase):
 
 class Foo(APIBase):
     def get(self, request, resourceid):
-        exclude = request.GET.get('exclude', [])
+        exclude = request.GET.get("exclude", [])
         perm = "read_nodegroup"
 
         resource = Resource.objects.get(pk=resourceid)
@@ -1389,9 +1389,11 @@ class Foo(APIBase):
             "graph": graph,
         }
 
-        if 'related_resources' not in exclude:
+        if "related_resources" not in exclude:
             resource_models = (
-                models.GraphModel.objects.filter(isresource=True).exclude(isactive=False).exclude(pk=settings.SYSTEM_SETTINGS_RESOURCE_MODEL_ID)
+                models.GraphModel.objects.filter(isresource=True)
+                .exclude(isactive=False)
+                .exclude(pk=settings.SYSTEM_SETTINGS_RESOURCE_MODEL_ID)
             )
 
             get_params = request.GET.copy()
@@ -1407,38 +1409,40 @@ class Foo(APIBase):
                 resource_models=resource_models,
             )
 
-            resp['related_resources'] = related_resources_summary
+            resp["related_resources"] = related_resources_summary
 
-        if 'tiles' not in exclude:
+        if "tiles" not in exclude:
             permitted_tiles = []
-            for tile in Tile.objects.filter(resourceinstance=resource).select_related('nodegroup').order_by("sortorder"):
+            for tile in Tile.objects.filter(resourceinstance=resource).select_related("nodegroup").order_by("sortorder"):
                 if request.user.has_perm(perm, tile.nodegroup):
                     tile.filter_by_perm(request.user, perm)
                     permitted_tiles.append(tile)
 
-            resp['tiles'] = permitted_tiles
+            resp["tiles"] = permitted_tiles
 
-        if 'cards' not in exclude:
+        if "cards" not in exclude:
             permitted_cards = []
-            for card in Card.objects.filter(graph_id=resource.graph_id).select_related('nodegroup').order_by("sortorder"):
+            for card in Card.objects.filter(graph_id=resource.graph_id).select_related("nodegroup").order_by("sortorder"):
                 if request.user.has_perm(perm, card.nodegroup):
                     card.filter_by_perm(request.user, perm)
                     permitted_cards.append(card)
 
             cardwidgets = [
-                widget for widgets in [card.cardxnodexwidget_set.order_by("sortorder").all() for card in permitted_cards] for widget in widgets
+                widget
+                for widgets in [card.cardxnodexwidget_set.order_by("sortorder").all() for card in permitted_cards]
+                for widget in widgets
             ]
 
-            resp['cards'] = permitted_cards
-            resp['cardwidgets'] = cardwidgets
+            resp["cards"] = permitted_cards
+            resp["cardwidgets"] = cardwidgets
 
         return JSONResponse(resp)
 
 
 class BulkFoo(APIBase):
     def get(self, request):
-        graph_ids = request.GET.get('graph_ids').split(',')
-        exclude = request.GET.get('exclude', [])
+        graph_ids = request.GET.get("graph_ids").split(",")
+        exclude = request.GET.get("exclude", [])
 
         if not graph_ids:
             raise Exception()
@@ -1449,10 +1453,10 @@ class BulkFoo(APIBase):
         graph_lookup = {}
 
         for graph_id in graph_ids_set:
-            graph = cache.get('serialized_graph_{}'.format(graph_id))
+            graph = cache.get("serialized_graph_{}".format(graph_id))
 
             if graph:
-                graph_lookup[graph['graphid']] = graph
+                graph_lookup[graph["graphid"]] = graph
             else:
                 graph_ids_not_in_cache.append(graph_id)
 
@@ -1460,12 +1464,8 @@ class BulkFoo(APIBase):
             graphs_from_database = list(Graph.objects.filter(pk__in=graph_ids_not_in_cache))
 
             for graph in graphs_from_database:
-                serialized_graph = JSONSerializer().serializeToPython(
-                    graph, 
-                    sort_keys=False, 
-                    exclude=["is_editable", "functions"]
-                )
-                cache.set('serialized_graph_{}'.format(graph.pk), serialized_graph)
+                serialized_graph = JSONSerializer().serializeToPython(graph, sort_keys=False, exclude=["is_editable", "functions"])
+                cache.set("serialized_graph_{}".format(graph.pk), serialized_graph)
                 graph_lookup[str(graph.pk)] = serialized_graph
 
         cards = CardProxyModel.objects.filter(graph_id__in=graph_ids_set).select_related("nodegroup").order_by("sortorder")
@@ -1478,7 +1478,7 @@ class BulkFoo(APIBase):
                 card.filter_by_perm(request.user, perm)
                 permitted_cards.append(card)
 
-        if 'datatypes' not in exclude:
+        if "datatypes" not in exclude:
             datatypes = models.DDataType.objects.all()
 
         resp = {}
@@ -1486,20 +1486,20 @@ class BulkFoo(APIBase):
         for graph_id in graph_ids_set:
             graph = graph_lookup[graph_id]
 
-            graph_cards = [ card for card in permitted_cards if str(card.graph_id) == graph['graphid'] ]
+            graph_cards = [card for card in permitted_cards if str(card.graph_id) == graph["graphid"]]
 
             cardwidgets = [
                 widget for widgets in [card.cardxnodexwidget_set.order_by("sortorder").all() for card in graph_cards] for widget in widgets
             ]
 
             resp[graph_id] = {
-                'graph': graph,
-                'cards': JSONSerializer().serializeToPython(graph_cards, sort_keys=False, exclude=["is_editable"]),
-                'cardwidgets': cardwidgets,
+                "graph": graph,
+                "cards": JSONSerializer().serializeToPython(graph_cards, sort_keys=False, exclude=["is_editable"]),
+                "cardwidgets": cardwidgets,
             }
 
-            if 'datatypes' not in exclude:
-                resp[graph_id]['datatypes'] = datatypes
+            if "datatypes" not in exclude:
+                resp[graph_id]["datatypes"] = datatypes
 
         return JSONResponse(resp)
 
