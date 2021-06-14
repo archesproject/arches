@@ -8,6 +8,8 @@ import sys
 import uuid
 import traceback
 from io import StringIO
+
+from django.contrib.auth.models import Group
 from oauth2_provider.views import ProtectedResourceView
 from pyld.jsonld import compact, frame, from_rdf
 from rdflib import RDF
@@ -1217,25 +1219,27 @@ class GenericResourceReportData(APIBase):
 
 class ResourceSpecificResourceReportData(APIBase):
     def get(self, request, resourceid):
+        should_serialize_graph = not request.GET.get('graph_data') == 'false'
+
         try:
             # needs validation?
-            resource = cache.get(resourceid)
-            if not resource:
-                resource = Resource.objects.get(pk=resourceid)
-                cache.set(resourceid, resource)
+            # resource = cache.get(resourceid)
+            # if not resource:
+            resource = Resource.objects.get(pk=resourceid)
+                # cache.set(resourceid, resource)
 
         except Exception as e:
             return JSONResponse(str(e), status=404)
 
-        graph = cache.get(resource.graph_id)
-        if not graph:
-            graph = Graph.objects.get(graphid=resource.graph_id)
-            cache.set(resource.graph_id, graph)
+        # graph = cache.get(resource.graph_id)
+        # if not graph:
+        graph = Graph.objects.get(graphid=resource.graph_id)
+            # cache.set(resource.graph_id, graph)
 
-        template = cache.get(graph.template_id)
-        if not template:
-            template = models.ReportTemplate.objects.get(pk=graph.template_id)
-            cache.set(graph.template_id, template)
+        # template = cache.get(graph.template_id)
+        # if not template:
+        template = models.ReportTemplate.objects.get(pk=graph.template_id)
+            # cache.set(graph.template_id, template)
 
         if template.preload_resource_data:
             response = self._load_resource_specific_resource_data(
@@ -1244,6 +1248,7 @@ class ResourceSpecificResourceReportData(APIBase):
                 resource=resource,
                 graph=graph,
                 template=template,
+                should_serialize_graph=should_serialize_graph,
             )
         else:
             response = {
@@ -1253,7 +1258,7 @@ class ResourceSpecificResourceReportData(APIBase):
 
         return JSONResponse(response)
 
-    def _load_resource_specific_resource_data(self, request, resourceid, resource, graph, template):
+    def _load_resource_specific_resource_data(self, request, resourceid, resource, graph, template, should_serialize_graph):
         resource_models = (
             models.GraphModel.objects.filter(isresource=True).exclude(isactive=False).exclude(pk=settings.SYSTEM_SETTINGS_RESOURCE_MODEL_ID)
         )
@@ -1291,31 +1296,34 @@ class ResourceSpecificResourceReportData(APIBase):
             widget for widgets in [card.cardxnodexwidget_set.order_by("sortorder").all() for card in permitted_cards] for widget in widgets
         ]
 
-        card_widgets_json = JSONSerializer().serialize(cardwidgets)
+        # card_widgets_json = JSONSerializer().serialize(cardwidgets)
 
-        graph_json = cache.get("{}_json".format(graph.pk))
-        if not graph_json:
-            graph_json = JSONSerializer().serialize(
-                graph,
-                sort_keys=False,
-                exclude=[
-                    "functions",
-                    "relatable_resource_model_ids",
-                    "domain_connections",
-                    "edges",
-                    "is_editable",
-                    "description",
-                    "iconclass",
-                    "subtitle",
-                    "author",
-                ],
-            )
-            cache.set("{}_json".format(graph.pk), graph_json)
+        graph_json = {}
+        if should_serialize_graph:
+            graph_json = cache.get("{}_json".format(graph.pk))
+            if not graph_json:
+                graph_json = JSONSerializer().serialize(
+                    graph,
+                    sort_keys=False,
+                    exclude=[
+                        "functions",
+                        "relatable_resource_model_ids",
+                        "domain_connections",
+                        "edges",
+                        "is_editable",
+                        "description",
+                        "iconclass",
+                        "subtitle",
+                        "author",
+                    ],
+                )
+                cache.set("{}_json".format(graph.pk), graph_json)
 
         return {
+            "displayname": resource.displayname,
             "graph_json": graph_json,
             "template": template,
-            "cardwidgets": card_widgets_json,
+            "cardwidgets": cardwidgets,
             "tiles": JSONSerializer().serialize(permitted_tiles, sort_keys=False),
             "cards": JSONSerializer().serialize(
                 permitted_cards,
@@ -1364,6 +1372,72 @@ class ResourceSpecificResourceReportData(APIBase):
     #                 )
 
     #     return related_resource_summary
+
+
+class BulkFoo(APIBase):
+    def get(self, request):
+        resource_ids = request.GET.get('resource_ids').split(',')
+        exclude = request.GET.get('exclude')
+
+        resources = Resource.objects.filter(pk__in=resource_ids)
+        graph_ids = [ resource.graph_id for resource in resources ]
+
+
+
+        if not graph_ids:
+            raise Exception()
+
+        graph_ids_set = set(graph_ids)  #calls set to delete dups
+        graph_ids_not_in_cache = []
+
+        graph_lookup = {}  
+
+        for graph_id in graph_ids_set:
+            graph = cache.get('graph_{}'.format(graph_id))
+
+            if graph:
+                graph_lookup[graph.pk] = graph
+            else:
+                graph_ids_not_in_cache.append(graph_id)
+
+        if graph_ids_not_in_cache:
+            graphs_from_database = list(Graph.objects.filter(pk__in=graph_ids_not_in_cache))
+
+
+            for graph in graphs_from_database:
+                # cache.set('graph_{}'.format(graph.pk))
+                graph_lookup[graph.pk] = graph
+
+        cards = CardProxyModel.objects.filter(graph_id__in=graph_ids_set).select_related('nodegroup').order_by("sortorder")
+
+        perm = "read_nodegroup"
+        permitted_cards = []
+
+        for card in cards:
+            if request.user.has_perm(perm, card.nodegroup):
+                card.filter_by_perm(request.user, perm)
+                permitted_cards.append(card)
+
+        resp = {}
+
+        for resource in resources:
+            graph = graph_lookup[resource.graph_id]
+
+            graph_cards = [ card for card in permitted_cards if card.graph_id == graph.pk ]
+
+            cardwidgets = [
+                widget
+                for widgets in [card.cardxnodexwidget_set.order_by("sortorder").all() for card in graph_cards]
+                for widget in widgets
+            ]
+
+            resp[resource.pk] = {
+                'graph': JSONSerializer().serializeToPython(graph, sort_keys=False, exclude=["is_editable", "functions"]),
+                'cards': JSONSerializer().serializeToPython(graph_cards, sort_keys=False, exclude=["is_editable"]),
+                'cardwidgets': cardwidgets,
+            }
+
+        return JSONResponse(resp)
 
 
 @method_decorator(csrf_exempt, name="dispatch")

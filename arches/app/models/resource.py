@@ -55,8 +55,6 @@ from arches.app.datatypes.datatypes import DataTypeFactory
 logger = logging.getLogger(__name__)
 
 
-foo_func_x_graph = list(models.FunctionXGraph.objects.all().select_related('function'))
-
 class Resource(models.ResourceInstance):
     class Meta:
         proxy = True
@@ -70,13 +68,10 @@ class Resource(models.ResourceInstance):
         # end from models.ResourceInstance
         self.tiles = []
 
-        # self.foo_config = list(models.FunctionXGraph.objects.select_related('function').filter(graph_id=self.graph_id, function__functiontype="primarydescriptors"))
-        self.foo_config = [bar for bar in foo_func_x_graph if bar.graph_id == self.graph_id and bar.function.functiontype == "primarydescriptors"]
-
     def get_descriptor(self, descriptor):
         module = importlib.import_module("arches.app.functions.primary_descriptors")
         PrimaryDescriptorsFunction = getattr(module, "PrimaryDescriptorsFunction")()
-        functionConfig = self.foo_config
+        functionConfig = models.FunctionXGraph.objects.filter(graph_id=self.graph_id, function__functiontype="primarydescriptors")
         if len(functionConfig) == 1:
             return PrimaryDescriptorsFunction.get_primary_descriptor_from_nodes(self, functionConfig[0].config[descriptor])
         else:

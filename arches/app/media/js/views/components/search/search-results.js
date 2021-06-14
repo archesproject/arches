@@ -7,9 +7,10 @@ define(['jquery',
     'knockout',
     'knockout-mapping',
     'view-data',
+    'report-templates',
     'bootstrap-datetimepicker',
     'plugins/knockout-select2'],
-function($, _, BaseFilter, bootstrap, arches, select2, ko, koMapping, viewdata) {
+function($, _, BaseFilter, bootstrap, arches, select2, ko, koMapping, viewdata, reportLookup) {
     var componentName = 'search-results';
     return ko.components.register(componentName, {
         viewModel: BaseFilter.extend({
@@ -102,7 +103,25 @@ function($, _, BaseFilter, bootstrap, arches, select2, ko, koMapping, viewdata) 
                 if (!!this.searchResults.results){
                     this.results.removeAll();
                     this.selectedResourceId(null);
+
+                    
+                    var resourceIds = this.searchResults.results.hits.hits.map(function(hit) {
+                        return hit['_id'];
+                    });
+                    
+                    console.log("ADFDSFDSFDSFDSF", this.searchResults, resourceIds)
+
+                    var url = arches.urls.api_bulk_foo + `?resource_ids=${resourceIds}`;
+
+                    $.getJSON(url, function(resp) {
+                        console.log("SDS", resp)
+                    })
+
+
                     this.searchResults.results.hits.hits.forEach(function(result){
+
+
+                        
                         var graphdata = _.find(viewdata.graphs, function(graphdata){
                             return result._source.graph_id === graphdata.graphid;
                         });

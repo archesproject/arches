@@ -22,6 +22,13 @@ define([
                 this.options = options;
 
                 this.resourceInstanceId = ko.observable();
+                this.resourceInstanceId.subscribe(function(resourceid) {
+                    var url = arches.urls.api_specific_resource_report_data(resourceid) + '?graph_data=false';
+
+                    $.getJSON(url, function(resp) {
+                        console.log("AAAxcxAAA", resp)
+                    })
+                });
 
                 this.loading = ko.observable(false);
                 this.ready = ko.observable(false);

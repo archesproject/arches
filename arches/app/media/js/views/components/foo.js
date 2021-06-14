@@ -77,28 +77,28 @@ define([
             if (ko.unwrap(self.resourceid)) {
                 var url = arches.urls.api_resource_report(self.resourceid);
 
-                self.fetchResourceData(url).then(function(responseJson) {
+                // self.fetchResourceData(url).then(function(responseJson) {
 
 
 
 
 
-                    console.log("AAAAAAA", responseJson, params.genericResourceReportData)
+                    // console.log("AAAAAAA", responseJson, params.genericResourceReportData)
 
 
 
-                    var template = responseJson.template;
-                    self.template(template);
+                    // var template = responseJson.template;
+                    // self.template(template);
                     
-                    if (template.preload_resource_data) {
-                        self.preloadResourceData(responseJson, params.genericResourceReportData)
-                    }
-                    else {
-                        self.report(responseJson.resource_instance);
-                    }
+                    // if (template.preload_resource_data) {
+                    //     self.preloadResourceData(responseJson, params.genericResourceReportData)
+                    // }
+                    // else {
+                    //     self.report(responseJson.resource_instance);
+                    // }
         
-                    self.loading(false);
-                });
+                    // self.loading(false);
+                // });
 
             }
             // else {
@@ -151,6 +151,8 @@ define([
             });
 
             var fooData = { ...responseJson, ...genericResourceReportData}
+
+            console.log('ssss', fooData, responseJson, genericResourceReportData)
 
 
             var report = new ReportModel(_.extend(fooData, {
