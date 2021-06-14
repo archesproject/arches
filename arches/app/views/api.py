@@ -1219,14 +1219,14 @@ class GenericResourceReportData(APIBase):
 
 class ResourceSpecificResourceReportData(APIBase):
     def get(self, request, resourceid):
-        should_serialize_graph = not request.GET.get('graph_data') == 'false'
+        should_serialize_graph = not request.GET.get("graph_data") == "false"
 
         try:
             # needs validation?
             # resource = cache.get(resourceid)
             # if not resource:
             resource = Resource.objects.get(pk=resourceid)
-                # cache.set(resourceid, resource)
+            # cache.set(resourceid, resource)
 
         except Exception as e:
             return JSONResponse(str(e), status=404)
@@ -1234,12 +1234,12 @@ class ResourceSpecificResourceReportData(APIBase):
         # graph = cache.get(resource.graph_id)
         # if not graph:
         graph = Graph.objects.get(graphid=resource.graph_id)
-            # cache.set(resource.graph_id, graph)
+        # cache.set(resource.graph_id, graph)
 
         # template = cache.get(graph.template_id)
         # if not template:
         template = models.ReportTemplate.objects.get(pk=graph.template_id)
-            # cache.set(graph.template_id, template)
+        # cache.set(graph.template_id, template)
 
         if template.preload_resource_data:
             response = self._load_resource_specific_resource_data(
@@ -1443,10 +1443,10 @@ class BulkFoo(APIBase):
         if not graph_ids:
             raise Exception()
 
-        graph_ids_set = set(graph_ids)  #calls set to delete dups
+        graph_ids_set = set(graph_ids)  # calls set to delete dups
         graph_ids_not_in_cache = []
 
-        graph_lookup = {}  
+        graph_lookup = {}
 
         for graph_id in graph_ids_set:
             graph = cache.get('serialized_graph_{}'.format(graph_id))
@@ -1468,7 +1468,7 @@ class BulkFoo(APIBase):
                 cache.set('serialized_graph_{}'.format(graph.pk), serialized_graph)
                 graph_lookup[str(graph.pk)] = serialized_graph
 
-        cards = CardProxyModel.objects.filter(graph_id__in=graph_ids_set).select_related('nodegroup').order_by("sortorder")
+        cards = CardProxyModel.objects.filter(graph_id__in=graph_ids_set).select_related("nodegroup").order_by("sortorder")
 
         perm = "read_nodegroup"
         permitted_cards = []
@@ -1489,9 +1489,7 @@ class BulkFoo(APIBase):
             graph_cards = [ card for card in permitted_cards if str(card.graph_id) == graph['graphid'] ]
 
             cardwidgets = [
-                widget
-                for widgets in [card.cardxnodexwidget_set.order_by("sortorder").all() for card in graph_cards]
-                for widget in widgets
+                widget for widgets in [card.cardxnodexwidget_set.order_by("sortorder").all() for card in graph_cards] for widget in widgets
             ]
 
             resp[graph_id] = {
