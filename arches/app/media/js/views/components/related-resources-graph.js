@@ -130,17 +130,32 @@ define([
             };
             this.refreshLayout = function() {
                 var viz = self.viz();
-                if (viz) viz.layout(layout).run();
+                if (viz) {
+                    viz.elements().makeLayout(layout).run();
+                }
             };
             this.expandNode = function(node) {
+                var viz = self.viz();
+                var position;
+                if (viz) {
+                    position = self.viz().getElementById(node.id).position();
+                }
                 if (node.id) getResourceRelations(node.id)
                     .then(function(response) {
                         return response.json();
                     })
                     .then(function(result) {
-                        var viz = self.viz();
                         var elements = result.related_resources.concat(result.resource_relationships)
-                            .map(dataToElement)
+                            .map(function(data) {
+                                var element = dataToElement(data);
+                                if (!data.source && position) {
+                                    element.position = {
+                                        x: position.x,
+                                        y: position.y
+                                    };
+                                }
+                                return element;
+                            })
                             .filter(function(element) {
                                 var elements = viz.getElementById(element.data.id);
                                 if (element.source) elements = elements.concat(
@@ -149,16 +164,12 @@ define([
                                 );
                                 return elements.length === 0;
                             });
-                        viz.nodes().forEach(function(node) {
-                            node.lock();
-                        });
+                        viz.nodes().lock();
                         viz.add(elements);
                         self.elements(viz.elements());
-                        var vizLayout = viz.layout(layout);
+                        var vizLayout = viz.elements().makeLayout(layout);
                         vizLayout.on("layoutstop", function() {
-                            viz.nodes().forEach(function(node) {
-                                node.unlock();
-                            });
+                            viz.nodes().unlock();
                         });
                         vizLayout.run();
                     });
@@ -318,9 +329,7 @@ define([
                     break;
                 case 'focus':
                     if (selection.source) viz.elements().unselect();
-                    else {
-                        self.focusResourceId(selection.id);
-                    }
+                    else self.focusResourceId(selection.id);
                     break;
                 default:
                     self.informationElement(selection);
