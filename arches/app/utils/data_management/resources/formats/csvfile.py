@@ -263,7 +263,7 @@ class TileCsvWriter(Writer):
         nodes = Node.objects.all().values('nodeid', 'name')
         self.node_name_lookup = {}
         for node in nodes:
-            self.node_name_lookup[node['nodeid']] = node['name']
+            self.node_name_lookup[str(node['nodeid'])] = node['name']
 
     def group_tiles(self, tiles, key):
         new_tiles = {}
@@ -344,6 +344,10 @@ class TileCsvWriter(Writer):
             csvwriter = csv.DictWriter(dest, delimiter=",", fieldnames=fieldnames)
             csvwriter.writeheader()
             csv_name = os.path.join("{0}.{1}".format(Card.objects.get(nodegroup_id=nodegroupid).name, "csv"))
+            forbidden_excel_sheet_name_characters = [ '\\', '/', '?', '*', '[' , ']' ]
+            for character in forbidden_excel_sheet_name_characters:
+                if character in csv_name:
+                    csv_name = csv_name.replace(character, '_')
             for v in tiles[nodegroupid]:
                 csvwriter.writerow(v)
             csvs_for_export.append({"name": csv_name, "outputfile": dest})
