@@ -250,6 +250,9 @@ define([
         $('.main-panel')[0].scrollTop = 0;
     });
 
+    vm.report = null;
+    vm.report = new ReportModel(_.extend(data, {graphModel: graphModel, cards: vm.topCards}));
+
     vm.resourceId.subscribe(function(){
         //switches the url from 'create-resource' once the resource id is available
         history.pushState({}, '', arches.urls.resource_editor + resourceId());

@@ -29,8 +29,6 @@ define([
         });
 
         if (params.report) {
-            console.log("DSSSDDS", params.report)
-
             this.template(reportLookup[params.report.templateId()]);
             this.report(params.report);
         }
@@ -86,33 +84,26 @@ define([
             //     self.loading(false)
 
             // }
-            // if (ko.unwrap(self.resourceid)) {
-                // var url = arches.urls.api_resource_report(self.resourceid);
+            if (ko.unwrap(self.resourceid)) {
+                var url = arches.urls.api_resource_report(self.resourceid);
 
-                // self.fetchResourceData(url).then(function(responseJson) {
-
-
-
-
-
-                    // console.log("AAAAAAA", responseJson, params.genericResourceReportData)
-
-
-
-                    // var template = responseJson.template;
-                    // self.template(template);
+                self.fetchResourceData(url).then(function(responseJson) {
+                    console.log("AAAAAAA", responseJson, CardViewModel)
                     
-                    // if (template.preload_resource_data) {
-                    //     self.preloadResourceData(responseJson, params.genericResourceReportData)
-                    // }
-                    // else {
-                    //     self.report(responseJson.resource_instance);
-                    // }
+                    var template = responseJson.template;
+                    self.template(template);
+                    
+                    if (template.preload_resource_data) {
+                        self.preloadResourceData(responseJson, params.genericResourceReportData)
+                    }
+                    else {
+                        self.report(responseJson.resource_instance);
+                    }
         
-                    // self.loading(false);
-                // });
+                    self.loading(false);
+                });
 
-            // }
+            }
             // else {
             //     self.loading(false);
             // }
@@ -129,21 +120,21 @@ define([
             });
         };
         
-        this.preloadResourceData = function(responseJson, genericResourceReportData) {
+        this.preloadResourceData = function(responseJson) {
             var graphModel = new GraphModel({
-                data: JSON.parse(responseJson.graph_json),
-                datatypes: JSON.parse(genericResourceReportData.datatypes_json),
+                data: responseJson.graph,
+                datatypes: responseJson.datatypes,
             });
 
             graph = {
                 graphModel: graphModel,
-                cards: JSON.parse(responseJson.cards),
-                graph: JSON.parse(responseJson.graph_json),
-                datatypes: JSON.parse(genericResourceReportData.datatypes_json),
-                cardwidgets: JSON.parse(responseJson.cardwidgets)
+                cards: responseJson.cards,
+                graph: responseJson.graph,
+                datatypes: responseJson.datatypes,
+                cardwidgets: responseJson.cardwidgets
             };
 
-            responseJson.tiles = JSON.parse(responseJson.tiles);
+            // responseJson.tiles = JSON.parse(responseJson.tiles);
 
             responseJson.cards = _.filter(graph.cards, function(card) {
                 var nodegroup = _.find(graph.graph.nodegroups, function(group) {
@@ -162,12 +153,7 @@ define([
                 });
             });
 
-            var fooData = { ...responseJson, ...genericResourceReportData}
-
-            console.log('ssss', fooData, responseJson, genericResourceReportData)
-
-
-            var report = new ReportModel(_.extend(fooData, {
+            var report = new ReportModel(_.extend(responseJson, {
                 resourceid: self.resourceid,
                 graphModel: graph.graphModel,
                 graph: graph.graph,

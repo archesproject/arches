@@ -510,6 +510,7 @@ define([
 
             updateTile: function(options, relationship) {
                 var self = this;
+                self.loading(true);
                 window.fetch(arches.urls.api_tiles(relationship.tileid()), {
                     method: 'GET',
                     credentials: 'include',

@@ -1212,7 +1212,6 @@ class GenericResourceReportData(APIBase):
                 "templates_json": templates_json,
                 "card_components_json": card_components_json,
                 "datatypes_json": datatypes_json,
-                "hide_empty_nodes": settings.HIDE_EMPTY_NODES_IN_REPORT,
             }
         )
 
@@ -1333,45 +1332,7 @@ class ResourceSpecificResourceReportData(APIBase):
             "related_resources": JSONSerializer().serialize(related_resources_summary, sort_keys=False),
         }
 
-    # def _generate_related_resources_summary(self, related_resources, resource_relationships, resource_models):
-    #     related_resource_summary = [
-    #         {"graphid": str(resource_model.graphid), "name": resource_model.name, "resources": []} for resource_model in resource_models
-    #     ]
 
-    #     resource_relationship_types = {
-    #         resource_relationship_type["id"]: resource_relationship_type["text"]
-    #         for resource_relationship_type in get_resource_relationship_types()["values"]
-    #     }
-
-    #     for related_resource in related_resources:
-    #         for summary in related_resource_summary:
-    #             if related_resource["graph_id"] == summary["graphid"]:
-    #                 relationship_summary = []
-    #                 for resource_relationship in resource_relationships:
-    #                     if related_resource["resourceinstanceid"] == resource_relationship["resourceinstanceidto"]:
-    #                         rr_type = (
-    #                             resource_relationship_types[resource_relationship["relationshiptype"]]
-    #                             if resource_relationship["relationshiptype"] in resource_relationship_types
-    #                             else resource_relationship["relationshiptype"]
-    #                         )
-    #                         relationship_summary.append(rr_type)
-    #                     elif related_resource["resourceinstanceid"] == resource_relationship["resourceinstanceidfrom"]:
-    #                         rr_type = (
-    #                             resource_relationship_types[resource_relationship["inverserelationshiptype"]]
-    #                             if resource_relationship["inverserelationshiptype"] in resource_relationship_types
-    #                             else resource_relationship["inverserelationshiptype"]
-    #                         )
-    #                         relationship_summary.append(rr_type)
-
-    #                 summary["resources"].append(
-    #                     {
-    #                         "instance_id": related_resource["resourceinstanceid"],
-    #                         "displayname": related_resource["displayname"],
-    #                         "relationships": relationship_summary,
-    #                     }
-    #                 )
-
-    #     return related_resource_summary
 
 
 class Foo(APIBase):
@@ -1387,7 +1348,12 @@ class Foo(APIBase):
             "displayname": resource.displayname,
             "resourceid": resourceid,
             "graph": graph,
+            "hide_empty_nodes": settings.HIDE_EMPTY_NODES_IN_REPORT,
         }
+
+        if 'template' not in exclude:
+            template = models.ReportTemplate.objects.get(pk=graph.template_id)
+            resp['template'] = template
 
         if 'related_resources' not in exclude:
             resource_models = (
@@ -1411,7 +1377,7 @@ class Foo(APIBase):
 
         if 'tiles' not in exclude:
             permitted_tiles = []
-            for tile in Tile.objects.filter(resourceinstance=resource).select_related('nodegroup').order_by("sortorder"):
+            for tile in TileProxyModel.objects.filter(resourceinstance=resource).select_related('nodegroup').order_by("sortorder"):
                 if request.user.has_perm(perm, tile.nodegroup):
                     tile.filter_by_perm(request.user, perm)
                     permitted_tiles.append(tile)
@@ -1420,7 +1386,7 @@ class Foo(APIBase):
 
         if 'cards' not in exclude:
             permitted_cards = []
-            for card in Card.objects.filter(graph_id=resource.graph_id).select_related('nodegroup').order_by("sortorder"):
+            for card in CardProxyModel.objects.filter(graph_id=resource.graph_id).select_related('nodegroup').order_by("sortorder"):
                 if request.user.has_perm(perm, card.nodegroup):
                     card.filter_by_perm(request.user, perm)
                     permitted_cards.append(card)
@@ -1433,6 +1399,46 @@ class Foo(APIBase):
             resp['cardwidgets'] = cardwidgets
 
         return JSONResponse(resp)
+
+    def _generate_related_resources_summary(self, related_resources, resource_relationships, resource_models):
+        related_resource_summary = [
+            {"graphid": str(resource_model.graphid), "name": resource_model.name, "resources": []} for resource_model in resource_models
+        ]
+
+        resource_relationship_types = {
+            resource_relationship_type["id"]: resource_relationship_type["text"]
+            for resource_relationship_type in get_resource_relationship_types()["values"]
+        }
+
+        for related_resource in related_resources:
+            for summary in related_resource_summary:
+                if related_resource["graph_id"] == summary["graphid"]:
+                    relationship_summary = []
+                    for resource_relationship in resource_relationships:
+                        if related_resource["resourceinstanceid"] == resource_relationship["resourceinstanceidto"]:
+                            rr_type = (
+                                resource_relationship_types[resource_relationship["relationshiptype"]]
+                                if resource_relationship["relationshiptype"] in resource_relationship_types
+                                else resource_relationship["relationshiptype"]
+                            )
+                            relationship_summary.append(rr_type)
+                        elif related_resource["resourceinstanceid"] == resource_relationship["resourceinstanceidfrom"]:
+                            rr_type = (
+                                resource_relationship_types[resource_relationship["inverserelationshiptype"]]
+                                if resource_relationship["inverserelationshiptype"] in resource_relationship_types
+                                else resource_relationship["inverserelationshiptype"]
+                            )
+                            relationship_summary.append(rr_type)
+
+                    summary["resources"].append(
+                        {
+                            "instance_id": related_resource["resourceinstanceid"],
+                            "displayname": related_resource["displayname"],
+                            "relationships": relationship_summary,
+                        }
+                    )
+
+        return related_resource_summary
 
 
 class BulkFoo(APIBase):

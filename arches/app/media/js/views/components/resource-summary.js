@@ -1,8 +1,11 @@
 define([
     'knockout',
+    'views/components/foo'
 ], function(ko) {
     var viewModel = function(params){
-        this.loading = ko.observable(true);
+        this.loading = ko.observable(false);
+
+        this.fooCache = ko.observable({});
 
         console.log("resource summary", this, params)
     };

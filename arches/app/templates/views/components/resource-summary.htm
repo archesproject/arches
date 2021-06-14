@@ -1,14 +1,8 @@
 {% load i18n %}
 
-<!--ko if: loading() -->
 <div class='loading-mask'></div>
-<!--/ko-->
-<!-- ko ifnot: loading() -->
-<div class='resource-report' data-bind='component: {
-    name: "foo",
+<div class='resource-report' data-bind="component: {
+    name: 'foo',
     params: {
-        qux: "qux"
-        summary: true
     }
-}'></div>
-<!-- /ko -->
+}"></div>
