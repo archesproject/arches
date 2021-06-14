@@ -24,19 +24,8 @@ define([
 
                 this.options = options;
 
-                this.resourceInstanceId = ko.observable();
-                // this.resourceInstanceId.subscribe(function(resourceid) {
-                //     var url = arches.urls.api_specific_resource_report_data(resourceid) + '?graph_data=false';
-
-                //     $.getJSON(url, function(resp) {
-                //         console.log("AAAxcxAAA", resp)
-                //     })
-                // });
-
                 this.report = ko.observable();
-
                 this.loading = ko.observable(false);
-                this.ready = ko.observable(false);
 
                 var setSearchResults = function(){
                     options.searchResultsVm = self.getFilter('search-results');
@@ -54,15 +43,6 @@ define([
                 query['tiles'] = true;
                 this.query(query);
 
-                console.log("search result details load", self, options, arches)
-
-                this.genericResourceReportData = ko.observable()
-
-                $.getJSON(arches.urls.api_generic_resource_report_data, function(resp) {
-                    self.genericResourceReportData(resp)
-                })
-
-                
                 this.setupReport = function(source, bulkFooCache) {    
                     var sourceData = {
                         "tiles": source.tiles,
@@ -90,8 +70,6 @@ define([
                 };
 
                 this.createReport = function(sourceData, bulkFooCacheData) {
-                    console.log('in create report', sourceData, bulkFooCacheData)
-
                     var data = { ...sourceData };
 
                     data.cards = _.filter(bulkFooCacheData.cards, function(card) {

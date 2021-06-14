@@ -1,5 +1,4 @@
 {% load staticfiles %} {% load i18n %} {% load template_tags %}
-<div style="display:none" data-bind="text: console.log('hmmmm')"></div>
 
 <!--ko let: {self: $data} -->
 <!--ko if: resourceEditorContext && displaySplash()-->
@@ -34,8 +33,6 @@
             <i class="fa fa-times-circle"></i>
         </div>
     </div>
-    <!-- ko ifnot: $data.loading() -->
-    <div style="display:none" data-bind="text: console.log('rsm', $data, $data.loading(), $data.searchResults.name, $parent)"></div>
     <div class="create-instance-panel" data-bind="component: {
         name: 'foo',
         params: {
@@ -43,7 +40,6 @@
             summary: true,
         }
     }"></div>
-    <!-- /ko -->
 </div>
 
 <!--ko if: !displaySplash()-->

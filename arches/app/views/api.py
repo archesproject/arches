@@ -1374,10 +1374,69 @@ class ResourceSpecificResourceReportData(APIBase):
     #     return related_resource_summary
 
 
+class Foo(APIBase):
+    def get(self, request, resourceid):
+        exclude = request.GET.get('exclude', [])
+        perm = "read_nodegroup"
+
+        resource = Resource.objects.get(pk=resourceid)
+        graph = Graph.objects.get(graphid=resource.graph_id)
+
+        resp = {
+            "datatypes": models.DDataType.objects.all(),
+            "displayname": resource.displayname,
+            "resourceid": resourceid,
+            "graph": graph,
+        }
+
+        if 'related_resources' not in exclude:
+            resource_models = (
+                models.GraphModel.objects.filter(isresource=True).exclude(isactive=False).exclude(pk=settings.SYSTEM_SETTINGS_RESOURCE_MODEL_ID)
+            )
+
+            get_params = request.GET.copy()
+            get_params.update({"paginate": "false"})
+            request.GET = get_params
+
+            related_resources_response = RelatedResourcesView().get(request, resourceid)
+            related_resources = json.loads(related_resources_response.content)
+
+            related_resources_summary = self._generate_related_resources_summary(
+                related_resources=related_resources["related_resources"],
+                resource_relationships=related_resources["resource_relationships"],
+                resource_models=resource_models,
+            )
+
+            resp['related_resources'] = related_resources_summary
+
+        if 'tiles' not in exclude:
+            permitted_tiles = []
+            for tile in Tile.objects.filter(resourceinstance=resource).select_related('nodegroup').order_by("sortorder"):
+                if request.user.has_perm(perm, tile.nodegroup):
+                    tile.filter_by_perm(request.user, perm)
+                    permitted_tiles.append(tile)
+
+            resp['tiles'] = permitted_tiles
+
+        if 'cards' not in exclude:
+            permitted_cards = []
+            for card in Card.objects.filter(graph_id=resource.graph_id).select_related('nodegroup').order_by("sortorder"):
+                if request.user.has_perm(perm, card.nodegroup):
+                    card.filter_by_perm(request.user, perm)
+                    permitted_cards.append(card)
+
+            cardwidgets = [
+                widget for widgets in [card.cardxnodexwidget_set.order_by("sortorder").all() for card in permitted_cards] for widget in widgets
+            ]
+
+            resp['cards'] = permitted_cards
+            resp['cardwidgets'] = cardwidgets
+
+        return JSONResponse(resp)
+
+
 class BulkFoo(APIBase):
     def get(self, request):
-        # correct input is two ordered lists
-        # of resource_id and corresponding graph_id
         graph_ids = request.GET.get('graph_ids').split(',')
         exclude = request.GET.get('exclude', [])
 
