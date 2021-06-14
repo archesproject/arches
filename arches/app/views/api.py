@@ -1219,14 +1219,14 @@ class GenericResourceReportData(APIBase):
 
 class ResourceSpecificResourceReportData(APIBase):
     def get(self, request, resourceid):
-        should_serialize_graph = not request.GET.get('graph_data') == 'false'
+        should_serialize_graph = not request.GET.get("graph_data") == "false"
 
         try:
             # needs validation?
             # resource = cache.get(resourceid)
             # if not resource:
             resource = Resource.objects.get(pk=resourceid)
-                # cache.set(resourceid, resource)
+            # cache.set(resourceid, resource)
 
         except Exception as e:
             return JSONResponse(str(e), status=404)
@@ -1234,12 +1234,12 @@ class ResourceSpecificResourceReportData(APIBase):
         # graph = cache.get(resource.graph_id)
         # if not graph:
         graph = Graph.objects.get(graphid=resource.graph_id)
-            # cache.set(resource.graph_id, graph)
+        # cache.set(resource.graph_id, graph)
 
         # template = cache.get(graph.template_id)
         # if not template:
         template = models.ReportTemplate.objects.get(pk=graph.template_id)
-            # cache.set(graph.template_id, template)
+        # cache.set(graph.template_id, template)
 
         if template.preload_resource_data:
             response = self._load_resource_specific_resource_data(
@@ -1376,24 +1376,22 @@ class ResourceSpecificResourceReportData(APIBase):
 
 class BulkFoo(APIBase):
     def get(self, request):
-        resource_ids = request.GET.get('resource_ids').split(',')
-        exclude = request.GET.get('exclude')
+        resource_ids = request.GET.get("resource_ids").split(",")
+        exclude = request.GET.get("exclude")
 
         resources = Resource.objects.filter(pk__in=resource_ids)
-        graph_ids = [ resource.graph_id for resource in resources ]
-
-
+        graph_ids = [resource.graph_id for resource in resources]
 
         if not graph_ids:
             raise Exception()
 
-        graph_ids_set = set(graph_ids)  #calls set to delete dups
+        graph_ids_set = set(graph_ids)  # calls set to delete dups
         graph_ids_not_in_cache = []
 
-        graph_lookup = {}  
+        graph_lookup = {}
 
         for graph_id in graph_ids_set:
-            graph = cache.get('graph_{}'.format(graph_id))
+            graph = cache.get("graph_{}".format(graph_id))
 
             if graph:
                 graph_lookup[graph.pk] = graph
@@ -1403,12 +1401,11 @@ class BulkFoo(APIBase):
         if graph_ids_not_in_cache:
             graphs_from_database = list(Graph.objects.filter(pk__in=graph_ids_not_in_cache))
 
-
             for graph in graphs_from_database:
                 # cache.set('graph_{}'.format(graph.pk))
                 graph_lookup[graph.pk] = graph
 
-        cards = CardProxyModel.objects.filter(graph_id__in=graph_ids_set).select_related('nodegroup').order_by("sortorder")
+        cards = CardProxyModel.objects.filter(graph_id__in=graph_ids_set).select_related("nodegroup").order_by("sortorder")
 
         perm = "read_nodegroup"
         permitted_cards = []
@@ -1423,18 +1420,16 @@ class BulkFoo(APIBase):
         for resource in resources:
             graph = graph_lookup[resource.graph_id]
 
-            graph_cards = [ card for card in permitted_cards if card.graph_id == graph.pk ]
+            graph_cards = [card for card in permitted_cards if card.graph_id == graph.pk]
 
             cardwidgets = [
-                widget
-                for widgets in [card.cardxnodexwidget_set.order_by("sortorder").all() for card in graph_cards]
-                for widget in widgets
+                widget for widgets in [card.cardxnodexwidget_set.order_by("sortorder").all() for card in graph_cards] for widget in widgets
             ]
 
             resp[resource.pk] = {
-                'graph': JSONSerializer().serializeToPython(graph, sort_keys=False, exclude=["is_editable", "functions"]),
-                'cards': JSONSerializer().serializeToPython(graph_cards, sort_keys=False, exclude=["is_editable"]),
-                'cardwidgets': cardwidgets,
+                "graph": JSONSerializer().serializeToPython(graph, sort_keys=False, exclude=["is_editable", "functions"]),
+                "cards": JSONSerializer().serializeToPython(graph_cards, sort_keys=False, exclude=["is_editable"]),
+                "cardwidgets": cardwidgets,
             }
 
         return JSONResponse(resp)
