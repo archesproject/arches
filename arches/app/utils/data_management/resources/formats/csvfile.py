@@ -318,7 +318,8 @@ class TileCsvWriter(Writer):
             )
         else:
             tiles = self.group_tiles(
-                list(TileModel.objects.filter(resourceinstance_id__in=resourceinstanceids).order_by("nodegroup_id").values()), "nodegroup_id"
+                list(TileModel.objects.filter(resourceinstance_id__in=resourceinstanceids).order_by("nodegroup_id").values()),
+                "nodegroup_id",
             )
         semantic_nodes = [str(n[0]) for n in Node.objects.filter(datatype="semantic").values_list("nodeid")]
 
