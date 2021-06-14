@@ -6,11 +6,12 @@ define(['jquery',
     'select2',
     'knockout',
     'knockout-mapping',
+    'models/graph',
     'view-data',
     'report-templates',
     'bootstrap-datetimepicker',
     'plugins/knockout-select2'],
-function($, _, BaseFilter, bootstrap, arches, select2, ko, koMapping, viewdata, reportLookup) {
+function($, _, BaseFilter, bootstrap, arches, select2, ko, koMapping, GraphModel, viewdata, reportLookup) {
     var componentName = 'search-results';
     return ko.components.register(componentName, {
         viewModel: BaseFilter.extend({
@@ -87,16 +88,10 @@ function($, _, BaseFilter, bootstrap, arches, select2, ko, koMapping, viewdata, 
                 };
             },
 
-            showResourceSummaryReport: function(graphId, resourceInstanceId, result) {
+            showResourceSummaryReport: function(result) {
                 var self = this;
                 return function(){
-
-
-
-                    console.log("BNBBBB", self.bulkFooCache(), graphId, resourceInstanceId)
-
-
-                    self.details.setupReport(graphId, resourceInstanceId, result._source);
+                    self.details.setupReport(result._source, self.bulkFooCache);
                     if (self.selectedTab() !== 'search-result-details') {
                         self.selectedTab('search-result-details');
                     }
@@ -126,10 +121,19 @@ function($, _, BaseFilter, bootstrap, arches, select2, ko, koMapping, viewdata, 
                         var url = arches.urls.api_bulk_foo + `?graph_ids=${graphIdsToFetch}`;
     
                         $.getJSON(url, function(resp) {
-                            bulkFooCache = self.bulkFooCache();
+                            var bulkFooCache = self.bulkFooCache();
 
                             Object.keys(resp).forEach(function(graphId) {
-                                bulkFooCache[graphId] = resp[graphId];
+                                graphData = resp[graphId];
+
+                                /* let's also cache the GraphModel */ 
+                                var graphModel = new GraphModel({
+                                    data: graphData.graph,
+                                    datatypes: graphData.datatypes
+                                });
+                                graphData['graphModel'] = graphModel;
+
+                                bulkFooCache[graphId] = graphData;
                             });
 
                             self.bulkFooCache(bulkFooCache);
@@ -154,7 +158,7 @@ function($, _, BaseFilter, bootstrap, arches, select2, ko, koMapping, viewdata, 
                             geometries: ko.observableArray(result._source.geometries),
                             iconclass: graphdata ? graphdata.iconclass : '',
                             showrelated: this.showRelatedResources(result._source.resourceinstanceid),
-                            showDetails: this.showResourceSummaryReport(result._source.graph_id, result._source.resourceinstanceid, result),
+                            showDetails: this.showResourceSummaryReport(result),
                             mouseoverInstance: this.mouseoverInstance(result._source.resourceinstanceid),
                             relationshipcandidacy: this.toggleRelationshipCandidacy(result._source.resourceinstanceid),
                             ontologyclass: result._source.root_ontology_class,

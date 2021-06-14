@@ -22,15 +22,27 @@ define([
 
         this.template = ko.observable();
         this.report = ko.observable();
+        this.report.subscribe(function(report) {
+            if (report) {
+                self.loading(false);
+            }
+        });
+
+        if (params.report) {
+            console.log("DSSSDDS", params.report)
+
+            this.template(reportLookup[params.report.templateId()]);
+            this.report(params.report);
+        }
 
         // Object.keys(params.genericResourceReportData).forEach(function(key) {
         //     this[key] = params.genericResourceReportData[key] 
         // })
 
-        if (params.genericResourceReportData) {
+        // if (params.genericResourceReportData) {
 
             console.log('in foo component', self, params)
-        }
+        // }
 
 
         this.initialize = function() {
@@ -74,8 +86,8 @@ define([
             //     self.loading(false)
 
             // }
-            if (ko.unwrap(self.resourceid)) {
-                var url = arches.urls.api_resource_report(self.resourceid);
+            // if (ko.unwrap(self.resourceid)) {
+                // var url = arches.urls.api_resource_report(self.resourceid);
 
                 // self.fetchResourceData(url).then(function(responseJson) {
 
@@ -100,7 +112,7 @@ define([
                     // self.loading(false);
                 // });
 
-            }
+            // }
             // else {
             //     self.loading(false);
             // }

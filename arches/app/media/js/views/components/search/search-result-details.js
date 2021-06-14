@@ -3,11 +3,14 @@ define([
     'underscore',
     'knockout',
     'arches',
-    'models/graph',
     'views/components/search/base-filter',
+    'report-templates',
+    'card-components',
+    'models/report',
+    'viewmodels/card',
     'views/components/foo',
     'bindings/chosen'
-], function($, _, ko, arches, GraphModel, BaseFilter) {
+], function($, _, ko, arches, BaseFilter, reportLookup, cardComponents, ReportModel, CardViewModel) {
     var componentName = 'search-result-details';
     return ko.components.register(componentName, {
         viewModel: BaseFilter.extend({
@@ -22,13 +25,15 @@ define([
                 this.options = options;
 
                 this.resourceInstanceId = ko.observable();
-                this.resourceInstanceId.subscribe(function(resourceid) {
-                    var url = arches.urls.api_specific_resource_report_data(resourceid) + '?graph_data=false';
+                // this.resourceInstanceId.subscribe(function(resourceid) {
+                //     var url = arches.urls.api_specific_resource_report_data(resourceid) + '?graph_data=false';
 
-                    $.getJSON(url, function(resp) {
-                        console.log("AAAxcxAAA", resp)
-                    })
-                });
+                //     $.getJSON(url, function(resp) {
+                //         console.log("AAAxcxAAA", resp)
+                //     })
+                // });
+
+                this.report = ko.observable();
 
                 this.loading = ko.observable(false);
                 this.ready = ko.observable(false);
@@ -49,23 +54,6 @@ define([
                 query['tiles'] = true;
                 this.query(query);
 
-                var graphCache = {};
-
-                // var fooCache = {};
-
-                this.foo = function() {
-                    console.log(self.searchResults.results)
-                };
-
-                // /* roundabout searchResults subscription */ 
-                // this.loading.subscribe(function() {
-                //     console.log('g', self, options, self.searchResults.results)
-                    
-                // });
-
-                // this.responseJson = ko.observable();
-
-
                 console.log("search result details load", self, options, arches)
 
                 this.genericResourceReportData = ko.observable()
@@ -74,41 +62,63 @@ define([
                     self.genericResourceReportData(resp)
                 })
 
-
-
                 
-                this.setupReport = function(graphId, resourceInstanceId, source) {
-                    // self.foo();
-                    // self.responseJson(responseJson);
-                    // self.loading(true);
-                    self.resourceInstanceId(resourceInstanceId);
+                this.setupReport = function(source, bulkFooCache) {    
+                    var sourceData = {
+                        "tiles": source.tiles,
+                        "displayname": source.displayname,
+                        "resourceid": source.resourceinstanceid
+                    };
 
-                    // var graph = graphCache[graphId];
+                    var graphId = source['graph_id'];
 
+                    if (bulkFooCache()[graphId]) {
+                        self.createReport(sourceData, bulkFooCache()[graphId]);
+                    }
+                    else {
+                        self.loading(true);
 
-                    // if (!graph) {
-                    //     $.getJSON(arches.urls.graphs_api + graphId + "?context=search-result-details", function(data) {
-                    //         var graphModel = new GraphModel({
-                    //             data: data.graph,
-                    //             datatypes: data.datatypes
-                    //         });
+                        var bulkFooSubscription = bulkFooCache.subscribe(function(cache) {
+                            if (cache[graphId]) {
+                                self.createReport(sourceData, cache[graphId]);
 
-                    //         graph = {
-                    //             graphModel: graphModel,
-                    //             cards: data.cards,
-                    //             graph: data.graph,
-                    //             datatypes: data.datatypes,
-                    //             cardwidgets: data.cardwidgets
-                    //         };
+                                bulkFooSubscription.dispose(); /* terminates subscription */
+                                self.loading(false);
+                            }
+                        });
+                    }
+                };
 
-                    //         graphCache[graphId] = graph;
+                this.createReport = function(sourceData, bulkFooCacheData) {
+                    console.log('in create report', sourceData, bulkFooCacheData)
 
-                    //         // self.loading(false);
-                    //     });
-                    // }
-                    // else {
-                    //     // self.loading(false);
-                    // }
+                    var data = { ...sourceData };
+
+                    data.cards = _.filter(bulkFooCacheData.cards, function(card) {
+                        var nodegroup = _.find(bulkFooCacheData.graph.nodegroups, function(group) {
+                            return group.nodegroupid === card.nodegroup_id;
+                        });
+                        return !nodegroup || !nodegroup.parentnodegroup_id;
+                    }).map(function(card) {
+                        return new CardViewModel({
+                            card: card,
+                            graphModel: bulkFooCacheData.graphModel,
+                            resourceId: data.resourceid,
+                            displayname: data.displayname,
+                            cards: bulkFooCacheData.cards,
+                            tiles: data.tiles,
+                            cardwidgets: bulkFooCacheData.cardwidgets
+                        });
+                    });
+
+                    data.templates = reportLookup;
+                    data.cardComponents = cardComponents;
+
+                    self.report(new ReportModel(_.extend(data, {
+                        graphModel: bulkFooCacheData.graphModel,
+                        graph: bulkFooCacheData.graph,
+                        datatypes: bulkFooCacheData.datatypes
+                    })));
                 };
             }
         }),

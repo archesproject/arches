@@ -8,18 +8,17 @@
     <!--/ko-->
 
     <!-- ko ifnot: loading() -->
-        <!--ko if: resourceInstanceId() -->
+        <!--ko if: report() -->
         <div class='resource-report' data-bind='component: {
             name: "foo",
             params: {
                 foobar: "foobar",
-                resourceid: resourceInstanceId(),
-                genericResourceReportData: genericResourceReportData(),
+                report: report(),
                 summary: true
             }
         }'></div>
         <!--/ko-->
-        <!--ko ifnot: resourceInstanceId() -->
+        <!--ko ifnot: report() -->
         <div class="search-result-details-splash">
             <div class="rr-splash">
                 <!-- Image -->
