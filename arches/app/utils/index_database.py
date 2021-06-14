@@ -72,6 +72,8 @@ def index_resources_by_type(resource_types, clear_index=True, batch_size=setting
     status = ""
     datatype_factory = DataTypeFactory()
     node_datatypes = {str(nodeid): datatype for nodeid, datatype in models.Node.objects.values_list("nodeid", "datatype")}
+    if isinstance(resource_types, str):
+        resource_types = [resource_types]
 
     for resource_type in resource_types:
         start = datetime.now()
