@@ -1333,8 +1333,6 @@ class ResourceSpecificResourceReportData(APIBase):
         }
 
 
-
-
 class Foo(APIBase):
     def get(self, request, resourceid):
         exclude = request.GET.get("exclude", [])
@@ -1351,11 +1349,11 @@ class Foo(APIBase):
             "hide_empty_nodes": settings.HIDE_EMPTY_NODES_IN_REPORT,
         }
 
-        if 'template' not in exclude:
+        if "template" not in exclude:
             template = models.ReportTemplate.objects.get(pk=graph.template_id)
-            resp['template'] = template
+            resp["template"] = template
 
-        if 'related_resources' not in exclude:
+        if "related_resources" not in exclude:
             resource_models = (
                 models.GraphModel.objects.filter(isresource=True)
                 .exclude(isactive=False)
@@ -1379,7 +1377,7 @@ class Foo(APIBase):
 
         if "tiles" not in exclude:
             permitted_tiles = []
-            for tile in TileProxyModel.objects.filter(resourceinstance=resource).select_related('nodegroup').order_by("sortorder"):
+            for tile in TileProxyModel.objects.filter(resourceinstance=resource).select_related("nodegroup").order_by("sortorder"):
                 if request.user.has_perm(perm, tile.nodegroup):
                     tile.filter_by_perm(request.user, perm)
                     permitted_tiles.append(tile)
@@ -1388,7 +1386,7 @@ class Foo(APIBase):
 
         if "cards" not in exclude:
             permitted_cards = []
-            for card in CardProxyModel.objects.filter(graph_id=resource.graph_id).select_related('nodegroup').order_by("sortorder"):
+            for card in CardProxyModel.objects.filter(graph_id=resource.graph_id).select_related("nodegroup").order_by("sortorder"):
                 if request.user.has_perm(perm, card.nodegroup):
                     card.filter_by_perm(request.user, perm)
                     permitted_cards.append(card)
