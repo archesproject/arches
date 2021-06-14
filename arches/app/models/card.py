@@ -172,7 +172,7 @@ class Card(models.CardModel):
 
                 sub_groups = models.NodeGroup.objects.filter(parentnodegroup=self.nodegroup)
                 for sub_group in sub_groups:
-                    self.cards.extend(Card.objects.select_related('nodegroup').filter(nodegroup=sub_group))
+                    self.cards.extend(Card.objects.select_related("nodegroup").filter(nodegroup=sub_group))
 
                 self.cardinality = self.nodegroup.cardinality
 

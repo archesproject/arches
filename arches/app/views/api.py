@@ -1265,7 +1265,7 @@ class ResourceSpecificResourceReportData(APIBase):
 
         resource_tiles = TileProxyModel.objects.filter(resourceinstance=resource).order_by("sortorder")
 
-        graph_cards = CardProxyModel.objects.filter(graph_id=resource.graph_id).select_related('graph').order_by("sortorder")
+        graph_cards = CardProxyModel.objects.filter(graph_id=resource.graph_id).select_related("graph").order_by("sortorder")
 
         related_resources_summary = {}
 
