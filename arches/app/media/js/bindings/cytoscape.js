@@ -3,7 +3,7 @@ define([
     'underscore',
     'cytoscape',
     'cytoscape-cola'
-], function (ko, _, cytoscape, cola) {
+], function(ko, _, cytoscape, cola) {
     cytoscape.use(cola);
     ko.bindingHandlers.cytoscape = {
         init: function(element, valueAccessor) {
