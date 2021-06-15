@@ -43,7 +43,10 @@ define([
                         self.preloadResourceData(responseJson, params.genericResourceReportData)
                     }
                     else {
-                        self.report(responseJson.resource);
+                        self.report({
+                            'template': responseJson.template,
+                            'disambiguated_resource': responseJson.resource,
+                        });
                     }
         
                     self.loading(false);

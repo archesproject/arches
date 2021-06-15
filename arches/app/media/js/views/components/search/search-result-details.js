@@ -97,21 +97,24 @@ define([
     
                         data.templates = reportLookup;
                         data.cardComponents = cardComponents;
-    
-                        self.report(new ReportModel(_.extend(data, {
+
+                        var report = new ReportModel(_.extend(data, {
                             graphModel: bulkFooGraphCacheData.graphModel,
                             graph: bulkFooGraphCacheData.graph,
                             datatypes: bulkFooGraphCacheData.datatypes,
-                            resource: bulkFooDisambiguatedResourceCacheData,
-                        })));
+                        }));
+
+                        report.disambiguated_resource = bulkFooDisambiguatedResourceCacheData;
+    
+                        self.report(report);
                     }
                     else {
                         self.report({
-                            ...bulkFooDisambiguatedResourceCacheData,
                             templateId: ko.observable(bulkFooGraphCacheData.template_id),
+                            disambiguated_resource: bulkFooDisambiguatedResourceCacheData,
                         });
-                    }
 
+                    }
                 };
             }
         }),

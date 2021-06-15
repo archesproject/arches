@@ -122,10 +122,21 @@ function($, _, BaseFilter, bootstrap, arches, select2, ko, koMapping, GraphModel
                         return acc;
                     }, []);
                     
-                    if (graphIdsToFetch.length > 0) {
+                    if (graphIdsToFetch.length > 0 || resourceIdsToFetch.length > 0) {
                         var url = arches.urls.api_bulk_foo + `?graph_ids=${graphIdsToFetch}&resource_ids=${resourceIdsToFetch}`;
     
                         $.getJSON(url, function(resp) {
+                            /* BEGIN _must_ come before caching graphs */ 
+                            var bulkFooDisambiguatedResourceCache = self.bulkFooDisambiguatedResourceCache();
+
+                            Object.keys(resp['resources']).forEach(function(resourceId) {
+                                resourceData = resp['resources'][resourceId];
+                                bulkFooDisambiguatedResourceCache[resourceId] = resourceData;
+                            });
+
+                            self.bulkFooDisambiguatedResourceCache(bulkFooDisambiguatedResourceCache);
+                            /* END _must_ come before caching graphs */ 
+
                             var bulkFooGraphCache = self.bulkFooGraphCache();
 
                             Object.keys(resp['graphs']).forEach(function(graphId) {
@@ -144,15 +155,6 @@ function($, _, BaseFilter, bootstrap, arches, select2, ko, koMapping, GraphModel
                             });
 
                             self.bulkFooGraphCache(bulkFooGraphCache);
-
-                            var bulkFooDisambiguatedResourceCache = self.bulkFooDisambiguatedResourceCache();
-
-                            Object.keys(resp['resources']).forEach(function(resourceId) {
-                                resourceData = resp['resources'][resourceId];
-                                bulkFooDisambiguatedResourceCache[resourceId] = resourceData;
-                            });
-
-                            self.bulkFooDisambiguatedResourceCache(bulkFooDisambiguatedResourceCache);
                         });
                     }
 
