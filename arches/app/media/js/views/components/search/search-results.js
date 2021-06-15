@@ -61,7 +61,8 @@ function($, _, BaseFilter, bootstrap, arches, select2, ko, koMapping, GraphModel
                     }
                 }, this);
 
-                this.bulkFooCache = ko.observable({});
+                this.bulkFooGraphCache = ko.observable({});
+                this.bulkFooDisambiguatedResourceCache = ko.observable({});
             },
 
             mouseoverInstance: function() {
@@ -91,7 +92,7 @@ function($, _, BaseFilter, bootstrap, arches, select2, ko, koMapping, GraphModel
             showResourceSummaryReport: function(result) {
                 var self = this;
                 return function(){
-                    self.details.setupReport(result._source, self.bulkFooCache);
+                    self.details.setupReport(result._source, self.bulkFooGraphCache, self.bulkFooDisambiguatedResourceCache);
                     if (self.selectedTab() !== 'search-result-details') {
                         self.selectedTab('search-result-details');
                     }
@@ -107,37 +108,51 @@ function($, _, BaseFilter, bootstrap, arches, select2, ko, koMapping, GraphModel
                     this.results.removeAll();
                     this.selectedResourceId(null);
 
-                    var graphIdsToFetch = this.searchResults.results.hits.hits.reduce(function(acc, hit) {
-                        var graphId = hit['_source']['graph_id'];
+                    resourceIdsToFetch = [];
 
-                        if (!self.bulkFooCache()[graphId]) {
+                    var graphIdsToFetch = this.searchResults.results.hits.hits.reduce(function(acc, hit) {
+                        
+                        var graphId = hit['_source']['graph_id'];
+                        
+                        if (!self.bulkFooGraphCache()[graphId]) {
                             acc.push(graphId);
+                            resourceIdsToFetch.push(hit['_source']['resourceinstanceid']);
                         }
 
                         return acc;
                     }, []);
                     
                     if (graphIdsToFetch.length > 0) {
-                        var url = arches.urls.api_bulk_foo + `?graph_ids=${graphIdsToFetch}`;
+                        var url = arches.urls.api_bulk_foo + `?graph_ids=${graphIdsToFetch}&resource_ids=${resourceIdsToFetch}`;
     
                         $.getJSON(url, function(resp) {
-                            var bulkFooCache = self.bulkFooCache();
+                            var bulkFooGraphCache = self.bulkFooGraphCache();
 
-                            Object.keys(resp).forEach(function(graphId) {
-                                graphData = resp[graphId];
+                            Object.keys(resp['graphs']).forEach(function(graphId) {
+                                graphData = resp['graphs'][graphId];
 
-                                /* let's also cache the GraphModel */ 
-                                var graphModel = new GraphModel({
-                                    data: graphData.graph,
-                                    datatypes: graphData.datatypes
-                                });
-                                graphData['graphModel'] = graphModel;
+                                /* let's cache the GraphModel of graphs that need to `preload_resource_data` */ 
+                                if (graphData.graph) {
+                                    var graphModel = new GraphModel({
+                                        data: graphData.graph,
+                                        datatypes: graphData.datatypes
+                                    });
+                                    graphData['graphModel'] = graphModel;
+                                }
 
-                                bulkFooCache[graphId] = graphData;
+                                bulkFooGraphCache[graphId] = graphData;
                             });
 
-                            self.bulkFooCache(bulkFooCache);
-                            console.log("SDS", self.bulkFooCache())
+                            self.bulkFooGraphCache(bulkFooGraphCache);
+
+                            var bulkFooDisambiguatedResourceCache = self.bulkFooDisambiguatedResourceCache();
+
+                            Object.keys(resp['resources']).forEach(function(resourceId) {
+                                resourceData = resp['resources'][resourceId];
+                                bulkFooDisambiguatedResourceCache[resourceId] = resourceData;
+                            });
+
+                            self.bulkFooDisambiguatedResourceCache(bulkFooDisambiguatedResourceCache);
                         });
                     }
 

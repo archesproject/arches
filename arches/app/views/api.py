@@ -1340,6 +1340,13 @@ class Foo(APIBase):
 
         resource = Resource.objects.get(pk=resourceid)
         graph = Graph.objects.get(graphid=resource.graph_id)
+        template = models.ReportTemplate.objects.get(pk=graph.template_id)
+
+        if not template.preload_resource_data:
+            return JSONResponse({
+                'template': template,
+                'resource': resource.to_json()
+            })
 
         resp = {
             "datatypes": models.DDataType.objects.all(),
@@ -1350,7 +1357,6 @@ class Foo(APIBase):
         }
 
         if "template" not in exclude:
-            template = models.ReportTemplate.objects.get(pk=graph.template_id)
             resp["template"] = template
 
         if "related_resources" not in exclude:
@@ -1446,6 +1452,7 @@ class Foo(APIBase):
 class BulkFoo(APIBase):
     def get(self, request):
         graph_ids = request.GET.get("graph_ids").split(",")
+        resource_ids = request.GET.get("resource_ids").split(",")  # should be ordered pairing with graph_ids
         exclude = request.GET.get("exclude", [])
 
         if not graph_ids:
@@ -1472,7 +1479,18 @@ class BulkFoo(APIBase):
                 cache.set("serialized_graph_{}".format(graph.pk), serialized_graph)
                 graph_lookup[str(graph.pk)] = serialized_graph
 
-        cards = CardProxyModel.objects.filter(graph_id__in=graph_ids_set).select_related("nodegroup").order_by("sortorder")
+        graph_ids_with_templates_that_preload_resource_data = []
+        graph_ids_with_templates_that_do_not_preload_resource_data = []
+
+        for graph in graph_lookup.values():
+            template = models.ReportTemplate.objects.get(pk=graph['template_id'])
+
+            if template.preload_resource_data:
+                graph_ids_with_templates_that_preload_resource_data.append(graph['graphid'])
+            else:
+                graph_ids_with_templates_that_do_not_preload_resource_data.append(graph['graphid'])
+
+        cards = CardProxyModel.objects.filter(graph_id__in=graph_ids_with_templates_that_preload_resource_data).select_related("nodegroup").order_by("sortorder")
 
         perm = "read_nodegroup"
         permitted_cards = []
@@ -1483,11 +1501,11 @@ class BulkFoo(APIBase):
                 permitted_cards.append(card)
 
         if "datatypes" not in exclude:
-            datatypes = models.DDataType.objects.all()
+            datatypes = list(models.DDataType.objects.all())
 
-        resp = {}
+        resp = {'graphs': {}, 'resources': {}}
 
-        for graph_id in graph_ids_set:
+        for graph_id in graph_ids_with_templates_that_preload_resource_data:
             graph = graph_lookup[graph_id]
 
             graph_cards = [card for card in permitted_cards if str(card.graph_id) == graph["graphid"]]
@@ -1496,14 +1514,25 @@ class BulkFoo(APIBase):
                 widget for widgets in [card.cardxnodexwidget_set.order_by("sortorder").all() for card in graph_cards] for widget in widgets
             ]
 
-            resp[graph_id] = {
+            resp['graphs'][graph_id] = {
                 "graph": graph,
                 "cards": JSONSerializer().serializeToPython(graph_cards, sort_keys=False, exclude=["is_editable"]),
                 "cardwidgets": cardwidgets,
             }
 
             if "datatypes" not in exclude:
-                resp[graph_id]["datatypes"] = datatypes
+                resp['graphs'][graph_id]["datatypes"] = datatypes
+
+        for graph_id in graph_ids_with_templates_that_do_not_preload_resource_data:
+            graph = graph_lookup[graph_id]
+
+            resp['graphs'][graph_id] = {
+                'template_id': graph['template_id']
+            }
+
+        resources = Resource.objects.filter(pk__in=resource_ids)
+        for resource in resources:
+            resp['resources'][resource.pk] = resource.to_json()
 
         return JSONResponse(resp)
 

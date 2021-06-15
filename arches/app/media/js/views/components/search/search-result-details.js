@@ -43,7 +43,9 @@ define([
                 query['tiles'] = true;
                 this.query(query);
 
-                this.setupReport = function(source, bulkFooCache) {    
+                this.setupReport = function(source, bulkFooGraphCache, bulkFooDisambiguatedResourceCache) {    
+                    self.loading(true);
+
                     var sourceData = {
                         "tiles": source.tiles,
                         "displayname": source.displayname,
@@ -51,52 +53,65 @@ define([
                     };
 
                     var graphId = source['graph_id'];
+                    var resourceId = source['resourceinstanceid'];
 
-                    if (bulkFooCache()[graphId]) {
-                        self.createReport(sourceData, bulkFooCache()[graphId]);
+                    if (bulkFooGraphCache()[graphId]) {
+                        self.createReport(sourceData, bulkFooGraphCache()[graphId], bulkFooDisambiguatedResourceCache()[resourceId]);
+                        self.loading(false)
                     }
                     else {
-                        self.loading(true);
 
-                        var bulkFooSubscription = bulkFooCache.subscribe(function(cache) {
+                        var bulkFooGraphCacheSubscription = bulkFooGraphCache.subscribe(function(cache) {
                             if (cache[graphId]) {
-                                self.createReport(sourceData, cache[graphId]);
+                                self.createReport(sourceData, cache[graphId], bulkFooDisambiguatedResourceCache()[resourceId]);
 
-                                bulkFooSubscription.dispose(); /* terminates subscription */
+                                bulkFooGraphCacheSubscription.dispose(); /* terminates subscription */
                                 self.loading(false);
                             }
                         });
                     }
                 };
 
-                this.createReport = function(sourceData, bulkFooCacheData) {
+                this.createReport = function(sourceData, bulkFooGraphCacheData, bulkFooDisambiguatedResourceCacheData) {
+                    console.log("DFDSFDSFDSFDSFSDFSD", sourceData, bulkFooDisambiguatedResourceCacheData, bulkFooGraphCacheData)
                     var data = { ...sourceData };
 
-                    data.cards = _.filter(bulkFooCacheData.cards, function(card) {
-                        var nodegroup = _.find(bulkFooCacheData.graph.nodegroups, function(group) {
-                            return group.nodegroupid === card.nodegroup_id;
+                    /* only templates that `preload_resource_data` use/cache the graph */ 
+                    if (bulkFooGraphCacheData.graph) {
+                        data.cards = _.filter(bulkFooGraphCacheData.cards, function(card) {
+                            var nodegroup = _.find(bulkFooGraphCacheData.graph.nodegroups, function(group) {
+                                return group.nodegroupid === card.nodegroup_id;
+                            });
+                            return !nodegroup || !nodegroup.parentnodegroup_id;
+                        }).map(function(card) {
+                            return new CardViewModel({
+                                card: card,
+                                graphModel: bulkFooGraphCacheData.graphModel,
+                                resourceId: data.resourceid,
+                                displayname: data.displayname,
+                                cards: bulkFooGraphCacheData.cards,
+                                tiles: data.tiles,
+                                cardwidgets: bulkFooGraphCacheData.cardwidgets
+                            });
                         });
-                        return !nodegroup || !nodegroup.parentnodegroup_id;
-                    }).map(function(card) {
-                        return new CardViewModel({
-                            card: card,
-                            graphModel: bulkFooCacheData.graphModel,
-                            resourceId: data.resourceid,
-                            displayname: data.displayname,
-                            cards: bulkFooCacheData.cards,
-                            tiles: data.tiles,
-                            cardwidgets: bulkFooCacheData.cardwidgets
+    
+                        data.templates = reportLookup;
+                        data.cardComponents = cardComponents;
+    
+                        self.report(new ReportModel(_.extend(data, {
+                            graphModel: bulkFooGraphCacheData.graphModel,
+                            graph: bulkFooGraphCacheData.graph,
+                            datatypes: bulkFooGraphCacheData.datatypes,
+                            resource: bulkFooDisambiguatedResourceCacheData,
+                        })));
+                    }
+                    else {
+                        self.report({
+                            ...bulkFooDisambiguatedResourceCacheData,
+                            templateId: ko.observable(bulkFooGraphCacheData.template_id),
                         });
-                    });
+                    }
 
-                    data.templates = reportLookup;
-                    data.cardComponents = cardComponents;
-
-                    self.report(new ReportModel(_.extend(data, {
-                        graphModel: bulkFooCacheData.graphModel,
-                        graph: bulkFooCacheData.graph,
-                        datatypes: bulkFooCacheData.datatypes
-                    })));
                 };
             }
         }),

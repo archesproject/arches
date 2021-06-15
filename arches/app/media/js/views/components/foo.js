@@ -22,73 +22,19 @@ define([
 
         this.template = ko.observable();
         this.report = ko.observable();
-        this.report.subscribe(function(report) {
-            if (report) {
+        
+        this.initialize = function() {
+            console.log("!!!!", params)
+            if (params.report) {
+                this.template(reportLookup[params.report.templateId()]);
+                this.report(params.report);
                 self.loading(false);
             }
-        });
-
-        if (params.report) {
-            this.template(reportLookup[params.report.templateId()]);
-            this.report(params.report);
-        }
-
-        // Object.keys(params.genericResourceReportData).forEach(function(key) {
-        //     this[key] = params.genericResourceReportData[key] 
-        // })
-
-        // if (params.genericResourceReportData) {
-
-            console.log('in foo component', self, params)
-        // }
-
-
-        this.initialize = function() {
-            // if (ko.unwrap(params.responseJson)) {
-
-
-            //     console.log("in params responseJson if", params.responseJson());
-
-            //     self.template(params.responseJson().template);
-
-            //     if (
-            //         params.responseJson().template.preload_resource_data
-            //         && !params.responseJson()['hasPreloadedResourceData']
-            //     ) {
-            //         self.preloadResourceData(params.responseJson())
-            //     }
-            //     else {
-            //         var graphModel = new GraphModel({
-            //             data: JSON.parse(params.responseJson().graph_json),
-            //             datatypes: JSON.parse(params.responseJson().datatypes_json),
-            //         });
-        
-            //         graph = {
-            //             graphModel: graphModel,
-            //             cards: params.responseJson().cards,
-            //             graph: JSON.parse(params.responseJson().graph_json),
-            //             datatypes: JSON.parse(params.responseJson().datatypes_json),
-            //             cardwidgets: JSON.parse(params.responseJson().cardwidgets)
-            //         };
-
-            //         var fooReport = new ReportModel(_.extend(params.responseJson(), {
-            //             resourceid: self.resourceid,
-            //             graphModel: graph.graphModel,
-            //             graph: graph.graph,
-            //             datatypes: graph.datatypes
-            //         }));
-                    
-            //         self.report(fooReport);
-            //     }
-                
-            //     self.loading(false)
-
-            // }
-            if (ko.unwrap(self.resourceid)) {
+            else if (ko.unwrap(self.resourceid)) {
                 var url = arches.urls.api_resource_report(self.resourceid);
 
                 self.fetchResourceData(url).then(function(responseJson) {
-                    console.log("AAAAAAA", responseJson, CardViewModel)
+                    console.log("AAAAAAA", responseJson)
                     
                     var template = responseJson.template;
                     self.template(template);
@@ -97,16 +43,13 @@ define([
                         self.preloadResourceData(responseJson, params.genericResourceReportData)
                     }
                     else {
-                        self.report(responseJson.resource_instance);
+                        self.report(responseJson.resource);
                     }
         
                     self.loading(false);
                 });
 
             }
-            // else {
-            //     self.loading(false);
-            // }
         };
 
         this.fetchResourceData = function(url) {
