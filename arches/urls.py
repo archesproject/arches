@@ -235,8 +235,8 @@ urlpatterns = [
     url(r"^api/nodes/(?P<nodeid>%s|())$" % (uuid_regex), api.Node.as_view(), name="api_nodes"),
     url(r"^api/instance_permissions/$", api.InstancePermission.as_view(), name="api_instance_permissions"),
     url(r"^api/node_value/$", api.NodeValue.as_view(), name="api_node_value"),
-    url(r"^api/resource_report/(?P<resourceid>%s|())$" % (uuid_regex), api.Foo.as_view(), name="api_resource_report"),
-    url(r"^api/bulk_foo$", api.BulkFoo.as_view(), name="api_bulk_foo"),
+    url(r"^api/resource_report/(?P<resourceid>%s|())$" % (uuid_regex), api.ResourceReport.as_view(), name="api_resource_report"),
+    url(r"^api/bulk_resource_report$", api.BulkResourceReport.as_view(), name="api_bulk_resource_report"),
     url(
         r"^api/bulk_disambiguated_resource_instance$",
         api.BulkDisambiguatedResourceInstance.as_view(),

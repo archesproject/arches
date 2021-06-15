@@ -57,7 +57,7 @@ function($, _, BaseFilter, bootstrap, arches, select2, ko, koMapping, GraphModel
                     }
                 }, this);
 
-                this.bulkFooGraphCache = ko.observable({});
+                this.bulkResourceReportCache = ko.observable({});
                 this.bulkDisambiguatedResourceInstanceCache = ko.observable({});
             },
 
@@ -88,7 +88,7 @@ function($, _, BaseFilter, bootstrap, arches, select2, ko, koMapping, GraphModel
             showResourceSummaryReport: function(result) {
                 var self = this;
                 return function(){
-                    self.details.setupReport(result._source, self.bulkFooGraphCache, self.bulkDisambiguatedResourceInstanceCache);
+                    self.details.setupReport(result._source, self.bulkResourceReportCache, self.bulkDisambiguatedResourceInstanceCache);
                     if (self.selectedTab() !== 'search-result-details') {
                         self.selectedTab('search-result-details');
                     }
@@ -106,7 +106,7 @@ function($, _, BaseFilter, bootstrap, arches, select2, ko, koMapping, GraphModel
                     var graphIdsToFetch = this.searchResults.results.hits.hits.reduce(function(acc, hit) {
                         var graphId = hit['_source']['graph_id'];
                         
-                        if (!self.bulkFooGraphCache()[graphId]) {
+                        if (!self.bulkResourceReportCache()[graphId]) {
                             acc.push(graphId);
                         }
 
@@ -114,10 +114,10 @@ function($, _, BaseFilter, bootstrap, arches, select2, ko, koMapping, GraphModel
                     }, []);
                     
                     if (graphIdsToFetch.length > 0) {
-                        var url = arches.urls.api_bulk_foo + `?graph_ids=${graphIdsToFetch}`;
+                        var url = arches.urls.api_bulk_resource_report + `?graph_ids=${graphIdsToFetch}`;
     
                         $.getJSON(url, function(resp) {
-                            var bulkFooGraphCache = self.bulkFooGraphCache();
+                            var bulkResourceReportCache = self.bulkResourceReportCache();
 
                             Object.keys(resp).forEach(function(graphId) {
                                 graphData = resp[graphId];
@@ -130,10 +130,10 @@ function($, _, BaseFilter, bootstrap, arches, select2, ko, koMapping, GraphModel
                                     graphData['graphModel'] = graphModel;
                                 }
 
-                                bulkFooGraphCache[graphId] = graphData;
+                                bulkResourceReportCache[graphId] = graphData;
                             });
 
-                            self.bulkFooGraphCache(bulkFooGraphCache);
+                            self.bulkResourceReportCache(bulkResourceReportCache);
                         });
                     }
 

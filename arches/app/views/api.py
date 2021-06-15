@@ -1102,7 +1102,7 @@ class OntologyProperty(APIBase):
         return JSONResponse(ret)
 
 
-class Foo(APIBase):
+class ResourceReport(APIBase):
     def get(self, request, resourceid):
         exclude = request.GET.get("exclude", [])
         perm = "read_nodegroup"
@@ -1216,7 +1216,7 @@ class Foo(APIBase):
         return related_resource_summary
 
 
-class BulkFoo(APIBase):
+class BulkResourceReport(APIBase):
     def get(self, request):
         graph_ids = request.GET.get("graph_ids").split(",")
         exclude = request.GET.get("exclude", [])

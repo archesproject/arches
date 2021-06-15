@@ -43,7 +43,7 @@ define([
                 query['tiles'] = true;
                 this.query(query);
 
-                this.setupReport = function(source, bulkFooGraphCache, bulkDisambiguatedResourceInstanceCache) {    
+                this.setupReport = function(source, bulkResourceReportCache, bulkDisambiguatedResourceInstanceCache) {    
                     self.loading(true);
 
                     var sourceData = {
@@ -55,40 +55,40 @@ define([
                     var graphId = source['graph_id'];
                     var resourceId = source['resourceinstanceid'];
 
-                    if (bulkFooGraphCache()[graphId] && bulkDisambiguatedResourceInstanceCache()[resourceId]) {
-                        self.createReport(sourceData, bulkFooGraphCache()[graphId], bulkDisambiguatedResourceInstanceCache()[resourceId]);
+                    if (bulkResourceReportCache()[graphId] && bulkDisambiguatedResourceInstanceCache()[resourceId]) {
+                        self.createReport(sourceData, bulkResourceReportCache()[graphId], bulkDisambiguatedResourceInstanceCache()[resourceId]);
                         self.loading(false)
                     }
                     else {
-                        var bulkFooGraphCacheSubscription = bulkFooGraphCache.subscribe(function(cache) {
+                        var bulkResourceReportCacheSubscription = bulkResourceReportCache.subscribe(function(cache) {
                             if (cache[graphId]) {
                                 self.createReport(sourceData, cache[graphId], bulkDisambiguatedResourceInstanceCache()[resourceId]);
 
-                                bulkFooGraphCacheSubscription.dispose(); /* terminates subscription */
+                                bulkResourceReportCacheSubscription.dispose(); /* terminates subscription */
                                 self.loading(false);
                             }
                         });
                     }
                 };
 
-                this.createReport = function(sourceData, bulkFooGraphCacheData, bulkDisambiguatedResourceInstanceCacheData) {
+                this.createReport = function(sourceData, bulkResourceReportCacheData, bulkDisambiguatedResourceInstanceCacheData) {
                     var data = { ...sourceData };
 
-                    if (bulkFooGraphCacheData.graph) {
-                        data.cards = _.filter(bulkFooGraphCacheData.cards, function(card) {
-                            var nodegroup = _.find(bulkFooGraphCacheData.graph.nodegroups, function(group) {
+                    if (bulkResourceReportCacheData.graph) {
+                        data.cards = _.filter(bulkResourceReportCacheData.cards, function(card) {
+                            var nodegroup = _.find(bulkResourceReportCacheData.graph.nodegroups, function(group) {
                                 return group.nodegroupid === card.nodegroup_id;
                             });
                             return !nodegroup || !nodegroup.parentnodegroup_id;
                         }).map(function(card) {
                             return new CardViewModel({
                                 card: card,
-                                graphModel: bulkFooGraphCacheData.graphModel,
+                                graphModel: bulkResourceReportCacheData.graphModel,
                                 resourceId: data.resourceid,
                                 displayname: data.displayname,
-                                cards: bulkFooGraphCacheData.cards,
+                                cards: bulkResourceReportCacheData.cards,
                                 tiles: data.tiles,
-                                cardwidgets: bulkFooGraphCacheData.cardwidgets
+                                cardwidgets: bulkResourceReportCacheData.cardwidgets
                             });
                         });
     
@@ -96,9 +96,9 @@ define([
                         data.cardComponents = cardComponents;
 
                         var report = new ReportModel(_.extend(data, {
-                            graphModel: bulkFooGraphCacheData.graphModel,
-                            graph: bulkFooGraphCacheData.graph,
-                            datatypes: bulkFooGraphCacheData.datatypes,
+                            graphModel: bulkResourceReportCacheData.graphModel,
+                            graph: bulkResourceReportCacheData.graph,
+                            datatypes: bulkResourceReportCacheData.datatypes,
                         }));
 
                         report.disambiguated_resource = bulkDisambiguatedResourceInstanceCacheData;
@@ -107,7 +107,7 @@ define([
                     }
                     else {
                         self.report({
-                            templateId: ko.observable(bulkFooGraphCacheData.template_id),
+                            templateId: ko.observable(bulkResourceReportCacheData.template_id),
                             disambiguated_resource: bulkDisambiguatedResourceInstanceCacheData,
                         });
 
