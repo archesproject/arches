@@ -60,7 +60,6 @@ define([
                         self.loading(false)
                     }
                     else {
-
                         var bulkFooGraphCacheSubscription = bulkFooGraphCache.subscribe(function(cache) {
                             if (cache[graphId]) {
                                 self.createReport(sourceData, cache[graphId], bulkFooDisambiguatedResourceCache()[resourceId]);
@@ -73,10 +72,8 @@ define([
                 };
 
                 this.createReport = function(sourceData, bulkFooGraphCacheData, bulkFooDisambiguatedResourceCacheData) {
-                    console.log("DFDSFDSFDSFDSFSDFSD", sourceData, bulkFooDisambiguatedResourceCacheData, bulkFooGraphCacheData)
                     var data = { ...sourceData };
 
-                    /* only templates that `preload_resource_data` use/cache the graph */ 
                     if (bulkFooGraphCacheData.graph) {
                         data.cards = _.filter(bulkFooGraphCacheData.cards, function(card) {
                             var nodegroup = _.find(bulkFooGraphCacheData.graph.nodegroups, function(group) {
