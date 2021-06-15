@@ -1300,10 +1300,9 @@ class BulkFoo(APIBase):
         return JSONResponse(resp)
 
 
-class BulkBar(APIBase):
+class BulkDisambiguatedResourceInstance(APIBase):
     def get(self, request):
         resource_ids = request.GET.get("resource_ids").split(",")
-
         return JSONResponse({resource.pk: resource.to_json() for resource in Resource.objects.filter(pk__in=resource_ids)})
 
 

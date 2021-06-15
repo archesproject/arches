@@ -4,12 +4,12 @@ require([
     'knockout',
     'arches',
     'views/base-manager',
-    'views/components/foo'
+    'views/components/resource-report-abstract'
 ], function($, _, ko, arches, BaseManagerView) {
     var View = BaseManagerView.extend({
         initialize: function(options){
             BaseManagerView.prototype.initialize.call(this, options);
-
+            
             if (location.search.indexOf('print') > 0) {
                 this.viewModel.loading(true);
                 setTimeout(

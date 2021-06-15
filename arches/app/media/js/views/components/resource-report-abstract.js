@@ -11,7 +11,7 @@ define([
     'viewmodels/card',
     'models/graph'
 ], function(arches, $, _, ko, koMapping, moment, reportLookup, cardComponents, ReportModel, CardViewModel, GraphModel) {
-    var Foo = function(params) {
+    var ResourceReportAbstract = function(params) {
         var self = this;
 
         this.loading = ko.observable(true);
@@ -124,9 +124,9 @@ define([
 
         this.initialize();
     };
-    ko.components.register('foo', {
-        viewModel: Foo,
-        template: { require: 'text!templates/views/components/foo.htm' }
+    ko.components.register('resource-report-abstract', {
+        viewModel: ResourceReportAbstract,
+        template: { require: 'text!templates/views/components/resource-report-abstract.htm' }
     });
-    return Foo;
+    return ResourceReportAbstract;
 });

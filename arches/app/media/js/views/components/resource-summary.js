@@ -1,6 +1,6 @@
 define([
     'knockout',
-    'views/components/foo'
+    'views/components/resource-report-abstract'
 ], function(ko) {
     var viewModel = function(params){
         this.loading = ko.observable(false);

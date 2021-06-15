@@ -8,7 +8,7 @@ define([
     'card-components',
     'models/report',
     'viewmodels/card',
-    'views/components/foo',
+    'views/components/resource-report-abstract',
     'bindings/chosen'
 ], function($, _, ko, arches, BaseFilter, reportLookup, cardComponents, ReportModel, CardViewModel) {
     var componentName = 'search-result-details';
