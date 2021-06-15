@@ -8,10 +8,9 @@ define(['jquery',
     'knockout-mapping',
     'models/graph',
     'view-data',
-    'report-templates',
     'bootstrap-datetimepicker',
     'plugins/knockout-select2'],
-function($, _, BaseFilter, bootstrap, arches, select2, ko, koMapping, GraphModel, viewdata, reportLookup) {
+function($, _, BaseFilter, bootstrap, arches, select2, ko, koMapping, GraphModel, viewdata) {
     var componentName = 'search-results';
     return ko.components.register(componentName, {
         viewModel: BaseFilter.extend({
@@ -31,9 +30,6 @@ function($, _, BaseFilter, bootstrap, arches, select2, ko, koMapping, GraphModel
                 this.showRelationships = ko.observable();
                 this.relationshipCandidates = ko.observableArray();
                 this.selectedResourceId = ko.observable(null);
-
-
-                console.log("IN SEECH RESULTS", self, options)
 
                 this.showRelationships.subscribe(function(res) {
                     this.selectedResourceId(res.resourceinstanceid);

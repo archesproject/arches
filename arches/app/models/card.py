@@ -118,7 +118,7 @@ class Card(models.CardModel):
         self.ontologyproperty = None
         self.constraints = []
 
-        self.foo_widgets = list(models.DDataType.objects.all())
+        self.datatypes = list(models.DDataType.objects.all())
 
         if args:
             if isinstance(args[0], dict):
@@ -234,14 +234,11 @@ class Card(models.CardModel):
                 return None
         return self
 
-    def serialize(self, fields=None, exclude=None, foo=None):
+    def serialize(self, fields=None, exclude=None):
         """
         serialize to a different form than used by the internal class structure
 
         """
-
-        # import pdb; pdb.set_trace()
-
         exclude = [] if exclude is None else exclude
         ret = JSONSerializer().handle_model(self, fields, exclude)
 
@@ -262,8 +259,7 @@ class Card(models.CardModel):
         # even if a widget hasn't been configured
         ret["widgets"] = self.widgets
         if "widgets" not in exclude:
-
-            widgets = self.foo_widgets
+            widgets = self.datatypes
 
             for node in ret["nodes"]:
                 found = False
