@@ -1101,6 +1101,7 @@ class OntologyProperty(APIBase):
 
         return JSONResponse(ret)
 
+
 class Foo(APIBase):
     def get(self, request, resourceid):
         exclude = request.GET.get("exclude", [])
