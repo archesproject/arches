@@ -46,6 +46,8 @@ define([
                 var url = arches.urls.api_resource_report(self.resourceid);
 
                 self.fetchResourceData(url).then(function(responseJson) {
+
+                    console.log('hhh', responseJson)
                     var template = responseJson.template;
                     self.template(template);
                     
