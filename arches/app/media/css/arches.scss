@@ -13884,6 +13884,9 @@ a.jstree-anchor.permissions-widget {
             }
         }
     }
+    .edge-node-information.element-hover .edge-node-display-name {
+        font-weight: 800;
+    }
     .related-resource-graph-information-content {
         margin-top: 60px;
         .edge-relationship-information {
@@ -13931,6 +13934,9 @@ a.jstree-anchor.permissions-widget {
                 }
             }
         }
+        .edge-relationship-information.element-hover .edge-relationship-label {
+            font-weight: 600;
+        }
     }
     .legend-listing {
         cursor: default;
@@ -13969,6 +13975,12 @@ a.jstree-anchor.permissions-widget {
                     color: darken($accent-color, 20%);
                 }
             }
+            .relationships-list-item-type.element-hover {
+                font-weight: bold;
+            }
+            .relationships-list-item-name.element-hover {
+                font-weight: bold;
+            }
         }
         .relationships-list-item:nth-of-type(odd) {
             background-color: rgb(246, 250, 254);
@@ -13995,6 +14007,9 @@ a.jstree-anchor.permissions-widget {
         .edge-node-information {
             background-color: rgb(247, 247, 247);
             border-bottom: 1px solid #aaa;
+        }
+        .edge-node-information.element-hover {
+            background-color: rgba(0, 0, 0, 0.05);
         }
     }
 }

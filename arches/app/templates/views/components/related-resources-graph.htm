@@ -111,17 +111,17 @@
     <div data-bind="text: displayname" class="node-display-name-header"></div>
     <div class="relationships-list-header">{% trans "Relationships" %}</div>
     <div class="relationships-list" data-bind="foreach: $parent.informationElementRelationships">
-        <div class="relationships-list-item" data-bind="event: {
-            mouseover: function() {
-                hoverElementId(edge.id)
-            },
-            mouseout: function() {
-                hoverElementId(null);
-            }
-        }, css: {'element-hover': hoverElementId() === edge.id}">
+        <div class="relationships-list-item">
             <span data-bind="text: label, click: function() {
                 informationElement(edge);
-            }" class="relationships-list-item-type"></span>
+            }, event: {
+                mouseover: function() {
+                    hoverElementId(edge.id)
+                },
+                mouseout: function() {
+                    hoverElementId(null);
+                }
+            }, css: {'element-hover': hoverElementId() === edge.id}" class="relationships-list-item-type"></span>
             <span class="relationships-list-item-name" data-bind="click: function() {
                 informationElement(node);
             }, event: {
@@ -129,7 +129,7 @@
                     hoverElementId(node.id)
                 },
                 mouseout: function() {
-                    hoverElementId(edge.id);
+                    hoverElementId(null);
                 }
             }, css: {'element-hover': hoverElementId() === node.id}">
                 (<span data-bind="text: node.displayname"></span>)
