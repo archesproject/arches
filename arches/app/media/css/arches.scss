@@ -13882,6 +13882,18 @@ a.jstree-anchor.permissions-widget {
             .edge-node-graph-name {
                 font-size: 13px;
             }
+            .edge-node-links {
+                margin-top: 5px;
+                span {
+                    cursor: pointer;
+                    color: #213e5f;
+                    display: inline-block;
+                    margin: 0 6px;
+                    i {
+                        padding-right: 4px;
+                    }
+                }
+            }
         }
     }
     .edge-node-information.element-hover .edge-node-display-name {
@@ -13940,6 +13952,14 @@ a.jstree-anchor.permissions-widget {
     }
     .legend-listing {
         cursor: default;
+        .edge-node-information {
+            .edge-node-title {
+                padding: 24px 0;
+                .edge-node-display-name {
+                    cursor: default;
+                }
+            }
+        }
     }
     .node-display-name-header {
         text-align: center;
@@ -14005,7 +14025,6 @@ a.jstree-anchor.permissions-widget {
         border: solid 1px #aaa;
         overflow-y: auto;
         .edge-node-information {
-            background-color: rgb(247, 247, 247);
             border-bottom: 1px solid #aaa;
         }
         .edge-node-information.element-hover {

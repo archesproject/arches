@@ -10,7 +10,8 @@ define([
             var layout = {
                 name: "cola",
                 animate: true,
-                directed: true
+                directed: true,
+                edgeLength: 200
             };
 
             this.viz = ko.observable();
@@ -22,8 +23,33 @@ define([
             this.selectionMode = ko.observable('information');
             this.elements = ko.observableArray();
             this.informationElement = ko.observable();
+            this.informationGraph = ko.computed(function() {
+                var informationElement = self.informationElement();
+                if (informationElement && informationElement.graph_id)
+                    return resourceTypeLookup[informationElement.graph_id];
+                return {};
+            });
+            this.viewInformationNodeReport = function() {
+                var informationElement = self.informationElement();
+                if (informationElement)
+                    window.open(arches.urls.resource_report + informationElement.id);
+            };
+            this.editInformationNode = function() {
+                var informationElement = self.informationElement();
+                if (informationElement)
+                    window.open(arches.urls.resource_editor + informationElement.id);
+            };
             this.hoverElementId = ko.observable();
-            this.legendEntries = ko.observableArray();
+            this.legendEntries = ko.computed(function() {
+                var elements = self.elements();
+                var entries = [];
+                for (var resourceTypeId in resourceTypeLookup) {
+                    if (elements.filter(function(element) {
+                        return element.data('graph_id') === resourceTypeId;
+                    }).length > 0) entries.push(resourceTypeLookup[resourceTypeId]);
+                }
+                return entries;
+            });
             this.nodeSearchFilter = ko.observable('');
             this.expandedSearchId = ko.observable();
             this.searchNodes = ko.computed(function() {
@@ -178,7 +204,6 @@ define([
                     });
             };
             var getStyle = function() {
-                self.legendEntries([]);
                 var nodeSize = 86;
                 var lineColor = '#606060';
                 var styles = [{
@@ -234,7 +259,6 @@ define([
                         }
                     };
                     styles.push(style);
-                    self.legendEntries.push(resourceTypeLookup[resourceId]);
                 }
                 return styles;
             };
