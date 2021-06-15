@@ -13888,7 +13888,6 @@ a.jstree-anchor.permissions-widget {
                     cursor: pointer;
                     color: #213e5f;
                     display: inline-block;
-                    margin: 0 6px;
                     i {
                         padding-right: 4px;
                     }
@@ -13900,7 +13899,8 @@ a.jstree-anchor.permissions-widget {
         font-weight: 800;
     }
     .related-resource-graph-information-content {
-        margin-top: 60px;
+        padding-top: 60px;
+        height: 100%;
         .edge-relationship-information {
             $edge-label-height: 150px;
             position: relative;
@@ -13961,14 +13961,10 @@ a.jstree-anchor.permissions-widget {
             }
         }
     }
-    .node-display-name-header {
-        text-align: center;
-        padding: 12px 0;
-        color: white;
-        background-color: $accent-color;
-        border: 1px solid darken($accent-color, 50%);
-        font-weight: bold;
-        font-size: 1.3em;
+    .edge-node-information.node-display-name-header {
+        .edge-node-title {
+            padding: 4px 0;
+        }
     }
     .relationships-list-header {
         padding: 5px 0;
@@ -13977,7 +13973,7 @@ a.jstree-anchor.permissions-widget {
         font-weight: 600;
     }
     .relationships-list {
-        height: 200px;
+        height: calc(100% - 134px);
         border: 1px solid rgb(221, 221, 221);
         overflow-y: auto;
         .relationships-list-item {
@@ -14009,7 +14005,7 @@ a.jstree-anchor.permissions-widget {
     .realtionships-list-count {
         color: rgb(120, 120, 120);
         font-size: 1.1em;
-        padding: 5px 0;
+        padding: 0 0 10px 0;
         a {
             color: darken($accent-color, 20%);
             padding-left: 5px;
