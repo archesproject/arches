@@ -25,10 +25,21 @@ define([
         
         this.initialize = function() {
             console.log("!!!!", params)
-            if (params.report) {
+            if (params.report && params.report.disambiguated_resource) {
                 this.template(reportLookup[params.report.templateId()]);
                 this.report(params.report);
                 self.loading(false);
+            }
+            else if (params.report) {
+                var url = arches.urls.api_bulk_bar + `?resource_ids=${params.report.attributes.resourceid}`;
+
+                $.getJSON(url, function(resp) {
+                    params.report.disambiguated_resource = resp[params.report.attributes.resourceid];
+
+                    self.template(reportLookup[params.report.templateId()]);
+                    self.report(params.report);
+                    self.loading(false);
+                })
             }
             else if (ko.unwrap(self.resourceid)) {
                 var url = arches.urls.api_resource_report(self.resourceid);
