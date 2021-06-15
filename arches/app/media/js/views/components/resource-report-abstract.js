@@ -32,7 +32,7 @@ define([
                 self.loading(false);
             }
             else if (params.report) {
-                var url = arches.urls.api_bulk_bar + `?resource_ids=${params.report.attributes.resourceid}`;
+                var url = arches.urls.api_bulk_disambiguated_resource_instance + `?resource_ids=${params.report.attributes.resourceid}`;
 
                 $.getJSON(url, function(resp) {
                     params.report.disambiguated_resource = resp[params.report.attributes.resourceid];

@@ -148,7 +148,7 @@ function($, _, BaseFilter, bootstrap, arches, select2, ko, koMapping, GraphModel
                     }, []);;
 
                     if (resourceIdsToFetch.length > 0) {
-                        var url = arches.urls.api_bulk_bar + `?resource_ids=${resourceIdsToFetch}`;
+                        var url = arches.urls.api_bulk_disambiguated_resource_instance + `?resource_ids=${resourceIdsToFetch}`;
 
                         $.getJSON(url, function(resp) {
                             var bulkFooDisambiguatedResourceCache = self.bulkFooDisambiguatedResourceCache();
