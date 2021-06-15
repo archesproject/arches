@@ -58,7 +58,7 @@ function($, _, BaseFilter, bootstrap, arches, select2, ko, koMapping, GraphModel
                 }, this);
 
                 this.bulkFooGraphCache = ko.observable({});
-                this.bulkFooDisambiguatedResourceCache = ko.observable({});
+                this.bulkDisambiguatedResourceInstanceCache = ko.observable({});
             },
 
             mouseoverInstance: function() {
@@ -88,7 +88,7 @@ function($, _, BaseFilter, bootstrap, arches, select2, ko, koMapping, GraphModel
             showResourceSummaryReport: function(result) {
                 var self = this;
                 return function(){
-                    self.details.setupReport(result._source, self.bulkFooGraphCache, self.bulkFooDisambiguatedResourceCache);
+                    self.details.setupReport(result._source, self.bulkFooGraphCache, self.bulkDisambiguatedResourceInstanceCache);
                     if (self.selectedTab() !== 'search-result-details') {
                         self.selectedTab('search-result-details');
                     }
@@ -140,7 +140,7 @@ function($, _, BaseFilter, bootstrap, arches, select2, ko, koMapping, GraphModel
                     var resourceIdsToFetch = this.searchResults.results.hits.hits.reduce(function(acc, hit) {
                         var resourceId = hit['_source']['resourceinstanceid'];
                         
-                        if (!self.bulkFooDisambiguatedResourceCache()[resourceId]) {
+                        if (!self.bulkDisambiguatedResourceInstanceCache()[resourceId]) {
                             acc.push(resourceId);
                         }
 
@@ -151,13 +151,13 @@ function($, _, BaseFilter, bootstrap, arches, select2, ko, koMapping, GraphModel
                         var url = arches.urls.api_bulk_disambiguated_resource_instance + `?resource_ids=${resourceIdsToFetch}`;
 
                         $.getJSON(url, function(resp) {
-                            var bulkFooDisambiguatedResourceCache = self.bulkFooDisambiguatedResourceCache();
+                            var bulkDisambiguatedResourceInstanceCache = self.bulkDisambiguatedResourceInstanceCache();
 
                             Object.keys(resp).forEach(function(resourceId) {
-                                bulkFooDisambiguatedResourceCache[resourceId] = resp[resourceId];
+                                bulkDisambiguatedResourceInstanceCache[resourceId] = resp[resourceId];
                             });
 
-                            self.bulkFooDisambiguatedResourceCache(bulkFooDisambiguatedResourceCache);
+                            self.bulkDisambiguatedResourceInstanceCache(bulkDisambiguatedResourceInstanceCache);
                         })
                     }
 

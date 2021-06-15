@@ -43,7 +43,7 @@ define([
                 query['tiles'] = true;
                 this.query(query);
 
-                this.setupReport = function(source, bulkFooGraphCache, bulkFooDisambiguatedResourceCache) {    
+                this.setupReport = function(source, bulkFooGraphCache, bulkDisambiguatedResourceInstanceCache) {    
                     self.loading(true);
 
                     var sourceData = {
@@ -55,14 +55,14 @@ define([
                     var graphId = source['graph_id'];
                     var resourceId = source['resourceinstanceid'];
 
-                    if (bulkFooGraphCache()[graphId] && bulkFooDisambiguatedResourceCache()[resourceId]) {
-                        self.createReport(sourceData, bulkFooGraphCache()[graphId], bulkFooDisambiguatedResourceCache()[resourceId]);
+                    if (bulkFooGraphCache()[graphId] && bulkDisambiguatedResourceInstanceCache()[resourceId]) {
+                        self.createReport(sourceData, bulkFooGraphCache()[graphId], bulkDisambiguatedResourceInstanceCache()[resourceId]);
                         self.loading(false)
                     }
                     else {
                         var bulkFooGraphCacheSubscription = bulkFooGraphCache.subscribe(function(cache) {
                             if (cache[graphId]) {
-                                self.createReport(sourceData, cache[graphId], bulkFooDisambiguatedResourceCache()[resourceId]);
+                                self.createReport(sourceData, cache[graphId], bulkDisambiguatedResourceInstanceCache()[resourceId]);
 
                                 bulkFooGraphCacheSubscription.dispose(); /* terminates subscription */
                                 self.loading(false);
@@ -71,7 +71,7 @@ define([
                     }
                 };
 
-                this.createReport = function(sourceData, bulkFooGraphCacheData, bulkFooDisambiguatedResourceCacheData) {
+                this.createReport = function(sourceData, bulkFooGraphCacheData, bulkDisambiguatedResourceInstanceCacheData) {
                     var data = { ...sourceData };
 
                     if (bulkFooGraphCacheData.graph) {
@@ -101,14 +101,14 @@ define([
                             datatypes: bulkFooGraphCacheData.datatypes,
                         }));
 
-                        report.disambiguated_resource = bulkFooDisambiguatedResourceCacheData;
+                        report.disambiguated_resource = bulkDisambiguatedResourceInstanceCacheData;
     
                         self.report(report);
                     }
                     else {
                         self.report({
                             templateId: ko.observable(bulkFooGraphCacheData.template_id),
-                            disambiguated_resource: bulkFooDisambiguatedResourceCacheData,
+                            disambiguated_resource: bulkDisambiguatedResourceInstanceCacheData,
                         });
 
                     }
