@@ -107,16 +107,6 @@ function($, _, BaseFilter, bootstrap, arches, select2, ko, koMapping, GraphModel
                     this.results.removeAll();
                     this.selectedResourceId(null);
 
-                    var resourceIdsToFetch = this.searchResults.results.hits.hits.reduce(function(acc, hit) {
-                        var resourceId = hit['_source']['resourceinstanceid'];
-                        
-                        if (!self.bulkFooDisambiguatedResourceCache()[resourceId]) {
-                            acc.push(resourceId);
-                        }
-
-                        return acc;
-                    }, []);;
-
                     var graphIdsToFetch = this.searchResults.results.hits.hits.reduce(function(acc, hit) {
                         var graphId = hit['_source']['graph_id'];
                         
@@ -131,12 +121,10 @@ function($, _, BaseFilter, bootstrap, arches, select2, ko, koMapping, GraphModel
                         var url = arches.urls.api_bulk_foo + `?graph_ids=${graphIdsToFetch}`;
     
                         $.getJSON(url, function(resp) {
-                            console.log("BBB", resp)
-
                             var bulkFooGraphCache = self.bulkFooGraphCache();
 
-                            Object.keys(resp['graphs']).forEach(function(graphId) {
-                                graphData = resp['graphs'][graphId];
+                            Object.keys(resp).forEach(function(graphId) {
+                                graphData = resp[graphId];
 
                                 if (graphData.graph) {
                                     var graphModel = new GraphModel({
@@ -153,12 +141,20 @@ function($, _, BaseFilter, bootstrap, arches, select2, ko, koMapping, GraphModel
                         });
                     }
 
+                    var resourceIdsToFetch = this.searchResults.results.hits.hits.reduce(function(acc, hit) {
+                        var resourceId = hit['_source']['resourceinstanceid'];
+                        
+                        if (!self.bulkFooDisambiguatedResourceCache()[resourceId]) {
+                            acc.push(resourceId);
+                        }
+
+                        return acc;
+                    }, []);;
+
                     if (resourceIdsToFetch.length > 0) {
                         var url = arches.urls.api_bulk_bar + `?resource_ids=${resourceIdsToFetch}`;
 
                         $.getJSON(url, function(resp) {
-                            console.log("CCC", resp)
-
                             var bulkFooDisambiguatedResourceCache = self.bulkFooDisambiguatedResourceCache();
 
                             Object.keys(resp).forEach(function(resourceId) {

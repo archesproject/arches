@@ -1503,7 +1503,7 @@ class BulkFoo(APIBase):
         if "datatypes" not in exclude:
             datatypes = list(models.DDataType.objects.all())
 
-        resp = {"graphs": {}, "resources": {}}
+        resp = {}
 
         for graph_id in graph_ids_with_templates_that_preload_resource_data:
             graph = graph_lookup[graph_id]
@@ -1514,18 +1514,18 @@ class BulkFoo(APIBase):
                 widget for widgets in [card.cardxnodexwidget_set.order_by("sortorder").all() for card in graph_cards] for widget in widgets
             ]
 
-            resp["graphs"][graph_id] = {
+            resp[graph_id] = {
                 "graph": graph,
                 "cards": JSONSerializer().serializeToPython(graph_cards, sort_keys=False, exclude=["is_editable"]),
                 "cardwidgets": cardwidgets,
             }
 
             if "datatypes" not in exclude:
-                resp["graphs"][graph_id]["datatypes"] = datatypes
+                resp[graph_id]["datatypes"] = datatypes
 
         for graph_id in graph_ids_with_templates_that_do_not_preload_resource_data:
             graph = graph_lookup[graph_id]
-            resp["graphs"][graph_id] = {"template_id": graph["template_id"]}
+            resp[graph_id] = {"template_id": graph["template_id"]}
 
         return JSONResponse(resp)
 
