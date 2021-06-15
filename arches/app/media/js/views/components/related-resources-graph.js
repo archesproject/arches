@@ -279,7 +279,6 @@ define([
                         if (element) self.informationElement(element.data());
                     }
 
-                    // self.viz(null);
                     self.selection(null);
                     getResourceRelations(resourceId)
                         .then(function(response) {
