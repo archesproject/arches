@@ -28,6 +28,7 @@ define([
             if (params.report && params.report.disambiguated_resource) {
                 this.template(reportLookup[params.report.templateId()]);
                 this.report(params.report);
+
                 self.loading(false);
             }
             else if (params.report) {
@@ -45,8 +46,6 @@ define([
                 var url = arches.urls.api_resource_report(self.resourceid);
 
                 self.fetchResourceData(url).then(function(responseJson) {
-                    console.log("AAAAAAA", responseJson)
-                    
                     var template = responseJson.template;
                     self.template(template);
                     
@@ -56,7 +55,7 @@ define([
                     else {
                         self.report({
                             'template': responseJson.template,
-                            'disambiguated_resource': responseJson.resource,
+                            'disambiguated_resource': responseJson.disambiguated_resource,
                         });
                     }
         
@@ -116,8 +115,7 @@ define([
             }));
 
             report['hideEmptyNodes'] = responseJson.hide_empty_nodes;
-
-            console.log('sdfsdf', report)
+            report['disambiguated_resource'] = responseJson.disambiguated_resource;
 
             self.report(report);
         };

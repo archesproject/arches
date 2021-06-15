@@ -1120,6 +1120,7 @@ class Foo(APIBase):
             "resourceid": resourceid,
             "graph": graph,
             "hide_empty_nodes": settings.HIDE_EMPTY_NODES_IN_REPORT,
+            "disambiguated_resource": resource.to_json(),
         }
 
         if "template" not in exclude:
