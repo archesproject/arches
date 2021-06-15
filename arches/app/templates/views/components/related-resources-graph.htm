@@ -57,7 +57,14 @@
 <div class="related-resource-graph-information-content" data-bind="using: informationElement">
     <!--ko if: $data -->
     <!--ko if: $parent.edgeInformation() -->
-    <div class="edge-node-information">
+    <div class="edge-node-information" data-bind="event: {
+            mouseover: function() {
+                $parent.hoverElementId($parent.edgeInformation().source.id)
+            },
+            mouseout: function() {
+                $parent.hoverElementId(null);
+            }
+        }, css: {'element-hover': $parent.hoverElementId() === $parent.edgeInformation().source.id}">
         <div class="edge-node-graph-color" data-bind="style: {backgroundColor: $parent.edgeInformation().sourceGraph.fillColor}"></div>
         <div class="edge-node-title">
             <div class="edge-node-display-name" data-bind="text: $parent.edgeInformation().source.displayname, click: function() {
@@ -66,7 +73,14 @@
             <div class="edge-node-graph-name" data-bind="text: $parent.edgeInformation().sourceGraph.name"></div>
         </div>
     </div>
-    <div class="edge-relationship-information">
+    <div class="edge-relationship-information" data-bind="event: {
+            mouseover: function() {
+                $parent.hoverElementId($parent.edgeInformation().id)
+            },
+            mouseout: function() {
+                $parent.hoverElementId(null);
+            }
+        }, css: {'element-hover': $parent.hoverElementId() === $parent.edgeInformation().id}">
         <div class="edge-relationship-arrow">
             <div></div>
         </div>
@@ -76,7 +90,14 @@
             <div class="edge-relationship-sufix">{% trans "with" %}</div>
         </div>
     </div>
-    <div class="edge-node-information">
+    <div class="edge-node-information" data-bind="event: {
+            mouseover: function() {
+                $parent.hoverElementId($parent.edgeInformation().target.id)
+            },
+            mouseout: function() {
+                $parent.hoverElementId(null);
+            }
+        }, css: {'element-hover': $parent.hoverElementId() === $parent.edgeInformation().target.id}">
         <div class="edge-node-graph-color" data-bind="style: {backgroundColor: $parent.edgeInformation().targetGraph.fillColor}"></div>
         <div class="edge-node-title">
             <div class="edge-node-display-name" data-bind="text: $parent.edgeInformation().target.displayname, click: function() {
@@ -90,13 +111,27 @@
     <div data-bind="text: displayname" class="node-display-name-header"></div>
     <div class="relationships-list-header">{% trans "Relationships" %}</div>
     <div class="relationships-list" data-bind="foreach: $parent.informationElementRelationships">
-        <div class="relationships-list-item">
+        <div class="relationships-list-item" data-bind="event: {
+            mouseover: function() {
+                hoverElementId(edge.id)
+            },
+            mouseout: function() {
+                hoverElementId(null);
+            }
+        }, css: {'element-hover': hoverElementId() === edge.id}">
             <span data-bind="text: label, click: function() {
                 informationElement(edge);
             }" class="relationships-list-item-type"></span>
             <span class="relationships-list-item-name" data-bind="click: function() {
                 informationElement(node);
-            }">
+            }, event: {
+                mouseover: function() {
+                    hoverElementId(node.id)
+                },
+                mouseout: function() {
+                    hoverElementId(edge.id);
+                }
+            }, css: {'element-hover': hoverElementId() === node.id}">
                 (<span data-bind="text: node.displayname"></span>)
             </span>
         </div>
@@ -123,7 +158,14 @@
     <span class="clear-node-search" data-bind="click: function() { nodeSearchFilter(''); }, visible: nodeSearchFilter() !== ''"><i class="fa fa-times-circle"></i></span>
 </div>
 <div class="related-reasources-search-list" data-bind="foreach: searchNodes">
-    <div class="edge-node-information">
+    <div class="edge-node-information" data-bind="event: {
+            mouseover: function() {
+                $parent.hoverElementId($data.id)
+            },
+            mouseout: function() {
+                $parent.hoverElementId(null);
+            }
+        }, css: {'element-hover': $parent.hoverElementId() === $data.id}">
         <div class="edge-node-graph-color" data-bind="style: {backgroundColor: graph.fillColor}"></div>
         <div class="edge-node-title">
             <div class="edge-node-display-name" data-bind="text: displayname, click: function() {

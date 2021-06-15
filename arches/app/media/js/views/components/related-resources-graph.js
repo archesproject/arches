@@ -22,6 +22,7 @@ define([
             this.selectionMode = ko.observable('information');
             this.elements = ko.observableArray();
             this.informationElement = ko.observable();
+            this.hoverElementId = ko.observable();
             this.legendEntries = ko.observableArray();
             this.nodeSearchFilter = ko.observable('');
             this.expandedSearchId = ko.observable();
@@ -73,7 +74,8 @@ define([
                             label: label,
                             node: nodeData,
                             edge: edgeData,
-                            informationElement: self.informationElement
+                            informationElement: self.informationElement,
+                            hoverElementId: self.hoverElementId
                         });
                     };
                     sourceEdges.forEach(function(edge) {
@@ -94,6 +96,7 @@ define([
                     var sourceData = viz.getElementById(informationElement.source).data();
                     var targetData = viz.getElementById(informationElement.target).data();
                     return {
+                        id: informationElement.id,
                         label: getRelationshipLabel(informationElement),
                         source: sourceData,
                         sourceGraph: resourceTypeLookup[sourceData['graph_id']],
@@ -164,7 +167,7 @@ define([
                                 );
                                 return elements.length === 0;
                             });
-                        viz.nodes().lock();
+                        self.viz().getElementById(node.id).lock();
                         viz.add(elements);
                         self.elements(viz.elements());
                         var vizLayout = viz.elements().makeLayout(layout);
@@ -198,7 +201,12 @@ define([
                 }, {
                     "selector": "node:selected",
                     "style": {
-                        "border-width": 5
+                        "border-width": 4
+                    }
+                }, {
+                    "selector": "node.hover",
+                    "style": {
+                        "border-width": 6
                     }
                 }, {
                     "selector": "edge",
@@ -208,8 +216,13 @@ define([
                 }, {
                     "selector": "edge:selected",
                     "style": {
-                        "width": 6,
+                        "width": 4,
                         "line-color": lineColor
+                    }
+                }, {
+                    "selector": "edge.hover",
+                    "style": {
+                        "width": 6
                     }
                 }];
                 for (var resourceId in resourceTypeLookup) {
@@ -295,6 +308,20 @@ define([
                     viz.on('unselect', 'node, edge', function() {
                         self.selection(null);
                     });
+                    viz.on('mouseover', 'node, edge', function(e) {
+                        self.hoverElementId(e.target.id());
+                    });
+                    viz.on('mouseout', 'node, edge', function() {
+                        self.hoverElementId(null);
+                    });
+                }
+            });
+
+            this.hoverElementId.subscribe(function(elementId) {
+                var viz = self.viz();
+                if (viz) {
+                    viz.elements().removeClass('hover');
+                    if (elementId) viz.getElementById(elementId).addClass('hover');
                 }
             });
 
