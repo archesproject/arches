@@ -714,7 +714,12 @@ class ResourceReportView(MapBaseManagerView):
 @method_decorator(can_read_resource_instance, name="dispatch")
 class RelatedResourcesView(BaseManagerView):
     action = None
-    graphs = models.GraphModel.objects.all().exclude(pk=settings.SYSTEM_SETTINGS_RESOURCE_MODEL_ID).exclude(isresource=False).exclude(isactive=False)
+    graphs = (
+        models.GraphModel.objects.all()
+        .exclude(pk=settings.SYSTEM_SETTINGS_RESOURCE_MODEL_ID)
+        .exclude(isresource=False)
+        .exclude(isactive=False)
+    )
 
     def paginate_related_resources(self, related_resources, page, request):
         total = related_resources["total"]["value"]
