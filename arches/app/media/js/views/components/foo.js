@@ -51,7 +51,7 @@ define([
                     self.template(template);
                     
                     if (template.preload_resource_data) {
-                        self.preloadResourceData(responseJson, params.genericResourceReportData)
+                        self.preloadResourceData(responseJson)
                     }
                     else {
                         self.report({
@@ -90,8 +90,6 @@ define([
                 datatypes: responseJson.datatypes,
                 cardwidgets: responseJson.cardwidgets
             };
-
-            // responseJson.tiles = JSON.parse(responseJson.tiles);
 
             responseJson.cards = _.filter(graph.cards, function(card) {
                 var nodegroup = _.find(graph.graph.nodegroups, function(group) {
