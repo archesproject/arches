@@ -55,7 +55,7 @@ define([
                     var graphId = source['graph_id'];
                     var resourceId = source['resourceinstanceid'];
 
-                    if (bulkFooGraphCache()[graphId]) {
+                    if (bulkFooGraphCache()[graphId] && bulkFooDisambiguatedResourceCache()[resourceId]) {
                         self.createReport(sourceData, bulkFooGraphCache()[graphId], bulkFooDisambiguatedResourceCache()[resourceId]);
                         self.loading(false)
                     }

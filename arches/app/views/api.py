@@ -1449,7 +1449,6 @@ class Foo(APIBase):
 class BulkFoo(APIBase):
     def get(self, request):
         graph_ids = request.GET.get("graph_ids").split(",")
-        resource_ids = request.GET.get("resource_ids").split(",")  # should be ordered pairing with graph_ids
         exclude = request.GET.get("exclude", [])
 
         if not graph_ids:
@@ -1526,14 +1525,20 @@ class BulkFoo(APIBase):
 
         for graph_id in graph_ids_with_templates_that_do_not_preload_resource_data:
             graph = graph_lookup[graph_id]
-
             resp["graphs"][graph_id] = {"template_id": graph["template_id"]}
 
-        resources = Resource.objects.filter(pk__in=resource_ids)
-        for resource in resources:
-            resp["resources"][resource.pk] = resource.to_json()
-
         return JSONResponse(resp)
+
+
+class BulkBar(APIBase):
+    def get(self, request):
+        resource_ids = request.GET.get("resource_ids").split(",")
+
+        return JSONResponse({
+            resource.pk: resource.to_json()
+            for resource in Resource.objects.filter(pk__in=resource_ids)
+        })
+
 
 
 @method_decorator(csrf_exempt, name="dispatch")

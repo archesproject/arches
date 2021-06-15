@@ -102,47 +102,42 @@ function($, _, BaseFilter, bootstrap, arches, select2, ko, koMapping, GraphModel
             updateResults: function(){
                 var self = this;
                 var data = $('div[name="search-result-data"]').data();
-
                 
                 if (!!this.searchResults.results){
                     this.results.removeAll();
                     this.selectedResourceId(null);
 
-                    resourceIdsToFetch = [];
+                    var resourceIdsToFetch = this.searchResults.results.hits.hits.reduce(function(acc, hit) {
+                        var resourceId = hit['_source']['resourceinstanceid'];
+                        
+                        if (!self.bulkFooDisambiguatedResourceCache()[resourceId]) {
+                            acc.push(resourceId);
+                        }
+
+                        return acc;
+                    }, []);;
 
                     var graphIdsToFetch = this.searchResults.results.hits.hits.reduce(function(acc, hit) {
-                        
                         var graphId = hit['_source']['graph_id'];
                         
                         if (!self.bulkFooGraphCache()[graphId]) {
                             acc.push(graphId);
-                            resourceIdsToFetch.push(hit['_source']['resourceinstanceid']);
                         }
 
                         return acc;
                     }, []);
                     
-                    if (graphIdsToFetch.length > 0 || resourceIdsToFetch.length > 0) {
-                        var url = arches.urls.api_bulk_foo + `?graph_ids=${graphIdsToFetch}&resource_ids=${resourceIdsToFetch}`;
+                    if (graphIdsToFetch.length > 0) {
+                        var url = arches.urls.api_bulk_foo + `?graph_ids=${graphIdsToFetch}`;
     
                         $.getJSON(url, function(resp) {
-                            /* BEGIN _must_ come before caching graphs */ 
-                            var bulkFooDisambiguatedResourceCache = self.bulkFooDisambiguatedResourceCache();
-
-                            Object.keys(resp['resources']).forEach(function(resourceId) {
-                                resourceData = resp['resources'][resourceId];
-                                bulkFooDisambiguatedResourceCache[resourceId] = resourceData;
-                            });
-
-                            self.bulkFooDisambiguatedResourceCache(bulkFooDisambiguatedResourceCache);
-                            /* END _must_ come before caching graphs */ 
+                            console.log("BBB", resp)
 
                             var bulkFooGraphCache = self.bulkFooGraphCache();
 
                             Object.keys(resp['graphs']).forEach(function(graphId) {
                                 graphData = resp['graphs'][graphId];
 
-                                /* let's cache the GraphModel of graphs that need to `preload_resource_data` */ 
                                 if (graphData.graph) {
                                     var graphModel = new GraphModel({
                                         data: graphData.graph,
@@ -156,6 +151,22 @@ function($, _, BaseFilter, bootstrap, arches, select2, ko, koMapping, GraphModel
 
                             self.bulkFooGraphCache(bulkFooGraphCache);
                         });
+                    }
+
+                    if (resourceIdsToFetch.length > 0) {
+                        var url = arches.urls.api_bulk_bar + `?resource_ids=${resourceIdsToFetch}`;
+
+                        $.getJSON(url, function(resp) {
+                            console.log("CCC", resp)
+
+                            var bulkFooDisambiguatedResourceCache = self.bulkFooDisambiguatedResourceCache();
+
+                            Object.keys(resp).forEach(function(resourceId) {
+                                bulkFooDisambiguatedResourceCache[resourceId] = resp[resourceId];
+                            });
+
+                            self.bulkFooDisambiguatedResourceCache(bulkFooDisambiguatedResourceCache);
+                        })
                     }
 
                     this.searchResults.results.hits.hits.forEach(function(result){

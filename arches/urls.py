@@ -238,6 +238,7 @@ urlpatterns = [
     url(r"^api/resource_report/(?P<resourceid>%s|())$" % (uuid_regex), api.Foo.as_view(), name="api_resource_report"),
     url(r"^api/generic_resource_report_data$", api.GenericResourceReportData.as_view(), name="api_generic_resource_report_data"),
     url(r"^api/bulk_foo$", api.BulkFoo.as_view(), name="api_bulk_foo"),
+    url(r"^api/bulk_bar$", api.BulkBar.as_view(), name="api_bulk_bar"),
     url(
         r"^api/specific_resource_report_data/(?P<resourceid>%s|())$" % (uuid_regex),
         api.ResourceSpecificResourceReportData.as_view(),
