@@ -85,6 +85,8 @@
 
 
 {% block body %}
+    <div style="display:none" data-bind="text: console.log($data, 'tab')"></div>
+
 
     <!--ko if: hasProvisionalData() && (editorContext === false) -->
     <div class="report-provisional-flag">{% trans 'This resource has provisional edits (not displayed in this report) that are pending review' %}</div>

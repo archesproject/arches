@@ -8,8 +8,6 @@ import sys
 import uuid
 import traceback
 from io import StringIO
-
-from django.contrib.auth.models import Group
 from oauth2_provider.views import ProtectedResourceView
 from pyld.jsonld import compact, frame, from_rdf
 from rdflib import RDF
@@ -17,7 +15,6 @@ from rdflib.namespace import SKOS, DCTERMS
 from revproxy.views import ProxyView
 from slugify import slugify
 from urllib import parse
-from distutils.util import strtobool
 from django.contrib.auth import authenticate
 from django.shortcuts import render
 from django.views.generic import View
@@ -489,34 +486,24 @@ class MVT(APIBase):
 class Graphs(APIBase):
     def get(self, request, graph_id=None):
         perm = "read_nodegroup"
+        datatypes = models.DDataType.objects.all()
+        graph = cache.get(f"graph_{graph_id}")
         user = request.user
 
-        graph = cache.get(f"graph_{graph_id}")
         if graph is None:
             graph = Graph.objects.get(graphid=graph_id)
-
-        resp = {"graph": JSONSerializer().serializeToPython(graph, sort_keys=False, exclude=["is_editable", "functions"])}
-
-        if request.GET.get("context") == "search-result-details" and not graph.template.preload_resource_data:
-            return JSONResponse(resp)
-        else:
-            cards = CardProxyModel.objects.filter(graph_id=graph_id).order_by("sortorder")
-            permitted_cards = []
-
-            for card in cards:
-                if user.has_perm(perm, card.nodegroup):
-                    card.filter_by_perm(user, perm)
-                    permitted_cards.append(card)
-
-            resp["datatypes"] = models.DDataType.objects.all()
-            resp["cards"] = JSONSerializer().serializeToPython(permitted_cards, sort_keys=False, exclude=["is_editable"])
-            resp["cardwidgets"] = [
-                widget
-                for widgets in [card.cardxnodexwidget_set.order_by("sortorder").all() for card in permitted_cards]
-                for widget in widgets
-            ]
-
-            return JSONResponse(resp)
+        cards = CardProxyModel.objects.filter(graph_id=graph_id).order_by("sortorder")
+        permitted_cards = []
+        for card in cards:
+            if user.has_perm(perm, card.nodegroup):
+                card.filter_by_perm(user, perm)
+                permitted_cards.append(card)
+        cardwidgets = [
+            widget for widgets in [card.cardxnodexwidget_set.order_by("sortorder").all() for card in permitted_cards] for widget in widgets
+        ]
+        graph = JSONSerializer().serializeToPython(graph, sort_keys=False, exclude=["is_editable", "functions"])
+        permitted_cards = JSONSerializer().serializeToPython(permitted_cards, sort_keys=False, exclude=["is_editable"])
+        return JSONResponse({"datatypes": datatypes, "cards": permitted_cards, "graph": graph, "cardwidgets": cardwidgets})
 
 
 @method_decorator(csrf_exempt, name="dispatch")
