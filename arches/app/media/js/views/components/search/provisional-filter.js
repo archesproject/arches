@@ -12,20 +12,20 @@ define([
                 this.filter = ko.observableArray();
                 this.provisionalOptions = [{'name': 'Authoritative'},{'name': 'Provisional'}];
 
-                // if (this.requiredFiltersLoaded() === false) {
-                //     this.requiredFiltersLoaded.subscribe(function() {
-                //         this.restoreState();
-                //     }, this);
-                // } else {
-                //     this.restoreState();
-                // }
+                if (this.requiredFiltersLoaded() === false) {
+                    this.requiredFiltersLoaded.subscribe(function() {
+                        this.restoreState();
+                    }, this);
+                } else {
+                    this.restoreState();
+                }
 
-                // var filterUpdated = ko.computed(function() {
-                //     return JSON.stringify(ko.toJS(this.filter()));
-                // }, this);
-                // filterUpdated.subscribe(function() {
-                //     this.updateQuery();
-                // }, this);
+                var filterUpdated = ko.computed(function() {
+                    return JSON.stringify(ko.toJS(this.filter()));
+                }, this);
+                filterUpdated.subscribe(function() {
+                    this.updateQuery();
+                }, this);
 
                 this.filters[componentName](this);
             },

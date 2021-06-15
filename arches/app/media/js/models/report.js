@@ -136,7 +136,7 @@ define(['jquery',
         updateRelatedResourcesLookup: function(json) {
             var relatedResourcesLookup = this.relatedResourcesLookup();
 
-            for (var [graphId, value] of Object.entries(JSON.parse(json))) {
+            for (var [graphId, value] of Object.entries(json)) {
                 var relatedResources;
                 var paginator;
                 var remainingResources;

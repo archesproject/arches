@@ -4,8 +4,7 @@ define([
     'viewmodels/widget',
     'arches',
     'views/components/resource-summary',
-    'utils/ontology',
-    'views/components/foo'
+    'utils/ontology'
 ], function(ko, _, WidgetViewModel, arches, ResourceSummary, ontologyUtils) {
     var resourceLookup = {};
     var graphCache = {};

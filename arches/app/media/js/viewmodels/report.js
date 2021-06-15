@@ -2,8 +2,6 @@ define(['knockout', 'knockout-mapping', 'underscore', 'moment', 'bindings/let', 
     var ReportViewModel = function(params) {
         var self = this;
 
-        console.log('report vm', params)
-
         this.report = params.report || null;
         this.summary = params.summary || false;
         this.reportDate = moment().format('MMMM D, YYYY');
