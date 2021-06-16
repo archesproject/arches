@@ -7,13 +7,11 @@ define([
     'models/report',
     'models/graph'
 ], function(arches, $, _, ko, reportLookup, ReportModel, GraphModel) {
-
     /* CardViewModel is not always available as a dependency on load. So let's get it explicitly */ 
     var CardViewModel;
     require(['viewmodels/card'], function(cardViewModel) { CardViewModel = cardViewModel; });
     
     var ResourceReportAbstract = function(params) {
-
         var self = this;
 
         this.loading = ko.observable(true);
