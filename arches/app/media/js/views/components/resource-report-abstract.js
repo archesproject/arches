@@ -3,28 +3,29 @@ define([
     'jquery',
     'underscore',
     'knockout',
-    'knockout-mapping',
-    'moment',
     'report-templates',
-    'card-components',
     'models/report',
-    'viewmodels/card',
     'models/graph'
-], function(arches, $, _, ko, koMapping, moment, reportLookup, cardComponents, ReportModel, CardViewModel, GraphModel) {
+], function(arches, $, _, ko, reportLookup, ReportModel, GraphModel) {
+
+    /* CardViewModel is not always available as a dependency on load. So let's get it explicitly */ 
+    var CardViewModel;
+    require(['viewmodels/card'], function(cardViewModel) { CardViewModel = cardViewModel; });
+    
     var ResourceReportAbstract = function(params) {
+
         var self = this;
 
         this.loading = ko.observable(true);
 
         this.version = arches.version;
-        this.resourceid = params.resourceid;
+        this.resourceid = ko.unwrap(params.resourceid);
         this.summary = Boolean(params.summary);
 
         this.template = ko.observable();
         this.report = ko.observable();
-        
+
         this.initialize = function() {
-            console.log("!!!!", params)
             if (params.report && params.report.disambiguated_resource) {
                 this.template(reportLookup[params.report.templateId()]);
                 this.report(params.report);
@@ -42,12 +43,10 @@ define([
                     self.loading(false);
                 })
             }
-            else if (ko.unwrap(self.resourceid)) {
+            else if (self.resourceid) {
                 var url = arches.urls.api_resource_report(self.resourceid);
 
                 self.fetchResourceData(url).then(function(responseJson) {
-
-                    console.log('hhh', responseJson)
                     var template = responseJson.template;
                     self.template(template);
                     

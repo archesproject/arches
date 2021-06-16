@@ -154,11 +154,10 @@
         </div>
     </div>
     <div class="create-instance-panel" data-bind="component: {
-        name: 'resource-summary',
+        name: 'resource-report-abstract',
         params: {
-            resourceId: reportResourceId,
-            graphId: reportGraphId,
-            source: null
+            resourceid: reportResourceId(),
+            summary: true,
         }
     }"></div>
 </div>

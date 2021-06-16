@@ -106,7 +106,7 @@ function($, _, BaseFilter, bootstrap, arches, select2, ko, koMapping, GraphModel
                     var graphIdsToFetch = this.searchResults.results.hits.hits.reduce(function(acc, hit) {
                         var graphId = hit['_source']['graph_id'];
                         
-                        if (!self.bulkResourceReportCache()[graphId]) {
+                        if (!ko.unwrap(self.bulkResourceReportCache)[graphId]) {
                             acc.push(graphId);
                         }
 
