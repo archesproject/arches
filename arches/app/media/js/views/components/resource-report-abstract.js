@@ -18,29 +18,37 @@ define([
 
         this.version = arches.version;
         this.resourceid = ko.unwrap(params.resourceid);
+
         this.summary = Boolean(params.summary);
+        this.configForm = params.configForm;
+        this.configType = params.configType;
 
         this.template = ko.observable();
         this.report = ko.observable();
 
+        console.log("DFS", params)
+
         this.initialize = function() {
-            if (params.report && params.report.disambiguated_resource) {
-                this.template(reportLookup[params.report.templateId()]);
-                this.report(params.report);
-
-                self.loading(false);
-            }
-            else if (params.report) {
-                var url = arches.urls.api_bulk_disambiguated_resource_instance + `?resource_ids=${params.report.attributes.resourceid}`;
-
-                $.getJSON(url, function(resp) {
-                    params.report.disambiguated_resource = resp[params.report.attributes.resourceid];
-
-                    self.template(reportLookup[params.report.templateId()]);
-                    self.report(params.report);
+            if (params.report) {
+                if (params.report.attributes.resourceid && !params.report.disambiguated_resource) {
+                    var url = arches.urls.api_bulk_disambiguated_resource_instance + `?resource_ids=${params.report.attributes.resourceid}`;
+    
+                    $.getJSON(url, function(resp) {
+                        params.report.disambiguated_resource = resp[params.report.attributes.resourceid];
+    
+                        self.template(reportLookup[params.report.templateId()]);
+                        self.report(params.report);
+                        self.loading(false);
+                    })
+                }
+                else {
+                    this.template(reportLookup[params.report.templateId()]);
+                    this.report(params.report);
+    
                     self.loading(false);
-                })
-            }
+                }
+            } 
+            
             else if (self.resourceid) {
                 var url = arches.urls.api_resource_report(self.resourceid);
 
