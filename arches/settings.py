@@ -220,20 +220,20 @@ LOCALE_PATHS = [
 # calendars according to the current locale
 USE_L10N = True
 
-# Absolute filesystem path to the directory that will hold user-uploaded files.
-MEDIA_ROOT = os.path.join(ROOT_DIR)
-
 # Sets default max upload size to 15MB
 DATA_UPLOAD_MAX_MEMORY_SIZE = 15728640
-
-# URL that handles the media served from MEDIA_ROOT, used for managing stored files.
-# It must end in a slash if set to a non-empty value.
-MEDIA_URL = "/files/"
 
 # By setting RESTRICT_MEDIA_ACCESS to True, media file requests will be
 # served by Django rather than your web server (e.g. Apache). This allows file requests to be checked against nodegroup permissions.
 # However, this will adversely impact performace when serving large files or during periods of high traffic.
 RESTRICT_MEDIA_ACCESS = False
+
+# Absolute filesystem path to the directory that will hold user-uploaded files.
+MEDIA_ROOT = os.path.join(ROOT_DIR)
+
+# URL that handles the media served from MEDIA_ROOT, used for managing stored files.
+# It must end in a slash if set to a non-empty value.
+MEDIA_URL = "/files/"
 
 # Absolute path to the directory static files should be collected to.
 # Don't put anything in this directory yourself; store your static files
@@ -244,6 +244,9 @@ STATIC_ROOT = ""
 # URL prefix for static files.
 # Example: "http://media.lawrence.com/static/"
 STATIC_URL = "/media/"
+
+# when hosting Arches under a sub path set this value to the sub path eg : "/{sub_path}/"
+FORCE_SCRIPT_NAME = None
 
 # URL prefix for admin static files -- CSS, JavaScript and images.
 # Make sure to use a trailing slash.
@@ -263,6 +266,7 @@ STATICFILES_DIRS = (
 STATICFILES_FINDERS = (
     "django.contrib.staticfiles.finders.FileSystemFinder",
     "django.contrib.staticfiles.finders.AppDirectoriesFinder",
+    "compressor.finders.CompressorFinder",
     #    'django.contrib.staticfiles.finders.DefaultStorageFinder',
 )
 
@@ -340,7 +344,8 @@ INSTALLED_APPS = (
     "revproxy",
     "corsheaders",
     "oauth2_provider",
-    "django_celery_results"
+    "django_celery_results",
+    "compressor",
     # 'debug_toolbar'
 )
 
@@ -611,8 +616,10 @@ TILE_CACHE_TIMEOUT = 600  # seconds
 CLUSTER_DISTANCE_MAX = 5000  # meters
 GRAPH_MODEL_CACHE_TIMEOUT = None  # seconds * hours * days = ~1mo
 
-CANTALOUPE_DIR = os.path.join(ROOT_DIR, "cantaloupe")
+CANTALOUPE_DIR = os.path.join(ROOT_DIR, "uploadedfiles")
 CANTALOUPE_HTTP_ENDPOINT = "http://localhost:8182/"
+
+COMPRESS_PRECOMPILERS = (("text/x-scss", "django_libsass.SassCompiler"),)
 
 RENDERERS = [
     {

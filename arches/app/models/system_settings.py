@@ -69,6 +69,17 @@ class SystemSettings(LazySettings):
             self.update_from_db()
             return super(SystemSettings, self).__getattr__(name)  # getattr(self, name, True)
 
+    def setting_exists(self, name):
+        """
+        Checks to see if the setting exists in the system
+        """
+
+        try:
+            super(SystemSettings, self).__getattr__(name)
+            return True
+        except:
+            return False
+
     def update_from_db(self, **kwargs):
         """
         Updates the settings the Arches System Settings graph tile instances stored in the database
@@ -78,6 +89,10 @@ class SystemSettings(LazySettings):
         # get all the possible settings defined by the Arches System Settings Graph
         for node in models.Node.objects.filter(graph_id=self.SYSTEM_SETTINGS_RESOURCE_MODEL_ID):
 
+            def setup_blank_setting(name, value):
+                if not self.setting_exists(name):
+                    setattr(self, name, value)
+
             def setup_node(node, parent_node=None):
                 if node.is_collector:
                     if node.nodegroup.cardinality == "1":
@@ -85,16 +100,18 @@ class SystemSettings(LazySettings):
                         for decendant_node in self.get_direct_decendent_nodes(node):
                             obj[decendant_node.name] = setup_node(decendant_node, node)
 
-                        setattr(self, node.name, obj)
+                        setup_blank_setting(node.name, obj)
 
                     if node.nodegroup.cardinality == "n":
-                        setattr(self, node.name, [])
+                        setup_blank_setting(node.name, [])
                     return getattr(self, node.name)
 
                 if parent_node is not None:
-                    setattr(self, node.name, None)
+                    setup_blank_setting(node.name, None)
 
             setup_node(node)
+
+        n_cardinality_collector_node_names = []
 
         # set any values saved in the instance of the Arches System Settings Graph
         for tile in models.TileModel.objects.filter(resourceinstance__graph_id=self.SYSTEM_SETTINGS_RESOURCE_MODEL_ID):
@@ -117,14 +134,15 @@ class SystemSettings(LazySettings):
                     if node.datatype != "semantic":
                         obj[node.name] = tile.data[str(node.nodeid)]
 
-                # print collector_nodename
-                # print obj
-
+                # this check will ensure that if an existing list of values exists in settings.py
+                # that those values won't get appended with what's in the database
                 val = getattr(self, collector_nodename)
-                val.append(obj)
+                if collector_nodename in n_cardinality_collector_node_names:
+                    val.append(obj)
+                else:
+                    val = [obj]
+                    n_cardinality_collector_node_names.append(collector_nodename)
                 setattr(self, collector_nodename, val)
-
-        # print self
 
     def get_direct_decendent_nodes(self, node):
         nodes = []
@@ -134,7 +152,3 @@ class SystemSettings(LazySettings):
 
 
 settings = SystemSettings()
-# try:
-#     settings.update_from_db()
-# except OperationalError, ProgrammingError:
-#     print "Skipping system settings update"
