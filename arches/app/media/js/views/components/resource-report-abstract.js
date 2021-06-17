@@ -48,7 +48,6 @@ define([
                     self.loading(false);
                 }
             } 
-            
             else if (self.resourceid) {
                 var url = arches.urls.api_resource_report(self.resourceid);
 
