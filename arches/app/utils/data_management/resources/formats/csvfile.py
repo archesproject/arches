@@ -319,7 +319,6 @@ class TileCsvWriter(Writer):
         columns_to_move_to_start = ["resourceinstance_id", "parenttile_id", "tileid"]
         for name in columns_to_move_to_start:
             columns.insert(0, columns.pop(columns.index(name)))
-        
 
     def write_resources(self, graph_id=None, resourceinstanceids=None, **kwargs):
         super(TileCsvWriter, self).write_resources(graph_id=graph_id, resourceinstanceids=resourceinstanceids, **kwargs)
@@ -351,7 +350,7 @@ class TileCsvWriter(Writer):
                 for fieldname in flattened_tile:
                     if fieldname not in fieldnames:
                         fieldnames.append(fieldname)
-                
+
             self.sort_field_names(fieldnames)
             tiles[nodegroupid] = sorted(flattened_tiles, key=lambda k: k["resourceinstance_id"])
             dest = StringIO()
