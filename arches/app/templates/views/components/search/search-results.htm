@@ -23,7 +23,7 @@
             <a class="search-candidate-link" href="" data-bind="click: showDetails"><i class="fa fa-info-circle"></i> {% trans "Details" %} </a>
             <!-- /ko -->
 
-            {% if user_can_edit %}
+            {% if user|can_edit_resource_instance %}
             <!--ko if: canEdit -->
             <a class="search-candidate-link" href="" data-bind="click: $parent.editResource.bind($parent)"><i class="ion-ios-refresh-empty"></i> {% trans "Edit" %} </a>
             <!--/ko-->
@@ -34,7 +34,7 @@
             <!-- /ko -->
 
             <!--ko ifnot: $root.resourceEditorContext -->
-            {% if user_can_read %}
+            {% if user|can_read_resource_instance %}
                 <!--ko if: !!$parent.relatedResourcesManager -->
                 <a class="search-candidate-link pull-right" href="" data-bind="click: showrelated"><i class="fa fa-code-fork"></i> {% trans "Related Resources" %} </a>
                 {% endif %}

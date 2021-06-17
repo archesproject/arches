@@ -62,7 +62,7 @@ class CardModel(models.Model):
         if settings.OVERRIDE_RESOURCE_MODEL_LOCK is True:
             return True
         else:
-            return not TileModel.objects.filter(nodegroup_id=self.nodegroup_id).exists()
+            return not TileModel.objects.filter(nodegroup=self.nodegroup).exists()
 
     class Meta:
         managed = True
@@ -499,7 +499,7 @@ class Node(models.Model):
 
     @property
     def is_collector(self):
-        return str(self.nodeid) == str(self.nodegroup_id) and self.nodegroup_id is not None
+        return str(self.nodeid) == str(self.nodegroup_id) and self.nodegroup is not None
 
     def is_editable(self):
         if settings.OVERRIDE_RESOURCE_MODEL_LOCK is True:
