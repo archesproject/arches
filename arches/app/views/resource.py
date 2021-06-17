@@ -695,12 +695,24 @@ class ResourceDescriptors(View):
 @method_decorator(can_read_resource_instance, name="dispatch")
 class ResourceReportView(MapBaseManagerView):
     def get(self, request, resourceid=None):
+        try:
+            map_layers = models.MapLayer.objects.all()
+            map_markers = models.MapMarker.objects.all()
+            map_sources = models.MapSource.objects.all()
+            geocoding_providers = models.Geocoder.objects.all()
+        except AttributeError:
+            raise Http404(_("No active report template is available for this resource."))
+
         context = self.get_context_data(
             main_script="views/resource/report",
             resourceid=resourceid,
             report_templates=models.ReportTemplate.objects.all(),
             card_components=models.CardComponent.objects.all(),
             widgets=models.Widget.objects.all(),
+            map_layers=map_layers,
+            map_markers=map_markers,
+            map_sources=map_sources,
+            geocoding_providers=geocoding_providers,
         )
 
         context["nav"]["icon"] = "fa fa-bookmark"
