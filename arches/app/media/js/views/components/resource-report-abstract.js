@@ -28,11 +28,11 @@ define([
 
         this.initialize = function() {
             if (params.report) {
-                if (!params.report.disambiguated_resource && params.report.attributes.resourceid) {
+                if (!params.report.report_json && params.report.attributes.resourceid) {
                     var url = arches.urls.api_bulk_disambiguated_resource_instance + `?resource_ids=${params.report.attributes.resourceid}`;
     
                     $.getJSON(url, function(resp) {
-                        params.report.disambiguated_resource = resp[params.report.attributes.resourceid];
+                        params.report.report_json = resp[params.report.attributes.resourceid];
     
                         self.template(reportLookup[params.report.templateId()]);
                         self.report(params.report);
@@ -59,7 +59,7 @@ define([
                     else {
                         self.report({
                             'template': responseJson.template,
-                            'disambiguated_resource': responseJson.disambiguated_resource,
+                            'report_json': responseJson.report_json,
                         });
                     }
         
@@ -119,7 +119,7 @@ define([
             }));
 
             report['hideEmptyNodes'] = responseJson.hide_empty_nodes;
-            report['disambiguated_resource'] = responseJson.disambiguated_resource;
+            report['report_json'] = responseJson.report_json;
 
             self.report(report);
         };

@@ -101,14 +101,14 @@ define([
                             datatypes: bulkResourceReportCacheData.datatypes,
                         }));
 
-                        report.disambiguated_resource = bulkDisambiguatedResourceInstanceCacheData;
+                        report.report_json = bulkDisambiguatedResourceInstanceCacheData;
     
                         self.report(report);
                     }
                     else {
                         self.report({
                             templateId: ko.observable(bulkResourceReportCacheData.template_id),
-                            disambiguated_resource: bulkDisambiguatedResourceInstanceCacheData,
+                            report_json: bulkDisambiguatedResourceInstanceCacheData,
                         });
 
                     }

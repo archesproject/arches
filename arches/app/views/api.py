@@ -1112,7 +1112,7 @@ class ResourceReport(APIBase):
         template = models.ReportTemplate.objects.get(pk=graph.template_id)
 
         if not template.preload_resource_data:
-            return JSONResponse({"template": template, "disambiguated_resource": resource.to_json()})
+            return JSONResponse({"template": template, "report_json": resource.to_json()})
 
         resp = {
             "datatypes": models.DDataType.objects.all(),
@@ -1120,7 +1120,7 @@ class ResourceReport(APIBase):
             "resourceid": resourceid,
             "graph": graph,
             "hide_empty_nodes": settings.HIDE_EMPTY_NODES_IN_REPORT,
-            "disambiguated_resource": resource.to_json(),
+            "report_json": resource.to_json(),
         }
 
         if "template" not in exclude:
