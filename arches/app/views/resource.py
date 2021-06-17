@@ -695,6 +695,9 @@ class ResourceDescriptors(View):
 @method_decorator(can_read_resource_instance, name="dispatch")
 class ResourceReportView(MapBaseManagerView):
     def get(self, request, resourceid=None):
+        resource = Resource.objects.only('graph_id').get(pk=resourceid)
+        graph = Graph.objects.only('name', 'iconclass').get(graphid=resource.graph_id)
+
         try:
             map_layers = models.MapLayer.objects.all()
             map_markers = models.MapMarker.objects.all()
@@ -715,8 +718,11 @@ class ResourceReportView(MapBaseManagerView):
             geocoding_providers=geocoding_providers,
         )
 
-        context["nav"]["icon"] = "fa fa-bookmark"
-        context["nav"]["title"] = _("Resource Report")
+        if graph.iconclass:
+            context["nav"]["icon"] = graph.iconclass
+        context["nav"]["title"] = graph.name
+        context["nav"]["res_edit"] = True
+        context["nav"]["print"] = True
 
         return render(request, "views/resource/report.htm", context)
 
