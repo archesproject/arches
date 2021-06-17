@@ -695,8 +695,8 @@ class ResourceDescriptors(View):
 @method_decorator(can_read_resource_instance, name="dispatch")
 class ResourceReportView(MapBaseManagerView):
     def get(self, request, resourceid=None):
-        resource = Resource.objects.only('graph_id').get(pk=resourceid)
-        graph = Graph.objects.only('name', 'iconclass').get(graphid=resource.graph_id)
+        resource = Resource.objects.only("graph_id").get(pk=resourceid)
+        graph = Graph.objects.only("name", "iconclass").get(graphid=resource.graph_id)
 
         try:
             map_layers = models.MapLayer.objects.all()
