@@ -140,7 +140,7 @@ function($, _, BaseFilter, bootstrap, arches, select2, ko, koMapping, GraphModel
                     var resourceIdsToFetch = this.searchResults.results.hits.hits.reduce(function(acc, hit) {
                         var resourceId = hit['_source']['resourceinstanceid'];
                         
-                        if (!self.bulkDisambiguatedResourceInstanceCache()[resourceId]) {
+                        if (ko.unwrap(self.bulkDisambiguatedResourceInstanceCache) && !ko.unwrap(self.bulkDisambiguatedResourceInstanceCache)[resourceId]) {
                             acc.push(resourceId);
                         }
 

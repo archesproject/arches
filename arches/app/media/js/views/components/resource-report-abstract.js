@@ -28,7 +28,7 @@ define([
 
         this.initialize = function() {
             if (params.report) {
-                if (params.report.attributes.resourceid && !params.report.disambiguated_resource) {
+                if (!params.report.disambiguated_resource && params.report.attributes.resourceid) {
                     var url = arches.urls.api_bulk_disambiguated_resource_instance + `?resource_ids=${params.report.attributes.resourceid}`;
     
                     $.getJSON(url, function(resp) {
