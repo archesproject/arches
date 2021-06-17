@@ -26,8 +26,6 @@ define([
         this.template = ko.observable();
         this.report = ko.observable();
 
-        console.log("DFS", params)
-
         this.initialize = function() {
             if (params.report) {
                 if (params.report.attributes.resourceid && !params.report.disambiguated_resource) {
