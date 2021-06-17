@@ -1,7 +1,7 @@
 {% load i18n %}
 <!-- ko if: $data.search -->
 <div class="col-md-4 col-lg-3">
-    <select class="resources" tabindex="-1" style="display: none;" data-bind="value: op, chosen: {width: '100%', disable_search_threshold: 15}">
+    <select class="resources" tabindex="-1" style="display: none;" data-bind="value: op, chosen: {width: '100%', disable_search_threshold: 15}, attr:{'aria-label': 'Search criteria'}">
         <option value="eq"> = </option>
         <option value="gt"> > </option>
         <option value="lt"> < </option>
@@ -13,7 +13,7 @@
 </div>
 
 <div class="col-md-8 col-lg-9" data-bind="visible: op() !== 'null' && op() !== 'not_null'">
-    <input type="" placeholder="{% trans "Date" %}" class="form-control input-md widget-input" data-bind="value: searchValue, datepicker: {format: dateFormat, viewMode: 'days', minDate: false, maxDate: false}">
+    <input type="" placeholder="{% trans "Date" %}" aria-label="{% trans "Date" %}" class="form-control input-md widget-input" data-bind="value: searchValue, datepicker: {format: dateFormat, viewMode: 'days', minDate: false, maxDate: false}">
 </div>
 <!-- /ko -->
 
@@ -23,6 +23,6 @@
 {% trans "Date Format" %}
 </div>
 <div class="col-xs-12 pad-no crud-widget-container">
-<select type="" id="" placeholder="{% trans " Date Format " %}" data-bind="options:dateFormatOptions, optionsText:'name', optionsValue:'id', event: {change: onDateFormatSelection}, value: dateFormat, chosen: {width: '100%', disable_search: true}"></select>
+<select type="" id="" placeholder="{% trans " Date Format " %}" aria-label="{% trans " Date Format " %}" data-bind="options:dateFormatOptions, optionsText:'name', optionsValue:'id', event: {change: onDateFormatSelection}, value: dateFormat, chosen: {width: '100%', disable_search: true}"></select>
 </div>
 <!-- /ko -->
