@@ -98,6 +98,14 @@ function($, _, BaseFilter, bootstrap, arches, select2, ko, koMapping, GraphModel
             updateResults: function(){
                 var self = this;
                 var data = $('div[name="search-result-data"]').data();
+
+                if (!self.bulkResourceReportCache) {
+                    self.bulkResourceReportCache = ko.observable({});
+                }
+
+                if (!self.bulkDisambiguatedResourceInstanceCache) {
+                    self.bulkDisambiguatedResourceInstanceCache = ko.observable({});
+                }
                 
                 if (!!this.searchResults.results){
                     this.results.removeAll();
@@ -106,13 +114,13 @@ function($, _, BaseFilter, bootstrap, arches, select2, ko, koMapping, GraphModel
                     var graphIdsToFetch = this.searchResults.results.hits.hits.reduce(function(acc, hit) {
                         var graphId = hit['_source']['graph_id'];
                         
-                        if (ko.unwrap(self.bulkResourceReportCache) && !ko.unwrap(self.bulkResourceReportCache)[graphId]) {
+                        if (!ko.unwrap(self.bulkResourceReportCache)[graphId]) {
                             acc.push(graphId);
                         }
 
                         return acc;
                     }, []);
-                    
+
                     if (graphIdsToFetch.length > 0) {
                         var url = arches.urls.api_bulk_resource_report + `?graph_ids=${graphIdsToFetch}`;
     
@@ -140,7 +148,7 @@ function($, _, BaseFilter, bootstrap, arches, select2, ko, koMapping, GraphModel
                     var resourceIdsToFetch = this.searchResults.results.hits.hits.reduce(function(acc, hit) {
                         var resourceId = hit['_source']['resourceinstanceid'];
                         
-                        if (ko.unwrap(self.bulkDisambiguatedResourceInstanceCache) && !ko.unwrap(self.bulkDisambiguatedResourceInstanceCache)[resourceId]) {
+                        if (!ko.unwrap(self.bulkDisambiguatedResourceInstanceCache)[resourceId]) {
                             acc.push(resourceId);
                         }
 
