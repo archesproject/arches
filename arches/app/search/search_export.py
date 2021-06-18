@@ -111,7 +111,7 @@ class SearchResultsExporter(object):
                 headers = graph.node_set.filter(exportable=True).values("fieldname", "datatype", "name")[::1]
                 headers = graph.node_set.filter(exportable=True).values("fieldname", "datatype")[::1]
                 headers.append({"fieldname": "resourceid", "datatype": "str"})
-                ret += self.to_tilexl(resources["output"], headers=headers, name=graph.name)
+                ret += self.to_tilexl(resources["output"])
 
         full_path = self.search_request.get_full_path()
         search_request_path = self.search_request.path if full_path is None else full_path
@@ -235,8 +235,8 @@ class SearchResultsExporter(object):
         dest = shape_exporter.writer.create_shapefiles(instances, headers, name)
         return dest
 
-    def to_tilexl(self, instances, headers, name):
-        resourceinstanceids = [i["resourceid"] for i in instances]
+    def to_tilexl(self, instances):
+        resourceinstanceids = [instance["resourceid"] for instance in instances if 'resourceid' in instance]
         tilexl_exporter = ResourceExporter(format="tilexl")
         dest = tilexl_exporter.export(resourceinstanceids=resourceinstanceids)
         return dest
