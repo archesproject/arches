@@ -260,10 +260,10 @@ class TileCsvWriter(Writer):
         self.node_datatypes = {}
         self.datatype_factory = DataTypeFactory()
 
-        nodes = Node.objects.all().values('nodeid', 'name')
+        nodes = Node.objects.all().values("nodeid", "name")
         self.node_name_lookup = {}
         for node in nodes:
-            self.node_name_lookup[str(node['nodeid'])] = node['name']
+            self.node_name_lookup[str(node["nodeid"])] = node["name"]
 
     def group_tiles(self, tiles, key):
         new_tiles = {}
@@ -307,6 +307,19 @@ class TileCsvWriter(Writer):
 
         return tile
 
+    def sort_field_names(self, columns=[]):
+        """
+        Moves sortorder, provisionaledits and nodegroup_id to last position and
+        ensures the first columns are ordered as tileid, parenttile_id, and resourceinstance_id.
+        """
+
+        columns_to_move_to_end = ["sortorder", "provisionaledits", "nodegroup_id"]
+        for name in columns_to_move_to_end:
+            columns.insert(len(columns) + 1, columns.pop(columns.index(name)))
+        columns_to_move_to_start = ["resourceinstance_id", "parenttile_id", "tileid"]
+        for name in columns_to_move_to_start:
+            columns.insert(0, columns.pop(columns.index(name)))
+
     def write_resources(self, graph_id=None, resourceinstanceids=None, **kwargs):
         super(TileCsvWriter, self).write_resources(graph_id=graph_id, resourceinstanceids=resourceinstanceids, **kwargs)
 
@@ -328,27 +341,26 @@ class TileCsvWriter(Writer):
             fieldnames = []
             for tile in nodegroup_tiles:
                 tile["tileid"] = str(tile["tileid"])
-                tile["resourceinstance_id"] = str(tile["resourceinstance_id"])
                 tile["parenttile_id"] = str(tile["parenttile_id"])
-                tile["nodegroup_id"] = str(tile["nodegroup_id"])
+                tile["resourceinstance_id"] = str(tile["resourceinstance_id"])
                 flattened_tile = self.flatten_tile(tile, semantic_nodes)
+                tile["nodegroup_id"] = str(tile["nodegroup_id"])
                 flattened_tiles.append(flattened_tile)
 
                 for fieldname in flattened_tile:
                     if fieldname not in fieldnames:
                         fieldnames.append(fieldname)
 
+            self.sort_field_names(fieldnames)
             tiles[nodegroupid] = sorted(flattened_tiles, key=lambda k: k["resourceinstance_id"])
-
-            ncsv_file = []
             dest = StringIO()
             csvwriter = csv.DictWriter(dest, delimiter=",", fieldnames=fieldnames)
             csvwriter.writeheader()
             csv_name = os.path.join("{0}.{1}".format(Card.objects.get(nodegroup_id=nodegroupid).name, "csv"))
-            forbidden_excel_sheet_name_characters = [ '\\', '/', '?', '*', '[' , ']' ]
+            forbidden_excel_sheet_name_characters = ["\\", "/", "?", "*", "[", "]"]
             for character in forbidden_excel_sheet_name_characters:
                 if character in csv_name:
-                    csv_name = csv_name.replace(character, '_')
+                    csv_name = csv_name.replace(character, "_")
             for v in tiles[nodegroupid]:
                 csvwriter.writerow(v)
             csvs_for_export.append({"name": csv_name, "outputfile": dest})

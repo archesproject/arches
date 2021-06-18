@@ -129,7 +129,7 @@ class ConceptDataType(BaseConceptDataType):
                 return errors
         return errors
 
-    def transform_value_for_tile(self, value):
+    def transform_value_for_tile(self, value, **kwargs):
         return value.strip()
 
     def transform_export_values(self, value, *args, **kwargs):
@@ -250,7 +250,7 @@ class ConceptListDataType(BaseConceptDataType):
                 errors += validate_concept.validate(val, row_number)
         return errors
 
-    def transform_value_for_tile(self, value):
+    def transform_value_for_tile(self, value, **kwargs):
         ret = []
         for val in csv.reader([value], delimiter=",", quotechar='"'):
             for v in val:
