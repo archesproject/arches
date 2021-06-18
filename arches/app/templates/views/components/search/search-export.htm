@@ -7,7 +7,7 @@
     <div class="search-export">
         <div class="instruction">
             <h2 class=""> {% trans "1. Format" %} </h2>
-            <h4 class=""> {% trans "Select the format you'd like for your export data" %} </h4>
+            <h4 class=""> {% trans "Select the format you'd like for your export data. (tile excel and geojson formats require a resource type filter)" %} </h4>
         </div>
         <div class="parameter">
             <div>
@@ -17,11 +17,15 @@
                 <label data-bind="css: { 'active': format() === 'shp' }, click: function () { format('shp') }" class="form-radio form-normal form-text">
                     <input type="radio" name="stat-w-label" data-bind="checked: format() === 'shp'" value="false"> {% trans "shapefile" %}
                 </label>
+
+                <label data-bind="css: { 'active': format() === 'tilexl', 'disabled': !hasResourceTypeFilter() }, click: function () { if (hasResourceTypeFilter()) {format('tilexl')} }" class="form-radio form-normal form-text">
+                    <input type="radio" name="stat-w-label" data-bind="checked: format() === 'tilexl'" value="false"> {% trans "tile excel" %}
+                </label>
                 <!-- ko if: total() < {{app_settings.SEARCH_EXPORT_IMMEDIATE_DOWNLOAD_THRESHOLD}} -->
-                <label data-bind="css: { 'active': format() === 'geojson' }, click: function () { format('geojson') }" class="form-radio form-normal form-text">
+                <label data-bind="css: { 'active': format() === 'geojson', 'disabled': !hasResourceTypeFilter()}, click: function () { if (hasResourceTypeFilter()) {format('geojson')} }" class="form-radio form-normal form-text">
                     <input type="radio" name="stat-w-label" data-bind="checked: format() === 'geojson'" value="false"> {% trans "geojson url" %}
                 </label>
-                <!-- ko if: format() === 'geojson' -->
+                <!-- ko if: format() === 'geojson' && hasResourceTypeFilter -->
                 <div data-bind="clipboard: geojsonUrl">
                     <div style="padding: 5px 0px"><textarea style="width: 300px;" data-bind="value: geojsonUrl"></textarea></div>
                     <button class="btn btn-shim btn-labeled btn-sm fa fa-clipboard btn-primary">{% trans "Copy to clipboard" %}</button>

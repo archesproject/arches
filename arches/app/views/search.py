@@ -46,6 +46,8 @@ import arches.app.utils.zip as zip_utils
 import arches.app.utils.task_management as task_management
 import arches.app.tasks as tasks
 from io import StringIO
+from tempfile import NamedTemporaryFile
+from openpyxl import Workbook
 
 logger = logging.getLogger(__name__)
 
@@ -215,6 +217,16 @@ def export_results(request):
         else:
             message = _("Your search exceeds the {download_limit} instance download limit. Please refine your search").format(**locals())
             return JSONResponse({"success": False, "message": message})
+    elif format == "tilexl":
+        exporter = SearchResultsExporter(search_request=request)
+        export_files, export_info = exporter.export(format)
+        wb = export_files[0]["outputfile"]
+        with NamedTemporaryFile() as tmp:
+            wb.save(tmp.name)
+            tmp.seek(0)
+            stream = tmp.read()
+            export_files[0]["outputfile"] = tmp
+            return zip_utils.zip_response(export_files, zip_file_name=f"{settings.APP_NAME}_export.zip")
     else:
         exporter = SearchResultsExporter(search_request=request)
         export_files, export_info = exporter.export(format)
