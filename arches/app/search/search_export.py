@@ -236,7 +236,7 @@ class SearchResultsExporter(object):
         return dest
 
     def to_tilexl(self, instances):
-        resourceinstanceids = [instance["resourceid"] for instance in instances if 'resourceid' in instance]
+        resourceinstanceids = [instance["resourceid"] for instance in instances if "resourceid" in instance]
         tilexl_exporter = ResourceExporter(format="tilexl")
         dest = tilexl_exporter.export(resourceinstanceids=resourceinstanceids)
         return dest
