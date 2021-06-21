@@ -7,6 +7,7 @@ define([
     'uuid',
     'viewmodels/alert',
     'viewmodels/workflow-step',
+    'bindings/gallery',
     'bindings/scrollTo'
 ], function(arches, $, _, ko, koMapping, uuid, AlertViewModel, Step) {
     WORKFLOW_LABEL = 'workflow';
@@ -36,6 +37,16 @@ define([
             }
         });
 
+        this.pan = ko.observable();
+
+        this.updatePan = function(val){
+            if (this.pan() !== val) {
+                this.pan(val);
+            } else {
+                this.pan.valueHasMutated();
+            }
+        };
+        
         this.ready = ko.observable(false);
 
         this.workflowName = ko.observable();
