@@ -288,7 +288,7 @@ class ServerSettingView(View):
 @method_decorator(csrf_exempt, name="dispatch")
 class Token(View):
     def get(self, request):
-        if settings.DEBUG == True:
+        if settings.DEBUG:
             data = {
                 "username": request.GET.get("username", None),
                 "password": request.GET.get("password", None),
