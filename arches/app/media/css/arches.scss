@@ -8438,6 +8438,7 @@ a.mega-dropdown-toggle.disabled {
     width: calc(100% - 350px) !important;
     left: 350px;
     text-align: left;
+    position: unset;
 }
 
 .mainnav-lg .workbench-card-sidepanel .create-resource-instance-card-component.rr-table-pop .install-buttons {
