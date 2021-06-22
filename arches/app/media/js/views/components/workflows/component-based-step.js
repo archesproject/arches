@@ -547,7 +547,7 @@ define([
     };
 
 
-    function WorkflowComponentAbstract(componentData, previouslyPersistedComponentData, externalStepData, resourceId, title, complete, saving, locked, setLock) {
+    function WorkflowComponentAbstract(componentData, previouslyPersistedComponentData, externalStepData, resourceId, title, complete, saving, locked, setSourceStepLock) {
         var self = this;
 
         this.saving = saving;
@@ -555,7 +555,7 @@ define([
         this.resourceId = resourceId;
         this.componentData = componentData;
         this.locked = locked;
-        this.setLock = setLock;
+        this.setSourceStepLock = setSourceStepLock;
 
         this.previouslyPersistedComponentData = previouslyPersistedComponentData;
         this.externalStepData = externalStepData;
@@ -587,9 +587,6 @@ define([
 
     function viewModel(params) {
         var self = this;
-
-        this.locked = params.locked;
-        this.setLock = params.setLock;
         
         this.resourceId = ko.observable();
         if (ko.unwrap(params.resourceid)) {
@@ -603,6 +600,8 @@ define([
         this.complete = params.complete || ko.observable(false);
         this.alert = params.alert || ko.observable();
         this.componentBasedStepClass = ko.unwrap(params.workflowstepclass);
+        this.locked = params.locked || ko.observable(false);
+        this.setSourceStepLock = params.setSourceStepLock || ko.observable();
 
         this.dataToPersist = ko.observable({});
         self.dataToPersist.subscribe(function(data) {
@@ -695,7 +694,7 @@ define([
                 self.complete,
                 self.saving,
                 self.locked,
-                self.setLock,
+                self.setSourceStepLock,
             );
 
             workflowComponentAbstract.savedData.subscribe(function() {

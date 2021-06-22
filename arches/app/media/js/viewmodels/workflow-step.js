@@ -38,11 +38,6 @@ define([
 
         this.externalStepData = {};
         this.locked = ko.observable();
-
-        this.setLock = function(stepName, locked) {
-            config.workflow.setLock(stepName, locked);
-        };
-
         this.locked.subscribe(function(val){
             self.setToLocalStorage("locked", val);
         });
@@ -196,7 +191,7 @@ define([
         this.getFromLocalStorage = function(key) {
             var allStepsLocalStorageData = JSON.parse(localStorage.getItem(STEPS_LABEL)) || {};
 
-            if (allStepsLocalStorageData[self.id()] && allStepsLocalStorageData[self.id()][key]) {
+            if (allStepsLocalStorageData[self.id()]) {
                 return JSON.parse(allStepsLocalStorageData[self.id()][key]);
             }
         };
@@ -240,6 +235,10 @@ define([
                 })
             }
         }
+
+        this.setSourceStepLock = function(locked) {
+            config.workflow.setLock(self.externalStepData.sourcesteptolock.stepName, locked);
+        };
 
         _.extend(this, config);
 
