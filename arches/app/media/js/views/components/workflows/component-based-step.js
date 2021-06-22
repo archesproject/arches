@@ -21,7 +21,12 @@ define([
             });
 
             self.addedData.push([self.componentData.uniqueInstanceName, value]);
-            self.hasUnsavedData(value);
+            if (self.previouslyPersistedComponentData) {
+                self.hasUnsavedData(!(_.isEqual(value, self.previouslyPersistedComponentData[0][1])));
+            }
+            else{
+                self.hasUnsavedData(!!value);
+            }
         });
 
         this.initialize = function() {
