@@ -143,7 +143,7 @@ define([
                 data.source = data.resourceinstanceidfrom;
                 data.target = data.resourceinstanceidto;
                 if (data.source) {
-                    data.id = data.source + data.target;
+                    data.id = data.resourcexid;
                 } else {
                     data.id = data.resourceinstanceid;
                     data.totalRelations = data.total_relations.value;
@@ -186,12 +186,7 @@ define([
                                 return element;
                             })
                             .filter(function(element) {
-                                var elements = viz.getElementById(element.data.id);
-                                if (element.source) elements = elements.concat(
-                                    viz.getElementById(element.source + element.target),
-                                    viz.getElementById(element.target + element.source)
-                                );
-                                return elements.length === 0;
+                                return viz.getElementById(element.data.id).length === 0;
                             });
                         self.viz().getElementById(node.id).lock();
                         viz.add(elements);
@@ -325,7 +320,6 @@ define([
                     viz.on('select', 'node, edge', function(e) {
                         // prevents multiple selection
                         viz.elements().not(e.target).unselect();
-
                         self.selection(e.target.data());
                     });
                     viz.on('unselect', 'node, edge', function() {
