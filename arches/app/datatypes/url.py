@@ -89,7 +89,7 @@ class URLDataType(BaseDataType):
             )
         return errors
 
-    def transform_value_for_tile(self, value):
+    def transform_value_for_tile(self, value, **kwargs):
         """
         Used, for example, during import for transforming incomming data to
 

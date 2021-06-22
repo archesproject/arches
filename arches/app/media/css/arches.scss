@@ -941,8 +941,26 @@ div.wf-multi-tile-card-info div {
 }
 
 .workflow-nav-tab-container {
+    display: flex;
+    width: inherit;
+}
+
+.workflow-tab-controls {
+    min-width: 30px;
+    display: flex;
+    background-color: #eceef0;
+    align-items: center;
+    font-size: 30px;
+    justify-content: center;
+    border: solid 1px #ddd;
+    color: #555;
+    cursor: pointer;
+}
+
+.workflow-nav-tabs {
     overflow-x: scroll;
     min-height: 45px;
+    width: 100%;
 }
 
 .tabbed-workflow-step-container {
@@ -951,7 +969,6 @@ div.wf-multi-tile-card-info div {
 }
 
 .workflow-nav-tab-list {
-    padding: 0px 10px 0px 10px;
     background-color: #fafafa;
     display: flex;
     min-width: max-content;
@@ -8366,6 +8383,14 @@ a.mega-dropdown-toggle.disabled {
     margin-right: -1px;
 }
 
+.resource-instance-card-component-content .workbench-card-wrapper {
+    height: calc(100vh - 100px);
+}
+
+.resource-instance-card-component-content .workbench-card-wrapper .workbench-card-sidepanel {
+    height: calc(100vh - 100px);
+}
+
 .workbench-card-sidepanel .create-resource-instance-card-component.rr-table-pop {
     top: 50px;
     z-index: 30;
@@ -8430,6 +8455,7 @@ a.mega-dropdown-toggle.disabled {
     width: calc(100% - 350px) !important;
     left: 350px;
     text-align: left;
+    position: unset;
 }
 
 .mainnav-lg .workbench-card-sidepanel .create-resource-instance-card-component.rr-table-pop .install-buttons {

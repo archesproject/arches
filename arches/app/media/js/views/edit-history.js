@@ -1,5 +1,6 @@
 require([
-    'views/base-manager'
+    'views/base-manager',
+    'bindings/datatable'
 ], function(BaseManagerView) {
     /**
     * a BaseManagerView representing the recent edits pages
