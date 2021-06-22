@@ -1,8 +1,10 @@
 define([
     'knockout',
     'underscore',
-    'cytoscape'
-], function(ko, _, cytoscape) {
+    'cytoscape',
+    'cytoscape-cola'
+], function(ko, _, cytoscape, cola) {
+    cytoscape.use(cola);
     ko.bindingHandlers.cytoscape = {
         init: function(element, valueAccessor) {
             var defaults = {
@@ -11,7 +13,7 @@ define([
             var config = ko.unwrap(valueAccessor()).config || {};
 
             var viz = cytoscape(
-                _.defaults(config, defaults)
+                _.defaults(ko.unwrap(config), defaults)
             );
 
             ko.utils.domNodeDisposal.addDisposeCallback(element, function() {
