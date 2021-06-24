@@ -180,6 +180,7 @@
 {% endblock sidepanel %}
 
 {% block main_menu %}
+<!-- ko if: showTabs -->
 <div>
     <ul class="nav nav-tabs">
             <li>
@@ -199,12 +200,20 @@
         </li>
     </ul>
 </div>
+<!-- /ko -->
 
 <div class="manifest-manager" style="height: 100%;">
 
 <!--ko if: createService -->
 <div data-bind="dropzone: dropzoneOptions4create" class="file-select loader-select" style="height: 100%;">
-    <div style="display:flex; flex-direction: column; align-items: center;">
+    <div style="
+            display:flex; 
+            flex-direction: column; 
+            align-items: center;
+            justify-content: center;
+            height: 100%;
+        "
+    >
         <div class="manifest-manager-main-menu-circle loader-button">
             <span><i style="color: #000" class="fa fa-cloud-upload r-select-icon"></i></span>
         </div> 
