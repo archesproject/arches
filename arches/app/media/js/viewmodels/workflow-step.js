@@ -237,7 +237,9 @@ define([
         }
 
         this.setSourceStepLock = function(locked) {
-            config.workflow.setLock(self.externalStepData.sourcesteptolock.stepName, locked);
+            self.lockableExternalSteps().forEach(function(step){
+                config.workflow.setLock(step, locked);
+            })
         };
 
         _.extend(this, config);
