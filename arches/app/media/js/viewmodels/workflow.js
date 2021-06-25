@@ -298,6 +298,13 @@ define([
             if (self.isWorkflowFinished()) { self.activeStep(self.steps[self.steps.length - 1]); }
         };
 
+        this.finishTabbedWorkflow = function() { //TODO: promise chain needs to be implemented later
+            self.steps.forEach(function(step){
+                step.saveOnQuit();
+            })
+            window.location.assign(self.quitUrl);
+        };
+
         this.quitWorkflow = function(){
             var resourcesToDelete = [];
             var tilesToDelete = [];
