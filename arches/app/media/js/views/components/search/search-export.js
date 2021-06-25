@@ -18,6 +18,23 @@ function($, ko, arches) {
             this.exportName = ko.observable("Arches Export");
             this.celeryRunning = ko.observable(arches.celeryRunning);
             this.downloadPending = ko.observable(false);
+            this.hasResourceTypeFilter = ko.observable(!!params.query()['resource-type-filter']);
+
+
+            this.query.subscribe(function(val) {
+                if (val['resource-type-filter']) {
+                    self.hasResourceTypeFilter(true);
+                }
+                else {
+                    self.hasResourceTypeFilter(false);
+                }
+            });
+
+            this.hasResourceTypeFilter.subscribe(function(val) {
+                if (!val) {
+                    self.format('tilecsv');
+                }
+            });
 
             this.url = ko.computed(function() {
                 var url = arches.urls.export_results;
