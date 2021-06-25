@@ -1171,6 +1171,7 @@ class CsvReader(Reader):
 
                 if bulk:
                     Resource.bulk_save(resources=resources, flat=True)
+                    del resources[:]  # clear out the array
                     print("Time to create resource and tile objects: %s" % datetime.timedelta(seconds=time() - self.start))
                 save_count = save_count + 1
                 print(_("Total resources saved: {save_count}").format(**locals()))
