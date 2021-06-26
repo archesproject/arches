@@ -299,6 +299,9 @@ define([
         };
 
         this.finishTabbedWorkflow = function() { //TODO: promise chain needs to be implemented later
+            if (self.activeStep().hasDirtyTile()) {
+                self.activeStep().save()
+            }
             self.steps.forEach(function(step){
                 step.saveOnQuit();
             })
