@@ -240,6 +240,10 @@ define([
             return ret + ' ' + ko.unwrap(this.icon);
         }, this);
 
+        this.saveOnQuit = function(){
+            // to be implemented in an individual step
+        };
+
         this.initialize();
     };
     
