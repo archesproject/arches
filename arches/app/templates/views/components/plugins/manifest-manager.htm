@@ -180,17 +180,16 @@
 {% endblock sidepanel %}
 
 {% block main_menu %}
-<!-- ko if: showTabs -->
 <div>
     <ul class="nav nav-tabs">
-            <li>
+            <li data-bind="if: shouldShowCreateService">
                 <div class='manifest-manager-nav-tab' data-bind="click: function(){createService(true); editService(false)}, css: { active: createService }">
                     <div class='tab-label'>
                         {% trans 'Create New Service' %}
                     </div>
                 </div>
             </li>
-            <li>
+            <li data-bind="if: shouldShowEditService">
             <div class='manifest-manager-nav-tab' data-bind=
                 "click: function(){createService(false); editService(true)}, css: { active: editService }">
                 <div class='tab-label'>
@@ -200,7 +199,6 @@
         </li>
     </ul>
 </div>
-<!-- /ko -->
 
 <div class="manifest-manager" style="height: 100%;">
 
@@ -277,7 +275,14 @@
         </div>
     </div>
     <div style="display: inline-flex; padding: 5px">
-        <div class="iiif-gallery-sequence-label" style="padding:0 5px" data-bind="click: toggleManifestEditor">
+        <div 
+            class="iiif-gallery-sequence-label" 
+            style="padding:0 5px" 
+            data-bind="
+                if: shouldShowEditService,
+                click: toggleManifestEditor,
+            "
+        >
             {% trans "Switch Image Service" %}
         </div>
         |
