@@ -21,12 +21,12 @@
                 >
                 <!-- ko if: (activeStep()._index === steps.length - 1) || isWorkflowFinished() -->
                 <button 
-                    data-bind="click: function(){window.location.assign(quitUrl)}" 
+                    data-bind="click: finishTabbedWorkflow"
                     class="btn btn-success"
                 >
                 <i class="fa fa-check"></i>
                 <span>
-                    {% trans "Complete Workflow" %}
+                    {% trans "Save and Complete Workflow" %}
                 </span>
                 </button>
                 <!-- /ko -->
