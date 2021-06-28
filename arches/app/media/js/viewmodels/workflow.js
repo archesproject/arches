@@ -186,7 +186,7 @@ define([
             }
         };
 
-        this.setLock = function(stepName, locked) {
+        this.toggleStepLockedState = function(stepName, locked) {
             var step = self.steps.find(function(step) { return ko.unwrap(step.name) === ko.unwrap(stepName) });
             if (step) {
                 step.locked(locked);

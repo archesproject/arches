@@ -37,10 +37,7 @@ define([
         this.postSaveCallback = ko.observable();
 
         this.externalStepData = {};
-        this.locked = ko.observable();
-        this.locked.subscribe(function(val){
-            self.setToLocalStorage("locked", val);
-        });
+        this.locked = ko.observable(false);
 
         var externalStepSourceData = ko.unwrap(config.externalstepdata) || {};
         Object.keys(externalStepSourceData).forEach(function(key) {
@@ -136,6 +133,10 @@ define([
                 self.setToLocalStorage('value', value);
             });
 
+            self.locked.subscribe(function(value){
+                self.setToLocalStorage("locked", value);
+            });
+    
             /* cached informationBox logic */
             this.setupInformationBox();
         };
@@ -236,10 +237,8 @@ define([
             }
         }
 
-        this.setSourceStepLock = function(locked) {
-            self.lockableExternalSteps().forEach(function(step){
-                config.workflow.setLock(step, locked);
-            })
+        this.lockExternalStep = function(step, locked) {
+                config.workflow.toggleStepLockedState(step, locked);
         };
 
         _.extend(this, config);
