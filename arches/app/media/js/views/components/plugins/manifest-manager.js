@@ -228,7 +228,7 @@ define([
             });
 
             this.manifest.subscribe(function(){
-                if (self.manifest().charAt(0) == '/') {
+                if (self.manifest() && self.manifest().charAt(0) == '/') {
                     self.remoteManifest(false);
                 }
                 else {
