@@ -49,7 +49,7 @@ def sync(self, surveyid=None, userid=None, synclogid=None):
 
 
 @shared_task(bind=True)
-def export_search_results(self, userid, request_values, format):
+def export_search_results(self, userid, request_values, format,report_link):
     from arches.app.search.search_export import SearchResultsExporter
     from arches.app.models.system_settings import settings
 
@@ -66,7 +66,7 @@ def export_search_results(self, userid, request_values, format):
         new_request.GET.__setitem__(k, v[0])
     new_request.path = request_values["path"]
     exporter = SearchResultsExporter(search_request=new_request)
-    files, export_info = exporter.export(format)
+    files, export_info = exporter.export(format,report_link)
     exportid = exporter.write_export_zipfile(files, export_info)
     search_history_obj = models.SearchExportHistory.objects.get(pk=exportid)
 
