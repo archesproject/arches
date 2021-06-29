@@ -398,6 +398,7 @@ ul.cons-splash-list > li > a:focus, ul.cons-splash-list > li > a:hover {
 
 .app-info-block.intro-section {
     padding: 0px;
+    height: 100vh;
 }
 
 .app-info-block:nth-child(even) {
