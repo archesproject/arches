@@ -85,7 +85,7 @@ class SearchResultsExporter(object):
         for graph_id, resources in output.items():
             graph = models.GraphModel.objects.get(pk=graph_id)
 
-            if report_link == "true":
+            if (report_link == "true") and (format != "tilexl"):
                 for resource in resources["output"]:
                     resource["Link"] = str(settings.ARCHES_NAMESPACE_FOR_DATA_EXPORT).rstrip("/") + "/report/" + str(resource["resourceid"])
 
@@ -126,8 +126,6 @@ class SearchResultsExporter(object):
                 headers = graph.node_set.filter(exportable=True).values("fieldname", "datatype", "name")[::1]
                 headers = graph.node_set.filter(exportable=True).values("fieldname", "datatype")[::1]
                 headers.append({"fieldname": "resourceid", "datatype": "str"})
-                if (report_link == "true") and ({"fieldname": "Link", "datatype": "str"} not in headers):
-                    headers.append({"fieldname": "Link", "datatype": "str"})
                 ret += self.to_tilexl(resources["output"])
 
         full_path = self.search_request.get_full_path()
