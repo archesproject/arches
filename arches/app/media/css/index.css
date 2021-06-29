@@ -528,8 +528,8 @@ footer .footer-links {
 
 .vertical-nav-container-background {
     position: fixed;
-    right: 21px;
-    top: 325px;
+    right: 2vw;
+    top: 37vh;
     z-index: 2500;
     width: 22px;
     background: #041B33;
@@ -541,8 +541,8 @@ footer .footer-links {
 
 .vertical-nav-container {
     position: fixed;
-    right: 25px;
-    top: 345px;
+    right: calc(2vw + 4px);
+    top: 39vh;
     z-index: 3000;
     padding: 5px;
 }
