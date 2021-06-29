@@ -38,6 +38,7 @@ define([
 
         this.externalStepData = {};
         this.locked = ko.observable(false);
+        this.lockableExternalSteps = config.lockableExternalSteps || []
 
         var externalStepSourceData = ko.unwrap(config.externalstepdata) || {};
         Object.keys(externalStepSourceData).forEach(function(key) {
@@ -238,8 +239,12 @@ define([
         }
 
         this.lockExternalStep = function(step, locked) {
+            if (self.lockableExternalSteps.indexOf(step) > -1){
                 config.workflow.toggleStepLockedState(step, locked);
-        };
+            } else {
+                throw new Error("The step, " + step + ", cannot be locked")
+            }
+        }
 
         _.extend(this, config);
 
