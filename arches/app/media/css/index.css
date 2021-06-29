@@ -1,10 +1,5 @@
 @import url(../packages/chosen-js/chosen.css);
 
-html, body {
-    overflow-x: hidden;
-    height: auto;
-}
-
 .auth-options {
     margin-top: 17px;
 }
@@ -63,17 +58,6 @@ div.collapse.navbar-collapse.navbar-ex1-collapse > div > ul {
     padding: 18px 20px;
 }
 
-.navbar-toggle {
-    margin-top: 11px;
-    background: #000;
-}
-
-.nav>li>a:focus, .navbar-toggle:focus {
-    box-shadow: inset 0 0 0 3px #13ce67;
-    color: #000;
-    text-decoration: underline;
-}
-
 .navbar-nav>li> .application-login {
     color: #13ce67;
     border-radius: 2px;
@@ -82,7 +66,6 @@ div.collapse.navbar-collapse.navbar-ex1-collapse > div > ul {
 .v5-splash-navbar .navbar-nav>li>a:hover {
     background: #000;
     color: #13ce67;
-    text-decoration: underline;
 }
 
 .one-page-header .navbar-nav>li> .fa-chevron-circle-down {
@@ -221,9 +204,8 @@ ul.cons-splash-list > li > a:focus, ul.cons-splash-list > li > a:hover {
 }
 
 .v5-splash-caption {
-    background: rgba(0, 0, 0, 0.5);
-    padding: 5px;
-    left: 10vw;
+    padding: 5px !important;
+    left: 10vw !important;
 }
 
 .v5-splash-caption h2 {
@@ -273,11 +255,6 @@ ul.cons-splash-list > li > a:focus, ul.cons-splash-list > li > a:hover {
     display: inline-flex;
     position: relative;
     left: 15px;
-}
-
-.application-name h1 {
-    color: #fff;
-    font-size: 24px;
 }
 
 .navbar-brand-disco h2 {
@@ -432,10 +409,6 @@ ul.cons-splash-list > li > a:focus, ul.cons-splash-list > li > a:hover {
     font-size: 55px;
 }
 
-.app-info-block-header {
-    font-size: 20px;
-}
-
 .app-info-block-title {
     font-size: 32px;
     font-weight: 300;
@@ -447,7 +420,7 @@ ul.cons-splash-list > li > a:focus, ul.cons-splash-list > li > a:hover {
 }
 
 .app-info-block-text {
-    color: #555;
+    color: #6c757d;
     font-size: 16px;
 }
 
@@ -467,7 +440,7 @@ ul.cons-splash-list > li > a:focus, ul.cons-splash-list > li > a:hover {
 
 .sub-block-description {
     font-size: 15px;
-    color: #555;
+    color: #777;
     padding: 20px 0px 30px 0px;
 }
 
@@ -529,7 +502,6 @@ footer .footer-links {
 
 .link-spacing {
     margin-right: 20px;
-    color: #91A5CF;
 }
 
 .app-footer-arches-link {
@@ -605,10 +577,6 @@ footer .footer-links {
     background: #ddd;
 }
 
-.vertical-nav-list-link:focus {
-    background: #13ce67;
-}
-
 .vertical-nav-list-link:hover .vertical-nav-list-ref {
     display: inline-flex;
     margin-top: -2px;
@@ -625,8 +593,6 @@ footer .footer-links {
 
 .vertical-nav-list-ref{
     display: none;
-    background: white;
-    border-radius: 5px;
 }
 
 .down-button {
@@ -649,12 +615,6 @@ footer .footer-links {
     align-items: center;
     justify-content: center;
     opacity: .7;
-}
-
-.down-button:hover,
-.down-button:focus {
-    color: #13ce67;
-    border: 3px solid #13ce67;
 }
 
 .data-type-icon {
@@ -709,12 +669,12 @@ footer .footer-links {
 }
 
 .wide-box .box-highlight p {
-    color: #555;
+    color: #777;
 }
 
 .mobile-description-container p {
     font-size: 17px;
-    color: #555;
+    color: #777;
 }
 
 .splash-links {
@@ -726,14 +686,6 @@ footer .footer-links {
     font-weight: 300;
     line-height: 1.5;
     color: #fff;
-}
-
-.splash-link-address:focus,
-.splash-link-address:hover,
-.link-spacing:focus,
-.link-spacing:hover {
-    color: #7AD02F;
-    text-decoration: underline;
 }
 
 .splash-link-container {
