@@ -942,6 +942,7 @@ class SearchExport(View):
         total = int(request.GET.get("total", 0))
         download_limit = settings.SEARCH_EXPORT_IMMEDIATE_DOWNLOAD_THRESHOLD
         format = request.GET.get("format", "tilecsv")
+        report_link = request.GET.get("reportlink", False)
         if "HTTP_AUTHORIZATION" in request.META:
             request_auth = request.META.get("HTTP_AUTHORIZATION").split()
             if request_auth[0].lower() == "basic":
@@ -950,7 +951,7 @@ class SearchExport(View):
                 if user is not None:
                     request.user = user
         exporter = SearchResultsExporter(search_request=request)
-        export_files, export_info = exporter.export(format)
+        export_files, export_info = exporter.export(format,report_link)
         if format == "geojson" and total <= download_limit:
             response = JSONResponse(export_files)
             return response
