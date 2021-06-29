@@ -2,7 +2,8 @@ define(['jquery',
     'knockout',
     'arches',
     'bindings/fadeVisible',
-    'bindings/clipboard'],
+    'bindings/clipboard',
+    'views/components/simple-switch'],
 function($, ko, arches) {
     var componentName = 'search-export';
     return ko.components.register(componentName, {
