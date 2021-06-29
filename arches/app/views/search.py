@@ -230,7 +230,7 @@ def export_results(request):
             return zip_utils.zip_response(export_files, zip_file_name=f"{settings.APP_NAME}_export.zip")
     else:
         exporter = SearchResultsExporter(search_request=request)
-        export_files, export_info = exporter.export(format)
+        export_files, export_info = exporter.export(format,report_link)
 
         if len(export_files) == 0 and format == "shp":
             message = _(
