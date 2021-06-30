@@ -42,7 +42,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                     <div class="header">
                         <div class="list-filter" data-bind="">
                             <input type="text" class="form-control" style="width: 100%;" placeholder="{% trans 'Find a card...' %}" data-bind="textInput: filter, event: {keypress: filterEnterKeyHandler}">
-    
+
                             <!-- Clear Search -->
                             <span class="clear-node-search" data-bind="visible: filter().length > 0, click: function() { filter(''); }"><i class="fa fa-times-circle"></i></span>
                         </div>
@@ -127,14 +127,14 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                         resourceId: resourceId,
                         creator: creator,
                         userIsCreator: userIsCreator,
-                        alert: alert, 
+                        alert: alert,
                         permissionLabelLookup: {
                             'view_resourceinstance':'{% trans 'Read' %}',
                             'change_resourceinstance':'{% trans 'Update' %}',
                             'no_access_to_resourceinstance':'{% trans 'No Access' %}',
                             'delete_resourceinstance':'{% trans 'Delete' %}',
                         },
-                        alertTitle: '{% trans 'You are about assign normal user access to this instance' %}', 
+                        alertTitle: '{% trans 'You are about assign normal user access to this instance' %}',
                         alertMessage: '{% trans 'Would you like to proceed?' %}'},
                 }"></div>
             </div>
