@@ -373,6 +373,7 @@ class JsonLdReader(Reader):
 
         # Ensure we've reset from any previous call
         self.errors = {}
+        self.idcache = {}
         self.resources = []
         self.resource = None
         self.use_ids = use_ids
@@ -416,6 +417,7 @@ class JsonLdReader(Reader):
                 result = {"data": [jsonld_document["@id"]]}
             else:
                 result = {"data": [None]}
+            self.find_local_references(jsonld_document)
             self.data_walk(jsonld_document, self.graphtree, result)
 
     def is_semantic_node(self, graph_node):
@@ -429,8 +431,21 @@ class JsonLdReader(Reader):
                 return True
         return False
 
+    def find_local_references(self, jsonld_document):
+        if "@id" in jsonld_document and "@type" in jsonld_document:
+            self.idcache[jsonld_document["@id"]] = jsonld_document["@type"][0]
+        for key, value in jsonld_document.items():
+            if key in ["@id", "@type"]:
+                continue
+            if isinstance(value, list):
+                for item in value:
+                    self.find_local_references(item)
+            elif isinstance(value, dict):
+                self.find_local_references(value)
+
     def data_walk(self, data_node, tree_node, result, tile=None):
         my_tiles = []
+        # print(data_node)
         for k, v in data_node.items():
             if k in ["@id", "@type"]:
                 continue
@@ -449,8 +464,8 @@ class JsonLdReader(Reader):
                         clss = vi["@type"][0]
                     except:
                         # {"@id": "http://something/.../"}
-                        # with no @type. This is typically an external concept URI
-                        # Look for it in the children of current node
+                        # with no @type. This is typically an external concept URI reference to a resource instance
+                        # Look for it in the children of current node or in the entire document itself (if it's a resource instance ref)
                         possible_cls = []
                         for tn in tree_node["children"]:
                             if tn.startswith(k):
@@ -458,7 +473,13 @@ class JsonLdReader(Reader):
                         if len(possible_cls) == 1:
                             clss = possible_cls[0]
                         else:
-                            raise ValueError(f"Multiple possible branches and no @type given: {vi}")
+                            try:
+                                # this may be a reference to an entity already defined elsewhere in the json document
+                                # this can happen when there are more than 1 reference to the same resource instance
+                                clss = self.idcache[uri]
+                                vi["@type"] = clss
+                            except:
+                                raise ValueError(f"Multiple possible branches and no @type given: {vi}")
 
                     value = None
                     is_literal = False
