@@ -1,7 +1,7 @@
 {% load i18n %}
 <!-- ko ifnot: $data.search -->
 <!--ko let: {self: $data} -->
-<div class="node-widget-label concept-label" style="width:540px;">
+<div class="node-widget-label concept-label" style="width:40vw;">
     <div class="control-label">
         {% trans "Resource Model" %}
     </div>
@@ -14,7 +14,8 @@
             chosen: {
                 width: '100%',
                 disabled: isEditable === false
-            }
+            },
+            attr:{'aria-label': 'Select a resource model'}
         "></select>
     </div>
     <div class="rr-table">
@@ -63,7 +64,7 @@
                             </label>
 
                             <div class="row" style="padding: 0px 12px; margin-bottom: 10px;">
-                                <span class="col-xs-12" style=""
+                                <span class="col-xs-12"
                                     data-bind="text: $data.name + ' (' + self.makeFriendly($data.ontologyClass) + ')'">
                                 </span>
 
