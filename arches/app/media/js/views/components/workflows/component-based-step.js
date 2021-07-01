@@ -21,7 +21,12 @@ define([
             });
 
             self.addedData.push([self.componentData.uniqueInstanceName, value]);
-            self.hasUnsavedData(value);
+            if (self.previouslyPersistedComponentData) {
+                self.hasUnsavedData(!(_.isEqual(value, self.previouslyPersistedComponentData[0][1])));
+            }
+            else{
+                self.hasUnsavedData(!!value);
+            }
         });
 
         this.initialize = function() {
@@ -605,9 +610,11 @@ define([
         })
 
         this.hasUnsavedData = ko.observable(false);
+        params.hasDirtyTile(false);
+        
         this.hasUnsavedData.subscribe(function(hasUnsavedData) {
             params.hasDirtyTile(hasUnsavedData);
-        })
+        });
 
         /* 
             `pageLayout` is an observableArray of arrays representing section Information ( `sectionInfo` ).
