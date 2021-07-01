@@ -8,7 +8,7 @@ define([
 ], function(ko, _, WidgetViewModel, arches, ResourceSummary, ontologyUtils) {
     var resourceLookup = {};
     var graphCache = {};
-    require(['views/components/workflows/new-resource-instance']);
+    require(['views/components/related-instance-creator']);
     
     /**
     * A viewmodel used for generic alert messages
