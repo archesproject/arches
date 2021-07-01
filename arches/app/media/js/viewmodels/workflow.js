@@ -197,6 +197,13 @@ define([
             }
         };
 
+        this.toggleStepLockedState = function(stepName, locked) {
+            var step = self.steps.find(function(step) { return ko.unwrap(step.name) === ko.unwrap(stepName) });
+            if (step) {
+                step.locked(locked);
+            }
+        }
+
         this.getStepIdFromUrl = function() {
             var searchParams = new URLSearchParams(window.location.search);
             return searchParams.get(STEP_ID_LABEL);
@@ -296,6 +303,16 @@ define([
 
         this.finishWorkflow = function() {
             if (self.isWorkflowFinished()) { self.activeStep(self.steps[self.steps.length - 1]); }
+        };
+
+        this.finishTabbedWorkflow = function() { //TODO: promise chain needs to be implemented later
+            if (self.activeStep().hasDirtyTile()) {
+                self.activeStep().save()
+            }
+            self.steps.forEach(function(step){
+                step.saveOnQuit();
+            })
+            window.location.assign(self.quitUrl);
         };
 
         this.quitWorkflow = function(){

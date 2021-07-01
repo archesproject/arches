@@ -37,6 +37,8 @@ define([
         this.postSaveCallback = ko.observable();
 
         this.externalStepData = {};
+        this.locked = ko.observable(false);
+        this.lockableExternalSteps = config.lockableExternalSteps || []
 
         var externalStepSourceData = ko.unwrap(config.externalstepdata) || {};
         Object.keys(externalStepSourceData).forEach(function(key) {
@@ -114,6 +116,11 @@ define([
                 self.id(uuid.generate());
             }
 
+            var locked = self.getFromLocalStorage('locked');
+            if (locked) {
+                self.locked(locked);
+            }
+
             /* cached value logic */ 
             var cachedValue = self.getFromLocalStorage('value');
             if (cachedValue) {
@@ -126,6 +133,10 @@ define([
                 self.setToLocalStorage('value', value);
             });
 
+            self.locked.subscribe(function(value){
+                self.setToLocalStorage("locked", value);
+            });
+    
             /* cached informationBox logic */
             this.setupInformationBox();
         };
@@ -181,7 +192,7 @@ define([
         this.getFromLocalStorage = function(key) {
             var allStepsLocalStorageData = JSON.parse(localStorage.getItem(STEPS_LABEL)) || {};
 
-            if (allStepsLocalStorageData[self.id()]) {
+            if (allStepsLocalStorageData[self.id()] && typeof allStepsLocalStorageData[self.id()][key] !== "undefined") {
                 return JSON.parse(allStepsLocalStorageData[self.id()][key]);
             }
         };
@@ -226,6 +237,14 @@ define([
             }
         }
 
+        this.lockExternalStep = function(step, locked) {
+            if (self.lockableExternalSteps.indexOf(step) > -1){
+                config.workflow.toggleStepLockedState(step, locked);
+            } else {
+                throw new Error("The step, " + step + ", cannot be locked")
+            }
+        }
+
         _.extend(this, config);
 
         this.iconClass = ko.computed(function(){
@@ -239,6 +258,10 @@ define([
             }
             return ret + ' ' + ko.unwrap(this.icon);
         }, this);
+
+        this.saveOnQuit = function(){
+            // to be implemented in an individual step
+        };
 
         this.initialize();
     };
