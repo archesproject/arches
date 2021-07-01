@@ -16,14 +16,29 @@ You should have received a copy of the GNU Affero General Public License
 along with this program. If not, see <http://www.gnu.org/licenses/>.
 """
 
+import json
 
-from arches.app.models import models
-from arches.app.models.system_settings import settings
-from arches.app.models.resource import Resource
-from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializer
 from django.views.generic import TemplateView
+
 from arches.app.datatypes.datatypes import DataTypeFactory
+from arches.app.models import models, graph
+from arches.app.models.resource import Resource
+from arches.app.models.system_settings import settings
+from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializer
+from arches.app.utils.singleton import Singleton
 from arches.app.utils.permission_backend import get_createable_resource_types, user_is_resource_reviewer
+
+
+class CreatableResourceValidDomainOntologyClasses(metaclass=Singleton):
+    def __init__(self, creatable_resources):
+        self.ontologies = {}
+
+        for resource in creatable_resources:
+            resource_graph = graph.Graph(resource.pk)
+            self.ontologies[str(resource_graph.pk)] = resource_graph.get_valid_domain_ontology_classes()
+
+        self.ontologies = json.dumps(self.ontologies)
+
 
 class BaseManagerView(TemplateView):
 
@@ -41,6 +56,8 @@ class BaseManagerView(TemplateView):
 
         createable = get_createable_resource_types(self.request.user)
         createable.sort(key=lambda x: x.name.lower())
+
+        context["creatable_resource_valid_ontologies"] = CreatableResourceValidDomainOntologyClasses(createable).ontologies
         context["createable_resources"] = JSONSerializer().serialize(
             createable,
             exclude=[

@@ -26,7 +26,6 @@ define([
             this.datatypes = _.keys(this.graphModel.get('datatypelookup'));
             this.node = options.node;
             this.isExportable = ko.observable(null);
-
             this.graph = options.graph;
             this.loading = options.loading || ko.observable(false);
             this.hasOntology = ko.computed(function(){

@@ -245,14 +245,23 @@ define([
                 }
             });
 
-            viewModel.nodeForm = new NodeFormView({
-                graph: viewModel.graph,
-                graphModel: viewModel.graphModel,
-                loading: viewModel.loading,
-                node: viewModel.selectedNode,
-                appliedFunctions: viewModel.appliedFunctions,
-                restrictedNodegroups: data.restrictedNodegroups
+            // forces view update on node selection
+            var selectedNode = ko.observable(viewModel.selectedNode);
+            
+            selectedNode.subscribe(function(node) {
+                if (node) {
+                    viewModel.nodeForm = new NodeFormView({
+                        graph: viewModel.graph,
+                        graphModel: viewModel.graphModel,
+                        loading: viewModel.loading,
+                        node: node,
+                        appliedFunctions: viewModel.appliedFunctions,
+                        restrictedNodegroups: data.restrictedNodegroups
+                    });
+                }
             });
+
+            selectedNode.valueHasMutated();
 
             viewModel.branchListView = new BranchListView({
                 el: $('#branch-library'),

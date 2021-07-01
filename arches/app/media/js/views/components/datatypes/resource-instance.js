@@ -11,15 +11,34 @@ define([
         viewModel: function(params) {
             var self = this;
             this.search = params.search;
-            this.resourceModels = [{
-                graphid: null,
-                name: ''
-            }].concat(_.map(data.createableResources, function(graph) {
-                return {
-                    graphid: graph.graphid,
-                    name: graph.name
-                };
-            }));
+
+            this.resourceModels = ko.computed(function() {
+                var ontologyClass = params.ontologyclass();
+                var parentProperty = params.parentproperty();
+                
+                return data.createableResources.filter(function(resource) {
+                    var hasValidOntologyClasses = true;
+
+                    // only filter resources if parent ontology and relationship are defined
+                    if (ontologyClass && parentProperty) {
+                        hasValidOntologyClasses = data.creatableResourceValidOntologies[resource.graphid].some(function(ontology) {
+                            if (ontology['ontology_property'] === parentProperty) {
+                                return ontology['ontology_classes'].some(function(ontologyClass) {
+                                    return ontologyClass === ontologyClass;
+                                });
+                            }
+                        });
+                    }
+
+                    if (hasValidOntologyClasses) {
+                        return({
+                            graphid: resource.graphid,
+                            name: resource.name
+                        });
+                    }
+                });
+            });
+
             if (!this.search) {
                 this.makeFriendly = ontologyUtils.makeFriendly;
                 this.getSelect2ConfigForOntologyProperties = ontologyUtils.getSelect2ConfigForOntologyProperties;
