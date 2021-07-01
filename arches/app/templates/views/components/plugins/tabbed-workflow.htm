@@ -21,12 +21,7 @@
                 >
                 <!-- ko if: (activeStep()._index === steps.length - 1) || isWorkflowFinished() -->
                 <button 
-                    data-bind="click: function(){
-                        if (activeStep().hasDirtyTile()) {
-                            activeStep().save()
-                        }
-                        window.location.assign(quitUrl)
-                    }" 
+                    data-bind="click: finishTabbedWorkflow"
                     class="btn btn-success"
                 >
                 <i class="fa fa-check"></i>

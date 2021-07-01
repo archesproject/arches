@@ -17,8 +17,10 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 """
 
 import time
+import requests
 from datetime import datetime, timedelta
 from django.http import HttpResponse
+from django.http.response import HttpResponseForbidden
 from django.template.loader import render_to_string
 from django.views.generic import View
 from django.utils.decorators import method_decorator
@@ -281,3 +283,19 @@ class ServerSettingView(View):
             response = Http401Response()
 
         return response
+
+
+@method_decorator(csrf_exempt, name="dispatch")
+class Token(View):
+    def get(self, request):
+        if settings.DEBUG:
+            data = {
+                "username": request.GET.get("username", None),
+                "password": request.GET.get("password", None),
+                "client_id": settings.MOBILE_OAUTH_CLIENT_ID,
+                "grant_type": "password",
+            }
+            url = request.get_raw_uri().replace(request.path, "").split("?")[0] + reverse("oauth2:token")
+            r = requests.post(url, data=data)
+            return JSONResponse(r.json(), indent=4)
+        return HttpResponseForbidden()
