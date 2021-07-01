@@ -7,13 +7,13 @@ import uuid
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('models', '7442_delete_manifest_images_table'),
+        ("models", "7442_delete_manifest_images_table"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='editlog',
-            name='transactionid',
+            model_name="editlog",
+            name="transactionid",
             field=models.UUIDField(default=uuid.uuid1),
         ),
     ]
