@@ -826,6 +826,8 @@ class CsvReader(Reader):
                             source_node = node_dict[key]
                             if child_only:
                                 blank_tile = Tile.get_blank_tile_from_nodegroup_id(str(source_node.nodegroup_id))
+                                blank_tile.tiles = []
+                                blank_tile.tileid = None
                             elif key not in blanktilecache:
                                 blank_tile = Tile.get_blank_tile(key)
                                 cache(blank_tile)
