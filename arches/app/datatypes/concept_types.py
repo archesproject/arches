@@ -129,7 +129,7 @@ class ConceptDataType(BaseConceptDataType):
                 return errors
         return errors
 
-    def transform_value_for_tile(self, value):
+    def transform_value_for_tile(self, value, **kwargs):
         return value.strip()
 
     def transform_export_values(self, value, *args, **kwargs):

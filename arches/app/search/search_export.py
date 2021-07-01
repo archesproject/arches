@@ -16,6 +16,7 @@ You should have received a copy of the GNU Affero General Public License
 along with this program. If not, see <http://www.gnu.org/licenses/>.
 """
 
+import os
 import csv
 import datetime
 import logging
@@ -105,6 +106,12 @@ class SearchResultsExporter(object):
                 headers = graph.node_set.filter(exportable=True).values("fieldname", "datatype")[::1]
                 headers.append({"fieldname": "resourceid", "datatype": "str"})
                 ret += self.to_shp(resources["output"], headers=headers, name=graph.name)
+
+            if format == "tilexl":
+                headers = graph.node_set.filter(exportable=True).values("fieldname", "datatype", "name")[::1]
+                headers = graph.node_set.filter(exportable=True).values("fieldname", "datatype")[::1]
+                headers.append({"fieldname": "resourceid", "datatype": "str"})
+                ret += self.to_tilexl(resources["output"])
 
         full_path = self.search_request.get_full_path()
         search_request_path = self.search_request.path if full_path is None else full_path
@@ -226,6 +233,12 @@ class SearchResultsExporter(object):
     def to_shp(self, instances, headers, name):
         shape_exporter = ResourceExporter(format="shp")
         dest = shape_exporter.writer.create_shapefiles(instances, headers, name)
+        return dest
+
+    def to_tilexl(self, instances):
+        resourceinstanceids = [instance["resourceid"] for instance in instances if "resourceid" in instance]
+        tilexl_exporter = ResourceExporter(format="tilexl")
+        dest = tilexl_exporter.export(resourceinstanceids=resourceinstanceids)
         return dest
 
     def get_geometry_fieldnames(self, instance):  # the same function exist in shapefile.py l.70

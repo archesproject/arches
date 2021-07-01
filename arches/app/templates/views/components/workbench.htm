@@ -1,6 +1,6 @@
 {% load i18n %}
 
-<div class="workbench-card-wrapper" data-bind="class: ko.unwrap(workbenchWrapperClass)">
+<div class="workbench-card-wrapper {% block workbench_wrapper_classes %}{% endblock workbench_wrapper_classes %}" data-bind="class: ko.unwrap(workbenchWrapperClass)">
     <!-- ko if: showTabs -->
     <div class="workbench-card-sidebar">
         {% block tabs %}
