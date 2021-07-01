@@ -164,7 +164,10 @@ class Resource(models.ResourceInstance):
 
     # # flatten out the nested tiles into a single array
     def get_flattened_tiles(self):
-        return [flat_tile for tile in self.tiles for flat_tile in tile.get_flattened_tiles()]
+        tiles = []
+        for tile in self.tiles:
+            tiles.extend(tile.get_flattened_tiles())
+        return tiles
 
     @staticmethod
     def bulk_save(resources):
@@ -176,29 +179,41 @@ class Resource(models.ResourceInstance):
 
         """
 
-        tiles = [tile for resource in resources for tile in resource.get_flattened_tiles()]
+        datatype_factory = DataTypeFactory()
+        node_datatypes = {str(nodeid): datatype for nodeid, datatype in models.Node.objects.values_list("nodeid", "datatype")}
+        tiles = []
+        documents = []
+        term_list = []
+
+        for resource in resources:
+            resource.tiles = resource.get_flattened_tiles()
+            tiles.extend(resource.tiles)
 
         # need to save the models first before getting the documents for index
+        start = time()
         Resource.objects.bulk_create(resources)
         TileModel.objects.bulk_create(tiles)
 
+        print(f"Time to bulk create tiles and resources: {datetime.timedelta(seconds=time() - start)}")
+
+        start = time()
         for resource in resources:
             resource.save_edit(edit_type="create")
 
         resources[0].tiles[0].save_edit(note=f"Bulk created: {len(tiles)} for {len(resources)} resources.", edit_type="bulk_create")
 
-        datatype_factory = DataTypeFactory()
-        node_datatypes = {str(nodeid): datatype for nodeid, datatype in models.Node.objects.values_list("nodeid", "datatype")}
-        documents = []
-        term_list = []
+        print("Time to save resource edits: %s" % datetime.timedelta(seconds=time() - start))
+
         for resource in resources:
+            start = time()
             document, terms = resource.get_documents_to_index(
                 fetchTiles=False, datatype_factory=datatype_factory, node_datatypes=node_datatypes
             )
 
             documents.append(se.create_bulk_item(index=RESOURCES_INDEX, id=document["resourceinstanceid"], data=document))
 
-            term_list.extend([se.create_bulk_item(index=TERMS_INDEX, id=term["_id"], data=term["_source"]) for term in terms])
+            for term in terms:
+                term_list.append(se.create_bulk_item(index=TERMS_INDEX, id=term["_id"], data=term["_source"]))
 
         se.bulk_index(documents)
         se.bulk_index(term_list)
