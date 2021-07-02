@@ -454,7 +454,7 @@ class CsvReader(Reader):
         create_concepts=False,
         create_collections=False,
         prevent_indexing=False,
-        transaction_id=None
+        transaction_id=None,
     ):
         # errors = businessDataValidator(self.business_data)
         celery_worker_running = task_management.check_if_celery_available()
@@ -887,7 +887,7 @@ class CsvReader(Reader):
                             save_count,
                             row_number,
                             prevent_indexing,
-                            transaction_id=transaction_id
+                            transaction_id=transaction_id,
                         )
 
                         # reset values for next resource instance
@@ -1086,7 +1086,7 @@ class CsvReader(Reader):
                         save_count,
                         row_number,
                         prevent_indexing,
-                        transaction_id=transaction_id
+                        transaction_id=transaction_id,
                     )
 
                 if bulk:

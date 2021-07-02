@@ -177,7 +177,9 @@ class BusinessDataImporter(object):
                 mapping = self.mapping
             if file_format == "json":
                 reader = ArchesFileReader()
-                reader.import_business_data(business_data, mapping=mapping, overwrite=overwrite, prevent_indexing=prevent_indexing, transaction_id=transaction_id)
+                reader.import_business_data(
+                    business_data, mapping=mapping, overwrite=overwrite, prevent_indexing=prevent_indexing, transaction_id=transaction_id
+                )
             elif file_format == "jsonl":
                 with open(self.file[0], "rU") as openf:
                     lines = openf.readlines()
@@ -191,7 +193,10 @@ class BusinessDataImporter(object):
                         for line in lines:
                             archesresource = JSONDeserializer().deserialize(line)
                             reader.import_business_data(
-                                {"resources": [archesresource]}, overwrite=overwrite, prevent_indexing=prevent_indexing, transaction_id=transaction_id
+                                {"resources": [archesresource]},
+                                overwrite=overwrite,
+                                prevent_indexing=prevent_indexing,
+                                transaction_id=transaction_id,
                             )
             elif file_format == "csv" or file_format == "shp" or file_format == "zip":
                 if mapping is not None:

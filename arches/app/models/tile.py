@@ -116,7 +116,7 @@ class Tile(models.TileModel):
         newprovisionalvalue=None,
         oldprovisionalvalue=None,
         provisional_edit_log_details=None,
-        transaction_id=None
+        transaction_id=None,
     ):
         timestamp = datetime.datetime.now()
         edit = EditLog()
@@ -141,7 +141,7 @@ class Tile(models.TileModel):
         edit.edittype = edit_type
         edit.newprovisionalvalue = newprovisionalvalue
         edit.oldprovisionalvalue = oldprovisionalvalue
-        if(transaction_id != None):
+        if transaction_id != None:
             edit.transactionid = transaction_id
         edit.save()
 
@@ -488,7 +488,11 @@ class Tile(models.TileModel):
 
             self.__preDelete(request)
             self.save_edit(
-                user=user, edit_type="tile delete", old_value=self.data, provisional_edit_log_details=provisional_edit_log_details, transaction_id=transaction_id
+                user=user,
+                edit_type="tile delete",
+                old_value=self.data,
+                provisional_edit_log_details=provisional_edit_log_details,
+                transaction_id=transaction_id,
             )
             try:
                 super(Tile, self).delete(*args, **kwargs)
