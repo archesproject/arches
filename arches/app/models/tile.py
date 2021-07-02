@@ -141,7 +141,7 @@ class Tile(models.TileModel):
         edit.edittype = edit_type
         edit.newprovisionalvalue = newprovisionalvalue
         edit.oldprovisionalvalue = oldprovisionalvalue
-        if transaction_id != None:
+        if transaction_id is not None:
             edit.transactionid = transaction_id
         edit.save()
 

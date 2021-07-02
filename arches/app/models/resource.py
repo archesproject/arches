@@ -100,7 +100,7 @@ class Resource(models.ResourceInstance):
         edit.user_lastname = getattr(user, "last_name", "")
         edit.note = note
         edit.timestamp = timestamp
-        if transaction_id != None:
+        if transaction_id is not None:
             edit.transactionid = transaction_id
         edit.edittype = edit_type
         edit.save()
