@@ -78,7 +78,8 @@ function main {
   sudo apt-get install -y libgdal-dev
   sudo apt-get install -y libpq-dev
 
-  sudo apt-get install python3-venv
+  sudo apt-get install -y python3-dev
+  sudo apt-get install -y python3-venv
 
   echo -n "Would you like to install elasticsearch? (y/N)? "
   read answer
