@@ -195,7 +195,7 @@ class Resource(models.ResourceInstance):
 
         # need to handle if the bulk load is appending tiles to existing resources/
         existing_resources = Resource.objects.filter(resourceinstanceid__in=[resource.resourceinstanceid for resource in resources])
-        existing_resources_ids = [existing_resource.resourceinstanceid for existing_resource in existing_resources]
+        existing_resources_ids = {existing_resource.resourceinstanceid for existing_resource in existing_resources}
         resources_to_create = [resource for resource in resources if resource.resourceinstanceid not in existing_resources_ids]
 
         start = time()
