@@ -170,12 +170,13 @@ class Resource(models.ResourceInstance):
         return tiles
 
     @staticmethod
-    def bulk_save(resources):
+    def bulk_save(resources, overwrite="overwrite"):
         """
         Saves and indexes a list of resources
 
         Arguments:
         resources -- a list of resource models
+        overwrite -- a string indicating to overwrite or append to resource instances
 
         """
 
