@@ -207,6 +207,8 @@ class Resource(models.ResourceInstance):
         start = time()
         for resource in resources_to_create:
             resource.save_edit(edit_type="create", transaction_id=transaction_id)
+        for resource in existing_resources:
+            resource.save_edit(edit_type="append", transaction_id=transaction_id)
 
         for resource in resources:
         try:
