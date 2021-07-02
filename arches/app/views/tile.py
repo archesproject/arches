@@ -88,6 +88,9 @@ class TileData(View):
         return JSONErrorResponse(_(title), _(str(message)), {"message": message, "title": title})
 
     def post(self, request):
+        # TODO: accept UUID, don't generate here.
+        transaction_id = uuid.uuid1()
+
         if self.action == "update_tile":
             json = request.POST.get("data", None)
             accepted_provisional = request.POST.get("accepted_provisional", None)
@@ -108,7 +111,7 @@ class TileData(View):
                     graphid = models.Node.objects.filter(nodegroup=data["nodegroup_id"])[0].graph_id
                     resource.graph_id = graphid
                     try:
-                        resource.save(user=request.user)
+                        resource.save(user=request.user, transaction_id=transaction_id)
                         data["resourceinstance_id"] = resource.pk
                         resource.index()
                     except ModelInactiveError as e:
@@ -131,7 +134,7 @@ class TileData(View):
                             try:
                                 if accepted_provisional is None:
                                     try:
-                                        tile.save(request=request)
+                                        tile.save(request=request, transaction_id=transaction_id)
                                     except TileValidationError as e:
                                         resource_tiles = models.TileModel.objects.filter(resourceinstance=tile.resourceinstance)
                                         if resource_tiles.count() == 0:
