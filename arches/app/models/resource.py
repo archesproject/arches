@@ -193,7 +193,7 @@ class Resource(models.ResourceInstance):
             tiles.extend(resource.tiles)
 
         if overwrite == "append":
-        # need to handle if the bulk load is appending tiles to existing resources/
+            # need to handle if the bulk load is appending tiles to existing resources/
             existing_resources = Resource.objects.filter(resourceinstance__in=resources)
             existing_resources_ids = {existing_resource.resourceinstanceid for existing_resource in existing_resources}
             resources_to_create = [resource for resource in resources if resource.resourceinstanceid not in existing_resources_ids]
