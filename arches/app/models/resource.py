@@ -185,12 +185,19 @@ class Resource(models.ResourceInstance):
         tiles = []
         documents = []
         term_list = []
+        existing_resources = []
+        resources_to_create = resources
 
         for resource in resources:
             resource.tiles = resource.get_flattened_tiles()
             tiles.extend(resource.tiles)
 
-        # need to save the models first before getting the documents for index
+        if overwrite == "append":
+        # need to handle if the bulk load is appending tiles to existing resources/
+            existing_resources = Resource.objects.filter(resourceinstance__in=resources)
+            existing_resources_ids = {existing_resource.resourceinstanceid for existing_resource in existing_resources}
+            resources_to_create = [resource for resource in resources if resource.resourceinstanceid not in existing_resources_ids]
+
         start = time()
         Resource.objects.bulk_create(resources)
         TileModel.objects.bulk_create(tiles)
