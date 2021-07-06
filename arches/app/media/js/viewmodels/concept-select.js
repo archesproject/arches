@@ -57,12 +57,12 @@ define([
         this.setNames = function() {
             var names = [];
             self.valueList().forEach(function(val) {
-                if (val) {
+                if (ko.unwrap(val)) {
                     if (NAME_LOOKUP[val]) {
                         names.push(NAME_LOOKUP[val]);
                         self.displayName(names.join(', '));
                     } else {
-                        $.ajax(arches.urls.get_pref_label + '?valueid=' + val, {
+                        $.ajax(arches.urls.get_pref_label + '?valueid=' + ko.unwrap(val), {
                             dataType: "json"
                         }).done(function(data) {
                             NAME_LOOKUP[val] = data.value;
@@ -171,11 +171,11 @@ define([
                 };
 
                 valueList.forEach(function(value) {
-                    if (value) {
+                    if (ko.unwrap(value)) {
                         if (NAME_LOOKUP[value]) {
                             setSelectionData(value);
                         } else {
-                            $.ajax(arches.urls.concept_value + '?valueid=' + value, {
+                            $.ajax(arches.urls.concept_value + '?valueid=' + ko.unwrap(value), {
                                 dataType: "json"
                             }).done(function(data) {
                                 NAME_LOOKUP[value] = data.value;
