@@ -100,10 +100,12 @@ define([
         this.initialize = function() {
             if (self.componentData.tilesManaged === "one") {
                 self.isDirty.subscribe(function(dirty) {
+                    console.log("diry", dirty)
                     self.hasUnsavedData(dirty);
                 });
 
                 self.tile.subscribe(function(tile) {
+                    console.log('tile sub')
                     if (!self.tiles()) {
                         self.tiles([tile]);
                     } 

@@ -10,6 +10,8 @@ define([
 ], function(_, ko, koMapping, L, uuid, geojsonExtent, IIIFViewerViewmodel) {
     var viewModel = function(params) {
         var self = this;
+
+        console.log('s')
         var drawControl;
         var drawFeatures = ko.observableArray();
         var editItems = new L.FeatureGroup();
@@ -26,6 +28,9 @@ define([
         this.lineOpacity = ko.observable(1);
         this.fillOpacity = ko.observable(0.2);
         this.showStylingTools = ko.observable(false);
+
+        console.log('ss', self, params)
+
 
         this.cancelDrawing = function() {
             _.each(tools, function(tool) {
@@ -85,7 +90,9 @@ define([
                 var id = ko.unwrap(widget.node_id);
                 var features = [];
                 drawFeatures().forEach(function(feature){
-                    if (feature.properties.nodeId === id) features.push(feature);
+                    if (feature.properties.nodeId === id) {
+                        features.push(feature)
+                    };
                 });
                 if (ko.isObservable(self.tile.data[id])) {
                     self.tile.data[id]({
@@ -93,17 +100,21 @@ define([
                         features: features
                     });
                 } else {
-                    self.tile.data[id].features(features);
+                    var foo = self.tile.data[id].features();
+
+                    var bar = [...foo, ...features]
+                    self.tile.data[id].features(bar);
                 }
             });
         };
 
         var updateDrawFeatures = function() {
+            console.log("updatedrawfeatures")
             drawFeatures([]);
             self.widgets.forEach(function(widget) {
                 var id = ko.unwrap(widget.node_id);
                 var featureCollection = koMapping.toJS(self.tile.data[id]);
-                if (featureCollection) {
+                if (featureCollection && featureCollection.features) {
                     featureCollection.features.forEach(function(feature) {
                         if (feature.properties.manifest && !params.manifest)
                             params.manifest = feature.properties.manifest;
@@ -119,10 +130,11 @@ define([
 
         IIIFViewerViewmodel.apply(this, [params]);
 
+
         var setTab = this.canvas.subscribe(function(val){
             if (val) {
                 self.expandGallery(false);
-                self.activeTab('editor');
+                self.activeTab(ko.unwrap(self.activeTab) || 'editor');
                 setTab.dispose();
             }
         });
@@ -238,6 +250,9 @@ define([
         if (this.card) {
             this.card.triggerUpdate = updateDrawFeatures; // can be called by the provisional tile view model to update the drawing
         }
+
+        console.log("DS", self, params)
+
 
         this.disableDrawing = ko.computed(function() {
             return !self.canvas();

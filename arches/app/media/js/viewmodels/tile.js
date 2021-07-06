@@ -131,7 +131,9 @@ define([
                 _.each(params.handlers['tile-reset'], function(handler) {
                     handler(self);
                 });
-                params.provisionalTileViewModel.selectedProvisionalEdit(undefined);
+                if (params.provisionalTileViewModel) {
+                    params.provisionalTileViewModel.selectedProvisionalEdit(undefined);
+                }
 
                 delete self.noDefaults;
             },

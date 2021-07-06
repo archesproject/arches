@@ -192,7 +192,11 @@ define([
         this.getFromLocalStorage = function(key) {
             var allStepsLocalStorageData = JSON.parse(localStorage.getItem(STEPS_LABEL)) || {};
 
+<<<<<<< Updated upstream
             if (allStepsLocalStorageData[self.id()] && typeof allStepsLocalStorageData[self.id()][key] !== "undefined") {
+=======
+            if (allStepsLocalStorageData[self.id()] && allStepsLocalStorageData[self.id()][key]) {
+>>>>>>> Stashed changes
                 return JSON.parse(allStepsLocalStorageData[self.id()][key]);
             }
         };
