@@ -6,4 +6,4 @@ sst
 django-nose
 coverage
 sauceclient
-mock==2.0.0
+mock==4.0.3
