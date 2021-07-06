@@ -11,7 +11,6 @@ define([
     var viewModel = function(params) {
         var self = this;
 
-        console.log('s')
         var drawControl;
         var drawFeatures = ko.observableArray();
         var editItems = new L.FeatureGroup();
@@ -28,9 +27,6 @@ define([
         this.lineOpacity = ko.observable(1);
         this.fillOpacity = ko.observable(0.2);
         this.showStylingTools = ko.observable(false);
-
-        console.log('ss', self, params)
-
 
         this.cancelDrawing = function() {
             _.each(tools, function(tool) {
@@ -99,17 +95,16 @@ define([
                         type: 'FeatureCollection',
                         features: features
                     });
-                } else {
-                    var foo = self.tile.data[id].features();
-
-                    var bar = [...foo, ...features]
-                    self.tile.data[id].features(bar);
+                } 
+                else {
+                    /* updates geometry table, instead of overwrite */ 
+                    var tileDataFeatures = self.tile.data[id].features();
+                    self.tile.data[id].features([...tileDataFeatures, ...features]);
                 }
             });
         };
 
         var updateDrawFeatures = function() {
-            console.log("updatedrawfeatures")
             drawFeatures([]);
             self.widgets.forEach(function(widget) {
                 var id = ko.unwrap(widget.node_id);
@@ -250,9 +245,6 @@ define([
         if (this.card) {
             this.card.triggerUpdate = updateDrawFeatures; // can be called by the provisional tile view model to update the drawing
         }
-
-        console.log("DS", self, params)
-
 
         this.disableDrawing = ko.computed(function() {
             return !self.canvas();

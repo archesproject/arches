@@ -72,8 +72,6 @@ define([
                 );
             });
 
-
-        console.log("IIIFVIEWER VM", self, params)
         var annotationLayer = ko.computed(function() {
             var annotationFeatures = [];
             self.annotationNodes().forEach(function(node) {
@@ -244,7 +242,6 @@ define([
         };
 
         this.getManifestData = function() {
-            console.log("getManifestData", self, params)
             var manifestURL = self.manifest();
             if (manifestURL) {
                 self.manifestLoading(true);
@@ -259,7 +256,6 @@ define([
                         self.editManifest(false);
                     })
                     .catch(function(error) {
-                        console.log('getManifestData error', error)
                         if (error.message !== "The user aborted a request.")
                             self.manifestError(error);
                     })
@@ -272,7 +268,6 @@ define([
         this.getManifestData();
 
         WorkbenchViewmodel.apply(this, [params]);
-
 
         this.activeTab.subscribe(function() {
             var map = self.map();

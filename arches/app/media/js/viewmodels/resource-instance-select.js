@@ -207,8 +207,6 @@ define([
             // Resolve Resource Instance Names from the incoming values
             self.value.valueHasMutated();
 
-            console.log("resourceinstanceselect init", self, params, ko.unwrap(self.value))
-
             this.relationshipsInFilter = ko.computed(function() {
                 if(!self.value()) {
                     return [];

@@ -97,7 +97,6 @@
                     <div data-bind="foreach: {
                             data:card.widgets, as: 'widget'
                         }">
-                        <div style="display:none" data-bind="text: console.log(self, self.form.nodeLookup[widget.node_id()].datatype() )"></div>
                         <!-- ko if: ko.unwrap(self.form.nodeLookup[widget.node_id()].datatype) === 'annotation' -->
                         <div class="row widget-wrapper">
                             <div class="form-group">
