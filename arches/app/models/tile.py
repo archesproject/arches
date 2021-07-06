@@ -283,7 +283,7 @@ class Tile(models.TileModel):
                             )
                             raise TileValidationError(message + (", ").join(duplicate_values))
 
-    def check_for_missing_nodes(self, request):
+    def check_for_missing_nodes(self):
         if settings.BYPASS_REQUIRED_VALUE_TILE_VALIDATION:
             return
         missing_nodes = []
@@ -292,13 +292,12 @@ class Tile(models.TileModel):
                 node = models.Node.objects.get(nodeid=nodeid)
                 datatype = self.datatype_factory.get_instance(node.datatype)
                 datatype.clean(self, nodeid)
-                if request is not None:
-                    if self.data[nodeid] is None and node.isrequired is True:
-                        if len(node.cardxnodexwidget_set.all()) > 0:
-                            missing_nodes.append(node.cardxnodexwidget_set.all()[0].label)
-                        else:
-                            missing_nodes.append(node.name)
-            except Exception as e:
+                if self.data[nodeid] is None and node.isrequired is True:
+                    if len(node.cardxnodexwidget_set.all()) > 0:
+                        missing_nodes.append(node.cardxnodexwidget_set.all()[0].label)
+                    else:
+                        missing_nodes.append(node.name)
+            except Exception:
                 warning = _(
                     "Error checking for missing node. Nodeid: {nodeid} with value: {value}, not in nodes. \
                     You may have a node in your business data that no longer exists in any graphs."
@@ -386,7 +385,7 @@ class Tile(models.TileModel):
                 datatype = self.datatype_factory.get_instance(node.datatype)
                 datatype.pre_tile_save(self, nodeid)
             self.__preSave(request)
-            self.check_for_missing_nodes(request)
+            self.check_for_missing_nodes()
             self.check_for_constraint_violation()
             self.check_tile_cardinality_violation()
 

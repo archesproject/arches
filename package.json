@@ -20,6 +20,7 @@
         "codemirror": "^5.24.0",
         "core-js": "^2.5.7",
         "cytoscape": "^3.18.2",
+        "cytoscape-cola": "^2.4.0",
         "d3": "^6.1.1",
         "datatables.net": "~1.10.12",
         "datatables.net-bs": "~1.10.12",

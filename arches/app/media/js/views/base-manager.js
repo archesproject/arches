@@ -5,7 +5,6 @@ define([
     'backbone',
     'views/page-view',
     'view-data',
-    'bindings/datatable',
     'uuid',
     'core-js',
     'dom-4',

@@ -21,12 +21,12 @@
                 >
                 <!-- ko if: (activeStep()._index === steps.length - 1) || isWorkflowFinished() -->
                 <button 
-                    data-bind="click: function(){window.location.assign(quitUrl)}" 
+                    data-bind="click: finishTabbedWorkflow"
                     class="btn btn-success"
                 >
                 <i class="fa fa-check"></i>
                 <span>
-                    {% trans "Complete Workflow" %}
+                    {% trans "Save and Complete Workflow" %}
                 </span>
                 </button>
                 <!-- /ko -->
@@ -42,81 +42,85 @@
             </div>
         </div>
         
-        <div class="workflow-nav-tab-container">
-            <ul class="nav nav-tabs workflow-nav-tab-list">
-                <!--ko foreach: {data: steps, as: 'step'} -->
-                    <li 
-                        class="workflow-nav-tab-list-item" 
-                        data-bind="
-                            css: { active: step.active() },
-                            container: '.workflow-nav-tab-container',
-                            scrollDirection: 'horizontal',
-                            scrollTo: step.active(),
-                        "
-                    >
-                        <div
-                            class='workflow-nav-tab'
-                            data-bind="{
-                                css: { 
-                                    active: step.active(), 
-                                    inactive: (
-                                        !step.active() 
-                                        && (
-                                            step.complete()
-                                            || ( step._index <= $parent.furthestValidStepIndex() )
-                                        )
-
-                                    ),
-                                    disabled: (
-                                        !step.active() 
-                                        && step._index > $parent.furthestValidStepIndex()
-                                    ),
-                                },
-                                click: function() { 
-                                    if (
-                                        !step.active() 
-                                        && step._index <= $parent.furthestValidStepIndex()
-                                    ) { 
-                                        $parent.activeStep(step) 
-                                    }
-                                },
-                            }" 
-                        >
-                            <div style="display: flex; flex-direction: row; justify-content: center; align-items: center;">
-                                <span
-                                    style="margin-right: 4px;"
-                                    class="workflow-nav-tab-arrow"
+        <div class="workflow-nav-tab-container" data-bind="gallery: pan, duration: 400, thumbnailclass: 'workflow-nav-tabs'">
+            <div class="workflow-tab-controls right" data-bind="click: function(){ updatePan('left') }"><i class="fa fa-angle-left"></i></div>
+                <div class="workflow-nav-tabs">
+                    <ul class="nav nav-tabs workflow-nav-tab-list">
+                        <!--ko foreach: {data: steps, as: 'step'} -->
+                            <li 
+                                class="workflow-nav-tab-list-item" 
+                                data-bind="
+                                    css: { active: step.active() },
+                                    container: '.workflow-nav-tab-container',
+                                    scrollDirection: 'horizontal',
+                                    scrollTo: step.active(),
+                                "
+                            >
+                                <div
+                                    class='workflow-nav-tab'
                                     data-bind="{
-                                        css: {
-                                            disabled: $parent.activeStep()._index === 0,
-                                        },
-                                        visible: step.active() && step._index !== 0,
-                                    }"
-                                >
-                                    <i class="fa fa-caret-left"></i>
-                                </span>
+                                        css: { 
+                                            active: step.active(), 
+                                            inactive: (
+                                                !step.active() 
+                                                && (
+                                                    step.complete()
+                                                    || ( step._index <= $parent.furthestValidStepIndex() )
+                                                )
 
-                                <span style="font-size: 14px;" data-bind="text: step.title()"></span>
-
-                                <span
-                                    style="margin-left: 4px;"
-                                    class="workflow-nav-tab-arrow"
-                                    data-bind="{
-                                        css: {
+                                            ),
                                             disabled: (
-                                                ( $parent.activeStep().required() && !$parent.activeStep().complete() )
+                                                !step.active() 
+                                                && step._index > $parent.furthestValidStepIndex()
                                             ),
                                         },
-                                        visible: step.active() && step._index !== $parent.steps.length - 1,
-                                    }"
+                                        click: function() { 
+                                            if (
+                                                !step.active() 
+                                                && step._index <= $parent.furthestValidStepIndex()
+                                            ) { 
+                                                $parent.activeStep(step) 
+                                            }
+                                        },
+                                    }" 
                                 >
-                                    <i class="fa fa-caret-right"></i>
-                                </span>
-                            </div>
-                        </div>
-                    </li>
-                <!-- /ko -->
-            </ul>
+                                    <div style="display: flex; flex-direction: row; justify-content: center; align-items: center;">
+                                        <span
+                                            style="margin-right: 4px;"
+                                            class="workflow-nav-tab-arrow"
+                                            data-bind="{
+                                                css: {
+                                                    disabled: $parent.activeStep()._index === 0,
+                                                },
+                                                visible: step.active() && step._index !== 0,
+                                            }"
+                                        >
+                                            <i class="fa fa-caret-left"></i>
+                                        </span>
+
+                                        <span style="font-size: 14px;" data-bind="text: step.title()"></span>
+
+                                        <span
+                                            style="margin-left: 4px;"
+                                            class="workflow-nav-tab-arrow"
+                                            data-bind="{
+                                                css: {
+                                                    disabled: (
+                                                        ( $parent.activeStep().required() && !$parent.activeStep().complete() )
+                                                    ),
+                                                },
+                                                visible: step.active() && step._index !== $parent.steps.length - 1,
+                                            }"
+                                        >
+                                            <i class="fa fa-caret-right"></i>
+                                        </span>
+                                    </div>
+                                </div>
+                            </li>
+                        <!-- /ko -->
+                    </ul>
+                </div>
+            <div class="workflow-tab-controls left" data-bind="click: function(){ updatePan('right') }"><i class="fa fa-angle-right"></i></div>
         </div>
         
         <div class="tabbed-workflow-step-container">
