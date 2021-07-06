@@ -87,8 +87,8 @@ define([
                 var features = [];
                 drawFeatures().forEach(function(feature){
                     if (feature.properties.nodeId === id) {
-                        features.push(feature)
-                    };
+                        features.push(feature);
+                    }
                 });
                 if (ko.isObservable(self.tile.data[id])) {
                     self.tile.data[id]({
