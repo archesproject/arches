@@ -18,6 +18,15 @@ define(['knockout', 'underscore', 'viewmodels/widget', 'bindings/formattedNumber
 
         var self = this;
 
+        this.disable = ko.computed(() => {
+            if (typeof self.disabled == 'function') {
+                return self.uneditable() || self.disabled();
+            }
+            else {
+                return true;
+            }
+        }, self);
+
         this.updateVal = ko.computed(function(){
             if (self.value() !== null && self.value() !== undefined) { //allow a value of 0 to pass
                 var val = self.value();

@@ -9,10 +9,22 @@ define(['knockout', 'underscore', 'viewmodels/widget'], function (ko, _, WidgetV
     * @param {string} params.config().placeholder - default text to show in the text input
     * @param {string} params.config().uneditable - disables widget
     */
+
     return ko.components.register('text-widget', {
-        viewModel: function(params) {
+        viewModel: function (params) {
             params.configKeys = ['placeholder', 'width', 'maxLength', 'defaultValue', 'uneditable'];
+    
             WidgetViewModel.apply(this, [params]);
+    
+            let self = this;
+    
+            this.disable = ko.computed(() => {
+                if (typeof self.disabled == 'function') {
+                    return self.uneditable() || self.disabled();
+                } else {
+                    return true;
+                }
+            }, self);
         },
         template: { require: 'text!widget-templates/text' }
     });
