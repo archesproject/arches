@@ -19,7 +19,7 @@ define(['knockout', 'underscore', 'viewmodels/widget', 'bindings/formattedNumber
         var self = this;
 
         this.disable = ko.computed(() => {
-            if (typeof self.disabled == 'function') {
+            if (ko.isObservable(self.disabled)) {
                 return self.uneditable() || self.disabled();
             }
             else {
