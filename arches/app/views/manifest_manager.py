@@ -226,11 +226,10 @@ class ManifestManagerView(View):
             pres_dict = create_manifest(canvases=canvases)
             manifest = models.IIIFManifest.objects.create(label=name, description=desc, manifest=pres_dict)
             manifest_id = manifest.id
-            
-            json_url = f"{request.scheme}://{request.get_host()}/manifest/{manifest_id}"
-            
+
+            json_url = f"/manifest/{manifest_id}"
             manifest.url = json_url
-            manifest.manifest["@id"] = json_url
+            manifest.manifest["@id"] = f"{request.scheme}://{request.get_host()}{json_url}"
 
             manifest.save()
 
