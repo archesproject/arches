@@ -209,7 +209,7 @@ define([
                         // If the user is provisional ensure their edits are provisional
                         self.provisionaledits(self.data);
                     }
-                    if (params.userisreviewer === true && params.provisionalTileViewModel.selectedProvisionalEdit()) {
+                    if (params.userisreviewer === true && params.provisionalTileViewModel && params.provisionalTileViewModel.selectedProvisionalEdit()) {
                         if (JSON.stringify(params.provisionalTileViewModel.selectedProvisionalEdit().value) === koMapping.toJSON(self.data)) {
                             params.provisionalTileViewModel.removeSelectedProvisionalEdit();
                         }
