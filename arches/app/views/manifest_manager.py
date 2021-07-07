@@ -227,8 +227,11 @@ class ManifestManagerView(View):
             manifest = models.IIIFManifest.objects.create(label=name, description=desc, manifest=pres_dict)
             manifest_id = manifest.id
             json_url = f"/manifest/{manifest_id}"
+            manifest.manifest["@id"] = json_url
             manifest.url = json_url
+
             manifest.save()
+
             return JSONResponse(manifest)
         else:
             manifest = models.IIIFManifest.objects.get(url=manifest_url)
