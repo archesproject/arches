@@ -31,7 +31,14 @@ class Command(BaseCommand):
 
     def add_arguments(self, parser):
         parser.add_argument("operation", nargs="?", help="operation 'livereload' starts livereload for this project on port 35729")
-        parser.add_argument("-lrh", "--livereloadhost", action="store", dest="livereloadhost", default=None, help="Host on which to run livereload (defaults to 127.0.0.1)")
+        parser.add_argument(
+            "-lrh",
+            "--livereloadhost",
+            action="store",
+            dest="livereloadhost",
+            default=None,
+            help="Host on which to run livereload (defaults to 127.0.0.1)",
+        )
 
     def handle(self, *args, **options):
         host = options["livereloadhost"]
@@ -46,8 +53,8 @@ class Command(BaseCommand):
             server.watch(path)
         for path in settings.TEMPLATES[0]["DIRS"]:
             server.watch(path)
-  
-        if(host is None):
+
+        if host is None:
             server.serve(port=settings.LIVERELOAD_PORT)
-        else: 
+        else:
             server.serve(port=settings.LIVERELOAD_PORT, host=host)
