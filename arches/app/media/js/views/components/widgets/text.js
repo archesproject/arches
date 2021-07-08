@@ -19,11 +19,7 @@ define(['knockout', 'underscore', 'viewmodels/widget'], function (ko, _, WidgetV
             let self = this;
     
             this.disable = ko.computed(() => {
-                if (ko.isObservable(self.disabled)) {
-                    return self.uneditable() || self.disabled();
-                } else {
-                    return true;
-                }
+                return ko.unwrap(self.disabled) || ko.unwrap(self.uneditable); 
             }, self);
         },
         template: { require: 'text!widget-templates/text' }
