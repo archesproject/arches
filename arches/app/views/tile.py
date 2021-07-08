@@ -88,8 +88,7 @@ class TileData(View):
         return JSONErrorResponse(_(title), _(str(message)), {"message": message, "title": title})
 
     def post(self, request):
-        # TODO: accept UUID, don't generate here.
-        transaction_id = uuid.uuid1()
+        transaction_id = request.POST.get("transaction_id", uuid.uuid1())
 
         if self.action == "update_tile":
             json = request.POST.get("data", None)
