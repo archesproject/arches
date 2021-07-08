@@ -17,8 +17,13 @@ define([
             this.metadataLabel = ko.observable('');
             this.metadataValues = ko.observable('');
             this.mainMenu = ko.observable(true);
+
+            this.shouldShowEditService = params.shouldShowEditService || ko.observable(true);
             this.editService = ko.observable(false);
+            
+            this.shouldShowCreateService = params.shouldShowCreateService || ko.observable(true);
             this.createService = ko.observable(true);
+
             this.remoteManifest = ko.observable(true);
             this.alert = params.alert || ko.observable(); 
             this.addCanvas = function(canvas) { //the function name needs to be better
@@ -223,7 +228,7 @@ define([
             });
 
             this.manifest.subscribe(function(){
-                if (self.manifest().charAt(0) == '/') {
+                if (self.manifest() && self.manifest().charAt(0) == '/') {
                     self.remoteManifest(false);
                 }
                 else {

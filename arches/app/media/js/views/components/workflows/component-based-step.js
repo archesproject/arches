@@ -41,6 +41,8 @@ define([
 
             self.complete(true);
             self.savedData(self.addedData());
+
+            self.saving(false);
         };
 
         this.reset = function() {
@@ -247,6 +249,8 @@ define([
             var saveFunction = self.saveFunction();
 
             if (saveFunction) { saveFunction(); }
+
+            self.saving(false);
         };
 
         this.onSaveSuccess = function(savedData) {
@@ -668,7 +672,6 @@ define([
     
             params.postSaveCallback(function() {
                 self.hasUnsavedData(false);
-                self.saving(false);
             });
 
             ko.toJS(params.layoutSections).forEach(function(layoutSection) {
