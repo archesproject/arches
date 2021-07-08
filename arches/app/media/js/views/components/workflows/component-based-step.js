@@ -87,8 +87,8 @@ define([
                     }
                 });
                 tile._tileData(koMapping.toJSON(tile.data));
-
-                data.forEach(function(datum){  
+                
+                data.forEach(function(datum){                    
                     if (datum.tileData) {
                         if (JSON.stringify(Object.keys(koMapping.toJS(tile.data)).sort()) 
                             === JSON.stringify(Object.keys(JSON.parse(datum.tileData)).sort())) {
@@ -96,7 +96,7 @@ define([
                             tile.tileid = datum.tileId;
                             tile.resourceinstance_id = datum.resourceInstanceId;        
                         }
-                    }           
+                    }
                 });
             });
         };

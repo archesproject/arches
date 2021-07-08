@@ -10,6 +10,7 @@ define([
 ], function(_, ko, koMapping, L, uuid, geojsonExtent, IIIFViewerViewmodel) {
     var viewModel = function(params) {
         var self = this;
+
         var drawControl;
         var drawFeatures = ko.observableArray();
         var editItems = new L.FeatureGroup();
@@ -85,15 +86,20 @@ define([
                 var id = ko.unwrap(widget.node_id);
                 var features = [];
                 drawFeatures().forEach(function(feature){
-                    if (feature.properties.nodeId === id) features.push(feature);
+                    if (feature.properties.nodeId === id) {
+                        features.push(feature);
+                    }
                 });
                 if (ko.isObservable(self.tile.data[id])) {
                     self.tile.data[id]({
                         type: 'FeatureCollection',
                         features: features
                     });
-                } else {
-                    self.tile.data[id].features(features);
+                } 
+                else {
+                    /* updates geometry table, instead of overwrite */ 
+                    var tileDataFeatures = self.tile.data[id].features();
+                    self.tile.data[id].features([...tileDataFeatures, ...features]);
                 }
             });
         };
@@ -103,7 +109,7 @@ define([
             self.widgets.forEach(function(widget) {
                 var id = ko.unwrap(widget.node_id);
                 var featureCollection = koMapping.toJS(self.tile.data[id]);
-                if (featureCollection) {
+                if (featureCollection && featureCollection.features) {
                     featureCollection.features.forEach(function(feature) {
                         if (feature.properties.manifest && !params.manifest)
                             params.manifest = feature.properties.manifest;
@@ -119,10 +125,11 @@ define([
 
         IIIFViewerViewmodel.apply(this, [params]);
 
+
         var setTab = this.canvas.subscribe(function(val){
             if (val) {
                 self.expandGallery(false);
-                self.activeTab('editor');
+                self.activeTab(ko.unwrap(self.activeTab) || 'editor');
                 setTab.dispose();
             }
         });
