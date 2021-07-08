@@ -97,9 +97,7 @@ define([
                     });
                 } 
                 else {
-                    /* updates geometry table, instead of overwrite */ 
-                    var tileDataFeatures = self.tile.data[id].features();
-                    self.tile.data[id].features([...tileDataFeatures, ...features]);
+                    self.tile.data[id].features(features);
                 }
             });
         };
