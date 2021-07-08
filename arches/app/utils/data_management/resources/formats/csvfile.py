@@ -384,6 +384,7 @@ class CsvReader(Reader):
         save_count,
         row_number,
         prevent_indexing,
+        transaction_id=None,
     ):
         # create a resource instance only if there are populated_tiles
         errors = []
@@ -400,11 +401,11 @@ class CsvReader(Reader):
             if bulk:
                 resources.append(newresourceinstance)
                 if len(resources) >= settings.BULK_IMPORT_BATCH_SIZE:
-                    Resource.bulk_save(resources=resources)
+                    Resource.bulk_save(resources=resources, transaction_id=transaction_id)
                     del resources[:]  # clear out the array
             else:
                 try:
-                    newresourceinstance.save(index=(not prevent_indexing))
+                    newresourceinstance.save(index=(not prevent_indexing), transaction_id=transaction_id)
 
                 except TransportError as e:
 
@@ -453,6 +454,7 @@ class CsvReader(Reader):
         create_concepts=False,
         create_collections=False,
         prevent_indexing=False,
+        transaction_id=None,
     ):
         # errors = businessDataValidator(self.business_data)
         celery_worker_running = task_management.check_if_celery_available()
@@ -890,6 +892,7 @@ class CsvReader(Reader):
                             save_count,
                             row_number,
                             prevent_indexing,
+                            transaction_id=transaction_id,
                         )
 
                         # reset values for next resource instance
@@ -1111,11 +1114,12 @@ class CsvReader(Reader):
                         save_count,
                         row_number,
                         prevent_indexing,
+                        transaction_id=transaction_id,
                     )
 
                 if bulk:
                     print("Time to create resource and tile objects: %s" % datetime.timedelta(seconds=time() - self.start))
-                    Resource.bulk_save(resources=resources)
+                    Resource.bulk_save(resources=resources, transaction_id=transaction_id)
                 save_count = save_count + 1
                 print(_("Total resources saved: {save_count}").format(**locals()))
 

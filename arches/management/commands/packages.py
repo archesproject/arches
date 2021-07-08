@@ -1073,6 +1073,7 @@ will be very jumbled."""
             create_concepts = True
 
         if len(data_source) > 0:
+            transaction_id = uuid.uuid1()
             for source in data_source:
                 path = utils.get_valid_path(source)
                 if path is not None:
@@ -1084,6 +1085,7 @@ will be very jumbled."""
                         create_collections=create_collections,
                         use_multiprocessing=use_multiprocessing,
                         prevent_indexing=prevent_indexing,
+                        transaction_id=transaction_id,
                     )
                 else:
                     utils.print_message("No file found at indicated location: {0}".format(source))
