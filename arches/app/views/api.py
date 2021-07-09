@@ -741,6 +741,15 @@ class Resources(APIBase):
                         reader = ArchesFileReader()
                         archesresource = JSONDeserializer().deserialize(request.body)
 
+                        # IF a resource id is supplied in the url it should match the resource ids in the body of the request.
+                        # (though Resource id's in the request body take precedence over the id supplied in the url, so are used).
+                        if resourceid != archesresource["resourceinstanceid"]:
+                            return JSONResponse(
+                                {"error": "Resource id in the URI does not match the resourceinstanceid supplied in the document"},
+                                indent=indent,
+                                status=400,
+                            )
+
                         resource = {
                             "resourceinstance": {
                                 "graph_id": archesresource["graph_id"],
@@ -759,7 +768,7 @@ class Resources(APIBase):
                             return JSONResponse({"error": response}, indent=indent, status=400)
                         else:
                             response = []
-                            response.append(JSONDeserializer().deserialize(self.get(request, resourceid).content))
+                            response.append(JSONDeserializer().deserialize(self.get(request, archesresource["resourceinstanceid"]).content))
                             return JSONResponse(response, indent=indent, status=201)
 
                 except models.ResourceInstance.DoesNotExist:
@@ -802,10 +811,12 @@ class Resources(APIBase):
                     reader = ArchesFileReader()
                     archesresource = JSONDeserializer().deserialize(request.body)
 
+                    nascent_resourceinstanceid = str(uuid.uuid4())
+
                     resource = {
                         "resourceinstance": {
                             "graph_id": archesresource["graph_id"],
-                            "resourceinstanceid": archesresource["resourceinstanceid"],
+                            "resourceinstanceid": nascent_resourceinstanceid,
                             "legacyid": archesresource["legacyid"],
                         },
                         "tiles": archesresource["tiles"],
@@ -820,7 +831,7 @@ class Resources(APIBase):
                         return JSONResponse({"error": response}, indent=indent, status=400)
                     else:
                         response = []
-                        response.append(JSONDeserializer().deserialize(self.get(request, resourceid).content))
+                        response.append(JSONDeserializer().deserialize(self.get(request, nascent_resourceinstanceid).content))
                         return JSONResponse(response, indent=indent, status=201)
 
             else:
