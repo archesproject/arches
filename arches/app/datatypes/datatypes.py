@@ -249,6 +249,16 @@ class BooleanDataType(BaseDataType):
             errors.append(error_message)
 
         return errors
+   
+    def get_display_value(self, tile, node):
+        data = self.get_tile_data(tile)
+
+        if data:
+            trueDisplay = node.config["trueLabel"]
+            falseDisplay = node.config["falseLabel"]
+            raw_value = data.get(str(node.nodeid))
+            if(raw_value is not None):
+                return trueDisplay if raw_value else falseDisplay
 
     def transform_value_for_tile(self, value, **kwargs):
         return bool(util.strtobool(str(value)))
