@@ -54,6 +54,7 @@ PIXELSPERTILE = 256
 
 logger = logging.getLogger(__name__)
 
+
 class DataTypeFactory(object):
     _datatypes = None
     _datatype_instances = {}
@@ -1703,12 +1704,12 @@ class DomainListDataType(BaseDomainDataType):
 
 class ResourceInstanceDataType(BaseDataType):
     """
-        tile data comes from the client looking like this:
-        {
-            "resourceId": "",
-            "ontologyProperty": "",
-            "inverseOntologyProperty": ""
-        }
+    tile data comes from the client looking like this:
+    {
+        "resourceId": "",
+        "ontologyProperty": "",
+        "inverseOntologyProperty": ""
+    }
 
     """
 
@@ -1849,7 +1850,6 @@ class ResourceInstanceDataType(BaseDataType):
             if isinstance(value, list):
                 return value
 
-
     def transform_export_values(self, value, *args, **kwargs):
         return json.dumps(value)
 
@@ -1937,7 +1937,6 @@ class ResourceInstanceDataType(BaseDataType):
 
 
 class ResourceInstanceListDataType(ResourceInstanceDataType):
-
     def collects_multiple_values(self):
         return True
 
