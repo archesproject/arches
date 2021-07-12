@@ -951,7 +951,7 @@ class SearchExport(View):
                 if user is not None:
                     request.user = user
         exporter = SearchResultsExporter(search_request=request)
-        export_files, export_info = exporter.export(format,report_link)
+        export_files, export_info = exporter.export(format, report_link)
         if format == "geojson" and total <= download_limit:
             response = JSONResponse(export_files)
             return response
