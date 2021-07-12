@@ -215,6 +215,7 @@ class Edge(models.Model):
 
 class EditLog(models.Model):
     editlogid = models.UUIDField(primary_key=True, default=uuid.uuid1)
+    transactionid = models.UUIDField(default=uuid.uuid1)
     resourcedisplayname = models.TextField(blank=True, null=True)
     resourceclassid = models.TextField(blank=True, null=True)
     resourceinstanceid = models.TextField(blank=True, null=True)
@@ -499,7 +500,7 @@ class Node(models.Model):
 
     @property
     def is_collector(self):
-        return str(self.nodeid) == str(self.nodegroup_id) and self.nodegroup is not None
+        return str(self.nodeid) == str(self.nodegroup_id) and self.nodegroup_id is not None
 
     def is_editable(self):
         if settings.OVERRIDE_RESOURCE_MODEL_LOCK is True:

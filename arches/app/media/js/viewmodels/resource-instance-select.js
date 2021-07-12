@@ -8,7 +8,7 @@ define([
 ], function(ko, _, WidgetViewModel, arches, ResourceSummary, ontologyUtils) {
     var resourceLookup = {};
     var graphCache = {};
-    require(['views/components/workflows/new-resource-instance']);
+    require(['views/components/related-instance-creator']);
     
     /**
     * A viewmodel used for generic alert messages
@@ -297,10 +297,14 @@ define([
         var url = ko.observable(arches.urls.search_results);
         this.url = url;
         var resourceToAdd = ko.observable("");
+
+        this.disabled = ko.computed(function() {
+            return ko.unwrap(self.waitingForGraphToDownload) || ko.unwrap(params.disabled);
+        });
         this.select2Config = {
             value: self.renderContext === 'search' ? self.value : resourceToAdd,
             clickBubble: true,
-            disabled: this.waitingForGraphToDownload,
+            disabled: this.disabled,
             multiple: !self.displayOntologyTable ? params.multiple : false,
             placeholder: this.placeholder() || arches.translations.riSelectPlaceholder,
             closeOnSelect: true,

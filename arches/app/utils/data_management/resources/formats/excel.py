@@ -14,7 +14,10 @@ class ExcelWriter(TileCsvWriter):
     def write_resources(self, graph_id=None, resourceinstanceids=None, **kwargs):
         super(TileCsvWriter, self).write_resources(graph_id=graph_id, resourceinstanceids=resourceinstanceids, **kwargs)
 
-        csv_files = TileCsvWriter().write_resources(graph_id=graph_id)
+        if graph_id:
+            csv_files = TileCsvWriter().write_resources(graph_id=graph_id)
+        else:
+            csv_files = TileCsvWriter().write_resources(resourceinstanceids=resourceinstanceids)
         wb = Workbook()
 
         for csv_file in csv_files:

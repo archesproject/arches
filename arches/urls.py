@@ -65,6 +65,7 @@ from arches.app.views.auth import (
     ServerSettingView,
     PasswordResetView,
     PasswordResetConfirmView,
+    Token,
 )
 from arches.app.models.system_settings import settings
 from django.views.decorators.cache import cache_page
@@ -86,6 +87,7 @@ urlpatterns = [
     url(r"^auth/get_client_id$", GetClientIdView.as_view(), name="get_client_id"),
     url(r"^auth/user_profile$", UserProfileView.as_view(), name="user_profile"),
     url(r"^auth/server_settings$", ServerSettingView.as_view(), name="server_settings"),
+    url(r"^auth/get_dev_token$", Token.as_view(), name="get_dev_token"),
     url(r"^auth/", LoginView.as_view(), name="auth"),
     url(r"^rdm/(?P<conceptid>%s|())$" % uuid_regex, RDMView.as_view(), name="rdm"),
     url(r"^admin/reindex/resources$", ReIndexResources.as_view(), name="reindex"),

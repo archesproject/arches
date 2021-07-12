@@ -24,5 +24,11 @@ module.exports = {
         "URL": false,
         "URLSearchParams": false,
         "fetch": false
+    },
+    "parserOptions": {
+        "ecmaVersion": 2017
+    },
+    "env": {
+        "es6": true
     }
 };

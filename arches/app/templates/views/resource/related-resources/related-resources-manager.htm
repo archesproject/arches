@@ -6,7 +6,7 @@
 
     <!-- Image -->
     <div class="img-lg img-circle rr-splash-img-container">
-        <img class="rr-splash-img" src="{% static '/img/Workflow.png'%}" alt="Resource Editor">
+        <img class="rr-splash-img" src="{% static 'img/Workflow.png'%}" alt="Resource Editor">
     </div>
 
     <!-- Splash Title -->
@@ -308,7 +308,7 @@
         <div id="rr-splash" class="rr-splash" style="margin: 50px 310px 0px 40px;">
             <!-- Image -->
             <div class="img-lg img-circle rr-splash-img-container">
-                <img class="rr-splash-img" src="{% static '/img/Workflow.png' %}" alt="Saved Search">
+                <img class="rr-splash-img" src="{% static 'img/Workflow.png' %}" alt="Saved Search">
             </div>
 
             <!-- Splash Title -->
@@ -401,7 +401,7 @@
                             <div class="node-list-details" data-bind="fadeVisible: selected, delay:100, fade: 250">
                                 <div class="rr-fdg-description" data-bind="html: description"></div>
                                 <div class="node-list-footer">
-                                    <a data-bind="click: function () { window.open($parent.reportURL + ko.unwrap(entityid)); }" href="javascript:void(0)"><i class="ion-document-text"></i>{% trans 'Report' %}</a> {% if user|can_edit_resource_instance %}
+                                    <a data-bind="click: function () { window.open($parent.reportURL + ko.unwrap(entityid)); }" href="javascript:void(0)"><i class="ion-document-text"></i>{% trans 'Report' %}</a> {% if user_can_edit %}
                                     <a data-bind="click: function () { window.open($parent.editURL + ko.unwrap(entityid)); }" href="javascript:void(0)"><i class="ion-ios-refresh-empty"></i>{% trans 'Edit' %}</a> {% endif %}
                                 </div>
                             </div>
