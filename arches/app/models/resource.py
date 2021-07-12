@@ -606,7 +606,7 @@ class Resource(models.ResourceInstance):
         """
         if version is None:
             return LabelBasedGraph.from_resource(resource=self, compact=compact, hide_empty_nodes=hide_empty_nodes, user=user, perm=perm)
-        elif version == 'beta':
+        elif version == "beta":
             return LabelBasedGraphV2.from_resource(resource=self, compact=compact, hide_empty_nodes=hide_empty_nodes, user=user, perm=perm)
 
     @staticmethod
@@ -622,7 +622,7 @@ class Resource(models.ResourceInstance):
 
         if version is None:
             return LabelBasedGraph.from_resources(resources=resources, compact=compact, hide_empty_nodes=hide_empty_nodes)
-        elif version == 'beta':
+        elif version == "beta":
             return LabelBasedGraphV2.from_resources(resources=resources, compact=compact, hide_empty_nodes=hide_empty_nodes)
 
     def get_node_values(self, node_name):
