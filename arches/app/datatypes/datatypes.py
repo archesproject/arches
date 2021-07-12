@@ -254,10 +254,7 @@ class BooleanDataType(BaseDataType):
         data = self.get_tile_data(tile)
         if data:
             value = data.get(str(node.nodeid))
-            return {
-                "value": value,
-                "label": node.config["trueLabel"] if value is True else node.config["falseLabel"]
-            }
+            return {"value": value, "label": node.config["trueLabel"] if value is True else node.config["falseLabel"]}
 
     def transform_value_for_tile(self, value, **kwargs):
         return bool(util.strtobool(str(value)))
@@ -1994,7 +1991,7 @@ class ResourceInstanceListDataType(ResourceInstanceDataType):
         data = self.get_tile_data(tile)
         nodevalue = self.get_id_list(data[str(node.nodeid)])
         items = []
-        
+
         for resourceXresource in nodevalue:
             try:
                 resourceid = resourceXresource["resourceId"]
@@ -2041,11 +2038,7 @@ class NodeValueDataType(BaseDataType):
             value_tile = models.TileModel.objects.get(tileid=tileid)
             value_node = models.Node.objects.get(nodeid=node.config["nodeid"])
             datatype = datatype_factory.get_instance(value_node.datatype)
-            return {
-                "display_value": datatype.get_display_value(value_tile, value_node),
-                "tileid": tileid,
-                "nodeid": node.config["nodeid"]
-            }
+            return {"display_value": datatype.get_display_value(value_tile, value_node), "tileid": tileid, "nodeid": node.config["nodeid"]}
         return None
 
     def append_to_document(self, document, nodevalue, nodeid, tile, provisional=False):
