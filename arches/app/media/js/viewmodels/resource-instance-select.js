@@ -8,7 +8,7 @@ define([
 ], function(ko, _, WidgetViewModel, arches, ResourceSummary, ontologyUtils) {
     var resourceLookup = {};
     var graphCache = {};
-    require(['views/components/workflows/new-tile-step']);
+    require(['views/components/related-instance-creator']);
     
     /**
     * A viewmodel used for generic alert messages
@@ -40,19 +40,39 @@ define([
         this.preview = arches.graphs.length > 0;
         this.allowInstanceCreation = params.allowInstanceCreation === false ? false : true;
         this.renderContext = params.renderContext;
+
+        /* 
+            shoehorn logic to piggyback off of search context functionality. 
+            Should be refactored when we get the chance for better component clarity.
+        */ 
+        if (params.renderContext === 'workflow') {
+            self.renderContext = 'search';
+        }
+
         this.multiple = params.multiple || false;
         this.value = params.value || undefined;
+
         this.selectedItem = params.selectedItem || ko.observable();
         this.rootOntologyClass = '';
         this.graphIsSemantic = false;
         this.resourceTypesToDisplayInDropDown = !!params.graphids ? ko.toJS(params.graphids) : [];
         this.displayOntologyTable = this.renderContext !== 'search' && !!params.node;
 
+        this.waitingForGraphToDownload = ko.observable(false);
+        this.counter = Object.keys(self.graphLookup).length;
+        if (params.node) {
+            ko.unwrap(params.node.config.graphs).forEach(function(graph){
+                if (!Object.keys(self.graphLookup).includes(graph.graphid)){
+                    self.waitingForGraphToDownload(true);
+                    self.counter += 1;
+                }
+            });
+        }
         var downloadGraph = function(graphid){
             if (graphid in self.graphLookup){
                 return Promise.resolve(self.graphLookup[graphid]);
             } else {
-                return fetch('/graphs/' + graphid)
+                return window.fetch(arches.urls.graphs_api + graphid)
                     .then(function(response){
                         if (!response.ok) {
                             throw new Error(arches.translations.reNetworkReponseError);
@@ -60,7 +80,9 @@ define([
                         return response.json();
                     })
                     .then(function(json){
-                        return self.graphLookup[graphid] = json.graph;
+                        self.graphLookup[graphid] = json.graph;
+                        self.waitingForGraphToDownload(Object.keys(self.graphLookup).length < self.counter);
+                        return json.graph;
                     });
             }
         };
@@ -93,7 +115,7 @@ define([
         this.resourceInstanceDisplayName = params.form && params.form.displayname ? params.form.displayname() : '';
         this.makeFriendly = ontologyUtils.makeFriendly;
         this.getSelect2ConfigForOntologyProperties = ontologyUtils.getSelect2ConfigForOntologyProperties;
-        self.newTileStep = ko.observable();
+        self.newResourceInstance = ko.observable();
         this.resourceReportUrl = arches.urls.resource_report;
         this.resourceEditorUrl = arches.urls.resource_editor;
         this.selectedResourceRelationship = ko.observable(null);
@@ -112,15 +134,15 @@ define([
         };
         
         WidgetViewModel.apply(this, [params]);
-        
+
         this.displayValue = ko.observable('');
         
         //
-        // this.close is only called if newTileStep is True and the user 
+        // this.close is only called if newResourceInstance is True and the user 
         // decides not to add the new resource instance, and closes the window without adding it
         //
         this.close = function(){
-            this.newTileStep(null);
+            this.newResourceInstance(null);
         };
         
         
@@ -183,7 +205,7 @@ define([
     
             self.value.subscribe(updateNameAndOntologyClass);
             // Resolve Resource Instance Names from the incoming values
-            updateNameAndOntologyClass(self.value);
+            self.value.valueHasMutated();
 
             this.relationshipsInFilter = ko.computed(function() {
                 if(!self.value()) {
@@ -204,16 +226,19 @@ define([
             if (graph) {
                 ontologyProperty = graph.config.ontologyProperty;
                 inverseOntologyProperty = graph.config.inverseOntologyProperty;
+
+                if (self.node && (!ontologyProperty || !inverseOntologyProperty) ) {
+                    var ontologyProperties = self.node.config.graphs().find(function(nodeConfigGraph) {
+                        return nodeConfigGraph.graphid === graph.graphid;
+                    });
+
+                    if (ontologyProperties) {
+                        ontologyProperty = ontologyProperty || ontologyProperties.ontologyProperty;
+                        inverseOntologyProperty = inverseOntologyProperty || ontologyProperties.inverseOntologyProperty;
+                    }
+                }
             }
             
-            if (self.node && (!ontologyProperty || !inverseOntologyProperty) ) {
-                var ontologyProperties = self.node.config.graphs().find(function(nodeConfigGraph) {
-                    return nodeConfigGraph.graphid === graph.graphid;
-                });
-
-                ontologyProperty = ontologyProperty || ontologyProperties.ontologyProperty;
-                inverseOntologyProperty = inverseOntologyProperty || ontologyProperties.inverseOntologyProperty;
-            }
 
             var ret = {
                 "resourceId": ko.observable(id),
@@ -229,9 +254,14 @@ define([
         var url = ko.observable(arches.urls.search_results);
         this.url = url;
         var resourceToAdd = ko.observable("");
+
+        this.disabled = ko.computed(function() {
+            return ko.unwrap(self.waitingForGraphToDownload) || ko.unwrap(params.disabled);
+        });
         this.select2Config = {
             value: self.renderContext === 'search' ? self.value : resourceToAdd,
             clickBubble: true,
+            disabled: this.disabled,
             multiple: !self.displayOntologyTable ? params.multiple : false,
             placeholder: this.placeholder() || arches.translations.riSelectPlaceholder,
             closeOnSelect: true,
@@ -256,26 +286,33 @@ define([
                                 resourceid: ko.observable(),
                                 tileid: ko.observable()
                             };
-                            self.newTileStep(params);
+                            self.newResourceInstance(params);
+                            var clearNewInstance = function() {
+                                self.newResourceInstance(null);
+                                window.setTimeout(function() {
+                                    resourceToAdd("");
+                                }, 250);
+                            };
                             params.complete.subscribe(function() {
-                                window.fetch(arches.urls.search_results + "?id=" + params.resourceid())
-                                    .then(function(response){
-                                        if(response.ok) {
-                                            return response.json();
-                                        }
-                                        throw("error");
-                                    })
-                                    .then(function(json) {
-                                        var item = json.results.hits.hits[0];
-                                        var ret = makeObject(params.resourceid(), item._source);
-                                        setValue(ret);
-                                    })
-                                    .finally(function(){
-                                        self.newTileStep(null);
-                                        window.setTimeout(function() {
-                                            resourceToAdd("");
-                                        }, 250);
-                                    });
+                                if (params.resourceid()) {
+                                    window.fetch(arches.urls.search_results + "?id=" + params.resourceid())
+                                        .then(function(response){
+                                            if(response.ok) {
+                                                return response.json();
+                                            }
+                                            throw("error");
+                                        })
+                                        .then(function(json) {
+                                            var item = json.results.hits.hits[0];
+                                            var ret = makeObject(params.resourceid(), item._source);
+                                            setValue(ret);
+                                        })
+                                        .finally(function(){
+                                            clearNewInstance();
+                                        });
+                                } else {
+                                    clearNewInstance();
+                                }
                             });
                         }
                     }
@@ -308,7 +345,7 @@ define([
                         if(graphids.length > 0) {
                             data['resource-type-filter'] = JSON.stringify(graphids);
                         }
-                        if (term) {
+                        if (term || typeof params.termFilter === 'function') {
                             if(typeof params.termFilter === 'function'){
                                 params.termFilter(term, data);
                             } else {
@@ -369,22 +406,35 @@ define([
                     if(!Array.isArray(self.value())){
                         values = [self.value()];
                     }
+
                     var lookups = [];
+
                     values.forEach(function(val){
-                        lookups.push(lookupResourceInstanceData(val)
-                            .then(function(resourceInstance) {
-                                return resourceInstance;
-                            })
-                        );
-                    });
-                    Promise.all(lookups).then(function(val){
-                        var ret = val.map(function(item) {
-                            return {"_source":{"displayname": item["_source"].displayname}, "_id":item["_id"]};
-                        });
-                        if(self.multiple === false) {
-                            ret = ret[0];
+                        var resourceId;
+                        if (typeof val === 'string') {
+                            resourceId = val;
                         }
-                        callback(ret);
+                        else if (ko.unwrap(val.resourceId)) {
+                            resourceId = ko.unwrap(val.resourceId);
+                        }
+
+                        var resourceInstance = lookupResourceInstanceData(resourceId).then(
+                            function(resourceInstance) { return resourceInstance; }
+                        );
+           
+                        if (resourceInstance) { lookups.push(resourceInstance); }
+                    });
+
+                    Promise.all(lookups).then(function(arr){
+                        if (arr.length) {
+                            var ret = arr.map(function(item) {
+                                return {"_source":{"displayname": item["_source"].displayname}, "_id":item["_id"]};
+                            });
+                            if(self.multiple === false) {
+                                ret = ret[0];
+                            }
+                            callback(ret);
+                        }
                     });
                 }
             }

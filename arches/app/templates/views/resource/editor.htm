@@ -35,14 +35,14 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 
 {% block main_content %}
 <div class="content-panel">
-    <div class="flex">
+    <div style="height: inherit;" class="flex">
         <div class="left-panel graph-designer" data-bind="resizableSidepanel:true">
             <div class="left-panel-inner-container">
                 <div class="jstree jstree-default" data-bind="visible: true" style="display: none;">
                     <div class="header">
                         <div class="list-filter" data-bind="">
                             <input type="text" class="form-control" style="width: 100%;" placeholder="{% trans 'Find a card...' %}" data-bind="textInput: filter, event: {keypress: filterEnterKeyHandler}">
-    
+
                             <!-- Clear Search -->
                             <span class="clear-node-search" data-bind="visible: filter().length > 0, click: function() { filter(''); }"><i class="fa fa-times-circle"></i></span>
                         </div>
@@ -127,14 +127,14 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                         resourceId: resourceId,
                         creator: creator,
                         userIsCreator: userIsCreator,
-                        alert: alert, 
+                        alert: alert,
                         permissionLabelLookup: {
                             'view_resourceinstance':'{% trans 'Read' %}',
                             'change_resourceinstance':'{% trans 'Update' %}',
                             'no_access_to_resourceinstance':'{% trans 'No Access' %}',
                             'delete_resourceinstance':'{% trans 'Delete' %}',
                         },
-                        alertTitle: '{% trans 'You are about assign normal user access to this instance' %}', 
+                        alertTitle: '{% trans 'You are about assign normal user access to this instance' %}',
                         alertMessage: '{% trans 'Would you like to proceed?' %}'},
                 }"></div>
             </div>

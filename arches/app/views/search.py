@@ -23,6 +23,7 @@ import os
 from django.contrib.auth import authenticate
 from django.contrib.gis.geos import GEOSGeometry
 from django.core.cache import cache
+from django.db import connection
 from django.http import HttpResponseNotFound
 from django.shortcuts import render
 from django.utils.translation import ugettext as _
@@ -45,6 +46,8 @@ import arches.app.utils.zip as zip_utils
 import arches.app.utils.task_management as task_management
 import arches.app.tasks as tasks
 from io import StringIO
+from tempfile import NamedTemporaryFile
+from openpyxl import Workbook
 
 logger = logging.getLogger(__name__)
 
@@ -214,6 +217,16 @@ def export_results(request):
         else:
             message = _("Your search exceeds the {download_limit} instance download limit. Please refine your search").format(**locals())
             return JSONResponse({"success": False, "message": message})
+    elif format == "tilexl":
+        exporter = SearchResultsExporter(search_request=request)
+        export_files, export_info = exporter.export(format)
+        wb = export_files[0]["outputfile"]
+        with NamedTemporaryFile() as tmp:
+            wb.save(tmp.name)
+            tmp.seek(0)
+            stream = tmp.read()
+            export_files[0]["outputfile"] = tmp
+            return zip_utils.zip_response(export_files, zip_file_name=f"{settings.APP_NAME}_export.zip")
     else:
         exporter = SearchResultsExporter(search_request=request)
         export_files, export_info = exporter.export(format)
@@ -379,11 +392,16 @@ def _buffer(geojson, width=0, unit="ft"):
     if width > 0:
         if unit == "ft":
             width = width / 3.28084
-
-        geom.transform(settings.ANALYSIS_COORDINATE_SYSTEM_SRID)
-        geom = geom.buffer(width)
-        geom.transform(4326)
-
+        with connection.cursor() as cursor:
+            # Transform geom to the analysis SRID, buffer it, and transform it back to wgs84
+            cursor.execute(
+                """SELECT ST_TRANSFORM(
+                    ST_BUFFER(ST_TRANSFORM(ST_SETSRID(%s::geometry, 4326), %s), %s),
+                4326)""",
+                (geom.hex.decode("utf-8"), settings.ANALYSIS_COORDINATE_SYSTEM_SRID, width),
+            )
+            res = cursor.fetchone()
+            geom = GEOSGeometry(res[0], srid=4326)
     return geom
 
 

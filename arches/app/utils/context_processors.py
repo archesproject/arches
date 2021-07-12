@@ -73,5 +73,6 @@ def app_settings(request):
             "USE_SEMANTIC_RESOURCE_RELATIONSHIPS": settings.USE_SEMANTIC_RESOURCE_RELATIONSHIPS,
             "SEARCH_EXPORT_IMMEDIATE_DOWNLOAD_THRESHOLD": settings.SEARCH_EXPORT_IMMEDIATE_DOWNLOAD_THRESHOLD,
             "RENDERERS": settings.RENDERERS,
+            "FORCE_SCRIPT_NAME": settings.FORCE_SCRIPT_NAME if settings.FORCE_SCRIPT_NAME is not None else "",
         }
     }

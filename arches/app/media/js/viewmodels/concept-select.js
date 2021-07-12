@@ -14,7 +14,7 @@ define([
         this.multiple = params.multiple || false;
         this.allowClear = true;
         this.displayName = ko.observable('');
-        
+
         WidgetViewModel.apply(this, [params]);
 
         this.valueList = ko.computed(function() {
@@ -54,16 +54,15 @@ define([
             return displayVal;
         });
 
-        this.value.subscribe(function() {
+        this.setNames = function() {
             var names = [];
-    
             self.valueList().forEach(function(val) {
-                if (val) {
+                if (ko.unwrap(val)) {
                     if (NAME_LOOKUP[val]) {
                         names.push(NAME_LOOKUP[val]);
                         self.displayName(names.join(', '));
                     } else {
-                        $.ajax(arches.urls.get_pref_label + '?valueid=' + val, {
+                        $.ajax(arches.urls.get_pref_label + '?valueid=' + ko.unwrap(val), {
                             dataType: "json"
                         }).done(function(data) {
                             NAME_LOOKUP[val] = data.value;
@@ -73,12 +72,12 @@ define([
                     }
                 }
             });
-        });
+        };
+        this.setNames();
 
-        /* flags UI change for previously saved data */
-        if (self.value()) {
-            self.value.valueHasMutated();  
-        }
+        this.value.subscribe(function() {
+            self.setNames();
+        });
 
         this.select2Config = {
             value: self.value,
@@ -172,11 +171,11 @@ define([
                 };
 
                 valueList.forEach(function(value) {
-                    if (value) {
+                    if (ko.unwrap(value)) {
                         if (NAME_LOOKUP[value]) {
                             setSelectionData(value);
                         } else {
-                            $.ajax(arches.urls.concept_value + '?valueid=' + value, {
+                            $.ajax(arches.urls.concept_value + '?valueid=' + ko.unwrap(value), {
                                 dataType: "json"
                             }).done(function(data) {
                                 NAME_LOOKUP[value] = data.value;

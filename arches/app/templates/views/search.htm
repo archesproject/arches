@@ -50,30 +50,37 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 
                 </div>
             </div>
-
-            <div class="search-control-container" data-bind="css: { 'slide': !sharedStateObject.resultsExpanded() }">
-                <!-- Title Block -->
+            <div class="search-tools-container">
+                <!-- Result Count and ordering Block -->
                 <div class="search-count-container">
                     <h3 class="search-title" data-bind="text: '{% trans 'Results: ' %}' + total()"></h3>
-                    <!--ko if: ko.unwrap(sharedStateObject.filterApplied) -->
-                    <button class="btn-sm btn btn-mint btn-labeled" style="padding: 2px 9px;" data-bind="click: function() {sharedStateObject.clearQuery();}">{% trans "Clear Filters" %}</button>
-                    <!--/ko-->
                 </div>
+                <div class="search-controls-container">
+                    <!--ko if: ko.unwrap(sharedStateObject.filterApplied) -->
+                    <button class="btn-sm btn btn-mint btn-labeled clear-filter" data-bind="click: function() {sharedStateObject.clearQuery();}">{% trans "Clear Filters" %}</button>
+                    <!--/ko-->
+                    <span style="width:125px">
+                        <div data-bind="component: {
+                            name: 'sort-results',
+                            params: sharedStateObject
+                        }"></div>
+                    </span>
+                </div>
+            </div>
 
+            <div class="search-control-container" data-bind="css: { 'slide': !sharedStateObject.resultsExpanded() }">
+                <!-- Results Block -->
                 <div class="search-results-container">
-
                     <div data-bind="component: {
                         name: 'search-results',
                         params: sharedStateObject
                     }"></div>
-                    <div class="margin-bottom-30"></div>
+                </div>
 
-                    <div data-bind="component: {
+                <div class="search-footer" data-bind="component: {
                         name: 'paging-filter',
                         params: sharedStateObject
                     }"></div>
-
-                </div>
 
             </div>
         </div>
@@ -84,7 +91,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
             <div class="search-toolbar" style="">
                 <div class="search-type-btn-panel" data-bind="foreach: {data: sharedStateObject.filtersList, as: 'filter'}">
                     <!-- ko if: filter.type === 'filter' && filter.enabled -->
-                    {% if user|can_read_resource_instance %}
+                    {% if user_can_read %}
                     <button class="search-type-btn relative" style="" data-bind="css: {'active': $parent.sharedStateObject.selectedTab() === filter.componentname}, click: function(){$parent.sharedStateObject.selectedTab(filter.componentname)}">
                         <i data-bind="css: filter.icon"></i>
                         <span data-bind="text: filter.name"></span>
@@ -96,7 +103,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                 <div class="search-type-btn-popup-panel">
                     <div class="popup-panel-row" data-bind="foreach: {data: sharedStateObject.filtersList, as: 'filter'}">
                         <!-- ko if: filter.type === 'popup' && filter.enabled -->
-                        {% if user|can_read_resource_instance %}
+                        {% if user_can_read %}
                         <button class="saved-search-container search-type-btn-popup relative" style="" data-bind="css: {'active': $parent.sharedStateObject.selectedPopup() === filter.componentname}, click: function(){$parent.sharedStateObject.selectPopup(filter.componentname); setTimeout(function() {$(window).trigger('resize');}, 100);}">
                             <i data-bind="css: filter.icon"></i>
                             <!-- <p data-bind="text: filter.name"></p> -->

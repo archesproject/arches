@@ -4,6 +4,7 @@ define([
     'knockout-mapping',
     'uuid'
 ], function(ko, _, koMapping, uuid) {
+    STEPS_LABEL = 'workflow-steps';
     STEP_ID_LABEL = 'workflow-step-id';
 
     var WorkflowStep = function(config) {
@@ -22,29 +23,70 @@ define([
         this.subtitle = '';
         this.description = '';
 
-        this.informationBoxData = ko.observable();        
+        this.informationBoxData = ko.observable();       
+
+        this.hasDirtyTile = ko.observable(false);
+
+        this.saving = ko.observable(false);
+
         this.complete = ko.observable(false);
         this.required = ko.observable(ko.unwrap(config.required));
         this.autoAdvance = ko.observable(true);
 
+        this.preSaveCallback = ko.observable();
+        this.postSaveCallback = ko.observable();
+
         this.externalStepData = {};
+        this.locked = ko.observable(false);
+        this.lockableExternalSteps = config.lockableExternalSteps || []
 
         var externalStepSourceData = ko.unwrap(config.externalstepdata) || {};
         Object.keys(externalStepSourceData).forEach(function(key) {
             if (key !== '__ko_mapping__') {
-                self.externalStepData[key] = {
-                    stepName: externalStepSourceData[key],
-                    data: config.workflow.getStepData(externalStepSourceData[key]),
-                };
+                config.workflow.getStepData(externalStepSourceData[key]).then(function(data) {
+                    self.externalStepData[key] = {
+                        stepName: externalStepSourceData[key],
+                        data: data,
+                    };
+                });
             }
         });
         delete config.externalstepdata;
         
         this.value = ko.observable();
         this.value.subscribe(function(value) {
+            var getResourceIdFromComponentData = function(componentData) {
+                /* iterates over each component in layout */
+                return Object.values(componentData).reduce(function(acc, componentDatum) {
+                    /* most components store data for a single tile */ 
+                    if (!acc && componentDatum instanceof Array && componentDatum.length === 1) {
+                        if (componentDatum[0].resourceInstanceId) {
+                            return componentDatum[0].resourceInstanceId;
+                        } else if (componentDatum[0] instanceof Array && componentDatum[0][1].resourceInstanceId) {
+                            return componentDatum[0][1].resourceInstanceId;
+                        }
+                    }
+                    return acc;
+                }, null);
+            };
+
             /* if we have defined that this is part of a single-resource workflow, and that this step creates the desired resource */ 
             if (self.shouldtrackresource && !ko.unwrap(config.workflow.resourceId)) {
-                config.workflow.resourceId(value.resourceid)
+                if (value) {
+                    var resourceId;
+                     
+                    if (value.resourceid) {  /* legacy newTileStep */
+                        resourceId = value.resourceid
+                    }
+                    else {  /* component-based-step */
+                        resourceId = getResourceIdFromComponentData(value);
+                    }
+
+                    config.workflow.resourceId(resourceId);
+                } 
+                else {
+                    config.workflow.resourceId(null);
+                }
             }
         });
 
@@ -74,6 +116,11 @@ define([
                 self.id(uuid.generate());
             }
 
+            var locked = self.getFromLocalStorage('locked');
+            if (locked) {
+                self.locked(locked);
+            }
+
             /* cached value logic */ 
             var cachedValue = self.getFromLocalStorage('value');
             if (cachedValue) {
@@ -86,28 +133,67 @@ define([
                 self.setToLocalStorage('value', value);
             });
 
-            /* cached informationBox logic */ 
-            if (config.informationboxdata) {
-                self.informationBoxData({
-                    hidden: self.getInformationBoxHiddenStateFromLocalStorage(),
-                    heading: config.informationboxdata['heading'],
-                    text: config.informationboxdata['text'],
-                })
+            self.locked.subscribe(function(value){
+                self.setToLocalStorage("locked", value);
+            });
+    
+            /* cached informationBox logic */
+            this.setupInformationBox();
+        };
+        
+        this.save = function() {
+            /* 
+                currently SYNCHRONOUS, however async localStore interaction is
+                covered by value subscription. This should be refactored when we can.
+            */ 
+            var preSaveCallback = ko.unwrap(self.preSaveCallback);
+            if (preSaveCallback) {
+                preSaveCallback();
+            }
+
+            self.setToLocalStorage('value', self.value())
+
+            var postSaveCallback = ko.unwrap(self.postSaveCallback);
+            if (postSaveCallback) {
+                postSaveCallback();
             }
         };
 
+
+        this.clearCallback = ko.observable();
+
+        this.clear = function() {
+            if (self.hasDirtyTile()) {
+                if (ko.unwrap(self.tile)) {
+                    self.tile().reset();
+                }
+
+                if (ko.unwrap(self.clearCallback)) {
+                    self.clearCallback()();
+                }
+            }
+        }
+
         this.setToLocalStorage = function(key, value) {
+            var allStepsLocalStorageData = JSON.parse(localStorage.getItem(STEPS_LABEL)) || {};
+
+            if (!allStepsLocalStorageData[self.id()]) {
+                allStepsLocalStorageData[self.id()] = {};
+            }
+
+            allStepsLocalStorageData[self.id()][key] = value ? koMapping.toJSON(value) : value;
+
             localStorage.setItem(
-                `${STEP_ID_LABEL}-${self.id()}`, 
-                JSON.stringify({ [key]: value })
+                STEPS_LABEL, 
+                JSON.stringify(allStepsLocalStorageData)
             );
         };
 
         this.getFromLocalStorage = function(key) {
-            var localStorageData = JSON.parse(localStorage.getItem(`${STEP_ID_LABEL}-${self.id()}`));
+            var allStepsLocalStorageData = JSON.parse(localStorage.getItem(STEPS_LABEL)) || {};
 
-            if (localStorageData) {
-                return localStorageData[key];
+            if (allStepsLocalStorageData[self.id()] && typeof allStepsLocalStorageData[self.id()][key] !== "undefined") {
+                return JSON.parse(allStepsLocalStorageData[self.id()][key]);
             }
         };
 
@@ -121,29 +207,43 @@ define([
 
         this.getExternalStepData = function() {
             Object.keys(self.externalStepData).forEach(function(key) {
-                self.externalStepData[key]['data'] = config.workflow.getStepData(externalStepSourceData[key]);
+                config.workflow.getStepData(externalStepSourceData[key]).then(function(data) {
+                    self.externalStepData[key]['data'] = data;
+                });
             });
+        };
+
+        this.toggleInformationBox = function() {
+            var informationBoxData = self.informationBoxData();
+            var isDisplayed = informationBoxData['displayed'];
+
+            informationBoxData['displayed'] = !isDisplayed;
+            self.informationBoxData(informationBoxData);
+
+            config.informationBoxDisplayed(!isDisplayed);
+        };
+
+        this.setupInformationBox = function() {
+            if (config.informationBoxDisplayed && config.informationboxdata) {
+                var isDisplayed = true;
+                if (config.informationBoxDisplayed() !== undefined){
+                    isDisplayed = config.informationBoxDisplayed();
+                }
+                self.informationBoxData({
+                    displayed: isDisplayed,
+                    heading: config.informationboxdata['heading'],
+                    text: config.informationboxdata['text'],
+                })
+            }
         }
 
-        this.hideInformationBox = function() {
-            var informationBoxData = self.informationBoxData();
-            informationBoxData['hidden'] = true;
-
-            self.informationBoxData(informationBoxData);
-            self.setToLocalStorage('informationBoxHidden', true);
-        };
-
-        this.showInformationBox = function() {
-            var informationBoxData = self.informationBoxData();
-            informationBoxData['hidden'] = false;
-            
-            self.informationBoxData(informationBoxData);
-            self.setToLocalStorage('informationBoxHidden', false);
-        };
-
-        this.getInformationBoxHiddenStateFromLocalStorage = function() {
-            return self.getFromLocalStorage('informationBoxHidden')
-        };
+        this.lockExternalStep = function(step, locked) {
+            if (self.lockableExternalSteps.indexOf(step) > -1){
+                config.workflow.toggleStepLockedState(step, locked);
+            } else {
+                throw new Error("The step, " + step + ", cannot be locked")
+            }
+        }
 
         _.extend(this, config);
 
@@ -159,7 +259,19 @@ define([
             return ret + ' ' + ko.unwrap(this.icon);
         }, this);
 
+        this.saveOnQuit = function(){
+            // to be implemented in an individual step
+        };
+
         this.initialize();
     };
+    
+    /* only register template here, params are passed at the workflow level */ 
+    ko.components.register('workflow-step', {
+        template: {
+            require: 'text!templates/views/components/plugins/workflow-step.htm'
+        }
+    });
+
     return WorkflowStep;
 });

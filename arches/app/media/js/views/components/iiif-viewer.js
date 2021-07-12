@@ -2,20 +2,22 @@ define([
     'arches',
     'jquery',
     'knockout',
+    'knockout-mapping',
     'leaflet',
     'views/components/workbench',
     'text!templates/views/components/iiif-popup.htm',
     'leaflet-iiif',
     'leaflet-fullscreen',
+    'bindings/select2-query',
     'bindings/leaflet'
-], function(arches, $, ko, L, WorkbenchViewmodel, iiifPopup) {
+], function(arches, $, ko, koMapping, L, WorkbenchViewmodel, iiifPopup) {
     var IIIFViewerViewmodel = function(params) {
         var self = this;
         var abortFetchManifest;
-        var getLabel = function(object) {
-            var label = object.label;
-            if (Array.isArray(label)) label = object.label[0]["@value"];
-            return label;
+        this.getManifestDataValue = function(object, property, returnFirstVal) {
+            var val = object[property];
+            if (Array.isArray(val) && returnFirstVal) val = object[property][0]["@value"];
+            return val;
         };
 
         this.map = ko.observable();
@@ -26,6 +28,13 @@ define([
         this.filter = ko.observable('');
         this.manifestData = ko.observable();
         this.manifestError = ko.observable();
+        this.manifestName = ko.observable();
+        this.manifestDescription = ko.observable();
+        this.manifestAttribution = ko.observable();
+        this.manifestLogo = ko.observable();
+        this.manifestMetadata = koMapping.fromJS([]);
+        this.canvasLabel = ko.observable();
+        this.zoomToCanvas = !(params.zoom && params.center);
         this.annotationNodes = ko.observableArray();
         window.fetch(arches.urls.iiifannotationnodes)
             .then(function(response) {
@@ -62,6 +71,7 @@ define([
                     })
                 );
             });
+
         var annotationLayer = ko.computed(function() {
             var annotationFeatures = [];
             self.annotationNodes().forEach(function(node) {
@@ -107,36 +117,40 @@ define([
                     return style;
                 },
                 onEachFeature: function(feature, layer) {
-                    var popup = L.popup({
-                        closeButton: false,
-                        maxWidth: 349
-                    })
-                        .setContent(iiifPopup)
-                        .on('add', function() {
-                            var popupData = {
-                                'closePopup': function() {
-                                    popup.remove();
-                                },
-                                'name': ko.observable(''),
-                                'description': ko.observable(''),
-                                'graphName': feature.properties.graphName,
-                                'resourceinstanceid': feature.properties.resourceId,
-                                'reportURL': arches.urls.resource_report
-                            };
-                            window.fetch(arches.urls.resource_descriptors + popupData.resourceinstanceid)
-                                .then(function(response) {
-                                    return response.json();
-                                })
-                                .then(function(descriptors) {
-                                    popupData.name(descriptors.displayname);
-                                    popupData.description(descriptors['map_popup']);
-                                });
-                            var popupElement = popup.getElement()
-                                .querySelector('.mapboxgl-popup-content');
-                            ko.applyBindingsToDescendants(popupData, popupElement);
-                        });
-                    layer.bindPopup(popup);
-
+                    if (params.onEachFeature) {
+                        params.onEachFeature(feature, layer);
+                    }
+                    else {
+                        var popup = L.popup({
+                            closeButton: false,
+                            maxWidth: 349
+                        })
+                            .setContent(iiifPopup)
+                            .on('add', function() {
+                                var popupData = {
+                                    'closePopup': function() {
+                                        popup.remove();
+                                    },
+                                    'name': ko.observable(''),
+                                    'description': ko.observable(''),
+                                    'graphName': feature.properties.graphName,
+                                    'resourceinstanceid': feature.properties.resourceId,
+                                    'reportURL': arches.urls.resource_report
+                                };
+                                window.fetch(arches.urls.resource_descriptors + popupData.resourceinstanceid)
+                                    .then(function(response) {
+                                        return response.json();
+                                    })
+                                    .then(function(descriptors) {
+                                        popupData.name(descriptors.displayname);
+                                        popupData.description(descriptors['map_popup']);
+                                    });
+                                var popupElement = popup.getElement()
+                                    .querySelector('.mapboxgl-popup-content');
+                                ko.applyBindingsToDescendants(popupData, popupElement);
+                            });
+                        layer.bindPopup(popup);
+                    }
                 }
             });
         });
@@ -156,9 +170,9 @@ define([
             var canvases = [];
             sequences.forEach(function(sequence) {
                 if (sequence.canvases) {
-                    sequence.label = getLabel(sequence);
+                    sequence.label = self.getManifestDataValue(sequence, 'label', true);
                     sequence.canvases.forEach(function(canvas) {
-                        canvas.label = getLabel(canvas);
+                        canvas.label = self.getManifestDataValue(canvas, 'label', true);
                         if (typeof canvas.thumbnail === 'object')
                             canvas.thumbnail = canvas.thumbnail["@id"];
                         else if (canvas.images && canvas.images[0] && canvas.images[0].resource)
@@ -169,11 +183,6 @@ define([
             });
             return canvases;
         });
-        this.manifestName = ko.pureComputed(function() {
-            var manifestData = self.manifestData();
-            return getLabel(manifestData || {label: ''});
-        });
-        this.zoomToCanvas = !(params.zoom && params.center);
 
         var validateUrl = function(value) {
             return /^(?:(?:(?:https?|ftp):)?\/\/)(?:\S+(?::\S*)?@)?(?:(?!(?:10|127)(?:\.\d{1,3}){3})(?!(?:169\.254|192\.168)(?:\.\d{1,3}){2})(?!172\.(?:1[6-9]|2\d|3[0-1])(?:\.\d{1,3}){2})(?:[1-9]\d?|1\d\d|2[01]\d|22[0-3])(?:\.(?:1?\d{1,2}|2[0-4]\d|25[0-5])){2}(?:\.(?:[1-9]\d?|1\d\d|2[0-4]\d|25[0-4]))|(?:(?:[a-z\u00a1-\uffff0-9]-*)*[a-z\u00a1-\uffff0-9]+)(?:\.(?:[a-z\u00a1-\uffff0-9]-*)*[a-z\u00a1-\uffff0-9]+)*(?:\.(?:[a-z\u00a1-\uffff]{2,})))(?::\d{2,5})?(?:[/?#]\S*)?$/i.test(value);
@@ -185,7 +194,7 @@ define([
             value: this.manifest,
             clickBubble: true,
             multiple: false,
-            closeOnSlect: false,
+            closeOnSelect: false,
             allowClear: true,
             ajax: {
                 url: arches.urls.iiifmanifest,
@@ -349,6 +358,9 @@ define([
             var service = self.getCanvasService(canvas);
             self.zoomToCanvas = true;
             if (service) self.canvas(service);
+
+            self.origCanvasLabel = self.getManifestDataValue(canvas, 'label', true);
+            self.canvasLabel(self.getManifestDataValue(canvas, 'label', true));
         };
 
         this.canvasClick = function(canvas) {
@@ -360,16 +372,35 @@ define([
             if (canvas.images.length > 0) return canvas.images[0].resource.service['@id'];
         };
 
-        var updateCanvas = !self.canvas();
+        this.updateCanvas = !self.canvas();
         this.manifestData.subscribe(function(manifestData) {
-            if (updateCanvas && manifestData.sequences.length > 0) {
-                var sequence = manifestData.sequences[0];
-                if (sequence.canvases.length > 0) {
-                    var canvas = sequence.canvases[0];
-                    self.selectCanvas(canvas);
+            if (manifestData) {
+                if (manifestData.sequences.length > 0) {
+                    var sequence = manifestData.sequences[0];
+                    var canvasIndex = 0;
+                    if (sequence.canvases.length > 0) {
+                        if (!self.updateCanvas) {
+                            canvasIndex = sequence.canvases.findIndex(function(c){return c.images[0].resource.service['@id'] === self.canvas();});
+                        }
+                        var canvas = sequence.canvases[canvasIndex];
+                        self.selectCanvas(canvas);
+                    }    
                 }
+                self.updateCanvas = true;
+                self.origManifestName = self.getManifestDataValue(manifestData, 'label', true);
+                self.manifestName(self.origManifestName);
+                self.origManifestDescription = self.getManifestDataValue(manifestData, 'description', true);
+                self.manifestDescription(self.origManifestDescription);
+                self.origManifestAttribution = self.getManifestDataValue(manifestData, 'attribution', true);
+                self.manifestAttribution(self.origManifestAttribution);
+                self.origManifestLogo = self.getManifestDataValue(manifestData, 'logo', true);
+                self.manifestLogo(self.origManifestLogo);
+                self.origManifestMetadata = koMapping.toJSON(self.getManifestDataValue(manifestData, 'metadata'));
+                self.manifestMetadata.removeAll();
+                self.getManifestDataValue(manifestData, 'metadata').forEach(function(entry){
+                    self.manifestMetadata.push(koMapping.fromJS(entry));
+                });
             }
-            updateCanvas = true;
         });
 
         this.toggleManifestEditor = function() {

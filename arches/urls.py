@@ -53,6 +53,8 @@ from arches.app.views.tile import TileData
 from arches.app.views.notifications import NotificationView
 from arches.app.views.map import MapLayerManagerView, TileserverProxyView
 from arches.app.views.mobile_survey import MobileSurveyManagerView, MobileSurveyResources, MobileSurveyDesignerView
+from arches.app.views.manifest_manager import ManifestManagerView
+from arches.app.views.manifest_manager import IIIFServerProxyView
 from arches.app.views.auth import (
     LoginView,
     SignupView,
@@ -63,6 +65,7 @@ from arches.app.views.auth import (
     ServerSettingView,
     PasswordResetView,
     PasswordResetConfirmView,
+    Token,
 )
 from arches.app.models.system_settings import settings
 from django.views.decorators.cache import cache_page
@@ -84,6 +87,7 @@ urlpatterns = [
     url(r"^auth/get_client_id$", GetClientIdView.as_view(), name="get_client_id"),
     url(r"^auth/user_profile$", UserProfileView.as_view(), name="user_profile"),
     url(r"^auth/server_settings$", ServerSettingView.as_view(), name="server_settings"),
+    url(r"^auth/get_dev_token$", Token.as_view(), name="get_dev_token"),
     url(r"^auth/", LoginView.as_view(), name="auth"),
     url(r"^rdm/(?P<conceptid>%s|())$" % uuid_regex, RDMView.as_view(), name="rdm"),
     url(r"^admin/reindex/resources$", ReIndexResources.as_view(), name="reindex"),
@@ -247,6 +251,8 @@ urlpatterns = [
     ),
     url(r"^images$", api.Images.as_view(), name="images"),
     url(r"^ontology_properties$", api.OntologyProperty.as_view(), name="ontology_properties"),
+    url(r"^validate/(?P<itemtype>[-\w]+)/(?P<itemid>[-\w]+)", api.Validator.as_view(), name="validate"),
+    url(r"^validate/(?P<itemtype>[-\w]+)", api.Validator.as_view(), name="validatejson"),
     url(r"^tileserver/(?P<path>.*)$", TileserverProxyView.as_view()),
     url(r"^history/$", ResourceActivityStreamCollectionView.as_view(), name="as_stream_collection"),
     url(r"^history/(?P<page>[0-9]+)$", ResourceActivityStreamPageView.as_view(), name="as_stream_page"),
@@ -270,9 +276,11 @@ urlpatterns = [
     url(r"^reset/done/$", auth_views.PasswordResetCompleteView.as_view(), name="password_reset_complete"),
     url(r"^o/", include("oauth2_provider.urls", namespace="oauth2")),
     url(r"^iiifmanifest$", api.IIIFManifest.as_view(), name="iiifmanifest"),
+    url(r"^iiifserver/(?P<path>.*)$", IIIFServerProxyView.as_view()),
     url(r"^iiifannotations$", api.IIIFAnnotations.as_view(), name="iiifannotations"),
     url(r"^iiifannotationnodes$", api.IIIFAnnotationNodes.as_view(), name="iiifannotationnodes"),
     url(r"^manifest/(?P<id>[0-9]+)$", api.Manifest.as_view(), name="manifest"),
+    url(r"^image-service-manager", ManifestManagerView.as_view(), name="manifest_manager"),
 ]
 
 if settings.DEBUG:

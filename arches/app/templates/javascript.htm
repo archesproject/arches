@@ -68,6 +68,10 @@
             'core-js':'{{ STATIC_URL }}packages/core-js/client/shim.min',
             'dom-4': '{{ STATIC_URL }}packages/dom4/build/dom4',
             'numeral': '{{ STATIC_URL }}packages/numeral/numeral',
+            'togeojson': '{{ STATIC_URL }}packages/@tmcw/togeojson/dist/togeojson.umd',
+            'cytoscape': '{{ STATIC_URL }}packages/cytoscape/dist/cytoscape.min',
+            'cytoscape-cola': '{{ STATIC_URL }}packages/cytoscape-cola/cytoscape-cola',
+            'webcola': '{{ STATIC_URL }}packages/webcola/WebCola/cola.min',
             {% block paths %}{% endblock paths %}
         },
         packages: [{
@@ -167,6 +171,7 @@
                 media: "{{ STATIC_URL }}",
                 rdm: "{% url 'rdm' ''%}",
                 uploadedfiles: "{{ MEDIA_URL }}",
+                url_subpath: "{{app_settings.FORCE_SCRIPT_NAME}}",
                 concept_tree: "{% url 'concept_tree' '' %}",
                 concept: "{% url 'concept' 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa' %}",
                 concept_search: "{% url 'concept_search' %}",
@@ -259,8 +264,10 @@
                 icons: "{% url 'icons' %}",
                 ontology_properties: "{% url 'ontology_properties' %}",
                 iiifmanifest: "{% url 'iiifmanifest' %}",
+                manifest_manager: "{% url 'manifest_manager' %}",
                 iiifannotations: "{% url 'iiifannotations' %}",
                 iiifannotationnodes: "{% url 'iiifannotationnodes' %}",
+                validatejson: "{% url 'validatejson' 'aaaa'%}".replace('aaaa', ''),
                 {% block urls %}{% endblock urls %}
             },
             geocoderPlaceHolder: "{% trans 'Find an address...' %}",
@@ -383,6 +390,7 @@
                 'reNetworkReponseError': '{% trans "Network response was not ok" %}',
                 'workflowWastbinWarning': '{% trans "You are about to delete ${val}." %}',
                 'workflowWastbinWarning2': '{% trans "Are you sure you want to continue?" %}',
+                'workflowWastbinWarning3': '{% trans "You are about to quit the workflow." %}',
                 'termSearchConcept': '{% trans "Concepts" %}',
                 'termSearchTerm': '{% trans "Term Matches" %}',
                 'timeWheelDateMatches': '{% trans "${total} date values" %}',

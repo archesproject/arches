@@ -138,6 +138,7 @@ class ResourceEditorView(MapBaseManagerView):
 
         creator = None
         user_created_instance = None
+
         if resourceid is None:
             resource_instance = None
             graph = models.GraphModel.objects.get(pk=graphid)
@@ -148,6 +149,7 @@ class ResourceEditorView(MapBaseManagerView):
             instance_creator = get_instance_creator(resource_instance, request.user)
             creator = instance_creator["creatorid"]
             user_created_instance = instance_creator["user_can_edit_instance_permissions"]
+
         nodes = graph.node_set.all()
         resource_graphs = (
             models.GraphModel.objects.exclude(pk=settings.SYSTEM_SETTINGS_RESOURCE_MODEL_ID)
@@ -266,6 +268,7 @@ class ResourceEditorView(MapBaseManagerView):
 
         context["nav"]["title"] = ""
         context["nav"]["menu"] = nav_menu
+
         if resourceid == settings.RESOURCE_INSTANCE_ID:
             context["nav"]["help"] = {"title": _("Managing System Settings"), "template": "system-settings-help"}
         else:
@@ -472,7 +475,9 @@ class ResourceEditLogView(BaseManagerView):
                 "bulk_create": _("Resource Created"),
             }
             deleted_instances = [e.resourceinstanceid for e in recent_edits if e.edittype == "delete"]
-            graph_name_lookup = {str(r.resourceinstanceid): r.graph.name for r in resources}
+            graphs = models.GraphModel.objects.filter(isresource=True).values("graphid", "name")
+            graph_names = {str(graph["graphid"]): graph["name"] for graph in graphs}
+            graph_name_lookup = {str(r.resourceinstanceid): graph_names[str(r.graph_id)] for r in resources}
             for edit in recent_edits:
                 edit.friendly_edittype = edit_type_lookup[edit.edittype]
                 edit.resource_model_name = None
@@ -541,7 +546,7 @@ class ResourceActivityStreamPageView(BaseManagerView):
         current_page = 1
         page_size = 100
         if hasattr(settings, "ACTIVITY_STREAM_PAGE_SIZE"):
-            page_size = int(setting.ACTIVITY_STREAM_PAGE_SIZE)
+            page_size = int(settings.ACTIVITY_STREAM_PAGE_SIZE)
         st = 0
         end = 100
         if page is not None:
@@ -588,7 +593,7 @@ class ResourceActivityStreamCollectionView(BaseManagerView):
     def get(self, request):
         page_size = 100
         if hasattr(settings, "ACTIVITY_STREAM_PAGE_SIZE"):
-            page_size = int(setting.ACTIVITY_STREAM_PAGE_SIZE)
+            page_size = int(settings.ACTIVITY_STREAM_PAGE_SIZE)
 
         totalItems = models.EditLog.objects.all().exclude(resourceclassid=settings.SYSTEM_SETTINGS_RESOURCE_MODEL_ID).count()
 
@@ -640,10 +645,11 @@ class ResourceTiles(View):
                         if str(node.nodeid) in tile.data:
                             datatype = datatype_factory.get_instance(node.datatype)
                             display_value = datatype.get_display_value(tile, node)
-                            if search_term is not None and search_term in display_value:
-                                tile_dict["display_values"].append({"value": display_value, "label": node.name, "nodeid": node.nodeid})
-                            elif search_term is None:
-                                tile_dict["display_values"].append({"value": display_value, "label": node.name, "nodeid": node.nodeid})
+                            if display_value is not None:
+                                if search_term is not None and search_term in display_value:
+                                    tile_dict["display_values"].append({"value": display_value, "label": node.name, "nodeid": node.nodeid})
+                                elif search_term is None:
+                                    tile_dict["display_values"].append({"value": display_value, "label": node.name, "nodeid": node.nodeid})
 
                 if search_term is None:
                     permitted_tiles.append(tile_dict)
@@ -689,49 +695,32 @@ class ResourceDescriptors(View):
 
 @method_decorator(can_read_resource_instance, name="dispatch")
 class ResourceReportView(MapBaseManagerView):
-    def _generate_related_resources_summary(self, related_resources, resource_relationships, resource_models):
-        related_resource_summary = [
-            {"graphid": str(resource_model.graphid), "name": resource_model.name, "resources": []} for resource_model in resource_models
-        ]
-
-        resource_relationship_types = {
-            resource_relationship_type["id"]: resource_relationship_type["text"]
-            for resource_relationship_type in get_resource_relationship_types()["values"]
-        }
-
-        for related_resource in related_resources:
-            for summary in related_resource_summary:
-                if related_resource["graph_id"] == summary["graphid"]:
-                    relationship_summary = []
-                    for resource_relationship in resource_relationships:
-                        if related_resource["resourceinstanceid"] == resource_relationship["resourceinstanceidto"]:
-                            rr_type = (
-                                resource_relationship_types[resource_relationship["relationshiptype"]]
-                                if resource_relationship["relationshiptype"] in resource_relationship_types
-                                else resource_relationship["relationshiptype"]
-                            )
-                            relationship_summary.append(rr_type)
-                        elif related_resource["resourceinstanceid"] == resource_relationship["resourceinstanceidfrom"]:
-                            rr_type = (
-                                resource_relationship_types[resource_relationship["inverserelationshiptype"]]
-                                if resource_relationship["inverserelationshiptype"] in resource_relationship_types
-                                else resource_relationship["inverserelationshiptype"]
-                            )
-                            relationship_summary.append(rr_type)
-
-                    summary["resources"].append(
-                        {
-                            "instance_id": related_resource["resourceinstanceid"],
-                            "displayname": related_resource["displayname"],
-                            "relationships": relationship_summary,
-                        }
-                    )
-
-        return related_resource_summary
-
     def get(self, request, resourceid=None):
         resource = Resource.objects.get(pk=resourceid)
+        graph = Graph.objects.get(graphid=resource.graph_id)
+        templates = models.ReportTemplate.objects.all()
 
+        if graph.template.preload_resource_data:
+            response = self._load_resource_data(
+                request=request,
+                resourceid=resourceid,
+                resource=resource,
+                graph=graph,
+                templates=templates,
+            )
+        else:
+            response = self._load_basic_data(
+                request=request,
+                resourceid=resourceid,
+                resource=resource,
+                graph=graph,
+                templates=templates,
+            )
+
+        return response
+
+
+    def _load_resource_data(self, request, resourceid, resource, graph, templates):
         resource_models = (
             models.GraphModel.objects.filter(isresource=True).exclude(isactive=False).exclude(pk=settings.SYSTEM_SETTINGS_RESOURCE_MODEL_ID)
         )
@@ -779,7 +768,6 @@ class ResourceReportView(MapBaseManagerView):
             )
 
         datatypes = models.DDataType.objects.all()
-        graph = Graph.objects.get(graphid=resource.graph_id)
 
         permitted_cards = []
 
@@ -807,7 +795,6 @@ class ResourceReportView(MapBaseManagerView):
             )
 
         widgets = models.Widget.objects.all()
-        templates = models.ReportTemplate.objects.all()
         card_components = models.CardComponent.objects.all()
 
         try:
@@ -862,15 +849,93 @@ class ResourceReportView(MapBaseManagerView):
             version=__version__,
             hide_empty_nodes=settings.HIDE_EMPTY_NODES_IN_REPORT,
         )
-
         if graph.iconclass:
             context["nav"]["icon"] = graph.iconclass
         context["nav"]["title"] = graph.name
         context["nav"]["res_edit"] = True
         context["nav"]["print"] = True
-        context["nav"]["print"] = True
 
         return render(request, "views/resource/report.htm", context)
+
+    def _load_basic_data(self, request, resourceid, resource, graph, templates):
+        context = self.get_context_data(
+            main_script="views/resource/report",
+            resourceid=resourceid,
+            graph_id=resource.graph_id,
+            graph=graph,
+            graph_json=JSONSerializer().serialize(
+                graph,
+                sort_keys=False,
+                exclude=[
+                    "functions",
+                    "relatable_resource_model_ids",
+                    "domain_connections",
+                    "edges",
+                    "is_editable",
+                    "description",
+                    "iconclass",
+                    "subtitle",
+                    "author",
+                ],
+            ),
+            hide_empty_nodes=settings.HIDE_EMPTY_NODES_IN_REPORT,
+            report_templates=templates,
+            templates_json=JSONSerializer().serialize(templates, sort_keys=False, exclude=["name", "description"]),
+        )
+
+        context["tiles"] = "[]"
+        context["templates"] = "[]"
+        context["templates_json"] = "[]"
+        context["datatypes"] = "[]"
+        context["datatypes_json"] = "[]"
+        context["cards"] = "[]"
+        context["related_resources"] = "[]"
+        context["cardwidgets"] = "[]"
+        context["card_components"] = "[]"
+        context["card_components_json"] = "[]"
+
+        return render(request, "views/resource/report.htm", context)
+
+    def _generate_related_resources_summary(self, related_resources, resource_relationships, resource_models):
+        related_resource_summary = [
+            {"graphid": str(resource_model.graphid), "name": resource_model.name, "resources": []} for resource_model in resource_models
+        ]
+
+        resource_relationship_types = {
+            resource_relationship_type["id"]: resource_relationship_type["text"]
+            for resource_relationship_type in get_resource_relationship_types()["values"]
+        }
+
+        for related_resource in related_resources:
+            for summary in related_resource_summary:
+                if related_resource["graph_id"] == summary["graphid"]:
+                    relationship_summary = []
+                    for resource_relationship in resource_relationships:
+                        if related_resource["resourceinstanceid"] == resource_relationship["resourceinstanceidto"]:
+                            rr_type = (
+                                resource_relationship_types[resource_relationship["relationshiptype"]]
+                                if resource_relationship["relationshiptype"] in resource_relationship_types
+                                else resource_relationship["relationshiptype"]
+                            )
+                            relationship_summary.append(rr_type)
+                        elif related_resource["resourceinstanceid"] == resource_relationship["resourceinstanceidfrom"]:
+                            rr_type = (
+                                resource_relationship_types[resource_relationship["inverserelationshiptype"]]
+                                if resource_relationship["inverserelationshiptype"] in resource_relationship_types
+                                else resource_relationship["inverserelationshiptype"]
+                            )
+                            relationship_summary.append(rr_type)
+
+                    summary["resources"].append(
+                        {
+                            "instance_id": related_resource["resourceinstanceid"],
+                            "displayname": related_resource["displayname"],
+                            "relationships": relationship_summary,
+                        }
+                    )
+
+        return related_resource_summary
+
 
 
 @method_decorator(can_read_resource_instance, name="dispatch")

@@ -1,0 +1,64 @@
+{% load i18n %}
+
+<!-- ko if: coordinateEditing() -->
+<div class="card map-coordinate-editor .fixed">
+    <div class="map-coordinate-editor-header">
+        {% trans 'Edit Coordinates' %}
+    </div>
+    <div class="map-coordinate-editor-crs-selector">
+        <dt>Coordinate Reference:</dt>
+        <select data-bind="
+            options: coordinateReferences,
+            optionsText: 'name',
+            optionsValue: 'proj4',
+            value: selectedCoordinateReference,
+            valueAllowUnset: false,
+            chosen: {
+                'width': '210px',
+                'disable_search_threshold': 10,
+                'allow_single_deselect': false
+            }
+        "></select>
+    </div>
+    <hr/>
+    <div class="map-coordinate-editor-list" data-bind="sortable: {
+        data: coordinates
+    }">
+        <div class="map-coordinate-editor-pair">
+            <!-- ko if: !$parent.hideNewCoordinates() -->
+            <i class="fa fa-unsorted map-coordinate-editor-drag-handler"></i>
+            <!-- /ko-->
+            <span class="coordinate-entry-label">X:</span>
+            <input type="number" step="any" class="coordinate-input form-control input-lg widget-input" data-bind="valueUpdate: 'keyup', value: $data[0]"></input>
+            <span class="coordinate-entry-label">Y:</span>
+            <!-- ko if: $parent.coordinates().length-1 === $index() -->
+            <input type="number" step="any" class="coordinate-input form-control input-lg widget-input" data-bind="hasFocus: $parent.focusLatestY, valueUpdate: 'keyup', value: $data[1]"></input>
+            <!-- /ko-->
+            <!-- ko if: $parent.coordinates().length-1 !== $index() -->
+            <input type="number" step="any" class="coordinate-input form-control input-lg widget-input" data-bind="valueUpdate: 'keyup', value: $data[1]"></input>
+            <!-- /ko-->
+            <!-- ko if: $parent.allowDeleteCoordinates() -->
+            <a href="javascript:void(0);" class="map-coordinate-editor-delete-button" data-bind="click: function() {
+                $parent.coordinates.remove($data);
+            }"><i class="fa fa-trash"></i></a>
+            <!-- /ko-->
+            <hr/>
+        </div>
+    </div>
+    <!-- ko if: !hideNewCoordinates() -->
+    <div class="map-coordinate-editor-pair map-coordinate-editor-new-coordinates">
+        <i class="fa fa-plus"></i>
+        <span class="coordinate-entry-label">X:</span>
+        <input type="number" step="any" class="coordinate-input form-control input-lg widget-input" data-bind="hasFocus: true, valueUpdate: 'keyup', value: newX"></input>
+        <span class="coordinate-entry-label">Y:</span>
+        <input type="number" step="any" class="coordinate-input form-control input-lg widget-input" data-bind="valueUpdate: 'keyup', value: newY"></input>
+    </div>
+    <!-- /ko-->
+    <div class="map-coordinate-editor-button-container">
+        <button class="btn btn-shim btn-labeled btn-lg fa fa-search btn-mint" data-bind="click: showCoordinateFeature">{% trans 'Show Feature' %}</button>
+        <button class="btn btn-shim btn-labeled btn-lg fa fa-check btn-primary" data-bind="click: function() {
+            self.coordinateEditing(false);
+        }">{% trans 'Done' %}</button>
+    </div>
+</div>
+<!-- /ko-->

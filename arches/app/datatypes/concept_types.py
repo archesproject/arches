@@ -89,22 +89,19 @@ class BaseConceptDataType(BaseDataType):
             if value["op"] == "null" or value["op"] == "not_null":
                 self.append_null_search_filters(value, node, query, request)
             elif value["val"] != "":
-                base_query = Bool()
-                base_query.filter(Terms(field="graph_id", terms=[str(node.graph_id)]))
-                match_query = Nested(path="tiles", query=Match(field="tiles.data.%s" % (str(node.pk)), type="phrase", query=value["val"]))
+                match_query = Match(field="tiles.data.%s" % (str(node.pk)), type="phrase", query=value["val"])
                 if "!" in value["op"]:
-                    base_query.must_not(match_query)
-                    # base_query.filter(Exists(field="tiles.data.%s" % (str(node.pk))))
+                    query.must_not(match_query)
+                    query.filter(Exists(field="tiles.data.%s" % (str(node.pk))))
                 else:
-                    base_query.must(match_query)
-                query.must(base_query)
+                    query.must(match_query)
 
         except KeyError as e:
             pass
 
 
 class ConceptDataType(BaseConceptDataType):
-    def validate(self, value, row_number=None, source="", node=None, nodeid=None):
+    def validate(self, value, row_number=None, source="", node=None, nodeid=None, strict=False):
         errors = []
         # first check to see if the validator has been passed a valid UUID,
         # which should be the case at this point. return error if not.
@@ -132,7 +129,7 @@ class ConceptDataType(BaseConceptDataType):
                 return errors
         return errors
 
-    def transform_value_for_tile(self, value):
+    def transform_value_for_tile(self, value, **kwargs):
         return value.strip()
 
     def transform_export_values(self, value, *args, **kwargs):
@@ -242,7 +239,7 @@ class ConceptDataType(BaseConceptDataType):
 
 
 class ConceptListDataType(BaseConceptDataType):
-    def validate(self, value, row_number=None, source="", node=None, nodeid=None):
+    def validate(self, value, row_number=None, source="", node=None, nodeid=None, strict=False):
         errors = []
 
         # iterate list of values and use the concept validation on each one
@@ -253,7 +250,7 @@ class ConceptListDataType(BaseConceptDataType):
                 errors += validate_concept.validate(val, row_number)
         return errors
 
-    def transform_value_for_tile(self, value):
+    def transform_value_for_tile(self, value, **kwargs):
         ret = []
         for val in csv.reader([value], delimiter=",", quotechar='"'):
             for v in val:

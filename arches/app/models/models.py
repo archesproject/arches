@@ -215,6 +215,7 @@ class Edge(models.Model):
 
 class EditLog(models.Model):
     editlogid = models.UUIDField(primary_key=True, default=uuid.uuid1)
+    transactionid = models.UUIDField(default=uuid.uuid1)
     resourcedisplayname = models.TextField(blank=True, null=True)
     resourceclassid = models.TextField(blank=True, null=True)
     resourceinstanceid = models.TextField(blank=True, null=True)
@@ -499,7 +500,7 @@ class Node(models.Model):
 
     @property
     def is_collector(self):
-        return str(self.nodeid) == str(self.nodegroup_id) and self.nodegroup is not None
+        return str(self.nodeid) == str(self.nodegroup_id) and self.nodegroup_id is not None
 
     def is_editable(self):
         if settings.OVERRIDE_RESOURCE_MODEL_LOCK is True:
@@ -537,7 +538,7 @@ class Node(models.Model):
         managed = True
         db_table = "nodes"
         constraints = [
-            models.UniqueConstraint(fields=["name", "nodegroupid"], name="unique_nodename_nodegroup"),
+            models.UniqueConstraint(fields=["name", "nodegroup"], name="unique_nodename_nodegroup"),
         ]
 
 
@@ -618,6 +619,7 @@ class Relation(models.Model):
 
 class ReportTemplate(models.Model):
     templateid = models.UUIDField(primary_key=True, default=uuid.uuid1)
+    preload_resource_data = models.BooleanField(default=True)
     name = models.TextField(blank=True, null=True)
     description = models.TextField(blank=True, null=True)
     component = models.TextField()
@@ -737,7 +739,7 @@ class ResourceXResource(models.Model):
 
         super(ResourceXResource, self).delete()
 
-    def save(self):
+    def save(self, *args, **kwargs):
         from arches.app.search.search_engine_factory import SearchEngineInstance as se
         from arches.app.search.mappings import RESOURCE_RELATIONS_INDEX
 
@@ -1357,7 +1359,6 @@ class IIIFManifest(models.Model):
         managed = True
         db_table = "iiif_manifests"
 
-
 class GroupMapSettings(models.Model):
     group = models.OneToOneField(Group, on_delete=models.CASCADE)
     min_zoom = models.IntegerField(default=0)
@@ -1385,3 +1386,14 @@ class VwAnnotation(models.Model):
     class Meta:
         managed = False
         db_table = "vw_annotations"
+
+
+class GeoJSONGeometry(models.Model):
+    tile = models.ForeignKey(TileModel, on_delete=models.CASCADE, db_column="tileid")
+    resourceinstance = models.ForeignKey(ResourceInstance, on_delete=models.CASCADE, db_column="resourceinstanceid")
+    node = models.ForeignKey(Node, on_delete=models.CASCADE, db_column="nodeid")
+    geom = models.GeometryField(srid=3857)
+
+    class Meta:
+        managed = True
+        db_table = "geojson_geometries"

@@ -811,9 +811,9 @@ class Command(BaseCommand):
         def cache_graphs():
             management.call_command("cache", operation="graphs")
 
-        def update_resource_materialized_view():
+        def update_resource_geojson_geometries():
             with connection.cursor() as cursor:
-                cursor.execute("REFRESH MATERIALIZED VIEW mv_geojson_geoms;")
+                cursor.execute("SELECT * FROM refresh_geojson_geometries();")
 
         def load_apps(package_dir):
             package_apps = glob.glob(os.path.join(package_dir, "apps", "*"))
@@ -914,7 +914,7 @@ class Command(BaseCommand):
             for css_file in css_files:
                 shutil.copy(css_file, css_dest)
         print("Refreshing the resource view")
-        update_resource_materialized_view()
+        update_resource_geojson_geometries()
         print("loading post sql")
         load_sql(package_location, "post_sql")
         if defer_indexing is True:
@@ -967,7 +967,9 @@ class Command(BaseCommand):
                 for graph in models.GraphModel.objects.filter(isresource=True).exclude(pk=settings.SYSTEM_SETTINGS_RESOURCE_MODEL_ID)
             ]
         if graphid is False and file_format != "json":
-            utils.print_message("Exporting data for all graphs is currently only supported for the json format")
+            utils.print_message(
+                "Exporting data for all graphs is currently only supported for the json format. Please specify a graphid with the -g flag."
+            )
             sys.exit()
         if graphid:
             graphids.append(graphid)
@@ -987,8 +989,11 @@ class Command(BaseCommand):
                             ),
                             "w",
                         ) as f:
-                            file["outputfile"].seek(0)
-                            shutil.copyfileobj(file["outputfile"], f, 16 * 1024)
+                            if file_format == "tilexl":
+                                file["outputfile"].save(os.path.join(data_dest, file["name"]))
+                            else:
+                                file["outputfile"].seek(0)
+                                shutil.copyfileobj(file["outputfile"], f, 16 * 1024)
                 except KeyError:
                     utils.print_message("{0} is not a valid export file format.".format(file_format))
                     sys.exit()
@@ -1068,6 +1073,7 @@ will be very jumbled."""
             create_concepts = True
 
         if len(data_source) > 0:
+            transaction_id = uuid.uuid1()
             for source in data_source:
                 path = utils.get_valid_path(source)
                 if path is not None:
@@ -1079,6 +1085,7 @@ will be very jumbled."""
                         create_collections=create_collections,
                         use_multiprocessing=use_multiprocessing,
                         prevent_indexing=prevent_indexing,
+                        transaction_id=transaction_id,
                     )
                 else:
                     utils.print_message("No file found at indicated location: {0}".format(source))

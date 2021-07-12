@@ -131,7 +131,10 @@ define([
                 _.each(params.handlers['tile-reset'], function(handler) {
                     handler(self);
                 });
-                params.provisionalTileViewModel.selectedProvisionalEdit(undefined);
+                if (params.provisionalTileViewModel) {
+                    params.provisionalTileViewModel.selectedProvisionalEdit(undefined);
+                }
+
                 delete self.noDefaults;
             },
             getAttributes: function() {
@@ -206,7 +209,7 @@ define([
                         // If the user is provisional ensure their edits are provisional
                         self.provisionaledits(self.data);
                     }
-                    if (params.userisreviewer === true && params.provisionalTileViewModel.selectedProvisionalEdit()) {
+                    if (params.userisreviewer === true && params.provisionalTileViewModel && params.provisionalTileViewModel.selectedProvisionalEdit()) {
                         if (JSON.stringify(params.provisionalTileViewModel.selectedProvisionalEdit().value) === koMapping.toJSON(self.data)) {
                             params.provisionalTileViewModel.removeSelectedProvisionalEdit();
                         }
@@ -251,6 +254,32 @@ define([
                 });
             }
         });
+
+        /* add defaults defined in parent card if they exist && action isn't disabled */ 
+        if (!self.noDefaults && self.parent instanceof CardViewModel) {
+            var widgets = ko.unwrap(self.parent.widgets) || [];
+
+            var _tileDataTemp = JSON.parse(self._tileData());
+            var hasDefaultValue = false;
+            widgets.forEach(function(widget) {
+                Object.keys(self.data).forEach(function(nodeId) {
+                    if (nodeId === widget.node_id()) {
+                        var defaultValue = ko.unwrap(widget.config.defaultValue);
+
+                        if (defaultValue) {
+                            self.data[nodeId](defaultValue);
+                            _tileDataTemp[nodeId] = defaultValue;
+                            hasDefaultValue = true;
+                        }
+                    }
+                });
+            });
+
+            if (hasDefaultValue) {
+                self._tileData(JSON.stringify(_tileDataTemp));
+            }
+        }
+
         this.selected.subscribe(function(selected) {
             if (selected) this.expanded(true);
         }, this);

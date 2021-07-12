@@ -209,7 +209,7 @@ class ArchesFileReader(Reader):
             blank_tile = None
         return blank_tile
 
-    def import_business_data(self, business_data, mapping=None, overwrite="append", prevent_indexing=False):
+    def import_business_data(self, business_data, mapping=None, overwrite="append", prevent_indexing=False, transaction_id=None):
         reporter = ResourceImportReporter(business_data)
         try:
             if mapping is None or mapping == "":
@@ -352,7 +352,7 @@ class ArchesFileReader(Reader):
                         createdtime=datetime.datetime.now(),
                     )
                     newresourceinstance.tiles = populated_tiles
-                    newresourceinstance.save(index=(not prevent_indexing))
+                    newresourceinstance.save(index=(not prevent_indexing), transaction_id=transaction_id)
                     reporter.update_resources_saved()
 
         except (KeyError, TypeError) as e:
