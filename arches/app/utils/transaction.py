@@ -1,6 +1,7 @@
 from arches.app.models.models import EditLog, TileModel, ResourceInstance
 from django.db import DatabaseError
 
+
 # Given a transaction ID, reverse (delete or update) tiles and resources created/updated during the transaction
 def reverse_edit_log_entries(transaction_id):
     transaction_changes = EditLog.objects.filter(transactionid=transaction_id).order_by("-timestamp").all()
