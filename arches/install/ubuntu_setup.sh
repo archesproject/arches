@@ -44,10 +44,14 @@ function install_couchdb {
 }
 
 function install_yarn {
-  wget --quiet -O - https://deb.nodesource.com/setup_10.x | sudo -E bash -
+  wget --quiet -O - https://deb.nodesource.com/setup_16.x | sudo -E bash -
   sudo apt-get update
   sudo apt-get install -y nodejs
-  sudo npm install -g yarn
+  sudo apt install curl
+  curl -sL https://dl.yarnpkg.com/debian/pubkey.gpg | gpg --dearmor | sudo tee /usr/share/keyrings/yarnkey.gpg >/dev/null
+  echo "deb [signed-by=/usr/share/keyrings/yarnkey.gpg] https://dl.yarnpkg.com/debian stable main" | sudo tee /etc/apt/sources.list.d/yarn.list
+  sudo apt update
+  sudo apt install yarn
 }
 
 function install_elasticsearch {
