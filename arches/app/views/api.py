@@ -742,7 +742,6 @@ class Resources(APIBase):
                         archesresource = JSONDeserializer().deserialize(request.body)
 
                         # IF a resource id is supplied in the url it should match the resource ids in the body of the request.
-                        # (though Resource id's in the request body take precedence over the id supplied in the url, so are used).
                         if resourceid != archesresource["resourceinstanceid"]:
                             return JSONResponse(
                                 {"error": "Resource id in the URI does not match the resourceinstanceid supplied in the document"},
@@ -750,10 +749,19 @@ class Resources(APIBase):
                                 status=400,
                             )
 
+                        #  Resource id's in the request body take precedence over the id supplied in the url.
+                        resource_instance_resourceinstanceid = archesresource["resourceinstanceid"]
+                        try:
+                            # Check if the record exists for the resourceinstanceid.
+                            resource_instance = Resource.objects.get(pk=archesresource["resourceinstanceid"])
+                        except models.ResourceInstance.DoesNotExist:
+                            # PUTing a resource should act like a POST if the supplied resource instance id doesn't exist in the system.
+                            resource_instance_resourceinstanceid = str(uuid.uuid4())
+
                         resource = {
                             "resourceinstance": {
                                 "graph_id": archesresource["graph_id"],
-                                "resourceinstanceid": archesresource["resourceinstanceid"],
+                                "resourceinstanceid": resource_instance_resourceinstanceid,
                                 "legacyid": archesresource["legacyid"],
                             },
                             "tiles": archesresource["tiles"],
@@ -768,7 +776,7 @@ class Resources(APIBase):
                             return JSONResponse({"error": response}, indent=indent, status=400)
                         else:
                             response = []
-                            response.append(JSONDeserializer().deserialize(self.get(request, archesresource["resourceinstanceid"]).content))
+                            response.append(JSONDeserializer().deserialize(self.get(request, resource_instance_resourceinstanceid).content))
                             return JSONResponse(response, indent=indent, status=201)
 
                 except models.ResourceInstance.DoesNotExist:
