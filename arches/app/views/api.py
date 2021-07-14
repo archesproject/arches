@@ -517,7 +517,7 @@ class Graphs(APIBase):
 
             return JSONResponse({"datatypes": datatypes, "cards": permitted_cards, "graph": graph, "cardwidgets": cardwidgets})
         else:
-            return JSONResponse({"datatypes": datatypes, "graph": graph})
+            return JSONResponse({"graph": graph})
 
 
 @method_decorator(csrf_exempt, name="dispatch")
