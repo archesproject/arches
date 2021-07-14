@@ -2053,6 +2053,11 @@ class AnnotationDataType(BaseDataType):
         errors = []
         return errors
 
+    def to_json(self, tile, node):
+        data = self.get_tile_data(tile)
+        if data:
+            return data.get(str(node.nodeid))
+
     def append_to_document(self, document, nodevalue, nodeid, tile, provisional=False):
         # document["strings"].append({"string": nodevalue["address"], "nodegroup_id": tile.nodegroup_id})
         return
