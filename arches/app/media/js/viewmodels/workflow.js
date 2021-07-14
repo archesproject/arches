@@ -385,7 +385,7 @@ define([
                     function(){
                         resourcesToDelete.forEach(function(resource){deleteObject('resource', resource.resourceid);});
                         tilesToDelete.forEach(function(tile){deleteObject('tile', tile.tile);});
-                        self.reverseWorkflowTransactions()
+                        self.reverseWorkflowTransactions();
                         window.location.href = self.quitUrl;
                     }
                 )
