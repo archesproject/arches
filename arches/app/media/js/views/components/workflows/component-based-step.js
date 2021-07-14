@@ -568,10 +568,11 @@ define([
         this.locked = locked;
         this.lockExternalStep = lockExternalStep;
         this.lockableExternalSteps = lockableExternalSteps;
+        this.workflowId = workflowId;
 
         this.previouslyPersistedComponentData = previouslyPersistedComponentData;
         this.externalStepData = externalStepData;
-        
+
         this.savedData = ko.observableArray();
         this.hasUnsavedData = ko.observable();
 
