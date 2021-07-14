@@ -417,7 +417,7 @@ class JsonLdReader(Reader):
                 result = {"data": [jsonld_document["@id"]]}
             else:
                 result = {"data": [None]}
-            self.find_local_references(jsonld_document)
+            self.root_json_document = jsonld_document
             self.data_walk(jsonld_document, self.graphtree, result)
 
     def is_semantic_node(self, graph_node):
@@ -431,7 +431,7 @@ class JsonLdReader(Reader):
                 return True
         return False
 
-    def find_local_references(self, jsonld_document):
+    def build_reference_cache(self, jsonld_document):
         if "@id" in jsonld_document and "@type" in jsonld_document:
             self.idcache[jsonld_document["@id"]] = jsonld_document["@type"][0]
         for key, value in jsonld_document.items():
@@ -439,13 +439,26 @@ class JsonLdReader(Reader):
                 continue
             if isinstance(value, list):
                 for item in value:
-                    self.find_local_references(item)
+                    self.build_reference_cache(item)
             elif isinstance(value, dict):
-                self.find_local_references(value)
+                self.build_reference_cache(value)
+
+    def get_cached_reference(self, lookup):
+        try:
+            return self.idcache[lookup]
+        except:
+            self.build_reference_cache(self.root_json_document)
+            try:
+                return self.idcache[lookup]
+            except:
+                raise("Local reference not found")
 
     def data_walk(self, data_node, tree_node, result, tile=None):
         my_tiles = []
         # print(data_node)
+        # pre-seed as much of the cache as we can during the data-walk
+        if "@id" in data_node and "@type" in data_node:
+            self.idcache[data_node["@id"]] = data_node["@type"][0]
         for k, v in data_node.items():
             if k in ["@id", "@type"]:
                 continue
@@ -476,7 +489,7 @@ class JsonLdReader(Reader):
                             try:
                                 # this may be a reference to an entity already defined elsewhere in the json document
                                 # this can happen when there are more than 1 reference to the same resource instance
-                                clss = self.idcache[uri]
+                                clss = self.get_cached_reference(uri)
                                 vi["@type"] = clss
                             except:
                                 raise ValueError(f"Multiple possible branches and no @type given: {vi}")
