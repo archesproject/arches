@@ -71,7 +71,7 @@ define([
         this.data = koMapping.fromJS(params.tile.data);
         this.provisionaledits = ko.observable(params.tile.provisionaledits);
         this.datatypeLookup = getDatatypeLookup(params);
-        this.transactionId = params.transactionId || null;
+        this.transactionId = params.transactionId;
 
         _.extend(this, {
             filter: filter,

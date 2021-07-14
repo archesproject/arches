@@ -610,9 +610,9 @@ define([
         }
 
         if (params.workflow && ko.unwrap(params.workflow.id)) {
-
             self.workflowId = ko.unwrap(params.workflow.id);
         }
+        
         this.saving = params.saving || ko.observable(false);
         this.complete = params.complete || ko.observable(false);
         this.alert = params.alert || ko.observable();
