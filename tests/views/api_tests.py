@@ -109,9 +109,7 @@ class APITests(ArchesTestCase):
         }
 
         payload = JSONSerializer().serialize(test_resource_simple)
-
         content_type = "application/json"
-
         self.client.login(username="admin", password="admin")
 
         # ==POST============================================================================================
@@ -125,7 +123,8 @@ class APITests(ArchesTestCase):
         # ==Assert==========================================================================================
         self.assertEqual(resp_post.status_code, 201)  # resource created.
         my_resource = JSONDeserializer().deserialize(resp_post.content)  # get the resourceinstance returned.
-        my_resource_resourceinstanceid = my_resource[0]["resourceinstanceid"]  # get first resourceinstanceid.
+        self.assertEqual(my_resource[0]["legacyid"], "ARCHES_api")  # Success, we returned the right one.
+        my_resource_resourceinstanceid = my_resource[0]["resourceinstanceid"]  # get resourceinstanceid.
         # ==================================================================================================
 
         # ==Act : GET confirmation that resource does now exist in database=================================
@@ -184,7 +183,7 @@ class APITests(ArchesTestCase):
         # ==Assert==========================================================================================
         self.assertEqual(resp_put_create.status_code, 201)  # resource created.
         resp_put_create_resource = JSONDeserializer().deserialize(resp_put_create.content)  # get the resourceinstance returned.
-        self.assertEqual(resp_put_create_resource[0]["legacyid"], "ARCHES_api_put_create")  # Success, we got the right one.
+        self.assertEqual(resp_put_create_resource[0]["legacyid"], "ARCHES_api_put_create")  # Success, we returned the right one.
         # ==================================================================================================
 
         # ==Act : PUT resource changes to database, with invalid URI========================================
@@ -205,6 +204,8 @@ class APITests(ArchesTestCase):
         )
         # ==Assert==========================================================================================
         self.assertEqual(resp_put.status_code, 201)  # resource created.
+        data_resp_put_confirm_mod = JSONDeserializer().deserialize(resp_put.content)
+        self.assertEqual(data_resp_put_confirm_mod[0]["legacyid"], "ARCHES_api_MOD")  # Success, we returned the right one.
         # ==================================================================================================
 
         # ==Act : GET confirmation that resource is now changed in database=================================
