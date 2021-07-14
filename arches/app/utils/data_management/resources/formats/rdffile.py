@@ -451,7 +451,7 @@ class JsonLdReader(Reader):
             try:
                 return self.idcache[lookup]
             except:
-                raise("Local reference not found")
+                raise ("Local reference not found")
 
     def data_walk(self, data_node, tree_node, result, tile=None):
         my_tiles = []
