@@ -492,7 +492,6 @@ class Graphs(APIBase):
             get_cards = True
 
         perm = "read_nodegroup"
-        datatypes = models.DDataType.objects.all()
         graph = cache.get(f"graph_{graph_id}")
         user = request.user
 
@@ -501,6 +500,7 @@ class Graphs(APIBase):
         graph = JSONSerializer().serializeToPython(graph, sort_keys=False, exclude=["is_editable", "functions"])
 
         if get_cards:
+            datatypes = models.DDataType.objects.all()
             cards = CardProxyModel.objects.filter(graph_id=graph_id).order_by("sortorder")
             permitted_cards = []
             for card in cards:
