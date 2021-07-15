@@ -255,7 +255,7 @@ class BooleanDataType(BaseDataType):
         data = self.get_tile_data(tile)
         if data:
             raw_value = data.get(str(node.nodeid))
-            if(raw_value is not None):
+            if raw_value is not None:
                 return str(raw_value)
 
         # TODO: When APIv1 is retired, replace the body of get_display_value with the following
