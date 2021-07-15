@@ -256,7 +256,7 @@ class BooleanDataType(BaseDataType):
         if data:
             value = data.get(str(node.nodeid))
             return {"value": value, "label": node.config["trueLabel"] if value is True else node.config["falseLabel"]}
-    
+
     def get_display_value(self, tile, node):
         data = self.get_tile_data(tile)
 
@@ -1995,7 +1995,6 @@ class ResourceInstanceDataType(BaseDataType):
 
 
 class ResourceInstanceListDataType(ResourceInstanceDataType):
-
     def to_json(self, tile, node):
         from arches.app.models.resource import Resource  # import here rather than top to avoid circular import
 
