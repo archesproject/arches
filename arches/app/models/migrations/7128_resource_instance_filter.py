@@ -4,7 +4,7 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ("models", "7442_delete_manifest_images_table"),
+        ("models", "7444_editlog_transactionid"),
     ]
 
     operations = [
