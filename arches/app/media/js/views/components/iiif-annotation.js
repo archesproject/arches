@@ -16,6 +16,7 @@ define([
         var editItems = new L.FeatureGroup();
         var tools;
 
+        this.drawFeatures = drawFeatures;
         this.widgets = params.widgets || [];
         this.newNodeId = null;
         this.featureLookup = {};
