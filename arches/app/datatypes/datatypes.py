@@ -1573,7 +1573,7 @@ class DomainDataType(BaseDomainDataType):
     def to_json(self, tile, node):
         data = self.get_tile_data(tile)
         option = self.get_option(node, data[str(node.nodeid)])
-        option.pop('selected', None)
+        option.pop("selected", None)
         return option
 
     def transform_export_values(self, value, *args, **kwargs):
@@ -1687,7 +1687,7 @@ class DomainListDataType(BaseDomainDataType):
         if data[str(node.nodeid)] is not None:
             for val in data[str(node.nodeid)]:
                 option = self.get_option(node, val)
-                option.pop('selected', None)
+                option.pop("selected", None)
                 new_values.append(option)
         return new_values
 
