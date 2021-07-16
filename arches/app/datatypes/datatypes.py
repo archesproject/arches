@@ -1096,30 +1096,13 @@ class GeojsonFeatureCollectionDataType(BaseDataType):
             "properties": {
                 "features": {
                     "properties": {
-                        "geometry": {
-                            "properties": {
-                                "coordinates": {
-                                    "type": "float"
-                                },
-                                "type": {
-                                    "type": "keyword"
-                                }
-                            }
-                        },
-                        "id": {
-                            "type": "keyword"
-                        },
-                        "type": {
-                            "type": "keyword"
-                        },
-                        "properties": {
-                            "type": "object"
-                        }
+                        "geometry": {"properties": {"coordinates": {"type": "float"}, "type": {"type": "keyword"}}},
+                        "id": {"type": "keyword"},
+                        "type": {"type": "keyword"},
+                        "properties": {"type": "object"},
                     }
                 },
-                "type": {
-                    "type": "keyword"
-                }
+                "type": {"type": "keyword"},
             }
         }
         return mapping
@@ -2016,30 +1999,13 @@ class AnnotationDataType(BaseDataType):
             "properties": {
                 "features": {
                     "properties": {
-                        "geometry": {
-                            "properties": {
-                                "coordinates": {
-                                    "type": "float"
-                                },
-                                "type": {
-                                    "type": "keyword"
-                                }
-                            }
-                        },
-                        "id": {
-                            "type": "keyword"
-                        },
-                        "type": {
-                            "type": "keyword"
-                        },
-                        "properties": {
-                            "type": "object"
-                        }
+                        "geometry": {"properties": {"coordinates": {"type": "float"}, "type": {"type": "keyword"}}},
+                        "id": {"type": "keyword"},
+                        "type": {"type": "keyword"},
+                        "properties": {"type": "object"},
                     }
                 },
-                "type": {
-                    "type": "keyword"
-                }
+                "type": {"type": "keyword"},
             }
         }
         return mapping
