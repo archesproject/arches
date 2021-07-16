@@ -27,6 +27,7 @@ define([
             else{
                 self.hasUnsavedData(!!value);
             }
+            self.hasUnsavedData.valueHasMutated();
         });
 
         this.initialize = function() {
