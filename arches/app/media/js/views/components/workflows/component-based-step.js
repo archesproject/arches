@@ -558,9 +558,11 @@ define([
     };
 
 
-    function WorkflowComponentAbstract(componentData, previouslyPersistedComponentData, externalStepData, resourceId, title, complete, saving, locked, lockExternalStep, lockableExternalSteps) {
+    function WorkflowComponentAbstract(componentData, previouslyPersistedComponentData, externalStepData, resourceId, title, complete, saving, locked, lockExternalStep, lockableExternalSteps, alert) {
         var self = this;
 
+        this.alert = alert;
+        this.AlertViewModel = AlertViewModel;
         this.saving = saving;
         this.complete = complete;
         this.resourceId = resourceId;
@@ -709,7 +711,8 @@ define([
                 self.saving,
                 self.locked,
                 self.lockExternalStep,
-                self.lockableExternalSteps
+                self.lockableExternalSteps,
+                self.alert
             );
 
             workflowComponentAbstract.savedData.subscribe(function() {
