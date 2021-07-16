@@ -1092,8 +1092,37 @@ class GeojsonFeatureCollectionDataType(BaseDataType):
                 cursor.execute("SELECT * FROM refresh_geojson_geometries();")
 
     def default_es_mapping(self):
-        # let ES dyanamically map this datatype
-        return
+        mapping = {
+            "properties": {
+                "features": {
+                    "properties": {
+                        "geometry": {
+                            "properties": {
+                                "coordinates": {
+                                    "type": "float"
+                                },
+                                "type": {
+                                    "type": "keyword"
+                                }
+                            }
+                        },
+                        "id": {
+                            "type": "keyword"
+                        },
+                        "type": {
+                            "type": "keyword"
+                        },
+                        "properties": {
+                            "type": "object"
+                        }
+                    }
+                },
+                "type": {
+                    "type": "keyword"
+                }
+            }
+        }
+        return mapping
 
     def is_a_literal_in_rdf(self):
         return True
@@ -1983,8 +2012,37 @@ class AnnotationDataType(BaseDataType):
         return []
 
     def default_es_mapping(self):
-        # let ES dyanamically map this datatype
-        return
+        mapping = {
+            "properties": {
+                "features": {
+                    "properties": {
+                        "geometry": {
+                            "properties": {
+                                "coordinates": {
+                                    "type": "float"
+                                },
+                                "type": {
+                                    "type": "keyword"
+                                }
+                            }
+                        },
+                        "id": {
+                            "type": "keyword"
+                        },
+                        "type": {
+                            "type": "keyword"
+                        },
+                        "properties": {
+                            "type": "object"
+                        }
+                    }
+                },
+                "type": {
+                    "type": "keyword"
+                }
+            }
+        }
+        return mapping
 
 
 def get_value_from_jsonld(json_ld_node):
