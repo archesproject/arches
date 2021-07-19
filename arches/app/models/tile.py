@@ -117,9 +117,9 @@ class Tile(models.TileModel):
         oldprovisionalvalue=None,
         provisional_edit_log_details=None,
         transaction_id=None,
-        new_resource_created=False
+        new_resource_created=False,
     ):
-        if(new_resource_created):
+        if new_resource_created:
             timestamp = datetime.datetime.now()
             resource_edit = EditLog()
             resource_edit.resourceclassid = self.resourceinstance.graph_id
@@ -130,11 +130,11 @@ class Tile(models.TileModel):
             resource_edit.user_email = getattr(user, "email", "")
             resource_edit.user_firstname = getattr(user, "first_name", "")
             resource_edit.user_lastname = getattr(user, "last_name", "")
-            resource_edit.user_username = getattr(user, "username", "") 
+            resource_edit.user_username = getattr(user, "username", "")
             if transaction_id is not None:
                 resource_edit.transactionid = transaction_id
             resource_edit.save()
-        
+
         timestamp = datetime.datetime.now()
         edit = EditLog()
         edit.resourceclassid = self.resourceinstance.graph_id
