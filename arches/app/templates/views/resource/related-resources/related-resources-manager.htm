@@ -46,12 +46,12 @@
 <!--ko if: !displaySplash()-->
 {% block tabs %}
 <div class="float-container">
-    <div class="workbench-card-sidebar-tab" style="width: 50%; float: left;" data-bind="click: function () { showGraph(false); }, 
+    <div class="workbench-card-sidebar-tab" style="width: 50%; float: left;" data-bind="click: function () { showGraph(false); },
         css: {'selected': showGraph(), 'disabled': !showGraph()
     }">
         <span class="map-sidebar-text" style="font-size: 150%;">{% trans "Table" %}</span>
     </div>
-    <div class="workbench-card-sidebar-tab" style="width: 50%; float: right;" data-bind="click: function () { if (currentResource()){showGraph(true)}; }, 
+    <div class="workbench-card-sidebar-tab" style="width: 50%; float: right;" data-bind="click: function () { if (currentResource()){showGraph(true)}; },
         css: {'selected': !showGraph(), 'disabled': showGraph()
     }">
         <span class="map-sidebar-text" style="font-size: 150%;">{% trans "Visualization" %}</span>
@@ -79,7 +79,7 @@
                         ">
                     </div>
                 </div>
-                
+
             </div>
         </div>
         <!--/ko-->

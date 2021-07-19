@@ -44,14 +44,17 @@ function install_couchdb {
 }
 
 function install_yarn {
-  wget --quiet -O - https://deb.nodesource.com/setup_10.x | sudo -E bash -
+  wget --quiet -O - https://deb.nodesource.com/setup_16.x | sudo -E bash -
   sudo apt-get update
   sudo apt-get install -y nodejs
-  sudo npm install -g yarn
+  sudo apt install curl
+  curl -sL https://dl.yarnpkg.com/debian/pubkey.gpg | gpg --dearmor | sudo tee /usr/share/keyrings/yarnkey.gpg >/dev/null
+  echo "deb [signed-by=/usr/share/keyrings/yarnkey.gpg] https://dl.yarnpkg.com/debian stable main" | sudo tee /etc/apt/sources.list.d/yarn.list
+  sudo apt update
+  sudo apt install yarn
 }
 
 function install_elasticsearch {
-  sudo apt-get install openjdk-8-jre-headless -y
   sudo apt-get install apt-transport-https
   wget -qO - https://artifacts.elastic.co/GPG-KEY-elasticsearch | sudo apt-key add -
   sudo sh -c 'echo "deb https://artifacts.elastic.co/packages/7.x/apt stable main" > /etc/apt/sources.list.d/elastic-7.x.list'
@@ -78,7 +81,8 @@ function main {
   sudo apt-get install -y libgdal-dev
   sudo apt-get install -y libpq-dev
 
-  sudo apt-get install python3-venv
+  sudo apt-get install -y python3-dev
+  sudo apt-get install -y python3-venv
 
   echo -n "Would you like to install elasticsearch? (y/N)? "
   read answer
