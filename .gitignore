@@ -39,3 +39,4 @@ djcp.sh
 pip-wheel-metadata
 .eggs
 *.code-workspace
+coverage.xml
