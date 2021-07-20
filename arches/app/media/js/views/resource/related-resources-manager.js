@@ -94,61 +94,41 @@ define([
                     }
                 });
 
-                // this.fdgNodeListView = new RelatedResourcesNodeList({
-                //     items: self.graphNodeList
-                // });
+                this.disableSearchResults = function(result) {
+                    var resourceinstanceid = this.editingInstanceId;
+                    var graph = this.graph;
+                    if (result._id === resourceinstanceid || _.contains(graph.relatable_resources, result._source.graph_id) === false) {
+                        return true;
+                    } else {
+                        return false;
+                    }
+                };
 
-                // this.disableSearchResults = function(result) {
-                //     var resourceinstanceid = this.editingInstanceId;
-                //     var graph = this.graph;
-                //     if (result._id === resourceinstanceid || _.contains(graph.relatable_resources, result._source.graph_id) === false) {
-                //         return true;
-                //     } else {
-                //         return false;
-                //     }
-                // };
-
-                // this.showGraph.subscribe(function(val) {
-                //     this.graphNodeList([]);
-                // }, this);
-
-                // this.panelPosition = ko.computed(function() {
-                //     var res = { x: 0, y: 0, first: [0, 0], second: [0, 0] };
-                //     var nodes = self.graphNodeSelection();
-                //     if (nodes.length === 2) {
-                //         res.x = nodes[0].absX < nodes[1].absX ? nodes[0].absX : nodes[1].absX;
-                //         res.y = nodes[0].absY < nodes[1].absY ? nodes[0].absY : nodes[1].absY;
-                //         res.first = nodes[0];
-                //         res.second = nodes[1];
-                //     }
-                //     return res;
-                // });
-
-                // this.selected = ko.computed(function() {
-                //     var res = _.filter(
-                //         self.resourceRelationships(),
-                //         function(rr) {
-                //             if (rr.selected() === true) {
-                //                 return rr;
-                //             }
-                //         }, self);
-                //     if (self.graphIsSemantic && self.resourceEditorContext === true) {
-                //         if (res.length > 0 && self.graphIsSemantic) {
-                //             self.selectedOntologyClass(res[0].resource.root_ontology_class);
-                //             self.resourceRelationships().forEach(function(rr) {
-                //                 if (rr.resource.root_ontology_class !== self.selectedOntologyClass()) {
-                //                     rr.unselectable(true);
-                //                 }
-                //             });
-                //         } else {
-                //             self.selectedOntologyClass(undefined);
-                //             self.resourceRelationships().forEach(function(rr) {
-                //                 rr.unselectable(false);
-                //             });
-                //         }
-                //     }
-                //     return res;
-                // });
+                this.selected = ko.computed(function() {
+                    var res = _.filter(
+                        self.resourceRelationships(),
+                        function(rr) {
+                            if (rr.selected() === true) {
+                                return rr;
+                            }
+                        }, self);
+                    if (self.graphIsSemantic && self.resourceEditorContext === true) {
+                        if (res.length > 0 && self.graphIsSemantic) {
+                            self.selectedOntologyClass(res[0].resource.root_ontology_class);
+                            self.resourceRelationships().forEach(function(rr) {
+                                if (rr.resource.root_ontology_class !== self.selectedOntologyClass()) {
+                                    rr.unselectable(true);
+                                }
+                            });
+                        } else {
+                            self.selectedOntologyClass(undefined);
+                            self.resourceRelationships().forEach(function(rr) {
+                                rr.unselectable(false);
+                            });
+                        }
+                    }
+                    return res;
+                });
 
                 this.dirty = ko.computed(function() {
                     return self.resourceRelationships().some(function(rr) {
