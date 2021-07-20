@@ -27,6 +27,7 @@ from arches.app.utils.permission_backend import user_can_read_resource
 from arches.app.utils.permission_backend import user_can_edit_resource
 from arches.app.utils.permission_backend import user_can_delete_resource
 from arches.app.utils.permission_backend import user_can_read_concepts
+from arches.app.utils.permission_backend import user_created_transaction
 from django.contrib.auth.decorators import user_passes_test
 
 # Get an instance of a logger
@@ -129,3 +130,16 @@ def can_read_concept():
     """
 
     return user_passes_test(user_can_read_concepts)
+
+
+# Checks whether current user is the one who created a particular transaction ID
+def user_created_transaction_match(function):
+    @functools.wraps(function)
+    def wrapper(request, *args, **kwargs):
+        transactionid = kwargs["transactionid"] if "transactionid" in kwargs else None
+        if user_created_transaction(request.user, transactionid=transactionid):
+            return function(request, *args, **kwargs)
+        else:
+            raise PermissionDenied
+
+    return wrapper
