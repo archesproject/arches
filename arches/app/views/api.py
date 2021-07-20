@@ -484,24 +484,40 @@ class MVT(APIBase):
 @method_decorator(csrf_exempt, name="dispatch")
 class Graphs(APIBase):
     def get(self, request, graph_id=None):
+        cards_querystring = request.GET.get("cards", None)
+
+        if cards_querystring == "false":
+            get_cards = False
+        else:
+            get_cards = True
+
         perm = "read_nodegroup"
-        datatypes = models.DDataType.objects.all()
         graph = cache.get(f"graph_{graph_id}")
         user = request.user
+
         if graph is None:
             graph = Graph.objects.get(graphid=graph_id)
-        cards = CardProxyModel.objects.filter(graph_id=graph_id).order_by("sortorder")
-        permitted_cards = []
-        for card in cards:
-            if user.has_perm(perm, card.nodegroup):
-                card.filter_by_perm(user, perm)
-                permitted_cards.append(card)
-        cardwidgets = [
-            widget for widgets in [card.cardxnodexwidget_set.order_by("sortorder").all() for card in permitted_cards] for widget in widgets
-        ]
         graph = JSONSerializer().serializeToPython(graph, sort_keys=False, exclude=["is_editable", "functions"])
-        permitted_cards = JSONSerializer().serializeToPython(permitted_cards, sort_keys=False, exclude=["is_editable"])
-        return JSONResponse({"datatypes": datatypes, "cards": permitted_cards, "graph": graph, "cardwidgets": cardwidgets})
+
+        if get_cards:
+            datatypes = models.DDataType.objects.all()
+            cards = CardProxyModel.objects.filter(graph_id=graph_id).order_by("sortorder")
+            permitted_cards = []
+            for card in cards:
+                if user.has_perm(perm, card.nodegroup):
+                    card.filter_by_perm(user, perm)
+                    permitted_cards.append(card)
+            cardwidgets = [
+                widget
+                for widgets in [card.cardxnodexwidget_set.order_by("sortorder").all() for card in permitted_cards]
+                for widget in widgets
+            ]
+
+            permitted_cards = JSONSerializer().serializeToPython(permitted_cards, sort_keys=False, exclude=["is_editable"])
+
+            return JSONResponse({"datatypes": datatypes, "cards": permitted_cards, "graph": graph, "cardwidgets": cardwidgets})
+        else:
+            return JSONResponse({"graph": graph})
 
 
 @method_decorator(csrf_exempt, name="dispatch")
