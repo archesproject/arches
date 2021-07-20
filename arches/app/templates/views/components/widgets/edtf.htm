@@ -4,6 +4,9 @@
 {% block form %}
 <div class="row widget-wrapper">
         <label class="control-label widget-input-label" for="" data-bind="text:label"></label>
+        <!-- ko if: node -->
+        <i data-bind="css: {'ion-asterisk widget-label-required': node.isrequired}"></i>
+        <!-- /ko -->
         <div class="form-group">
           <div class="edtf-style-tools-collapser" data-bind=" click: function() {
               showEDTFFormats(!showEDTFFormats());
@@ -66,9 +69,6 @@
                   </div>
               </div>
           </div>
-        <!-- ko if: node -->
-        <i data-bind="css: {'ion-asterisk widget-label-required': node.isrequired}"></i>
-        <!-- /ko -->
         <div class="col-xs-12">
             <input type="text" data-bind="textInput: value, attr: {placeholder: placeholder, disabled: disabled}" class="form-control input-lg widget-input">
         </div>

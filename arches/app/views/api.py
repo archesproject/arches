@@ -1118,8 +1118,10 @@ class Tile(APIBase):
     def post(self, request, tileid):
         tileview = TileView()
         tileview.action = "update_tile"
-        request.POST = request.POST.copy()
-        request.POST["data"] = request.body
+        # check that no data is on POST or FILES before assigning body to POST (otherwise request fails)
+        if len(dict(request.POST.items())) == 0 and len(dict(request.FILES.items())) == 0:
+            request.POST = request.POST.copy()
+            request.POST["data"] = request.body
         return tileview.post(request)
 
 
