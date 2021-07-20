@@ -25,6 +25,7 @@ from io import BytesIO
 from django.contrib.gis.geos import GeometryCollection, GEOSGeometry
 from django.core.files import File
 from django.utils.translation import ugettext as _
+from django.urls import reverse
 from arches.app.models import models
 from arches.app.models.system_settings import settings
 from arches.app.datatypes.datatypes import DataTypeFactory
@@ -87,7 +88,9 @@ class SearchResultsExporter(object):
 
             if (report_link == "true") and (format != "tilexl"):
                 for resource in resources["output"]:
-                    resource["Link"] = str(settings.ARCHES_NAMESPACE_FOR_DATA_EXPORT).rstrip("/") + "/report/" + str(resource["resourceid"])
+                    report_url = reverse("resource_report", kwargs={"resourceid": resource["resourceid"]})
+                    export_namespace = settings.ARCHES_NAMESPACE_FOR_DATA_EXPORT.rstrip("/")
+                    resource["Link"] = f"{export_namespace}{report_url}"
 
             if format == "geojson":
                 headers = list(graph.node_set.filter(exportable=True).values_list("name", flat=True))
