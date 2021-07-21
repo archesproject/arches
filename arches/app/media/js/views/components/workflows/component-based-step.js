@@ -27,6 +27,7 @@ define([
             else{
                 self.hasUnsavedData(!!value);
             }
+            self.hasUnsavedData.valueHasMutated();
         });
 
         this.initialize = function() {
@@ -178,7 +179,17 @@ define([
                         loading: self.loading
                     });
                 });
-    
+
+                self.card.subscribe(function(card){
+                    if (ko.unwrap(card.widgets) && self.componentData.parameters.hiddenNodes) {
+                        card.widgets().forEach(function(widget){
+                            if (self.componentData.parameters.hiddenNodes.indexOf(widget.node_id()) > -1) {
+                                widget.visible(false);
+                            }
+                        });
+                    }
+                });
+
                 self.topCards.forEach(function(topCard) {
                     topCard.topCards = self.topCards;
                 });
@@ -558,9 +569,11 @@ define([
     };
 
 
-    function WorkflowComponentAbstract(componentData, previouslyPersistedComponentData, externalStepData, resourceId, title, complete, saving, locked, lockExternalStep, lockableExternalSteps, workflowId) {
+    function WorkflowComponentAbstract(componentData, previouslyPersistedComponentData, externalStepData, resourceId, title, complete, saving, locked, lockExternalStep, lockableExternalSteps, workflowId, alert) {
         var self = this;
 
+        this.alert = alert;
+        this.AlertViewModel = AlertViewModel;
         this.saving = saving;
         this.complete = complete;
         this.resourceId = resourceId;
@@ -715,7 +728,8 @@ define([
                 self.locked,
                 self.lockExternalStep,
                 self.lockableExternalSteps,
-                self.workflowId
+                self.workflowId,
+                self.alert
             );
 
             workflowComponentAbstract.savedData.subscribe(function() {

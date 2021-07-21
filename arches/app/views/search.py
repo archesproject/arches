@@ -51,6 +51,7 @@ from openpyxl import Workbook
 
 logger = logging.getLogger(__name__)
 
+
 class SearchView(MapBaseManagerView):
     def get(self, request):
         map_layers = models.MapLayer.objects.all()
@@ -111,7 +112,13 @@ class SearchView(MapBaseManagerView):
 
 
 def home_page(request):
-    return render(request, "views/search.htm", {"main_script": "views/search",})
+    return render(
+        request,
+        "views/search.htm",
+        {
+            "main_script": "views/search",
+        },
+    )
 
 
 def search_terms(request):
@@ -200,6 +207,7 @@ def export_results(request):
 
     total = int(request.GET.get("total", 0))
     format = request.GET.get("format", "tilecsv")
+    report_link = request.GET.get("reportlink", False)
     download_limit = settings.SEARCH_EXPORT_IMMEDIATE_DOWNLOAD_THRESHOLD
     if total > download_limit and format != "geojson":
         celery_worker_running = task_management.check_if_celery_available()
@@ -207,7 +215,9 @@ def export_results(request):
             request_values = dict(request.GET)
             request_values["path"] = request.get_full_path()
             result = tasks.export_search_results.apply_async(
-                (request.user.id, request_values, format), link=tasks.update_user_task_record.s(), link_error=tasks.log_error.s()
+                (request.user.id, request_values, format, report_link),
+                link=tasks.update_user_task_record.s(),
+                link_error=tasks.log_error.s(),
             )
             message = _(
                 "{total} instances have been submitted for export. \
@@ -219,7 +229,7 @@ def export_results(request):
             return JSONResponse({"success": False, "message": message})
     elif format == "tilexl":
         exporter = SearchResultsExporter(search_request=request)
-        export_files, export_info = exporter.export(format)
+        export_files, export_info = exporter.export(format, report_link)
         wb = export_files[0]["outputfile"]
         with NamedTemporaryFile() as tmp:
             wb.save(tmp.name)
@@ -229,7 +239,7 @@ def export_results(request):
             return zip_utils.zip_response(export_files, zip_file_name=f"{settings.APP_NAME}_export.zip")
     else:
         exporter = SearchResultsExporter(search_request=request)
-        export_files, export_info = exporter.export(format)
+        export_files, export_info = exporter.export(format, report_link)
 
         if len(export_files) == 0 and format == "shp":
             message = _(

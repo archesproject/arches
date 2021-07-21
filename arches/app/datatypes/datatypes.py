@@ -54,6 +54,7 @@ PIXELSPERTILE = 256
 
 logger = logging.getLogger(__name__)
 
+
 class DataTypeFactory(object):
     _datatypes = None
     _datatype_instances = {}
@@ -249,6 +250,23 @@ class BooleanDataType(BaseDataType):
             errors.append(error_message)
 
         return errors
+
+    def get_display_value(self, tile, node):
+        data = self.get_tile_data(tile)
+        if data:
+            raw_value = data.get(str(node.nodeid))
+            if raw_value is not None:
+                return str(raw_value)
+
+        # TODO: When APIv1 is retired, replace the body of get_display_value with the following
+        # data = self.get_tile_data(tile)
+
+        # if data:
+        #     trueDisplay = node.config["trueLabel"]
+        #     falseDisplay = node.config["falseLabel"]
+        #     raw_value = data.get(str(node.nodeid))
+        #     if raw_value is not None:
+        #         return trueDisplay if raw_value else falseDisplay
 
     def transform_value_for_tile(self, value, **kwargs):
         return bool(util.strtobool(str(value)))
@@ -1081,8 +1099,20 @@ class GeojsonFeatureCollectionDataType(BaseDataType):
                 cursor.execute("SELECT * FROM refresh_geojson_geometries();")
 
     def default_es_mapping(self):
-        # let ES dyanamically map this datatype
-        return
+        mapping = {
+            "properties": {
+                "features": {
+                    "properties": {
+                        "geometry": {"properties": {"coordinates": {"type": "float"}, "type": {"type": "keyword"}}},
+                        "id": {"type": "keyword"},
+                        "type": {"type": "keyword"},
+                        "properties": {"type": "object"},
+                    }
+                },
+                "type": {"type": "keyword"},
+            }
+        }
+        return mapping
 
     def is_a_literal_in_rdf(self):
         return True
@@ -1693,12 +1723,12 @@ class DomainListDataType(BaseDomainDataType):
 
 class ResourceInstanceDataType(BaseDataType):
     """
-        tile data comes from the client looking like this:
-        {
-            "resourceId": "",
-            "ontologyProperty": "",
-            "inverseOntologyProperty": ""
-        }
+    tile data comes from the client looking like this:
+    {
+        "resourceId": "",
+        "ontologyProperty": "",
+        "inverseOntologyProperty": ""
+    }
 
     """
 
@@ -1839,7 +1869,6 @@ class ResourceInstanceDataType(BaseDataType):
             if isinstance(value, list):
                 return value
 
-
     def transform_export_values(self, value, *args, **kwargs):
         return json.dumps(value)
 
@@ -1927,7 +1956,6 @@ class ResourceInstanceDataType(BaseDataType):
 
 
 class ResourceInstanceListDataType(ResourceInstanceDataType):
-
     def collects_multiple_values(self):
         return True
 
@@ -1974,8 +2002,20 @@ class AnnotationDataType(BaseDataType):
         return []
 
     def default_es_mapping(self):
-        # let ES dyanamically map this datatype
-        return
+        mapping = {
+            "properties": {
+                "features": {
+                    "properties": {
+                        "geometry": {"properties": {"coordinates": {"type": "float"}, "type": {"type": "keyword"}}},
+                        "id": {"type": "keyword"},
+                        "type": {"type": "keyword"},
+                        "properties": {"type": "object"},
+                    }
+                },
+                "type": {"type": "keyword"},
+            }
+        }
+        return mapping
 
 
 def get_value_from_jsonld(json_ld_node):
