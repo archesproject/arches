@@ -256,8 +256,9 @@ define([
         var resourceToAdd = ko.observable("");
 
         this.disabled = ko.computed(function() {
-            return ko.unwrap(self.waitingForGraphToDownload) || ko.unwrap(params.disabled);
+            return ko.unwrap(self.waitingForGraphToDownload) || ko.unwrap(params.disabled) || ko.unwrap(params.form?.locked);
         });
+        
         this.select2Config = {
             value: self.renderContext === 'search' ? self.value : resourceToAdd,
             clickBubble: true,
