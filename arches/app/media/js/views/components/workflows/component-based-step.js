@@ -179,7 +179,17 @@ define([
                         loading: self.loading
                     });
                 });
-    
+
+                self.card.subscribe(function(card){
+                    if (ko.unwrap(card.widgets) && self.componentData.parameters.hiddenNodes) {
+                        card.widgets().forEach(function(widget){
+                            if (self.componentData.parameters.hiddenNodes.indexOf(widget.node_id()) > -1) {
+                                widget.visible(false);
+                            }
+                        });
+                    }
+                });
+
                 self.topCards.forEach(function(topCard) {
                     topCard.topCards = self.topCards;
                 });
