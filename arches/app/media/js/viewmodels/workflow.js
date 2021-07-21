@@ -303,7 +303,7 @@ define([
 
         this.reverseWorkflowTransactions = function() {
             $.ajax({
-                type: "GET",
+                type: "POST",
                 url: arches.urls.transaction_reverse(self.id()),
                 context: self,
             });
