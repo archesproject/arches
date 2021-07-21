@@ -141,6 +141,7 @@ define([
 
         this.saveTile = function(callback) {
             self.loading(true);
+            self.tile.transactionId = params.form?.workflowId || undefined;
             self.tile.save(function(response) {
                 self.loading(false);
                 params.pageVm.alert(
