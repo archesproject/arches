@@ -304,8 +304,7 @@ define([
         this.reverseWorkflowTransactions = function() {
             $.ajax({
                 type: "POST",
-                url: arches.urls.transaction_reverse(self.id()),
-                context: self,
+                url: arches.urls.transaction_reverse(self.id())
             });
         };
 
