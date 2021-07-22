@@ -1,3 +1,4 @@
+from arches.app.utils.betterJSONSerializer import JSONSerializer
 import uuid
 import csv
 from django.core.exceptions import ObjectDoesNotExist
@@ -148,10 +149,10 @@ class ConceptDataType(BaseConceptDataType):
 
     def to_json(self, tile, node):
         data = self.get_tile_data(tile)
-        if data[str(node.nodeid)]:
+        if data:
             val = data[str(node.nodeid)]
-            return self.get_value(uuid.UUID(val))
-        return None
+            value_data = JSONSerializer().serializeToPython(self.get_value(uuid.UUID(val)))
+            return self.compile_json(tile, node, **value_data)
 
     def get_rdf_uri(self, node, data, which="r"):
         if not data:
@@ -283,11 +284,11 @@ class ConceptListDataType(BaseConceptDataType):
     def to_json(self, tile, node):
         new_values = []
         data = self.get_tile_data(tile)
-        if data[str(node.nodeid)]:
+        if data:
             for val in data[str(node.nodeid)]:
                 new_val = self.get_value(uuid.UUID(val))
                 new_values.append(new_val)
-        return new_values
+        return self.compile_json(tile, node, concept_details=new_values)
 
     def get_rdf_uri(self, node, data, which="r"):
         c = ConceptDataType()

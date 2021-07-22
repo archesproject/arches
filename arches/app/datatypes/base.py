@@ -417,6 +417,22 @@ class BaseDataType(object):
     def to_json(self, tile, node):
         """
         Returns a value for display in a json object
+        """        
+        return self.compile_json(tile, node)
+
+    def compile_json(self, tile, node, **kwargs):
+        """
+        Compiles an object for presentation for use in the to_json method
+        Arguments:
+        tile -- (required) the tile model for the datatype
+        node -- (required) the node model related to the tile
+
+        Keyword Arguments:
+        optional number of arguments to add to the opject
         """
 
-        return self.get_display_value(tile, node)
+        ret = {
+            "display_value": self.get_display_value(tile, node)
+        }
+        ret.update(kwargs)
+        return ret

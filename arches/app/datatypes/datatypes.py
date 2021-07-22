@@ -251,12 +251,6 @@ class BooleanDataType(BaseDataType):
 
         return errors
 
-    def to_json(self, tile, node):
-        data = self.get_tile_data(tile)
-        if data:
-            value = data.get(str(node.nodeid))
-            return {"value": value, "label": node.config["trueLabel"] if value is True else node.config["falseLabel"]}
-
     def get_display_value(self, tile, node):
         data = self.get_tile_data(tile)
         if data:
@@ -273,6 +267,17 @@ class BooleanDataType(BaseDataType):
         #     raw_value = data.get(str(node.nodeid))
         #     if raw_value is not None:
         #         return trueDisplay if raw_value else falseDisplay
+
+    def to_json(self, tile, node):
+        """
+        Returns a value for display in a json object
+        """   
+
+        data = self.get_tile_data(tile)
+        if data:
+            value = data.get(str(node.nodeid))    
+            label = node.config["trueLabel"] if value is True else node.config["falseLabel"]
+            return self.compile_json(tile, node, label=label)
 
     def transform_value_for_tile(self, value, **kwargs):
         return bool(util.strtobool(str(value)))
@@ -605,7 +610,7 @@ class GeojsonFeatureCollectionDataType(BaseDataType):
     def to_json(self, tile, node):
         data = self.get_tile_data(tile)
         if data:
-            return data.get(str(node.nodeid))
+            return self.compile_json(tile, node, geom=data.get(str(node.nodeid)))
 
     def clean(self, tile, nodeid):
         if tile.data[nodeid] is not None and "features" in tile.data[nodeid]:
@@ -1241,8 +1246,8 @@ class FileListDataType(BaseDataType):
 
     def to_json(self, tile, node):
         data = self.get_tile_data(tile)
-        files = data[str(node.pk)]
-        return files
+        if data:
+            return self.compile_json(tile, node, file_details=data[str(node.pk)])
 
     def handle_request(self, current_tile, request, node):
         # this does not get called when saving data from the mobile app
@@ -1522,11 +1527,7 @@ class FileListDataType(BaseDataType):
 
 
 class BaseDomainDataType(BaseDataType):
-    def get_option(self, node, option_id):
-        for option in node.config["options"]:
-            if option["id"] == option_id:
-                return option
-        return None
+
 
     def get_option_text(self, node, option_id):
         for option in node.config["options"]:
@@ -1588,12 +1589,6 @@ class DomainDataType(BaseDomainDataType):
     def get_display_value(self, tile, node):
         data = self.get_tile_data(tile)
         return self.get_option_text(node, data[str(node.nodeid)])
-
-    def to_json(self, tile, node):
-        data = self.get_tile_data(tile)
-        option = self.get_option(node, data[str(node.nodeid)])
-        option.pop("selected", None)
-        return option
 
     def transform_export_values(self, value, *args, **kwargs):
         ret = ""
@@ -1699,16 +1694,6 @@ class DomainListDataType(BaseDomainDataType):
                 option = self.get_option_text(node, val)
                 new_values.append(option)
         return ",".join(new_values)
-
-    def to_json(self, tile, node):
-        new_values = []
-        data = self.get_tile_data(tile)
-        if data[str(node.nodeid)] is not None:
-            for val in data[str(node.nodeid)]:
-                option = self.get_option(node, val)
-                option.pop("selected", None)
-                new_values.append(option)
-        return new_values
 
     def transform_export_values(self, value, *args, **kwargs):
         new_values = []
@@ -1886,22 +1871,18 @@ class ResourceInstanceDataType(BaseDataType):
     def to_json(self, tile, node):
         from arches.app.models.resource import Resource  # import here rather than top to avoid circular import
 
-        resourceid = None
         data = self.get_tile_data(tile)
-        nodevalue = self.get_id_list(data[str(node.nodeid)])
+        if data:
+            nodevalue = self.get_id_list(data[str(node.nodeid)])
 
-        for resourceXresource in nodevalue:
-            try:
-                resourceid = resourceXresource["resourceId"]
-                related_resource = Resource.objects.get(pk=resourceid)
-                displayname = related_resource.displayname
-                resourceXresource["displayname"] = displayname
-                return resourceXresource
-            except (TypeError, KeyError):
-                pass
-            except:
-                logger.info(f'Resource with id "{resourceid}" not in the system.')
-        return None
+            for resourceXresource in nodevalue:
+                try:
+                    return self.compile_json(tile, node, **resourceXresource)
+                except (TypeError, KeyError):
+                    pass
+                except:
+                    resourceid = resourceXresource["resourceId"]
+                    logger.info(f'Resource with id "{resourceid}" not in the system.')
 
     def append_to_document(self, document, nodevalue, nodeid, tile, provisional=False):
         if type(nodevalue) != list and nodevalue is not None:
@@ -2019,21 +2000,22 @@ class ResourceInstanceListDataType(ResourceInstanceDataType):
 
         resourceid = None
         data = self.get_tile_data(tile)
-        nodevalue = self.get_id_list(data[str(node.nodeid)])
-        items = []
+        if data:
+            nodevalue = self.get_id_list(data[str(node.nodeid)])
+            items = []
 
-        for resourceXresource in nodevalue:
-            try:
-                resourceid = resourceXresource["resourceId"]
-                related_resource = Resource.objects.get(pk=resourceid)
-                displayname = related_resource.displayname
-                resourceXresource["displayname"] = displayname
-                items.append(resourceXresource)
-            except (TypeError, KeyError):
-                pass
-            except:
-                logger.info(f'Resource with id "{resourceid}" not in the system.')
-        return items
+            for resourceXresource in nodevalue:
+                try:
+                    resourceid = resourceXresource["resourceId"]
+                    related_resource = Resource.objects.get(pk=resourceid)
+                    displayname = related_resource.displayname
+                    resourceXresource["display_value"] = displayname
+                    items.append(resourceXresource)
+                except (TypeError, KeyError):
+                    pass
+                except:
+                    logger.info(f'Resource with id "{resourceid}" not in the system.')
+            return self.compile_json(tile, node, instance_details=items)
 
     def collects_multiple_values(self):
         return True
@@ -2060,17 +2042,6 @@ class NodeValueDataType(BaseDataType):
             return datatype.get_display_value(value_tile, value_node)
         return ""
 
-    def to_json(self, tile, node):
-        datatype_factory = DataTypeFactory()
-        data = self.get_tile_data(tile)
-        tileid = data[str(node.pk)]
-        if tileid:
-            value_tile = models.TileModel.objects.get(tileid=tileid)
-            value_node = models.Node.objects.get(nodeid=node.config["nodeid"])
-            datatype = datatype_factory.get_instance(value_node.datatype)
-            return {"display_value": datatype.get_display_value(value_tile, value_node), "tileid": tileid, "nodeid": node.config["nodeid"]}
-        return None
-
     def append_to_document(self, document, nodevalue, nodeid, tile, provisional=False):
         pass
 
@@ -2086,7 +2057,7 @@ class AnnotationDataType(BaseDataType):
     def to_json(self, tile, node):
         data = self.get_tile_data(tile)
         if data:
-            return data.get(str(node.nodeid))
+            return self.compile_json(tile, node, geom=data.get(str(node.nodeid)))
 
     def append_to_document(self, document, nodevalue, nodeid, tile, provisional=False):
         # document["strings"].append({"string": nodevalue["address"], "nodegroup_id": tile.nodegroup_id})
