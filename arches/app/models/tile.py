@@ -488,7 +488,7 @@ class Tile(models.TileModel):
 
     def get_missing_nodes(self):
         missing_nodes = []
-        first_node = next(iter(self.data.items()))
+        first_node = next(iter(self.data.items()), None)
         if first_node is not None:
             first_node_model = models.Node.objects.get(nodeid=first_node[0])
             all_nodes = models.Node.objects.filter(nodegroup_id=first_node_model.nodegroup_id)
