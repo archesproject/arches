@@ -4,7 +4,6 @@ from arches.app.models import models
 RESOURCE_ID_KEY = "@resource_id"
 NODE_ID_KEY = "@node_id"
 TILE_ID_KEY = "@tile_id"
-VALUE_KEY = "@value"
 
 NON_DATA_COLLECTING_NODE = "NON_DATA_COLLECTING_NODE"
 
@@ -51,15 +50,18 @@ class LabelBasedNode(object):
                 else:
                     display_data[formatted_node_name] = [previous_val, formatted_node_value]
 
+        val = self.value
         if compact and display_data:
             if self.value is not NON_DATA_COLLECTING_NODE:
-                display_data[VALUE_KEY] = self.value
+                if self.value is not None:
+                    display_data.update(self.value)
         elif compact and not display_data:  # if compact and no child nodes
             display_data = self.value
         elif not compact:
             display_data[NODE_ID_KEY] = self.node_id
             display_data[TILE_ID_KEY] = self.tile_id
-            display_data[VALUE_KEY] = self.value
+            if self.value is not None and self.value is not NON_DATA_COLLECTING_NODE:
+                display_data.update(self.value)
 
         return {self.name: display_data}
 
@@ -175,9 +177,8 @@ class LabelBasedGraph(object):
             _dummy_resource_name, resource_graph = root_label_based_node_json.popitem()
 
             # removes unneccesary ( None ) top-node values
-            for key in [NODE_ID_KEY, TILE_ID_KEY, VALUE_KEY]:
-                if key in resource_graph:
-                    resource_graph.pop(key)
+            for key in [NODE_ID_KEY, TILE_ID_KEY]:
+                resource_graph.pop(key, None)
 
             return resource_graph
         else:  # pragma: no cover
