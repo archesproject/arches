@@ -3,7 +3,7 @@
 
 <!-- ko if: state === 'editor-tree' && card.model.visible() -->
 {% block editor_tree %}
-<li style="border:1px solid purple;" role="treeitem card-treeitem" class="jstree-node" data-bind="css: {'jstree-open': (card.tiles().length > 0 && card.expanded()), 'jstree-closed' : (card.tiles().length > 0 && !card.expanded()), 'jstree-leaf': card.tiles().length === 0}, scrollTo: card.scrollTo, container: '.resource-editor-tree'">
+<li role="treeitem card-treeitem" class="jstree-node" data-bind="css: {'jstree-open': (card.tiles().length > 0 && card.expanded()), 'jstree-closed' : (card.tiles().length > 0 && !card.expanded()), 'jstree-leaf': card.tiles().length === 0}, scrollTo: card.scrollTo, container: '.resource-editor-tree'">
     <i tabindex="0" class="jstree-icon jstree-ocl" role="presentation" data-bind="click: function(){card.expanded(!card.expanded())}" onkeyup="if(event.which == 13 || event.keyCode == 13){ $(this).trigger('click'); }"></i>
     <a class="jstree-anchor" href="#" tabindex="-1" data-bind="css:{'filtered': card.highlight(), 'jstree-clicked': card.selected, 'child-selected': card.isChildSelected(), 'func-node': card.isFuncNode(),'unsaved-edit': card.isDirty() === true}, event: {
         mousedown: function(d, e) {
