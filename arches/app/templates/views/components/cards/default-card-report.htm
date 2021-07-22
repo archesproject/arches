@@ -1,7 +1,7 @@
 
 {% load i18n %}
 
-<div data-bind="css: {'print-hide': !reportExpanded()}">
+<div style="border:1px solid red;" data-bind="css: {'print-hide': !reportExpanded()}">
     <!-- ko if: showHeaderLine--><hr class="rp-tile-separator"><!-- /ko -->
     <div class="rp-card-section" data-bind="css: card.model.cssclass, visible: card.fullyProvisional() !== 'fullyprovisional'">
         <span class="rp-tile-title" data-bind="text: card.model.get('name')"></span>
