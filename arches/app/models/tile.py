@@ -388,7 +388,7 @@ class Tile(models.TileModel):
         log = kwargs.pop("log", True)
         transaction_id = kwargs.pop("transaction_id", None)
         provisional_edit_log_details = kwargs.pop("provisional_edit_log_details", None)
-        missing_nodes = []
+        missing_nodes = self.get_missing_nodes()
         creating_new_tile = True
         user_is_reviewer = False
         newprovisionalvalue = None
@@ -416,6 +416,10 @@ class Tile(models.TileModel):
 
             if creating_new_tile is False:
                 existing_model = models.TileModel.objects.get(pk=self.tileid)
+            else:
+                if len(missing_nodes) > 0:
+                    for missing_node in missing_nodes:
+                        self.data[str(missing_node.nodeid)] = None
 
             # this section moves the data over from self.data to self.provisionaledits if certain users permissions are in force
             # then self.data is restored from the previously saved tile data
@@ -481,6 +485,18 @@ class Tile(models.TileModel):
                 tile.resourceinstance = self.resourceinstance
                 tile.parenttile = self
                 tile.save(*args, request=request, index=index, **kwargs)
+
+    def get_missing_nodes(self):
+        missing_nodes = []
+        first_node = next(iter(self.data.items()))
+        if first_node is not None:
+            first_node_model = models.Node.objects.get(nodeid=first_node[0])
+            all_nodes = models.Node.objects.filter(nodegroup_id=first_node_model.nodegroup_id)
+            for node in all_nodes:
+                node_id = str(node.nodeid)
+                if self.data.get(node_id, None) is None:
+                    missing_nodes.append(node)
+        return missing_nodes
 
     def delete(self, *args, **kwargs):
         se = SearchEngineFactory().create()
