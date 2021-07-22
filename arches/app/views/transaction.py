@@ -11,7 +11,7 @@ logger = logging.getLogger(__name__)
 
 @method_decorator(user_created_transaction_match, name="dispatch")
 class ReverseTransaction(View):
-    def get(self, request, transactionid=None):
+    def post(self, request, transactionid=None):
         response = dict()
         success = False
         if transactionid is not None:
