@@ -271,11 +271,11 @@ class BooleanDataType(BaseDataType):
     def to_json(self, tile, node):
         """
         Returns a value for display in a json object
-        """   
+        """
 
         data = self.get_tile_data(tile)
         if data:
-            value = data.get(str(node.nodeid))    
+            value = data.get(str(node.nodeid))
             label = node.config["trueLabel"] if value is True else node.config["falseLabel"]
             return self.compile_json(tile, node, label=label)
 
@@ -1527,8 +1527,6 @@ class FileListDataType(BaseDataType):
 
 
 class BaseDomainDataType(BaseDataType):
-
-
     def get_option_text(self, node, option_id):
         for option in node.config["options"]:
             if option["id"] == option_id:
