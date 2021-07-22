@@ -277,7 +277,7 @@ class BooleanDataType(BaseDataType):
         if data:
             value = data.get(str(node.nodeid))
             label = node.config["trueLabel"] if value is True else node.config["falseLabel"]
-            return self.compile_json(tile, node, label=label)
+            return self.compile_json(tile, node, display_value=label, value=value)
 
     def transform_value_for_tile(self, value, **kwargs):
         return bool(util.strtobool(str(value)))
