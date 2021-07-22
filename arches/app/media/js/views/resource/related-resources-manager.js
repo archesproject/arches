@@ -8,7 +8,7 @@ define([
     'views/components/widgets/resource-instance-multiselect',
     'views/resource/related-resources-node-list',
     'utils/ontology',
-    'bindings/related-resources-graph',
+    'views/components/related-resources-graph',
     'plugins/knockout-select2',
     'bindings/datepicker',
     'bindings/datatable'
@@ -22,6 +22,7 @@ define([
                 this.graph = options.graph;
                 this.loading = options.loading;
                 this.rootOntologyClass  = '';
+                this.activeTab = ko.observable();
                 if (this.graph) {
                     if(!!options.graph.ontologyclass){
                         this.rootOntologyClass = options.graph.ontologyclass;
@@ -61,6 +62,14 @@ define([
                     });
                 });
 
+                this.toggleTab = function(tabName) {
+                    if (self.activeTab() === tabName) {
+                        self.activeTab(null);
+                    } else {
+                        self.activeTab(tabName);
+                    }
+                };
+
                 this.toggleSelectedResourceRelationship = function(resourceRelationship) {
                     if (self.selectedResourceRelationship() === resourceRelationship) {
                         self.selectedResourceRelationship(null);
@@ -85,10 +94,6 @@ define([
                     }
                 });
 
-                this.fdgNodeListView = new RelatedResourcesNodeList({
-                    items: self.graphNodeList
-                });
-
                 this.disableSearchResults = function(result) {
                     var resourceinstanceid = this.editingInstanceId;
                     var graph = this.graph;
@@ -98,22 +103,6 @@ define([
                         return false;
                     }
                 };
-
-                this.showGraph.subscribe(function(val) {
-                    this.graphNodeList([]);
-                }, this);
-
-                this.panelPosition = ko.computed(function() {
-                    var res = { x: 0, y: 0, first: [0, 0], second: [0, 0] };
-                    var nodes = self.graphNodeSelection();
-                    if (nodes.length === 2) {
-                        res.x = nodes[0].absX < nodes[1].absX ? nodes[0].absX : nodes[1].absX;
-                        res.y = nodes[0].absY < nodes[1].absY ? nodes[0].absY : nodes[1].absY;
-                        res.first = nodes[0];
-                        res.second = nodes[1];
-                    }
-                    return res;
-                });
 
                 this.selected = ko.computed(function() {
                     var res = _.filter(
