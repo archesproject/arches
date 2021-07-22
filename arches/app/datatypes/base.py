@@ -417,7 +417,7 @@ class BaseDataType(object):
     def to_json(self, tile, node):
         """
         Returns a value for display in a json object
-        """        
+        """
         return self.compile_json(tile, node)
 
     def compile_json(self, tile, node, **kwargs):
@@ -431,8 +431,6 @@ class BaseDataType(object):
         optional number of arguments to add to the opject
         """
 
-        ret = {
-            "display_value": self.get_display_value(tile, node)
-        }
+        ret = {"display_value": self.get_display_value(tile, node)}
         ret.update(kwargs)
         return ret
