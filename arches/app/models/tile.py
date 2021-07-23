@@ -493,7 +493,7 @@ class Tile(models.TileModel):
             all_nodes = models.Node.objects.filter(nodegroup_id=self.nodegroup_id).exclude(datatype="semantic").iterator()
             for node in all_nodes:
                 node_id = str(node.nodeid)
-                if self.data.get(node_id, None) is None:
+                if node_id not in self.data:
                     missing_nodes.append(node)
         return missing_nodes
 
