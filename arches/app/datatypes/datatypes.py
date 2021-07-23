@@ -610,7 +610,7 @@ class GeojsonFeatureCollectionDataType(BaseDataType):
     def to_json(self, tile, node):
         data = self.get_tile_data(tile)
         if data:
-            return self.compile_json(tile, node, geom=data.get(str(node.nodeid)))
+            return self.compile_json(tile, node, geojson=data.get(str(node.nodeid)))
 
     def clean(self, tile, nodeid):
         if tile.data[nodeid] is not None and "features" in tile.data[nodeid]:
@@ -2055,7 +2055,7 @@ class AnnotationDataType(BaseDataType):
     def to_json(self, tile, node):
         data = self.get_tile_data(tile)
         if data:
-            return self.compile_json(tile, node, geom=data.get(str(node.nodeid)))
+            return self.compile_json(tile, node, geojson=data.get(str(node.nodeid)))
 
     def append_to_document(self, document, nodevalue, nodeid, tile, provisional=False):
         # document["strings"].append({"string": nodevalue["address"], "nodegroup_id": tile.nodegroup_id})

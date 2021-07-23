@@ -431,6 +431,6 @@ class BaseDataType(object):
         optional number of arguments to add to the opject
         """
 
-        ret = {"display_value": self.get_display_value(tile, node)}
+        ret = {"@display_value": self.get_display_value(tile, node)}
         ret.update(kwargs)
         return ret
