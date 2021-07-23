@@ -88,6 +88,7 @@ class TileData(View):
         return JSONErrorResponse(_(title), _(str(message)), {"message": message, "title": title})
 
     def post(self, request):
+        original_transaction_id = request.POST.get("transaction_id", None)
         transaction_id = request.POST.get("transaction_id", uuid.uuid1())
 
         if self.action == "update_tile":
@@ -98,6 +99,12 @@ class TileData(View):
             if json is not None:
                 data = JSONDeserializer().deserialize(json)
                 data["resourceinstance_id"] = "" if "resourceinstance_id" not in data else data["resourceinstance_id"]
+
+                if original_transaction_id is None:
+                    data["transaction_id"] = None if "transaction_id" not in data else data["transaction_id"]
+                    if data["transaction_id"] is not None:
+                        transaction_id = data["transaction_id"]
+
                 if data["resourceinstance_id"] == "":
                     data["resourceinstance_id"] = uuid.uuid4()
                 try:
