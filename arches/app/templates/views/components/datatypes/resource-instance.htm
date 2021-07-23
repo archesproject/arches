@@ -2,6 +2,7 @@
 <!-- ko ifnot: $data.search -->
 <!--ko let: {self: $data} -->
 <div class="node-widget-label concept-label" style="width:540px;">
+
     <div class="control-label">
         {% trans "Resource Model" %}
     </div>
@@ -83,6 +84,19 @@
             </div>
         </div>
     </div>
+
+    <div class="relative">
+        <label class="col-xs-12 control-label widget-input-label">
+            {% trans "Search String - use to filter resources displayed" %} <i class="fa fa-eye" style="cursor: pointer;" data-bind="click: openSearch"
+                title="{% trans " View search string..." %}"></i>
+        </label>
+    </div>
+    
+    <div class="col-xs-12" style="padding-bottom: 10px;">
+        <input type="text" placeholder="{% trans " Enter Search String here..." %}" class="form-control" style=""
+            data-bind="textInput: config.searchString">
+    </div>
+
 </div>
 <!-- /ko -->
 <!-- /ko -->

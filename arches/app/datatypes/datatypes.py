@@ -21,7 +21,7 @@ from arches.app.utils.module_importer import get_class_from_modulename
 from arches.app.utils.permission_backend import user_is_resource_reviewer
 from arches.app.utils.geo_utils import GeoUtils
 import arches.app.utils.task_management as task_management
-from arches.app.search.elasticsearch_dsl_builder import Bool, Match, Range, Term, Terms, Nested, Exists, RangeDSLException
+from arches.app.search.elasticsearch_dsl_builder import Query, Dsl, Bool, Match, Range, Term, Terms, Nested, Exists, RangeDSLException
 from arches.app.search.search_engine_factory import SearchEngineInstance as se
 from arches.app.search.mappings import RESOURCES_INDEX, RESOURCE_RELATIONS_INDEX
 from django.core.cache import cache
@@ -34,6 +34,7 @@ from django.contrib.gis.geos import Polygon
 from django.core.exceptions import ObjectDoesNotExist
 from django.core.exceptions import ValidationError
 from django.db import connection, transaction
+
 from elasticsearch import Elasticsearch
 from elasticsearch.exceptions import NotFoundError
 from edtf import parse_edtf
@@ -1744,7 +1745,26 @@ class ResourceInstanceDataType(BaseDataType):
             for resourceXresourceId in resourceXresourceIds:
                 resourceid = resourceXresourceId["resourceId"]
                 try:
-                    models.ResourceInstance.objects.get(pk=resourceid)
+                    if node.config["searchString"] != "":
+                        dsl = node.config["searchDsl"]
+                        if dsl:
+                            query = Query(se)
+                            bool_query = Bool()
+                            ri_query = Dsl(dsl)
+                            bool_query.must(ri_query)
+                            ids_query = Dsl({"ids": {"values": [resourceid]}})
+                            bool_query.must(ids_query)
+                            query.add_query(bool_query)
+                            try:
+                                results = query.search(index=RESOURCES_INDEX)
+                                count = results["hits"]["total"]["value"]
+                                assert count == 1
+                            except:
+                                raise ObjectDoesNotExist()
+                    if len(node.config["graphs"]) > 0:
+                        graphids = map(lambda x: x["graphid"], node.config["graphs"])
+                        if not models.ResourceInstance.objects.filter(pk=resourceid, graph_id__in=graphids).exists():
+                            raise ObjectDoesNotExist()
                 except ObjectDoesNotExist:
                     message = _("The related resource with id '{0}' is not in the system.".format(resourceid))
                     error_type = "WARNING"

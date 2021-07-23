@@ -118,6 +118,7 @@ urlpatterns = [
     url(r"^search/time_wheel_config$", search.time_wheel_config, name="time_wheel_config"),
     url(r"^search/export_results$", search.export_results, name="export_results"),
     url(r"^search/get_export_file$", search.get_export_file, name="get_export_file"),
+    url(r"^search/get_dsl$", search.get_dsl_from_search_string, name="get_dsl"),
     url(r"^buffer/$", search.buffer, name="buffer"),
     url(
         r"^settings/",

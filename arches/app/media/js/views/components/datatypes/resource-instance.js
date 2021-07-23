@@ -35,8 +35,12 @@ define([
                 } else if (params.widget) {
                     this.isEditable = params.widget.card.get('is_editable');
                 }
+                
                 this.node = params;
                 this.config = params.config;
+                this.openSearch = function(){
+                    window.open(self.config.searchString(), '_blank');
+                };
                 this.selectedResourceModel = ko.observable('');
                 this.selectedResourceModel.subscribe(function(resourceType) {
                     if (resourceType.length > 0) {
@@ -45,7 +49,7 @@ define([
                         self.selectedResourceModel([]);
                     }
                 });
-
+                
                 this.selectedResourceType = ko.observable(null);
                 this.toggleSelectedResource = function(resourceRelationship) {
                     if (self.selectedResourceType() === resourceRelationship) {
@@ -54,7 +58,7 @@ define([
                         self.selectedResourceType(resourceRelationship);
                     }
                 };
-
+                
                 var preventSetup = false;
                 var setupConfig = function(graph) {
                     var model = _.find(self.resourceModels, function(model){
@@ -108,6 +112,25 @@ define([
                         graphs.forEach(function(graph) {
                             setupConfig(graph);
                         });
+                    }
+                });
+
+                this.config.searchString.subscribe(function(searchString){
+                    if(searchString !== ''){
+                        var searchUrl = new URL(ko.unwrap(searchString));
+                        var queryString = new URLSearchParams(searchUrl.search);
+                        window.fetch(arches.urls.get_dsl + '?' + queryString.toString())
+                            .then(function(response){
+                                if(response.ok) {
+                                    return response.json();
+                                }
+                                throw("error");
+                            })
+                            .then(function(json) {
+                                self.config.searchDsl(json.query);
+                            });
+                    } else {
+                        self.config.searchDsl('');
                     }
                 });
 

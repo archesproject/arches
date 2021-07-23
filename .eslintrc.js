@@ -20,7 +20,10 @@ module.exports = {
         "history": false,
         "location": false,
         "Promise": false,
-        "setTimeout": false
+        "setTimeout": false,
+        "URL": false,
+        "URLSearchParams": false,
+        "fetch": false
     },
     "parserOptions": {
         "ecmaVersion": 2017
