@@ -301,6 +301,13 @@ define([
             });
         };
 
+        this.reverseWorkflowTransactions = function() {
+            $.ajax({
+                type: "POST",
+                url: arches.urls.transaction_reverse(self.id())
+            });
+        };
+
         this.finishWorkflow = function() {
             if (self.isWorkflowFinished()) { self.activeStep(self.steps[self.steps.length - 1]); }
         };
@@ -377,6 +384,7 @@ define([
                     function(){
                         resourcesToDelete.forEach(function(resource){deleteObject('resource', resource.resourceid);});
                         tilesToDelete.forEach(function(tile){deleteObject('tile', tile.tile);});
+                        self.reverseWorkflowTransactions();
                         window.location.href = self.quitUrl;
                     }
                 )
