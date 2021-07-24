@@ -269,6 +269,17 @@ class BooleanDataType(BaseDataType):
         #     if raw_value is not None:
         #         return trueDisplay if raw_value else falseDisplay
 
+    def to_json(self, tile, node):
+        """
+        Returns a value for display in a json object
+        """
+
+        data = self.get_tile_data(tile)
+        if data:
+            value = data.get(str(node.nodeid))
+            label = node.config["trueLabel"] if value is True else node.config["falseLabel"]
+            return self.compile_json(tile, node, display_value=label, value=value)
+
     def transform_value_for_tile(self, value, **kwargs):
         return bool(util.strtobool(str(value)))
 
@@ -596,6 +607,11 @@ class GeojsonFeatureCollectionDataType(BaseDataType):
                     error_message = self.create_error_message(value, source, row_number, message)
                     errors.append(error_message)
         return errors
+
+    def to_json(self, tile, node):
+        data = self.get_tile_data(tile)
+        if data:
+            return self.compile_json(tile, node, geojson=data.get(str(node.nodeid)))
 
     def clean(self, tile, nodeid):
         if tile.data[nodeid] is not None and "features" in tile.data[nodeid]:
@@ -1228,6 +1244,11 @@ class FileListDataType(BaseDataType):
             file_urls = " | ".join([file["url"] for file in files])
 
         return file_urls
+
+    def to_json(self, tile, node):
+        data = self.get_tile_data(tile)
+        if data:
+            return self.compile_json(tile, node, file_details=data[str(node.pk)])
 
     def handle_request(self, current_tile, request, node):
         # this does not get called when saving data from the mobile app
@@ -1865,6 +1886,22 @@ class ResourceInstanceDataType(BaseDataType):
                 logger.info(f'Resource with id "{resourceid}" not in the system.')
         return ", ".join(items)
 
+    def to_json(self, tile, node):
+        from arches.app.models.resource import Resource  # import here rather than top to avoid circular import
+
+        data = self.get_tile_data(tile)
+        if data:
+            nodevalue = self.get_id_list(data[str(node.nodeid)])
+
+            for resourceXresource in nodevalue:
+                try:
+                    return self.compile_json(tile, node, **resourceXresource)
+                except (TypeError, KeyError):
+                    pass
+                except:
+                    resourceid = resourceXresource["resourceId"]
+                    logger.info(f'Resource with id "{resourceid}" not in the system.')
+
     def append_to_document(self, document, nodevalue, nodeid, tile, provisional=False):
         if type(nodevalue) != list and nodevalue is not None:
             nodevalue = [nodevalue]
@@ -1976,6 +2013,28 @@ class ResourceInstanceDataType(BaseDataType):
 
 
 class ResourceInstanceListDataType(ResourceInstanceDataType):
+    def to_json(self, tile, node):
+        from arches.app.models.resource import Resource  # import here rather than top to avoid circular import
+
+        resourceid = None
+        data = self.get_tile_data(tile)
+        if data:
+            nodevalue = self.get_id_list(data[str(node.nodeid)])
+            items = []
+
+            for resourceXresource in nodevalue:
+                try:
+                    resourceid = resourceXresource["resourceId"]
+                    related_resource = Resource.objects.get(pk=resourceid)
+                    displayname = related_resource.displayname
+                    resourceXresource["display_value"] = displayname
+                    items.append(resourceXresource)
+                except (TypeError, KeyError):
+                    pass
+                except:
+                    logger.info(f'Resource with id "{resourceid}" not in the system.')
+            return self.compile_json(tile, node, instance_details=items)
+
     def collects_multiple_values(self):
         return True
 
@@ -2012,6 +2071,11 @@ class AnnotationDataType(BaseDataType):
     def validate(self, value, source=None, node=None, strict=False):
         errors = []
         return errors
+
+    def to_json(self, tile, node):
+        data = self.get_tile_data(tile)
+        if data:
+            return self.compile_json(tile, node, geojson=data.get(str(node.nodeid)))
 
     def append_to_document(self, document, nodevalue, nodeid, tile, provisional=False):
         # document["strings"].append({"string": nodevalue["address"], "nodegroup_id": tile.nodegroup_id})

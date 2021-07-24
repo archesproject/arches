@@ -573,6 +573,7 @@ class Resources(APIBase):
             if format == "json":
                 resource = Resource.objects.get(pk=resourceid)
 
+                version = request.GET.get("v", None)
                 compact = bool(request.GET.get("compact", "true").lower() == "true")  # default True
                 hide_empty_nodes = bool(request.GET.get("hide_empty_nodes", "false").lower() == "true")  # default False
 
@@ -582,6 +583,7 @@ class Resources(APIBase):
                         hide_empty_nodes=hide_empty_nodes,
                         user=user,
                         perm=perm,
+                        version=version
                     ),
                     "displaydescription": resource.displaydescription,
                     "displayname": resource.displayname,
