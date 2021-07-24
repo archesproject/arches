@@ -6,15 +6,11 @@ from unittest import mock, TestCase
 from arches.app.models import models
 from arches.app.models.tile import Tile
 from arches.app.models.resource import Resource
-from arches.app.utils.label_based_graph_v2 import (
-    LabelBasedGraph,
-    LabelBasedNode,
-    NODE_ID_KEY,
-    TILE_ID_KEY
-)
+from arches.app.utils.label_based_graph_v2 import LabelBasedGraph, LabelBasedNode, NODE_ID_KEY, TILE_ID_KEY
 
 # these tests can be run from the command line via
 # python manage.py test tests/utils/label_based_graph_test_v2.py --pattern="*.py" --settings="tests.test_settings"
+
 
 class LabelBasedNodeTests(TestCase):
     @classmethod
@@ -25,11 +21,7 @@ class LabelBasedNodeTests(TestCase):
             name="test_node_name", node_id="test_node_node_id", tile_id="test_node_tile_id", value={cls.VALUE_KEY: "test_node_value"}
         )
 
-        cls.test_node_json_data = {
-            NODE_ID_KEY: cls.test_node.node_id,
-            TILE_ID_KEY: cls.test_node.tile_id,
-            cls.VALUE_KEY: "test_node_value"
-        }
+        cls.test_node_json_data = {NODE_ID_KEY: cls.test_node.node_id, TILE_ID_KEY: cls.test_node.tile_id, cls.VALUE_KEY: "test_node_value"}
 
         cls.empty_node = LabelBasedNode(name="empty_node_name", node_id="empty_node_node_id", tile_id="empty_node_tile_id", value=None)
 
@@ -81,8 +73,16 @@ class LabelBasedNodeTests(TestCase):
         self.test_node.child_nodes.append(self.child_node_2)
 
         self.test_node_json_data[self.child_node_1.name] = [
-            {NODE_ID_KEY: self.child_node_1.node_id, TILE_ID_KEY: self.child_node_1.tile_id, self.VALUE_KEY: self.child_node_1.value[self.VALUE_KEY]},
-            {NODE_ID_KEY: self.child_node_2.node_id, TILE_ID_KEY: self.child_node_2.tile_id, self.VALUE_KEY: self.child_node_2.value[self.VALUE_KEY]},
+            {
+                NODE_ID_KEY: self.child_node_1.node_id,
+                TILE_ID_KEY: self.child_node_1.tile_id,
+                self.VALUE_KEY: self.child_node_1.value[self.VALUE_KEY],
+            },
+            {
+                NODE_ID_KEY: self.child_node_2.node_id,
+                TILE_ID_KEY: self.child_node_2.tile_id,
+                self.VALUE_KEY: self.child_node_2.value[self.VALUE_KEY],
+            },
         ]
 
         self.assertEqual(self.test_node.as_json(), {self.test_node.name: self.test_node_json_data})
@@ -93,9 +93,21 @@ class LabelBasedNodeTests(TestCase):
         self.test_node.child_nodes.append(self.child_node_3)
 
         self.test_node_json_data[self.child_node_1.name] = [
-            {NODE_ID_KEY: self.child_node_1.node_id, TILE_ID_KEY: self.child_node_1.tile_id, self.VALUE_KEY: self.child_node_1.value[self.VALUE_KEY]},
-            {NODE_ID_KEY: self.child_node_2.node_id, TILE_ID_KEY: self.child_node_2.tile_id, self.VALUE_KEY: self.child_node_2.value[self.VALUE_KEY]},
-            {NODE_ID_KEY: self.child_node_3.node_id, TILE_ID_KEY: self.child_node_3.tile_id, self.VALUE_KEY: self.child_node_3.value[self.VALUE_KEY]},
+            {
+                NODE_ID_KEY: self.child_node_1.node_id,
+                TILE_ID_KEY: self.child_node_1.tile_id,
+                self.VALUE_KEY: self.child_node_1.value[self.VALUE_KEY],
+            },
+            {
+                NODE_ID_KEY: self.child_node_2.node_id,
+                TILE_ID_KEY: self.child_node_2.tile_id,
+                self.VALUE_KEY: self.child_node_2.value[self.VALUE_KEY],
+            },
+            {
+                NODE_ID_KEY: self.child_node_3.node_id,
+                TILE_ID_KEY: self.child_node_3.tile_id,
+                self.VALUE_KEY: self.child_node_3.value[self.VALUE_KEY],
+            },
         ]
 
         self.assertEqual(self.test_node.as_json(), {self.test_node.name: self.test_node_json_data})
@@ -217,13 +229,15 @@ class LabelBasedGraph_FromResourceTests(TestCase):
 
         label_based_graph = LabelBasedGraph.from_resource(resource=self.test_resource, compact=False, hide_empty_nodes=False)
 
-        print('cat' * 5)
+        print("cat" * 5)
         print(label_based_graph)
-        print({
-                    NODE_ID_KEY: str(self.grouping_node.pk),
-                    TILE_ID_KEY: str(self.grouping_tile.pk),
-                })
-        print('cat' * 5)
+        print(
+            {
+                NODE_ID_KEY: str(self.grouping_node.pk),
+                TILE_ID_KEY: str(self.grouping_tile.pk),
+            }
+        )
+        print("cat" * 5)
 
         self.assertEqual(
             label_based_graph,
