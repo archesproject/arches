@@ -292,7 +292,7 @@ class Command(BaseCommand):
                 options["create_concepts"],
                 use_multiprocessing=options["use_multiprocessing"],
                 force=options["yes"],
-                prevent_indexing=prevent_indexing
+                prevent_indexing=prevent_indexing,
             )
 
             if defer_indexing:
@@ -1045,7 +1045,7 @@ class Command(BaseCommand):
         create_concepts=False,
         use_multiprocessing=False,
         force=False,
-        prevent_indexing=False
+        prevent_indexing=False,
     ):
         """
         Imports business data from all formats. A config file (mapping file) is required for .csv format.
