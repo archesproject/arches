@@ -229,16 +229,6 @@ class LabelBasedGraph_FromResourceTests(TestCase):
 
         label_based_graph = LabelBasedGraph.from_resource(resource=self.test_resource, compact=False, hide_empty_nodes=False)
 
-        print("cat" * 5)
-        print(label_based_graph)
-        print(
-            {
-                NODE_ID_KEY: str(self.grouping_node.pk),
-                TILE_ID_KEY: str(self.grouping_tile.pk),
-            }
-        )
-        print("cat" * 5)
-
         self.assertEqual(
             label_based_graph,
             {
