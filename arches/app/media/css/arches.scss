@@ -13303,6 +13303,15 @@ a.jstree-anchor.permissions-widget {
     text-decoration: none;
 }
 
+.iiif-gallery-sequence-labels {
+    display: inline-flex;
+    padding: 5px
+}
+
+.tabbed-workflow-step-container .iiif-gallery-sequence-labels {
+    display: none;
+}
+
 .iiif-gallery-panel {
     display: flex;
     flex-direction: column;
