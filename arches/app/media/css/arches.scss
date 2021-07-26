@@ -941,8 +941,26 @@ div.wf-multi-tile-card-info div {
 }
 
 .workflow-nav-tab-container {
+    display: flex;
+    width: inherit;
+}
+
+.workflow-tab-controls {
+    min-width: 30px;
+    display: flex;
+    background-color: #eceef0;
+    align-items: center;
+    font-size: 30px;
+    justify-content: center;
+    border: solid 1px #ddd;
+    color: #555;
+    cursor: pointer;
+}
+
+.workflow-nav-tabs {
     overflow-x: scroll;
     min-height: 45px;
+    width: 100%;
 }
 
 .tabbed-workflow-step-container {
@@ -951,7 +969,6 @@ div.wf-multi-tile-card-info div {
 }
 
 .workflow-nav-tab-list {
-    padding: 0px 10px 0px 10px;
     background-color: #fafafa;
     display: flex;
     min-width: max-content;
@@ -1997,7 +2014,6 @@ div.final-cons-step-separator>h4 {
 
 .manifest-manager .loader-select {
     height: 100%;
-    padding-top: 125px;
 }
 
 .manifest-manager .rr-splash-description {
@@ -8084,7 +8100,6 @@ a.mega-dropdown-toggle.disabled {
 
 .rr-drag-panel-target {
     border-bottom-width: 0px;
-    height: 100vh;
     background: white;
     border: 1px solid white;
     border-radius: 2px;
@@ -8334,7 +8349,6 @@ a.mega-dropdown-toggle.disabled {
 
 .resource-instance-card-component-container .card-component {
     width: 100%;
-    position: absolute;
     top: 50px;
     padding-top: 0px !important;
 }
@@ -8440,6 +8454,7 @@ a.mega-dropdown-toggle.disabled {
     width: calc(100% - 350px) !important;
     left: 350px;
     text-align: left;
+    position: unset;
 }
 
 .mainnav-lg .workbench-card-sidepanel .create-resource-instance-card-component.rr-table-pop .install-buttons {
@@ -13288,6 +13303,15 @@ a.jstree-anchor.permissions-widget {
     text-decoration: none;
 }
 
+.iiif-gallery-sequence-labels {
+    display: inline-flex;
+    padding: 5px
+}
+
+.tabbed-workflow-step-container .iiif-gallery-sequence-labels {
+    display: none;
+}
+
 .iiif-gallery-panel {
     display: flex;
     flex-direction: column;
@@ -13795,6 +13819,277 @@ a.jstree-anchor.permissions-widget {
 
 .related-resources-filter {
     height: 100%;
+}
+
+.related-resources-graph-workbench {
+    $sidebar-width: 400px;
+    $controls-height: 36px;
+    $controls-top: 10px;
+    $controls-grey: #9b9b9b;
+    $controls-border: 1px solid $controls-grey;
+    $controls-background: #e0e0e0;
+    $controls-right: 10px;
+    $accent-color: #9b97e3;
+
+    .related-resources-graph-cytoscape {
+        height: 100%;
+    }
+    .workbench-card-container-sidepanel-active {
+        padding-right: $sidebar-width;
+    }
+    .related-resources-graph-controls,
+    .related-resources-graph-controls-instructions {
+        z-index: 10000;
+        position: absolute;
+        right: $controls-right;
+    }
+    .workbench-card-container-sidepanel-active .related-resources-graph-controls,
+    .workbench-card-container-sidepanel-active .related-resources-graph-controls-instructions {
+        padding-right: $sidebar-width + $controls-right;
+    }
+    .related-resources-graph-controls {
+        top: $controls-top;
+        height: $controls-height;
+        span {
+            border: $controls-border;
+            cursor: pointer;
+            border-right: none;
+            display: block;
+            float: left;
+            width: $controls-height - 2;
+            height: $controls-height - 2;
+            box-sizing: border-box;
+            position: relative;
+            color: $controls-grey;
+            background-color: $controls-background;
+        }
+        span.active-graph-control {
+            color: #2a446a;
+            background-color: lighten($controls-background, 15%);
+        }
+        span:hover {
+            background-color: lighten($controls-background, 8%);
+        }
+        span:last-child {
+            border-right: $controls-border;
+        }
+        span:before {
+            position: absolute;
+            margin: 8px 0;
+            font-size: 1.2em;
+            display: block;
+            width: 100%;
+            text-align: center;
+        }
+    }
+    .related-resources-graph-controls-instructions {
+        background-color: rgba(256, 256, 256, 0.9);
+        padding: 3px;
+        border-radius: 3px;
+        color: $accent-color;
+        font-weight: 500;
+        margin-top: 2px;
+        top: $controls-height + $controls-top;
+    }
+    .edge-node-information {
+        position: relative;
+        .edge-node-graph-color {
+            position: absolute;
+            width: 50px;
+            height: 50px;
+            border-radius: 100%;
+            border: solid black 1px;
+            margin: 10px;
+        }
+        .edge-node-title {
+            margin-left: 74px;
+            min-height: 70px;
+            padding: 16px 0;
+            .edge-node-display-name {
+                color: #213e5f;
+                cursor: pointer;
+                font-size: 15px;
+                font-weight: 600;
+            }
+            .edge-node-graph-name {
+                font-size: 13px;
+            }
+            .edge-node-links {
+                margin-top: 5px;
+                span {
+                    cursor: pointer;
+                    color: #213e5f;
+                    display: inline-block;
+                    i {
+                        padding-right: 4px;
+                    }
+                }
+            }
+        }
+    }
+    .edge-node-information.element-hover .edge-node-display-name {
+        font-weight: 800;
+    }
+    .related-resource-graph-information-content {
+        padding-top: 60px;
+        height: 100%;
+        .edge-relationship-information {
+            $edge-label-height: 150px;
+            position: relative;
+            .edge-relationship-arrow {
+                display: inline-block;
+                position: absolute;
+                margin-left: 14px;
+                div {
+                    position: relative;
+                    background: #aaa;
+                    width: 2px;
+                    margin-left: 20px;
+                    height: $edge-label-height - 10;
+                }
+                div:before {
+                    content: "";
+                    position: absolute;
+                    width: 0px;
+                    height: 0px;
+                    border: 5px solid transparent;
+                    bottom: -15px;
+                    border-top: 15px solid #aaa;
+                    left: -4px;
+                }
+            }
+            .edge-relationship-details {
+                height: $edge-label-height;
+                margin-left: 74px;
+                border: 1px solid #aaa;
+                .edge-relationship-prefix,
+                .edge-relationship-sufix {
+                    padding: 10px;
+                    background-color: rgb(230, 230, 230);
+                }
+                .edge-relationship-label {
+                    height: 72px;
+                    color: #213e5f;
+                    font-size: 14px;
+                    padding: 25px 0;
+                    text-align: center;
+                    border-bottom: 1px solid #aaa;
+                    border-top: 1px solid #aaa;
+                }
+            }
+        }
+        .edge-relationship-information.element-hover .edge-relationship-label {
+            font-weight: 600;
+        }
+    }
+    .legend-listing {
+        cursor: default;
+        .edge-node-information {
+            .edge-node-title {
+                padding: 24px 0;
+                .edge-node-display-name {
+                    cursor: default;
+                }
+            }
+        }
+    }
+    .edge-node-information.node-display-name-header {
+        .edge-node-title {
+            padding: 4px 0;
+        }
+    }
+    .relationships-list-header {
+        padding: 5px 0;
+        color: rgb(120, 120, 120);
+        font-size: 1.3em;
+        font-weight: 600;
+    }
+    .relationships-list {
+        height: calc(100% - 134px);
+        border: 1px solid rgb(221, 221, 221);
+        overflow-y: auto;
+        .relationships-list-item {
+            padding: 8px;
+            font-size: 1.1em;
+            .relationships-list-item-type {
+                font-size: 1.2em;
+                color: rgb(29, 61, 116);
+                cursor: pointer;
+            }
+            .relationships-list-item-name {
+                padding-left: 10px;
+                cursor: pointer;
+                span {
+                    color: darken($accent-color, 20%);
+                }
+            }
+            .relationships-list-item-type.element-hover {
+                font-weight: bold;
+            }
+            .relationships-list-item-name.element-hover {
+                font-weight: bold;
+            }
+        }
+        .relationships-list-item:nth-of-type(odd) {
+            background-color: rgb(246, 250, 254);
+        }
+    }
+    .realtionships-list-count {
+        color: rgb(120, 120, 120);
+        font-size: 1.1em;
+        padding: 0 0 10px 0;
+        a {
+            color: darken($accent-color, 20%);
+            padding-left: 5px;
+        }
+    }
+    .related-reasources-search-container {
+        margin-top: 60px;
+        position: relative;
+    }
+    .related-reasources-search-list {
+        height: calc(100% - 110px);
+        margin-top: 16px;
+        border: solid 1px #aaa;
+        overflow-y: auto;
+        .edge-node-information {
+            border-bottom: 1px solid #aaa;
+        }
+        .edge-node-information.element-hover {
+            background-color: rgba(0, 0, 0, 0.05);
+        }
+    }
+}
+
+.rr-viewer-selector {
+    background: #ddd;
+}
+
+.rr-viewer-selector-title {
+    min-width: 200px;
+    text-align: center;
+    font-size: 13px;
+    padding: 9px 15px;
+    color: #666;
+    background: #fff;
+    display: table-cell;
+    border-right: 1px solid #BBD1EA;
+}
+
+.rr-viewer-selector-title.selected {
+    color: #25476A;
+    cursor: default;
+}
+
+.rr-viewer-selector-title.disabled {
+    cursor: pointer;
+    background: #F7F9FB;
+    border-bottom: 1px solid #BBD1EA;
+}
+
+.rr-viewer-selector-title.disabled:hover {
+    cursor: pointer;
+    background: #bbb;
 }
 
 @keyframes loader {

@@ -21,7 +21,13 @@ define([
             });
 
             self.addedData.push([self.componentData.uniqueInstanceName, value]);
-            self.hasUnsavedData(value);
+            if (self.previouslyPersistedComponentData) {
+                self.hasUnsavedData(!(_.isEqual(value, self.previouslyPersistedComponentData[0][1])));
+            }
+            else{
+                self.hasUnsavedData(!!value);
+            }
+            self.hasUnsavedData.valueHasMutated();
         });
 
         this.initialize = function() {
@@ -36,6 +42,8 @@ define([
 
             self.complete(true);
             self.savedData(self.addedData());
+
+            self.saving(false);
         };
 
         this.reset = function() {
@@ -63,7 +71,7 @@ define([
         this.loadData = function(data) {
             /* a flat object of the previously saved data for all tiles */ 
             var tileDataLookup = data.reduce(function(acc, componentData) {
-                var parsedTileData = JSON.parse(componentData.tileData);
+                var parsedTileData = componentData.data || JSON.parse(componentData.tileData);
 
                 Object.keys(parsedTileData).forEach(function(key) {
                     acc[key] = parsedTileData[key];
@@ -80,13 +88,15 @@ define([
                     }
                 });
                 tile._tileData(koMapping.toJSON(tile.data));
-
+                
                 data.forEach(function(datum){                    
-                    if (JSON.stringify(Object.keys(koMapping.toJS(tile.data)).sort()) 
-                        === JSON.stringify(Object.keys(JSON.parse(datum.tileData)).sort())) {
-                        tile.nodegroup_id = datum.nodegroupId;
-                        tile.tileid = datum.tileId;
-                        tile.resourceinstance_id = datum.resourceInstanceId;        
+                    if (datum.tileData) {
+                        if (JSON.stringify(Object.keys(koMapping.toJS(tile.data)).sort()) 
+                            === JSON.stringify(Object.keys(JSON.parse(datum.tileData)).sort())) {
+                            tile.nodegroup_id = datum.nodegroupId;
+                            tile.tileid = datum.tileId;
+                            tile.resourceinstance_id = datum.resourceInstanceId;        
+                        }
                     }
                 });
             });
@@ -169,7 +179,17 @@ define([
                         loading: self.loading
                     });
                 });
-    
+
+                self.card.subscribe(function(card){
+                    if (ko.unwrap(card.widgets) && self.componentData.parameters.hiddenNodes) {
+                        card.widgets().forEach(function(widget){
+                            if (self.componentData.parameters.hiddenNodes.indexOf(widget.node_id()) > -1) {
+                                widget.visible(false);
+                            }
+                        });
+                    }
+                });
+
                 self.topCards.forEach(function(topCard) {
                     topCard.topCards = self.topCards;
                 });
@@ -240,6 +260,8 @@ define([
             var saveFunction = self.saveFunction();
 
             if (saveFunction) { saveFunction(); }
+
+            self.saving(false);
         };
 
         this.onSaveSuccess = function(savedData) {
@@ -547,17 +569,23 @@ define([
     };
 
 
-    function WorkflowComponentAbstract(componentData, previouslyPersistedComponentData, externalStepData, resourceId, title, complete, saving) {
+    function WorkflowComponentAbstract(componentData, previouslyPersistedComponentData, externalStepData, resourceId, title, complete, saving, locked, lockExternalStep, lockableExternalSteps, workflowId, alert) {
         var self = this;
 
+        this.alert = alert;
+        this.AlertViewModel = AlertViewModel;
         this.saving = saving;
         this.complete = complete;
         this.resourceId = resourceId;
         this.componentData = componentData;
+        this.locked = locked;
+        this.lockExternalStep = lockExternalStep;
+        this.lockableExternalSteps = lockableExternalSteps;
+        this.workflowId = workflowId;
 
         this.previouslyPersistedComponentData = previouslyPersistedComponentData;
         this.externalStepData = externalStepData;
-        
+
         this.savedData = ko.observableArray();
         this.hasUnsavedData = ko.observable();
 
@@ -589,15 +617,22 @@ define([
         this.resourceId = ko.observable();
         if (ko.unwrap(params.resourceid)) {
             self.resourceId(ko.unwrap(params.resourceid));
-        } 
+        }
         else if (params.workflow && ko.unwrap(params.workflow.resourceId)) {
             self.resourceId(ko.unwrap(params.workflow.resourceId));
-        } 
+        }
 
+        if (params.workflow && ko.unwrap(params.workflow.id)) {
+            self.workflowId = ko.unwrap(params.workflow.id);
+        }
+        
         this.saving = params.saving || ko.observable(false);
         this.complete = params.complete || ko.observable(false);
         this.alert = params.alert || ko.observable();
         this.componentBasedStepClass = ko.unwrap(params.workflowstepclass);
+        this.locked = params.locked;
+        this.lockExternalStep = params.lockExternalStep;
+        this.lockableExternalSteps = params.lockableExternalSteps;
 
         this.dataToPersist = ko.observable({});
         self.dataToPersist.subscribe(function(data) {
@@ -655,7 +690,6 @@ define([
     
             params.postSaveCallback(function() {
                 self.hasUnsavedData(false);
-                self.saving(false);
             });
 
             ko.toJS(params.layoutSections).forEach(function(layoutSection) {
@@ -684,13 +718,18 @@ define([
             var workflowComponentAbstractLookup = self.workflowComponentAbstractLookup();
 
             var workflowComponentAbstract = new WorkflowComponentAbstract(
-                workflowComponentAbtractData, 
-                previouslyPersistedComponentData, 
+                workflowComponentAbtractData,
+                previouslyPersistedComponentData,
                 params.externalStepData,
                 self.resourceId,
-                params.title, 
+                params.title,
                 self.complete,
                 self.saving,
+                self.locked,
+                self.lockExternalStep,
+                self.lockableExternalSteps,
+                self.workflowId,
+                self.alert
             );
 
             workflowComponentAbstract.savedData.subscribe(function() {

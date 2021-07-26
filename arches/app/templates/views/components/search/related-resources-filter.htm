@@ -1,6 +1,8 @@
-<div data-bind="if: ready">
-    <div data-bind="component: {
-        name: 'related-resources-manager',
-        params: options
-    }"></div>
+<div data-bind="if: ready" class="related-resources-filter">
+    <!-- ko component: {
+        name: 'related-resources-graph',
+        params: {
+            resourceId: options.searchResultsVm.selectedResourceId
+        }
+    } --><!-- /ko -->
 </div>

@@ -7,7 +7,7 @@
     <div class="search-export">
         <div class="instruction">
             <h2 class=""> {% trans "1. Format" %} </h2>
-            <h4 class=""> {% trans "Select the format you'd like for your export data" %} </h4>
+            <h4 class=""> {% trans "Select the format you'd like for your export data. (tile excel and geojson formats require a resource type filter)" %} </h4>
         </div>
         <div class="parameter">
             <div>
@@ -17,11 +17,15 @@
                 <label data-bind="css: { 'active': format() === 'shp' }, click: function () { format('shp') }" class="form-radio form-normal form-text">
                     <input type="radio" name="stat-w-label" data-bind="checked: format() === 'shp'" value="false"> {% trans "shapefile" %}
                 </label>
+
+                <label data-bind="css: { 'active': format() === 'tilexl', 'disabled': !hasResourceTypeFilter() }, click: function () { if (hasResourceTypeFilter()) {format('tilexl')} }" class="form-radio form-normal form-text">
+                    <input type="radio" name="stat-w-label" data-bind="checked: format() === 'tilexl'" value="false"> {% trans "tile excel" %}
+                </label>
                 <!-- ko if: total() < {{app_settings.SEARCH_EXPORT_IMMEDIATE_DOWNLOAD_THRESHOLD}} -->
-                <label data-bind="css: { 'active': format() === 'geojson' }, click: function () { format('geojson') }" class="form-radio form-normal form-text">
+                <label data-bind="css: { 'active': format() === 'geojson', 'disabled': !hasResourceTypeFilter()}, click: function () { if (hasResourceTypeFilter()) {format('geojson')} }" class="form-radio form-normal form-text">
                     <input type="radio" name="stat-w-label" data-bind="checked: format() === 'geojson'" value="false"> {% trans "geojson url" %}
                 </label>
-                <!-- ko if: format() === 'geojson' -->
+                <!-- ko if: format() === 'geojson' && hasResourceTypeFilter -->
                 <div data-bind="clipboard: geojsonUrl">
                     <div style="padding: 5px 0px"><textarea style="width: 300px;" data-bind="value: geojsonUrl"></textarea></div>
                     <button class="btn btn-shim btn-labeled btn-sm fa fa-clipboard btn-primary">{% trans "Copy to clipboard" %}</button>
@@ -38,10 +42,17 @@
         <div class="parameter">
             <input type="number" class="form-control input-md widget-input precision" data-bind="textInput: precision"></input>
         </div>
+        <div class="instruction">
+            <h2 class=""> {% trans "3. Report Link" %} </h2>
+            <h4 class=""> {% trans "Only applicable to CSV and shapefile exports" %} </h4>
+        </div>
+        <div class="parameter">
+            <div data-bind="component: { name: 'views/components/simple-switch', params: {value: reportlink, config:{ label: '{% trans "Include the report link in the export?" %}', subtitle: ''}}}"></div>
+        </div>
         <!-- ko if: total() > {{app_settings.SEARCH_EXPORT_IMMEDIATE_DOWNLOAD_THRESHOLD}} && celeryRunning() === "True" -->
         <div>
             <div class="instruction">
-                <h2>{% trans "3. Name this export" %}</h2>
+                <h2>{% trans "4. Name this export" %}</h2>
             </div>
             <div class="parameter">
                 <input type="" class="form-control input-md widget-input" data-bind="textInput: exportName" placeholder="Arches Export"></input>
@@ -49,7 +60,7 @@
         </div>
         <div class="">
             <div class="instruction">
-                    <h2 class=""> {% trans "4. Email Address" %} </h2>
+                    <h2 class=""> {% trans "5. Email Address" %} </h2>
                     <h4 class=""> {% trans "This download may take some time.  Tell us where to email a download link to your results" %} </h4>
             </div>
             <div class="parameter">
