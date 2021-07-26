@@ -485,11 +485,16 @@ class MVT(APIBase):
 class Graphs(APIBase):
     def get(self, request, graph_id=None):
         cards_querystring = request.GET.get("cards", None)
-
+        exclusions_querystring = request.GET.get("exclude", None)
         if cards_querystring == "false":
             get_cards = False
         else:
             get_cards = True
+
+        if exclusions_querystring is not None:
+            exclusions = list(map(str.strip, exclusions_querystring.split(",")))
+        else:
+            exclusions = []
 
         perm = "read_nodegroup"
         graph = cache.get(f"graph_{graph_id}")
@@ -497,7 +502,7 @@ class Graphs(APIBase):
 
         if graph is None:
             graph = Graph.objects.get(graphid=graph_id)
-        graph = JSONSerializer().serializeToPython(graph, sort_keys=False, exclude=["is_editable", "functions"])
+        graph = JSONSerializer().serializeToPython(graph, sort_keys=False, exclude=["is_editable", "functions"] + exclusions)
 
         if get_cards:
             datatypes = models.DDataType.objects.all()

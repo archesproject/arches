@@ -75,7 +75,7 @@ define([
             if (graphid in self.graphLookup){
                 return Promise.resolve(self.graphLookup[graphid]);
             } else {
-                return window.fetch(`${arches.urls.graphs_api}${graphid}?cards=false`)
+                return window.fetch(`${arches.urls.graphs_api}${graphid}?cards=false&exclude=cards,domain_connections,edges,nodegroups,nodes,widgets`)
                     .then(function(response){
                         if (!response.ok) {
                             throw new Error(arches.translations.reNetworkReponseError);
