@@ -122,7 +122,7 @@ function($, _, BaseFilter, bootstrap, arches, select2, ko, koMapping, GraphModel
                     }, []);
 
                     if (graphIdsToFetch.length > 0) {
-                        var url = arches.urls.api_bulk_resource_report + `?graph_ids=${graphIdsToFetch}`;
+                        let url = arches.urls.api_bulk_resource_report + `?graph_ids=${graphIdsToFetch}`;
     
                         $.getJSON(url, function(resp) {
                             var bulkResourceReportCache = self.bulkResourceReportCache();
@@ -156,7 +156,7 @@ function($, _, BaseFilter, bootstrap, arches, select2, ko, koMapping, GraphModel
                     }, []);
 
                     if (resourceIdsToFetch.length > 0) {
-                        var url = arches.urls.api_bulk_disambiguated_resource_instance + `?resource_ids=${resourceIdsToFetch}`;
+                        let url = arches.urls.api_bulk_disambiguated_resource_instance + `?resource_ids=${resourceIdsToFetch}`;
 
                         $.getJSON(url, function(resp) {
                             var bulkDisambiguatedResourceInstanceCache = self.bulkDisambiguatedResourceInstanceCache();
@@ -166,7 +166,7 @@ function($, _, BaseFilter, bootstrap, arches, select2, ko, koMapping, GraphModel
                             });
 
                             self.bulkDisambiguatedResourceInstanceCache(bulkDisambiguatedResourceInstanceCache);
-                        })
+                        });
                     }
 
                     this.searchResults.results.hits.hits.forEach(function(result){
