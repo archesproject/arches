@@ -27,9 +27,11 @@ define([
         this.report = ko.observable();
 
         this.initialize = function() {
+            var url;
+
             if (params.report) {
                 if (!params.report.report_json && params.report.attributes.resourceid) {
-                    var url = arches.urls.api_bulk_disambiguated_resource_instance + `?resource_ids=${params.report.attributes.resourceid}`;
+                    url = arches.urls.api_bulk_disambiguated_resource_instance + `?resource_ids=${params.report.attributes.resourceid}`;
     
                     $.getJSON(url, function(resp) {
                         params.report.report_json = resp[params.report.attributes.resourceid];
@@ -37,7 +39,7 @@ define([
                         self.template(reportLookup[params.report.templateId()]);
                         self.report(params.report);
                         self.loading(false);
-                    })
+                    });
                 }
                 else {
                     this.template(reportLookup[params.report.templateId()]);
@@ -47,14 +49,14 @@ define([
                 }
             } 
             else if (self.resourceid) {
-                var url = arches.urls.api_resource_report(self.resourceid);
+                url = arches.urls.api_resource_report(self.resourceid);
 
                 self.fetchResourceData(url).then(function(responseJson) {
                     var template = responseJson.template;
                     self.template(template);
                     
                     if (template.preload_resource_data) {
-                        self.preloadResourceData(responseJson)
+                        self.preloadResourceData(responseJson);
                     }
                     else {
                         self.report({
@@ -86,7 +88,7 @@ define([
                 datatypes: responseJson.datatypes,
             });
 
-            graph = {
+            var graph = {
                 graphModel: graphModel,
                 cards: responseJson.cards,
                 graph: responseJson.graph,

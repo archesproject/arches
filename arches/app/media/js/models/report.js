@@ -184,7 +184,7 @@ define(['jquery',
                 if (value['related_resources']) { /* for paginated response */ 
                     // add new resource relationships to lookup entry
                     for (var resourceRelationship of value['related_resources']['resource_relationships']) {
-                        var relatedResource = value['related_resources']['related_resources'].find(function(resource) {
+                        let relatedResource = value['related_resources']['related_resources'].find(function(resource) {
                             return (
                                 resource.resourceinstanceid === resourceRelationship.resourceinstanceidto
                                 || resource.resourceinstanceid === resourceRelationship.resourceinstanceidfrom
@@ -208,7 +208,7 @@ define(['jquery',
                     remainingResources(remainingResourcesCount < resourceLimit ? remainingResourcesCount : resourceLimit);
                 }
                 else if (value['resources'].length > 0) {
-                    for (var relatedResource of value['resources']) {
+                    for (let relatedResource of value['resources']) {
                         relatedResources.push({
                             'displayName': relatedResource.displayname,
                             'relationship': relatedResource.relationships[0],

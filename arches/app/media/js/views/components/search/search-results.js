@@ -128,7 +128,7 @@ function($, _, BaseFilter, bootstrap, arches, select2, ko, koMapping, GraphModel
                             var bulkResourceReportCache = self.bulkResourceReportCache();
 
                             Object.keys(resp).forEach(function(graphId) {
-                                graphData = resp[graphId];
+                                var graphData = resp[graphId];
 
                                 if (graphData.graph) {
                                     var graphModel = new GraphModel({
@@ -153,7 +153,7 @@ function($, _, BaseFilter, bootstrap, arches, select2, ko, koMapping, GraphModel
                         }
 
                         return acc;
-                    }, []);;
+                    }, []);
 
                     if (resourceIdsToFetch.length > 0) {
                         var url = arches.urls.api_bulk_disambiguated_resource_instance + `?resource_ids=${resourceIdsToFetch}`;
