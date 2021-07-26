@@ -14061,6 +14061,37 @@ a.jstree-anchor.permissions-widget {
     }
 }
 
+.rr-viewer-selector {
+    background: #ddd;
+}
+
+.rr-viewer-selector-title {
+    min-width: 200px;
+    text-align: center;
+    font-size: 13px;
+    padding: 9px 15px;
+    color: #666;
+    background: #fff;
+    display: table-cell;
+    border-right: 1px solid #BBD1EA;
+}
+
+.rr-viewer-selector-title.selected {
+    color: #25476A;
+    cursor: default;
+}
+
+.rr-viewer-selector-title.disabled {
+    cursor: pointer;
+    background: #F7F9FB;
+    border-bottom: 1px solid #BBD1EA;
+}
+
+.rr-viewer-selector-title.disabled:hover {
+    cursor: pointer;
+    background: #bbb;
+}
+
 @keyframes loader {
     0% {
         background: #ddd;
