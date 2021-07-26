@@ -500,7 +500,7 @@ class Node(models.Model):
 
     @property
     def is_collector(self):
-        return str(self.nodeid) == str(self.nodegroup_id) and self.nodegroup is not None
+        return str(self.nodeid) == str(self.nodegroup_id) and self.nodegroup_id is not None
 
     def is_editable(self):
         if settings.OVERRIDE_RESOURCE_MODEL_LOCK is True:
