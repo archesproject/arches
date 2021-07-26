@@ -529,6 +529,11 @@ class Command(BaseCommand):
 
         celery_worker_running = task_management.check_if_celery_available()
 
+        # only defer indexing if the celery worker ISN'T running because celery processes
+        # are async and we currently don't have a celery process to index data.  Once
+        # we do, then we can think about deferring indexing in the celery task as well.
+        defer_indexing = False if celery_worker_running else defer_indexing
+
         def load_ontologies(package_dir):
             ontologies = glob.glob(os.path.join(package_dir, "ontologies/*"))
             if len(ontologies) > 0:
@@ -939,10 +944,10 @@ class Command(BaseCommand):
         update_resource_geojson_geometries()
         print("loading post sql")
         load_sql(package_location, "post_sql")
-        if defer_indexing is True and celery_worker_running is False:
+        if defer_indexing is True:
             print("indexing database")
             management.call_command("es", "reindex_database")
-        elif celery_worker_running:
+        if celery_worker_running:
             print("Celery detected: Resource instances loading. Log in to arches to be notified on completion.")
         else:
             print("package load complete")
