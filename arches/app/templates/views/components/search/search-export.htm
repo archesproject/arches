@@ -42,10 +42,17 @@
         <div class="parameter">
             <input type="number" class="form-control input-md widget-input precision" data-bind="textInput: precision"></input>
         </div>
+        <div class="instruction">
+            <h2 class=""> {% trans "3. Report Link" %} </h2>
+            <h4 class=""> {% trans "Only applicable to CSV and shapefile exports" %} </h4>
+        </div>
+        <div class="parameter">
+            <div data-bind="component: { name: 'views/components/simple-switch', params: {value: reportlink, config:{ label: '{% trans "Include the report link in the export?" %}', subtitle: ''}}}"></div>
+        </div>
         <!-- ko if: total() > {{app_settings.SEARCH_EXPORT_IMMEDIATE_DOWNLOAD_THRESHOLD}} && celeryRunning() === "True" -->
         <div>
             <div class="instruction">
-                <h2>{% trans "3. Name this export" %}</h2>
+                <h2>{% trans "4. Name this export" %}</h2>
             </div>
             <div class="parameter">
                 <input type="" class="form-control input-md widget-input" data-bind="textInput: exportName" placeholder="Arches Export"></input>
@@ -53,7 +60,7 @@
         </div>
         <div class="">
             <div class="instruction">
-                    <h2 class=""> {% trans "4. Email Address" %} </h2>
+                    <h2 class=""> {% trans "5. Email Address" %} </h2>
                     <h4 class=""> {% trans "This download may take some time.  Tell us where to email a download link to your results" %} </h4>
             </div>
             <div class="parameter">

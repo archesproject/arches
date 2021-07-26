@@ -246,6 +246,7 @@
                 mobile_survey_resources: function(surveyid){return "{% url 'mobile_survey_resources' 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa' %}".replace('aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa', surveyid)},
                 collector_designer: function(surveyid){return "{% url 'collector_designer' 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa' %}".replace('aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa', surveyid)},
                 plugin: function(pluginid){return "{% url 'plugins' 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa' %}".replace('aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa', pluginid)},
+                transaction_reverse: function(transactionid) {return "{% url 'transaction_reverse' 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa' %}".replace('aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa', transactionid)},
                 mvt: function(nodeid){return decodeURI("{% url 'mvt' 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa' '{z}' '{x}' '{y}' %}").replace('aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa', nodeid)},
                 collector_manager: "{% url 'collector_manager' %}",
                 help_template: "{% url 'help_templates' %}",
@@ -268,6 +269,7 @@
                 iiifannotations: "{% url 'iiifannotations' %}",
                 iiifannotationnodes: "{% url 'iiifannotationnodes' %}",
                 validatejson: "{% url 'validatejson' 'aaaa'%}".replace('aaaa', ''),
+                get_dsl: "{% url 'get_dsl' %}",
                 {% block urls %}{% endblock urls %}
             },
             geocoderPlaceHolder: "{% trans 'Find an address...' %}",

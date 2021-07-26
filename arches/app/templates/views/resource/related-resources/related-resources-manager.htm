@@ -6,7 +6,7 @@
 
     <!-- Image -->
     <div class="img-lg img-circle rr-splash-img-container">
-        <img class="rr-splash-img" src="{% static '/img/Workflow.png'%}" alt="Resource Editor">
+        <img class="rr-splash-img" src="{% static 'img/Workflow.png'%}" alt="Resource Editor">
     </div>
 
     <!-- Splash Title -->
@@ -44,15 +44,30 @@
 </div>
 
 <!--ko if: !displaySplash()-->
+{% block tabs %}
+<div class="rr-viewer-selector">
+    <div class="rr-viewer-selector-title" data-bind="click: function () { showGraph(false); },
+        css: {'selected': !showGraph(), 'disabled': showGraph()
+    }">
+        <span>{% trans "Table" %}</span>
+    </div>
+    <div class="rr-viewer-selector-title" data-bind="click: function () { if (currentResource()){showGraph(true)}; },
+        css: {'selected': showGraph(), 'disabled': !showGraph()
+    }">
+        <span>{% trans "Visualization" %}</span>
+    </div>
+</div>
+{% endblock tabs %}
+
 <div id="related-resources-drag-panel" style="overflow-y: hidden; position: relative;" class="search-container related-resources-container">
 
     <!-- Target -->
     <div id="rr-manager-content-id" class="rr-drag-panel-target" data-bind="style: {'margin-bottom': containerBottomMargin }">
 
+        <!--ko if: resourceEditorContext && !showGraph() -->
         <div class="related-resources-header" data-bind="css: {'open-graph': showGraph() == true}, style: {height: resourceEditorContext === true ? '55px' : '40px'}">
 
             <div class="editor-elements">
-                <!--ko if: resourceEditorContext && !showGraph() -->
                 <div class="">
                     <h2 class="">{% trans "Related Resources" %}</h2>
                     <h3 class="">{% trans "Select resources and relate it to this one" %}</h3>
@@ -64,16 +79,12 @@
                         ">
                     </div>
                 </div>
-                <!--/ko-->
 
-            </div>
-            <div class="btn-group rr-display-toggle" data-bind="css: {'open-graph': showGraph() == true}">
-                <button class="btn btn-default btn-display-toggle add-tooltip" data-toggle="tooltip" data-placement="bottom" data-original-title="grid" data-bind="click: function () { showGraph(false); }, css: {'selected': !showGraph()}"><i class="ion-grid"></i></button>
-                <button class="btn btn-default btn-display-toggle add-tooltip" data-toggle="tooltip" data-placement="bottom" data-original-title="graph" data-bind="click: function () { if (currentResource()){showGraph(true)}; }, css: {'selected': showGraph()}"><i class="ion-asterisk"></i></button>
             </div>
         </div>
+        <!--/ko-->
 
-        <div data-bind="visible: !showGraph()">
+        <div data-bind="hidden: showGraph()">
             <!--ko if: resourceRelationships().length > 0 -->
             <div class="rr-table-border" style="padding: 3px; display: flex; border-bottom: none; background: #f2f2f2; height: 40px; padding-top: 5px; padding-left: 5px;">
                 <div class="relative">
@@ -308,7 +319,7 @@
         <div id="rr-splash" class="rr-splash" style="margin: 50px 310px 0px 40px;">
             <!-- Image -->
             <div class="img-lg img-circle rr-splash-img-container">
-                <img class="rr-splash-img" src="{% static '/img/Workflow.png' %}" alt="Saved Search">
+                <img class="rr-splash-img" src="{% static 'img/Workflow.png' %}" alt="Saved Search">
             </div>
 
             <!-- Splash Title -->
@@ -323,96 +334,13 @@
     </div>
 
     <!--ko if: showGraph() -->
-    <div class="svg arches-related-resource-panel" data-bind="relatedResourcesGraph: {
-            nodeList: graphNodeList,
-            currentResource: newResource,
-            subscriptions: currentResourceSubscriptions,
-            nodeSelection: graphNodeSelection
-        }">
-
-        <!--ko if: graphNodeSelection().length == 2 -->
-        <div class="hover-rr-node-info" data-bind="style: {position: 'fixed', top: (panelPosition().y - 100) + 'px', left: (panelPosition().x - 300) + 'px'}">
-            <div>
-                <div class="rr-fdg-name">
-                    <div class='rr-number'>1. </div>
-                    <div class="rr-fdg-details">
-                        <div data-bind="text: graphNodeSelection()[0].name"></div>
-                        <span class="rr-fdg-model-name">
-                            <i class="resource-graph-node-icon" data-bind="css: graphNodeSelection()[0].iconclass, style:{'background-color': graphNodeSelection()[0].color}"></i>
-                            <div class="list-item-model-name" data-bind="text: graphNodeSelection()[0].graphname"></div>
-                        </span>
-                    </div>
-                </div>
-
-                <!--ko foreach: graphNodeSelection()[0].relationships -->
-                <div class="rr-fdg-edge" data-bind="text: $data"></div>
-                <!--/ko -->
-                <div class="rr-fdg-name">
-                    <div class='rr-number'>2. </div>
-                    <div class="rr-fdg-details">
-                        <div data-bind="text: graphNodeSelection()[1].name"></div>
-                        <span class="rr-fdg-model-name">
-                            <i class="resource-graph-node-icon" data-bind="css: graphNodeSelection()[1].iconclass, style:{'background-color': graphNodeSelection()[1].color}"></i>
-                            <div class="list-item-model-name" data-bind="text: graphNodeSelection()[1].graphname"></div>
-                        </span>
-                    </div>
-                </div>
-            </div>
-        </div>
-        <div class="rr-number fdg" data-bind="style: {position: 'fixed', top: (panelPosition().first.absY - 25) + 'px', left: (panelPosition().first.absX + 20) + 'px'}">1</div>
-        <div class="rr-number fdg" data-bind="style: {position: 'fixed', top: (panelPosition().second.absY - 25) + 'px', left: (panelPosition().second.absX + 20) + 'px'}">2</div>
-        <!--/ko-->
-
-        <!-- Resource Node Search/Listing -->
-        <div class="related-resources-nodes form-list">
-
-            <div class="header" data-bind="with: fdgNodeListView">
-
-                <div class="layer-list search">
-
-                    <div class="list-filter fdg-node-filter">
-                        <input type="text" class="form-control" style="z-index:100; border-color: #bbb;" placeholder="{% trans " Find a resource " %}" data-bind="value: $data.filter, valueUpdate: 'afterkeydown'">
-                        <span class="clear-node-search" style="position: absolute;" data-bind="click: $data.clearSearch"><i class="fa fa-times-circle"></i></span>
-                    </div>
-
-                </div>
-
-                <!-- Resource Nodes -->
-
-                <!-- ko foreach: { data: [$data], as: 'self' } -->
-                <div class="report-image-grid search relative">
-                    <div class="grid" style="margin-left: 0px; background: transparent;" data-bind="foreach: {data: items}">
-
-                        <div class="library-card relative" data-bind="scrollTo: selected(), container: $parent.scrollContainerSelector, event: { click: self.selectNode, mouseover: self.hoverNode, mouseout: function(e){e.hovered(false)} }, visible: filtered() == false, css:{'selected': selected() == true, 'hovered': hovered() == true}">
-                            <div class="crud-card-main" style="left: 5px;">
-                                <div class="related-node-details">
-                                    <a class="list-item-name" data-bind="text: name"></a>
-                                    <div class="graph-name"><i class="resource-graph-node-icon" data-bind="css: iconclass, style:{'background-color': color}"></i>
-                                        <a class="list-item-model-name" data-bind="text: graphname"></a>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div class="crud-card-subtitle" style="left: 5px;">
-                                <span data-bind="text: loaded"></span> <span>{% trans 'out of' %}</span><span data-bind="text: total"></span><span>{% trans 'relations loaded' %}</span>
-                                <div class="load-relations" data-bind="click: function(){loadcount(loadcount() + 1)}, clickBubble: false, css: {'disabled' : total() === loaded()}">{% trans 'load more' %}</div>
-                            </div>
-
-                            <div class="node-list-details" data-bind="fadeVisible: selected, delay:100, fade: 250">
-                                <div class="rr-fdg-description" data-bind="html: description"></div>
-                                <div class="node-list-footer">
-                                    <a data-bind="click: function () { window.open($parent.reportURL + ko.unwrap(entityid)); }" href="javascript:void(0)"><i class="ion-document-text"></i>{% trans 'Report' %}</a> {% if user|can_edit_resource_instance %}
-                                    <a data-bind="click: function () { window.open($parent.editURL + ko.unwrap(entityid)); }" href="javascript:void(0)"><i class="ion-ios-refresh-empty"></i>{% trans 'Edit' %}</a> {% endif %}
-                                </div>
-                            </div>
-                        </div>
-
-                    </div>
-                </div>
-                <!--/ko-->
-            </div>
-
-        </div>
+    <div class="related-resources-filter" style="height: calc(100vh - 80px)">
+        <!-- ko component: {
+            name: 'related-resources-graph',
+            params: {
+                resourceId: editingInstanceId
+            }
+        } --><!-- /ko -->
     </div>
     <!--/ko-->
 
