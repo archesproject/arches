@@ -118,6 +118,11 @@ class URLDataType(BaseDataType):
             if display_value:
                 return json.dumps(display_value)
 
+    def to_json(self, tile, node):
+        data = self.get_tile_data(tile)
+        if data:
+            return self.compile_json(tile, node, **data.get(str(node.nodeid)))
+
     def append_to_document(self, document, nodevalue, nodeid, tile, provisional=False):
         if nodevalue.get("url") is not None:
             if nodevalue.get("url_label") is not None:

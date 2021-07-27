@@ -71,6 +71,7 @@ define([
         this.data = koMapping.fromJS(params.tile.data);
         this.provisionaledits = ko.observable(params.tile.provisionaledits);
         this.datatypeLookup = getDatatypeLookup(params);
+        this.transactionId = params.transactionId;
 
         _.extend(this, {
             filter: filter,
@@ -174,6 +175,14 @@ define([
                     self.formData.append('accepted_provisional', JSON.stringify(params.provisionalTileViewModel.selectedProvisionalEdit()));
                     params.provisionalTileViewModel.acceptProvisionalEdit();
                 }
+
+                if (self.transactionId) {
+                    self.formData.append(
+                        'transaction_id',
+                        self.transactionId
+                    );
+                }
+
                 self.formData.append(
                     'data',
                     JSON.stringify(
