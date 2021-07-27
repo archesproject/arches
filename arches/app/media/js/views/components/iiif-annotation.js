@@ -16,6 +16,7 @@ define([
         var editItems = new L.FeatureGroup();
         var tools;
 
+        this.drawFeatures = drawFeatures;
         this.widgets = params.widgets || [];
         this.newNodeId = null;
         this.featureLookup = {};
@@ -27,6 +28,8 @@ define([
         this.lineOpacity = ko.observable(1);
         this.fillOpacity = ko.observable(0.2);
         this.showStylingTools = ko.observable(false);
+
+        this.hideEditorTab = params.hideEditorTab || ko.observable(false);
 
         this.cancelDrawing = function() {
             _.each(tools, function(tool) {
