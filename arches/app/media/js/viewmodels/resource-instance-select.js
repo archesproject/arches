@@ -403,7 +403,7 @@ define([
                         }
                         if (term || typeof params.termFilter === 'function') {
                             if(typeof params.termFilter === 'function'){
-                                params.termFilter(term, data);
+                                params.termFilter(term, queryString);
                             } else {
                                 var termFilter = JSON.parse(queryString.get('term-filter')) || [];
                                 termFilter.push({
