@@ -4,11 +4,17 @@
 <!-- ko if: state === 'editor-tree' && card.model.visible() -->
 {% block editor_tree %}
 <li role="treeitem card-treeitem" class="jstree-node" data-bind="css: {'jstree-open': (card.tiles().length > 0 && card.expanded()), 'jstree-closed' : (card.tiles().length > 0 && !card.expanded()), 'jstree-leaf': card.tiles().length === 0}, scrollTo: card.scrollTo, container: '.resource-editor-tree'">
-    <i tabindex="0" class="jstree-icon jstree-ocl" role="presentation" data-bind="click: function(){card.expanded(!card.expanded())}" onkeyup="if(event.which == 13 || event.keyCode == 13){ $(this).trigger('click'); }"></i>
-    <a class="jstree-anchor" href="#" tabindex="-1" data-bind="css:{'filtered': card.highlight(), 'jstree-clicked': card.selected, 'child-selected': card.isChildSelected(), 'func-node': card.isFuncNode(),'unsaved-edit': card.isDirty() === true}, event: {
+    <i tabindex="0" class="jstree-icon jstree-ocl" role="presentation" data-bind="click: function(){card.expanded(!card.expanded())}" aria-label="Expand/collapse" onkeyup="if(event.which == 13 || event.keyCode == 13){ $(this).trigger('click'); }"></i>
+    <a class="jstree-anchor" href="#" data-bind="css:{'filtered': card.highlight(), 'jstree-clicked': card.selected, 'child-selected': card.isChildSelected(), 'func-node': card.isFuncNode(),'unsaved-edit': card.isDirty() === true}, event: {
         mousedown: function(d, e) {
             e.stopPropagation();
             card.canAdd() ? card.selected(true) : card.tiles()[0].selected(true);
+        },
+        keyup: function(d, e){
+            if (event.which == 13 || event.keyCode == 13) {
+                e.stopPropagation();
+                card.canAdd() ? card.selected(true) : card.tiles()[0].selected(true);
+            }
         }
     }">
         <!-- ko if: !card.isFuncNode() -->
@@ -19,7 +25,7 @@
         <!-- /ko -->
         <span style="padding-right: 5px;" data-bind="text: card.model.name"></span>
         <!-- ko if: card.canAdd() -->
-        <i class="fa fa-plus-circle add-new-tile" role="presentation" data-bind="css:{'jstree-clicked': card.selected}, click: function(){card.showForm(true);}, clickBubble: false" data-toggle="tooltip" data-original-title="{% trans 'Add Gnu' %}"></i>
+        <i tabindex="0" class="fa fa-plus-circle add-new-tile" role="presentation" data-bind="css:{'jstree-clicked': card.selected}, click: function(){card.showForm(true);}, clickBubble: false" data-toggle="tooltip" data-original-title="{% trans 'Add Gnu' %}" onkeyup="if(event.which == 13 || event.keyCode == 13){ $(this).trigger('click'); }"></i>
         <!-- /ko -->
     </a>
     <ul class="jstree-children" aria-expanded="true">
@@ -33,7 +39,7 @@
         }">
             <li role="treeitem" class="jstree-node" data-bind="css: {'jstree-open': (cards.length > 0 && expanded), 'jstree-closed' : (cards.length > 0 && !expanded()), 'jstree-leaf': cards.length === 0}, event: {'dragstart': function () { console.log('dragging...') }}">
                 <i tabindex="0" class="jstree-icon jstree-ocl" role="presentation" data-bind="click: function(){expanded(!expanded())}" onkeyup="if(event.which == 13 || event.keyCode == 13){ $(this).trigger('click'); }"></i>
-                <a class="jstree-anchor" href="#" tabindex="-1" data-bind="click: function () { self.form.selection($data);}, css:{'jstree-clicked': selected, 'child-selected': isChildSelected(), 'filtered-leaf': card.highlight(), 'unsaved-edit': !!$data.dirty()}">
+                <a class="jstree-anchor" href="#" data-bind="click: function () { self.form.selection($data);}, css:{'jstree-clicked': selected, 'child-selected': isChildSelected(), 'filtered-leaf': card.highlight(), 'unsaved-edit': !!$data.dirty()}">
                     <i class="fa " role="presentation" data-bind="css:{'has-provisional-edits': doesChildHaveProvisionalEdits() || $data.hasprovisionaledits(),'fa-pencil':$data.dirty()===true,'fa-file':!$data.dirty()}"></i>
                     <strong style="margin-right: 10px;">
                         {% block editor_tree_node_content %}
@@ -88,7 +94,7 @@
 {% block designer_tree %}
 <li role="treeitem card-treeitem" class="jstree-node" data-bind="css: {'jstree-open': ((card.cards().length > 0 || card.widgets().length > 0) && card.expanded()), 'jstree-closed' : ((card.cards().length > 0 || card.widgets().length > 0) && !card.expanded()), 'jstree-leaf': card.cards().length === 0 && card.widgets().length === 0}, scrollTo: card.scrollTo, container: '.designer-card-tree'">
     <i tabindex="0" class="jstree-icon jstree-ocl" role="presentation" data-bind="click: function(){card.expanded(!card.expanded())}" onkeyup="if(event.which == 13 || event.keyCode == 13){ $(this).trigger('click'); }"></i>
-    <a class="jstree-anchor" href="#" tabindex="-1" data-bind="css:{'filtered': card.highlight(), 'jstree-clicked': card.selected, 'child-selected': card.isChildSelected(), 'func-node': card.isFuncNode()}, click: function () { card.selected(true) },">
+    <a class="jstree-anchor" href="#" data-bind="css:{'filtered': card.highlight(), 'jstree-clicked': card.selected, 'child-selected': card.isChildSelected(), 'func-node': card.isFuncNode()}, click: function () { card.selected(true) },">
         <i class="fa fa-file-o" role="presentation"></i>
         <span data-bind="text: card.model.name"></span>
         <!-- ko if: card.showIds -->
@@ -107,7 +113,7 @@
                     'jstree-last': $index() === (card.widgets().length - 1) && $parent.card.cards().length === 0
                 }">
                 <i class="jstree-icon jstree-ocl" role="presentation"></i>
-                <a class="jstree-anchor" href="#" data-bind="click: function() { widget.selected(true) }, css:{'jstree-clicked': widget.selected, 'hover': widget.hovered}, event: { mouseover: function(){ widget.hovered(true) }, mouseout: function(){ widget.hovered(null) } }" onkeyup="if(event.which == 13 || event.keyCode == 13){ $(this).trigger('click'); }">
+                <a class="jstree-anchor" href="#" data-bind="click: function() { widget.selected(true) }, css:{'jstree-clicked': widget.selected, 'hover': widget.hovered}, event: { mouseover: function(){ widget.hovered(true) }, mouseout: function(){ widget.hovered(null) }, keyup: function(d, e) { if (event.which == 13 || event.keyCode == 13) { e.stopPropagation(); widget.selected(true); } } }">
                     <i data-bind="css: widget.datatype.iconclass" role="presentation"></i>
                     <strong style="margin-right: 10px;" >
                         <span data-bind="text: !!(widget.label()) ? widget.label() : widget.node.name"></span>
@@ -154,7 +160,7 @@
 {% block permissions_tree %}
 <li role="treeitem card-treeitem" class="jstree-node" data-bind="css: {'jstree-open': ((card.cards().length > 0 || card.widgets().length > 0) && card.expanded()), 'jstree-closed' : ((card.cards().length > 0 || card.widgets().length > 0) && !card.expanded()), 'jstree-leaf': card.cards().length === 0 && card.widgets().length === 0}">
     <i tabindex="0" class="jstree-icon jstree-ocl" role="presentation" data-bind="click: function(){card.expanded(!card.expanded())}" onkeyup="if(event.which == 13 || event.keyCode == 13){ $(this).trigger('click'); }"></i>
-    <a class="jstree-anchor permissions-card" href="#" data-bind="css:{'jstree-clicked': card.selected, 'child-selected': card.isChildSelected(), 'filtered': card.highlight()}, click: function () { card.selectChildCards() }," onkeyup="if(event.which == 13 || event.keyCode == 13){ $(this).trigger('click'); }">
+    <a class="jstree-anchor permissions-card" href="#" data-bind="css:{'jstree-clicked': card.selected, 'child-selected': card.isChildSelected(), 'filtered': card.highlight()}, click: function () { card.selectChildCards() }, event: { keyup: function(d, e) { if (event.which == 13 || event.keyCode == 13) { e.stopPropagation(); card.selectChildCards(); } } }">
         <i class="fa fa-file-o" role="presentation"></i>
         <span style="padding-right: 5px;" data-bind="text: card.model.name">
         </span>
@@ -227,7 +233,7 @@
         <span>{% trans 'Showing edits by' %}</span>
         <span class="edit-message-container-user" data-bind="text: provisionalTileViewModel.selectedProvisionalEdit().username() + '.'"></span>
         <!-- ko if: !provisionalTileViewModel.tileIsFullyProvisional() -->
-        <a class="reset-authoritative" href='#' data-bind="click: function(){provisionalTileViewModel.resetAuthoritative();}" onkeyup="if(event.which == 13 || event.keyCode == 13){ $(this).trigger('click'); }">{% trans 'Return to approved edits' %}</a>
+        <a class="reset-authoritative" href='#' data-bind="click: function(){provisionalTileViewModel.resetAuthoritative();}, event: { keyup: function(d, e) { if (event.which == 13 || event.keyCode == 13) { e.stopPropagation(); provisionalTileViewModel.resetAuthoritative(); } } }">{% trans 'Return to approved edits' %}</a>
         <!-- /ko-->
         <!-- ko if: provisionalTileViewModel.selectedProvisionalEdit().isfullyprovisional -->
         <span>{% trans ' This is a new contribution by a provisional editor.' %}</span>
@@ -257,7 +263,7 @@
                     <div class='field'>
                         <span data-bind="text : pe.username"></span>
                     </div>
-                    <a href='#' class='field fa fa-times-circle new-delete-provisional-edit' data-bind="click : function(){$parent.provisionalTileViewModel.rejectProvisionalEdit(pe)}" onkeyup="if(event.which == 13 || event.keyCode == 13){ $(this).trigger('click'); }"></a>
+                    <a href='#' class='field fa fa-times-circle new-delete-provisional-edit' data-bind="click : function(){$parent.provisionalTileViewModel.rejectProvisionalEdit(pe)}, event: { keyup: function(d, e) { if (event.which == 13 || event.keyCode == 13) { e.stopPropagation(); $parent.provisionalTileViewModel.rejectProvisionalEdit(pe); } } }"></a>
                 </div>
                 <div class="field timestamp">
                     <span data-bind="text : pe.displaydate">@</span>
@@ -276,7 +282,7 @@
 
             <!-- ko if: card.model.helpenabled -->
             <span>
-                <a href="#" class="pull-right card-help help editable-help" data-bind="click: function () {card.model.get('helpactive')(true) }" onkeyup="if(event.which == 13 || event.keyCode == 13){ $(this).trigger('click'); }" style="cursor:pointer;"> {% trans "Help" %} <i class="fa fa-question-circle"></i></a>
+                <a href="#" class="pull-right card-help help editable-help" data-bind="click: function () {card.model.get('helpactive')(true) }, event: { keyup: function(d, e) { if (event.which == 13 || event.keyCode == 13) { e.stopPropagation(); card.model.get('helpactive')(true); } } }" style="cursor:pointer;"> {% trans "Help" %} <i class="fa fa-question-circle"></i></a>
             </span>
             <!-- /ko -->
             <h5 class="card-instructions" data-bind="text: card.model.instructions"></h5>
@@ -289,11 +295,11 @@
             <!-- ko if: card.showSummary() === false -->
             <!-- ko if: card.widgets().length > 0 -->
             {% block form_widgets %}
-            <form tabindex="0" class="widgets" style="margin-bottom: 20px;">
+            <form class="widgets" style="margin-bottom: 20px;">
                 <div data-bind="foreach: {
                         data:card.widgets, as: 'widget'
                     }">
-                    <div data-bind='component: {
+                    <div tabindex="0" aria-label="Open settings" data-bind='component: {
                         name: self.form.widgetLookup[widget.widget_id()].name,
                         params: {
                             widget: widget,
@@ -311,7 +317,7 @@
                         }
                     }, css:{ "active": widget.selected, "hover": widget.hovered, "widget-preview": self.preview
                 }, click: function(data, e) { if (!widget.selected() && self.preview) {widget.selected(true);}
-            }, event: { mouseover: function(){ if (self.preview){widget.hovered(true) } }, mouseout: function(){ if (self.preview){widget.hovered(null)} } }, visible: widget.visible' onkeyup="if(event.which == 13 || event.keyCode == 13){ $(this).trigger('click'); }"></div>
+            }, event: { keyup: function(d, e) { if (event.which == 13 || event.keyCode == 13) { e.stopPropagation(); if (!widget.selected() && self.preview) {widget.selected(true);} } }, mouseover: function(){ if (self.preview){widget.hovered(true) } }, mouseout: function(){ if (self.preview){widget.hovered(null)} } }, visible: widget.visible'></div>
                 </div>
             </form>
             {% endblock form_widgets %}
@@ -320,7 +326,7 @@
             {% block form_cards %}
             <ul class="card-summary-section" data-bind="css: {disabled: !tile.tileid}">
                 <!-- ko foreach: { data: tile.cards, as: 'card' } -->
-                <li class="card-summary" data-bind="visible: card.model.visible()">
+                <li style="border:1px solid red;" class="card-summary" data-bind="visible: card.model.visible()">
                     <a href="#" data-bind="click: function () {
                         if (card.parent.tileid) {
                             card.canAdd() ? card.selected(true) : card.tiles()[0].selected(true);
