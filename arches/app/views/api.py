@@ -1230,7 +1230,7 @@ class ResourceReport(APIBase):
 
                     summary["resources"].append(
                         {
-                            "instance_id": related_resource["resourceinstanceid"],
+                            "resourceinstanceid": related_resource["resourceinstanceid"],
                             "displayname": related_resource["displayname"],
                             "relationships": relationship_summary,
                         }

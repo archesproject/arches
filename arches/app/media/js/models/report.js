@@ -191,7 +191,6 @@ define(['jquery',
                                 || this.attributes && resource.resourceinstanceid === this.attributes.graph.graphid  // self
                             );
                         });
-    
                         if (relatedResource) {
                             relatedResources.push({
                                 'displayName': relatedResource.displayname,
