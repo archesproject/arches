@@ -19,11 +19,13 @@ define([
     var Workflow = function(config) {
         var self = this;
 
-        this.v2 = config.v2;
-
         this.id = ko.observable();
 
-        this.steps = ko.observableArray(config.steps || []);
+        this.resourceId = ko.observable();
+        this.quitUrl = config.quitUrl || self.quitUrl || arches.urls.plugin('init-workflow');
+        
+        this.v2 = config.v2 || self.v2;
+        this.steps = ko.observableArray(config.steps || self.steps || []);
 
         this.hoverStep = ko.observable();
         
@@ -49,15 +51,15 @@ define([
             }
         };
         
-        this.ready = ko.observable(false);
+        this.ready = ko.observable(false);  // legacy  DO NOT USE
 
         this.workflowName = ko.observable();
-        this.workflowName.subscribe(function(workflowName) {
-            if (workflowName && self.ready()) {
-                var components = _.unique(self.steps().map(function(step) {return step.component;}));
-                require(components, function() { self.initialize(); });
-            }
-        });
+        // this.workflowName.subscribe(function(workflowName) {
+        //     if (workflowName) {
+        //         var components = _.unique(self.steps().map(function(step) {return step.component;}));
+        //         require(components, function() { self.initialize(); });
+        //     }
+        // });
 
         this.loading = config.loading || ko.observable(false);
         
@@ -74,6 +76,10 @@ define([
         this.warning = '';
 
         this.initialize = function() {
+            if (self.componentName) {
+                self.getJSON(self.componentName);
+            }
+
             /* workflow ID url logic */  
             var currentWorkflowId = self.getWorkflowIdFromUrl();
             if (currentWorkflowId) {
@@ -400,10 +406,10 @@ define([
             // if ((!activeStep.required() || activeStep.complete()) && activeStep._index < self.steps().length - 1) {
                 var steps = self.steps();
 
-                steps.splice(self.steps()[activeStep._index + 1], 0, self.steps()[activeStep._index])
+                steps.splice(activeStep._index + 1, 0, self.steps()[self.steps().length - 1])
                 
                 self.steps(steps);
-                console.log(self.steps())
+                console.log(self.steps(), self.activeStep())
                 // self.activeStep(self.steps()[activeStep._index + 1]);
             // }
         };
@@ -415,6 +421,8 @@ define([
                 self.activeStep(self.steps()[activeStep._index - 1]);
             }
         };
+
+        self.initialize();
     };
 
     return Workflow;
