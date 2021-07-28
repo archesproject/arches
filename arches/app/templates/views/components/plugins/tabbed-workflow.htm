@@ -19,7 +19,7 @@
                 width: 335px;
                 justify-content: flex-end;"
                 >
-                <!-- ko if: (activeStep()._index === steps.length - 1) || isWorkflowFinished() -->
+                <!-- ko if: (activeStep()._index === steps().length - 1) || isWorkflowFinished() -->
                 <button 
                     data-bind="click: finishTabbedWorkflow"
                     class="btn btn-success"
@@ -46,7 +46,7 @@
             <div class="workflow-tab-controls right" data-bind="click: function(){ updatePan('left') }"><i class="fa fa-angle-left"></i></div>
                 <div class="workflow-nav-tabs">
                     <ul class="nav nav-tabs workflow-nav-tab-list">
-                        <!--ko foreach: {data: steps, as: 'step'} -->
+                        <!--ko foreach: {data: $data.steps(), as: 'step'} -->
                             <li 
                                 class="workflow-nav-tab-list-item" 
                                 data-bind="
@@ -109,7 +109,7 @@
                                                         ( $parent.activeStep().required() && !$parent.activeStep().complete() )
                                                     ),
                                                 },
-                                                visible: step.active() && step._index !== $parent.steps.length - 1,
+                                                visible: step.active() && step._index !== $parent.steps().length - 1,
                                             }"
                                         >
                                             <i class="fa fa-caret-right"></i>
@@ -134,7 +134,7 @@
                         style="padding-right: 2px;"
                         data-bind="text:activeStep()['_index'] + 1"
                     ></span>
-                    <span data-bind="text:`/ ${steps.length}`"></span>
+                    <span data-bind="text:`/ ${steps().length}`"></span>
                     
                 </div>
     
@@ -188,7 +188,7 @@
                     class="btn btn-success"
                     data-bind="
                         click: function() {
-                            activeStep().save();
+                            $data.next()
                         },
                     "
                 >
@@ -200,7 +200,7 @@
                 </button>
                 <!-- /ko -->
                 <!-- ko ifnot: activeStep().hasDirtyTile() -->
-                <!-- ko if: activeStep()._index < steps.length - 1 -->
+                <!-- ko if: activeStep()._index < steps().length - 1 -->
                 <button
                     class="btn btn-primary"
                     data-bind="
