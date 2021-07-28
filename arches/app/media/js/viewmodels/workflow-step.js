@@ -2,7 +2,8 @@ define([
     'knockout',
     'underscore',
     'knockout-mapping',
-    'uuid'
+    'uuid',
+    'views/components/workflows/component-based-step',
 ], function(ko, _, koMapping, uuid) {
     STEPS_LABEL = 'workflow-steps';
     STEP_ID_LABEL = 'workflow-step-id';
@@ -12,6 +13,8 @@ define([
 
         this.id = ko.observable();
         this.workflowId = ko.observable(config.workflow ? config.workflow.id : null);
+
+        this.isV2Workflow = config.workflow.v2;
 
         this.classUnvisited = 'workflow-step-icon';
         this.classActive = 'workflow-step-icon active';

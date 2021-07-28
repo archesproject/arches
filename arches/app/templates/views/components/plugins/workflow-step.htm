@@ -43,9 +43,17 @@
         </div>
         <!-- /ko -->
 
-        <!--ko if: componentname-->
+        <div style="display:none" data-bind="text: console.log($data, $data.isV2Workflow)"></div>
+
+        <!--ko if: !$data.isV2Workflow && $data.componentname -->
             <!-- ko component: {
                 name: componentname,
+                params: $data,
+            } --><!--/ko-->
+        <!--/ko-->
+        <!--ko if: $data.isV2Workflow -->
+            <!-- ko component: {
+                name: 'component-based-step',
                 params: $data,
             } --><!--/ko-->
         <!--/ko-->

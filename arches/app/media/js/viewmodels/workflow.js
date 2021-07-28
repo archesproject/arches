@@ -19,6 +19,8 @@ define([
     var Workflow = function(config) {
         var self = this;
 
+        this.v2 = config.v2;
+
         this.id = ko.observable();
 
         this.steps = config.steps || [];
