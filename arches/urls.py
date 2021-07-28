@@ -50,6 +50,7 @@ from arches.app.views.plugin import PluginView
 from arches.app.views.concept import RDMView
 from arches.app.views.user import UserManagerView
 from arches.app.views.tile import TileData
+from arches.app.views.transaction import ReverseTransaction
 from arches.app.views.notifications import NotificationView
 from arches.app.views.map import MapLayerManagerView, TileserverProxyView
 from arches.app.views.mobile_survey import MobileSurveyManagerView, MobileSurveyResources, MobileSurveyDesignerView
@@ -117,6 +118,7 @@ urlpatterns = [
     url(r"^search/time_wheel_config$", search.time_wheel_config, name="time_wheel_config"),
     url(r"^search/export_results$", search.export_results, name="export_results"),
     url(r"^search/get_export_file$", search.get_export_file, name="get_export_file"),
+    url(r"^search/get_dsl$", search.get_dsl_from_search_string, name="get_dsl"),
     url(r"^buffer/$", search.buffer, name="buffer"),
     url(
         r"^settings/",
@@ -193,6 +195,7 @@ urlpatterns = [
     url(r"^resource/descriptors/(?P<resourceid>%s|())$" % uuid_regex, ResourceDescriptors.as_view(), name="resource_descriptors"),
     url(r"^resource/(?P<resourceid>%s)/tiles$" % uuid_regex, ResourceTiles.as_view(), name="resource_tiles"),
     url(r"^report/(?P<resourceid>%s)$" % uuid_regex, ResourceReportView.as_view(), name="resource_report"),
+    url(r"^transaction/(?P<transactionid>%s)/reverse$" % uuid_regex, ReverseTransaction.as_view(), name="transaction_reverse"),
     url(r"^card/(?P<cardid>%s|())$" % uuid_regex, CardView.as_view(action="update_card"), name="card"),
     url(r"^reorder_cards/", CardView.as_view(action="reorder_cards"), name="reorder_cards"),
     url(r"^node/(?P<graphid>%s)$" % uuid_regex, GraphDataView.as_view(action="update_node"), name="node"),

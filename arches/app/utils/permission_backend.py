@@ -1,4 +1,4 @@
-from arches.app.models.models import Node, TileModel
+from arches.app.models.models import Node, TileModel, EditLog
 from arches.app.models.system_settings import settings
 from guardian.backends import check_support
 from guardian.backends import ObjectPermissionBackend
@@ -423,4 +423,13 @@ def user_is_resource_reviewer(user):
     Single test for whether a user is in the Resource Reviewer group
     """
 
-    return user.groups.filter(name='Resource Reviewer').exists()
+    return user.groups.filter(name="Resource Reviewer").exists()
+
+
+def user_created_transaction(user, transactionid):
+    if user.is_authenticated:
+        if user.is_superuser:
+            return True
+        if EditLog.objects.filter(transactionid=transactionid, userid=user.id).count() > 0:
+            return True
+    return False

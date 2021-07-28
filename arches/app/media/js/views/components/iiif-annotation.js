@@ -29,6 +29,8 @@ define([
         this.fillOpacity = ko.observable(0.2);
         this.showStylingTools = ko.observable(false);
 
+        this.hideEditorTab = params.hideEditorTab || ko.observable(false);
+
         this.cancelDrawing = function() {
             _.each(tools, function(tool) {
                 tool.disable();
