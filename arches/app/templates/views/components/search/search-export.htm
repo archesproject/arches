@@ -14,6 +14,11 @@
                 <label data-bind="css: { 'active': format() === 'tilecsv' }, click: function () { format('tilecsv') }" class="form-radio form-normal form-text">
                     <input type="radio" name="stat-w-label" data-bind="checked: format() === 'tilecsv'" value="true"> {% trans "csv" %}
                 </label>
+                <!-- ko if: celeryRunning() === "True" -->
+                <label data-bind="css: { 'active': format() === 'html' }, click: function () { format('html') }" class="form-radio form-normal form-text">
+                    <input type="radio" name="stat-w-label" data-bind="checked: format() === 'html'" value="false"> {% trans "html" %}
+                </label>
+                <!-- /ko -->
                 <label data-bind="css: { 'active': format() === 'shp' }, click: function () { format('shp') }" class="form-radio form-normal form-text">
                     <input type="radio" name="stat-w-label" data-bind="checked: format() === 'shp'" value="false"> {% trans "shapefile" %}
                 </label>

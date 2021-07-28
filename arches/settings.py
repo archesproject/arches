@@ -97,6 +97,7 @@ RESOURCE_FORMATTERS = {
     "n3": "arches.app.utils.data_management.resources.formats.rdffile.RdfWriter",
     "nt": "arches.app.utils.data_management.resources.formats.rdffile.RdfWriter",
     "trix": "arches.app.utils.data_management.resources.formats.rdffile.RdfWriter",
+    "html": "arches.app.utils.data_management.resources.formats.htmlfile.HtmlWriter"
 }
 
 # Hide nodes and cards in a report that have no data
