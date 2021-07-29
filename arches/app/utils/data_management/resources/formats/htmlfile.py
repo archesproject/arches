@@ -1,43 +1,10 @@
-#import csv
-#import pickle
-#import datetime
-#import json
 import os
-#import sys
-#import uuid
-#import traceback
 import logging
-#from time import time
-#from copy import deepcopy
 from io import StringIO
 from .format import Writer
-from .format import Reader
-#from elasticsearch import TransportError
-from arches.app.models.tile import Tile
-from arches.app.models.concept import Concept
-from arches.app.models.models import (
-    GraphModel,
-    Node,
-    NodeGroup,
-    ResourceXResource,
-    ResourceInstance,
-    FunctionXGraph,
-    GraphXMapping,
-    TileModel,
-)
-from arches.app.models.card import Card
-from arches.app.models.graph import Graph
-
-#from arches.app.utils.data_management.resource_graphs import exporter as GraphExporter
+from arches.app.models.models import GraphModel
 from arches.app.models.resource import Resource
 from arches.app.models.system_settings import settings
-from arches.app.datatypes.datatypes import DataTypeFactory
-import arches.app.utils.task_management as task_management
-from django.core.exceptions import ObjectDoesNotExist
-from django.db import transaction
-from django.db.models import Q
-from django.utils.translation import ugettext as _
-
 from jinja2 import Environment, FileSystemLoader
 
 logger = logging.getLogger(__name__)
@@ -46,7 +13,7 @@ logger = logging.getLogger(__name__)
 class HtmlWriter(Writer):
     def __init__(self, **kwargs):
         super(HtmlWriter, self).__init__(**kwargs)
-        self.templates_dir = "C:/Development/repos/keystone/arches-her/arches_her/export_report_templates" #hardcoded for development
+        self.templates_dir = os.path.join(settings.APP_ROOT, "export_report_templates")
 
     def fetch_resource_objects_list(self,resourceinstanceids=None, user=None, allowed_graph_ids=None):
         """
@@ -68,8 +35,8 @@ class HtmlWriter(Writer):
         
         perm = "read_nodegroup"
         resources = Resource.objects.filter(pk__in=resourceinstanceids)
-        compact = True #bool(request.GET.get("compact", "true").lower() == "true")  # default True
-        hide_empty_nodes = False #bool(request.GET.get("hide_empty_nodes", "false").lower() == "true")  # default False
+        compact = True
+        hide_empty_nodes = False
         resource_lists = {}
         for resource in resources:
             gid = str(resource.graph_id)
@@ -110,7 +77,6 @@ class HtmlWriter(Writer):
         logger.debug("Starting HTML export")
         logger.debug("... Fetching JSON")
 
-        # get list of templates ()
         from pathlib import Path
         valid_graphs = []
         for filename in os.listdir(self.templates_dir):
@@ -118,17 +84,22 @@ class HtmlWriter(Writer):
 
         resources_list = self.fetch_resource_objects_list(resourceinstanceids=resourceinstanceids, user=user, allowed_graph_ids=valid_graphs)
         
-        logger.debug("...Fetched")
-        logger.debug("... building html")
+        logger.debug("... fetched")
+        logger.debug("... Building html")
 
         files = self.generate_html_files(resources_list)
         
         logger.debug("... built")
         logger.debug("Finished HTML export")
+
         return files
     
     def generate_html_files(self, resource_object_list=None):
         """
+            uses the provided resource object list to generate a set of html file objects required by the Arches ResourceExporter.
+            
+            graph_ids for proto reference
+            =============================
             "b9e0701e-5463-11e9-b5f5-000d3ab1e588"	"Activity"
             "42ce82f6-83bf-11ea-b1e8-f875a44e0e11"	"Application Area"
             "b07cfa6f-894d-11ea-82aa-f875a44e0e11"	"Archive Source"
@@ -148,9 +119,6 @@ class HtmlWriter(Writer):
             "78b32d8c-b6f2-11ea-af42-f875a44e0e11"	"Place"
             "cf3a2979-f1aa-11e8-9f5d-022b22146258"	"Radiocarbon Date"
         """
-        
-        
-        
         files = []
         for gid in resource_object_list.keys():
             template = self.load_template(gid)
