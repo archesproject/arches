@@ -45,6 +45,7 @@ from arches.app.models.concept import get_preflabel_from_conceptid
 from arches.app.utils.permission_backend import get_nodegroups_by_perm, user_is_resource_reviewer
 import arches.app.utils.zip as zip_utils
 import arches.app.utils.task_management as task_management
+from arches.app.utils.data_management.resources.formats.htmlfile import HtmlWriter
 import arches.app.tasks as tasks
 from io import StringIO
 from tempfile import NamedTemporaryFile
@@ -108,6 +109,7 @@ class SearchView(MapBaseManagerView):
             "template": "search-help",
         }
         context["celery_running"] = task_management.check_if_celery_available()
+        context["export_html_templates"] = HtmlWriter.get_graphids_with_export_template()
 
         return render(request, "views/search.htm", context)
 

@@ -1,11 +1,14 @@
 import os
 import logging
+from uuid import UUID
 from io import StringIO
 from .format import Writer
 from arches.app.models.models import GraphModel
 from arches.app.models.resource import Resource
 from arches.app.models.system_settings import settings
 from jinja2 import Environment, FileSystemLoader
+from pathlib import Path
+
 
 logger = logging.getLogger(__name__)
 
@@ -13,7 +16,30 @@ logger = logging.getLogger(__name__)
 class HtmlWriter(Writer):
     def __init__(self, **kwargs):
         super(HtmlWriter, self).__init__(**kwargs)
-        self.templates_dir = os.path.join(settings.APP_ROOT, "export_report_templates")
+        self.templates_dir = HtmlWriter.get_templates_dir_path()
+
+    @staticmethod
+    def get_templates_dir_path():
+        return os.path.join(settings.APP_ROOT, "export_report_templates")
+
+    @staticmethod
+    def get_graphids_with_export_template():
+        valid_graphs = []
+        filename_list = []
+        for filename in os.listdir(HtmlWriter.get_templates_dir_path()):
+            try:
+                pth = Path(filename)
+                if pth.suffix == ".html":
+                    template_file_name = pth.stem
+                    #ensure the template name is the graph UUID
+                    x = UUID(template_file_name)
+                    filename_list.append(template_file_name)
+            except:
+                pass
+
+        return [str(graph) for graph in GraphModel.objects.filter(pk__in=filename_list)]
+
+
 
     def fetch_resource_objects_list(self,resourceinstanceids=None, user=None, allowed_graph_ids=None):
         """
@@ -30,7 +56,6 @@ class HtmlWriter(Writer):
                 ...
             }
 
-            NOTE: much was taken from api.Resources.get ln 557
         """
         
         perm = "read_nodegroup"
@@ -65,7 +90,7 @@ class HtmlWriter(Writer):
 
     def write_resources(self, graph_id=None, resourceinstanceids=None, **kwargs):
         """
-            Returns a list of dictionaries with the following format:
+            Returns a list of dictionaries representing the generated html files with the following format:
             [
                 {'name':file name, 'outputfile': a StringIO() buffer of resource instance data in the specified format},
                 {'name':file name, 'outputfile': a StringIO()},
@@ -73,51 +98,22 @@ class HtmlWriter(Writer):
                 ...
             ]
         """
+
+        valid_graphs = HtmlWriter.get_graphids_with_export_template()
+        if len(valid_graphs) == 0:
+            logger.warning("There are no valid graph html templates in the project - cannot generate html exports.")
+            return []
+
         user = kwargs.get("user", None)
-        logger.debug("Starting HTML export")
-        logger.debug("... Fetching JSON")
-
-        from pathlib import Path
-        valid_graphs = []
-        for filename in os.listdir(self.templates_dir):
-            valid_graphs.append(Path(filename).stem)
-
         resources_list = self.fetch_resource_objects_list(resourceinstanceids=resourceinstanceids, user=user, allowed_graph_ids=valid_graphs)
-        
-        logger.debug("... fetched")
-        logger.debug("... Building html")
-
         files = self.generate_html_files(resources_list)
-        
-        logger.debug("... built")
-        logger.debug("Finished HTML export")
 
         return files
     
     def generate_html_files(self, resource_object_list=None):
         """
             uses the provided resource object list to generate a set of html file objects required by the Arches ResourceExporter.
-            
-            graph_ids for proto reference
-            =============================
-            "b9e0701e-5463-11e9-b5f5-000d3ab1e588"	"Activity"
-            "42ce82f6-83bf-11ea-b1e8-f875a44e0e11"	"Application Area"
-            "b07cfa6f-894d-11ea-82aa-f875a44e0e11"	"Archive Source"
-            "343cc20c-2c5a-11e8-90fa-0242ac120005"	"Artefact"
-            "24d7b54f-5464-11e9-a86b-000d3ab1e588"	"Bibliographic Source"
-            "8d41e49e-a250-11e9-9eab-00224800b26d"	"Consultation"
-            "a535a235-8481-11ea-a6b9-f875a44e0e11"	"Digital Object"
-            "979aaf0b-7042-11ea-9674-287fcf6a5e72"	"Heritage Area"
-            "076f9381-7b00-11e9-8d6b-80000b44d1d9"	"Heritage Asset"
-            "0add0e11-99aa-11ea-9ab8-f875a44e0e11"	"Heritage Story"
-            "b8032b00-594d-11e9-9cf0-18cf5eb368c4"	"Historic Aircraft"
-            "934cd7f0-480a-11ea-9240-c4d9877d154e"	"Historic Landscape Characterization"
-            "49bac32e-5464-11e9-a6e2-000d3ab1e588"	"Maritime Vessel"
-            "d4a88461-5463-11e9-90d9-000d3ab1e588"	"Organization"
-            "f9045867-8861-11ea-b06f-f875a44e0e11"	"Period"
-            "22477f01-1a44-11e9-b0a9-000d3ab1e588"	"Person"
-            "78b32d8c-b6f2-11ea-af42-f875a44e0e11"	"Place"
-            "cf3a2979-f1aa-11e8-9f5d-022b22146258"	"Radiocarbon Date"
+
         """
         files = []
         for gid in resource_object_list.keys():
