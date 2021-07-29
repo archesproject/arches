@@ -505,6 +505,7 @@ PHONE_REGEX = r"^\+\d{8,15}$"
 SEARCH_ITEMS_PER_PAGE = 5
 SEARCH_EXPORT_LIMIT = 100000
 SEARCH_EXPORT_IMMEDIATE_DOWNLOAD_THRESHOLD = 2000  # The maximum number of instances a user can download from search export without celery
+SEARCH_EXPORT_IMMEDIATE_DOWNLOAD_THRESHOLD_HTML_FORMAT = 10  # The maximum number of instances a user can download using HTML format from search export without celery
 RELATED_RESOURCES_PER_PAGE = 15
 RELATED_RESOURCES_EXPORT_LIMIT = 10000
 SEARCH_DROPDOWN_LENGTH = 100

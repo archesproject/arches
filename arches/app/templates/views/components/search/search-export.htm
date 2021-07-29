@@ -14,11 +14,11 @@
                 <label data-bind="css: { 'active': format() === 'tilecsv' }, click: function () { format('tilecsv') }" class="form-radio form-normal form-text">
                     <input type="radio" name="stat-w-label" data-bind="checked: format() === 'tilecsv'" value="true"> {% trans "csv" %}
                 </label>
-                <!-- ko if: celeryRunning() === "True" -->
-                <label data-bind="css: { 'active': format() === 'html' }, click: function () { format('html') }" class="form-radio form-normal form-text">
+                
+                <label data-bind="css: { 'active': format() === 'html', 'disabled': (celeryRunning() !== 'True' && total() > {{app_settings.SEARCH_EXPORT_IMMEDIATE_DOWNLOAD_THRESHOLD_HTML_FORMAT}}) }, click: function () { if((celeryRunning() === 'True' || total() < {{app_settings.SEARCH_EXPORT_IMMEDIATE_DOWNLOAD_THRESHOLD_HTML_FORMAT}})) {format('html')} }" class="form-radio form-normal form-text">
                     <input type="radio" name="stat-w-label" data-bind="checked: format() === 'html'" value="false"> {% trans "html" %}
                 </label>
-                <!-- /ko -->
+                
                 <label data-bind="css: { 'active': format() === 'shp' }, click: function () { format('shp') }" class="form-radio form-normal form-text">
                     <input type="radio" name="stat-w-label" data-bind="checked: format() === 'shp'" value="false"> {% trans "shapefile" %}
                 </label>
@@ -47,6 +47,7 @@
         <div class="parameter">
             <input type="number" class="form-control input-md widget-input precision" data-bind="textInput: precision"></input>
         </div>
+        
         <div class="instruction">
             <h2 class=""> {% trans "3. Report Link" %} </h2>
             <h4 class=""> {% trans "Only applicable to CSV and shapefile exports" %} </h4>
@@ -54,7 +55,7 @@
         <div class="parameter">
             <div data-bind="component: { name: 'views/components/simple-switch', params: {value: reportlink, config:{ label: '{% trans "Include the report link in the export?" %}', subtitle: ''}}}"></div>
         </div>
-        <!-- ko if: total() > {{app_settings.SEARCH_EXPORT_IMMEDIATE_DOWNLOAD_THRESHOLD}} && celeryRunning() === "True" -->
+        <!-- ko if: (total() > {{app_settings.SEARCH_EXPORT_IMMEDIATE_DOWNLOAD_THRESHOLD}} && celeryRunning() === "True") || (format() === 'html' && total() > {{app_settings.SEARCH_EXPORT_IMMEDIATE_DOWNLOAD_THRESHOLD_HTML_FORMAT}} && celeryRunning() === "True") -->
         <div>
             <div class="instruction">
                 <h2>{% trans "4. Name this export" %}</h2>
@@ -75,12 +76,12 @@
         <!-- /ko -->
     </div>
 
-    <div data-bind="visible: ((total() > {{app_settings.SEARCH_EXPORT_IMMEDIATE_DOWNLOAD_THRESHOLD}}) && (celeryRunning() !== 'True')), text: ('Arches is currently running without Celery. All exports will be limited to {{app_settings.SEARCH_EXPORT_IMMEDIATE_DOWNLOAD_THRESHOLD}} records.')"></div>
+    <div data-bind="visible: ((total() > {{app_settings.SEARCH_EXPORT_IMMEDIATE_DOWNLOAD_THRESHOLD}}) && (celeryRunning() !== 'True') || (format() === 'html' && total() > {{app_settings.SEARCH_EXPORT_IMMEDIATE_DOWNLOAD_THRESHOLD_HTML_FORMAT}} && celeryRunning() !== 'True')), text: ('Arches is currently running without Celery. Exports will be limited to {{app_settings.SEARCH_EXPORT_IMMEDIATE_DOWNLOAD_THRESHOLD}} records or {{app_settings.SEARCH_EXPORT_IMMEDIATE_DOWNLOAD_THRESHOLD_HTML_FORMAT}} when chosing html format.')"></div>
     <div class="search-export download" data-bind="">
         <button class="btn btn-lg btn-primary btn-active-primary"
             type="button"
             aria-expanded="true"
-            data-bind="css: {disabled: (total() === 0) || (total() > {{app_settings.SEARCH_EXPORT_IMMEDIATE_DOWNLOAD_THRESHOLD}} && celeryRunning() !== 'True')},click: function(){executeExport( {{app_settings.SEARCH_EXPORT_IMMEDIATE_DOWNLOAD_THRESHOLD}} )}"> {% trans "Download" %}
+            data-bind="css: {disabled: (total() === 0) || (total() > {{app_settings.SEARCH_EXPORT_IMMEDIATE_DOWNLOAD_THRESHOLD}} && celeryRunning() !== 'True') || (format() === 'html' && total() > {{app_settings.SEARCH_EXPORT_IMMEDIATE_DOWNLOAD_THRESHOLD_HTML_FORMAT}} && celeryRunning() !== 'True') },click: function(){executeExport( {{app_settings.SEARCH_EXPORT_IMMEDIATE_DOWNLOAD_THRESHOLD}} )}"> {% trans "Download" %}
             <i class="fa fa-spin fa-spinner" data-bind="visible: downloadPending() === true"></i>
         </button>
     </div>
