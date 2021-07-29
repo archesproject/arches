@@ -39,22 +39,23 @@ define([
         this.preSaveCallback = ko.observable();
         this.postSaveCallback = ko.observable();
 
+        this.clearCallback = ko.observable();
+
         this.externalStepData = {};
         this.locked = ko.observable(false);
-        this.lockableExternalSteps = config.lockableExternalSteps || []
+        this.lockableExternalSteps = config.lockableExternalSteps || [];
 
+        /* BEGIN coerce externalStepData */ 
         var externalStepSourceData = ko.unwrap(config.externalstepdata) || {};
         Object.keys(externalStepSourceData).forEach(function(key) {
             if (key !== '__ko_mapping__') {
-                config.workflow.getStepData(externalStepSourceData[key]).then(function(data) {
-                    self.externalStepData[key] = {
-                        stepName: externalStepSourceData[key],
-                        data: data,
-                    };
-                });
+                self.externalStepData[key] = {
+                    stepName: externalStepSourceData[key]
+                };
             }
         });
         delete config.externalstepdata;
+        /* END coerce externalStepData */
         
         this.value = ko.observable();
         this.value.subscribe(function(value) {
@@ -110,6 +111,8 @@ define([
         });
 
         this.initialize = function() {
+            _.extend(this, config);
+
             /* cached ID logic */ 
             var cachedId = ko.unwrap(config.id);
             if (cachedId) {
@@ -145,25 +148,39 @@ define([
         };
         
         this.save = function() {
-            /* 
-                currently SYNCHRONOUS, however async localStore interaction is
-                covered by value subscription. This should be refactored when we can.
-            */ 
-            var preSaveCallback = ko.unwrap(self.preSaveCallback);
-            if (preSaveCallback) {
-                preSaveCallback();
-            }
+            var preSaveCallbackPromise = new Promise(function(resolve, _reject) {
+                var preSaveCallback = ko.unwrap(self.preSaveCallback);
 
-            self.setToLocalStorage('value', self.value())
+                resolve(preSaveCallback());
+            });
+            var localStoragePromise = new Promise(function(resolve, _reject) {
+                self.setToLocalStorage('value', self.value());
 
-            var postSaveCallback = ko.unwrap(self.postSaveCallback);
-            if (postSaveCallback) {
-                postSaveCallback();
-            }
+                resolve(self.value())
+            });
+            var postSaveCallbackPromise = new Promise(function(resolve, _reject) {
+                var postSaveCallback = ko.unwrap(self.postSaveCallback);
+
+                resolve(postSaveCallback());
+            });
+
+            return new Promise(function(resolve, _reject) {
+                preSaveCallbackPromise.then(function(_preSaveCallbackData) {
+                    localStoragePromise.then(function(localStorageData) {
+                        postSaveCallbackPromise.then(function(_postSaveCallbackData) {
+                            resolve(localStorageData);
+                        });
+                    });
+                });
+            });
         };
 
-
-        this.clearCallback = ko.observable();
+        this.resolveInjectedStep = function() {
+            if (config.injectStepIntoWorkflow) {
+                self.locked(true);
+                return config.injectStepIntoWorkflow();
+            }
+        };
 
         this.clear = function() {
             if (self.hasDirtyTile()) {
@@ -211,6 +228,7 @@ define([
         this.getExternalStepData = function() {
             Object.keys(self.externalStepData).forEach(function(key) {
                 config.workflow.getStepData(externalStepSourceData[key]).then(function(data) {
+                    console.log("CCCC", key, data)
                     self.externalStepData[key]['data'] = data;
                 });
             });
@@ -238,7 +256,7 @@ define([
                     text: config.informationboxdata['text'],
                 })
             }
-        }
+        };
 
         this.lockExternalStep = function(step, locked) {
             if (self.lockableExternalSteps.indexOf(step) > -1){
@@ -246,9 +264,7 @@ define([
             } else {
                 throw new Error("The step, " + step + ", cannot be locked")
             }
-        }
-
-        _.extend(this, config);
+        };
 
         this.iconClass = ko.computed(function(){
             var ret = '';

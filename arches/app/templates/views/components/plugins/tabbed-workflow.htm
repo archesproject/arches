@@ -187,7 +187,11 @@
                     class="btn btn-success"
                     data-bind="
                         click: function() {
-                            $data.next()
+                            $data.saveActiveStep().then(function() {
+                                $data.handleActiveStepStepInjection().then(function() {
+                                    $data.next();
+                                });
+                            });
                         },
                     "
                 >

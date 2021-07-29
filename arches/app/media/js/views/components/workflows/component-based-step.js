@@ -264,7 +264,7 @@ define([
             self.saving(false);
         };
 
-        this.onSaveSuccess = function(savedData) {
+        this.onSaveSuccess = function(savedData) {  // LEGACY -- DO NOT USE
             if (!(savedData instanceof Array)) { savedData = [savedData]; }
             
             self.savedData(savedData.map(function(savedDatum) {
@@ -760,6 +760,8 @@ define([
 
         this.save = function() {
             Object.values(self.workflowComponentAbstractLookup()).forEach(function(workflowComponentAbstract) {
+
+                // maybe wrap each save method with promise in here?
                 if (workflowComponentAbstract.hasUnsavedData()) {
                     workflowComponentAbstract.save();
                 } 

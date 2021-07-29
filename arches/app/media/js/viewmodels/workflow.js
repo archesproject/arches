@@ -20,37 +20,28 @@ define([
         var self = this;
 
         this.id = ko.observable();
-
         this.resourceId = ko.observable();
+
         this.quitUrl = config.quitUrl || self.quitUrl || arches.urls.plugin('init-workflow');
-        
+
         this.v2 = config.v2 || self.v2;
-        this.steps = ko.observableArray(config.steps || self.steps || []);
-
-        this.hoverStep = ko.observable();
         
-        this.previousStep = ko.observable();
+        this.steps = ko.observableArray();
+        
         this.activeStep = ko.observable();
-
+        
         this.isWorkflowFinished = ko.observable(false);
-
+        
         this.furthestValidStepIndex = ko.observable();
         this.furthestValidStepIndex.subscribe(function(index){
             if (index >= self.steps().length - 1) {
                 self.isWorkflowFinished(true)
             }
         });
-
-        this.pan = ko.observable();
-
-        this.updatePan = function(val){
-            if (this.pan() !== val) {
-                this.pan(val);
-            } else {
-                this.pan.valueHasMutated();
-            }
-        };
         
+        this.pan = ko.observable();
+        
+        this.hoverStep = ko.observable();  // legacy DO NOT USE
         this.ready = ko.observable(false);  // legacy  DO NOT USE
 
         this.workflowName = ko.observable();
@@ -66,13 +57,6 @@ define([
         this.alert = config.alert || ko.observable(null);
         this.quitUrl = arches.urls.home;
 
-        this.wastebinWarning = function(val){
-            if (val === '') {
-                return [[arches.translations.workflowWastbinWarning3],[arches.translations.workflowWastbinWarning2]];
-            } else {
-                return [[arches.translations.workflowWastbinWarning.replace("${val}", val)],[arches.translations.workflowWastbinWarning2]];
-            }
-        };
         this.warning = '';
 
         this.initialize = function() {
@@ -124,6 +108,22 @@ define([
             }
         };
 
+        this.wastebinWarning = function(val){
+            if (val === '') {
+                return [[arches.translations.workflowWastbinWarning3],[arches.translations.workflowWastbinWarning2]];
+            } else {
+                return [[arches.translations.workflowWastbinWarning.replace("${val}", val)],[arches.translations.workflowWastbinWarning2]];
+            }
+        };
+
+        this.updatePan = function(val){
+            if (this.pan() !== val) {
+                this.pan(val);
+            } else {
+                this.pan.valueHasMutated();
+            }
+        };
+
         this.getInformationBoxDisplayedStateFromLocalStorage = function(stepName) {
             return self.getMetadataFromLocalStorage(stepName, 'informationBoxDisplayed');
         };
@@ -156,31 +156,86 @@ define([
             );
         };
 
-        this.createSteps = function(cachedStepIds) {
-            self.steps().forEach(function(step, i) {
-                if (!(self.steps()[i] instanceof Step)) {
-                    step.workflow = self;
-                    step.loading = self.loading;
-                    step.alert = self.alert;
+        this.createStep = function(step) {
+            step.workflow = self;
+            step.loading = self.loading;
+            step.alert = self.alert;
 
-                    /* if stepIds exist for this workflow in localStorage, set correct value */ 
-                    if (cachedStepIds) { step.id = cachedStepIds[i]; }
+            // /* if stepIds exist for this workflow in localStorage, set correct value */ 
+            // if (cachedStepIds) { step.id = cachedStepIds[i]; }
 
-                    step.informationBoxDisplayed = ko.observable(self.getInformationBoxDisplayedStateFromLocalStorage(step.name));
-                    step.informationBoxDisplayed.subscribe(function(val){
-                        self.setMetadataToLocalStorage(ko.unwrap(step.name), 'informationBoxDisplayed', val);
-                    })
+            step.informationBoxDisplayed = ko.observable(self.getInformationBoxDisplayedStateFromLocalStorage(step.name));
+            step.informationBoxDisplayed.subscribe(function(val){
+                self.setMetadataToLocalStorage(ko.unwrap(step.name), 'informationBoxDisplayed', val);
+            })
 
-                    var newStep = new Step(step);
-                    self.steps()[i] = newStep;
+            return new Step(step);
 
-                    self.steps()[i].complete.subscribe(function(complete) {
+            // newStep.complete.subscribe(function(complete) {
+            //     self.getFurthestValidStepIndex();
+            //     if (complete && self.steps()[i].autoAdvance()) self.next();
+            // });
+        };
+
+        this.createSteps = function() {
+            self.stepConfig.forEach(function(stepData) {
+                self.steps.push(self.createStep(stepData));
+            });
+
+            self.updateStepIndices();
+        };
+
+        this.updateStepIndices = function() {
+            var steps = self.steps();
+
+            var updatedSteps = steps.map(function(step, index) {
+                step['_index'] = index;
+
+                return step;
+            });
+
+            self.steps(updatedSteps);
+        };
+
+        this.saveActiveStep = function() {
+            return new Promise(function(resolve, _reject) {
+                self.activeStep().save().then(function(data) {             
+                    resolve(data);
+                });
+            });
+        };
+
+        this.handleActiveStepStepInjection = function() {
+            return new Promise(function(resolve, _reject) {
+                var activeStep = self.activeStep();
+    
+                var injectedStepData = activeStep.resolveInjectedStep();
+                        
+                if (injectedStepData) {
+                    var nextStep = self.steps()[activeStep._index + 1];
+    
+                    if (!nextStep || nextStep.name() !== injectedStepData.name) {
+                        var steps = self.steps();
+
+                        var newStep = self.createStep(injectedStepData);
+                        steps.splice(activeStep._index + 1, 0, newStep);
+                        
+                        self.steps(steps);
+
+                        self.updateStepIndices();
+                        
                         self.getFurthestValidStepIndex();
-                        if (complete && self.steps()[i].autoAdvance()) self.next();
-                    });
+                        resolve(newStep);
+                    }
+                    else {
+                        self.getFurthestValidStepIndex();
+                        resolve(nextStep);
+                    }
                 }
-
-                self.steps()[i]._index = i;
+                else {
+                    self.getFurthestValidStepIndex();
+                    resolve(null);
+                }
             });
         };
 
@@ -400,18 +455,14 @@ define([
         };
 
         this.next = function(){
-            console.log("DSFDSF")
             var activeStep = self.activeStep();
 
-            // if ((!activeStep.required() || activeStep.complete()) && activeStep._index < self.steps().length - 1) {
-                var steps = self.steps();
-
-                steps.splice(activeStep._index + 1, 0, self.steps()[self.steps().length - 1])
-                
-                self.steps(steps);
-                console.log(self.steps(), self.activeStep())
-                // self.activeStep(self.steps()[activeStep._index + 1]);
-            // }
+            console.log("AAAAAA", activeStep, activeStep.required(), activeStep.complete(), activeStep._index, self.steps().length)
+            
+            if ((!activeStep.required() || activeStep.complete()) && activeStep._index < self.steps().length - 1) {
+                console.log("BB", activeStep)
+                self.activeStep(self.steps()[activeStep._index + 1]);
+            }
         };
 
         this.back = function(){
