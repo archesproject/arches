@@ -1,7 +1,14 @@
 {% load i18n %}
 
+
 <div class='tabbed-workflow-step-body'>
     <!-- ko with: step -->
+        <div style="display:none" data-bind="text: console.log($data, $parent)"></div>
+        <div 
+            class='workflow-step-loading-mask loading-mask' 
+            data-bind="visible: $data.loading() || $data.saving()"
+        ></div>
+
         <!--ko if: informationBoxData -->
         <div 
             class='tabbed-workflow-step-information-box-container'
@@ -42,8 +49,6 @@
             </div>
         </div>
         <!-- /ko -->
-
-        <div style="display:none" data-bind="text: console.log($data, $data.isV2Workflow)"></div>
 
         <!--ko if: !$data.isV2Workflow && $data.componentname -->
             <!-- ko component: {

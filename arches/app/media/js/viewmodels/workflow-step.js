@@ -31,6 +31,7 @@ define([
         this.hasDirtyTile = ko.observable(false);
 
         this.saving = ko.observable(false);
+        this.loading = ko.observable(false);
 
         this.complete = ko.observable(false);
         this.required = ko.observable(ko.unwrap(config.required));
@@ -112,6 +113,8 @@ define([
 
         this.initialize = function() {
             _.extend(this, config);
+
+            self.loading(true);
 
             /* cached ID logic */ 
             var cachedId = ko.unwrap(config.id);

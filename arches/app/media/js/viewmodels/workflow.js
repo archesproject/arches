@@ -52,7 +52,7 @@ define([
         //     }
         // });
 
-        this.loading = config.loading || ko.observable(false);
+        // this.loading = config.loading || ko.observable(false);
         
         this.alert = config.alert || ko.observable(null);
         this.quitUrl = arches.urls.home;
@@ -158,7 +158,7 @@ define([
 
         this.createStep = function(step) {
             step.workflow = self;
-            step.loading = self.loading;
+            // step.loading = self.loading;
             step.alert = self.alert;
 
             // /* if stepIds exist for this workflow in localStorage, set correct value */ 

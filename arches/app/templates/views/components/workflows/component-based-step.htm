@@ -14,7 +14,6 @@
         <!-- /ko -->
 
         <!-- ko foreach: { data: layoutSection[1], as: 'uniqueInstanceName'} -->
-            <!-- ko if: !$parents[1].loading() -->
 
             <!-- ko with: $parents[1].workflowComponentAbstractLookup()[uniqueInstanceName] -->
                 <div style="
@@ -142,7 +141,6 @@
                 </div>
             <!-- /ko -->
             
-            <!-- /ko -->
         <!-- /ko -->
     </div>
     <!-- /ko -->
