@@ -50,8 +50,6 @@
             <div data-bind="component: { name: 'views/components/simple-switch', params: {value: reportlink, config:{ label: '{% trans "Include the report link in the export?" %}', subtitle: ''}}}"></div>
         </div>
         <!-- ko if: total() > {{app_settings.SEARCH_EXPORT_IMMEDIATE_DOWNLOAD_THRESHOLD}} && celeryRunning() === "True" && ("{{app_settings.RESTRICT_BG_EXPORT_ANON}}" === "False" || "{{app_settings.RESTRICT_BG_EXPORT_ANON}}" === "True" && "{{user.username}}" !== "anonymous")-->
-
-
         <div>
             <div class="instruction">
                 <h2>{% trans "4. Name this export" %}</h2>
