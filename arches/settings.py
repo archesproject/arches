@@ -229,10 +229,10 @@ DATA_UPLOAD_MAX_MEMORY_SIZE = 15728640
 RESTRICT_MEDIA_ACCESS = False
 
 
-# By setting RESTRICT_BG_EXPORT_ANON to True, if the user is attempting
+# By setting RESTRICT_CELERY_EXPORT_FOR_ANONYMOUS_USER to True, if the user is attempting
 # to export search results above the SEARCH_EXPORT_IMMEDIATE_DOWNLOAD_THRESHOLD
 # value and is not signed in with a user account then the request will not be allowed.
-RESTRICT_BG_EXPORT_ANON = False
+RESTRICT_CELERY_EXPORT_FOR_ANONYMOUS_USER = False
 
 # Absolute filesystem path to the directory that will hold user-uploaded files.
 MEDIA_ROOT = os.path.join(ROOT_DIR)

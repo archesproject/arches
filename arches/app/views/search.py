@@ -211,7 +211,7 @@ def export_results(request):
     download_limit = settings.SEARCH_EXPORT_IMMEDIATE_DOWNLOAD_THRESHOLD
     app_name = settings.APP_NAME
     if total > download_limit and format != "geojson":
-        if (settings.RESTRICT_BG_EXPORT_ANON == True) and (request.user.username == "anonymous"):
+        if (settings.RESTRICT_CELERY_EXPORT_FOR_ANONYMOUS_USER == True) and (request.user.username == "anonymous"):
             message = _(
                 "Your search exceeds the {download_limit} instance download limit.  Anonymous users cannot run an export exceeding this limit. Please sign in with your {app_name} account or refine your search"
             ).format(**locals())
