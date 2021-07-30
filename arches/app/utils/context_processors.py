@@ -74,5 +74,6 @@ def app_settings(request):
             "SEARCH_EXPORT_IMMEDIATE_DOWNLOAD_THRESHOLD": settings.SEARCH_EXPORT_IMMEDIATE_DOWNLOAD_THRESHOLD,
             "RENDERERS": settings.RENDERERS,
             "FORCE_SCRIPT_NAME": settings.FORCE_SCRIPT_NAME if settings.FORCE_SCRIPT_NAME is not None else "",
+            "RESTRICT_BG_EXPORT_ANON": settings.RESTRICT_BG_EXPORT_ANON,
         }
     }
