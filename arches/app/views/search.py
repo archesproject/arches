@@ -52,7 +52,6 @@ from arches.app.models.system_settings import settings
 
 logger = logging.getLogger(__name__)
 
-
 class SearchView(MapBaseManagerView):
     def get(self, request):
         map_layers = models.MapLayer.objects.all()
