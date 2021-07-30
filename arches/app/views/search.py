@@ -52,6 +52,7 @@ from arches.app.models.system_settings import settings
 
 logger = logging.getLogger(__name__)
 
+
 class SearchView(MapBaseManagerView):
     def get(self, request):
         map_layers = models.MapLayer.objects.all()
@@ -112,7 +113,13 @@ class SearchView(MapBaseManagerView):
 
 
 def home_page(request):
-    return render(request, "views/search.htm", {"main_script": "views/search",})
+    return render(
+        request,
+        "views/search.htm",
+        {
+            "main_script": "views/search",
+        },
+    )
 
 
 def search_terms(request):
@@ -205,8 +212,10 @@ def export_results(request):
     download_limit = settings.SEARCH_EXPORT_IMMEDIATE_DOWNLOAD_THRESHOLD
     app_name = settings.APP_NAME
     if total > download_limit and format != "geojson":
-        if (settings.RESTRICT_BG_EXPORT_ANON == True) and (request.user.username == 'anonymous'):
-            message = _("Your search exceeds the {download_limit} instance download limit.  Anonymous users cannot run an export exceeding this limit. Please sign in with your {app_name} account or refine your search").format(**locals())
+        if (settings.RESTRICT_BG_EXPORT_ANON == True) and (request.user.username == "anonymous"):
+            message = _(
+                "Your search exceeds the {download_limit} instance download limit.  Anonymous users cannot run an export exceeding this limit. Please sign in with your {app_name} account or refine your search"
+            ).format(**locals())
             return JSONResponse({"success": False, "message": message})
         else:
             celery_worker_running = task_management.check_if_celery_available()
@@ -214,7 +223,9 @@ def export_results(request):
                 request_values = dict(request.GET)
                 request_values["path"] = request.get_full_path()
                 result = tasks.export_search_results.apply_async(
-                    (request.user.id, request_values, format, report_link), link=tasks.update_user_task_record.s(), link_error=tasks.log_error.s()
+                    (request.user.id, request_values, format, report_link),
+                    link=tasks.update_user_task_record.s(),
+                    link_error=tasks.log_error.s(),
                 )
                 message = _(
                     "{total} instances have been submitted for export. \
@@ -222,7 +233,9 @@ def export_results(request):
                 ).format(**locals())
                 return JSONResponse({"success": True, "message": message})
             else:
-                message = _("Your search exceeds the {download_limit} instance download limit. Please refine your search").format(**locals())
+                message = _("Your search exceeds the {download_limit} instance download limit. Please refine your search").format(
+                    **locals()
+                )
                 return JSONResponse({"success": False, "message": message})
 
     elif format == "tilexl":
@@ -237,7 +250,7 @@ def export_results(request):
             return zip_utils.zip_response(export_files, zip_file_name=f"{settings.APP_NAME}_export.zip")
     else:
         exporter = SearchResultsExporter(search_request=request)
-        export_files, export_info = exporter.export(format,report_link)
+        export_files, export_info = exporter.export(format, report_link)
 
         if len(export_files) == 0 and format == "shp":
             message = _(
