@@ -37,6 +37,7 @@ from arches.app.search.mappings import TERMS_INDEX, RESOURCE_RELATIONS_INDEX, RE
 from arches.app.search.elasticsearch_dsl_builder import Query, Bool, Terms, Nested
 from arches.app.utils import import_class_from_string
 from arches.app.utils.label_based_graph import LabelBasedGraph
+from arches.app.utils.label_based_graph_v2 import LabelBasedGraph as LabelBasedGraphV2
 from guardian.shortcuts import assign_perm, remove_perm
 from guardian.exceptions import NotUserNorGroup
 from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializer
@@ -595,7 +596,7 @@ class Resource(models.ResourceInstance):
 
         return JSONSerializer().serializeToPython(ret)
 
-    def to_json(self, compact=True, hide_empty_nodes=False, user=None, perm=None):
+    def to_json(self, compact=True, hide_empty_nodes=False, user=None, perm=None, version=None):
         """
         Returns resource represented as disambiguated JSON graph
 
@@ -603,10 +604,13 @@ class Resource(models.ResourceInstance):
         compact -- type bool: hide superfluous node data
         hide_empty_nodes -- type bool: hide nodes without data
         """
-        return LabelBasedGraph.from_resource(resource=self, compact=compact, hide_empty_nodes=hide_empty_nodes, user=user, perm=perm)
+        if version is None:
+            return LabelBasedGraph.from_resource(resource=self, compact=compact, hide_empty_nodes=hide_empty_nodes, user=user, perm=perm)
+        elif version == "beta":
+            return LabelBasedGraphV2.from_resource(resource=self, compact=compact, hide_empty_nodes=hide_empty_nodes, user=user, perm=perm)
 
     @staticmethod
-    def to_json__bulk(resources, compact=True, hide_empty_nodes=False):
+    def to_json__bulk(resources, compact=True, hide_empty_nodes=False, version=None):
         """
         Returns list of resources represented as disambiguated JSON graphs
 
@@ -615,7 +619,11 @@ class Resource(models.ResourceInstance):
         compact -- type bool: hide superfluous node data
         hide_empty_nodes -- type bool: hide nodes without data
         """
-        return LabelBasedGraph.from_resources(resources=resources, compact=compact, hide_empty_nodes=hide_empty_nodes)
+
+        if version is None:
+            return LabelBasedGraph.from_resources(resources=resources, compact=compact, hide_empty_nodes=hide_empty_nodes)
+        elif version == "beta":
+            return LabelBasedGraphV2.from_resources(resources=resources, compact=compact, hide_empty_nodes=hide_empty_nodes)
 
     def get_node_values(self, node_name):
         """

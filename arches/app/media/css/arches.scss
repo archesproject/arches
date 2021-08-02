@@ -10440,6 +10440,7 @@ ul.pagination {
 .calendar.picker {
     max-width: 175px;
     min-width: 175px;
+    position: relative;
 }
 
 .dropdown-crud {
@@ -13303,6 +13304,15 @@ a.jstree-anchor.permissions-widget {
     text-decoration: none;
 }
 
+.iiif-gallery-sequence-labels {
+    display: inline-flex;
+    padding: 5px
+}
+
+.tabbed-workflow-step-container .iiif-gallery-sequence-labels {
+    display: none;
+}
+
 .iiif-gallery-panel {
     display: flex;
     flex-direction: column;
@@ -14050,6 +14060,37 @@ a.jstree-anchor.permissions-widget {
             background-color: rgba(0, 0, 0, 0.05);
         }
     }
+}
+
+.rr-viewer-selector {
+    background: #ddd;
+}
+
+.rr-viewer-selector-title {
+    min-width: 200px;
+    text-align: center;
+    font-size: 13px;
+    padding: 9px 15px;
+    color: #666;
+    background: #fff;
+    display: table-cell;
+    border-right: 1px solid #BBD1EA;
+}
+
+.rr-viewer-selector-title.selected {
+    color: #25476A;
+    cursor: default;
+}
+
+.rr-viewer-selector-title.disabled {
+    cursor: pointer;
+    background: #F7F9FB;
+    border-bottom: 1px solid #BBD1EA;
+}
+
+.rr-viewer-selector-title.disabled:hover {
+    cursor: pointer;
+    background: #bbb;
 }
 
 @keyframes loader {
