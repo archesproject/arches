@@ -641,7 +641,7 @@ define([
         this.locked = params.locked;
         this.lockExternalStep = params.lockExternalStep;
         this.lockableExternalSteps = params.lockableExternalSteps;
-        
+
         /* 
             `pageLayout` is an observableArray of arrays representing section Information ( `sectionInfo` ).
 
@@ -712,6 +712,7 @@ define([
             }
 
             Object.values(self.workflowComponentAbstractLookup()).forEach(function(workflowComponentAbstract) {
+                console.log('workflowcomponentabstract', workflowComponentAbstract)
                 if (!workflowComponentAbstract.complete()) {
                     isStepComplete = false;
                 }
@@ -720,6 +721,7 @@ define([
             return isStepComplete;
         });
         this.isStepComplete.subscribe(function(isStepComplete) {
+            console.log("isstepcomplete", isStepComplete)
             params.complete(isStepComplete);
         });
 

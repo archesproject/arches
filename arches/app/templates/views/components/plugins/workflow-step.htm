@@ -3,7 +3,6 @@
 
 <div class='tabbed-workflow-step-body'>
     <!-- ko with: step -->
-        <div style="display:none" data-bind="text: console.log($data, $parent)"></div>
         <div 
             class='workflow-step-loading-mask loading-mask' 
             data-bind="visible: $data.loading() || $data.saving()"

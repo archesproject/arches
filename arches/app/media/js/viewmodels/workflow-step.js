@@ -34,6 +34,10 @@ define([
         this.loading = ko.observable(false);
 
         this.complete = ko.observable(false);
+        this.complete.subscribe(function(complete) {
+            console.log("STEP COMPLETE", complete)
+        })
+
         this.required = ko.observable(ko.unwrap(config.required));
         this.autoAdvance = ko.observable(true);
 
@@ -99,6 +103,7 @@ define([
             return config.workflow.activeStep() === this;
         }, this);
         this.active.subscribe(function(active) {
+            console.log("active", active)
             if (active) { 
                 self.setStepIdToUrl(); 
                 self.getExternalStepData();

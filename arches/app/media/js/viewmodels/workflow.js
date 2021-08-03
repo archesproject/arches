@@ -29,6 +29,9 @@ define([
         this.steps = ko.observableArray();
         
         this.activeStep = ko.observable();
+        this.activeStep.subscribe(function(activeStep) {
+            console.log('step', activeStep)
+        })
         
         this.isWorkflowFinished = ko.observable(false);
         
@@ -45,14 +48,6 @@ define([
         this.ready = ko.observable(false);  // legacy  DO NOT USE
 
         this.workflowName = ko.observable();
-        // this.workflowName.subscribe(function(workflowName) {
-        //     if (workflowName) {
-        //         var components = _.unique(self.steps().map(function(step) {return step.component;}));
-        //         require(components, function() { self.initialize(); });
-        //     }
-        // });
-
-        // this.loading = config.loading || ko.observable(false);
         
         this.alert = config.alert || ko.observable(null);
         this.quitUrl = arches.urls.home;
@@ -60,11 +55,15 @@ define([
         this.warning = '';
 
         this.initialize = function() {
+            /* BEGIN workflow metadata logic */ 
             if (self.componentName) {
-                self.getJSON(self.componentName);
+                self.getWorkflowMetaData(self.componentName).then(function(workflowJson) {
+                    self.workflowName(workflowJson.name);
+                });
             }
+            /* END workflow metadata logic */ 
 
-            /* workflow ID url logic */  
+            /* BEGIN workflow id logic */ 
             var currentWorkflowId = self.getWorkflowIdFromUrl();
             if (currentWorkflowId) {
                 self.id(currentWorkflowId)
@@ -73,39 +72,37 @@ define([
                 self.id(uuid.generate());
                 self.setWorkflowIdToUrl();
             }
+            /* END workflow id logic */ 
 
-            /* cached Step data logic */ 
-            if (self.getFromLocalStorage(WORKFLOW_ID_LABEL) === self.id()) {
-                var cachedStepIds = self.getFromLocalStorage(STEP_IDS_LABEL);
-                self.createSteps(cachedStepIds);
-            }
-            else {
+            /* BEGIN workflow step creation logic */ 
+            if (self.getFromLocalStorage(WORKFLOW_ID_LABEL) !== self.id()) {
                 self.setToLocalStorage(WORKFLOW_ID_LABEL, self.id());
-                localStorage.removeItem(STEPS_LABEL);
-
-                self.createSteps();
-
-                var stepIds = self.steps().map(function(step) { return step.id(); })
-                self.setToLocalStorage(STEP_IDS_LABEL, stepIds);
+                localStorage.removeItem(STEPS_LABEL);  /* remove step data created by previous workflow from localstorage */
             }
 
-            self.getFurthestValidStepIndex();
+            var seedStep = self.createStep(self.stepConfig[0]);
+            self.steps([seedStep]);
+            self.activeStep(seedStep);
+            self.updateStepIndices();
+            
+            self.updateStepPath();
+            /* END workflow step creation logic */ 
 
-            /* cached activeStep logic */ 
-            var cachedActiveStep = self.steps().find(function(step) {
-                return step.id() === self.getStepIdFromUrl();
-            });
+            // /* workflow activeStep logic */ 
+            // var cachedActiveStep = self.steps().find(function(step) {
+            //     return step.id() === self.getStepIdFromUrl();
+            // });
 
-            if (cachedActiveStep) {
-                self.activeStep(cachedActiveStep);
-            }
-            else {
-                self.removeStepIdFromUrl();
+            // if (cachedActiveStep) {
+            //     self.activeStep(cachedActiveStep);
+            // }
+            // else {
+            //     self.removeStepIdFromUrl();
 
-                if(self.steps().length > 0) {
+            //     if(self.steps().length > 0) {
                     self.activeStep(self.steps()[0]);
-                }
-            }
+            //     }
+            // }
         };
 
         this.wastebinWarning = function(val){
@@ -158,31 +155,20 @@ define([
 
         this.createStep = function(step) {
             step.workflow = self;
-            // step.loading = self.loading;
-            step.alert = self.alert;
+            
+            var stepNameToIdLookup = self.getFromLocalStorage(STEP_IDS_LABEL);
 
+            // console.log('111', step, stepNameToIdLookup)
+            
             // /* if stepIds exist for this workflow in localStorage, set correct value */ 
             // if (cachedStepIds) { step.id = cachedStepIds[i]; }
-
+            
             step.informationBoxDisplayed = ko.observable(self.getInformationBoxDisplayedStateFromLocalStorage(step.name));
             step.informationBoxDisplayed.subscribe(function(val){
                 self.setMetadataToLocalStorage(ko.unwrap(step.name), 'informationBoxDisplayed', val);
             })
 
             return new Step(step);
-
-            // newStep.complete.subscribe(function(complete) {
-            //     self.getFurthestValidStepIndex();
-            //     if (complete && self.steps()[i].autoAdvance()) self.next();
-            // });
-        };
-
-        this.createSteps = function() {
-            self.stepConfig.forEach(function(stepData) {
-                self.steps.push(self.createStep(stepData));
-            });
-
-            self.updateStepIndices();
         };
 
         this.updateStepIndices = function() {
@@ -190,7 +176,6 @@ define([
 
             var updatedSteps = steps.map(function(step, index) {
                 step['_index'] = index;
-
                 return step;
             });
 
@@ -205,43 +190,44 @@ define([
             });
         };
 
-        this.handleActiveStepStepInjection = function() {
-            return new Promise(function(resolve, _reject) {
-                var activeStep = self.activeStep();
+        // this.handleActiveStepStepInjection = function() {
+        //     return new Promise(function(resolve, _reject) {
+        //         var activeStep = self.activeStep();
     
-                var injectedStepData = activeStep.resolveInjectedStep();
-                        
-                if (injectedStepData) {
-                    var nextStep = self.steps()[activeStep._index + 1];
+        //         var stepInjectionConfig = activeStep.stepInjectionConfig;
+        //         if (stepInjectionConfig) {
+        //             var nextStep = self.steps()[activeStep._index + 1];
     
-                    if (!nextStep || nextStep.name() !== injectedStepData.name) {
-                        var steps = self.steps();
+        //             if (!nextStep || nextStep.name() !== stepInjectionConfig.name) {
+        //                 var steps = self.steps();
 
-                        var newStep = self.createStep(injectedStepData);
-                        steps.splice(activeStep._index + 1, 0, newStep);
+        //                 var newStep = self.createStep(stepInjectionConfig);
+        //                 steps.splice(activeStep._index + 1, 0, newStep);
                         
-                        self.steps(steps);
+        //                 self.steps(steps);
 
-                        self.updateStepIndices();
+        //                 self.updateStepIndices();
+        //                 self.getFurthestValidStepIndex();
                         
-                        self.getFurthestValidStepIndex();
-                        resolve(newStep);
-                    }
-                    else {
-                        self.getFurthestValidStepIndex();
-                        resolve(nextStep);
-                    }
-                }
-                else {
-                    self.getFurthestValidStepIndex();
-                    resolve(null);
-                }
-            });
-        };
+        //                 resolve(newStep);
+        //             }
+        //             else {
+        //                 self.getFurthestValidStepIndex();
+        //                 resolve(nextStep);
+        //             }
+        //         }
+        //         else {
+        //             self.getFurthestValidStepIndex();
+        //             resolve(null);
+        //         }
+        //     });
+        // };
 
         this.getStepData = function(stepName) {
             /* ONLY to be used as intermediary for when a step needs data from a different step in the workflow */
             var step = self.steps().find(function(step) { return ko.unwrap(step.name) === ko.unwrap(stepName) });
+
+            console.log("MEHBEH", step)
 
             if (step) { 
                 return new Promise(function(resolve) {
@@ -354,13 +340,15 @@ define([
             }
         };
 
-        this.getJSON = function(pluginJsonFileName) {
-            $.ajax({
-                type: "GET",
-                url: arches.urls.plugin(pluginJsonFileName),
-                data: { "json":true },
-                context: self,
-                success: function(workflowJson){ self.workflowName(workflowJson.name); }
+        this.getWorkflowMetaData = function(pluginJsonFileName) {
+            return new Promise(function(resolve, _reject) {
+                $.ajax({
+                    type: "GET",
+                    url: arches.urls.plugin(pluginJsonFileName),
+                    data: { "json":true },
+                    context: self,
+                    success: function(workflowJson){ resolve(workflowJson); }
+                });
             });
         };
 
@@ -452,6 +440,122 @@ define([
                     }
                 )
             );
+        };
+
+        this.updateStepPath = function() {
+            var findFurthestValidConfiguredStepIndex = function() {
+                /* 
+                    because `self.steps()` idx can be higher than `self.stepConfig` idx,
+                    we backtrack from active step to first step to appear in `self.stepConfig`
+                */ 
+                var stepIdx = self.activeStep()._index;
+                var foundStepConfigStepIdx = -1;
+                
+                while (stepIdx > -1) {
+                    var step = self.steps()[stepIdx];
+                    var foundStepConfigStep = self.stepConfig.find(function(stepConfigStep) {
+                        return stepConfigStep.name() === step.name();
+                    });
+
+                    if (foundStepConfigStep) {
+                        foundStepConfigStepIdx = stepIdx;
+                    }
+
+                    stepIdx -= 1;
+                }
+
+                return foundStepConfigStepIdx;
+            };
+
+            var stepConfigIdx = findFurthestValidConfiguredStepIndex();
+            var furthestValidConfiguredStep = self.steps()[stepConfigIdx];
+            var step;
+
+            var remainingStepPath = [];
+
+            while (
+                !step 
+                || step.name() !== ko.unwrap(self.stepConfig[self.stepConfig.length - 1].name)
+                /* runs until it creates the last step in the step configuration */ 
+            ) {
+                var parentStep = remainingStepPath.length ? remainingStepPath[remainingStepPath.length - 1] : furthestValidConfiguredStep;
+
+                if (parentStep && parentStep['stepInjectionConfig']) {
+                    if (parentStep.complete()) {
+                        step = self.createStep(parentStep['stepInjectionConfig']['injectionLogic']());
+                    }
+                    else {
+                        step = self.createStep(ko.unwrap(parentStep['stepInjectionConfig']['defaultStepChoice']));
+                    }
+                }
+                else {
+                    stepConfigIdx += 1;
+                    step = self.createStep(self.stepConfig[stepConfigIdx]);
+                }
+    
+                remainingStepPath.push(step);
+            }
+            
+
+
+            // if (self.activeStep().name() === self.steps()[furthestValidConfiguredStepIdx].name()) {
+
+            // }
+
+            // if (self.activeStep() && self.activeStep().name() === self.stepConfig[stepConfigIdx].name()) {
+            // }
+
+            // // console.log("STEP CONFIG IDX", stepConfigIdx, self.steps())
+            // while (stepConfigIdx < self.stepConfig.length) {
+            //     var step;
+
+            //     else {
+            //         var parentStep = remainingStepPath[remainingStepPath.length - 1];
+    
+            //         if (parentStep && parentStep['stepInjectionConfig']) {
+            //             // if (parentStep.complete()) {
+            //             //     step = self.createStep(parentStep['stepInjectionConfig']['injectionLogic']());
+            //             // }
+            //             // else {
+            //                 step = self.createStep(ko.unwrap(parentStep['stepInjectionConfig']['defaultStepChoice']));
+            //             // }
+            //         }
+            //         else {
+            //             step = self.createStep(self.stepConfig[stepConfigIdx]);
+            //             stepConfigIdx += 1;
+            //         }
+    
+            //     }
+
+
+            // }
+
+            var spliceIdx;
+            if (self.activeStep()) {
+                /* corner case for completing first step */ 
+                if (self.activeStep()._index === 0) {
+                    spliceIdx = 1;
+                }
+                else {
+                    spliceIdx = self.activeStep()._index;
+                }
+            }
+            else {
+                spliceIdx = 0;
+            }
+
+            console.log("REMAINING STEP PATH", remainingStepPath)
+
+            self.steps.splice(spliceIdx, remainingStepPath.length, ...remainingStepPath);
+
+            var updatedStepNameToIdLookup = self.steps().reduce(function(acc, step) { 
+                acc[step.name()] = step.id(); 
+                return acc;
+            }, {});
+
+            self.setToLocalStorage(STEP_IDS_LABEL, updatedStepNameToIdLookup);
+            self.updateStepIndices();
+            self.getFurthestValidStepIndex();
         };
 
         this.next = function(){

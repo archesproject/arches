@@ -188,9 +188,8 @@
                     data-bind="
                         click: function() {
                             $data.saveActiveStep().then(function() {
-                                $data.handleActiveStepStepInjection().then(function() {
-                                    $data.next();
-                                });
+                                $data.updateStepPath();
+                                $data.next();
                             });
                         },
                     "
