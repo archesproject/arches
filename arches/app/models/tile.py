@@ -601,7 +601,7 @@ class Tile(models.TileModel):
         return tile
 
     @staticmethod
-    def update_node_value(nodeid, value, tileid=None, nodegroupid=None, resourceinstanceid=None):
+    def update_node_value(nodeid, value, tileid=None, nodegroupid=None, resourceinstanceid=None, transaction_id=None):
         """
         Updates the value of a node in a tile. Creates the tile and parent tiles if they do not yet
         exist.
@@ -610,11 +610,11 @@ class Tile(models.TileModel):
         if tileid and models.TileModel.objects.filter(pk=tileid).exists():
             tile = Tile.objects.get(pk=tileid)
             tile.data[nodeid] = value
-            tile.save()
+            tile.save(transaction_id=transaction_id)
         elif models.TileModel.objects.filter(Q(resourceinstance_id=resourceinstanceid), Q(nodegroup_id=nodegroupid)).count() == 1:
             tile = Tile.objects.filter(Q(resourceinstance_id=resourceinstanceid), Q(nodegroup_id=nodegroupid))[0]
             tile.data[nodeid] = value
-            tile.save()
+            tile.save(transaction_id=transaction_id)
         else:
             new_resource_created = False
             if not resourceinstanceid:
@@ -626,13 +626,13 @@ class Tile(models.TileModel):
             tile = Tile.get_blank_tile(nodeid, resourceinstanceid)
             if nodeid in tile.data:
                 tile.data[nodeid] = value
-                tile.save(new_resource_created=new_resource_created)
+                tile.save(new_resource_created=new_resource_created, transaction_id=transaction_id)
             else:
-                tile.save(new_resource_created=new_resource_created)
+                tile.save(new_resource_created=new_resource_created, transaction_id=transaction_id)
                 if not nodegroupid:
                     nodegroupid = models.Node.objects.get(pk=nodeid).nodegroup_id
                 if nodegroupid and resourceinstanceid:
-                    tile = Tile.update_node_value(nodeid, value, nodegroupid=nodegroupid, resourceinstanceid=resourceinstanceid)
+                    tile = Tile.update_node_value(nodeid, value, nodegroupid=nodegroupid, resourceinstanceid=resourceinstanceid, transaction_id=transaction_id)
         return tile
 
     def __preSave(self, request=None):
