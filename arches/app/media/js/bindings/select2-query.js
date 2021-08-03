@@ -52,7 +52,7 @@ define([
             if (ko.unwrap(select2Config.disabled)) {
                 $(el).select2("disable");
                 select2Config.disabled.subscribe(function(val){
-                    if (val === false) {
+                    if (!val) {
                         $(el).select2("enable");
                     }
                 });
