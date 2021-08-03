@@ -19,7 +19,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 <div class="scroll-y">
 
     <!-- Main Editor -->
-    <div id="">
+    <div>
 
         <!-- Profile Summary -->
         <div class="profile-summary-page">
@@ -30,7 +30,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                 <img class="widget-bg img-responsive" src='{{ STATIC_URL }}img/user/profile_background.png'>
                 -->
 
-                <div class="">
+                <div>
                     <div class="profile-full-name">
                         {{user.first_name}} {{user.last_name}}
                     </div>
@@ -44,7 +44,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
             <div class="profile-sections">
 
                 <!-- My Account Info -->
-                <section id="" class="profile-list">
+                <section class="profile-list">
                     <div class="account-wrapper">
                         <div class="row relative">
 
@@ -357,9 +357,9 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                             </div>
 
                             <!-- Survey List -->
-                            <div id="" class="row">
+                            <div class="row">
                                 <div class="col-sm-9 col-sm-offset-3 mar-top">
-                                    <div class="">
+                                    <div>
                                         <!--ko foreach: {data: filteredMobileSurveys(), as: 'vm'} -->
                                         <div class="project-panel">
 
@@ -376,7 +376,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                                                 </div>
                                                 <h3 class="project-panel-title" data-bind="text: vm.mobilesurvey.name() === '' ? '{% trans "Unnamed Survey" %}' : vm.mobilesurvey.name()"></h3>
 
-                                                <div class="">
+                                                <div>
                                                     <div class="project-details">
                                                         <a id="view-project-details-btn" class="text-primary text-semibold" data-bind="click: function(val){val.mobilesurvey.toggleShowDetails();}">{% trans 'View Details' %}</a>
                                                     </div>
@@ -384,54 +384,54 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                                             </div>
 
                                             <div class='profile-mpm-panel' data-bind="css: {'show-details': vm.mobilesurvey.showDetails}">
-                                                <div class="">
+                                                <div>
                                                     <p class="mpm-item-listing-header" style="margin-bottom: 0px;">
                                                         {% trans 'Project Summary' %}
                                                     </p>
                                                     <ul class="mpm-node-detail-metadata">
-                                                        <li class="">
+                                                        <li>
                                                             {% trans "Number of edits:" %} 0
                                                         </li>
-                                                        <li class="">
+                                                        <li>
                                                             {% trans "Contributors:" %} 0
                                                         </li>
-                                                        <li class="">
+                                                        <li>
                                                             {% trans "Offline Basemap:" %} {% trans "Streets-Grey" %}
                                                         </li>
                                                     </ul>
                                                 </div>
 
-                                                <div class="">
+                                                <div>
                                                     <p class="mpm-item-listing-header" style="margin-bottom: 0px;">
                                                         {% trans 'Groups/Users' %}
                                                     </p>
                                                     <ul class="mpm-node-detail-metadata">
-                                                        <li class="">
+                                                        <li>
 
                                                             {% trans 'Groups' %} (<span data-bind="text: vm.mobilesurvey.groups().length"></span>)
                                                             <ul class="mpm-node-detail-metadata" data-bind="foreach: _.filter(vm.mobilesurvey.identities, function(id){return (id.type === 'group' && _.contains(mobilesurvey.groups(), id.id))})">
-                                                                <li class="" data-bind="text: $data.name"></li>
+                                                                <li data-bind="text: $data.name"></li>
                                                             </ul>
                                                         </li>
                                                     </ul>
                                                     <ul class="mpm-node-detail-metadata">
-                                                        <li class="">
+                                                        <li>
                                                             {% trans 'Users' %} (<span data-bind="text: vm.mobilesurvey.users().length"></span>)
                                                             <ul class="mpm-node-detail-metadata" data-bind="foreach: _.filter(vm.mobilesurvey.identities, function(id){return (id.type === 'user' && _.contains(vm.mobilesurvey.users(), id.id))})">
-                                                                <li class="" data-bind="text: $data.name"></li>
+                                                                <li data-bind="text: $data.name"></li>
                                                             </ul>
                                                         </li>
                                                     </ul>
                                                 </div>
 
-                                                <div class="">
+                                                <div>
                                                     <p class="mpm-item-listing-header" style="margin-bottom: 0px;">
                                                         {% trans 'Models and Data Entry Cards' %}
                                                     </p>
 
                                                     <ul class="mpm-node-detail-metadata">
                                                         <!--ko foreach: {data: vm.resources, as: 'resource'} -->
-                                                        <li class="">
+                                                        <li>
                                                             <div data-bind="text: resource.name + ' (' + resource.cards.length + ' data entry cards)'"></div>
                                                             <!--ko foreach: {data: resource.cards, as: 'card'} -->
                                                             <ul class="mpm-node-detail-metadata">
