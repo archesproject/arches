@@ -103,9 +103,7 @@ define([
             return config.workflow.activeStep() === this;
         }, this);
         this.active.subscribe(function(active) {
-            console.log("active", active)
             if (active) { 
-                self.setStepIdToUrl(); 
                 self.getExternalStepData();
             }
         });
@@ -223,14 +221,6 @@ define([
             if (allStepsLocalStorageData[self.id()] && typeof allStepsLocalStorageData[self.id()][key] !== "undefined") {
                 return JSON.parse(allStepsLocalStorageData[self.id()][key]);
             }
-        };
-
-        this.setStepIdToUrl = function() {
-            var searchParams = new URLSearchParams(window.location.search);
-            searchParams.set(STEP_ID_LABEL, self.id());
-
-            var newRelativePathQuery = `${window.location.pathname}?${searchParams.toString()}`;
-            history.pushState(null, '', newRelativePathQuery);
         };
 
         this.getExternalStepData = function() {
