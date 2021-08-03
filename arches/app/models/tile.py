@@ -632,7 +632,9 @@ class Tile(models.TileModel):
                 if not nodegroupid:
                     nodegroupid = models.Node.objects.get(pk=nodeid).nodegroup_id
                 if nodegroupid and resourceinstanceid:
-                    tile = Tile.update_node_value(nodeid, value, nodegroupid=nodegroupid, resourceinstanceid=resourceinstanceid, transaction_id=transaction_id)
+                    tile = Tile.update_node_value(
+                        nodeid, value, nodegroupid=nodegroupid, resourceinstanceid=resourceinstanceid, transaction_id=transaction_id
+                    )
         return tile
 
     def __preSave(self, request=None):
