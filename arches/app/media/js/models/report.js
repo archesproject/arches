@@ -147,13 +147,24 @@ define(['jquery',
                     remainingResources = ko.observable();
                     paginator = ko.observable();
 
+                    var totalRelatedResources;
+                    if (value['related_resources']) {
+                        totalRelatedResources = value['related_resources']['total']['value'];
+                    }
+                    else if (value['resources']) {
+                        totalRelatedResources = value['resources'].length;
+                    }
+                    else {
+                        totalRelatedResources = 0;
+                    }
+
                     relatedResourcesLookup[graphId] = {
                         'graphId': graphId,
                         'loadedRelatedResources': relatedResources,
                         'name': value['name'] || value['related_resources']['node_config_lookup'][graphId]['name'],
                         'paginator': paginator,
                         'remainingResources': remainingResources,
-                        'totalRelatedResources': value['related_resources'] ? value['related_resources']['total']['value'] : 0,
+                        'totalRelatedResources': totalRelatedResources,
                     };
                 } else {
                     // else get pertinent references
@@ -170,17 +181,16 @@ define(['jquery',
                 */
                 if (!value['paginator']) {relatedResources.removeAll();}
 
-                if (value['related_resources']) {
+                if (value['related_resources']) { /* for paginated response */ 
                     // add new resource relationships to lookup entry
                     for (var resourceRelationship of value['related_resources']['resource_relationships']) {
-                        var relatedResource = value['related_resources']['related_resources'].find(function(resource) {
+                        let relatedResource = value['related_resources']['related_resources'].find(function(resource) {
                             return (
                                 resource.resourceinstanceid === resourceRelationship.resourceinstanceidto
                                 || resource.resourceinstanceid === resourceRelationship.resourceinstanceidfrom
                                 || this.attributes && resource.resourceinstanceid === this.attributes.graph.graphid  // self
                             );
                         });
-    
                         if (relatedResource) {
                             relatedResources.push({
                                 'displayName': relatedResource.displayname,
@@ -195,6 +205,15 @@ define(['jquery',
                     var remainingResourcesCount = value['related_resources']['total']['value'] - relatedResources().length;
     
                     remainingResources(remainingResourcesCount < resourceLimit ? remainingResourcesCount : resourceLimit);
+                }
+                else if (value['resources'].length > 0) {
+                    for (let relatedResource of value['resources']) {
+                        relatedResources.push({
+                            'displayName': relatedResource.displayname,
+                            'relationship': relatedResource.relationships[0],
+                            'link': arches.urls.resource_report + relatedResource.resourceinstanceid,
+                        });
+                    }
                 }
             }
 
