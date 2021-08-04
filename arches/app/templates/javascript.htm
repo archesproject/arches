@@ -259,6 +259,9 @@
                     return "{% url 'api_nodes' 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa' %}".replace('aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa', nodeid)
                 },
                 api_node_value: "{% url 'api_node_value' %}",
+                api_resource_report: function(resourceid){return "{% url 'api_resource_report' 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa' %}".replace('aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa', resourceid)},
+                api_bulk_resource_report: "{% url 'api_bulk_resource_report' %}",
+                api_bulk_disambiguated_resource_instance: "{% url 'api_bulk_disambiguated_resource_instance' %}",
                 api_resources: function(resourceid){return "{% url 'resources' 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa' %}".replace('aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa', resourceid)},
                 api_search_component_data: "{% url 'api_search_component_data' 'aaaa'%}".replace('aaaa', ''),
                 geojson: "{% url 'geojson' %}",
@@ -403,7 +406,8 @@
                 'mobileSurveyDesc': '{% trans "Summary of how this model participates in the survey" %}',
                 'groupingErrorTitle': '{% trans "Settings Conflict: Remove this card from grouped card?" %}',
                 'groupingErrorMessage': "{% trans 'The cardinality of this card can\'t be changed until you remove it from being grouped with the ${cardName} card.  Do you want to remove this card from being grouped with the ${cardName} card' %}",
-            }
+            },
+            version: '{{ app_settings.VERSION }}'
         };
     });
 
@@ -448,7 +452,8 @@
                 'componentname': '{{ template.componentname }}',
                 'component': '{{ template.component }}',
                 'defaultconfig': '{{ template.defaultconfig_json }}',
-                'name': '{{ template.name }}'
+                'name': '{{ template.name }}',
+                'preload_resource_data': '{{ template.preload_resource_data }}'
             },
         {% endfor %}{% endautoescape %}};
     });

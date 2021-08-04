@@ -127,18 +127,17 @@ define([
             }, this);
 
             this.viewModel.loading(true);
-            this.firstLoadComplete = ko.observable(false);  /* logic to not call `loading(complete)` too early in page load */
 
             BaseManagerView.prototype.initialize.call(this, options);
         },
 
         doQuery: function() {
             var queryString = JSON.parse(this.queryString());
+
             if (this.updateRequest) {
                 this.updateRequest.abort();
             }
 
-            this.viewModel.loading(true);
             this.updateRequest = $.ajax({
                 type: "GET",
                 url: arches.urls.search_results,
@@ -167,13 +166,6 @@ define([
                     }
                 },
                 complete: function(request, status) {
-                    if (!this.firstLoadComplete()) {
-                        this.firstLoadComplete(true);
-                    }
-                    else {
-                        this.viewModel.loading(false);
-                    }
-
                     this.updateRequest = undefined;
                     window.history.pushState({}, '', '?' + $.param(queryString).split('+').join('%20'));
                 }

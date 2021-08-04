@@ -3,9 +3,9 @@ define([
     'underscore',
     'viewmodels/widget',
     'arches',
-    'views/components/resource-summary',
-    'utils/ontology'
-], function(ko, _, WidgetViewModel, arches, ResourceSummary, ontologyUtils) {
+    'utils/ontology',
+    'views/components/resource-report-abstract',
+], function(ko, _, WidgetViewModel, arches, ontologyUtils) {
     var resourceLookup = {};
     var graphCache = {};
     require(['views/components/related-instance-creator']);
