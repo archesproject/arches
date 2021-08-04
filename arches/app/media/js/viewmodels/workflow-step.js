@@ -35,7 +35,7 @@ define([
 
         this.complete = ko.observable(false);
         this.complete.subscribe(function(complete) {
-            console.log("STEP COMPLETE", complete)
+            console.log("STEP COMPLETE", complete, self.name())
         })
 
         this.required = ko.observable(ko.unwrap(config.required));
@@ -52,15 +52,15 @@ define([
 
         /* BEGIN coerce externalStepData */ 
         var externalStepSourceData = ko.unwrap(config.externalstepdata) || {};
-        Object.keys(externalStepSourceData).forEach(function(key) {
-            if (key !== '__ko_mapping__') {
-                self.externalStepData[key] = {
-                    stepName: externalStepSourceData[key]
-                };
-            }
+        Object.keys(koMapping.toJS(externalStepSourceData)).forEach(function(key) {
+            self.externalStepData[key] = {
+                stepName: externalStepSourceData[key]
+            };
         });
         delete config.externalstepdata;
         /* END coerce externalStepData */
+
+        console.log("AADFDSFDSFDSFDS", self.externalStepData)
         
         this.value = ko.observable();
         this.value.subscribe(function(value) {
@@ -103,8 +103,17 @@ define([
             return config.workflow.activeStep() === this;
         }, this);
         this.active.subscribe(function(active) {
+            console.log("AAAAAA", self.name(), active)
+            self.loading(true);
             if (active) { 
-                self.getExternalStepData();
+                self.getExternalStepData().then(function(externalStepData){
+                    if (externalStepData) {
+                        Object.entries(self.externalStepData).forEach(function([externalStepReferenceName, value]) {
+                            self.externalStepData[externalStepReferenceName]['data'] = externalStepData[value.stepName];
+                        });
+                    }
+                    self.loading(false);
+                });
             }
         });
 
@@ -116,8 +125,6 @@ define([
 
         this.initialize = function() {
             _.extend(this, config);
-
-            self.loading(true);
 
             /* cached ID logic */ 
             var cachedId = ko.unwrap(config.id);
@@ -160,6 +167,7 @@ define([
                 resolve(preSaveCallback());
             });
             var localStoragePromise = new Promise(function(resolve, _reject) {
+                console.log('svae', self.name(), self.value())
                 self.setToLocalStorage('value', self.value());
 
                 resolve(self.value())
@@ -179,13 +187,6 @@ define([
                     });
                 });
             });
-        };
-
-        this.resolveInjectedStep = function() {
-            if (config.injectStepIntoWorkflow) {
-                self.locked(true);
-                return config.injectStepIntoWorkflow();
-            }
         };
 
         this.clear = function() {
@@ -224,11 +225,24 @@ define([
         };
 
         this.getExternalStepData = function() {
-            Object.keys(self.externalStepData).forEach(function(key) {
-                config.workflow.getStepData(externalStepSourceData[key]).then(function(data) {
-                    console.log("CCCC", key, data)
-                    self.externalStepData[key]['data'] = data;
+            return new Promise(function(resolve, _reject) {
+                var promises = [];
+
+                Object.keys(self.externalStepData).forEach(function(key) {
+                    promises.push(config.workflow.getStepData(externalStepSourceData[key]));
                 });
+
+                if (promises.length) {
+                    Promise.all(promises).then(function(resolvedPromiseData) {
+
+                        resolve(...resolvedPromiseData);
+                        console.log("resovledpromsedata", resolvedPromiseData)
+
+                    });
+                }
+                else {
+                    resolve(null);
+                }
             });
         };
 

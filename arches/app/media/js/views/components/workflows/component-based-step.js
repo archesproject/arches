@@ -597,7 +597,10 @@ define([
             if (self.hasUnsavedData()) {
                 var completeSubscription = self.complete.subscribe(function(complete) {
                     if (complete) {
-                        fooResolve(self.savedData());
+                        fooResolve({
+                            [self.componentData.uniqueInstanceName]: self.savedData(),
+                        });
+
                         completeSubscription.dispose();  /* disposes after save */
                     }
                 });
@@ -605,7 +608,9 @@ define([
                 self.save();
             }
             else {
-                fooResolve(self.savedData());
+                fooResolve({
+                    [self.componentData.uniqueInstanceName]: self.savedData(),
+                });
             }
         };
 
@@ -656,16 +661,10 @@ define([
         */ 
         this.workflowComponentAbstractLookup = ko.observable({});
 
-        this.dataToPersist = ko.observable({});
-        this.dataToPersist.subscribe(function(data) {
-            params.value(data);
-        });
-
         this.hasUnsavedData = ko.observable(false);        
         this.hasUnsavedData.subscribe(function(hasUnsavedData) {
             params.hasDirtyTile(hasUnsavedData);
         });
-
 
         this.isStepLoading = ko.computed(function() {
             var isLoading = false;
@@ -676,7 +675,6 @@ define([
             }
 
             Object.values(self.workflowComponentAbstractLookup()).forEach(function(workflowComponentAbstract) {
-                console.log(workflowComponentAbstract)
                 if (workflowComponentAbstract.loading()) {
                     isLoading = true;
                 }
@@ -712,7 +710,6 @@ define([
             }
 
             Object.values(self.workflowComponentAbstractLookup()).forEach(function(workflowComponentAbstract) {
-                console.log('workflowcomponentabstract', workflowComponentAbstract)
                 if (!workflowComponentAbstract.complete()) {
                     isStepComplete = false;
                 }
@@ -721,7 +718,6 @@ define([
             return isStepComplete;
         });
         this.isStepComplete.subscribe(function(isStepComplete) {
-            console.log("isstepcomplete", isStepComplete)
             params.complete(isStepComplete);
         });
 
@@ -786,12 +782,6 @@ define([
                 self.alert,
             );
 
-            workflowComponentAbstract.savedData.subscribe(function() {
-                var dataToPersist = self.dataToPersist();
-                dataToPersist[workflowComponentAbtractData.uniqueInstanceName] = workflowComponentAbstract.savedData();
-                self.dataToPersist(dataToPersist);
-            });
-
             /* 
                 checks if all `workflowComponentAbstract`s have saved data if a single `workflowComponentAbstract` 
                 updates its data, neccessary for correct aggregate behavior
@@ -823,6 +813,10 @@ define([
 
             return new Promise(function(resolve, _reject) {
                 Promise.all(savePromises).then(function(values) {
+                    console.log("values", values)
+
+                    
+                    params.value(...values);
                     resolve(values);
                 });
             });

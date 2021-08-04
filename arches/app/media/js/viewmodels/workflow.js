@@ -92,7 +92,10 @@ define([
             var cachedActiveStep = self.steps().find(function(step) {
                 return step.id() === cachedStepId;
             });
-            self.activeStep(cachedActiveStep);
+
+            if (cachedActiveStep) {
+                self.activeStep(cachedActiveStep);
+            }
             /* END workflow step creation logic */ 
         };
         
@@ -181,24 +184,28 @@ define([
         };
 
         this.getStepData = function(stepName) {
-            /* ONLY to be used as intermediary for when a step needs data from a different step in the workflow */
-            var step = self.steps().find(function(step) { return ko.unwrap(step.name) === ko.unwrap(stepName) });
+            return new Promise(function(resolve) {
+                /* ONLY to be used as intermediary for when a step needs data from a different step in the workflow */
+                var step = self.steps().find(function(step) { return ko.unwrap(step.name) === ko.unwrap(stepName) });
 
-            if (step) { 
-                return new Promise(function(resolve) {
+                console.log("AAA", step, step.saving(), step.value())
+                if (step) { 
                     if (step.saving()) {
                         var savingSubscription = step.saving.subscribe(function(saving) {
                             if (!saving) {
                                 savingSubscription.dispose(); /* self-disposing subscription */
-                                resolve(step.value()); 
+                                resolve({ [step.name()]: step.value() }); 
                             }
                         });
                     }
                     else {
-                        resolve(step.value());
+                        resolve({ [step.name()]: step.value() });
                     }
-                });
-            }
+                }
+                else {
+                    resolve(null);
+                }
+            });
         };
 
         this.toggleStepLockedState = function(stepName, locked) {
@@ -219,14 +226,6 @@ define([
 
             var newRelativePathQuery = `${window.location.pathname}?${searchParams.toString()}`;
             history.pushState(null, '', newRelativePathQuery);
-        };
-
-        this.removeStepIdFromUrl = function() {
-            var searchParams = new URLSearchParams(window.location.search);
-            searchParams.delete(STEP_ID_LABEL);
-
-            var newRelativePathQuery = `${window.location.pathname}?${searchParams.toString()}`;
-            history.replaceState(null, '', newRelativePathQuery);
         };
 
         this.getFurthestValidStepIndex = function() {
@@ -325,7 +324,7 @@ define([
                 remainingStepPath.push(step);
             }
 
-            self.steps.splice(self.activeStep()._index + 1, remainingStepPath.length, ...remainingStepPath);
+            self.steps.splice(findFurthestValidConfiguredStepIndex() + 1, remainingStepPath.length, ...remainingStepPath);
 
             var updatedStepNameToIdLookup = self.steps().reduce(function(acc, step) { 
                 acc[step.name()] = step.id(); 
