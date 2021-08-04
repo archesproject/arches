@@ -20,6 +20,7 @@ from base64 import b64decode
 from datetime import datetime
 import logging
 import os
+import json
 from django.contrib.auth import authenticate
 from django.contrib.gis.geos import GEOSGeometry
 from django.core.cache import cache
@@ -245,6 +246,9 @@ def search_results(request):
     pages = request.GET.get("pages", None)
     total = int(request.GET.get("total", "0"))
     resourceinstanceid = request.GET.get("id", None)
+    load_tiles = request.GET.get("tiles", None)
+    if load_tiles is not None:
+        load_tiles = json.loads(load_tiles)
     se = SearchEngineFactory().create()
     search_results_object = {"query": Query(se)}
 
@@ -276,7 +280,7 @@ def search_results(request):
     dsl.include("displaydescription")
     dsl.include("map_popup")
     dsl.include("provisional_resource")
-    if request.GET.get("tiles", None) is not None:
+    if load_tiles is not False:
         dsl.include("tiles")
     if for_export or pages:
         results = dsl.search(index=RESOURCES_INDEX, scroll="1m")
