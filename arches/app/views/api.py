@@ -1228,6 +1228,7 @@ class NodeValue(APIBase):
         resourceid = request.POST.get("resourceinstanceid", None)
         format = request.POST.get("format")
         operation = request.POST.get("operation")
+        transaction_id = request.POST.get("transaction_id")
 
         # get node model return error if not found
         try:
@@ -1254,7 +1255,7 @@ class NodeValue(APIBase):
                 data = datatype.update(tile, data, nodeid, action=operation)
 
             # update/create tile
-            new_tile = TileProxyModel.update_node_value(nodeid, data, tileid, resourceinstanceid=resourceid)
+            new_tile = TileProxyModel.update_node_value(nodeid, data, tileid, resourceinstanceid=resourceid, transaction_id=transaction_id)
 
             response = JSONResponse(new_tile, status=200)
         else:

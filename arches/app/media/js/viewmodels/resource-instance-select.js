@@ -299,7 +299,7 @@ define([
         var resourceToAdd = ko.observable("");
 
         this.disabled = ko.computed(function() {
-            return ko.unwrap(self.waitingForGraphToDownload) || ko.unwrap(params.disabled) || ko.unwrap(params.form?.locked);
+            return ko.unwrap(self.waitingForGraphToDownload) || ko.unwrap(params.disabled) || !!ko.unwrap(params.form?.locked);
         });
         
         this.select2Config = {
