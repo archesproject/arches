@@ -802,7 +802,7 @@ define([
             self.workflowComponentAbstractLookup(workflowComponentAbstractLookup);
         };
 
-        this.save = function() {
+        this.save = function(fooResolve) {
             var savePromises = [];
             
             Object.values(self.workflowComponentAbstractLookup()).forEach(function(workflowComponentAbstract) {
@@ -811,14 +811,11 @@ define([
                 }));
             });
 
-            return new Promise(function(resolve, _reject) {
-                Promise.all(savePromises).then(function(values) {
-                    console.log("values", values)
+            Promise.all(savePromises).then(function(values) {
 
-                    
-                    params.value(...values);
-                    resolve(values);
-                });
+                console.log("THIS TIME", values)
+                params.value(...values);
+                fooResolve(values);
             });
         };
 

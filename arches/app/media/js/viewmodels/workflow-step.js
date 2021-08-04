@@ -52,16 +52,15 @@ define([
 
         /* BEGIN coerce externalStepData */ 
         var externalStepSourceData = ko.unwrap(config.externalstepdata) || {};
-        Object.keys(koMapping.toJS(externalStepSourceData)).forEach(function(key) {
-            self.externalStepData[key] = {
-                stepName: externalStepSourceData[key]
-            };
+        Object.keys(externalStepSourceData).forEach(function(key) {
+            if (key !== '__ko_mapping__') {
+                self.externalStepData[key] = {
+                    stepName: externalStepSourceData[key]
+                };
+            }
         });
-        delete config.externalstepdata;
         /* END coerce externalStepData */
 
-        console.log("AADFDSFDSFDSFDS", self.externalStepData)
-        
         this.value = ko.observable();
         this.value.subscribe(function(value) {
             var getResourceIdFromComponentData = function(componentData) {
@@ -103,13 +102,15 @@ define([
             return config.workflow.activeStep() === this;
         }, this);
         this.active.subscribe(function(active) {
-            console.log("AAAAAA", self.name(), active)
+            console.log("AAAAAA", self.name(), active, self.externalStepData)
             self.loading(true);
             if (active) { 
                 self.getExternalStepData().then(function(externalStepData){
                     if (externalStepData) {
+
+                        console.log("BBBBB", externalStepData)
                         Object.entries(self.externalStepData).forEach(function([externalStepReferenceName, value]) {
-                            self.externalStepData[externalStepReferenceName]['data'] = externalStepData[value.stepName];
+                            self.externalStepData[externalStepReferenceName]['data'] = externalStepData[ko.unwrap(value.stepName)];
                         });
                     }
                     self.loading(false);
@@ -161,30 +162,34 @@ define([
         };
         
         this.save = function() {
-            var preSaveCallbackPromise = new Promise(function(resolve, _reject) {
-                var preSaveCallback = ko.unwrap(self.preSaveCallback);
+            var preSaveFoo = function() {
+                return new Promise(function(resolve, _reject) {
+                    var preSaveCallback = ko.unwrap(self.preSaveCallback);
+                    preSaveCallback(resolve);
+                });
+            };
+            var preSaveBar = function() {
+                return new Promise(function(resolve, _reject) {
 
-                resolve(preSaveCallback());
-            });
-            var localStoragePromise = new Promise(function(resolve, _reject) {
-                console.log('svae', self.name(), self.value())
-                self.setToLocalStorage('value', self.value());
-
-                resolve(self.value())
-            });
-            var postSaveCallbackPromise = new Promise(function(resolve, _reject) {
-                var postSaveCallback = ko.unwrap(self.postSaveCallback);
-
-                resolve(postSaveCallback());
-            });
-
-            return new Promise(function(resolve, _reject) {
-                preSaveCallbackPromise.then(function(_preSaveCallbackData) {
-                    localStoragePromise.then(function(localStorageData) {
-                        postSaveCallbackPromise.then(function(_postSaveCallbackData) {
-                            resolve(localStorageData);
+                    console.log("FDIOFDS", self.value())
+                    self.setToLocalStorage('value', self.value());
+                    resolve(self.value())
+                });
+            };
+            var preSaveBaz = function() {
+                return new Promise(function(resolve, _reject) {
+                    var postSaveCallback = ko.unwrap(self.postSaveCallback);
+                    resolve(postSaveCallback());
+                });
+            };
+            
+            return new Promise(function(outerResolve, _reject) {
+                preSaveFoo().then(function(_fooData) {
+                    preSaveBar().then(function(_barData) {
+                        preSaveBaz().then(function(_bazData) {
+                            outerResolve(self.value());
                         });
-                    });
+                    })
                 });
             });
         };
