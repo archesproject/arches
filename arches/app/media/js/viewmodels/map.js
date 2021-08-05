@@ -23,6 +23,8 @@ define([
         };
 
         this.activeTab = ko.observable(ko.unwrap(params.activeTab));
+        this.canEdit = params.userCanEditResources;
+        this.canRead = params.userCanReadResources;
 
         var boundingOptions = {
             padding: {
@@ -337,7 +339,7 @@ define([
         this.getPopupData = function(feature) {
             var data = feature.properties;
             var id = data.resourceinstanceid;
-            data.showEditButton = true;
+            data.showEditButton = self.canEdit;
             if (id) {
                 if (!self.resourceLookup[id]){
                     data = _.defaults(data, {
