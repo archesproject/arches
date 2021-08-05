@@ -118,6 +118,8 @@ define([
             _.extend(this, this.viewModel.sharedStateObject);
             this.viewModel.sharedStateObject.total = this.viewModel.total;
             this.viewModel.sharedStateObject.loading = this.viewModel.loading;
+            this.viewModel.sharedStateObject.userCanEditResources = this.viewModel.userCanEditResources;
+            this.viewModel.sharedStateObject.userCanReadResources = this.viewModel.userCanReadResources;
             this.queryString = ko.computed(function() {
                 return JSON.stringify(this.query());
             }, this);

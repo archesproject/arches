@@ -477,6 +477,8 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                 graphs: {{graphs}},
                 createableResources: {{createable_resources}},
                 help: "{{nav.help.template}}",
+                userCanEditResources: JSON.parse('{{ user_can_edit }}'.toLowerCase()),
+                userCanReadResources: JSON.parse('{{ user_can_read }}'.toLowerCase())
             };
         });
         {% endautoescape %}
