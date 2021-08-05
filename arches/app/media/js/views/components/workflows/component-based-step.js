@@ -593,11 +593,11 @@ define([
         this.lockExternalStep = lockExternalStep;
         this.lockableExternalSteps = lockableExternalSteps;
         
-        this.fooSave = function(fooResolve) {
+        this.saveComponent = function(componentBasedStepResolve) {
             if (self.hasUnsavedData()) {
                 var completeSubscription = self.complete.subscribe(function(complete) {
                     if (complete) {
-                        fooResolve({
+                        componentBasedStepResolve({
                             [self.componentData.uniqueInstanceName]: self.savedData(),
                         });
 
@@ -608,7 +608,7 @@ define([
                 self.save();
             }
             else {
-                fooResolve({
+                componentBasedStepResolve({
                     [self.componentData.uniqueInstanceName]: self.savedData(),
                 });
             }
@@ -802,18 +802,18 @@ define([
             self.workflowComponentAbstractLookup(workflowComponentAbstractLookup);
         };
 
-        this.save = function(fooResolve) {
+        this.save = function(workflowStepResolve) {
             var savePromises = [];
             
             Object.values(self.workflowComponentAbstractLookup()).forEach(function(workflowComponentAbstract) {
                 savePromises.push(new Promise(function(resolve, _reject) {
-                    workflowComponentAbstract.fooSave(resolve);
+                    workflowComponentAbstract.saveComponent(resolve);
                 }));
             });
 
             Promise.all(savePromises).then(function(values) {
                 params.value(...values);
-                fooResolve(values);
+                workflowStepResolve(...values);
             });
         };
 

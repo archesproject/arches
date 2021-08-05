@@ -142,11 +142,6 @@ define([
                 self.complete(true);
             }
 
-            /* set value subscription */ 
-            self.value.subscribe(function(value) {
-                self.setToLocalStorage('value', value);
-            });
-
             self.locked.subscribe(function(value){
                 self.setToLocalStorage("locked", value);
             });
@@ -172,7 +167,13 @@ define([
                 // TODO: Refactor promise logic to pass down resolve
                 return new Promise(function(resolve, _reject) {
                     var postSaveCallback = ko.unwrap(self.postSaveCallback);
-                    resolve(postSaveCallback());
+
+                    if (postSaveCallback) {
+                        resolve(postSaveCallback());
+                    }
+                    else {
+                        resolve(null);
+                    }
                 });
             };
             
