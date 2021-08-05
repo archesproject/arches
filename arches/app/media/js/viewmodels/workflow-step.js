@@ -177,9 +177,9 @@ define([
             };
             
             return new Promise(function(resolve, _reject) {
-                preSaveCallback().then(function(_fooData) {
-                    writeToLocalStorage().then(function(_barData) {
-                        postSaveCallback().then(function(_bazData) {
+                preSaveCallback().then(function(_preSaveCallbackData) {
+                    writeToLocalStorage().then(function(_localStorageData) {
+                        postSaveCallback().then(function(_postSaveCallbackData) {
                             resolve(self.value());
                         });
                     })
