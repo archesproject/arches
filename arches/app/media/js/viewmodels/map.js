@@ -337,7 +337,7 @@ define([
         this.getPopupData = function(feature) {
             var data = feature.properties;
             var id = data.resourceinstanceid;
-            data.showEditButton = false;
+            data.showEditButton = true;
             if (id) {
                 if (!self.resourceLookup[id]){
                     data = _.defaults(data, {
@@ -352,8 +352,8 @@ define([
                         } catch (err) {
                             data.permissions = koMapping.toJS(ko.unwrap(data.permissions));
                         }
-                        if (data.permissions.users_without_edit_perm.indexOf(ko.unwrap(self.userid)) === -1) {
-                            data.showEditButton = true;
+                        if (data.permissions.users_without_edit_perm.indexOf(ko.unwrap(self.userid)) > 0) {
+                            data.showEditButton = false;
                         }
                     }
                     data = ko.mapping.fromJS(data);
