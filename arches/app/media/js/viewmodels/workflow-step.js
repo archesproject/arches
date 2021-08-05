@@ -34,9 +34,6 @@ define([
         this.loading = ko.observable(false);
 
         this.complete = ko.observable(false);
-        this.complete.subscribe(function(complete) {
-            console.log("STEP COMPLETE", complete, self.name())
-        })
 
         this.required = ko.observable(ko.unwrap(config.required));
         this.autoAdvance = ko.observable(true);
@@ -102,13 +99,10 @@ define([
             return config.workflow.activeStep() === this;
         }, this);
         this.active.subscribe(function(active) {
-            console.log("AAAAAA", self.name(), active, self.externalStepData)
             self.loading(true);
             if (active) { 
                 self.getExternalStepData().then(function(externalStepData){
                     if (externalStepData) {
-
-                        console.log("BBBBB", externalStepData)
                         Object.entries(self.externalStepData).forEach(function([externalStepReferenceName, value]) {
                             self.externalStepData[externalStepReferenceName]['data'] = externalStepData[ko.unwrap(value.stepName)];
                         });
@@ -162,32 +156,31 @@ define([
         };
         
         this.save = function() {
-            var preSaveFoo = function() {
+            var preSaveCallback = function() {
                 return new Promise(function(resolve, _reject) {
                     var preSaveCallback = ko.unwrap(self.preSaveCallback);
                     preSaveCallback(resolve);
                 });
             };
-            var preSaveBar = function() {
+            var writeToLocalStorage = function() {
                 return new Promise(function(resolve, _reject) {
-
-                    console.log("FDIOFDS", self.value())
                     self.setToLocalStorage('value', self.value());
                     resolve(self.value())
                 });
             };
-            var preSaveBaz = function() {
+            var postSaveCallback = function() {
+                // TODO: Refactor promise logic to pass down resolve
                 return new Promise(function(resolve, _reject) {
                     var postSaveCallback = ko.unwrap(self.postSaveCallback);
                     resolve(postSaveCallback());
                 });
             };
             
-            return new Promise(function(outerResolve, _reject) {
-                preSaveFoo().then(function(_fooData) {
-                    preSaveBar().then(function(_barData) {
-                        preSaveBaz().then(function(_bazData) {
-                            outerResolve(self.value());
+            return new Promise(function(resolve, _reject) {
+                preSaveCallback().then(function(_fooData) {
+                    writeToLocalStorage().then(function(_barData) {
+                        postSaveCallback().then(function(_bazData) {
+                            resolve(self.value());
                         });
                     })
                 });
@@ -241,9 +234,11 @@ define([
                     Promise.all(promises).then(function(resolvedPromiseData) {
                         resolve(
                             resolvedPromiseData.reduce(function(acc, resolvedPromiseDatum) {
-                                Object.keys(resolvedPromiseDatum).forEach(function(key) {
-                                    acc[key] = resolvedPromiseDatum[key];
-                                });
+                                if (resolvedPromiseDatum) {
+                                    Object.keys(resolvedPromiseDatum).forEach(function(key) {
+                                        acc[key] = resolvedPromiseDatum[key];
+                                    });
+                                }
                                 return acc;
                             }, {})
                         );

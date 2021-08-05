@@ -812,8 +812,6 @@ define([
             });
 
             Promise.all(savePromises).then(function(values) {
-
-                console.log("THIS TIME", values)
                 params.value(...values);
                 fooResolve(values);
             });

@@ -159,8 +159,6 @@ define([
                 stepData.id = stepNameToIdLookup[stepName];
             }
             
-            console.log("HERE BRO", stepNameToIdLookup, stepName, ko.unwrap(stepData.id))
-
             stepData.informationBoxDisplayed = ko.observable(self.getInformationBoxDisplayedStateFromLocalStorage(stepName));
             stepData.informationBoxDisplayed.subscribe(function(val){
                 self.setMetadataToLocalStorage(stepName, 'informationBoxDisplayed', val);
@@ -184,7 +182,6 @@ define([
         this.saveActiveStep = function() {
             return new Promise(function(resolve, _reject) {
                 self.activeStep().save().then(function(data) {            
-                    console.log("ACTIVE STEP DATA", data) 
                     resolve(data);
                 });
             });
@@ -194,10 +191,6 @@ define([
             return new Promise(function(resolve) {
                 /* ONLY to be used as intermediary for when a step needs data from a different step in the workflow */
                 var step = self.steps().find(function(step) { return ko.unwrap(step.name) === ko.unwrap(stepName) });
-
-
-                // HAS WRONG ID HERE AND THEREFORE NEVER STOCKS CORRECT DATA, LIKELY A RESULT OF RE-MAPPING INJECTD STEPS
-                console.log("HERE FAM", step, step.name(), step.value(), step.getFromLocalStorage('value'))
 
                 if (step) { 
                     if (step.saving()) {
