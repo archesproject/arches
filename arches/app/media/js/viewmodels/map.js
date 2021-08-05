@@ -57,7 +57,7 @@ define([
             if (ko.unwrap(params.bounds)) {
                 map.fitBounds(ko.unwrap(params.bounds), boundingOptions);
             }
-        })
+        });
 
         this.bounds = ko.observable(ko.unwrap(params.bounds) || arches.hexBinBounds);
         this.bounds.subscribe(function(bounds) {
