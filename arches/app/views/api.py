@@ -750,18 +750,10 @@ class Resources(APIBase):
                             )
 
                         #  Resource id's in the request body take precedence over the id supplied in the url.
-                        resource_instance_resourceinstanceid = archesresource["resourceinstanceid"]
-                        try:
-                            # Check if the record exists for the resourceinstanceid.
-                            resource_instance = Resource.objects.get(pk=archesresource["resourceinstanceid"])
-                        except models.ResourceInstance.DoesNotExist:
-                            # PUTing a resource should act like a POST if the supplied resource instance id doesn't exist in the system.
-                            resource_instance_resourceinstanceid = str(uuid.uuid4())
-
                         resource = {
                             "resourceinstance": {
                                 "graph_id": archesresource["graph_id"],
-                                "resourceinstanceid": resource_instance_resourceinstanceid,
+                                "resourceinstanceid": archesresource["resourceinstanceid"],
                                 "legacyid": archesresource["legacyid"],
                             },
                             "tiles": archesresource["tiles"],
@@ -776,7 +768,7 @@ class Resources(APIBase):
                             return JSONResponse({"error": response}, indent=indent, status=400)
                         else:
                             response = []
-                            response.append(JSONDeserializer().deserialize(self.get(request, resource_instance_resourceinstanceid).content))
+                            response.append(JSONDeserializer().deserialize(self.get(request, archesresource["resourceinstanceid"]).content))
                             return JSONResponse(response, indent=indent, status=201)
 
                 except models.ResourceInstance.DoesNotExist:
