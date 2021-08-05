@@ -77,7 +77,9 @@ define([
             /* BEGIN workflow step creation logic */ 
             if (self.getFromLocalStorage(WORKFLOW_ID_LABEL) !== self.id()) {
                 self.setToLocalStorage(WORKFLOW_ID_LABEL, self.id());
-                localStorage.removeItem(STEPS_LABEL);  /* remove step data created by previous workflow from localstorage */
+                /* remove step data created by previous workflow from localstorage */
+                localStorage.removeItem(STEPS_LABEL);  
+                localStorage.removeItem(STEP_IDS_LABEL);  
             }
 
             var cachedStepId = self.getStepIdFromUrl();
@@ -147,21 +149,25 @@ define([
             );
         };
 
-        this.createStep = function(step) {
+        this.createStep = function(stepData) {
             var stepNameToIdLookup = self.getFromLocalStorage(STEP_IDS_LABEL);
 
+            var stepName = ko.unwrap(stepData.name);
+            
             /* if stepIds exist for this workflow in localStorage, set correct value */ 
-            if (stepNameToIdLookup[step.name]) {
-                step.id = stepNameToIdLookup[step.name];
+            if (stepNameToIdLookup[stepName]) {
+                stepData.id = stepNameToIdLookup[stepName];
             }
             
-            step.informationBoxDisplayed = ko.observable(self.getInformationBoxDisplayedStateFromLocalStorage(step.name));
-            step.informationBoxDisplayed.subscribe(function(val){
-                self.setMetadataToLocalStorage(ko.unwrap(step.name), 'informationBoxDisplayed', val);
+            console.log("HERE BRO", stepNameToIdLookup, stepName, ko.unwrap(stepData.id))
+
+            stepData.informationBoxDisplayed = ko.observable(self.getInformationBoxDisplayedStateFromLocalStorage(stepName));
+            stepData.informationBoxDisplayed.subscribe(function(val){
+                self.setMetadataToLocalStorage(stepName, 'informationBoxDisplayed', val);
             });
 
-            step.workflow = self;
-            return new WorkflowStep(step);
+            stepData.workflow = self;
+            return new WorkflowStep(stepData);
         };
 
         this.updateStepIndices = function() {

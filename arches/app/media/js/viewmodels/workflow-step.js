@@ -239,10 +239,14 @@ define([
 
                 if (promises.length) {
                     Promise.all(promises).then(function(resolvedPromiseData) {
-
-                        resolve(...resolvedPromiseData);
-                        console.log("resovledpromsedata", resolvedPromiseData)
-
+                        resolve(
+                            resolvedPromiseData.reduce(function(acc, resolvedPromiseDatum) {
+                                Object.keys(resolvedPromiseDatum).forEach(function(key) {
+                                    acc[key] = resolvedPromiseDatum[key];
+                                });
+                                return acc;
+                            }, {})
+                        );
                     });
                 }
                 else {
