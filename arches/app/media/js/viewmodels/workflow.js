@@ -31,7 +31,7 @@ define([
         this.activeStep = ko.observable();
         this.activeStep.subscribe(function(activeStep) {
             self.setStepIdToUrl(activeStep);
-        })
+        });
         
         this.isWorkflowFinished = ko.observable(false);
         
@@ -190,7 +190,7 @@ define([
         this.getStepData = function(stepName) {
             return new Promise(function(resolve) {
                 /* ONLY to be used as intermediary for when a step needs data from a different step in the workflow */
-                var step = self.steps().find(function(step) { return ko.unwrap(step.name) === ko.unwrap(stepName) });
+                var step = self.steps().find(function(step) { return ko.unwrap(step.name) === ko.unwrap(stepName); });
 
                 if (step) { 
                     if (step.saving()) {
@@ -212,7 +212,7 @@ define([
         };
 
         this.toggleStepLockedState = function(stepName, locked) {
-            var step = self.steps().find(function(step) { return ko.unwrap(step.name) === ko.unwrap(stepName) });
+            var step = self.steps().find(function(step) { return ko.unwrap(step.name) === ko.unwrap(stepName); });
             if (step) {
                 step.locked(locked);
             }

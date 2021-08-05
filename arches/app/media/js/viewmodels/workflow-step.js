@@ -160,7 +160,7 @@ define([
             var writeToLocalStorage = function() {
                 return new Promise(function(resolve, _reject) {
                     self.setToLocalStorage('value', self.value());
-                    resolve(self.value())
+                    resolve(self.value());
                 });
             };
             var postSaveCallback = function() {
@@ -183,7 +183,7 @@ define([
                         postSaveCallback().then(function(_postSaveCallbackData) {
                             resolve(self.value());
                         });
-                    })
+                    });
                 });
             });
         };
