@@ -5,12 +5,9 @@ define([
     'knockout',
     'report-templates',
     'models/report',
-    'models/graph'
-], function(arches, $, _, ko, reportLookup, ReportModel, GraphModel) {
-    /* CardViewModel is not always available as a dependency on load. So let's get it explicitly */ 
-    var CardViewModel;
-    require(['viewmodels/card'], function(cardViewModel) { CardViewModel = cardViewModel; });
-    
+    'models/graph',
+    'viewmodels/card',
+], function(arches, $, _, ko, reportLookup, ReportModel, GraphModel, CardViewModel) {    
     var ResourceReportAbstract = function(params) {
         var self = this;
 
@@ -82,7 +79,7 @@ define([
             });
         };
         
-        this.preloadResourceData = function(responseJson) {
+        this.preloadResourceData = function(responseJson) {            
             var graphModel = new GraphModel({
                 data: responseJson.graph,
                 datatypes: responseJson.datatypes,
@@ -125,8 +122,10 @@ define([
 
             self.report(report);
         };
-
-        this.initialize();
+        
+        if (CardViewModel) {
+            self.initialize();
+        }
     };
     ko.components.register('resource-report-abstract', {
         viewModel: ResourceReportAbstract,
