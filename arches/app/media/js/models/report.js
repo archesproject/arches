@@ -221,7 +221,7 @@ define(['jquery',
         },
 
         getRelatedResources: function(loadAll, resource) {
-            $.ajax({
+            return $.ajax({
                 context: this,
                 url: (
                     arches.urls.related_resources 
@@ -266,7 +266,7 @@ define(['jquery',
         },
 
         save: function() {
-            AbstractModel.prototype.save.call(this, function(request, status, self) {
+            return AbstractModel.prototype.save.call(this, function(request, status, self) {
                 if (status === 'success') {
                     this._data(JSON.stringify(this.toJSON()));
                 }
