@@ -161,7 +161,7 @@ define([
                     var dataEmpty = _.keys(koMapping.toJS(tile.data)).length === 0;
                     if (ko.unwrap(tile.provisionaledits) !== null && dataEmpty) {
                         return 2;
-                    } else if (tile.provisionaledits() !== null && !dataEmpty) {
+                    } else if (ko.unwrap(tile.provisionaledits) !== null && !dataEmpty) {
                         return 1;
                     } else {
                         return 0;

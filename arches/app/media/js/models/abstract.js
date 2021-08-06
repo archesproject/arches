@@ -11,10 +11,11 @@ define(['backbone', 'jquery'], function (Backbone, $) {
          * @memberof AbstractModel.prototype
          * @param  {function} callback - the function to call when the request returns
          * @param  {object} scope - (optional) the scope used for the callback
+         * @return  {jqXHR} - a Proimise compatible asynchronous request
         */
         read: function (callback, scope) {
             var method = "GET";
-            this._doRequest({
+            return this._doRequest({
                 type: method,
                 data: {
                     'format': 'json'
@@ -28,10 +29,11 @@ define(['backbone', 'jquery'], function (Backbone, $) {
          * @memberof AbstractModel.prototype
          * @param  {function} callback - the function to call when the request returns
          * @param  {object} scope - (optional) the scope used for the callback
+         * @return  {jqXHR} - a Proimise compatible asynchronous request
         */
         save: function (callback, scope) {
             var method = "POST";
-            this._doRequest({
+            return this._doRequest({
                 type: method,
                 url: this._getURL(method),
                 data: JSON.stringify(this.toJSON())
@@ -43,10 +45,11 @@ define(['backbone', 'jquery'], function (Backbone, $) {
          * @memberof AbstractModel.prototype
          * @param  {function} callback - the function to call when the request returns
          * @param  {object} scope - (optional) the scope used for the callback
+         * @return  {jqXHR} - a Proimise compatible asynchronous request
         */
         delete: function (callback, scope) {
             var method = "DELETE";
-            this._doRequest({
+            return this._doRequest({
                 type: method,
                 url: this._getURL(method),
                 data: JSON.stringify(this.toJSON())
@@ -78,13 +81,14 @@ define(['backbone', 'jquery'], function (Backbone, $) {
          * @param  {function} callback - function to call when the request returns
          * @param  {object} scope - (optional) the scope used for the callback
          * @param  {string} eventname - (optional) the event to trigger upon successfull return of the request
+         * @return  {jqXHR} - a Proimise compatible asynchronous request
          */
         _doRequest: function (config, callback, scope, eventname) {
             var self = this;
             if (! scope){
                 scope = self;
             }
-            $.ajax($.extend({
+            return $.ajax($.extend({
                 complete: function (request, status) {
                     if (typeof callback === 'function') {
                         callback.call(scope, request, status, self);
