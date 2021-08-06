@@ -313,7 +313,7 @@ define([
 
                 if (parentStep && parentStep['stepInjectionConfig']) {
                     if (parentStep.complete()) {
-                        step = self.createStep(parentStep['stepInjectionConfig']['injectionLogic']());
+                        step = self.createStep(parentStep['stepInjectionConfig']['injectionLogic'](parentStep));
                     }
                     else {
                         step = self.createStep(ko.unwrap(parentStep['stepInjectionConfig']['defaultStepChoice']));
