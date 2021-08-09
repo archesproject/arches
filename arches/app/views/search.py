@@ -275,7 +275,10 @@ def search_results(request, returnDsl=False):
     resourceinstanceid = request.GET.get("id", None)
     load_tiles = request.GET.get("tiles", False)
     if load_tiles:
-        load_tiles = json.loads(load_tiles)
+        try:
+            load_tiles = json.loads(load_tiles)
+        except TypeError:
+            pass
     se = SearchEngineFactory().create()
     permitted_nodegroups = get_permitted_nodegroups(request.user)
     include_provisional = get_provisional_type(request)
