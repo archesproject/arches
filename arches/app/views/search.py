@@ -303,7 +303,7 @@ def search_results(request, returnDsl=False):
     dsl.include("permissions.users_without_edit_perm")
     dsl.include("permissions.users_without_delete_perm")
     dsl.include("permissions.users_with_no_access")
-    if not points_only:
+    if not points_only or for_export:
         dsl.include("geometries")
     dsl.include("displayname")
     dsl.include("displaydescription")
