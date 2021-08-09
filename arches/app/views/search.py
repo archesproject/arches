@@ -273,8 +273,8 @@ def search_results(request, returnDsl=False):
     pages = request.GET.get("pages", None)
     total = int(request.GET.get("total", "0"))
     resourceinstanceid = request.GET.get("id", None)
-    load_tiles = request.GET.get("tiles", None)
-    if load_tiles is not None:
+    load_tiles = request.GET.get("tiles", False)
+    if load_tiles:
         load_tiles = json.loads(load_tiles)
     se = SearchEngineFactory().create()
     permitted_nodegroups = get_permitted_nodegroups(request.user)
@@ -308,7 +308,7 @@ def search_results(request, returnDsl=False):
     dsl.include("displaydescription")
     dsl.include("map_popup")
     dsl.include("provisional_resource")
-    if load_tiles is not False:
+    if load_tiles:
         dsl.include("tiles")
     if for_export or pages:
         results = dsl.search(index=RESOURCES_INDEX, scroll="1m")
