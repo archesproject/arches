@@ -296,7 +296,6 @@ define([
                         if (stepData) {
                             childStep = self.createStep(stepData);
                         }
-                        console.log(currentStep.name(), currentStep)
                         currentStep.locked(true)
                     }
                     else if (defaultStepChoice) {
@@ -311,12 +310,9 @@ define([
 
                         steps.splice(stepToInjectAfterIndex + 1, 0, childStep);
                     }
-                        
-                    idx += 1;
                 }
-                else {
-                    idx += 1;
-                }
+
+                idx += 1;
             }
 
             self.steps(steps);
@@ -325,8 +321,8 @@ define([
                 acc[step.name()] = step.id(); 
                 return acc;
             }, {});
-
             self.setToLocalStorage(STEP_IDS_LABEL, updatedStepNameToIdLookup);
+
             self.updateStepIndices();
             self.getFurthestValidStepIndex();
         };

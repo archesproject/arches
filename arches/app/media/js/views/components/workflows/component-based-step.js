@@ -31,7 +31,6 @@ define([
         });
 
         this.initialize = function() {
-            console.log("AAAAAAA", self.previouslyPersistedComponentData)
             if (self.previouslyPersistedComponentData) {
                 self.value(self.previouslyPersistedComponentData[0][1]);
             }
