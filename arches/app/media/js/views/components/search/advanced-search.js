@@ -23,6 +23,8 @@ define([
                     facets: ko.observableArray()
                 };
                 this.cardNameDict = {};
+                this.graphNameDict = {};
+                this.graphsFiltered = [];
                 var createLookup = function(list, idKey) {
                     return _.reduce(list, function(lookup, item) {
                         lookup[item[idKey]] = item;
@@ -62,6 +64,9 @@ define([
                             self.newFacet(card);
                         };
                     }, this);
+                    response.graphs.forEach(function(graph) {
+                        this.graphNameDict[graph.graphid] = graph.name;
+                    }, this);
                     var graphs = response.graphs.sort(function(a,b) {
                         return a.name.toLowerCase() > b.name.toLowerCase() ? 1 : -1;});
                     _.each(graphs, function(graph) {
@@ -93,6 +98,12 @@ define([
                             }
                         }
                     }, this);
+                    if (this.filter.facets()) {
+                        this.filter.facets().forEach(function(facet) {
+                            if (this.graphsFiltered.indexOf(this.graphNameDict[facet.card.graph_id]) === -1)
+                                this.graphsFiltered.push(this.graphNameDict[facet.card.graph_id]);
+                        }, this);
+                    }
                     this.restoreState();
 
                     var filterUpdated = ko.computed(function() {
@@ -148,9 +159,6 @@ define([
                 if (componentName in query) {
                     var facets = JSON.parse(query[componentName]);
 
-                    if (facets.length > 0) {
-                        this.getFilter('term-filter').addTag("Advanced Search", this.name, ko.observable(false));    
-                    }
                     _.each(facets, function(facet) {
                         var nodeIds = _.filter(Object.keys(facet), function(key) {
                             return key !== 'op';
@@ -162,6 +170,8 @@ define([
                             return _.contains(cardNodeIds, nodeIds[0]);
                         }, this);
                         if (card) {
+                            if (this.graphsFiltered.indexOf(this.graphNameDict[card.graph_id]) === -1)
+                                this.graphsFiltered.push(this.graphNameDict[card.graph_id]);
                             _.each(card.nodes, function(node) {
                                 facet[node.nodeid] = ko.observable(facet[node.nodeid]);
                             });
@@ -172,6 +182,9 @@ define([
                             });
                         }
                     }, this);
+                    if (facets.length > 0) {
+                        this.getFilter('term-filter').addTag("Advanced Search", this.name, ko.observable(false), this.graphsFiltered);
+                    }
                 }
             },
 
