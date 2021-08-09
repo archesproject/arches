@@ -70,7 +70,7 @@ define([
                 }
             },
 
-            addTag: function(term, type, inverted){
+            addTag: function(term, type, inverted, graphsFiltered){
                 this.filter.tags.unshift({
                     inverted: inverted,
                     type: type,
@@ -78,7 +78,8 @@ define([
                     context_label: '',
                     id: term,
                     text: term,
-                    value: term
+                    value: term,
+                    graphs_filtered: graphsFiltered
                 });
             },
 
