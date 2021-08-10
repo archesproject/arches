@@ -13921,14 +13921,15 @@ a.jstree-anchor.permissions-widget {
             .edge-node-display-name {
                 color: #213e5f;
                 cursor: pointer;
-                font-size: 15px;
-                font-weight: 600;
+                font-size: 14px;
+                font-weight: 550;
+                line-height: 1.2;
             }
             .edge-node-graph-name {
                 font-size: 13px;
             }
             .edge-node-links {
-                margin-top: 5px;
+                margin-top: 0px;
                 span {
                     cursor: pointer;
                     color: #213e5f;
@@ -14012,10 +14013,11 @@ a.jstree-anchor.permissions-widget {
         }
     }
     .relationships-list-header {
-        padding: 5px 0;
-        color: rgb(120, 120, 120);
-        font-size: 1.3em;
-        font-weight: 600;
+        padding: 10px 0px 0px 0px;
+        color: #213e5f;
+        font-size: 15px;
+        font-weight: 550;
+        line-height: 0.9;
     }
     .relationships-list {
         height: calc(100% - 134px);
@@ -14024,23 +14026,28 @@ a.jstree-anchor.permissions-widget {
         .relationships-list-item {
             padding: 8px;
             font-size: 1.1em;
+            border-bottom: 1px solid #e9e9e9;
             .relationships-list-item-type {
-                font-size: 1.2em;
+                font-size: 13px;
                 color: rgb(29, 61, 116);
                 cursor: pointer;
             }
+            .relationships-list-icon {
+                padding-left: 5px;
+            }
             .relationships-list-item-name {
-                padding-left: 10px;
+                padding-left: 5px;
+                font-size: 13px;
                 cursor: pointer;
                 span {
                     color: darken($accent-color, 20%);
                 }
             }
             .relationships-list-item-type.element-hover {
-                font-weight: bold;
+                font: bold;
             }
             .relationships-list-item-name.element-hover {
-                font-weight: bold;
+                color: darken($accent-color, 40%)
             }
         }
         .relationships-list-item:nth-of-type(odd) {
@@ -14049,8 +14056,8 @@ a.jstree-anchor.permissions-widget {
     }
     .realtionships-list-count {
         color: rgb(120, 120, 120);
-        font-size: 1.1em;
-        padding: 0 0 10px 0;
+        font-size: 13px;
+        padding: 0 0 5px 0;
         a {
             color: darken($accent-color, 20%);
             padding-left: 5px;

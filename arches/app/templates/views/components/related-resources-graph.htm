@@ -138,7 +138,7 @@
     </div>
     <div class="relationships-list" data-bind="foreach: $parent.informationElementRelationships">
         <div class="relationships-list-item">
-            <span data-bind="text: label, click: function() {
+            <span data-bind="text: label || 'Related to', click: function() {
                 informationElement(edge);
             }, event: {
                 mouseover: function() {
@@ -148,6 +148,7 @@
                     hoverElementId(null);
                 }
             }, css: {'element-hover': hoverElementId() === edge.id}" class="relationships-list-item-type"></span>
+            <i class="relationships-list-icon fa fa-angle-right"></i>
             <span class="relationships-list-item-name" data-bind="click: function() {
                 informationElement(node);
             }, event: {
