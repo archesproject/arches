@@ -575,7 +575,7 @@ define([
     };
 
 
-    function WorkflowComponentAbstract(componentData, previouslyPersistedComponentData, externalStepData, resourceId, title, complete, saving, locked, lockExternalStep, lockableExternalSteps, alert) {
+    function WorkflowComponentAbstract(componentData, previouslyPersistedComponentData, externalStepData, resourceId, title, complete, saving, locked, lockExternalStep, lockableExternalSteps, workflowId, alert) {
         var self = this;
 
         this.alert = alert;
@@ -587,10 +587,11 @@ define([
         this.locked = locked;
         this.lockExternalStep = lockExternalStep;
         this.lockableExternalSteps = lockableExternalSteps;
+        this.workflowId = workflowId;
 
         this.previouslyPersistedComponentData = previouslyPersistedComponentData;
         this.externalStepData = externalStepData;
-        
+
         this.savedData = ko.observableArray();
         this.hasUnsavedData = ko.observable();
 
@@ -618,15 +619,19 @@ define([
 
     function viewModel(params) {
         var self = this;
-        
+
         this.resourceId = ko.observable();
         if (ko.unwrap(params.resourceid)) {
             self.resourceId(ko.unwrap(params.resourceid));
-        } 
+        }
         else if (params.workflow && ko.unwrap(params.workflow.resourceId)) {
             self.resourceId(ko.unwrap(params.workflow.resourceId));
-        } 
+        }
 
+        if (params.workflow && ko.unwrap(params.workflow.id)) {
+            self.workflowId = ko.unwrap(params.workflow.id);
+        }
+        
         this.saving = params.saving || ko.observable(false);
         this.complete = params.complete || ko.observable(false);
         this.alert = params.alert || ko.observable();
@@ -719,16 +724,17 @@ define([
             var workflowComponentAbstractLookup = self.workflowComponentAbstractLookup();
 
             var workflowComponentAbstract = new WorkflowComponentAbstract(
-                workflowComponentAbtractData, 
-                previouslyPersistedComponentData, 
+                workflowComponentAbtractData,
+                previouslyPersistedComponentData,
                 params.externalStepData,
                 self.resourceId,
-                params.title, 
+                params.title,
                 self.complete,
                 self.saving,
                 self.locked,
                 self.lockExternalStep,
                 self.lockableExternalSteps,
+                self.workflowId,
                 self.alert
             );
 

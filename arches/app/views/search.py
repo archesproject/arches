@@ -262,18 +262,23 @@ def append_instance_permission_filter_dsl(request, search_results_object):
         search_results_object["query"].add_query(has_access)
 
 
-def search_results(request):
+def get_dsl_from_search_string(request):
+    dsl = search_results(request, returnDsl=True).dsl
+    return JSONResponse(dsl)
+
+
+def search_results(request, returnDsl=False):
     for_export = request.GET.get("export")
     pages = request.GET.get("pages", None)
     total = int(request.GET.get("total", "0"))
     resourceinstanceid = request.GET.get("id", None)
+
     se = SearchEngineFactory().create()
+    permitted_nodegroups = get_permitted_nodegroups(request.user)
+    include_provisional = get_provisional_type(request)
+    search_filter_factory = SearchFilterFactory(request)
     search_results_object = {"query": Query(se)}
 
-    include_provisional = get_provisional_type(request)
-    permitted_nodegroups = get_permitted_nodegroups(request.user)
-
-    search_filter_factory = SearchFilterFactory(request)
     try:
         for filter_type, querystring in list(request.GET.items()) + [("search-results", "")]:
             search_filter = search_filter_factory.get_filter(filter_type)
@@ -285,6 +290,8 @@ def search_results(request):
         return JSONErrorResponse(message=err)
 
     dsl = search_results_object.pop("query", None)
+    if returnDsl:
+        return dsl
     dsl.include("graph_id")
     dsl.include("root_ontology_class")
     dsl.include("resourceinstanceid")
