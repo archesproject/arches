@@ -20,6 +20,7 @@ from base64 import b64decode
 from datetime import datetime
 import logging
 import os
+import json
 from django.contrib.auth import authenticate
 from django.contrib.gis.geos import GEOSGeometry
 from django.core.cache import cache
@@ -272,7 +273,9 @@ def search_results(request, returnDsl=False):
     pages = request.GET.get("pages", None)
     total = int(request.GET.get("total", "0"))
     resourceinstanceid = request.GET.get("id", None)
-
+    points_only = request.GET.get("points_only", False)
+    if points_only:
+        points_only = json.loads(points_only)
     se = SearchEngineFactory().create()
     permitted_nodegroups = get_permitted_nodegroups(request.user)
     include_provisional = get_provisional_type(request)
@@ -300,7 +303,8 @@ def search_results(request, returnDsl=False):
     dsl.include("permissions.users_without_edit_perm")
     dsl.include("permissions.users_without_delete_perm")
     dsl.include("permissions.users_with_no_access")
-    dsl.include("geometries")
+    if not points_only or for_export:
+        dsl.include("geometries")
     dsl.include("displayname")
     dsl.include("displaydescription")
     dsl.include("map_popup")

@@ -49,7 +49,10 @@ class SearchResultsFilter(BaseSearchFilter):
 
         for result in results["hits"]["hits"]:
             result["_source"]["points"] = select_geoms_for_results(result["_source"]["points"], geojson_nodes, user_is_reviewer)
-            result["_source"]["geometries"] = select_geoms_for_results(result["_source"]["geometries"], geojson_nodes, user_is_reviewer)
+            try:
+                result["_source"]["geometries"] = select_geoms_for_results(result["_source"]["geometries"], geojson_nodes, user_is_reviewer)
+            except:
+                pass
             try:
                 permitted_tiles = []
                 for tile in result["_source"]["tiles"]:
