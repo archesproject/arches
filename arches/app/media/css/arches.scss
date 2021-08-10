@@ -13826,11 +13826,16 @@ a.jstree-anchor.permissions-widget {
     $sidebar-width: 400px;
     $controls-height: 36px;
     $controls-top: 10px;
-    $controls-grey: #9b9b9b;
+    $icons-grey: #999;
+    $controls-grey: #ddd;
     $controls-border: 1px solid $controls-grey;
-    $controls-background: #e0e0e0;
+    $controls-background: #f9f9f9;
     $controls-right: 10px;
     $accent-color: #9b97e3;
+    $highlight-color: #2a446a;
+
+    background: #fff;
+    border-top: none;
 
     .related-resources-graph-cytoscape {
         height: 100%;
@@ -13861,7 +13866,7 @@ a.jstree-anchor.permissions-widget {
             height: $controls-height - 2;
             box-sizing: border-box;
             position: relative;
-            color: $controls-grey;
+            color: $icons-grey;
             background-color: $controls-background;
         }
         span.active-graph-control {
@@ -13870,9 +13875,16 @@ a.jstree-anchor.permissions-widget {
         }
         span:hover {
             background-color: lighten($controls-background, 8%);
+            color: $highlight-color;
+        }
+        span:first-child {
+            border-top-left-radius: 2px;
+            border-bottom-left-radius: 2px;
         }
         span:last-child {
             border-right: $controls-border;
+            border-top-right-radius: 2px;
+            border-bottom-right-radius: 2px;
         }
         span:before {
             position: absolute;
