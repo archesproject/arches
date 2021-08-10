@@ -7,10 +7,12 @@
 <!-- ko ifnot: loading() -->
 <div 
     style="
-        height: calc(100vh - 50px);
         display: flex;
         flex-direction: column;
         justify-content: space-between;
+    "
+    data-bind="
+        style: { height: $data.summary ? 'inherit' : 'calc(100vh - 50px)' }
     "
 >
     <div 
@@ -31,6 +33,7 @@
         '
     ></div>
 
+    <!-- ko ifnot: $data.summary -->
     <footer 
         style="
             background: #f8f8f8; 
@@ -46,5 +49,6 @@
             <a href="http://archesproject.org" target="_blank">http://archesproject.org</a>
         </div>
     </footer>
+    <!--/ko-->
 </div>
 <!-- /ko -->
