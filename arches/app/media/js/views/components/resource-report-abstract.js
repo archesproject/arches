@@ -122,10 +122,14 @@ define([
 
             self.report(report);
         };
-        
-        if (CardViewModel) {
+
+        if (ko.unwrap(this.template)?.preload_resource_data && CardViewModel) {
+            self.initialize();
+        } 
+        else {
             self.initialize();
         }
+
     };
     ko.components.register('resource-report-abstract', {
         viewModel: ResourceReportAbstract,
