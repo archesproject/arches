@@ -82,7 +82,7 @@
                                 <div class="row">
                                     <div class="col-sm-5">
                                         <div>
-                                            <button class="btn btn-primary btn-active-purple btn-profile" data-bind='click: toggleEditUserForm'>{% trans 'Edit' %}</button>
+                                            <button class="btn btn-primary btn-active-purple btn-profile" data-bind='click: toggleEditUserForm' onkeyup="if(event.which == 13 || event.keyCode == 13){ $(this).trigger('click'); }">{% trans 'Edit' %}</button>
                                         </div>
                                     </div>
                                 </div>
@@ -96,7 +96,7 @@
                                         <div class="col-sm-5">
                                             <div class="form-group">
                                                 <label class="control-label account-label">{% trans 'Arches user name' %}</label>
-                                                <input disabled type="text" class="form-control input-lg account-input" placeholder="Fist name" name="username" value="{{ user.username }}">
+                                                <input disabled type="text" class="form-control input-lg account-input" placeholder="Username" aria-label="Username" name="username" value="{{ user.username }}">
                                             </div>
                                         </div>
 
@@ -120,7 +120,7 @@
                                         <div class="col-sm-5">
                                             <div class="form-group">
                                                 <label class="control-label account-label">{% trans 'First name' %}</label>
-                                                <input type="text" class="form-control input-lg account-input" placeholder="{% trans 'First name' %}" name="first_name" value="{{ user.first_name }}">
+                                                <input type="text" class="form-control input-lg account-input" placeholder="{% trans 'First name' %}" aria-label="{% trans 'First name' %}" name="first_name" value="{{ user.first_name }}">
                                                 {% if form.first_name.errors %}
                                                 {% for error in form.first_name.errors %}
                                                     <div style="color:darkred">{{ error|escape }}</div>
@@ -141,7 +141,7 @@
                                         <div class="col-sm-5">
                                             <div class="form-group">
                                                 <label class="control-label account-label">{% trans 'Last name' %}</label>
-                                                <input type="text" class="form-control input-lg account-input" placeholder="{% trans 'Last name' %}" name="last_name" value="{{ user.last_name }}">
+                                                <input type="text" class="form-control input-lg account-input" placeholder="{% trans 'Last name' %}" aria-label="{% trans 'Last name' %}" name="last_name" value="{{ user.last_name }}">
                                                 {% if form.last_name.errors %}
                                                 {% for error in form.last_name.errors %}
                                                     <div style="color:darkred">{{ error|escape }}</div>
@@ -157,7 +157,7 @@
                                         <div class="col-sm-5">
                                             <div class="form-group">
                                                 <label class="control-label account-label">{% trans 'Phone Number (optional)' %}</label>
-                                                <input type="text" class="form-control input-lg account-input" placeholder="e.g. +1 415 555-1234" name="phone" value="{{ user.userprofile.phone }}">
+                                                <input type="text" class="form-control input-lg account-input" placeholder="e.g. +1 415 555-1234" name="phone" value="{{ user.userprofile.phone }}" aria-label="Contact phone number">
                                             </div>
                                         </div>
                                     </div>
@@ -170,7 +170,7 @@
                                         <div class="col-sm-5">
                                             <div class="form-group">
                                                 <label class="control-label account-label">{% trans 'Contact Email' %}</label>
-                                                <input type="email" class="form-control input-lg account-input" placeholder="jsmith@company.com" name="email" value="{{ user.email }}">
+                                                <input type="email" class="form-control input-lg account-input" placeholder="jsmith@company.com" name="email" value="{{ user.email }}" aria-label="Contact email address">
                                                 {% if form.email.errors %}
                                                 {% for error in form.email.errors %}
                                                     <div style="color:darkred">{{ error|escape }}</div>
@@ -288,12 +288,12 @@
                                         <td data-bind="text:name"></td>
                                         <td>
                                             <label class="control-label widget-input-label-notif">
-                                                <span class="switch switch-small arches-switch" data-bind="css: {'on': emailnotify()}, click: function(){emailnotify(!emailnotify())}"><small></small></span>{% trans 'Enable' %}
+                                                <span class="switch switch-small arches-switch" data-bind="css: {'on': emailnotify()}, click: function(){emailnotify(!emailnotify())}" tabindex="0" onkeyup="if(event.which == 13 || event.keyCode == 13){ $(this).trigger('click'); }" aria-label="Notify by email"><small></small></span>{% trans 'Enable' %}
                                             </label>
                                         </td>
                                         <td>
                                             <label class="control-label widget-input-label-notif">
-                                                <span class="switch switch-small arches-switch" data-bind="css: {'on': webnotify()}, click: function(){webnotify(!webnotify())}"><small></small></span>{% trans 'Enable' %}
+                                                <span class="switch switch-small arches-switch" data-bind="css: {'on': webnotify()}, click: function(){webnotify(!webnotify())}" tabindex="0" onkeyup="if(event.which == 13 || event.keyCode == 13){ $(this).trigger('click'); }" aria-label="Notify by web"><small></small></span>{% trans 'Enable' %}
                                             </label>
                                         </td>
                                     </tr>
@@ -336,7 +336,7 @@
                             <div class="col-sm-9 col-sm-offset-3 relative">
                                 <div class="project-search-widget">
                                     <input type="text" class="form-control" placeholder="{% trans 'Find a project...' %}" data-bind="value: mobileSurveyFilter, valueUpdate: 'keyup'">
-                                    <span class="clear-node-search" data-bind="visible: mobileSurveyFilter().length > 0, click: function() { mobileSurveyFilter(''); }"><i class="fa fa-times-circle"></i></span>
+                                    <span class="clear-node-search" data-bind="visible: mobileSurveyFilter().length > 0, click: function() { mobileSurveyFilter(''); }" tabindex="0" onkeyup="if(event.which == 13 || event.keyCode == 13){ $(this).trigger('click'); }" aria-label="Mobile survey filter"><i class="fa fa-times-circle"></i></span>
                                 </div>
                             </div>
                         </div>
@@ -363,7 +363,7 @@
 
                                             <div>
                                                 <div class="project-details">
-                                                    <a id="view-project-details-btn" class="text-primary text-semibold" data-bind="click: function(val){val.mobilesurvey.toggleShowDetails();}">{% trans 'View Details' %}</a>
+                                                    <a href="#" id="view-project-details-btn" class="text-primary text-semibold" data-bind="click: function(val){val.mobilesurvey.toggleShowDetails();}" tabindex="0" onkeyup="if(event.which == 13 || event.keyCode == 13){ $(this).trigger('click'); }">{% trans 'View Details' %}</a>
                                                 </div>
                                             </div>
                                         </div>
