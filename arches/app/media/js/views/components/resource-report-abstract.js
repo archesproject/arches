@@ -123,8 +123,11 @@ define([
             self.report(report);
         };
 
-        if (ko.unwrap(this.template)?.preload_resource_data && CardViewModel) {
-            self.initialize();
+        if (ko.unwrap(this.template)?.preload_resource_data) {
+            require(['viewmodels/card'], function(cardViewModel) { 
+                CardViewModel = cardViewModel; 
+                self.initialize();
+            });
         } 
         else {
             self.initialize();
