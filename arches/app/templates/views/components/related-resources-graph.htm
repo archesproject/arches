@@ -86,7 +86,7 @@
         </div>
         <div class="edge-relationship-details">
             <div class="edge-relationship-prefix">{% trans "Has relationship" %}</div>
-            <div class="edge-relationship-label" data-bind="text: $parent.edgeInformation().label"></div>
+            <div class="edge-relationship-label" data-bind="text: $parent.edgeInformation().label || 'Related to' "></div>
             <div class="edge-relationship-sufix">{% trans "with" %}</div>
         </div>
     </div>
@@ -127,7 +127,7 @@
         </div>
     </div>
     <div class="relationships-list-header">{% trans "Relationships" %}</div>
-    <div class="realtionships-list-count">
+    <div class="relationships-list-count">
         <span data-bind="text: $parent.informationElementRelationships().length"></span> / <span data-bind="text: totalRelations"></span>
         {% trans "relationships shown" %}
         <!--ko if: $parent.informationElementRelationships().length !== totalRelations -->
@@ -190,7 +190,7 @@
                 $parent.informationElement($data);
             }"></div>
             <div class="edge-node-graph-name" data-bind="text: graph.name"></div>
-            <div class="realtionships-list-count">
+            <div class="relationships-list-count shim">
                 <span data-bind="text: shownRelationsCount"></span> / <span data-bind="text: totalRelations"></span>
                 {% trans "relationships shown" %}
                 <!--ko if: shownRelationsCount() !== totalRelations -->
@@ -218,7 +218,7 @@
     <h4 class="workbench-card-sidepanel-header" data-bind="click: hideSidePanel">{% trans "Legend" %}</h4>
 </div>
 <div class="legend-listing-container" data-bind="foreach: legendEntries">
-    <div class="legend-listing">
+    <div class="legend-listing related-resource-legend">
         <div class="edge-node-information">
             <div class="edge-node-graph-color" data-bind="style: {backgroundColor: fillColor}"></div>
             <div class="edge-node-title">

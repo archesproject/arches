@@ -199,15 +199,15 @@ define([
                     });
             };
             var getStyle = function() {
-                var nodeSize = 50;
+                var nodeSize = 60;
                 var borderColor = '#115170'
                 var borderHighlightColor = '#023047';
                 var borderSelectedColor = '#000F16';
                 var lineColor = '#BFBEBE';
                 var selectedLineColor = '#023047';
                 var borderWidth = 1;
-                var hoverBorderWidth = 3;
-                var selectedBorderWidth = 3;
+                var hoverBorderWidth = 4;
+                var selectedBorderWidth = 4;
                 var styles = [{
                     "selector": "node",
                     "style": {
