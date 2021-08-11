@@ -304,6 +304,19 @@ class APITests(ArchesTestCase):
         )  # Success, we returned the right one.
         # ==================================================================================================
 
+        # ==Act : GET confirmation that resource does now exist in database=================================
+        resp_put_get_confirm = self.client.get(
+            reverse("resources", kwargs={"resourceid": "075957c4-d97f-4986-8d27-c32b6dec8e62"}) + "?format=arches-json"
+        )
+        # ==Assert==========================================================================================
+        self.assertEqual(resp_put_get_confirm.status_code, 200)  # Success, we got one.
+        data_put_get_confirm = JSONDeserializer().deserialize(resp_put_get_confirm.content)
+        self.assertEqual(
+            data_put_get_confirm["tiles"][0]["data"]["65f87f4c-95bd-11e8-b7a6-acde48001122"],
+            "We do routines and chorus scenes with footwork impec-cable..",
+        )  # Success, we got the right one.
+        # ==================================================================================================
+
         # ==Act : PUT resource changes to database, with invalid URI========================================
         resp_put_uri_diff = self.client.put(
             reverse("resources", kwargs={"resourceid": "001fe587-ad3d-4d0d-a3c9-814028766434"}) + "?format=arches-json",
