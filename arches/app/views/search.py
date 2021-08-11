@@ -246,9 +246,15 @@ def search_results(request):
     pages = request.GET.get("pages", None)
     total = int(request.GET.get("total", "0"))
     resourceinstanceid = request.GET.get("id", None)
-    load_tiles = request.GET.get("tiles", None)
-    if load_tiles is not None:
-        load_tiles = json.loads(load_tiles)
+    load_tiles = request.GET.get("tiles", False)
+    if load_tiles:
+        try:
+            load_tiles = json.loads(load_tiles)
+        except:
+            pass
+    points_only = request.GET.get("points_only", False)
+    if points_only:
+        points_only = json.loads(points_only)
     se = SearchEngineFactory().create()
     search_results_object = {"query": Query(se)}
 
@@ -275,12 +281,13 @@ def search_results(request):
     dsl.include("permissions.users_without_edit_perm")
     dsl.include("permissions.users_without_delete_perm")
     dsl.include("permissions.users_with_no_access")
-    dsl.include("geometries")
+    if not points_only or for_export:
+        dsl.include("geometries")
     dsl.include("displayname")
     dsl.include("displaydescription")
     dsl.include("map_popup")
     dsl.include("provisional_resource")
-    if load_tiles is not False:
+    if load_tiles:
         dsl.include("tiles")
     if for_export or pages:
         results = dsl.search(index=RESOURCES_INDEX, scroll="1m")
