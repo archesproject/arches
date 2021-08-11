@@ -38,6 +38,7 @@ define([
         };
 
         this.save = function() {
+            self.complete(false);
             self.saving(true);
 
             self.savedData(self.addedData());
@@ -594,24 +595,17 @@ define([
         this.lockableExternalSteps = lockableExternalSteps;
         
         this.saveComponent = function(componentBasedStepResolve) {
-            if (self.hasUnsavedData()) {
-                var completeSubscription = self.complete.subscribe(function(complete) {
-                    if (complete) {
-                        componentBasedStepResolve({
-                            [self.componentData.uniqueInstanceName]: self.savedData(),
-                        });
+            var completeSubscription = self.complete.subscribe(function(complete) {
+                if (complete) {
+                    componentBasedStepResolve({
+                        [self.componentData.uniqueInstanceName]: self.savedData(),
+                    });
 
-                        completeSubscription.dispose();  /* disposes after save */
-                    }
-                });
-    
-                self.save();
-            }
-            else {
-                componentBasedStepResolve({
-                    [self.componentData.uniqueInstanceName]: self.savedData(),
-                });
-            }
+                    completeSubscription.dispose();  /* disposes after save */
+                }
+            });
+
+            self.save();
         };
 
         this.initialize = function() {
