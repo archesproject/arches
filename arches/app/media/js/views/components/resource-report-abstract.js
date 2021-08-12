@@ -7,7 +7,7 @@ define([
     'models/report',
     'models/graph',
     'viewmodels/card',
-], function(arches, $, _, ko, reportLookup, ReportModel, GraphModel, CardViewModel) {    
+], function(arches, $, _, ko, reportLookup, ReportModel, GraphModel, CardViewModel) {
     var ResourceReportAbstract = function(params) {
         var self = this;
 
@@ -122,11 +122,15 @@ define([
 
             self.report(report);
         };
-        
-        if (ko.unwrap(this.template)?.preload_resource_data && CardViewModel) {
-            self.initialize();
-        } 
-        else if (!ko.unwrap(this.template)?.preload_resource_data) {
+
+        if (!CardViewModel) {
+            require(['viewmodels/card'], function(cardViewModel) { 
+                CardViewModel = cardViewModel; 
+                
+                self.initialize();
+            });
+        }
+        else {
             self.initialize();
         }
     };
