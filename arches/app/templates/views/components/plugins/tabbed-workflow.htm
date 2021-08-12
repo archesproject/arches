@@ -21,7 +21,7 @@
                 >
                 <!-- ko if: (activeStep()._index === steps.length - 1) || isWorkflowFinished() -->
                 <button 
-                    data-bind="click: finishTabbedWorkflow"
+                    data-bind="click: finishWorkflow"
                     class="btn btn-success"
                 >
                 <i class="fa fa-check"></i>
@@ -98,7 +98,7 @@
                                             <i class="fa fa-caret-left"></i>
                                         </span>
 
-                                        <span style="font-size: 14px;" data-bind="text: step.title()"></span>
+                                        <span style="font-size: 14px;" data-bind="text: ko.unwrap(step.title)"></span>
 
                                         <span
                                             style="margin-left: 4px;"
