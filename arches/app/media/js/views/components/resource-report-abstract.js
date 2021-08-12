@@ -7,7 +7,7 @@ define([
     'models/report',
     'models/graph',
     'viewmodels/card',
-], function(arches, $, _, ko, reportLookup, ReportModel, GraphModel, CardViewModel) {   
+], function(arches, $, _, ko, reportLookup, ReportModel, GraphModel, CardViewModel) {
     var ResourceReportAbstract = function(params) {
         var self = this;
 
