@@ -200,7 +200,7 @@ define([
             };
             var getStyle = function() {
                 var nodeSize = 60;
-                var borderColor = '#115170'
+                var borderColor = '#115170';
                 var borderHighlightColor = '#023047';
                 var borderSelectedColor = '#000F16';
                 var lineColor = '#BFBEBE';
