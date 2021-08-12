@@ -139,5 +139,4 @@ define([
         template: { require: 'text!templates/views/components/resource-report-abstract.htm' }
     });
     return ResourceReportAbstract;
-    
 });
