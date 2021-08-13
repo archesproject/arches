@@ -7,7 +7,7 @@ define([
     'models/report',
     'models/graph',
     'viewmodels/card',
-], function(arches, $, _, ko, reportLookup, ReportModel, GraphModel, CardViewModel) {    
+], function(arches, $, _, ko, reportLookup, ReportModel, GraphModel, CardViewModel) {
     var ResourceReportAbstract = function(params) {
         var self = this;
 
@@ -29,7 +29,10 @@ define([
             if (params.report) {
                 if (!params.report.report_json && params.report.attributes.resourceid) {
                     url = arches.urls.api_bulk_disambiguated_resource_instance + `?resource_ids=${params.report.attributes.resourceid}`;
-    
+                    if(params.report.defaultConfig?.uncompacted_reporting) {
+                        url += '&uncompacted=true';
+                    }
+
                     $.getJSON(url, function(resp) {
                         params.report.report_json = resp[params.report.attributes.resourceid];
     
@@ -122,8 +125,15 @@ define([
 
             self.report(report);
         };
-        
-        if (CardViewModel) {
+
+        if (!CardViewModel) {
+            require(['viewmodels/card'], function(cardViewModel) { 
+                CardViewModel = cardViewModel; 
+                
+                self.initialize();
+            });
+        }
+        else {
             self.initialize();
         }
     };
