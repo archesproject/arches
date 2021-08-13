@@ -1327,7 +1327,7 @@ class BulkDisambiguatedResourceInstance(APIBase):
     def get(self, request):
         resource_ids = request.GET.get("resource_ids").split(",")
         uncompacted_value = request.GET.get("uncompacted")
-        compact = False
+        compact = True
         if uncompacted_value == "true":
             compact = False
         return JSONResponse({resource.pk: resource.to_json(compact=compact) for resource in Resource.objects.filter(pk__in=resource_ids)})
