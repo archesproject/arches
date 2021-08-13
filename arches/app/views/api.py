@@ -1326,7 +1326,11 @@ class BulkResourceReport(APIBase):
 class BulkDisambiguatedResourceInstance(APIBase):
     def get(self, request):
         resource_ids = request.GET.get("resource_ids").split(",")
-        return JSONResponse({resource.pk: resource.to_json() for resource in Resource.objects.filter(pk__in=resource_ids)})
+        uncompacted_value = request.GET.get("uncompacted")
+        compact = True
+        if uncompacted_value == "true":
+            compact = False
+        return JSONResponse({resource.pk: resource.to_json(compact=compact) for resource in Resource.objects.filter(pk__in=resource_ids)})
 
 
 @method_decorator(csrf_exempt, name="dispatch")
