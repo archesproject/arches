@@ -62,7 +62,7 @@ define([
         this.tiles = ko.observable();
 
         this.card = ko.observable();
-        this.nodeLookup = ko.observable()
+        this.nodeLookup = ko.observable();
         this.topCards = ko.observable();
 
         self.isDirty = ko.observable();
@@ -254,7 +254,7 @@ define([
 
                     self.loading(false);
                 });
-            }
+            };
             self.getJSON();
         };
 
