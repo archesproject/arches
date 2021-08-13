@@ -14,7 +14,8 @@
         <!-- /ko -->
 
         <!-- ko foreach: { data: layoutSection[1], as: 'uniqueInstanceName'} -->
-            <!-- ko if: !$parents[1].loading() -->
+
+            <!-- ko if: !$parents[1].isStepLoading() -->
 
             <!-- ko with: $parents[1].workflowComponentAbstractLookup()[uniqueInstanceName] -->
                 <div style="
@@ -27,6 +28,8 @@
                             height: inherit;
                         "
                     >
+                        <div style="display:none" data-bind="text: console.log($data)"></div>
+
                         <!-- ko if: !loading() && !saving() -->
                         <div 
                         style="height: inherit; display: unset;"

@@ -125,9 +125,13 @@ define([
             };
             
             return new Promise(function(resolve, _reject) {
+                console.log("S")
                 preSaveCallback().then(function(_preSaveCallbackData) {
+                    console.log("SD")
                     writeToLocalStorage().then(function(_localStorageData) {
+                        console.log("SDD")
                         postSaveCallback().then(function(_postSaveCallbackData) {
+                            console.log("SDDS")
                             resolve(self.value());
                         });
                     });
