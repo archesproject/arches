@@ -433,7 +433,8 @@ class JsonLdReader(Reader):
 
     def build_reference_cache(self, jsonld_document):
         if "@id" in jsonld_document and "@type" in jsonld_document:
-            self.idcache[jsonld_document["@id"]] = jsonld_document["@type"][0]
+            dataType = jsonld_document["@type"][0] if isinstance(jsonld_document["@type"], list) else jsonld_document["@type"]
+            self.idcache[jsonld_document["@id"]] = dataType
         for key, value in jsonld_document.items():
             if key in ["@id", "@type"]:
                 continue
@@ -458,7 +459,8 @@ class JsonLdReader(Reader):
         # print(data_node)
         # pre-seed as much of the cache as we can during the data-walk
         if "@id" in data_node and "@type" in data_node:
-            self.idcache[data_node["@id"]] = data_node["@type"][0]
+            dataType = data_node["@type"][0] if isinstance(data_node["@type"], list) else data_node["@type"]
+            self.idcache[data_node["@id"]] = dataType
         for k, v in data_node.items():
             if k in ["@id", "@type"]:
                 continue
