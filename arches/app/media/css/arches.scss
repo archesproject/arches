@@ -5191,6 +5191,14 @@ ul .collapse li:last-of-type {
     text-align: left;
 }
 
+#login-form .alert h2 {
+    margin-top: 0;
+    margin-bottom: 10px;
+    color: inherit;
+    font-weight: 600;
+    font-size: 1.2em;
+}
+
 .change-password-form.popover {
     display: block;
     margin-top: 65px;
