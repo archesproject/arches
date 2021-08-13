@@ -4140,6 +4140,17 @@ div.dropdown-menu.open {
     z-index: 8000;
 }
 
+.workflow-step-loading-mask {
+    position: absolute;
+    top: 94px;
+    bottom: 58px;
+    opacity: 1;
+}
+
+.workflow-step-loading-mask::after {
+    margin-top: 34vh;
+}
+
 .branch-list-loading-mask {
     height: 100%;
     position: relative;

@@ -2,7 +2,8 @@ define([
     'knockout',
     'underscore',
     'knockout-mapping',
-    'uuid'
+    'uuid',
+    'views/components/workflows/component-based-step',
 ], function(ko, _, koMapping, uuid) {
     STEPS_LABEL = 'workflow-steps';
     STEP_ID_LABEL = 'workflow-step-id';
@@ -12,6 +13,8 @@ define([
 
         this.id = ko.observable();
         this.workflowId = ko.observable(config.workflow ? config.workflow.id : null);
+
+        this.isV2Workflow = config.workflow.v2;
 
         this.classUnvisited = 'workflow-step-icon';
         this.classActive = 'workflow-step-icon active';
@@ -28,31 +31,33 @@ define([
         this.hasDirtyTile = ko.observable(false);
 
         this.saving = ko.observable(false);
+        this.loading = ko.observable(false);
 
         this.complete = ko.observable(false);
+
         this.required = ko.observable(ko.unwrap(config.required));
         this.autoAdvance = ko.observable(true);
 
         this.preSaveCallback = ko.observable();
         this.postSaveCallback = ko.observable();
 
+        this.clearCallback = ko.observable();
+
         this.externalStepData = {};
         this.locked = ko.observable(false);
-        this.lockableExternalSteps = config.lockableExternalSteps || []
+        this.lockableExternalSteps = config.lockableExternalSteps || [];
 
+        /* BEGIN coerce externalStepData */ 
         var externalStepSourceData = ko.unwrap(config.externalstepdata) || {};
         Object.keys(externalStepSourceData).forEach(function(key) {
             if (key !== '__ko_mapping__') {
-                config.workflow.getStepData(externalStepSourceData[key]).then(function(data) {
-                    self.externalStepData[key] = {
-                        stepName: externalStepSourceData[key],
-                        data: data,
-                    };
-                });
+                self.externalStepData[key] = {
+                    stepName: externalStepSourceData[key]
+                };
             }
         });
-        delete config.externalstepdata;
-        
+        /* END coerce externalStepData */
+
         this.value = ko.observable();
         this.value.subscribe(function(value) {
             var getResourceIdFromComponentData = function(componentData) {
@@ -94,9 +99,16 @@ define([
             return config.workflow.activeStep() === this;
         }, this);
         this.active.subscribe(function(active) {
+            self.loading(true);
             if (active) { 
-                self.setStepIdToUrl(); 
-                self.getExternalStepData();
+                self.getExternalStepData().then(function(externalStepData){
+                    if (externalStepData) {
+                        Object.entries(self.externalStepData).forEach(function([externalStepReferenceName, value]) {
+                            self.externalStepData[externalStepReferenceName]['data'] = externalStepData[ko.unwrap(value.stepName)];
+                        });
+                    }
+                    self.loading(false);
+                });
             }
         });
 
@@ -107,6 +119,8 @@ define([
         });
 
         this.initialize = function() {
+            _.extend(this, config);
+
             /* cached ID logic */ 
             var cachedId = ko.unwrap(config.id);
             if (cachedId) {
@@ -128,11 +142,6 @@ define([
                 self.complete(true);
             }
 
-            /* set value subscription */ 
-            self.value.subscribe(function(value) {
-                self.setToLocalStorage('value', value);
-            });
-
             self.locked.subscribe(function(value){
                 self.setToLocalStorage("locked", value);
             });
@@ -142,25 +151,42 @@ define([
         };
         
         this.save = function() {
-            /* 
-                currently SYNCHRONOUS, however async localStore interaction is
-                covered by value subscription. This should be refactored when we can.
-            */ 
-            var preSaveCallback = ko.unwrap(self.preSaveCallback);
-            if (preSaveCallback) {
-                preSaveCallback();
-            }
+            var preSaveCallback = function() {
+                return new Promise(function(resolve, _reject) {
+                    var preSaveCallback = ko.unwrap(self.preSaveCallback);
+                    preSaveCallback(resolve);
+                });
+            };
+            var writeToLocalStorage = function() {
+                return new Promise(function(resolve, _reject) {
+                    self.setToLocalStorage('value', self.value());
+                    resolve(self.value());
+                });
+            };
+            var postSaveCallback = function() {
+                // TODO: Refactor promise logic to pass down resolve
+                return new Promise(function(resolve, _reject) {
+                    var postSaveCallback = ko.unwrap(self.postSaveCallback);
 
-            self.setToLocalStorage('value', self.value())
-
-            var postSaveCallback = ko.unwrap(self.postSaveCallback);
-            if (postSaveCallback) {
-                postSaveCallback();
-            }
+                    if (postSaveCallback) {
+                        resolve(postSaveCallback());
+                    }
+                    else {
+                        resolve(null);
+                    }
+                });
+            };
+            
+            return new Promise(function(resolve, _reject) {
+                preSaveCallback().then(function(_preSaveCallbackData) {
+                    writeToLocalStorage().then(function(_localStorageData) {
+                        postSaveCallback().then(function(_postSaveCallbackData) {
+                            resolve(self.value());
+                        });
+                    });
+                });
+            });
         };
-
-
-        this.clearCallback = ko.observable();
 
         this.clear = function() {
             if (self.hasDirtyTile()) {
@@ -197,19 +223,31 @@ define([
             }
         };
 
-        this.setStepIdToUrl = function() {
-            var searchParams = new URLSearchParams(window.location.search);
-            searchParams.set(STEP_ID_LABEL, self.id());
-
-            var newRelativePathQuery = `${window.location.pathname}?${searchParams.toString()}`;
-            history.pushState(null, '', newRelativePathQuery);
-        };
-
         this.getExternalStepData = function() {
-            Object.keys(self.externalStepData).forEach(function(key) {
-                config.workflow.getStepData(externalStepSourceData[key]).then(function(data) {
-                    self.externalStepData[key]['data'] = data;
+            return new Promise(function(resolve, _reject) {
+                var promises = [];
+
+                Object.keys(self.externalStepData).forEach(function(key) {
+                    promises.push(config.workflow.getStepData(externalStepSourceData[key]));
                 });
+
+                if (promises.length) {
+                    Promise.all(promises).then(function(resolvedPromiseData) {
+                        resolve(
+                            resolvedPromiseData.reduce(function(acc, resolvedPromiseDatum) {
+                                if (resolvedPromiseDatum) {
+                                    Object.keys(resolvedPromiseDatum).forEach(function(key) {
+                                        acc[key] = resolvedPromiseDatum[key];
+                                    });
+                                }
+                                return acc;
+                            }, {})
+                        );
+                    });
+                }
+                else {
+                    resolve(null);
+                }
             });
         };
 
@@ -235,7 +273,7 @@ define([
                     text: config.informationboxdata['text'],
                 })
             }
-        }
+        };
 
         this.lockExternalStep = function(step, locked) {
             if (self.lockableExternalSteps.indexOf(step) > -1){
@@ -243,9 +281,7 @@ define([
             } else {
                 throw new Error("The step, " + step + ", cannot be locked")
             }
-        }
-
-        _.extend(this, config);
+        };
 
         this.iconClass = ko.computed(function(){
             var ret = '';
