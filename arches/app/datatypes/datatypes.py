@@ -1766,6 +1766,7 @@ class ResourceInstanceDataType(BaseDataType):
             for resourceXresourceId in resourceXresourceIds:
                 resourceid = resourceXresourceId["resourceId"]
                 try:
+                    node = models.Node.objects.get(pk=nodeid)
                     if node.config["searchString"] != "":
                         dsl = node.config["searchDsl"]
                         if dsl:
