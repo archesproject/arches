@@ -5131,6 +5131,8 @@ ul .collapse li:last-of-type {
 
 .arches-signin .login-panel {
     border: 1px solid #ddd;
+    width: auto;
+    max-width: 350px;
 }
 
 .arches-signin .panel-footer {
