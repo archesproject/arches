@@ -313,7 +313,7 @@ def search_results(request):
         while scroll_size > 0:
             page = dsl.se.es.scroll(scroll_id=scroll_id, scroll="1m")
             # sid = page['_scroll_id']
-            scroll_size = len(page['hits']['hits'])
+            scroll_size = len(page["hits"]["hits"])
             results["hits"]["hits"] += page["hits"]["hits"]
     else:
         results = dsl.search(index=RESOURCES_INDEX, id=resourceinstanceid)
