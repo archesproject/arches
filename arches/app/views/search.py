@@ -297,9 +297,15 @@ def search_results(request):
                 pages = (total // settings.SEARCH_RESULT_LIMIT) + 1
             if total > settings.SEARCH_EXPORT_LIMIT:
                 pages = int(settings.SEARCH_EXPORT_LIMIT // settings.SEARCH_RESULT_LIMIT) - 1
-        for page in range(int(pages)):
-            results_scrolled = dsl.se.es.scroll(scroll_id=scroll_id, scroll="1m")
-            results["hits"]["hits"] += results_scrolled["hits"]["hits"]
+        # for page in range(int(pages)):
+        scroll_size = results["hits"]["total"]["value"]
+
+        # results_scrolled = dsl.se.es.scroll(scroll_id=scroll_id, scroll="1m")
+        while scroll_size > 0:
+            page = dsl.se.es.scroll(scroll_id=scroll_id, scroll="1m")
+            # sid = page['_scroll_id']
+            scroll_size = len(page['hits']['hits'])
+            results["hits"]["hits"] += page["hits"]["hits"]
     else:
         results = dsl.search(index=RESOURCES_INDEX, id=resourceinstanceid)
 
