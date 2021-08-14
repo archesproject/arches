@@ -290,7 +290,7 @@ def search_results(request):
     if load_tiles:
         dsl.include("tiles")
     if for_export or pages:
-        results = dsl.search(index=RESOURCES_INDEX, scroll="1m")
+        results = dsl.search(index=RESOURCES_INDEX, limit=10000, scroll="1m")
         scroll_id = results["_scroll_id"]
         if not pages:
             if total <= settings.SEARCH_EXPORT_LIMIT:
