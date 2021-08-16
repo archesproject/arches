@@ -27,7 +27,11 @@ define([
             var url;
 
             if (params.report) {
-                if (!params.report.report_json && params.report.attributes.resourceid) {
+                if (
+                    !params.disableDisambiguatedReport
+                    && !params.report.report_json 
+                    && params.report.attributes.resourceid
+                ) {
                     url = arches.urls.api_bulk_disambiguated_resource_instance + `?resource_ids=${params.report.attributes.resourceid}`;
                     if(params.report.defaultConfig?.uncompacted_reporting) {
                         url += '&uncompacted=true';
