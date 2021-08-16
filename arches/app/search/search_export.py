@@ -100,7 +100,94 @@ class SearchResultsExporter(object):
                 return ret, ""
 
             if format == "tilecsv":
-                headers = list(graph.node_set.filter(exportable=True).values_list("name", flat=True))
+
+
+                graphCards = list(models.CardModel.objects.filter(graph=graph_id))
+                cardList = []
+                cardListNoSort = []
+                for g in graphCards:
+                    if g.sortorder == None:
+                        cardListNoSort.append(g)
+                    else:
+                        cardList.append(g)
+
+                cardList.sort(key=lambda x: x.sortorder)
+
+                graphCardList = []
+
+                subCards = []
+
+
+
+
+
+                for c in cardList:
+                    nodegroupObj = models.NodeGroup.objects.get(nodegroupid = c.nodegroup_id)
+                    parentObj = nodegroupObj.parentnodegroup_id
+                    if parentObj == None:
+                        graphCardList.append(c)
+                    else:
+                        subCards.append(c)
+
+                subCards.sort(key=lambda x: x.sortorder,reverse=True)
+
+
+                for cN in cardListNoSort:
+                    nodegroupObj = models.NodeGroup.objects.get(nodegroupid = cN.nodegroup_id)
+                    parentObj = nodegroupObj.parentnodegroup_id
+                    for c in graphCardList:
+                        if c.nodegroup_id == parentObj:
+                            indexNumber = graphCardList.index(c) + 1
+                            graphCardList.insert(indexNumber,cN)
+
+                for sC in subCards:
+                    nodegroupObj = models.NodeGroup.objects.get(nodegroupid = sC.nodegroup_id)
+                    parentObj = nodegroupObj.parentnodegroup_id
+                    for c in graphCardList:
+                        if c.nodegroup_id == parentObj:
+                            graphCardList.insert((graphCardList.index(c) + 1),sC)
+
+                orderedList = []
+                for gg in graphCardList:
+                    cardNodeObj = list(models.CardXNodeXWidget.objects.filter(card_id=gg.cardid))
+                    if len(cardNodeObj) > 0:
+                        nodesInCard = []
+                        for cNO in cardNodeObj:
+                            nodeObject = models.Node.objects.get(nodeid=cNO.node_id)
+                            if nodeObject.datatype != "semantic":
+                                nodesInCard.append(cNO)
+                            else:
+                                pass
+                        cardListSorted = sorted(nodesInCard, key=lambda x: x.sortorder)
+                        for nIC in cardListSorted:
+                            orderedList.append(nIC)
+                    else:
+                        pass
+
+                headers = []
+                for oL in orderedList:
+                    nodeObject = models.Node.objects.get(nodeid=oL.node_id)
+                    if nodeObject.exportable == True:
+                        if nodeObject.name not in headers:
+                            headers.append(nodeObject.name)
+                        else:
+                            pass
+                    else:
+                        pass
+
+                print(str(headers))
+
+
+
+
+
+
+
+
+
+
+
+                #headers = list(graph.node_set.filter(exportable=True).values_list("name", flat=True))
                 headers.append("resourceid")
                 if (report_link == "true") and ("Link" not in headers):
                     headers.append("Link")
