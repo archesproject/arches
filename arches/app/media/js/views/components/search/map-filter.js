@@ -262,15 +262,18 @@ define([
                     var agg = ko.unwrap(self.searchAggregations);
                     var features = [];
                     var mouseoverInstanceId = self.mouseoverInstanceId();
-                    _.each(agg.results, function(result) {
-                        _.each(result._source.points, function(point) {
-                            var feature = turf.point([point.point.lon, point.point.lat], _.extend(result._source, {
-                                resourceinstanceid: result._id,
-                                highlight: result._id === mouseoverInstanceId
-                            }));
-                            features.push(feature);
+                    
+                    if (agg) {
+                        _.each(agg.results, function(result) {
+                            _.each(result._source.points, function(point) {
+                                var feature = turf.point([point.point.lon, point.point.lat], _.extend(result._source, {
+                                    resourceinstanceid: result._id,
+                                    highlight: result._id === mouseoverInstanceId
+                                }));
+                                features.push(feature);
+                            });
                         });
-                    });
+                    }
 
                     var pointsFC = turf.featureCollection(features);
                     pointSource.setData(pointsFC);
