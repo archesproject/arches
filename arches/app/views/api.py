@@ -1271,7 +1271,9 @@ class BulkResourceReport(APIBase):
             graphs_from_database = list(Graph.objects.filter(pk__in=graph_ids_not_in_cache))
 
             for graph in graphs_from_database:
-                serialized_graph = JSONSerializer().serializeToPython(graph, sort_keys=False, exclude=["is_editable", "functions"] + exclusions)
+                serialized_graph = JSONSerializer().serializeToPython(
+                    graph, sort_keys=False, exclude=["is_editable", "functions"] + exclusions
+                )
                 cache.set("serialized_graph_{}".format(graph.pk), serialized_graph)
                 graph_lookup[str(graph.pk)] = serialized_graph
 
@@ -1285,7 +1287,7 @@ class BulkResourceReport(APIBase):
                 graph_ids_with_templates_that_preload_resource_data.append(graph["graphid"])
             else:
                 graph_ids_with_templates_that_do_not_preload_resource_data.append(graph["graphid"])
-        
+
         permitted_cards = []
 
         if "cards" not in exclude:
