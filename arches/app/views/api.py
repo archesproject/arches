@@ -1247,6 +1247,13 @@ class BulkResourceReport(APIBase):
         if not graph_ids:
             raise Exception()
 
+        exclusions_querystring = request.GET.get("exclude", None)
+
+        if exclusions_querystring is not None:
+            exclusions = list(map(str.strip, exclude.split(",")))
+        else:
+            exclusions = []
+
         graph_ids_set = set(graph_ids)  # calls set to delete dups
         graph_ids_not_in_cache = []
 
@@ -1264,7 +1271,9 @@ class BulkResourceReport(APIBase):
             graphs_from_database = list(Graph.objects.filter(pk__in=graph_ids_not_in_cache))
 
             for graph in graphs_from_database:
-                serialized_graph = JSONSerializer().serializeToPython(graph, sort_keys=False, exclude=["is_editable", "functions"])
+                serialized_graph = JSONSerializer().serializeToPython(
+                    graph, sort_keys=False, exclude=["is_editable", "functions"] + exclusions
+                )
                 cache.set("serialized_graph_{}".format(graph.pk), serialized_graph)
                 graph_lookup[str(graph.pk)] = serialized_graph
 
@@ -1279,19 +1288,22 @@ class BulkResourceReport(APIBase):
             else:
                 graph_ids_with_templates_that_do_not_preload_resource_data.append(graph["graphid"])
 
-        cards = (
-            CardProxyModel.objects.filter(graph_id__in=graph_ids_with_templates_that_preload_resource_data)
-            .select_related("nodegroup")
-            .order_by("sortorder")
-        )
-
-        perm = "read_nodegroup"
         permitted_cards = []
 
-        for card in cards:
-            if request.user.has_perm(perm, card.nodegroup):
-                card.filter_by_perm(request.user, perm)
-                permitted_cards.append(card)
+        if "cards" not in exclude:
+            cards = (
+                CardProxyModel.objects.filter(graph_id__in=graph_ids_with_templates_that_preload_resource_data)
+                .select_related("nodegroup")
+                .order_by("sortorder")
+            )
+
+            perm = "read_nodegroup"
+            permitted_cards = []
+
+            for card in cards:
+                if request.user.has_perm(perm, card.nodegroup):
+                    card.filter_by_perm(request.user, perm)
+                    permitted_cards.append(card)
 
         if "datatypes" not in exclude:
             datatypes = list(models.DDataType.objects.all())
