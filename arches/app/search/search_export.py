@@ -60,6 +60,119 @@ class SearchResultsExporter(object):
         self.output = {}
         self.set_precision = GeoUtils().set_precision
 
+
+
+
+    def return_ordered_header(self,graphid,export_type):
+
+        # Will contain top level cards (i.e. for nodegroups with no parent) with sortorder populated
+        card_list_with_sort = []
+        # Will contain all cards with NO sortorder populated
+        card_list_no_sort = []
+        # Will contain cards for nodegroups with parent nodegroup with sortorder populated
+        subcard_list_with_sort = []
+        # Will contain all cards as close to the order in the graph as possible
+        graph_card_list = []
+
+
+        graph_cards = list(models.CardModel.objects.filter(graph=graphid))
+
+
+
+        for gc in graph_cards:
+            if gc.sortorder == None:
+                card_list_no_sort.append(gc)
+            else:
+                card_list_with_sort.append(gc)
+        card_list_with_sort.sort(key=lambda x: x.sortorder)
+
+        #Work out which cards with sort order are sub cards by looking at the
+        # related nodegroup's parent nodegroup value
+
+        for clws in card_list_with_sort:
+            nodegroup_obj = models.NodeGroup.objects.get(nodegroupid = clws.nodegroup_id)
+            parent_obj = nodegroup_obj.parentnodegroup_id
+            if parent_obj == None:
+                graph_card_list.append(clws)
+            else:
+                subcard_list_with_sort.append(clws)
+
+        # Reverse set to allow cards with sort and a parent nodegroup
+        # to be injected into the main list in the correct order i.e. above
+        # cards with no sort order and according to the sort order as cards are
+        # injected just below the top card.
+
+        subcard_list_with_sort.sort(key=lambda x: x.sortorder,reverse=True)
+
+        for cN in card_list_no_sort:
+            nodegroup_obj = models.NodeGroup.objects.get(nodegroupid = cN.nodegroup_id)
+            parent_obj = nodegroup_obj.parentnodegroup_id
+            for gcl in graph_card_list:
+                if gcl.nodegroup_id == parent_obj:
+                    index_number = graph_card_list.index(gcl) + 1
+                    graph_card_list.insert(index_number,cN)
+
+
+        # Cards in subcard_list_with_sort are added after cards with no sort
+
+        for sC in subcard_list_with_sort:
+            nodegroup_obj = models.NodeGroup.objects.get(nodegroupid = sC.nodegroup_id)
+            parent_obj = nodegroup_obj.parentnodegroup_id
+            for gcl in graph_card_list:
+                if gcl.nodegroup_id == parent_obj:
+                    graph_card_list.insert((graph_card_list.index(gcl) + 1),sC)
+
+
+
+        # Create a list of nodes within each card and order them according to sort
+        # order then add them to the main list of
+
+        ordered_list = []
+        for gcl in graph_card_list:
+            card_node_obj = list(models.CardXNodeXWidget.objects.filter(card_id=gcl.cardid))
+            if len(card_node_obj) > 0:
+                nodes_in_card = []
+                for cNO in card_node_obj:
+                    node_object = models.Node.objects.get(nodeid=cNO.node_id)
+                    if node_object.datatype != "semantic":
+                        nodes_in_card.append(cNO)
+                    else:
+                        pass
+                card_list_sorted = sorted(nodes_in_card, key=lambda x: x.sortorder)
+                for nIC in card_list_sorted:
+                    ordered_list.append(nIC)
+            else:
+                pass
+
+
+        # Build the list of headers (in correct format for return file format) to be returned
+        # from the ordered list of nodes, only where the exportable tag is true
+
+        headers = []
+        for oL in ordered_list:
+            node_object = models.Node.objects.get(nodeid=oL.node_id)
+            if node_object.exportable == True:
+                if export_type == "csv":
+                    if node_object.name not in headers:
+                        headers.append(node_object.name)
+                    else:
+                        pass
+                elif export_type == "shp":
+                    header_object = {}
+                    header_object["fieldname"] = node_object.fieldname
+                    header_object["datatype"] = node_object.datatype
+                    if header_object not in headers:
+                        headers.append(header_object)
+                    else:
+                        pass
+                else:
+                    pass
+            else:
+                pass
+
+        return headers
+
+
     def export(self, format, report_link):
         ret = []
         search_res_json = SearchView.search_results(self.search_request)
@@ -100,101 +213,22 @@ class SearchResultsExporter(object):
                 return ret, ""
 
             if format == "tilecsv":
+                orderheaders = True
+                if orderheaders == True:
+                    headers = self.return_ordered_header(graph_id,"csv")
+                else:
+                    headers = list(graph.node_set.filter(exportable=True).values_list("name", flat=True))
 
 
-                graphCards = list(models.CardModel.objects.filter(graph=graph_id))
-                cardList = []
-                cardListNoSort = []
-                for g in graphCards:
-                    if g.sortorder == None:
-                        cardListNoSort.append(g)
-                    else:
-                        cardList.append(g)
-
-                cardList.sort(key=lambda x: x.sortorder)
-
-                graphCardList = []
-
-                subCards = []
-
-
-
-
-
-                for c in cardList:
-                    nodegroupObj = models.NodeGroup.objects.get(nodegroupid = c.nodegroup_id)
-                    parentObj = nodegroupObj.parentnodegroup_id
-                    if parentObj == None:
-                        graphCardList.append(c)
-                    else:
-                        subCards.append(c)
-
-                subCards.sort(key=lambda x: x.sortorder,reverse=True)
-
-
-                for cN in cardListNoSort:
-                    nodegroupObj = models.NodeGroup.objects.get(nodegroupid = cN.nodegroup_id)
-                    parentObj = nodegroupObj.parentnodegroup_id
-                    for c in graphCardList:
-                        if c.nodegroup_id == parentObj:
-                            indexNumber = graphCardList.index(c) + 1
-                            graphCardList.insert(indexNumber,cN)
-
-                for sC in subCards:
-                    nodegroupObj = models.NodeGroup.objects.get(nodegroupid = sC.nodegroup_id)
-                    parentObj = nodegroupObj.parentnodegroup_id
-                    for c in graphCardList:
-                        if c.nodegroup_id == parentObj:
-                            graphCardList.insert((graphCardList.index(c) + 1),sC)
-
-                orderedList = []
-                for gg in graphCardList:
-                    cardNodeObj = list(models.CardXNodeXWidget.objects.filter(card_id=gg.cardid))
-                    if len(cardNodeObj) > 0:
-                        nodesInCard = []
-                        for cNO in cardNodeObj:
-                            nodeObject = models.Node.objects.get(nodeid=cNO.node_id)
-                            if nodeObject.datatype != "semantic":
-                                nodesInCard.append(cNO)
-                            else:
-                                pass
-                        cardListSorted = sorted(nodesInCard, key=lambda x: x.sortorder)
-                        for nIC in cardListSorted:
-                            orderedList.append(nIC)
-                    else:
-                        pass
-
-                headers = []
-                for oL in orderedList:
-                    nodeObject = models.Node.objects.get(nodeid=oL.node_id)
-                    if nodeObject.exportable == True:
-                        if nodeObject.name not in headers:
-                            headers.append(nodeObject.name)
-                        else:
-                            pass
-                    else:
-                        pass
-
-                print(str(headers))
-
-
-
-
-
-
-
-
-
-
-
-                #headers = list(graph.node_set.filter(exportable=True).values_list("name", flat=True))
                 headers.append("resourceid")
                 if (report_link == "true") and ("Link" not in headers):
                     headers.append("Link")
                 ret.append(self.to_csv(resources["output"], headers=headers, name=graph.name))
 
             if format == "shp":
+
                 headers = graph.node_set.filter(exportable=True).values("fieldname", "datatype", "name")[::1]
+
                 missing_field_names = []
                 for header in headers:
                     if not header["fieldname"]:
@@ -205,10 +239,16 @@ class SearchResultsExporter(object):
                     logger.error(message)
                     raise (Exception(message))
 
-                headers = graph.node_set.filter(exportable=True).values("fieldname", "datatype")[::1]
+                orderheaders = True
+                if orderheaders == True:
+                    headers = self.return_ordered_header(graph_id,"shp")
+                else:
+                    headers = graph.node_set.filter(exportable=True).values("fieldname", "datatype")[::1]
                 headers.append({"fieldname": "resourceid", "datatype": "str"})
                 if (report_link == "true") and ({"fieldname": "Link", "datatype": "str"} not in headers):
                     headers.append({"fieldname": "Link", "datatype": "str"})
+                else:
+                    pass
                 ret += self.to_shp(resources["output"], headers=headers, name=graph.name)
 
             if format == "tilexl":
