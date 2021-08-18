@@ -3,9 +3,9 @@ define([
     'underscore',
     'viewmodels/widget',
     'arches',
-    'views/components/resource-summary',
-    'utils/ontology'
-], function(ko, _, WidgetViewModel, arches, ResourceSummary, ontologyUtils) {
+    'utils/ontology',
+    'views/components/resource-report-abstract',
+], function(ko, _, WidgetViewModel, arches, ontologyUtils) {
     var resourceLookup = {};
     var graphCache = {};
     require(['views/components/related-instance-creator']);
@@ -299,7 +299,7 @@ define([
         var resourceToAdd = ko.observable("");
 
         this.disabled = ko.computed(function() {
-            return ko.unwrap(self.waitingForGraphToDownload) || ko.unwrap(params.disabled) || ko.unwrap(params.form?.locked);
+            return ko.unwrap(self.waitingForGraphToDownload) || ko.unwrap(params.disabled) || !!ko.unwrap(params.form?.locked);
         });
         
         this.select2Config = {
