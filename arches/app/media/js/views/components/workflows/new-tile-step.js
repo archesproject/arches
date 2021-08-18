@@ -15,15 +15,15 @@ define([
         this.resourceId = ko.observable();
         if (params.workflow) {
             if (!params.resourceid()) {
-                if (params.workflow.state.steps[params._index]) {
+                if (params.workflow.state && params.workflow.state.steps[params._index]) {
                     this.resourceId(params.workflow.state.steps[params._index].resourceid);
-                } else {
+                } else if (params.workflow.state) {
                     this.resourceId(params.workflow.state.resourceid);
                 }
             } else {
                 this.resourceId = params.resourceid;
             }
-            if (params.workflow.state.steps[params._index]) {
+            if (params.workflow.state && params.workflow.state.steps[params._index]) {
                 params.tileid(params.workflow.state.steps[params._index].tileid);
             }
         }
@@ -217,7 +217,7 @@ define([
 
         this.setStateProperties = function(){
             //Sets properties in defineStateProperties to the state.
-            if (params.workflow) {
+            if (params.workflow && params.workflow.state) {
                 params.workflow.state.steps[params._index] = params.defineStateProperties();
             }
         };
@@ -231,7 +231,7 @@ define([
                 self.resourceId(tile.resourceinstance_id);
             }
             self.setStateProperties();
-            if (params.workflow) {
+            if (params.workflow && params.workflow.updateUrl instanceof Function) {
                 params.workflow.updateUrl();
             }
             if (self.completeOnSave === true) { self.complete(true); }
