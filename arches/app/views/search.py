@@ -211,7 +211,11 @@ def export_results(request):
     total = int(request.GET.get("total", 0))
     format = request.GET.get("format", "tilecsv")
     report_link = request.GET.get("reportlink", False)
-    download_limit = settings.SEARCH_EXPORT_IMMEDIATE_DOWNLOAD_THRESHOLD
+    if format == "html":
+        download_limit = settings.SEARCH_EXPORT_IMMEDIATE_DOWNLOAD_THRESHOLD_HTML_FORMAT
+    else:
+        download_limit = settings.SEARCH_EXPORT_IMMEDIATE_DOWNLOAD_THRESHOLD
+    
     if total > download_limit and format != "geojson":
         celery_worker_running = task_management.check_if_celery_available()
         if celery_worker_running is True:

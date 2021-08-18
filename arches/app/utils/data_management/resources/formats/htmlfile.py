@@ -37,7 +37,8 @@ class HtmlWriter(Writer):
             except:
                 pass
 
-        return [str(graph) for graph in GraphModel.objects.filter(pk__in=filename_list)]
+        #return [str(graph) for graph in GraphModel.objects.filter(pk__in=filename_list)]
+        return filename_list
 
 
 
@@ -66,6 +67,7 @@ class HtmlWriter(Writer):
         for resource in resources:
             gid = str(resource.graph_id)
             if gid in allowed_graph_ids:
+                #should this use the API over http call as might parallel run if webserver configured for multiple processes?
                 out = {
                     "resource": resource.to_json(
                         compact=compact,
