@@ -15,7 +15,7 @@
                     <input type="radio" name="stat-w-label" data-bind="checked: format() === 'tilecsv'" value="true"> {% trans "csv" %}
                 </label>
                 <!-- ko if: hasExportHtmlTemplates() -->
-                <label data-bind="css: { 'active': format() === 'html', 'disabled': (celeryRunning() !== 'True' && total() > {{app_settings.SEARCH_EXPORT_IMMEDIATE_DOWNLOAD_THRESHOLD_HTML_FORMAT}}) }, click: function () { if((celeryRunning() === 'True' || total() < {{app_settings.SEARCH_EXPORT_IMMEDIATE_DOWNLOAD_THRESHOLD_HTML_FORMAT}})) {format('html')} }" class="form-radio form-normal form-text">
+                <label data-bind="css: { 'active': format() === 'html', 'disabled': (celeryRunning() !== 'True' && total() > {{app_settings.SEARCH_EXPORT_IMMEDIATE_DOWNLOAD_THRESHOLD_HTML_FORMAT}}) }, click: function () { if((celeryRunning() === 'True' || total() <= {{app_settings.SEARCH_EXPORT_IMMEDIATE_DOWNLOAD_THRESHOLD_HTML_FORMAT}})) {format('html')} }" class="form-radio form-normal form-text">
                     <input type="radio" name="stat-w-label" data-bind="checked: format() === 'html'" value="false"> {% trans "html" %}
                 </label>
                 <!-- /ko -->
@@ -76,7 +76,7 @@
         <!-- /ko -->
     </div>
 
-    <div data-bind="visible: ((total() > {{app_settings.SEARCH_EXPORT_IMMEDIATE_DOWNLOAD_THRESHOLD}}) && (celeryRunning() !== 'True') || (format() === 'html' && total() > {{app_settings.SEARCH_EXPORT_IMMEDIATE_DOWNLOAD_THRESHOLD_HTML_FORMAT}} && celeryRunning() !== 'True')), text: ('Arches is currently running without Celery. Exports will be limited to {{app_settings.SEARCH_EXPORT_IMMEDIATE_DOWNLOAD_THRESHOLD}} records or {{app_settings.SEARCH_EXPORT_IMMEDIATE_DOWNLOAD_THRESHOLD_HTML_FORMAT}} when chosing html format.')"></div>
+    <div data-bind="visible: ((total() > {{app_settings.SEARCH_EXPORT_IMMEDIATE_DOWNLOAD_THRESHOLD}}) && (celeryRunning() !== 'True') || (format() === 'html' && total() > {{app_settings.SEARCH_EXPORT_IMMEDIATE_DOWNLOAD_THRESHOLD_HTML_FORMAT}} && celeryRunning() !== 'True')), text: ('Arches is currently running without Celery. Exports will be limited to {{app_settings.SEARCH_EXPORT_IMMEDIATE_DOWNLOAD_THRESHOLD}} records. The html option is only allowed with a selection of up to {{app_settings.SEARCH_EXPORT_IMMEDIATE_DOWNLOAD_THRESHOLD_HTML_FORMAT}} resources.')"></div>
     <div class="search-export download" data-bind="">
         <button class="btn btn-lg btn-primary btn-active-primary"
             type="button"
