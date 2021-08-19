@@ -569,7 +569,7 @@ define([
     };
 
 
-    function WorkflowComponentAbstract(componentData, previouslyPersistedComponentData, externalStepData, resourceId, title, complete, saving, locked, lockExternalStep, lockableExternalSteps, workflowId, alert) {
+    function WorkflowComponentAbstract(componentData, previouslyPersistedComponentData, externalStepData, resourceId, title, complete, saving, locked, lockExternalStep, lockableExternalSteps, workflowId, alert, outerSaveOnQuit) {
         var self = this;
 
         this.alert = alert;
@@ -590,6 +590,11 @@ define([
         this.hasUnsavedData = ko.observable();
 
         this.loading = ko.observable(true);
+
+        this.saveOnQuit = ko.observable();
+        this.saveOnQuit.subscribe(function(val){
+            outerSaveOnQuit(val);
+        });
 
         this.initialize = function() {
             if (!componentData.tilesManaged || componentData.tilesManaged === "none") {
@@ -633,6 +638,10 @@ define([
         this.locked = params.locked;
         this.lockExternalStep = params.lockExternalStep;
         this.lockableExternalSteps = params.lockableExternalSteps;
+        this.outerSaveOnQuit = ko.observable();
+        this.outerSaveOnQuit.subscribe(function(val){
+            params.saveOnQuit = val;
+        });
 
         this.dataToPersist = ko.observable({});
         self.dataToPersist.subscribe(function(data) {
@@ -729,7 +738,8 @@ define([
                 self.lockExternalStep,
                 self.lockableExternalSteps,
                 self.workflowId,
-                self.alert
+                self.alert,
+                self.outerSaveOnQuit,
             );
 
             workflowComponentAbstract.savedData.subscribe(function() {

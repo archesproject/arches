@@ -48,9 +48,10 @@ define(['arches',
          * @param  {NodeModel} node - the node to be deleted
          * @param  {function} callback - (optional) a callback function
          * @param  {object} scope - (optional) the scope used for the callback
+         * @return  {jqXHR} - a Proimise compatible asynchronous request
          */
         deleteNode: function(node, callback, scope){
-            this._doRequest({
+            return this._doRequest({
                 type: "DELETE",
                 url: this.url + this.get('graphid') + '/delete_node',
                 data: JSON.stringify({nodeid:node.nodeid})
@@ -139,6 +140,7 @@ define(['arches',
          * @param  {string} branch_graph - the {@link GraphModel} we're appending to this graph
          * @param  {function} callback - the function to call after the response returns from the server
          * @param  {object} scope - the value of "this" in the callback function
+         * @return  {jqXHR} - a Proimise compatible asynchronous request
          */
         appendBranch: function(node, property, branch_graph, callback, scope){
             property = property ? property : null;
@@ -161,7 +163,7 @@ define(['arches',
                 }
             }
 
-            this._doRequest({
+            return this._doRequest({
                 type: "POST",
                 url: this.url + this.get('graphid') + '/append_branch',
                 data: JSON.stringify({nodeid:node.nodeid, property: property, graphid: branch_graph.get('graphid')})
@@ -215,9 +217,10 @@ define(['arches',
          * @param  {string} node - the node within this graph onto which we're appending a new node
          * @param  {function} callback - the function to call after the response returns from the server
          * @param  {object} scope - the value of "this" in the callback function
+         * @return  {jqXHR} - a Proimise compatible asynchronous request
          */
         appendNode: function(node, callback, scope){
-            this._doRequest({
+            return this._doRequest({
                 type: "POST",
                 url: this.url + this.get('graphid') + '/append_node',
                 data: JSON.stringify({nodeid:node.nodeid})
@@ -265,9 +268,10 @@ define(['arches',
          * @param  {NodeModel} newParentNode - the node to which we moved our branch to
          * @param  {function} callback - the function to call after the response returns from the server
          * @param  {object} scope - the value of "this" in the callback function
+         * @return  {jqXHR} - a Proimise compatible asynchronous request
          */
         moveNode: function(node, property, newParentNode, callback, scope){
-            this._doRequest({
+            return this._doRequest({
                 type: "POST",
                 url: this.url + this.get('graphid') + '/move_node',
                 data: JSON.stringify({nodeid:node.nodeid, property: property, newparentnodeid: newParentNode.nodeid})
@@ -305,9 +309,10 @@ define(['arches',
          * @param  {NodeModel} node - the node with updated values
          * @param  {function} callback - the function to call after the response returns from the server
          * @param  {object} scope - the value of "this" in the callback function
+         * @return  {jqXHR} - a Proimise compatible asynchronous request
          */
         updateNode: function(node, callback, scope){
-            this._doRequest({
+            return this._doRequest({
                 type: "POST",
                 url: this.url + this.get('graphid') + '/update_node',
                 data: JSON.stringify(node.toJSON())
@@ -330,8 +335,16 @@ define(['arches',
             }, this, 'changed');
         },
 
+        /**
+         * exportBranch - creates a new branch rooted at the supplied node
+         * @memberof GraphModel.prototype
+         * @param  {NodeModel} node - the node with updated values
+         * @param  {function} callback - the function to call after the response returns from the server
+         * @param  {object} scope - the value of "this" in the callback function
+         * @return  {jqXHR} - a Proimise compatible asynchronous request
+         */
         exportBranch: function(node, callback, scope){
-            this._doRequest({
+            return this._doRequest({
                 type: "POST",
                 async: false,
                 url: this.url + this.get('graphid') + '/export_branch',
@@ -355,9 +368,10 @@ define(['arches',
          * @param  {string} nodeid - the node id of the node of interest
          * @param  {function} callback - function to call when the request returns
          * @param  {object} scope - (optional) the scope used for the callback
+         * @return  {jqXHR} - a Proimise compatible asynchronous request
          */
         getValidNodesEdges: function(nodeid, callback, scope){
-            this._doRequest({
+            return this._doRequest({
                 type: "GET",
                 url: this.url + this.get('graphid') + '/get_related_nodes/' + nodeid,
             }, function(response, status){

@@ -240,6 +240,13 @@ urlpatterns = [
     url(r"^api/nodes/(?P<nodeid>%s|())$" % (uuid_regex), api.Node.as_view(), name="api_nodes"),
     url(r"^api/instance_permissions/$", api.InstancePermission.as_view(), name="api_instance_permissions"),
     url(r"^api/node_value/$", api.NodeValue.as_view(), name="api_node_value"),
+    url(r"^api/resource_report/(?P<resourceid>%s|())$" % (uuid_regex), api.ResourceReport.as_view(), name="api_resource_report"),
+    url(r"^api/bulk_resource_report$", api.BulkResourceReport.as_view(), name="api_bulk_resource_report"),
+    url(
+        r"^api/bulk_disambiguated_resource_instance$",
+        api.BulkDisambiguatedResourceInstance.as_view(),
+        name="api_bulk_disambiguated_resource_instance",
+    ),
     url(r"^api/search/export_results$", api.SearchExport.as_view(), name="api_export_results"),
     url(r"^rdm/concepts/(?P<conceptid>%s|())$" % uuid_regex, api.Concepts.as_view(), name="concepts"),
     url(r"^plugins/(?P<pluginid>%s)$" % uuid_regex, PluginView.as_view(), name="plugins"),
