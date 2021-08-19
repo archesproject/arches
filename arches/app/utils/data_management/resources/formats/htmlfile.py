@@ -20,7 +20,7 @@ class HtmlWriter(Writer):
 
     @staticmethod
     def get_templates_dir_path():
-        return os.path.join(settings.APP_ROOT, "export_report_templates")
+        return os.path.join(settings.APP_ROOT, "export_html_templates")
 
     @staticmethod
     def get_graphids_with_export_template():

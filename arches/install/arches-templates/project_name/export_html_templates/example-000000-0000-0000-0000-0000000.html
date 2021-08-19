@@ -19,66 +19,19 @@
          {% for resource in resources %}
          <section class="section-title">
             <blockquote>
-               {% for n in resource.resource["Heritage Asset Names"] %}
-                  {% if n["Asset Name Use Type"]["@value"] == "Primary" %}
-                     <h2>{{ n["Asset Name"] }}</h2>
-                  {% endif %}
-               {% endfor %}
-               <p><strong>Primary Reference Number: </strong>{{ resource.resource["System Reference Numbers"]["PrimaryReferenceNumber"]["Primary Reference Number"] }}<br>
-                  <strong>ResourceID: </strong>{{ resource.resourceinstanceid }}
-               </p>
+                <h2>{{ resource.displayname }}</h2>
             </blockquote>
-         </section>
-         <section>
-            <div class="container location-details">
-               {% if resource.resource["Location Data"] is defined %}
-               <div class="row">
-                  <div class="column">
-                     <div>
-                        <h3>OSGB Reference</h3>
-                        <p>{% if resource.resource["Location Data"]["National Grid References"] is defined %}
-                           {{ resource.resource["Location Data"]["National Grid References"]["National Grid Reference"] }}
-                           {% endif %}
-                        </p>
-                     </div>
-                  </div>
-                  <div class="column">
-                     <div class="keeptogether"></div>
-                     <div class="keeptogether">
-                        <div>
-                           <h3>Named Location</h3>
-                           <p>{% if resource.resource["Location Data"]["Addresses"] is defined %}
-                        {% for address in resource.resource["Location Data"]["Addresses"] %}
-                           {% if address["Address Status"]["@value"] == "Primary" %}
-                              {{ address["Full Address"] }}
-                           {% endif %}
-                        {% endfor %}
-                        {% endif %}
-                        </p>
-                        </div>
-                     </div>
-                  </div>
-                  <div class="column">
-                     <div class="keeptogether"></div>
-                     <div class="keeptogether">
-                        <div>
-                           <h3>Localities/Administrative Areas</h3>
-                        <p>{% if resource.resource["Location Data"]["Localities/Administrative Areas"] is defined %}
-                        {% for area in resource.resource["Location Data"]["Localities/Administrative Areas"] %}
-                           <b>{{ area["Area Type"]["@value"] }}:</b> {{ area["Area Names"]["Area Name"] }}
-                        {% endfor %}
-                        {% endif %}
-                        </p>
-                        </div>
-                     </div>
-                  </div>
-               </div>
-               {% endif %}
-            </div>
          </section>
          <hr>
          <section>
+            <h3>Description</h3>
             <div class="container">
+            <p>
+                {{ resource.displayname }}
+            </p>
+
+            {# Example of adding a description from an array of Description cards based on the type
+                ======================================================
                {% if resource.resource["Descriptions"] is defined %}
                <div class="keeptogether">
                   {% for desc in resource.resource["Descriptions"] %}
@@ -95,6 +48,11 @@
                   {% endfor %}
                </div>
                {% endif %}
+                =====================================================
+            #}
+
+            {# Example of creating a responsive table from a list of card values
+                ======================================================
                {% if resource.resource["External Cross References"] is defined %}
                <div class="keeptogether">
                   <h3>External Cross References</h3>
@@ -118,6 +76,8 @@
                   </div>
                </div>
                {% endif %}
+            =========================================================
+            #}
             </div>
          </section>
          {% endfor %}
