@@ -6,6 +6,7 @@ define([
     'report-templates',
     'models/report',
     'models/graph',
+    'viewmodels/card'
 ], function(arches, $, _, ko, reportLookup, ReportModel, GraphModel) {
     var ResourceReportAbstract = function(params) {
         var self = this;
