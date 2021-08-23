@@ -15,11 +15,17 @@ def reverse_edit_log_entries(transaction_id):
         with transaction.atomic():
             for edit_log in transaction_changes:
                 if edit_log.edittype == "create":
-                    number_of_db_changes += Resource.objects.filter(resourceinstanceid=edit_log.resourceinstanceid).delete()[0]
+                    for obj in Resource.objects.filter(resourceinstanceid=edit_log.resourceinstanceid):
+                        obj.delete()
+                        number_of_db_changes += 1
                 elif edit_log.edittype == "tile create":
-                    number_of_db_changes += Tile.objects.filter(tileid=edit_log.tileinstanceid).delete()[0]
+                    for obj in Tile.objects.filter(tileid=edit_log.tileinstanceid):
+                        obj.delete()
+                        number_of_db_changes += 1
                 elif edit_log.edittype == "tile edit":
-                    number_of_db_changes += Tile.objects.filter(tileid=edit_log.tileinstanceid).update(data=edit_log.oldvalue)
+                    for obj in Tile.objects.filter(tileid=edit_log.tileinstanceid):
+                        obj.update(data=edit_log.oldvalue)
+                        number_of_db_changes += 1
     except DatabaseError:
         logger.error("Error connecting to database")
 
