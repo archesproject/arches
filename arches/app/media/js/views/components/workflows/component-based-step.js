@@ -570,7 +570,7 @@ define([
     };
 
 
-    function WorkflowComponentAbstract(componentData, previouslyPersistedComponentData, externalStepData, resourceId, title, isStepSaving, locked, lockExternalStep, lockableExternalSteps, workflowId, alert) {
+    function WorkflowComponentAbstract(componentData, previouslyPersistedComponentData, externalStepData, resourceId, title, isStepSaving, locked, lockExternalStep, lockableExternalSteps, workflowId, alert, outerSaveOnQuit) {
         var self = this;
 
         this.workflowId = workflowId;
@@ -608,6 +608,11 @@ define([
             self.save();
         };
 
+        this.saveOnQuit = ko.observable();
+        this.saveOnQuit.subscribe(function(val){
+            outerSaveOnQuit(val);
+        });
+
         this.initialize = function() {
             self.loading(true);
 
@@ -640,6 +645,10 @@ define([
         this.locked = params.locked;
         this.lockExternalStep = params.lockExternalStep;
         this.lockableExternalSteps = params.lockableExternalSteps;
+        this.outerSaveOnQuit = ko.observable();
+        this.outerSaveOnQuit.subscribe(function(val){
+            params.saveOnQuit = val;
+        });
 
         /* 
             `pageLayout` is an observableArray of arrays representing section Information ( `sectionInfo` ).
@@ -774,6 +783,7 @@ define([
                 self.lockableExternalSteps,
                 self.workflowId,
                 self.alert,
+                self.outerSaveOnQuit,
             );
 
             /* 
