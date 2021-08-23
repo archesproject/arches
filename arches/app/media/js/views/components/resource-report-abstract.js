@@ -6,10 +6,11 @@ define([
     'report-templates',
     'models/report',
     'models/graph',
-    'viewmodels/card',
-], function(arches, $, _, ko, reportLookup, ReportModel, GraphModel, CardViewModel) {
+    'viewmodels/card'
+], function(arches, $, _, ko, reportLookup, ReportModel, GraphModel) {
     var ResourceReportAbstract = function(params) {
         var self = this;
+        var CardViewModel = require('viewmodels/card');
 
         this.loading = ko.observable(true);
 
@@ -58,7 +59,6 @@ define([
                 self.fetchResourceData(url).then(function(responseJson) {
                     var template = responseJson.template;
                     self.template(template);
-                    
                     if (template.preload_resource_data) {
                         self.preloadResourceData(responseJson);
                     }
@@ -130,16 +130,7 @@ define([
             self.report(report);
         };
 
-        if (!CardViewModel) {
-            require(['viewmodels/card'], function(cardViewModel) { 
-                CardViewModel = cardViewModel; 
-                
-                self.initialize();
-            });
-        }
-        else {
-            self.initialize();
-        }
+        self.initialize();
     };
     ko.components.register('resource-report-abstract', {
         viewModel: ResourceReportAbstract,
