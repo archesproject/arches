@@ -153,7 +153,7 @@ class SearchResultsExporter(object):
                     header_object["fieldname"] = node_object.fieldname
                     header_object["datatype"] = node_object.datatype
                     header_object["name"] = node_object.name
-                    if node_object.id not in node_id_list:
+                    if node_object.nodeid not in node_id_list:
                         headers.append(header_object)
                         node_id_list.append(node_object.nodeid)
                     else:
@@ -198,7 +198,12 @@ class SearchResultsExporter(object):
                     resource["Link"] = f"{export_namespace}{report_url}"
 
             if format == "geojson":
-                headers = list(graph.node_set.filter(exportable=True).values_list("name", flat=True))
+
+                if settings.EXPORT_DATA_FIELDS_IN_CARD_ORDER == True:
+                    headers = self.return_ordered_header(graph_id, "csv")
+                else:
+                    headers = list(graph.node_set.filter(exportable=True).values_list("name", flat=True))
+
                 if (report_link == "true") and ("Link" not in headers):
                     headers.append("Link")
                 ret = self.to_geojson(resources["output"], headers=headers, name=graph.name)
@@ -229,7 +234,7 @@ class SearchResultsExporter(object):
                 for header in headers:
                     if not header["fieldname"]:
                         missing_field_names.append(header["name"])
-                    header.pop("name")
+                        header.pop("name")
                 if len(missing_field_names) > 0:
                     message = _("Shapefile are fieldnames required for the following nodes: {0}".format(", ".join(missing_field_names)))
                     logger.error(message)

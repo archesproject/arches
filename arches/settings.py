@@ -131,7 +131,7 @@ ARCHES_NAMESPACE_FOR_DATA_EXPORT = "http://localhost:8000/"
 
 # This is used to indicate whether the data in the CSV and SHP exports should be
 # ordered as seen in the resource cards or not.
-EXPORT_DATA_FIELDS_IN_CARD_ORDER = True
+EXPORT_DATA_FIELDS_IN_CARD_ORDER = False
 
 RDM_JSONLD_CONTEXT = {"arches": ARCHES_NAMESPACE_FOR_DATA_EXPORT}
 

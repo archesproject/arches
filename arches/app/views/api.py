@@ -583,13 +583,7 @@ class Resources(APIBase):
                 hide_empty_nodes = bool(request.GET.get("hide_empty_nodes", "false").lower() == "true")  # default False
 
                 out = {
-                    "resource": resource.to_json(
-                        compact=compact,
-                        hide_empty_nodes=hide_empty_nodes,
-                        user=user,
-                        perm=perm,
-                        version=version
-                    ),
+                    "resource": resource.to_json(compact=compact, hide_empty_nodes=hide_empty_nodes, user=user, perm=perm, version=version),
                     "displaydescription": resource.displaydescription,
                     "displayname": resource.displayname,
                     "graph_id": resource.graph_id,
@@ -976,7 +970,10 @@ class SearchExport(View):
         exporter = SearchResultsExporter(search_request=request)
         export_files, export_info = exporter.export(format, report_link)
         if format == "geojson" and total <= download_limit:
-            response = JSONResponse(export_files)
+            if settings.EXPORT_DATA_FIELDS_IN_CARD_ORDER == True:
+                response = JSONResponse(export_files, sort_keys=False)
+            else:
+                response = JSONResponse(export_files)
             return response
         return JSONResponse(status=404)
 
