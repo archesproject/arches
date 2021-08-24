@@ -73,8 +73,6 @@ define([
         });
 
         this.initialize = function() {
-            console.log(self, self.id)
-
             /* cached ID logic */ 
             var cachedId = ko.unwrap(config.id);
             if (cachedId) {
