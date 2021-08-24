@@ -1093,7 +1093,7 @@ class CsvReader(Reader):
                     if len(v) > 0:
                         errors.append(
                             {
-                                "type": "WARNING",
+                                "type": "INFO",
                                 "message": "{0} is null or not mapped on rows {1} and \
                                 participates in a display value function.".format(
                                     k, ",".join(v)

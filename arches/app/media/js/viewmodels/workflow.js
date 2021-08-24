@@ -161,11 +161,8 @@ define([
         };
 
         this.saveActiveStep = function() {
-            console.log(self.activeStep())
             return new Promise(function(resolve, _reject) {
-                self.activeStep().save().then(function(data) {      
-                    
-                    console.log("DDSES", data)
+                self.activeStep().save().then(function(data) {            
                     resolve(data);
                 });
             });

@@ -199,8 +199,15 @@ define([
                     });
             };
             var getStyle = function() {
-                var nodeSize = 86;
-                var lineColor = '#606060';
+                var nodeSize = 60;
+                var borderColor = '#115170';
+                var borderHighlightColor = '#023047';
+                var borderSelectedColor = '#000F16';
+                var lineColor = '#BFBEBE';
+                var selectedLineColor = '#023047';
+                var borderWidth = 1;
+                var hoverBorderWidth = 4;
+                var selectedBorderWidth = 4;
                 var styles = [{
                     "selector": "node",
                     "style": {
@@ -210,8 +217,8 @@ define([
                         "height": nodeSize,
                         "text-valign": "center",
                         "text-halign": "center",
-                        "border-color": lineColor,
-                        "border-width": 1
+                        "border-color": borderColor,
+                        "border-width": borderWidth
                     }
                 }, {
                     "selector": "node.focus",
@@ -221,28 +228,32 @@ define([
                 }, {
                     "selector": "node:selected",
                     "style": {
-                        "border-width": 4
+                        "border-width": selectedBorderWidth,
+                        "border-color": borderSelectedColor
                     }
                 }, {
                     "selector": "node.hover",
                     "style": {
-                        "border-width": 6
+                        "border-width": hoverBorderWidth,
+                        "border-color": borderHighlightColor
                     }
                 }, {
                     "selector": "edge",
                     "style": {
-                        "line-color": lineColor
+                        "line-color": lineColor,
+                        "border-width": borderWidth
                     }
                 }, {
                     "selector": "edge:selected",
                     "style": {
-                        "width": 4,
-                        "line-color": lineColor
+                        "width": selectedBorderWidth,
+                        "line-color": selectedLineColor
                     }
                 }, {
                     "selector": "edge.hover",
                     "style": {
-                        "width": 6
+                        "width": hoverBorderWidth,
+                        "line-color": selectedLineColor
                     }
                 }];
                 for (var resourceId in resourceTypeLookup) {

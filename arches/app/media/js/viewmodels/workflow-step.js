@@ -34,6 +34,8 @@ define([
         this.postSaveCallback = ko.observable();
         this.clearCallback = ko.observable();
 
+        this.clearCallback = ko.observable();
+
         this.externalStepData = {};
         this.lockableExternalSteps = config.lockableExternalSteps || [];
 
@@ -71,6 +73,8 @@ define([
         });
 
         this.initialize = function() {
+            _.extend(this, config);
+
             /* cached ID logic */ 
             var cachedId = ko.unwrap(config.id);
             if (cachedId) {
