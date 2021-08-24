@@ -324,7 +324,7 @@ define([
             },
 
             // used to generate parent tile for nexted data
-            saveParentTile: async (optionalParentTile) => {
+            saveParentTile: async(optionalParentTile) => {
                 return new Promise((resolve, reject) => {
                     if(optionalParentTile && !optionalParentTile.tileid) {
                         optionalParentTile.save((err) => {
@@ -337,12 +337,12 @@ define([
                         resolve(false);
                         return;
                     } else {
-                        tile = self.getNewTile();
+                        const tile = self.getNewTile();
                         tile.save((err) => {
                             reject(err);
                         }, () => {
                             resolve(true);
-                        })
+                        });
                     }
                 });
             },
