@@ -26,12 +26,14 @@ define([
 
         this.initialize = function() {
             var url;
+            params.cache = params.cache === undefined ? true : params.cache;
 
             if (params.report) {
                 if (
-                    !params.disableDisambiguatedReport
+                    (!params.disableDisambiguatedReport
                     && !params.report.report_json 
-                    && params.report.attributes.resourceid
+                    && params.report.attributes.resourceid) 
+                    || !params.cache
                 ) {
                     url = arches.urls.api_bulk_disambiguated_resource_instance + `?resource_ids=${params.report.attributes.resourceid}`;
                     if(params.report.defaultConfig?.uncompacted_reporting) {
