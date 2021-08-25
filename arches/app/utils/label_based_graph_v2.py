@@ -1,4 +1,3 @@
-from collections import OrderedDict
 from arches.app.datatypes.datatypes import DataTypeFactory
 from arches.app.models import models
 
