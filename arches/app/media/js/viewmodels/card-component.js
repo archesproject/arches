@@ -205,12 +205,14 @@ define([
             });
         };
         
-        this.createParentAndChild = function(parenttile, childcard) {
-            if (parenttile.tileid === "") {
-                var callback = function(){childcard.selected(true);};
-                parenttile.save(function() {
-                    return;
-                }, callback);
+        this.createParentAndChild = async (parenttile, childcard) => {
+            try{
+                const newSave = await self.card.saveParentTile(parenttile);
+                if(newSave){
+                    childcard.selected(true);
+                }
+            } catch (err){
+                console.log(err);
             }
         };
 
