@@ -14,7 +14,7 @@ def check_if_celery_available():
         try:
             conn = Connection(settings.CELERY_BROKER_URL)
             conn.ensure_connection(max_retries=2)
-            if settings.CELERY_CHECK_ONLY_INSPECT_BROKER == True:
+            if settings.CELERY_CHECK_ONLY_INSPECT_BROKER:
                 result = True
             else:
                 inspect = app.control.inspect()
