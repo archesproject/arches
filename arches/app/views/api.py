@@ -583,21 +583,32 @@ class Resources(APIBase):
                 compact = bool(request.GET.get("compact", "true").lower() == "true")  # default True
                 hide_empty_nodes = bool(request.GET.get("hide_empty_nodes", "false").lower() == "true")  # default False
 
-                out = {
-                    "resource": resource.to_json(
+                if version == 'beta':
+                    out = resource.to_json(
                         compact=compact,
                         hide_empty_nodes=hide_empty_nodes,
                         user=user,
                         perm=perm,
                         version=version
-                    ),
-                    "displaydescription": resource.displaydescription,
-                    "displayname": resource.displayname,
-                    "graph_id": resource.graph_id,
-                    "legacyid": resource.legacyid,
-                    "map_popup": resource.map_popup,
-                    "resourceinstanceid": resource.resourceinstanceid,
-                }
+                    ) 
+                else:
+                    out = {
+                        "resource": resource.to_json(
+                            compact=compact,
+                            hide_empty_nodes=hide_empty_nodes,
+                            user=user,
+                            perm=perm,
+                            version=version
+                        ),
+                        "displaydescription": resource.displaydescription,
+                        "displayname": resource.displayname,
+                        "graph_id": resource.graph_id,
+                        "legacyid": resource.legacyid,
+                        "map_popup": resource.map_popup,
+                        "resourceinstanceid": resource.resourceinstanceid,
+                    }
+
+
 
             elif format == "arches-json":
                 out = Resource.objects.get(pk=resourceid)

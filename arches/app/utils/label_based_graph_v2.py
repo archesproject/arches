@@ -1,3 +1,4 @@
+from collections import OrderedDict
 from arches.app.datatypes.datatypes import DataTypeFactory
 from arches.app.models import models
 
@@ -179,6 +180,14 @@ class LabelBasedGraph(object):
             # removes unneccesary ( None ) top-node values
             for key in [NODE_ID_KEY, TILE_ID_KEY]:
                 resource_graph.pop(key, None)
+
+            # adds metadata that was previously only accessible via API
+            resource_graph["displaydescription"] = resource.displaydescription
+            resource_graph["displayname"] = resource.displayname
+            resource_graph["graph_id"] = resource.graph_id
+            resource_graph["legacyid"] = resource.legacyid
+            resource_graph["map_popup"] = resource.map_popup
+            resource_graph["resourceinstanceid"] = resource.resourceinstanceid
 
             return resource_graph
         else:  # pragma: no cover
