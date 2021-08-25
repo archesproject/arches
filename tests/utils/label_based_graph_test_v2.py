@@ -173,14 +173,17 @@ class LabelBasedGraph_FromResourceTests(TestCase):
     def test_smoke(self, mock_Node, mock_NodeGroup):
         label_based_graph = LabelBasedGraph.from_resource(resource=self.test_resource, compact=False, hide_empty_nodes=False)
 
-        self.assertEqual(label_based_graph, {
-            self.DISPLAY_DESCRIPTION_KEY: mock.ANY,
-            self.DISPLAY_NAME_KEY: mock.ANY,
-            self.GRAPH_ID_KEY: mock.ANY,
-            self.LEGACY_ID_KEY: mock.ANY,
-            self.MAP_POPUP_KEY: mock.ANY,
-            self.RESOURCE_INSTANCE_ID_KEY: mock.ANY,
-        })
+        self.assertEqual(
+            label_based_graph,
+            {
+                self.DISPLAY_DESCRIPTION_KEY: mock.ANY,
+                self.DISPLAY_NAME_KEY: mock.ANY,
+                self.GRAPH_ID_KEY: mock.ANY,
+                self.LEGACY_ID_KEY: mock.ANY,
+                self.MAP_POPUP_KEY: mock.ANY,
+                self.RESOURCE_INSTANCE_ID_KEY: mock.ANY,
+            },
+        )
 
     def test_handles_node_with_single_value(self, mock_Node, mock_NodeGroup):
         mock_Node.objects.get.return_value = self.string_node
