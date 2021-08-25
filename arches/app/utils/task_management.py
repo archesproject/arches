@@ -14,10 +14,10 @@ def check_if_celery_available():
         try:
             conn = Connection(settings.CELERY_BROKER_URL)
             conn.ensure_connection(max_retries=2)
-            inspect = app.control.inspect()
             if settings.CELERY_CHECK_ONLY_INSPECT_BROKER == True:
                 result = True
             else:
+                inspect = app.control.inspect()
                 for i in range(4):
                     try:
                         # ping returns an object or None
