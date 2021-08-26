@@ -31,6 +31,7 @@ define([
         this.quitUrl = config.quitUrl || self.quitUrl || arches.urls.plugin('init-workflow');
         this.isWorkflowFinished = ko.observable(false);
         
+        this.stepConfig;  /* overwritten in workflow.js file */
         this.steps = ko.observableArray();
         
         this.activeStep = ko.observable();
@@ -166,6 +167,61 @@ define([
                     resolve(data);
                 });
             });
+        };
+
+        this.parseComponentPath = function(path) {
+            var pathAsStringArray = path.slice(1, path.length - 1).split('][');
+
+            return pathAsStringArray.map(function(string) {
+                if (!isNaN(Number(string))) {
+                    return Number(string);
+                }
+                else {
+                    return string.slice(1, string.length - 1);
+                }
+            });
+        };
+
+        this.isValidComponentPath = function(path) {
+            var matchingStep;
+
+            if (typeof path === 'string') {  /* path instanceOf String returns false */
+                var pathAsArray = self.parseComponentPath(path);
+
+                matchingStep = self.steps().find(function(step) {
+                    return step.name === pathAsArray[0];
+                });
+            }
+
+            return Boolean(matchingStep);
+        };
+
+        this.getDataFromComponentPath = function(path) {
+            var pathAsArray = self.parseComponentPath(path);
+
+            var matchingStep = self.steps().find(function(step) {
+                return step.name === pathAsArray[0];
+            });
+
+            var value;
+
+            if (matchingStep) {
+                var matchingComponentData = matchingStep.value()[pathAsArray[1]];
+
+                if (matchingComponentData) {
+                    var updatedPath = pathAsArray.slice(2);
+
+                    value = matchingComponentData;
+
+                    for (var chunk of updatedPath) {
+                        if (value[chunk] !== undefined) {
+                            value = value[chunk];
+                        }
+                    }
+                }
+            }
+
+            return value;
         };
 
         this.getStepData = function(stepName) {

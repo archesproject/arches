@@ -570,8 +570,10 @@ define([
     };
 
 
-    function WorkflowComponentAbstract(componentData, previouslyPersistedComponentData, externalStepData, resourceId, title, isStepSaving, locked, lockExternalStep, lockableExternalSteps, workflowId, alert, outerSaveOnQuit) {
+    function WorkflowComponentAbstract(componentData, previouslyPersistedComponentData, isValidComponentPath, getDataFromComponentPath, externalStepData, resourceId, title, isStepSaving, locked, lockExternalStep, lockableExternalSteps, workflowId, alert, outerSaveOnQuit) {
         var self = this;
+
+        console.log(self, componentData)
 
         this.workflowId = workflowId;
         this.resourceId = resourceId;
@@ -616,6 +618,20 @@ define([
         this.initialize = function() {
             self.loading(true);
 
+            /* 
+                Checks format of parameter values for external-component-path-patterned arrays.
+                If parameter value matches pattern, get external component data and update value in self.componentData
+            */ 
+            if (self.componentData.parameters) {
+                Object.keys(self.componentData.parameters).forEach(function(componentDataKey) {
+                    var componentDataValue = self.componentData.parameters[componentDataKey];
+    
+                    if (isValidComponentPath(componentDataValue)) {
+                        self.componentData.parameters[componentDataKey] = getDataFromComponentPath(componentDataValue);
+                    }
+                });
+            }
+
             if (!componentData.tilesManaged || componentData.tilesManaged === "none") {
                 NonTileBasedComponent.apply(self);
             }
@@ -628,7 +644,7 @@ define([
         };
 
         this.getCardResourceIdOrGraphId = function() {
-            return (ko.unwrap(this.resourceId) || ko.unwrap(componentData.parameters.graphid));
+            return (ko.unwrap(componentData.parameters.resourceid) || ko.unwrap(componentData.parameters.graphid));
         };
 
         this.initialize();
@@ -639,6 +655,8 @@ define([
         var self = this;
 
         this.resourceId = ko.observable();
+
+        console.log(self, params)
         
         this.alert = params.alert || ko.observable();
         this.componentBasedStepClass = ko.unwrap(params.workflowstepclass);
@@ -774,6 +792,8 @@ define([
             var workflowComponentAbstract = new WorkflowComponentAbstract(
                 workflowComponentAbtractData,
                 previouslyPersistedComponentData,
+                params.workflow.isValidComponentPath,
+                params.workflow.getDataFromComponentPath,
                 params.externalStepData,
                 self.resourceId,
                 params.title,
