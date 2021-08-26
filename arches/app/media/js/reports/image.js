@@ -15,7 +15,7 @@ define([
 
             self.imgs = ko.computed(function() {
                 var imgs = [];
-                var nodes = self.nodes();
+                var nodes = ko.unwrap(self.nodes);
                 self.tiles().forEach(function(tile) {
                     _.each(tile.data, function(val, key) {
                         val = koMapping.toJS(val);
