@@ -142,6 +142,7 @@ define([
         this.saveTile = function(callback) {
             self.loading(true);
             self.tile.transactionId = params.form?.workflowId || undefined;
+            self.tile.resourceinstance_id = self.tile.resourceinstance_id || ko.unwrap(self.form.resourceId);
             self.tile.save(function(response) {
                 self.loading(false);
                 params.pageVm.alert(
