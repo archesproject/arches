@@ -149,6 +149,14 @@ class LabelBasedGraph_FromResourceTests(TestCase):
     @classmethod
     def setUp(cls):
         cls.VALUE_KEY = "@display_value"
+
+        cls.DISPLAY_DESCRIPTION_KEY = "displaydescription"
+        cls.DISPLAY_NAME_KEY = "displayname"
+        cls.GRAPH_ID_KEY = "graph_id"
+        cls.LEGACY_ID_KEY = "legacyid"
+        cls.MAP_POPUP_KEY = "map_popup"
+        cls.RESOURCE_INSTANCE_ID_KEY = "resourceinstanceid"
+
         cls.nodegroup = models.NodeGroup()
         cls.grouping_node = models.Node(datatype="semantic", name="Test Node Grouping", nodegroup=cls.nodegroup)
         cls.string_node = models.Node(datatype="string", name="Test Node")
@@ -165,7 +173,17 @@ class LabelBasedGraph_FromResourceTests(TestCase):
     def test_smoke(self, mock_Node, mock_NodeGroup):
         label_based_graph = LabelBasedGraph.from_resource(resource=self.test_resource, compact=False, hide_empty_nodes=False)
 
-        self.assertEqual(label_based_graph, {})
+        self.assertEqual(
+            label_based_graph,
+            {
+                self.DISPLAY_DESCRIPTION_KEY: mock.ANY,
+                self.DISPLAY_NAME_KEY: mock.ANY,
+                self.GRAPH_ID_KEY: mock.ANY,
+                self.LEGACY_ID_KEY: mock.ANY,
+                self.MAP_POPUP_KEY: mock.ANY,
+                self.RESOURCE_INSTANCE_ID_KEY: mock.ANY,
+            },
+        )
 
     def test_handles_node_with_single_value(self, mock_Node, mock_NodeGroup):
         mock_Node.objects.get.return_value = self.string_node
@@ -185,6 +203,12 @@ class LabelBasedGraph_FromResourceTests(TestCase):
                     TILE_ID_KEY: str(self.string_tile.pk),
                     self.VALUE_KEY: self.string_tile.data[str(self.string_node.pk)],
                 },
+                self.DISPLAY_DESCRIPTION_KEY: mock.ANY,
+                self.DISPLAY_NAME_KEY: mock.ANY,
+                self.GRAPH_ID_KEY: mock.ANY,
+                self.LEGACY_ID_KEY: mock.ANY,
+                self.MAP_POPUP_KEY: mock.ANY,
+                self.RESOURCE_INSTANCE_ID_KEY: mock.ANY,
             },
         )
 
@@ -216,6 +240,12 @@ class LabelBasedGraph_FromResourceTests(TestCase):
                         self.VALUE_KEY: duplicate_node_tile.data[str(self.string_node.pk)],
                     },
                 ],
+                self.DISPLAY_DESCRIPTION_KEY: mock.ANY,
+                self.DISPLAY_NAME_KEY: mock.ANY,
+                self.GRAPH_ID_KEY: mock.ANY,
+                self.LEGACY_ID_KEY: mock.ANY,
+                self.MAP_POPUP_KEY: mock.ANY,
+                self.RESOURCE_INSTANCE_ID_KEY: mock.ANY,
             },
         )
 
@@ -236,6 +266,12 @@ class LabelBasedGraph_FromResourceTests(TestCase):
                     NODE_ID_KEY: str(self.grouping_node.pk),
                     TILE_ID_KEY: str(self.grouping_tile.pk),
                 },
+                self.DISPLAY_DESCRIPTION_KEY: mock.ANY,
+                self.DISPLAY_NAME_KEY: mock.ANY,
+                self.GRAPH_ID_KEY: mock.ANY,
+                self.LEGACY_ID_KEY: mock.ANY,
+                self.MAP_POPUP_KEY: mock.ANY,
+                self.RESOURCE_INSTANCE_ID_KEY: mock.ANY,
             },
         )
 
@@ -264,6 +300,12 @@ class LabelBasedGraph_FromResourceTests(TestCase):
                         self.VALUE_KEY: self.grouping_tile.data[str(self.string_node.pk)],
                     },
                 },
+                self.DISPLAY_DESCRIPTION_KEY: mock.ANY,
+                self.DISPLAY_NAME_KEY: mock.ANY,
+                self.GRAPH_ID_KEY: mock.ANY,
+                self.LEGACY_ID_KEY: mock.ANY,
+                self.MAP_POPUP_KEY: mock.ANY,
+                self.RESOURCE_INSTANCE_ID_KEY: mock.ANY,
             },
         )
 
@@ -295,5 +337,11 @@ class LabelBasedGraph_FromResourceTests(TestCase):
                         self.VALUE_KEY: self.string_tile.data[str(self.string_node.pk)],
                     },
                 },
+                self.DISPLAY_DESCRIPTION_KEY: mock.ANY,
+                self.DISPLAY_NAME_KEY: mock.ANY,
+                self.GRAPH_ID_KEY: mock.ANY,
+                self.LEGACY_ID_KEY: mock.ANY,
+                self.MAP_POPUP_KEY: mock.ANY,
+                self.RESOURCE_INSTANCE_ID_KEY: mock.ANY,
             },
         )
