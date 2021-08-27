@@ -26,4 +26,3 @@ arcgis2geojson==2.0.0
 openpyxl==3.0.7
 django_compressor==2.2
 django-libsass==0.7
-Jinja2==3.0.1
