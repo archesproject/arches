@@ -1342,7 +1342,9 @@ class BulkDisambiguatedResourceInstance(APIBase):
         compact = True
         if uncompacted_value == "true":
             compact = False
-        return JSONResponse({resource.pk: resource.to_json(compact=compact, version=version) for resource in Resource.objects.filter(pk__in=resource_ids)})
+        return JSONResponse(
+            {resource.pk: resource.to_json(compact=compact, version=version) for resource in Resource.objects.filter(pk__in=resource_ids)}
+        )
 
 
 @method_decorator(csrf_exempt, name="dispatch")
