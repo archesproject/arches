@@ -573,8 +573,6 @@ define([
     function WorkflowComponentAbstract(componentData, previouslyPersistedComponentData, isValidComponentPath, getDataFromComponentPath, externalStepData, title, isStepSaving, locked, lockExternalStep, lockableExternalSteps, workflowId, alert, outerSaveOnQuit) {
         var self = this;
 
-        console.log(self, componentData)
-
         this.workflowId = workflowId;
         this.resourceId = ko.observable();
                 
@@ -634,6 +632,8 @@ define([
 
             if (componentData && componentData['parameters']) {
                 self.resourceId(ko.unwrap(componentData['parameters']['resourceid']));
+                
+                componentData['parameters']['renderContext'] = 'workflow';
             }
 
             if (!componentData.tilesManaged || componentData.tilesManaged === "none") {
