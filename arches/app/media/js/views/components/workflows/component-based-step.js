@@ -213,14 +213,6 @@ define([
                     }
                 };
 
-                /*
-                    If a step modifies a child tile, get the correct parent tile id from the step that created the parent tile. 
-                    This requires that your step has a parameter 'parenttilesourcestep' that identifies the step with the parent tile.
-                */
-                if (self.externalStepData[self.componentData.parameters.parenttilesourcestep]){
-                    self.componentData.parameters.parenttileid = self.externalStepData[self.componentData.parameters.parenttilesourcestep].data.tileid;
-                }
-
                 self.flattenTree(self.topCards, []).forEach(function(item) {
                     if (item.constructor.name === 'CardViewModel' && item.nodegroupid === ko.unwrap(self.componentData.parameters.nodegroupid)) {
                         if (ko.unwrap(self.componentData.parameters.parenttileid) && item.parent && ko.unwrap(self.componentData.parameters.parenttileid) !== item.parent.tileid) {
@@ -570,7 +562,7 @@ define([
     };
 
 
-    function WorkflowComponentAbstract(componentData, previouslyPersistedComponentData, isValidComponentPath, getDataFromComponentPath, externalStepData, title, isStepSaving, locked, lockExternalStep, lockableExternalSteps, workflowId, alert, outerSaveOnQuit) {
+    function WorkflowComponentAbstract(componentData, previouslyPersistedComponentData, isValidComponentPath, getDataFromComponentPath, title, isStepSaving, locked, lockExternalStep, lockableExternalSteps, workflowId, alert, outerSaveOnQuit) {
         var self = this;
 
         this.workflowId = workflowId;
@@ -582,7 +574,6 @@ define([
 
         this.componentData = componentData;
         this.previouslyPersistedComponentData = previouslyPersistedComponentData;
-        this.externalStepData = externalStepData;
 
         this.savedData = ko.observableArray();
         this.hasUnsavedData = ko.observable();
@@ -787,7 +778,6 @@ define([
                 previouslyPersistedComponentData,
                 params.workflow.isValidComponentPath,
                 params.workflow.getDataFromComponentPath,
-                params.externalStepData,
                 params.title,
                 self.isStepSaving,
                 self.locked,

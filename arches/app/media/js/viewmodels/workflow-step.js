@@ -36,36 +36,11 @@ define([
 
         this.clearCallback = ko.observable();
 
-        this.externalStepData = {};
         this.lockableExternalSteps = config.lockableExternalSteps || [];
-
-        /* BEGIN coerce externalStepData */ 
-        var externalStepSourceData = ko.unwrap(config.externalstepdata) || {};
-        Object.keys(externalStepSourceData).forEach(function(key) {
-            if (key !== '__ko_mapping__') {
-                self.externalStepData[key] = {
-                    stepName: externalStepSourceData[key]
-                };
-            }
-        });
-        /* END coerce externalStepData */
 
         this.active = ko.computed(function() {
             return config.workflow.activeStep() === this;
         }, this);
-        this.active.subscribe(function(active) {
-            self.loading(true);
-            if (active) { 
-                self.getExternalStepData().then(function(externalStepData){
-                    if (externalStepData) {
-                        Object.entries(self.externalStepData).forEach(function([externalStepReferenceName, value]) {
-                            self.externalStepData[externalStepReferenceName]['data'] = externalStepData[ko.unwrap(value.stepName)];
-                        });
-                    }
-                    self.loading(false);
-                });
-            }
-        });
 
         this.locked = ko.observable(false);
         this.locked.subscribe(function(value){
@@ -170,34 +145,6 @@ define([
             if (allStepsLocalStorageData[self.id()] && typeof allStepsLocalStorageData[self.id()][key] !== "undefined") {
                 return JSON.parse(allStepsLocalStorageData[self.id()][key]);
             }
-        };
-
-        this.getExternalStepData = function() {
-            return new Promise(function(resolve, _reject) {
-                var promises = [];
-
-                Object.keys(self.externalStepData).forEach(function(key) {
-                    promises.push(config.workflow.getStepData(externalStepSourceData[key]));
-                });
-
-                if (promises.length) {
-                    Promise.all(promises).then(function(resolvedPromiseData) {
-                        resolve(
-                            resolvedPromiseData.reduce(function(acc, resolvedPromiseDatum) {
-                                if (resolvedPromiseDatum) {
-                                    Object.keys(resolvedPromiseDatum).forEach(function(key) {
-                                        acc[key] = resolvedPromiseDatum[key];
-                                    });
-                                }
-                                return acc;
-                            }, {})
-                        );
-                    });
-                }
-                else {
-                    resolve(null);
-                }
-            });
         };
 
         this.toggleInformationBox = function() {
