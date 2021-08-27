@@ -570,13 +570,13 @@ define([
     };
 
 
-    function WorkflowComponentAbstract(componentData, previouslyPersistedComponentData, isValidComponentPath, getDataFromComponentPath, externalStepData, resourceId, title, isStepSaving, locked, lockExternalStep, lockableExternalSteps, workflowId, alert, outerSaveOnQuit) {
+    function WorkflowComponentAbstract(componentData, previouslyPersistedComponentData, isValidComponentPath, getDataFromComponentPath, externalStepData, title, isStepSaving, locked, lockExternalStep, lockableExternalSteps, workflowId, alert, outerSaveOnQuit) {
         var self = this;
 
         console.log(self, componentData)
 
         this.workflowId = workflowId;
-        this.resourceId = resourceId;
+        this.resourceId = ko.observable();
                 
         this.loading = ko.observable(false);
         this.saving = ko.observable(false);
@@ -632,6 +632,10 @@ define([
                 });
             }
 
+            if (componentData && componentData['parameters']) {
+                self.resourceId(ko.unwrap(componentData['parameters']['resourceid']));
+            }
+
             if (!componentData.tilesManaged || componentData.tilesManaged === "none") {
                 NonTileBasedComponent.apply(self);
             }
@@ -654,10 +658,6 @@ define([
     function viewModel(params) {
         var self = this;
 
-        this.resourceId = ko.observable();
-
-        console.log(self, params)
-        
         this.alert = params.alert || ko.observable();
         this.componentBasedStepClass = ko.unwrap(params.workflowstepclass);
         this.locked = params.locked;
@@ -745,13 +745,6 @@ define([
         this.initialize = function() {
             params.hasDirtyTile(false);
 
-            if (ko.unwrap(params.resourceid)) {
-                self.resourceId(ko.unwrap(params.resourceid));
-            }
-            else if (params.workflow && ko.unwrap(params.workflow.resourceId)) {
-                self.resourceId(ko.unwrap(params.workflow.resourceId));
-            }
-    
             if (params.workflow && ko.unwrap(params.workflow.id)) {
                 self.workflowId = ko.unwrap(params.workflow.id);
             }
@@ -795,7 +788,6 @@ define([
                 params.workflow.isValidComponentPath,
                 params.workflow.getDataFromComponentPath,
                 params.externalStepData,
-                self.resourceId,
                 params.title,
                 self.isStepSaving,
                 self.locked,

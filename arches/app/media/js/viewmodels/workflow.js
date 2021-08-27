@@ -206,13 +206,15 @@ define([
             var value;
 
             if (matchingStep) {
+                value = matchingStep.value();
+
                 var matchingComponentData = matchingStep.value()[pathAsArray[1]];
 
                 if (matchingComponentData) {
-                    var updatedPath = pathAsArray.slice(2);
-
                     value = matchingComponentData;
-
+                    
+                    var updatedPath = pathAsArray.slice(2);
+                    
                     for (var chunk of updatedPath) {
                         if (value[chunk] !== undefined) {
                             value = value[chunk];
