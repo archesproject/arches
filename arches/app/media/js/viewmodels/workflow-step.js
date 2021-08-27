@@ -16,10 +16,6 @@ define([
         this.id = ko.observable();
         this.workflowId = ko.observable(config.workflow ? config.workflow.id : null);
 
-
-        this.isV2Workflow = config.workflow.v2;  // TODO: remove this
-
-
         this.informationBoxData = ko.observable();       
         
         this.required = ko.observable(ko.unwrap(config.required));

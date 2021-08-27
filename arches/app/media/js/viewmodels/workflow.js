@@ -22,10 +22,6 @@ define([
         this.id = ko.observable();
         this.workflowName = ko.observable();
 
-
-        this.v2 = config.v2 || self.v2;  // TODO: remove this when all steps are component-based-step
-
-                
         this.pan = ko.observable();
         this.alert = config.alert || ko.observable(null);
         this.quitUrl = config.quitUrl || self.quitUrl || arches.urls.plugin('init-workflow');

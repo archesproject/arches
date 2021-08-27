@@ -50,20 +50,10 @@
         <!-- /ko -->
 
         <!-- ko if: $data.active() && !$data.loading() && !$data.saving() -->
-
-            <!--ko if: !$data.isV2Workflow && $data.componentname -->
-                <!-- ko component: {
-                    name: componentname,
-                    params: $data,
-                } --><!--/ko-->
-            <!--/ko-->
-            <!--ko if: $data.isV2Workflow -->
-                <!-- ko component: {
-                    name: 'component-based-step',
-                    params: $data,
-                } --><!--/ko-->
-            <!--/ko-->
-
+            <!-- ko component: {
+                name: 'component-based-step',
+                params: $data,
+            } --><!--/ko-->
         <!-- /ko -->
     <!-- /ko -->
 </div>
