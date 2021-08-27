@@ -36,7 +36,7 @@ define([
             animate: false
         };
 
-        this.map = ko.observable(ko.unwrap(params.map));
+        this.map = ko.isObservable(params.map) ? params.map : ko.observable();
         this.map.subscribe(function(map) {
             self.setupMap(map);
 
@@ -59,6 +59,7 @@ define([
             if (ko.unwrap(params.bounds)) {
                 map.fitBounds(ko.unwrap(params.bounds), boundingOptions);
             }
+
         });
 
         this.bounds = ko.observable(ko.unwrap(params.bounds) || arches.hexBinBounds);
