@@ -1,4 +1,6 @@
-<html>
+{% load template_tags %}
+<!DOCTYPE html>
+<html lang="en">
    <head>
       <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
       <meta charset="UTF-8">
@@ -17,6 +19,7 @@
       </header>
       <main>
          {% for resource in resources %}
+         {% with resource_data=resource_data %}
          <section class="section-title">
             <blockquote>
                 <h2>{{ resource.displayname }}</h2>
@@ -32,18 +35,18 @@
 
             {# Example of adding a description from an array of Description cards based on the type
                 ======================================================
-               {% if resource.resource["Descriptions"] is defined %}
+               {% if resource_data|has_key:"Descriptions" %}
                <div class="keeptogether">
-                  {% for desc in resource.resource["Descriptions"] %}
-                  {% if desc["Description Type"]["@value"] == "Summary" %}
+                  {% for desc in resource_data|val_from_key:"Descriptions" %}
+                  {% if desc|val_from_key:"Description Type"|val_from_key:"@value" == "Summary" %}
                   <h3>Summary</h3>
-                  <p>{{ desc["Description"] }}</p>
+                  <p>{{ desc|val_from_key:"Description" }}</p>
                   {% endif %}
                   {% endfor %}
-                  {% for desc in resource.resource["Descriptions"] %}
-                  {% if desc["Description Type"]["@value"] == "Full" %}
+                  {% for desc in resource_data|val_from_key:"Descriptions" %}
+                  {% if desc|val_from_key:"Description Type"|val_from_key:"@value" == "Full" %}
                   <h3>Full</h3>
-                  <p>{{ desc["Description"] }}</p>
+                  <p>{{ desc|val_from_key:"Description" }}</p>
                   {% endif %}
                   {% endfor %}
                </div>
@@ -53,7 +56,7 @@
 
             {# Example of creating a responsive table from a list of card values
                 ======================================================
-               {% if resource.resource["External Cross References"] is defined %}
+               {% if resource_data|has_key:"External Cross References" %}
                <div class="keeptogether">
                   <h3>External Cross References</h3>
                   <div class="rtable">
@@ -62,15 +65,15 @@
                         <div class="rcell">Description</div>
                         <div class="rcell">Source</div>
                      </div>
-                     {% for src in resource.resource["External Cross References"] %}
+                     {% for src in resource_data|val_from_key:"External Cross References" %}
                      <div class="rrow">
-                        <div class="rcell" data-title="Number">{{ src["External Cross Reference Number"] }}</div>
+                        <div class="rcell" data-title="Number">{{ src|val_from_key:"External Cross Reference Number" }}</div>
                         <div class="rcell" data-title="Description">
-                           {% if src["External Cross Reference Notes"] is defined %}
-                           {{ src["External Cross Reference Notes"]["External Cross Reference Description"] }}
+                           {% if src|has_key:"External Cross Reference Notes" %}
+                           {{ src|val_from_key:"External Cross Reference Notes"|val_from_key:"External Cross Reference Description" }}
                            {% endif %}
                            </div>
-                        <div class="rcell" data-title="Source">{{ src["External Cross Reference Source"] }}</div>
+                        <div class="rcell" data-title="Source">{{ src|val_from_key:"External Cross Reference Source"] }}</div>
                      </div>
                      {% endfor %}
                   </div>
@@ -80,6 +83,7 @@
             #}
             </div>
          </section>
+         {% endwith%}
          {% endfor %}
       </main>
    </body>
