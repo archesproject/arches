@@ -425,7 +425,7 @@ define([
             if (self.activeStep().hasDirtyTile()) {
                 self.activeStep().save().then(function() {
                     window.location.assign(self.quitUrl);
-                })
+                });
             }
             else {
                 window.location.assign(self.quitUrl);
