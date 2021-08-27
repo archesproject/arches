@@ -222,30 +222,6 @@ define([
             return value;
         };
 
-        this.getStepData = function(stepName) {
-            return new Promise(function(resolve) {
-                /* ONLY to be used as intermediary for when a step needs data from a different step in the workflow */
-                var step = self.steps().find(function(step) { return ko.unwrap(step.name) === ko.unwrap(stepName); });
-
-                if (step) { 
-                    if (step.saving()) {
-                        var savingSubscription = step.saving.subscribe(function(saving) {
-                            if (!saving) {
-                                savingSubscription.dispose(); /* self-disposing subscription */
-                                resolve({ [ko.unwrap(step.name)]: step.value() }); 
-                            }
-                        });
-                    }
-                    else {
-                        resolve({ [ko.unwrap(step.name)]: step.value() });
-                    }
-                }
-                else {
-                    resolve(null);
-                }
-            });
-        };
-
         this.toggleStepLockedState = function(stepName, locked) {
             var step = self.steps().find(function(step) { return ko.unwrap(step.name) === ko.unwrap(stepName); });
             if (step) {
