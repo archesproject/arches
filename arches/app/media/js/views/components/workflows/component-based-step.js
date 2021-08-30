@@ -650,10 +650,13 @@ define([
         var self = this;
 
         this.alert = params.alert || ko.observable();
+
         this.componentBasedStepClass = ko.unwrap(params.workflowstepclass);
+
         this.locked = params.locked;
         this.lockExternalStep = params.lockExternalStep;
         this.lockableExternalSteps = params.lockableExternalSteps;
+
         this.outerSaveOnQuit = ko.observable();
         this.outerSaveOnQuit.subscribe(function(val){
             params.saveOnQuit = val;

@@ -22,6 +22,8 @@ define([
         this.id = ko.observable();
         this.workflowName = ko.observable();
 
+        this.hiddenWorkflowButtons = ko.observableArray();
+
         this.pan = ko.observable();
         this.alert = config.alert || ko.observable(null);
         this.quitUrl = config.quitUrl || self.quitUrl || arches.urls.plugin('init-workflow');
@@ -33,6 +35,7 @@ define([
         this.activeStep = ko.observable();
         this.activeStep.subscribe(function(activeStep) {
             self.setStepIdToUrl(activeStep);
+            self.hiddenWorkflowButtons(activeStep.hiddenWorkflowButtons());
         });
         
         this.furthestValidStepIndex = ko.observable();

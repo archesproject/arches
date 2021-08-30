@@ -169,20 +169,22 @@
                 </button>
                 <!-- /ko -->
                 <!-- ko if: activeStep().hasDirtyTile() -->
-                <button
-                    class="btn btn-danger"
-                    data-bind="{
-                        css: {
-                            disabled: !activeStep().hasDirtyTile(),
-                        },
-                        click: activeStep().clear
-                    }"
-                >
-                    <i class="fa fa-undo"></i>
-                    <span>
-                        {% trans  "Undo" %}
-                    </span>
-                </button>
+                    <!-- ko if: !$data.hiddenWorkflowButtons().includes('undo') -->
+                    <button
+                        class="btn btn-danger"
+                        data-bind="{
+                            css: {
+                                disabled: !activeStep().hasDirtyTile(),
+                            },
+                            click: activeStep().clear
+                        }"
+                    >
+                        <i class="fa fa-undo"></i>
+                        <span>
+                            {% trans  "Undo" %}
+                        </span>
+                    </button>
+                <!-- /ko -->
                 <button
                     class="btn btn-success"
                     data-bind="

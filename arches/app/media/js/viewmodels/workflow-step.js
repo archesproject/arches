@@ -16,7 +16,9 @@ define([
         this.id = ko.observable();
         this.workflowId = ko.observable(config.workflow ? config.workflow.id : null);
 
-        this.informationBoxData = ko.observable();       
+        this.informationBoxData = ko.observable();
+
+        this.hiddenWorkflowButtons = ko.observableArray(config.hiddenWorkflowButtons || []);
         
         this.required = ko.observable(ko.unwrap(config.required));
         this.loading = ko.observable(false);
