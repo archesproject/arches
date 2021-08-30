@@ -408,8 +408,8 @@ define([
             self.alert(
                 new AlertViewModel(
                     'ep-alert-red',
-                    'foobar',
-                    'bazqux',
+                    'Are you sure you would like to delete this workflow?',
+                    'All data created during the course of this workflow will be deleted.',
                     function(){}, //does nothing when canceled
                     self.reverseWorkflowTransactions,
                 )
