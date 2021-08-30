@@ -227,7 +227,7 @@ define([
             if (step) {
                 step.locked(locked);
             }
-        }
+        };
 
         this.getFurthestValidStepIndex = function() {
             /*
