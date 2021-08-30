@@ -35,7 +35,7 @@ define([
                     && params.report.attributes.resourceid) 
                     || !params.cache
                 ) {
-                    url = arches.urls.api_bulk_disambiguated_resource_instance + `?resource_ids=${params.report.attributes.resourceid}`;
+                    url = arches.urls.api_bulk_disambiguated_resource_instance + `?v=beta&resource_ids=${params.report.attributes.resourceid}`;
                     if(params.report.defaultConfig?.uncompacted_reporting) {
                         url += '&uncompacted=true';
                     }
