@@ -20,20 +20,20 @@ define([
         var self = this;
 
         this.id = ko.observable();
-        this.resourceId = ko.observable();
+        this.workflowName = ko.observable();
 
+        this.pan = ko.observable();
+        this.alert = config.alert || ko.observable(null);
         this.quitUrl = config.quitUrl || self.quitUrl || arches.urls.plugin('init-workflow');
-
-        this.v2 = config.v2 || self.v2;
+        this.isWorkflowFinished = ko.observable(false);
         
+        this.stepConfig;  /* overwritten in workflow.js file */
         this.steps = ko.observableArray();
         
         this.activeStep = ko.observable();
         this.activeStep.subscribe(function(activeStep) {
             self.setStepIdToUrl(activeStep);
         });
-        
-        this.isWorkflowFinished = ko.observable(false);
         
         this.furthestValidStepIndex = ko.observable();
         this.furthestValidStepIndex.subscribe(function(index){
@@ -42,18 +42,6 @@ define([
             }
         });
         
-        this.pan = ko.observable();
-        
-        this.hoverStep = ko.observable();  // legacy DO NOT USE
-        this.ready = ko.observable(false);  // legacy  DO NOT USE
-
-        this.workflowName = ko.observable();
-        
-        this.alert = config.alert || ko.observable(null);
-        this.quitUrl = arches.urls.home;
-
-        this.warning = '';
-
         this.initialize = function() {
             /* BEGIN workflow metadata logic */ 
             if (self.componentName) {
@@ -97,14 +85,6 @@ define([
                 self.activeStep(self.steps()[0]);
             }
             /* END workflow step creation logic */ 
-        };
-        
-        this.wastebinWarning = function(val){
-            if (val === '') {
-                return [[arches.translations.workflowWastbinWarning3],[arches.translations.workflowWastbinWarning2]];
-            } else {
-                return [[arches.translations.workflowWastbinWarning.replace("${val}", val)],[arches.translations.workflowWastbinWarning2]];
-            }
         };
 
         this.updatePan = function(val){
@@ -185,28 +165,61 @@ define([
             });
         };
 
-        this.getStepData = function(stepName) {
-            return new Promise(function(resolve) {
-                /* ONLY to be used as intermediary for when a step needs data from a different step in the workflow */
-                var step = self.steps().find(function(step) { return ko.unwrap(step.name) === ko.unwrap(stepName); });
+        this.parseComponentPath = function(path) {
+            var pathAsStringArray = path.slice(1, path.length - 1).split('][');
 
-                if (step) { 
-                    if (step.saving()) {
-                        var savingSubscription = step.saving.subscribe(function(saving) {
-                            if (!saving) {
-                                savingSubscription.dispose(); /* self-disposing subscription */
-                                resolve({ [step.name()]: step.value() }); 
-                            }
-                        });
-                    }
-                    else {
-                        resolve({ [step.name()]: step.value() });
-                    }
+            return pathAsStringArray.map(function(string) {
+                if (!isNaN(Number(string))) {
+                    return Number(string);
                 }
                 else {
-                    resolve(null);
+                    return string.slice(1, string.length - 1);
                 }
             });
+        };
+
+        this.isValidComponentPath = function(path) {
+            var matchingStep;
+
+            if (typeof path === 'string') {  /* path instanceOf String returns false */
+                var pathAsArray = self.parseComponentPath(path);
+
+                matchingStep = self.steps().find(function(step) {
+                    return step.name === pathAsArray[0];
+                });
+            }
+
+            return Boolean(matchingStep);
+        };
+
+        this.getDataFromComponentPath = function(path) {
+            var pathAsArray = self.parseComponentPath(path);
+
+            var matchingStep = self.steps().find(function(step) {
+                return step.name === pathAsArray[0];
+            });
+
+            var value;
+
+            if (matchingStep) {
+                value = matchingStep.value();
+
+                var matchingComponentData = matchingStep.value()[pathAsArray[1]];
+
+                if (matchingComponentData) {
+                    value = matchingComponentData;
+                    
+                    var updatedPath = pathAsArray.slice(2);
+                    
+                    for (var chunk of updatedPath) {
+                        if (value[chunk] !== undefined) {
+                            value = value[chunk];
+                        }
+                    }
+                }
+            }
+
+            return value;
         };
 
         this.toggleStepLockedState = function(stepName, locked) {
@@ -214,19 +227,6 @@ define([
             if (step) {
                 step.locked(locked);
             }
-        }
-
-        this.getStepIdFromUrl = function() {
-            var searchParams = new URLSearchParams(window.location.search);
-            return searchParams.get(STEP_ID_LABEL);
-        };
-
-        this.setStepIdToUrl = function(step) {
-            var searchParams = new URLSearchParams(window.location.search);
-            searchParams.set(STEP_ID_LABEL, step.id());
-
-            var newRelativePathQuery = `${window.location.pathname}?${searchParams.toString()}`;
-            history.pushState(null, '', newRelativePathQuery);
         };
 
         this.getFurthestValidStepIndex = function() {
@@ -283,7 +283,7 @@ define([
             var currentStep;
             
             while (  /* while the current step is not the configured last step */ 
-                steps[idx].name() !== ko.unwrap(self.stepConfig[self.stepConfig.length - 1].name)
+                ko.unwrap(steps[idx].name) !== ko.unwrap(self.stepConfig[self.stepConfig.length - 1].name)
             ) {
                 currentStep = steps[idx];
 
@@ -318,7 +318,7 @@ define([
             self.steps(steps);
 
             var updatedStepNameToIdLookup = self.steps().reduce(function(acc, step) { 
-                acc[step.name()] = step.id(); 
+                acc[ko.unwrap(step.name)] = step.id(); 
                 return acc;
             }, {});
             self.setToLocalStorage(STEP_IDS_LABEL, updatedStepNameToIdLookup);
@@ -338,6 +338,19 @@ define([
 
             var newRelativePathQuery = `${window.location.pathname}?${searchParams.toString()}`;
             history.replaceState(null, '', newRelativePathQuery);
+        };
+
+        this.getStepIdFromUrl = function() {
+            var searchParams = new URLSearchParams(window.location.search);
+            return searchParams.get(STEP_ID_LABEL);
+        };
+
+        this.setStepIdToUrl = function(step) {
+            var searchParams = new URLSearchParams(window.location.search);
+            searchParams.set(STEP_ID_LABEL, step.id());
+
+            var newRelativePathQuery = `${window.location.pathname}?${searchParams.toString()}`;
+            history.pushState(null, '', newRelativePathQuery);
         };
 
         this.setToLocalStorage = function(key, value) {
@@ -375,88 +388,30 @@ define([
             $.ajax({
                 type: "POST",
                 url: arches.urls.transaction_reverse(self.id())
+            }).then(function() {
+                window.location.href = self.quitUrl;
             });
         };
 
         this.finishWorkflow = function() {
-            if (self.isWorkflowFinished()) { self.activeStep(self.steps()[self.steps().length - 1]); }
-        };
-
-        this.finishTabbedWorkflow = function() { //TODO: promise chain needs to be implemented later
             if (self.activeStep().hasDirtyTile()) {
-                self.activeStep().save()
+                self.activeStep().save().then(function() {
+                    window.location.assign(self.quitUrl);
+                });
             }
-            self.steps().forEach(function(step){
-                step.saveOnQuit();
-            })
-            window.location.assign(self.quitUrl);
+            else {
+                window.location.assign(self.quitUrl);
+            }
         };
 
         this.quitWorkflow = function(){
-            var resourcesToDelete = [];
-            var tilesToDelete = [];
-            var warnings = []
-
-            self.steps().forEach(function(step) {
-                var wastebin = step.wastebin;
-
-                if (wastebin) {
-                    if (ko.unwrap(wastebin.resources)) {
-                        var resources = ko.mapping.toJS(wastebin.resources);
-                        resources.forEach(function(resource) {
-                            warnings.push(resource.description);
-                            resourcesToDelete.push(resource);
-                        })
-                    }
-                    if (ko.unwrap(wastebin.resourceid)) {
-                        warnings.push(ko.unwrap(wastebin.description));
-                        resourcesToDelete.push(ko.mapping.toJS(wastebin));
-                    } else if (ko.unwrap(wastebin.tile)) {
-                        warnings.push(ko.unwrap(wastebin.description));
-                        tilesToDelete.push(ko.mapping.toJS(wastebin));
-                    }
-                }
-            });
-
-            self.warning = self.wastebinWarning(warnings.join(', '));
-            
-            var deleteObject = function(type, obj){
-                if (type === 'resource') {
-                    console.log(obj);
-                    $.ajax({
-                        url: arches.urls.api_resources(obj),
-                        type: 'DELETE',
-                        success: function(result) {
-                            console.log('result', result);
-                        }
-                    });
-                } else if (type === 'tile') {
-                    $.ajax({
-                        type: "DELETE",
-                        url: arches.urls.tile,
-                        data: JSON.stringify(obj)
-                    }).done(function(response) {
-                        console.log('deleted', obj.tileid);
-                    }).fail(function(response) {
-                        if (typeof onFail === 'function') {
-                            console.log(response);
-                        }
-                    });
-                }
-            };
-
             self.alert(
                 new AlertViewModel(
                     'ep-alert-red',
-                    self.warning[0],
-                    self.warning[1],
+                    'Are you sure you would like to delete this workflow?',
+                    'All data created during the course of this workflow will be deleted.',
                     function(){}, //does nothing when canceled
-                    function(){
-                        resourcesToDelete.forEach(function(resource){deleteObject('resource', resource.resourceid);});
-                        tilesToDelete.forEach(function(tile){deleteObject('tile', tile.tile);});
-                        self.reverseWorkflowTransactions();
-                        window.location.href = self.quitUrl;
-                    }
+                    self.reverseWorkflowTransactions,
                 )
             );
         };

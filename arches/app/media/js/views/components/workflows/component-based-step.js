@@ -213,14 +213,6 @@ define([
                     }
                 };
 
-                /*
-                    If a step modifies a child tile, get the correct parent tile id from the step that created the parent tile. 
-                    This requires that your step has a parameter 'parenttilesourcestep' that identifies the step with the parent tile.
-                */
-                if (self.externalStepData[self.componentData.parameters.parenttilesourcestep]){
-                    self.componentData.parameters.parenttileid = self.externalStepData[self.componentData.parameters.parenttilesourcestep].data.tileid;
-                }
-
                 self.flattenTree(self.topCards, []).forEach(function(item) {
                     if (item.constructor.name === 'CardViewModel' && item.nodegroupid === ko.unwrap(self.componentData.parameters.nodegroupid)) {
                         if (ko.unwrap(self.componentData.parameters.parenttileid) && item.parent && ko.unwrap(self.componentData.parameters.parenttileid) !== item.parent.tileid) {
@@ -570,11 +562,11 @@ define([
     };
 
 
-    function WorkflowComponentAbstract(componentData, previouslyPersistedComponentData, externalStepData, resourceId, title, isStepSaving, locked, lockExternalStep, lockableExternalSteps, workflowId, alert, outerSaveOnQuit) {
+    function WorkflowComponentAbstract(componentData, previouslyPersistedComponentData, isValidComponentPath, getDataFromComponentPath, title, isStepSaving, locked, lockExternalStep, lockableExternalSteps, workflowId, alert, outerSaveOnQuit) {
         var self = this;
 
         this.workflowId = workflowId;
-        this.resourceId = resourceId;
+        this.resourceId = ko.observable();
                 
         this.loading = ko.observable(false);
         this.saving = ko.observable(false);
@@ -582,7 +574,6 @@ define([
 
         this.componentData = componentData;
         this.previouslyPersistedComponentData = previouslyPersistedComponentData;
-        this.externalStepData = externalStepData;
 
         this.savedData = ko.observableArray();
         this.hasUnsavedData = ko.observable();
@@ -616,6 +607,26 @@ define([
         this.initialize = function() {
             self.loading(true);
 
+            /* 
+                Checks format of parameter values for external-component-path-patterned arrays.
+                If parameter value matches pattern, get external component data and update value in self.componentData
+            */ 
+            if (self.componentData.parameters) {
+                Object.keys(self.componentData.parameters).forEach(function(componentDataKey) {
+                    var componentDataValue = self.componentData.parameters[componentDataKey];
+    
+                    if (isValidComponentPath(componentDataValue)) {
+                        self.componentData.parameters[componentDataKey] = getDataFromComponentPath(componentDataValue);
+                    }
+                });
+            }
+
+            if (componentData && componentData['parameters']) {
+                self.resourceId(ko.unwrap(componentData['parameters']['resourceid']));
+                
+                componentData['parameters']['renderContext'] = 'workflow';
+            }
+
             if (!componentData.tilesManaged || componentData.tilesManaged === "none") {
                 NonTileBasedComponent.apply(self);
             }
@@ -628,7 +639,7 @@ define([
         };
 
         this.getCardResourceIdOrGraphId = function() {
-            return (ko.unwrap(this.resourceId) || ko.unwrap(componentData.parameters.graphid));
+            return (ko.unwrap(componentData.parameters.resourceid) || ko.unwrap(componentData.parameters.graphid));
         };
 
         this.initialize();
@@ -638,8 +649,6 @@ define([
     function viewModel(params) {
         var self = this;
 
-        this.resourceId = ko.observable();
-        
         this.alert = params.alert || ko.observable();
         this.componentBasedStepClass = ko.unwrap(params.workflowstepclass);
         this.locked = params.locked;
@@ -727,13 +736,6 @@ define([
         this.initialize = function() {
             params.hasDirtyTile(false);
 
-            if (ko.unwrap(params.resourceid)) {
-                self.resourceId(ko.unwrap(params.resourceid));
-            }
-            else if (params.workflow && ko.unwrap(params.workflow.resourceId)) {
-                self.resourceId(ko.unwrap(params.workflow.resourceId));
-            }
-    
             if (params.workflow && ko.unwrap(params.workflow.id)) {
                 self.workflowId = ko.unwrap(params.workflow.id);
             }
@@ -774,8 +776,8 @@ define([
             var workflowComponentAbstract = new WorkflowComponentAbstract(
                 workflowComponentAbtractData,
                 previouslyPersistedComponentData,
-                params.externalStepData,
-                self.resourceId,
+                params.workflow.isValidComponentPath,
+                params.workflow.getDataFromComponentPath,
                 params.title,
                 self.isStepSaving,
                 self.locked,
@@ -826,32 +828,6 @@ define([
                 workflowComponentAbstract.reset();
             });
         };
-
-        params.defineStateProperties = function(){
-            // Collects those properties that you want to set to the state.
-            /** 
-             * Wastebin
-             * Note that wastebin as set on the workflow step params is inclusive; only things identified by those keys (e.g. tile, resourceid) will be deleted on quit. Otherwise if no wastebin params given, nothing will be deleted on quit.
-             * 
-             * -- If the workflow edits/creates one and only one new resource, resourceid need only be named in the first step's params' wastebin like so: wastebin: {resourceid:null}
-             * This will automatically cascade/delete all tiles generated from this resource.
-             * 
-             * -- If not every step's generated tile belongs to the same resource or you want to selectively delete a tile from a step, {tile:null} should be declared in every step's params' wastebin where you want the tile from that step to be deleted on quit.
-             * 
-             * Overriding this method:
-             * Keep in mind that anything extending newStep that overrides this method should include similar logic to handle for wastebin if there is a wastebin use case for that particular step in the workflow.
-            **/
-            var wastebin;
-            if (ko.unwrap(params.wastebin)) {
-                wastebin = koMapping.toJS(params.wastebin);
-            }
-
-            return {
-                wastebin: wastebin,
-                pageLayout: koMapping.toJS(self.pageLayout),
-            };
-        };
-        params.defineStateProperties();
 
         this.initialize();
     }
