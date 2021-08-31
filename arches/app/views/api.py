@@ -583,21 +583,20 @@ class Resources(APIBase):
                 compact = bool(request.GET.get("compact", "true").lower() == "true")  # default True
                 hide_empty_nodes = bool(request.GET.get("hide_empty_nodes", "false").lower() == "true")  # default False
 
-                out = {
-                    "resource": resource.to_json(
-                        compact=compact,
-                        hide_empty_nodes=hide_empty_nodes,
-                        user=user,
-                        perm=perm,
-                        version=version
-                    ),
-                    "displaydescription": resource.displaydescription,
-                    "displayname": resource.displayname,
-                    "graph_id": resource.graph_id,
-                    "legacyid": resource.legacyid,
-                    "map_popup": resource.map_popup,
-                    "resourceinstanceid": resource.resourceinstanceid,
-                }
+                if version == "beta":
+                    out = resource.to_json(compact=compact, hide_empty_nodes=hide_empty_nodes, user=user, perm=perm, version=version)
+                else:
+                    out = {
+                        "resource": resource.to_json(
+                            compact=compact, hide_empty_nodes=hide_empty_nodes, user=user, perm=perm, version=version
+                        ),
+                        "displaydescription": resource.displaydescription,
+                        "displayname": resource.displayname,
+                        "graph_id": resource.graph_id,
+                        "legacyid": resource.legacyid,
+                        "map_popup": resource.map_popup,
+                        "resourceinstanceid": resource.resourceinstanceid,
+                    }
 
             elif format == "arches-json":
                 out = Resource.objects.get(pk=resourceid)
@@ -1339,10 +1338,13 @@ class BulkDisambiguatedResourceInstance(APIBase):
     def get(self, request):
         resource_ids = request.GET.get("resource_ids").split(",")
         uncompacted_value = request.GET.get("uncompacted")
+        version = request.GET.get("v")
         compact = True
         if uncompacted_value == "true":
             compact = False
-        return JSONResponse({resource.pk: resource.to_json(compact=compact) for resource in Resource.objects.filter(pk__in=resource_ids)})
+        return JSONResponse(
+            {resource.pk: resource.to_json(compact=compact, version=version) for resource in Resource.objects.filter(pk__in=resource_ids)}
+        )
 
 
 @method_decorator(csrf_exempt, name="dispatch")

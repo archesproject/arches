@@ -180,6 +180,14 @@ class LabelBasedGraph(object):
             for key in [NODE_ID_KEY, TILE_ID_KEY]:
                 resource_graph.pop(key, None)
 
+            # adds metadata that was previously only accessible via API
+            resource_graph["displaydescription"] = resource.displaydescription
+            resource_graph["displayname"] = resource.displayname
+            resource_graph["graph_id"] = resource.graph_id
+            resource_graph["legacyid"] = resource.legacyid
+            resource_graph["map_popup"] = resource.map_popup
+            resource_graph["resourceinstanceid"] = resource.resourceinstanceid
+
             return resource_graph
         else:  # pragma: no cover
             return root_label_based_node
