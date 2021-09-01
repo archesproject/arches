@@ -193,6 +193,7 @@ define([
                             },
                             'selected': undefined
                         });
+                        relatedResourceIds.push(resourceId);
                     }
                 });
                 return elements;
