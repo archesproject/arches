@@ -56,7 +56,7 @@ define([
                 }
             } 
             else if (self.resourceid) {
-                url = arches.urls.api_resource_report(self.resourceid);
+                url = arches.urls.api_resource_report(self.resourceid) + "?v=beta&uncompacted=true";
 
                 self.fetchResourceData(url).then(function(responseJson) {
                     var template = responseJson.template;
