@@ -27,7 +27,6 @@ def reverse_edit_log_entries(transaction_id):
                         obj.data = edit_log.oldvalue
                         obj.save()
                         number_of_db_changes += 1
-
     except DatabaseError:
         logger.error("Error connecting to database")
 
