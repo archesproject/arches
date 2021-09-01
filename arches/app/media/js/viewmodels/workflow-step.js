@@ -28,10 +28,9 @@ define([
         this.loading = ko.observable(false);
         this.saving = ko.observable(false);
         this.complete = ko.observable(false);
-        
-        // this.value = ko.observable();
-        this.hasDirtyTile = ko.observable(false);
 
+        this.hasUnsavedData = ko.observable(false);
+        
         this.preSaveCallback = ko.observable();
         this.postSaveCallback = ko.observable();
         this.clearCallback = ko.observable();
@@ -80,6 +79,11 @@ define([
                 self.id(uuid.generate());
             }
 
+            /* workflow ID logic */ 
+            if (config.workflow && ko.unwrap(config.workflow.id)) {
+                self.workflowId = ko.unwrap(config.workflow.id);
+            }
+
             /* cached workflowComponentAbstract logic */ 
             var cachedComponentIdLookup = self.getFromLocalStorage('componentIdLookup');
             if (cachedComponentIdLookup) {
@@ -95,6 +99,8 @@ define([
             /* cached informationBox logic */
             this.setupInformationBox();
 
+
+            /* build page layout */ 
             ko.toJS(self.layoutSections).forEach(function(layoutSection) {
                 var uniqueInstanceNames = [];
     
@@ -107,8 +113,6 @@ define([
                         workflowComponentAbstractId = self.componentIdLookup()[componentConfigData.uniqueInstanceName];
                     }
     
-                    console.log('ds90', workflowComponentAbstractId, self.componentIdLookup(), self.componentIdLookup())
-    
                     self.updateWorkflowComponentAbstractLookup(componentConfigData, workflowComponentAbstractId);
                 });
     
@@ -116,32 +120,12 @@ define([
     
                 self.pageLayout.push(sectionInfo);
             });
-
-            console.log(config)
         };
 
         this.updateWorkflowComponentAbstractLookup = function(workflowComponentAbtractData, workflowComponentAbstractId) {
             var workflowComponentAbstractLookup = self.workflowComponentAbstractLookup();
 
-            // var workflowComponentAbstract = new WorkflowComponentAbstract(
-                // workflowComponentAbtractData,
-            //     workflowComponentAbstractId,
-            //     config.workflow.isValidComponentPath,
-            //     config.workflow.getDataFromComponentPath,
-            //     config.title,
-            //     self.isStepSaving,
-            //     self.locked,
-            //     self.lockExternalStep,
-            //     self.lockableExternalSteps,
-            //     self.workflowId,
-            //     self.alert,
-            //     self.outerSaveOnQuit,
-            // );
-
-        // console.log("90ds", componentData, workflowComponentAbstractId, isValidComponentPath, getDataFromComponentPath, title, isStepSaving, locked, lockExternalStep, lockableExternalSteps, workflowId, alert, outerSaveOnQuit)
-
-
-            var workflowComponentAbstract = {
+            var workflowComponentAbstract = new WorkflowComponentAbstract({
                 componentData: workflowComponentAbtractData,
                 workflowComponentAbstractId: workflowComponentAbstractId,
                 isValidComponentPath: config.workflow.isValidComponentPath,
@@ -154,72 +138,47 @@ define([
                 workflowId: self.workflowId,
                 alert: self.alert,
                 outerSaveOnQuit: self.outerSaveOnQuit,
-            };
+            });
 
-            console.log('!!!!', workflowComponentAbstract)
+            /* 
+                checks if all `workflowComponentAbstract`s have saved data if a single `workflowComponentAbstract` 
+                updates its data, neccessary for correct aggregate behavior
+            */
+            workflowComponentAbstract.hasUnsavedData.subscribe(function() {
+                var hasUnsavedData = Object.values(self.workflowComponentAbstractLookup()).reduce(function(acc, workflowComponentAbstract) {
 
-            // /* 
-            //     checks if all `workflowComponentAbstract`s have saved data if a single `workflowComponentAbstract` 
-            //     updates its data, neccessary for correct aggregate behavior
-            // */
-            // workflowComponentAbstract.hasUnsavedData.subscribe(function() {
-            //     var hasUnsavedData = Object.values(self.workflowComponentAbstractLookup()).reduce(function(acc, workflowComponentAbstract) {
-            //         if (workflowComponentAbstract.hasUnsavedData()) {
-            //             acc = true;
-            //         } 
-            //         return acc;
-            //     }, false);
+                    if (workflowComponentAbstract.hasUnsavedData()) {
+                        acc = true;
+                    } 
+                    return acc;
+                }, false);
 
-            //     self.hasUnsavedData(hasUnsavedData);
-            // });
+                self.hasUnsavedData(hasUnsavedData);
+            });
 
             workflowComponentAbstractLookup[workflowComponentAbtractData.uniqueInstanceName] = workflowComponentAbstract;
 
             self.workflowComponentAbstractLookup(workflowComponentAbstractLookup);
         };
 
-        // this.save = function() {};  /* overwritten in component-based-step */
-        
         this.save = function() {
-            var preSaveCallback = function() {
-                return new Promise(function(resolve, _reject) {
-                    var preSaveCallback = ko.unwrap(self.preSaveCallback);
-                    preSaveCallback(resolve);
-                });
-            };
-            // var writeToLocalStorage = function() {
-            //     return new Promise(function(resolve, _reject) {
-            //         self.setToLocalStorage('value', self.value());
-            //         resolve(self.value());
-            //     });
-            // };
-            var postSaveCallback = function() {
-                // TODO: Refactor promise logic to pass down resolve
-                return new Promise(function(resolve, _reject) {
-                    var postSaveCallback = ko.unwrap(self.postSaveCallback);
-
-                    if (postSaveCallback) {
-                        resolve(postSaveCallback());
-                    }
-                    else {
-                        resolve(null);
-                    }
-                });
-            };
-            
             return new Promise(function(resolve, _reject) {
-                preSaveCallback().then(function(_preSaveCallbackData) {
-                    // writeToLocalStorage().then(function(_localStorageData) {
-                        postSaveCallback().then(function(_postSaveCallbackData) {
-                            resolve(self.value());
-                        });
-                    // });
+                var savePromises = [];
+            
+                Object.values(self.workflowComponentAbstractLookup()).forEach(function(workflowComponentAbstract) {
+                    savePromises.push(new Promise(function(resolve, _reject) {
+                        workflowComponentAbstract._saveComponent(resolve);
+                    }));
+                });
+    
+                Promise.all(savePromises).then(function(values) {
+                    resolve(...values);
                 });
             });
         };
 
         this.clear = function() {
-            if (self.hasDirtyTile()) {
+            if (self.hasUnsavedData()) {
                 if (ko.unwrap(self.tile)) {
                     self.tile().reset();
                 }

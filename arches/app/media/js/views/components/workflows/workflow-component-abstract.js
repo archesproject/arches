@@ -615,9 +615,8 @@ define([
     function viewModel(params) {
         var self = this;
 
-        console.log('asdf90fads90', params)
+        console.log("fs90d", params)
 
-        // console.log("90ds", componentData, workflowComponentAbstractId, isValidComponentPath, getDataFromComponentPath, title, isStepSaving, locked, lockExternalStep, lockableExternalSteps, workflowId, alert, outerSaveOnQuit)
         this.workflowId = params.workflowId;
         this.componentData = params.componentData;
         this.alert = params.alert;
@@ -720,7 +719,7 @@ define([
         };
 
         this.getCardResourceIdOrGraphId = function() {
-            return (ko.unwrap(componentData.parameters.resourceid) || ko.unwrap(componentData.parameters.graphid));
+            return (ko.unwrap(self.componentData.parameters.resourceid) || ko.unwrap(self.componentData.parameters.graphid));
         };
 
         this._saveComponent = function(componentBasedStepResolve) {
@@ -743,7 +742,6 @@ define([
     }
 
     ko.components.register('workflow-component-abstract', {
-        viewModel: viewModel,
         template: {
             require: 'text!templates/views/components/workflows/workflow-component-abstract.htm'
         }

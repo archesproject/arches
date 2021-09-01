@@ -62,20 +62,11 @@
                     ></h4>
                 </div>
                 <!-- /ko -->
-        
 
-                <!-- <div style="display:none" data-bind="text: console.log(layoutSection[1], $parent, $parent.workflowComponentAbstractLookup())"></div> -->
                 <!-- ko foreach: { data: layoutSection[1], as: 'uniqueInstanceName'} -->
-                <div style="display:none" data-bind="text: console.log(uniqueInstanceName, $parent, $parents[1], $parents[1].workflowComponentAbstractLookup()[uniqueInstanceName])"></div>
-                <div 
-                    data-bind="component: {
-                        name: 'workflow-component-abstract',
-                        params: {
-                            ...ko.unwrap($parents[1].workflowComponentAbstractLookup()[uniqueInstanceName]),
-                        }
-                    }"
-                >
-                </div>
+                    <workflow-component-abstract 
+                        params='workflowComponentAbstract: ko.unwrap($parents[1].workflowComponentAbstractLookup()[uniqueInstanceName])'
+                    ></workflow-component-abstract>
                 <!-- /ko -->
             </div>
             <!-- /ko -->

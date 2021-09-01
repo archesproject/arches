@@ -213,6 +213,12 @@ define([
             var value;
 
             if (matchingStep) {
+
+                // var foo = Object.keys(matchingStep.componentIdLookup()).reduce(function(acc, key) {
+                //     acc[key] = 
+                //     return acc;
+                // }, {});
+
                 value = matchingStep.componentIdLookup();
 
                 console.log("DS()DS", value)
@@ -221,7 +227,11 @@ define([
 
                 if (matchingComponentData) {
 
-                    console.log("iodfs", matchingComponentData)
+                    console.log("iodfs", self.getFromLocalStorage(), matchingComponentData)
+
+
+
+
                     value = matchingComponentData;
                     
                     var updatedPath = pathAsArray.slice(2);
@@ -409,7 +419,7 @@ define([
         };
 
         this.finishWorkflow = function() {
-            if (self.activeStep().hasDirtyTile()) {
+            if (self.activeStep().hasUnsavedData()) {
                 self.activeStep().save().then(function() {
                     window.location.assign(self.quitUrl);
                 });

@@ -123,7 +123,7 @@
         </div>
         
         <div class="tabbed-workflow-step-container">
-            <workflow-step params='step: activeStep()' ></workflow-step>
+            <workflow-step params='step: activeStep()'></workflow-step>
         </div>
 
         <div class="tabbed-workflow-footer">
@@ -168,13 +168,13 @@
                     </span>
                 </button>
                 <!-- /ko -->
-                <!-- ko if: activeStep().hasDirtyTile() -->
+                <!-- ko if: activeStep().hasUnsavedData() -->
                     <!-- ko if: !$data.hiddenWorkflowButtons().includes('undo') -->
                     <button
                         class="btn btn-danger"
                         data-bind="{
                             css: {
-                                disabled: !activeStep().hasDirtyTile(),
+                                disabled: !activeStep().hasUnsavedData(),
                             },
                             click: activeStep().clear
                         }"
@@ -223,7 +223,7 @@
                         <!-- /ko -->
                     <!-- /ko -->
                 <!-- /ko -->
-                <!-- ko ifnot: activeStep().hasDirtyTile() -->
+                <!-- ko ifnot: activeStep().hasUnsavedData() -->
                     <!-- ko if: activeStep()._index < steps().length - 1 -->
                     <button
                         class="btn btn-primary"
