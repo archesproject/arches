@@ -190,12 +190,19 @@ define([
         this.isValidComponentPath = function(path) {
             var matchingStep;
 
+            // self.steps.subscribe(function(steps) {
+
+            // })
+
             if (typeof path === 'string') {  /* path instanceOf String returns false */
                 var pathAsArray = self.parseComponentPath(path);
+
 
                 matchingStep = self.steps().find(function(step) {
                     return step.name === pathAsArray[0];
                 });
+
+                console.log(pathAsArray, matchingStep, self.steps(), self)
             }
 
             return Boolean(matchingStep);

@@ -666,6 +666,9 @@ define([
                 Object.keys(self.componentData.parameters).forEach(function(componentDataKey) {
                     var componentDataValue = self.componentData.parameters[componentDataKey];
     
+
+                    console.log("ccc", componentDataValue, params.isValidComponentPath(componentDataValue), )
+
                     if (params.isValidComponentPath(componentDataValue)) {
                         self.componentData.parameters[componentDataKey] = params.getDataFromComponentPath(componentDataValue);
                     }

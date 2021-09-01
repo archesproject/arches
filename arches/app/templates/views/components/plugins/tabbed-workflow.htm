@@ -190,7 +190,10 @@
                         class="btn btn-success"
                         data-bind="
                             click: function() {
-                                $data.saveActiveStep()
+                                $data.saveActiveStep().then(function() {
+                                    $data.updateStepPath();
+                                    $data.next();
+                                });
                             },
                         "
                     >

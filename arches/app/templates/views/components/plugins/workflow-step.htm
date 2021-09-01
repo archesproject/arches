@@ -63,10 +63,12 @@
                 </div>
                 <!-- /ko -->
 
-                <!-- ko foreach: { data: layoutSection[1], as: 'uniqueInstanceName'} -->
-                    <workflow-component-abstract 
-                        params='workflowComponentAbstract: ko.unwrap($parents[1].workflowComponentAbstractLookup()[uniqueInstanceName])'
-                    ></workflow-component-abstract>
+                <!-- ko if: !$parent.loading() && !$parent.saving() -->
+                    <!-- ko foreach: { data: layoutSection[1], as: 'uniqueInstanceName'} -->
+                        <workflow-component-abstract 
+                            params='workflowComponentAbstract: ko.unwrap($parents[1].workflowComponentAbstractLookup()[uniqueInstanceName])'
+                        ></workflow-component-abstract>
+                    <!-- /ko -->
                 <!-- /ko -->
             </div>
             <!-- /ko -->

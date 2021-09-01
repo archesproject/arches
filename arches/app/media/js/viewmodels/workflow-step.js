@@ -73,6 +73,7 @@ define([
 
 
         this.initialize = function() {
+            
             /* cached ID logic */ 
             var cachedId = ko.unwrap(config.id);
             if (cachedId) {
@@ -91,6 +92,7 @@ define([
             var cachedComponentIdLookup = self.getFromLocalStorage('componentIdLookup');
             if (cachedComponentIdLookup) {
                 self.componentIdLookup(cachedComponentIdLookup);
+                self.complete(true);
             }
 
             /* step lock logic */ 
@@ -103,27 +105,32 @@ define([
             this.setupInformationBox();
 
 
-            /* build page layout */ 
-            ko.toJS(self.layoutSections).forEach(function(layoutSection) {
-                var uniqueInstanceNames = [];
-    
-                layoutSection.componentConfigs.forEach(function(componentConfigData) {
-                    uniqueInstanceNames.push(componentConfigData.uniqueInstanceName);
-                    self.updateWorkflowComponentAbstractLookup(componentConfigData);
-                });
-    
-                self.pageLayout.push([layoutSection.sectionTitle, uniqueInstanceNames]);
-            });
+            self.active.subscribe(function(active) {
+                if (active) {
 
-            /* assigns componentIdLookup to self, which updates localStorage */ 
-            var componentIdLookup = Object.keys(self.workflowComponentAbstractLookup()).reduce(function(acc, key) {
-                acc[key] = self.workflowComponentAbstractLookup()[key].id();
-                return acc;
-            }, {});
-
-            console.log("fd90fsd09dsf90dsf", componentIdLookup)
-
-            self.componentIdLookup(componentIdLookup);
+                    /* build page layout */ 
+                    ko.toJS(self.layoutSections).forEach(function(layoutSection) {
+                        var uniqueInstanceNames = [];
+            
+                        layoutSection.componentConfigs.forEach(function(componentConfigData) {
+                            uniqueInstanceNames.push(componentConfigData.uniqueInstanceName);
+                            self.updateWorkflowComponentAbstractLookup(componentConfigData);
+                        });
+            
+                        self.pageLayout.push([layoutSection.sectionTitle, uniqueInstanceNames]);
+                    });
+        
+                    /* assigns componentIdLookup to self, which updates localStorage */ 
+                    var componentIdLookup = Object.keys(self.workflowComponentAbstractLookup()).reduce(function(acc, key) {
+                        acc[key] = self.workflowComponentAbstractLookup()[key].id();
+                        return acc;
+                    }, {});
+        
+                    console.log("fd90fsd09dsf90dsf", componentIdLookup)
+        
+                    self.componentIdLookup(componentIdLookup);
+                }
+            })
         };
 
         this.updateWorkflowComponentAbstractLookup = function(workflowComponentAbtractData) {
@@ -173,6 +180,7 @@ define([
         };
 
         this.save = function() {
+            self.complete(false);
             self.saving(true);
 
             return new Promise(function(resolve, _reject) {
@@ -187,6 +195,7 @@ define([
                 Promise.all(savePromises).then(function(values) {
                     resolve(...values);
                     self.saving(false);
+                    self.complete(true);
                 });
             });
         };
