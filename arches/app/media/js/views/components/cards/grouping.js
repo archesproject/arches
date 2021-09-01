@@ -211,10 +211,10 @@ define([
         }, this);
 
         this.saveTiles = function(){
-            // var self = this;
             var errors = ko.observableArray().extend({ rateLimit: 250 });
             var tiles = self.groupedTiles();
             var tile = self.groupedTiles()[0];
+            tile.resourceinstance_id = ko.unwrap(self.form.resourceId);
             self.saving = true;
 
             tile.save(function(response) {
@@ -222,10 +222,9 @@ define([
                 self.saving = false;
                 self.groupedCardIds.valueHasMutated();
                 self.selectGroupCard();
-            }, function(response){
-                var resourceInstanceId = response.resourceinstance_id;
+            }, function(){
                 var requests = _.map(_.rest(tiles), function(tile) {
-                    tile.resourceinstance_id = resourceInstanceId;
+                    tile.resourceinstance_id = ko.unwrap(self.form.resourceId);
                     return tile.save(function(response) {
                         errors.push(response);
                     });
