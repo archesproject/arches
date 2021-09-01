@@ -42,6 +42,9 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
     <link href="{% static 'css/unify.css' %}" rel="stylesheet">
     <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/font-awesome/4.2.0/css/font-awesome.min.css">
     <link href="{% static 'css/index.css' %}" rel="stylesheet">
+    {% if app_settings.ACCESSIBILITY_MODE %}
+    <link href="{% static 'css/accessibility.css' %}" rel="stylesheet">
+    {% endif %}
 </head>
 
 <body>
