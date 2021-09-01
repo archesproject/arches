@@ -15,6 +15,8 @@ define([
     STEPS_LABEL = 'workflow-steps';
     STEP_ID_LABEL = 'workflow-step-id';
     STEP_IDS_LABEL = 'workflow-step-ids';
+    WORKFLOW_COMPONENT_ABSTRACTS_LABEL = 'workflow-component-abstracts';
+
 
     var Workflow = function(config) {
         var self = this;
@@ -34,6 +36,8 @@ define([
         
         this.activeStep = ko.observable();
         this.activeStep.subscribe(function(activeStep) {
+            // activeStep.loading(true);
+
             self.setStepIdToUrl(activeStep);
             self.hiddenWorkflowButtons(activeStep.hiddenWorkflowButtons());
         });
@@ -70,7 +74,8 @@ define([
                 self.setToLocalStorage(WORKFLOW_ID_LABEL, self.id());
                 /* remove step data created by previous workflow from localstorage */
                 localStorage.removeItem(STEPS_LABEL);  
-                localStorage.removeItem(STEP_IDS_LABEL);  
+                localStorage.removeItem(STEP_IDS_LABEL);
+                localStorage.removeItem(WORKFLOW_COMPONENT_ABSTRACTS_LABEL);
             }
 
             self.updateStepPath();
@@ -162,6 +167,7 @@ define([
 
         this.saveActiveStep = function() {
             return new Promise(function(resolve, _reject) {
+                console.log(self.activeStep())
                 self.activeStep().save().then(function(data) {            
                     resolve(data);
                 });
@@ -202,14 +208,20 @@ define([
                 return step.name === pathAsArray[0];
             });
 
+            console.log('90dsadsf', matchingStep, pathAsArray)
+
             var value;
 
             if (matchingStep) {
-                value = matchingStep.value();
+                value = matchingStep.componentIdLookup();
 
-                var matchingComponentData = matchingStep.value()[pathAsArray[1]];
+                console.log("DS()DS", value)
+
+                var matchingComponentData = matchingStep.componentIdLookup()[pathAsArray[1]];
 
                 if (matchingComponentData) {
+
+                    console.log("iodfs", matchingComponentData)
                     value = matchingComponentData;
                     
                     var updatedPath = pathAsArray.slice(2);

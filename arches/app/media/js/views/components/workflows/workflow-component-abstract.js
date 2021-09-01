@@ -612,11 +612,21 @@ define([
     };
 
 
-    function WorkflowComponentAbstract(componentData, workflowComponentAbstractId, isValidComponentPath, getDataFromComponentPath, title, isStepSaving, locked, lockExternalStep, lockableExternalSteps, workflowId, alert, outerSaveOnQuit) {
+    function viewModel(params) {
         var self = this;
 
+        console.log('asdf90fads90', params)
+
+        // console.log("90ds", componentData, workflowComponentAbstractId, isValidComponentPath, getDataFromComponentPath, title, isStepSaving, locked, lockExternalStep, lockableExternalSteps, workflowId, alert, outerSaveOnQuit)
+        this.workflowId = params.workflowId;
+        this.componentData = params.componentData;
+        this.alert = params.alert;
+        
+        this.locked = params.locked;
+        this.lockExternalStep = params.lockExternalStep;
+        this.lockableExternalSteps = params.lockableExternalSteps;
+
         this.id = ko.observable();
-        this.workflowId = workflowId;
 
         this.resourceId = ko.observable();
                 
@@ -624,17 +634,11 @@ define([
         this.saving = ko.observable(false);
         this.complete = ko.observable(false);
 
-        this.componentData = componentData;
 
         this.savedData = ko.observableArray();
         this.hasUnsavedData = ko.observable();
 
-        this.alert = alert;
         this.AlertViewModel = AlertViewModel;
-        
-        this.locked = locked;
-        this.lockExternalStep = lockExternalStep;
-        this.lockableExternalSteps = lockableExternalSteps;
 
         this.value = ko.observable();
         this.previouslyPersistedComponentData;
@@ -648,8 +652,8 @@ define([
             self.loading(true);
 
             /* cached ID logic */ 
-            if (workflowComponentAbstractId) {
-                self.id(workflowComponentAbstractId)
+            if (params.workflowComponentAbstractId) {
+                self.id(params.workflowComponentAbstractId)
             }
             else {
                 self.id(uuid.generate());
@@ -663,8 +667,8 @@ define([
                 Object.keys(self.componentData.parameters).forEach(function(componentDataKey) {
                     var componentDataValue = self.componentData.parameters[componentDataKey];
     
-                    if (isValidComponentPath(componentDataValue)) {
-                        self.componentData.parameters[componentDataKey] = getDataFromComponentPath(componentDataValue);
+                    if (params.isValidComponentPath(componentDataValue)) {
+                        self.componentData.parameters[componentDataKey] = params.getDataFromComponentPath(componentDataValue);
                     }
                 });
             }
@@ -675,18 +679,18 @@ define([
                 self.complete(true);
             }
 
-            if (componentData && componentData['parameters']) {
-                self.resourceId(ko.unwrap(componentData['parameters']['resourceid']));
-                componentData['parameters']['renderContext'] = 'workflow';
+            if (self.componentData && self.componentData['parameters']) {
+                self.resourceId(ko.unwrap(self.componentData['parameters']['resourceid']));
+                self.componentData['parameters']['renderContext'] = 'workflow';
             }
 
-            if (!componentData.tilesManaged || componentData.tilesManaged === "none") {
+            if (!self.componentData.tilesManaged || self.componentData.tilesManaged === "none") {
                 NonTileBasedComponent.apply(self);
             }
-            else if (componentData.tilesManaged === "one") {
+            else if (self.componentData.tilesManaged === "one") {
                 TileBasedComponent.apply(self);
             }
-            else if (componentData.tilesManaged === "many") {
+            else if (self.componentData.tilesManaged === "many") {
                 MultipleTileBasedComponent.apply(self, [title] );
             }
         };
@@ -738,216 +742,10 @@ define([
         this.initialize();
     }
 
-
-    function viewModel(params) {
-        var self = this;
-
-        this.alert = params.alert || ko.observable();
-
-        // this.componentBasedStepClass = ko.unwrap(params.workflowstepclass);
-
-        this.foo = params.componentIdLookup;
-
-        this.locked = params.locked;
-        this.lockExternalStep = params.lockExternalStep;
-        this.lockableExternalSteps = params.lockableExternalSteps;
-
-        this.outerSaveOnQuit = ko.observable();
-        this.outerSaveOnQuit.subscribe(function(val){
-            params.saveOnQuit = val;
-        });
-
-        // /* 
-        //     `pageLayout` is an observableArray of arrays representing section Information ( `sectionInfo` ).
-
-        //     `sectionInfo` is an array where the first item is the `sectionTitle` parameter, and the second 
-        //     item is an array of `uniqueInstanceName`.
-        // */ 
-        // this.pageLayout = ko.observableArray();
-        
-        // /*
-        //     `workflowComponentAbstractLookup` is an object where we pair a `uniqueInstanceName` 
-        //     key to `WorkflowComponentAbstract` class objects.
-        // */ 
-        // this.workflowComponentAbstractLookup = ko.observable({});
-
-        this.hasUnsavedData = ko.observable(false);        
-        this.hasUnsavedData.subscribe(function(hasUnsavedData) {
-            params.hasDirtyTile(hasUnsavedData);
-        });
-
-        this.isStepLoading = ko.computed(function() {
-            var isLoading = false;
-
-            /* if no components loaded */ 
-            if ( !Object.values(self.workflowComponentAbstractLookup()).length ) {
-                isLoading = true;
-            }
-
-            Object.values(self.workflowComponentAbstractLookup()).forEach(function(workflowComponentAbstract) {
-                if (workflowComponentAbstract.loading()) {
-                    isLoading = true;
-                }
-            });
-
-            return isLoading;
-        });
-        this.isStepLoading.subscribe(function(isStepLoading) {
-            console.log("ods", isStepLoading)
-            params.loading(isStepLoading);
-        });
-
-        // params.loading(false)
-
-        this.isStepSaving = ko.computed(function() {
-            var isSaving = false;
-
-            Object.values(self.workflowComponentAbstractLookup()).forEach(function(workflowComponentAbstract) {
-                if (workflowComponentAbstract.saving()) {
-                    isSaving = true;
-                }
-            });
-
-            return isSaving;
-        });
-        this.isStepSaving.subscribe(function(isStepSaving) {
-            params.saving(isStepSaving);
-        });
-
-        this.isStepComplete = ko.computed(function() {
-            var isStepComplete = true;
-
-            /* if no components loaded */ 
-            if ( !Object.values(self.workflowComponentAbstractLookup()).length ) {
-                isStepComplete = false;
-            }
-
-            Object.values(self.workflowComponentAbstractLookup()).forEach(function(workflowComponentAbstract) {
-                if (!workflowComponentAbstract.complete()) {
-                    isStepComplete = false;
-                }
-            });
-
-            return isStepComplete;
-        });
-        this.isStepComplete.subscribe(function(isStepComplete) {
-            params.complete(isStepComplete);
-        });
-
-        this.initialize = function() {
-            params.hasDirtyTile(false);
-
-            if (params.workflow && ko.unwrap(params.workflow.id)) {
-                self.workflowId = ko.unwrap(params.workflow.id);
-            }
-
-            params.clearCallback(self.reset);
-
-            params.preSaveCallback(self.save);
-    
-            params.postSaveCallback(function() {
-                self.hasUnsavedData(false);
-            });
-
-            // ko.toJS(params.layoutSections).forEach(function(layoutSection) {
-            //     var uniqueInstanceNames = [];
-
-            //     layoutSection.componentConfigs.forEach(function(componentConfigData) {
-            //         uniqueInstanceNames.push(componentConfigData.uniqueInstanceName);
-                    
-            //         var workflowComponentAbstractId;
-
-            //         if (self.foo() && self.foo()[componentConfigData.uniqueInstanceName]) {
-            //             workflowComponentAbstractId = self.foo()[componentConfigData.uniqueInstanceName];
-            //         }
-
-            //         console.log('ds90', workflowComponentAbstractId, self.foo(), params.componentIdLookup())
-
-            //         self.updateWorkflowComponentAbstractLookup(componentConfigData, workflowComponentAbstractId);
-            //     });
-
-            //     var sectionInfo = [layoutSection.sectionTitle, uniqueInstanceNames];
-
-            //     self.pageLayout.push(sectionInfo);
-            // });
-
-            
-            var bar = Object.keys(self.workflowComponentAbstractLookup()).reduce(function(acc, key) {
-                acc[key] = self.workflowComponentAbstractLookup()[key].id();
-                return acc;
-            }, {});
-
-            /* updates workflow-step with component name to component id mapping */ 
-            // UPDATE NAME HERE
-            self.foo(bar);
-        };
-
-        this.updateWorkflowComponentAbstractLookup = function(workflowComponentAbtractData, workflowComponentAbstractId) {
-            var workflowComponentAbstractLookup = self.workflowComponentAbstractLookup();
-
-            var workflowComponentAbstract = new WorkflowComponentAbstract(
-                workflowComponentAbtractData,
-                workflowComponentAbstractId,
-                params.workflow.isValidComponentPath,
-                params.workflow.getDataFromComponentPath,
-                params.title,
-                self.isStepSaving,
-                self.locked,
-                self.lockExternalStep,
-                self.lockableExternalSteps,
-                self.workflowId,
-                self.alert,
-                self.outerSaveOnQuit,
-            );
-
-            /* 
-                checks if all `workflowComponentAbstract`s have saved data if a single `workflowComponentAbstract` 
-                updates its data, neccessary for correct aggregate behavior
-            */
-            workflowComponentAbstract.hasUnsavedData.subscribe(function() {
-                var hasUnsavedData = Object.values(self.workflowComponentAbstractLookup()).reduce(function(acc, workflowComponentAbstract) {
-                    if (workflowComponentAbstract.hasUnsavedData()) {
-                        acc = true;
-                    } 
-                    return acc;
-                }, false);
-
-                self.hasUnsavedData(hasUnsavedData);
-            });
-
-            workflowComponentAbstractLookup[workflowComponentAbtractData.uniqueInstanceName] = workflowComponentAbstract;
-
-            self.workflowComponentAbstractLookup(workflowComponentAbstractLookup);
-        };
-
-        this.save = function(workflowStepResolve) {
-            var savePromises = [];
-            
-            Object.values(self.workflowComponentAbstractLookup()).forEach(function(workflowComponentAbstract) {
-                savePromises.push(new Promise(function(resolve, _reject) {
-                    workflowComponentAbstract._saveComponent(resolve);
-                }));
-            });
-
-            Promise.all(savePromises).then(function(values) {
-                // params.value(...values);
-                workflowStepResolve(...values);
-            });
-        };
-
-        this.reset = function() {
-            Object.values(self.workflowComponentAbstractLookup()).forEach(function(workflowComponentAbstract) {
-                workflowComponentAbstract.reset();
-            });
-        };
-
-        this.initialize();
-    }
-
-    ko.components.register('component-based-step', {
+    ko.components.register('workflow-component-abstract', {
         viewModel: viewModel,
         template: {
-            require: 'text!templates/views/components/workflows/component-based-step.htm'
+            require: 'text!templates/views/components/workflows/workflow-component-abstract.htm'
         }
     });
 
