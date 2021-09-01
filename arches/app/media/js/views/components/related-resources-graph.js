@@ -163,7 +163,7 @@ define([
                     viz.elements().makeLayout(layout).run();
                 }
             };
-            this.ensureMatchingNodesAndEdges = function(elements){
+            this.addMissingNodes = function(elements){
                 var nodesReferencedByEdges = [];
                 elements.forEach(function(ele){
                     if(!!ele.data.source){
@@ -196,9 +196,6 @@ define([
                     }
                 });
                 return elements;
-                // return elements.filter(function(ele){
-                //     return (relatedResourceIds.includes(ele.data.source) && relatedResourceIds.includes(ele.data.target)) || (ele.data.source === undefined && ele.data.target === undefined);
-                // }); 
             };
             this.expandNode = function(node) {
                 var viz = self.viz();
@@ -221,11 +218,11 @@ define([
                                     };
                                 }
                                 return element;
-                            })
+                            });    
+                        elements = self.addMissingNodes(elements)
                             .filter(function(element) {
                                 return viz.getElementById(element.data.id).length === 0;
                             });
-                        elements = self.ensureMatchingNodesAndEdges(elements);
                         self.viz().getElementById(node.id).lock();
                         viz.add(elements);
                         self.elements(viz.elements());
@@ -349,7 +346,7 @@ define([
                                     result.related_resources.concat(result.resource_relationships)
                                         .map(dataToElement)
                                 );
-                            elements = self.ensureMatchingNodesAndEdges(elements);
+                            elements = self.addMissingNodes(elements);
                             self.selection(elements[0].data);
                             if (!viz) {
                                 updateCytoscapeConfig(elements);
