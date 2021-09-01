@@ -1,5 +1,10 @@
 @import url(../packages/chosen-js/chosen.css);
 
+html, body {
+    overflow-x: hidden;
+    height: auto;
+}
+
 .auth-options {
     margin-top: 17px;
 }
@@ -639,8 +644,13 @@ footer .footer-links {
     padding: 0 20px;
 }
 
+.splash-img img {
+    width: 100%;
+}
+
 .search-screen {
     border: 1px solid #bbb;
+    width: 100%;
 }
 
 .iphone {
