@@ -612,10 +612,8 @@ define([
     };
 
 
-    function viewModel(params) {
+    function WorkflowComponentAbstract(params) {
         var self = this;
-
-        console.log("fs90d", params)
 
         this.workflowId = params.workflowId;
         this.componentData = params.componentData;
@@ -657,6 +655,8 @@ define([
             else {
                 self.id(uuid.generate());
             }
+
+            console.log('bbb', self, params, self.id())
 
             /* 
                 Checks format of parameter values for external-component-path-patterned arrays.
@@ -747,5 +747,5 @@ define([
         }
     });
 
-    return viewModel;
+    return WorkflowComponentAbstract;
 });

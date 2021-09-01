@@ -62,6 +62,9 @@ define([
         */ 
         this.workflowComponentAbstractLookup = ko.observable({});
 
+
+
+
         this.componentIdLookup = ko.observable();
         this.componentIdLookup.subscribe(function(componentIdLookup) {
             self.setToLocalStorage('componentIdLookup', componentIdLookup)
@@ -106,24 +109,32 @@ define([
     
                 layoutSection.componentConfigs.forEach(function(componentConfigData) {
                     uniqueInstanceNames.push(componentConfigData.uniqueInstanceName);
-                    
-                    var workflowComponentAbstractId;
-    
-                    if (self.componentIdLookup() && self.componentIdLookup()[componentConfigData.uniqueInstanceName]) {
-                        workflowComponentAbstractId = self.componentIdLookup()[componentConfigData.uniqueInstanceName];
-                    }
-    
-                    self.updateWorkflowComponentAbstractLookup(componentConfigData, workflowComponentAbstractId);
+                    self.updateWorkflowComponentAbstractLookup(componentConfigData);
                 });
     
-                var sectionInfo = [layoutSection.sectionTitle, uniqueInstanceNames];
-    
-                self.pageLayout.push(sectionInfo);
+                self.pageLayout.push([layoutSection.sectionTitle, uniqueInstanceNames]);
             });
+
+            /* assigns componentIdLookup to self, which updates localStorage */ 
+            var componentIdLookup = Object.keys(self.workflowComponentAbstractLookup()).reduce(function(acc, key) {
+                acc[key] = self.workflowComponentAbstractLookup()[key].id();
+                return acc;
+            }, {});
+
+            console.log("fd90fsd09dsf90dsf", componentIdLookup)
+
+            self.componentIdLookup(componentIdLookup);
         };
 
-        this.updateWorkflowComponentAbstractLookup = function(workflowComponentAbtractData, workflowComponentAbstractId) {
+        this.updateWorkflowComponentAbstractLookup = function(workflowComponentAbtractData) {
             var workflowComponentAbstractLookup = self.workflowComponentAbstractLookup();
+            var workflowComponentAbstractId;
+
+            if (self.getFromLocalStorage('componentIdLookup')) {
+                workflowComponentAbstractId = self.getFromLocalStorage('componentIdLookup')[workflowComponentAbtractData.uniqueInstanceName];
+            }
+
+            console.log("(D)FDS()", self.getFromLocalStorage('componentIdLookup'), workflowComponentAbstractId, workflowComponentAbtractData)
 
             var workflowComponentAbstract = new WorkflowComponentAbstract({
                 componentData: workflowComponentAbtractData,
@@ -162,6 +173,8 @@ define([
         };
 
         this.save = function() {
+            self.saving(true);
+
             return new Promise(function(resolve, _reject) {
                 var savePromises = [];
             
@@ -173,6 +186,7 @@ define([
     
                 Promise.all(savePromises).then(function(values) {
                     resolve(...values);
+                    self.saving(false);
                 });
             });
         };

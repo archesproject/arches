@@ -167,8 +167,8 @@ define([
 
         this.saveActiveStep = function() {
             return new Promise(function(resolve, _reject) {
-                console.log(self.activeStep())
-                self.activeStep().save().then(function(data) {            
+                self.activeStep().save().then(function(data) {        
+                    console.log("data", data)    
                     resolve(data);
                 });
             });
@@ -213,26 +213,30 @@ define([
             var value;
 
             if (matchingStep) {
+                var matchingComponentData = Object.keys(matchingStep.componentIdLookup()).reduce(function(acc, key) {
+                    if (
+                        matchingStep.workflowComponentAbstractLookup() 
+                        && matchingStep.workflowComponentAbstractLookup()[key]
+                        && matchingStep.workflowComponentAbstractLookup()[key].id() === matchingStep.componentIdLookup()[key]
+                    ) {
+                        acc[key] = matchingStep.workflowComponentAbstractLookup()[key]
+                    }
+                    return acc;
+                }, {});
 
-                // var foo = Object.keys(matchingStep.componentIdLookup()).reduce(function(acc, key) {
-                //     acc[key] = 
-                //     return acc;
-                // }, {});
+                value = matchingComponentData;
+                
+                var foo = matchingComponentData[pathAsArray[1]];
+                
+                console.log("DS()DS", foo)
+                if (foo) {
 
-                value = matchingStep.componentIdLookup();
-
-                console.log("DS()DS", value)
-
-                var matchingComponentData = matchingStep.componentIdLookup()[pathAsArray[1]];
-
-                if (matchingComponentData) {
-
-                    console.log("iodfs", self.getFromLocalStorage(), matchingComponentData)
+                    console.log("iodfs", self.getFromLocalStorage(), foo)
 
 
 
 
-                    value = matchingComponentData;
+                    value = foo;
                     
                     var updatedPath = pathAsArray.slice(2);
                     
