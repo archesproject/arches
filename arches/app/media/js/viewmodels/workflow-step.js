@@ -48,11 +48,11 @@ define([
         this.required = ko.observable(ko.unwrap(config.required));
         this.loading = ko.observable(false);
         this.saving = ko.observable(false);
-        // this.complete = ko.observable(false);
+
 
         this.complete = ko.computed(function() {
             var complete = true; 
-
+            
             Object.values(self.workflowComponentAbstractLookup()).forEach(function(workflowComponentAbstract) {
                 if (!workflowComponentAbstract.complete()) {
                     complete = false;
@@ -61,9 +61,6 @@ define([
 
             return complete;
         });
-
-        // this.hasUnsavedData = ko.observable(false);
-
 
         /* 
             checks if all `workflowComponentAbstract`s have saved data if a single `workflowComponentAbstract` 
@@ -77,6 +74,9 @@ define([
                 return acc;
             }, false);
         });
+
+        // this.complete = ko.observable(false);
+
 
         
         // this.preSaveCallback = ko.observable();
@@ -145,6 +145,21 @@ define([
             }, {});
 
             self.componentIdLookup(componentIdLookup);
+
+            // self.complete(true)
+
+
+            // self.complete = ko.computed(function() {
+            //     var complete = true; 
+                
+            //     Object.values(self.workflowComponentAbstractLookup()).forEach(function(workflowComponentAbstract) {
+            //         if (!workflowComponentAbstract.complete()) {
+            //             complete = false;
+            //         }
+            //     });
+
+            //     return complete;
+            // });
         };
 
         this.updateWorkflowComponentAbstractLookup = function(workflowComponentAbtractData) {

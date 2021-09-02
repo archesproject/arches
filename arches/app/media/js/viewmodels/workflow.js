@@ -436,6 +436,10 @@ define([
         this.next = function(){
             var activeStep = self.activeStep();
 
+            if (activeStep.stepInjectionConfig) {
+                self.updateStepPath();
+            }
+
             if ((!activeStep.required() || activeStep.complete()) && activeStep._index < self.steps().length - 1) {
                 self.activeStep(self.steps()[activeStep._index + 1]);
             }

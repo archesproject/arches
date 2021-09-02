@@ -549,7 +549,6 @@ define([
                 
         this.loading = ko.observable(false);
         this.saving = ko.observable(false);
-        this.complete = ko.observable(false);
 
         this.isStepActive = params.isStepActive;
         this.isStepActive.subscribe(function(stepActive) {
@@ -609,6 +608,8 @@ define([
         this.savedData.subscribe(function(savedData) {
             self.setToLocalStorage('value', savedData);
         });
+        this.complete = ko.observable(false);
+
 
         this.dirty = ko.observable(); /* user can manually set dirty state */
 
@@ -639,6 +640,7 @@ define([
 
             if (self.getFromLocalStorage('value')) {
                 self.savedData( self.getFromLocalStorage('value') );
+                self.complete(true);
             }
         };
 

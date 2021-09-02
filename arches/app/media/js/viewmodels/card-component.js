@@ -168,9 +168,7 @@ define([
         };
 
         var saveTileInWorkflow = function() {
-            console.log("AAAAAAA", params)
             self.saveTile(function() {
-                console.log("AAAAAAA", params)
                 params.form.complete(true);
             });
         };
