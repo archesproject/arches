@@ -34,7 +34,7 @@ define([
 
         this.componentIdLookup = ko.observable();
         this.componentIdLookup.subscribe(function(componentIdLookup) {
-            self.setToLocalStorage('componentIdLookup', componentIdLookup)
+            self.setToLocalStorage('componentIdLookup', componentIdLookup);
         });
 
 

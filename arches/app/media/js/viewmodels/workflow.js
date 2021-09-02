@@ -204,7 +204,7 @@ define([
                         && matchingStep.workflowComponentAbstractLookup()[key]
                         && matchingStep.workflowComponentAbstractLookup()[key].id() === matchingStep.componentIdLookup()[key]
                     ) {
-                        acc[key] = matchingStep.workflowComponentAbstractLookup()[key]
+                        acc[key] = matchingStep.workflowComponentAbstractLookup()[key];
                     }
                     return acc;
                 }, {});
