@@ -631,33 +631,19 @@ define([
         this.saving = ko.observable(false);
         this.complete = ko.observable(false);
 
-
-        this.savedData = ko.observableArray();
-        this.hasUnsavedData = ko.observable();
-
-        this.AlertViewModel = AlertViewModel;
-
-        this.value = ko.observable();
-        this.previouslyPersistedComponentData;
-
-        this.saveOnQuit = ko.observable();
-        this.saveOnQuit.subscribe(function(val){
-            outerSaveOnQuit(val);
+        this.isStepActive = params.isStepActive;
+        // this.isStepActive = ko.observable(false);
+        console.log(params.isStepActive())
+        this.isStepActive.subscribe(function(stepActive) {
+            if (stepActive) {
+                self.foobar();
+            }
         });
 
-        this.initialize = function() {
+        this.foobar = function() {
             self.loading(true);
-
-            /* cached ID logic */ 
-            if (params.workflowComponentAbstractId) {
-                self.id(params.workflowComponentAbstractId)
-            }
-            else {
-                self.id(uuid.generate());
-            }
-
             console.log('bbb', self, params, self.id())
-
+    
             /* 
                 Checks format of parameter values for external-component-path-patterned arrays.
                 If parameter value matches pattern, get external component data and update value in self.componentData
@@ -667,15 +653,14 @@ define([
                     var componentDataValue = self.componentData.parameters[componentDataKey];
     
 
-                    console.log("ccc", componentDataValue, params.isValidComponentPath(componentDataValue), )
-
+                    
                     if (params.isValidComponentPath(componentDataValue)) {
+                        console.log("ccc", componentDataValue, params.isValidComponentPath(componentDataValue), params.getDataFromComponentPath(componentDataValue))
                         self.componentData.parameters[componentDataKey] = params.getDataFromComponentPath(componentDataValue);
                     }
                 });
             }
 
-            self.previouslyPersistedComponentData = self.getFromLocalStorage('value');
             if (self.previouslyPersistedComponentData) {
                 self.value(self.previouslyPersistedComponentData);
                 self.complete(true);
@@ -695,6 +680,40 @@ define([
             else if (self.componentData.tilesManaged === "many") {
                 MultipleTileBasedComponent.apply(self, [title] );
             }
+        }
+
+
+        this.savedData = ko.observableArray();
+        this.hasUnsavedData = ko.observable();
+
+        this.AlertViewModel = AlertViewModel;
+
+        this.value = ko.observable();
+        this.previouslyPersistedComponentData;
+
+        this.saveOnQuit = ko.observable();
+        this.saveOnQuit.subscribe(function(val){
+            outerSaveOnQuit(val);
+        });
+
+        this.initialize = function() {
+            /* cached ID logic */ 
+            if (params.workflowComponentAbstractId) {
+                self.id(params.workflowComponentAbstractId)
+            }
+            else {
+                self.id(uuid.generate());
+            }
+
+            self.previouslyPersistedComponentData = self.getFromLocalStorage('value');
+
+            // self.isStepActive(ko.unwrap(params.isStepActive));
+
+
+            console.log("AAAAAA", self.isStepActive(), self.previouslyPersistedComponentData)
+            // if (self.isStepActive()) {
+            //     self.foobar();
+            // }
         };
 
         this.setToLocalStorage = function(key, value) {

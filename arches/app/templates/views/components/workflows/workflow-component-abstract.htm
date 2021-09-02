@@ -11,14 +11,14 @@
             height: inherit;
         "
     >
-        <!-- ko if: !loading() && !saving() -->
+        <!-- ko if: !loading() && !saving() && isStepActive() -->
         <div 
         style="height: inherit; display: unset;"
         data-bind="component: {
             name: componentData['componentName'],
             params: {
                 ...componentData['parameters'],
-                form: $data.bar,
+                form: $data,
                 pageVm: $root,
                 value: $data.value
             }

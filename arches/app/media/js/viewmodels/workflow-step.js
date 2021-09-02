@@ -105,8 +105,9 @@ define([
             this.setupInformationBox();
 
 
-            self.active.subscribe(function(active) {
-                if (active) {
+            // self.active.subscribe(function(active) {
+                // if (active) {
+                    // self.pageLayout([]);
 
                     /* build page layout */ 
                     ko.toJS(self.layoutSections).forEach(function(layoutSection) {
@@ -126,11 +127,11 @@ define([
                         return acc;
                     }, {});
         
-                    console.log("fd90fsd09dsf90dsf", componentIdLookup)
+                    console.log("fd90fsd09dsf90dsf", componentIdLookup, self.workflowComponentAbstractLookup())
         
                     self.componentIdLookup(componentIdLookup);
-                }
-            })
+                // }
+            // })
         };
 
         this.updateWorkflowComponentAbstractLookup = function(workflowComponentAbtractData) {
@@ -156,6 +157,7 @@ define([
                 workflowId: self.workflowId,
                 alert: self.alert,
                 outerSaveOnQuit: self.outerSaveOnQuit,
+                isStepActive: self.active,
             });
 
             /* 

@@ -220,7 +220,7 @@ define([
             var value;
 
             if (matchingStep) {
-                var matchingComponentData = Object.keys(matchingStep.componentIdLookup()).reduce(function(acc, key) {
+                var matchingWorkflowComponentAbstract = Object.keys(matchingStep.componentIdLookup()).reduce(function(acc, key) {
                     if (
                         matchingStep.workflowComponentAbstractLookup() 
                         && matchingStep.workflowComponentAbstractLookup()[key]
@@ -231,9 +231,9 @@ define([
                     return acc;
                 }, {});
 
-                value = matchingComponentData;
+                value = matchingWorkflowComponentAbstract;
                 
-                var foo = matchingComponentData[pathAsArray[1]];
+                var foo = matchingWorkflowComponentAbstract[pathAsArray[1]];
                 
                 console.log("DS()DS", foo)
                 if (foo) {
@@ -243,7 +243,7 @@ define([
 
 
 
-                    value = foo;
+                    value = foo.previouslyPersistedComponentData;
                     
                     var updatedPath = pathAsArray.slice(2);
                     
