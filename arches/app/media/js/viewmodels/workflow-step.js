@@ -4,7 +4,6 @@ define([
     'knockout-mapping',
     'uuid',
     'views/components/workflows/workflow-component-abstract',
-    'views/components/workflows/component-based-step',
 ], function(ko, _, koMapping, uuid, WorkflowComponentAbstract) {
     STEPS_LABEL = 'workflow-steps';
     STEP_ID_LABEL = 'workflow-step-id';
