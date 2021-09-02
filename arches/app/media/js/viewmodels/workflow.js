@@ -79,7 +79,6 @@ define([
             }
 
             self.updateStepPath();
-            // self.getFurthestValidStepIndex();
             
             var cachedStepId = self.getStepIdFromUrl();
             var cachedActiveStep = self.steps().find(function(step) {
@@ -153,10 +152,6 @@ define([
             stepData.workflow = self;
             return new WorkflowStep(stepData);
         };
-
-        // this.updateStepIndices = function() {
-
-        // };
 
         this.saveActiveStep = function() {
             return new Promise(function(resolve, _reject) {
@@ -242,18 +237,6 @@ define([
         };
 
         this.foo = ko.computed(function() {
-            /* 
-                updates step indices
-            */ 
-            var steps = self.steps();
-
-            var updatedSteps = steps.map(function(step, index) {
-                step['_index'] = index;
-                return step;
-            });
-
-            self.steps(updatedSteps);
-
             /*
                 valid index is the index directly after the furthest completed step
                 or furthest non-required step chained to the beginning/most-completed step
@@ -278,6 +261,7 @@ define([
                 }
                 else { break; }
             }
+            console.log("2", furthestValidStepIndex)
 
             /* add index position for furthest valid index if not incomplete beginning step */ 
             if (
@@ -290,6 +274,8 @@ define([
             ) { 
                 furthestValidStepIndex += 1; 
             }
+
+            console.log("1", furthestValidStepIndex)
 
             if (furthestValidStepIndex !== self.furthestValidStepIndex()) {
                 self.furthestValidStepIndex(furthestValidStepIndex);
@@ -340,7 +326,15 @@ define([
                 idx += 1;
             }
 
-            self.steps(steps);
+            /* 
+                updates step indices
+            */ 
+            var updatedSteps = steps.map(function(step, index) {
+                step['_index'] = index;
+                return step;
+            });
+
+            self.steps(updatedSteps);
 
             var updatedStepNameToIdLookup = self.steps().reduce(function(acc, step) { 
                 acc[ko.unwrap(step.name)] = step.id(); 

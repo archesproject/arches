@@ -615,8 +615,6 @@ define([
         this.hasUnsavedData = ko.computed(function() {
             var hasUnsavedData = false;
 
-            console.log("@#()", self.savedData(), self.value(), !_.isEqual(self.savedData(), self.value()))
-
             if (!_.isEqual(self.savedData(), self.value())) {
                 hasUnsavedData = true;
             }
@@ -674,7 +672,6 @@ define([
 
         this._saveComponent = function(componentBasedStepResolve) {
             var completeSubscription = self.complete.subscribe(function(complete) {
-                console.log("COMPLET", self, complete)
                 if (complete) {
 
                     if (componentBasedStepResolve) {
