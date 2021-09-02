@@ -15,27 +15,7 @@ define([
     function NonTileBasedComponent() {
         var self = this;
 
-        this.addedData = ko.observableArray();
-
-        this.value.subscribe(function(value) {
-            self.addedData.remove(function(datum) {
-                return datum[0] === self.componentData.uniqueInstanceName
-            });
-
-            self.addedData.push([self.componentData.uniqueInstanceName, value]);
-            if (self.previouslyPersistedComponentData) {
-                self.hasUnsavedData(!(_.isEqual(value, self.previouslyPersistedComponentData[0][1])));
-            }
-            else{
-                self.hasUnsavedData(!!value);
-            }
-            self.hasUnsavedData.valueHasMutated();
-        });
-
         this.initialize = function() {
-            if (self.savedData() && self.savedData().length) {
-                self.value(self.savedData()[0][1]);
-            }
             self.loading(false);
         };
 
@@ -43,15 +23,14 @@ define([
             self.complete(false);
             self.saving(true);
 
-            self.savedData(self.addedData());
+            self.savedData(self.value());
             
             self.complete(true);
             self.saving(false);
         };
 
         this.reset = function() {
-            self.value(self.previouslyPersistedComponentData ? self.previouslyPersistedComponentData[0][1] : null)
-            self.addedData.removeAll();
+            self.value(self.savedData() ? self.savedData() : null);
         };
 
         this.initialize();
@@ -67,11 +46,14 @@ define([
         this.card = ko.observable();
         this.topCards = ko.observable();
 
-        self.isDirty = ko.observable();
-
-        self.saveFunction = ko.observable();
-
-        this.loadData = function(data) {
+        this.loadData = function(loadedData) {
+            if (!Array.isArray(loadedData)) {
+                var data = [loadedData]
+            }
+            else {
+                var data = loadedData;
+            }
+            
             /* a flat object of the previously saved data for all tiles */ 
             var tileDataLookup = data.reduce(function(acc, componentData) {
                 var parsedTileData = componentData.data || JSON.parse(componentData.tileData);
@@ -107,10 +89,6 @@ define([
 
         this.initialize = function() {
             if (self.componentData.tilesManaged === "one") {
-                self.isDirty.subscribe(function(dirty) {
-                    self.hasUnsavedData(dirty);
-                });
-
                 self.tile.subscribe(function(tile) {
                     if (!self.tiles()) {
                         self.tiles([tile]);
@@ -119,7 +97,7 @@ define([
 
                 self.tiles.subscribe(function(tiles) {
                     if (tiles && !self.saving()) {
-                        if (self.savedData().length) {  /* if the refresh after tile save */
+                        if (self.savedData()) {  /* if the refresh after tile save */
                             self.loadData(self.savedData());
                         }
                         else if (self.previouslyPersistedComponentData) { /* if previously saved data */
@@ -239,73 +217,15 @@ define([
                 self.componentData.parameters.loading = self.loading;
                 self.componentData.parameters.provisionalTileViewModel = self.provisionalTileViewModel;
                 self.componentData.parameters.reviewer = data.userisreviewer;
-                self.componentData.parameters.dirty = self.isDirty;
-                self.componentData.parameters.saveFunction = self.saveFunction;
+                self.componentData.parameters.dirty = self.dirty;
+                self.componentData.parameters.save = self.save;
                 self.componentData.parameters.tiles = self.tiles;
-
-
-
-
-                // setTimeout(function() {
-                //     console.log('adfs90')
-                //     self.save = function(){
-                //         console.log('sdf9sdf0')
-                //         self.save()
-                //     };
-                // }, 7000)
-
-                // Object.defineProperty(Object.prototype, "save", {
-                //     set: function (value) {
-                //         this._value = value;
-                //     },
-                //     get: function () {
-                //         return "changed";
-                //     }
-                // });
-
-                // var foo = {
-                //     set: function(target, prop, val) {
-                //         if (prop === 'save') {
-                //             console.log(prop)
-                //             target[prop] = function(){
-                //                 console.log('90dsf')
-                //                 val();
-                //             };
-                //             return false
-                //         }
-                //         else {
-                //             target[prop] = val;
-                //             return true;
-                //         }
-                //     }
-                // };
-        
-                self.bar = new Proxy(self, {});
-
-                var baz = {
-                    apply: function(target, thisArg, argumentsList) {
-
-                        console.log("hmmmm")
-                    }
-                  }
-
-                self.save = new Proxy(self.bar.save, baz)
     
                 self.loading(false);
             });
         };
 
-        this.save = function() {
-            self.complete(false);
-
-            self.saving(true);
-
-            var saveFunction = self.saveFunction();
-
-            if (saveFunction) { saveFunction(); }
-
-            self.saving(false);
-        };
+        this.save = function() {};  /* overwritten at component level */
 
         this.onSaveSuccess = function(savedData) {  // LEGACY -- DO NOT USE
             if (!(savedData instanceof Array)) { savedData = [savedData]; }
@@ -376,8 +296,8 @@ define([
             if (!tiles) { 
                 hasDirtyTiles = true; 
             }
-            else if (self.savedData().length ) {
-                if (self.savedData().length !== tiles.length) {
+            else if (self.savedData() ) {
+                if (self.savedData() !== tiles.length) {
                     hasDirtyTiles = true;
                 }
 
@@ -415,7 +335,7 @@ define([
                     }
                 });
             }
-            // else if (self.isDirty()) {
+            // else if (self.dirty()) {
             //     hasDirtyTiles = true;
             // }
 
@@ -444,7 +364,7 @@ define([
                 if (tiles.length === 1 && !tiles[0].tileid) {
                     var savedTiles = [];
 
-                    if (self.savedData().length) {
+                    if (self.savedData()) {
                         var savedData = self.savedData();
 
                         savedData.forEach(function(savedDatum) {
@@ -632,8 +552,6 @@ define([
         this.complete = ko.observable(false);
 
         this.isStepActive = params.isStepActive;
-        // this.isStepActive = ko.observable(false);
-        console.log(params.isStepActive())
         this.isStepActive.subscribe(function(stepActive) {
             if (stepActive) {
                 self.foobar();
@@ -664,7 +582,7 @@ define([
                 });
             }
 
-            if (self.savedData().length) {
+            if (self.savedData()) {
                 self.value(self.savedData());
                 self.complete(true);
             }
@@ -685,24 +603,32 @@ define([
             }
         }
 
+        this.value = ko.observable();
 
-        this.savedData = ko.observableArray();
+        this.savedData = ko.observable();
         this.savedData.subscribe(function(savedData) {
-            console.log("ds90")
             self.setToLocalStorage('value', savedData);
         });
 
-        this.hasUnsavedData = ko.observable();
+        this.dirty = ko.observable(); /* user can manually set dirty state */
+
+        this.hasUnsavedData = ko.computed(function() {
+            var hasUnsavedData = false;
+
+            console.log("@#()", self.savedData(), self.value(), !_.isEqual(self.savedData(), self.value()))
+
+            if (!_.isEqual(self.savedData(), self.value())) {
+                hasUnsavedData = true;
+            }
+            else if (self.dirty()) {
+                hasUnsavedData = true;
+            }
+
+            return hasUnsavedData;
+        });
 
         this.AlertViewModel = AlertViewModel;
-
-        this.value = ko.observable();
-        // this.previouslyPersistedComponentData;
-
         this.saveOnQuit = ko.observable();
-        this.saveOnQuit.subscribe(function(val){
-            outerSaveOnQuit(val);
-        });
 
         this.initialize = function() {
             /* cached ID logic */ 
@@ -716,14 +642,6 @@ define([
             if (self.getFromLocalStorage('value')) {
                 self.savedData( self.getFromLocalStorage('value') );
             }
-
-            // self.isStepActive(ko.unwrap(params.isStepActive));
-
-
-            console.log("AAAAAA", self.isStepActive(), self.previouslyPersistedComponentData)
-            // if (self.isStepActive()) {
-            //     self.foobar();
-            // }
         };
 
         this.setToLocalStorage = function(key, value) {
@@ -756,6 +674,7 @@ define([
 
         this._saveComponent = function(componentBasedStepResolve) {
             var completeSubscription = self.complete.subscribe(function(complete) {
+                console.log("COMPLET", self, complete)
                 if (complete) {
 
                     if (componentBasedStepResolve) {
@@ -769,6 +688,14 @@ define([
             });
 
             self.save();
+        };
+
+        this._resetComponent = function(componentBasedStepResolve) {
+            if (ko.unwrap(self.tile)) {
+                ko.unwrap(self.tile).reset();
+            }
+
+            componentBasedStepResolve(self.reset());
         };
 
         this.initialize();

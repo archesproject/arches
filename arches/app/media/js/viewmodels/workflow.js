@@ -79,7 +79,7 @@ define([
             }
 
             self.updateStepPath();
-            self.getFurthestValidStepIndex();
+            // self.getFurthestValidStepIndex();
             
             var cachedStepId = self.getStepIdFromUrl();
             var cachedActiveStep = self.steps().find(function(step) {
@@ -154,28 +154,19 @@ define([
             return new WorkflowStep(stepData);
         };
 
-        this.updateStepIndices = function() {
-            var steps = self.steps();
+        // this.updateStepIndices = function() {
 
-            var updatedSteps = steps.map(function(step, index) {
-                step['_index'] = index;
-                return step;
-            });
-
-            self.steps(updatedSteps);
-        };
+        // };
 
         this.saveActiveStep = function() {
             return new Promise(function(resolve, _reject) {
                 self.activeStep().save().then(function(data) {        
-                    console.log("data", data)    
                     resolve(data);
                 });
             });
         };
 
         this.parseComponentPath = function(path) {
-            console.log(path)
             var pathAsStringArray = path.slice(1, path.length - 1).split('][');
 
             return pathAsStringArray.map(function(string) {
@@ -191,19 +182,12 @@ define([
         this.isValidComponentPath = function(path) {
             var matchingStep;
 
-            // self.steps.subscribe(function(steps) {
-
-            // })
-
             if (typeof path === 'string') {  /* path instanceOf String returns false */
                 var pathAsArray = self.parseComponentPath(path);
-
 
                 matchingStep = self.steps().find(function(step) {
                     return step.name === pathAsArray[0];
                 });
-
-                console.log(pathAsArray, matchingStep, self.steps(), self)
             }
 
             return Boolean(matchingStep);
@@ -215,8 +199,6 @@ define([
             var matchingStep = self.steps().find(function(step) {
                 return step.name === pathAsArray[0];
             });
-
-            console.log('90dsadsf', matchingStep, pathAsArray)
 
             var value;
 
@@ -234,17 +216,10 @@ define([
 
                 value = matchingWorkflowComponentAbstract;
                 
-                var foo = matchingWorkflowComponentAbstract[pathAsArray[1]];
+                var workflowAbstractComponent = matchingWorkflowComponentAbstract[pathAsArray[1]];
                 
-                console.log("DS()DS", foo)
-                if (foo) {
-
-                    console.log("iodfs", self.getFromLocalStorage(), foo, foo.savedData())
-
-
-
-
-                    value = ko.unwrap(foo.savedData);
+                if (workflowAbstractComponent) {
+                    value = ko.unwrap(workflowAbstractComponent.savedData);
                     
                     var updatedPath = pathAsArray.slice(2);
                     
@@ -266,7 +241,19 @@ define([
             }
         };
 
-        this.getFurthestValidStepIndex = function() {
+        this.foo = ko.computed(function() {
+            /* 
+                updates step indices
+            */ 
+            var steps = self.steps();
+
+            var updatedSteps = steps.map(function(step, index) {
+                step['_index'] = index;
+                return step;
+            });
+
+            self.steps(updatedSteps);
+
             /*
                 valid index is the index directly after the furthest completed step
                 or furthest non-required step chained to the beginning/most-completed step
@@ -281,7 +268,7 @@ define([
                     startIdx = step._index;
                 }
             });
-
+            
             /* furthest non-required step directly after furthest completed step */ 
             for (var i = startIdx; i < self.steps().length; i++) {
                 var step = self.steps()[i];
@@ -296,6 +283,7 @@ define([
             if (
                 (
                     furthestValidStepIndex === 0 
+                    && self.steps()[furthestValidStepIndex]
                     && self.steps()[furthestValidStepIndex].complete()
                 )
                 || furthestValidStepIndex > 0
@@ -306,7 +294,7 @@ define([
             if (furthestValidStepIndex !== self.furthestValidStepIndex()) {
                 self.furthestValidStepIndex(furthestValidStepIndex);
             }
-        };
+        });
 
         this.updateStepPath = function() {
             var steps = [];
@@ -358,10 +346,8 @@ define([
                 acc[ko.unwrap(step.name)] = step.id(); 
                 return acc;
             }, {});
-            self.setToLocalStorage(STEP_IDS_LABEL, updatedStepNameToIdLookup);
 
-            self.updateStepIndices();
-            self.getFurthestValidStepIndex();
+            self.setToLocalStorage(STEP_IDS_LABEL, updatedStepNameToIdLookup);
         };
 
         this.getWorkflowIdFromUrl = function() {
