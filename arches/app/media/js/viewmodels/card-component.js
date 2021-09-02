@@ -175,7 +175,7 @@ define([
         if (params.save) {
             params.save = saveTileInWorkflow;
         }
-        else if (params.form && params.form.save) {
+        if (params.form && params.form.save) {
             params.form.save = saveTileInWorkflow;
         }
 

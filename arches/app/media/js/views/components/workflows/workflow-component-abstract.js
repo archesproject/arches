@@ -225,8 +225,6 @@ define([
             });
         };
 
-        this.save = function() {};  /* overwritten at component level */
-
         this.onSaveSuccess = function(savedData) {  // LEGACY -- DO NOT USE
             if (!(savedData instanceof Array)) { savedData = [savedData]; }
             
@@ -561,7 +559,6 @@ define([
 
         this.foobar = function() {
             self.loading(true);
-            console.log('bbb', self, params, self.id())
     
             /* 
                 Checks format of parameter values for external-component-path-patterned arrays.
@@ -570,7 +567,7 @@ define([
             if (self.componentData.parameters) {
                 Object.keys(self.componentData.parameters).forEach(function(componentDataKey) {
                     var componentDataValue = self.componentData.parameters[componentDataKey];
-    
+
                     if (params.isValidComponentPath(componentDataValue)) {
                         self.componentData.parameters[componentDataKey] = params.getDataFromComponentPath(componentDataValue);
                         self.savedComponentPaths[componentDataKey] = componentDataValue;
@@ -609,7 +606,6 @@ define([
             self.setToLocalStorage('value', savedData);
         });
         this.complete = ko.observable(false);
-
 
         this.dirty = ko.observable(); /* user can manually set dirty state */
 
@@ -671,6 +667,8 @@ define([
         this.getCardResourceIdOrGraphId = function() {
             return (ko.unwrap(self.componentData.parameters.resourceid) || ko.unwrap(self.componentData.parameters.graphid));
         };
+
+        this.save = function(){};  /* overwritten by inherited components */
 
         this._saveComponent = function(componentBasedStepResolve) {
             var completeSubscription = self.complete.subscribe(function(complete) {
