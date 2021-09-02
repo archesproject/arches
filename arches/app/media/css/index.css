@@ -209,8 +209,9 @@ ul.cons-splash-list > li > a:focus, ul.cons-splash-list > li > a:hover {
 }
 
 .v5-splash-caption {
-    padding: 5px !important;
-    left: 10vw !important;
+    background: rgba(0, 0, 0, 0.5);
+    padding: 5px!important;
+    left: 10vw!important;
 }
 
 .v5-splash-caption h2 {
@@ -260,6 +261,11 @@ ul.cons-splash-list > li > a:focus, ul.cons-splash-list > li > a:hover {
     display: inline-flex;
     position: relative;
     left: 15px;
+}
+
+.application-name h1 {
+    color: #fff;
+    font-size: 24px;
 }
 
 .navbar-brand-disco h2 {
@@ -415,6 +421,10 @@ ul.cons-splash-list > li > a:focus, ul.cons-splash-list > li > a:hover {
     font-size: 55px;
 }
 
+.app-info-block-header {
+    font-size: 20px;
+}
+
 .app-info-block-title {
     font-size: 32px;
     font-weight: 300;
@@ -426,7 +436,7 @@ ul.cons-splash-list > li > a:focus, ul.cons-splash-list > li > a:hover {
 }
 
 .app-info-block-text {
-    color: #6c757d;
+    color: #555;
     font-size: 16px;
 }
 
@@ -446,7 +456,7 @@ ul.cons-splash-list > li > a:focus, ul.cons-splash-list > li > a:hover {
 
 .sub-block-description {
     font-size: 15px;
-    color: #777;
+    color: #555;
     padding: 20px 0px 30px 0px;
 }
 
@@ -508,6 +518,7 @@ footer .footer-links {
 
 .link-spacing {
     margin-right: 20px;
+    color: #91A5CF;
 }
 
 .app-footer-arches-link {
@@ -534,8 +545,8 @@ footer .footer-links {
 
 .vertical-nav-container-background {
     position: fixed;
-    right: 2vw;
-    top: 37vh;
+    right: 21px;
+    top: 325px;
     z-index: 2500;
     width: 22px;
     background: #041B33;
@@ -547,8 +558,8 @@ footer .footer-links {
 
 .vertical-nav-container {
     position: fixed;
-    right: calc(2vw + 4px);
-    top: 39vh;
+    right: 25px;
+    top: 345px;
     z-index: 3000;
     padding: 5px;
 }
@@ -583,6 +594,10 @@ footer .footer-links {
     background: #ddd;
 }
 
+.vertical-nav-list-link:focus {
+    background: #13ce67;
+}
+
 .vertical-nav-list-link:hover .vertical-nav-list-ref {
     display: inline-flex;
     margin-top: -2px;
@@ -599,6 +614,8 @@ footer .footer-links {
 
 .vertical-nav-list-ref{
     display: none;
+    background: white;
+    border-radius: 5px;
 }
 
 .down-button {
@@ -608,7 +625,7 @@ footer .footer-links {
     z-index: 100;
     color: #fff;
     background: #2a2a2a;
-    border: 3px solid #fff;
+    border: 1px solid #fff;
     border-radius: 50%;
 }
 
@@ -642,15 +659,15 @@ footer .footer-links {
 .splash-img {
     border: none;
     padding: 0 20px;
+    text-align: center;
 }
 
 .splash-img img {
-    width: 100%;
+    max-width: 100%;
 }
 
 .search-screen {
     border: 1px solid #bbb;
-    width: 100%;
 }
 
 .iphone {
@@ -680,12 +697,12 @@ footer .footer-links {
 }
 
 .wide-box .box-highlight p {
-    color: #777;
+    color: #555;
 }
 
 .mobile-description-container p {
     font-size: 17px;
-    color: #777;
+    color: #555;
 }
 
 .splash-links {
@@ -697,6 +714,14 @@ footer .footer-links {
     font-weight: 300;
     line-height: 1.5;
     color: #fff;
+}
+
+.splash-link-address:focus,
+.splash-link-address:hover,
+.link-spacing:focus,
+.link-spacing:hover {
+    color: #7AD02F;
+    text-decoration: underline;
 }
 
 .splash-link-container {
@@ -786,7 +811,7 @@ footer .footer-links {
         padding: 140px 10px 40px 10px;
     }
     .v5-splash-caption {
-        left: 0;
+        left: 0!important;
         width: 100%;
         padding: 10px !important;
     }

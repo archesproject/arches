@@ -1,8 +1,3 @@
-html, body {
-    overflow-x: hidden;
-    height: auto;
-}
-
 .navbar-toggle {
     margin-top: 11px;
     background: #000;
@@ -31,10 +26,6 @@ html, body {
     font-size: 20px;
 }
 
-.app-info-block-text {
-    color: #555;
-}
-
 .sub-block-description {
     color: #555;
 }
@@ -50,6 +41,14 @@ html, body {
 .vertical-nav-list-ref{
     background: white;
     border-radius: 5px;
+}
+
+.down-button {
+    border: 3px solid #fff;
+}
+
+.down-button-icon {
+    opacity: 1;
 }
 
 .down-button:hover,

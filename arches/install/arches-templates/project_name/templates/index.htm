@@ -51,71 +51,68 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 
     <!--=== Header ===-->
     <header>
-        <div class="v5-splash-navbar navbar">
-            <nav class="navbar">
-                <div class="container-fluid">
-                    <div class="navbar-header">
-                        <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#myNavbar" aria-expanded="false" aria-controls="myNavbar">
-							<span class="sr-only">Toggle navigation</span>
-							<span class="icon-bar"></span>
-							<span class="icon-bar"></span>
-							<span class="icon-bar"></span>
-						</button>
+        <nav class="v5-splash-navbar navbar" role="navigation">
+            <div class="container-fluid">
+                <div class="navbar-header">
+                    <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#myNavbar" aria-expanded="false" aria-controls="myNavbar">
+                        <span class="sr-only">Toggle navigation</span>
+                        <span class="icon-bar"></span>
+                        <span class="icon-bar"></span>
+                        <span class="icon-bar"></span>
+                    </button>
 
-                        <div class="relative nav-brand-container">
-                            <div class="navbar-brand-v5-icon-container">
-                                <img class="navbar-brand-v5-icon" src="{% static 'img/landing/Arches_logo_white.png' %}" alt="Arches Logo">
-                            </div>
-                            <div class="application-name">
-                                <h1>{% blocktrans %}Arches | {{version}}{% endblocktrans %}</h1>
-                            </div>
+                    <div class="relative nav-brand-container">
+                        <div class="navbar-brand-v5-icon-container">
+                            <img class="navbar-brand-v5-icon" src="{% static 'img/landing/Arches_logo_white.png' %}" alt="Arches Logo">
+                        </div>
+                        <div class="application-name">
+                            <h1>{% blocktrans %}Arches | {{version}}{% endblocktrans %}</h1>
                         </div>
                     </div>
-
-                    <div id="myNavbar" class="navbar-collapse collapse">
-                        <ul class="nav navbar-nav navbar-right">
-                            <li>
-                                <a href="#info-block-1">{% trans "Arches Features" %}</a>
-                            </li>
-                            <li>
-                                <a href="{% url 'search_home' %}">{% trans "Search Arches" %}</a>
-                            </li>
-                            {% if user|can_create_resource_instance and user.username != 'anonymous' %}
-                                <li>
-                                    <a href="{% url 'resource' %}" target="_blank">{% trans "Manage" %}</a>
-                                </li>
-                            {% endif %}
-                            {% if user.username == 'anonymous' %}
-                                <li>
-                                    <a class="application-login" id="auth-link" href="{% url 'auth' %}?next={% url 'home' %}{% if user.username != 'anonymous' %}&logout=true{% endif %}">{% trans "Sign in" %}</a>
-                                </li>
-                            {% else %}
-                                <li>
-                                    <a class="auth-welcome" href="{% url 'user_profile_manager' %}">
-                                        {% trans "Welcome, " %} {{ user.first_name|default:user.username }}
-                                    </a>
-                                </li>
-                                <li>
-                                    <a class="application-login" href="{% url 'auth' %}?next={% url 'home' %}{% if user.username != 'anonymous' %}&logout=true{% endif %}">{% trans 'Log off' %}</a>
-                                </li>
-                            {% endif %}
-                            {% if show_language_swtich %}
-                                <li>
-                                    {% get_current_language as LANGUAGE_CODE %}
-                                    <div class="lang-switch" style="max-width: none;" data-bind='component: {
-                                        name: "views/components/language-switcher",
-                                        params: {
-                                            current_language: "{{LANGUAGE_CODE}}"
-                                        }
-                                    }'></div>
-                                </li>
-                            {% endif %}
-                        </ul>
-                    </div>
                 </div>
-            </nav>
-            <!-- /container -->
-        </div>
+
+                <div id="myNavbar" class="navbar-collapse collapse">
+                    <ul class="nav navbar-nav navbar-right">
+                        <li>
+                            <a href="#info-block-1">{% trans "Arches Features" %}</a>
+                        </li>
+                        <li>
+                            <a href="{% url 'search_home' %}">{% trans "Search Arches" %}</a>
+                        </li>
+                        {% if user|can_create_resource_instance and user.username != 'anonymous' %}
+                            <li>
+                                <a href="{% url 'resource' %}" target="_blank">{% trans "Manage" %}</a>
+                            </li>
+                        {% endif %}
+                        {% if user.username == 'anonymous' %}
+                            <li>
+                                <a class="application-login" id="auth-link" href="{% url 'auth' %}?next={% url 'home' %}{% if user.username != 'anonymous' %}&logout=true{% endif %}">{% trans "Sign in" %}</a>
+                            </li>
+                        {% else %}
+                            <li>
+                                <a class="auth-welcome" href="{% url 'user_profile_manager' %}">
+                                    {% trans "Welcome, " %} {{ user.first_name|default:user.username }}
+                                </a>
+                            </li>
+                            <li>
+                                <a class="application-login" href="{% url 'auth' %}?next={% url 'home' %}{% if user.username != 'anonymous' %}&logout=true{% endif %}">{% trans 'Log off' %}</a>
+                            </li>
+                        {% endif %}
+                        {% if show_language_swtich %}
+                            <li>
+                                {% get_current_language as LANGUAGE_CODE %}
+                                <div class="lang-switch" style="max-width: none;" data-bind='component: {
+                                    name: "views/components/language-switcher",
+                                    params: {
+                                        current_language: "{{LANGUAGE_CODE}}"
+                                    }
+                                }'></div>
+                            </li>
+                        {% endif %}
+                    </ul>
+                </div>
+            </div>
+        </nav>
     </header>
     <!--=== End Header ===-->
 
@@ -168,7 +165,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                                 <!-- NEW LAYER -->
                                 <div class="tp-caption sft start text-bold v5-splash-caption" delay="4500" data-hoffset="0" data-y="400" data-speed="800" data-start="100" data-easing="Back.easeInOut" data-endspeed="300" data-x="0">
                                     <h2>{% blocktrans %}Arches {{version}}{% endblocktrans %}</h2>
-                                    <p>{% trans "TEST A web and mobile platform for" %}</p>
+                                    <p>{% trans "A web and mobile platform for" %}</p>
                                     <p>{% trans "managing your most important resource information" %}</p>
                                 </div>
 
@@ -203,9 +200,13 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                                 <p class="app-info-block-text">
                                     {% trans "Design custom information management applications in hours.  Build your databases with Arches Designer, then configure your interface all without having to write any code." %}
                                 </p>
-                                <img class="sub-block-image splash-img" src="{% static 'img/landing/imac_designer.png' %}" alt="Arches Designer">
                             </div>
                         </div>
+                    </div>
+
+                    <!-- Content -->
+                    <div class="splash-img">
+                        <img src="{% static 'img/landing/imac_designer.png' %}"  alt="Arches Designer">
                     </div>
 
                     <!-- Sub-section -->
@@ -253,9 +254,13 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                                 <p class="app-info-block-text">
                                     {% trans "Design step-wise data management interfaces that simplify complex editing tasks.  Ensure that everyone enters data completely and consistently" %}
                                 </p>
-                                <img class="sub-block-image splash-img" src="{% static 'img/landing/consultation_workflow.jpg' %}" alt="Arches Workflows">
                             </div>
                         </div>
+                    </div>
+
+                    <!-- Content -->
+                    <div class="splash-img">
+                        <img class="sub-block-image" src="{% static 'img/landing/consultation_workflow.jpg' %}" alt="Arches Workflows">
                     </div>
 
                 </div>
@@ -275,9 +280,12 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                                 <p class="app-info-block-text">
                                     {% trans "Arches comes with powerful built-in search tools.  Quickly filter large databases with term, geospatial, and time-based search components" %}
                                 </p>
-                                <img class="sub-block-image splash-img" src="{% static 'img/landing/arches_search.png' %}" alt="Arches Search">
                             </div>
                         </div>
+                    </div>
+
+                    <div class="splash-img">
+                        <img class="sub-block-image" src="{% static 'img/landing/arches_search.png' %}" alt="Arches Search">
                     </div>
 
                     <!-- Sub-section -->
@@ -335,7 +343,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
         </article>
     </main>
 
-    
+
 
     <!-- Footer -->
     <footer>
@@ -436,14 +444,14 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 <script src="{% static 'packages/requirejs/require.js' %}"></script>
 
 <script>
-    
+
     require.config({
         baseUrl: '{{ STATIC_URL }}js',
         paths: {
             'templates': '{% url "templates" ""%}'.replace(/\/$/, ""),
             'text': '{{ STATIC_URL }}packages/requirejs-text/text',
-            'jquery-lib': '{{ STATIC_URL }}plugins/revolution-slider/rs-plugin/js/jquery2.2.3/jquery.min',
-            'jquery': '{{ STATIC_URL }}plugins/revolution-slider/rs-plugin/js/jqmigrate1.4.0/jquery-migrate.min',
+            'jquery-lib': '{{ STATIC_URL }}packages/jquery/dist/jquery.min',
+            'jquery': '{{ STATIC_URL }}packages/jquery-migrate/dist/jquery-migrate.min',
             'jquery-ui': '{{ STATIC_URL }}packages/jqueryui/jquery-ui.min',
             'underscore': '{{ STATIC_URL }}packages/underscore/underscore-min',
             'chosen': '{{ STATIC_URL }}packages/chosen-js/chosen.jquery.min',
@@ -478,7 +486,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                 deps: ['jquery'],
             }
         }
-    }); 
+    });
     require(
         ['jquery',
             'knockout',
@@ -531,7 +539,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                 var ViewModel = function () {
                      // place observables here
                 };
-    
+
                 // need to have this to prevent mismatched anonymous define error in require.js
                 setTimeout(function () {
                     ko.applyBindings(new ViewModel());
