@@ -33,8 +33,8 @@ define([
         });
 
         this.initialize = function() {
-            if (self.previouslyPersistedComponentData) {
-                self.value(self.previouslyPersistedComponentData[0][1]);
+            if (self.savedData() && self.savedData().length) {
+                self.value(self.savedData()[0][1]);
             }
             self.loading(false);
         };
@@ -640,6 +640,8 @@ define([
             }
         });
 
+        this.savedComponentPaths = {};
+
         this.foobar = function() {
             self.loading(true);
             console.log('bbb', self, params, self.id())
@@ -652,17 +654,18 @@ define([
                 Object.keys(self.componentData.parameters).forEach(function(componentDataKey) {
                     var componentDataValue = self.componentData.parameters[componentDataKey];
     
-
-                    
                     if (params.isValidComponentPath(componentDataValue)) {
-                        console.log("ccc", componentDataValue, params.isValidComponentPath(componentDataValue), params.getDataFromComponentPath(componentDataValue))
                         self.componentData.parameters[componentDataKey] = params.getDataFromComponentPath(componentDataValue);
+                        self.savedComponentPaths[componentDataKey] = componentDataValue;
+                    }
+                    else if (self.savedComponentPaths[componentDataKey]) {
+                        self.componentData.parameters[componentDataKey] = params.getDataFromComponentPath(self.savedComponentPaths[componentDataKey]);
                     }
                 });
             }
 
-            if (self.previouslyPersistedComponentData) {
-                self.value(self.previouslyPersistedComponentData);
+            if (self.savedData().length) {
+                self.value(self.savedData());
                 self.complete(true);
             }
 
@@ -684,12 +687,17 @@ define([
 
 
         this.savedData = ko.observableArray();
+        this.savedData.subscribe(function(savedData) {
+            console.log("ds90")
+            self.setToLocalStorage('value', savedData);
+        });
+
         this.hasUnsavedData = ko.observable();
 
         this.AlertViewModel = AlertViewModel;
 
         this.value = ko.observable();
-        this.previouslyPersistedComponentData;
+        // this.previouslyPersistedComponentData;
 
         this.saveOnQuit = ko.observable();
         this.saveOnQuit.subscribe(function(val){
@@ -705,7 +713,9 @@ define([
                 self.id(uuid.generate());
             }
 
-            self.previouslyPersistedComponentData = self.getFromLocalStorage('value');
+            if (self.getFromLocalStorage('value')) {
+                self.savedData( self.getFromLocalStorage('value') );
+            }
 
             // self.isStepActive(ko.unwrap(params.isStepActive));
 
@@ -747,11 +757,12 @@ define([
         this._saveComponent = function(componentBasedStepResolve) {
             var completeSubscription = self.complete.subscribe(function(complete) {
                 if (complete) {
-                    self.setToLocalStorage('value', self.savedData());
 
-                    componentBasedStepResolve({
-                        [self.componentData.uniqueInstanceName]: self.savedData(),
-                    });
+                    if (componentBasedStepResolve) {
+                        componentBasedStepResolve({
+                            [self.componentData.uniqueInstanceName]: self.savedData(),
+                        });
+                    }
 
                     completeSubscription.dispose();  /* disposes after save */
                 }

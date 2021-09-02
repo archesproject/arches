@@ -175,6 +175,7 @@ define([
         };
 
         this.parseComponentPath = function(path) {
+            console.log(path)
             var pathAsStringArray = path.slice(1, path.length - 1).split('][');
 
             return pathAsStringArray.map(function(string) {
@@ -238,12 +239,12 @@ define([
                 console.log("DS()DS", foo)
                 if (foo) {
 
-                    console.log("iodfs", self.getFromLocalStorage(), foo)
+                    console.log("iodfs", self.getFromLocalStorage(), foo, foo.savedData())
 
 
 
 
-                    value = foo.previouslyPersistedComponentData;
+                    value = ko.unwrap(foo.savedData);
                     
                     var updatedPath = pathAsArray.slice(2);
                     
