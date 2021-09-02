@@ -658,7 +658,6 @@ define([
         this.getFromLocalStorage = function(key) {
             var allComponentsLocalStorageData = JSON.parse(localStorage.getItem(WORKFLOW_COMPONENT_ABSTRACTS_LABEL)) || {};
 
-            console.log(allComponentsLocalStorageData, self.id())
             if (allComponentsLocalStorageData[self.id()] && typeof allComponentsLocalStorageData[self.id()][key] !== "undefined") {
                 return JSON.parse(allComponentsLocalStorageData[self.id()][key]);
             }

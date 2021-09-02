@@ -261,7 +261,6 @@ define([
                 }
                 else { break; }
             }
-            console.log("2", furthestValidStepIndex)
 
             /* add index position for furthest valid index if not incomplete beginning step */ 
             if (
@@ -274,8 +273,6 @@ define([
             ) { 
                 furthestValidStepIndex += 1; 
             }
-
-            console.log("1", furthestValidStepIndex)
 
             if (furthestValidStepIndex !== self.furthestValidStepIndex()) {
                 self.furthestValidStepIndex(furthestValidStepIndex);
