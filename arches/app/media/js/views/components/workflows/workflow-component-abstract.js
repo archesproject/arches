@@ -548,16 +548,56 @@ define([
         this.loading = ko.observable(false);
         this.saving = ko.observable(false);
 
+        this.savedComponentPaths = {};
+        this.value = ko.observable();
+
+        this.complete = ko.observable(false);
+        this.dirty = ko.observable(); /* user can manually set dirty state */
+
+        this.AlertViewModel = AlertViewModel;
+        this.saveOnQuit = ko.observable();
+
         this.isStepActive = params.isStepActive;
         this.isStepActive.subscribe(function(stepActive) {
             if (stepActive) {
-                self.foobar();
+                self.loadComponent();
             }
         });
 
-        this.savedComponentPaths = {};
+        this.savedData = ko.observable();
+        this.savedData.subscribe(function(savedData) {
+            self.setToLocalStorage('value', savedData);
+        });
 
-        this.foobar = function() {
+        this.hasUnsavedData = ko.computed(function() {
+            var hasUnsavedData = false;
+
+            if (!_.isEqual(self.savedData(), self.value())) {
+                hasUnsavedData = true;
+            }
+            else if (self.dirty()) {
+                hasUnsavedData = true;
+            }
+
+            return hasUnsavedData;
+        });
+
+        this.initialize = function() {
+            /* cached ID logic */ 
+            if (params.workflowComponentAbstractId) {
+                self.id(params.workflowComponentAbstractId)
+            }
+            else {
+                self.id(uuid.generate());
+            }
+
+            if (self.getFromLocalStorage('value')) {
+                self.savedData( self.getFromLocalStorage('value') );
+                self.complete(true);
+            }
+        };
+
+        this.loadComponent = function() {
             self.loading(true);
     
             /* 
@@ -598,47 +638,6 @@ define([
                 MultipleTileBasedComponent.apply(self, [title] );
             }
         }
-
-        this.value = ko.observable();
-
-        this.savedData = ko.observable();
-        this.savedData.subscribe(function(savedData) {
-            self.setToLocalStorage('value', savedData);
-        });
-        this.complete = ko.observable(false);
-
-        this.dirty = ko.observable(); /* user can manually set dirty state */
-
-        this.hasUnsavedData = ko.computed(function() {
-            var hasUnsavedData = false;
-
-            if (!_.isEqual(self.savedData(), self.value())) {
-                hasUnsavedData = true;
-            }
-            else if (self.dirty()) {
-                hasUnsavedData = true;
-            }
-
-            return hasUnsavedData;
-        });
-
-        this.AlertViewModel = AlertViewModel;
-        this.saveOnQuit = ko.observable();
-
-        this.initialize = function() {
-            /* cached ID logic */ 
-            if (params.workflowComponentAbstractId) {
-                self.id(params.workflowComponentAbstractId)
-            }
-            else {
-                self.id(uuid.generate());
-            }
-
-            if (self.getFromLocalStorage('value')) {
-                self.savedData( self.getFromLocalStorage('value') );
-                self.complete(true);
-            }
-        };
 
         this.setToLocalStorage = function(key, value) {
             var allComponentsLocalStorageData = JSON.parse(localStorage.getItem(WORKFLOW_COMPONENT_ABSTRACTS_LABEL)) || {};

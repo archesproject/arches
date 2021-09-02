@@ -23,7 +23,6 @@ define([
         this.componentBasedStepClass = ko.unwrap(config.workflowstepclass);
         this.hiddenWorkflowButtons = ko.observableArray(config.hiddenWorkflowButtons || []);
 
-
         /* 
             `pageLayout` is an observableArray of arrays representing section Information ( `sectionInfo` ).
 
@@ -31,11 +30,6 @@ define([
             item is an array of `uniqueInstanceName`.
         */ 
         this.pageLayout = ko.observableArray();
-
-        /*
-            `workflowComponentAbstractLookup` is an object where we pair a `uniqueInstanceName` 
-            key to `WorkflowComponentAbstract` class objects.
-        */ 
         this.workflowComponentAbstractLookup = ko.observable({});
 
         this.componentIdLookup = ko.observable();
@@ -48,6 +42,7 @@ define([
         this.loading = ko.observable(false);
         this.saving = ko.observable(false);
 
+        this.lockableExternalSteps = config.lockableExternalSteps || [];
 
         this.complete = ko.computed(function() {
             var complete = true; 
@@ -73,18 +68,6 @@ define([
                 return acc;
             }, false);
         });
-
-        // this.complete = ko.observable(false);
-
-
-        
-        // this.preSaveCallback = ko.observable();
-        // this.postSaveCallback = ko.observable();
-        // this.clearCallback = ko.observable();
-
-        // this.clearCallback = ko.observable();
-
-        this.lockableExternalSteps = config.lockableExternalSteps || [];
 
         this.active = ko.computed(function() {
             return config.workflow.activeStep() === this;
@@ -144,21 +127,6 @@ define([
             }, {});
 
             self.componentIdLookup(componentIdLookup);
-
-            // self.complete(true)
-
-
-            // self.complete = ko.computed(function() {
-            //     var complete = true; 
-                
-            //     Object.values(self.workflowComponentAbstractLookup()).forEach(function(workflowComponentAbstract) {
-            //         if (!workflowComponentAbstract.complete()) {
-            //             complete = false;
-            //         }
-            //     });
-
-            //     return complete;
-            // });
         };
 
         this.updateWorkflowComponentAbstractLookup = function(workflowComponentAbtractData) {

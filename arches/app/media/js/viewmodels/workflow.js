@@ -236,7 +236,7 @@ define([
             }
         };
 
-        this.foo = ko.computed(function() {
+        this.computedFurthestValidStepIndex = ko.computed(function() {
             /*
                 valid index is the index directly after the furthest completed step
                 or furthest non-required step chained to the beginning/most-completed step
