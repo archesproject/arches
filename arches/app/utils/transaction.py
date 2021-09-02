@@ -24,7 +24,8 @@ def reverse_edit_log_entries(transaction_id):
                         number_of_db_changes += 1
                 elif edit_log.edittype == "tile edit":
                     for obj in Tile.objects.filter(tileid=edit_log.tileinstanceid):
-                        obj.update(data=edit_log.oldvalue)
+                        obj.data = edit_log.oldvalue
+                        obj.save()
                         number_of_db_changes += 1
     except DatabaseError:
         logger.error("Error connecting to database")
