@@ -49,12 +49,30 @@
         </div>
         <!-- /ko -->
 
-        <!-- ko if: $data.active() && !$data.loading() && !$data.saving() -->
-            <!-- ko component: {
-                name: 'component-based-step',
-                params: $data,
-            } --><!--/ko-->
-        <!-- /ko -->
+        <div data-bind="css: componentBasedStepClass || 'workflow-component-based-step'">
+            <!-- ko foreach: { data: pageLayout(), as: 'layoutSection'} -->
+            <div
+                data-bind="style: { 'height': $parent.pageLayout().length === 1 && '100%' }"
+            >
+                <!-- ko if: layoutSection[0] -->
+                <div style="padding: 2px;">
+                    <h4
+                        style="font-weight: unset;"
+                        data-bind="text: layoutSection[0]"
+                    ></h4>
+                </div>
+                <!-- /ko -->
+
+                <!-- ko if: !$parent.loading() && !$parent.saving() -->
+                    <!-- ko foreach: { data: layoutSection[1], as: 'uniqueInstanceName'} -->
+                        <workflow-component-abstract 
+                            params='workflowComponentAbstract: ko.unwrap($parents[1].workflowComponentAbstractLookup()[uniqueInstanceName])'
+                        ></workflow-component-abstract>
+                    <!-- /ko -->
+                <!-- /ko -->
+            </div>
+            <!-- /ko -->
+        </div>
     <!-- /ko -->
 </div>
 

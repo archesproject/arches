@@ -123,7 +123,7 @@
         </div>
         
         <div class="tabbed-workflow-step-container">
-            <workflow-step params='step: activeStep()' ></workflow-step>
+            <workflow-step params='step: activeStep()'></workflow-step>
         </div>
 
         <div class="tabbed-workflow-footer">
@@ -168,56 +168,77 @@
                     </span>
                 </button>
                 <!-- /ko -->
-                <!-- ko if: activeStep().hasDirtyTile() -->
-                <button
-                    class="btn btn-danger"
-                    data-bind="{
-                        css: {
-                            disabled: !activeStep().hasDirtyTile(),
-                        },
-                        click: activeStep().clear
-                    }"
-                >
-                    <i class="fa fa-undo"></i>
-                    <span>
-                        {% trans  "Undo" %}
-                    </span>
-                </button>
-                <button
-                    class="btn btn-success"
-                    data-bind="
-                        click: function() {
-                            $data.saveActiveStep().then(function() {
-                                $data.updateStepPath();
-                                $data.next();
-                            });
-                        },
-                    "
-                >
-                    <i class="ion-android-cloud-done"></i>
-                    <span>
-                        {% trans  "Save and Continue" %}
-                    </span>
-                    <i class="fa fa-caret-right"></i>
-                </button>
+                <!-- ko if: activeStep().hasUnsavedData() -->
+                    <!-- ko if: !$data.hiddenWorkflowButtons().includes('undo') -->
+                    <button
+                        class="btn btn-danger"
+                        data-bind="{
+                            css: {
+                                disabled: !activeStep().hasUnsavedData(),
+                            },
+                            click: activeStep().undo
+                        }"
+                    >
+                        <i class="fa fa-undo"></i>
+                        <span>
+                            {% trans  "Undo" %}
+                        </span>
+                    </button>
+                    <!-- /ko -->
+                    <!-- ko if: !$data.hiddenWorkflowButtons().includes('save') -->
+                    <button
+                        class="btn btn-success"
+                        data-bind="
+                            click: function() {
+                                $data.saveActiveStep().then(function() {
+                                    $data.next();
+                                });
+                            },
+                        "
+                    >
+                        <i class="ion-android-cloud-done"></i>
+                        <span>
+                            {% trans  "Save and Continue" %}
+                        </span>
+                        <i class="fa fa-caret-right"></i>
+                    </button>
+                    <!-- /ko -->
+                    <!-- ko if: $data.hiddenWorkflowButtons().includes('save') -->
+                        <!-- ko if: activeStep()._index < steps().length - 1 -->
+                        <button
+                            class="btn btn-primary"
+                            data-bind="
+                                click: next,
+                                css: {
+                                    disabled: activeStep().required() && !activeStep().complete(),
+                                }
+                            "
+                        >
+                            <span>
+                                {% trans  "Next Step" %}
+                            </span>
+                            <i class="fa fa-caret-right"></i>
+                        </button>
+                        <!-- /ko -->
+                    <!-- /ko -->
                 <!-- /ko -->
-                <!-- ko ifnot: activeStep().hasDirtyTile() -->
-                <!-- ko if: activeStep()._index < steps().length - 1 -->
-                <button
-                    class="btn btn-primary"
-                    data-bind="
-                        click: next,
-                        css: {
-                            disabled: activeStep().required() && !activeStep().complete(),
-                        }
-                    "
-                >
-                    <span>
-                        {% trans  "Next Step" %}
-                    </span>
-                    <i class="fa fa-caret-right"></i>
-                </button>
-                <!-- /ko -->
+                <!-- ko ifnot: activeStep().hasUnsavedData() -->
+                    <!-- ko if: activeStep()._index < steps().length - 1 -->
+                    <button
+                        class="btn btn-primary"
+                        data-bind="
+                            click: next,
+                            css: {
+                                disabled: activeStep().required() && !activeStep().complete(),
+                            }
+                        "
+                    >
+                        <span>
+                            {% trans  "Next Step" %}
+                        </span>
+                        <i class="fa fa-caret-right"></i>
+                    </button>
+                    <!-- /ko -->
                 <!-- /ko -->
             </div>
 

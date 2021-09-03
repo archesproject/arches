@@ -15,12 +15,16 @@ define([
     STEPS_LABEL = 'workflow-steps';
     STEP_ID_LABEL = 'workflow-step-id';
     STEP_IDS_LABEL = 'workflow-step-ids';
+    WORKFLOW_COMPONENT_ABSTRACTS_LABEL = 'workflow-component-abstracts';
+
 
     var Workflow = function(config) {
         var self = this;
 
         this.id = ko.observable();
         this.workflowName = ko.observable();
+
+        this.hiddenWorkflowButtons = ko.observableArray();
 
         this.pan = ko.observable();
         this.alert = config.alert || ko.observable(null);
@@ -32,7 +36,10 @@ define([
         
         this.activeStep = ko.observable();
         this.activeStep.subscribe(function(activeStep) {
+            // activeStep.loading(true);
+
             self.setStepIdToUrl(activeStep);
+            self.hiddenWorkflowButtons(activeStep.hiddenWorkflowButtons());
         });
         
         this.furthestValidStepIndex = ko.observable();
@@ -67,11 +74,11 @@ define([
                 self.setToLocalStorage(WORKFLOW_ID_LABEL, self.id());
                 /* remove step data created by previous workflow from localstorage */
                 localStorage.removeItem(STEPS_LABEL);  
-                localStorage.removeItem(STEP_IDS_LABEL);  
+                localStorage.removeItem(STEP_IDS_LABEL);
+                localStorage.removeItem(WORKFLOW_COMPONENT_ABSTRACTS_LABEL);
             }
 
             self.updateStepPath();
-            self.getFurthestValidStepIndex();
             
             var cachedStepId = self.getStepIdFromUrl();
             var cachedActiveStep = self.steps().find(function(step) {
@@ -146,20 +153,9 @@ define([
             return new WorkflowStep(stepData);
         };
 
-        this.updateStepIndices = function() {
-            var steps = self.steps();
-
-            var updatedSteps = steps.map(function(step, index) {
-                step['_index'] = index;
-                return step;
-            });
-
-            self.steps(updatedSteps);
-        };
-
         this.saveActiveStep = function() {
             return new Promise(function(resolve, _reject) {
-                self.activeStep().save().then(function(data) {            
+                self.activeStep().save().then(function(data) {        
                     resolve(data);
                 });
             });
@@ -202,12 +198,23 @@ define([
             var value;
 
             if (matchingStep) {
-                value = matchingStep.value();
+                var matchingWorkflowComponentAbstract = Object.keys(matchingStep.componentIdLookup()).reduce(function(acc, key) {
+                    if (
+                        matchingStep.workflowComponentAbstractLookup() 
+                        && matchingStep.workflowComponentAbstractLookup()[key]
+                        && matchingStep.workflowComponentAbstractLookup()[key].id() === matchingStep.componentIdLookup()[key]
+                    ) {
+                        acc[key] = matchingStep.workflowComponentAbstractLookup()[key];
+                    }
+                    return acc;
+                }, {});
 
-                var matchingComponentData = matchingStep.value()[pathAsArray[1]];
-
-                if (matchingComponentData) {
-                    value = matchingComponentData;
+                value = matchingWorkflowComponentAbstract;
+                
+                var workflowAbstractComponent = matchingWorkflowComponentAbstract[pathAsArray[1]];
+                
+                if (workflowAbstractComponent) {
+                    value = ko.unwrap(workflowAbstractComponent.savedData);
                     
                     var updatedPath = pathAsArray.slice(2);
                     
@@ -229,7 +236,7 @@ define([
             }
         };
 
-        this.getFurthestValidStepIndex = function() {
+        this.computedFurthestValidStepIndex = ko.computed(function() {
             /*
                 valid index is the index directly after the furthest completed step
                 or furthest non-required step chained to the beginning/most-completed step
@@ -244,7 +251,7 @@ define([
                     startIdx = step._index;
                 }
             });
-
+            
             /* furthest non-required step directly after furthest completed step */ 
             for (var i = startIdx; i < self.steps().length; i++) {
                 var step = self.steps()[i];
@@ -259,6 +266,7 @@ define([
             if (
                 (
                     furthestValidStepIndex === 0 
+                    && self.steps()[furthestValidStepIndex]
                     && self.steps()[furthestValidStepIndex].complete()
                 )
                 || furthestValidStepIndex > 0
@@ -269,7 +277,7 @@ define([
             if (furthestValidStepIndex !== self.furthestValidStepIndex()) {
                 self.furthestValidStepIndex(furthestValidStepIndex);
             }
-        };
+        });
 
         this.updateStepPath = function() {
             var steps = [];
@@ -315,16 +323,22 @@ define([
                 idx += 1;
             }
 
-            self.steps(steps);
+            /* 
+                updates step indices
+            */ 
+            var updatedSteps = steps.map(function(step, index) {
+                step['_index'] = index;
+                return step;
+            });
+
+            self.steps(updatedSteps);
 
             var updatedStepNameToIdLookup = self.steps().reduce(function(acc, step) { 
                 acc[ko.unwrap(step.name)] = step.id(); 
                 return acc;
             }, {});
-            self.setToLocalStorage(STEP_IDS_LABEL, updatedStepNameToIdLookup);
 
-            self.updateStepIndices();
-            self.getFurthestValidStepIndex();
+            self.setToLocalStorage(STEP_IDS_LABEL, updatedStepNameToIdLookup);
         };
 
         this.getWorkflowIdFromUrl = function() {
@@ -394,7 +408,7 @@ define([
         };
 
         this.finishWorkflow = function() {
-            if (self.activeStep().hasDirtyTile()) {
+            if (self.activeStep().hasUnsavedData()) {
                 self.activeStep().save().then(function() {
                     window.location.assign(self.quitUrl);
                 });
@@ -418,6 +432,10 @@ define([
 
         this.next = function(){
             var activeStep = self.activeStep();
+
+            if (activeStep.stepInjectionConfig) {
+                self.updateStepPath();
+            }
 
             if ((!activeStep.required() || activeStep.complete()) && activeStep._index < self.steps().length - 1) {
                 self.activeStep(self.steps()[activeStep._index + 1]);

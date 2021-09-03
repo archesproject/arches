@@ -3,8 +3,8 @@ define([
     'underscore',
     'knockout-mapping',
     'uuid',
-    'views/components/workflows/component-based-step',
-], function(ko, _, koMapping, uuid) {
+    'views/components/workflows/workflow-component-abstract',
+], function(ko, _, koMapping, uuid, WorkflowComponentAbstract) {
     STEPS_LABEL = 'workflow-steps';
     STEP_ID_LABEL = 'workflow-step-id';
 
@@ -16,23 +16,58 @@ define([
         this.id = ko.observable();
         this.workflowId = ko.observable(config.workflow ? config.workflow.id : null);
 
-        this.informationBoxData = ko.observable();       
-        
+        this.parameters = config.parameters;
+
+        this.informationBoxData = ko.observable();
+
+        this.componentBasedStepClass = ko.unwrap(config.workflowstepclass);
+        this.hiddenWorkflowButtons = ko.observableArray(config.hiddenWorkflowButtons || []);
+
+        /* 
+            `pageLayout` is an observableArray of arrays representing section Information ( `sectionInfo` ).
+
+            `sectionInfo` is an array where the first item is the `sectionTitle` parameter, and the second 
+            item is an array of `uniqueInstanceName`.
+        */ 
+        this.pageLayout = ko.observableArray();
+        this.workflowComponentAbstractLookup = ko.observable({});
+
+        this.componentIdLookup = ko.observable();
+        this.componentIdLookup.subscribe(function(componentIdLookup) {
+            self.setToLocalStorage('componentIdLookup', componentIdLookup);
+        });
+
+
         this.required = ko.observable(ko.unwrap(config.required));
         this.loading = ko.observable(false);
         this.saving = ko.observable(false);
-        this.complete = ko.observable(false);
-        
-        this.value = ko.observable();
-        this.hasDirtyTile = ko.observable(false);
-
-        this.preSaveCallback = ko.observable();
-        this.postSaveCallback = ko.observable();
-        this.clearCallback = ko.observable();
-
-        this.clearCallback = ko.observable();
 
         this.lockableExternalSteps = config.lockableExternalSteps || [];
+
+        this.complete = ko.computed(function() {
+            var complete = true; 
+            
+            Object.values(self.workflowComponentAbstractLookup()).forEach(function(workflowComponentAbstract) {
+                if (!workflowComponentAbstract.complete()) {
+                    complete = false;
+                }
+            });
+
+            return complete;
+        });
+
+        /* 
+            checks if all `workflowComponentAbstract`s have saved data if a single `workflowComponentAbstract` 
+            updates its data, neccessary for correct aggregate behavior
+        */
+        this.hasUnsavedData = ko.computed(function() {
+            return Object.values(self.workflowComponentAbstractLookup()).reduce(function(acc, workflowComponentAbstract) {
+                if (workflowComponentAbstract.hasUnsavedData()) {
+                    acc = true;
+                } 
+                return acc;
+            }, false);
+        });
 
         this.active = ko.computed(function() {
             return config.workflow.activeStep() === this;
@@ -53,11 +88,15 @@ define([
                 self.id(uuid.generate());
             }
 
-            /* cached value logic */ 
-            var cachedValue = self.getFromLocalStorage('value');
-            if (cachedValue) {
-                self.value(cachedValue);
-                self.complete(true);
+            /* workflow ID logic */ 
+            if (config.workflow && ko.unwrap(config.workflow.id)) {
+                self.workflowId = ko.unwrap(config.workflow.id);
+            }
+
+            /* cached workflowComponentAbstract logic */ 
+            var cachedComponentIdLookup = self.getFromLocalStorage('componentIdLookup');
+            if (cachedComponentIdLookup) {
+                self.componentIdLookup(cachedComponentIdLookup);
             }
 
             /* step lock logic */ 
@@ -68,66 +107,100 @@ define([
     
             /* cached informationBox logic */
             this.setupInformationBox();
-        };
-        
-        this.save = function() {
-            var preSaveCallback = function() {
-                return new Promise(function(resolve, _reject) {
-                    var preSaveCallback = ko.unwrap(self.preSaveCallback);
-                    preSaveCallback(resolve);
-                });
-            };
-            var writeToLocalStorage = function() {
-                return new Promise(function(resolve, _reject) {
-                    self.setToLocalStorage('value', self.value());
-                    resolve(self.value());
-                });
-            };
-            var postSaveCallback = function() {
-                // TODO: Refactor promise logic to pass down resolve
-                return new Promise(function(resolve, _reject) {
-                    var postSaveCallback = ko.unwrap(self.postSaveCallback);
 
-                    if (postSaveCallback) {
-                        resolve(postSaveCallback());
-                    }
-                    else {
-                        resolve(null);
-                    }
+            /* build page layout */ 
+            ko.toJS(self.layoutSections).forEach(function(layoutSection) {
+                var uniqueInstanceNames = [];
+    
+                layoutSection.componentConfigs.forEach(function(componentConfigData) {
+                    uniqueInstanceNames.push(componentConfigData.uniqueInstanceName);
+                    self.updateWorkflowComponentAbstractLookup(componentConfigData);
                 });
-            };
-            
+    
+                self.pageLayout.push([layoutSection.sectionTitle, uniqueInstanceNames]);
+            });
+
+            /* assigns componentIdLookup to self, which updates localStorage */ 
+            var componentIdLookup = Object.keys(self.workflowComponentAbstractLookup()).reduce(function(acc, key) {
+                acc[key] = self.workflowComponentAbstractLookup()[key].id();
+                return acc;
+            }, {});
+
+            self.componentIdLookup(componentIdLookup);
+        };
+
+        this.updateWorkflowComponentAbstractLookup = function(workflowComponentAbtractData) {
+            var workflowComponentAbstractLookup = self.workflowComponentAbstractLookup();
+            var workflowComponentAbstractId;
+
+            if (self.getFromLocalStorage('componentIdLookup')) {
+                workflowComponentAbstractId = self.getFromLocalStorage('componentIdLookup')[workflowComponentAbtractData.uniqueInstanceName];
+            }
+
+            var workflowComponentAbstract = new WorkflowComponentAbstract({
+                componentData: workflowComponentAbtractData,
+                workflowComponentAbstractId: workflowComponentAbstractId,
+                isValidComponentPath: config.workflow.isValidComponentPath,
+                getDataFromComponentPath: config.workflow.getDataFromComponentPath,
+                title: config.title,
+                isStepSaving: self.isStepSaving,
+                locked: self.locked,
+                lockExternalStep: self.lockExternalStep,
+                lockableExternalSteps: self.lockableExternalSteps,
+                workflowId: self.workflowId,
+                alert: self.alert,
+                outerSaveOnQuit: self.outerSaveOnQuit,
+                isStepActive: self.active,
+            });
+
+            workflowComponentAbstractLookup[workflowComponentAbtractData.uniqueInstanceName] = workflowComponentAbstract;
+
+            self.workflowComponentAbstractLookup(workflowComponentAbstractLookup);
+        };
+
+        this.save = function() {
+            self.saving(true);
+
             return new Promise(function(resolve, _reject) {
-                preSaveCallback().then(function(_preSaveCallbackData) {
-                    writeToLocalStorage().then(function(_localStorageData) {
-                        postSaveCallback().then(function(_postSaveCallbackData) {
-                            resolve(self.value());
-                        });
-                    });
+                var savePromises = [];
+            
+                Object.values(self.workflowComponentAbstractLookup()).forEach(function(workflowComponentAbstract) {
+                    savePromises.push(new Promise(function(resolve, _reject) {
+                        workflowComponentAbstract._saveComponent(resolve);
+                    }));
+                });
+    
+                Promise.all(savePromises).then(function(values) {
+                    resolve(...values);
+                    self.saving(false);
                 });
             });
         };
 
-        this.clear = function() {
-            if (self.hasDirtyTile()) {
-                if (ko.unwrap(self.tile)) {
-                    self.tile().reset();
-                }
-
-                if (ko.unwrap(self.clearCallback)) {
-                    self.clearCallback()();
-                }
-            }
+        this.undo = function() {
+            return new Promise(function(resolve, _reject) {
+                var resetPromises = [];
+            
+                Object.values(self.workflowComponentAbstractLookup()).forEach(function(workflowComponentAbstract) {
+                    resetPromises.push(new Promise(function(resolve, _reject) {
+                        workflowComponentAbstract._resetComponent(resolve);
+                    }));
+                });
+    
+                Promise.all(resetPromises).then(function(values) {
+                    resolve(...values);
+                });
+            });
         }
 
         this.setToLocalStorage = function(key, value) {
             var allStepsLocalStorageData = JSON.parse(localStorage.getItem(STEPS_LABEL)) || {};
 
-            if (!allStepsLocalStorageData[self.id()]) {
-                allStepsLocalStorageData[self.id()] = {};
+            if (!allStepsLocalStorageData[ko.unwrap(self.name)]) {
+                allStepsLocalStorageData[ko.unwrap(self.name)] = {};
             }
 
-            allStepsLocalStorageData[self.id()][key] = value ? koMapping.toJSON(value) : value;
+            allStepsLocalStorageData[ko.unwrap(self.name)][key] = value ? koMapping.toJSON(value) : value;
 
             localStorage.setItem(
                 STEPS_LABEL, 
@@ -138,8 +211,8 @@ define([
         this.getFromLocalStorage = function(key) {
             var allStepsLocalStorageData = JSON.parse(localStorage.getItem(STEPS_LABEL)) || {};
 
-            if (allStepsLocalStorageData[self.id()] && typeof allStepsLocalStorageData[self.id()][key] !== "undefined") {
-                return JSON.parse(allStepsLocalStorageData[self.id()][key]);
+            if (allStepsLocalStorageData[ko.unwrap(self.name)] && typeof allStepsLocalStorageData[ko.unwrap(self.name)][key] !== "undefined") {
+                return JSON.parse(allStepsLocalStorageData[ko.unwrap(self.name)][key]);
             }
         };
 
