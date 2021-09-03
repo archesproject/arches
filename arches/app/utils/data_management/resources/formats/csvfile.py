@@ -417,7 +417,8 @@ class CsvReader(Reader):
                         cause,
                     )
                     errors.append({"type": "WARNING", "message": msg})
-                    newresourceinstance.delete()
+                    if not ResourceInstance.objects.filter(pk=newresourceinstance.resourceinstanceid).exists:
+                        newresourceinstance.delete()
                     save_count = save_count - 1
                 except Exception as e:
                     msg = "%s: WARNING: failed to save document in resource: %s %s. Exception detail:\n%s\n" % (
@@ -427,17 +428,8 @@ class CsvReader(Reader):
                         e,
                     )
                     errors.append({"type": "WARNING", "message": msg})
-                    # import pdb; pdb.set_trace()
-                    try: 
-                        ResourceInstance.objects.get(pk=newresourceinstance.resourceinstanceid)
-                    except Exception as e:
+                    if not ResourceInstance.objects.filter(pk=newresourceinstance.resourceinstanceid).exists:
                         newresourceinstance.delete()
-                        msg = "%s: WARNING: this resource was deleted: %s %s. Exception detail:\n%s\n" % (
-                        datetime.datetime.now(),
-                        resourceinstanceid,
-                        row_number,
-                        e,
-                    )
                     save_count = save_count - 1
 
         else:
