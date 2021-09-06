@@ -56,9 +56,10 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                                 </legend>
 
                                 <div class="form-group">
+                                    <label class="reqlabel control-label widget-input-label" for="username">Username (required)</label>
                                     <div class="input-group">
-                                            <div class="input-group-addon"><i class="ion-compose"></i></div>
-                                            <input type="text" class="form-control input-lg" placeholder="Username" name='username' autofocus value='{{postdata.username}}'>
+                                        <div class="input-group-addon"><i class="ion-compose"></i></div>
+                                        <input id="username" type="text" class="form-control input-lg" name='username' autofocus value='{{postdata.username}}' aria-required="true">
                                     </div>
                                     {% if form.username.errors %}
                                     {% for error in form.username.errors %}
@@ -68,9 +69,10 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                                 </div>
 
                                 <div class="form-group">
+                                    <label class="reqlabel control-label widget-input-label" for="first_name">First Name (required)</label>
                                     <div class="input-group">
-                                            <div class="input-group-addon"><i class="ion-compose"></i></div>
-                                            <input type="text" class="form-control input-lg" placeholder="First Name" name='first_name' autofocus value='{{postdata.first_name}}'>
+                                        <div class="input-group-addon"><i class="ion-compose"></i></div>
+                                        <input id="first_name" type="text" class="form-control input-lg" name='first_name' autofocus value='{{postdata.first_name}}' aria-required="true">
                                     </div>
                                     {% if form.first_name.errors %}
                                     {% for error in form.first_name.errors %}
@@ -80,9 +82,10 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                                 </div>
 
                                 <div class="form-group">
+                                    <label class="reqlabel control-label widget-input-label" for="last_name">Last Name (required)</label>
                                     <div class="input-group">
-                                            <div class="input-group-addon"><i class="ion-compose"></i></div>
-                                            <input type="text" class="form-control input-lg" placeholder="Last Name" name='last_name' value='{{postdata.last_name}}'>
+                                        <div class="input-group-addon"><i class="ion-compose"></i></div>
+                                        <input id="last_name" type="text" class="form-control input-lg" name='last_name' value='{{postdata.last_name}}' aria-required="true">
                                     </div>
                                     {% if form.last_name.errors %}
                                     {% for error in form.last_name.errors %}
@@ -92,9 +95,10 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                                 </div>
 
                                 <div class="form-group">
+                                    <label class="reqlabel control-label widget-input-label" for="email">Email (required)</label>
                                     <div class="input-group">
-                                            <div class="input-group-addon"><i class="ion-email"></i></div>
-                                            <input type="text" class="form-control input-lg" placeholder="Email" name='email' value='{{postdata.email}}'>
+                                        <div class="input-group-addon"><i class="ion-email"></i></div>
+                                        <input id="email" type="text" class="form-control input-lg" name='email' value='{{postdata.email}}' aria-required="true">
                                     </div>
                                     {% if form.email.errors %}
                                     {% for error in form.email.errors %}
@@ -104,9 +108,10 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                                 </div>
 
                                 <div class="form-group">
+                                    <label class="reqlabel control-label widget-input-label" for="password1">Password (required)</label>
                                     <div class="input-group">
-                                            <div class="input-group-addon"><i class="ion-asterisk"></i></div>
-                                            <input type="password" class="form-control input-lg" placeholder="Password" name='password1'>
+                                        <div class="input-group-addon"><i class="ion-asterisk"></i></div>
+                                        <input id="password1" type="password" class="form-control input-lg" name='password1' aria-required="true">
                                     </div>
                                     {% if form.password1.errors %}
                                     {% for error in form.password1.errors %}
@@ -116,9 +121,10 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                                 </div>
 
                                 <div class="form-group">
+                                    <label class="reqlabel control-label widget-input-label" for="password2">Confirm Password (required)</label>
                                     <div class="input-group">
-                                            <div class="input-group-addon"><i class="ion-asterisk"></i></div>
-                                            <input type="password" class="form-control input-lg" placeholder="Confirm Password" name='password2'>
+                                        <div class="input-group-addon"><i class="ion-asterisk"></i></div>
+                                        <input id="password2" type="password" class="form-control input-lg" name='password2' aria-required="true">
                                     </div>
                                     {% if form.password2.errors %}
                                     {% for error in form.password2.errors %}
@@ -128,7 +134,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                                 </div>
 
                                 <div class="form-group">
-                                    <div class="arches-signin-btn" style="padding-bottom: 0px;">
+                                    <div class="arches-signin-btn">
                                         {% if showform %}
                                         <button class="btn btn-primary btn-lg btn-block" type="submit">{% trans "Signup" %}</button>
                                         {% endif %}

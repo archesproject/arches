@@ -5128,7 +5128,9 @@ ul .collapse li:last-of-type {
 
 .arches-signin-subtext {
     padding: 0px 5px 10px 5px;
-    color: #888;
+    color: #595959;
+    font-size: 1em;
+    font-weight: normal;
 }
 
 .arches-signin .login-panel {
@@ -14141,6 +14143,11 @@ a.jstree-anchor.permissions-widget {
 .rr-viewer-selector-title.disabled:hover {
     cursor: pointer;
     background: #bbb;
+}
+
+.reqlabel {
+    width: 100%;
+    text-align: left;
 }
 
 @keyframes loader {
