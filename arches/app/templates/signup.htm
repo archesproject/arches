@@ -49,101 +49,102 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                         {{ confirmation_message | safe }}
 
                         {% if showform %}
-                        <div class="form-group">
-                            <div class="input-group">
-                                    <div class="input-group-addon"><i class="ion-compose"></i></div>
-                                    <input type="text" class="form-control input-lg" placeholder="Username" name='username' autofocus value='{{postdata.username}}'>
-                            </div>
-                            {% if form.username.errors %}
-                            {% for error in form.username.errors %}
-                                <div style="color:darkred">{{ error|escape }}</div>
-                            {% endfor %}
-                            {% endif %}
-                        </div>
-
-                        <div class="form-group">
-                            <div class="input-group">
-                                    <div class="input-group-addon"><i class="ion-compose"></i></div>
-                                    <input type="text" class="form-control input-lg" placeholder="First Name" name='first_name' autofocus value='{{postdata.first_name}}'>
-                            </div>
-                            {% if form.first_name.errors %}
-                            {% for error in form.first_name.errors %}
-                                <div style="color:darkred">{{ error|escape }}</div>
-                            {% endfor %}
-                            {% endif %}
-                        </div>
-
-                        <div class="form-group">
-                            <div class="input-group">
-                                    <div class="input-group-addon"><i class="ion-compose"></i></div>
-                                    <input type="text" class="form-control input-lg" placeholder="Last Name" name='last_name' value='{{postdata.last_name}}'>
-                            </div>
-                            {% if form.last_name.errors %}
-                            {% for error in form.last_name.errors %}
-                                <div style="color:darkred">{{ error|escape }}</div>
-                            {% endfor %}
-                            {% endif %}
-                        </div>
-
-                        <div class="form-group">
-                            <div class="input-group">
-                                    <div class="input-group-addon"><i class="ion-email"></i></div>
-                                    <input type="text" class="form-control input-lg" placeholder="Email" name='email' value='{{postdata.email}}'>
-                            </div>
-                            {% if form.email.errors %}
-                            {% for error in form.email.errors %}
-                                <div style="color:darkred">{{ error|escape }}</div>
-                            {% endfor %}
-                            {% endif %}
-                        </div>
-
-                        <div class="form-group">
-                            <div class="input-group">
-                                    <div class="input-group-addon"><i class="ion-asterisk"></i></div>
-                                    <input type="password" class="form-control input-lg" placeholder="Password" name='password1'>
-                            </div>
-                            {% if form.password1.errors %}
-                            {% for error in form.password1.errors %}
-                                <div style="color:darkred">{{ error|escape }}</div>
-                            {% endfor %}
-                            {% endif %}
-                        </div>
-
-                        <div class="form-group">
-                            <div class="input-group">
-                                    <div class="input-group-addon"><i class="ion-asterisk"></i></div>
-                                    <input type="password" class="form-control input-lg" placeholder="Confirm Password" name='password2'>
-                            </div>
-                            {% if form.password2.errors %}
-                            {% for error in form.password2.errors %}
-                                <div style="color:darkred">{{ error|escape }}</div>
-                            {% endfor %}
-                            {% endif %}
-                        </div>
-
-                        <div class="form-group">
-                            <div class="arches-signin-btn" style="padding-bottom: 0px;">
-                                {% if showform %}
-                                <button class="btn btn-primary btn-lg btn-block" type="submit">{% trans "Signup" %}</button>
+                        <fieldset>
+                            <div class="form-group">
+                                <div class="input-group">
+                                        <div class="input-group-addon"><i class="ion-compose"></i></div>
+                                        <input type="text" class="form-control input-lg" placeholder="Username" name='username' autofocus value='{{postdata.username}}'>
+                                </div>
+                                {% if form.username.errors %}
+                                {% for error in form.username.errors %}
+                                    <div style="color:darkred">{{ error|escape }}</div>
+                                {% endfor %}
                                 {% endif %}
                             </div>
-                        </div>
 
-                        <div class="password-rules text-left">
-                            {% trans 'Your password must:' %}
-                            <ul class="list-unstyled">
-                                {% for message in validation_help %}
-                                <li class="password-rule"><i class="ion-checkmark-circled"></i><span>{{ message }}</span></li>
+                            <div class="form-group">
+                                <div class="input-group">
+                                        <div class="input-group-addon"><i class="ion-compose"></i></div>
+                                        <input type="text" class="form-control input-lg" placeholder="First Name" name='first_name' autofocus value='{{postdata.first_name}}'>
+                                </div>
+                                {% if form.first_name.errors %}
+                                {% for error in form.first_name.errors %}
+                                    <div style="color:darkred">{{ error|escape }}</div>
                                 {% endfor %}
-                            </ul>
-                        </div>
+                                {% endif %}
+                            </div>
 
-                        {% if enable_captcha %}
-                        <div class="form-group">
-                        {{form.captcha}}
-                        </div>
-                        {% endif %}
+                            <div class="form-group">
+                                <div class="input-group">
+                                        <div class="input-group-addon"><i class="ion-compose"></i></div>
+                                        <input type="text" class="form-control input-lg" placeholder="Last Name" name='last_name' value='{{postdata.last_name}}'>
+                                </div>
+                                {% if form.last_name.errors %}
+                                {% for error in form.last_name.errors %}
+                                    <div style="color:darkred">{{ error|escape }}</div>
+                                {% endfor %}
+                                {% endif %}
+                            </div>
 
+                            <div class="form-group">
+                                <div class="input-group">
+                                        <div class="input-group-addon"><i class="ion-email"></i></div>
+                                        <input type="text" class="form-control input-lg" placeholder="Email" name='email' value='{{postdata.email}}'>
+                                </div>
+                                {% if form.email.errors %}
+                                {% for error in form.email.errors %}
+                                    <div style="color:darkred">{{ error|escape }}</div>
+                                {% endfor %}
+                                {% endif %}
+                            </div>
+
+                            <div class="form-group">
+                                <div class="input-group">
+                                        <div class="input-group-addon"><i class="ion-asterisk"></i></div>
+                                        <input type="password" class="form-control input-lg" placeholder="Password" name='password1'>
+                                </div>
+                                {% if form.password1.errors %}
+                                {% for error in form.password1.errors %}
+                                    <div style="color:darkred">{{ error|escape }}</div>
+                                {% endfor %}
+                                {% endif %}
+                            </div>
+
+                            <div class="form-group">
+                                <div class="input-group">
+                                        <div class="input-group-addon"><i class="ion-asterisk"></i></div>
+                                        <input type="password" class="form-control input-lg" placeholder="Confirm Password" name='password2'>
+                                </div>
+                                {% if form.password2.errors %}
+                                {% for error in form.password2.errors %}
+                                    <div style="color:darkred">{{ error|escape }}</div>
+                                {% endfor %}
+                                {% endif %}
+                            </div>
+
+                            <div class="form-group">
+                                <div class="arches-signin-btn" style="padding-bottom: 0px;">
+                                    {% if showform %}
+                                    <button class="btn btn-primary btn-lg btn-block" type="submit">{% trans "Signup" %}</button>
+                                    {% endif %}
+                                </div>
+                            </div>
+
+                            <div class="password-rules text-left">
+                                {% trans 'Your password must:' %}
+                                <ul class="list-unstyled">
+                                    {% for message in validation_help %}
+                                    <li class="password-rule"><i class="ion-checkmark-circled"></i><span>{{ message }}</span></li>
+                                    {% endfor %}
+                                </ul>
+                            </div>
+
+                            {% if enable_captcha %}
+                            <div class="form-group">
+                            {{form.captcha}}
+                            </div>
+                            {% endif %}
+                        </fieldset>
                         {% endif %}
                     </div>
                 </form>
