@@ -976,7 +976,10 @@ class SearchExport(View):
         exporter = SearchResultsExporter(search_request=request)
         export_files, export_info = exporter.export(format, report_link)
         if format == "geojson" and total <= download_limit:
-            response = JSONResponse(export_files)
+            if settings.EXPORT_DATA_FIELDS_IN_CARD_ORDER == True:
+                response = JSONResponse(export_files, sort_keys=False)
+            else:
+                response = JSONResponse(export_files)
             return response
         return JSONResponse(status=404)
 
