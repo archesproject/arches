@@ -252,6 +252,10 @@ class SearchResultsExporter(object):
                 headers.append({"fieldname": "resourceid", "datatype": "str"})
                 ret += self.to_tilexl(resources["output"])
 
+            if format == "html":
+                ret += self.to_html(resources["output"], name=graph.name, graph_id=str(graph.pk))
+
+
         full_path = self.search_request.get_full_path()
         search_request_path = self.search_request.path if full_path is None else full_path
         search_export_info = models.SearchExportHistory(
@@ -378,6 +382,12 @@ class SearchResultsExporter(object):
         resourceinstanceids = [instance["resourceid"] for instance in instances if "resourceid" in instance]
         tilexl_exporter = ResourceExporter(format="tilexl")
         dest = tilexl_exporter.export(resourceinstanceids=resourceinstanceids)
+        return dest
+
+    def to_html(self, instances, name, graph_id):
+        resourceinstanceids = [instance["resourceid"] for instance in instances if "resourceid" in instance]
+        html_exporter = ResourceExporter(format="html")
+        dest = html_exporter.export(resourceinstanceids=resourceinstanceids)
         return dest
 
     def get_geometry_fieldnames(self, instance):  # the same function exist in shapefile.py l.70
