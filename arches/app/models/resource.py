@@ -193,24 +193,41 @@ class Resource(models.ResourceInstance):
             resource.tiles = resource.get_flattened_tiles()
             tiles.extend(resource.tiles)
 
-        # need to save the models first before getting the documents for index
+        # need to handle if the bulk load is appending tiles to existing resources/
+        existing_resources_ids = Resource.objects.filter(
+            resourceinstanceid__in=[resource.resourceinstanceid for resource in resources]
+        ).values_list("resourceinstanceid", flat=True)
+
+        existing_resources = [resource for resource in resources if resource.resourceinstanceid in existing_resources_ids]
+        resources_to_create = [resource for resource in resources if resource.resourceinstanceid not in existing_resources_ids]
+
         start = time()
-        Resource.objects.bulk_create(resources)
+        Resource.objects.bulk_create(resources_to_create)
         TileModel.objects.bulk_create(tiles)
 
-        print(f"Time to bulk create tiles and resources: {datetime.timedelta(seconds=time() - start)}")
+        logger.info(f"Time to bulk save tiles and resources: {datetime.timedelta(seconds=time() - start)}")
 
         start = time()
-        for resource in resources:
+        for resource in resources_to_create:
             resource.save_edit(edit_type="create", transaction_id=transaction_id)
-
-        resources[0].tiles[0].save_edit(
-            note=f"Bulk created: {len(tiles)} for {len(resources)} resources.", edit_type="bulk_create", transaction_id=transaction_id
-        )
-
-        print("Time to save resource edits: %s" % datetime.timedelta(seconds=time() - start))
+        for resource in existing_resources:
+            resource.save_edit(edit_type="append", transaction_id=transaction_id)
 
         for resource in resources:
+            try:
+                resources[0].tiles[0].save_edit(
+                    note=f"Bulk created: {len(tiles)} for {len(resources)} resources.",
+                    edit_type="bulk_create",
+                    transaction_id=transaction_id,
+                )
+            except:
+                pass
+
+        logger.info("Time to save resource edits: %s" % datetime.timedelta(seconds=time() - start))
+
+        # refetch new AND updated resources and index
+        for resource in Resource.objects.filter(resourceinstanceid__in=[resource.resourceinstanceid for resource in resources]):
+
             start = time()
             document, terms = resource.get_documents_to_index(
                 fetchTiles=False, datatype_factory=datatype_factory, node_datatypes=node_datatypes
@@ -512,10 +529,11 @@ class Resource(models.ResourceInstance):
             return query.search(index=RESOURCE_RELATIONS_INDEX)
 
         resource_relations = get_relations(
-            resourceinstanceid=self.resourceinstanceid, start=start, limit=limit, resourceinstance_graphid=resourceinstance_graphid,
+            resourceinstanceid=self.resourceinstanceid,
+            start=start,
+            limit=limit,
+            resourceinstance_graphid=resourceinstance_graphid,
         )
-
-        
 
         ret["total"] = resource_relations["hits"]["total"]
         instanceids = set()
