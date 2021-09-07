@@ -174,7 +174,7 @@ class Resource(models.ResourceInstance):
         return tiles
 
     @staticmethod
-    def bulk_save(resources, transaction_id=None):
+    def bulk_save(resources, transaction_id=None, prevent_indexing=False):
         """
         Saves and indexes a list of resources
 
@@ -224,22 +224,22 @@ class Resource(models.ResourceInstance):
                 pass
 
         logger.info("Time to save resource edits: %s" % datetime.timedelta(seconds=time() - start))
-
-        # refetch new AND updated resources and index
-        for resource in Resource.objects.filter(resourceinstanceid__in=[resource.resourceinstanceid for resource in resources]):
-
-            start = time()
-            document, terms = resource.get_documents_to_index(
-                fetchTiles=False, datatype_factory=datatype_factory, node_datatypes=node_datatypes
-            )
+        if not prevent_indexing:
+            for resource in resources:
+                start = time()
+                document, terms = resource.get_documents_to_index(
+                    fetchTiles=False, datatype_factory=datatype_factory, node_datatypes=node_datatypes
+                )
 
             documents.append(se.create_bulk_item(index=RESOURCES_INDEX, id=document["resourceinstanceid"], data=document))
 
             for term in terms:
-                term_list.append(se.create_bulk_item(index=TERMS_INDEX, id=term["_id"], data=term["_source"]))
+            	term_list.append(se.create_bulk_item(index=TERMS_INDEX, id=term["_id"], data=term["_source"]))
 
-        se.bulk_index(documents)
-        se.bulk_index(term_list)
+            se.bulk_index(documents)
+            se.bulk_index(term_list)
+        else:
+            logger.info("... defering indexing in resource bulk save")
 
     def index(self):
         """
