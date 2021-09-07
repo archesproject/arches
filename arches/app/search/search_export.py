@@ -127,7 +127,7 @@ class SearchResultsExporter(object):
                         nodes_in_card.append(card_node_object)
                     else:
                         pass
-                node_object_list_sorted = sorted(nodes_in_card, key=lambda x: x.sortorder)
+                node_object_list_sorted = sorted(nodes_in_card, key=lambda x: 0 if x.sortorder is None else x.sortorder)
                 for sorted_node_object in node_object_list_sorted:
                     ordered_list_all_nodes.append(sorted_node_object)
             else:
