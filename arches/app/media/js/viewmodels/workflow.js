@@ -50,48 +50,44 @@ define([
         });
         
         this.initialize = function() {
-            /* BEGIN workflow metadata logic */ 
-            if (self.componentName) {
-                self.getWorkflowMetaData(self.componentName).then(function(workflowJson) {
-                    self.workflowName(workflowJson.name);
+            self.getWorkflowMetaData(self.componentName).then(function(workflowJson) {
+                self.workflowName(workflowJson.name);
+
+                /* BEGIN workflow id logic */ 
+                var currentWorkflowId = self.getWorkflowIdFromUrl();
+                if (currentWorkflowId) {
+                    self.id(currentWorkflowId);
+                }
+                else {
+                    self.id(uuid.generate());
+                    self.setWorkflowIdToUrl();
+                }
+                /* END workflow id logic */ 
+
+                /* BEGIN workflow step creation logic */ 
+                if (self.getFromLocalStorage(WORKFLOW_ID_LABEL) !== self.id()) {
+                    self.setToLocalStorage(WORKFLOW_ID_LABEL, self.id());
+                    /* remove step data created by previous workflow from localstorage */
+                    localStorage.removeItem(STEPS_LABEL);  
+                    localStorage.removeItem(STEP_IDS_LABEL);
+                    localStorage.removeItem(WORKFLOW_COMPONENT_ABSTRACTS_LABEL);
+                }
+
+                self.updateStepPath();
+                
+                var cachedStepId = self.getStepIdFromUrl();
+                var cachedActiveStep = self.steps().find(function(step) {
+                    return step.id() === cachedStepId;
                 });
-            }
-            /* END workflow metadata logic */ 
 
-            /* BEGIN workflow id logic */ 
-            var currentWorkflowId = self.getWorkflowIdFromUrl();
-            if (currentWorkflowId) {
-                self.id(currentWorkflowId)
-            }
-            else {
-                self.id(uuid.generate());
-                self.setWorkflowIdToUrl();
-            }
-            /* END workflow id logic */ 
-
-            /* BEGIN workflow step creation logic */ 
-            if (self.getFromLocalStorage(WORKFLOW_ID_LABEL) !== self.id()) {
-                self.setToLocalStorage(WORKFLOW_ID_LABEL, self.id());
-                /* remove step data created by previous workflow from localstorage */
-                localStorage.removeItem(STEPS_LABEL);  
-                localStorage.removeItem(STEP_IDS_LABEL);
-                localStorage.removeItem(WORKFLOW_COMPONENT_ABSTRACTS_LABEL);
-            }
-
-            self.updateStepPath();
-            
-            var cachedStepId = self.getStepIdFromUrl();
-            var cachedActiveStep = self.steps().find(function(step) {
-                return step.id() === cachedStepId;
+                if (cachedActiveStep) {
+                    self.activeStep(cachedActiveStep);
+                }
+                else {
+                    self.activeStep(self.steps()[0]);
+                }
+                /* END workflow step creation logic */
             });
-
-            if (cachedActiveStep) {
-                self.activeStep(cachedActiveStep);
-            }
-            else {
-                self.activeStep(self.steps()[0]);
-            }
-            /* END workflow step creation logic */ 
         };
 
         this.updatePan = function(val){
