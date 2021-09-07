@@ -57,7 +57,7 @@ define([
                     /* BEGIN workflow id logic */ 
                     var currentWorkflowId = self.getWorkflowIdFromUrl();
                     if (currentWorkflowId) {
-                        self.id(currentWorkflowId)
+                        self.id(currentWorkflowId);
                     }
                     else {
                         self.id(uuid.generate());
