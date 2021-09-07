@@ -212,16 +212,15 @@ class Resource(models.ResourceInstance):
             resource.save_edit(edit_type="create", transaction_id=transaction_id)
         for resource in existing_resources:
             resource.save_edit(edit_type="append", transaction_id=transaction_id)
-
-        for resource in resources:
-            try:
-                resources[0].tiles[0].save_edit(
-                    note=f"Bulk created: {len(tiles)} for {len(resources)} resources.",
-                    edit_type="bulk_create",
-                    transaction_id=transaction_id,
-                )
-            except:
-                pass
+        
+        try:
+            resources[0].tiles[0].save_edit(
+                note=f"Bulk created: {len(tiles)} for {len(resources)} resources.",
+                edit_type="bulk_create",
+                transaction_id=transaction_id,
+            )
+        except:
+            pass
 
         logger.info("Time to save resource edits: %s" % datetime.timedelta(seconds=time() - start))
         if not prevent_indexing:
@@ -231,10 +230,10 @@ class Resource(models.ResourceInstance):
                     fetchTiles=False, datatype_factory=datatype_factory, node_datatypes=node_datatypes
                 )
 
-            documents.append(se.create_bulk_item(index=RESOURCES_INDEX, id=document["resourceinstanceid"], data=document))
+                documents.append(se.create_bulk_item(index=RESOURCES_INDEX, id=document["resourceinstanceid"], data=document))
 
-            for term in terms:
-            	term_list.append(se.create_bulk_item(index=TERMS_INDEX, id=term["_id"], data=term["_source"]))
+                for term in terms:
+                    term_list.append(se.create_bulk_item(index=TERMS_INDEX, id=term["_id"], data=term["_source"]))
 
             se.bulk_index(documents)
             se.bulk_index(term_list)
