@@ -9,7 +9,6 @@ from django.template.loader import get_template
 from arches.app.models.models import GraphModel
 from arches.app.models.resource import Resource
 from arches.app.models.system_settings import settings
-from jinja2 import Environment, FileSystemLoader
 from pathlib import Path
 
 
