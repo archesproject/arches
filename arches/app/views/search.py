@@ -225,22 +225,22 @@ def export_results(request):
             return JSONResponse({"success": False, "message": message})
         else:
             celery_worker_running = task_management.check_if_celery_available()
-	        if celery_worker_running is True:
-	            request_values = dict(request.GET)
-	            request_values["path"] = request.get_full_path()
-	            result = tasks.export_search_results.apply_async(
-	                (request.user.id, request_values, format, report_link),
-	                link=tasks.update_user_task_record.s(),
-	                link_error=tasks.log_error.s(),
-	            )
-	            message = _(
-	                "{total} instances have been submitted for export. \
-	                Click the Bell icon to check for a link to download your data"
-	            ).format(**locals())
-	            return JSONResponse({"success": True, "message": message})
-	        else:
-	            message = _("Your search exceeds the {download_limit} instance download limit. Please refine your search").format(**locals())
-	            return JSONResponse({"success": False, "message": message})
+            if celery_worker_running is True:
+                request_values = dict(request.GET)
+                request_values["path"] = request.get_full_path()
+                result = tasks.export_search_results.apply_async(
+                    (request.user.id, request_values, format, report_link),
+                    link=tasks.update_user_task_record.s(),
+                    link_error=tasks.log_error.s(),
+                )
+                message = _(
+                    "{total} instances have been submitted for export. \
+                    Click the Bell icon to check for a link to download your data"
+                ).format(**locals())
+                return JSONResponse({"success": True, "message": message})
+            else:
+                message = _("Your search exceeds the {download_limit} instance download limit. Please refine your search").format(**locals())
+                return JSONResponse({"success": False, "message": message})
 
     elif format == "tilexl":
         exporter = SearchResultsExporter(search_request=request)
