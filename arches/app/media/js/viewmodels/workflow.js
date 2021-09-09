@@ -45,9 +45,15 @@ define([
         this.furthestValidStepIndex = ko.observable();
         this.furthestValidStepIndex.subscribe(function(index){
             if (index >= self.steps().length - 1) {
-                self.isWorkflowFinished(true)
+                self.isWorkflowFinished(true);
+            } else {
+                self.isWorkflowFinished(false);
             }
         });
+
+        this.steps.subscribe(() => {
+            this.furthestValidStepIndex.valueHasMutated();
+        })
         
         this.initialize = function() {
             self.getWorkflowMetaData(self.componentName).then(function(workflowJson) {
