@@ -552,6 +552,7 @@ define([
         this.value = ko.observable();
 
         this.complete = ko.observable(false);
+        this.error = ko.observable();
         this.dirty = ko.observable(); /* user can manually set dirty state */
 
         this.AlertViewModel = AlertViewModel;
@@ -677,8 +678,20 @@ define([
                             [self.componentData.uniqueInstanceName]: self.savedData(),
                         });
                     }
-
                     completeSubscription.dispose();  /* disposes after save */
+                    errorSubscription.dispose();  /* disposes after save */
+                }
+            });
+
+            var errorSubscription = self.error.subscribe(function(error) {
+                if (error) {
+
+                    if (componentBasedStepResolve) {
+                        componentBasedStepResolve();
+                        self.error(false);
+                    }
+                    completeSubscription.dispose();  /* disposes after save */
+                    errorSubscription.dispose();  /* disposes after save */
                 }
             });
 
