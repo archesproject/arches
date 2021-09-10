@@ -108,8 +108,15 @@ class StringDataType(BaseDataType):
     def get_search_terms(self, nodevalue, nodeid=None):
         terms = []
         if nodevalue is not None:
-            if settings.WORDS_PER_SEARCH_TERM is None or (len(nodevalue.split(" ")) < settings.WORDS_PER_SEARCH_TERM):
-                terms.append(nodevalue)
+            try:
+                if settings.WORDS_PER_SEARCH_TERM is None or (len(nodevalue.split(" ")) < settings.WORDS_PER_SEARCH_TERM):
+                    terms.append(nodevalue)
+            except AttributeError:
+                # print('AttributeError: list object has no attribute split')
+                # print(nodevalue)
+                if settings.WORDS_PER_SEARCH_TERM is None or (len(nodevalue[0].split(" ")) < settings.WORDS_PER_SEARCH_TERM):
+                    terms.append(nodevalue)
+
         return terms
 
     def append_search_filters(self, value, node, query, request):
