@@ -1141,20 +1141,20 @@ class CsvReader(Reader):
                     legacyid = row["ResourceID"]
 
                 # check for missing display value nodes.
-                errors = []
-                for k, v in missing_display_values.items():
-                    if len(v) > 0:
-                        errors.append(
-                            {
-                                "type": "WARNING",
-                                "message": "{0} is null or not mapped on rows {1} and \
-                                participates in a display value function.".format(
-                                    k, ",".join(v)
-                                ),
-                            }
-                        )
-                if len(errors) > 0:
-                    self.errors += errors
+                # errors = []
+                # for k, v in missing_display_values.items():
+                #     if len(v) > 0:
+                #         errors.append(
+                #             {
+                #                 "type": "WARNING",
+                #                 "message": "{0} is null or not mapped on rows {1} and \
+                #                 participates in a display value function.".format(
+                #                     k, ",".join(v)
+                #                 ),
+                #             }
+                #         )
+                # if len(errors) > 0:
+                #     self.errors += errors
 
                 if "legacyid" in locals():
                     self.save_resource(
