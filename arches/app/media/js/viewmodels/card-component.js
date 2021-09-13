@@ -167,11 +167,16 @@ define([
             });
         };
 
-        if (params.saveFunction) {
-            params.saveFunction(self.saveTile);
+        var saveTileInWorkflow = function() {
+            self.saveTile(function() {
+                params.form.complete(true);
+            });
+        };
+        if (params.save) {
+            params.save = saveTileInWorkflow;
         }
-        else if (params.form && params.form.saveFunction) {
-            params.form.saveFunction(self.saveTile);
+        if (params.form && params.form.save) {
+            params.form.save = saveTileInWorkflow;
         }
 
         this.saveTileAddNew = function() {
