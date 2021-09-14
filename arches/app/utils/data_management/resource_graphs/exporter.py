@@ -78,6 +78,7 @@ def sort(object, dict_key=None):
     """
     This is meant realy just to sort graph data for export
     """
+
     def handle_dictionary(d):
         """Called to handle a Dictionary"""
         obj = {}
@@ -147,10 +148,14 @@ def get_graphs_for_export(graphids=None):
         function_ids = []
         for function in resource_graph["functions"]:
             function_ids.append(function["function_id"])
-        resource_graph["functions_x_graphs"] = JSONSerializer().serializeToPython(get_function_x_graph_data_for_export(function_ids, resource_graph["graphid"]))
+        resource_graph["functions_x_graphs"] = JSONSerializer().serializeToPython(
+            get_function_x_graph_data_for_export(function_ids, resource_graph["graphid"])
+        )
         del resource_graph["functions"]
         del resource_graph["domain_connections"]
-        resource_graph["cards_x_nodes_x_widgets"] = JSONSerializer().serializeToPython(get_card_x_node_x_widget_data_for_export(resource_graph))
+        resource_graph["cards_x_nodes_x_widgets"] = JSONSerializer().serializeToPython(
+            get_card_x_node_x_widget_data_for_export(resource_graph)
+        )
         resource_graph["resource_2_resource_constraints"] = JSONSerializer().serializeToPython(r2r_constraints_for_export(resource_graph))
         graphs["graph"].append(resource_graph)
     return sort(graphs)
