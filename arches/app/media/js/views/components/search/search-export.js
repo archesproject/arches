@@ -19,7 +19,7 @@ function($, ko, arches) {
             this.emailInput = ko.observable(arches.userEmail);
             this.exportName = ko.observable("Arches Export");
             this.celeryRunning = ko.observable(arches.celeryRunning);
-            this.hasExportHtmlTemplates = ko.observable(arches.export_html_templates.length > 0)
+            this.hasExportHtmlTemplates = ko.observable(arches.export_html_templates.length > 0);
             this.downloadPending = ko.observable(false);
             this.hasResourceTypeFilter = ko.observable(!!params.query()['resource-type-filter']);
 

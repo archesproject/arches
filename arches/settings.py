@@ -97,7 +97,7 @@ RESOURCE_FORMATTERS = {
     "n3": "arches.app.utils.data_management.resources.formats.rdffile.RdfWriter",
     "nt": "arches.app.utils.data_management.resources.formats.rdffile.RdfWriter",
     "trix": "arches.app.utils.data_management.resources.formats.rdffile.RdfWriter",
-    "html": "arches.app.utils.data_management.resources.formats.htmlfile.HtmlWriter"
+    "html": "arches.app.utils.data_management.resources.formats.htmlfile.HtmlWriter",
 }
 
 # Hide nodes and cards in a report that have no data
@@ -505,7 +505,10 @@ PHONE_REGEX = r"^\+\d{8,15}$"
 SEARCH_ITEMS_PER_PAGE = 5
 SEARCH_EXPORT_LIMIT = 100000
 SEARCH_EXPORT_IMMEDIATE_DOWNLOAD_THRESHOLD = 2000  # The maximum number of instances a user can download from search export without celery
-SEARCH_EXPORT_IMMEDIATE_DOWNLOAD_THRESHOLD_HTML_FORMAT = 10  # The maximum number of instances a user can download using HTML format from search export without celery
+
+# The maximum number of instances a user can download using HTML format from search export without celery
+SEARCH_EXPORT_IMMEDIATE_DOWNLOAD_THRESHOLD_HTML_FORMAT = 10
+
 RELATED_RESOURCES_PER_PAGE = 15
 RELATED_RESOURCES_EXPORT_LIMIT = 10000
 SEARCH_DROPDOWN_LENGTH = 100

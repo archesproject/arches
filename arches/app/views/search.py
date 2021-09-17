@@ -215,7 +215,7 @@ def export_results(request):
         download_limit = settings.SEARCH_EXPORT_IMMEDIATE_DOWNLOAD_THRESHOLD_HTML_FORMAT
     else:
         download_limit = settings.SEARCH_EXPORT_IMMEDIATE_DOWNLOAD_THRESHOLD
-    
+
     if total > download_limit and format != "geojson":
         celery_worker_running = task_management.check_if_celery_available()
         if celery_worker_running is True:
