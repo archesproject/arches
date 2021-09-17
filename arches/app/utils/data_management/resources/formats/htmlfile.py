@@ -40,7 +40,7 @@ class HtmlWriter(Writer):
         """
         result = False
         try:
-            temp = get_template(f"html_export/{graphid}.html")
+            temp = get_template(f"html_export/{graphid}.htm")
             result = True
         except TemplateDoesNotExist as e:
             pass
@@ -49,7 +49,7 @@ class HtmlWriter(Writer):
     def load_html_template(self, graphid=None):
         template = None
         try:
-            template = get_template(f"html_export/{graphid}.html")
+            template = get_template(f"html_export/{graphid}.htm")
         except TemplateDoesNotExist as e:
             pass
         return template
