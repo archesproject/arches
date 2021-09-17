@@ -260,15 +260,6 @@ def search_results(request):
 
     include_provisional = get_provisional_type(request)
     permitted_nodegroups = get_permitted_nodegroups(request.user)
-    # request.GET = request.GET.copy()
-    # default_adv_search_filter = [
-    #     {"op":"and","1b6d7664-943b-11e8-a3b3-94659cf754d0":{"op":"not_null","val":""},"1b6d7661-943b-11e8-b811-94659cf754d0":{"op":"~","val":""}},
-    #     {"op":"or","bb6dea3a-98a2-11eb-b28f-5f1901ec6b3b":{"op":"","val":""},"bb6de9d9-98a2-11eb-b28f-5f1901ec6b3b":{"op":"not_null","val":""}},
-    #     {"op":"or","9a8a862a-67ed-11eb-8291-000d3a59ef9a":{"op":"","val":""},"9a8a85b0-67ed-11eb-8291-000d3a59ef9a":{"op":"not_null","val":""}}
-    # ]
-    # f = [{"op":"and","1b6d7664-943b-11e8-a3b3-94659cf754d0":{"op":"not_null","val":""},"1b6d7661-943b-11e8-b811-94659cf754d0":{"op":"~","val":""}},{"op":"or","bb6dea3a-98a2-11eb-b28f-5f1901ec6b3b":{"op":"","val":""},"bb6de9d9-98a2-11eb-b28f-5f1901ec6b3b":{"op":"not_null","val":""}},{"op":"or","9a8a862a-67ed-11eb-8291-000d3a59ef9a":{"op":"","val":""},"9a8a85b0-67ed-11eb-8291-000d3a59ef9a":{"op":"not_null","val":""}}]
-    # default_adv_search_filter = json.dumps(default_adv_search_filter)
-    # request.GET["advanced-search"] = default_adv_search_filter
 
     search_filter_factory = SearchFilterFactory(request)
     try:
