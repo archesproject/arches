@@ -637,6 +637,8 @@ GRAPH_MODEL_CACHE_TIMEOUT = None  # seconds * hours * days = ~1mo
 CANTALOUPE_DIR = os.path.join(ROOT_DIR, "uploadedfiles")
 CANTALOUPE_HTTP_ENDPOINT = "http://localhost:8182/"
 
+ACCESSIBILITY_MODE = False
+
 COMPRESS_PRECOMPILERS = (("text/x-scss", "django_libsass.SassCompiler"),)
 
 RENDERERS = [

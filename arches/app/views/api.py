@@ -1130,6 +1130,11 @@ class OntologyProperty(APIBase):
 class ResourceReport(APIBase):
     def get(self, request, resourceid):
         exclude = request.GET.get("exclude", [])
+        uncompacted_value = request.GET.get("uncompacted")
+        version = request.GET.get("v")
+        compact = True
+        if uncompacted_value == "true":
+            compact = False
         perm = "read_nodegroup"
 
         resource = Resource.objects.get(pk=resourceid)
@@ -1137,7 +1142,7 @@ class ResourceReport(APIBase):
         template = models.ReportTemplate.objects.get(pk=graph.template_id)
 
         if not template.preload_resource_data:
-            return JSONResponse({"template": template, "report_json": resource.to_json()})
+            return JSONResponse({"template": template, "report_json": resource.to_json(compact=compact, version=version)})
 
         resp = {
             "datatypes": models.DDataType.objects.all(),
@@ -1145,7 +1150,7 @@ class ResourceReport(APIBase):
             "resourceid": resourceid,
             "graph": graph,
             "hide_empty_nodes": settings.HIDE_EMPTY_NODES_IN_REPORT,
-            "report_json": resource.to_json(),
+            "report_json": resource.to_json(compact=compact, version=version),
         }
 
         if "template" not in exclude:
