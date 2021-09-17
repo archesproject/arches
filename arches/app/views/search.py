@@ -273,23 +273,23 @@ def search_results(request):
         return JSONErrorResponse(message=err)
 
     dsl = search_results_object.pop("query", None)
-    dsl.include("graph_id")
-    dsl.include("root_ontology_class")
-    dsl.include("resourceinstanceid")
     dsl.include("points")
-    dsl.include("permissions.users_without_read_perm")
-    dsl.include("permissions.users_without_edit_perm")
-    dsl.include("permissions.users_without_delete_perm")
     dsl.include("permissions.users_with_no_access")
-    if not points_only or for_export:
-        dsl.include("geometries")
+    dsl.include("permissions.users_without_edit_perm")
     dsl.include("displayname")
     dsl.include("displaydescription")
     dsl.include("map_popup")
-    dsl.include("provisional_resource")
-    if load_tiles:
-        dsl.include("tiles")
-    if for_export or pages:
+    if not points_only:
+        dsl.include("graph_id")
+        dsl.include("root_ontology_class")
+        dsl.include("resourceinstanceid")
+        dsl.include("permissions.users_without_read_perm")
+        dsl.include("permissions.users_without_delete_perm")
+        dsl.include("geometries")
+        dsl.include("provisional_resource")
+        if load_tiles:
+            dsl.include("tiles")
+    if for_export or pages or points_only:
         results = dsl.search(index=RESOURCES_INDEX, limit=10000, scroll="1m")
         scroll_id = results["_scroll_id"]
         if not pages:
