@@ -133,7 +133,6 @@ class SearchResultsExporter(object):
             if format == "html":
                 ret += self.to_html(resources["output"], name=graph.name, graph_id=str(graph.pk))
 
-
         full_path = self.search_request.get_full_path()
         search_request_path = self.search_request.path if full_path is None else full_path
         search_export_info = models.SearchExportHistory(
