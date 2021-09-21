@@ -6,17 +6,17 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('models', '7442_delete_manifest_images_table'),
+        ("models", "7442_delete_manifest_images_table"),
     ]
 
     operations = [
         migrations.RemoveConstraint(
-            model_name='node',
-            name='unique_nodename_nodegroup',
+            model_name="node",
+            name="unique_nodename_nodegroup",
         ),
         migrations.AddField(
-            model_name='maplayer',
-            name='sortorder',
+            model_name="maplayer",
+            name="sortorder",
             field=models.IntegerField(null=True),
         ),
     ]
