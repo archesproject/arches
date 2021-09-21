@@ -142,7 +142,7 @@ define([
             var stepName = ko.unwrap(stepData.name);
             
             /* if stepIds exist for this workflow in localStorage, set correct value */ 
-            if (stepNameToIdLookup[stepName]) {
+            if (stepNameToIdLookup && stepNameToIdLookup[stepName]) {
                 stepData.id = stepNameToIdLookup[stepName];
             }
             
