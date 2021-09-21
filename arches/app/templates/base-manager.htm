@@ -9,230 +9,10 @@
 
         <div id="container" class="effect aside-left aside-bright navbar-fixed mainnav-sm" data-bind="css: {'mainnav-in': tabsActive() && showTabs(), 'mainnav-sm': !navExpanded(), 'mainnav-lg': navExpanded()}">
 
-            {% block navheader %}
-            <header id="navbar">
-
-                <div id="navbar-container" class="boxed" style="background-color: inherit; padding-right: 0px">
-                    <div class="navbar-header">
-                        <a href="#" class="navbar-brand" data-bind="click: function () { navExpanded(!navExpanded()) }">
-                            <img src="{{ STATIC_URL }}img/arches_logo_light.png" alt="Nifty Logo" class="brand-icon">
-                            <div class="brand-title">
-                                <span class="brand-text">{{ app_name }}</span>
-                            </div>
-                        </a>
-                    </div>
-                </div>
-
-            </header>
-            {% endblock navheader %}
-
             <div class="boxed">
-                <div id="content-container" style="{% block content_container_style %}padding-bottom: 0px; padding-top: 0px;{% endblock content_container_style %}">
-
-                    <!-- ko if: alert() -->
-                    <div data-bind="visible: alert().active" style="display: none;" class="relative">
-                        <div id="card-alert-panel" data-bind="css: 'ep-form-alert ' + (alert() ? alert().type() : '')">
-                            <h4 class="ep-form-alert-title" data-bind="text: alert().title"></h4>
-                            <p class="ep-form-alert-text" data-bind="html: alert().text"></p>
-
-                            <div class="ep-form-alert-default-dismiss">
-                                <i class="fa fa-times-circle" data-bind="click: alert().close"></i>
-                            </div>
-
-                            <div class="ep-form-alert-buttons">
-                                <!-- ko if: alert().cancel -->
-                                <button id="" class="btn btn-sm btn-danger btn-labeled fa fa-times" data-bind="click: alert().cancel">{% trans "Cancel" %}</button>
-                                <!-- /ko -->
-                                <!-- ko if: alert().ok -->
-                                <button id="" class="btn btn-sm btn-primary btn-labeled fa fa-check" data-bind="click: alert().ok">{% trans "OK" %}</button>
-                                <!-- /ko -->
-                            </div>
-                        </div>
-                    </div>
-                    <!-- /ko -->
-
-                    {% block header %}
-                    <div class="ep-toolbar">
-
-                        <!-- Tools Menu -->
-                        {% if nav.menu %}
-                        <a id="menu-control" href="" class="ep-tools ep-tool-title" data-bind="click:function() { menuActive(!menuActive()); }, clickBubble: false">
-                            <div class="">{% trans "Manage" %}
-                                <i class="ion-more"></i>
-                            </div>
-                        </a>
-                            {% if main_script == 'views/resource/editor' %}
-                                {% include 'navbar/resource-manage-menu.htm' %}
-                            {% elif main_script == 'views/graph/function-manager' %}
-                                {% include 'navbar/function-manage-menu.htm' %}
-                            {% elif main_script == 'views/mobile-survey-designer' %}
-                                {% include 'navbar/mobile-survey-manage-menu.htm' %}
-                            {% else %}
-                                {% include 'navbar/graph-designer-menu.htm' %}
-                            {% endif %}
-                        {% endif %}
-
-
-                        {% block graph_title %}
-                        <!-- Page Title and Icon -->
-                        <div class="ep-tools-title">
-                            <h1 class="page-header text-overflow ep-graph-title">
-                                <i class="fa {{graph.iconclass|default:nav.icon}} text-center icon-wrap bg-gray ep-graph-title-icon"></i>
-                                <span>{% trans nav.title %}</span>
-                            </h1>
-                        </div>
-                        {% endblock graph_title %}
-
-                        <!-- Login -->
-                        {% if nav.login %}
-                        <a href="{% url 'auth' %}?next={{ request.get_full_path }}{% if user.username != 'anonymous' %}&logout=true{% endif %}" class="ep-tools ep-tools-login">
-                            <div class="" data-placement="bottom" data-toggle="tooltip" data-original-title="{% if user.username != 'anonymous' %}Logout{% else %}Login{% endif %}">
-                                {% if user.username == 'anonymous' %}
-                                <h5 class="hidden-xs">{% trans "Login" %}</h5>
-                                {% else %}
-                                <h5 class="hidden-xs">{% trans "Welcome" %}, {{ user.first_name|default:user.username }}</h5>
-                                {% endif %}
-                            </div>
-                        </a>
-                        {% endif %}
-
-                        {% if show_language_swtich %}
-                        {% get_current_language as LANGUAGE_CODE %}
-                            <div class="lang-switch ep-tools ep-tools-right" style="max-width: none;" 
-                            data-bind='component: {
-                                name: "views/components/language-switcher",
-                                params: {
-                                    current_language: "{{LANGUAGE_CODE}}"
-                                }
-                            }'></div>
-                        {% endif %}
-                        
-                        <!-- Notifications -->
-                        {% if nav.notifs %}
-                        <a href="" class="ep-tools ep-notifs-toggle ep-tools-right" data-bind="click: function() {getNotifications();}">
-                            <div class="" data-placement="bottom" data-toggle="tooltip" aria-expanded="true" data-original-title="{% trans 'Notifications' %}">
-                                <div >
-                                    <div data-bind="visible: unreadNotifs()" id="circle"></div>
-                                    <div data-bind="visible: unreadNotifs()" id="circle-outline"></div>
-                                    <i class="fa fa-bell"></i>
-                                </div>
-                            </div>
-                        </a>
-                        {% endif %}
-
-                        <!-- Search Bar -->
-                        {% if nav.search %}
-                        <a href="{% url 'search_home' %}" class="ep-tools ep-tools-right" data-bind="click:function () { navigate('{% url 'search_home' %}') }">
-                            <div class="" data-placement="bottom" data-toggle="tooltip" data-original-title='{% trans "Search" %}'>
-                              <i class="ion-search"></i>
-
-                            </div>
-                        </a>
-                        {% endif %}
-
-                        <!-- Prov edit history-->
-                        {% if user_is_reviewer == False and user_can_edit %}
-                        <a href="{% url 'search_home' %}" class="ep-edits-toggle ep-tools ep-tools-right" data-bind="click:function () { getProvisionalHistory(); }">
-                            <div class="" data-placement="bottom" data-toggle="tooltip" data-original-title='{% trans "My Recent Edits" %}'>
-                              <i class="ion-clock"></i>
-                            </div>
-                        </a>
-                        {% endif %}
-
-                        {% if nav.res_edit and user_can_edit %}
-                        <a href="{% url 'resource_editor' resourceid %}" class="ep-tools ep-tools-right" data-bind="click:function () { navigate('{% url 'resource_editor' resourceid %}') }">
-                            <div class="" data-placement="bottom" data-toggle="tooltip" data-original-title='{% trans "Edit Resource" %}'>
-                              <i class="ion-edit"></i>
-                            </div>
-                        </a>
-                        {% endif %}
-
-                        {% if nav.print %}
-                        <a href="" class="ep-tools ep-tools-right" data-bind="click: function() { window.print() }">
-                            <div class="" data-placement="bottom" data-toggle="tooltip" data-original-title='{% trans "Print" %}'>
-                              <i class="ion-printer"></i>
-                            </div>
-                        </a>
-                        {% endif %}
-
-                        {% if nav.help %}
-                        <a href="javascript:void(0)" class="ep-help-toggle ep-tools ep-tools-right" data-bind="click: function(){ getHelp('{{ nav.help.template }}'); helpOpen(true) }">
-                            <div class="" data-placement="bottom" data-toggle="tooltip" data-original-title='{% trans "Help" %}'>
-                              <i class="ion-help"></i>
-                            </div>
-                        </a>
-                        {% endif %}
-                    </div>
-
-                    <!-- Notifications Panel -->
-                    <div id="ep-notifs-panel" class="ep-notifs" style="display:none;">
-                            <div class="ep-edits-header">
-                                <div class="ep-help-title">
-                                    <span>{% trans 'Notifications' %}</span>
-                                </div>
-                                <a href="javascript:void(0);" data-bind="click: function() {getNotifications();}" class="ep-notifs-toggle ep-notifs-close ep-tools ep-tools-right">
-                                    <div class="" data-placement="bottom" data-toggle="tooltip" data-original-title='{% trans "Close" %}'>
-                                      <i class="fa fa-times-circle fa-lg"></i>
-                                    </div>
-                                </a>
-                            </div>
-
-                            <div class="ep-edits-body provisional-edit-history" style="float:left" data-bind="css: {'loading-mask': helploading()}">
-                                <div class="ep-edits-content">
-                                    {% include 'views/notifications-list.htm' %}
-                                </div>
-                            </div>
-                        </div>
-
-                    <!-- Edits Panel -->
-                    <div id="ep-edits-panel" class="ep-edits" style="display:none;">
-                        <div class="ep-edits-header">
-                            <div class="ep-edits-title">
-                                <span>{% trans 'My Edit History' %}</span>
-                            </div>
-                            <a href="javascript:void(0);" class="ep-edits-toggle ep-edits-close ep-tools ep-tools-right" style="border:none;">
-                                <div class="" data-placement="bottom" data-toggle="tooltip" data-original-title='{% trans "Close" %}'>
-                                  <i class="fa fa-times-circle fa-lg"></i>
-                                </div>
-                            </a>
-                        </div>
-
-                        <div class="ep-edits-body provisional-edit-history" style="float:left" data-bind="css: {'loading-mask': helploading()}">
-                            <div class="ep-edits-content">
-                                {% include 'views/provisional-history-list.htm' %}
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Help Panel -->
-                    <div id="ep-help-panel" class="ep-help" style="display: none" data-bind="slide: helpOpen, duration: 400, direction: {direction: 'right'}, easing: 'slide'">
-                        <div class="ep-edits-header">
-                            <div class="ep-help-title">
-                                <span>{% trans nav.help.title %}</span>
-                            </div>
-                            <a href="javascript:void(0);" class="ep-help-toggle ep-help-close ep-tools ep-tools-right" style="border:none" data-bind="click: function(){helpOpen(false)}">
-                                <div class="" data-placement="bottom" data-toggle="tooltip" data-original-title='{% trans "Close Help" %}'>
-                                  <i class="fa fa-times-circle fa-lg"></i>
-                                </div>
-                            </a>
-                        </div>
-
-                        <!-- help content loaded from contextually referenced template -->
-                        <div class="ep-help-body" data-bind="css: {'loading-mask': helploading()}">
-                            <!-- content gets inserted into this div -->
-                            <div class="ep-help-content"></div>
-                            <hr>
-                            <h5>{% trans "for more documentation, visit" %} <a href="https://arches.readthedocs.io/" target="_blank">arches.readthedocs.io <i class="fa fa-external-link-square" aria-hidden="true"></i></a></h5>
-                        </div>
-                    </div>
-                    {% endblock header %}
-
-                    {% block main_content %}
-                    {% endblock main_content %}
-                </div>
 
                 {% block mainnav %}
-                <nav id="mainnav-container">
+                <nav id="mainnav-container" role="navigation">
                     <div id="mainnav">
                         {% block navbar %}
                         <div id="mainnav-menu-wrap">
@@ -240,6 +20,18 @@
                                 <div class="nano-content" tabindex="0">
                                     <ul id="mainnav-menu" class="list-group">
 
+                                        <!-- Open/close nav menu -->
+                                        <li class="toggle-leftnav-container">
+                                            {% block navheader %}
+                                            <a href="#" class="navbar-brand" data-bind="click: function () { navExpanded(!navExpanded()) }">
+                                                <img src="{{ STATIC_URL }}img/arches_logo_light.png" alt="Open/close menu" class="brand-icon">
+                                                <span class="brand-title">
+                                                    <span class="brand-text">{{ app_name }}</span>
+                                                </span>
+                                            </a>
+                                            {% endblock navheader %}
+                                        </li>
+                                        
                                         <!-- Tools -->
                                         <li class="list-header">{% trans "Tools" %}</li>
 
@@ -430,6 +222,232 @@
                 </nav>
                 {% endblock mainnav %}
 
+                <div id="content-container" style="{% block content_container_style %}padding-bottom: 0px; padding-top: 0px;{% endblock content_container_style %}">
+
+                    <!-- ko if: alert() -->
+                    <div data-bind="visible: alert().active" style="display: none;" class="relative">
+                        <div id="card-alert-panel" data-bind="css: 'ep-form-alert ' + (alert() ? alert().type() : '')">
+                            <h4 class="ep-form-alert-title" data-bind="text: alert().title"></h4>
+                            <p class="ep-form-alert-text" data-bind="html: alert().text"></p>
+
+                            <div class="ep-form-alert-default-dismiss">
+                                <i class="fa fa-times-circle" data-bind="click: alert().close"></i>
+                            </div>
+
+                            <div class="ep-form-alert-buttons">
+                                <!-- ko if: alert().cancel -->
+                                <button id="" class="btn btn-sm btn-danger btn-labeled fa fa-times" data-bind="click: alert().cancel">{% trans "Cancel" %}</button>
+                                <!-- /ko -->
+                                <!-- ko if: alert().ok -->
+                                <button id="" class="btn btn-sm btn-primary btn-labeled fa fa-check" data-bind="click: alert().ok">{% trans "OK" %}</button>
+                                <!-- /ko -->
+                            </div>
+                        </div>
+                    </div>
+                    <!-- /ko -->
+
+                    <header>
+                        
+                        {% block header %}
+                        
+                        <div class="ep-toolbar">
+
+                            <div class="col-xs-12 col-sm-8">
+
+                                <!-- Tools Menu -->
+                                {% if nav.menu %}
+                                <a id="menu-control" href="" class="ep-tools ep-tool-title" data-bind="click:function() { menuActive(!menuActive()); }, clickBubble: false">
+                                    <div class="">{% trans "Manage" %}
+                                        <i class="ion-more"></i>
+                                    </div>
+                                </a>
+                                    {% if main_script == 'views/resource/editor' %}
+                                        {% include 'navbar/resource-manage-menu.htm' %}
+                                    {% elif main_script == 'views/graph/function-manager' %}
+                                        {% include 'navbar/function-manage-menu.htm' %}
+                                    {% elif main_script == 'views/mobile-survey-designer' %}
+                                        {% include 'navbar/mobile-survey-manage-menu.htm' %}
+                                    {% else %}
+                                        {% include 'navbar/graph-designer-menu.htm' %}
+                                    {% endif %}
+                                {% endif %}
+
+
+                                {% block graph_title %}
+                                <!-- Page Title and Icon -->
+                                <div class="ep-tools-title">
+                                    <h1 class="page-header text-overflow ep-graph-title">
+                                        <i class="fa {{graph.iconclass|default:nav.icon}} text-center icon-wrap bg-gray ep-graph-title-icon"></i>
+                                        <span>{% trans nav.title %}</span>
+                                    </h1>
+                                </div>
+                                {% endblock graph_title %}
+
+                            </div>
+
+                            <div class="col-xs-12 col-sm-4">
+
+                                <div role="navigation" class="top-right-nav">
+
+                                    <!-- Login -->
+                                    {% if nav.login %}
+                                    <a href="{% url 'auth' %}?next={{ request.get_full_path }}{% if user.username != 'anonymous' %}&logout=true{% endif %}" class="ep-tools ep-tools-login">
+                                        <div class="" data-placement="bottom" data-toggle="tooltip" data-original-title="{% if user.username != 'anonymous' %}Logout{% else %}Login{% endif %}">
+                                            {% if user.username == 'anonymous' %}
+                                            <h5 class="hidden-xs">{% trans "Login" %}</h5>
+                                            {% else %}
+                                            <h5 class="hidden-xs">{% trans "Welcome" %}, {{ user.first_name|default:user.username }}</h5>
+                                            {% endif %}
+                                        </div>
+                                    </a>
+                                    {% endif %}
+
+                                    {% if show_language_swtich %}
+                                    {% get_current_language as LANGUAGE_CODE %}
+                                        <div class="lang-switch ep-tools ep-tools-right" style="max-width: none;" 
+                                        data-bind='component: {
+                                            name: "views/components/language-switcher",
+                                            params: {
+                                                current_language: "{{LANGUAGE_CODE}}"
+                                            }
+                                        }'></div>
+                                    {% endif %}
+                                    
+                                    <!-- Notifications -->
+                                    {% if nav.notifs %}
+                                    <a href="" class="ep-tools ep-notifs-toggle ep-tools-right" data-bind="click: function() {getNotifications();}">
+                                        <div class="" data-placement="bottom" data-toggle="tooltip" aria-expanded="true" data-original-title="{% trans 'Notifications' %}">
+                                            <div >
+                                                <div data-bind="visible: unreadNotifs()" id="circle"></div>
+                                                <div data-bind="visible: unreadNotifs()" id="circle-outline"></div>
+                                                <i class="fa fa-bell"></i>
+                                            </div>
+                                        </div>
+                                    </a>
+                                    {% endif %}
+
+                                    <!-- Search Bar -->
+                                    {% if nav.search %}
+                                    <a href="{% url 'search_home' %}" class="ep-tools ep-tools-right" data-bind="click:function () { navigate('{% url 'search_home' %}') }">
+                                        <div class="" data-placement="bottom" data-toggle="tooltip" data-original-title='{% trans "Search" %}'>
+                                        <i class="ion-search"></i>
+
+                                        </div>
+                                    </a>
+                                    {% endif %}
+
+                                    <!-- Prov edit history-->
+                                    {% if user_is_reviewer == False and user_can_edit %}
+                                    <a href="{% url 'search_home' %}" class="ep-edits-toggle ep-tools ep-tools-right" data-bind="click:function () { getProvisionalHistory(); }">
+                                        <div class="" data-placement="bottom" data-toggle="tooltip" data-original-title='{% trans "My Recent Edits" %}'>
+                                        <i class="ion-clock"></i>
+                                        </div>
+                                    </a>
+                                    {% endif %}
+
+                                    {% if nav.res_edit and user_can_edit %}
+                                    <a href="{% url 'resource_editor' resourceid %}" class="ep-tools ep-tools-right" data-bind="click:function () { navigate('{% url 'resource_editor' resourceid %}') }">
+                                        <div class="" data-placement="bottom" data-toggle="tooltip" data-original-title='{% trans "Edit Resource" %}'>
+                                        <i class="ion-edit"></i>
+                                        </div>
+                                    </a>
+                                    {% endif %}
+
+                                    {% if nav.print %}
+                                    <a href="" class="ep-tools ep-tools-right" data-bind="click: function() { window.print() }">
+                                        <div class="" data-placement="bottom" data-toggle="tooltip" data-original-title='{% trans "Print" %}'>
+                                        <i class="ion-printer"></i>
+                                        </div>
+                                    </a>
+                                    {% endif %}
+
+                                    {% if nav.help %}
+                                    <a href="javascript:void(0)" class="ep-help-toggle ep-tools ep-tools-right" data-bind="click: function(){ getHelp('{{ nav.help.template }}'); helpOpen(true) }">
+                                        <div class="" data-placement="bottom" data-toggle="tooltip" data-original-title='{% trans "Help" %}'>
+                                        <i class="ion-help"></i>
+                                        </div>
+                                    </a>
+                                    {% endif %}
+
+                                </div>
+
+                            </div>
+
+                        </div>
+
+                        <!-- Notifications Panel -->
+                        <div id="ep-notifs-panel" class="ep-notifs" style="display:none;">
+                            <div class="ep-edits-header">
+                                <div class="ep-help-title">
+                                    <span>{% trans 'Notifications' %}</span>
+                                </div>
+                                <a href="javascript:void(0);" data-bind="click: function() {getNotifications();}" class="ep-notifs-toggle ep-notifs-close ep-tools ep-tools-right">
+                                    <div class="" data-placement="bottom" data-toggle="tooltip" data-original-title='{% trans "Close" %}'>
+                                    <i class="fa fa-times-circle fa-lg"></i>
+                                    </div>
+                                </a>
+                            </div>
+
+                            <div class="ep-edits-body provisional-edit-history" style="float:left" data-bind="css: {'loading-mask': helploading()}">
+                                <div class="ep-edits-content">
+                                    {% include 'views/notifications-list.htm' %}
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Edits Panel -->
+                        <div id="ep-edits-panel" class="ep-edits" style="display:none;">
+                            <div class="ep-edits-header">
+                                <div class="ep-edits-title">
+                                    <span>{% trans 'My Edit History' %}</span>
+                                </div>
+                                <a href="javascript:void(0);" class="ep-edits-toggle ep-edits-close ep-tools ep-tools-right" style="border:none;">
+                                    <div class="" data-placement="bottom" data-toggle="tooltip" data-original-title='{% trans "Close" %}'>
+                                    <i class="fa fa-times-circle fa-lg"></i>
+                                    </div>
+                                </a>
+                            </div>
+
+                            <div class="ep-edits-body provisional-edit-history" style="float:left" data-bind="css: {'loading-mask': helploading()}">
+                                <div class="ep-edits-content">
+                                    {% include 'views/provisional-history-list.htm' %}
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Help Panel -->
+                        <div id="ep-help-panel" class="ep-help" style="display: none" data-bind="slide: helpOpen, duration: 400, direction: {direction: 'right'}, easing: 'slide'">
+                            <div class="ep-edits-header">
+                                <div class="ep-help-title">
+                                    <span>{% trans nav.help.title %}</span>
+                                </div>
+                                <a href="javascript:void(0);" class="ep-help-toggle ep-help-close ep-tools ep-tools-right" style="border:none" data-bind="click: function(){helpOpen(false)}">
+                                    <div class="" data-placement="bottom" data-toggle="tooltip" data-original-title='{% trans "Close Help" %}'>
+                                    <i class="fa fa-times-circle fa-lg"></i>
+                                    </div>
+                                </a>
+                            </div>
+
+                            <!-- help content loaded from contextually referenced template -->
+                            <div class="ep-help-body" data-bind="css: {'loading-mask': helploading()}">
+                                <!-- content gets inserted into this div -->
+                                <div class="ep-help-content"></div>
+                                <hr>
+                                <h5>{% trans "for more documentation, visit" %} <a href="https://arches.readthedocs.io/" target="_blank">arches.readthedocs.io <i class="fa fa-external-link-square" aria-hidden="true"></i></a></h5>
+                            </div>
+                        </div>
+                        
+                        {% endblock header %}
+
+                    </header>
+
+                    <main id="main-content" role="main">
+                        {% block main_content %}
+                        {% endblock main_content %}
+                    </main>
+                   
+                </div>
+
                 {% block aside_container %}
                 <aside id="aside-container" style="position: fixed;">
                     <div id="aside">
@@ -440,7 +458,7 @@
                 {% endblock aside_container %}
             </div>
 
-            <button id="scroll-top" class="btn"><i class="fa fa-chevron-up"></i></button>
+            <button id="scroll-top" class="btn" aria-label="Go to top of page"><i class="fa fa-chevron-up"></i></button>
         </div>
 
     </div>

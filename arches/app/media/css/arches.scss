@@ -128,6 +128,12 @@ dl.inline-flex dd {
     padding: 0;
 }
 
+.top-right-nav {
+    display: flex;
+    float: right;
+    margin-right: -8px;
+}
+
 .one-page-header .navbar-nav>li>a:before {
     content: "";
 }
@@ -146,20 +152,38 @@ dl.inline-flex dd {
 .brand-icon {
     height: 20px !important;
     width: 20px !important;
-    margin-top: 14px !important;
+    /*margin-top: 14px !important;
     margin-left: 15px !important;
-    margin-right: 15px !important;
+    margin-right: 15px !important;*/
+    margin: 0 !important;
+    float: none;
+    line-height: inherit;
+    display: inline !important;
 }
 
 .brand-title {
-    display: block;
+    /*display: block;
     line-height: 48px;
-    font-size: 20px;
+    font-size: 20px;*/
+
+    font-size: 1.4em;
+    position: relative;
+    top: 3px;
+    left: 15px;
+    min-height: 47px;
 }
 
 #mainnav-container {
-    padding-top: 50px;
+    padding-top: 0;
     background-color: #2d3c4b;
+}
+
+#container.mainnav-sm .toggle-leftnav-container a {
+    padding: 12px 0 12px 15px !important;
+}
+
+.toggle-leftnav-container .navbar-brand {
+    float: none;
 }
 
 #mainnav-menu .arches {
