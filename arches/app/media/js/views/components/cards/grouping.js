@@ -253,10 +253,12 @@ define([
             });
         };
 
-        if (params.saveFunction) {
-            params.saveFunction(self.saveTiles);
+        if (params.save) {
+            params.save = self.saveTiles;
         }
-
+        if (params.form && params.form.save) {
+            params.form.save = self.saveTiles;
+        }
 
         this.deleteTiles = function(){
             params.loading(true);

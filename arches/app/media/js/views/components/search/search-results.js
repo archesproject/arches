@@ -156,7 +156,7 @@ function($, _, BaseFilter, bootstrap, arches, select2, ko, koMapping, GraphModel
                     }, []);
 
                     if (resourceIdsToFetch.length > 0) {
-                        let url = arches.urls.api_bulk_disambiguated_resource_instance + `?resource_ids=${resourceIdsToFetch}`;
+                        let url = arches.urls.api_bulk_disambiguated_resource_instance + `?v=beta&resource_ids=${resourceIdsToFetch}`;
 
                         $.getJSON(url, function(resp) {
                             var bulkDisambiguatedResourceInstanceCache = self.bulkDisambiguatedResourceInstanceCache();

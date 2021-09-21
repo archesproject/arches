@@ -1078,6 +1078,11 @@ div.wf-multi-tile-card-info div {
     color: #ccc;
 }
 
+.resource-component-abstract {
+    overflow-y: scroll;
+    height: 100%;
+}
+
 .workflow-plugin {
     flex-grow: inherit;
     background-color: #fff;
@@ -4162,6 +4167,17 @@ div.dropdown-menu.open {
     color: #fff;
     background-color: #000;
     z-index: 8000;
+}
+
+.workflow-step-loading-mask {
+    position: absolute;
+    top: 94px;
+    bottom: 58px;
+    opacity: 1;
+}
+
+.workflow-step-loading-mask::after {
+    margin-top: 34vh;
 }
 
 .branch-list-loading-mask {
