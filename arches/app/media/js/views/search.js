@@ -120,9 +120,16 @@ define([
             this.viewModel.sharedStateObject.loading = this.viewModel.loading;
             this.viewModel.sharedStateObject.userCanEditResources = this.viewModel.userCanEditResources;
             this.viewModel.sharedStateObject.userCanReadResources = this.viewModel.userCanReadResources;
+            this.lastQuery = ko.observable({});
+            this.lastQueryString = ko.computed(function() {
+                return JSON.stringify(this.lastQuery());
+            }, this);
             this.queryString = ko.computed(function() {
                 return JSON.stringify(this.query());
             }, this);
+            this.viewModel.sharedStateObject.lastQuery = this.lastQuery;
+            this.viewModel.sharedStateObject.lastQueryString = this.lastQueryString;
+            this.viewModel.sharedStateObject.queryString = this.queryString;
 
             this.queryString.subscribe(function() {
                 this.doQuery();
