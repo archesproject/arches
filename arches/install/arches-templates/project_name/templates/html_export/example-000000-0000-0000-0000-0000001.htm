@@ -33,8 +33,8 @@
                 {{ resource.displayname }}
             </p>
 
-            {# Example of adding a description from an array of Description cards based on the type
-                ======================================================
+            {% comment "Example of adding a description from an array of Description cards based on the type" %}
+
                {% if resource_data|has_key:"Descriptions" %}
                <div class="keeptogether">
                   {% for desc in resource_data|val_from_key:"Descriptions" %}
@@ -51,11 +51,11 @@
                   {% endfor %}
                </div>
                {% endif %}
-                =====================================================
-            #}
 
-            {# Example of creating a responsive table from a list of card values
-                ======================================================
+            {% endcomment %}
+            
+            {% comment "Example of creating a responsive table from a list of card values" %}
+
                {% if resource_data|has_key:"External Cross References" %}
                <div class="keeptogether">
                   <h3>External Cross References</h3>
@@ -73,14 +73,14 @@
                            {{ src|val_from_key:"External Cross Reference Notes"|val_from_key:"External Cross Reference Description" }}
                            {% endif %}
                            </div>
-                        <div class="rcell" data-title="Source">{{ src|val_from_key:"External Cross Reference Source"] }}</div>
+                        <div class="rcell" data-title="Source">{{ src|val_from_key:"External Cross Reference Source" }}</div>
                      </div>
                      {% endfor %}
                   </div>
                </div>
                {% endif %}
-            =========================================================
-            #}
+
+            {% endcomment %}
             </div>
          </section>
          {% endwith%}
