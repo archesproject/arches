@@ -332,6 +332,8 @@ def search_results(request, returnDsl=False):
         results = dsl.search(index=RESOURCES_INDEX, id=resourceinstanceid)
 
     ret = {}
+    elapsed = time() - start
+    print("_______Time to finish search = {0}".format(timedelta(seconds=elapsed)))
     if results is not None:
         if "hits" not in results:
             if "docs" in results:
