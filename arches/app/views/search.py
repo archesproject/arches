@@ -177,11 +177,20 @@ def search_terms(request):
                             )
                         i = i + 1
                 else:
+                    context_label = ""
+                    if len(result["nodegroupid"]["buckets"]) > 0:
+                        for nodegroup in result["nodegroupid"]["buckets"]:
+                            nodegroup_id = nodegroup["key"]
+                            node = models.Node.objects.get(nodeid=nodegroup_id)
+                            graph = node.graph
+                        if str(graph.graphid) not in {"a271c302-1037-11ec-b65f-31043b30bbcd", "bb6de9d8-98a2-11eb-b28f-5f1901ec6b3b", "ccbd1537-ac5e-11e6-84a5-026d961c88e6"}:
+                            continue
+                        context_label = "{0} - {1}".format(graph.name, node.name)
                     ret[index].append(
                         {
                             "type": "term",
                             "context": "",
-                            "context_label": get_resource_model_label(result),
+                            "context_label": context_label,
                             "id": i,
                             "text": result["key"],
                             "value": result["key"],
