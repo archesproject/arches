@@ -39,7 +39,7 @@ class HtmlWriter(Writer):
         Check an html template for the graph is available
         """
         result = False
-        for extension in ('htm', 'html'):
+        for extension in ("htm", "html"):
             try:
                 path = os.path.join("html_export", str(graphid))
                 get_template(f"{path}.{extension}")
@@ -50,7 +50,7 @@ class HtmlWriter(Writer):
 
     def load_html_template(self, graphid=None):
         template = None
-        for extension in ('htm', 'html'):
+        for extension in ("htm", "html"):
             try:
                 path = os.path.join("html_export", str(graphid))
                 template = get_template(f"{path}.{extension}")
