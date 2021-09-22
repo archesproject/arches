@@ -142,7 +142,8 @@ define([
 
         doQuery: function() {
             var queryString = JSON.parse(this.queryString());
-
+            queryString['points_only'] = false;
+            queryString['tiles'] = false;
             if (this.updateRequest) {
                 this.updateRequest.abort();
             }
