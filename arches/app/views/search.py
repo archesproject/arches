@@ -47,6 +47,8 @@ import arches.app.utils.zip as zip_utils
 import arches.app.utils.task_management as task_management
 import arches.app.tasks as tasks
 from io import StringIO
+from tempfile import NamedTemporaryFile
+from openpyxl import Workbook
 
 logger = logging.getLogger(__name__)
 
@@ -110,7 +112,13 @@ class SearchView(MapBaseManagerView):
 
 
 def home_page(request):
-    return render(request, "views/search.htm", {"main_script": "views/search",})
+    return render(
+        request,
+        "views/search.htm",
+        {
+            "main_script": "views/search",
+        },
+    )
 
 
 def search_terms(request):
@@ -199,6 +207,7 @@ def export_results(request):
 
     total = int(request.GET.get("total", 0))
     format = request.GET.get("format", "tilecsv")
+    report_link = request.GET.get("reportlink", False)
     download_limit = settings.SEARCH_EXPORT_IMMEDIATE_DOWNLOAD_THRESHOLD
     if total > download_limit and format != "geojson":
         celery_worker_running = task_management.check_if_celery_available()
@@ -206,7 +215,9 @@ def export_results(request):
             request_values = dict(request.GET)
             request_values["path"] = request.get_full_path()
             result = tasks.export_search_results.apply_async(
-                (request.user.id, request_values, format), link=tasks.update_user_task_record.s(), link_error=tasks.log_error.s()
+                (request.user.id, request_values, format, report_link),
+                link=tasks.update_user_task_record.s(),
+                link_error=tasks.log_error.s(),
             )
             message = _(
                 "{total} instances have been submitted for export. \
@@ -216,9 +227,19 @@ def export_results(request):
         else:
             message = _("Your search exceeds the {download_limit} instance download limit. Please refine your search").format(**locals())
             return JSONResponse({"success": False, "message": message})
+    elif format == "tilexl":
+        exporter = SearchResultsExporter(search_request=request)
+        export_files, export_info = exporter.export(format, report_link)
+        wb = export_files[0]["outputfile"]
+        with NamedTemporaryFile() as tmp:
+            wb.save(tmp.name)
+            tmp.seek(0)
+            stream = tmp.read()
+            export_files[0]["outputfile"] = tmp
+            return zip_utils.zip_response(export_files, zip_file_name=f"{settings.APP_NAME}_export.zip")
     else:
         exporter = SearchResultsExporter(search_request=request)
-        export_files, export_info = exporter.export(format)
+        export_files, export_info = exporter.export(format, report_link)
 
         if len(export_files) == 0 and format == "shp":
             message = _(
@@ -241,7 +262,15 @@ def append_instance_permission_filter_dsl(request, search_results_object):
         search_results_object["query"].add_query(has_access)
 
 
-def search_results(request):
+def get_dsl_from_search_string(request):
+    dsl = search_results(request, returnDsl=True).dsl
+    return JSONResponse(dsl)
+
+
+def search_results(request, returnDsl=False):
+    from datetime import timedelta
+    from time import time
+    start = time()
     for_export = request.GET.get("export")
     pages = request.GET.get("pages", None)
     total = int(request.GET.get("total", "0"))
@@ -250,18 +279,17 @@ def search_results(request):
     if load_tiles:
         try:
             load_tiles = json.loads(load_tiles)
-        except:
+        except TypeError:
             pass
     points_only = request.GET.get("points_only", False)
     if points_only:
         points_only = json.loads(points_only)
     se = SearchEngineFactory().create()
+    permitted_nodegroups = get_permitted_nodegroups(request.user)
+    include_provisional = get_provisional_type(request)
+    search_filter_factory = SearchFilterFactory(request)
     search_results_object = {"query": Query(se)}
 
-    include_provisional = get_provisional_type(request)
-    permitted_nodegroups = get_permitted_nodegroups(request.user)
-
-    search_filter_factory = SearchFilterFactory(request)
     try:
         for filter_type, querystring in list(request.GET.items()) + [("search-results", "")]:
             search_filter = search_filter_factory.get_filter(filter_type)
@@ -273,6 +301,8 @@ def search_results(request):
         return JSONErrorResponse(message=err)
 
     dsl = search_results_object.pop("query", None)
+    if returnDsl:
+        return dsl
     dsl.include("points")
     dsl.include("permissions.users_with_no_access")
     dsl.include("permissions.users_without_edit_perm")
@@ -292,18 +322,10 @@ def search_results(request):
     if for_export or pages or points_only:
         results = dsl.search(index=RESOURCES_INDEX, limit=10000, scroll="1m")
         scroll_id = results["_scroll_id"]
-        if not pages:
-            if total <= settings.SEARCH_EXPORT_LIMIT:
-                pages = (total // settings.SEARCH_RESULT_LIMIT) + 1
-            if total > settings.SEARCH_EXPORT_LIMIT:
-                pages = int(settings.SEARCH_EXPORT_LIMIT // settings.SEARCH_RESULT_LIMIT) - 1
-        # for page in range(int(pages)):
         scroll_size = results["hits"]["total"]["value"]
 
-        # results_scrolled = dsl.se.es.scroll(scroll_id=scroll_id, scroll="1m")
         while scroll_size > 0:
             page = dsl.se.es.scroll(scroll_id=scroll_id, scroll="1m")
-            # sid = page['_scroll_id']
             scroll_size = len(page["hits"]["hits"])
             results["hits"]["hits"] += page["hits"]["hits"]
     else:
