@@ -380,7 +380,7 @@
             },{% endfor %}{% endautoescape %}],
             userEmail: '{{ user.email }}',
             celeryRunning: '{{celery_running}}',
-            export_html_templates: [{% autoescape off %}{% for template in export_html_templates %}
+            exportHtmlTemplates: [{% autoescape off %}{% for template in export_html_templates %}
                 '{{ template }}',
             {% endfor %}{% endautoescape %}],
             graphs: {% autoescape off %}{{graphs|default:"[]"}}{% endautoescape %},
