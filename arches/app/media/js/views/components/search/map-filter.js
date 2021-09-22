@@ -559,16 +559,70 @@ define([
             },
 
             updateResults: function() {
-                if (!!this.searchResults.results){
-                    this.searchAggregations({
-                        results: this.searchResults.results.hits.hits,
-                        geo_aggs: this.searchResults.results.aggregations.geo_aggs.inner.buckets[0]
-                    });
-                    this.fitToAggregationBounds();
+                this.loading(true);
+                var queryString = JSON.parse(this.queryString());
+                queryString['points_only'] = true;
+                queryString['tiles'] = false;
+                if (!queryString["advanced-search"] && !queryString["resource-type-filter"]) {
+                    queryString["resource-type-filter"] = JSON.stringify([{"graphid":"a271c302-1037-11ec-b65f-31043b30bbcd","name":"Historic Resourcev3","inverted":false},{"graphid":"bb6de9d8-98a2-11eb-b28f-5f1901ec6b3b","name":"Historic District","inverted":false}]);
+                    // queryString["advanced-search"] = JSON.stringify([{"op":"or","bb6dea3a-98a2-11eb-b28f-5f1901ec6b3b":{"op":"","val":""},"bb6de9d9-98a2-11eb-b28f-5f1901ec6b3b":{"op":"not_null","val":""}},{"op":"or","a271c388-1037-11ec-b65f-31043b30bbcd":{"op":"","val":""},"a271c354-1037-11ec-b65f-31043b30bbcd":{"op":"not_null","val":""}}]);
                 }
-                if(!!this.searchResults[componentName]) {
-                    var buffer = this.searchResults[componentName].search_buffer;
-                    this.map().getSource('geojson-search-buffer-data').setData(buffer);
+                if (this.updateRequest) { this.updateRequest.abort(); }
+                var querySansPage = JSON.parse(this.queryString()), lastQuery = JSON.parse(this.lastQueryString());
+                querySansPage = Object.keys(querySansPage).sort().reduce(function(obj, key) {
+                    obj[key] = querySansPage[key];
+                    return obj;
+                }, {});
+                if (Object.keys(this.lastQuery()).length > 0) {
+                    lastQuery = Object.keys(lastQuery).sort().reduce(function(obj, key) {
+                        obj[key] = lastQuery[key];
+                        return obj;
+                    }, {});
+                }
+                delete querySansPage["paging-filter"];
+                if (lastQuery["paging-filter"])
+                    delete lastQuery["paging-filter"];
+                querySansPage = JSON.stringify(querySansPage);
+                lastQuery = JSON.stringify(lastQuery);
+                if ((querySansPage != lastQuery) || !this.pageLoaded) {
+                    $.ajax({
+                        type: "GET",
+                        url: arches.urls.search_results,
+                        data: queryString,
+                        context: this,
+                        success: function(response) {
+                            // console.log("SUCCESS: NEW RESULTS");
+                            // console.log(response);
+                            _.each(this.mapSearchResults, function(value, key, results) {
+                                delete this.mapSearchResults[key];
+                            }, this);
+                            _.each(response, function(value, key, response) {
+                                this.mapSearchResults[key] = value;
+                            }, this);
+                        },
+                        error: function(response, status, error) {
+                            console.log(response);
+                            this.loading(false);
+                        },
+                        complete: function(request, status) {
+                            this.searchAggregations({
+                                results: this.mapSearchResults.results.hits.hits,
+                                geo_aggs: this.mapSearchResults.results.aggregations.geo_aggs.inner.buckets[0]
+                            });
+                            this.fitToAggregationBounds();
+                            if(!!this.searchResults[componentName]) {
+                                var buffer = this.searchResults[componentName].search_buffer;
+                                this.map().getSource('geojson-search-buffer-data').setData(buffer);
+                            }
+                            this.loading(false);
+                        }
+                    });
+                } else {
+                    if(!!this.searchResults[componentName]) {
+                        var buffer = this.searchResults[componentName].search_buffer;
+                        this.map().getSource('geojson-search-buffer-data').setData(buffer);
+                    }
+                    this.loading(false);
                 }
             },
 
