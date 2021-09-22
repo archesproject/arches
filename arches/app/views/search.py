@@ -279,6 +279,9 @@ def search_results(request, returnDsl=False):
             load_tiles = json.loads(load_tiles)
         except TypeError:
             pass
+    points_only = request.GET.get("points_only", False)
+    if points_only:
+        points_only = json.loads(points_only)
     se = SearchEngineFactory().create()
     permitted_nodegroups = get_permitted_nodegroups(request.user)
     include_provisional = get_provisional_type(request)
@@ -298,32 +301,31 @@ def search_results(request, returnDsl=False):
     dsl = search_results_object.pop("query", None)
     if returnDsl:
         return dsl
-    dsl.include("graph_id")
-    dsl.include("root_ontology_class")
-    dsl.include("resourceinstanceid")
     dsl.include("points")
-    dsl.include("permissions.users_without_read_perm")
-    dsl.include("permissions.users_without_edit_perm")
-    dsl.include("permissions.users_without_delete_perm")
     dsl.include("permissions.users_with_no_access")
-    dsl.include("geometries")
+    dsl.include("permissions.users_without_edit_perm")
     dsl.include("displayname")
     dsl.include("displaydescription")
     dsl.include("map_popup")
-    dsl.include("provisional_resource")
-    if load_tiles:
-        dsl.include("tiles")
-    if for_export or pages:
-        results = dsl.search(index=RESOURCES_INDEX, scroll="1m")
+    if not points_only:
+        dsl.include("graph_id")
+        dsl.include("root_ontology_class")
+        dsl.include("resourceinstanceid")
+        dsl.include("permissions.users_without_read_perm")
+        dsl.include("permissions.users_without_delete_perm")
+        dsl.include("geometries")
+        dsl.include("provisional_resource")
+        if load_tiles:
+            dsl.include("tiles")
+    if for_export or pages or points_only:
+        results = dsl.search(index=RESOURCES_INDEX, limit=10000, scroll="1m")
         scroll_id = results["_scroll_id"]
-        if not pages:
-            if total <= settings.SEARCH_EXPORT_LIMIT:
-                pages = (total // settings.SEARCH_RESULT_LIMIT) + 1
-            if total > settings.SEARCH_EXPORT_LIMIT:
-                pages = int(settings.SEARCH_EXPORT_LIMIT // settings.SEARCH_RESULT_LIMIT) - 1
-        for page in range(int(pages)):
-            results_scrolled = dsl.se.es.scroll(scroll_id=scroll_id, scroll="1m")
-            results["hits"]["hits"] += results_scrolled["hits"]["hits"]
+        scroll_size = results["hits"]["total"]["value"]
+
+        while scroll_size > 0:
+            page = dsl.se.es.scroll(scroll_id=scroll_id, scroll="1m")
+            scroll_size = len(page["hits"]["hits"])
+            results["hits"]["hits"] += page["hits"]["hits"]
     else:
         results = dsl.search(index=RESOURCES_INDEX, id=resourceinstanceid)
 
