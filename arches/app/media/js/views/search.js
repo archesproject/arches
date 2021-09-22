@@ -143,11 +143,10 @@ define([
         doQuery: function() {
             var queryString = JSON.parse(this.queryString());
             queryString['points_only'] = false;
-            queryString['tiles'] = false;
             if (this.updateRequest) {
                 this.updateRequest.abort();
             }
-
+            this.viewModel.loading(true);
             this.updateRequest = $.ajax({
                 type: "GET",
                 url: arches.urls.search_results,
@@ -169,6 +168,7 @@ define([
                     this.viewModel.sharedStateObject.userid(response.userid);
                     this.viewModel.total(response.total_results);
                     this.viewModel.alert(false);
+                    this.lastQuery(this.query());
                 },
                 error: function(response, status, error) {
                     if(this.updateRequest.statusText !== 'abort'){
