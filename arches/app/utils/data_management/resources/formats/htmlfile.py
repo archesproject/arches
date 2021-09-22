@@ -39,19 +39,24 @@ class HtmlWriter(Writer):
         Check an html template for the graph is available
         """
         result = False
-        try:
-            temp = get_template(f"html_export/{graphid}.htm")
-            result = True
-        except TemplateDoesNotExist as e:
-            pass
+        for extension in ("htm", "html"):
+            try:
+                path = os.path.join("html_export", str(graphid))
+                get_template(f"{path}.{extension}")
+                result = True
+            except TemplateDoesNotExist as e:
+                pass
         return result
 
     def load_html_template(self, graphid=None):
         template = None
-        try:
-            template = get_template(f"html_export/{graphid}.htm")
-        except TemplateDoesNotExist as e:
-            pass
+        for extension in ("htm", "html"):
+            try:
+                path = os.path.join("html_export", str(graphid))
+                template = get_template(f"{path}.{extension}")
+                return template
+            except TemplateDoesNotExist as e:
+                pass
         return template
 
     def fetch_resource_objects_list(self, resourceinstanceids=None, user=None, allowed_graph_ids=None):
