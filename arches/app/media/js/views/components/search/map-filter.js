@@ -475,15 +475,32 @@ define([
             },
 
             zoomToGeoJSON: function(data) {
-                var mapData = data.properties.geometries.reduce(function(fc1, fc2) {
-                    fc1.geom.features = fc1.geom.features.concat(fc2.geom.features);
-                    return fc1;
-                }, {
-                    "geom": {
-                        "type": "FeatureCollection",
-                        "features": []
-                    }
-                });
+                var mapData;
+                if (data.properties.geometries) {
+                    mapData = data.properties.geometries.reduce(function(fc1, fc2) {
+                        fc1.geom.features = fc1.geom.features.concat(fc2.geom.features);
+                        return fc1;
+                    }, {
+                        "geom": {
+                            "type": "FeatureCollection",
+                            "features": []
+                        }
+                    });
+                } else {
+                    mapData = {
+                        "geom": {
+                            "type": "FeatureCollection",
+                            "features": [{
+                                "geometry": {
+                                    "coordinates": [data.properties.points[0]["point"]["lon"], data.properties.points[0]["point"]["lat"]],
+                                    "type": "Point"
+                                },
+                                "properties": {},
+                                "type": "Feature"
+                            }]
+                        }
+                    };
+                }
                 var bounds = new mapboxgl.LngLatBounds(geojsonExtent(mapData.geom));
                 var maxZoom = ko.unwrap(this.maxZoom);
                 this.map().fitBounds(bounds, {
