@@ -142,6 +142,8 @@ define([
                     }
                 }, this);
 
+                this.mapSearchResults = {};
+
                 this.getGeoJSONErrors = function(geoJSONString) {
                     var hint = geojsonhint.hint(geoJSONString);
                     var errors = [];
