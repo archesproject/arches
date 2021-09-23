@@ -658,13 +658,17 @@ input[type="checkbox"] {
 
 .tabbed-workflow-step-information-box {
     padding: 10px 35px 20px 35px;
-    background-color: #eaeaea;
+    background-color: #fafafa;
     border: 1px solid #ddd;
     color: grey;
     margin: -16px -21px 0px -21px;
     height: 100px;
     overflow-y: scroll;
     position: relative;
+}
+
+.workflow-information-box-toggle:hover {
+    color: #454545;
 }
 
 .btn-workflow-tile {
