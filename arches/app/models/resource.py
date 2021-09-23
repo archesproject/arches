@@ -196,6 +196,17 @@ class Resource(models.ResourceInstance):
         # need to save the models first before getting the documents for index
         start = time()
         Resource.objects.bulk_create(resources)
+
+        # need to run logic in pre_tile_save fro the datatypes otherwise resource relationships and file aren't loaded correctly.
+        # Needs to be some kind of bulk_pre_tile_save
+        for tile in tiles:
+            for nodeid in tile.data.keys():
+                try:
+                    node_datatype = datatype_factory.get_instance(node_datatypes[nodeid])
+                    node_datatype.pre_tile_save(tile, nodeid)
+                except:
+                    pass
+
         TileModel.objects.bulk_create(tiles)
 
         print(f"Time to bulk create tiles and resources: {datetime.timedelta(seconds=time() - start)}")
@@ -512,10 +523,11 @@ class Resource(models.ResourceInstance):
             return query.search(index=RESOURCE_RELATIONS_INDEX)
 
         resource_relations = get_relations(
-            resourceinstanceid=self.resourceinstanceid, start=start, limit=limit, resourceinstance_graphid=resourceinstance_graphid,
+            resourceinstanceid=self.resourceinstanceid,
+            start=start,
+            limit=limit,
+            resourceinstance_graphid=resourceinstance_graphid,
         )
-
-        
 
         ret["total"] = resource_relations["hits"]["total"]
         instanceids = set()
