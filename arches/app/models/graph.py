@@ -29,6 +29,7 @@ from arches.app.models import models
 from arches.app.models.resource import Resource
 from arches.app.models.system_settings import settings
 from arches.app.datatypes.datatypes import DataTypeFactory
+from arches.app.utils.language import default_lang_node_json
 from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializer
 from arches.app.search.search_engine_factory import SearchEngineFactory
 from django.utils.translation import ugettext as _
@@ -585,7 +586,7 @@ class Graph(models.GraphModel):
         if nodeToAppendTo.nodeid == self.root.nodeid and self.isresource is True:
             newid = uuid.uuid1()
             nodegroup = models.NodeGroup.objects.create(pk=newid)
-            card = models.CardModel.objects.create(nodegroup=nodegroup, name=temp_node_name, graph=self)
+            card = models.CardModel.objects.create(nodegroup=nodegroup, name=default_lang_node_json(value=temp_node_name), graph=self)
             newNode = models.Node(
                 nodeid=newid, name=temp_node_name, istopnode=False, ontologyclass=None, datatype="semantic", nodegroup=nodegroup, graph=self
             )

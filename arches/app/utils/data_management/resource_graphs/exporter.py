@@ -78,26 +78,26 @@ def get_graphs_for_export(graphids=None):
     graphs = {}
     graphs["graph"] = []
     if graphids is None or graphids[0] == "all" or graphids == [""]:
-        resource_graph_query = JSONSerializer().serializeToPython(
-            Graph.objects.all().exclude(pk=settings.SYSTEM_SETTINGS_RESOURCE_MODEL_ID), exclude=["widgets"]
-        )
+        resource_graphs = Graph.objects.all().exclude(pk=settings.SYSTEM_SETTINGS_RESOURCE_MODEL_ID)
     elif graphids[0] == "resource_models":
-        resource_graph_query = JSONSerializer().serializeToPython(
-            Graph.objects.filter(isresource=True).exclude(pk=settings.SYSTEM_SETTINGS_RESOURCE_MODEL_ID), exclude=["widgets"]
-        )
+        resource_graphs = Graph.objects.filter(isresource=True).exclude(pk=settings.SYSTEM_SETTINGS_RESOURCE_MODEL_ID)
     elif graphids[0] == "branches":
-        resource_graph_query = JSONSerializer().serializeToPython(
-            Graph.objects.filter(isresource=False).exclude(pk=settings.SYSTEM_SETTINGS_RESOURCE_MODEL_ID), exclude=["widgets"]
-        )
+        resource_graphs = Graph.objects.filter(isresource=False).exclude(pk=settings.SYSTEM_SETTINGS_RESOURCE_MODEL_ID)
     else:
         try:
-            resource_graph_query = JSONSerializer().serializeToPython(Graph.objects.filter(graphid__in=graphids), exclude=["widgets"])
+            resource_graphs = Graph.objects.filter(graphid__in=graphids)
         except:
             # this warning should never get thrown while doing an export from the UI, but maybe it should be moved somewhere else.
             print("*" * 80)
             print('"{0}" contains/is not a valid graphid or option for this command.'.format(",".join(graphids)))
             print("*" * 80)
             sys.exit()
+
+    for graph in resource_graphs:
+        for card in graph.cards.values():
+            card.name = card.name.value
+
+    resource_graph_query =JSONSerializer().serializeToPython(resource_graphs, exclude=["widgets"]) 
 
     for resource_graph in resource_graph_query:
         function_ids = []
