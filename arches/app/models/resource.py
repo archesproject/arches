@@ -203,6 +203,17 @@ class Resource(models.ResourceInstance):
 
         start = time()
         Resource.objects.bulk_create(resources_to_create)
+
+        # need to run logic in pre_tile_save fro the datatypes otherwise resource relationships and file aren't loaded correctly.
+        # Needs to be some kind of bulk_pre_tile_save
+        for tile in tiles:
+            for nodeid in tile.data.keys():
+                try:
+                    node_datatype = datatype_factory.get_instance(node_datatypes[nodeid])
+                    node_datatype.pre_tile_save(tile, nodeid)
+                except:
+                    pass
+
         TileModel.objects.bulk_create(tiles)
 
         logger.info(f"Time to bulk save tiles and resources: {datetime.timedelta(seconds=time() - start)}")
