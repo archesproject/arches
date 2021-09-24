@@ -325,7 +325,7 @@ define([
                 this.filters[componentName](this);
                 this.map.subscribe(function(){
                     this.setupDraw();
-                    this.restoreState();
+                    if (!this.pageLoaded) {this.restoreState();}
 
                     var filterUpdated = ko.computed(function() {
                         return JSON.stringify(ko.toJS(this.filter.feature_collection())) + this.filter.inverted();
@@ -560,13 +560,10 @@ define([
 
             updateResults: function() {
                 this.loading(true);
+                var initQuery = false, queryChanged = false;
                 var queryString = JSON.parse(this.queryString());
                 queryString['points_only'] = true;
                 queryString['tiles'] = false;
-                if (!queryString["advanced-search"] && !queryString["resource-type-filter"]) {
-                    queryString["resource-type-filter"] = JSON.stringify([{"graphid":"a271c302-1037-11ec-b65f-31043b30bbcd","name":"Historic Resourcev3","inverted":false},{"graphid":"bb6de9d8-98a2-11eb-b28f-5f1901ec6b3b","name":"Historic District","inverted":false}]);
-                    // queryString["advanced-search"] = JSON.stringify([{"op":"or","bb6dea3a-98a2-11eb-b28f-5f1901ec6b3b":{"op":"","val":""},"bb6de9d9-98a2-11eb-b28f-5f1901ec6b3b":{"op":"not_null","val":""}},{"op":"or","a271c388-1037-11ec-b65f-31043b30bbcd":{"op":"","val":""},"a271c354-1037-11ec-b65f-31043b30bbcd":{"op":"not_null","val":""}}]);
-                }
                 if (this.updateRequest) { this.updateRequest.abort(); }
                 var querySansPage = JSON.parse(this.queryString()), lastQuery = JSON.parse(this.lastQueryString());
                 querySansPage = Object.keys(querySansPage).sort().reduce(function(obj, key) {
@@ -584,18 +581,16 @@ define([
                     delete lastQuery["paging-filter"];
                 querySansPage = JSON.stringify(querySansPage);
                 lastQuery = JSON.stringify(lastQuery);
-                if ((querySansPage != lastQuery) || !this.pageLoaded) {
+                initQuery = lastQuery == '{}';
+                queryChanged = querySansPage != lastQuery;
+                if ((queryChanged && !initQuery) || !this.pageLoaded) {
                     $.ajax({
                         type: "GET",
                         url: arches.urls.search_results,
                         data: queryString,
                         context: this,
                         success: function(response) {
-                            // console.log("SUCCESS: NEW RESULTS");
-                            // console.log(response);
-                            _.each(this.mapSearchResults, function(value, key, results) {
-                                delete this.mapSearchResults[key];
-                            }, this);
+                            this.mapSearchResults = {};
                             _.each(response, function(value, key, response) {
                                 this.mapSearchResults[key] = value;
                             }, this);
