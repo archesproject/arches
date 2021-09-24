@@ -317,6 +317,7 @@
             mapDefaultMinZoom: {{ map_info.map_min_zoom | unlocalize }},
             mapDefaultMaxZoom: {{ map_info.map_max_zoom | unlocalize }},
             preferredCoordinateSystems: {% autoescape off %}{{ map_info.preferred_coordinate_systems }}{% endautoescape %},
+            searchMapLoadAll: {% autoescape off %}{{ map_info.search_map_load_all }}{% endautoescape %},
             useSemanticRelationships: {{ app_settings.USE_SEMANTIC_RESOURCE_RELATIONSHIPS|lower }},
             geocoderDefault: '{{ map_info.geocoder_default }}',
             mapMarkers: [{% autoescape off %}{% for map_marker in map_markers %}{
