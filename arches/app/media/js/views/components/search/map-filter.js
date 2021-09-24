@@ -105,6 +105,7 @@ define([
                 this.maxBuffer = 100000;
                 this.maxBufferUnits = 'm';
                 this.maxZoom = arches.mapDefaultMaxZoom;
+                this.searchMapLoadAll = arches.searchMapLoadAll;
                 this.filter.feature_collection = ko.observable({
                     "type": "FeatureCollection",
                     "features": []
