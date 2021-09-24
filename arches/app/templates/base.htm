@@ -94,6 +94,26 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 
     {% endif %}
 
+    <script>
+        // Detect clicks
+        document.addEventListener('click', function (event) {
+            
+            // Left nav toggle
+            if (event.target.matches('#menu-toggle, #menu-toggle>*')){
+                event.preventDefault();
+                if($('#container').hasClass('mainnav-sm')){
+                    $('#mainnav-container').removeClass('menu-expanded');
+                } else{
+                    $('#mainnav-container').addClass('menu-expanded');
+                }
+            
+            // Return if no matches
+            } else {
+                return;
+            }
+        }, false);
+    </script>
+
 {% endblock javascript %}
 
 </html>

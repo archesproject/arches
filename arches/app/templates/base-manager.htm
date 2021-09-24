@@ -18,20 +18,21 @@
                         <div id="mainnav-menu-wrap">
                             <div class="nano">
                                 <div class="nano-content" tabindex="0">
+                                    
+                                    {% block navheader %}
+                                    <div class="toggle-leftnav-container">
+                                        <!--<a id="menu-toggle" href="#" class="navbar-brand" data-bind="click: function () { navExpanded(!navExpanded()); }" onclick="if($('#container').hasClass('mainnav-sm')){$('#mainnav-container').removeClass('menu-expanded');}else{$('#mainnav-container').addClass('menu-expanded');}" onkeyup="if($('#container').hasClass('mainnav-sm')){$('#mainnav-container').removeClass('menu-expanded');}else{$('#mainnav-container').addClass('menu-expanded');}">-->
+                                        <a id="menu-toggle" href="#" class="navbar-brand" data-bind="click: function () { navExpanded(!navExpanded()); }">
+                                            <img src="{{ STATIC_URL }}img/arches_logo_light.png" alt="Open/close menu" class="brand-icon">
+                                            <span class="brand-title">
+                                                <span class="brand-text">{{ app_name }}</span>
+                                            </span>
+                                        </a>
+                                    </div>
+                                    {% endblock navheader %}
+                                    
                                     <ul id="mainnav-menu" class="list-group">
 
-                                        <!-- Open/close nav menu -->
-                                        <li class="toggle-leftnav-container">
-                                            {% block navheader %}
-                                            <a href="#" class="navbar-brand" data-bind="click: function () { navExpanded(!navExpanded()) }">
-                                                <img src="{{ STATIC_URL }}img/arches_logo_light.png" alt="Open/close menu" class="brand-icon">
-                                                <span class="brand-title">
-                                                    <span class="brand-text">{{ app_name }}</span>
-                                                </span>
-                                            </a>
-                                            {% endblock navheader %}
-                                        </li>
-                                        
                                         <!-- Tools -->
                                         <li class="list-header">{% trans "Tools" %}</li>
 
@@ -249,7 +250,7 @@
                     <header>
                         
                         {% block header %}
-                        
+
                         <div class="ep-toolbar">
 
                             <div class="col-xs-12 col-sm-8">
@@ -277,7 +278,7 @@
                                 <!-- Page Title and Icon -->
                                 <div class="ep-tools-title">
                                     <h1 class="page-header text-overflow ep-graph-title">
-                                        <i class="fa {{graph.iconclass|default:nav.icon}} text-center icon-wrap bg-gray ep-graph-title-icon"></i>
+                                        <i class="fa {{graph.iconclass|default:nav.icon}} text-center icon-wrap bg-gray ep-graph-title-icon hidden-xs"></i>
                                         <span>{% trans nav.title %}</span>
                                     </h1>
                                 </div>

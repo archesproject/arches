@@ -138,6 +138,10 @@ dl.inline-flex dd {
     content: "";
 }
 
+.page-header {
+    padding: 5px;
+}
+
 
 /*Remove pointer from Mega drop panel button*/
 
@@ -152,25 +156,21 @@ dl.inline-flex dd {
 .brand-icon {
     height: 20px !important;
     width: 20px !important;
-    /*margin-top: 14px !important;
-    margin-left: 15px !important;
-    margin-right: 15px !important;*/
     margin: 0 !important;
-    float: none;
+    float: left;
     line-height: inherit;
     display: inline !important;
 }
 
 .brand-title {
-    /*display: block;
-    line-height: 48px;
-    font-size: 20px;*/
-
-    font-size: 1.4em;
     position: relative;
-    top: 3px;
+    top: -10px;
     left: 15px;
     min-height: 47px;
+}
+
+.brand-title .brand-text {
+    font-size: 0.85em;
 }
 
 #mainnav-container {
@@ -178,12 +178,30 @@ dl.inline-flex dd {
     background-color: #2d3c4b;
 }
 
-#container.mainnav-sm .toggle-leftnav-container a {
-    padding: 12px 0 12px 15px !important;
+.toggle-leftnav-container {
+    position: fixed;
+    left: 0;
+    top: 0;
+    z-index: 4000;
+    height: 50px;
+    width: 50px;
+    background-color: #2d3c4b;
+    padding: 14px 0 12px 15px;
 }
 
 .toggle-leftnav-container .navbar-brand {
     float: none;
+}
+
+#container.mainnav-sm .toggle-leftnav-container .brand-title {
+    display: none;
+    top: -30px;
+    left: 35px;
+}
+
+#mainnav-menu {
+    position: relative;
+    top: 50px;
 }
 
 #mainnav-menu .arches {
@@ -4864,6 +4882,11 @@ ul .collapse li:last-of-type {
     text-overflow: ellipsis;
 }
 
+.menu-expanded {
+    left: 0 !important;
+    z-index: 3500 !important;
+}
+
 .edit-menu-item.selected {
     background: #f4f4f4;
     border-left: 3px solid #579ddb;
@@ -6182,10 +6205,21 @@ th.notif-type {
     padding: 7px 12px;
 }
 
-.ep-toolbar {
+/*.ep-toolbar {
     display: -ms-flexbox;
     display: -webkit-flex;
     display: flex;
+    -ms-flex-align: center;
+    -webkit-align-items: center;
+    align-items: center;
+    width: 100%;
+    height: 50px;
+    background: #fff;
+    border-bottom: 1px solid #ddd;
+    z-index: 3000;
+}*/
+
+.ep-toolbar {
     -ms-flex-align: center;
     -webkit-align-items: center;
     align-items: center;
@@ -6324,14 +6358,12 @@ th.notif-type {
 
 .ep-tools-title {
     height: 50px;
-    margin-right: auto;
+    margin-right: 0;
     overflow: hidden;
 }
 
 .ep-graph-title {
-    font-size: 1.6em;
-    padding-left: 5px;
-    padding-top: 5px;
+    font-size: 1.3em;
 }
 
 .ep-graph-title-icon {
@@ -9182,7 +9214,7 @@ div.row.widget-wrapper.report-header:hover {
 }
 
 #mainnav-container {
-    z-index: 15;
+    z-index: 3000;
 }
 
 #navbar {
@@ -14304,10 +14336,6 @@ a.jstree-anchor.permissions-widget {
 @media screen and (max-width: 650px) {}
 
 @media screen and (max-width: 768px) {
-    #content-container {
-        padding-top: 50px !important;
-    }
-
     #navbar {
         width: 100%;
     }
@@ -14323,6 +14351,24 @@ a.jstree-anchor.permissions-widget {
 
     .rp-report-tile dd {
         padding-left: 8px;
+    }
+
+    .ep-tools-title h1,
+    h1.page-header.text-overflow.ep-graph-title {
+        font-size: 1.1em;
+        padding-left: 59px !important;
+        position: absolute;
+        top: 50%;
+        transform: translateY(-50%);
+    }
+
+    #container.mainnav-lg .menu-expanded .brand-title {
+        top: -30px;
+        left: 35px;
+    }
+
+    #container.mainnav-sm .brand-title {
+        display: none;
     }
 
 }
