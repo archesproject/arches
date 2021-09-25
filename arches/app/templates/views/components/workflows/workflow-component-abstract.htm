@@ -1,16 +1,8 @@
 {% load i18n %}
 
 <!-- ko with: $data.workflowComponentAbstract -->
-<div style="
-    display: flex;
-    height: 100%;
-">
-    <div
-        style="
-            width: 100%;
-            height: inherit;
-        "
-    >
+<div style="display: flex; height: 100%;">
+    <div class="workflow-component" style="width: 100%; height: inherit;">
         <!-- ko if: !loading() && !saving() && isStepActive() -->
         <div 
         style="height: inherit; display: unset;"
