@@ -100,6 +100,9 @@ RUN mv ${WHEELS}/entrypoint.sh entrypoint.sh
 
 RUN python3.8 -m venv ENV \
     && . ENV/bin/activate \
+    && pip install --upgrade pip \
+    && pip install rust \
+    && pip install setuptools_rust \
     && pip install requests \
     && pip install -f ${WHEELS} django-auth-ldap \
     && pip install -f ${WHEELS} gunicorn \
