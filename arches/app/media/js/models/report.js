@@ -184,6 +184,7 @@ define(['jquery',
                         if (relatedResource) {
                             relatedResources.push({
                                 'displayName': relatedResource.displayname,
+                                'resourceinstanceid': relatedResource.resourceinstanceid,
                                 'relationship': resourceRelationship.relationshiptype_label,
                                 'link': arches.urls.resource_report + relatedResource.resourceinstanceid,
                             });

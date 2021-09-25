@@ -475,7 +475,9 @@ class ResourceEditLogView(BaseManagerView):
                 "bulk_create": _("Resource Created"),
             }
             deleted_instances = [e.resourceinstanceid for e in recent_edits if e.edittype == "delete"]
-            graph_name_lookup = {str(r.resourceinstanceid): r.graph.name for r in resources}
+            graphs = models.GraphModel.objects.filter(isresource=True).values("graphid", "name")
+            graph_names = {str(graph["graphid"]): graph["name"] for graph in graphs}
+            graph_name_lookup = {str(r.resourceinstanceid): graph_names[str(r.graph_id)] for r in resources}
             for edit in recent_edits:
                 edit.friendly_edittype = edit_type_lookup[edit.edittype]
                 edit.resource_model_name = None

@@ -211,7 +211,7 @@ class Command(BaseCommand):
             "--prevent_indexing",
             action="store_true",
             dest="prevent_indexing",
-            help="Prevents indexing the resources or concepts into Elasticsearch",
+            help="Prevents indexing the resources or concepts into Elasticsearch.  If set to True will override any 'defer_indexing' setting.",
         )
 
         parser.add_argument(
@@ -283,6 +283,7 @@ class Command(BaseCommand):
                     defer_indexing = False
 
             defer_indexing = defer_indexing and not options["bulk_load"] and not celery_worker_running
+
             if defer_indexing:
                 concept_count = models.Value.objects.count()
                 relation_count = models.ResourceXResource.objects.count()
@@ -297,11 +298,12 @@ class Command(BaseCommand):
                 force=options["yes"],
                 prevent_indexing=defer_indexing,
             )
+
             if defer_indexing:
                 # index concepts if new concepts created
                 if concept_count != models.Value.objects.count():
                     management.call_command("es", "index_concepts")
-                # index relations if new relations created
+                # index relations if new relations created via new r-i tiles created
                 if relation_count != models.ResourceXResource.objects.count():
                     management.call_command("es", "index_resource_relations")
                 # index resources of this model only
@@ -531,6 +533,11 @@ class Command(BaseCommand):
 
         celery_worker_running = task_management.check_if_celery_available()
 
+        # only defer indexing if the celery worker ISN'T running because celery processes
+        # are async and we currently don't have a celery process to index data.  Once
+        # we do, then we can think about deferring indexing in the celery task as well.
+        defer_indexing = False if celery_worker_running else defer_indexing
+
         def load_ontologies(package_dir):
             ontologies = glob.glob(os.path.join(package_dir, "ontologies/*"))
             if len(ontologies) > 0:
@@ -677,7 +684,7 @@ class Command(BaseCommand):
             load_mapbox_styles(basemap_styles, True)
             load_mapbox_styles(overlay_styles, False)
 
-        def load_business_data(package_dir, defer_indexing):
+        def load_business_data(package_dir, prevent_indexing):
             config_paths = glob.glob(os.path.join(package_dir, "package_config.json"))
             configs = {}
             if len(config_paths) > 0:
@@ -737,7 +744,7 @@ class Command(BaseCommand):
             else:
                 for path in business_data:
                     if path not in erring_csvs:
-                        self.import_business_data(path, overwrite=True, bulk_load=bulk_load, prevent_indexing=defer_indexing)
+                        self.import_business_data(path, overwrite=True, bulk_load=bulk_load, prevent_indexing=prevent_indexing)
 
             relations = glob.glob(os.path.join(package_dir, "business_data", "relations", "*.relations"))
             for relation in relations:
@@ -941,10 +948,10 @@ class Command(BaseCommand):
         update_resource_geojson_geometries()
         print("loading post sql")
         load_sql(package_location, "post_sql")
-        if defer_indexing is True and celery_worker_running is False:
+        if defer_indexing is True:
             print("indexing database")
             management.call_command("es", "reindex_database")
-        elif celery_worker_running:
+        if celery_worker_running:
             print("Celery detected: Resource instances loading. Log in to arches to be notified on completion.")
         else:
             print("package load complete")
@@ -1097,6 +1104,7 @@ class Command(BaseCommand):
             create_concepts = True
 
         if len(data_source) > 0:
+            transaction_id = uuid.uuid1()
             for source in data_source:
                 path = utils.get_valid_path(source)
                 if path is not None:
@@ -1108,6 +1116,7 @@ class Command(BaseCommand):
                         create_collections=create_collections,
                         use_multiprocessing=use_multiprocessing,
                         prevent_indexing=prevent_indexing,
+                        transaction_id=transaction_id,
                     )
                 else:
                     utils.print_message("No file found at indicated location: {0}".format(source))

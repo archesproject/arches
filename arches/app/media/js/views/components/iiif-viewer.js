@@ -71,6 +71,7 @@ define([
                     })
                 );
             });
+
         var annotationLayer = ko.computed(function() {
             var annotationFeatures = [];
             self.annotationNodes().forEach(function(node) {
@@ -116,36 +117,40 @@ define([
                     return style;
                 },
                 onEachFeature: function(feature, layer) {
-                    var popup = L.popup({
-                        closeButton: false,
-                        maxWidth: 349
-                    })
-                        .setContent(iiifPopup)
-                        .on('add', function() {
-                            var popupData = {
-                                'closePopup': function() {
-                                    popup.remove();
-                                },
-                                'name': ko.observable(''),
-                                'description': ko.observable(''),
-                                'graphName': feature.properties.graphName,
-                                'resourceinstanceid': feature.properties.resourceId,
-                                'reportURL': arches.urls.resource_report
-                            };
-                            window.fetch(arches.urls.resource_descriptors + popupData.resourceinstanceid)
-                                .then(function(response) {
-                                    return response.json();
-                                })
-                                .then(function(descriptors) {
-                                    popupData.name(descriptors.displayname);
-                                    popupData.description(descriptors['map_popup']);
-                                });
-                            var popupElement = popup.getElement()
-                                .querySelector('.mapboxgl-popup-content');
-                            ko.applyBindingsToDescendants(popupData, popupElement);
-                        });
-                    layer.bindPopup(popup);
-
+                    if (params.onEachFeature) {
+                        params.onEachFeature(feature, layer);
+                    }
+                    else {
+                        var popup = L.popup({
+                            closeButton: false,
+                            maxWidth: 349
+                        })
+                            .setContent(iiifPopup)
+                            .on('add', function() {
+                                var popupData = {
+                                    'closePopup': function() {
+                                        popup.remove();
+                                    },
+                                    'name': ko.observable(''),
+                                    'description': ko.observable(''),
+                                    'graphName': feature.properties.graphName,
+                                    'resourceinstanceid': feature.properties.resourceId,
+                                    'reportURL': arches.urls.resource_report
+                                };
+                                window.fetch(arches.urls.resource_descriptors + popupData.resourceinstanceid)
+                                    .then(function(response) {
+                                        return response.json();
+                                    })
+                                    .then(function(descriptors) {
+                                        popupData.name(descriptors.displayname);
+                                        popupData.description(descriptors['map_popup']);
+                                    });
+                                var popupElement = popup.getElement()
+                                    .querySelector('.mapboxgl-popup-content');
+                                ko.applyBindingsToDescendants(popupData, popupElement);
+                            });
+                        layer.bindPopup(popup);
+                    }
                 }
             });
         });

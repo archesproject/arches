@@ -484,24 +484,45 @@ class MVT(APIBase):
 @method_decorator(csrf_exempt, name="dispatch")
 class Graphs(APIBase):
     def get(self, request, graph_id=None):
+        cards_querystring = request.GET.get("cards", None)
+        exclusions_querystring = request.GET.get("exclude", None)
+        if cards_querystring == "false":
+            get_cards = False
+        else:
+            get_cards = True
+
+        if exclusions_querystring is not None:
+            exclusions = list(map(str.strip, exclusions_querystring.split(",")))
+        else:
+            exclusions = []
+
         perm = "read_nodegroup"
-        datatypes = models.DDataType.objects.all()
         graph = cache.get(f"graph_{graph_id}")
         user = request.user
+
         if graph is None:
             graph = Graph.objects.get(graphid=graph_id)
-        cards = CardProxyModel.objects.filter(graph_id=graph_id).order_by("sortorder")
-        permitted_cards = []
-        for card in cards:
-            if user.has_perm(perm, card.nodegroup):
-                card.filter_by_perm(user, perm)
-                permitted_cards.append(card)
-        cardwidgets = [
-            widget for widgets in [card.cardxnodexwidget_set.order_by("sortorder").all() for card in permitted_cards] for widget in widgets
-        ]
-        graph = JSONSerializer().serializeToPython(graph, sort_keys=False, exclude=["is_editable", "functions"])
-        permitted_cards = JSONSerializer().serializeToPython(permitted_cards, sort_keys=False, exclude=["is_editable"])
-        return JSONResponse({"datatypes": datatypes, "cards": permitted_cards, "graph": graph, "cardwidgets": cardwidgets})
+        graph = JSONSerializer().serializeToPython(graph, sort_keys=False, exclude=["is_editable", "functions"] + exclusions)
+
+        if get_cards:
+            datatypes = models.DDataType.objects.all()
+            cards = CardProxyModel.objects.filter(graph_id=graph_id).order_by("sortorder")
+            permitted_cards = []
+            for card in cards:
+                if user.has_perm(perm, card.nodegroup):
+                    card.filter_by_perm(user, perm)
+                    permitted_cards.append(card)
+            cardwidgets = [
+                widget
+                for widgets in [card.cardxnodexwidget_set.order_by("sortorder").all() for card in permitted_cards]
+                for widget in widgets
+            ]
+
+            permitted_cards = JSONSerializer().serializeToPython(permitted_cards, sort_keys=False, exclude=["is_editable"])
+
+            return JSONResponse({"datatypes": datatypes, "cards": permitted_cards, "graph": graph, "cardwidgets": cardwidgets})
+        else:
+            return JSONResponse({"graph": graph})
 
 
 @method_decorator(csrf_exempt, name="dispatch")
@@ -557,6 +578,7 @@ class Resources(APIBase):
             if format == "json":
                 resource = Resource.objects.get(pk=resourceid)
 
+                version = request.GET.get("v", None)
                 compact = bool(request.GET.get("compact", "true").lower() == "true")  # default True
                 hide_empty_nodes = bool(request.GET.get("hide_empty_nodes", "false").lower() == "true")  # default False
 
@@ -566,6 +588,7 @@ class Resources(APIBase):
                         hide_empty_nodes=hide_empty_nodes,
                         user=user,
                         perm=perm,
+                        version=version
                     ),
                     "displaydescription": resource.displaydescription,
                     "displayname": resource.displayname,
@@ -942,6 +965,7 @@ class SearchExport(View):
         total = int(request.GET.get("total", 0))
         download_limit = settings.SEARCH_EXPORT_IMMEDIATE_DOWNLOAD_THRESHOLD
         format = request.GET.get("format", "tilecsv")
+        report_link = request.GET.get("reportlink", False)
         if "HTTP_AUTHORIZATION" in request.META:
             request_auth = request.META.get("HTTP_AUTHORIZATION").split()
             if request_auth[0].lower() == "basic":
@@ -950,7 +974,7 @@ class SearchExport(View):
                 if user is not None:
                     request.user = user
         exporter = SearchResultsExporter(search_request=request)
-        export_files, export_info = exporter.export(format)
+        export_files, export_info = exporter.export(format, report_link)
         if format == "geojson" and total <= download_limit:
             response = JSONResponse(export_files)
             return response
@@ -1118,8 +1142,10 @@ class Tile(APIBase):
     def post(self, request, tileid):
         tileview = TileView()
         tileview.action = "update_tile"
-        request.POST = request.POST.copy()
-        request.POST["data"] = request.body
+        # check that no data is on POST or FILES before assigning body to POST (otherwise request fails)
+        if len(dict(request.POST.items())) == 0 and len(dict(request.FILES.items())) == 0:
+            request.POST = request.POST.copy()
+            request.POST["data"] = request.body
         return tileview.post(request)
 
 

@@ -17,10 +17,12 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 """
 
 import os
+import uuid
 from arches.management.commands import utils
 from arches.app.models import models
-from arches.app.models.system_settings import settings
 from django.core.management.base import BaseCommand, CommandError
+from django.db.utils import IntegrityError
+from arches.app.utils import transaction
 
 
 class Command(BaseCommand):
@@ -30,31 +32,12 @@ class Command(BaseCommand):
     """
 
     def add_arguments(self, parser):
-        parser.add_argument("operation", nargs="?", help="operation 'livereload' starts livereload for this project on port 35729")
-        parser.add_argument(
-            "-lrh",
-            "--livereloadhost",
-            action="store",
-            dest="livereloadhost",
-            default=None,
-            help="Host on which to run livereload (defaults to 127.0.0.1)",
-        )
+        parser.add_argument("operation", nargs="?")
+        parser.add_argument("transaction_id", nargs="?")
 
     def handle(self, *args, **options):
-        host = options["livereloadhost"]
-        if options["operation"] == "livereload":
-            self.start_livereload(host)
+        if options["operation"] == "reverse":
+            self.reverse(options["transaction_id"])
 
-    def start_livereload(self, host):
-        from livereload import Server
-
-        server = Server()
-        for path in settings.STATICFILES_DIRS:
-            server.watch(path)
-        for path in settings.TEMPLATES[0]["DIRS"]:
-            server.watch(path)
-
-        if host is None:
-            server.serve(port=settings.LIVERELOAD_PORT)
-        else:
-            server.serve(port=settings.LIVERELOAD_PORT, host=host)
+    def reverse(self, transaction_id):
+        print(transaction.reverse_edit_log_entries(transaction_id))
