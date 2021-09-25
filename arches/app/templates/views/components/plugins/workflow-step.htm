@@ -51,7 +51,7 @@
 
         <div data-bind="css: componentBasedStepClass || 'workflow-component-based-step'">
             <!-- ko foreach: { data: pageLayout(), as: 'layoutSection'} -->
-            <div
+            <div class="workflow-component-based-step-wrapper"
                 data-bind="style: { 'height': $parent.pageLayout().length === 1 && '100%' }"
             >
                 <!-- ko if: layoutSection[0] -->
