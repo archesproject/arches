@@ -243,6 +243,7 @@ class Command(BaseCommand):
     def handle(self, *args, **options):
         print("operation: " + options["operation"])
         package_name = settings.PACKAGE_NAME
+        celery_worker_running = task_management.check_if_celery_available()
 
         if options["operation"] == "setup":
             self.setup(package_name, es_install_location=options["dest_dir"])
@@ -281,7 +282,7 @@ class Command(BaseCommand):
                 elif str(options["defer_indexing"])[0].lower() == "f":
                     defer_indexing = False
 
-            defer_indexing = defer_indexing and not options["bulk_load"]
+            defer_indexing = defer_indexing and not options["bulk_load"] and not celery_worker_running
             if defer_indexing:
                 concept_count = models.Value.objects.count()
                 relation_count = models.ResourceXResource.objects.count()
