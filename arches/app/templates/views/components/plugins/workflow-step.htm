@@ -9,24 +9,14 @@
         ></div>
 
         <!--ko if: informationBoxData -->
-        <div 
-            class='tabbed-workflow-step-information-box-container'
+        <div class='tabbed-workflow-step-information-box-container' 
             data-bind="
                 css: {
                     seen: informationBoxData().displayed,
                     unseen: !informationBoxData().displayed,
-                }
-            "
-        >
-            <div
-                style="
-                    padding: 20px;
-                    padding-bottom: unset;
-                "
-            >
-                <div
-                    class='tabbed-workflow-step-information-box'
-                >
+                }">
+            <div style="padding: 20px; padding-bottom: unset;">
+                <div class='tabbed-workflow-step-information-box'>
                     <h4 data-bind="text: informationBoxData().heading"></h4>
                     <span data-bind="text: informationBoxData().text"></span>
 
