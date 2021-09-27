@@ -163,6 +163,41 @@ define([
                     viz.elements().makeLayout(layout).run();
                 }
             };
+            this.addMissingNodes = function(elements){
+                var nodesReferencedByEdges = [];
+                elements.forEach(function(ele){
+                    if(!!ele.data.source){
+                        nodesReferencedByEdges.push(ele.data.source);
+                    }
+                    if(!!ele.data.target){
+                        nodesReferencedByEdges.push(ele.data.target);
+                    }
+                });
+                var relatedResourceIds = elements.filter(function(ele){
+                    return !!ele.data.resourceinstanceid;
+                }).map(function(ele){
+                    return ele.data.resourceinstanceid;
+                });
+                // add reference to missing nodes
+                nodesReferencedByEdges.forEach(function(resourceId){
+                    if(!relatedResourceIds.includes(resourceId)){
+                        elements.push({
+                            'classes':[],
+                            'data':{
+                                'graph_id': 'undefined',
+                                'id': resourceId,
+                                'target': undefined,
+                                'source': undefined,
+                                'displayname': '',
+                                'totalRelations': 1
+                            },
+                            'selected': undefined
+                        });
+                        relatedResourceIds.push(resourceId);
+                    }
+                });
+                return elements;
+            };
             this.expandNode = function(node) {
                 var viz = self.viz();
                 var position;
@@ -184,7 +219,8 @@ define([
                                     };
                                 }
                                 return element;
-                            })
+                            });    
+                        elements = self.addMissingNodes(elements)
                             .filter(function(element) {
                                 return viz.getElementById(element.data.id).length === 0;
                             });
@@ -297,6 +333,10 @@ define([
                                 lookup[resourceId].className = 'resource-type-' + i;
                                 i++;
                             }
+                            // add lookup for referencing a missing related resources
+                            lookup['undefined'] = {
+                                'fillColor': '#CCCCCC'
+                            };
                             resourceTypeLookup = lookup;
                             result.resource_instance.focus = true;
                             result.resource_instance['total_relations'] = {
@@ -307,6 +347,7 @@ define([
                                     result.related_resources.concat(result.resource_relationships)
                                         .map(dataToElement)
                                 );
+                            elements = self.addMissingNodes(elements);
                             self.selection(elements[0].data);
                             if (!viz) {
                                 updateCytoscapeConfig(elements);
