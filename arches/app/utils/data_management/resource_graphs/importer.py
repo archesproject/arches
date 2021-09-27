@@ -22,7 +22,7 @@ import json
 import uuid
 from arches.app.models.graph import Graph
 from arches.app.models.models import CardXNodeXWidget, NodeGroup, DDataType, Widget, ReportTemplate, Function, Ontology, OntologyClass
-from arches.app.utils.language import default_lang_node_json
+from arches.app.models.fields.i18n import default_lang_node_json
 from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializer
 from arches.app.models.models import GraphXMapping
 from django.db import transaction
