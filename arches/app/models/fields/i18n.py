@@ -1,117 +1,124 @@
 import json
-from django.contrib.postgres.fields import JSONField
+from django.utils.translation import gettext_lazy as _
+# from json.decoder import JSONDecodeError
 from arches.app.models.system_settings import settings
+from django.contrib.postgres.fields import JSONField
+from django.db.models.sql.compiler import SQLInsertCompiler
 from django.utils.translation import get_language
-from django.contrib.postgres.fields.jsonb import JsonAdapter
-
-
-def default_lang_node_json(value=None, lang=None):
-    print('in default_lang_node_json')
-    ret = {}
-    ret[settings.LANGUAGE_CODE] = ""
-    for lang_setting in settings.LANGUAGES:
-        ret[lang_setting[0]] = ""
-
-    if value is not None:
-        available_languages = [settings.LANGUAGE_CODE] if len(settings.LANGUAGES) == 0 else [lang[0] for lang in settings.LANGUAGES]
-        if lang is None:
-            lang = get_language()
-        if lang in available_languages:
-            ret[lang] = value
-        else:
-            raise Exception("The language code requested is not enabled in settings.LANGUAGES or settings.LANGUAGE_CODE")
-
-    return I18n_Field(ret)
 
 
 class JSONBSet(object):
-    def __init__(self, attname, value):
-        print('in JSONBset init')
-        self.sql = "jsonb_set(" + attname + ", %s, %s)"
+    """
+    The "as_sql" method of this class is called by Django when the sql statement 
+    for each field in a model instance is being generated.  
+    If we're inserting a new value then we can just set the localzed column to the json object.
+    If we're updating a value for a specific language, then use the postgres "jsonb_set" command to do that
+    https://www.postgresql.org/docs/9.5/functions-json.html
+    """
+    def __init__(self, column_name, value):
+        self.column_name = column_name
         self.value = value
 
     def as_sql(self, compiler, connection):
-        # import ipdb; ipdb.sset_trace()
-        from django.db.models.sql.compiler import SQLInsertCompiler
-        lang = f"{{{get_language()}}}"
-        params = (lang, json.dumps(self.value))
         if isinstance(compiler, SQLInsertCompiler):
-            # import ipdb; ipdb.sset_trace()
             params = [f'{{"{get_language()}": {json.dumps(self.value)}}}']
-            # params = (get_language(), json.dumps(self.value))
             self.sql = "%s"
-            print(self.sql % params)
-            
-        
+        else: # SQLUpdateCompiler
+            lang = f"{{{get_language()}}}"
+            self.sql = "jsonb_set(" + self.column_name + ", %s, %s)"
+            params = (lang, json.dumps(self.value))
+
+        # print(self.sql % params)
         return self.sql, params
 
 
-class I18n_Field(object):
-    def __init__(self, value):
-        self.value = value
+class I18n_String(object):
+    def __init__(self, value=None, lang=None, use_nulls=False):
+        ret = {}
+        if lang is None:
+            lang = get_language()
+
+        if isinstance(value, str):
+            try:
+                ret = json.loads(value)
+            except:
+                ret[lang] = value
+        elif value is None:
+            ret[lang] = None if use_nulls else ""
+        elif isinstance(value, I18n_String):
+            ret = value.raw_value
+        elif isinstance(value, dict):
+            ret = value
+        self.raw_value = ret
 
     def __str__(self):
-        if self.value is None:
-            return self.value
-
+        ret = None
         try:
-            ret = json.loads(self.value)
-        except TypeError:
-            ret = self.value
-
-        try:
-            return ret[get_language()]
+            ret = self.raw_value[get_language()]
         except KeyError as e:
             try:
-                return ret[settings.LANGUAGE_CODE]
+                # if you can't return the requested language because the value doesn't exist then 
+                # return the default language.
+                # the reasoning is that for display in the UI, we want to show what the user initially entered
+                ret = self.raw_value[settings.LANGUAGE_CODE]
             except KeyError as e:
                 try:
-                    return list(ret.values())[0]
+                    # if the default language doesn't exist then return the first language available
+                    ret = list(self.raw_value.values())[0]
                 except:
-                    print('error')
-                    return ""
+                    # if there are no languages available return an empty string
+                    ret = ""
+        return json.dumps(ret) if ret is None else ret
 
     def serialize(self):
         return str(self)
 
 
 class I18n_TextField(JSONField):
+    description = _('A I18n_TextField object') 
+
     def __init__(self, *args, **kwargs):
-        kwargs["default"] = default_lang_node_json
+        use_nulls = kwargs.get("null", False)
+        kwargs["default"] = I18n_String(use_nulls=use_nulls)
         super().__init__(*args, **kwargs)
-        pass
 
     def from_db_value(self, value, expression, connection):
-        # import ipdb; ipdb.sset_trace()
         print('in from_db_value')
         if value is not None:
-            return I18n_Field(value)
+            return I18n_String(value)
         return None
 
-    # def to_python(self, value):
-    #     # import ipdb; ipdb.sset_trace()
-    #     print('in to_python')
-    #     if isinstance(value, I18n_Field):
-    #         return value
-    #     if value is None:
-    #         return value
-    #     value = super().to_python(value)
-    #     return I18n_Field(value)
+    def to_python(self, value):
+        print('in to_python')
+        if isinstance(value, I18n_String):
+            return value
+        if value is None:
+            return value
+        value = super().to_python(value)
+        return I18n_String(value)
 
     def get_prep_value(self, value):
-        # import ipdb; ipdb.sset_trace()
+        print(type(value))
         print(f'in get_prep_value, value={value}')
+        """
+        If the value was set to a string rather then using I18n_String, then check to see if it's 
+        a json object like {"en": "boat", "es": "barco"}, or just a simple string like "boat".
+        If it's a json object then save it directly to the database.
+        If it's just a simple string then return a JSONBset object that can just update one language value
+        out of potentially several previously stored languages using the currently set language.
+        See JSONBSet to see how this magic happens.  :)
+        """
         if isinstance(value, str):
             try:
                 json.loads(value)
             except:
                 value = JSONBSet(self.attname, value)
-        elif isinstance(value, I18n_Field):
-            value = json.dumps(value.value)
+        elif isinstance(value, I18n_String):
+            value = json.dumps(value.raw_value)
         elif isinstance(value, dict):
             value = json.dumps(value)
         return value
 
-    def get_db_prep_value(self, value, connection, prepared=False):
-        print(f'in get_db_prep_value, value={value}')
-        return super().get_db_prep_value(value, connection, prepared)
+    # def get_db_prep_value(self, value, connection, prepared=False):
+    #     print(f'in get_db_prep_value, value={value}')
+    #     return super().get_db_prep_value(value, connection, prepared)

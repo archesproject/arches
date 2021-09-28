@@ -1,4 +1,4 @@
-from arches.app.models.fields.i18n import I18n_TextField
+from arches.app.models.fields.i18n import I18n_String, I18n_TextField
 from tests.base_test import ArchesTestCase
 from django.contrib.gis.db import models
 from django.utils import translation
@@ -21,40 +21,141 @@ class Customi18nTextFieldTests(ArchesTestCase):
 
         ALTER TABLE public._localization_test_model
             OWNER to postgres;
+
+        CREATE TABLE public._localization_test_model_w_nulls
+        (
+            name jsonb,
+            id integer,
+            PRIMARY KEY (id)
+        );
+
+        ALTER TABLE public._localization_test_model
+            OWNER to postgres;
         """
 
         cursor = connection.cursor()
         cursor.execute(sql)
 
 
-    def test_i18n_text_field(self):
-        class LocalizationTestModel(models.Model):
-            name = I18n_TextField()
-            id = models.IntegerField(primary_key=True)
-            
-            class Meta: 
-                app_label = '_test'
-                managed = True
-                db_table = "_localization_test_model"
+    class LocalizationTestModel(models.Model):
+        name = I18n_TextField(null=False)
+        id = models.IntegerField(primary_key=True)
+        
+        class Meta: 
+            app_label = "_test"
+            managed = True
+            db_table = "_localization_test_model"
+    
 
-        m = LocalizationTestModel()
+    class LocalizationTestModelWNulls(models.Model):
+        name = I18n_TextField(null=True)
+        id = models.IntegerField(primary_key=True)
+
+        class Meta: 
+            app_label = "_test"
+            managed = True
+            db_table = "_localization_test_model_w_nulls"
+
+
+    def test_i18n_text_field(self):
+        m = self.LocalizationTestModel()
         m.id = 1
 
-        translation.activate('en')
-        m.name = 'foo'
+        translation.activate("en")
+        m.name = "boat"
         m.save()
 
-        translation.activate('de')
-        m.name = 'foo-bar'
+        translation.activate("es")
+        m.name = "barco"
         m.save()
 
-        # self.assertEqual(str(m.name), 'foo-bar')
+        # test that we can save a single localized value
+        translation.activate("en")
+        m = self.LocalizationTestModel.objects.get(pk=1)
+        self.assertEqual(str(m.name), "boat")
 
-        translation.activate('en')
-        m = LocalizationTestModel.objects.get(pk=1)
-        self.assertEqual(str(m.name), 'foo')
+        # test that we can save a different localized value to the same object
+        translation.activate("es")
+        m = self.LocalizationTestModel.objects.get(pk=1)
+        self.assertEqual(str(m.name), "barco")
 
-        translation.activate('de')
-        m = LocalizationTestModel.objects.get(pk=1)
-        self.assertEqual(str(m.name), 'foo-bar')
+        # test that we can access the raw value with all languages
+        self.assertEqual(m.name.raw_value, {"en": "boat", "es": "barco"})
 
+        # test that we can update just a single language
+        translation.activate("en")
+        m.name = "ship"
+        m.save()
+        m = self.LocalizationTestModel.objects.get(pk=1)
+        self.assertEqual(str(m.name), "ship")
+        self.assertEqual(m.name.raw_value, {"en": "ship", "es": "barco"})
+
+    def test_i18n_text_field_w_blank_strings(self):
+        translation.activate("en")
+        m = self.LocalizationTestModel()
+        m.id = 2
+        m.save()
+        self.assertEqual(str(m.name), "")
+        self.assertEqual(m.name.raw_value, {"en":""})
+
+    def test_i18n_text_field_w_nulls(self):
+        translation.activate("en")
+        m = self.LocalizationTestModelWNulls()
+        m.id = 3
+        m.save()
+        self.assertEqual(str(m.name), 'null')
+        self.assertEqual(m.name.raw_value, {"en":None})
+        
+        m = self.LocalizationTestModelWNulls.objects.get(pk=3)
+        self.assertEqual(str(m.name), 'null')
+        self.assertEqual(m.name.raw_value, {"en":None})
+
+    def test_i18n_text_field_return_default_language(self):
+        # test that if the language code requested doesn't exist then return the defualt language instead
+        translation.activate("en")
+        m = self.LocalizationTestModel()
+        m.id = 4
+        m.name = "one"
+        m.save()
+
+        translation.activate("de")
+        m = self.LocalizationTestModel.objects.get(pk=4)
+        self.assertEqual(str(m.name), "one")
+
+    def test_init_i18n_text_field_w_dict(self):
+        m = self.LocalizationTestModel()
+        m.id = 5
+        m.name = {"en": "one", "es": "uno"}
+        m.save()
+
+        translation.activate("es")
+        m = self.LocalizationTestModel.objects.get(pk=5)
+        self.assertEqual(str(m.name), "uno")
+
+    def test_init_i18n_text_field_w_json(self):
+        m = self.LocalizationTestModel.objects.create(id=6, name='{"en": "one", "es": "uno"}')
+        m.save()
+
+        translation.activate("es")
+        m = self.LocalizationTestModel.objects.get(pk=6)
+        self.assertEqual(str(m.name), "uno")
+
+    def test_init_i18n_text_field_w_i18n_string(self):
+        m = self.LocalizationTestModel()
+        m.name = I18n_String(value='{"en": "one", "es": "uno"}')
+        m.id = 7
+        m.save()
+
+        translation.activate("es")
+        m = self.LocalizationTestModel.objects.get(pk=7)
+        self.assertEqual(str(m.name), "uno")
+
+    def test_init_i18n_text_field_w_i18n_string_dict(self):
+        m = self.LocalizationTestModel()
+        m.name = I18n_String(value={"en": "one", "es": "uno"})
+        m.id = 8
+        m.save()
+
+        translation.activate("es")
+        m = self.LocalizationTestModel.objects.get(pk=8)
+        self.assertEqual(str(m.name), "uno")
