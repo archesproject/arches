@@ -46,6 +46,8 @@ define([
                 });
             });
             options.viewModel.createableResources = ko.observableArray(data.createableResources);
+            options.viewModel.userCanReadResources = data.userCanReadResources;
+            options.viewModel.userCanEditResources = data.userCanEditResources;
 
             options.viewModel.setResourceOptionDisable = function(option, item) {
               if (item) {

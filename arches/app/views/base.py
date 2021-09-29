@@ -29,7 +29,7 @@ from arches.app.utils.permission_backend import (
     get_editable_resource_types,
     get_resource_types_by_perm,
 )
-
+from arches.app.utils.permission_backend import get_createable_resource_types, user_is_resource_reviewer
 
 class BaseManagerView(TemplateView):
 

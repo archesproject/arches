@@ -107,7 +107,7 @@ define([
                 return !!edits && _.keys(edits).length > 0;
             }, this),
             isfullyprovisional: ko.pureComputed(function() {
-                return !!ko.unwrap(self.provisionaledits()) && _.keys(koMapping.toJS(this.data)).length === 0;
+                return !!ko.unwrap(self.provisionaledits) && _.keys(koMapping.toJS(this.data)).length === 0;
             }, this),
             selected: ko.pureComputed({
                 read: function() {

@@ -242,6 +242,7 @@ define([
                 dictDefaultMessage: '',
                 autoProcessQueue: false,
                 uploadMultiple: true,
+                acceptedFiles: ["image/jpeg", "image/png", "image/tiff"].join(','),
                 autoQueue: false,
                 clickable: ".fileinput-create-button." + this.uniqueidClass(),
                 previewsContainer: '#hidden-dz-create-previews',

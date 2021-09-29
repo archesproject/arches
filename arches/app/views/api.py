@@ -39,6 +39,7 @@ from arches.app.models.resource import Resource
 from arches.app.models.system_settings import settings
 from arches.app.models.tile import Tile as TileProxyModel, TileValidationError
 from arches.app.views.tile import TileData as TileView
+from arches.app.views.resource import RelatedResourcesView, get_resource_relationship_types
 from arches.app.utils.skos import SKOSWriter
 from arches.app.utils.response import JSONResponse
 from arches.app.utils.decorators import can_read_concept, group_required
@@ -582,21 +583,20 @@ class Resources(APIBase):
                 compact = bool(request.GET.get("compact", "true").lower() == "true")  # default True
                 hide_empty_nodes = bool(request.GET.get("hide_empty_nodes", "false").lower() == "true")  # default False
 
-                out = {
-                    "resource": resource.to_json(
-                        compact=compact,
-                        hide_empty_nodes=hide_empty_nodes,
-                        user=user,
-                        perm=perm,
-                        version=version
-                    ),
-                    "displaydescription": resource.displaydescription,
-                    "displayname": resource.displayname,
-                    "graph_id": resource.graph_id,
-                    "legacyid": resource.legacyid,
-                    "map_popup": resource.map_popup,
-                    "resourceinstanceid": resource.resourceinstanceid,
-                }
+                if version == "beta":
+                    out = resource.to_json(compact=compact, hide_empty_nodes=hide_empty_nodes, user=user, perm=perm, version=version)
+                else:
+                    out = {
+                        "resource": resource.to_json(
+                            compact=compact, hide_empty_nodes=hide_empty_nodes, user=user, perm=perm, version=version
+                        ),
+                        "displaydescription": resource.displaydescription,
+                        "displayname": resource.displayname,
+                        "graph_id": resource.graph_id,
+                        "legacyid": resource.legacyid,
+                        "map_popup": resource.map_popup,
+                        "resourceinstanceid": resource.resourceinstanceid,
+                    }
 
             elif format == "arches-json":
                 out = Resource.objects.get(pk=resourceid)
@@ -1124,6 +1124,234 @@ class OntologyProperty(APIBase):
         return JSONResponse(ret)
 
 
+class ResourceReport(APIBase):
+    def get(self, request, resourceid):
+        exclude = request.GET.get("exclude", [])
+        uncompacted_value = request.GET.get("uncompacted")
+        version = request.GET.get("v")
+        compact = True
+        if uncompacted_value == "true":
+            compact = False
+        perm = "read_nodegroup"
+
+        resource = Resource.objects.get(pk=resourceid)
+        graph = Graph.objects.get(graphid=resource.graph_id)
+        template = models.ReportTemplate.objects.get(pk=graph.template_id)
+
+        if not template.preload_resource_data:
+            return JSONResponse({"template": template, "report_json": resource.to_json(compact=compact, version=version)})
+
+        resp = {
+            "datatypes": models.DDataType.objects.all(),
+            "displayname": resource.displayname,
+            "resourceid": resourceid,
+            "graph": graph,
+            "hide_empty_nodes": settings.HIDE_EMPTY_NODES_IN_REPORT,
+            "report_json": resource.to_json(compact=compact, version=version),
+        }
+
+        if "template" not in exclude:
+            resp["template"] = template
+
+        if "related_resources" not in exclude:
+            resource_models = (
+                models.GraphModel.objects.filter(isresource=True)
+                .exclude(isactive=False)
+                .exclude(pk=settings.SYSTEM_SETTINGS_RESOURCE_MODEL_ID)
+            )
+
+            get_params = request.GET.copy()
+            get_params.update({"paginate": "false"})
+            request.GET = get_params
+
+            related_resources_response = RelatedResourcesView().get(request, resourceid)
+            related_resources = json.loads(related_resources_response.content)
+
+            related_resources_summary = self._generate_related_resources_summary(
+                related_resources=related_resources["related_resources"],
+                resource_relationships=related_resources["resource_relationships"],
+                resource_models=resource_models,
+            )
+
+            resp["related_resources"] = related_resources_summary
+
+        if "tiles" not in exclude:
+            permitted_tiles = []
+            for tile in TileProxyModel.objects.filter(resourceinstance=resource).select_related("nodegroup").order_by("sortorder"):
+                if request.user.has_perm(perm, tile.nodegroup):
+                    tile.filter_by_perm(request.user, perm)
+                    permitted_tiles.append(tile)
+
+            resp["tiles"] = permitted_tiles
+
+        if "cards" not in exclude:
+            permitted_cards = []
+            for card in CardProxyModel.objects.filter(graph_id=resource.graph_id).select_related("nodegroup").order_by("sortorder"):
+                if request.user.has_perm(perm, card.nodegroup):
+                    card.filter_by_perm(request.user, perm)
+                    permitted_cards.append(card)
+
+            cardwidgets = [
+                widget
+                for widgets in [card.cardxnodexwidget_set.order_by("sortorder").all() for card in permitted_cards]
+                for widget in widgets
+            ]
+
+            resp["cards"] = permitted_cards
+            resp["cardwidgets"] = cardwidgets
+
+        return JSONResponse(resp)
+
+    def _generate_related_resources_summary(self, related_resources, resource_relationships, resource_models):
+        related_resource_summary = [
+            {"graphid": str(resource_model.graphid), "name": resource_model.name, "resources": []} for resource_model in resource_models
+        ]
+
+        resource_relationship_types = {
+            resource_relationship_type["id"]: resource_relationship_type["text"]
+            for resource_relationship_type in get_resource_relationship_types()["values"]
+        }
+
+        for related_resource in related_resources:
+            for summary in related_resource_summary:
+                if related_resource["graph_id"] == summary["graphid"]:
+                    relationship_summary = []
+                    for resource_relationship in resource_relationships:
+                        if related_resource["resourceinstanceid"] == resource_relationship["resourceinstanceidto"]:
+                            rr_type = (
+                                resource_relationship_types[resource_relationship["relationshiptype"]]
+                                if resource_relationship["relationshiptype"] in resource_relationship_types
+                                else resource_relationship["relationshiptype"]
+                            )
+                            relationship_summary.append(rr_type)
+                        elif related_resource["resourceinstanceid"] == resource_relationship["resourceinstanceidfrom"]:
+                            rr_type = (
+                                resource_relationship_types[resource_relationship["inverserelationshiptype"]]
+                                if resource_relationship["inverserelationshiptype"] in resource_relationship_types
+                                else resource_relationship["inverserelationshiptype"]
+                            )
+                            relationship_summary.append(rr_type)
+
+                    summary["resources"].append(
+                        {
+                            "resourceinstanceid": related_resource["resourceinstanceid"],
+                            "displayname": related_resource["displayname"],
+                            "relationships": relationship_summary,
+                        }
+                    )
+
+        return related_resource_summary
+
+
+class BulkResourceReport(APIBase):
+    def get(self, request):
+        graph_ids = request.GET.get("graph_ids").split(",")
+        exclude = request.GET.get("exclude", [])
+
+        if not graph_ids:
+            raise Exception()
+
+        exclusions_querystring = request.GET.get("exclude", None)
+
+        if exclusions_querystring is not None:
+            exclusions = list(map(str.strip, exclude.split(",")))
+        else:
+            exclusions = []
+
+        graph_ids_set = set(graph_ids)  # calls set to delete dups
+        graph_ids_not_in_cache = []
+
+        graph_lookup = {}
+
+        for graph_id in graph_ids_set:
+            graph = cache.get("serialized_graph_{}".format(graph_id))
+
+            if graph:
+                graph_lookup[graph["graphid"]] = graph
+            else:
+                graph_ids_not_in_cache.append(graph_id)
+
+        if graph_ids_not_in_cache:
+            graphs_from_database = list(Graph.objects.filter(pk__in=graph_ids_not_in_cache))
+
+            for graph in graphs_from_database:
+                serialized_graph = JSONSerializer().serializeToPython(
+                    graph, sort_keys=False, exclude=["is_editable", "functions"] + exclusions
+                )
+                cache.set("serialized_graph_{}".format(graph.pk), serialized_graph)
+                graph_lookup[str(graph.pk)] = serialized_graph
+
+        graph_ids_with_templates_that_preload_resource_data = []
+        graph_ids_with_templates_that_do_not_preload_resource_data = []
+
+        for graph in graph_lookup.values():
+            template = models.ReportTemplate.objects.get(pk=graph["template_id"])
+
+            if template.preload_resource_data:
+                graph_ids_with_templates_that_preload_resource_data.append(graph["graphid"])
+            else:
+                graph_ids_with_templates_that_do_not_preload_resource_data.append(graph["graphid"])
+
+        permitted_cards = []
+
+        if "cards" not in exclude:
+            cards = (
+                CardProxyModel.objects.filter(graph_id__in=graph_ids_with_templates_that_preload_resource_data)
+                .select_related("nodegroup")
+                .order_by("sortorder")
+            )
+
+            perm = "read_nodegroup"
+            permitted_cards = []
+
+            for card in cards:
+                if request.user.has_perm(perm, card.nodegroup):
+                    card.filter_by_perm(request.user, perm)
+                    permitted_cards.append(card)
+
+        if "datatypes" not in exclude:
+            datatypes = list(models.DDataType.objects.all())
+
+        resp = {}
+
+        for graph_id in graph_ids_with_templates_that_preload_resource_data:
+            graph = graph_lookup[graph_id]
+
+            graph_cards = [card for card in permitted_cards if str(card.graph_id) == graph["graphid"]]
+
+            cardwidgets = [
+                widget for widgets in [card.cardxnodexwidget_set.order_by("sortorder").all() for card in graph_cards] for widget in widgets
+            ]
+
+            resp[graph_id] = {
+                "graph": graph,
+                "cards": JSONSerializer().serializeToPython(graph_cards, sort_keys=False, exclude=["is_editable"]),
+                "cardwidgets": cardwidgets,
+            }
+
+            if "datatypes" not in exclude:
+                resp[graph_id]["datatypes"] = datatypes
+
+        for graph_id in graph_ids_with_templates_that_do_not_preload_resource_data:
+            graph = graph_lookup[graph_id]
+            resp[graph_id] = {"template_id": graph["template_id"]}
+
+        return JSONResponse(resp)
+
+
+class BulkDisambiguatedResourceInstance(APIBase):
+    def get(self, request):
+        resource_ids = request.GET.get("resource_ids").split(",")
+        uncompacted_value = request.GET.get("uncompacted")
+        version = request.GET.get("v")
+        compact = True
+        if uncompacted_value == "true":
+            compact = False
+        return JSONResponse(
+            {resource.pk: resource.to_json(compact=compact, version=version) for resource in Resource.objects.filter(pk__in=resource_ids)}
+        )
+
+
 @method_decorator(csrf_exempt, name="dispatch")
 class Tile(APIBase):
     def get(self, request, tileid):
@@ -1228,6 +1456,7 @@ class NodeValue(APIBase):
         resourceid = request.POST.get("resourceinstanceid", None)
         format = request.POST.get("format")
         operation = request.POST.get("operation")
+        transaction_id = request.POST.get("transaction_id")
 
         # get node model return error if not found
         try:
@@ -1254,7 +1483,7 @@ class NodeValue(APIBase):
                 data = datatype.update(tile, data, nodeid, action=operation)
 
             # update/create tile
-            new_tile = TileProxyModel.update_node_value(nodeid, data, tileid, resourceinstanceid=resourceid)
+            new_tile = TileProxyModel.update_node_value(nodeid, data, tileid, resourceinstanceid=resourceid, transaction_id=transaction_id)
 
             response = JSONResponse(new_tile, status=200)
         else:

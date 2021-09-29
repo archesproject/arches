@@ -205,7 +205,7 @@ def prepare_search_index(create=False):
                     "dates": {
                         "type": "nested",
                         "properties": {
-                            "date": {"type": "integer"},
+                            "date": {"type": "long"},
                             "nodegroup_id": {"type": "keyword"},
                             "nodeid": {"type": "keyword"},
                             "provisional": {"type": "boolean"},
@@ -222,7 +222,7 @@ def prepare_search_index(create=False):
                     "date_ranges": {
                         "type": "nested",
                         "properties": {
-                            "date_range": {"type": "integer_range"},
+                            "date_range": {"type": "long_range"},
                             "nodegroup_id": {"type": "keyword"},
                             "provisional": {"type": "boolean"},
                         },
@@ -233,6 +233,7 @@ def prepare_search_index(create=False):
     }
     try:
         from arches.app.datatypes.datatypes import DataTypeFactory
+
         datatype_factory = DataTypeFactory()
         data = index_settings["mappings"]["_doc"]["properties"]["tiles"]["properties"]["data"]["properties"]
         for node in models.Node.objects.all():
