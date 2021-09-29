@@ -142,7 +142,7 @@ def get_graphs_for_export(graphids=None):
         for card in graph.cards.values():
             card.name = card.name.value
 
-    resource_graph_query =JSONSerializer().serializeToPython(resource_graphs, exclude=["widgets"]) 
+    resource_graph_query = JSONSerializer().serializeToPython(resource_graphs, exclude=["widgets"])
 
     for resource_graph in resource_graph_query:
         function_ids = []
