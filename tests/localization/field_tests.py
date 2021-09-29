@@ -36,26 +36,23 @@ class Customi18nTextFieldTests(ArchesTestCase):
         cursor = connection.cursor()
         cursor.execute(sql)
 
-
     class LocalizationTestModel(models.Model):
         name = I18n_TextField(null=False)
         id = models.IntegerField(primary_key=True)
-        
-        class Meta: 
+
+        class Meta:
             app_label = "_test"
             managed = True
             db_table = "_localization_test_model"
-    
 
     class LocalizationTestModelWNulls(models.Model):
         name = I18n_TextField(null=True)
         id = models.IntegerField(primary_key=True)
 
-        class Meta: 
+        class Meta:
             app_label = "_test"
             managed = True
             db_table = "_localization_test_model_w_nulls"
-
 
     def test_i18n_text_field(self):
         m = self.LocalizationTestModel()
@@ -96,15 +93,15 @@ class Customi18nTextFieldTests(ArchesTestCase):
         m.id = 2
         m.save()
         self.assertEqual(str(m.name), "")
-        self.assertEqual(m.name.raw_value, {"en":""})
+        self.assertEqual(m.name.raw_value, {"en": ""})
 
     def test_i18n_text_field_w_nulls(self):
         translation.activate("en")
         m = self.LocalizationTestModelWNulls()
         m.id = 3
         m.save()
-        self.assertEqual(str(m.name), 'null')
-        self.assertEqual(m.name.raw_value, {"en":None})
+        self.assertEqual(str(m.name), "null")
+        self.assertEqual(m.name.raw_value, {"en": None})
 
     def test_i18n_text_field_return_default_language(self):
         # test that if the language code requested doesn't exist then return the defualt language instead
@@ -179,7 +176,7 @@ class Customi18nTextFieldTests(ArchesTestCase):
 
         # test that post save everything is the same
         self.assertEqual(str(m.name), "Marco")
-        
+
         # test that the object retrieved from the database is the same
         m = self.LocalizationTestModel.objects.get(pk=10)
         self.assertEqual(str(m.name), "Marco")

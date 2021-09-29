@@ -15,7 +15,7 @@ class I18n_String(object):
         self.lang = get_language() if lang is None else lang
 
         self._parse(self.value, self.lang, use_nulls)
-        
+
     def _parse(self, value, lang, use_nulls):
         ret = {}
 
@@ -35,8 +35,8 @@ class I18n_String(object):
 
     def as_sql(self, compiler, connection):
         """
-        The "as_sql" method of this class is called by Django when the sql statement 
-        for each field in a model instance is being generated.  
+        The "as_sql" method of this class is called by Django when the sql statement
+        for each field in a model instance is being generated.
         If we're inserting a new value then we can just set the localzed column to the json object.
         If we're updating a value for a specific language, then use the postgres "jsonb_set" command to do that
         https://www.postgresql.org/docs/9.5/functions-json.html
@@ -51,7 +51,7 @@ class I18n_String(object):
 
         return self.sql, params
 
-    # need this to avoid a Django error when setting 
+    # need this to avoid a Django error when setting
     # the default value on the i18n_TextField
     def __call__(self):
         return self
@@ -62,7 +62,7 @@ class I18n_String(object):
             ret = self.raw_value[get_language()]
         except KeyError as e:
             try:
-                # if you can't return the requested language because the value doesn't exist then 
+                # if you can't return the requested language because the value doesn't exist then
                 # return the default language.
                 # the reasoning is that for display in the UI, we want to show what the user initially entered
                 ret = self.raw_value[settings.LANGUAGE_CODE]
@@ -77,7 +77,7 @@ class I18n_String(object):
 
 
 class I18n_TextField(JSONField):
-    description = _('A I18n_TextField object') 
+    description = _("A I18n_TextField object")
 
     def __init__(self, *args, **kwargs):
         use_nulls = kwargs.get("null", False)
@@ -85,13 +85,13 @@ class I18n_TextField(JSONField):
         super().__init__(*args, **kwargs)
 
     def from_db_value(self, value, expression, connection):
-        print('in from_db_value')
+        print("in from_db_value")
         if value is not None:
             return I18n_String(value)
         return None
 
     def to_python(self, value):
-        print('in to_python')
+        print("in to_python")
         if isinstance(value, I18n_String):
             return value
         if value is None:
@@ -101,7 +101,7 @@ class I18n_TextField(JSONField):
 
     def get_prep_value(self, value):
         print(type(value))
-        print(f'in get_prep_value, value={value}')
+        print(f"in get_prep_value, value={value}")
         """
         If the value was set to a string, then check to see if it's 
         a json object like {"en": "boat", "es": "barco"}, or just a simple string like "boat".
