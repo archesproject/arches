@@ -93,35 +93,28 @@
                                 <form method="post">
                                     {% csrf_token %}
                                     <div class="row">
-
                                         <div class="col-sm-5">
                                             <div class="form-group">
-                                                <label class="control-label account-label">{% trans 'Arches user name' %}</label>
-                                                <input disabled type="text" class="form-control input-lg account-input" placeholder="Username" aria-label="Username" name="username" value="{{ user.username }}">
+                                                <label class="control-label account-label" for="username">{% trans 'Arches user name' %}</label>
+                                                <input id="username" disabled type="text" class="form-control input-lg account-input" placeholder="Username" aria-label="Username" name="username" value="{{ user.username }}">
                                             </div>
                                         </div>
-
                                         <!-- Password -->
-                                        <div class="col-sm-5">
+                                        <div class="col-sm-7">
                                             <p class="account-tips">
                                                 {% trans 'This is the unique email or name that you use to log on to Arches.' %}
                                             </p>
                                         </div>
-
-                                        <div class="col-sm-2">
-                                            <div>
-                                                <button class="btn btn-primary btn-active-purple btn-profile mar-btm" type="submit" formaction="{% url 'user_profile_manager' %}">{% trans 'Save' %}</button>
-                                                <button class="btn btn-danger btn-active-dark btn-profile mar-btm" data-bind='click: toggleEditUserForm'>{% trans 'Cancel' %}</button>
-                                            </div>
-                                        </div>
                                     </div>
 
                                     <hr style="border-color: #eee;">
+
+                                    <!-- Account First Name -->
                                     <div class="row">
                                         <div class="col-sm-5">
                                             <div class="form-group">
-                                                <label class="control-label account-label">{% trans 'First name' %}</label>
-                                                <input type="text" class="form-control input-lg account-input" placeholder="{% trans 'First name' %}" aria-label="{% trans 'First name' %}" name="first_name" value="{{ user.first_name }}">
+                                                <label for="first_name" class="control-label account-label">{% trans 'First name' %}</label>
+                                                <input id="first_name" type="text" class="form-control input-lg account-input" placeholder="{% trans 'First name' %}" aria-label="{% trans 'First name' %}" name="first_name" value="{{ user.first_name }}">
                                                 {% if form.first_name.errors %}
                                                 {% for error in form.first_name.errors %}
                                                     <div style="color:darkred">{{ error|escape }}</div>
@@ -129,7 +122,7 @@
                                                 {% endif %}
                                             </div>
                                         </div>
-                                        <div class="col-sm-5">
+                                        <div class="col-sm-7">
                                             <p class="account-tips">
                                                 {% trans 'Arches uses your name and phone number to make it easier for other users to find and work with you.' %}
                                             </p>
@@ -141,8 +134,8 @@
                                         <!-- Names -->
                                         <div class="col-sm-5">
                                             <div class="form-group">
-                                                <label class="control-label account-label">{% trans 'Last name' %}</label>
-                                                <input type="text" class="form-control input-lg account-input" placeholder="{% trans 'Last name' %}" aria-label="{% trans 'Last name' %}" name="last_name" value="{{ user.last_name }}">
+                                                <label for="last_name" class="control-label account-label">{% trans 'Last name' %}</label>
+                                                <input id="last_name" type="text" class="form-control input-lg account-input" placeholder="{% trans 'Last name' %}" aria-label="{% trans 'Last name' %}" name="last_name" value="{{ user.last_name }}">
                                                 {% if form.last_name.errors %}
                                                 {% for error in form.last_name.errors %}
                                                     <div style="color:darkred">{{ error|escape }}</div>
@@ -157,8 +150,8 @@
                                         <!-- Names -->
                                         <div class="col-sm-5">
                                             <div class="form-group">
-                                                <label class="control-label account-label">{% trans 'Phone Number (optional)' %}</label>
-                                                <input type="text" class="form-control input-lg account-input" placeholder="e.g. +1 415 555-1234" name="phone" value="{{ user.userprofile.phone }}" aria-label="Contact phone number">
+                                                <label for="phone" class="control-label account-label">{% trans 'Phone Number (optional)' %}</label>
+                                                <input id="phone" type="text" class="form-control input-lg account-input" placeholder="e.g. +1 415 555-1234" name="phone" value="{{ user.userprofile.phone }}" aria-label="Contact phone number">
                                             </div>
                                         </div>
                                     </div>
@@ -170,8 +163,8 @@
                                         <!-- Names -->
                                         <div class="col-sm-5">
                                             <div class="form-group">
-                                                <label class="control-label account-label">{% trans 'Contact Email' %}</label>
-                                                <input type="email" class="form-control input-lg account-input" placeholder="jsmith@company.com" name="email" value="{{ user.email }}" aria-label="Contact email address">
+                                                <label for="email" class="control-label account-label">{% trans 'Contact Email' %}</label>
+                                                <input id="email" type="email" class="form-control input-lg account-input" placeholder="jsmith@company.com" name="email" value="{{ user.email }}" aria-label="Contact email address">
                                                 {% if form.email.errors %}
                                                 {% for error in form.email.errors %}
                                                     <div style="color:darkred">{{ error|escape }}</div>
@@ -183,6 +176,16 @@
                                             <p class="account-tips">
                                                 {% trans 'Arches uses your e-maill to alert you to projects and tasks assigned to you.' %}
                                             </p>
+                                        </div>
+                                    </div>
+
+                                    <!--Form action buttons-->
+                                    <div class="row">
+                                        <div class="col-sm-5">
+                                            <div>
+                                                <button class="btn btn-primary btn-active-purple btn-profile mar-btm" type="submit" formaction="{% url 'user_profile_manager' %}" aria-label="{% trans 'Save' %}">{% trans 'Save' %}</button>
+                                                <button class="btn btn-danger btn-active-dark btn-profile mar-btm" data-bind='click: toggleEditUserForm' aria-label="{% trans 'Cancel' %}">{% trans 'Cancel' %}</button>
+                                            </div>
                                         </div>
                                     </div>
                                 </form>
