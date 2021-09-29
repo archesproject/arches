@@ -51,6 +51,11 @@ class I18n_String(object):
             ret = value
         self.raw_value = ret
 
+    # need this to avoid a Django error when setting 
+    # the default value on the i18n_TextField
+    def __call__(self):
+        return self
+
     def __str__(self):
         ret = None
         try:
@@ -69,9 +74,6 @@ class I18n_String(object):
                     # if there are no languages available return an empty string
                     ret = ""
         return json.dumps(ret) if ret is None else ret
-
-    def serialize(self):
-        return str(self)
 
 
 class I18n_TextField(JSONField):
