@@ -1,48 +1,30 @@
 import json
 from django.utils.translation import gettext_lazy as _
-# from json.decoder import JSONDecodeError
 from arches.app.models.system_settings import settings
 from django.contrib.postgres.fields import JSONField
-from django.db.models.sql.compiler import SQLInsertCompiler
+from django.db.models.sql.compiler import SQLInsertCompiler, SQLUpdateCompiler
 from django.utils.translation import get_language
 
 
-class JSONBSet(object):
-    """
-    The "as_sql" method of this class is called by Django when the sql statement 
-    for each field in a model instance is being generated.  
-    If we're inserting a new value then we can just set the localzed column to the json object.
-    If we're updating a value for a specific language, then use the postgres "jsonb_set" command to do that
-    https://www.postgresql.org/docs/9.5/functions-json.html
-    """
-    def __init__(self, column_name, value):
-        self.column_name = column_name
-        self.value = value
-
-    def as_sql(self, compiler, connection):
-        if isinstance(compiler, SQLInsertCompiler):
-            params = [f'{{"{get_language()}": {json.dumps(self.value)}}}']
-            self.sql = "%s"
-        else: # SQLUpdateCompiler
-            lang = f"{{{get_language()}}}"
-            self.sql = "jsonb_set(" + self.column_name + ", %s, %s)"
-            params = (lang, json.dumps(self.value))
-
-        # print(self.sql % params)
-        return self.sql, params
-
-
 class I18n_String(object):
-    def __init__(self, value=None, lang=None, use_nulls=False):
+    def __init__(self, value=None, lang=None, use_nulls=False, attname=None):
+        self.attname = attname
+        self.value = value
+        self.raw_value = {}
+        self.value_is_primitive = False
+        self.lang = get_language() if lang is None else lang
+
+        self._parse(self.value, self.lang, use_nulls)
+        
+    def _parse(self, value, lang, use_nulls):
         ret = {}
-        if lang is None:
-            lang = get_language()
 
         if isinstance(value, str):
             try:
                 ret = json.loads(value)
             except:
                 ret[lang] = value
+                self.value_is_primitive = True
         elif value is None:
             ret[lang] = None if use_nulls else ""
         elif isinstance(value, I18n_String):
@@ -50,6 +32,24 @@ class I18n_String(object):
         elif isinstance(value, dict):
             ret = value
         self.raw_value = ret
+
+    def as_sql(self, compiler, connection):
+        """
+        The "as_sql" method of this class is called by Django when the sql statement 
+        for each field in a model instance is being generated.  
+        If we're inserting a new value then we can just set the localzed column to the json object.
+        If we're updating a value for a specific language, then use the postgres "jsonb_set" command to do that
+        https://www.postgresql.org/docs/9.5/functions-json.html
+        """
+
+        if (self.value_is_primitive or self.value is None) and not isinstance(compiler, SQLInsertCompiler):
+            self.sql = "jsonb_set(" + self.attname + ", %s, %s)"
+            params = (f"{{{self.lang}}}", json.dumps(self.value))
+        else:
+            params = [json.dumps(self.raw_value)]
+            self.sql = "%s"
+
+        return self.sql, params
 
     # need this to avoid a Django error when setting 
     # the default value on the i18n_TextField
@@ -103,24 +103,12 @@ class I18n_TextField(JSONField):
         print(type(value))
         print(f'in get_prep_value, value={value}')
         """
-        If the value was set to a string rather then using I18n_String, then check to see if it's 
+        If the value was set to a string, then check to see if it's 
         a json object like {"en": "boat", "es": "barco"}, or just a simple string like "boat".
-        If it's a json object then save it directly to the database.
-        If it's just a simple string then return a JSONBset object that can just update one language value
-        out of potentially several previously stored languages using the currently set language.
-        See JSONBSet to see how this magic happens.  :)
+        If it's a json object then use the I18n_String.as_sql method to insert it directly to the database.
+        If it's just a simple string then use the I18n_String.as_sql method is used to update one language value
+        out of potentially several previously stored languages using the currently active language.
+        See I18n_String.as_sql to see how this magic happens.  :)
         """
-        if isinstance(value, str):
-            try:
-                json.loads(value)
-            except:
-                value = JSONBSet(self.attname, value)
-        elif isinstance(value, I18n_String):
-            value = json.dumps(value.raw_value)
-        elif isinstance(value, dict):
-            value = json.dumps(value)
-        return value
 
-    # def get_db_prep_value(self, value, connection, prepared=False):
-    #     print(f'in get_db_prep_value, value={value}')
-    #     return super().get_db_prep_value(value, connection, prepared)
+        return I18n_String(value, attname=self.attname)

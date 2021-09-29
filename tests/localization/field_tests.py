@@ -105,10 +105,6 @@ class Customi18nTextFieldTests(ArchesTestCase):
         m.save()
         self.assertEqual(str(m.name), 'null')
         self.assertEqual(m.name.raw_value, {"en":None})
-        
-        m = self.LocalizationTestModelWNulls.objects.get(pk=3)
-        self.assertEqual(str(m.name), 'null')
-        self.assertEqual(m.name.raw_value, {"en":None})
 
     def test_i18n_text_field_return_default_language(self):
         # test that if the language code requested doesn't exist then return the defualt language instead
@@ -159,3 +155,32 @@ class Customi18nTextFieldTests(ArchesTestCase):
         translation.activate("es")
         m = self.LocalizationTestModel.objects.get(pk=8)
         self.assertEqual(str(m.name), "uno")
+
+    def test_init_i18n_text_field_w_null_update(self):
+        m = self.LocalizationTestModelWNulls()
+        m.name = I18n_String(value={"en": "one", "es": "uno"})
+        m.id = 9
+        m.save()
+
+        translation.activate("es")
+        m.name = None
+        m.save()
+        m = self.LocalizationTestModelWNulls.objects.get(pk=9)
+        self.assertEqual(str(m.name), "null")
+        self.assertEqual(m.name.raw_value, {"en": "one", "es": None})
+
+    def test_i18n_text_field_data_consistency_before_and_after_save(self):
+        translation.activate("en")
+        m = self.LocalizationTestModel()
+        m.name = "Marco"
+        m.id = 10
+        self.assertEqual(str(m.name), "Marco")
+        m.save()
+
+        # test that post save everything is the same
+        self.assertEqual(str(m.name), "Marco")
+        
+        # test that the object retrieved from the database is the same
+        m = self.LocalizationTestModel.objects.get(pk=10)
+        self.assertEqual(str(m.name), "Marco")
+        self.assertEqual(m.name.raw_value, {"en": "Marco"})
