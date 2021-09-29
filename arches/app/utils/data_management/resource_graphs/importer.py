@@ -18,11 +18,9 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 
 import logging
 import sys
-import json
 import uuid
 from arches.app.models.graph import Graph
 from arches.app.models.models import CardXNodeXWidget, NodeGroup, DDataType, Widget, ReportTemplate, Function, Ontology, OntologyClass
-from arches.app.models.fields.i18n import default_lang_node_json
 from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializer
 from arches.app.models.models import GraphXMapping
 from django.db import transaction
@@ -99,11 +97,6 @@ def import_graph(graphs, overwrite_graphs=True):
                 if not hasattr(graph, "cards"):
                     errors.append("{0} graph has no attribute cards".format(graph.name))
                 else:
-                    for card in graph.cards.values():
-                        try:
-                            json.loads(card.name)
-                        except:
-                            card.name = default_lang_node_json(value=card.name)
                     if len(Graph.objects.filter(pk=graph.graphid)) == 0 or overwrite_graphs is True:
                         if hasattr(graph, "reports"):
                             for report in graph.reports:
