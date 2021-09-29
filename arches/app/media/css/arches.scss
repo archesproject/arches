@@ -5916,7 +5916,7 @@ ul.jqtree_common li.jqtree-folder {
 }
 
 .profile-report {
-    height: 150px;
+    min-height: 150px;
     background: #102F4F;
     width: 100%;
     padding: 40px 150px 0px 150px;
@@ -14305,8 +14305,17 @@ a.jstree-anchor.permissions-widget {
         padding-left: 8px;
     }
 
-    .profile-list {
+    .profile-list,
+    .profile-report {
         padding: 40px;
+    }
+
+    .profile-full-name,
+    .profile-e-mail {
+        position: relative;
+        left: auto;
+        top: auto;
+        font-size: 1.5em;
     }
 
     .profile-summary-page .notif-table {
