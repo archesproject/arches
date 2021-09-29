@@ -43,14 +43,15 @@
                                 <div class="row">
                                     <div class="col-sm-5">
                                         <div class="relative">
-                                            <h4 class="text-main" style="font-weight: 500;">{{ user.username }}</h4>
-                                            <p class="profile-label-shim">{% trans 'User name' %}</p>
+                                            <h4 class="text-main">{% trans 'User name' %}</h4>
+                                            <p class="profile-label-shim">{{ user.username }}</p>
                                         </div>
                                     </div>
 
                                     <div class="col-sm-7">
-                                        <h4 class="text-main">********</h4>
-                                        <button class="btn btn-default btn-active-success btn-profile-password add-popover" data-bind='click: toggleChangePasswordForm'>
+                                        <h4 class="text-main">{% trans 'Password' %}</h4>
+                                        <p class="profile-label-shim">********</p>
+                                        <button class="btn btn-default btn-active-success btn-profile-password add-popover" data-bind="click: function() { toggleChangePasswordForm(); document.getElementById('old_password').focus(); }" aria-label="Change password">
                                         {% trans 'Change password' %}</button>
                                         <div class="password-success" data-bind="text:changePasswordSuccess"></div>
                                         <div class="change-password-form bottom fade in popover" data-bind='visible: showChangePasswordForm()'>
@@ -64,8 +65,8 @@
                                 <div class="row">
                                     <div class="col-sm-5">
                                         <div class="relative">
-                                            <h4 class="text-main" style="font-weight: 500;">{{ user.email }}</h4>
-                                            <p class="profile-label-shim">{% trans 'Contact email' %}</p>
+                                            <h4 class="text-main">{% trans 'Contact email' %}</h4>
+                                            <p class="profile-label-shim">{{ user.email }}</p>
                                         </div>
                                     </div>
                                 </div>
@@ -73,8 +74,8 @@
                                 <div class="row">
                                     <div class="col-sm-5">
                                         <div class="relative">
-                                            <h4 class="text-main" style="font-weight: 500;">{{ user.userprofile.phone }}</h4>
-                                            <p class="profile-label-shim">{% trans 'Phone' %}</p>
+                                            <h4 class="text-main">{% trans 'Phone' %}</h4>
+                                            <p class="profile-label-shim">{{ user.userprofile.phone }}</p>
                                         </div>
                                     </div>
                                 </div>
