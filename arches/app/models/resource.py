@@ -457,18 +457,26 @@ class Resource(models.ResourceInstance):
         return errors
 
     def get_related_resources(
-        self, lang="en-US", limit=settings.RELATED_RESOURCES_EXPORT_LIMIT, start=0, page=0, user=None, resourceinstance_graphid=None,
+        self,
+        lang="en-US",
+        limit=settings.RELATED_RESOURCES_EXPORT_LIMIT,
+        start=0,
+        page=0,
+        user=None,
+        resourceinstance_graphid=None,
+        graphs=None,
     ):
         """
         Returns an object that lists the related resources, the relationship types, and a reference to the current resource
 
         """
-        graphs = (
-            models.GraphModel.objects.all()
-            .exclude(pk=settings.SYSTEM_SETTINGS_RESOURCE_MODEL_ID)
-            .exclude(isresource=False)
-            .exclude(isactive=False)
-        )
+        if not graphs:
+            graphs = list(
+                models.GraphModel.objects.all()
+                .exclude(pk=settings.SYSTEM_SETTINGS_RESOURCE_MODEL_ID)
+                .exclude(isresource=False)
+                .exclude(isactive=False)
+            )
 
         graph_lookup = {
             str(graph.graphid): {"name": graph.name, "iconclass": graph.iconclass, "fillColor": graph.color} for graph in graphs

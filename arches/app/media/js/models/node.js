@@ -315,7 +315,7 @@ define([
                     this._node(this.json());
                 }
             };
-            this._doRequest({
+            return this._doRequest({
                 type: method,
                 url: this._getURL(method),
                 data: JSON.stringify(this.toJSON())
