@@ -72,3 +72,16 @@
     color: #7AD02F;
     text-decoration: underline;
 }
+
+.profile-label-shim,
+.profile-default-message-panel {
+    color: #595959;
+}
+
+.btn-profile-password {
+    color: #1b4f7d;
+}
+
+.btn-profile-password:focus {
+    outline: #006600 solid 3px !important;
+}
