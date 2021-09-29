@@ -26,7 +26,7 @@ img {
     image-orientation: from-image;
 }
 
-[class^="col-"]:not(.pad-no) {
+[class^="col-"]:not(.pad-no):not(.need-padding) {
     padding-left: 0px;
     padding-right: 0px;
 }
