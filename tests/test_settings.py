@@ -20,6 +20,10 @@ from arches.settings import *
 import os
 import inspect
 
+try:
+    from django.utils.translation import gettext_lazy as _
+except ImportError:  # unable to import prior to installing requirements.txt in setup.py
+    pass
 
 PACKAGE_NAME = "arches"
 ROOT_DIR = os.path.dirname(os.path.abspath(inspect.getfile(inspect.currentframe())))
@@ -84,7 +88,15 @@ NOSE_ARGS = ["--with-coverage", "--nologcapture", "--cover-package=arches", "--v
 
 INSTALLED_APPS = INSTALLED_APPS + ("django_nose",)
 
-DATATYPE_LOCATIONS.append('tests.fixtures.datatypes')
+DATATYPE_LOCATIONS.append("tests.fixtures.datatypes")
+
+LANGUAGES = [
+    ("de", _("German")),
+    ("en", _("English")),
+    ("en-gb", _("British English")),
+    ("es", _("Spanish")),
+    ("ar", _("Arabic")),
+]
 
 try:
     from settings_local import *
