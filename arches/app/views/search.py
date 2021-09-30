@@ -183,7 +183,11 @@ def search_terms(request):
                             nodegroup_id = nodegroup["key"]
                             node = models.Node.objects.get(nodeid=nodegroup_id)
                             graph = node.graph
-                        if str(graph.graphid) not in {"a271c302-1037-11ec-b65f-31043b30bbcd", "bb6de9d8-98a2-11eb-b28f-5f1901ec6b3b", "ccbd1537-ac5e-11e6-84a5-026d961c88e6"}:
+                        if str(graph.graphid) not in {
+                            "a271c302-1037-11ec-b65f-31043b30bbcd",
+                            "bb6de9d8-98a2-11eb-b28f-5f1901ec6b3b",
+                            "ccbd1537-ac5e-11e6-84a5-026d961c88e6",
+                        }:
                             continue
                         context_label = "{0} - {1}".format(graph.name, node.name)
                     ret[index].append(
@@ -279,6 +283,7 @@ def get_dsl_from_search_string(request):
 def search_results(request, returnDsl=False):
     from datetime import timedelta
     from time import time
+
     start = time()
     for_export = request.GET.get("export")
     pages = request.GET.get("pages", None)
