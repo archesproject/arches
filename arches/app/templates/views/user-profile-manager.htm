@@ -39,6 +39,7 @@
                             </div>
 
                             <div class="col-sm-9">
+                                
                                 <!-- ko if: showEditUserForm() === false -->
                                 <div class="row">
                                     <div class="col-sm-5">
@@ -55,11 +56,10 @@
                                         {% trans 'Change password' %}</button>
                                         <div class="password-success" data-bind="text:changePasswordSuccess"></div>
                                         <div class="change-password-form bottom fade in popover" data-bind='visible: showChangePasswordForm()'>
-                                            <div class="arrow" style="left: 50%;"></div>
+                                            <div class="arrow"></div>
                                             {% include 'change_password.htm' %}
                                         </div>
                                     </div>
-
                                 </div>
 
                                 <div class="row">
@@ -190,6 +190,7 @@
                                     </div>
                                 </form>
                                 <!-- /ko -->
+                                
                             </div>
                         </div>
 
@@ -339,7 +340,7 @@
                             <!-- Find a survey -->
                             <div class="col-sm-9 col-sm-offset-3 relative">
                                 <div class="project-search-widget">
-                                    <input type="text" class="form-control" placeholder="{% trans 'Find a project...' %}" data-bind="value: mobileSurveyFilter, valueUpdate: 'keyup'">
+                                    <input type="text" class="form-control" placeholder="{% trans 'Find a project...' %}" aria-label="{% trans 'Find a project...' %}" data-bind="value: mobileSurveyFilter, valueUpdate: 'keyup'">
                                     <span class="clear-node-search" data-bind="visible: mobileSurveyFilter().length > 0, click: function() { mobileSurveyFilter(''); }" tabindex="0" onkeyup="if(event.which == 13 || event.keyCode == 13){ $(this).trigger('click'); }" aria-label="Mobile survey filter"><i class="fa fa-times-circle"></i></span>
                                 </div>
                             </div>
