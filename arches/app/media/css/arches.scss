@@ -5202,10 +5202,20 @@ ul .collapse li:last-of-type {
 
 .change-password-form.popover {
     display: block;
-    margin-top: 65px;
+    margin-top: 80px;
     font-size: 14px;
-    width: 250px;
+    width: auto;
+    max-width: 330px;
     border: 1px solid rgba(0, 0, 0, .2);
+}
+
+.change-password-form.popover legend {
+    font-size: 0.9em;
+    padding: 0 0 10px 0;
+}
+
+.popover.bottom>.arrow {
+    left: 20%;
 }
 
 .change-password-form .panel {
