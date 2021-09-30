@@ -85,3 +85,7 @@
 .btn-profile-password:focus {
     outline: #006600 solid 3px !important;
 }
+
+.password-rule {
+    color: #555;
+}
