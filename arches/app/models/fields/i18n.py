@@ -106,7 +106,7 @@ class I18n_TextField(JSONField):
         If the value was set to a string, then check to see if it's 
         a json object like {"en": "boat", "es": "barco"}, or just a simple string like "boat".
         If it's a json object then use the I18n_String.as_sql method to insert it directly to the database.
-        If it's just a simple string then use the I18n_String.as_sql method is used to update one language value
+        If it's just a simple string then use the I18n_String.as_sql method to update one language value
         out of potentially several previously stored languages using the currently active language.
         See I18n_String.as_sql to see how this magic happens.  :)
         """
