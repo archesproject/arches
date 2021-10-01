@@ -161,7 +161,7 @@ define([
                     var dataEmpty = _.keys(koMapping.toJS(tile.data)).length === 0;
                     if (ko.unwrap(tile.provisionaledits) !== null && dataEmpty) {
                         return 2;
-                    } else if (tile.provisionaledits() !== null && !dataEmpty) {
+                    } else if (ko.unwrap(tile.provisionaledits) !== null && !dataEmpty) {
                         return 1;
                     } else {
                         return 0;
@@ -322,6 +322,31 @@ define([
                     }
                 });
             },
+
+            // used to generate parent tile for nexted data
+            saveParentTile: async(optionalParentTile) => {
+                return new Promise((resolve, reject) => {
+                    if(optionalParentTile && !optionalParentTile.tileid) {
+                        optionalParentTile.save((err) => {
+                            reject(err);
+                        }, () => {
+                            resolve(true);
+                        });
+                    } else if (optionalParentTile && optionalParentTile.tileid) {
+                        // parent tile already exists
+                        resolve(false);
+                        return;
+                    } else {
+                        const tile = self.getNewTile();
+                        tile.save((err) => {
+                            reject(err);
+                        }, () => {
+                            resolve(true);
+                        });
+                    }
+                });
+            },
+
             getNewTile: function(forceNewTile) {
                 if (!this.newTile || forceNewTile) this.newTile = new TileViewModel({
                     tile: {

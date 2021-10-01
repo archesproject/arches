@@ -386,7 +386,7 @@ define([
         },
 
         save: function(callback) {
-            AbstractModel.prototype.save.call(this, function(request, status, self) {
+            return AbstractModel.prototype.save.call(this, function(request, status, self) {
                 if (status === 'success') {
                     this._card(JSON.stringify(this.toJSON()));
                 }
