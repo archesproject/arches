@@ -2080,8 +2080,18 @@ class AnnotationDataType(BaseDataType):
             return self.compile_json(tile, node, geojson=data.get(str(node.nodeid)))
 
     def append_to_document(self, document, nodevalue, nodeid, tile, provisional=False):
-        # document["strings"].append({"string": nodevalue["address"], "nodegroup_id": tile.nodegroup_id})
         return
+
+    def transform_value_for_tile(self, value, **kwargs):
+        try:
+            return json.loads(value)
+        except ValueError:
+            # do this if json (invalid) is formatted with single quotes, re #6390
+            return ast.literal_eval(value)
+        except TypeError:
+            # data should come in as json but python list is accepted as well
+            if isinstance(value, list):
+                return value
 
     def get_search_terms(self, nodevalue, nodeid=None):
         # return [nodevalue["address"]]
