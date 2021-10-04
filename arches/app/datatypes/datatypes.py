@@ -2070,7 +2070,7 @@ class NodeValueDataType(BaseDataType):
 
 
 class AnnotationDataType(BaseDataType):
-    def validate(self, value, source=None, node=None, strict=False):
+    def validate(self, value, row_number=None, source=None, node=None, nodeid=None, strict=False):
         errors = []
         return errors
 
