@@ -61,3 +61,15 @@ def dict_value_from_key(the_dict, key):
     except:
         pass
     return value
+
+
+@register.filter(name="string_to_json")
+def return_string_as_json(string):
+    import json
+    value = {}
+    try:
+        if isinstance(string, str):
+            value = json.loads(string)
+    except:
+        pass
+    return value
