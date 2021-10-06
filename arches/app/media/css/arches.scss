@@ -5662,6 +5662,7 @@ span.editable-card i.fa.fa-align-justify:hover {
 
 .widgets {
     border-bottom-width: 1px;
+    margin-bottom: 20px;
 }
 
 .report li {
@@ -6156,6 +6157,7 @@ th.notif-type {
     display: inline-block;
     margin-right: 20px;
     padding: 7px 12px;
+    cursor: pointer;
 }
 
 .ep-toolbar {
@@ -6680,7 +6682,7 @@ ul div .card-tree-list span .card-tree-list-item .card-tree-list-icon {
     border-bottom: 1px solid #FFB700;
     height: 50px;
     margin-top: -15px;
-    margin-left: -25px;
+    margin-left: -16px;
     margin-right: -25px;
     padding: 15px 25px;
 }
@@ -6720,7 +6722,7 @@ ul div .card-tree-list span .card-tree-list-item .card-tree-list-icon {
     display: flex;
     flex-direction: column;
     position: relative;
-    margin-right: -25px;
+    margin-right: -20px;
     width: 250px;
     padding: 5px 5px 0px 5px;
     border-left: 1px solid #ddd;
@@ -6860,7 +6862,7 @@ ul div .card-tree-list span .card-tree-list-item .card-tree-list-icon {
 
 .new-provisional-edits-header .new-provisional-edits-delete-all {
     width: 100%;
-    padding: 3px 0px;
+    padding: 3px;
     margin: 3px;
 }
 
@@ -14157,6 +14159,10 @@ a.jstree-anchor.permissions-widget {
 .rr-viewer-selector-title.disabled:hover {
     cursor: pointer;
     background: #bbb;
+}
+
+#add-basemap-wizard-help-content .panel-body {
+    padding: 10px 10px 15px 10px;
 }
 
 @keyframes loader {
