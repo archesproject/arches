@@ -84,20 +84,27 @@ class HtmlWriter(Writer):
         for resource in resources:
             gid = str(resource.graph_id)
             if gid in allowed_graph_ids:
-                out = {
-                    "resource": resource.to_json(
+                out = resource.to_json(
                         compact=compact,
                         hide_empty_nodes=hide_empty_nodes,
                         user=user,
                         perm=perm,
-                    ),
-                    "displaydescription": resource.displaydescription,
-                    "displayname": resource.displayname,
-                    "graph_id": resource.graph_id,
-                    "legacyid": resource.legacyid,
-                    "map_popup": resource.map_popup,
-                    "resourceinstanceid": resource.resourceinstanceid,
-                }
+                    )
+                
+                # check to handle if v2 labelgraph is not being used.
+                # TODO: remove once v2 is standardised
+                try:
+                    x = out["displayname"]
+                except KeyError:
+                    out = {
+                        "resource": out,
+                        "displaydescription": resource.displaydescription,
+                        "displayname": resource.displayname,
+                        "graph_id": resource.graph_id,
+                        "legacyid": resource.legacyid,
+                        "map_popup": resource.map_popup,
+                        "resourceinstanceid": resource.resourceinstanceid,
+                    }
 
                 if gid not in resource_lists.keys():
                     resource_lists[gid] = []
