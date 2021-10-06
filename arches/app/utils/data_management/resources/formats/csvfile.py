@@ -941,7 +941,7 @@ class CsvReader(Reader):
                                 tile_to_populate.nodegroup_id = str(tile_to_populate.nodegroup_id)
                                 # Check if we are populating a parent tile by inspecting the tile_to_populate.data array.
                                 source_data_has_target_tile_nodes = (
-                                    len(set([list(obj.keys())[0] for obj in source_data]) & set(tile_to_populate.data.keys())) > 0
+                                    len({list(obj.keys())[0] for obj in source_data} & set(tile_to_populate.data.keys())) > 0
                                 )
                                 source_dict = {k: v for s in source_data for k, v in s.items()}
 
