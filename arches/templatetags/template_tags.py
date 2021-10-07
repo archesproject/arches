@@ -2,6 +2,7 @@ from arches.app.utils.permission_backend import get_editable_resource_types
 from arches.app.utils.permission_backend import get_createable_resource_types
 from arches.app.utils.permission_backend import get_resource_types_by_perm
 from django import template
+import json
 
 register = template.Library()
 
@@ -58,6 +59,20 @@ def dict_value_from_key(the_dict, key):
     try:
         if key in the_dict.keys():
             value = the_dict[key]
+    except:
+        pass
+    return value
+
+
+@register.filter(name="json_to_obj")
+def return_json_as_obj(string):
+    """
+    Allows a json value found in the template context to be converted into an object.
+    """
+    value = {}
+    try:
+        if isinstance(string, str):
+            value = json.loads(string)
     except:
         pass
     return value
