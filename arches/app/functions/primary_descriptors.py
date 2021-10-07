@@ -9,8 +9,8 @@ from django.utils.translation import ugettext as _
 class PrimaryDescriptorsFunction(BaseFunction):
     def get_primary_descriptor_from_nodes(self, resource, config):
         map_popup = False
-        map_popup_template_default = '<Place Address> (<Address Type>)'
-        if config['string_template'] == map_popup_template_default:
+        map_popup_template_default = "<Place Address> (<Address Type>)"
+        if config["string_template"] == map_popup_template_default:
             map_popup = True
         datatype_factory = None
         try:
