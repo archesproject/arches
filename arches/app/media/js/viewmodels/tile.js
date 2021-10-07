@@ -68,9 +68,20 @@ define([
             koMapping.toJSON(params.tile.data)
         );
 
-        this.data = koMapping.fromJS(params.tile.data);
-        this.provisionaledits = ko.observable(params.tile.provisionaledits);
         this.datatypeLookup = getDatatypeLookup(params);
+
+        this.data = {};
+
+        for(key of Object.keys(params.tile.data)){
+            const datatype = this.datatypeLookup[key];
+            if(datatype == 'string'){
+                this.data[key] = ko.observable(params.tile.data[key]);
+            } else {
+                this.data[key] = koMapping.fromJS(params.tile.data[key]);
+            }
+        }
+
+        this.provisionaledits = ko.observable(params.tile.provisionaledits);
         this.transactionId = params.transactionId;
 
         _.extend(this, {

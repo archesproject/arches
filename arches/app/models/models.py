@@ -430,6 +430,30 @@ class Icon(models.Model):
         db_table = "icons"
 
 
+class Language(models.Model):
+    LEFT_TO_RIGHT = "ltr"
+    RIGHT_TO_LEFT = "rtl"
+    LANGUAGE_DIRECTION_CHOICES = [
+        (LEFT_TO_RIGHT, 'Left to Right'),
+        (RIGHT_TO_LEFT, 'Right to Left')
+    ]
+
+    SYSTEM_SCOPE = "system"
+    DATA_SCOPE = "data"
+    SCOPE_CHOICES = [
+        (SYSTEM_SCOPE, "System Scope"),
+        (DATA_SCOPE, "Data Scope")
+    ]
+    id = models.AutoField(primary_key=True)
+    code = models.TextField() #ISO639 code
+    name = models.TextField()
+    default_direction = models.TextField(choices=LANGUAGE_DIRECTION_CHOICES, default=LEFT_TO_RIGHT)
+    scope = models.TextField(choices=SCOPE_CHOICES, default=SYSTEM_SCOPE)
+
+    class Meta:
+        managed = True
+        db_table = "languages"
+
 class NodeGroup(models.Model):
     nodegroupid = models.UUIDField(primary_key=True, default=uuid.uuid1)  # This field type is a guess.
     legacygroupid = models.TextField(blank=True, null=True)

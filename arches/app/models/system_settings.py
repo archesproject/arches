@@ -119,8 +119,12 @@ class SystemSettings(LazySettings):
                 for node in tile.nodegroup.node_set.all():
                     if node.datatype != "semantic":
                         try:
-                            val = tile.data[str(node.nodeid)]
-                            setattr(self, node.name, val)
+                            if node.datatype == "string":
+                                val = tile.data[str(node.nodeid)]["en-us"]["value"]
+                                setattr(self, node.name, val)
+                            else:
+                                val = tile.data[str(node.nodeid)]
+                                setattr(self, node.name, val)
                         except:
                             pass
 

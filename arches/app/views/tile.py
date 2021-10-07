@@ -119,7 +119,7 @@ class TileData(View):
                     try:
                         resource.save(user=request.user, transaction_id=transaction_id)
                         data["resourceinstance_id"] = resource.pk
-                        resource.index()
+                        #resource.index()
                     except ModelInactiveError as e:
                         message = _("Unable to save. Please verify the model status is active")
                         return JSONResponse({"status": "false", "message": [_(e.title), _(str(message))]}, status=500)

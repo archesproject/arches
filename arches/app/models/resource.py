@@ -20,6 +20,7 @@ import uuid
 import importlib
 import datetime
 import logging
+import pdb
 from time import time
 from uuid import UUID
 from django.db import transaction
@@ -27,6 +28,7 @@ from django.db.models import Q
 from django.contrib.auth.models import User, Group, Permission
 from django.core.exceptions import ObjectDoesNotExist
 from django.utils.translation import ugettext as _
+from django.utils.translation import get_language
 from arches.app.models import models
 from arches.app.models.models import EditLog
 from arches.app.models.models import TileModel
@@ -265,7 +267,9 @@ class Resource(models.ResourceInstance):
         document["displayname"] = None
         document["root_ontology_class"] = self.get_root_ontology()
         document["legacyid"] = self.legacyid
-        document["displayname"] = self.displayname
+        #pdb.set_trace()
+        if self.displayname is not None:
+            document["displayname"] = JSONDeserializer().deserialize(self.displayname)[get_language()]["value"]
         document["displaydescription"] = self.displaydescription
         document["map_popup"] = self.map_popup
 
@@ -296,20 +300,40 @@ class Resource(models.ResourceInstance):
                     datatype_instance = datatype_factory.get_instance(datatype)
                     datatype_instance.append_to_document(document, nodevalue, nodeid, tile)
                     node_terms = datatype_instance.get_search_terms(nodevalue, nodeid)
+
                     for index, term in enumerate(node_terms):
-                        terms.append(
-                            {
-                                "_id": str(nodeid) + str(tile.tileid) + str(index),
-                                "_source": {
-                                    "value": term,
-                                    "nodeid": nodeid,
-                                    "nodegroupid": tile.nodegroup_id,
-                                    "tileid": tile.tileid,
-                                    "resourceinstanceid": tile.resourceinstance_id,
-                                    "provisional": False,
-                                },
-                            }
-                        )
+                        if(datatype == "string"):
+                            terms.append(
+                                {
+                                    "_id": str(nodeid) + str(tile.tileid) + str(index) + term["language"],
+                                    "_source": {
+                                        "value": term["value"],
+                                        "nodeid": nodeid,
+                                        "nodegroupid": tile.nodegroup_id,
+                                        "tileid": tile.tileid,
+                                        "language": term["language"],
+                                        "direction": term["direction"],
+                                        "resourceinstanceid": tile.resourceinstance_id,
+                                        "provisional": False,
+                                    },
+                                }
+                            )    
+                        else:
+                            terms.append(
+                                {
+                                    "_id": str(nodeid) + str(tile.tileid) + str(index),
+                                    "_source": {
+                                        "value": term,
+                                        "nodeid": nodeid,
+                                        "nodegroupid": tile.nodegroup_id,
+                                        "tileid": tile.tileid,
+                                        "language": "en-us", #TODO: make dynamic based on system language
+                                        "direction": "ltr",
+                                        "resourceinstanceid": tile.resourceinstance_id,
+                                        "provisional": False,
+                                    },
+                                }
+                            )
 
             if tile.provisionaledits is not None:
                 provisionaledits = tile.provisionaledits
@@ -324,20 +348,40 @@ class Resource(models.ResourceInstance):
                                     datatype_instance = datatype_factory.get_instance(datatype)
                                     datatype_instance.append_to_document(document, nodevalue, nodeid, tile, True)
                                     node_terms = datatype_instance.get_search_terms(nodevalue, nodeid)
+
                                     for index, term in enumerate(node_terms):
-                                        terms.append(
-                                            {
-                                                "_id": str(nodeid) + str(tile.tileid) + str(index),
-                                                "_source": {
-                                                    "value": term,
-                                                    "nodeid": nodeid,
-                                                    "nodegroupid": tile.nodegroup_id,
-                                                    "tileid": tile.tileid,
-                                                    "resourceinstanceid": tile.resourceinstance_id,
-                                                    "provisional": True,
-                                                },
-                                            }
-                                        )
+                                        if(datatype == "string"):
+                                            terms.append(
+                                                {
+                                                    "_id": str(nodeid) + str(tile.tileid) + str(index) + term["language"],
+                                                    "_source": {
+                                                        "value": term["value"],
+                                                        "nodeid": nodeid,
+                                                        "nodegroupid": tile.nodegroup_id,
+                                                        "tileid": tile.tileid,
+                                                        "language": term["language"],
+                                                        "direction": term["direction"],
+                                                        "resourceinstanceid": tile.resourceinstance_id,
+                                                        "provisional": True,
+                                                    },
+                                                }
+                                            )    
+                                        else:
+                                            terms.append(
+                                                {
+                                                    "_id": str(nodeid) + str(tile.tileid) + str(index),
+                                                    "_source": {
+                                                        "value": term,
+                                                        "nodeid": nodeid,
+                                                        "nodegroupid": tile.nodegroup_id,
+                                                        "tileid": tile.tileid,
+                                                        "language": "en-us", #TODO: make dynamic based on system language
+                                                        "direction": "ltr",
+                                                        "resourceinstanceid": tile.resourceinstance_id,
+                                                        "provisional": True,
+                                                    },
+                                                }
+                                            )
 
         return document, terms
 

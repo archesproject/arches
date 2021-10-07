@@ -88,7 +88,9 @@ class StringDataType(BaseDataType):
         errors = []
         try:
             if value is not None:
-                value.upper()
+                for key in value.keys():
+                    isinstance(value[key]['value'], str)
+                    isinstance(value[key]['direction'], str)
         except:
             message = _("This is not a string")
             error_message = self.create_error_message(value, source, row_number, message)
@@ -100,8 +102,12 @@ class StringDataType(BaseDataType):
             tile.data[nodeid] = None
 
     def append_to_document(self, document, nodevalue, nodeid, tile, provisional=False):
-        val = {"string": nodevalue, "nodegroup_id": tile.nodegroup_id, "provisional": provisional}
-        document["strings"].append(val)
+        if nodevalue is not None:
+            for lang in nodevalue.keys():
+                val = {"string": nodevalue[lang]["value"], "nodegroup_id": tile.nodegroup_id, "provisional": provisional}
+                document["strings"].append(val)
+        else:
+            document["strings"].append({"string": None, "nodegroup_id": tile.nodegroup_id, "provisional": provisional})
 
     def transform_export_values(self, value, *args, **kwargs):
         if value is not None:
@@ -109,9 +115,12 @@ class StringDataType(BaseDataType):
 
     def get_search_terms(self, nodevalue, nodeid=None):
         terms = []
+
         if nodevalue is not None:
-            if settings.WORDS_PER_SEARCH_TERM is None or (len(nodevalue.split(" ")) < settings.WORDS_PER_SEARCH_TERM):
-                terms.append(nodevalue)
+            for key in nodevalue.keys():
+                if settings.WORDS_PER_SEARCH_TERM is None or (len(nodevalue[key]['value'].split(" ")) < settings.WORDS_PER_SEARCH_TERM):
+                    terms.append({"language": key, "value": nodevalue[key]["value"], "direction": nodevalue[key]["direction"]})
+
         return terms
 
     def append_search_filters(self, value, node, query, request):
@@ -149,6 +158,22 @@ class StringDataType(BaseDataType):
             return value[0]
         except (AttributeError, KeyError) as e:
             pass
+
+    def get_display_value(self, tile, node):
+        data = self.get_tile_data(tile)
+        if data:
+            raw_value = data.get(str(node.nodeid))
+            if raw_value is not None:
+                return raw_value
+
+    # def default_es_mapping(self):
+    #     """
+    #     Default mapping if not specified is a text field
+    #     """
+
+    #     text_mapping = {"properties": {"en-us": {"properties": {"value": {"type": "text", "fields": {"keyword": {"ignore_above": 256, "type": "keyword"}}}}}}}
+    #     return text_mapping
+
 
 
 class NumberDataType(BaseDataType):

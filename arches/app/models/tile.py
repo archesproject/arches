@@ -476,7 +476,8 @@ class Tile(models.TileModel):
                 )
 
             if index:
-                self.index()
+                pass
+                #self.index()
 
             for tile in self.tiles:
                 tile.resourceinstance = self.resourceinstance

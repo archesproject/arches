@@ -9,7 +9,26 @@
         <i data-bind="css: {'ion-asterisk widget-label-required': node.isrequired}"></i>
         <!-- /ko -->
         <div class="col-xs-12">
-            <input type="text" data-bind="textInput: value, attr: {placeholder: placeholder, maxlength: maxLength, disabled: disable}" class="form-control input-lg widget-input">
+            <input type="text" data-bind="textInput: currentText, attr: {placeholder: placeholder, maxlength: maxLength, disabled: disable, dir: currentDirection}" class="form-control input-lg widget-input">
+            <select id="lang_dd" style="max-width: 600px;" name="language" data-bind="value: currentLanguage, chosen: {
+                'max-width':'600px'}">
+                {% get_current_language as LANGUAGE_CODE %}
+                {% get_available_languages as LANGUAGES %}
+                {% for CODE, NAME in LANGUAGES %}
+                <option value="{{ CODE|lower }}" {% if CODE|lower == LANGUAGE_CODE|lower %}selected="selected" {% endif %}>
+                    {{ NAME }} ({{ CODE }})
+                </option>
+                {% endfor %}
+            </select>            
+            <select id="lang_dir" style="max-width: 600px;" name="language" data-bind="value: currentDirection, chosen: {
+                'max-width':'600px'}">
+                <option value="ltr">
+                    Left-to-Right
+                </option>
+                <option value="rtl">
+                    Right-to-Left
+                </option>
+            </select>
         </div>
     </div>
 </div>
@@ -44,3 +63,18 @@
     </div>
 </div>
 {% endblock config_form %}
+
+<!-- ko if: !configForm  && state === 'display_value' -->
+{% block display_value %}<span data-bind="text: console.log(displayValue())"></span>
+<span data-bind="text: displayValue && displayValue()[currentLanguage()] && displayValue()[currentLanguage()]['value'] ? displayValue()[currentLanguage()]['value'] : '' || '{% trans "None" %}'"></span>
+{% endblock display_value %}
+<!-- /ko -->
+
+<!-- ko if: !configForm  && state === 'report' -->
+<!-- ko if: !ko.unwrap(hideEmptyNodes) || ko.unwrap(hideEmptyNodes) === true && displayValue() -->
+{% block report %}
+<dt data-bind="text: label"></dt>
+<dd data-bind="text: displayValue()[currentLanguage()] && displayValue()[currentLanguage()]['value'] ? displayValue()[currentLanguage()]['value'] : '{% trans "None" %}'"></dd>
+{% endblock report %}
+<!-- /ko -->
+<!-- /ko -->
