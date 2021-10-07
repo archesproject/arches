@@ -85,12 +85,12 @@ class HtmlWriter(Writer):
             gid = str(resource.graph_id)
             if gid in allowed_graph_ids:
                 out = resource.to_json(
-                        compact=compact,
-                        hide_empty_nodes=hide_empty_nodes,
-                        user=user,
-                        perm=perm,
-                    )
-                
+                    compact=compact,
+                    hide_empty_nodes=hide_empty_nodes,
+                    user=user,
+                    perm=perm,
+                )
+
                 # check to handle if v2 labelgraph is not being used.
                 # TODO: remove once v2 is standardised
                 try:
