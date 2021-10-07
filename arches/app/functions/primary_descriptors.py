@@ -8,6 +8,10 @@ from django.utils.translation import ugettext as _
 
 class PrimaryDescriptorsFunction(BaseFunction):
     def get_primary_descriptor_from_nodes(self, resource, config):
+        map_popup = False
+        map_popup_template_default = '<Place Address> (<Address Type>)'
+        if config['string_template'] == map_popup_template_default:
+            map_popup = True
         datatype_factory = None
         try:
             if "nodegroup_id" in config and config["nodegroup_id"] != "" and config["nodegroup_id"] is not None:
@@ -34,6 +38,8 @@ class PrimaryDescriptorsFunction(BaseFunction):
                             if value is None:
                                 value = ""
                             config["string_template"] = config["string_template"].replace("<%s>" % node.name, str(value))
+                            if map_popup and map_popup_template_default not in config["string_template"]:
+                                config["string_template"] += "<br>" + map_popup_template_default.replace("<%s>" % node.name, str(value))
         except ValueError as e:
             print(e, "invalid nodegroupid participating in descriptor function.")
         if config["string_template"].strip() == "":
