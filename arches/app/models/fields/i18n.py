@@ -75,6 +75,9 @@ class I18n_String(object):
                     ret = ""
         return json.dumps(ret) if ret is None else ret
 
+    def serialize(self):
+        return str(self)
+
 
 class I18n_TextField(JSONField):
     description = _("A I18n_TextField object")
