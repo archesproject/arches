@@ -26,7 +26,7 @@ img {
     image-orientation: from-image;
 }
 
-[class^="col-"]:not(.pad-no) {
+[class^="col-"]:not(.pad-no):not(.need-padding) {
     padding-left: 0px;
     padding-right: 0px;
 }
@@ -5271,10 +5271,20 @@ ul .collapse li:last-of-type {
 
 .change-password-form.popover {
     display: block;
-    margin-top: 65px;
+    margin-top: 80px;
     font-size: 14px;
-    width: 250px;
+    width: auto;
+    max-width: 330px;
     border: 1px solid rgba(0, 0, 0, .2);
+}
+
+.change-password-form.popover legend {
+    font-size: 0.9em;
+    padding: 0 0 10px 0;
+}
+
+.popover.bottom>.arrow {
+    left: 20%;
 }
 
 .change-password-form .panel {
@@ -5985,7 +5995,7 @@ ul.jqtree_common li.jqtree-folder {
 }
 
 .profile-report {
-    height: 150px;
+    min-height: 150px;
     background: #102F4F;
     width: 100%;
     padding: 40px 150px 0px 150px;
@@ -6010,7 +6020,7 @@ div.profile-notif-settings {
 
 .notif-table {
     width: 100%;
-    margin-top: -40px;
+    margin-top: -7px;
 }
 
 .notif-table th {
@@ -6073,6 +6083,7 @@ th.notif-type {
 
 .profile-header {
     font-size: 21px;
+    margin-top: 5px;
 }
 
 .account-summary {
@@ -6179,7 +6190,6 @@ th.notif-type {
 }
 
 .profile-default-message-panel {
-    text-align: center;
     padding-top: 10px;
     padding-bottom: 20px;
     font-size: 17px;
@@ -11908,6 +11918,10 @@ a.filter-tools:hover {
     padding-top: 0px;
 }
 
+.account-wrapper hr {
+    border-color: #eee;
+}
+
 .msm-data-selection .form-text.form-checkbox:not(.btn),
 .form-text.form-radio:not(.btn) {
     margin-top: 1px;
@@ -14398,6 +14412,27 @@ a.jstree-anchor.permissions-widget {
 
     #container.mainnav-sm .brand-title {
         display: none;
+    }
+    
+    .profile-list,
+    .profile-report {
+        padding: 40px;
+    }
+
+    .profile-full-name,
+    .profile-e-mail {
+        position: relative;
+        left: auto;
+        top: auto;
+        font-size: 1.5em;
+    }
+
+    .profile-summary-page .notif-table {
+        margin-top: 0;
+    }
+
+    .profile-summary-page .account-wrapper .row {
+        margin: 0;
     }
 
 }
