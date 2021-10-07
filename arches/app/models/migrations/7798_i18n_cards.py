@@ -7,7 +7,7 @@ from django.conf import settings
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('models', '7128_resource_instance_filter'),
+        ("models", "7128_resource_instance_filter"),
     ]
 
     sql = """
@@ -16,8 +16,13 @@ class Migration(migrations.Migration):
         UPDATE public.cards SET instructions=CONCAT('{"%s":"',instructions,'"}'); 
         UPDATE public.cards SET helptitle=CONCAT('{"%s":"',helptitle,'"}'); 
         UPDATE public.cards SET helptext=CONCAT('{"%s":"',helptext,'"}');
-    """ % (settings.LANGUAGE_CODE,settings.LANGUAGE_CODE,settings.LANGUAGE_CODE,settings.LANGUAGE_CODE,settings.LANGUAGE_CODE )
-
+    """ % (
+        settings.LANGUAGE_CODE,
+        settings.LANGUAGE_CODE,
+        settings.LANGUAGE_CODE,
+        settings.LANGUAGE_CODE,
+        settings.LANGUAGE_CODE,
+    )
 
     reverse_sql = """
         UPDATE public.cards SET name=name::jsonb->>'%s'::text;
@@ -25,33 +30,39 @@ class Migration(migrations.Migration):
         UPDATE public.cards SET instructions=instructions::jsonb->>'%s'::text;
         UPDATE public.cards SET helptitle=helptitle::jsonb->>'%s'::text;
         UPDATE public.cards SET helptext=helptext::jsonb->>'%s'::text;
-    """ % (settings.LANGUAGE_CODE,settings.LANGUAGE_CODE,settings.LANGUAGE_CODE,settings.LANGUAGE_CODE,settings.LANGUAGE_CODE)
+    """ % (
+        settings.LANGUAGE_CODE,
+        settings.LANGUAGE_CODE,
+        settings.LANGUAGE_CODE,
+        settings.LANGUAGE_CODE,
+        settings.LANGUAGE_CODE,
+    )
 
     operations = [
         migrations.RunSQL(sql, reverse_sql),
         migrations.AlterField(
-            model_name='cardmodel',
-            name='name',
+            model_name="cardmodel",
+            name="name",
             field=I18n_TextField(blank=True, null=True),
         ),
         migrations.AlterField(
-            model_name='cardmodel',
-            name='description',
+            model_name="cardmodel",
+            name="description",
             field=I18n_TextField(blank=True, null=True),
         ),
         migrations.AlterField(
-            model_name='cardmodel',
-            name='instructions',
+            model_name="cardmodel",
+            name="instructions",
             field=I18n_TextField(blank=True, null=True),
         ),
         migrations.AlterField(
-            model_name='cardmodel',
-            name='helptitle',
+            model_name="cardmodel",
+            name="helptitle",
             field=I18n_TextField(blank=True, null=True),
         ),
         migrations.AlterField(
-            model_name='cardmodel',
-            name='helptext',
+            model_name="cardmodel",
+            name="helptext",
             field=I18n_TextField(blank=True, null=True),
         ),
     ]
