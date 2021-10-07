@@ -36,41 +36,45 @@ define([
         this.canvasLabel = ko.observable();
         this.zoomToCanvas = !(params.zoom && params.center);
         this.annotationNodes = ko.observableArray();
+
+        this.buildAnnotationNodes = params.buildAnnotationNodes || function(json) {
+            self.annotationNodes(
+                json.map(function(node) {
+                    var annotations = ko.observableArray();
+                    var updateAnnotations = function() {
+                        var canvas = self.canvas();
+                        if (canvas) {
+                            window.fetch(arches.urls.iiifannotations + '?canvas=' + canvas + '&nodeid=' + node.nodeid)
+                                .then(function(response) {
+                                    return response.json();
+                                })
+                                .then(function(json) {
+                                    json.features.forEach(function(feature) {
+                                        feature.properties.graphName = node['graph_name'];
+                                    });
+                                    annotations(json.features);
+                                });
+                        }
+                    };
+                    self.canvas.subscribe(updateAnnotations);
+                    updateAnnotations();
+                    return {
+                        name: node['graph_name'] + ' - ' + node.name,
+                        icon: node.icon,
+                        active: ko.observable(false),
+                        opacity: ko.observable(100),
+                        annotations: annotations
+                    };
+                })
+            );
+        };
+
         window.fetch(arches.urls.iiifannotationnodes)
             .then(function(response) {
                 return response.json();
             })
-            .then(function(json) {
-                self.annotationNodes(
-                    json.map(function(node) {
-                        var annotations = ko.observableArray();
-                        var updateAnnotations = function() {
-                            var canvas = self.canvas();
-                            if (canvas) {
-                                window.fetch(arches.urls.iiifannotations + '?canvas=' + canvas + '&nodeid=' + node.nodeid)
-                                    .then(function(response) {
-                                        return response.json();
-                                    })
-                                    .then(function(json) {
-                                        json.features.forEach(function(feature) {
-                                            feature.properties.graphName = node['graph_name'];
-                                        });
-                                        annotations(json.features);
-                                    });
-                            }
-                        };
-                        self.canvas.subscribe(updateAnnotations);
-                        updateAnnotations();
-                        return {
-                            name: node['graph_name'] + ' - ' + node.name,
-                            icon: node.icon,
-                            active: ko.observable(false),
-                            opacity: ko.observable(100),
-                            annotations: annotations
-                        };
-                    })
-                );
-            });
+            .then(self.buildAnnotationNodes);
+
         var annotationLayer = ko.computed(function() {
             var annotationFeatures = [];
             self.annotationNodes().forEach(function(node) {
@@ -116,36 +120,40 @@ define([
                     return style;
                 },
                 onEachFeature: function(feature, layer) {
-                    var popup = L.popup({
-                        closeButton: false,
-                        maxWidth: 349
-                    })
-                        .setContent(iiifPopup)
-                        .on('add', function() {
-                            var popupData = {
-                                'closePopup': function() {
-                                    popup.remove();
-                                },
-                                'name': ko.observable(''),
-                                'description': ko.observable(''),
-                                'graphName': feature.properties.graphName,
-                                'resourceinstanceid': feature.properties.resourceId,
-                                'reportURL': arches.urls.resource_report
-                            };
-                            window.fetch(arches.urls.resource_descriptors + popupData.resourceinstanceid)
-                                .then(function(response) {
-                                    return response.json();
-                                })
-                                .then(function(descriptors) {
-                                    popupData.name(descriptors.displayname);
-                                    popupData.description(descriptors['map_popup']);
-                                });
-                            var popupElement = popup.getElement()
-                                .querySelector('.mapboxgl-popup-content');
-                            ko.applyBindingsToDescendants(popupData, popupElement);
-                        });
-                    layer.bindPopup(popup);
-
+                    if (params.onEachFeature) {
+                        params.onEachFeature(feature, layer);
+                    }
+                    else {
+                        var popup = L.popup({
+                            closeButton: false,
+                            maxWidth: 349
+                        })
+                            .setContent(iiifPopup)
+                            .on('add', function() {
+                                var popupData = {
+                                    'closePopup': function() {
+                                        popup.remove();
+                                    },
+                                    'name': ko.observable(''),
+                                    'description': ko.observable(''),
+                                    'graphName': feature.properties.graphName,
+                                    'resourceinstanceid': feature.properties.resourceId,
+                                    'reportURL': arches.urls.resource_report
+                                };
+                                window.fetch(arches.urls.resource_descriptors + popupData.resourceinstanceid)
+                                    .then(function(response) {
+                                        return response.json();
+                                    })
+                                    .then(function(descriptors) {
+                                        popupData.name(descriptors.displayname);
+                                        popupData.description(descriptors['map_popup']);
+                                    });
+                                var popupElement = popup.getElement()
+                                    .querySelector('.mapboxgl-popup-content');
+                                ko.applyBindingsToDescendants(popupData, popupElement);
+                            });
+                        layer.bindPopup(popup);
+                    }
                 }
             });
         });

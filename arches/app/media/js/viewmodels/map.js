@@ -23,6 +23,8 @@ define([
         };
 
         this.activeTab = ko.observable(ko.unwrap(params.activeTab));
+        this.canEdit = params.userCanEditResources;
+        this.canRead = params.userCanReadResources;
 
         var boundingOptions = {
             padding: {
@@ -34,7 +36,7 @@ define([
             animate: false
         };
 
-        this.map = ko.observable(ko.unwrap(params.map));
+        this.map = ko.isObservable(params.map) ? params.map : ko.observable();
         this.map.subscribe(function(map) {
             self.setupMap(map);
 
@@ -57,7 +59,8 @@ define([
             if (ko.unwrap(params.bounds)) {
                 map.fitBounds(ko.unwrap(params.bounds), boundingOptions);
             }
-        })
+
+        });
 
         this.bounds = ko.observable(ko.unwrap(params.bounds) || arches.hexBinBounds);
         this.bounds.subscribe(function(bounds) {
@@ -337,7 +340,7 @@ define([
         this.getPopupData = function(feature) {
             var data = feature.properties;
             var id = data.resourceinstanceid;
-            data.showEditButton = false;
+            data.showEditButton = self.canEdit;
             if (id) {
                 if (!self.resourceLookup[id]){
                     data = _.defaults(data, {
@@ -352,8 +355,8 @@ define([
                         } catch (err) {
                             data.permissions = koMapping.toJS(ko.unwrap(data.permissions));
                         }
-                        if (data.permissions.users_without_edit_perm.indexOf(ko.unwrap(self.userid)) === -1) {
-                            data.showEditButton = true;
+                        if (data.permissions.users_without_edit_perm.indexOf(ko.unwrap(self.userid)) > 0) {
+                            data.showEditButton = false;
                         }
                     }
                     data = ko.mapping.fromJS(data);

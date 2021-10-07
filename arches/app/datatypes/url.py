@@ -65,7 +65,7 @@ class URLDataType(BaseDataType):
 
     URL_REGEX = re.compile(r"https?:\/\/(www\.)?[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_\+.~#?&//=]*)")
 
-    def validate(self, value, row_number=None, source=None, node=None, nodeid=None):
+    def validate(self, value, row_number=None, source=None, node=None, nodeid=None, strict=False):
         errors = []
         try:
             if value.get("url") is not None:
@@ -117,6 +117,11 @@ class URLDataType(BaseDataType):
 
             if display_value:
                 return json.dumps(display_value)
+
+    def to_json(self, tile, node):
+        data = self.get_tile_data(tile)
+        if data:
+            return self.compile_json(tile, node, **data.get(str(node.nodeid)))
 
     def append_to_document(self, document, nodevalue, nodeid, tile, provisional=False):
         if nodevalue.get("url") is not None:

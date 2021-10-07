@@ -20,6 +20,7 @@ from base64 import b64decode
 from datetime import datetime
 import logging
 import os
+import json
 from django.contrib.auth import authenticate
 from django.contrib.gis.geos import GEOSGeometry
 from django.core.cache import cache
@@ -50,6 +51,7 @@ from tempfile import NamedTemporaryFile
 from openpyxl import Workbook
 
 logger = logging.getLogger(__name__)
+
 
 class SearchView(MapBaseManagerView):
     def get(self, request):
@@ -111,7 +113,13 @@ class SearchView(MapBaseManagerView):
 
 
 def home_page(request):
-    return render(request, "views/search.htm", {"main_script": "views/search",})
+    return render(
+        request,
+        "views/search.htm",
+        {
+            "main_script": "views/search",
+        },
+    )
 
 
 def search_terms(request):
@@ -200,6 +208,7 @@ def export_results(request):
 
     total = int(request.GET.get("total", 0))
     format = request.GET.get("format", "tilecsv")
+    report_link = request.GET.get("reportlink", False)
     download_limit = settings.SEARCH_EXPORT_IMMEDIATE_DOWNLOAD_THRESHOLD
     if total > download_limit and format != "geojson":
         celery_worker_running = task_management.check_if_celery_available()
@@ -207,7 +216,9 @@ def export_results(request):
             request_values = dict(request.GET)
             request_values["path"] = request.get_full_path()
             result = tasks.export_search_results.apply_async(
-                (request.user.id, request_values, format), link=tasks.update_user_task_record.s(), link_error=tasks.log_error.s()
+                (request.user.id, request_values, format, report_link),
+                link=tasks.update_user_task_record.s(),
+                link_error=tasks.log_error.s(),
             )
             message = _(
                 "{total} instances have been submitted for export. \
@@ -219,7 +230,7 @@ def export_results(request):
             return JSONResponse({"success": False, "message": message})
     elif format == "tilexl":
         exporter = SearchResultsExporter(search_request=request)
-        export_files, export_info = exporter.export(format)
+        export_files, export_info = exporter.export(format, report_link)
         wb = export_files[0]["outputfile"]
         with NamedTemporaryFile() as tmp:
             wb.save(tmp.name)
@@ -229,7 +240,7 @@ def export_results(request):
             return zip_utils.zip_response(export_files, zip_file_name=f"{settings.APP_NAME}_export.zip")
     else:
         exporter = SearchResultsExporter(search_request=request)
-        export_files, export_info = exporter.export(format)
+        export_files, export_info = exporter.export(format, report_link)
 
         if len(export_files) == 0 and format == "shp":
             message = _(
@@ -252,18 +263,28 @@ def append_instance_permission_filter_dsl(request, search_results_object):
         search_results_object["query"].add_query(has_access)
 
 
-def search_results(request):
+def get_dsl_from_search_string(request):
+    dsl = search_results(request, returnDsl=True).dsl
+    return JSONResponse(dsl)
+
+
+def search_results(request, returnDsl=False):
     for_export = request.GET.get("export")
     pages = request.GET.get("pages", None)
     total = int(request.GET.get("total", "0"))
     resourceinstanceid = request.GET.get("id", None)
+    load_tiles = request.GET.get("tiles", False)
+    if load_tiles:
+        try:
+            load_tiles = json.loads(load_tiles)
+        except TypeError:
+            pass
     se = SearchEngineFactory().create()
+    permitted_nodegroups = get_permitted_nodegroups(request.user)
+    include_provisional = get_provisional_type(request)
+    search_filter_factory = SearchFilterFactory(request)
     search_results_object = {"query": Query(se)}
 
-    include_provisional = get_provisional_type(request)
-    permitted_nodegroups = get_permitted_nodegroups(request.user)
-
-    search_filter_factory = SearchFilterFactory(request)
     try:
         for filter_type, querystring in list(request.GET.items()) + [("search-results", "")]:
             search_filter = search_filter_factory.get_filter(filter_type)
@@ -275,6 +296,8 @@ def search_results(request):
         return JSONErrorResponse(message=err)
 
     dsl = search_results_object.pop("query", None)
+    if returnDsl:
+        return dsl
     dsl.include("graph_id")
     dsl.include("root_ontology_class")
     dsl.include("resourceinstanceid")
@@ -288,7 +311,7 @@ def search_results(request):
     dsl.include("displaydescription")
     dsl.include("map_popup")
     dsl.include("provisional_resource")
-    if request.GET.get("tiles", None) is not None:
+    if load_tiles:
         dsl.include("tiles")
     if for_export or pages:
         results = dsl.search(index=RESOURCES_INDEX, scroll="1m")

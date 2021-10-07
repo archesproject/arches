@@ -24,7 +24,7 @@ define(['arches', 'models/abstract'], function (arches, AbstractModel) {
         },
 
         makeCollection: function(callback, scope){
-            this._doRequest({
+            return this._doRequest({
                 type: 'GET',
                 url: arches.urls.concept_make_collection.replace('aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa', this.get('id')),
                 data: {}

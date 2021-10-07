@@ -3,14 +3,17 @@ define([
     'underscore',
     'knockout',
     'knockout-mapping',
-    'viewmodels/report',
     'arches',
-    'bindings/chosen'
-], function($, _, ko, koMapping, ReportViewModel, arches) {
+    'viewmodels/report',
+    'bindings/chosen',
+], function($, _, ko, koMapping, arches, ReportViewModel) {
     return function(params) {
-        params.configKeys = ['tabs', 'activeTabIndex'];
-        ReportViewModel.apply(this, [params]);
         var self = this;
+
+        params.configKeys = ['tabs', 'activeTabIndex'];
+
+        ReportViewModel.apply(this, [params]);
+
         if (this.activeTabIndex() > self.tabs().length - 1) {
             this.activeTabIndex(0);
         }
@@ -35,7 +38,7 @@ define([
         this.activeTab = ko.observable(self.tabs()[ko.unwrap(this.activeTabIndex)]);
         this.report.configJSON.subscribe(function(){
             if (self.tabs.indexOf(self.activeTab()) === -1) {
-                self.activeTab(self.tabs()[ko.unwrap(this.activeTabIndex)]);
+                self.activeTab(self.tabs()[ko.unwrap(self.activeTabIndex)]);
             }
         });
         this.topcards = ko.unwrap(self.report.cards).map(function(card){

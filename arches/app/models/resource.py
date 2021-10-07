@@ -37,6 +37,7 @@ from arches.app.search.mappings import TERMS_INDEX, RESOURCE_RELATIONS_INDEX, RE
 from arches.app.search.elasticsearch_dsl_builder import Query, Bool, Terms, Nested
 from arches.app.utils import import_class_from_string
 from arches.app.utils.label_based_graph import LabelBasedGraph
+from arches.app.utils.label_based_graph_v2 import LabelBasedGraph as LabelBasedGraphV2
 from guardian.shortcuts import assign_perm, remove_perm
 from guardian.exceptions import NotUserNorGroup
 from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializer
@@ -89,7 +90,7 @@ class Resource(models.ResourceInstance):
     def displayname(self):
         return self.get_descriptor("name")
 
-    def save_edit(self, user={}, note="", edit_type=""):
+    def save_edit(self, user={}, note="", edit_type="", transaction_id=None):
         timestamp = datetime.datetime.now()
         edit = EditLog()
         edit.resourceclassid = self.graph_id
@@ -100,6 +101,8 @@ class Resource(models.ResourceInstance):
         edit.user_lastname = getattr(user, "last_name", "")
         edit.note = note
         edit.timestamp = timestamp
+        if transaction_id is not None:
+            edit.transactionid = transaction_id
         edit.edittype = edit_type
         edit.save()
 
@@ -120,10 +123,11 @@ class Resource(models.ResourceInstance):
         request = kwargs.pop("request", None)
         user = kwargs.pop("user", None)
         index = kwargs.pop("index", True)
+        transaction_id = kwargs.pop("transaction_id", None)
         super(Resource, self).save(*args, **kwargs)
         for tile in self.tiles:
             tile.resourceinstance_id = self.resourceinstanceid
-            saved_tile = tile.save(request=request, index=False)
+            saved_tile = tile.save(request=request, index=False, transaction_id=transaction_id)
         if request is None:
             if user is None:
                 user = {}
@@ -136,7 +140,7 @@ class Resource(models.ResourceInstance):
         except NotUserNorGroup:
             pass
 
-        self.save_edit(user=user, edit_type="create")
+        self.save_edit(user=user, edit_type="create", transaction_id=transaction_id)
         if index is True:
             self.index()
 
@@ -168,7 +172,7 @@ class Resource(models.ResourceInstance):
         return [flat_tile for tile in self.tiles for flat_tile in tile.get_flattened_tiles()]
 
     @staticmethod
-    def bulk_save(resources, flat=False):
+    def bulk_save(resources, transaction_id=None, flat=False):
         """
         Saves and indexes a list of resources
 
@@ -190,22 +194,32 @@ class Resource(models.ResourceInstance):
             tiles = [tile for resource in resources for tile in resource.tiles]
 
         # need to save the models first before getting the documents for index
+        start = time()
         Resource.objects.bulk_create(resources)
         TileModel.objects.bulk_create(tiles)
 
-        for resource in resources:
-            resource.save_edit(edit_type="create")
+        print(f"Time to bulk create tiles and resources: {datetime.timedelta(seconds=time() - start)}")
 
-        resources[0].tiles[0].save_edit(note=f"Bulk created: {len(tiles)} for {len(resources)} resources.", edit_type="bulk_create")
+        start = time()
+        for resource in resources:
+            resource.save_edit(edit_type="create", transaction_id=transaction_id)
+
+        resources[0].tiles[0].save_edit(
+            note=f"Bulk created: {len(tiles)} for {len(resources)} resources.", edit_type="bulk_create", transaction_id=transaction_id
+        )
+
+        print("Time to save resource edits: %s" % datetime.timedelta(seconds=time() - start))
 
         for resource in resources:
+            start = time()
             document, terms = resource.get_documents_to_index(
                 fetchTiles=False, datatype_factory=datatype_factory, node_datatypes=node_datatypes
             )
 
             documents.append(se.create_bulk_item(index=RESOURCES_INDEX, id=document["resourceinstanceid"], data=document))
 
-            term_list.extend([se.create_bulk_item(index=TERMS_INDEX, id=term["_id"], data=term["_source"]) for term in terms])
+            for term in terms:
+                term_list.append(se.create_bulk_item(index=TERMS_INDEX, id=term["_id"], data=term["_source"]))
 
         se.bulk_index(documents)
         se.bulk_index(term_list)
@@ -282,8 +296,8 @@ class Resource(models.ResourceInstance):
                     datatype_instance = datatype_factory.get_instance(datatype)
                     datatype_instance.append_to_document(document, nodevalue, nodeid, tile)
                     node_terms = datatype_instance.get_search_terms(nodevalue, nodeid)
-                    terms.extend(
-                        [
+                    for index, term in enumerate(node_terms):
+                        terms.append(
                             {
                                 "_id": str(nodeid) + str(tile.tileid) + str(index),
                                 "_source": {
@@ -295,9 +309,7 @@ class Resource(models.ResourceInstance):
                                     "provisional": False,
                                 },
                             }
-                            for index, term in enumerate(node_terms)
-                        ]
-                    )
+                        )
 
             if tile.provisionaledits is not None:
                 provisionaledits = tile.provisionaledits
@@ -312,8 +324,8 @@ class Resource(models.ResourceInstance):
                                     datatype_instance = datatype_factory.get_instance(datatype)
                                     datatype_instance.append_to_document(document, nodevalue, nodeid, tile, True)
                                     node_terms = datatype_instance.get_search_terms(nodevalue, nodeid)
-                                    terms.extend(
-                                        [
+                                    for index, term in enumerate(node_terms):
+                                        terms.append(
                                             {
                                                 "_id": str(nodeid) + str(tile.tileid) + str(index),
                                                 "_source": {
@@ -325,13 +337,11 @@ class Resource(models.ResourceInstance):
                                                     "provisional": True,
                                                 },
                                             }
-                                            for index, term in enumerate(node_terms)
-                                        ]
-                                    )
+                                        )
 
         return document, terms
 
-    def delete(self, user={}, index=True):
+    def delete(self, user={}, index=True, transaction_id=None):
         """
         Deletes a single resource and any related indexed data
 
@@ -368,7 +378,7 @@ class Resource(models.ResourceInstance):
                 self.delete_index()
 
             try:
-                self.save_edit(edit_type="delete", user=user, note=self.displayname)
+                self.save_edit(edit_type="delete", user=user, note=self.displayname, transaction_id=transaction_id)
             except:
                 pass
             super(Resource, self).delete()
@@ -447,18 +457,26 @@ class Resource(models.ResourceInstance):
         return errors
 
     def get_related_resources(
-        self, lang="en-US", limit=settings.RELATED_RESOURCES_EXPORT_LIMIT, start=0, page=0, user=None, resourceinstance_graphid=None,
+        self,
+        lang="en-US",
+        limit=settings.RELATED_RESOURCES_EXPORT_LIMIT,
+        start=0,
+        page=0,
+        user=None,
+        resourceinstance_graphid=None,
+        graphs=None,
     ):
         """
         Returns an object that lists the related resources, the relationship types, and a reference to the current resource
 
         """
-        graphs = (
-            models.GraphModel.objects.all()
-            .exclude(pk=settings.SYSTEM_SETTINGS_RESOURCE_MODEL_ID)
-            .exclude(isresource=False)
-            .exclude(isactive=False)
-        )
+        if not graphs:
+            graphs = list(
+                models.GraphModel.objects.all()
+                .exclude(pk=settings.SYSTEM_SETTINGS_RESOURCE_MODEL_ID)
+                .exclude(isresource=False)
+                .exclude(isactive=False)
+            )
 
         graph_lookup = {
             str(graph.graphid): {"name": graph.name, "iconclass": graph.iconclass, "fillColor": graph.color} for graph in graphs
@@ -586,7 +604,7 @@ class Resource(models.ResourceInstance):
 
         return JSONSerializer().serializeToPython(ret)
 
-    def to_json(self, compact=True, hide_empty_nodes=False, user=None, perm=None):
+    def to_json(self, compact=True, hide_empty_nodes=False, user=None, perm=None, version=None):
         """
         Returns resource represented as disambiguated JSON graph
 
@@ -594,10 +612,13 @@ class Resource(models.ResourceInstance):
         compact -- type bool: hide superfluous node data
         hide_empty_nodes -- type bool: hide nodes without data
         """
-        return LabelBasedGraph.from_resource(resource=self, compact=compact, hide_empty_nodes=hide_empty_nodes, user=user, perm=perm)
+        if version is None:
+            return LabelBasedGraph.from_resource(resource=self, compact=compact, hide_empty_nodes=hide_empty_nodes, user=user, perm=perm)
+        elif version == "beta":
+            return LabelBasedGraphV2.from_resource(resource=self, compact=compact, hide_empty_nodes=hide_empty_nodes, user=user, perm=perm)
 
     @staticmethod
-    def to_json__bulk(resources, compact=True, hide_empty_nodes=False):
+    def to_json__bulk(resources, compact=True, hide_empty_nodes=False, version=None):
         """
         Returns list of resources represented as disambiguated JSON graphs
 
@@ -606,7 +627,11 @@ class Resource(models.ResourceInstance):
         compact -- type bool: hide superfluous node data
         hide_empty_nodes -- type bool: hide nodes without data
         """
-        return LabelBasedGraph.from_resources(resources=resources, compact=compact, hide_empty_nodes=hide_empty_nodes)
+
+        if version is None:
+            return LabelBasedGraph.from_resources(resources=resources, compact=compact, hide_empty_nodes=hide_empty_nodes)
+        elif version == "beta":
+            return LabelBasedGraphV2.from_resources(resources=resources, compact=compact, hide_empty_nodes=hide_empty_nodes)
 
     def get_node_values(self, node_name):
         """
