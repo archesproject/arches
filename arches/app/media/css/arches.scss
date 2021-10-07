@@ -658,13 +658,17 @@ input[type="checkbox"] {
 
 .tabbed-workflow-step-information-box {
     padding: 10px 35px 20px 35px;
-    background-color: #eaeaea;
+    background-color: #fafafa;
     border: 1px solid #ddd;
     color: grey;
     margin: -16px -21px 0px -21px;
     height: 100px;
     overflow-y: scroll;
     position: relative;
+}
+
+.workflow-information-box-toggle:hover {
+    color: #454545;
 }
 
 .btn-workflow-tile {
@@ -1268,6 +1272,7 @@ ul.tabbed-report-tab-list {
     color: steelblue;
     font-size: 11px;
     padding-left: 5px;
+    padding-top: 5px;
 }
 
 .file-workbench-files::-webkit-scrollbar {
@@ -13371,6 +13376,8 @@ a.jstree-anchor.permissions-widget {
     display: inline-flex;
     justify-content: space-between;
     width: 100%;
+    border-bottom: 1px solid #ddd;
+    margin-bottom: 3px;
 }
 
 .gallery-expanded .iiif-gallery-header {
