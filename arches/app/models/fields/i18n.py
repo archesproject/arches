@@ -74,7 +74,7 @@ class I18n_String(object):
                     # if there are no languages available return an empty string
                     ret = ""
         return json.dumps(ret) if ret is None else ret
-    
+
     def serialize(self):
         return str(self)
 
