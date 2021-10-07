@@ -283,6 +283,7 @@ class Command(BaseCommand):
                     defer_indexing = False
 
             defer_indexing = defer_indexing and not options["bulk_load"] and not celery_worker_running
+            prevent_indexing = True if options["prevent_indexing"] else defer_indexing
 
             if defer_indexing:
                 concept_count = models.Value.objects.count()
@@ -296,10 +297,10 @@ class Command(BaseCommand):
                 options["create_concepts"],
                 use_multiprocessing=options["use_multiprocessing"],
                 force=options["yes"],
-                prevent_indexing=defer_indexing,
+                prevent_indexing=prevent_indexing,
             )
 
-            if defer_indexing:
+            if defer_indexing and not prevent_indexing:
                 # index concepts if new concepts created
                 if concept_count != models.Value.objects.count():
                     management.call_command("es", "index_concepts")
