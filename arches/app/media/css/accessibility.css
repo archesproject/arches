@@ -72,3 +72,15 @@
     color: #7AD02F;
     text-decoration: underline;
 }
+
+.arches-signin .panel-footer {
+    color: #494949;
+}
+
+.arches-signin .panel-footer a {
+    color: #2c5271;
+}
+
+.password-rule {
+    color: #494949;
+}
