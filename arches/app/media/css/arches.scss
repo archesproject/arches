@@ -5195,7 +5195,7 @@ ul .collapse li:last-of-type {
 }
 
 .arches-signin-subtext {
-    padding: 0px 5px 10px 5px;
+    padding: 0 5px 10px 5px;
     color: #595959;
     font-size: 1em;
     font-weight: normal;
@@ -5203,6 +5203,8 @@ ul .collapse li:last-of-type {
 
 .arches-signin .login-panel {
     border: 1px solid #ddd;
+    width: auto;
+    max-width: 350px;
 }
 
 .arches-signin .panel-footer {
@@ -5252,6 +5254,19 @@ ul .collapse li:last-of-type {
     margin-top: 0;
     padding-bottom: 5px;
     font-weight: 300;
+}
+
+.reqlabel {
+    width: 100%;
+    text-align: left;
+}
+
+#login-form .alert h2 {
+    margin-top: 0;
+    margin-bottom: 10px;
+    color: inherit;
+    font-weight: 600;
+    font-size: 1.2em;
 }
 
 .change-password-form.popover {
