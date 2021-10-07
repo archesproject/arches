@@ -25,8 +25,17 @@ function($, _, arches, ko, koMapping, FunctionViewModel, chosen) {
 
             this.description = params.config.description;
             this.map_popup = params.config.map_popup;
+            console.log(this.map_popup);
+            if (!ko.unwrap(params.config.map_popup.multiTile)) {
+                this.map_popup.multiTile = ko.observable(false);
+            }
+            console.log(this.map_popup);
+            this.map_popup.multiTile.subscribe(function(val) {
+                console.log(val);
+            });
 
             _.each([this.name, this.description, this.map_popup], function(property){
+                console.log("HELLLOOOOO");
                 if (property.nodegroup_id) {
                     property.nodegroup_id.subscribe(function(nodegroup_id){
                         property.string_template(nodegroup_id);
