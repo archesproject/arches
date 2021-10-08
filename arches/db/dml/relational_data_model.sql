@@ -1,7 +1,8 @@
 create extension if not exists "unaccent";
 
 drop function if exists __arches_slugify;
-create or replace function __arches_slugify("value" text) returns text as $$ -- removes accents (diacritic signs) from a given string --
+create or replace function __arches_slugify("value" text) returns text as $$
+    -- removes accents (diacritic signs) from a given string
     with "unaccented" as (
         select unaccent("value") as "value"
     ),
@@ -16,14 +17,14 @@ create or replace function __arches_slugify("value" text) returns text as $$ -- 
         from "lowercase"
     ),
     -- replaces anything that's not a letter, number, hyphen('-'), or underscore('_') with an underscore('_')
-    "hyphenated" as (
+    "separated" as (
         select regexp_replace("value", '[^a-z0-9\\-_]+', '_', 'gi') as "value"
         from "removed_quotes"
     ),
     -- trims hyphens('-') if they exist on the head or tail of the string
     "trimmed" as (
         select regexp_replace(regexp_replace("value", '\-+$', ''), '^\-', '') as "value"
-        from "hyphenated"
+        from "separated"
     )
 select "value"
 from "trimmed";
