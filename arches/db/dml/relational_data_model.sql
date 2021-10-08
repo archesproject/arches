@@ -1,5 +1,7 @@
 create extension if not exists "unaccent";
-create or replace function slugify("value" text) returns text as $$ -- removes accents (diacritic signs) from a given string --
+
+drop function if exists __arches_slugify;
+create or replace function __arches_slugify("value" text) returns text as $$ -- removes accents (diacritic signs) from a given string --
     with "unaccented" as (
         select unaccent("value") as "value"
     ),
@@ -28,7 +30,6 @@ from "trimmed";
 $$ language sql strict immutable;
 
 drop function if exists __arches_get_node_value_sql;
-
 create or replace function __arches_get_node_value_sql(
     node record
 ) returns text as $$
@@ -68,14 +69,13 @@ begin
             %s::%s as %s,',
             select_sql,
             datatype,
-            slugify(node.name)
+            __arches_slugify(node.name)
         );
     return node_value_sql;
 end
 $$ language plpgsql volatile;
 
 drop function if exists __arches_create_nodegroup_view;
-
 create or replace function __arches_create_nodegroup_view(
     view_name text,
     schema_name text,
