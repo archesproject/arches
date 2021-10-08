@@ -83,7 +83,7 @@ class SearchResultsExporter(object):
         graph_cards = list(models.CardModel.objects.filter(graph=graphid))
 
         for graph_card in graph_cards:
-            if graph_card.sortorder == None:
+            if graph_card.sortorder is None:
                 card_list_no_sort.append(graph_card)
             else:
                 all_card_list_with_sort.append(graph_card)
@@ -95,7 +95,7 @@ class SearchResultsExporter(object):
         for card_with_sortorder in all_card_list_with_sort:
             nodegroup_obj = models.NodeGroup.objects.get(nodegroupid=card_with_sortorder.nodegroup_id)
             parent_obj = nodegroup_obj.parentnodegroup_id
-            if parent_obj == None:
+            if parent_obj is None:
                 sorted_card_list.append(card_with_sortorder)
             else:
                 subcard_list_with_sort.append(card_with_sortorder)
@@ -140,7 +140,7 @@ class SearchResultsExporter(object):
         node_id_list = []
         for ordered_node in ordered_list_all_nodes:
             node_object = models.Node.objects.get(nodeid=ordered_node.node_id)
-            if node_object.exportable == True:
+            if node_object.exportable is True:
                 if export_type == "csv":
                     if node_object.nodeid not in node_id_list:
                         headers.append(node_object.name)
@@ -199,7 +199,7 @@ class SearchResultsExporter(object):
 
             if format == "geojson":
 
-                if settings.EXPORT_DATA_FIELDS_IN_CARD_ORDER == True:
+                if settings.EXPORT_DATA_FIELDS_IN_CARD_ORDER is True:
                     headers = self.return_ordered_header(graph_id, "csv")
                 else:
                     headers = list(graph.node_set.filter(exportable=True).values_list("name", flat=True))
@@ -211,7 +211,7 @@ class SearchResultsExporter(object):
 
             if format == "tilecsv":
 
-                if settings.EXPORT_DATA_FIELDS_IN_CARD_ORDER == True:
+                if settings.EXPORT_DATA_FIELDS_IN_CARD_ORDER is True:
                     headers = self.return_ordered_header(graph_id, "csv")
                 else:
                     headers = list(graph.node_set.filter(exportable=True).values_list("name", flat=True))
@@ -223,7 +223,7 @@ class SearchResultsExporter(object):
 
             if format == "shp":
 
-                if settings.EXPORT_DATA_FIELDS_IN_CARD_ORDER == True:
+                if settings.EXPORT_DATA_FIELDS_IN_CARD_ORDER is True:
                     headers = self.return_ordered_header(graph_id, "shp")
                 else:
                     headers = graph.node_set.filter(exportable=True).values("fieldname", "datatype", "name")[::1]
