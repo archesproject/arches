@@ -88,6 +88,9 @@ class TileData(View):
         return JSONErrorResponse(_(title), _(str(message)), {"message": message, "title": title})
 
     def post(self, request):
+        original_transaction_id = request.POST.get("transaction_id", None)
+        transaction_id = request.POST.get("transaction_id", uuid.uuid1())
+
         if self.action == "update_tile":
             json = request.POST.get("data", None)
             accepted_provisional = request.POST.get("accepted_provisional", None)
@@ -96,6 +99,12 @@ class TileData(View):
             if json is not None:
                 data = JSONDeserializer().deserialize(json)
                 data["resourceinstance_id"] = "" if "resourceinstance_id" not in data else data["resourceinstance_id"]
+
+                if original_transaction_id is None:
+                    data["transaction_id"] = None if "transaction_id" not in data else data["transaction_id"]
+                    if data["transaction_id"] is not None:
+                        transaction_id = data["transaction_id"]
+
                 if data["resourceinstance_id"] == "":
                     data["resourceinstance_id"] = uuid.uuid4()
                 try:
@@ -108,7 +117,7 @@ class TileData(View):
                     graphid = models.Node.objects.filter(nodegroup=data["nodegroup_id"])[0].graph_id
                     resource.graph_id = graphid
                     try:
-                        resource.save(user=request.user)
+                        resource.save(user=request.user, transaction_id=transaction_id)
                         data["resourceinstance_id"] = resource.pk
                         resource.index()
                     except ModelInactiveError as e:
@@ -131,7 +140,7 @@ class TileData(View):
                             try:
                                 if accepted_provisional is None:
                                     try:
-                                        tile.save(request=request)
+                                        tile.save(request=request, transaction_id=transaction_id)
                                     except TileValidationError as e:
                                         resource_tiles = models.TileModel.objects.filter(resourceinstance=tile.resourceinstance)
                                         if resource_tiles.count() == 0:

@@ -311,7 +311,7 @@
             <!-- ko foreach: { data: sortedWidgetIds, as: 'nodeId' } -->
             <!-- ko let: $parent.getDataForDisplay(nodeId) --> 
             <!-- the let statement above returns an object of the form {widget: null, tile: null: tileData: null, card: null} -->
-                <div class="rp-card-section" data-bind="css: {'provisional': tile.provisionaledits() !== null && tile.userisreviewer === false, 'fullyprovisional': tile.isfullyprovisional()}">
+                <div class="rp-card-section" data-bind="css: {'provisional': ko.unwrap(tile.provisionaledits) !== null && tile.userisreviewer === false, 'fullyprovisional': tile.isfullyprovisional()}">
 
                     {% block report_widgets %}
                         <div class="rp-report-tile" data-bind="attr: { id: tile.tileid }">

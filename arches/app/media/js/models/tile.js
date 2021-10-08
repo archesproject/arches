@@ -15,7 +15,7 @@ define(['arches', 'models/abstract'], function(arches, AbstractModel) {
             delete fd.data;
             fd.append('data', JSON.stringify(this.toJSON()));
             var method = "POST";
-            this._doRequest({
+            return this._doRequest({
                 type: method,
                 processData: false,
                 contentType: false,
