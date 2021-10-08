@@ -184,15 +184,15 @@ class Resource(models.ResourceInstance):
 
         datatype_factory = DataTypeFactory()
         node_datatypes = {str(nodeid): datatype for nodeid, datatype in models.Node.objects.values_list("nodeid", "datatype")}
-        tiles = []
         documents = []
         term_list = []
 
-        if flat is False:
-            tiles = [tile for resource in resources for tile in resource.get_flattened_tiles()]
+        if flat:
+            tiles = (tile for resource in resources for tile in resource.tiles)
         else:
-            tiles = [tile for resource in resources for tile in resource.tiles]
+            tiles = (tile for resource in resources for tile in resource.get_flattened_tiles())
 
+        tile_count = sum(1 for t in tiles)
         # need to save the models first before getting the documents for index
         start = time()
         Resource.objects.bulk_create(resources)
@@ -205,7 +205,7 @@ class Resource(models.ResourceInstance):
             resource.save_edit(edit_type="create", transaction_id=transaction_id)
 
         resources[0].tiles[0].save_edit(
-            note=f"Bulk created: {len(tiles)} for {len(resources)} resources.", edit_type="bulk_create", transaction_id=transaction_id
+            note=f"Bulk created: {tile_count} for {len(resources)} resources.", edit_type="bulk_create", transaction_id=transaction_id
         )
 
         print("Time to save resource edits: %s" % datetime.timedelta(seconds=time() - start))
