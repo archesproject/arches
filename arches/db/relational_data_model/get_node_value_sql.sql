@@ -12,10 +12,8 @@ begin
             select_sql = format('
                 st_collect(
                     array(
-                        select geom
-                        from geojson_geometries
-                        where tileid = tileid
-                        and nodeid = %L
+                        select geom from geojson_geometries
+                        where tileid = tileid and nodeid = %L
                     )
                 )',
                 node.nodeid
@@ -23,14 +21,10 @@ begin
             datatype = 'geometry';
         when 'number' then
             datatype = 'numeric';
-        when 'concept' then
-            datatype = 'uuid';
-        when 'domain-value' then
-            datatype = 'uuid';
-        when 'date' then
-            datatype = 'timestamp';
         when 'boolean' then
             datatype = 'boolean';
+        else
+            datatype = 'text';
         end case;
 
         node_value_sql = format('
