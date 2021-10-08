@@ -2,7 +2,7 @@
 
 Arches is a web-based, geospatial information system for cultural heritage inventory and management. Arches is purpose-built for the international cultural heritage field, and designed to record all types of immovable heritage, including archaeological sites, buildings and other historic structures, landscapes, and heritage ensembles or districts. For more information and background on the Arches project, please visit [archesproject.org](http://archesproject.org/).
 
-For general inquiries and to get technical support from the wider Arches community, visit our [Google groups forum](https://groups.google.com/forum/#!forum/archesproject).
+For general inquiries and to get technical support from the wider Arches community, visit our [Community Forum](https://community.archesproject.org/).
 
 For general user installation and app documentation, visit [arches.readthedocs.io](https://arches.readthedocs.io).
 

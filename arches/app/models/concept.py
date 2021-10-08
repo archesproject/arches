@@ -499,6 +499,12 @@ class Concept(object):
 
         """
 
+        # if the conceptid isn't a UUID then Postgres will throw an error and transactions will be aborted #7822
+        try:
+            uuid.UUID(conceptid)
+        except:
+            return []
+
         languageid = get_language() if languageid is None else languageid
         relationtypes = " or ".join(["r.relationtype = '%s'" % (relationtype) for relationtype in relationtypes])
         depth_limit = "and depth < %s" % depth_limit if depth_limit else ""

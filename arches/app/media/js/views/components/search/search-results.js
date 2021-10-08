@@ -6,10 +6,11 @@ define(['jquery',
     'select2',
     'knockout',
     'knockout-mapping',
+    'models/graph',
     'view-data',
     'bootstrap-datetimepicker',
     'plugins/knockout-select2'],
-function($, _, BaseFilter, bootstrap, arches, select2, ko, koMapping, viewdata) {
+function($, _, BaseFilter, bootstrap, arches, select2, ko, koMapping, GraphModel, viewdata) {
     var componentName = 'search-results';
     return ko.components.register(componentName, {
         viewModel: BaseFilter.extend({
@@ -55,6 +56,9 @@ function($, _, BaseFilter, bootstrap, arches, select2, ko, koMapping, viewdata) 
                         }
                     }
                 }, this);
+
+                this.bulkResourceReportCache = ko.observable({});
+                this.bulkDisambiguatedResourceInstanceCache = ko.observable({});
             },
 
             mouseoverInstance: function() {
@@ -81,10 +85,10 @@ function($, _, BaseFilter, bootstrap, arches, select2, ko, koMapping, viewdata) 
                 };
             },
 
-            showResourceDetails: function(graphId, result) {
+            showResourceSummaryReport: function(result) {
                 var self = this;
                 return function(){
-                    self.details.setupReport(graphId, result._source);
+                    self.details.setupReport(result._source, self.bulkResourceReportCache, self.bulkDisambiguatedResourceInstanceCache);
                     if (self.selectedTab() !== 'search-result-details') {
                         self.selectedTab('search-result-details');
                     }
@@ -95,9 +99,76 @@ function($, _, BaseFilter, bootstrap, arches, select2, ko, koMapping, viewdata) 
                 var self = this;
                 var data = $('div[name="search-result-data"]').data();
 
+                if (!self.bulkResourceReportCache) {
+                    self.bulkResourceReportCache = ko.observable({});
+                }
+
+                if (!self.bulkDisambiguatedResourceInstanceCache) {
+                    self.bulkDisambiguatedResourceInstanceCache = ko.observable({});
+                }
+                
                 if (!!this.searchResults.results){
                     this.results.removeAll();
                     this.selectedResourceId(null);
+
+                    var graphIdsToFetch = this.searchResults.results.hits.hits.reduce(function(acc, hit) {
+                        var graphId = hit['_source']['graph_id'];
+                        
+                        if (!ko.unwrap(self.bulkResourceReportCache)[graphId]) {
+                            acc.push(graphId);
+                        }
+
+                        return acc;
+                    }, []);
+
+                    if (graphIdsToFetch.length > 0) {
+                        let url = arches.urls.api_bulk_resource_report + `?graph_ids=${graphIdsToFetch}`;
+    
+                        $.getJSON(url, function(resp) {
+                            var bulkResourceReportCache = self.bulkResourceReportCache();
+
+                            Object.keys(resp).forEach(function(graphId) {
+                                var graphData = resp[graphId];
+
+                                if (graphData.graph) {
+                                    var graphModel = new GraphModel({
+                                        data: graphData.graph,
+                                        datatypes: graphData.datatypes
+                                    });
+                                    graphData['graphModel'] = graphModel;
+                                }
+
+                                bulkResourceReportCache[graphId] = graphData;
+                            });
+
+                            self.bulkResourceReportCache(bulkResourceReportCache);
+                        });
+                    }
+
+                    var resourceIdsToFetch = this.searchResults.results.hits.hits.reduce(function(acc, hit) {
+                        var resourceId = hit['_source']['resourceinstanceid'];
+                        
+                        if (!ko.unwrap(self.bulkDisambiguatedResourceInstanceCache)[resourceId]) {
+                            acc.push(resourceId);
+                        }
+
+                        return acc;
+                    }, []);
+
+                    if (resourceIdsToFetch.length > 0) {
+                        let url = arches.urls.api_bulk_disambiguated_resource_instance + `?v=beta&resource_ids=${resourceIdsToFetch}`;
+
+                        $.getJSON(url, function(resp) {
+                            var bulkDisambiguatedResourceInstanceCache = self.bulkDisambiguatedResourceInstanceCache();
+
+                            Object.keys(resp).forEach(function(resourceId) {
+                                bulkDisambiguatedResourceInstanceCache[resourceId] = resp[resourceId];
+                            });
+
+                            self.bulkDisambiguatedResourceInstanceCache(bulkDisambiguatedResourceInstanceCache);
+                        });
+                    }
+
                     this.searchResults.results.hits.hits.forEach(function(result){
                         var graphdata = _.find(viewdata.graphs, function(graphdata){
                             return result._source.graph_id === graphdata.graphid;
@@ -115,7 +186,7 @@ function($, _, BaseFilter, bootstrap, arches, select2, ko, koMapping, viewdata) 
                             geometries: ko.observableArray(result._source.geometries),
                             iconclass: graphdata ? graphdata.iconclass : '',
                             showrelated: this.showRelatedResources(result._source.resourceinstanceid),
-                            showDetails: this.showResourceDetails(result._source.graph_id, result),
+                            showDetails: this.showResourceSummaryReport(result),
                             mouseoverInstance: this.mouseoverInstance(result._source.resourceinstanceid),
                             relationshipcandidacy: this.toggleRelationshipCandidacy(result._source.resourceinstanceid),
                             ontologyclass: result._source.root_ontology_class,
@@ -131,8 +202,8 @@ function($, _, BaseFilter, bootstrap, arches, select2, ko, koMapping, viewdata) 
                             selected: ko.computed(function() {
                                 return result._source.resourceinstanceid === ko.unwrap(self.selectedResourceId);
                             }),
-                            canRead: result._source.permissions && result._source.permissions.users_without_read_perm.indexOf(this.userid) < 0,
-                            canEdit: result._source.permissions && result._source.permissions.users_without_edit_perm.indexOf(this.userid) < 0,
+                            canRead: result._source.permissions && result._source.permissions.users_without_read_perm.indexOf(this.userid) < 0 && self.userCanReadResources,
+                            canEdit: result._source.permissions && result._source.permissions.users_without_edit_perm.indexOf(this.userid) < 0 && self.userCanEditResources,
                             // can_delete: result._source.permissions.users_without_delete_perm.indexOf(this.userid) < 0,
                         });
                     }, this);
