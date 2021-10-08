@@ -28,7 +28,7 @@ define([
             var url;
             params.cache = params.cache === undefined ? true : params.cache;
 
-            if (params.report && params.report?.report_json) {
+            if (params.report) {
                 if (
                     (!params.disableDisambiguatedReport
                     && !params.report.report_json 
