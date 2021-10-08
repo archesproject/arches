@@ -87,7 +87,7 @@ function($, _, BaseFilter, bootstrap, arches, select2, ko, koMapping, GraphModel
 
             showResourceSummaryReport: function(result) {
                 const self = this;
-                const resourceId = result._source.resourceinstanceid
+                const resourceId = result._source.resourceinstanceid;
 
                 return function(){
                     if (!self.bulkDisambiguatedResourceInstanceCache()[resourceId]) {
