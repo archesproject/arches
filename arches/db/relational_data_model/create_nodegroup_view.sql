@@ -6,6 +6,7 @@ create or replace function __arches_create_nodegroup_view(
 ) returns text as $$
 declare
     creation_sql text;
+    additional_sql text;
     node record;
     parent_group_id uuid;
 begin
@@ -23,6 +24,26 @@ begin
         view_name
     );
 
+    additional_sql = format('
+        create trigger %2$s_insert
+            instead of insert on %1$s.%2$s
+            for each row
+            execute function __arches_tile_view_insert_row();
+
+        create trigger %2$s_update
+            instead of update on %1$s.%2$s
+            for each row
+            execute function __arches_tile_view_update_row();
+
+        create trigger %2$s_delete
+            instead of delete on %1$s.%2$s
+            for each row
+            execute function __arches_tile_view_delete_row();
+        ',
+        schema_name,
+        view_name
+    );
+
     for node in select n.*, d.*
         from nodes n
             join d_data_types d on d.datatype = n.datatype
@@ -30,6 +51,14 @@ begin
             and d.defaultwidget is not null
     loop
         creation_sql = creation_sql || __arches_get_node_value_sql(node);
+        additional_sql = additional_sql || format('
+                comment on column %s.%s.%s is %L;
+            ',
+            schema_name,
+            view_name,
+            __arches_slugify(node.name),
+            node.nodeid
+        );
     end loop;
 
     select parentnodegroupid into parent_group_id
@@ -42,13 +71,15 @@ begin
     end if;
 
     creation_sql = creation_sql || format('
-            resourceinstanceid
+            resourceinstanceid,
+            nodegroupid
         from tiles
         where nodegroupid = %L;',
         group_id
     );
 
     execute creation_sql;
+    execute additional_sql;
     return format('view "%s.%s" created.', schema_name, view_name);
 end
 $$ language plpgsql volatile;
