@@ -28,11 +28,11 @@ define([
             var url;
             params.cache = params.cache === undefined ? true : params.cache;
 
-            if (params.report) {
+            if (params.report && params.report?.report_json) {
                 if (
                     (!params.disableDisambiguatedReport
                     && !params.report.report_json 
-                    && params.report.attributes.resourceid) 
+                    && params?.report?.attributes?.resourceid) 
                     || !params.cache
                 ) {
                     url = arches.urls.api_bulk_disambiguated_resource_instance + `?v=beta&resource_ids=${params.report.attributes.resourceid}`;

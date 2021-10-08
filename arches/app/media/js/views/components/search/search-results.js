@@ -86,8 +86,22 @@ function($, _, BaseFilter, bootstrap, arches, select2, ko, koMapping, GraphModel
             },
 
             showResourceSummaryReport: function(result) {
-                var self = this;
+                const self = this;
+                const resourceId = result._source.resourceinstanceid
+
                 return function(){
+                    if (!self.bulkDisambiguatedResourceInstanceCache()[resourceId]) {
+                        const url = arches.urls.api_bulk_disambiguated_resource_instance + `?v=beta&resource_ids=${resourceId}`;
+                        
+                        $.getJSON(url, (resp) => {
+                            const instanceCache = self.bulkDisambiguatedResourceInstanceCache();
+                            Object.keys(resp).forEach(function(resourceId) {
+                                instanceCache[resourceId] = resp[resourceId];
+                            });
+
+                            self.bulkDisambiguatedResourceInstanceCache(instanceCache);
+                        });
+                    }  
                     self.details.setupReport(result._source, self.bulkResourceReportCache, self.bulkDisambiguatedResourceInstanceCache);
                     if (self.selectedTab() !== 'search-result-details') {
                         self.selectedTab('search-result-details');
@@ -154,20 +168,6 @@ function($, _, BaseFilter, bootstrap, arches, select2, ko, koMapping, GraphModel
 
                         return acc;
                     }, []);
-
-                    if (resourceIdsToFetch.length > 0) {
-                        let url = arches.urls.api_bulk_disambiguated_resource_instance + `?v=beta&resource_ids=${resourceIdsToFetch}`;
-
-                        $.getJSON(url, function(resp) {
-                            var bulkDisambiguatedResourceInstanceCache = self.bulkDisambiguatedResourceInstanceCache();
-
-                            Object.keys(resp).forEach(function(resourceId) {
-                                bulkDisambiguatedResourceInstanceCache[resourceId] = resp[resourceId];
-                            });
-
-                            self.bulkDisambiguatedResourceInstanceCache(bulkDisambiguatedResourceInstanceCache);
-                        });
-                    }
 
                     this.searchResults.results.hits.hits.forEach(function(result){
                         var graphdata = _.find(viewdata.graphs, function(graphdata){
