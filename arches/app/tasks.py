@@ -116,7 +116,12 @@ def import_business_data(
     self, data_source="", overwrite="", bulk_load=False, create_concepts=False, create_collections=False, prevent_indexing=False
 ):
     management.call_command(
-        "packages", operation="import_business_data", source=data_source, overwrite=True, prevent_indexing=prevent_indexing
+        "packages",
+        operation="import_business_data",
+        source=data_source,
+        bulk_load=bulk_load,
+        overwrite=overwrite,
+        prevent_indexing=prevent_indexing,
     )
 
 
