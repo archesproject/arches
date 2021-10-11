@@ -26,19 +26,9 @@ begin
 
     additional_sql = format('
         create trigger %2$s_insert
-            instead of insert on %1$s.%2$s
+            instead of insert or update or delete on %1$s.%2$s
             for each row
-            execute function __arches_tile_view_insert_row();
-
-        create trigger %2$s_update
-            instead of update on %1$s.%2$s
-            for each row
-            execute function __arches_tile_view_update_row();
-
-        create trigger %2$s_delete
-            instead of delete on %1$s.%2$s
-            for each row
-            execute function __arches_tile_view_delete_row();
+            execute function __arches_tile_view_update();
         ',
         schema_name,
         view_name
@@ -68,6 +58,14 @@ begin
         creation_sql = creation_sql || format('
             parenttileid as %s,
         ', parent_name);
+        additional_sql = additional_sql || format('
+            comment on column %1$s.%2$s.%3$s is %4$L;
+            ',
+            schema_name,
+            view_name,
+            parent_name,
+            'parenttileid'
+        );
     end if;
 
     creation_sql = creation_sql || format('

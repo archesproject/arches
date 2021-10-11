@@ -31,7 +31,7 @@ begin
         and g.parentnodegroupid is null
         and graphid = model_id
     loop
-        perform __arches_create_branch_views(node.nodeid, schema_name);
+        perform __arches_create_branch_views(node.nodeid, schema_name, '');
     end loop;
 
     return format('schema "%s" created for resource model.', schema_name);
