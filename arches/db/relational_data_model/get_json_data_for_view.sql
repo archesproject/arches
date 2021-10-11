@@ -35,13 +35,13 @@ begin
             view_name,
             column_info.column_name
         );
-        if view_name is null then
+        -- handle datatypes here...
+        if datatype = 'geojson-feature-collection' then
             execute query into geom using view_row;
             raise notice '%', st_astext(geom);
-        -- else
         end if;
         execute query into result using view_row;
-        tiledata = tiledata || jsonb_build_object(column_info.description, result);
+        tiledata = tiledata || jsonb_build_object(column_info.description, to_json(result));
     end loop;
 
     return tiledata::json;

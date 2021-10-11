@@ -3,7 +3,7 @@ create or replace function __arches_get_node_value_sql(
 ) returns text as $$
 declare
     node_value_sql text;
-    select_sql text = '(tiledata->%L)';
+    select_sql text = '(tiledata->>%L)';
     datatype text = 'text';
 begin
     select_sql = format(select_sql, node.nodeid);
