@@ -4,12 +4,13 @@ create or replace function __arches_get_json_data_for_view(
     view_name text
 ) returns json as $$
 declare
-    tiledata json = '{}'::json;
+    column_info record;
+    query text;
+    result jsonb;
+    geom geometry;
+    node_datatype text;
+    tiledata jsonb = '{}'::jsonb;
 begin
-    -- iterate over columns in view and inspect comment
-    -- if it is not "parenttileid", assume it is a data column and handle
-    -- for each get node datatype and then transform to json value
-    -- and assign value to json using node id
     for column_info in select a.attname as column_name,
         d.description
     from pg_class as c
@@ -24,11 +25,25 @@ begin
         and n.nspname = schema_name
         and c.relname = view_name
         and d.description is not null
-        and d.description != 'parenttileid';
+        and d.description != 'parenttileid'
     loop
-        -- get node data type and set tiledata property...
+        select datatype into node_datatype
+        from nodes where nodeid = column_info.description::uuid;
+        query = format(
+            'select ($1::text::%s.%s).%s',
+            schema_name,
+            view_name,
+            column_info.column_name
+        );
+        if view_name is null then
+            execute query into geom using view_row;
+            raise notice '%', st_astext(geom);
+        -- else then
+        end if;
+        execute query into result using view_row;
+        tiledata = tiledata || jsonb_build_object(column_info.description, result);
     end loop;
 
-    return tiledata;
+    return tiledata::json;
 end
 $$ language plpgsql volatile;
