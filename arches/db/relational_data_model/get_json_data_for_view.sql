@@ -29,19 +29,27 @@ begin
     loop
         select datatype into node_datatype
         from nodes where nodeid = column_info.description::uuid;
-        query = format(
-            'select ($1::text::%s.%s).%s',
-            schema_name,
-            view_name,
-            column_info.column_name
-        );
-        -- handle datatypes here...
-        if datatype = 'geojson-feature-collection' then
-            execute query into geom using view_row;
-            raise notice '%', st_astext(geom);
+        if node_datatype = 'geojson-feature-collection' then
+            query = format(
+                'select st_asgeojson(
+                    ($1::text::%s.%s).%s
+                )',
+                schema_name,
+                view_name,
+                column_info.column_name
+            );
+        else
+            query = format(
+                'select to_json(
+                    ($1::text::%s.%s).%s
+                )',
+                schema_name,
+                view_name,
+                column_info.column_name
+            );
         end if;
         execute query into result using view_row;
-        tiledata = tiledata || jsonb_build_object(column_info.description, to_json(result));
+        tiledata = tiledata || jsonb_build_object(column_info.description, result);
     end loop;
 
     return tiledata::json;
