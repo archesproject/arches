@@ -7,6 +7,7 @@ declare
     column_name text;
     query text;
     parent_id uuid;
+    parent_column_count int;
 begin
     select a.attname into column_name
     from pg_class as c
@@ -22,14 +23,18 @@ begin
         and c.relname = view_name
         and d.description = 'parenttileid';
 
-    query = format(
-        'select ($1::text::%s.%s).%s',
-        schema_name,
-        view_name,
-        column_name
-    );
+    get diagnostics parent_column_count = row_count;
 
-    execute query into parent_id using view_row;
+    if parent_column_count > 0 then
+        query = format(
+            'select ($1::text::%s.%s).%s',
+            schema_name,
+            view_name,
+            column_name
+        );
+
+        execute query into parent_id using view_row;
+    end if;
 
     return parent_id;
 end
