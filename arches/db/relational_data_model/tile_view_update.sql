@@ -1,5 +1,6 @@
 create or replace function __arches_tile_view_update() returns trigger as $$
     declare
+        view_namespace text;
         group_id uuid;
         parent_id uuid;
         json_data json;
@@ -8,7 +9,8 @@ create or replace function __arches_tile_view_update() returns trigger as $$
             delete from public.tiles where tileid = old.tileid;
             return old;
         else
-            select obj_description('person.name_part'::regclass, 'pg_class') into group_id;
+            view_namespace = format('%s.%s', tg_table_schema, tg_table_name);
+            select obj_description(view_namespace::regclass, 'pg_class') into group_id;
             select __arches_get_json_data_for_view(new, tg_table_schema, tg_table_name) into json_data;
             select __arches_get_parent_id_for_view(new, tg_table_schema, tg_table_name) into parent_id;
             if (TG_OP = 'UPDATE') then
