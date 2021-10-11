@@ -25,13 +25,15 @@ begin
     );
 
     additional_sql = format('
+        comment on view %1$s.%2$s is %3$L;
         create trigger %2$s_insert
             instead of insert or update or delete on %1$s.%2$s
             for each row
             execute function __arches_tile_view_update();
         ',
         schema_name,
-        view_name
+        view_name,
+        group_id
     );
 
     for node in select n.*, d.*

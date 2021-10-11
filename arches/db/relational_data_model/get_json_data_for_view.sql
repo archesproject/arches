@@ -38,7 +38,7 @@ begin
         if view_name is null then
             execute query into geom using view_row;
             raise notice '%', st_astext(geom);
-        -- else then
+        -- else
         end if;
         execute query into result using view_row;
         tiledata = tiledata || jsonb_build_object(column_info.description, result);
