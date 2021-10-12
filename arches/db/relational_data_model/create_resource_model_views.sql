@@ -17,7 +17,13 @@ begin
         create schema %1$s;
         create or replace view %1$s.instances as
             select * from resource_instances
-            where graphid = %2$L;',
+            where graphid = %2$L;
+        comment on view %1$s.instances is %2$L;
+        create trigger %1$s_insert
+            instead of insert or update or delete on %1$s.instances
+            for each row
+            execute function __arches_instance_view_update();
+        ',
         schema_name,
         model_id
     );

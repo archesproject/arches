@@ -31,8 +31,22 @@ begin
         from nodes where nodeid = column_info.description::uuid;
         if node_datatype = 'geojson-feature-collection' then
             query = format(
-                'select st_asgeojson(
-                    ($1::text::%s.%s).%s
+                'select json_build_object(
+                    "type",
+                    "FeatureCollection",
+                    "features",
+                    json_agg(
+                        json_build_object(
+                            "type",
+                            "Feature",
+                            "geometry",
+                            st_asgeojson(
+                                ($1::text::%s. %s).%s
+                            ),
+                            "properties",
+                            json_build_object()
+                        )
+                    )
                 )',
                 schema_name,
                 view_name,
