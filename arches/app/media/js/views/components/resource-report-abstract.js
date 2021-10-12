@@ -32,7 +32,7 @@ define([
                 if (
                     (!params.disableDisambiguatedReport
                     && !params.report.report_json 
-                    && params.report.attributes.resourceid) 
+                    && params?.report?.attributes?.resourceid) 
                     || !params.cache
                 ) {
                     url = arches.urls.api_bulk_disambiguated_resource_instance + `?v=beta&resource_ids=${params.report.attributes.resourceid}`;
