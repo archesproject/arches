@@ -89,6 +89,7 @@ class HtmlWriter(Writer):
                     hide_empty_nodes=hide_empty_nodes,
                     user=user,
                     perm=perm,
+                    version="beta",
                 )
 
                 # check to handle if v2 labelgraph is not being used.
