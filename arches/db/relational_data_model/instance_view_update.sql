@@ -16,17 +16,20 @@ create or replace function __arches_instance_view_update() returns trigger as $$
             end if;
             if (TG_OP = 'UPDATE') then
                 update public.resource_instances
-                set createdtime = new.createdtime
+                set createdtime = new.createdtime,
+                    legacyid = new.legacyid
                 where resourceinstanceid = instance_id;
                 return new;
             elsif (TG_OP = 'INSERT') then
                 insert into public.resource_instances(
                     resourceinstanceid,
                     graphid,
+                    legacyid,
                     createdtime
                 ) values (
                     instance_id,
                     model_id,
+                    new.legacyid,
                     now()
                 );
                 raise notice 'instance "%" created.', instance_id;
