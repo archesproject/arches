@@ -29,6 +29,7 @@ create or replace function __arches_instance_view_update() returns trigger as $$
                     model_id,
                     now()
                 );
+                raise notice 'instance "%" created.', instance_id;
                 return new;
             end if;
         end if;
