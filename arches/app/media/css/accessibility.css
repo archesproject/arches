@@ -72,3 +72,7 @@
     color: #7AD02F;
     text-decoration: underline;
 }
+
+.jstree-default .func-node {
+    color: #000000;
+}
