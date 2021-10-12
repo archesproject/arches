@@ -45,6 +45,7 @@ from arches.app.models.concept import get_preflabel_from_conceptid
 from arches.app.utils.permission_backend import get_nodegroups_by_perm, user_is_resource_reviewer
 import arches.app.utils.zip as zip_utils
 import arches.app.utils.task_management as task_management
+from arches.app.utils.data_management.resources.formats.htmlfile import HtmlWriter
 import arches.app.tasks as tasks
 from io import StringIO
 from tempfile import NamedTemporaryFile
@@ -109,6 +110,7 @@ class SearchView(MapBaseManagerView):
             "template": "search-help",
         }
         context["celery_running"] = task_management.check_if_celery_available()
+        context["export_html_templates"] = HtmlWriter.get_graphids_with_export_template()
 
         return render(request, "views/search.htm", context)
 
@@ -210,8 +212,12 @@ def export_results(request):
     total = int(request.GET.get("total", 0))
     format = request.GET.get("format", "tilecsv")
     report_link = request.GET.get("reportlink", False)
-    download_limit = settings.SEARCH_EXPORT_IMMEDIATE_DOWNLOAD_THRESHOLD
     app_name = settings.APP_NAME
+    if format == "html":
+        download_limit = settings.SEARCH_EXPORT_IMMEDIATE_DOWNLOAD_THRESHOLD_HTML_FORMAT
+    else:
+        download_limit = settings.SEARCH_EXPORT_IMMEDIATE_DOWNLOAD_THRESHOLD
+
     if total > download_limit and format != "geojson":
         if (settings.RESTRICT_CELERY_EXPORT_FOR_ANONYMOUS_USER is True) and (request.user.username == "anonymous"):
             message = _(
