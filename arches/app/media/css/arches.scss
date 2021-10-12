@@ -658,13 +658,17 @@ input[type="checkbox"] {
 
 .tabbed-workflow-step-information-box {
     padding: 10px 35px 20px 35px;
-    background-color: #eaeaea;
+    background-color: #fafafa;
     border: 1px solid #ddd;
     color: grey;
     margin: -16px -21px 0px -21px;
     height: 100px;
     overflow-y: scroll;
     position: relative;
+}
+
+.workflow-information-box-toggle:hover {
+    color: #454545;
 }
 
 .btn-workflow-tile {
@@ -1054,6 +1058,11 @@ div.wf-multi-tile-card-info div {
     color: #ccc;
 }
 
+.resource-component-abstract {
+    overflow-y: scroll;
+    height: 100%;
+}
+
 .workflow-plugin {
     flex-grow: inherit;
     background-color: #fff;
@@ -1263,6 +1272,7 @@ ul.tabbed-report-tab-list {
     color: steelblue;
     font-size: 11px;
     padding-left: 5px;
+    padding-top: 5px;
 }
 
 .file-workbench-files::-webkit-scrollbar {
@@ -4138,6 +4148,17 @@ div.dropdown-menu.open {
     color: #fff;
     background-color: #000;
     z-index: 8000;
+}
+
+.workflow-step-loading-mask {
+    position: absolute;
+    top: 94px;
+    bottom: 58px;
+    opacity: 1;
+}
+
+.workflow-step-loading-mask::after {
+    margin-top: 34vh;
 }
 
 .branch-list-loading-mask {
@@ -13355,6 +13376,8 @@ a.jstree-anchor.permissions-widget {
     display: inline-flex;
     justify-content: space-between;
     width: 100%;
+    border-bottom: 1px solid #ddd;
+    margin-bottom: 3px;
 }
 
 .gallery-expanded .iiif-gallery-header {

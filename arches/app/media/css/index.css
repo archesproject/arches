@@ -1,4 +1,10 @@
 @import url(../packages/chosen-js/chosen.css);
+
+html, body {
+    overflow-x: hidden;
+    height: auto;
+}
+
 .auth-options {
     margin-top: 17px;
 }
@@ -67,11 +73,6 @@ div.collapse.navbar-collapse.navbar-ex1-collapse > div > ul {
     color: #13ce67;
 }
 
-.nav>li>a:focus, .nav>li>a:hover {
-    text-decoration: none;
-    background-color: inherit;
-}
-
 .one-page-header .navbar-nav>li> .fa-chevron-circle-down {
     padding: 0px 0px 0px;
     z-index: 100;
@@ -90,7 +91,6 @@ div.collapse.navbar-collapse.navbar-ex1-collapse > div > ul {
     justify-content: space-between;
     /* white-space: normal; */
     word-wrap: break-word;
-
 }
 
 .disco-caption h2 a {
@@ -208,6 +208,12 @@ ul.cons-splash-list > li > a:focus, ul.cons-splash-list > li > a:hover {
     background-color: rgba(0, 0, 0, 0.174);
 }
 
+.v5-splash-caption {
+    background: rgba(0, 0, 0, 0.5);
+    padding: 5px!important;
+    left: 10vw!important;
+}
+
 .v5-splash-caption h2 {
     font-size: 55px;
     font-weight: 300;
@@ -251,8 +257,15 @@ ul.cons-splash-list > li > a:focus, ul.cons-splash-list > li > a:hover {
     /*font-family: "Open Sans",Arial,sans-serif;*/
 }
 
-.application-name h2 {
+.application-name {
+    display: inline-flex;
+    position: relative;
+    left: 15px;
+}
+
+.application-name h1 {
     color: #fff;
+    font-size: 24px;
 }
 
 .navbar-brand-disco h2 {
@@ -273,12 +286,10 @@ ul.cons-splash-list > li > a:focus, ul.cons-splash-list > li > a:hover {
 }
 
 .navbar-brand-v5-icon-container {
-    height: 40px; 
-    width: 40px; 
-    border-radius: 50%; 
-    border: 1px solid #ff0000; 
-    background: #fff;
-    display: flex;
+    height: 50px;
+    position: relative;
+    top: 2px;
+    display: inline-flex;
     align-items: center;
     justify-content: center;
 }
@@ -295,10 +306,8 @@ ul.cons-splash-list > li > a:focus, ul.cons-splash-list > li > a:hover {
 }
 
 .navbar-brand-v5-icon {
-    height: 18px; 
-    width: 18px; 
-    text-align: center; 
-    margin-top: -5px
+    height: 25px;
+    text-align: center;
 }
 
 .navbar-brand-disco-icon {
@@ -307,7 +316,6 @@ ul.cons-splash-list > li > a:focus, ul.cons-splash-list > li > a:hover {
     text-align: center; 
     margin-top: -5px
 }
-
 
 .splash-nav #auth-link:focus, .splash-nav #auth-link:hover {
     background-color: transparent;
@@ -381,7 +389,7 @@ ul.cons-splash-list > li > a:focus, ul.cons-splash-list > li > a:hover {
 
 .image-attribution {
     position: absolute; 
-    top: 94%; 
+    bottom: 1vh;
     right: 15px; 
     color: #bbb; 
     padding: 10px; 
@@ -401,6 +409,7 @@ ul.cons-splash-list > li > a:focus, ul.cons-splash-list > li > a:hover {
 
 .app-info-block.intro-section {
     padding: 0px;
+    height: 100vh;
 }
 
 .app-info-block:nth-child(even) {
@@ -412,7 +421,11 @@ ul.cons-splash-list > li > a:focus, ul.cons-splash-list > li > a:hover {
     font-size: 55px;
 }
 
-.app-info-block h2 {
+.app-info-block-header {
+    font-size: 20px;
+}
+
+.app-info-block-title {
     font-size: 32px;
     font-weight: 300;
     color: #25476A;
@@ -423,7 +436,7 @@ ul.cons-splash-list > li > a:focus, ul.cons-splash-list > li > a:hover {
 }
 
 .app-info-block-text {
-    color: #6c757d;
+    color: #555;
     font-size: 16px;
 }
 
@@ -443,15 +456,16 @@ ul.cons-splash-list > li > a:focus, ul.cons-splash-list > li > a:hover {
 
 .sub-block-description {
     font-size: 15px;
-    color: #777;
+    color: #555;
     padding: 20px 0px 30px 0px;
 }
 
-.app-footer {
+footer .footer-links {
     background: #0F2E4F;
     color: #fff;
     min-height: 400px;
     overflow-x: hidden;
+    padding: 0 70px;
 }
 
 .app-footer-content-container {
@@ -477,7 +491,6 @@ ul.cons-splash-list > li > a:focus, ul.cons-splash-list > li > a:hover {
     font-weight: 200;
     color: #dcdcdc;
     margin-top: 27px;
-    padding-left: 80px;
 }
 
 .app-footer-image {
@@ -490,14 +503,12 @@ ul.cons-splash-list > li > a:focus, ul.cons-splash-list > li > a:hover {
     font-weight: 300;
     line-height: 1.5;
     margin-top: 20px;
-    padding-left: 80px;
 }
 
 .copyright-container {
-    height: 80px;
     background: #041B33;
     color: #fff;
-    padding: 30px 120px 30px 120px;
+    padding: 30px 70px;
 }
 
 .app-footer-links {
@@ -507,10 +518,14 @@ ul.cons-splash-list > li > a:focus, ul.cons-splash-list > li > a:hover {
 
 .link-spacing {
     margin-right: 20px;
+    color: #91A5CF;
 }
 
 .app-footer-arches-link {
-    float: right;
+    color: #91A5CF;
+    display: block;
+    width: 100%;
+    text-align: right;
 }
 
 .datatype-box {
@@ -579,6 +594,10 @@ ul.cons-splash-list > li > a:focus, ul.cons-splash-list > li > a:hover {
     background: #ddd;
 }
 
+.vertical-nav-list-link:focus {
+    background: #13ce67;
+}
+
 .vertical-nav-list-link:hover .vertical-nav-list-ref {
     display: inline-flex;
     margin-top: -2px;
@@ -595,23 +614,25 @@ ul.cons-splash-list > li > a:focus, ul.cons-splash-list > li > a:hover {
 
 .vertical-nav-list-ref{
     display: none;
+    background: white;
+    border-radius: 5px;
 }
 
 .down-button {
     position: absolute;
-    bottom: 70px;
-    left: 48%;
+    bottom: 10vh;
+    left: calc(50% - 20px);
     z-index: 100;
+    color: #fff;
+    background: #2a2a2a;
+    border: 1px solid #fff;
+    border-radius: 50%;
 }
 
 .down-button-icon {
-    color: #fff;
-    background: #041B33;
     font-size: 43px;
     padding-top: 4px;
     padding-left: 10px;
-    border: 1px solid #fff;
-    border-radius: 50%;
     height: 50px;
     width: 50px;
     align-items: center;
@@ -636,13 +657,13 @@ ul.cons-splash-list > li > a:focus, ul.cons-splash-list > li > a:hover {
 }
 
 .splash-img {
-    display: inline-flex;
-    margin: auto;
-    justify-content: center;
+    border: none;
+    padding: 0 20px;
+    text-align: center;
 }
 
 .splash-img img {
-    max-width: 90%;
+    max-width: 100%;
 }
 
 .search-screen {
@@ -651,6 +672,7 @@ ul.cons-splash-list > li > a:focus, ul.cons-splash-list > li > a:hover {
 
 .iphone {
     max-height: 700px;
+    max-width: 100%;
     margin: auto;
 }
 
@@ -675,12 +697,12 @@ ul.cons-splash-list > li > a:focus, ul.cons-splash-list > li > a:hover {
 }
 
 .wide-box .box-highlight p {
-    color: #777;
+    color: #555;
 }
 
 .mobile-description-container p {
     font-size: 17px;
-    color: #777;
+    color: #555;
 }
 
 .splash-links {
@@ -694,6 +716,14 @@ ul.cons-splash-list > li > a:focus, ul.cons-splash-list > li > a:hover {
     color: #fff;
 }
 
+.splash-link-address:focus,
+.splash-link-address:hover,
+.link-spacing:focus,
+.link-spacing:hover {
+    color: #7AD02F;
+    text-decoration: underline;
+}
+
 .splash-link-container {
     list-style: none;
     padding-left: 0px;
@@ -701,6 +731,34 @@ ul.cons-splash-list > li > a:focus, ul.cons-splash-list > li > a:hover {
 
 .icon-bar {
     background: #fff;
+}
+
+.nav-brand-container {
+    padding: 0 10px;
+}
+
+.tp-caption {
+    top: auto !important;
+    bottom: 20vh;
+}
+
+@media screen and (max-height: 640px) {
+    .down-button {
+        bottom: 11.7vh;
+    }
+    .down-button-icon {
+        font-size: 2em;
+        padding-top: 1vh;
+        padding-left: 2vh;
+        height: 7vh;
+        width: 7vh;
+    }
+}
+
+@media screen and (max-height: 640px) {
+    .down-button {
+        display: none;
+    }
 }
 
 @media (min-width: 768px) {
@@ -718,9 +776,6 @@ ul.cons-splash-list > li > a:focus, ul.cons-splash-list > li > a:hover {
     }
     .navbar-header .collapse, .navbar-toggle {
         display:block !important;
-        background: #000;
-        margin-top: 11px;
-        margin-right: 80px;
     }
     .navbar-header {
         float:none;
@@ -755,6 +810,33 @@ ul.cons-splash-list > li > a:focus, ul.cons-splash-list > li > a:hover {
     .mobile-description-container {
         padding: 140px 10px 40px 10px;
     }
+    .v5-splash-caption {
+        left: 0!important;
+        width: 100%;
+        padding: 10px !important;
+    }
+    .v5-splash-caption p {
+        font-size: 2.7em;
+    }
+    .app-info-block.intro-section h2 {
+        font-size: 4.5em;
+    }
+    .image-attribution {
+        right: 0;
+    }
+    .tp-caption h2 {
+        font-size: 18px !important;
+    }
+    .tp-caption p {
+        font-size: 12.5px !important;
+    }
+}
+
+@media screen and (max-height: 375px) {
+    .v5-splash-caption, .image-attribution {
+        /*display: none;*/
+        padding: 0 10px !important;
+    }
 }
 
 @media (max-width: 768px) {
@@ -770,19 +852,23 @@ ul.cons-splash-list > li > a:focus, ul.cons-splash-list > li > a:hover {
     .mobile-description-container {
         padding: 140px 10px 40px 10px;
     }
+    .vertical-nav-container-background,
+    #cd-vertical-nav {
+        display: none;
+    }
+    .copyright-container {
+        padding: 30px 20px;
+    }
+    .app-footer-arches-link {
+        text-align: left;
+    }
 }
-
-
 
 @media (max-width: 1000px) {
     .one-page-header .navbar-nav>li> .fa-chevron-circle-down {
         padding-left: 12px;
         margin-top: 14px;
     }
-}
-
-
-@media (max-width: 1000px) {
     ul .auth-options {
         position: inherit;
         float:left;
@@ -790,6 +876,12 @@ ul.cons-splash-list > li > a:focus, ul.cons-splash-list > li > a:hover {
         list-style: none;
         margin-top: 0px;
         margin-right: -142px;
+    }
+    .app-info-block.intro-section h2 {
+        font-size: 5vw;
+    }
+    .v5-splash-caption p {
+        font-size: 3vw;
     }
 }
 
@@ -801,6 +893,12 @@ ul.cons-splash-list > li > a:focus, ul.cons-splash-list > li > a:hover {
         list-style: none;
         margin-top: 40px;
         margin-right: -142px;
+    }
+}
+
+@media (max-width: 1024px) {
+    .copyright-container {
+        padding: 30px 70px;
     }
 }
 

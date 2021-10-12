@@ -142,6 +142,7 @@ define([
         this.saveTile = function(callback) {
             self.loading(true);
             self.tile.transactionId = params.form?.workflowId || undefined;
+            self.tile.resourceinstance_id = self.tile.resourceinstance_id || ko.unwrap(params.form?.resourceId);
             self.tile.save(function(response) {
                 self.loading(false);
                 params.pageVm.alert(
@@ -166,11 +167,16 @@ define([
             });
         };
 
-        if (params.saveFunction) {
-            params.saveFunction(self.saveTile);
+        var saveTileInWorkflow = function() {
+            self.saveTile(function() {
+                params.form.complete(true);
+            });
+        };
+        if (params.save) {
+            params.save = saveTileInWorkflow;
         }
-        else if (params.form && params.form.saveFunction) {
-            params.form.saveFunction(self.saveTile);
+        if (params.form && params.form.save) {
+            params.form.save = saveTileInWorkflow;
         }
 
         this.saveTileAddNew = function() {
@@ -205,12 +211,14 @@ define([
             });
         };
         
-        this.createParentAndChild = function(parenttile, childcard) {
-            if (parenttile.tileid === "") {
-                var callback = function(){childcard.selected(true);};
-                parenttile.save(function() {
-                    return;
-                }, callback);
+        this.createParentAndChild = async (parenttile, childcard) => {
+            try{
+                const newSave = await self.card.saveParentTile(parenttile);
+                if(newSave){
+                    childcard.selected(true);
+                }
+            } catch (err){
+                console.log(err);
             }
         };
 
