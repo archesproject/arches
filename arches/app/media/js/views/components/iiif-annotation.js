@@ -29,6 +29,8 @@ define([
         this.fillOpacity = ko.observable(0.2);
         this.showStylingTools = ko.observable(false);
 
+        this.hideEditorTab = params.hideEditorTab || ko.observable(false);
+
         this.cancelDrawing = function() {
             _.each(tools, function(tool) {
                 tool.disable();
@@ -146,7 +148,7 @@ define([
         };
 
         var disableEditing = function() {
-            if (editingFeature) editingFeature.editing.disable();
+            if (editingFeature && editingFeature.editing) editingFeature.editing.disable();
             editingFeature = undefined;
             self.selectedFeatureIds([]);
         };
@@ -181,6 +183,7 @@ define([
         });
 
         var featureClick;
+        this.featureClick = featureClick;
         var drawLayer = ko.computed(function() {
             var selectedFeatureIds = self.selectedFeatureIds();
             var styleProperties = self.styleProperties();
@@ -225,6 +228,7 @@ define([
                 }
             });
         });
+        this.drawLayer = drawLayer;
 
         drawLayer.subscribe(function(newDrawLayer) {
             var map = self.map();

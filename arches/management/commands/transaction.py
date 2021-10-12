@@ -1,4 +1,4 @@
-<!--
+"""
 ARCHES - a program developed to inventory and manage immovable cultural heritage.
 Copyright (C) 2013 J. Paul Getty Trust and World Monuments Fund
 
@@ -14,26 +14,30 @@ GNU Affero General Public License for more details.
 
 You should have received a copy of the GNU Affero General Public License
 along with this program. If not, see <http://www.gnu.org/licenses/>.
--->
-{% extends "base-manager.htm" %}
-{% load staticfiles %}
-{% load i18n %}
+"""
 
-{% block title %}
-{{ block.super }}
-{% trans "Resource Report" %}
-{% endblock title %}
+import os
+import uuid
+from arches.management.commands import utils
+from arches.app.models import models
+from django.core.management.base import BaseCommand, CommandError
+from django.db.utils import IntegrityError
+from arches.app.utils import transaction
 
 
-{% block main_content %}
-<div 
-    data-bind="
-        component: { 
-            name: 'resource-report-abstract',
-            params: {
-                resourceid: '{{ resourceid }}'
-            }
-        }
-    "
-></div>
-{% endblock main_content %}
+class Command(BaseCommand):
+    """
+    Commands for managing Arches functions
+
+    """
+
+    def add_arguments(self, parser):
+        parser.add_argument("operation", nargs="?")
+        parser.add_argument("transaction_id", nargs="?")
+
+    def handle(self, *args, **options):
+        if options["operation"] == "reverse":
+            self.reverse(options["transaction_id"])
+
+    def reverse(self, transaction_id):
+        print(transaction.reverse_edit_log_entries(transaction_id))
