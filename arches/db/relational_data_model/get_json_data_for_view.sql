@@ -31,23 +31,30 @@ begin
         from nodes where nodeid = column_info.description::uuid;
         if node_datatype = 'geojson-feature-collection' then
             query = format(
-                'select json_build_object(
-                    "type",
-                    "FeatureCollection",
-                    "features",
-                    json_agg(
-                        json_build_object(
-                            "type",
-                            "Feature",
-                            "geometry",
-                            st_asgeojson(
-                                ($1::text::%s. %s).%s
-                            ),
-                            "properties",
-                            json_build_object()
+                E'select json_build_object(
+                        \'type\',
+                        \'FeatureCollection\',
+                        \'features\',
+                        json_agg(
+                            json_build_object(
+                                \'type\',
+                                \'Feature\',
+                                \'geometry\',
+                                g.geom,
+                                \'properties\',
+                                json_build_object()
+                            )
                         )
                     )
-                )',
+                from (
+                    select json_array_elements(
+                        (
+                            st_asgeojson(
+                                ($1::text::%s. %s).%s
+                            )::jsonb ->> \'geometries\'
+                        )::json
+                    ) as geom
+                ) as g',
                 schema_name,
                 view_name,
                 column_info.column_name

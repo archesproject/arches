@@ -12,7 +12,7 @@ begin
             select_sql = format('
                 st_collect(
                     array(
-                        select geom from geojson_geometries
+                        select st_transform(geom, 4326) from geojson_geometries
                         where tileid = tileid and nodeid = %L
                     )
                 )',
