@@ -11,31 +11,25 @@ class Migration(migrations.Migration):
     ]
 
     sql = """
-        UPDATE public.cards SET name=CONCAT('{"%s":"',name,'"}'); 
-        UPDATE public.cards SET description=CONCAT('{"%s":"',description,'"}'); 
-        UPDATE public.cards SET instructions=CONCAT('{"%s":"',instructions,'"}'); 
-        UPDATE public.cards SET helptitle=CONCAT('{"%s":"',helptitle,'"}'); 
-        UPDATE public.cards SET helptext=CONCAT('{"%s":"',helptext,'"}');
-    """ % (
-        settings.LANGUAGE_CODE,
-        settings.LANGUAGE_CODE,
-        settings.LANGUAGE_CODE,
-        settings.LANGUAGE_CODE,
-        settings.LANGUAGE_CODE,
+        SET CONSTRAINTS ALL IMMEDIATE;
+        UPDATE public.cards SET name=json_build_object('{0}', name); 
+        UPDATE public.cards SET description=json_build_object('{0}', description); 
+        UPDATE public.cards SET instructions=json_build_object('{0}', instructions); 
+        UPDATE public.cards SET helptitle=json_build_object('{0}', helptitle); 
+        UPDATE public.cards SET helptext=json_build_object('{0}', helptext);
+        SET CONSTRAINTS ALL DEFERRED;
+    """.format(
+        settings.LANGUAGE_CODE
     )
 
     reverse_sql = """
-        UPDATE public.cards SET name=name::jsonb->>'%s'::text;
-        UPDATE public.cards SET description=description::jsonb->>'%s'::text;
-        UPDATE public.cards SET instructions=instructions::jsonb->>'%s'::text;
-        UPDATE public.cards SET helptitle=helptitle::jsonb->>'%s'::text;
-        UPDATE public.cards SET helptext=helptext::jsonb->>'%s'::text;
-    """ % (
-        settings.LANGUAGE_CODE,
-        settings.LANGUAGE_CODE,
-        settings.LANGUAGE_CODE,
-        settings.LANGUAGE_CODE,
-        settings.LANGUAGE_CODE,
+        UPDATE public.cards SET name=name::jsonb->>'{0}'::text;
+        UPDATE public.cards SET description=description::jsonb->>'{0}'::text;
+        UPDATE public.cards SET instructions=instructions::jsonb->>'{0}'::text;
+        UPDATE public.cards SET helptitle=helptitle::jsonb->>'{0}'::text;
+        UPDATE public.cards SET helptext=helptext::jsonb->>'{0}'::text;
+    """.format(
+        settings.LANGUAGE_CODE
     )
 
     operations = [
@@ -64,5 +58,5 @@ class Migration(migrations.Migration):
             model_name="cardmodel",
             name="helptext",
             field=I18n_TextField(blank=True, null=True),
-        ),
+        )
     ]
