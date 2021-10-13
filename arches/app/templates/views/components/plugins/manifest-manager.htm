@@ -35,12 +35,12 @@
     <div class="form-group">
         <div class="row widget-wrapper">
         <label class="control-label">{% trans "Title" %}</label>
-        <input type="text" placeholder="Manifest Title" class="form-control input-lg" style="height: 36px;"
+        <input type="text" placeholder="Service Title" class="form-control input-lg" style="height: 36px;"
             data-bind="textInput: self.manifestName, valueUpdate: 'keyup'">
         </div>  
         <div class="row widget-wrapper">  
         <label class="control-label">{% trans "Description" %}</label>
-        <textarea rows="10" type="text" placeholder='Manifest Description' class="form-control input-lg"
+        <textarea rows="10" type="text" placeholder='Service Description' class="form-control input-lg"
             data-bind="textInput: self.manifestDescription, valueUpdate: 'keyup'"></textarea>
         </div>
         <div class="row widget-wrapper">
@@ -182,14 +182,14 @@
 {% block main_menu %}
 <div>
     <ul class="nav nav-tabs">
-            <li>
+            <li data-bind="if: shouldShowCreateService">
                 <div class='manifest-manager-nav-tab' data-bind="click: function(){createService(true); editService(false)}, css: { active: createService }">
                     <div class='tab-label'>
                         {% trans 'Create New Service' %}
                     </div>
                 </div>
             </li>
-            <li>
+            <li data-bind="if: shouldShowEditService">
             <div class='manifest-manager-nav-tab' data-bind=
                 "click: function(){createService(false); editService(true)}, css: { active: editService }">
                 <div class='tab-label'>
@@ -204,7 +204,14 @@
 
 <!--ko if: createService -->
 <div data-bind="dropzone: dropzoneOptions4create" class="file-select loader-select" style="height: 100%;">
-    <div style="display:flex; flex-direction: column; align-items: center;">
+    <div style="
+            display:flex; 
+            flex-direction: column; 
+            align-items: center;
+            justify-content: center;
+            height: 100%;
+        "
+    >
         <div class="manifest-manager-main-menu-circle loader-button">
             <span><i style="color: #000" class="fa fa-cloud-upload r-select-icon"></i></span>
         </div> 
@@ -267,8 +274,15 @@
             <span class="clear-node-search" data-bind="visible: filter().length > 0, click: function() { filter(''); }"><i class="fa fa-times-circle"></i></span>
         </div>
     </div>
-    <div style="display: inline-flex; padding: 5px">
-        <div class="iiif-gallery-sequence-label" style="padding:0 5px" data-bind="click: toggleManifestEditor">
+    <div class="iiif-gallery-sequence-labels">
+        <div 
+            class="iiif-gallery-sequence-label" 
+            style="padding:0 5px" 
+            data-bind="
+                if: shouldShowEditService,
+                click: toggleManifestEditor,
+            "
+        >
             {% trans "Switch Image Service" %}
         </div>
         |

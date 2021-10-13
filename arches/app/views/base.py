@@ -23,6 +23,12 @@ from arches.app.models.resource import Resource
 from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializer
 from django.views.generic import TemplateView
 from arches.app.datatypes.datatypes import DataTypeFactory
+from arches.app.utils.permission_backend import (
+    get_createable_resource_types,
+    user_is_resource_reviewer,
+    get_editable_resource_types,
+    get_resource_types_by_perm,
+)
 from arches.app.utils.permission_backend import get_createable_resource_types, user_is_resource_reviewer
 
 class BaseManagerView(TemplateView):
@@ -70,6 +76,15 @@ class BaseManagerView(TemplateView):
             "print": False,
         }
         context["user_is_reviewer"] = user_is_resource_reviewer(self.request.user)
+        context["user_can_edit"] = len(get_editable_resource_types(self.request.user)) > 0
+        context["user_can_read"] = (
+            len(
+                get_resource_types_by_perm(
+                    self.request.user, ["models.write_nodegroup", "models.delete_nodegroup", "models.read_nodegroup"]
+                )
+            )
+            > 0
+        )
         context["app_name"] = settings.APP_NAME
         context["show_language_swtich"] = settings.SHOW_LANGUAGE_SWITCH
         return context

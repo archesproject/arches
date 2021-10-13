@@ -39,12 +39,14 @@ from arches.app.models.resource import Resource
 from arches.app.models.system_settings import settings
 from arches.app.models.tile import Tile as TileProxyModel, TileValidationError
 from arches.app.views.tile import TileData as TileView
+from arches.app.views.resource import RelatedResourcesView, get_resource_relationship_types
 from arches.app.utils.skos import SKOSWriter
 from arches.app.utils.response import JSONResponse
 from arches.app.utils.decorators import can_read_concept, group_required
 from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializer
 from arches.app.utils.data_management.resources.exporter import ResourceExporter
 from arches.app.utils.data_management.resources.formats.rdffile import JsonLdReader
+from arches.app.utils.data_management.resources.formats.archesfile import ArchesFileReader
 from arches.app.utils.permission_backend import (
     user_can_read_resource,
     user_can_edit_resource,
@@ -484,24 +486,45 @@ class MVT(APIBase):
 @method_decorator(csrf_exempt, name="dispatch")
 class Graphs(APIBase):
     def get(self, request, graph_id=None):
+        cards_querystring = request.GET.get("cards", None)
+        exclusions_querystring = request.GET.get("exclude", None)
+        if cards_querystring == "false":
+            get_cards = False
+        else:
+            get_cards = True
+
+        if exclusions_querystring is not None:
+            exclusions = list(map(str.strip, exclusions_querystring.split(",")))
+        else:
+            exclusions = []
+
         perm = "read_nodegroup"
-        datatypes = models.DDataType.objects.all()
         graph = cache.get(f"graph_{graph_id}")
         user = request.user
+
         if graph is None:
             graph = Graph.objects.get(graphid=graph_id)
-        cards = CardProxyModel.objects.filter(graph_id=graph_id).order_by("sortorder")
-        permitted_cards = []
-        for card in cards:
-            if user.has_perm(perm, card.nodegroup):
-                card.filter_by_perm(user, perm)
-                permitted_cards.append(card)
-        cardwidgets = [
-            widget for widgets in [card.cardxnodexwidget_set.order_by("sortorder").all() for card in permitted_cards] for widget in widgets
-        ]
-        graph = JSONSerializer().serializeToPython(graph, sort_keys=False, exclude=["is_editable", "functions"])
-        permitted_cards = JSONSerializer().serializeToPython(permitted_cards, sort_keys=False, exclude=["is_editable"])
-        return JSONResponse({"datatypes": datatypes, "cards": permitted_cards, "graph": graph, "cardwidgets": cardwidgets})
+        graph = JSONSerializer().serializeToPython(graph, sort_keys=False, exclude=["is_editable", "functions"] + exclusions)
+
+        if get_cards:
+            datatypes = models.DDataType.objects.all()
+            cards = CardProxyModel.objects.filter(graph_id=graph_id).order_by("sortorder")
+            permitted_cards = []
+            for card in cards:
+                if user.has_perm(perm, card.nodegroup):
+                    card.filter_by_perm(user, perm)
+                    permitted_cards.append(card)
+            cardwidgets = [
+                widget
+                for widgets in [card.cardxnodexwidget_set.order_by("sortorder").all() for card in permitted_cards]
+                for widget in widgets
+            ]
+
+            permitted_cards = JSONSerializer().serializeToPython(permitted_cards, sort_keys=False, exclude=["is_editable"])
+
+            return JSONResponse({"datatypes": datatypes, "cards": permitted_cards, "graph": graph, "cardwidgets": cardwidgets})
+        else:
+            return JSONResponse({"graph": graph})
 
 
 @method_decorator(csrf_exempt, name="dispatch")
@@ -557,23 +580,24 @@ class Resources(APIBase):
             if format == "json":
                 resource = Resource.objects.get(pk=resourceid)
 
+                version = request.GET.get("v", None)
                 compact = bool(request.GET.get("compact", "true").lower() == "true")  # default True
                 hide_empty_nodes = bool(request.GET.get("hide_empty_nodes", "false").lower() == "true")  # default False
 
-                out = {
-                    "resource": resource.to_json(
-                        compact=compact,
-                        hide_empty_nodes=hide_empty_nodes,
-                        user=user,
-                        perm=perm,
-                    ),
-                    "displaydescription": resource.displaydescription,
-                    "displayname": resource.displayname,
-                    "graph_id": resource.graph_id,
-                    "legacyid": resource.legacyid,
-                    "map_popup": resource.map_popup,
-                    "resourceinstanceid": resource.resourceinstanceid,
-                }
+                if version == "beta":
+                    out = resource.to_json(compact=compact, hide_empty_nodes=hide_empty_nodes, user=user, perm=perm, version=version)
+                else:
+                    out = {
+                        "resource": resource.to_json(
+                            compact=compact, hide_empty_nodes=hide_empty_nodes, user=user, perm=perm, version=version
+                        ),
+                        "displaydescription": resource.displaydescription,
+                        "displayname": resource.displayname,
+                        "graph_id": resource.graph_id,
+                        "legacyid": resource.legacyid,
+                        "map_popup": resource.map_popup,
+                        "resourceinstanceid": resource.resourceinstanceid,
+                    }
 
             elif format == "arches-json":
                 out = Resource.objects.get(pk=resourceid)
@@ -699,24 +723,100 @@ class Resources(APIBase):
         except Exception:
             indent = None
 
+        allowed_formats = ["arches-json", "json-ld"]
+        format = request.GET.get("format", "json-ld")
+        if format not in allowed_formats:
+            return JSONResponse(status=406, reason="incorrect format specified, only %s formats allowed" % allowed_formats)
+
         if not user_can_edit_resource(user=request.user, resourceid=resourceid):
             return JSONResponse(status=403)
         else:
             with transaction.atomic():
                 try:
-                    # DELETE
-                    resource_instance = Resource.objects.get(pk=resourceid)
-                    resource_instance.delete()
-                except models.ResourceInstance.DoesNotExist:
-                    pass
+                    if format == "json-ld":
+                        try:
+                            # DELETE
+                            resource_instance = Resource.objects.get(pk=resourceid)
+                            resource_instance.delete()
+                        except models.ResourceInstance.DoesNotExist:
+                            pass
 
-                try:
-                    # POST
+                        # POST
+                        data = JSONDeserializer().deserialize(request.body)
+                        reader = JsonLdReader()
+                        if slug is not None:
+                            graphid = models.GraphModel.objects.get(slug=slug).pk
+                        reader.read_resource(data, resourceid=resourceid, graphid=graphid)
+                        if reader.errors:
+                            response = []
+                            for value in reader.errors.values():
+                                response.append(value.message)
+                            return JSONResponse({"error": response}, indent=indent, status=400)
+                        else:
+                            response = []
+                            for resource in reader.resources:
+                                with transaction.atomic():
+                                    resource.save(request=request)
+                                response.append(JSONDeserializer().deserialize(self.get(request, resource.resourceinstanceid).content))
+                            return JSONResponse(response, indent=indent, status=201)
+
+                    elif format == "arches-json":
+                        reader = ArchesFileReader()
+                        archesresource = JSONDeserializer().deserialize(request.body)
+
+                        # IF a resource id is supplied in the url it should match the resource ids in the body of the request.
+                        if resourceid != archesresource["resourceinstanceid"]:
+                            return JSONResponse(
+                                {"error": "Resource id in the URI does not match the resourceinstanceid supplied in the document"},
+                                indent=indent,
+                                status=400,
+                            )
+
+                        #  Resource id's in the request body take precedence over the id supplied in the url.
+                        resource = {
+                            "resourceinstance": {
+                                "graph_id": archesresource["graph_id"],
+                                "resourceinstanceid": archesresource["resourceinstanceid"],
+                                "legacyid": archesresource["legacyid"],
+                            },
+                            "tiles": archesresource["tiles"],
+                        }
+
+                        reader.import_business_data({"resources": [resource]})
+
+                        if reader.errors:
+                            response = []
+                            for value in reader.errors.values():
+                                response.append(value.message)
+                            return JSONResponse({"error": response}, indent=indent, status=400)
+                        else:
+                            response = []
+                            response.append(JSONDeserializer().deserialize(self.get(request, archesresource["resourceinstanceid"]).content))
+                            return JSONResponse(response, indent=indent, status=201)
+
+                except models.ResourceInstance.DoesNotExist:
+                    return JSONResponse(status=404)
+                except Exception as e:
+                    return JSONResponse({"error": "resource data could not be saved"}, status=500, reason=e)
+
+    def post(self, request, resourceid=None, slug=None, graphid=None):
+        try:
+            indent = int(request.POST.get("indent", None))
+        except Exception:
+            indent = None
+        allowed_formats = ["arches-json", "json-ld"]
+        format = request.GET.get("format", "json-ld")
+        if format not in allowed_formats:
+            return JSONResponse(status=406, reason="incorrect format specified, only %s formats allowed" % allowed_formats)
+
+        try:
+            if user_can_edit_resource(user=request.user, resourceid=resourceid):
+                if format == "json-ld":
                     data = JSONDeserializer().deserialize(request.body)
                     reader = JsonLdReader()
                     if slug is not None:
                         graphid = models.GraphModel.objects.get(slug=slug).pk
-                    reader.read_resource(data, resourceid=resourceid, graphid=graphid)
+                    reader.read_resource(data, graphid=graphid)
                     if reader.errors:
                         response = []
                         for value in reader.errors.values():
@@ -729,36 +829,34 @@ class Resources(APIBase):
                                 resource.save(request=request)
                             response.append(JSONDeserializer().deserialize(self.get(request, resource.resourceinstanceid).content))
                         return JSONResponse(response, indent=indent, status=201)
-                except models.ResourceInstance.DoesNotExist:
-                    return JSONResponse(status=404)
-                except Exception as e:
-                    return JSONResponse({"error": "resource data could not be saved"}, status=500, reason=e)
 
-    def post(self, request, resourceid=None, slug=None, graphid=None):
-        try:
-            indent = int(request.POST.get("indent", None))
-        except Exception:
-            indent = None
+                elif format == "arches-json":
+                    reader = ArchesFileReader()
+                    archesresource = JSONDeserializer().deserialize(request.body)
 
-        try:
-            if user_can_edit_resource(user=request.user, resourceid=resourceid):
-                data = JSONDeserializer().deserialize(request.body)
-                reader = JsonLdReader()
-                if slug is not None:
-                    graphid = models.GraphModel.objects.get(slug=slug).pk
-                reader.read_resource(data, graphid=graphid)
-                if reader.errors:
-                    response = []
-                    for value in reader.errors.values():
-                        response.append(value.message)
-                    return JSONResponse({"error": response}, indent=indent, status=400)
-                else:
-                    response = []
-                    for resource in reader.resources:
-                        with transaction.atomic():
-                            resource.save(request=request)
-                        response.append(JSONDeserializer().deserialize(self.get(request, resource.resourceinstanceid).content))
-                    return JSONResponse(response, indent=indent, status=201)
+                    nascent_resourceinstanceid = str(uuid.uuid4())
+
+                    resource = {
+                        "resourceinstance": {
+                            "graph_id": archesresource["graph_id"],
+                            "resourceinstanceid": nascent_resourceinstanceid,
+                            "legacyid": archesresource["legacyid"],
+                        },
+                        "tiles": archesresource["tiles"],
+                    }
+
+                    reader.import_business_data({"resources": [resource]})
+
+                    if reader.errors:
+                        response = []
+                        for value in reader.errors.values():
+                            response.append(value.message)
+                        return JSONResponse({"error": response}, indent=indent, status=400)
+                    else:
+                        response = []
+                        response.append(JSONDeserializer().deserialize(self.get(request, nascent_resourceinstanceid).content))
+                        return JSONResponse(response, indent=indent, status=201)
+
             else:
                 return JSONResponse(status=403)
         except Exception as e:
@@ -942,6 +1040,7 @@ class SearchExport(View):
         total = int(request.GET.get("total", 0))
         download_limit = settings.SEARCH_EXPORT_IMMEDIATE_DOWNLOAD_THRESHOLD
         format = request.GET.get("format", "tilecsv")
+        report_link = request.GET.get("reportlink", False)
         if "HTTP_AUTHORIZATION" in request.META:
             request_auth = request.META.get("HTTP_AUTHORIZATION").split()
             if request_auth[0].lower() == "basic":
@@ -950,7 +1049,7 @@ class SearchExport(View):
                 if user is not None:
                     request.user = user
         exporter = SearchResultsExporter(search_request=request)
-        export_files, export_info = exporter.export(format)
+        export_files, export_info = exporter.export(format, report_link)
         if format == "geojson" and total <= download_limit:
             response = JSONResponse(export_files)
             return response
@@ -1100,6 +1199,234 @@ class OntologyProperty(APIBase):
         return JSONResponse(ret)
 
 
+class ResourceReport(APIBase):
+    def get(self, request, resourceid):
+        exclude = request.GET.get("exclude", [])
+        uncompacted_value = request.GET.get("uncompacted")
+        version = request.GET.get("v")
+        compact = True
+        if uncompacted_value == "true":
+            compact = False
+        perm = "read_nodegroup"
+
+        resource = Resource.objects.get(pk=resourceid)
+        graph = Graph.objects.get(graphid=resource.graph_id)
+        template = models.ReportTemplate.objects.get(pk=graph.template_id)
+
+        if not template.preload_resource_data:
+            return JSONResponse({"template": template, "report_json": resource.to_json(compact=compact, version=version)})
+
+        resp = {
+            "datatypes": models.DDataType.objects.all(),
+            "displayname": resource.displayname,
+            "resourceid": resourceid,
+            "graph": graph,
+            "hide_empty_nodes": settings.HIDE_EMPTY_NODES_IN_REPORT,
+            "report_json": resource.to_json(compact=compact, version=version),
+        }
+
+        if "template" not in exclude:
+            resp["template"] = template
+
+        if "related_resources" not in exclude:
+            resource_models = (
+                models.GraphModel.objects.filter(isresource=True)
+                .exclude(isactive=False)
+                .exclude(pk=settings.SYSTEM_SETTINGS_RESOURCE_MODEL_ID)
+            )
+
+            get_params = request.GET.copy()
+            get_params.update({"paginate": "false"})
+            request.GET = get_params
+
+            related_resources_response = RelatedResourcesView().get(request, resourceid)
+            related_resources = json.loads(related_resources_response.content)
+
+            related_resources_summary = self._generate_related_resources_summary(
+                related_resources=related_resources["related_resources"],
+                resource_relationships=related_resources["resource_relationships"],
+                resource_models=resource_models,
+            )
+
+            resp["related_resources"] = related_resources_summary
+
+        if "tiles" not in exclude:
+            permitted_tiles = []
+            for tile in TileProxyModel.objects.filter(resourceinstance=resource).select_related("nodegroup").order_by("sortorder"):
+                if request.user.has_perm(perm, tile.nodegroup):
+                    tile.filter_by_perm(request.user, perm)
+                    permitted_tiles.append(tile)
+
+            resp["tiles"] = permitted_tiles
+
+        if "cards" not in exclude:
+            permitted_cards = []
+            for card in CardProxyModel.objects.filter(graph_id=resource.graph_id).select_related("nodegroup").order_by("sortorder"):
+                if request.user.has_perm(perm, card.nodegroup):
+                    card.filter_by_perm(request.user, perm)
+                    permitted_cards.append(card)
+
+            cardwidgets = [
+                widget
+                for widgets in [card.cardxnodexwidget_set.order_by("sortorder").all() for card in permitted_cards]
+                for widget in widgets
+            ]
+
+            resp["cards"] = permitted_cards
+            resp["cardwidgets"] = cardwidgets
+
+        return JSONResponse(resp)
+
+    def _generate_related_resources_summary(self, related_resources, resource_relationships, resource_models):
+        related_resource_summary = [
+            {"graphid": str(resource_model.graphid), "name": resource_model.name, "resources": []} for resource_model in resource_models
+        ]
+
+        resource_relationship_types = {
+            resource_relationship_type["id"]: resource_relationship_type["text"]
+            for resource_relationship_type in get_resource_relationship_types()["values"]
+        }
+
+        for related_resource in related_resources:
+            for summary in related_resource_summary:
+                if related_resource["graph_id"] == summary["graphid"]:
+                    relationship_summary = []
+                    for resource_relationship in resource_relationships:
+                        if related_resource["resourceinstanceid"] == resource_relationship["resourceinstanceidto"]:
+                            rr_type = (
+                                resource_relationship_types[resource_relationship["relationshiptype"]]
+                                if resource_relationship["relationshiptype"] in resource_relationship_types
+                                else resource_relationship["relationshiptype"]
+                            )
+                            relationship_summary.append(rr_type)
+                        elif related_resource["resourceinstanceid"] == resource_relationship["resourceinstanceidfrom"]:
+                            rr_type = (
+                                resource_relationship_types[resource_relationship["inverserelationshiptype"]]
+                                if resource_relationship["inverserelationshiptype"] in resource_relationship_types
+                                else resource_relationship["inverserelationshiptype"]
+                            )
+                            relationship_summary.append(rr_type)
+
+                    summary["resources"].append(
+                        {
+                            "resourceinstanceid": related_resource["resourceinstanceid"],
+                            "displayname": related_resource["displayname"],
+                            "relationships": relationship_summary,
+                        }
+                    )
+
+        return related_resource_summary
+
+
+class BulkResourceReport(APIBase):
+    def get(self, request):
+        graph_ids = request.GET.get("graph_ids").split(",")
+        exclude = request.GET.get("exclude", [])
+
+        if not graph_ids:
+            raise Exception()
+
+        exclusions_querystring = request.GET.get("exclude", None)
+
+        if exclusions_querystring is not None:
+            exclusions = list(map(str.strip, exclude.split(",")))
+        else:
+            exclusions = []
+
+        graph_ids_set = set(graph_ids)  # calls set to delete dups
+        graph_ids_not_in_cache = []
+
+        graph_lookup = {}
+
+        for graph_id in graph_ids_set:
+            graph = cache.get("serialized_graph_{}".format(graph_id))
+
+            if graph:
+                graph_lookup[graph["graphid"]] = graph
+            else:
+                graph_ids_not_in_cache.append(graph_id)
+
+        if graph_ids_not_in_cache:
+            graphs_from_database = list(Graph.objects.filter(pk__in=graph_ids_not_in_cache))
+
+            for graph in graphs_from_database:
+                serialized_graph = JSONSerializer().serializeToPython(
+                    graph, sort_keys=False, exclude=["is_editable", "functions"] + exclusions
+                )
+                cache.set("serialized_graph_{}".format(graph.pk), serialized_graph)
+                graph_lookup[str(graph.pk)] = serialized_graph
+
+        graph_ids_with_templates_that_preload_resource_data = []
+        graph_ids_with_templates_that_do_not_preload_resource_data = []
+
+        for graph in graph_lookup.values():
+            template = models.ReportTemplate.objects.get(pk=graph["template_id"])
+
+            if template.preload_resource_data:
+                graph_ids_with_templates_that_preload_resource_data.append(graph["graphid"])
+            else:
+                graph_ids_with_templates_that_do_not_preload_resource_data.append(graph["graphid"])
+
+        permitted_cards = []
+
+        if "cards" not in exclude:
+            cards = (
+                CardProxyModel.objects.filter(graph_id__in=graph_ids_with_templates_that_preload_resource_data)
+                .select_related("nodegroup")
+                .order_by("sortorder")
+            )
+
+            perm = "read_nodegroup"
+            permitted_cards = []
+
+            for card in cards:
+                if request.user.has_perm(perm, card.nodegroup):
+                    card.filter_by_perm(request.user, perm)
+                    permitted_cards.append(card)
+
+        if "datatypes" not in exclude:
+            datatypes = list(models.DDataType.objects.all())
+
+        resp = {}
+
+        for graph_id in graph_ids_with_templates_that_preload_resource_data:
+            graph = graph_lookup[graph_id]
+
+            graph_cards = [card for card in permitted_cards if str(card.graph_id) == graph["graphid"]]
+
+            cardwidgets = [
+                widget for widgets in [card.cardxnodexwidget_set.order_by("sortorder").all() for card in graph_cards] for widget in widgets
+            ]
+
+            resp[graph_id] = {
+                "graph": graph,
+                "cards": JSONSerializer().serializeToPython(graph_cards, sort_keys=False, exclude=["is_editable"]),
+                "cardwidgets": cardwidgets,
+            }
+
+            if "datatypes" not in exclude:
+                resp[graph_id]["datatypes"] = datatypes
+
+        for graph_id in graph_ids_with_templates_that_do_not_preload_resource_data:
+            graph = graph_lookup[graph_id]
+            resp[graph_id] = {"template_id": graph["template_id"]}
+
+        return JSONResponse(resp)
+
+
+class BulkDisambiguatedResourceInstance(APIBase):
+    def get(self, request):
+        resource_ids = request.GET.get("resource_ids").split(",")
+        uncompacted_value = request.GET.get("uncompacted")
+        version = request.GET.get("v")
+        compact = True
+        if uncompacted_value == "true":
+            compact = False
+        return JSONResponse(
+            {resource.pk: resource.to_json(compact=compact, version=version) for resource in Resource.objects.filter(pk__in=resource_ids)}
+        )
+
+
 @method_decorator(csrf_exempt, name="dispatch")
 class Tile(APIBase):
     def get(self, request, tileid):
@@ -1118,8 +1445,10 @@ class Tile(APIBase):
     def post(self, request, tileid):
         tileview = TileView()
         tileview.action = "update_tile"
-        request.POST = request.POST.copy()
-        request.POST["data"] = request.body
+        # check that no data is on POST or FILES before assigning body to POST (otherwise request fails)
+        if len(dict(request.POST.items())) == 0 and len(dict(request.FILES.items())) == 0:
+            request.POST = request.POST.copy()
+            request.POST["data"] = request.body
         return tileview.post(request)
 
 
@@ -1202,6 +1531,7 @@ class NodeValue(APIBase):
         resourceid = request.POST.get("resourceinstanceid", None)
         format = request.POST.get("format")
         operation = request.POST.get("operation")
+        transaction_id = request.POST.get("transaction_id")
 
         # get node model return error if not found
         try:
@@ -1228,7 +1558,7 @@ class NodeValue(APIBase):
                 data = datatype.update(tile, data, nodeid, action=operation)
 
             # update/create tile
-            new_tile = TileProxyModel.update_node_value(nodeid, data, tileid, resourceinstanceid=resourceid)
+            new_tile = TileProxyModel.update_node_value(nodeid, data, tileid, resourceinstanceid=resourceid, transaction_id=transaction_id)
 
             response = JSONResponse(new_tile, status=200)
         else:

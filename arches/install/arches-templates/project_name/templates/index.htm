@@ -42,344 +42,324 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
     <link href="{% static 'css/unify.css' %}" rel="stylesheet">
     <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/font-awesome/4.2.0/css/font-awesome.min.css">
     <link href="{% static 'css/index.css' %}" rel="stylesheet">
-
+    {% if app_settings.ACCESSIBILITY_MODE %}
+    <link href="{% static 'css/accessibility.css' %}" rel="stylesheet">
+    {% endif %}
 </head>
 
-<!--
-The #page-top ID is part of the scrolling feature.
-The data-spy and data-target are part of the built-in Bootstrap scrollspy function.
--->
-
-<body id="body" data-spy="scroll" data-target=".splash-nav" class="demo-lightbox-gallery">
+<body>
 
     <!--=== Header ===-->
-    <nav class="v5-splash-navbar navbar" role="navigation">
-
-        <nav class="navbar">
+    <header>
+        <nav class="v5-splash-navbar navbar" role="navigation">
             <div class="container-fluid">
                 <div class="navbar-header">
-                    <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#myNavbar">
+                    <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#myNavbar" aria-expanded="false" aria-controls="myNavbar">
+                        <span class="sr-only">Toggle navigation</span>
                         <span class="icon-bar"></span>
                         <span class="icon-bar"></span>
                         <span class="icon-bar"></span>
                     </button>
 
-                    <div class="relative" style="padding: 8px 10px 8px 100px; width: 300px;">
-                        <div class="navbar-brand-v5-icon-container" style="">
-                            <img class="navbar-brand-v5-icon" src="{% static 'img/landing/arches_logo_dark.png' %}" style="" alt="Arches Logo">
+                    <div class="relative nav-brand-container">
+                        <div class="navbar-brand-v5-icon-container">
+                            <img class="navbar-brand-v5-icon" src="{% static 'img/landing/Arches_logo_white.png' %}" alt="Arches Logo">
                         </div>
-                        <div class="application-name" style="position: absolute; top: 5px; left: 160px;">
-                            <h2>{% blocktrans %}Arches | {{version}}{% endblocktrans %}</h2>
+                        <div class="application-name">
+                            <h1>{% blocktrans %}Arches | {{version}}{% endblocktrans %}</h1>
                         </div>
                     </div>
                 </div>
 
-                <div class="collapse navbar-collapse" id="myNavbar">
-                    <ul class="nav navbar-nav">
-                        <li class="">
-                            <a href="#info-block-0">{% trans "Arches Features" %}</a>
+                <div id="myNavbar" class="navbar-collapse collapse">
+                    <ul class="nav navbar-nav navbar-right">
+                        <li>
+                            <a href="#info-block-1">{% trans "Arches Features" %}</a>
                         </li>
-
-                        <li class="">
+                        <li>
                             <a href="{% url 'search_home' %}">{% trans "Search Arches" %}</a>
                         </li>
-
                         {% if user|can_create_resource_instance and user.username != 'anonymous' %}
-                        <li class="">
-                            <a href="{% url 'resource' %}" target="_blank">{% trans "Manage" %}</a>
-                        </li>
+                            <li>
+                                <a href="{% url 'resource' %}" target="_blank">{% trans "Manage" %}</a>
+                            </li>
                         {% endif %}
-                    </ul>
-
-                    <ul class="nav navbar-nav navbar-right" style="padding-right: 80px;">
                         {% if user.username == 'anonymous' %}
-                        <li class="">
-                            <a class="application-login" id="auth-link"
-                                href="{% url 'auth' %}?next={% url 'home' %}{% if user.username != 'anonymous' %}&logout=true{% endif %}">{% trans "Sign in" %}</a>
-                        </li>
+                            <li>
+                                <a class="application-login" id="auth-link" href="{% url 'auth' %}?next={% url 'home' %}{% if user.username != 'anonymous' %}&logout=true{% endif %}">{% trans "Sign in" %}</a>
+                            </li>
                         {% else %}
-                        <li>
-                            <a class="auth-welcome" href="{% url 'user_profile_manager' %}">
-                                {% trans "Welcome, " %} {{ user.first_name|default:user.username }}
-                            </a>
-                        </li>
-                        <li>
-                            <a class="application-login"
-                                href="{% url 'auth' %}?next={% url 'home' %}{% if user.username != 'anonymous' %}&logout=true{% endif %}">{% trans 'Log off' %}</a>
-                        </li>
+                            <li>
+                                <a class="auth-welcome" href="{% url 'user_profile_manager' %}">
+                                    {% trans "Welcome, " %} {{ user.first_name|default:user.username }}
+                                </a>
+                            </li>
+                            <li>
+                                <a class="application-login" href="{% url 'auth' %}?next={% url 'home' %}{% if user.username != 'anonymous' %}&logout=true{% endif %}">{% trans 'Log off' %}</a>
+                            </li>
                         {% endif %}
                         {% if show_language_swtich %}
-                        <li>
-                            {% get_current_language as LANGUAGE_CODE %}
-                            <div class="lang-switch" style="max-width: none;" data-bind='component: {
-                                name: "views/components/language-switcher",
-                                params: {
-                                    current_language: "{{LANGUAGE_CODE}}"
-                                }
-                            }'></div>
-                        </li>
+                            <li>
+                                {% get_current_language as LANGUAGE_CODE %}
+                                <div class="lang-switch" style="max-width: none;" data-bind='component: {
+                                    name: "views/components/language-switcher",
+                                    params: {
+                                        current_language: "{{LANGUAGE_CODE}}"
+                                    }
+                                }'></div>
+                            </li>
                         {% endif %}
                     </ul>
                 </div>
             </div>
         </nav>
-        <!-- /container -->
-    </nav>
+    </header>
     <!--=== End Header ===-->
 
-    <!-- Intro Section -->
-    <section id="info-block-0" class="app-info-block intro-section relative" style="">
-        <!-- Vertical Nav -->
-        <div class="vertical-nav-container-background"></div>
+    <main>
+        <article>
+            <!-- Intro Section -->
+            <section id="info-block-0" class="app-info-block intro-section relative">
+                <!-- Vertical Nav -->
+                <div class="vertical-nav-container-background"></div>
 
-        <div id="cd-vertical-nav" class="vertical-nav-container">
-            <ul class="vertical-nav-list">
-                <li class="active">
-                    <a class="vertical-nav-list-link" href="#info-block-0" data-number="1">
-                        <span class="vertical-nav-list-ref">{% trans "Home" %}</span>
-                    </a>
-                </li>
-                <li class="">
-                    <a class="vertical-nav-list-link" href="#info-block-1" data-number="2">
-                        <span class="vertical-nav-list-ref">{% trans "Fast" %}</span>
-                    </a>
-                </li>
-                <li class="">
-                    <a class="vertical-nav-list-link" href="#info-block-2" data-number="3">
-                        <span class="vertical-nav-list-ref">{% trans "Workflows" %}</span>
-                    </a>
-                </li>
-                <li class="">
-                    <a class="vertical-nav-list-link" href="#info-block-3" data-number="4">
-                        <span class="vertical-nav-list-ref">{% trans "Search Tools" %}</span>
-                    </a>
-                </li>
-                <li class="">
-                    <a class="vertical-nav-list-link" href="#info-block-4" data-number="5">
-                        <span class="vertical-nav-list-ref">{% trans "Mobile" %}</span>
-                    </a>
-                </li>
-            </ul>
-        </div>
+                <div id="cd-vertical-nav" class="vertical-nav-container">
+                    <ul class="vertical-nav-list">
+                        <li class="active">
+                            <a class="vertical-nav-list-link" href="#info-block-0" data-number="1" aria-label="Go to the top of the page">
+                                <span class="vertical-nav-list-ref">{% trans "Home" %}</span>
+                            </a>
+                        </li>
+                        <li>
+                            <a class="vertical-nav-list-link" href="#info-block-1" data-number="2" aria-label="Go to the fast section">
+                                <span class="vertical-nav-list-ref">{% trans "Fast" %}</span>
+                            </a>
+                        </li>
+                        <li>
+                            <a class="vertical-nav-list-link" href="#info-block-2" data-number="3" aria-label="Go to the workflows section">
+                                <span class="vertical-nav-list-ref">{% trans "Workflows" %}</span>
+                            </a>
+                        </li>
+                        <li>
+                            <a class="vertical-nav-list-link" href="#info-block-3" data-number="4" aria-label="Go to the search tools section">
+                                <span class="vertical-nav-list-ref">{% trans "Search Tools" %}</span>
+                            </a>
+                        </li>
+                        <li>
+                            <a class="vertical-nav-list-link" href="#info-block-4" data-number="5" aria-label="Go to the mobile section">
+                                <span class="vertical-nav-list-ref">{% trans "Mobile" %}</span>
+                            </a>
+                        </li>
+                    </ul>
+                </div>
 
-        <!-- Splash Screen -->
-        <div class="fullscreenbanner-container">
-            <div class="fullscreenbanner">
-                <ul>
-                    <!-- SLIDE 1 -->
-                    <li data-transition="fade" data-slotamount="9" data-masterspeed="0" data-title="Slide 1">
-                        <!-- MAIN IMAGE -->
-                        <img src="{% static 'img/landing/potala_palace.jpg' %}" alt="slidebg1" data-bgfit="cover" data-bgposition="center center" data-bgrepeat="no-repeat">
+                <!-- Splash Screen -->
+                <div class="fullscreenbanner-container">
+                    <div class="fullscreenbanner">
+                        <ul>
+                            <!-- SLIDE 1 -->
+                            <li data-transition="fade" data-slotamount="9" data-masterspeed="0" data-title="Slide 1">
+                                <!-- MAIN IMAGE -->
+                                <img src="{% static 'img/landing/bhutan_tigersnest_lr.jpg' %}" alt="slidebg1" data-bgfit="cover" data-bgposition="center center" data-bgrepeat="no-repeat">
+                                <!-- LAYERS -->
+                                <!-- NEW LAYER -->
+                                <div class="tp-caption sft start text-bold v5-splash-caption" delay="4500" data-hoffset="0" data-y="400" data-speed="800" data-start="100" data-easing="Back.easeInOut" data-endspeed="300" data-x="0">
+                                    <h2>{% blocktrans %}Arches {{version}}{% endblocktrans %}</h2>
+                                    <p>{% trans "A web and mobile platform for" %}</p>
+                                    <p>{% trans "managing your most important resource information" %}</p>
+                                </div>
 
-                        <!-- LAYERS -->
-                        <!-- NEW LAYER -->
-                        <div class="tp-caption sft start text-bold v5-splash-caption" style="left: 150px;" delay="4500"  data-hoffset="0" data-y="400" data-speed="800" data-start="100" data-easing="Back.easeInOut" data-endspeed="300">
-                            <h2>{% blocktrans %}Arches {{version}}{% endblocktrans %}</h2>
-                            <p>{% trans "A web and mobile platform for" %}</p>
-                            <p>{% trans "managing your most important resource information" %}</p>
+                                <!-- Gradient -->
+                                <div class="image-gradient"></div>
+
+                                <!-- Attribution -->
+                                <div class="image-attribution">
+                                    <span>{% trans "Taktsang Palphug Monastery (also known as Paro Takstang or Tiger's Nest Monastery), Bhutan" %}</span>
+                                </div>
+                            </li>
+                        </ul>
+                        <div class="tp-bannertimer tp-bottom"></div>
+                    </div>
+
+                    <!-- Down button -->
+                    <a href="#info-block-1" class="down-button" aria-label="Go to content"><i class="fa fa-angle-down down-button-icon"></i></a>
+                </div>
+            </section>
+            <!-- End Intro Section -->
+
+            <!-- Info Block 1 -->
+            <section id="info-block-1" class="app-info-block relative">
+                <div>
+
+                    <!-- Heading Info -->
+                    <div class="sub-section">
+                        <div class="col-lg-7">
+                            <div class="app-info-block-intro text-center">
+                                <h2 class="app-info-block-header">{% trans "Fast" %}</h2>
+                                <h3 class="app-info-block-title">{% trans "Deploy Applications Rapidly" %}</h3>
+                                <p class="app-info-block-text">
+                                    {% trans "Design custom information management applications in hours.  Build your databases with Arches Designer, then configure your interface all without having to write any code." %}
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Content -->
+                    <div class="splash-img">
+                        <img src="{% static 'img/landing/imac_designer.png' %}"  alt="Arches Designer">
+                    </div>
+
+                    <!-- Sub-section -->
+                    <div class="row app-info-sub-block">
+
+                        <!-- Arches Data Type Block -->
+                        <div class="col-lg-6">
+                            <div class="sub-block-container">
+                                <h3 class="app-info-block-title">{% trans "Interface Manager" %}</h3>
+                                <p class="sub-block-description">
+                                    {% trans "Arches automatically creates data entry forms based on your data models.  Use Arches' Card Manager to configure the look and feel of your data entry UI." %}
+                                </p>
+                                <img class="sub-block-image" src="{% static 'img/landing/card_manager.png' %}" alt="Card Manager">
+                            </div>
                         </div>
 
-                        <!-- Gradient -->
-                        <div class="image-gradient"></div>
-
-                        <!-- Attribution -->
-                        <div class="image-attribution" style="">
-                            <span class="">{% trans "Potala Palace, Lhasa | TJKakuris https://www.flickr.com/photos/60546255@N03/5521603324/ | (CC BY-NC-ND 2.0)" %}</span>
+                        <!-- Arches Data Type Block -->
+                        <div class="col-lg-6">
+                            <div class="sub-block-container">
+                                <h3 class="app-info-block-title">{% trans "Data Security" %}</h3>
+                                <p class="sub-block-description">
+                                    {% trans "Use Arches' Permissions Manager to set up data access rules for all your user groups and individual accounts.  You can define read/write/delete and no-access permissions." %}
+                                </p>
+                                <img class="sub-block-image" src="{% static 'img/landing/permissions_manager.png' %}" alt="Permissions Manager">
+                            </div>
                         </div>
-                    </li>
 
-                </ul>
-                <div class="tp-bannertimer tp-bottom"></div>
-            </div>
-
-            <!-- Down button -->
-            <div class="down-button">
-                <a class="" href="#info-block-1"><i class="fa fa-angle-down down-button-icon"></i></a>
-            </div>
-        </div>
-    </section>
-    <!-- End Intro Section -->
-
-    <!-- Info Block 1 -->
-    <section id="info-block-1" class="app-info-block relative">
-        <div class="">
-
-            <!-- Heading Info -->
-            <div class="sub-section">
-                <div class="col-lg-7">
-                    <div class="app-info-block-intro text-center">
-                        <h3 class="app-info-block-header">{% trans "Fast" %}</h3>
-                        <h2 class="app-info-block-title">{% trans "Deploy Applications Rapidly" %}</h2>
-                        <p class="app-info-block-text">
-                            {% trans "Design custom information management applications in hours.  Build your databases with Arches Designer, then configure your interface all without having to write any code." %}
-                        </p>
                     </div>
+                    <!-- End Sub-section -->
+
                 </div>
-            </div>
+            </section>
+            <!-- End Info Block 1 -->
 
-            <!-- Content -->
-            <div class="splash-img">
-                <img class="" src="{% static 'img/landing/imac_designer.png' %}" style="" alt="Arches Designer">
-            </div>
+            <!-- Info Block 2 -->
+            <section id="info-block-2" class="app-info-block relative">
+                <div>
 
-            <!-- Sub-section -->
-            <div class="row app-info-sub-block">
-
-                <!-- Arches Data Type Block -->
-                <div class="col-lg-6">
-                    <div class="sub-block-container">
-                        <h2 class="">{% trans "Interface Manager" %}</h2>
-                        <p class="sub-block-description">
-                            {% trans "Arches automatically creates data entry forms based on your data models.  Use Arches' Card Manager to configure the look and feel of your data entry UI." %}
-                        </p>
-                        <img class="sub-block-image" src="{% static 'img/landing/card_manager.png' %}" style="" alt="Card Manager">
+                    <!-- Heading Info -->
+                    <div class="sub-section">
+                        <div class="col-lg-7">
+                            <div class="app-info-block-intro text-center">
+                                <h2 class="app-info-block-header">{% trans "Workflows" %}</h2>
+                                <h3 class="app-info-block-title">{% trans "Orchestrate your data entry" %}</h3>
+                                <p class="app-info-block-text">
+                                    {% trans "Design step-wise data management interfaces that simplify complex editing tasks.  Ensure that everyone enters data completely and consistently" %}
+                                </p>
+                            </div>
+                        </div>
                     </div>
-                </div>
 
-                <!-- Arches Data Type Block -->
-                <div class="col-lg-6">
-                    <div class="sub-block-container">
-                        <h2 class="">{% trans "Data Security" %}</h2>
-                        <p class="sub-block-description">
-                            {% trans "Use Arches' Permissions Manager to set up data access rules for all your user groups and individual accounts.  You can define read/write/delete and no-access permissions." %}
-                        </p>
-                        <img class="sub-block-image" src="{% static 'img/landing/permissions_manager.png' %}" style="" alt="Permissions Manager">
+                    <!-- Content -->
+                    <div class="splash-img">
+                        <img class="sub-block-image" src="{% static 'img/landing/consultation_workflow.jpg' %}" alt="Arches Workflows">
                     </div>
+
                 </div>
+            </section>
+            <!-- End Info Block 2 -->
 
-            </div>
-            <!-- End Sub-section -->
+            <!-- Info Block 3 -->
+            <section id="info-block-3" class="app-info-block relative">
+                <div>
 
-
-        </div>
-    </section>
-    <!-- End Info Block 1 -->
-
-
-    <!-- Info Block 2 -->
-    <section id="info-block-2" class="app-info-block relative">
-        <div class="">
-
-            <!-- Heading Info -->
-            <div class="sub-section">
-                <div class="col-lg-7">
-                    <div class="app-info-block-intro text-center">
-                        <h3 class="app-info-block-header">{% trans "Workflows" %}</h3>
-                        <h2 class="app-info-block-title">{% trans "Orchestrate your data entry" %}</h2>
-                        <p class="app-info-block-text">
-                            {% trans "Design step-wise data management interfaces that simplify complex editing tasks.  Ensure that everyone enters data completely and consistently" %}
-                        </p>
+                    <!-- Heading Info -->
+                    <div class="sub-section">
+                        <div class="col-lg-7">
+                            <div class="app-info-block-intro text-center">
+                                <h2 class="app-info-block-header">{% trans "Arches Search Tools" %}</h2>
+                                <h3 class="app-info-block-title">{% trans "Find what you're looking for" %}</h3>
+                                <p class="app-info-block-text">
+                                    {% trans "Arches comes with powerful built-in search tools.  Quickly filter large databases with term, geospatial, and time-based search components" %}
+                                </p>
+                            </div>
+                        </div>
                     </div>
-                </div>
-            </div>
 
-            <!-- Content -->
-            <div class="splash-img">
-                <img class="search-screen" src="{% static 'img/landing/consultation_workflow.jpg' %}" style="" alt="Arches Workflows">
-            </div>
-
-        </div>
-    </section>
-    <!-- End Info Block 2 -->
-
-
-    <!-- Info Block 3 -->
-    <section id="info-block-3" class="app-info-block relative">
-        <div class="">
-
-            <!-- Heading Info -->
-            <div class="sub-section">
-                <div class="col-lg-7">
-                    <div class="app-info-block-intro text-center">
-                        <h3 class="app-info-block-header">{% trans "Arches Search Tools" %}</h3>
-                        <h2 class="app-info-block-title">{% trans "Find what you're looking for" %}</h2>
-                        <p class="app-info-block-text">
-                            {% trans "Arches comes with powerful built-in search tools.  Quickly filter large databases with term, geospatial, and time-based search components" %}
-                        </p>
+                    <div class="splash-img">
+                        <img class="sub-block-image" src="{% static 'img/landing/arches_search.png' %}" alt="Arches Search">
                     </div>
-                </div>
-            </div>
 
-            <!-- Content -->
-            <div class="splash-img">
-                <img class="search-screen" src="{% static 'img/landing/arches_search.png' %}" style="" alt="Arches Search">
-            </div>
-
-            <!-- Sub-section -->
-            <div class="wide-box">
-                <div class="box-highlight">
-                    <h3 class="">{% trans "Search Options" %}</h3>
-                    <p class="">
-                        {% trans "Arches gives you many ways to find precisely the information you need, even if your Arches application contains 10's of millions of records.  In addition to term, thesaurus, geospatial, and temporal filters, Arches provides you with advanced filtering options that support boolean logic, inverses, and many other filtering options." %}
-                    </p>
-                    <br>
-                    <p class="">
-                        {% trans "Arches' search capabilities also provide for sophisticated data visualizations, including interactive displays of the connections between your data objects using a Force Directed Graph." %}
-                    </p>
-                    <br>
-                    <p class="">
-                        {% trans "If you're a software developer, you can build on Arches modular search services and create your own filters, reports, and visualizations to best show off your particular dataset." %}
-                    </p>
-
-                </div>
-            </div>
-
-        </div>
-    </section>
-    <!-- End Info Block 3 -->
-
-
-    <!-- Info Block 4 -->
-    <section id="info-block-4" class="app-info-block relative">
-        <div class="">
-
-            <!-- Heading Info -->
-            <div class="sub-section">
-
-            </div>
-
-            <!-- Content -->
-            <div class="row">
-                <div class="col-md-6 col-lg-4">
-                    <img class="iphone" src="{% static 'img/landing/iPhone_8_map.png' %}" style="" alt="Arches Designer">
-                </div>
-                <div class="col-md-6 col-lg-8">
-                    <div class="mobile-description-container">
+                    <!-- Sub-section -->
+                    <div class="wide-box">
                         <div class="box-highlight">
-                            <h2 class="">{% trans "Work on the go..." %}</h2>
-                            <p class="">
-                                {% trans "Arches Collector allows you to create new data and edit existing records when you're away from your computer.  Don't worry if you're out of cell or Wi-Fi range.  Create new records, update information, even add new map locations.  Then synch your changes to your Arches application when you re-establish a network connection." %}
+                            <h3 class="app-info-block-header">{% trans "Search Options" %}</h3>
+                            <p>
+                                {% trans "Arches gives you many ways to find precisely the information you need, even if your Arches application contains 10's of millions of records.  In addition to term, thesaurus, geospatial, and temporal filters, Arches provides you with advanced filtering options that support boolean logic, inverses, and many other filtering options." %}
                             </p>
                             <br>
-                            <p class="">
-                                {% trans "Arches Collector is available for iOS and Android devices.  Download the app from your favorite marketplace." %}
+                            <p>
+                                {% trans "Arches' search capabilities also provide for sophisticated data visualizations, including interactive displays of the connections between your data objects using a Force Directed Graph." %}
                             </p>
+                            <br>
+                            <p>
+                                {% trans "If you're a software developer, you can build on Arches modular search services and create your own filters, reports, and visualizations to best show off your particular dataset." %}
+                            </p>
+
+                        </div>
+                    </div>
+
+                </div>
+            </section>
+            <!-- End Info Block 3 -->
+
+            <!-- Info Block 4 -->
+            <section id="info-block-4" class="app-info-block relative">
+                <div>
+                    <!-- Heading Info -->
+                    <div class="sub-section">
+                    </div>
+                    <!-- Content -->
+                    <div class="row">
+                        <div class="col-md-6 col-lg-4 text-center">
+                            <img class="iphone" src="{% static 'img/landing/IPhone_8_map.png' %}" alt="Arches Designer">
+                        </div>
+                        <div class="col-md-6 col-lg-8">
+                            <div class="mobile-description-container">
+                                <div class="box-highlight">
+                                    <h2 class="app-info-block-title">{% trans "Work on the go..." %}</h2>
+                                    <p>
+                                        {% trans "Arches Collector allows you to create new data and edit existing records when you're away from your computer.  Don't worry if you're out of cell or Wi-Fi range.  Create new records, update information, even add new map locations.  Then synch your changes to your Arches application when you re-establish a network connection." %}
+                                    </p>
+                                    <br>
+                                    <p>
+                                        {% trans "Arches Collector is available for iOS and Android devices.  Download the app from your favorite marketplace." %}
+                                    </p>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
-            </div>
-        </div>
+            </section>
+            <!-- End Info Block 4 -->
+        </article>
+    </main>
 
-    </section>
-    <!-- End Info Block 4 -->
 
 
     <!-- Footer -->
-    <div class="app-footer">
+    <footer>
 
         <!-- footer content container -->
-        <div class="row">
+        <div class="row footer-links">
 
             <!-- branding column -->
             <div class="col-lg-4">
-
                 <h2 class="app-footer-heading">{% trans "Sample Institution Name" %}</h2>
 
                 <div class="organization-address">
-                  Sample Address<br>
-                  Getty Conservation Institute<br>
-                  1200 Getty Center Drive<br>
-                  Los Angeles, CA  90049<br>
+                  {% trans "Sample Address" %}<br>
+                  {% trans "Getty Conservation Institute" %}<br>
+                  {% trans "1200 Getty Center Drive" %}<br>
+                  {% trans "Los Angeles, CA  90049" %}<br>
                 </div>
             </div>
 
@@ -389,10 +369,10 @@ The data-spy and data-target are part of the built-in Bootstrap scrollspy functi
 
                 <!-- Links -->
                 <div class="splash-links">
-                    <div class="row" style="padding-left: 80px;">
+                    <div class="row">
                         <div class="col-lg-4">
                             <ul class="splash-link-container">
-                                <li class="">
+                                <li>
                                     <a class="splash-link-address" href="http://https://www.archesproject.org/what-is-arches/" target="_blank">{% trans "What is Arches" %}</a>
                                 </li>
                                 <li>
@@ -411,7 +391,7 @@ The data-spy and data-target are part of the built-in Bootstrap scrollspy functi
 
                         <div class="col-lg-4">
                             <ul class="splash-link-container">
-                                <li class="">
+                                <li>
                                     <a class="splash-link-address" href="https://www.archesproject.org/faq/" target="_blank">{% trans "FAQ" %}</a>
                                 </li>
                                 <li>
@@ -425,7 +405,7 @@ The data-spy and data-target are part of the built-in Bootstrap scrollspy functi
 
                         <div class="col-lg-4">
                             <ul class="splash-link-container">
-                                <li class="">
+                                <li>
                                     <a class="splash-link-address" href="https://www.archesproject.org/project-background/" target="_blank">{% trans "Arches Project Background" %}</a>
                                 </li>
                                 <li>
@@ -442,29 +422,35 @@ The data-spy and data-target are part of the built-in Bootstrap scrollspy functi
 
             </div>
         </div>
-    </div>
-    <!-- End Footer -->
 
-    <!-- Copyright Panel -->
-    <div class="copyright-container">
-        <!-- Arches link -->
-        <div class="app-footer-links">
-            <a class="link-spacing" href="">{% trans "Terms & Conditions" %}</a>
-            <a class="link-spacing" href="">{% trans "Privacy Policy" %}</a>
-            <a class="app-footer-arches-link" href="http://www.archesproject.org" target="_blank">Powered by Arches</a>
+        <!-- Copyright Panel -->
+        <div class="row copyright-container">
+            <!-- Arches link -->
+            <div class="app-footer-links">
+                <div class="col-sm-8">
+                    <a class="link-spacing" href="#">{% trans "Terms & Conditions" %}</a>
+                    <a class="link-spacing" href="#">{% trans "Privacy Policy" %}</a>
+                </div>
+                <div class="col-sm-4">
+                    <a class="app-footer-arches-link" href="http://www.archesproject.org" target="_blank">{% trans "Powered by Arches" %}</a>
+                </div>
+            </div>
         </div>
-    </div>
-    <!-- End Copyright Container -->
+        <!-- End Copyright Container -->
+
+    </footer>
+    <!-- End Footer -->
 
 <script src="{% static 'packages/requirejs/require.js' %}"></script>
 
 <script>
+
     require.config({
         baseUrl: '{{ STATIC_URL }}js',
         paths: {
             'templates': '{% url "templates" ""%}'.replace(/\/$/, ""),
             'text': '{{ STATIC_URL }}packages/requirejs-text/text',
-            'jquery-lib': '{{ STATIC_URL }}plugins/revolution-slider/rs-plugin/js/jquery2.2.3/jquery.min',
+            'jquery-lib': '{{ STATIC_URL }}packages/jquery/dist/jquery.min',
             'jquery': '{{ STATIC_URL }}packages/jquery-migrate/dist/jquery-migrate.min',
             'jquery-ui': '{{ STATIC_URL }}packages/jqueryui/jquery-ui.min',
             'underscore': '{{ STATIC_URL }}packages/underscore/underscore-min',
@@ -551,9 +537,9 @@ The data-spy and data-target are part of the built-in Bootstrap scrollspy functi
                 }
 
                 var ViewModel = function () {
-                    // place observables here
+                     // place observables here
                 };
-    
+
                 // need to have this to prevent mismatched anonymous define error in require.js
                 setTimeout(function () {
                     ko.applyBindings(new ViewModel());
