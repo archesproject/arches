@@ -58,5 +58,5 @@ class Migration(migrations.Migration):
             model_name="cardmodel",
             name="helptext",
             field=I18n_TextField(blank=True, null=True),
-        )
+        ),
     ]
