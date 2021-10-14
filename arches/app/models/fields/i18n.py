@@ -75,6 +75,11 @@ class I18n_String(object):
                     ret = ""
         return json.dumps(ret) if ret is None else ret
 
+    def __eq__(self, other):
+        # this is here so you can compare a string against an instance of this class
+        # eg I18n_String("toast") == "toast" would return True
+        return str(self) == str(other)
+
     def serialize(self):
         return str(self)
 
