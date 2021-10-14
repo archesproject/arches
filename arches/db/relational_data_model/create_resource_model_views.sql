@@ -8,7 +8,7 @@ declare
 begin
     -- create schema and instance view for model
     if schema_name is null then
-        select name into schema_name
+        select __arches_slugify(name) into schema_name
         from graphs where graphid = model_id;
     end if;
 
