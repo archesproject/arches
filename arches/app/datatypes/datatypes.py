@@ -34,6 +34,7 @@ from django.contrib.gis.geos import Polygon
 from django.core.exceptions import ObjectDoesNotExist
 from django.core.exceptions import ValidationError
 from django.db import connection, transaction
+from django.utils.translation import get_language
 
 from elasticsearch import Elasticsearch
 from elasticsearch.exceptions import NotFoundError
@@ -149,6 +150,11 @@ class StringDataType(BaseDataType):
             g.add((edge_info["d_uri"], RDF.type, URIRef(edge.domainnode.ontologyclass)))
             g.add((edge_info["d_uri"], URIRef(edge.ontologyproperty), Literal(edge_info["range_tile_data"])))
         return g
+
+    def transform_value_for_tile(self, value, **kwargs):
+        if(type(value) is str):
+            return {get_language(): {"value": value, "direction": "ltr"}}
+        return value
 
     def from_rdf(self, json_ld_node):
         # returns the string value only
