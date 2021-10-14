@@ -12,10 +12,10 @@ class Migration(migrations.Migration):
 
     sql = """
         SET CONSTRAINTS ALL IMMEDIATE;
-        UPDATE public.cards SET name=json_build_object('{0}', name); 
-        UPDATE public.cards SET description=json_build_object('{0}', description); 
-        UPDATE public.cards SET instructions=json_build_object('{0}', instructions); 
-        UPDATE public.cards SET helptitle=json_build_object('{0}', helptitle); 
+        UPDATE public.cards SET name=json_build_object('{0}', name);
+        UPDATE public.cards SET description=json_build_object('{0}', description);
+        UPDATE public.cards SET instructions=json_build_object('{0}', instructions);
+        UPDATE public.cards SET helptitle=json_build_object('{0}', helptitle);
         UPDATE public.cards SET helptext=json_build_object('{0}', helptext);
         SET CONSTRAINTS ALL DEFERRED;
     """.format(
