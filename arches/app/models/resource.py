@@ -267,9 +267,8 @@ class Resource(models.ResourceInstance):
         document["displayname"] = None
         document["root_ontology_class"] = self.get_root_ontology()
         document["legacyid"] = self.legacyid
-        #pdb.set_trace()
         if self.displayname is not None:
-            document["displayname"] = JSONDeserializer().deserialize(self.displayname)[get_language()]["value"]
+            document["displayname"] = JSONDeserializer().deserialize(self.displayname)
         document["displaydescription"] = self.displaydescription
         document["map_popup"] = self.map_popup
 

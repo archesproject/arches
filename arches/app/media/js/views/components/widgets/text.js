@@ -1,4 +1,4 @@
-define(['knockout', 'underscore', 'viewmodels/widget', 'arches'], function (ko, _, WidgetViewModel, arches) {
+define(['knockout', 'underscore', 'viewmodels/widget', 'arches', 'bindings/chosen'], function (ko, _, WidgetViewModel, arches) {
     /**
     * registers a text-widget component for use in forms
     * @function external:"ko.components".text-widget
@@ -15,53 +15,75 @@ define(['knockout', 'underscore', 'viewmodels/widget', 'arches'], function (ko, 
             params.configKeys = ['placeholder', 'width', 'maxLength', 'defaultValue', 'uneditable'];
     
             WidgetViewModel.apply(this, [params]);
-    
             const self = this;
+            self.currentLanguage = ko.observable({code: arches.defaultLanguage});
+            self.languages = ko.observableArray();
+            self.currentText = ko.observable();
+            self.currentDirection = ko.observable();
+            const currentValue = ko.unwrap(self.value) || {};
+
+            const originalValue = JSON.stringify(self.value());
+
+            if(self.form){
+                self.form.on('tile-reset', (x) => {
+                    self.value(JSON.parse(originalValue));
+                    currentValue = self.value();
+                });
+            }
+
+            const init = async() => {
+                const languages = (await $.getJSON(arches.urls.languages))?.languages;
+                const currentLanguage = languages?.find(x => x.code == arches.defaultLanguage);
+                self.languages(languages);
+                self.currentLanguage(currentLanguage);
     
+                if(!currentValue?.[currentLanguage.code]){
+                    self.currentText('');
+                    self.currentDirection('ltr');
+                    currentValue[currentLanguage.code] = {value: '', direction: 'ltr'}
+                } else {
+                    self.currentText(currentValue?.[currentLanguage.code]?.value);
+                    self.currentDirection(currentValue?.[currentLanguage.code]?.direction);
+                }
+            }
+
+            init();
+
             self.disable = ko.computed(() => {
                 return ko.unwrap(self.disabled) || ko.unwrap(self.uneditable); 
             }, self);
 
-            const currentValue = ko.unwrap(self.value) || {};
-
-            const currentLanguage = arches.defaultLanguage;
-            self.currentLanguage = ko.observable(currentLanguage);
-            if(!currentValue?.[currentLanguage]){
-                self.currentText = ko.observable('');
-                self.currentDirection = ko.observable('ltr');
-                currentValue[currentLanguage] = {value: '', direction: 'ltr'}
-            } else {
-                self.currentText = ko.observable(currentValue?.[currentLanguage]?.value);
-                self.currentDirection = ko.observable(currentValue?.[currentLanguage]?.direction);
-            }
-            self.languages = arches.languages;
-
             self.currentText.subscribe(x => {
-                const currentLanguage = self.currentLanguage()
-                currentValue[self.currentLanguage()].value = x;
+                const currentLanguage = self.currentLanguage();
+                if(!currentLanguage) { return; }
+                currentValue[currentLanguage.code].value = x;
                 self.value(currentValue);
-            })
+            });
+
             self.currentDirection.subscribe(x => {
-                if(!currentValue?.[currentLanguage]){
-                    currentValue[currentLanguage] = {}
+                const currentLanguage = self.currentLanguage();
+                if(!currentLanguage) { return; }
+                if(!currentValue?.[currentLanguage.code]){
+                    currentValue[currentLanguage.code] = {}
                 }
-                currentValue[self.currentLanguage()].direction = x;
+                currentValue[currentLanguage.code].direction = x;
                 self.value(currentValue);
             })
 
             self.currentLanguage.subscribe(x => {
-                const currentValue = self.value()
-                const currentLanguage = x;
-                if(!self.value()?.[currentLanguage]) {
-                    currentValue[currentLanguage] = {
+                if(!x){ return; }
+                const currentValue = self.value() || {};
+                const currentLanguage = self.currentLanguage();
+                if(!self.value()?.[currentLanguage.code]) {
+                    currentValue[currentLanguage.code] = {
                         value: '',
-                        direction: 'ltr'
+                        direction: currentLanguage?.default_direction
                     }
                     self.value(currentValue);
                 }
 
-                self.currentText(self.value()?.[currentLanguage]?.value);
-                self.currentDirection(self.value()?.[currentLanguage]?.direction);
+                self.currentText(self.value()?.[currentLanguage.code]?.value);
+                self.currentDirection(self.value()?.[currentLanguage.code]?.direction);
                 
             });
 

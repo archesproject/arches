@@ -1,4 +1,4 @@
-define(['knockout', 'underscore', 'viewmodels/widget', 'arches', 'bindings/ckeditor'], function (ko, _, WidgetViewModel, arches) {
+define(['knockout', 'underscore', 'viewmodels/widget', 'arches', 'bindings/ckeditor', 'bindings/chosen'], function (ko, _, WidgetViewModel, arches) {
     /**
     * registers a rich-text-widget component for use in forms
     * @function external:"ko.components".rich-text-widget
@@ -12,46 +12,72 @@ define(['knockout', 'underscore', 'viewmodels/widget', 'arches', 'bindings/ckedi
             const self = this;
             WidgetViewModel.apply(self, [params]);
             const currentValue = ko.unwrap(self.value) || {};
-            const currentLanguage = arches.defaultLanguage;
-            if(!currentValue?.[currentLanguage]){
+
+            if(self.form){
+                const originalValue = JSON.parse(JSON.stringify(self.value()));
+                self.form.on('tile-reset', (x) => {
+                    self.value(originalValue);
+                });
+            }
+
+            self.languages =  ko.observableArray();
+            
+            $.getJSON(arches.urls.languages).then((data) => {
+                self.languages(data?.languages);
+                const currentLanguage = data?.languages?.find(x => x.code == arches.defaultLanguage);
+                self.currentLanguage(currentLanguage);
+                window.setTimeout(function(){$("select[data-bind^=chosen]").trigger("chosen:updated");}, 300);
+            });
+
+            const currentLanguage = {"code": arches.defaultLanguage};
+
+            self.currentLanguage = ko.observable(currentLanguage);
+
+            if(!currentValue?.[currentLanguage.code]){
                 self.currentText = ko.observable('');
                 self.currentDirection = ko.observable('ltr');
-                currentValue[currentLanguage] = {value: '', direction: 'ltr'}
+                currentValue[currentLanguage.code] = {value: '', direction: 'ltr'}
             } else {
-                self.currentText = ko.observable(currentValue?.[currentLanguage]?.value);
-                self.currentDirection = ko.observable(currentValue?.[currentLanguage]?.direction);
+                self.currentText = ko.observable(currentValue?.[currentLanguage.code]?.value);
+                self.currentDirection = ko.observable(currentValue?.[currentLanguage.code]?.direction);
             }
-            self.currentLanguage = ko.observable(currentLanguage);
+
             self.strippedValue = ko.pureComputed(() => {
                 return $(`<span>${self.currentText()}</span>`).text();
             });
 
+            self.strippedValue();
             self.currentText.subscribe(x => {
-                currentValue[self.currentLanguage()].value = x;
+                const currentLanguage = self.currentLanguage();
+                if(!currentLanguage) { return; }
+                currentValue[currentLanguage.code].value = x;
                 self.value(currentValue);
-            })
+            });
             self.currentDirection.subscribe(x => {
-                currentValue[self.currentLanguage()].direction = x;
+                const currentLanguage = self.currentLanguage();
+                if(!currentLanguage) { return; }
+                currentValue[currentLanguage.code].direction = x;
                 self.value(currentValue);
             })
 
-            self.currentLanguage.subscribe(x => {
+            self.currentLanguage.subscribe(() => {
+                if(!self.currentLanguage()){ return; }
+
                 const currentValue = self.value()
-                const currentLanguage = x;
-                if(!self.value()?.[currentLanguage]) {
-                    currentValue[currentLanguage] = {
+                const currentLanguage = self.currentLanguage()
+                if(!self.value()?.[currentLanguage.code]) {
+                    currentValue[currentLanguage.code] = {
                         value: '',
-                        direction: 'ltr'
+                        direction: currentLanguage.default_direction
                     }
                     self.value(currentValue);
                 }
 
-                self.currentText(self.value()?.[currentLanguage]?.value);
-                self.currentDirection(self.value()?.[currentLanguage]?.direction);
+                self.currentText(self.value()?.[currentLanguage.code]?.value);
+                self.currentDirection(self.value()?.[currentLanguage.code]?.direction);
                 
             });
 
-            this.languages = arches.languages;
             this.displayfullvalue(params.displayfullvalue);
         },
         template: { require: 'text!widget-templates/rich-text' }

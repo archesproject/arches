@@ -29,7 +29,11 @@ define([
     var loading = ko.observable(false);
     var selection = ko.observable('root');
     var scrollTo = ko.observable();
-    var displayname = ko.observable(JSON.parse(data.displayname)?.[arches.defaultLanguage]?.value);
+    let parsedDisplayName = undefined;
+    try { 
+        parsedDisplayName = JSON.parse(data.displayname)
+    } catch(e){}
+    const displayname = parsedDisplayName ? ko.observable(JSON.parse(data.displayname)?.[arches.defaultLanguage]?.value) : ko.observable(data.displayname) ;
     var resourceId = ko.observable(data.resourceid);
     var appliedFunctions = ko.observable(data['appliedFunctions']);
     var userIsCreator = data['useriscreator'];

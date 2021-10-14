@@ -450,6 +450,8 @@ class Language(models.Model):
     default_direction = models.TextField(choices=LANGUAGE_DIRECTION_CHOICES, default=LEFT_TO_RIGHT)
     scope = models.TextField(choices=SCOPE_CHOICES, default=SYSTEM_SCOPE)
 
+    def __str__(self):
+        return self.name
     class Meta:
         managed = True
         db_table = "languages"
