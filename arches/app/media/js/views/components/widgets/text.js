@@ -73,10 +73,9 @@ define(['knockout', 'underscore', 'viewmodels/widget', 'arches', 'bindings/chose
             })
 
             self.currentLanguage.subscribe(x => {
-                if(!x){ return; }
-                const currentValue = self.value() || {};
+                if(!self.currentLanguage()){ return; }
                 const currentLanguage = self.currentLanguage();
-                if(!self.value()?.[currentLanguage.code]) {
+                if(!currentValue?.[currentLanguage.code]) {
                     currentValue[currentLanguage.code] = {
                         value: '',
                         direction: currentLanguage?.default_direction

@@ -11,7 +11,11 @@ define(['knockout', 'underscore', 'viewmodels/widget', 'arches', 'bindings/ckedi
             params.configKeys = ['displayfullvalue'];
             const self = this;
             WidgetViewModel.apply(self, [params]);
-            const currentValue = ko.unwrap(self.value) || {};
+            const initialCurrent = {};
+            initialCurrent[arches.defaultLanguage] = {value: '', direction: 'ltr'};
+            let currentValue = ko.unwrap(self.value) || initialCurrent;
+            const currentLanguage = {"code": arches.defaultLanguage};
+            self.currentLanguage = ko.observable(currentLanguage);
 
             if(self.form){
                 const originalValue = JSON.parse(JSON.stringify(self.value()));
@@ -29,9 +33,6 @@ define(['knockout', 'underscore', 'viewmodels/widget', 'arches', 'bindings/ckedi
                 window.setTimeout(function(){$("select[data-bind^=chosen]").trigger("chosen:updated");}, 300);
             });
 
-            const currentLanguage = {"code": arches.defaultLanguage};
-
-            self.currentLanguage = ko.observable(currentLanguage);
 
             if(!currentValue?.[currentLanguage.code]){
                 self.currentText = ko.observable('');
@@ -63,12 +64,11 @@ define(['knockout', 'underscore', 'viewmodels/widget', 'arches', 'bindings/ckedi
             self.currentLanguage.subscribe(() => {
                 if(!self.currentLanguage()){ return; }
 
-                const currentValue = self.value()
                 const currentLanguage = self.currentLanguage()
-                if(!self.value()?.[currentLanguage.code]) {
+                if(!currentValue?.[currentLanguage.code]) {
                     currentValue[currentLanguage.code] = {
                         value: '',
-                        direction: currentLanguage.default_direction
+                        direction: currentLanguage?.default_direction
                     }
                     self.value(currentValue);
                 }

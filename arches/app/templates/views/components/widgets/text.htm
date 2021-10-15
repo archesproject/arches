@@ -59,8 +59,8 @@
 {% endblock config_form %}
 
 <!-- ko if: !configForm  && state === 'display_value' -->
-{% block display_value %}<span data-bind="text: console.log(displayValue())"></span>
-<span data-bind="text: displayValue && displayValue()[currentLanguage().code] && displayValue()[currentLanguage().code]['value'] ? displayValue()[currentLanguage().code]['value'] : '' || '{% trans "None" %}'"></span>
+{% block display_value %}
+<span data-bind="text: displayValue && displayValue() && displayValue()[currentLanguage().code] && displayValue()[currentLanguage().code]['value'] ? displayValue()[currentLanguage().code]['value'] : '' || '{% trans "None" %}'"></span>
 {% endblock display_value %}
 <!-- /ko -->
 
@@ -68,7 +68,7 @@
 <!-- ko if: !ko.unwrap(hideEmptyNodes) || ko.unwrap(hideEmptyNodes) === true && displayValue() -->
 {% block report %}
 <dt data-bind="text: label"></dt>
-<dd data-bind="text: displayValue()[currentLanguage().code] && displayValue()[currentLanguage().code]['value'] ? displayValue()[currentLanguage().code]['value'] : '{% trans "None" %}'"></dd>
+<dd data-bind="text: displayValue() && displayValue()[currentLanguage().code] && displayValue()[currentLanguage().code]['value'] ? displayValue()[currentLanguage().code]['value'] : '{% trans "None" %}'"></dd>
 {% endblock report %}
 <!-- /ko -->
 <!-- /ko -->

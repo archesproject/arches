@@ -144,7 +144,8 @@ class Resource(models.ResourceInstance):
 
         self.save_edit(user=user, edit_type="create", transaction_id=transaction_id)
         if index is True:
-            self.index()
+            #self.index()
+            pass
 
     def get_root_ontology(self):
         """
