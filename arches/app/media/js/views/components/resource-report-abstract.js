@@ -97,6 +97,8 @@ define([
                 }
             })();
 
+            responseJson.displayname = displayName;
+
             var graphModel = new GraphModel({
                 data: responseJson.graph,
                 datatypes: responseJson.datatypes,
@@ -120,7 +122,7 @@ define([
                     card: card,
                     graphModel: graph.graphModel,
                     resourceId: self.resourceid,
-                    displayname: displayName,
+                    displayname: responseJson.displayname,
                     cards: graph.cards,
                     tiles: responseJson.tiles,
                     cardwidgets: graph.cardwidgets
