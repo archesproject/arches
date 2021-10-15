@@ -2,7 +2,7 @@ import json
 from django.utils.translation import gettext_lazy as _
 from arches.app.models.system_settings import settings
 from django.contrib.postgres.fields import JSONField
-from django.db.models.sql.compiler import SQLInsertCompiler, SQLUpdateCompiler
+from django.db.models.sql.compiler import SQLInsertCompiler
 from django.utils.translation import get_language
 
 
@@ -19,13 +19,13 @@ class I18n_String(object):
     def _parse(self, value, lang, use_nulls):
         ret = {}
 
-        if isinstance(value, str):
+        if isinstance(value, str) and value != "null":
             try:
                 ret = json.loads(value)
             except:
                 ret[lang] = value
                 self.value_is_primitive = True
-        elif value is None:
+        elif value is None or value == "null":
             ret[lang] = None if use_nulls else ""
         elif isinstance(value, I18n_String):
             ret = value.raw_value
@@ -75,6 +75,11 @@ class I18n_String(object):
                     ret = ""
         return json.dumps(ret) if ret is None else ret
 
+    def __eq__(self, other):
+        # this is here so you can compare a string against an instance of this class
+        # eg I18n_String("toast") == "toast" would return True
+        return str(self) == str(other)
+
     def serialize(self):
         return str(self)
 
@@ -83,28 +88,24 @@ class I18n_TextField(JSONField):
     description = _("A I18n_TextField object")
 
     def __init__(self, *args, **kwargs):
-        use_nulls = kwargs.get("null", False)
-        kwargs["default"] = I18n_String(use_nulls=use_nulls)
+        self.use_nulls = kwargs.get("null", False)
+        kwargs["default"] = I18n_String(use_nulls=self.use_nulls)
         super().__init__(*args, **kwargs)
 
     def from_db_value(self, value, expression, connection):
-        print("in from_db_value")
         if value is not None:
-            return I18n_String(value)
+            return I18n_String(value, use_nulls=self.use_nulls)
         return None
 
     def to_python(self, value):
-        print("in to_python")
         if isinstance(value, I18n_String):
             return value
         if value is None:
             return value
         value = super().to_python(value)
-        return I18n_String(value)
+        return I18n_String(value, use_nulls=self.use_nulls)
 
     def get_prep_value(self, value):
-        print(type(value))
-        print(f"in get_prep_value, value={value}")
         """
         If the value was set to a string, then check to see if it's 
         a json object like {"en": "boat", "es": "barco"}, or just a simple string like "boat".
@@ -114,4 +115,4 @@ class I18n_TextField(JSONField):
         See I18n_String.as_sql to see how this magic happens.  :)
         """
 
-        return I18n_String(value, attname=self.attname)
+        return I18n_String(value, attname=self.attname, use_nulls=self.use_nulls)

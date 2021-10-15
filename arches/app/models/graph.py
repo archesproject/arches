@@ -1211,7 +1211,7 @@ class Graph(models.GraphModel):
             if self.isresource:
                 if not card.name:
                     card.name = self.nodes[card.nodegroup_id].name
-                if not card.description:
+                if str(card.description) in ["null", ""]:
                     try:
                         card.description = self.nodes[card.nodegroup_id].description
                     except KeyError as e:
@@ -1225,14 +1225,14 @@ class Graph(models.GraphModel):
                 else:
                     if not card.name:
                         card.name = self.nodes[card.nodegroup_id].name
-                    if not card.description:
+                    if str(card.description) in ["null", ""]:
                         card.description = self.nodes[card.nodegroup_id].description
             card_dict = JSONSerializer().serializeToPython(card)
             card_dict["is_editable"] = is_editable
             card_constraints = card.constraintmodel_set.all()
             card_dict["constraints"] = JSONSerializer().serializeToPython(card_constraints)
             cards.append(card_dict)
-
+            print(cards)
         return cards
 
     def get_widgets(self):
