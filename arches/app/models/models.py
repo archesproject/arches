@@ -16,6 +16,7 @@ import datetime
 import logging
 from datetime import timedelta
 from arches.app.utils.module_importer import get_class_from_modulename
+from arches.app.models.fields.i18n import I18n_TextField
 from django.forms.models import model_to_dict
 from django.contrib.gis.db import models
 from django.contrib.postgres.fields import JSONField
@@ -41,13 +42,13 @@ from django.conf import settings
 
 class CardModel(models.Model):
     cardid = models.UUIDField(primary_key=True, default=uuid.uuid1)  # This field type is a guess.
-    name = models.TextField(blank=True, null=True)
-    description = models.TextField(blank=True, null=True)
-    instructions = models.TextField(blank=True, null=True)
+    name = I18n_TextField(blank=True, null=True)
+    description = I18n_TextField(blank=True, null=True)
+    instructions = I18n_TextField(blank=True, null=True)
     cssclass = models.TextField(blank=True, null=True)
     helpenabled = models.BooleanField(default=False)
-    helptitle = models.TextField(blank=True, null=True)
-    helptext = models.TextField(blank=True, null=True)
+    helptitle = I18n_TextField(blank=True, null=True)
+    helptext = I18n_TextField(blank=True, null=True)
     nodegroup = models.ForeignKey("NodeGroup", db_column="nodegroupid", on_delete=models.CASCADE)
     graph = models.ForeignKey("GraphModel", db_column="graphid", on_delete=models.CASCADE)
     active = models.BooleanField(default=True)
