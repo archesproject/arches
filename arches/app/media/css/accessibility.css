@@ -72,3 +72,8 @@
     color: #7AD02F;
     text-decoration: underline;
 }
+
+.map-data-drop-area,
+.workbench-card-sidebar-tab {
+    color: #000;
+}
