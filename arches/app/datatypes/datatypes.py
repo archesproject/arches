@@ -90,8 +90,8 @@ class StringDataType(BaseDataType):
         try:
             if value is not None:
                 for key in value.keys():
-                    isinstance(value[key]['value'], str)
-                    isinstance(value[key]['direction'], str)
+                    isinstance(value[key]["value"], str)
+                    isinstance(value[key]["direction"], str)
         except:
             message = _("This is not a string")
             error_message = self.create_error_message(value, source, row_number, message)
@@ -119,7 +119,7 @@ class StringDataType(BaseDataType):
 
         if nodevalue is not None:
             for key in nodevalue.keys():
-                if settings.WORDS_PER_SEARCH_TERM is None or (len(nodevalue[key]['value'].split(" ")) < settings.WORDS_PER_SEARCH_TERM):
+                if settings.WORDS_PER_SEARCH_TERM is None or (len(nodevalue[key]["value"].split(" ")) < settings.WORDS_PER_SEARCH_TERM):
                     terms.append({"language": key, "value": nodevalue[key]["value"], "direction": nodevalue[key]["direction"]})
 
         return terms
@@ -152,7 +152,7 @@ class StringDataType(BaseDataType):
         return g
 
     def transform_value_for_tile(self, value, **kwargs):
-        if(type(value) is str):
+        if type(value) is str:
             return {get_language(): {"value": value, "direction": "ltr"}}
         return value
 

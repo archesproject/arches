@@ -29,6 +29,7 @@ from arches.app.utils.betterJSONSerializer import JSONSerializer
 
 logger = logging.getLogger(__name__)
 
+
 class LanguageView(View):
     def get(self, request):
         try:

@@ -1,42 +1,49 @@
 from django.db import migrations, models
-from django.utils import translation 
-from arches.app.models.system_settings  import settings
+from django.utils import translation
+from arches.app.models.system_settings import settings
 
 
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('models', '7798_i18n_cards'),
+        ("models", "7798_i18n_cards"),
     ]
     translation.activate(settings.LANGUAGE_CODE)
 
     language = translation.get_language()
-    if(language is None):
-        language = 'en'
+    if language is None:
+        language = "en"
 
     language_info = translation.get_language_info(language)
 
     operations = [
         migrations.CreateModel(
-            name='Language',
+            name="Language",
             fields=[
-                ('id', models.AutoField(primary_key=True, serialize=False)),
-                ('code', models.TextField()),
-                ('name', models.TextField()),
-                ('default_direction', models.TextField(choices=[('ltr', 'Left to Right'), ('rtl', 'Right to Left')], default='ltr')),
-                ('scope', models.TextField(choices=[('system', 'System Scope'), ('data', 'Data Scope')], default='system')),
+                ("id", models.AutoField(primary_key=True, serialize=False)),
+                ("code", models.TextField()),
+                ("name", models.TextField()),
+                ("default_direction", models.TextField(choices=[("ltr", "Left to Right"), ("rtl", "Right to Left")], default="ltr")),
+                ("scope", models.TextField(choices=[("system", "System Scope"), ("data", "Data Scope")], default="system")),
             ],
             options={
-                'db_table': 'languages',
-                'managed': True,
+                "db_table": "languages",
+                "managed": True,
             },
         ),
         migrations.RunSQL(
-            sql=[("insert into languages (code, name, default_direction, scope) values (%s, %s, %s, %s);", [language, language_info['name'], 'rtl' if language_info['bidi'] else 'ltr', 'system'])],
-            reverse_sql=[("delete from languages")]
-        ), 
+            sql=[
+                (
+                    "insert into languages (code, name, default_direction, scope) values (%s, %s, %s, %s);",
+                    [language, language_info["name"], "rtl" if language_info["bidi"] else "ltr", "system"],
+                )
+            ],
+            reverse_sql=[("delete from languages")],
+        ),
         migrations.RunSQL(
-            sql=[("""
+            sql=[
+                (
+                    """
                 do
                 $$
                 declare
@@ -51,8 +58,12 @@ class Migration(migrations.Migration):
                     return;
                 end;
                 $$
-            """)],
-            reverse_sql=[("""
+            """
+                )
+            ],
+            reverse_sql=[
+                (
+                    """
                 do
                 $$
                 declare
@@ -67,6 +78,8 @@ class Migration(migrations.Migration):
                     return;
                 end;
                 $$
-            """)]
-        )
+            """
+                )
+            ],
+        ),
     ]

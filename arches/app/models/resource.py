@@ -144,7 +144,7 @@ class Resource(models.ResourceInstance):
 
         self.save_edit(user=user, edit_type="create", transaction_id=transaction_id)
         if index is True:
-            #self.index()
+            # self.index()
             pass
 
     def get_root_ontology(self):
@@ -302,7 +302,7 @@ class Resource(models.ResourceInstance):
                     node_terms = datatype_instance.get_search_terms(nodevalue, nodeid)
 
                     for index, term in enumerate(node_terms):
-                        if(datatype == "string"):
+                        if datatype == "string":
                             terms.append(
                                 {
                                     "_id": str(nodeid) + str(tile.tileid) + str(index) + term["language"],
@@ -317,7 +317,7 @@ class Resource(models.ResourceInstance):
                                         "provisional": False,
                                     },
                                 }
-                            )    
+                            )
                         else:
                             terms.append(
                                 {
@@ -327,7 +327,7 @@ class Resource(models.ResourceInstance):
                                         "nodeid": nodeid,
                                         "nodegroupid": tile.nodegroup_id,
                                         "tileid": tile.tileid,
-                                        "language": "en-us", #TODO: make dynamic based on system language
+                                        "language": "en-us",  # TODO: make dynamic based on system language
                                         "direction": "ltr",
                                         "resourceinstanceid": tile.resourceinstance_id,
                                         "provisional": False,
@@ -350,7 +350,7 @@ class Resource(models.ResourceInstance):
                                     node_terms = datatype_instance.get_search_terms(nodevalue, nodeid)
 
                                     for index, term in enumerate(node_terms):
-                                        if(datatype == "string"):
+                                        if datatype == "string":
                                             terms.append(
                                                 {
                                                     "_id": str(nodeid) + str(tile.tileid) + str(index) + term["language"],
@@ -365,7 +365,7 @@ class Resource(models.ResourceInstance):
                                                         "provisional": True,
                                                     },
                                                 }
-                                            )    
+                                            )
                                         else:
                                             terms.append(
                                                 {
@@ -375,7 +375,7 @@ class Resource(models.ResourceInstance):
                                                         "nodeid": nodeid,
                                                         "nodegroupid": tile.nodegroup_id,
                                                         "tileid": tile.tileid,
-                                                        "language": "en-us", #TODO: make dynamic based on system language
+                                                        "language": "en-us",  # TODO: make dynamic based on system language
                                                         "direction": "ltr",
                                                         "resourceinstanceid": tile.resourceinstance_id,
                                                         "provisional": True,
