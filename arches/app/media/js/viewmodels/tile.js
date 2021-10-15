@@ -72,7 +72,7 @@ define([
 
         this.data = {};
 
-        for(key of Object.keys(params.tile.data)){
+        for(const key of Object.keys(params.tile.data)){
             const datatype = this.datatypeLookup[key];
             if(datatype == 'string'){
                 this.data[key] = ko.observable(params.tile.data[key]);
@@ -214,8 +214,9 @@ define([
                     self._tileData(koMapping.toJSON(self.data));
                     if (!self.tileid) {
                         self.tileid = tileData.tileid;
-                        self.data = {}
-                        for(key of Object.keys(tileData.data)){
+                        
+                        self.data = {};
+                        for(const key of Object.keys(tileData.data)){
                             const datatype = self.datatypeLookup[key];
                             if(datatype == 'string'){
                                 self.data[key] = ko.observable(tileData.data[key]);
@@ -223,6 +224,7 @@ define([
                                 self.data[key] = koMapping.fromJS(tileData.data[key]);
                             }
                         }
+                        
                         self.provisionaledits = koMapping.fromJS(tileData.provisionaledits);
                         self._tileData(koMapping.toJSON(self.data));
                         self.dirty = ko.pureComputed(function() {

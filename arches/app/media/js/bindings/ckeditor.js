@@ -29,18 +29,18 @@ define([
                 options = (typeof opts === 'object') ? opts : {};
             };
 
-            const language_list = [];
-            for(lang of Object.keys(arches.languages)){
-                language_list.push(`${lang}:${arches.languages[lang]}`)
+            const languageList = [];
+            for(const lang of Object.keys(arches.languages)){
+                languageList.push(`${lang}:${arches.languages[lang]}`)
             }
 
-            CKEDITOR.config.language_list = language_list;
+            CKEDITOR.config.language_list = languageList;
             CKEDITOR.config.language = language();
             CKEDITOR.config.contentsLangDirection = direction();
 
             direction.subscribe(x => {
                 CKEDITOR.config.contentsLangDirection = x;
-                CKEDITOR.replace('ckeditor', CKEDITOR.config)
+                CKEDITOR.replace('ckeditor', CKEDITOR.config);
             });
 
             language.subscribe(x => {
