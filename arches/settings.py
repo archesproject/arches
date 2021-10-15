@@ -193,7 +193,7 @@ USE_TZ = False
 # language code needs to be all lower case with the form:
 # {langcode}-{regioncode} eg: en, en-gb ....
 # a list of language codes can be found here http://www.i18nguy.com/unicode/language-identifiers.html
-LANGUAGE_CODE = "en-us"
+LANGUAGE_CODE = "en"
 
 # list of languages to display in the language switcher,
 # if left empty or with a single entry then the switch won't be displayed
@@ -202,7 +202,7 @@ LANGUAGE_CODE = "en-us"
 # a list of language codes can be found here http://www.i18nguy.com/unicode/language-identifiers.html
 LANGUAGES = [
     ("de", _("German")),
-    ("en-us", _("US English")),
+    ("en", _("English")),
     ("en-gb", _("British English")),
     ("es", _("Spanish")),
     ("ar", _("Arabic")),

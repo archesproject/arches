@@ -1,5 +1,6 @@
 from django.db import migrations, models
-from django.utils.translation import get_language, get_language_info
+from django.utils import translation 
+from arches.app.models.system_settings  import settings
 
 
 class Migration(migrations.Migration):
@@ -7,12 +8,13 @@ class Migration(migrations.Migration):
     dependencies = [
         ('models', '7798_i18n_cards'),
     ]
+    translation.activate(settings.LANGUAGE_CODE)
 
-    language = get_language()
+    language = translation.get_language()
     if(language is None):
         language = 'en'
 
-    language_info = get_language_info(language)
+    language_info = translation.get_language_info(language)
 
     operations = [
         migrations.CreateModel(
