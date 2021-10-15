@@ -212,11 +212,12 @@ def export_results(request):
     total = int(request.GET.get("total", 0))
     format = request.GET.get("format", "tilecsv")
     report_link = request.GET.get("reportlink", False)
+    app_name = settings.APP_NAME
     if format == "html":
         download_limit = settings.SEARCH_EXPORT_IMMEDIATE_DOWNLOAD_THRESHOLD_HTML_FORMAT
     else:
         download_limit = settings.SEARCH_EXPORT_IMMEDIATE_DOWNLOAD_THRESHOLD
-    app_name = settings.APP_NAME
+
     if total > download_limit and format != "geojson":
         if (settings.RESTRICT_CELERY_EXPORT_FOR_ANONYMOUS_USER is True) and (request.user.username == "anonymous"):
             message = _(
