@@ -35,8 +35,10 @@ class PrimaryDescriptorsFunction(BaseFunction):
                             if value is None:
                                 value = ""
                             if node.datatype == "string":
-                                config["string_template"] = config["string_template"].replace("<%s>" % node.name, JSONSerializer().serialize(value))
-                            else: 
+                                config["string_template"] = config["string_template"].replace(
+                                    "<%s>" % node.name, JSONSerializer().serialize(value)
+                                )
+                            else:
                                 config["string_template"] = config["string_template"].replace("<%s>" % node.name, str(value))
         except ValueError as e:
             print(e, "invalid nodegroupid participating in descriptor function.")
