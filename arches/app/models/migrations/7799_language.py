@@ -5,7 +5,7 @@ from django.utils.translation import get_language, get_language_info
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('models', '7128_resource_instance_filter'),
+        ('models', '7798_i18n_cards'),
     ]
 
     language = get_language()
