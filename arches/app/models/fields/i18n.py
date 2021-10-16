@@ -104,7 +104,7 @@ class I18n_TextField(JSONField):
         if value is None:
             return value
         return I18n_String(value, use_nulls=self.use_nulls)
-    
+
     def value_to_string(self, obj):
         value = self.value_from_object(obj)
         return str(value)
@@ -120,6 +120,7 @@ class I18n_TextField(JSONField):
         """
 
         return I18n_String(value, attname=self.attname, use_nulls=self.use_nulls)
+
 
 class I18n_JSON(object):
     def __init__(self, value=None, lang=None, use_nulls=False, attname=None):
@@ -143,7 +144,7 @@ class I18n_JSON(object):
         elif isinstance(value, dict):
             ret = value
         self.raw_value = ret
-         
+
         if "i18n_properties" in self.raw_value:
             self.i18n_properties = self.raw_value["i18n_properties"]
 
@@ -158,7 +159,7 @@ class I18n_JSON(object):
 
         if len(self.i18n_properties) == 0 or isinstance(compiler, SQLInsertCompiler):
             params = [json.dumps(self.raw_value)]
-            self.sql = "%s" 
+            self.sql = "%s"
         else:
             self.sql = self.attname
             params = []
