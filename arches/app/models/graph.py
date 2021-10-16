@@ -1232,7 +1232,6 @@ class Graph(models.GraphModel):
             card_constraints = card.constraintmodel_set.all()
             card_dict["constraints"] = JSONSerializer().serializeToPython(card_constraints)
             cards.append(card_dict)
-            print(cards)
         return cards
 
     def get_widgets(self):

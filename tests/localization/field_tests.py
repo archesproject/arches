@@ -304,7 +304,6 @@ class Customi18nJSONFieldTests(ArchesTestCase):
         m.save()
         m = self.LocalizationTestJsonModel.objects.get(pk=2)
         self.assertEqual(m.config.raw_value, test_json)
-        import ipdb; ipdb.sset_trace()
         
         self.assertEqual(json.loads(str(m.config))["trueLabel"], "verdad")
         self.assertEqual(json.loads(str(m.config))["falseLabel"], "falso")
