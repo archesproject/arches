@@ -169,7 +169,7 @@ class I18n_JSON(object):
         return self.sql, params
 
     # need this to avoid a Django error when setting
-    # the default value on the i18n_TextField
+    # the default value on the I18n_JSONField
     def __call__(self):
         return self
 
