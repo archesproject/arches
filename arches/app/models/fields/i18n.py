@@ -1,4 +1,5 @@
 import json
+import copy
 from django.utils.translation import gettext_lazy as _
 from arches.app.models.system_settings import settings
 from django.contrib.postgres.fields import JSONField
@@ -102,17 +103,112 @@ class I18n_TextField(JSONField):
             return value
         if value is None:
             return value
-        value = super().to_python(value)
         return I18n_String(value, use_nulls=self.use_nulls)
+
+    def value_to_string(self, obj):
+        value = self.value_from_object(obj)
+        return str(value)
 
     def get_prep_value(self, value):
         """
-        If the value was set to a string, then check to see if it's 
+        If the value was set to a string, then check to see if it's
         a json object like {"en": "boat", "es": "barco"}, or just a simple string like "boat".
         If it's a json object then use the I18n_String.as_sql method to insert it directly to the database.
-        If it's just a simple string then use the I18n_String.as_sql method to update one language value
+        If it's just a simple string then use the I18n_String.as_sql method is used to update one language value
         out of potentially several previously stored languages using the currently active language.
         See I18n_String.as_sql to see how this magic happens.  :)
         """
 
         return I18n_String(value, attname=self.attname, use_nulls=self.use_nulls)
+
+
+class I18n_JSON(object):
+    def __init__(self, value=None, lang=None, use_nulls=False, attname=None):
+        self.attname = attname
+        self.value = value
+        self.raw_value = {}
+        self.i18n_properties = []
+        self.lang = get_language() if lang is None else lang
+
+        self._parse(self.value, self.lang, use_nulls)
+
+    def _parse(self, value, lang, use_nulls):
+        ret = {}
+
+        if isinstance(value, str):
+            ret = json.loads(value)
+        elif value is None:
+            ret[lang] = None if use_nulls else ""
+        elif isinstance(value, I18n_JSON):
+            ret = value.raw_value
+        elif isinstance(value, dict):
+            ret = value
+        self.raw_value = ret
+
+        if "i18n_properties" in self.raw_value:
+            self.i18n_properties = self.raw_value["i18n_properties"]
+
+    def as_sql(self, compiler, connection):
+        """
+        The "as_sql" method of this class is called by Django when the sql statement
+        for each field in a model instance is being generated.
+        If we're inserting a new value then we can just set the localzed column to the json object.
+        If we're updating a value for a specific language, then use the postgres "jsonb_set" command to do that
+        https://www.postgresql.org/docs/9.5/functions-json.html
+        """
+
+        if len(self.i18n_properties) == 0 or isinstance(compiler, SQLInsertCompiler):
+            params = [json.dumps(self.raw_value)]
+            self.sql = "%s"
+        else:
+            self.sql = self.attname
+            params = []
+            for prop in self.raw_value["i18n_properties"]:
+                self.sql = f"jsonb_set({self.sql}, '{{{prop},{self.lang}}}', %s)"
+                params.append(json.dumps(self.raw_value[prop]))
+        return self.sql, params
+
+    # need this to avoid a Django error when setting
+    # the default value on the I18n_JSONField
+    def __call__(self):
+        return self
+
+    def __str__(self):
+        return json.dumps(self.serialize())
+
+    def serialize(self):
+        ret = copy.deepcopy(self.raw_value)
+        if "i18n_properties" in ret:
+            for prop in ret["i18n_properties"]:
+                ret[prop] = str(I18n_String(ret[prop]))
+        return ret
+
+
+class I18n_JSONField(JSONField):
+    description = _("A I18n_JSONField object")
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
+    def from_db_value(self, value, expression, connection):
+        if value is not None:
+            return I18n_JSON(value)
+        return None
+
+    def to_python(self, value):
+        if isinstance(value, I18n_JSON):
+            return value
+        if value is None:
+            return value
+        return I18n_JSON(value)
+
+    def value_to_string(self, obj):
+        value = self.value_from_object(obj)
+        return str(value)
+
+    def get_prep_value(self, value):
+        """
+        Perpares the value for insertion into the database
+        """
+
+        return I18n_JSON(value, attname=self.attname)
