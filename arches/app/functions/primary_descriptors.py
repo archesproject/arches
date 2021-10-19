@@ -1,4 +1,5 @@
 import uuid
+from arches.app.utils.betterJSONSerializer import JSONSerializer
 from arches.app.functions.base import BaseFunction
 from arches.app.models import models
 from arches.app.models.tile import Tile
@@ -33,7 +34,12 @@ class PrimaryDescriptorsFunction(BaseFunction):
                             value = datatype.get_display_value(tile, node)
                             if value is None:
                                 value = ""
-                            config["string_template"] = config["string_template"].replace("<%s>" % node.name, str(value))
+                            if node.datatype == "string":
+                                config["string_template"] = config["string_template"].replace(
+                                    "<%s>" % node.name, JSONSerializer().serialize(value)
+                                )
+                            else:
+                                config["string_template"] = config["string_template"].replace("<%s>" % node.name, str(value))
         except ValueError as e:
             print(e, "invalid nodegroupid participating in descriptor function.")
         if config["string_template"].strip() == "":

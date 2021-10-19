@@ -9,7 +9,20 @@
         <i data-bind="css: {'ion-asterisk widget-label-required': node.isrequired}"></i>
         <!-- /ko -->
         <div class="col-xs-12">
-            <textarea rows="10" cols="80" data-bind="ckeditor: value, ckeditorOptions: {},  valueUpdate: 'afterkeydown', attr: {disabled: disabled}"></textarea>
+            <textarea rows="10" cols="80" data-bind="ckeditor: currentText, language: currentLanguage.code, direction: currentDirection, ckeditorOptions: {},  valueUpdate: 'afterkeydown', attr: {disabled: disabled}"></textarea>
+            <div style="display: flex; flex-direction: row; max-width:600px">
+                <select id="lang_dd" style="flex:1" name="language" data-bind="options: languages, optionsText: function(item){return item.name + ' (' + item.code + ')'}, value: currentLanguage, chosen: {width:'100%'}">
+                </select>            
+                <select id="lang_dir" style="flex:1" name="language" data-bind="value: currentDirection, chosen: {
+                    'width':'100%'}">
+                    <option value="ltr">
+                        Left-to-Right
+                    </option>
+                    <option value="rtl">
+                        Right-to-Left
+                    </option>
+                </select>
+            </div>
         </div>
     </div>
 </div>
@@ -17,17 +30,17 @@
 
 {% block report %}
 <dt data-bind="text: label"></dt>
-<dd data-bind="html: value() || '{% trans "None" %}'"></dd>
+<dd data-bind="html: strippedValue || '{% trans "None" %}'"></dd>
 {% endblock report %}
 
 {% block display_value %}
-<!-- ko if: value() && !ko.unwrap(displayfullvalue) -->
+<!-- ko if: value() && currentLanguage() && value()[currentLanguage().code] &&  value()[currentLanguage().code]['value'] && !ko.unwrap(displayfullvalue) -->
 <em>[{% trans "rich text" %}]</em>
 <!-- /ko -->
-<!-- ko if: value() && ko.unwrap(displayfullvalue) === true -->
-<div data-bind="html: value() || '{% trans "None" %}'"></div>
+<!-- ko if: value() && value()[currentLanguage().code] &&  value()[currentLanguage().code]['value'] && ko.unwrap(displayfullvalue) === true -->
+<div data-bind="html: value() && value()[currentLanguage()] &&  value()[currentLanguage()]['value'] ? strippedValue : '{% trans "None" %}'"></div>
 <!-- /ko -->
-<!-- ko if: !value() -->
+<!-- ko if: !value() || !value()[currentLanguage().code] || !value()[currentLanguage().code]['value'] -->
 {% trans "None" %}
 <!-- /ko -->
 {% endblock display_value %}

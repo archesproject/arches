@@ -181,3 +181,13 @@ class Customi18nTextFieldTests(ArchesTestCase):
         m = self.LocalizationTestModel.objects.get(pk=10)
         self.assertEqual(str(m.name), "Marco")
         self.assertEqual(m.name.raw_value, {"en": "Marco"})
+
+    def test_equality(self):
+        value = I18n_String("toast")
+        self.assertEqual(value, "toast")
+
+        value = I18n_String('{"de": "genau", "en": "precisely"}')
+        translation.activate("de")
+        self.assertEqual(value, "genau")
+        translation.activate("en")
+        self.assertEqual(value, "precisely")

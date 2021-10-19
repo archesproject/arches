@@ -16,31 +16,25 @@ You should have received a copy of the GNU Affero General Public License
 along with this program. If not, see <http://www.gnu.org/licenses/>.
 """
 
-from .app.models import models
-from django.contrib import admin
-from guardian.admin import GuardedModelAdmin
+from arches.app.utils.betterJSONSerializer import JSONSerializer
+import logging
+
+from arches.app.models import models
+
+from arches.app.utils.response import JSONResponse
+from django.utils.decorators import method_decorator
+from django.utils.translation import ugettext as _
+from django.views.generic import View
+from arches.app.utils.betterJSONSerializer import JSONSerializer
+
+logger = logging.getLogger(__name__)
 
 
-class GuardedAdmin(GuardedModelAdmin):
-    pass
-
-
-admin.site.register(
-    [
-        models.DLanguage,
-        models.MapLayer,
-        models.MapSource,
-        models.Geocoder,
-        models.MapMarker,
-        models.DDataType,
-        models.Widget,
-        models.UserProfile,
-        models.GraphModel,
-        models.SearchComponent,
-        models.IIIFManifest,
-        models.GroupMapSettings,
-        models.Language,
-    ]
-)
-
-admin.site.register([models.Plugin, models.NodeGroup], GuardedAdmin)
+class LanguageView(View):
+    def get(self, request):
+        try:
+            languages = models.Language.objects.all()
+            serializedLanguages = JSONSerializer().serializeToPython(languages)
+        except models.Language.DoesNotExist:
+            pass
+        return JSONResponse({"languages": serializedLanguages})
