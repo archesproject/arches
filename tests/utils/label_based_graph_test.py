@@ -312,11 +312,13 @@ class LabelBasedGraph_FromResourceTests(TestCase):
                     NODE_ID_KEY: str(self.grouping_node.pk),
                     TILE_ID_KEY: str(self.grouping_tile.pk),
                     VALUE_KEY: NON_DATA_COLLECTING_NODE,
-                    self.string_node.name: [{
-                        NODE_ID_KEY: str(self.string_node.pk),
-                        TILE_ID_KEY: str(self.string_tile.pk),
-                        VALUE_KEY: self.string_tile.data[str(self.string_node.pk)],
-                    }],
+                    self.string_node.name: [
+                        {
+                            NODE_ID_KEY: str(self.string_node.pk),
+                            TILE_ID_KEY: str(self.string_tile.pk),
+                            VALUE_KEY: self.string_tile.data[str(self.string_node.pk)],
+                        }
+                    ],
                 },
             },
         )

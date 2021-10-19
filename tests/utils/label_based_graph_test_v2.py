@@ -381,11 +381,13 @@ class LabelBasedGraph_FromResourceTests(TestCase):
                     self.grouping_node.name: {
                         NODE_ID_KEY: str(self.grouping_node.pk),
                         TILE_ID_KEY: str(self.grouping_tile.pk),
-                        self.string_node.name: [{
-                            NODE_ID_KEY: str(self.string_node.pk),
-                            TILE_ID_KEY: str(self.string_tile.pk),
-                            self.VALUE_KEY: self.string_tile.data[str(self.string_node.pk)],
-                        }],
+                        self.string_node.name: [
+                            {
+                                NODE_ID_KEY: str(self.string_node.pk),
+                                TILE_ID_KEY: str(self.string_tile.pk),
+                                self.VALUE_KEY: self.string_tile.data[str(self.string_node.pk)],
+                            }
+                        ],
                     },
                 },
                 self.DISPLAY_DESCRIPTION_KEY: mock.ANY,
