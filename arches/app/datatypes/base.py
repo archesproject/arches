@@ -217,7 +217,7 @@ class BaseDataType(object):
         if data:
             display_value = data.get(str(node.nodeid))
 
-            if display_value:
+            if display_value is not None:
                 return str(display_value)
 
     def get_search_terms(self, nodevalue, nodeid=None):
