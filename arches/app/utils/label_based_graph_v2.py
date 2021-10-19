@@ -242,8 +242,7 @@ class LabelBasedGraph(object):
     def _build_graph(
         cls, input_node, input_tile, parent_tree, node_ids_to_tiles_reference, nodegroup_cardinality_reference, node_cache, datatype_factory
     ):
-        # if an input_tile doesn't have any nodes, it should associate itself
-        for associated_tile in node_ids_to_tiles_reference.get(str(input_node.pk), [input_tile]):
+        for associated_tile in node_ids_to_tiles_reference.get(str(input_node.pk), []):
             parent_tile = associated_tile.parenttile
 
             if associated_tile == input_tile or parent_tile == input_tile:
