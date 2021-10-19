@@ -28,7 +28,7 @@ define(['knockout', 'underscore', 'viewmodels/widget', 'arches', 'bindings/ckedi
             
             $.getJSON(arches.urls.languages).then((data) => {
                 self.languages(data?.languages);
-                const currentLanguage = data?.languages?.find(x => x.code == arches.defaultLanguage);
+                const currentLanguage = data?.languages?.find(element => element.code == arches.defaultLanguage);
                 self.currentLanguage(currentLanguage);
                 window.setTimeout(function(){$("select[data-bind^=chosen]").trigger("chosen:updated");}, 300);
             });
@@ -48,16 +48,16 @@ define(['knockout', 'underscore', 'viewmodels/widget', 'arches', 'bindings/ckedi
             });
 
             self.strippedValue();
-            self.currentText.subscribe(x => {
+            self.currentText.subscribe(newValue => {
                 const currentLanguage = self.currentLanguage();
                 if(!currentLanguage) { return; }
-                currentValue[currentLanguage.code].value = x;
+                currentValue[currentLanguage.code].value = newValue;
                 self.value(currentValue);
             });
-            self.currentDirection.subscribe(x => {
+            self.currentDirection.subscribe(newValue => {
                 const currentLanguage = self.currentLanguage();
                 if(!currentLanguage) { return; }
-                currentValue[currentLanguage.code].direction = x;
+                currentValue[currentLanguage.code].direction = newValue;
                 self.value(currentValue);
             })
 

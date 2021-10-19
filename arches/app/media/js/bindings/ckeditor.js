@@ -38,13 +38,13 @@ define([
             CKEDITOR.config.language = language();
             CKEDITOR.config.contentsLangDirection = direction();
 
-            direction.subscribe(x => {
-                CKEDITOR.config.contentsLangDirection = x;
+            direction.subscribe(newValue => {
+                CKEDITOR.config.contentsLangDirection = newValue;
                 CKEDITOR.replace('ckeditor', CKEDITOR.config);
             });
 
-            language.subscribe(x => {
-                CKEDITOR.config.language = x;
+            language.subscribe(newValue => {
+                CKEDITOR.config.language = newValue;
             });
 
             // Set initial value and create the CKEditor
@@ -65,9 +65,9 @@ define([
                 return true;
             };
             editor.on('change', onChange, modelValue, element);
-            editor.on('afterCommandExec', (x => {
-                if(x.data.name == 'language'){
-                    language(x.data.commandData);
+            editor.on('afterCommandExec', (event => {
+                if(event.data.name == 'language'){
+                    language(event.data.commandData);
                 }
             }), modelValue, element);
 
