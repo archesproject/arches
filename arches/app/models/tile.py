@@ -475,8 +475,7 @@ class Tile(models.TileModel):
                 )
 
             if index:
-                pass
-                # self.index()
+                self.index()
 
             for tile in self.tiles:
                 tile.resourceinstance = self.resourceinstance
@@ -541,8 +540,7 @@ class Tile(models.TileModel):
         Indexes all the nessesary documents related to resources to support the map, search, and reports
 
         """
-        pass
-        # Resource.objects.get(pk=self.resourceinstance_id).index()
+        Resource.objects.get(pk=self.resourceinstance_id).index()
 
     # # flatten out the nested tiles into a single array
     def get_flattened_tiles(self):

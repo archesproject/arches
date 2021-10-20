@@ -10,6 +10,7 @@ define([
             var allBindings = allBindingsAccessor();
             var terms = valueAccessor().terms;
             var tags = valueAccessor().tags;
+            var language = valueAccessor().language;
 
             var notifyValueChange = function(value){
                 var val = terms().concat(tags());
@@ -24,6 +25,10 @@ define([
                 notifyValueChange(value);
             });
 
+            language.subscribe(function (value) {
+                notifyValueChange(value);
+            });
+
             var searchbox = $(el).select2({
                 dropdownCssClass: 'resource_search_widget_dropdown',
                 multiple: true,
@@ -34,6 +39,7 @@ define([
                     data: function(term, page) {
                         return {
                             q: term, // search term
+                            lang: language().code,
                             page_limit: 30
                         };
                     },

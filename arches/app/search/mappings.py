@@ -42,6 +42,7 @@ def prepare_terms_index(create=False):
                     "tileid": {"type": "keyword"},
                     "nodeid": {"type": "keyword"},
                     "resourceinstanceid": {"type": "keyword"},
+                    "language": {"type": "text"},
                     "provisional": {"type": "boolean"},
                     "value": {
                         "analyzer": "standard",
@@ -90,7 +91,7 @@ def prepare_concepts_index(create=False):
 
     if create:
         se = SearchEngineFactory().create()
-        se.create_index(index=CONCEPTS_INDEX, body=index_settings)
+        print(se.create_index(index=CONCEPTS_INDEX, body=index_settings))
 
     return index_settings
 
@@ -119,13 +120,33 @@ def prepare_search_index(create=False):
         },
         "mappings": {
             "_doc": {
+                "dynamic_templates": [
+                    {
+                        "language_values": {
+                            "path_match": "tiles.data.*.*.value",
+                            "mapping": {"type": "text", "fields": {"keyword": {"ignore_above": 256, "type": "keyword"}}}
+                        }
+                    }
+                ],
                 "properties": {
                     "graph_id": {"type": "keyword"},
                     "legacyid": {"type": "text", "fields": {"keyword": {"ignore_above": 256, "type": "keyword"}}},
                     "resourceinstanceid": {"type": "keyword"},
                     "root_ontology_class": {"type": "keyword"},
-                    "displayname": {"type": "keyword"},
-                    "displaydescription": {"type": "keyword"},
+                    "displayname": {
+                        "type": "nested", 
+                        "properties": {
+                            "value":{"type": "keyword"},
+                            "language": {"type": "keyword"}
+                        }
+                    },
+                    "displaydescription": {
+                        "type": "nested", 
+                        "properties": {
+                            "value": {"type": "keyword"},
+                            "language": {"type": "keyword"}
+                        }
+                    },
                     "map_popup": {"type": "keyword"},
                     "provisional_resource": {"type": "keyword"},
                     "tiles": {
@@ -157,6 +178,7 @@ def prepare_search_index(create=False):
                                 "fields": {"raw": {"type": "keyword"}, "folded": {"type": "text", "analyzer": "folding"}},
                             },
                             "nodegroup_id": {"type": "keyword"},
+                            "language": {"type": "keyword"},
                             "provisional": {"type": "boolean"},
                         },
                     },
@@ -287,7 +309,7 @@ def prepare_resource_relations_index(create=False):
 
     if create:
         se = SearchEngineFactory().create()
-        se.create_index(index=RESOURCE_RELATIONS_INDEX, body=index_settings)
+        print(se.create_index(index=RESOURCE_RELATIONS_INDEX, body=index_settings))
 
     return index_settings
 
