@@ -1525,12 +1525,20 @@ class Graph(models.GraphModel):
     def publish(self):
         """
         """
-        
+        publication = models.GraphPublication.objects.create(
+            graph=models.GraphModel.objects.get(pk=self.graphid)
+        )
+        publication.save()
+
+        self.publication = publication
+        self.save()
 
     def unpublish(self):
         """
         """
         self.publication = None
+        self.save()
+
 class GraphValidationError(Exception):
     def __init__(self, message, code=None):
         self.title = _("Graph Validation Error")

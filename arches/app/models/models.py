@@ -16,7 +16,6 @@ import datetime
 import logging
 from datetime import timedelta
 
-from django.db.models.fields import DateTimeField
 from arches.app.utils.module_importer import get_class_from_modulename
 from django.forms.models import model_to_dict
 from django.contrib.gis.db import models
@@ -429,7 +428,7 @@ class GraphPublication(models.Model):
     notes = models.TextField(blank=True, null=True)
     graph = models.ForeignKey(GraphModel, db_column="graphid", on_delete=models.CASCADE)
     user = models.ForeignKey(User, db_column="userid", blank=True, null=True, on_delete=models.CASCADE)
-    published_time = DateTimeField(auto_now_add=True, null=False)
+    published_time = models.DateTimeField(auto_now_add=True, null=False)
 
     class Meta:
         managed = True

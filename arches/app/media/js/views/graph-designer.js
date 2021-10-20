@@ -76,7 +76,19 @@ define([
 
 
             viewModel.publishGraph = function() {
-
+                $.ajax({
+                    type: "POST",
+                    url: arches.urls.publish_graph(viewModel.graph.graphid()),
+                    complete: function(response, status) {
+                        console.log(response)
+                        viewModel.loading(false);
+                        // if (status === 'success') {
+                        //     window.location = arches.urls.graph;
+                        // } else {
+                        //     viewModel.alert(new JsonErrorAlertViewModel('ep-alert-red', response.responseJSON));
+                        // }
+                    }
+                });
             };
             viewModel.unpublishGraph = function() {
                 $.ajax({
@@ -85,11 +97,11 @@ define([
                     complete: function(response, status) {
                         console.log(response)
                         viewModel.loading(false);
-                        if (status === 'success') {
-                            window.location = arches.urls.graph;
-                        } else {
-                            viewModel.alert(new JsonErrorAlertViewModel('ep-alert-red', response.responseJSON));
-                        }
+                        // if (status === 'success') {
+                        //     window.location = arches.urls.graph;
+                        // } else {
+                        //     viewModel.alert(new JsonErrorAlertViewModel('ep-alert-red', response.responseJSON));
+                        // }
                     }
                 });
             };

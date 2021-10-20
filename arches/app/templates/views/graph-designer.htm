@@ -113,7 +113,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                 >{% trans "Unpublish Graph" %}</button>
                 <!-- /ko -->
                 <!-- ko ifnot: $data.isGraphPublished() -->
-                <button class="btn btn-sm btn-primary btn-labeled fa fa-check" data-bind="click: function(){  }">{% trans "Publish Graph" %}</button>
+                <button class="btn btn-sm btn-primary btn-labeled fa fa-check" data-bind="click: $data.publishGraph">{% trans "Publish Graph" %}</button>
                 <!-- /ko -->
             </span>
 
