@@ -84,8 +84,20 @@ class I18n_String(object):
     def serialize(self):
         return str(self)
 
-    def lower(self):
-        return str(self).lower()
+    # Use this to call all the sting methods on our class so this class can be used as a "string" type
+    def __getattr__(self, name):
+        string_methods = [
+            "capitalize","casefold","center","count","encode","endswith","expandtabs",
+            "find","format","format_map","index","isalnum","isalpha","isascii","isdecimal",
+            "isdigit","isidentifier","islower","isnumeric","isprintable","isspace","istitle",
+            "isupper","join","ljust","lower","lstrip","maketrans","partition","replace","rfind",
+            "rindex","rjust","rpartition","rsplit","rstrip","split","splitlines","startswith",
+            "strip","swapcase","title","translate","upper","zfill"
+        ]
+        if name in string_methods:
+            return getattr(str(self), name)
+        else:
+            return super(I18n_String, self).__getattr__(name)
 
 
 class I18n_TextField(JSONField):
