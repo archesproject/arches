@@ -112,7 +112,10 @@ class TileTests(ArchesTestCase):
                     "parenttile_id": "",
                     "nodegroup_id": "32999999-0000-0000-0000-000000000000",
                     "tileid": "",
-                    "data": {"20000000-0000-0000-0000-000000000004": {"en": {"value": "TEST 4", "direction": "ltr"}}, "20000000-0000-0000-0000-000000000002": {"en": {"value": "TEST 5", "direction": "ltr"}}},
+                    "data": {
+                        "20000000-0000-0000-0000-000000000004": {"en": {"value": "TEST 4", "direction": "ltr"}},
+                        "20000000-0000-0000-0000-000000000002": {"en": {"value": "TEST 5", "direction": "ltr"}},
+                    },
                 },
             ],
             "resourceinstance_id": "40000000-0000-0000-0000-000000000000",

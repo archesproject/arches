@@ -268,7 +268,7 @@ class Resource(models.ResourceInstance):
         document["displayname"] = None
         document["root_ontology_class"] = self.get_root_ontology()
         document["legacyid"] = self.legacyid
-        
+
         document["displayname"] = []
         if self.displayname is not None:
             try:
@@ -279,7 +279,6 @@ class Resource(models.ResourceInstance):
                 display_name = {"value": self.displayname, "language": get_language()}
                 document["displayname"].append(display_name)
 
-        
         document["displaydescription"] = []
         if self.displaydescription is not None:
             try:
@@ -391,7 +390,7 @@ class Resource(models.ResourceInstance):
                                                         "nodeid": nodeid,
                                                         "nodegroupid": tile.nodegroup_id,
                                                         "tileid": tile.tileid,
-                                                        "language": get_language(), 
+                                                        "language": get_language(),
                                                         "resourceinstanceid": tile.resourceinstance_id,
                                                         "provisional": True,
                                                     },

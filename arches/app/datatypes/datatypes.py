@@ -105,13 +105,17 @@ class StringDataType(BaseDataType):
     def append_to_document(self, document, nodevalue, nodeid, tile, provisional=False):
         if nodevalue is not None:
             if type(nodevalue) == type(""):
-                #TODO: fix tests where this condition fires
+                # TODO: fix tests where this condition fires
                 pass
             else:
                 for key in nodevalue.keys():
-                    val = {"string": nodevalue[key]["value"], "language": key, "nodegroup_id": tile.nodegroup_id, "provisional": provisional}
+                    val = {
+                        "string": nodevalue[key]["value"],
+                        "language": key,
+                        "nodegroup_id": tile.nodegroup_id,
+                        "provisional": provisional,
+                    }
                     document["strings"].append(val)
-
 
     def transform_export_values(self, value, *args, **kwargs):
         if value is not None:
@@ -122,7 +126,7 @@ class StringDataType(BaseDataType):
 
         if nodevalue is not None:
             if type(nodevalue) == type(""):
-                #TODO: fix tests where this condition fires
+                # TODO: fix tests where this condition fires
                 pass
             else:
                 for key in nodevalue.keys():
