@@ -104,7 +104,7 @@ class StringDataType(BaseDataType):
 
     def append_to_document(self, document, nodevalue, nodeid, tile, provisional=False):
         if nodevalue is not None:
-            if type(nodevalue) == type(""):
+            if isinstance(nodevalue, str):
                 # TODO: fix tests where this condition fires
                 pass
             else:
@@ -125,7 +125,7 @@ class StringDataType(BaseDataType):
         terms = []
 
         if nodevalue is not None:
-            if type(nodevalue) == type(""):
+            if isinstance(nodevalue, str):
                 # TODO: fix tests where this condition fires
                 pass
             else:
