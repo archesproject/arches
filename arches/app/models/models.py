@@ -984,10 +984,10 @@ def auto_delete_file_on_change(sender, instance, **kwargs):
 
 class Widget(models.Model):
     widgetid = models.UUIDField(primary_key=True, default=uuid.uuid1)  # This field type is a guess.
-    name = models.TextField(unique=True)
+    name = I18n_TextField(unique=True)
     component = models.TextField(unique=True)
     defaultconfig = JSONField(blank=True, null=True, db_column="defaultconfig")
-    helptext = models.TextField(blank=True, null=True)
+    helptext = I18n_TextField(blank=True, null=True)
     datatype = models.TextField()
 
     @property
