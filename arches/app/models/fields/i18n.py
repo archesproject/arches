@@ -84,6 +84,9 @@ class I18n_String(object):
     def serialize(self):
         return str(self)
 
+    def lower(self):
+        return str(self).lower()
+
 
 class I18n_TextField(JSONField):
     description = _("A I18n_TextField object")
