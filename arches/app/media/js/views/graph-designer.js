@@ -26,12 +26,15 @@ define([
     var GraphDesignerView = BaseManagerView.extend({
         initialize: function(options) {
             var viewModel = options.viewModel;
+
+            console.log("()())(", arches, data)
             viewModel.graphid = ko.observable(data.graphid);
             viewModel.activeTab = ko.observable('graph');
             viewModel.viewState = ko.observable('design');
             viewModel.helpTemplate(viewData.help);
             viewModel.graphSettingsVisible = ko.observable(false);
             viewModel.graph = koMapping.fromJS(data['graph']);
+            viewModel.isGraphPublished = ko.observable(ko.unwrap(data['graph'].publication_id));
             viewModel.ontologies = ko.observable(data['ontologies']);
             viewModel.ontologyClasses = ko.observable(data['ontologyClasses']);
             viewModel.cardComponents = data.cardComponents;
@@ -71,6 +74,25 @@ define([
                 window.open(arches.urls.export_mapping_file(viewModel.graph.graphid()), '_blank');
             };
 
+
+            viewModel.publishGraph = function() {
+
+            };
+            viewModel.unpublishGraph = function() {
+                $.ajax({
+                    type: "POST",
+                    url: arches.urls.unpublish_graph(viewModel.graph.graphid()),
+                    complete: function(response, status) {
+                        console.log(response)
+                        viewModel.loading(false);
+                        if (status === 'success') {
+                            window.location = arches.urls.graph;
+                        } else {
+                            viewModel.alert(new JsonErrorAlertViewModel('ep-alert-red', response.responseJSON));
+                        }
+                    }
+                });
+            };
             viewModel.deleteGraph = function() {
                 viewModel.alert(new AlertViewModel('ep-alert-red', arches.confirmGraphDelete.title, arches.confirmGraphDelete.text, function() {
                     return;

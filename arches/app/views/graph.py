@@ -445,6 +445,19 @@ class GraphDataView(View):
         return HttpResponseNotFound()
 
 
+class GraphPublicationView(View):
+    action = None
+
+    def post(self, request, graphid):
+        graph = models.GraphModel.objects.get(pk=graphid)
+
+        if self.action == 'publish':
+            print("!!!!!!")
+        elif self.action == 'unpublish':
+            print("!!!!!!")
+
+        import pdb; pdb.set_trace()
+
 @method_decorator(group_required("Graph Editor"), name="dispatch")
 class CardView(GraphBaseView):
     action = "update_card"
