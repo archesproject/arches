@@ -375,8 +375,8 @@ class FunctionXGraph(models.Model):
 
 class GraphModel(models.Model):
     graphid = models.UUIDField(primary_key=True, default=uuid.uuid1)  # This field type is a guess.
-    name = models.TextField(blank=True, null=True)
-    description = models.TextField(blank=True, null=True)
+    name = I18n_TextField(blank=True, null=True)
+    description = I18n_TextField(blank=True, null=True)
     deploymentfile = models.TextField(blank=True, null=True)
     author = models.TextField(blank=True, null=True)
     deploymentdate = models.DateTimeField(blank=True, null=True)
@@ -385,7 +385,7 @@ class GraphModel(models.Model):
     isactive = models.BooleanField()
     iconclass = models.TextField(blank=True, null=True)
     color = models.TextField(blank=True, null=True)
-    subtitle = models.TextField(blank=True, null=True)
+    subtitle = I18n_TextField(blank=True, null=True)
     ontology = models.ForeignKey(
         "Ontology", db_column="ontologyid", related_name="graphs", null=True, blank=True, on_delete=models.SET_NULL
     )
@@ -414,7 +414,7 @@ class GraphModel(models.Model):
             return True
 
     def __str__(self):
-        return self.name
+        return str(self.name)
 
     class Meta:
         managed = True
