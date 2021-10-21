@@ -13,7 +13,7 @@ begin
                 st_collect(
                     array(
                         select st_transform(geom, 4326) from geojson_geometries
-                        where tileid = tileid and nodeid = %L
+                        where geojson_geometries.tileid = tiles.tileid and nodeid = %L
                     )
                 )',
                 node.nodeid
