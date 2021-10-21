@@ -7,7 +7,7 @@ from django.conf import settings
 class Migration(migrations.Migration):
 
     dependencies = [
-        ("models", "7798_i18n_cards"),
+        ("models", "7792_i18n_widgets"),
     ]
 
     sql = """
