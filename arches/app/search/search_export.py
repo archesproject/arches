@@ -60,6 +60,83 @@ class SearchResultsExporter(object):
         self.output = {}
         self.set_precision = GeoUtils().set_precision
 
+    def insert_subcard_below_parent_card(self, main_card_list, sub_card_list):
+        for sub_card in sub_card_list:
+            parent_obj = sub_card.nodegroup.parentnodegroup_id
+            for main_card in main_card_list:
+                if main_card.nodegroup_id == parent_obj:
+                    index_number = main_card_list.index(main_card) + 1
+                    main_card_list.insert(index_number, sub_card)
+
+    def return_ordered_header(self, graphid, export_type):
+
+        subcard_list_with_sort = []
+        all_cards = models.CardModel.objects.filter(graph=graphid).prefetch_related("nodegroup")
+        all_card_list_with_sort = list(all_cards.exclude(sortorder=None).order_by("sortorder"))
+        card_list_no_sort = list(all_cards.filter(sortorder=None))
+        sorted_card_list = []
+
+        # Work out which cards with sort order are sub cards by looking at the
+        # related nodegroup's parent nodegroup value
+
+        for card_with_sortorder in all_card_list_with_sort:
+            if card_with_sortorder.nodegroup.parentnodegroup_id is None:
+                sorted_card_list.append(card_with_sortorder)
+            else:
+                subcard_list_with_sort.append(card_with_sortorder)
+
+        # Reverse set to allow cards with sort and a parent nodegroup
+        # to be injected into the main list in the correct order i.e. above
+        # cards with no sort order and according to the sort order as cards are
+        # injected just below the top card.
+
+        subcard_list_with_sort.sort(key=lambda x: x.sortorder, reverse=True)
+
+        self.insert_subcard_below_parent_card(sorted_card_list, card_list_no_sort)
+
+        # Cards in subcard_list_with_sort are added after cards with no sort
+
+        self.insert_subcard_below_parent_card(sorted_card_list, subcard_list_with_sort)
+
+        # Create a list of nodes within each card and order them according to sort
+        # order then add them to the main list of
+
+        ordered_list_all_nodes = []
+        for sorted_card in sorted_card_list:
+            card_node_objects = list(models.CardXNodeXWidget.objects.filter(card_id=sorted_card.cardid).prefetch_related("node"))
+            if len(card_node_objects) > 0:
+                nodes_in_card = []
+                for card_node_object in card_node_objects:
+                    if card_node_object.node.datatype != "semantic":
+                        nodes_in_card.append(card_node_object)
+                node_object_list_sorted = sorted(nodes_in_card, key=lambda x: x.sortorder)
+                for sorted_node_object in node_object_list_sorted:
+                    ordered_list_all_nodes.append(sorted_node_object)
+
+        # Build the list of headers (in correct format for return file format) to be returned
+        # from the ordered list of nodes, only where the exportable tag is true
+
+        headers = []
+        node_id_list = []
+        for ordered_node in ordered_list_all_nodes:
+            node_object = ordered_node.node
+            if node_object.exportable is True:
+                if export_type == "csv":
+                    if node_object.nodeid not in node_id_list:
+                        headers.append(node_object.name)
+                        node_id_list.append(node_object.nodeid)
+
+                elif export_type == "shp":
+                    header_object = {}
+                    header_object["fieldname"] = node_object.fieldname
+                    header_object["datatype"] = node_object.datatype
+                    header_object["name"] = node_object.name
+                    if node_object.nodeid not in node_id_list:
+                        headers.append(header_object)
+                        node_id_list.append(node_object.nodeid)
+
+        return headers
+
     def export(self, format, report_link):
         ret = []
         search_res_json = SearchView.search_results(self.search_request)
@@ -93,35 +170,52 @@ class SearchResultsExporter(object):
                     resource["Link"] = f"{export_namespace}{report_url}"
 
             if format == "geojson":
-                headers = list(graph.node_set.filter(exportable=True).values_list("name", flat=True))
+
+                if settings.EXPORT_DATA_FIELDS_IN_CARD_ORDER is True:
+                    headers = self.return_ordered_header(graph_id, "csv")
+                else:
+                    headers = list(graph.node_set.filter(exportable=True).values_list("name", flat=True))
+
                 if (report_link == "true") and ("Link" not in headers):
                     headers.append("Link")
                 ret = self.to_geojson(resources["output"], headers=headers, name=graph.name)
                 return ret, ""
 
             if format == "tilecsv":
-                headers = list(graph.node_set.filter(exportable=True).values_list("name", flat=True))
+
+                if settings.EXPORT_DATA_FIELDS_IN_CARD_ORDER is True:
+                    headers = self.return_ordered_header(graph_id, "csv")
+                else:
+                    headers = list(graph.node_set.filter(exportable=True).values_list("name", flat=True))
+
                 headers.append("resourceid")
                 if (report_link == "true") and ("Link" not in headers):
                     headers.append("Link")
                 ret.append(self.to_csv(resources["output"], headers=headers, name=graph.name))
 
             if format == "shp":
-                headers = graph.node_set.filter(exportable=True).values("fieldname", "datatype", "name")[::1]
+
+                if settings.EXPORT_DATA_FIELDS_IN_CARD_ORDER is True:
+                    headers = self.return_ordered_header(graph_id, "shp")
+                else:
+                    headers = graph.node_set.filter(exportable=True).values("fieldname", "datatype", "name")[::1]
+
+                headers.append({"fieldname": "resourceid", "datatype": "str"})
+
                 missing_field_names = []
                 for header in headers:
                     if not header["fieldname"]:
                         missing_field_names.append(header["name"])
-                    header.pop("name")
+                        header.pop("name")
                 if len(missing_field_names) > 0:
                     message = _("Shapefile are fieldnames required for the following nodes: {0}".format(", ".join(missing_field_names)))
                     logger.error(message)
                     raise (Exception(message))
 
-                headers = graph.node_set.filter(exportable=True).values("fieldname", "datatype")[::1]
-                headers.append({"fieldname": "resourceid", "datatype": "str"})
                 if (report_link == "true") and ({"fieldname": "Link", "datatype": "str"} not in headers):
                     headers.append({"fieldname": "Link", "datatype": "str"})
+                else:
+                    pass
                 ret += self.to_shp(resources["output"], headers=headers, name=graph.name)
 
             if format == "tilexl":

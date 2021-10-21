@@ -167,6 +167,13 @@ class NumberDataType(BaseDataType):
             errors.append(error_message)
         return errors
 
+    def get_display_value(self, tile, node):
+        data = self.get_tile_data(tile)
+        if data:
+            display_value = data.get(str(node.nodeid))
+            if display_value is not None:
+                return str(display_value)
+
     def transform_value_for_tile(self, value, **kwargs):
         try:
             if value == "":
