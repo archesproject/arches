@@ -129,7 +129,7 @@ class TileTests(ArchesTestCase):
 
         self.assertEqual(t.resourceinstance_id, "40000000-0000-0000-0000-000000000000")
         self.assertEqual(t.data, {})
-        self.assertEqual(t.tiles[0].data["20000000-0000-0000-0000-000000000004"], "TEST 1")
+        self.assertEqual(t.tiles[0].data["20000000-0000-0000-0000-000000000004"]["en"]["value"], "TEST 1")
 
     def test_save(self):
         """

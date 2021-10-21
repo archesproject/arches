@@ -510,7 +510,7 @@ class JsonLDExportTests(ArchesTestCase):
         ref = js[prop]
         note = "http://www.cidoc-crm.org/cidoc-crm/P3_has_note"
         self.assertTrue(note in ref)
-        self.assertTrue(ref[note] == "Production")
+        self.assertTrue(ref[note]["@value"] == "Production")
         self.assertTrue(note in js)
         self.assertTrue(js[note] == "#ff00ff")
 
@@ -536,11 +536,11 @@ class JsonLDExportTests(ArchesTestCase):
         note = 'http://www.cidoc-crm.org/cidoc-crm/P3_has_note'
         ts = 'http://www.cidoc-crm.org/cidoc-crm/P4_has_time-span'
         if note in conts[0]:
-            self.assertTrue(conts[0][note] == "Note")
+            self.assertTrue(conts[0][note]["@value"] == "Note")
             self.assertTrue(ts in conts[1])
             tsdata = conts[1][ts]
         else:
-            self.assertTrue(conts[1][note] == "Note")
+            self.assertTrue(conts[1][note]["@value"] == "Note")
             self.assertTrue(ts in conts[0])
             tsdata = conts[0][ts]
 

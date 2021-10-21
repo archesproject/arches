@@ -138,7 +138,7 @@ class ResourceTests(ArchesTestCase):
         """
         node_name = "Name"
         result = self.test_resource.get_node_values(node_name)
-        self.assertEqual("Test Name 1", result[0])
+        self.assertEqual("Test Name 1", result[0]["en"]["value"])
 
     def test_get_node_value_date(self):
         """
