@@ -1,5 +1,5 @@
 create or replace function __arches_get_parent_id_for_view(
-    view_row record,
+    view_row anyelement,
     schema_name text,
     view_name text
 ) returns uuid as $$
