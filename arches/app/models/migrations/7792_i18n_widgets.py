@@ -30,5 +30,5 @@ class Migration(migrations.Migration):
             model_name="cardxnodexwidget",
             name="label",
             field=I18n_TextField(blank=True, null=True),
-        )
+        ),
     ]
