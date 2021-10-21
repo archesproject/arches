@@ -143,7 +143,7 @@ class Resource(models.ResourceInstance):
 
         self.save_edit(user=user, edit_type="create", transaction_id=transaction_id)
         if index is True:
-            # self.index()
+            self.index()
             pass
 
     def get_root_ontology(self):
@@ -267,9 +267,27 @@ class Resource(models.ResourceInstance):
         document["displayname"] = None
         document["root_ontology_class"] = self.get_root_ontology()
         document["legacyid"] = self.legacyid
+
+        document["displayname"] = []
         if self.displayname is not None:
-            document["displayname"] = JSONDeserializer().deserialize(self.displayname)
-        document["displaydescription"] = self.displaydescription
+            try:
+                display_name = JSONDeserializer().deserialize(self.displayname)
+                for key in display_name.keys():
+                    document["displayname"].append({"value": display_name[key]["value"], "language": key})
+            except:
+                display_name = {"value": self.displayname, "language": get_language()}
+                document["displayname"].append(display_name)
+
+        document["displaydescription"] = []
+        if self.displaydescription is not None:
+            try:
+                display_description = JSONDeserializer().deserialize(self.displaydescription)
+                for key in display_description.keys():
+                    document["displaydescription"].append({"value": display_description[key]["value"], "language": key})
+            except:
+                display_description = {"value": self.displaydescription, "language": get_language()}
+                document["displaydescription"].append(display_description)
+
         document["map_popup"] = self.map_popup
 
         tiles = list(models.TileModel.objects.filter(resourceinstance=self)) if fetchTiles else self.tiles
@@ -311,7 +329,6 @@ class Resource(models.ResourceInstance):
                                         "nodegroupid": tile.nodegroup_id,
                                         "tileid": tile.tileid,
                                         "language": term["language"],
-                                        "direction": term["direction"],
                                         "resourceinstanceid": tile.resourceinstance_id,
                                         "provisional": False,
                                     },
@@ -326,8 +343,7 @@ class Resource(models.ResourceInstance):
                                         "nodeid": nodeid,
                                         "nodegroupid": tile.nodegroup_id,
                                         "tileid": tile.tileid,
-                                        "language": "en-us",  # TODO: make dynamic based on system language
-                                        "direction": "ltr",
+                                        "language": get_language(),  # TODO: make dynamic based on system language
                                         "resourceinstanceid": tile.resourceinstance_id,
                                         "provisional": False,
                                     },
@@ -359,7 +375,6 @@ class Resource(models.ResourceInstance):
                                                         "nodegroupid": tile.nodegroup_id,
                                                         "tileid": tile.tileid,
                                                         "language": term["language"],
-                                                        "direction": term["direction"],
                                                         "resourceinstanceid": tile.resourceinstance_id,
                                                         "provisional": True,
                                                     },
@@ -374,14 +389,13 @@ class Resource(models.ResourceInstance):
                                                         "nodeid": nodeid,
                                                         "nodegroupid": tile.nodegroup_id,
                                                         "tileid": tile.tileid,
-                                                        "language": "en-us",  # TODO: make dynamic based on system language
-                                                        "direction": "ltr",
+                                                        "language": get_language(),
                                                         "resourceinstanceid": tile.resourceinstance_id,
                                                         "provisional": True,
                                                     },
                                                 }
                                             )
-
+        print(document)
         return document, terms
 
     def delete(self, user={}, index=True, transaction_id=None):

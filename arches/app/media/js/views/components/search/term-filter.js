@@ -3,8 +3,9 @@ define([
     'knockout-mapping',
     'underscore',
     'views/components/search/base-filter',
-    'bindings/term-search'
-], function(ko, koMapping, _, BaseFilter, termSearchComponent) {
+    'bindings/term-search', 
+    'arches'
+], function(ko, koMapping, _, BaseFilter, termSearchComponent, arches) {
     var componentName = 'term-filter';
     return ko.components.register(componentName, {
         viewModel: BaseFilter.extend({
@@ -14,6 +15,15 @@ define([
 
                 this.filter.terms = ko.observableArray();
                 this.filter.tags = ko.observableArray();
+
+                this.language = ko.observable();
+                const getLanguages = async() => {
+                    let languages = (await $.getJSON(arches.urls.languages))?.languages
+                    languages.unshift({"code": "*", "name": "All"})
+                    this.languages(languages);
+                }
+                this.languages = ko.observableArray();
+                getLanguages();
 
                 var updatedTerms = ko.computed(function() {
                     return ko.toJS(this.filter.terms);
