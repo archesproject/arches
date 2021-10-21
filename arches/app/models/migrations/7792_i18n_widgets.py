@@ -12,16 +12,14 @@ class Migration(migrations.Migration):
 
     sql = """
         SET CONSTRAINTS ALL IMMEDIATE;
-        UPDATE public.widgets SET name=json_build_object('{0}', name);
-        UPDATE public.widgets SET helptext=json_build_object('{0}', helptext);
+        UPDATE public.cards_x_nodes_x_widgets SET label=json_build_object('{0}', label);
         SET CONSTRAINTS ALL DEFERRED;
     """.format(
         settings.LANGUAGE_CODE
     )
 
     reverse_sql = """
-        UPDATE public.widgets SET name=name::jsonb->>'{0}'::text;
-        UPDATE public.widgets SET helptext=helptext::jsonb->>'{0}'::text;
+        UPDATE public.cards_x_nodes_x_widgets SET label=label::jsonb->>'{0}'::text;
     """.format(
         settings.LANGUAGE_CODE
     )
@@ -29,13 +27,8 @@ class Migration(migrations.Migration):
     operations = [
         migrations.RunSQL(sql, reverse_sql),
         migrations.AlterField(
-            model_name="widget",
-            name="name",
-            field=I18n_TextField(blank=True),
-        ),
-        migrations.AlterField(
-            model_name="widget",
-            name="helptext",
+            model_name="cardxnodexwidget",
+            name="label",
             field=I18n_TextField(blank=True, null=True),
-        ),
+        )
     ]
