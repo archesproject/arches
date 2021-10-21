@@ -28,7 +28,7 @@ class TermFilter(BaseSearchFilter):
                 if term["type"] == "term":
                     string_filter.must(Match(field="strings.string", query=term["value"], type="phrase"))
                 elif term["type"] == "string":
-                    if(language != "*"):
+                    if language != "*":
                         string_filter.must(Match(field="strings.language", query=language, type="phrase_prefix"))
                     string_filter.should(Match(field="strings.string", query=term["value"], type="phrase_prefix"))
                     string_filter.should(Match(field="strings.string.folded", query=term["value"], type="phrase_prefix"))
