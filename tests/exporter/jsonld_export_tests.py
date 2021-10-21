@@ -126,7 +126,7 @@ class JsonLDExportTests(ArchesTestCase):
         self.assertTrue("@id" in js)
         self.assertTrue(js["@id"] == "http://localhost:8000/resources/e6412598-f6b5-11e9-8f09-a4d18cec433a")
         self.assertTrue("http://www.cidoc-crm.org/cidoc-crm/P3_has_note" in js)
-        self.assertTrue(js["http://www.cidoc-crm.org/cidoc-crm/P3_has_note"] == "Test Text Here")
+        self.assertTrue(js["http://www.cidoc-crm.org/cidoc-crm/P3_has_note"]["@value"] == "Test Text Here")
 
     def test_2a_complex_export_data(self):
         # 24d0d25a-fa75-11e9-b369-3af9d3b32b71  -- data types
@@ -140,7 +140,7 @@ class JsonLDExportTests(ArchesTestCase):
         self.assertTrue(js["@type"] == "http://www.cidoc-crm.org/cidoc-crm/E22_Man-Made_Object")
         # Test string data type
         self.assertTrue("http://www.cidoc-crm.org/cidoc-crm/P3_has_note" in js)
-        self.assertTrue(js["http://www.cidoc-crm.org/cidoc-crm/P3_has_note"] == "Test Data")
+        self.assertTrue(js["http://www.cidoc-crm.org/cidoc-crm/P3_has_note"]["@value"] == "Test Data")
         # Test number data type
         self.assertTrue("http://www.cidoc-crm.org/cidoc-crm/P57_has_number_of_parts" in js)
         self.assertTrue(js["http://www.cidoc-crm.org/cidoc-crm/P57_has_number_of_parts"] == 10)

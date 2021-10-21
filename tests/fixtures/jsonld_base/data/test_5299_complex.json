@@ -11,7 +11,7 @@
                     {
                         "data": {
                             "2d956d38-0722-11ea-b628-acde48001122": "Note",
-                            "667abff4-0722-11ea-b628-acde48001122": "2019-11-01"
+                            "667abff4-0722-11ea-b628-acde48001122": {"en": {"value": "2019-11-01"}}
                         },
                         "nodegroup_id": "fdbc4f50-0721-11ea-b628-acde48001122",
                         "parenttile_id": null,
