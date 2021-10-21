@@ -28,7 +28,12 @@ define([
                 var updatedTerms = ko.computed(function() {
                     return ko.toJS(this.filter.terms);
                 }, this);
+
                 updatedTerms.subscribe(function() {
+                    this.updateQuery();
+                }, this);
+
+                this.language.subscribe(function() {
                     this.updateQuery();
                 }, this);
 
@@ -61,6 +66,7 @@ define([
                 var queryObj = this.query();
                 if (terms.length > 0){
                     queryObj[componentName] = ko.toJSON(terms);
+                    queryObj['language'] = this.language()?.code;
                 } else {
                     delete queryObj[componentName];
                 }
