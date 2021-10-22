@@ -56,7 +56,6 @@ class Graph(models.GraphModel):
         # self.deploymentdate = None
         # self.version = ''
         # self.isresource = False
-        # self.isactive = False
         # self.iconclass = ''
         # self.color = ''
         # self.subtitle = ''
@@ -144,7 +143,6 @@ class Graph(models.GraphModel):
             description="",
             version="",
             isresource=is_resource,
-            isactive=not is_resource,
             iconclass="",
             ontology=None,
             slug=None,
@@ -1336,7 +1334,6 @@ class Graph(models.GraphModel):
                         "iconclass",
                         "author",
                         "description",
-                        "isactive",
                         "color",
                         "nodes",
                         "edges",

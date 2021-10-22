@@ -97,7 +97,6 @@ class GraphSettingsView(GraphBaseView):
                 "ontology_id",
                 "version",
                 "subtitle",
-                "isactive",
                 "color",
                 "jsonldcontext",
                 "slug",
@@ -435,7 +434,7 @@ class GraphDataView(View):
                 graph = Graph.objects.get(graphid=graphid)
                 if graph.isresource:
                     graph.delete_instances()
-                    graph.isactive = False
+                    graph.publication = None
                     graph.save(validate=False)
                 graph.delete()
                 return JSONResponse({"success": True})

@@ -117,8 +117,8 @@ class Resource(models.ResourceInstance):
 
         """
         graph = models.GraphModel.objects.get(graphid=self.graph_id)
-        if graph.isactive is False:
-            message = _("This model is not yet active; unable to save.")
+        if graph.publication:
+            message = _("This model is published; unable to save.")
             raise ModelInactiveError(message)
         request = kwargs.pop("request", None)
         user = kwargs.pop("user", None)
@@ -353,8 +353,8 @@ class Resource(models.ResourceInstance):
 
         permit_deletion = False
         graph = models.GraphModel.objects.get(graphid=self.graph_id)
-        if graph.isactive is False:
-            message = _("This model is not yet active; unable to delete.")
+        if graph.publication:
+            message = _("This model is published; unable to delete.")
             raise ModelInactiveError(message)
         if user != {}:
             user_is_reviewer = user_is_resource_reviewer(user)
@@ -475,7 +475,7 @@ class Resource(models.ResourceInstance):
                 models.GraphModel.objects.all()
                 .exclude(pk=settings.SYSTEM_SETTINGS_RESOURCE_MODEL_ID)
                 .exclude(isresource=False)
-                .exclude(isactive=False)
+                .exclude(publication=None)
             )
 
         graph_lookup = {

@@ -125,7 +125,7 @@ class TileData(View):
                         return JSONResponse({"status": "false", "message": [_(e.title), _(str(message))]}, status=500)
                 tile_id = data["tileid"]
                 resource_instance = models.ResourceInstance.objects.get(pk=data["resourceinstance_id"])
-                is_active = resource_instance.graph.isactive
+                is_active = resource_instance.graph.publication
                 if tile_id is not None and tile_id != "":
                     try:
                         old_tile = Tile.objects.get(pk=tile_id)
@@ -228,7 +228,7 @@ class TileData(View):
                 try:
                     tile = Tile.objects.get(tileid=data["tileid"])
                     resource_instance = tile.resourceinstance
-                    is_active = resource_instance.graph.isactive
+                    is_active = resource_instance.graph.publication
                 except ObjectDoesNotExist:
                     return JSONErrorResponse(_("This tile is no longer available"), _("It was likely already deleted by another user"))
                 user_is_reviewer = user_is_resource_reviewer(request.user)

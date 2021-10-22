@@ -153,7 +153,7 @@ class ResourceEditorView(MapBaseManagerView):
         resource_graphs = (
             models.GraphModel.objects.exclude(pk=settings.SYSTEM_SETTINGS_RESOURCE_MODEL_ID)
             .exclude(isresource=False)
-            .exclude(isactive=False)
+            .exclude(publication=None)
         )
         ontologyclass = [node for node in nodes if node.istopnode is True][0].ontologyclass or ""
         relationship_type_values = get_resource_relationship_types()
@@ -732,7 +732,7 @@ class RelatedResourcesView(BaseManagerView):
         models.GraphModel.objects.all()
         .exclude(pk=settings.SYSTEM_SETTINGS_RESOURCE_MODEL_ID)
         .exclude(isresource=False)
-        .exclude(isactive=False)
+        .exclude(publication=None)
     )
 
     def paginate_related_resources(self, related_resources, page, request):

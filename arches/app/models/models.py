@@ -15,6 +15,7 @@ import uuid
 import datetime
 import logging
 from datetime import timedelta
+
 from arches.app.utils.module_importer import get_class_from_modulename
 from django.forms.models import model_to_dict
 from django.contrib.gis.db import models
@@ -371,7 +372,6 @@ class FunctionXGraph(models.Model):
         db_table = "functions_x_graphs"
         unique_together = ("function", "graph")
 
-
 class GraphModel(models.Model):
     graphid = models.UUIDField(primary_key=True, default=uuid.uuid1)  # This field type is a guess.
     name = models.TextField(blank=True, null=True)
@@ -381,7 +381,6 @@ class GraphModel(models.Model):
     deploymentdate = models.DateTimeField(blank=True, null=True)
     version = models.TextField(blank=True, null=True)
     isresource = models.BooleanField()
-    isactive = models.BooleanField()
     iconclass = models.TextField(blank=True, null=True)
     color = models.TextField(blank=True, null=True)
     subtitle = models.TextField(blank=True, null=True)
@@ -395,13 +394,16 @@ class GraphModel(models.Model):
     )
     config = JSONField(db_column="config", default=dict)
     slug = models.TextField(validators=[validate_slug], unique=True, null=True)
+    publication = models.ForeignKey(
+        "GraphPublication", db_column="publicationid", null=True, on_delete=models.SET_NULL
+    )
 
     @property
     def disable_instance_creation(self):
         if not self.isresource:
             return _("Only resource models may be edited - branches are not editable")
-        if not self.isactive:
-            return _("This Model is Inactive and not available for editing")
+        if not self.publication:
+            return _("This Model is unpublished and not available for editing")
         return False
 
     def is_editable(self):
@@ -418,6 +420,18 @@ class GraphModel(models.Model):
     class Meta:
         managed = True
         db_table = "graphs"
+
+
+class GraphPublication(models.Model):
+    publicationid = models.UUIDField(primary_key=True, serialize=False, default=uuid.uuid1)
+    notes = models.TextField(blank=True, null=True)
+    graph = models.ForeignKey(GraphModel, db_column="graphid", on_delete=models.CASCADE)
+    user = models.ForeignKey(User, db_column="userid", null=True, on_delete=models.CASCADE)
+    published_time = models.DateTimeField(auto_now_add=True, null=False)
+
+    class Meta:
+        managed = True
+        db_table = "graph_publications"
 
 
 class Icon(models.Model):
