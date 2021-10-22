@@ -39,7 +39,7 @@ from arches.app.models import models
 from arches.app.models.card import Card
 from arches.app.models.graph import Graph
 from arches.app.models.tile import Tile
-from arches.app.models.resource import Resource, ModelInactiveError
+from arches.app.models.resource import Resource, PublishedModelError
 from arches.app.models.system_settings import settings
 from arches.app.utils.activity_stream_jsonld import ActivityStreamCollection
 from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializer
@@ -285,8 +285,8 @@ class ResourceEditorView(MapBaseManagerView):
                 ret = Resource.objects.get(pk=resourceid)
                 try:
                     deleted = ret.delete(user=request.user)
-                except ModelInactiveError as e:
-                    message = _("Unable to delete. Please verify the model status is active")
+                except PublishedModelError as e:
+                    message = _("Unable to delete. Please verify the model is not currently published.")
                     return JSONResponse({"status": "false", "message": [_(e.title), _(str(message))]}, status=500)
                 except PermissionDenied:
                     return JSONErrorResponse(delete_error, delete_msg)
@@ -880,8 +880,8 @@ class RelatedResourcesView(BaseManagerView):
                 )
                 try:
                     rr.save()
-                except ModelInactiveError as e:
-                    message = _("Unable to save. Please verify the model status is active")
+                except PublishedModelError as e:
+                    message = _("Unable to save. Please verify the model is not currently published.")
                     return JSONResponse({"status": "false", "message": [_(e.title), _(str(message))]}, status=500)
             else:
                 print("relationship not permitted")
@@ -894,8 +894,8 @@ class RelatedResourcesView(BaseManagerView):
             rr.dateended = dateto
             try:
                 rr.save()
-            except ModelInactiveError as e:
-                message = _("Unable to save. Please verify the model status is active")
+            except PublishedModelError as e:
+                message = _("Unable to save. Please verify the model is not currently published.")
                 return JSONResponse({"status": "false", "message": [_(e.title), _(str(message))]}, status=500)
 
         start = request.GET.get("start", 0)

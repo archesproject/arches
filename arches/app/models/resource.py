@@ -119,7 +119,7 @@ class Resource(models.ResourceInstance):
         graph = models.GraphModel.objects.get(graphid=self.graph_id)
         if graph.publication:
             message = _("This model is published; unable to save.")
-            raise ModelInactiveError(message)
+            raise PublishedModelError(message)
         request = kwargs.pop("request", None)
         user = kwargs.pop("user", None)
         index = kwargs.pop("index", True)
@@ -355,7 +355,7 @@ class Resource(models.ResourceInstance):
         graph = models.GraphModel.objects.get(graphid=self.graph_id)
         if graph.publication:
             message = _("This model is published; unable to delete.")
-            raise ModelInactiveError(message)
+            raise PublishedModelError(message)
         if user != {}:
             user_is_reviewer = user_is_resource_reviewer(user)
             if user_is_reviewer is False:
@@ -695,9 +695,9 @@ def is_uuid(value_to_test):
         return False
 
 
-class ModelInactiveError(Exception):
+class PublishedModelError(Exception):
     def __init__(self, message, code=None):
-        self.title = _("Model Inactive Error")
+        self.title = _("Published Model Error")
         self.message = message
         self.code = code
 

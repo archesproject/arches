@@ -38,7 +38,7 @@ from arches.app.models.graph import Graph, GraphValidationError
 from arches.app.models.card import Card
 from arches.app.models.concept import Concept
 from arches.app.models.system_settings import settings
-from arches.app.models.resource import ModelInactiveError
+from arches.app.models.resource import PublishedModelError
 from arches.app.utils.data_management.resource_graphs.exporter import get_graphs_for_export, create_mapping_configuration_file
 from arches.app.utils.data_management.resource_graphs import importer as GraphImporter
 from arches.app.utils.system_metadata import system_metadata
@@ -393,7 +393,7 @@ class GraphDataView(View):
             return JSONResponse(ret)
         except GraphValidationError as e:
             return JSONErrorResponse(e.title, e.message, {"status": "Failed"})
-        except ModelInactiveError as e:
+        except PublishedModelError as e:
             return JSONErrorResponse(e.title, e.message)
         except RequestError as e:
             return JSONErrorResponse(
@@ -427,7 +427,7 @@ class GraphDataView(View):
                 )
             except GraphValidationError as e:
                 return JSONErrorResponse(e.title, e.message)
-            except ModelInactiveError as e:
+            except PublishedModelError as e:
                 return JSONErrorResponse(e.title, e.message)
         elif self.action == "delete_graph":
             try:
