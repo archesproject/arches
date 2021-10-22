@@ -73,6 +73,15 @@ class RDFExportUnitTests(ArchesTestCase):
         graph = dt.to_rdf(edge_info, edge)
         obj = Literal(edge_info["range_tile_data"]["en"]["value"], lang="en")
         self.assertTrue((edge_info["d_uri"], edge.ontologyproperty, obj) in graph)
+    
+    def test_rdf_string_multi_language(self):
+        dt = self.DT.get_instance("string")
+        edge_info, edge = mock_edge(1, CIDOC_NS["name"], None, "", {"en": {"value": "test", "direction": "ltr"}, "es": {"value": "prueba", "direction": "ltr"}})
+        graph = dt.to_rdf(edge_info, edge)
+        enObj = Literal(edge_info["range_tile_data"]["en"]["value"], lang="en")
+        esObj = Literal(edge_info["range_tile_data"]["es"]["value"], lang="es")
+        self.assertTrue((edge_info["d_uri"], edge.ontologyproperty, enObj) in graph)
+        self.assertTrue((edge_info["d_uri"], edge.ontologyproperty, esObj) in graph)
 
     def test_rdf_None_string(self):
         dt = self.DT.get_instance("string")

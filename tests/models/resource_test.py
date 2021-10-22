@@ -103,7 +103,7 @@ class ResourceTests(ArchesTestCase):
         cls.test_resource = Resource(graph_id=cls.search_model_graphid)
 
         # Add Name
-        tile = Tile(data={cls.search_model_name_nodeid: {"en": {"value": "Test Name 1"}}}, nodegroup_id=cls.search_model_name_nodeid)
+        tile = Tile(data={cls.search_model_name_nodeid: {"en": {"value": "Test Name 1"}, "es": {"value": "Prueba Nombre 1"}}}, nodegroup_id=cls.search_model_name_nodeid)
         cls.test_resource.tiles.append(tile)
 
         # Add Cultural Period
@@ -139,6 +139,7 @@ class ResourceTests(ArchesTestCase):
         node_name = "Name"
         result = self.test_resource.get_node_values(node_name)
         self.assertEqual("Test Name 1", result[0]["en"]["value"])
+        self.assertEqual("Prueba Nombre 1", result[0]["es"]["value"])
 
     def test_get_node_value_date(self):
         """

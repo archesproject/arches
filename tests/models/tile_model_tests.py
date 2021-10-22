@@ -101,7 +101,7 @@ class TileTests(ArchesTestCase):
                     "nodegroup_id": "19999999-0000-0000-0000-000000000000",
                     "tileid": "",
                     "data": {
-                        "20000000-0000-0000-0000-000000000004": {"en": {"value": "TEST 1", "direction": "ltr"}},
+                        "20000000-0000-0000-0000-000000000004": {"en": {"value": "TEST 1", "direction": "ltr"}, "es": {"value": "PRUEBA 1", "direction": "ltr"}},
                         "20000000-0000-0000-0000-000000000002": {"en": {"value": "TEST 2", "direction": "ltr"}},
                         "20000000-0000-0000-0000-000000000003": {"en": {"value": "TEST 3", "direction": "ltr"}},
                     },
@@ -146,7 +146,12 @@ class TileTests(ArchesTestCase):
                     "parenttile_id": "",
                     "nodegroup_id": "72048cb3-adbc-11e6-9ccf-14109fd34195",
                     "tileid": "",
-                    "data": {"72048cb3-adbc-11e6-9ccf-14109fd34195": {"en": {"value": "TEST 1", "direction": "ltr"}}},
+                    "data": {
+                        "72048cb3-adbc-11e6-9ccf-14109fd34195": {
+                            "en": {"value": "TEST 1", "direction": "ltr"}, 
+                            "es": {"value": "PRUEBA 1", "direction": "ltr"}
+                        }
+                    },
                 }
             ],
             "resourceinstance_id": "40000000-0000-0000-0000-000000000000",
@@ -174,7 +179,11 @@ class TileTests(ArchesTestCase):
             "parenttile_id": "",
             "nodegroup_id": "72048cb3-adbc-11e6-9ccf-14109fd34195",
             "tileid": "",
-            "data": {"72048cb3-adbc-11e6-9ccf-14109fd34195": {"en": {"value": "TEST 1", "direction": "ltr"}}},
+            "data": {
+                "72048cb3-adbc-11e6-9ccf-14109fd34195": {
+                    "en": {"value": "TEST 1", "direction": "ltr"},
+                    "es": {"value": "PRUEBA 1", "direction": "ltr"}
+                }},
         }
 
         t = Tile(json)
@@ -184,6 +193,7 @@ class TileTests(ArchesTestCase):
 
         self.assertEqual(t.tileid, t2.tileid)
         self.assertEqual(t2.data["72048cb3-adbc-11e6-9ccf-14109fd34195"]["en"]["value"], "TEST 1")
+        self.assertEqual(t2.data["72048cb3-adbc-11e6-9ccf-14109fd34195"]["es"]["value"], "PRUEBA 1")
 
     def test_create_new_authoritative(self):
         """
