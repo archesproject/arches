@@ -34,8 +34,8 @@ define(['knockout', 'underscore', 'viewmodels/widget', 'arches', 'bindings/chose
             }
 
             const init = async() => {
-                const languages = (await $.getJSON(arches.urls.languages))?.languages;
-                const currentLanguage = languages?.find(x => x.code == arches.defaultLanguage);
+                const languages = arches.languages;
+                const currentLanguage = languages?.find(element => element.code == arches.defaultLanguage);
                 self.languages(languages);
                 self.currentLanguage(currentLanguage);
     

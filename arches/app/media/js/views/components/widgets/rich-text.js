@@ -24,15 +24,9 @@ define(['knockout', 'underscore', 'viewmodels/widget', 'arches', 'bindings/ckedi
                 });
             }
 
-            self.languages =  ko.observableArray();
-            
-            $.getJSON(arches.urls.languages).then((data) => {
-                self.languages(data?.languages);
-                const currentLanguage = data?.languages?.find(x => x.code == arches.defaultLanguage);
-                self.currentLanguage(currentLanguage);
-                window.setTimeout(function(){$("select[data-bind^=chosen]").trigger("chosen:updated");}, 300);
-            });
-
+            const languages = arches.languages;
+            self.languages =  ko.observableArray(languages);
+            self.currentLanguage(languages.find(element => element.code == arches.defaultLanguage));
 
             if(!currentValue?.[currentLanguage.code]){
                 self.currentText = ko.observable('');
