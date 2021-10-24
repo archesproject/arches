@@ -8336,7 +8336,7 @@ a.mega-dropdown-toggle.disabled {
 }
 
 .create-resource-instance-card-component {
-    position: absolute;
+    position: fixed;
     background: #fcfcfc;
     z-index: 11;
     height: 95%;
@@ -8357,6 +8357,7 @@ a.mega-dropdown-toggle.disabled {
     overflow-x: hidden;
     transform: translate(100%, 0);
     transition: all 0.3s ease-out;
+    padding-left: 50px;
 }
 
 .create-resource-instance-card-component.rr-table-pop .rp-edit-buttons {
