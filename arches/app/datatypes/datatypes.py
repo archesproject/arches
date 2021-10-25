@@ -145,7 +145,7 @@ class StringDataType(BaseDataType):
                 match_type = "phrase_prefix" if "~" in value["op"] else "phrase"
                 if value["lang"]:
                     match_query = Match(field="tiles.data.%s.%s.value" % (str(node.pk), value["lang"]), query=value["val"], type=match_type)
-                else: 
+                else:
                     match_query = Match(field="tiles.data.%s" % (str(node.pk)), query=value["val"], type=match_type)
 
                 if "!" in value["op"]:
