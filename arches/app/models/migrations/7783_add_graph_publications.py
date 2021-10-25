@@ -10,39 +10,39 @@ class Migration(migrations.Migration):
         ("models", "7128_resource_instance_filter"),
     ]
 
-    def forwards_add_graph_transactions_table_data(apps, schema_editor):
-        GraphPublication = apps.get_model("models", "GraphPublication")
-        GraphModel = apps.get_model("models", "GraphModel")
+    # def forwards_add_graph_transactions_table_data(apps, schema_editor):
+    #     GraphPublication = apps.get_model("models", "GraphPublication")
+    #     GraphModel = apps.get_model("models", "GraphModel")
 
-        for graph in GraphModel.objects.all():
-            if graph.isresource:
-                graph_publication = GraphPublication.objects.create(graph=graph)
-                graph_publication.save()
-
-
-    def reverse_add_graph_transactions_table_data(apps, schema_editor):
-        GraphPublication = apps.get_model("models", "GraphPublication")
-        GraphPublication.objects.all().delete()
+    #     for graph in GraphModel.objects.all():
+    #         if graph.isresource:
+    #             graph_publication = GraphPublication.objects.create(graph=graph)
+    #             graph_publication.save()
 
 
-    def forwards_add_graph_column_data(apps, schema_editor):
-        GraphPublication = apps.get_model("models", "GraphPublication")
-        GraphModel = apps.get_model("models", "GraphModel")
-
-        for graph in GraphModel.objects.all():
-            graph_publications = GraphPublication.objects.filter(graph=graph)  # filtering for silent failure
-
-            if len(graph_publications):
-                graph.publication = graph_publications[0]
-                graph.save()
+    # def reverse_add_graph_transactions_table_data(apps, schema_editor):
+    #     GraphPublication = apps.get_model("models", "GraphPublication")
+    #     GraphPublication.objects.all().delete()
 
 
-    def reverse_add_graph_column_data(apps, schema_editor):
-        GraphModel = apps.get_model("models", "GraphModel")
+    # def forwards_add_graph_column_data(apps, schema_editor):
+    #     GraphPublication = apps.get_model("models", "GraphPublication")
+    #     GraphModel = apps.get_model("models", "GraphModel")
 
-        for graph in GraphModel.objects.all():
-            graph.publicationid = None
-            graph.save()
+    #     for graph in GraphModel.objects.all():
+    #         graph_publications = GraphPublication.objects.filter(graph=graph)  # filtering for silent failure
+
+    #         if len(graph_publications):
+    #             graph.publication = graph_publications[0]
+    #             graph.save()
+
+
+    # def reverse_add_graph_column_data(apps, schema_editor):
+    #     GraphModel = apps.get_model("models", "GraphModel")
+
+    #     for graph in GraphModel.objects.all():
+    #         graph.publicationid = None
+    #         graph.save()
 
 
     operations = [
@@ -73,7 +73,7 @@ class Migration(migrations.Migration):
                 'managed': True,
             },
         ),
-        migrations.RunPython(forwards_add_graph_transactions_table_data, reverse_add_graph_transactions_table_data),
+        # migrations.RunPython(forwards_add_graph_transactions_table_data, reverse_add_graph_transactions_table_data),
         migrations.AddField(
             model_name="graphmodel",
             name="publication",
@@ -81,7 +81,7 @@ class Migration(migrations.Migration):
                 to="models.GraphPublication", db_column="publicationid", null=True, on_delete=models.SET_NULL
             ),
         ),
-        migrations.RunPython(forwards_add_graph_column_data, reverse_add_graph_column_data),
+        # migrations.RunPython(forwards_add_graph_column_data, reverse_add_graph_column_data),
         migrations.AlterField(
             model_name='graphmodel',
             name='isactive',
