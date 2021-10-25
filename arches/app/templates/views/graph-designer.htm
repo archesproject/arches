@@ -58,6 +58,20 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
         </h4>
 
         <div class="graph-settings-crud">
+            <!-- ko if: $data.isGraphPublished() -->
+            <span>
+                <button
+                    style="padding: 1px 12px;"
+                    class="btn btn-sm btn-danger btn-labeled fa fa-exclamation" 
+                    data-bind="click: $data.unpublishGraph"
+                >{% trans "Unpublish Graph" %}</button>
+            </span>
+            <!-- /ko -->
+            <!-- ko ifnot: $data.isGraphPublished() -->
+            <span>
+                <button class="btn btn-sm btn-primary btn-labeled fa fa-check" data-bind="click: $data.publishGraph">{% trans "Publish Graph" %}</button>
+            </span>
+            <!-- /ko -->
 
             <span data-bind="visible: graphSettingsVisible()" style="display: none;">
                 <!-- ko if: graphSettingsViewModel.dirty() -->
@@ -92,32 +106,6 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                 <!-- /ko -->
             </span>
             <!-- /ko -->
-
-
-
-
-
-            <div style="display:none" data-bind="text: console.log($data)"></div>
-
-
-
-            <span>
-                <!-- ko if: $data.isGraphPublished() -->
-                <button
-                    style="padding: 1px 12px;"
-                    class="btn btn-sm btn-danger btn-labeled fa fa-exclamation" 
-                    data-bind="click: $data.unpublishGraph"
-                >{% trans "Unpublish Graph" %}</button>
-                <!-- /ko -->
-                <!-- ko ifnot: $data.isGraphPublished() -->
-                <button class="btn btn-sm btn-primary btn-labeled fa fa-check" data-bind="click: function(){  }">{% trans "Publish Graph" %}</button>
-                <!-- /ko -->
-            </span>
-
-
-
-
-
 
             <a class="btn btn-md btn-mint btn-labeled fa fa-mail-reply back-to-designer" data-bind="
                 attr: {

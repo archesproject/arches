@@ -65,7 +65,10 @@ define([
                     var graphs = response.graphs.sort(function(a,b) {
                         return a.name.toLowerCase() > b.name.toLowerCase() ? 1 : -1;});
                     _.each(graphs, function(graph) {
-                        if (graph.isresource && graph.publication) {
+                        if (
+                            graph.isresource 
+                            // && graph.publication
+                        ) {
                             var graphCards = _.filter(response.cards, function(card) {
                                 return card.graph_id === graph.graphid && card.nodes.length > 0;
                             });
