@@ -42,16 +42,16 @@ define(['knockout', 'underscore', 'viewmodels/widget', 'arches', 'bindings/ckedi
             });
 
             self.strippedValue();
-            self.currentText.subscribe(x => {
+            self.currentText.subscribe(newValue => {
                 const currentLanguage = self.currentLanguage();
                 if(!currentLanguage) { return; }
-                currentValue[currentLanguage.code].value = x;
+                currentValue[currentLanguage.code].value = newValue;
                 self.value(currentValue);
             });
-            self.currentDirection.subscribe(x => {
+            self.currentDirection.subscribe(newValue => {
                 const currentLanguage = self.currentLanguage();
                 if(!currentLanguage) { return; }
-                currentValue[currentLanguage.code].direction = x;
+                currentValue[currentLanguage.code].direction = newValue;
                 self.value(currentValue);
             })
 

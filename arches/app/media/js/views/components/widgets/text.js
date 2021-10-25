@@ -35,6 +35,7 @@ define(['knockout', 'underscore', 'viewmodels/widget', 'arches', 'bindings/chose
 
             const init = async() => {
                 const languages = arches.languages;
+
                 const currentLanguage = languages?.find(element => element.code == arches.defaultLanguage);
                 self.languages(languages);
                 self.currentLanguage(currentLanguage);
@@ -55,24 +56,24 @@ define(['knockout', 'underscore', 'viewmodels/widget', 'arches', 'bindings/chose
                 return ko.unwrap(self.disabled) || ko.unwrap(self.uneditable); 
             }, self);
 
-            self.currentText.subscribe(x => {
+            self.currentText.subscribe(newValue => {
                 const currentLanguage = self.currentLanguage();
                 if(!currentLanguage) { return; }
-                currentValue[currentLanguage.code].value = x;
+                currentValue[currentLanguage.code].value = newValue;
                 self.value(currentValue);
             });
 
-            self.currentDirection.subscribe(x => {
+            self.currentDirection.subscribe(newValue => {
                 const currentLanguage = self.currentLanguage();
                 if(!currentLanguage) { return; }
                 if(!currentValue?.[currentLanguage.code]){
                     currentValue[currentLanguage.code] = {}
                 }
-                currentValue[currentLanguage.code].direction = x;
+                currentValue[currentLanguage.code].direction = newValue;
                 self.value(currentValue);
             })
 
-            self.currentLanguage.subscribe(x => {
+            self.currentLanguage.subscribe(() => {
                 if(!self.currentLanguage()){ return; }
                 const currentLanguage = self.currentLanguage();
                 if(!currentValue?.[currentLanguage.code]) {
