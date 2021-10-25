@@ -83,7 +83,8 @@ define([
                     url: arches.urls.publish_graph(viewModel.graph.graphid()),
                     complete: function(response, status) {
                         console.log(response)
-                        // viewModel.loading(false);
+                        viewModel.isGraphPublished(true);
+                        viewModel.loading(false);
                         // window.location.reload();
 
                         // if (status === 'success') {
@@ -102,7 +103,9 @@ define([
                     url: arches.urls.unpublish_graph(viewModel.graph.graphid()),
                     complete: function(response, status) {
                         console.log(response)
-                        // viewModel.loading(false);
+                        viewModel.isGraphPublished(false);
+
+                        viewModel.loading(false);
                         // window.location.reload();
                         // if (status === 'success') {
                         //     window.location = arches.urls.graph;

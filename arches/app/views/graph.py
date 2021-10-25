@@ -448,15 +448,14 @@ class GraphPublicationView(View):
     action = None
 
     def post(self, request, graphid):
-        graph = models.GraphModel.objects.get(pk=graphid)
+        graph = Graph.objects.get(pk=graphid)
 
         if self.action == 'publish':
-            print("!!!!!!")
+            graph.publish()
         elif self.action == 'unpublish':
-            print("!!!!!!")
+            graph.unpublish()
 
-        import pdb; pdb.set_trace()
-
+        return JSONResponse(graph)
 
 @method_decorator(group_required("Graph Editor"), name="dispatch")
 class CardView(GraphBaseView):
