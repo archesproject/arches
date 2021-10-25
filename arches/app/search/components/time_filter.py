@@ -110,7 +110,11 @@ class TimeFilter(BaseSearchFilter):
     def view_data(self):
         ret = {}
         date_datatypes = ["date", "edtf"]
-        date_nodes = models.Node.objects.filter(datatype__in=date_datatypes, graph__isresource=True, graph__publication=True).prefetch_related(
+        date_nodes = models.Node.objects.filter(
+            datatype__in=date_datatypes, 
+            graph__isresource=True, 
+            # graph__publication=True
+        ).prefetch_related(
             "nodegroup"
         )
         node_graph_dict = {

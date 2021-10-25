@@ -1520,6 +1520,17 @@ class Graph(models.GraphModel):
                 raise GraphValidationError(_("Another resource modal already uses the slug '{self.slug}'").format(**locals()), 1007)
 
 
+    def publish(self):
+        """
+        """
+
+
+    def unpublish(self):
+        """
+        """
+        self.publication = None
+
+
 class GraphValidationError(Exception):
     def __init__(self, message, code=None):
         self.title = _("Graph Validation Error")
