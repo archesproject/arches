@@ -1,4 +1,4 @@
-define(['knockout'], function (ko) {
+define(['knockout', 'arches'], function (ko, arches) {
     var name = 'string-datatype-config';
     ko.components.register(name, {
         viewModel: function(params) {
@@ -7,10 +7,14 @@ define(['knockout'], function (ko) {
             if (this.search) {
                 var filter = params.filterValue();
                 this.op = ko.observable(filter.op || '~');
+                this.languages = ko.observableArray();
+                this.languages(arches.languages);
+                this.language = ko.observable();
                 this.searchValue = ko.observable(filter.val || '');
                 this.filterValue = ko.computed(function () {
                     return {
                         op: self.op(),
+                        lang: self.language()?.code,
                         val: self.searchValue()
                     }
                 }).extend({ throttle: 750 });

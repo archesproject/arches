@@ -11,6 +11,8 @@ import time
 from distutils import util
 from datetime import datetime
 from mimetypes import MimeTypes
+
+from django.db.models import fields
 from arches.app.datatypes.base import BaseDataType
 from arches.app.models import models
 from arches.app.models.system_settings import settings
@@ -141,7 +143,11 @@ class StringDataType(BaseDataType):
                 self.append_null_search_filters(value, node, query, request)
             elif value["val"] != "":
                 match_type = "phrase_prefix" if "~" in value["op"] else "phrase"
-                match_query = Match(field="tiles.data.%s" % (str(node.pk)), query=value["val"], type=match_type)
+                if value["lang"]:
+                    match_query = Match(field="tiles.data.%s.%s.value" % (str(node.pk), value["lang"]), query=value["val"], type=match_type)
+                else:
+                    match_query = Match(field="tiles.data.%s" % (str(node.pk)), query=value["val"], type=match_type)
+
                 if "!" in value["op"]:
                     query.must_not(match_query)
                     query.filter(Exists(field="tiles.data.%s" % (str(node.pk))))
