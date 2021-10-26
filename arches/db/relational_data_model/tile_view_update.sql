@@ -23,7 +23,6 @@ create or replace function __arches_tile_view_update() returns trigger as $$
                     parenttileid = parent_id,
                     resourceinstanceid = new.resourceinstanceid
                 where tileid = new.tileid;
-                return new;
             elsif (TG_OP = 'INSERT') then
                 if tile_id is null then
                     tile_id = public.uuid_generate_v1mc();
@@ -41,8 +40,9 @@ create or replace function __arches_tile_view_update() returns trigger as $$
                     parent_id,
                     new.resourceinstanceid
                 );
-                return new;
             end if;
+            perform refresh_tile_geojson_geometries(tile_id);
+            return new;
         end if;
     end;
 $$ language plpgsql;

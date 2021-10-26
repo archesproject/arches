@@ -8,6 +8,8 @@ declare
     query text;
     result jsonb;
     geom geometry;
+    geometry_type text;
+    geometry_query text;
     node_datatype text;
     tiledata jsonb = '{}'::jsonb;
 begin
@@ -31,6 +33,30 @@ begin
         from nodes where nodeid = column_info.description::uuid;
         if node_datatype = 'geojson-feature-collection' then
             query = format(
+                'select st_geometrytype(
+                    ($1::text::%s.%s).%s
+                )',
+                schema_name,
+                view_name,
+                column_info.column_name
+            );
+            execute query into geometry_type using view_row;
+            if geometry_type = 'ST_GeometryCollection' or geometry_type like 'ST_Multi%' then
+                geometry_query = E'from (
+                    select st_asgeojson(
+                        st_dump(
+                            ($1::text::%s. %s).%s
+                        )
+                    )::json->\'geometry\' as geom
+                ) as g';
+            else
+                geometry_query = 'from (
+                    select st_asgeojson(
+                        ($1::text::%s. %s).%s
+                    ) as geom
+                ) as g';
+            end if;
+            query = format(
                 E'select json_build_object(
                         \'type\',
                         \'FeatureCollection\',
@@ -40,21 +66,12 @@ begin
                                 \'type\',
                                 \'Feature\',
                                 \'geometry\',
-                                g.geom,
+                                g.geom::json,
                                 \'properties\',
                                 json_build_object()
                             )
                         )
-                    )
-                from (
-                    select json_array_elements(
-                        (
-                            st_asgeojson(
-                                ($1::text::%s. %s).%s
-                            )::jsonb ->> \'geometries\'
-                        )::json
-                    ) as geom
-                ) as g',
+                    )' || geometry_query,
                 schema_name,
                 view_name,
                 column_info.column_name
