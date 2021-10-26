@@ -35,7 +35,6 @@ class Migration(migrations.Migration):
     """.format(
         settings.LANGUAGE_CODE
     )
-    
 
     reverse_sql = """
         UPDATE nodes
