@@ -174,6 +174,10 @@ BYPASS_REQUIRED_VALUE_TILE_VALIDATION = False
 
 DATE_IMPORT_EXPORT_FORMAT = "%Y-%m-%d" # Custom date format for dates imported from and exported to csv
 
+# This is used to indicate whether the data in the CSV and SHP exports should be
+# ordered as seen in the resource cards or not.
+EXPORT_DATA_FIELDS_IN_CARD_ORDER = False
+
 #Identify the usernames and duration (seconds) for which you want to cache the time wheel
 CACHE_BY_USER = {'anonymous': 3600 * 24}
 TILE_CACHE_TIMEOUT = 600 #seconds
@@ -240,6 +244,10 @@ ACCESSIBILITY_MODE = False
 # By setting RESTRICT_MEDIA_ACCESS to True, media file requests outside of Arches will checked against nodegroup permissions.
 RESTRICT_MEDIA_ACCESS = False
 
+# By setting RESTRICT_CELERY_EXPORT_FOR_ANONYMOUS_USER to True, if the user is attempting
+# to export search results above the SEARCH_EXPORT_IMMEDIATE_DOWNLOAD_THRESHOLD
+# value and is not signed in with a user account then the request will not be allowed.
+RESTRICT_CELERY_EXPORT_FOR_ANONYMOUS_USER = False
 
 # see https://docs.djangoproject.com/en/1.9/topics/i18n/translation/#how-django-discovers-language-preference
 # to see how LocaleMiddleware tries to determine the user's language preference
