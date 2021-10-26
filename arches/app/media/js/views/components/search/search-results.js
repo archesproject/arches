@@ -227,6 +227,22 @@ function($, _, BaseFilter, bootstrap, arches, select2, ko, koMapping, GraphModel
             zoomToFeature: function(evt){
                 var data = $(evt.currentTarget).data();
                 this.trigger('find_on_map', data.resourceid, data);
+            },
+
+            getLocalizedText: function(data){
+                var d = data.find(function(element){
+                    return arches.defaultLanguage == element.language;
+                });
+                if(!!d && d["value"] !== ""){
+                    return d["value"];
+                }else{
+                    let ret = data.filter(function(entry){
+                        return !!entry["value"];
+                    }).map(function(entry){
+                        return entry["value"];
+                    });
+                    return ret.join(",");
+                }
             }
         }),
         template: { require: 'text!templates/views/components/search/search-results.htm' }
