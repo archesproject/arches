@@ -12,17 +12,25 @@ class Migration(migrations.Migration):
 
     sql = """
         UPDATE public.nodes
-        SET config = jsonb_set(jsonb_set(config, '{{trueLabel}}', json_build_object('{0}', config->>'trueLabel')::jsonb, true), '{{falseLabel}}', json_build_object('{0}', config->>'falseLabel')::jsonb, true) ||
-        '{{"i18n_properties": ["trueLabel", "falseLabel"]}}'
+        SET config = 
+            jsonb_set(jsonb_set(config, '{{trueLabel}}', 
+            json_build_object('{0}', config->>'trueLabel')::jsonb, true), '{{falseLabel}}', 
+            json_build_object('{0}', config->>'falseLabel')::jsonb, true) ||
+            '{{"i18n_properties": ["trueLabel", "falseLabel"]}}'
         WHERE datatype = 'boolean';
 
         UPDATE widgets
-        SET defaultconfig = defaultconfig || json_build_object('subtitle', jsonb_build_object('{0}', jsonb_extract_path(defaultconfig, 'subtitle')))::jsonb
+        SET defaultconfig = 
+            defaultconfig || 
+            json_build_object('subtitle', jsonb_build_object('{0}', jsonb_extract_path(defaultconfig, 'subtitle')))::jsonb
         WHERE datatype = 'boolean' AND defaultconfig ? 'subtitle';
 
         UPDATE public.d_data_types
-        SET defaultconfig = jsonb_set(jsonb_set(defaultconfig, '{{trueLabel}}', json_build_object('{0}', defaultconfig->>'trueLabel')::jsonb, true), '{{falseLabel}}', json_build_object('{0}', defaultconfig->>'falseLabel')::jsonb, true) ||
-        '{{"i18n_properties": ["trueLabel", "falseLabel"]}}'
+        SET defaultconfig = 
+            jsonb_set(jsonb_set(defaultconfig, '{{trueLabel}}', 
+            json_build_object('{0}', defaultconfig->>'trueLabel')::jsonb, true), '{{falseLabel}}', 
+            json_build_object('{0}', defaultconfig->>'falseLabel')::jsonb, true) ||
+            '{{"i18n_properties": ["trueLabel", "falseLabel"]}}'
         WHERE datatype = 'boolean';
     """.format(
         settings.LANGUAGE_CODE
@@ -31,15 +39,23 @@ class Migration(migrations.Migration):
 
     reverse_sql = """
         UPDATE nodes
-        SET config = config - 'i18n_properties' || json_build_object('trueLabel', jsonb_extract_path(config, 'trueLabel', '{0}'))::jsonb || json_build_object('falseLabel', jsonb_extract_path(config, 'falseLabel', '{0}'))::jsonb
+        SET config = 
+            config - 'i18n_properties' || 
+            json_build_object('trueLabel', jsonb_extract_path(config, 'trueLabel', '{0}'))::jsonb || 
+            json_build_object('falseLabel', jsonb_extract_path(config, 'falseLabel', '{0}'))::jsonb
         WHERE datatype = 'boolean';
 
         UPDATE widgets
-        SET defaultconfig = defaultconfig || json_build_object('subtitle', jsonb_extract_path(defaultconfig, 'subtitle', '{0}'))::jsonb
+        SET defaultconfig = 
+            defaultconfig || 
+            json_build_object('subtitle', jsonb_extract_path(defaultconfig, 'subtitle', '{0}'))::jsonb
         WHERE datatype = 'boolean' AND defaultconfig ? 'subtitle';
 
         UPDATE public.d_data_types
-        SET defaultconfig = defaultconfig - 'i18n_properties' || json_build_object('trueLabel', jsonb_extract_path(defaultconfig, 'trueLabel', '{0}'))::jsonb || json_build_object('falseLabel', jsonb_extract_path(defaultconfig, 'falseLabel', '{0}'))::jsonb
+        SET defaultconfig = 
+            defaultconfig - 'i18n_properties' || 
+            json_build_object('trueLabel', jsonb_extract_path(defaultconfig, 'trueLabel', '{0}'))::jsonb || 
+            json_build_object('falseLabel', jsonb_extract_path(defaultconfig, 'falseLabel', '{0}'))::jsonb
         WHERE datatype = 'boolean';
 
     """.format(
