@@ -44,7 +44,9 @@ define([
                 if(typeof descriptors.displayname == "string"){
                     displayname(descriptors.displayname);
                 } else {
-                    displayname(descriptors.displayname.find(displayname => displayname.language == arches.defaultLanguage)?.value);
+                    const defaultLanguageValue = descriptors.displayname.find(displayname => displayname.language == arches.defaultLanguage)?.value;
+                    const displayNameValue = defaultLanguageValue ? defaultLanguageValue : "(" + descriptors.displayname.filter(descriptor => descriptor.language != arches.defaultLanguage)?.[0]?.value + ")"
+                    displayname(displayNameValue);
                 }
             }
         );

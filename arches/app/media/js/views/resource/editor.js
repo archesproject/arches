@@ -35,7 +35,15 @@ define([
             parsedDisplayName = JSON.parse(data.displayname)
         }
     } catch(e){}
-    const displayname = parsedDisplayName ? ko.observable(JSON.parse(data.displayname)?.[arches.defaultLanguage]?.value) : ko.observable(data.displayname) ;
+
+    let displayNameValue = undefined;
+    if(parsedDisplayName){
+        const defaultLanguageValue = parsedDisplayName?.[arches.defaultLanguage]?.value;
+        displayNameValue = defaultLanguageValue ? defaultLanguageValue : "(" + parsedDisplayName[Object.keys(parsedDisplayName).filter(languageKey => languageKey != arches.defaultLanguage)?.[0]]?.value + ")";
+    } else {
+        displayNameValue = data.displayname;
+    }
+    const displayname = ko.observable(displayNameValue);
     var resourceId = ko.observable(data.resourceid);
     var appliedFunctions = ko.observable(data['appliedFunctions']);
     var userIsCreator = data['useriscreator'];
