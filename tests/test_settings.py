@@ -85,7 +85,7 @@ OVERRIDE_RESOURCE_MODEL_LOCK = True
 
 # Tell nose to measure coverage on the 'foo' and 'bar' apps
 NOSE_ARGS = ["--with-coverage", "--nologcapture", "--cover-package=arches", "--verbosity=1", "--cover-erase"]
-#NOSE_ARGS = ["-s"]
+# NOSE_ARGS = ["-s"]
 
 INSTALLED_APPS = INSTALLED_APPS + ("django_nose",)
 
