@@ -677,50 +677,8 @@ class Resources(APIBase):
 
         return JSONResponse(out, indent=indent)
 
-    # def put(self, request, resourceid):
-    #     try:
-    #         indent = int(request.POST.get('indent', None))
-    #     except:
-    #         indent = None
-
-    #     try:
-    #         if user_can_edit_resource(user=request.user):
-    #             data = JSONDeserializer().deserialize(request.body)
-    #             reader = JsonLdReader()
-    #             reader.read_resource(data, use_ids=True)
-    #             if reader.errors:
-    #                 response = []
-    #                 for value in reader.errors.itervalues():
-    #                     response.append(value.message)
-    #                 return JSONResponse(data, indent=indent, status=400, reason=response)
-    #             else:
-    #                 response = []
-    #                 for resource in reader.resources:
-    #                     if resourceid != str(resource.pk):
-    #                         raise Exception(
-    #                             'Resource id in the URI does not match the resource @id supplied in the document')
-    #                     old_resource = Resource.objects.get(pk=resource.pk)
-    #                     old_resource.load_tiles()
-    #                     old_tile_ids = set([str(tile.pk) for tile in old_resource.tiles])
-    #                     new_tile_ids = set([str(tile.pk) for tile in resource.get_flattened_tiles()])
-    #                     tileids_to_delete = old_tile_ids.difference(new_tile_ids)
-    #                     tiles_to_delete = models.TileModel.objects.filter(pk__in=tileids_to_delete)
-    #                     with transaction.atomic():
-    #                         tiles_to_delete.delete()
-    #                         resource.save(request=request)
-    #                     response.append(JSONDeserializer().deserialize(
-    #                         self.get(request, resource.resourceinstanceid).content))
-    #                 return JSONResponse(response, indent=indent)
-    #         else:
-    #             return JSONResponse(status=403)
-    #     except Exception as e:
-    #         return JSONResponse(status=500, reason=e)
-
     def put(self, request, resourceid, slug=None, graphid=None):
-        try:
-            indent = int(request.PUT.get("indent", None))
-        except Exception:
-            indent = None
+        indent = request.GET.get("indent", None)
 
         if not user_can_edit_resource(user=request.user, resourceid=resourceid):
             return JSONResponse(status=403)
@@ -758,10 +716,7 @@ class Resources(APIBase):
                     return JSONResponse({"error": "resource data could not be saved"}, status=500, reason=e)
 
     def post(self, request, resourceid=None, slug=None, graphid=None):
-        try:
-            indent = int(request.POST.get("indent", None))
-        except Exception:
-            indent = None
+        indent = request.POST.get("indent", None)
 
         try:
             if user_can_edit_resource(user=request.user, resourceid=resourceid):
