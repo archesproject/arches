@@ -84,7 +84,7 @@ class I18n_String(object):
     def serialize(self):
         return str(self)
 
-    # Use this to call all the sting methods on our class so 
+    # Use this to call all the sting methods on our class so
     # this class can emulate the "string" type
     def __getattr__(self, name):
         string_methods = [
@@ -233,7 +233,7 @@ class I18n_JSON(object):
 
     # adding this so that we can treat it like a dict object
     def __getitem__(self, item):
-        return self.raw_value[item] 
+        return self.raw_value[item]
 
     def __setitem__(self, item, value):
         self.raw_value[item] = value
@@ -241,27 +241,15 @@ class I18n_JSON(object):
     def __iter__(self):
         return self.raw_value.__iter__()
 
-    # Use this to call all the sting methods on our class so 
+    # Use this to call all the sting methods on our class so
     # this class can emulate the "string" type
     # see https://docs.python.org/3/reference/datamodel.html?emulating-container-types#emulating-container-types
     def __getattr__(self, name):
-        mapping_methods = [
-            "keys",
-            "values",
-            "items",
-            "get",
-            "clear",
-            "setdefault",
-            "pop",
-            "popitem",
-            "copy",
-            "update"
-        ]
+        mapping_methods = ["keys", "values", "items", "get", "clear", "setdefault", "pop", "popitem", "copy", "update"]
         if name in mapping_methods:
             return getattr(self.raw_value, name)
         else:
             return super().__getattr__(name)
-
 
     def serialize(self):
         ret = copy.deepcopy(self.raw_value)
@@ -280,7 +268,7 @@ class I18n_JSONField(JSONField):
     def from_db_value(self, value, expression, connection):
         if value is not None:
             return I18n_JSON(value)
-        return I18n_JSON('{}')
+        return I18n_JSON("{}")
 
     def to_python(self, value):
         if isinstance(value, I18n_JSON):
