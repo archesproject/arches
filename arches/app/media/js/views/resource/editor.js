@@ -31,7 +31,9 @@ define([
     var scrollTo = ko.observable();
     let parsedDisplayName = undefined;
     try { 
-        parsedDisplayName = JSON.parse(data.displayname)
+        if(typeof data.displayname == 'string') {
+            parsedDisplayName = JSON.parse(data.displayname)
+        }
     } catch(e){}
     const displayname = parsedDisplayName ? ko.observable(JSON.parse(data.displayname)?.[arches.defaultLanguage]?.value) : ko.observable(data.displayname) ;
     var resourceId = ko.observable(data.resourceid);

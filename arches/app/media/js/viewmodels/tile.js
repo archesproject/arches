@@ -41,7 +41,11 @@ define([
         $.get(
             arches.urls.resource_descriptors + resourceId(),
             function(descriptors) {
-                displayname(descriptors.displayname);
+                if(typeof descriptors.displayname == "string"){
+                    displayname(descriptors.displayname);
+                } else {
+                    displayname(descriptors.displayname.find(displayname => displayname.language == arches.defaultLanguage)?.value);
+                }
             }
         );
     };
