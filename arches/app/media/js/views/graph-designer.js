@@ -94,8 +94,7 @@ define([
                 modalBackground.style.visibility = 'hidden';
             };
             viewModel.displayUnpublishWarning = function() {
-                viewModel.alert(new AlertViewModel('ep-alert-red', 'Unpublish the graph?', 'This will make the graph inaccessible to other users.', function() {}, viewModel.unpublishGraph))
-
+                viewModel.alert(new AlertViewModel('ep-alert-red', 'Unpublish the graph?', 'This will make the graph inaccessible to other users.', function() {}, viewModel.unpublishGraph));
             };
             viewModel.publishGraph = function() {
                 viewModel.loading(true);
@@ -105,11 +104,19 @@ define([
                     data: JSON.stringify({'notes': viewModel.graphPublicationNotes()}),
                     url: arches.urls.publish_graph(viewModel.graph.graphid()),
                     complete: function(response, status) {
-                        viewModel.isGraphPublished(true);
-                        viewModel.graphPublicationNotes(null);
-                        viewModel.closeModal();
-                        viewModel.alert(new AlertViewModel('ep-alert-blue', response.responseJSON.title, response.responseJSON.message));
-                        viewModel.loading(false);
+                        if (status === 'success') {
+                            viewModel.isGraphPublished(true);
+                            viewModel.graphPublicationNotes(null);
+                            viewModel.closeModal();
+                            viewModel.alert(new AlertViewModel('ep-alert-blue', response.responseJSON.title, response.responseJSON.message));
+                            viewModel.loading(false);
+                        }
+                        else {
+                            viewModel.graphPublicationNotes(null);
+                            viewModel.closeModal();
+                            viewModel.alert(new JsonErrorAlertViewModel('ep-alert-red', response.responseJSON));
+                            viewModel.loading(false);
+                        }
                     }
                 });
             };
@@ -120,9 +127,16 @@ define([
                     type: "POST",
                     url: arches.urls.unpublish_graph(viewModel.graph.graphid()),
                     complete: function(response, status) {
-                        viewModel.isGraphPublished(false);
-                        viewModel.closeModal();
-                        viewModel.loading(false);
+                        if (status === 'success') {
+                            viewModel.isGraphPublished(false);
+                            viewModel.closeModal();
+                            viewModel.loading(false);
+                        }
+                        else {
+                            viewModel.closeModal();
+                            viewModel.alert(new JsonErrorAlertViewModel('ep-alert-red', response.responseJSON));
+                            viewModel.loading(false);
+                        }
                     }
                 });
             };

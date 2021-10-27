@@ -1519,7 +1519,6 @@ class Graph(models.GraphModel):
             if graphs_with_matching_slug.exists() and graphs_with_matching_slug[0].graphid != self.graphid:
                 raise GraphValidationError(_("Another resource modal already uses the slug '{self.slug}'").format(**locals()), 1007)
 
-
     def publish(self, notes=None):
         """
         Adds a row to the GraphPublication table
