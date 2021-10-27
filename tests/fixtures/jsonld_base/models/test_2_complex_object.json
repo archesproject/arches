@@ -573,7 +573,6 @@
             "graphid": "ee72fb1e-fa6c-11e9-b369-3af9d3b32b71",
             "iconclass": "",
             "is_editable": false,
-            "isactive": true,
             "isresource": true,
             "jsonldcontext": null,
             "name": "Test Complex Export",

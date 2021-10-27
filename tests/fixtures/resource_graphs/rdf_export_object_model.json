@@ -503,7 +503,6 @@
             "graphid": "c35fe0a1-df30-11e8-b280-a4d18cec433a", 
             "iconclass": "", 
             "is_editable": false, 
-            "isactive": true, 
             "isresource": true, 
             "jsonldcontext": "https://linked.art/ns/v1/linked-art.json", 
             "name": "Import Test - Object", 

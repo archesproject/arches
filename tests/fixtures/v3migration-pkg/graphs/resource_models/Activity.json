@@ -8870,7 +8870,6 @@
             "graphid": "243f8689-b8f6-11e6-84a5-026d961c88e6",
             "iconclass": "fa fa-tasks",
             "is_editable": false,
-            "isactive": true,
             "isresource": true,
             "jsonldcontext": null,
             "name": "Activity",

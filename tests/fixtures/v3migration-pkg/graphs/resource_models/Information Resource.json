@@ -10940,7 +10940,6 @@
             "graphid": "3caf329f-b8f7-11e6-84a5-026d961c88e6",
             "iconclass": "fa fa-file-text-o",
             "is_editable": false,
-            "isactive": true,
             "isresource": true,
             "jsonldcontext": null,
             "name": "Information Resource",
