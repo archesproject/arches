@@ -1530,10 +1530,9 @@ class Graph(models.GraphModel):
             notes=notes,
         )
         publication.save()
-        
+
         self.publication = publication
         self.save()
-
 
     def unpublish(self):
         """
@@ -1541,6 +1540,7 @@ class Graph(models.GraphModel):
         """
         self.publication = None
         self.save()
+
 
 class GraphValidationError(Exception):
     def __init__(self, message, code=None):

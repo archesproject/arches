@@ -394,9 +394,7 @@ class GraphModel(models.Model):
     )
     config = JSONField(db_column="config", default=dict)
     slug = models.TextField(validators=[validate_slug], unique=True, null=True)
-    publication = models.ForeignKey(
-        "GraphPublication", db_column="publicationid", null=True, on_delete=models.SET_NULL
-    )
+    publication = models.ForeignKey("GraphPublication", db_column="publicationid", null=True, on_delete=models.SET_NULL)
 
     @property
     def disable_instance_creation(self):
