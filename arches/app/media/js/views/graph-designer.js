@@ -86,11 +86,11 @@ define([
             };
 
             viewModel.openPublishModal = function() {
-                const modalBackground = document.querySelector('.modal-background');
+                const modalBackground = window.document.querySelector('.modal-background');
                 modalBackground.style.visibility = 'visible';
             };
             viewModel.closeModal = function() {
-                const modalBackground = document.querySelector('.modal-background');
+                const modalBackground = window.document.querySelector('.modal-background');
                 modalBackground.style.visibility = 'hidden';
             };
             viewModel.displayUnpublishWarning = function() {
