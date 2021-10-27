@@ -74,7 +74,17 @@ define([
                 window.open(arches.urls.export_mapping_file(viewModel.graph.graphid()), '_blank');
             };
 
+            viewModel.openUnpublishModal = function() {
 
+            };
+            viewModel.openPublishModal = function() {
+                const modalBackground = document.querySelector('.modal-background');
+                modalBackground.style.visibility = 'visible';
+            };
+            viewModel.closeModal = function() {
+                const modalBackground = document.querySelector('.modal-background');
+                modalBackground.style.visibility = 'hidden';
+            };
             viewModel.publishGraph = function() {
                 viewModel.loading(true);
 
@@ -115,6 +125,7 @@ define([
                     }
                 });
             };
+
             viewModel.deleteGraph = function() {
                 viewModel.alert(new AlertViewModel('ep-alert-red', arches.confirmGraphDelete.title, arches.confirmGraphDelete.text, function() {
                     return;

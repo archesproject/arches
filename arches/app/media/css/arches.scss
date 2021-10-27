@@ -4105,6 +4105,29 @@ div.dropdown-menu.open {
     stroke-width: 3px;
 }
 
+.modal-background {
+    position: fixed;
+    background-color: rgba(200, 200, 200, 0.75);
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    z-index: 999;
+    visibility: hidden;
+    transition: all 0.3s;
+    cursor: pointer;
+}
+
+.modal-content-container {
+    cursor: default;
+    background-color: #fff;
+    margin: 15% auto;
+    padding: 12px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    width: 70%;
+}
+
 .loading-mask {
     position: fixed;
     opacity: .75;

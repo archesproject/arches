@@ -36,6 +36,65 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 {% endblock graph_title %}
 
 {% block main_content %}
+<div class="modal-background" data-bind="click: $data.closeModal, clickBubble: false,">
+    <div class="modal-content-container" data-bind="click: function(){}, clickBubble: false,">
+        <div 
+            style="
+                display: flex;
+                flex-direction: column;
+                justify-content: center;
+                align-items: center;
+            "
+        >
+            <h4
+                style="margin-bottom: 12px;"
+            >{% trans "Publish the graph?" %}</h4>
+
+            <label 
+                style="align-self: flex-start;"
+                class="control-label" 
+                for="publication_notes"
+            >{% trans "Notes:" %}</label>
+            <textarea 
+                style="margin-bottom: 12px;"
+                class="form-control textarea textarea-resizable" 
+                rows="2" 
+                type="text" 
+                name="publication_notes"
+            ></textarea>
+
+            <!-- ko if: $data.isGraphPublished() -->
+            <span
+                style="
+                    align-self: flex-end;
+                "
+            >
+                <button
+                    style="transition: none;"
+                    class="btn btn-sm btn-danger btn-labeled fa fa-exclamation" 
+                    data-bind="click: $data.unpublishGraph"
+                >{% trans "Unpublish Graph" %}</button>
+            </span>
+            <!-- /ko -->
+            <!-- ko ifnot: $data.isGraphPublished() -->
+                <!-- ko if: (
+                    !$data.dirty()
+                    && !graphSettingsViewModel.dirty() 
+                    && !(selectedNode() && selectedNode().dirty() && selectedNode().istopnode == false)
+                    && !( ko.unwrap(cardTree.selection).model ? ko.unwrap(cardTree.selection).model : ko.unwrap(cardTree.selection).card ).dirty()
+                )  -->
+                <span
+                    style="
+                        align-self: flex-end;
+                    "
+                >
+                    <button style="transition: none;" class="btn btn-sm btn-primary btn-labeled fa fa-check" data-bind="click: $data.publishGraph">{% trans "Publish Graph" %}</button>
+                </span>
+                <!-- /ko -->
+            <!-- /ko -->
+        </div>
+    </div>
+</div>
 <div class="content-panel">
     <!-- Title Block -->
     <div class="ep-form-toolbar">
@@ -105,7 +164,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                 <button
                     style="padding: 1px 12px;"
                     class="btn btn-sm btn-danger btn-labeled fa fa-exclamation" 
-                    data-bind="click: $data.unpublishGraph"
+                    data-bind="click: $data.openUnpublishModal"
                 >{% trans "Unpublish Graph" %}</button>
             </span>
             <!-- /ko -->
@@ -117,7 +176,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                     && !( ko.unwrap(cardTree.selection).model ? ko.unwrap(cardTree.selection).model : ko.unwrap(cardTree.selection).card ).dirty()
                 )  -->
                 <span>
-                    <button class="btn btn-sm btn-primary btn-labeled fa fa-check" data-bind="click: $data.publishGraph">{% trans "Publish Graph" %}</button>
+                    <button class="btn btn-sm btn-primary btn-labeled fa fa-check" data-bind="click: $data.openPublishModal">{% trans "Publish Graph" %}</button>
                 </span>
                 <!-- /ko -->
             <!-- /ko -->
