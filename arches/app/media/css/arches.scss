@@ -4120,9 +4120,10 @@ div.dropdown-menu.open {
 
 .modal-content-container {
     cursor: default;
-    background-color: #fff;
+    background-color: #fafafa;
     margin: 15% auto;
-    padding: 12px;
+    max-width: 600px;
+    padding: 18px;
     border: 1px solid #ddd;
     border-radius: 5px;
     width: 70%;

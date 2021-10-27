@@ -46,49 +46,46 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                 align-items: center;
             "
         >
-            <h4
-                style="margin-bottom: 12px;"
-            >{% trans "Publish the graph?" %}</h4>
+            <div style="display: flex;">
+                <h4>
+                    {% trans "Resource:" %}
+                </h4>
+                <h4
+                    style="padding-left: 8px;"
+                    data-bind='text: $data.graph.name()'
+                ></h4>
+            </div>
 
-            <label 
-                style="align-self: flex-start;"
-                class="control-label" 
-                for="publication_notes"
-            >{% trans "Notes:" %}</label>
-            <textarea 
-                style="margin-bottom: 12px;"
-                class="form-control textarea textarea-resizable" 
-                rows="2" 
-                type="text" 
-                name="publication_notes"
-            ></textarea>
+            <h5 style="color: red; padding: 0 50px;">{% trans "Warning! This will save the graph in its current state and make the Resource accessible to permissioned users." %}</h5>
 
-            <!-- ko if: $data.isGraphPublished() -->
-            <span
+            <div
                 style="
-                    align-self: flex-end;
+                    width: 100%;
+                    padding-top: 5px;
                 "
             >
-                <button
-                    style="transition: none;"
-                    class="btn btn-sm btn-danger btn-labeled fa fa-exclamation" 
-                    data-bind="click: $data.unpublishGraph"
-                >{% trans "Unpublish Graph" %}</button>
-            </span>
-            <!-- /ko -->
-            <!-- ko ifnot: $data.isGraphPublished() -->
-                <!-- ko if: (
-                    !$data.dirty()
-                    && !graphSettingsViewModel.dirty() 
-                    && !(selectedNode() && selectedNode().dirty() && selectedNode().istopnode == false)
-                    && !( ko.unwrap(cardTree.selection).model ? ko.unwrap(cardTree.selection).model : ko.unwrap(cardTree.selection).card ).dirty()
-                )  -->
-                <span
-                    style="
-                        align-self: flex-end;
-                    "
+                <label 
+                    style="align-self: flex-start;"
+                    class="control-label" 
+                    for="publication_notes"
                 >
-                    <button style="transition: none;" class="btn btn-sm btn-primary btn-labeled fa fa-check" data-bind="click: $data.publishGraph">{% trans "Publish Graph" %}</button>
+                    {% trans "Notes:" %}
+                </label>
+                <textarea 
+                    data-bind="textInput: $data.graphPublicationNotes"
+                    style="margin-bottom: 12px;"
+                    class="form-control textarea textarea-resizable" 
+                    rows="4" 
+                    type="text" 
+                    name="publication_notes"
+                    placeholder="Add publication notes..."
+                ></textarea>
+            </div>
+                    
+            <!-- ko ifnot: $data.isGraphPublished() -->
+                <!-- ko if: $data.shouldShowGraphPublishButtons() -->
+                <span style="align-self: flex-end;">
+                    <button style="transition: none;" class="btn btn-sm btn-primary btn-labeled fa fa-check" data-bind="click: $data.publishGraph">{% trans "Publish" %}</button>
                 </span>
                 <!-- /ko -->
             <!-- /ko -->
@@ -164,17 +161,12 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                 <button
                     style="padding: 1px 12px;"
                     class="btn btn-sm btn-danger btn-labeled fa fa-exclamation" 
-                    data-bind="click: $data.openUnpublishModal"
+                    data-bind="click: $data.displayUnpublishWarning"
                 >{% trans "Unpublish Graph" %}</button>
             </span>
             <!-- /ko -->
             <!-- ko ifnot: $data.isGraphPublished() -->
-                <!-- ko if: (
-                    !$data.dirty()
-                    && !graphSettingsViewModel.dirty() 
-                    && !(selectedNode() && selectedNode().dirty() && selectedNode().istopnode == false)
-                    && !( ko.unwrap(cardTree.selection).model ? ko.unwrap(cardTree.selection).model : ko.unwrap(cardTree.selection).card ).dirty()
-                )  -->
+                <!-- ko if: $data.shouldShowGraphPublishButtons() -->
                 <span>
                     <button class="btn btn-sm btn-primary btn-labeled fa fa-check" data-bind="click: $data.openPublishModal">{% trans "Publish Graph" %}</button>
                 </span>

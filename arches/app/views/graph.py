@@ -450,12 +450,24 @@ class GraphPublicationView(View):
     def post(self, request, graphid):
         graph = Graph.objects.get(pk=graphid)
 
-        if self.action == 'publish':
-            graph.publish()
-        elif self.action == 'unpublish':
-            graph.unpublish()
+        try:
+            notes = None
+            if request.body:
+                data = JSONDeserializer().deserialize(request.body)
+                notes = data.get('notes')
 
-        return JSONResponse(graph)
+            if self.action == 'publish':
+                graph.publish(notes)
+            elif self.action == 'unpublish':
+                graph.unpublish()
+        except Exception as e:
+            return JSONErrorResponse(e)
+
+        return JSONResponse({
+            'graph': graph,
+            'title': "Success!",
+            'message': "The graph has been successfully updated."
+        })
 
 @method_decorator(group_required("Graph Editor"), name="dispatch")
 class CardView(GraphBaseView):

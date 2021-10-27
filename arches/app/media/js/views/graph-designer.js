@@ -27,18 +27,29 @@ define([
         initialize: function(options) {
             var viewModel = options.viewModel;
 
-            console.log("()())(", arches, data)
             viewModel.graphid = ko.observable(data.graphid);
             viewModel.activeTab = ko.observable('graph');
             viewModel.viewState = ko.observable('design');
             viewModel.helpTemplate(viewData.help);
             viewModel.graphSettingsVisible = ko.observable(false);
             viewModel.graph = koMapping.fromJS(data['graph']);
-            viewModel.isGraphPublished = ko.observable(ko.unwrap(data['graph'].publication_id));
             viewModel.ontologies = ko.observable(data['ontologies']);
             viewModel.ontologyClasses = ko.observable(data['ontologyClasses']);
             viewModel.cardComponents = data.cardComponents;
             viewModel.appliedFunctions = ko.observable(data['appliedFunctions']);
+            viewModel.isGraphPublished = ko.observable(ko.unwrap(data['graph'].publication_id));
+            viewModel.graphPublicationNotes = ko.observable();
+            viewModel.shouldShowGraphPublishButtons = ko.pureComputed(function() {
+                if (
+                    !viewModel.dirty()
+                    && !( viewModel.graphSettingsViewModel && viewModel.graphSettingsViewModel.dirty() ) 
+                    && !( viewModel.selectedNode() && viewModel.selectedNode().dirty() && viewModel.selectedNode().istopnode == false )
+                    && !( ko.unwrap(viewModel.cardTree.selection).model ? ko.unwrap(viewModel.cardTree.selection).model : ko.unwrap(viewModel.cardTree.selection).card ).dirty()
+                ) {
+                    return true;
+                }
+                return false;
+            });
 
             var resources = ko.utils.arrayFilter(viewData.graphs, function(graph) {
                 return graph.isresource;
@@ -74,9 +85,6 @@ define([
                 window.open(arches.urls.export_mapping_file(viewModel.graph.graphid()), '_blank');
             };
 
-            viewModel.openUnpublishModal = function() {
-
-            };
             viewModel.openPublishModal = function() {
                 const modalBackground = document.querySelector('.modal-background');
                 modalBackground.style.visibility = 'visible';
@@ -85,23 +93,23 @@ define([
                 const modalBackground = document.querySelector('.modal-background');
                 modalBackground.style.visibility = 'hidden';
             };
+            viewModel.displayUnpublishWarning = function() {
+                viewModel.alert(new AlertViewModel('ep-alert-red', 'Unpublish the graph?', 'This will make the graph inaccessible to other users.', function() {}, viewModel.unpublishGraph))
+
+            };
             viewModel.publishGraph = function() {
                 viewModel.loading(true);
 
                 $.ajax({
                     type: "POST",
+                    data: JSON.stringify({'notes': viewModel.graphPublicationNotes()}),
                     url: arches.urls.publish_graph(viewModel.graph.graphid()),
                     complete: function(response, status) {
-                        console.log(response)
                         viewModel.isGraphPublished(true);
+                        viewModel.graphPublicationNotes(null);
+                        viewModel.closeModal();
+                        viewModel.alert(new AlertViewModel('ep-alert-blue', response.responseJSON.title, response.responseJSON.message));
                         viewModel.loading(false);
-                        // window.location.reload();
-
-                        // if (status === 'success') {
-                        //     window.location = arches.urls.graph;
-                        // } else {
-                        //     viewModel.alert(new JsonErrorAlertViewModel('ep-alert-red', response.responseJSON));
-                        // }
                     }
                 });
             };
@@ -112,16 +120,9 @@ define([
                     type: "POST",
                     url: arches.urls.unpublish_graph(viewModel.graph.graphid()),
                     complete: function(response, status) {
-                        console.log(response)
                         viewModel.isGraphPublished(false);
-
+                        viewModel.closeModal();
                         viewModel.loading(false);
-                        // window.location.reload();
-                        // if (status === 'success') {
-                        //     window.location = arches.urls.graph;
-                        // } else {
-                        //     viewModel.alert(new JsonErrorAlertViewModel('ep-alert-red', response.responseJSON));
-                        // }
                     }
                 });
             };
