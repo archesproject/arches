@@ -120,8 +120,12 @@ class StringDataType(BaseDataType):
                 document["strings"].append(val)
 
     def transform_export_values(self, value, *args, **kwargs):
+        language = kwargs.pop("language", None)
         if value is not None:
-            return value[get_language()]["value"]
+            if(language != None):
+                return value[language]["value"]
+            else:
+                return value[get_language()]["value"]
 
     def get_search_terms(self, nodevalue, nodeid=None):
         terms = []
@@ -170,7 +174,13 @@ class StringDataType(BaseDataType):
         return g
 
     def transform_value_for_tile(self, value, **kwargs):
+        language = kwargs.pop("language", None)
         if type(value) is str:
+            if(language is not None):
+                language_objects = list(models.Language.objects.filter(code=language))
+                if(len(language_objects) > 0):
+                    return {language: {"value": value, "direction": language_objects[0].default_direction}}
+            
             return {get_language(): {"value": value, "direction": "ltr"}}
         return value
 
