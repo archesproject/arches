@@ -101,7 +101,10 @@ class TileTests(ArchesTestCase):
                     "nodegroup_id": "19999999-0000-0000-0000-000000000000",
                     "tileid": "",
                     "data": {
-                        "20000000-0000-0000-0000-000000000004": {"en": {"value": "TEST 1", "direction": "ltr"}, "es": {"value": "PRUEBA 1", "direction": "ltr"}},
+                        "20000000-0000-0000-0000-000000000004": {
+                            "en": {"value": "TEST 1", "direction": "ltr"},
+                            "es": {"value": "PRUEBA 1", "direction": "ltr"},
+                        },
                         "20000000-0000-0000-0000-000000000002": {"en": {"value": "TEST 2", "direction": "ltr"}},
                         "20000000-0000-0000-0000-000000000003": {"en": {"value": "TEST 3", "direction": "ltr"}},
                     },
@@ -148,8 +151,8 @@ class TileTests(ArchesTestCase):
                     "tileid": "",
                     "data": {
                         "72048cb3-adbc-11e6-9ccf-14109fd34195": {
-                            "en": {"value": "TEST 1", "direction": "ltr"}, 
-                            "es": {"value": "PRUEBA 1", "direction": "ltr"}
+                            "en": {"value": "TEST 1", "direction": "ltr"},
+                            "es": {"value": "PRUEBA 1", "direction": "ltr"},
                         }
                     },
                 }
@@ -182,8 +185,9 @@ class TileTests(ArchesTestCase):
             "data": {
                 "72048cb3-adbc-11e6-9ccf-14109fd34195": {
                     "en": {"value": "TEST 1", "direction": "ltr"},
-                    "es": {"value": "PRUEBA 1", "direction": "ltr"}
-                }},
+                    "es": {"value": "PRUEBA 1", "direction": "ltr"},
+                }
+            },
         }
 
         t = Tile(json)
@@ -275,7 +279,7 @@ class TileTests(ArchesTestCase):
         provisional_tile = None
         for tile in tiles:
             provisional_tile = tile
-            provisional_tile.data["72048cb3-adbc-11e6-9ccf-14109fd34195"] = {"en": {"value": "PROVISIONAL", "direction": "ltr"}} 
+            provisional_tile.data["72048cb3-adbc-11e6-9ccf-14109fd34195"] = {"en": {"value": "PROVISIONAL", "direction": "ltr"}}
         request = HttpRequest()
         request.user = self.user
         provisional_tile.save(index=False, request=request)

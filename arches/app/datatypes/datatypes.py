@@ -122,7 +122,7 @@ class StringDataType(BaseDataType):
     def transform_export_values(self, value, *args, **kwargs):
         language = kwargs.pop("language", None)
         if value is not None:
-            if(language != None):
+            if language != None:
                 return value[language]["value"]
             else:
                 return value[get_language()]["value"]
@@ -170,17 +170,17 @@ class StringDataType(BaseDataType):
         if edge_info["range_tile_data"] is not None:
             g.add((edge_info["d_uri"], RDF.type, URIRef(edge.domainnode.ontologyclass)))
             for key in edge_info["range_tile_data"].keys():
-                g.add((edge_info["d_uri"], URIRef(edge.ontologyproperty), Literal(edge_info["range_tile_data"][key]['value'], lang=key)))
+                g.add((edge_info["d_uri"], URIRef(edge.ontologyproperty), Literal(edge_info["range_tile_data"][key]["value"], lang=key)))
         return g
 
     def transform_value_for_tile(self, value, **kwargs):
         language = kwargs.pop("language", None)
         if type(value) is str:
-            if(language is not None):
+            if language is not None:
                 language_objects = list(models.Language.objects.filter(code=language))
-                if(len(language_objects) > 0):
+                if len(language_objects) > 0:
                     return {language: {"value": value, "direction": language_objects[0].default_direction}}
-            
+
             return {get_language(): {"value": value, "direction": "ltr"}}
         return value
 
@@ -189,7 +189,7 @@ class StringDataType(BaseDataType):
         # FIXME: Language?
         value = get_value_from_jsonld(json_ld_node)
         try:
-            return { value[1]: {"value": value[0], "direction": "ltr"}}
+            return {value[1]: {"value": value[0], "direction": "ltr"}}
         except (AttributeError, KeyError) as e:
             pass
 
@@ -2179,15 +2179,15 @@ class AnnotationDataType(BaseDataType):
 def get_value_from_jsonld(json_ld_node):
     try:
         language = json_ld_node[0].get("@language")
-        if(language is None):
+        if language is None:
             language = get_language()
         return (json_ld_node[0].get("@value"), language)
     except KeyError as e:
         try:
             language = json_ld_node.get("@language")
-            if(language is None):
+            if language is None:
                 language = get_language()
-            return (json_ld_node.get("@value"), language) 
+            return (json_ld_node.get("@value"), language)
         except AttributeError as e:
             return
     except IndexError as e:

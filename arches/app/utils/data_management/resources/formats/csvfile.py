@@ -115,7 +115,9 @@ class CsvWriter(Writer):
 
     def transform_value_for_export(self, datatype, value, concept_export_value_type, node, language=None):
         datatype_instance = self.datatype_factory.get_instance(datatype)
-        value = datatype_instance.transform_export_values(value, concept_export_value_type=concept_export_value_type, node=node, language=language)
+        value = datatype_instance.transform_export_values(
+            value, concept_export_value_type=concept_export_value_type, node=node, language=language
+        )
         return value
 
     def write_resources(self, graph_id=None, resourceinstanceids=None, **kwargs):
@@ -124,7 +126,7 @@ class CsvWriter(Writer):
         super(CsvWriter, self).write_resources(graph_id=graph_id, resourceinstanceids=resourceinstanceids, **kwargs)
 
         csv_records = []
-        language_codes = Language.objects.values_list('code')
+        language_codes = Language.objects.values_list("code")
         other_group_records = []
         mapping = {}
         concept_export_value_lookup = {}
@@ -161,18 +163,20 @@ class CsvWriter(Writer):
                 if tile.data != {}:
                     for k in list(tile.data.keys()):
                         if tile.data[k] != "" and k in mapping and tile.data[k] is not None:
-                            if ((isinstance(mapping[k], str) and mapping[k] not in csv_record) \
-                                or isinstance(mapping[k], list) and len(set(mapping[k]).intersection(csv_record)) == 0) \
-                                and tile.nodegroup_id not in csv_record["populated_node_groups"]:
+                            if (
+                                (isinstance(mapping[k], str) and mapping[k] not in csv_record)
+                                or isinstance(mapping[k], list)
+                                and len(set(mapping[k]).intersection(csv_record)) == 0
+                            ) and tile.nodegroup_id not in csv_record["populated_node_groups"]:
                                 concept_export_value_type = None
                                 if k in concept_export_value_lookup:
                                     concept_export_value_type = concept_export_value_lookup[k]
                                 if tile.data[k] is not None:
-                                    if(self.node_datatypes[k] == "string"):
+                                    if self.node_datatypes[k] == "string":
                                         for language_column in mapping[k]:
                                             lang_regex = re.compile(".+ \(([A-Za-z-]+)\)")
                                             matches = lang_regex.match(language_column)
-                                            if(len(matches.groups()) > 0):
+                                            if len(matches.groups()) > 0:
                                                 lang = matches.groups()[0]
                                                 value = self.transform_value_for_export(
                                                     self.node_datatypes[k], tile.data[k], concept_export_value_type, k, lang
@@ -547,7 +551,7 @@ class CsvReader(Reader):
 
         try:
             with transaction.atomic():
-                language_codes = Language.objects.values_list('code')
+                language_codes = Language.objects.values_list("code")
                 save_count = 0
                 try:
                     resourceinstanceid = process_resourceid(business_data[0]["ResourceID"], overwrite)
@@ -808,7 +812,7 @@ class CsvReader(Reader):
                                         language = column_match.groups()[0]
                                         if language in [code[0].upper() for code in language_codes]:
                                             new_row.append({row["arches_nodeid"]: value + "|" + language.lower()})
-                                        
+
                     return new_row
 
                 def transform_value(datatype, value, source, nodeid):
@@ -835,7 +839,7 @@ class CsvReader(Reader):
                                 language = None
                                 regex = re.compile("(^.+)\|([A-Za-z-]+)$", re.MULTILINE)
                                 match = regex.match(value)
-                                if(match is not None):
+                                if match is not None:
                                     language = match.groups()[1]
                                     value = match.groups()[0]
                                 value = datatype_instance.transform_value_for_tile(value, language=language)
@@ -1018,8 +1022,13 @@ class CsvReader(Reader):
                                                         value = transform_value(
                                                             node_datatypes[source_key], source_tile[source_key], row_number, source_key
                                                         )
-                                                        if node_datatypes[source_key] == "string" and isinstance(tile_to_populate.data[source_key], dict):
-                                                            tile_to_populate.data[source_key] = {**tile_to_populate.data[source_key], **value["value"]}
+                                                        if node_datatypes[source_key] == "string" and isinstance(
+                                                            tile_to_populate.data[source_key], dict
+                                                        ):
+                                                            tile_to_populate.data[source_key] = {
+                                                                **tile_to_populate.data[source_key],
+                                                                **value["value"],
+                                                            }
                                                         else:
                                                             tile_to_populate.data[source_key] = value["value"]
                                                         # tile_to_populate.request = value['request']
