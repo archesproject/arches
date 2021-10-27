@@ -62,4 +62,14 @@ class Migration(migrations.Migration):
             name="config",
             field=I18n_JSONField(blank=True, null=True),
         ),
+        migrations.AlterField(
+            model_name="cardxnodexwidget",
+            name="config",
+            field=I18n_JSONField(blank=True, null=True),
+        ),
+        migrations.AlterField(
+            model_name="ddatatype",
+            name="defaultconfig",
+            field=I18n_JSONField(blank=True, null=True),
+        ),
     ]
