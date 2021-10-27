@@ -230,18 +230,19 @@ function($, _, BaseFilter, bootstrap, arches, select2, ko, koMapping, GraphModel
             },
 
             getLocalizedText: function(data){
-                var d = data.find(function(element){
+                const d = data.find((element) => {
                     return arches.defaultLanguage == element.language;
                 });
-                if(!!d && d["value"] !== ""){
-                    return d["value"];
-                }else{
-                    let ret = data.filter(function(entry){
+                if(!!d && d["value"] !== "") {
+                    return { displayText: d["value"], alternative: false };
+                } else {
+                    const allValues = data.filter((entry) => {
                         return !!entry["value"];
-                    }).map(function(entry){
+                    }).map((entry) => {
                         return entry["value"];
                     });
-                    return ret.join(",");
+
+                    return { displayText: allValues.join(","), alternative: true };
                 }
             }
         }),
