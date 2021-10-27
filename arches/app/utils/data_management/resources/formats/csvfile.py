@@ -138,9 +138,8 @@ class CsvWriter(Writer):
                     columns = ["{column} ({code})".format(column=node["file_field_name"], code=code[0]) for code in language_codes]
                     csv_header += columns
                     mapping[node["arches_nodeid"]] = columns
-                elif "concept_export_value" in node:
+                if "concept_export_value" in node:
                     concept_export_value_lookup[node["arches_nodeid"]] = node["concept_export_value"]
-                    csv_header += [node["concept_export_value"]]
 
         csvs_for_export = []
 
@@ -180,7 +179,6 @@ class CsvWriter(Writer):
                                                 )
                                                 csv_record[language_column] = value
                                     else:
-                                        breakpoint()
                                         value = self.transform_value_for_export(
                                             self.node_datatypes[k], tile.data[k], concept_export_value_type, k
                                         )
