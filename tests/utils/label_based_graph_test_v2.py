@@ -221,7 +221,6 @@ class LabelBasedGraph_FromResourceTests(TestCase):
         mock_NodeGroup.objects.filter.return_value.values.return_value = [
             {"nodegroupid": self.string_tile.nodegroup_id, "cardinality": "1"}
         ]
-        breakpoint()
         duplicate_node_tile = models.TileModel(data={str(self.string_node.pk): "value_2"}, nodegroup_id=str(self.string_node.pk))
 
         self.test_resource.tiles.append(self.string_tile)
