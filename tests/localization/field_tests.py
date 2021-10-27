@@ -285,3 +285,30 @@ class Customi18nJSONFieldTests(ArchesTestCase):
         }
         m = self.LocalizationTestJsonModel.objects.get(pk=2)
         self.assertEqual(m.config.raw_value, expected_output)
+
+    def test_i18n_json_class_as_dict(self):
+        test_json = {
+            "i18n_properties": [
+                "placeholder"
+            ],
+            "placeholder": {
+                "en": "choose one",
+                "es": "elija uno"
+            },
+            "min_length": 19
+        }
+        translation.activate("en")
+        j = I18n_JSON(test_json)
+        
+        self.assertEqual(j["min_length"], test_json["min_length"])
+        self.assertTrue("min_length" in j)
+        self.assertEqual(j.get("min_length"), 19)
+        self.assertEqual(list(j.keys()), ["i18n_properties", "placeholder", "min_length"])
+        self.assertEqual(j.pop("min_length"), 19)
+        self.assertEqual(list(j.keys()), ["i18n_properties", "placeholder"])
+
+        # test item assignment
+        j["new_property"] = "TACO"
+        self.assertEqual(list(j.keys()), ["i18n_properties", "placeholder", "new_property"])
+
+
