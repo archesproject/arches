@@ -30,7 +30,7 @@ function($, _, BaseFilter, bootstrap, arches, select2, ko, koMapping, GraphModel
                 this.showRelationships = ko.observable();
                 this.relationshipCandidates = ko.observableArray();
                 this.selectedResourceId = ko.observable(null);
-                this.language = arches.defaultLanguage
+                this.language = arches.defaultLanguage;
                 this.showRelationships.subscribe(function(res) {
                     this.selectedResourceId(res.resourceinstanceid);
                 }, this);
