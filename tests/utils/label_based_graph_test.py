@@ -286,7 +286,7 @@ class LabelBasedGraph_FromResourceTests(TestCase):
                 },
             },
         )
-        
+
     def test_handles_node_grouped_in_separate_card_with_cardinality_n(self, mock_Node, mock_NodeGroup):
         mock_Node.objects.get.side_effect = [self.grouping_node, self.string_node]
         mock_NodeGroup.objects.filter.return_value.values.return_value = [
