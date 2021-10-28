@@ -77,7 +77,7 @@ class Reader(object):
     def import_business_data(self):
         pass
 
-    def scan_for_new_languages(self):
+    def scan_for_new_languages(self, business_data=None): 
         pass
 
     def import_relations(self, relations=None):
