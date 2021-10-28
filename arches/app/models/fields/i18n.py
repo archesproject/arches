@@ -136,8 +136,6 @@ class I18n_String(object):
         ]
         if name in string_methods:
             return getattr(str(self), name)
-        else:
-            return super().__getattr__(name)
 
 
 class I18n_TextField(JSONField):
@@ -245,11 +243,21 @@ class I18n_JSON(object):
     # this class can emulate the "string" type
     # see https://docs.python.org/3/reference/datamodel.html?emulating-container-types#emulating-container-types
     def __getattr__(self, name):
-        mapping_methods = ["keys", "values", "items", "get", "clear", "setdefault", "pop", "popitem", "copy", "update"]
+        mapping_methods = [
+            "keys", 
+            "values", 
+            "items", 
+            "get", 
+            "clear", 
+            "setdefault", 
+            "pop", 
+            "popitem", 
+            "copy", 
+            "update"
+        ]
+        print('in gettattr: ' + name)
         if name in mapping_methods:
             return getattr(self.raw_value, name)
-        else:
-            return super().__getattr__(name)
 
     def serialize(self):
         ret = copy.deepcopy(self.raw_value)
