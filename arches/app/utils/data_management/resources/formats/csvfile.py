@@ -133,10 +133,10 @@ class CsvWriter(Writer):
         csv_header = ["ResourceID"]
         for resource_export_config in self.resource_export_configs:
             for node in resource_export_config["nodes"]:
-                if node["file_field_name"] != "" and node["export"] == True and node["data_type"] != "string":
+                if node["file_field_name"] != "" and node["export"] is True and node["data_type"] != "string":
                     mapping[node["arches_nodeid"]] = node["file_field_name"]
                     csv_header += [node["file_field_name"]]
-                elif node["file_field_name"] != "" and node["export"] == True and node["data_type"] == "string":
+                elif node["file_field_name"] != "" and node["export"] is True and node["data_type"] == "string":
                     columns = ["{column} ({code})".format(column=node["file_field_name"], code=code[0]) for code in language_codes]
                     csv_header += columns
                     mapping[node["arches_nodeid"]] = columns
