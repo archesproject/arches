@@ -482,7 +482,7 @@ class CsvReader(Reader):
                 existing_language_count = Language.objects.filter(code=new_language_candidate).count()
                 if existing_language_count == 0:
                     new_languages.append(new_language_candidate)
-        
+
         return new_languages
 
     def import_business_data(

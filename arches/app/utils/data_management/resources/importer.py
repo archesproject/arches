@@ -164,7 +164,6 @@ class BusinessDataImporter(object):
         else:
             return []
 
-
     def get_reader(self, file_format=None):
         if file_format is None:
             file_format = self.file_format
@@ -184,7 +183,7 @@ class BusinessDataImporter(object):
         create_collections=False,
         use_multiprocessing=False,
         prevent_indexing=False,
-        transaction_id=None
+        transaction_id=None,
     ):
         start = time()
         cursor = connection.cursor()

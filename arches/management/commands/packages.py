@@ -1079,23 +1079,25 @@ will be very jumbled."""
                 if path is not None:
                     print("Importing {0}. . .".format(path))
                     importer = BusinessDataImporter(path, config_file)
-                    
+
                     new_languages = importer.scan_for_new_languages()
 
                     if new_languages is not None and len(new_languages) > 0:
                         print("Found possible new languages while attempting import.")
-                        for language  in new_languages:
+                        for language in new_languages:
                             added = False
                             while added == False:
-                                print("Do you wish to add \"{language}\" as a new language? (y or n)".format(language=language))
+                                print('Do you wish to add "{language}" as a new language? (y or n)'.format(language=language))
                                 create_new_language = input()
-                                if(create_new_language == "Y" or create_new_language == "y"):
+                                if create_new_language == "Y" or create_new_language == "y":
                                     print("Enter the human-readable language name: ")
                                     language_name = input()
                                     print("Is this language primary read right to left or left to right (enter ltr or rtl):")
                                     default_direction = input()
                                     scope = "data"
-                                    new_language = models.Language(code=language, name=language_name, default_direction=default_direction, scope=scope)
+                                    new_language = models.Language(
+                                        code=language, name=language_name, default_direction=default_direction, scope=scope
+                                    )
                                     try:
                                         new_language.save()
                                         added = True
