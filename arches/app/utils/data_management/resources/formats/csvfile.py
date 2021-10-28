@@ -837,7 +837,7 @@ class CsvReader(Reader):
                         try:
                             if datatype == "string":
                                 language = None
-                                regex = re.compile("(^.+)\|([A-Za-z-]+)$", re.MULTILINE)
+                                regex = re.compile("(.+)\|([A-Za-z-]+)$", flags=re.DOTALL|re.MULTILINE)
                                 match = regex.match(value)
                                 if match is not None:
                                     language = match.groups()[1]
