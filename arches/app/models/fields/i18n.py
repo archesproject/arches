@@ -243,19 +243,8 @@ class I18n_JSON(object):
     # this class can emulate the "string" type
     # see https://docs.python.org/3/reference/datamodel.html?emulating-container-types#emulating-container-types
     def __getattr__(self, name):
-        mapping_methods = [
-            "keys", 
-            "values", 
-            "items", 
-            "get", 
-            "clear", 
-            "setdefault", 
-            "pop", 
-            "popitem", 
-            "copy", 
-            "update"
-        ]
-        print('in gettattr: ' + name)
+        mapping_methods = ["keys", "values", "items", "get", "clear", "setdefault", "pop", "popitem", "copy", "update"]
+        print("in gettattr: " + name)
         if name in mapping_methods:
             return getattr(self.raw_value, name)
 
