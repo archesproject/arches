@@ -359,8 +359,8 @@ class DateDataType(BaseDataType):
         if value is not None:
             if type(value) == list:
                 value = value[0]
-            elif type(value) == str and len(value) < 4 and value.startswith('-') is False: #a year before 1000 but not BCE
-                value = value.zfill(4) 
+            elif type(value) == str and len(value) < 4 and value.startswith("-") is False:  # a year before 1000 but not BCE
+                value = value.zfill(4)
             valid_date_format, valid = self.get_valid_date_format(value)
             if valid:
                 v = datetime.strptime(value, valid_date_format)
