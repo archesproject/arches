@@ -471,6 +471,20 @@ class CsvReader(Reader):
         if save_count % (settings.BULK_IMPORT_BATCH_SIZE / 4) == 0:
             print("%s resources processed" % str(save_count))
 
+    def scan_for_new_languages(self, business_data=None):
+        new_languages = []
+        first_business_data_row = next(iter(business_data))
+        for column in first_business_data_row.keys():
+            column_regex = re.compile("^.+ \(([A-Za-z-]+)\)$")
+            match = column_regex.match(column)
+            if match is not None:
+                new_language_candidate = match.groups()[0]
+                existing_language_count = Language.objects.filter(code=new_language_candidate).count()
+                if existing_language_count == 0:
+                    new_languages.append(new_language_candidate)
+        
+        return new_languages
+
     def import_business_data(
         self,
         business_data=None,

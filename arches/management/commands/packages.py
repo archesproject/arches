@@ -1078,7 +1078,33 @@ will be very jumbled."""
                 path = utils.get_valid_path(source)
                 if path is not None:
                     print("Importing {0}. . .".format(path))
-                    BusinessDataImporter(path, config_file).import_business_data(
+                    importer = BusinessDataImporter(path, config_file)
+                    
+                    new_languages = importer.scan_for_new_languages()
+
+                    if new_languages is not None and len(new_languages) > 0:
+                        print("Found possible new languages while attempting import.")
+                        for language  in new_languages:
+                            added = False
+                            while added == False:
+                                print("Do you wish to add \"{language}\" as a new language? (y or n)".format(language=language))
+                                create_new_language = input()
+                                if(create_new_language == "Y" or create_new_language == "y"):
+                                    print("Enter the human-readable language name: ")
+                                    language_name = input()
+                                    print("Is this language primary read right to left or left to right (enter ltr or rtl):")
+                                    default_direction = input()
+                                    scope = "data"
+                                    new_language = models.Language(code=language, name=language_name, default_direction=default_direction, scope=scope)
+                                    try:
+                                        new_language.save()
+                                        added = True
+                                    except:
+                                        print("Couldn't save new entry for {language}.  Try again.".format(language=language))
+                                else:
+                                    added = True
+
+                    importer.import_business_data(
                         overwrite=overwrite,
                         bulk=bulk_load,
                         create_concepts=create_concepts,
