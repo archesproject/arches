@@ -120,7 +120,7 @@ class CsvWriter(Writer):
         )
         return value
 
-    def get_language_values(self, node_id:str, mapping:list, tiledata:dict, concept_export_value_type:str) -> dict:
+    def get_language_values(self, node_id: str, mapping: list, tiledata: dict, concept_export_value_type: str) -> dict:
         result = {}
         for language_column in mapping[node_id]:
             lang_regex = re.compile(".+ \(([A-Za-z-]+)\)")
@@ -146,7 +146,7 @@ class CsvWriter(Writer):
         csv_header = ["ResourceID"]
         for resource_export_config in self.resource_export_configs:
             for node in resource_export_config["nodes"]:
-                if(node["file_field_name"] == "ResourceID"):
+                if node["file_field_name"] == "ResourceID":
                     pass
                 elif node["file_field_name"] != "" and node["export"] is True and node["data_type"] != "string":
                     mapping[node["arches_nodeid"]] = node["file_field_name"]
@@ -206,7 +206,12 @@ class CsvWriter(Writer):
                                     if language_values is not None:
                                         other_group_record = {**other_group_record, **language_values}
                                 else:
-                                    value = self.transform_value_for_export(self.node_datatypes[k], tile.data[k], concept_export_value_type, k,)
+                                    value = self.transform_value_for_export(
+                                        self.node_datatypes[k],
+                                        tile.data[k],
+                                        concept_export_value_type,
+                                        k,
+                                    )
                                     other_group_record[mapping[k]] = value
                         else:
                             del tile.data[k]
