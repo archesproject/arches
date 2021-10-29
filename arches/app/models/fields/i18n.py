@@ -136,6 +136,7 @@ class I18n_String(object):
         ]
         if name in string_methods:
             return getattr(str(self), name)
+        raise AttributeError
 
 
 class I18n_TextField(JSONField):
@@ -255,9 +256,9 @@ class I18n_JSON(object):
             "copy", 
             "update"
         ]
-        print('in gettattr: ' + name)
         if name in mapping_methods:
             return getattr(self.raw_value, name)
+        raise AttributeError
 
     def serialize(self):
         ret = copy.deepcopy(self.raw_value)
