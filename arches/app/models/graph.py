@@ -1524,9 +1524,9 @@ class Graph(models.GraphModel):
         Adds a row to the GraphPublication table
         Assigns GraphPublication id to Graph
         """
-        publication = models.GraphPublication(
+        publication = models.GraphPublication.objects.create(
             graph=self,
-            serialized_graph=self.serialize(),
+            serialized_graph=JSONSerializer().serialize(self.serialize()),
             notes=notes,
         )
         publication.save()

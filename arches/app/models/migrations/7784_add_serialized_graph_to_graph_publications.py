@@ -1,6 +1,7 @@
 from django.conf import settings
 from django.db import migrations, models
 from arches.app.models.graph import Graph
+from arches.app.utils.betterJSONSerializer import JSONSerializer
 
 
 class Migration(migrations.Migration):
@@ -10,25 +11,20 @@ class Migration(migrations.Migration):
     ]
 
     def forwards_add_serialized_graph_column_data(apps, schema_editor):
-        GraphPublication = apps.get_model("models", "GraphPublication")
         GraphModel = apps.get_model("models", "GraphModel")
 
         for graph in GraphModel.objects.all():
             if graph.publication:
-                graph_publication = GraphPublication.objects.get(graph=graph)
                 arches_graph = Graph.objects.get(pk=graph.pk)
-                graph_publication.serialized_graph = arches_graph.serialize()
-                graph_publication.save()
+                graph.publication.serialized_graph = JSONSerializer().serialize(arches_graph.serialize())
+                graph.publication.save()
 
     def reverse_add_serialized_graph_column_data(apps, schema_editor):
         GraphPublication = apps.get_model("models", "GraphPublication")
-        GraphModel = apps.get_model("models", "GraphModel")
 
-        for graph in GraphModel.objects.all():
-            if graph.publication:
-                graph_publication = GraphPublication.objects.get(graph=graph)
-                graph_publication.serialized_graph = None
-                graph_publication.save()
+        for graph_publication in GraphPublication.objects.all():
+            graph_publication.serialized_graph = ""
+            graph_publication.save()
 
     operations = [
         migrations.AddField(
