@@ -424,6 +424,7 @@ class GraphPublication(models.Model):
     publicationid = models.UUIDField(primary_key=True, serialize=False, default=uuid.uuid1)
     notes = models.TextField(blank=True, null=True)
     graph = models.ForeignKey(GraphModel, db_column="graphid", on_delete=models.CASCADE)
+    serialized_graph = models.TextField()
     user = models.ForeignKey(User, db_column="userid", null=True, on_delete=models.CASCADE)
     published_time = models.DateTimeField(auto_now_add=True, null=False)
 

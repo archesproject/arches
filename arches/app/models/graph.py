@@ -1526,6 +1526,7 @@ class Graph(models.GraphModel):
         """
         publication = models.GraphPublication(
             graph=self,
+            serialized_graph=self.serialize(),
             notes=notes,
         )
         publication.save()
