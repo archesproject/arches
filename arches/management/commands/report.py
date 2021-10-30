@@ -91,3 +91,16 @@ class Command(BaseCommand):
             instance.delete()
         except Exception as e:
             print(e)
+
+    def list(self):
+        """
+        Lists registered report templates
+
+        """
+
+        try:
+            instances = models.ReportTemplate.objects.all()
+            for instance in instances:
+                print(instance.name)
+        except Exception as e:
+            print(e)
