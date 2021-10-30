@@ -18,6 +18,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 
 import os
 import uuid
+import imp
 from arches.management.commands import utils
 from arches.app.models import models
 from django.core.management.base import BaseCommand, CommandError
@@ -78,6 +79,26 @@ class Command(BaseCommand):
             preload_resource_data=details.get("preload_resource_data", True),
         )
 
+        instance.save()
+
+    def update(self, source):
+        """
+        Updates an existing report template in the arches db
+
+        """
+
+        import json
+
+        details = {}
+
+        with open(source) as f:
+            details = json.load(f)
+
+        instance = models.ReportTemplate.objects.get(name=details["name"])
+        instance.description = details["description"]
+        instance.component = details["component"]
+        instance.componentname = details["componentname"]
+        instance.defaultconfig = details["defaultconfig"]
         instance.save()
 
     def unregister(self, name):
