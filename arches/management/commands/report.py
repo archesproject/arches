@@ -79,3 +79,15 @@ class Command(BaseCommand):
         )
 
         instance.save()
+
+    def unregister(self, name):
+        """
+        Removes the report template from the system
+
+        """
+
+        try:
+            instance = models.ReportTemplate.objects.get(name=name)
+            instance.delete()
+        except Exception as e:
+            print(e)
