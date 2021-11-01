@@ -182,7 +182,8 @@ class StringDataType(BaseDataType):
                     return {language: {"value": value, "direction": language_objects[0].default_direction}}
 
             return {get_language(): {"value": value, "direction": "ltr"}}
-        return value
+        elif type(value) is dict:
+            return value
 
     def from_rdf(self, json_ld_node):
         # returns the string value only
