@@ -26,12 +26,11 @@ from tests.base_test import ArchesTestCase
 
 
 class StringDataTypeTests(ArchesTestCase):
-
     def test_string_validate(self):
         string = DataTypeFactory().get_instance("string")
         some_errors = string.validate("")
         self.assertGreater(len(some_errors), 0)
-        no_errors = string.validate({"en": {"value": "hello", "direction":"ltr"}})
+        no_errors = string.validate({"en": {"value": "hello", "direction": "ltr"}})
         self.assertEqual(len(no_errors), 0)
 
     def test_tile_transform(self):
@@ -42,6 +41,3 @@ class StringDataTypeTests(ArchesTestCase):
         print(tile_value.keys())
         self.assertTrue("es" in tile_value.keys())
         new_language.delete()
-
-
-            
