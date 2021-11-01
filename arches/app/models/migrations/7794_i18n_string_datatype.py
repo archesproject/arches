@@ -7,7 +7,7 @@ from django.conf import settings
 class Migration(migrations.Migration):
 
     dependencies = [
-        ("models", "7899_i18n_graph_model_updates"),
+        ("models", "7801_i18n_boolean_datatype"),
     ]
 
     sql = """
