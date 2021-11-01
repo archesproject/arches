@@ -12,12 +12,12 @@ class Migration(migrations.Migration):
 
     sql = """
         UPDATE public.cards_x_nodes_x_widgets
-        SET config = config || 
+        SET config = config ||
         jsonb_set(
             jsonb_set(
                 jsonb_set(
-                    config, '{{label}}', json_build_object('{0}', config->>'label')::jsonb, true), 
-            '{{placeholder}}', json_build_object('{0}', config->>'placeholder')::jsonb, true), 
+                    config, '{{label}}', json_build_object('{0}', config->>'label')::jsonb, true),
+            '{{placeholder}}', json_build_object('{0}', config->>'placeholder')::jsonb, true),
         '{{defaultValue}}', json_build_object('{0}', config->>'defaultValue')::jsonb, true) ||
         '{{"i18n_properties": ["label", "placeholder", "defaultValue"]}}'
         WHERE nodeid in (SELECT nodeid FROM nodes WHERE datatype = 'string');
@@ -26,9 +26,9 @@ class Migration(migrations.Migration):
     )
 
     reverse_sql = """
-        UPDATE public.cards_x_nodes_x_widgets 
-        SET config = config - 'i18n_properties' || 
-        json_build_object('label', jsonb_extract_path(config, 'label', '{0}'))::jsonb || 
+        UPDATE public.cards_x_nodes_x_widgets
+        SET config = config - 'i18n_properties' ||
+        json_build_object('label', jsonb_extract_path(config, 'label', '{0}'))::jsonb ||
         json_build_object('placeholder', jsonb_extract_path(config, 'placeholder', '{0}'))::jsonb ||
         json_build_object('defaultValue', jsonb_extract_path(config, 'defaultValue', '{0}'))::jsonb
         WHERE nodeid in (SELECT nodeid FROM nodes WHERE datatype = 'string')
