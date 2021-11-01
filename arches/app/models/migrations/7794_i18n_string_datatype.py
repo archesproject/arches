@@ -42,5 +42,5 @@ class Migration(migrations.Migration):
             model_name="cardxnodexwidget",
             name="config",
             field=I18n_JSONField(blank=True, null=True),
-        )
+        ),
     ]
