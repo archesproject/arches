@@ -16,7 +16,8 @@ class Migration(migrations.Migration):
         for graph in GraphModel.objects.all():
             if graph.publication:
                 arches_graph = Graph.objects.get(pk=graph.pk)
-                graph.publication.serialized_graph = JSONSerializer().serialize(arches_graph.serialize())
+                graph.publication.serialized_graph = JSONSerializer().serialize(arches_graph.serialize(force_recalculation=True))
+
                 graph.publication.save()
 
     def reverse_add_serialized_graph_column_data(apps, schema_editor):
