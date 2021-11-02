@@ -494,9 +494,11 @@ class CsvReader(Reader):
                 # If resourceid is a UUID check if it is already an arches resource.
                 if overwrite == "overwrite":
                     try:
-                        Resource.objects.get(pk=resourceid).delete()
+                        Resource.objects.get(pk=resourceid).delete(index=False)
                     except:
-                        pass
+                        ret = list(Resource.objects.filter(legacyid=resourceid))
+                        for r in ret:
+                            r.delete(index=False)
             except:
                 # Get resources with the given legacyid
                 ret = Resource.objects.filter(legacyid=resourceid)
@@ -509,7 +511,7 @@ class CsvReader(Reader):
                 # If a resource is returned with the give legacyid then return its archesid
                 else:
                     if overwrite == "overwrite":
-                        Resource.objects.get(pk=str(ret[0].resourceinstanceid)).delete()
+                        Resource.objects.get(pk=str(ret[0].resourceinstanceid)).delete(index=False)
                     resourceinstanceid = ret[0].resourceinstanceid
 
             return resourceinstanceid
@@ -829,6 +831,18 @@ class CsvReader(Reader):
                     # return deepcopy(blank_tile)
                     return pickle.loads(pickle.dumps(blank_tile, -1))
 
+                def get_preexisting_tile(target_tile, populated_tiles, row):
+                    preexisting_tile_for_nodegroup = list(
+                        filter(
+                            lambda t: str(t.resourceinstance_id) == str(row["ResourceID"])
+                            and str(t.nodegroup_id) == str(target_tile.nodegroup_id),
+                            populated_tiles,
+                        )
+                    )
+                    if len(preexisting_tile_for_nodegroup) > 0:
+                        return preexisting_tile_for_nodegroup[0]
+                    return False
+                
                 def check_required_nodes(tile, parent_tile, required_nodes):
                     # Check that each required node in a tile is populated.
                     if settings.BYPASS_REQUIRED_VALUE_TILE_VALIDATION:
@@ -1109,17 +1123,7 @@ class CsvReader(Reader):
                         # mock_request_object = HttpRequest()
 
                         # identify whether a tile for this nodegroup on this resource already exists
-                        preexisting_tile_for_nodegroup = list(
-                            filter(
-                                lambda t: str(t.resourceinstance_id) == str(row["ResourceID"])
-                                and str(t.nodegroup_id) == str(target_tile.nodegroup_id),
-                                populated_tiles,
-                            )
-                        )
-                        if len(preexisting_tile_for_nodegroup) > 0:
-                            preexisting_tile_for_nodegroup = preexisting_tile_for_nodegroup[0]
-                        else:
-                            preexisting_tile_for_nodegroup = False
+                        preexisting_tile_for_nodegroup = get_preexisting_tile(target_tile, populated_tiles, row)
 
                         # aggregates a tile of the nodegroup associated with source_data (via get_blank_tile)
                         # onto the pre-existing tile who would be its parent
@@ -1129,11 +1133,36 @@ class CsvReader(Reader):
                             populate_tile(source_data, target_tile, appending_to_parent=True)
                             if not bulk:
                                 preexisting_tile_for_nodegroup.tiles.append(target_tile)
+                            while len(source_data) > 0:
+                                target_tile = get_blank_tile(source_data)
+                                preexisting_tile_for_nodegroup = get_preexisting_tile(target_tile, populated_tiles, row)
+                                if preexisting_tile_for_nodegroup:
+                                    target_tile = get_blank_tile(source_data, child_only=True)
+                                    target_tile.parenttile = preexisting_tile_for_nodegroup
+                                    populate_tile(source_data, target_tile, appending_to_parent=True)
+                                else:
+                                    target_tile = get_blank_tile(source_data)
+                                    populate_tile(source_data, target_tile)
+
+                                if not bulk and preexisting_tile_for_nodegroup:
+                                    preexisting_tile_for_nodegroup.tiles.append(target_tile)
 
                         # populates a tile from parent-level nodegroup because
                         # parent cardinality is N or because none exists yet on resource
                         elif target_tile is not None and len(source_data) > 0:
                             populate_tile(source_data, target_tile)
+                            while len(source_data) > 0:
+                                target_tile = get_blank_tile(source_data)
+                                preexisting_tile_for_nodegroup = get_preexisting_tile(target_tile, populated_tiles, row)
+                                if preexisting_tile_for_nodegroup:
+                                    target_tile = get_blank_tile(source_data, child_only=True)
+                                    target_tile.parenttile = preexisting_tile_for_nodegroup
+                                    populate_tile(source_data, target_tile, appending_to_parent=True)
+                                else:
+                                    target_tile = get_blank_tile(source_data)
+                                    populate_tile(source_data, target_tile)
+                                if not bulk and preexisting_tile_for_nodegroup:
+                                    preexisting_tile_for_nodegroup.tiles.append(target_tile)
                             # Check that required nodes are populated. If not remove tile from populated_tiles array.
                             check_required_nodes(target_tile, target_tile, required_nodes)
 
