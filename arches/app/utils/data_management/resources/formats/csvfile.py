@@ -842,7 +842,7 @@ class CsvReader(Reader):
                     if len(preexisting_tile_for_nodegroup) > 0:
                         return preexisting_tile_for_nodegroup[0]
                     return False
-                
+
                 def check_required_nodes(tile, parent_tile, required_nodes):
                     # Check that each required node in a tile is populated.
                     if settings.BYPASS_REQUIRED_VALUE_TILE_VALIDATION:
