@@ -69,21 +69,23 @@ class GraphBaseView(BaseManagerView):
 class GraphSettingsView(GraphBaseView):
     def get(self, request, graphid):
         self.graph = models.GraphModel.objects.get(graphid=graphid)
-        icons = models.Icon.objects.order_by("name")
-        resource_graphs = models.GraphModel.objects.filter(Q(isresource=True)).exclude(graphid=settings.SYSTEM_SETTINGS_RESOURCE_MODEL_ID)
+
         resource_data = []
+
         node = models.Node.objects.get(graph_id=graphid, istopnode=True)
         relatable_resources = node.get_relatable_resources()
+        resource_graphs = models.GraphModel.objects.filter(Q(isresource=True)).exclude(graphid=settings.SYSTEM_SETTINGS_RESOURCE_MODEL_ID)
+
         for res in resource_graphs:
-            if models.Node.objects.filter(graph=res, istopnode=True).count() > 0:
-                node_model = models.Node.objects.get(graph=res, istopnode=True)
+            node_model = models.Node.objects.get(graph=res, istopnode=True)
+            if node_model:
                 resource_data.append({"id": node_model.nodeid, "graph": res, "is_relatable": (node_model in relatable_resources)})
-        data = {
-            "icons": JSONSerializer().serializeToPython(icons),
+
+        return JSONResponse({
+            "icons": JSONSerializer().serializeToPython(models.Icon.objects.order_by("name")),
             "node_count": models.Node.objects.filter(graph=self.graph).count(),
             "resources": JSONSerializer().serializeToPython(resource_data),
-        }
-        return JSONResponse(data)
+        })
 
     def post(self, request, graphid):
         graph = Graph.objects.get(graphid=graphid)
@@ -233,7 +235,6 @@ class GraphDesignerView(GraphBaseView):
             serialized_graph['_nodegroups_to_delete'] = None
         if serialized_graph.get('_functions'):
             serialized_graph['_functions'] = None
-
         context["graph"] = JSONSerializer().serialize(serialized_graph)
 
         context["nav"]["title"] = self.graph.name
