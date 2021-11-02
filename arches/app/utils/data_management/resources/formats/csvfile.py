@@ -501,7 +501,7 @@ class CsvReader(Reader):
                     ret = Resource.objects.filter(resourceinstanceid=resourceid)
                     # If resourceid is an arches resource and overwrite is true, delete the existing arches resource.
                     if overwrite == "overwrite":
-                        Resource.objects.get(pk=str(ret[0].resourceinstanceid)).delete()
+                        Resource.objects.get(pk=str(ret[0].resourceinstanceid)).delete(index=False)
                     resourceinstanceid = resourceinstanceid
                 # If resourceid is not a UUID create one.
                 except:
@@ -518,7 +518,7 @@ class CsvReader(Reader):
                 # If a resource is returned with the give legacyid then return its archesid
                 else:
                     if overwrite == "overwrite":
-                        Resource.objects.get(pk=str(ret[0].resourceinstanceid)).delete()
+                        Resource.objects.get(pk=str(ret[0].resourceinstanceid)).delete(index=False)
                     resourceinstanceid = ret[0].resourceinstanceid
 
             return resourceinstanceid
