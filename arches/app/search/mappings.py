@@ -91,7 +91,7 @@ def prepare_concepts_index(create=False):
 
     if create:
         se = SearchEngineFactory().create()
-        print(se.create_index(index=CONCEPTS_INDEX, body=index_settings))
+        se.create_index(index=CONCEPTS_INDEX, body=index_settings)
 
     return index_settings
 
@@ -297,7 +297,7 @@ def prepare_resource_relations_index(create=False):
 
     if create:
         se = SearchEngineFactory().create()
-        print(se.create_index(index=RESOURCE_RELATIONS_INDEX, body=index_settings))
+        se.create_index(index=RESOURCE_RELATIONS_INDEX, body=index_settings)
 
     return index_settings
 
