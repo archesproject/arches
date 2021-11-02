@@ -19,10 +19,21 @@ begin
                 node.nodeid
             );
             datatype = 'geometry';
-        when 'number' then
-            datatype = 'numeric';
-        when 'boolean' then
-            datatype = 'boolean';
+        when 'number' then datatype = 'numeric';
+        when 'boolean' then datatype = 'boolean';
+        when 'concept-list' then
+            select_sql = format('(
+                    CASE
+                        WHEN tiles.tiledata->>%1$L is null THEN null
+                        ELSE ARRAY(
+                            SELECT jsonb_array_elements_text(
+                                    tiles.tiledata->%1$L
+                                ) AS jsonb_array_elements_text
+                        )
+                    END
+                )', node.nodeid
+            );
+            datatype = 'text[]';
         else
             datatype = 'text';
         end case;
