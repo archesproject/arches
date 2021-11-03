@@ -49,6 +49,7 @@ import arches.app.tasks as tasks
 from io import StringIO
 from tempfile import NamedTemporaryFile
 from openpyxl import Workbook
+from arches.app.models.system_settings import settings
 
 logger = logging.getLogger(__name__)
 
@@ -210,24 +211,36 @@ def export_results(request):
     format = request.GET.get("format", "tilecsv")
     report_link = request.GET.get("reportlink", False)
     download_limit = settings.SEARCH_EXPORT_IMMEDIATE_DOWNLOAD_THRESHOLD
+    app_name = settings.APP_NAME
     if total > download_limit and format != "geojson":
-        celery_worker_running = task_management.check_if_celery_available()
-        if celery_worker_running is True:
-            request_values = dict(request.GET)
-            request_values["path"] = request.get_full_path()
-            result = tasks.export_search_results.apply_async(
-                (request.user.id, request_values, format, report_link),
-                link=tasks.update_user_task_record.s(),
-                link_error=tasks.log_error.s(),
-            )
+        if (settings.RESTRICT_CELERY_EXPORT_FOR_ANONYMOUS_USER is True) and (request.user.username == "anonymous"):
             message = _(
-                "{total} instances have been submitted for export. \
-                Click the Bell icon to check for a link to download your data"
+                "Your search exceeds the {download_limit} instance download limit.  \
+                Anonymous users cannot run an export exceeding this limit.  \
+                Please sign in with your {app_name} account or refine your search"
             ).format(**locals())
-            return JSONResponse({"success": True, "message": message})
-        else:
-            message = _("Your search exceeds the {download_limit} instance download limit. Please refine your search").format(**locals())
             return JSONResponse({"success": False, "message": message})
+        else:
+            celery_worker_running = task_management.check_if_celery_available()
+            if celery_worker_running is True:
+                request_values = dict(request.GET)
+                request_values["path"] = request.get_full_path()
+                result = tasks.export_search_results.apply_async(
+                    (request.user.id, request_values, format, report_link),
+                    link=tasks.update_user_task_record.s(),
+                    link_error=tasks.log_error.s(),
+                )
+                message = _(
+                    "{total} instances have been submitted for export. \
+                    Click the Bell icon to check for a link to download your data"
+                ).format(**locals())
+                return JSONResponse({"success": True, "message": message})
+            else:
+                message = _("Your search exceeds the {download_limit} instance download limit. Please refine your search").format(
+                    **locals()
+                )
+                return JSONResponse({"success": False, "message": message})
+
     elif format == "tilexl":
         exporter = SearchResultsExporter(search_request=request)
         export_files, export_info = exporter.export(format, report_link)

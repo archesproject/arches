@@ -121,3 +121,7 @@
 .hover-feature-footer a {
     color: #2F5879;
 }
+
+.jstree-default .func-node {
+    color: #000000;
+}
