@@ -72,6 +72,7 @@ class Graph(models.GraphModel):
         self._card_constraints = []
         self._constraints_x_nodes = []
         self.temp_node_name = _("New Node")
+        self.serialized_graph = None
 
         if args:
             if isinstance(args[0], dict):
@@ -114,22 +115,52 @@ class Graph(models.GraphModel):
                     for key, value in models.GraphModel.objects.get(pk=args[0]).__dict__.items():
                         setattr(self, key, value)
 
-                nodes = self.node_set.all()
-                edges = self.edge_set.all()
-                cards = self.cardmodel_set.all()
-                edge_dicts = json.loads(JSONSerializer().serialize(edges))
+                if self.publication:
+                    self.serialized_graph = self.serialize()  # reads from graph_publication table and returns serialized graph as dict
+
+                    nodes = models.Node.objects.filter(pk__in=[ node_dict['nodeid'] for node_dict in self.serialized_graph['nodes'] ])
+                    cards = models.CardModel.objects.filter(pk__in=[ card_dict['cardid'] for card_dict in self.serialized_graph['cards'] ])
+                    edges = models.Edge.objects.filter(pk__in=[ edge_dict['edgeid'] for edge_dict in self.serialized_graph['edges'] ])
+
+                    edge_lookup = {edge["edgeid"]: edge for edge in self.serialized_graph['edges']} 
+
+                    self.widgets = {
+                        widget.pk: widget
+                        for widget in models.CardXNodeXWidget.objects.filter(pk__in=[ widget_dict['id'] for widget_dict in self.serialized_graph['widgets'] ])
+                    }
+
+                else:
+                # if True:
+                    nodes = self.node_set.all()
+                    edges = self.edge_set.all()
+                    cards = self.cardmodel_set.all()
+
+                    edge_dicts = json.loads(JSONSerializer().serialize(edges))
+                    edge_lookup = {edge["edgeid"]: edge for edge in edge_dicts}
+
+
                 node_lookup = {}
-                edge_lookup = {edge["edgeid"]: edge for edge in edge_dicts}
                 for node in nodes:
                     self.add_node(node)
                     node_lookup[str(node.nodeid)] = node
-                for card in cards:
-                    self.add_card(card)
+                                               
                 for edge in edges:
                     edge_dict = edge_lookup[str(edge.edgeid)]
                     edge.domainnode = node_lookup[edge_dict["domainnode_id"]]
                     edge.rangenode = node_lookup[edge_dict["rangenode_id"]]
                     self.add_edge(edge)
+
+                for card in cards:
+                    self.add_card(card)
+
+                    if not self.publication:
+                    # if True:
+                        widgets = list(card.cardxnodexwidget_set.all())
+                        for widget in widgets:
+                            self.widgets[widget.pk] = widget
+
+                # if not self.publication:
+                # import pdb; pdb.set_trace()
                 self.populate_null_nodegroups()
 
     @staticmethod
@@ -287,10 +318,6 @@ class Graph(models.GraphModel):
             card.pk = uuid.uuid1()
 
         self.cards[card.pk] = card
-
-        widgets = list(card.cardxnodexwidget_set.all())
-        for widget in widgets:
-            self.widgets[widget.pk] = widget
 
         return card
 
@@ -757,7 +784,7 @@ class Graph(models.GraphModel):
         nodegroup = None
         node = self.nodes[uuid.UUID(str(nodeid))]
 
-        graph_dict = self.serialize()
+        graph_dict = self.serialized_graph or self.serialize()
         graph_dict["nodes"] = []
         graph_dict["edges"] = []
         graph_dict["cards"] = []
@@ -1149,14 +1176,16 @@ class Graph(models.GraphModel):
         get the nodegroups associated with this graph
 
         """
-
-        nodegroups = set()
-        for node in self.nodes.values():
-            if node.is_collector:
-                nodegroups.add(node.nodegroup)
-        for card in self.cards.values():
-            nodegroups.add(card.nodegroup)
-        return list(nodegroups)
+        if self.publication:
+            return models.NodeGroup.objects.filter(pk__in=[ nodegroup_dict['nodegroupid'] for nodegroup_dict in self.serialized_graph['nodegroups'] ])
+        else:
+            nodegroups = set()
+            for node in self.nodes.values():
+                if node.is_collector:
+                    nodegroups.add(node.nodegroup)
+            for card in self.cards.values():
+                nodegroups.add(card.nodegroup)
+            return list(nodegroups)
 
     def get_or_create_nodegroup(self, nodegroupid):
         """
@@ -1238,12 +1267,16 @@ class Graph(models.GraphModel):
         get the widget data (if any) associated with this graph
 
         """
-        widgets = []
-        for widget in self.widgets.values():
-            widget_dict = JSONSerializer().serializeToPython(widget)
-            widgets.append(widget_dict)
+        if self.publication:
+            return self.serialized_graph['widgets']
+        else:
+            widgets = []
+            
+            for widget in self.widgets.values():
+                widget_dict = JSONSerializer().serializeToPython(widget)
+                widgets.append(widget_dict)
 
-        return widgets
+            return widgets
 
     def serialize(self, fields=None, exclude=None, force_recalculation=False):
         """
