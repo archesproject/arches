@@ -115,7 +115,7 @@ class Graph(models.GraphModel):
                     for key, value in models.GraphModel.objects.get(pk=args[0]).__dict__.items():
                         setattr(self, key, value)
 
-                if self.publication:
+                if self.publication and self.publication.serialized_graph:
                     self.serialized_graph = self.serialize()  # reads from graph_publication table and returns serialized graph as dict
 
                     nodes = models.Node.objects.filter(pk__in=[ node_dict['nodeid'] for node_dict in self.serialized_graph['nodes'] ])
@@ -1178,7 +1178,7 @@ class Graph(models.GraphModel):
         get the nodegroups associated with this graph
 
         """
-        if self.publication:
+        if self.serialized_graph:
             return models.NodeGroup.objects.filter(pk__in=[ nodegroup_dict['nodegroupid'] for nodegroup_dict in self.serialized_graph['nodegroups'] ])
         else:
             nodegroups = set()
@@ -1269,7 +1269,7 @@ class Graph(models.GraphModel):
         get the widget data (if any) associated with this graph
 
         """
-        if self.publication:
+        if self.serialized_graph:
             return self.serialized_graph['widgets']
         else:
             widgets = []

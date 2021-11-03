@@ -15,9 +15,9 @@ class Migration(migrations.Migration):
         GraphModel = apps.get_model("models", "GraphModel")
 
         for graph in GraphModel.objects.all():
-            if graph.isactive:
-                graph_publication = GraphPublication.objects.create(graph=graph)
-                graph_publication.save()
+        # if graph.isactive:
+            graph_publication = GraphPublication.objects.create(graph=graph)
+            graph_publication.save()
 
     def reverse_add_graph_transactions_table_data(apps, schema_editor):
         GraphPublication = apps.get_model("models", "GraphPublication")
