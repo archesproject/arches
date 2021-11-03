@@ -125,3 +125,8 @@
 .jstree-default .func-node {
     color: #000000;
 }
+
+.map-data-drop-area,
+.workbench-card-sidebar-tab {
+    color: #000;
+}

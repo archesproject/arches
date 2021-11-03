@@ -7,7 +7,7 @@
     </div>
     <div class="add-buffer-feature-input">
         <div>{% trans 'Distance:' %}</div>
-        <input type="number" step="any" class="form-control input-lg widget-input" data-bind="valueUpdate: 'keyup', value: bufferDistance"></input>
+        <input type="number" step="any" class="form-control input-lg widget-input" data-bind="valueUpdate: 'keyup', value: bufferDistance" aria-label="Buffer distance"></input>
     </div>
     <div class="add-buffer-feature-input">
         <div>{% trans 'Units:' %}</div>
@@ -28,7 +28,7 @@
                 'disable_search_threshold': 10,
                 'allow_single_deselect': false
             }
-        "></select>
+        " aria-label="Buffer units"></select>
     </div>
     <!-- ko if: allowAddNew -->
     <div class="add-buffer-feature-input">
