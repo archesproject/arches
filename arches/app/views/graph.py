@@ -76,8 +76,10 @@ class GraphSettingsView(GraphBaseView):
         relatable_resources = node.get_relatable_resources()
         resource_graphs = models.GraphModel.objects.filter(Q(isresource=True)).exclude(graphid=settings.SYSTEM_SETTINGS_RESOURCE_MODEL_ID)
 
+        node_models = models.Node.objects.filter(graph__pk__in=[resource_graph.pk for resource_graph in resource_graphs])
+
         for res in resource_graphs:
-            node_model = models.Node.objects.get(graph=res, istopnode=True)
+            node_model = node_models.get(graph=res, istopnode=True)
             if node_model:
                 resource_data.append({"id": node_model.nodeid, "graph": res, "is_relatable": (node_model in relatable_resources)})
 
@@ -216,7 +218,7 @@ class GraphDesignerView(GraphBaseView):
                 models.OntologyClass.objects.values("source", "ontology_id")
             ),
             graph_models=graph_models,
-            graphs = JSONSerializer().serialize(graph_models, exclude=["functions"]),
+            graphs=JSONSerializer().serialize(graph_models, exclude=["functions"]),
             constraints=JSONSerializer().serialize(
                 models.ConstraintModel.objects.filter(card__pk__in=[ card_dict['cardid'] for card_dict in serialized_graph['cards'] ])
             )
@@ -247,6 +249,109 @@ class GraphDesignerView(GraphBaseView):
         context["nav"]["help"] = {"title": help_title, "template": "graph-tab-help"}
 
         return render(request, "views/graph-designer.htm", context)
+
+
+# @method_decorator(group_required("Graph Editor"), name="dispatch")
+# class GraphDesignerView(GraphBaseView):
+#     def get_ontology_namespaces(self):
+#         ontology_namespaces = settings.ONTOLOGY_NAMESPACES
+#         for ontology in models.Ontology.objects.all():
+#             try:
+#                 namespace_keys = ontology.namespaces.keys()
+#                 for k in namespace_keys:
+#                     if k not in ontology_namespaces:
+#                         ontology_namespaces[k] = ontology.namespaces[k]
+#             except AttributeError as e:
+#                 logger.info(
+#                     _(
+#                         "No namespaces appear to be associated with {ontology.ontologyid} in the ontologies table."
+#                         " This is not a problem as long as all necessary namespaces are included in the"
+#                         " ONTOLOGY_NAMESPACES setting."
+#                     ).format(**locals())
+#                 )
+#         return ontology_namespaces
+
+#     def get(self, request, graphid):
+#         self.graph = Graph.objects.get(graphid=graphid)
+#         ontologies = models.Ontology.objects.filter(parentontology=None)
+#         ontology_classes = models.OntologyClass.objects.values("source", "ontology_id")
+#         datatypes = models.DDataType.objects.all()
+#         datatypes_json = JSONSerializer().serialize(datatypes, exclude=["modulename", "isgeometric"])
+#         branch_graphs = Graph.objects.exclude(pk=graphid).exclude(isresource=True)
+#         applied_functions = JSONSerializer().serialize(models.FunctionXGraph.objects.filter(graph=self.graph))
+
+#         # import pdb; pdb.set_trace()
+#         # serialized_graph = JSONDeserializer().deserialize(self.graph.publication.serialized_graph)
+
+#         # cards = serialized_graph.cards
+#         cards = self.graph.cardmodel_set.order_by("sortorder").prefetch_related("cardxnodexwidget_set")
+#         constraints = []
+#         for card in cards:
+#             if models.ConstraintModel.objects.filter(card=card).count() > 0:
+#                 constraints += models.ConstraintModel.objects.filter(card=card)
+
+#         cardwidgets = [
+#             widget for widgets in [card.cardxnodexwidget_set.order_by("sortorder").all() for card in cards] for widget in widgets
+#         ]
+#         widgets = models.Widget.objects.all()
+#         nodegroups = cards.values_list("nodegroup_id", flat=True)
+
+#         if settings.OVERRIDE_RESOURCE_MODEL_LOCK:
+#             restricted_nodegroups = []
+#         else:
+#             restricted_nodegroups = (
+#                 models.TileModel.objects.filter(nodegroup__in=nodegroups).values_list("nodegroup_id", flat=True).distinct()
+#             )
+
+#         map_layers = models.MapLayer.objects.all()
+#         map_markers = models.MapMarker.objects.all()
+#         map_sources = models.MapSource.objects.all()
+#         templates = models.ReportTemplate.objects.all()
+#         card_components = models.CardComponent.objects.all()
+#         geocoding_providers = models.Geocoder.objects.all()
+#         if self.graph.ontology is not None:
+#             branch_graphs = branch_graphs.filter(ontology=self.graph.ontology)
+#         context = self.get_context_data(
+#             main_script="views/graph-designer",
+#             datatypes_json=datatypes_json,
+#             datatypes=datatypes,
+#             ontology_namespaces=self.get_ontology_namespaces(),
+#             branches=JSONSerializer().serialize(
+#                 branch_graphs, exclude=["cards", "domain_connections", "functions", "cards", "deploymentfile", "deploymentdate"]
+#             ),
+#             branch_list={"title": _("Branch Library"), "search_placeholder": _("Find a graph branch")},
+#             widgets=widgets,
+#             widgets_json=JSONSerializer().serialize(widgets),
+#             card_components=card_components,
+#             card_components_json=JSONSerializer().serialize(card_components),
+#             cards=JSONSerializer().serialize(cards),
+#             cardwidgets=JSONSerializer().serialize(cardwidgets),
+#             map_layers=map_layers,
+#             map_markers=map_markers,
+#             map_sources=map_sources,
+#             applied_functions=applied_functions,
+#             geocoding_providers=geocoding_providers,
+#             report_templates=templates,
+#             restricted_nodegroups=[str(nodegroup) for nodegroup in restricted_nodegroups],
+#         )
+#         context["ontologies"] = JSONSerializer().serialize(ontologies, exclude=["version", "path"])
+#         context["ontology_classes"] = JSONSerializer().serialize(ontology_classes)
+#         context["graph"] = JSONSerializer().serialize(
+#             self.graph, exclude=["functions", "cards", "deploymentfile", "deploymentdate", "_nodegroups_to_delete", "_functions"]
+#         )
+#         context["graph_models"] = models.GraphModel.objects.all().exclude(graphid=settings.SYSTEM_SETTINGS_RESOURCE_MODEL_ID)
+#         context["graphs"] = JSONSerializer().serialize(context["graph_models"], exclude=["functions"])
+#         context["nav"]["title"] = self.graph.name
+#         context["nav"]["menu"] = True
+
+#         help_title = _("Designing a Resource Model")
+#         if not self.graph.isresource:
+#             help_title = _("Designing a Branch")
+
+#         context["nav"]["help"] = {"title": help_title, "template": "graph-tab-help"}
+#         context["constraints"] = JSONSerializer().serialize(constraints)
+
+#         return render(request, "views/graph-designer.htm", context)
 
 
 class GraphDataView(View):

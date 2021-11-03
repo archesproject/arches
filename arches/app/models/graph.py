@@ -1253,11 +1253,17 @@ class Graph(models.GraphModel):
         internal objects (like models.Nodes) don't support
 
         """
-        if self.publication and not force_recalculation:
-            return JSONDeserializer().deserialize(self.publication.serialized_graph)  # changes from string to dict
-        else:
-            exclude = [] if exclude is None else exclude
+        exclude = [] if exclude is None else exclude
 
+        if self.publication and not force_recalculation:
+            serialized_graph = JSONDeserializer().deserialize(self.publication.serialized_graph)  # changes from string to dict
+
+            for key in exclude:
+                if serialized_graph.get(key) is not None:  # explicit None comparison so falsey values will still return
+                    serialized_graph[key] = None
+
+            return serialized_graph
+        else:
             ret = JSONSerializer().handle_model(self, fields, exclude)
             ret["root"] = self.root
 
