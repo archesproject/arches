@@ -2222,7 +2222,7 @@ div.final-cons-step-separator>h4 {
     background: white;
     border-left: 1px solid rgb(216, 216, 216);
     padding: 16px;
-    overflow-y: scroll;
+    overflow-y: auto;
 }
 
 .workbench-sidepanel-card-container {
@@ -2299,16 +2299,12 @@ div.final-cons-step-separator>h4 {
 
 .workbench-card-sidepanel-header-container {
     border-bottom: 1px solid #ddd;
-    padding: 17px 30px 10px 0px;
+    padding: 10px 20px 10px 5px;
     margin-left: 0px;
     margin-top: -16px;
-    position: fixed;
     background: #fff;
     z-index: 20;
-    width: 370px;
 }
-
-
 
 .expanded .workbench-card-sidepanel-header-container {
     width: 599px;
@@ -5741,6 +5737,7 @@ span.editable-card i.fa.fa-align-justify:hover {
 
 .widgets {
     border-bottom-width: 1px;
+    margin-bottom: 20px;
 }
 
 .report li {
@@ -6235,6 +6232,7 @@ th.notif-type {
     display: inline-block;
     margin-right: 20px;
     padding: 7px 12px;
+    cursor: pointer;
 }
 
 /*.ep-toolbar {
@@ -6768,7 +6766,7 @@ ul div .card-tree-list span .card-tree-list-item .card-tree-list-icon {
     border-bottom: 1px solid #FFB700;
     height: 50px;
     margin-top: -15px;
-    margin-left: -25px;
+    margin-left: -16px;
     margin-right: -25px;
     padding: 15px 25px;
 }
@@ -6808,7 +6806,7 @@ ul div .card-tree-list span .card-tree-list-item .card-tree-list-icon {
     display: flex;
     flex-direction: column;
     position: relative;
-    margin-right: -25px;
+    margin-right: -20px;
     width: 250px;
     padding: 5px 5px 0px 5px;
     border-left: 1px solid #ddd;
@@ -6948,7 +6946,7 @@ ul div .card-tree-list span .card-tree-list-item .card-tree-list-icon {
 
 .new-provisional-edits-header .new-provisional-edits-delete-all {
     width: 100%;
-    padding: 3px 0px;
+    padding: 3px;
     margin: 3px;
 }
 
@@ -14256,6 +14254,10 @@ a.jstree-anchor.permissions-widget {
 .reqlabel {
     width: 100%;
     text-align: left;
+}
+
+#add-basemap-wizard-help-content .panel-body {
+    padding: 10px 10px 15px 10px;
 }
 
 @keyframes loader {

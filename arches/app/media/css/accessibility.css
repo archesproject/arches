@@ -105,3 +105,19 @@
 .account-tips {
     color: #595959;
 }
+
+.workbench-card-sidebar-tab {
+    color: #4f4f4f;
+}
+
+.hover-feature-metadata {
+    color: #595959;
+}
+
+.hover-feature-metadata span {
+    color: #315B7D;
+}
+
+.hover-feature-footer a {
+    color: #2F5879;
+}

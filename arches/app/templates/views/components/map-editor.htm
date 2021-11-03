@@ -23,7 +23,7 @@
     <div data-bind="css: card.model.cssclass">
 
         <!-- ko if: reviewer && provisionalTileViewModel.selectedProvisionalEdit() -->
-        <div class="edit-message-container" style="margin-left: -16px;">
+        <div class="edit-message-container">
             <span>{% trans 'Showing edits by' %}</span>
             <span class="edit-message-container-user" data-bind="text: provisionalTileViewModel.selectedProvisionalEdit().username() + '.'"></span>
             <!-- ko if: !provisionalTileViewModel.tileIsFullyProvisional() -->
@@ -36,7 +36,7 @@
         <!-- /ko-->
 
         <!-- ko if: reviewer && provisionalTileViewModel.provisionaledits().length > 0 && !provisionalTileViewModel.selectedProvisionalEdit()-->
-        <div class="edit-message-container approved" style="margin-left: -16px;">
+        <div class="edit-message-container approved">
             <div>{% trans 'Currently showing the most recent approved edits' %}</div>
         </div>
         <!-- /ko-->
@@ -46,10 +46,10 @@
         <div class="new-provisional-edit-card-container">
             <!-- ko if: reviewer && provisionalTileViewModel.provisionaledits().length > 0 -->
             <!-- ko if: !provisionalTileViewModel.tileIsFullyProvisional() -->
-            <div class='new-provisional-edits-list' style="margin-right: -20px">
+            <div class='new-provisional-edits-list'>
                 <div class='new-provisional-edits-header'>
                     <div class='new-provisional-edits-title'>{% trans 'Provisional Edits' %}</div>
-                    <div class="btn btn-shim btn-danger btn-labeled btn-xs fa fa-trash new-provisional-edits-delete-all" style="padding: 3px;" data-bind="click: function(){
+                    <div class="btn btn-shim btn-danger btn-labeled btn-xs fa fa-trash new-provisional-edits-delete-all" data-bind="click: function(){
                             provisionalTileViewModel.deleteAllProvisionalEdits();
                         }" tabindex="0" onkeyup="if(event.which == 13 || event.keyCode == 13){ $(this).trigger('click'); }">{% trans 'Delete all edits' %}</div>
                 </div>
@@ -115,7 +115,7 @@
                 <span>
                     <a class="pull-right card-help help editable-help" href="#" data-bind="click: function () {
                         card.model.get('helpactive')(true)
-                    }" style="cursor:pointer;" onkeyup="if(event.which == 13 || event.keyCode == 13){ $(this).trigger('click'); }" aria-label="Editing help">
+                    }" onkeyup="if(event.which == 13 || event.keyCode == 13){ $(this).trigger('click'); }" aria-label="Editing help">
                         {% trans "Help" %}
                         <i class="fa fa-question-circle"></i>
                     </a>
@@ -125,7 +125,7 @@
                 {% endblock form_header %}
                 <!-- ko if: card.widgets().length > 0 -->
                 {% block form_widgets %}
-                <form class="widgets" style="margin-bottom: 20px;">
+                <form class="widgets">
                     <div data-bind="foreach: {
                             data:card.widgets, as: 'widget'
                         }">
@@ -339,7 +339,7 @@
                                     <span data-bind="html: card.model.get('helptitle')"></span>
                                 </h3>
                             </div>
-                            <div class="panel-body" style="padding: 10px 10px 15px 10px;" data-bind="html: card.model.get('helptext')">
+                            <div class="panel-body" data-bind="html: card.model.get('helptext')">
                             </div>
                         </div>
                     </div>
