@@ -1118,23 +1118,8 @@ class Graph(models.GraphModel):
             out_edges = self.get_out_edges(nodeid)
 
             ontology_classes = set()
-            # if len(out_edges) > 0:
-            #     for edge in out_edges:
-            #         for ontology_property in models.OntologyClass.objects.get(
-            #             source=edge.rangenode.ontologyclass, ontology_id=self.ontology_id
-            #         ).target["up"]:
-            #             if edge.ontologyproperty == ontology_property["ontology_property"]:
-            #                 if len(ontology_classes) == 0:
-            #                     ontology_classes = set(ontology_property["ontology_classes"])
-            #                 else:
-            #                     ontology_classes = ontology_classes.intersection(set(ontology_property["ontology_classes"]))
-
-            #                 if len(ontology_classes) == 0:
-            #                     break
-
-
             
-            foo = { 
+            ontology_dict = { 
                 ontology.source: ontology 
                 for ontology in models.OntologyClass.objects.filter(source__in=[ edge.rangenode.ontologyclass for edge in out_edges ], ontology_id=self.ontology_id) 
             }
@@ -1142,7 +1127,7 @@ class Graph(models.GraphModel):
             if len(out_edges) > 0:
                 for edge in out_edges:
 
-                    for ontology_property in foo.get(
+                    for ontology_property in ontology_dict.get(
                         edge.rangenode.ontologyclass
                     ).target["up"]:
                         if edge.ontologyproperty == ontology_property["ontology_property"]:
