@@ -128,9 +128,7 @@ class Graph(models.GraphModel):
                         widget.pk: widget
                         for widget in models.CardXNodeXWidget.objects.filter(pk__in=[ widget_dict['id'] for widget_dict in self.serialized_graph['widgets'] ])
                     }
-
                 else:
-                # if True:
                     nodes = self.node_set.all()
                     edges = self.edge_set.all()
                     cards = self.cardmodel_set.all()
@@ -138,6 +136,10 @@ class Graph(models.GraphModel):
                     edge_dicts = json.loads(JSONSerializer().serialize(edges))
                     edge_lookup = {edge["edgeid"]: edge for edge in edge_dicts}
 
+                    for card in cards:
+                        widgets = list(card.cardxnodexwidget_set.all())
+                        for widget in widgets:
+                            self.widgets[widget.pk] = widget
 
                 node_lookup = {}
                 for node in nodes:
@@ -153,14 +155,6 @@ class Graph(models.GraphModel):
                 for card in cards:
                     self.add_card(card)
 
-                    if not self.publication:
-                    # if True:
-                        widgets = list(card.cardxnodexwidget_set.all())
-                        for widget in widgets:
-                            self.widgets[widget.pk] = widget
-
-                # if not self.publication:
-                # import pdb; pdb.set_trace()
                 self.populate_null_nodegroups()
 
     @staticmethod
@@ -500,11 +494,12 @@ class Graph(models.GraphModel):
         """
 
         tree = self.get_tree()
+        nodegroups = self.get_nodegroups()
 
         def traverse_tree(tree, current_nodegroup=None):
             if tree["node"]:
                 if tree["node"].is_collector:
-                    nodegroup = self.get_or_create_nodegroup(nodegroupid=tree["node"].nodegroup_id)
+                    nodegroup = self.get_or_create_nodegroup(nodegroupid=tree["node"].nodegroup_id, nodegroups_list=nodegroups)
                     nodegroup.parentnodegroup = current_nodegroup
                     current_nodegroup = nodegroup
 
@@ -1171,7 +1166,7 @@ class Graph(models.GraphModel):
                     ret = [{"ontology_property": "", "ontology_classes": list(ontology_classes)}]
         return ret
 
-    def get_nodegroups(self, nodegroupid=None):
+    def get_nodegroups(self):
         """
         get the nodegroups associated with this graph
 
@@ -1187,7 +1182,7 @@ class Graph(models.GraphModel):
                 nodegroups.add(card.nodegroup)
             return list(nodegroups)
 
-    def get_or_create_nodegroup(self, nodegroupid):
+    def get_or_create_nodegroup(self, nodegroupid, nodegroups_list=[]):
         """
         get a nodegroup from an id by first looking through the nodes and cards associated with this graph.
         if not found then get the nodegroup instance from the database, otherwise return a new instance of a nodegroup
@@ -1195,10 +1190,10 @@ class Graph(models.GraphModel):
         Keyword Arguments
 
         nodegroupid -- return a nodegroup with this id
-
+        nodegroups_list -- list of nodegroups from which to filter
         """
 
-        for nodegroup in self.get_nodegroups():
+        for nodegroup in nodegroups_list or self.get_nodegroups():
             if str(nodegroup.nodegroupid) == str(nodegroupid):
                 return nodegroup
         try:
@@ -1271,7 +1266,7 @@ class Graph(models.GraphModel):
             return self.serialized_graph['widgets']
         else:
             widgets = []
-            
+
             for widget in self.widgets.values():
                 widget_dict = JSONSerializer().serializeToPython(widget)
                 widgets.append(widget_dict)
