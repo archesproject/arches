@@ -10,28 +10,40 @@
     </div>
     <!-- /ko -->
 
-    <h3 class="config-title" style="margin-top: -10px; margin-bottom: 0px;"><i class="fa fa-binoculars"></i> {% trans "Layer Preview" %} <span class="service-url text-semibold" data-bind="text: serviceURL"></span></h3>
+    <div class="row">
 
-    <div class="map-service-manage-buttons">
-        <div class="form-group">
-            <label class="control-label text-semibold">{% trans "Activated:" %}</label>
-            <span class="switch switch-small" data-bind="css: {
-                    'on': config.layerActivated()
-                }, click: function () {
-                    config.layerActivated(!config.layerActivated());
-                }">
-                <small></small>
-            </span>
+        <div class="col-xs-12 col-sm-6 col-md-8 col-lg-9" style="padding-left: 15px;">
+            <h3 class="config-title" style="margin-top: -10px; margin-bottom: 0px;"><i class="fa fa-binoculars"></i> {% trans "Layer Preview" %} <span class="service-url text-semibold" data-bind="text: serviceURL"></span></h3>
         </div>
+        
+        <div class="col-xs-12 col-sm-6 col-md-4 col-lg-3" style="top: -10px; left: -2px;">
+        
+            <div class="map-service-manage-buttons">
+                <div class="form-group">
+                    <label class="control-label text-semibold">{% trans "Activated:" %}</label>
+                    <span tabindex="0" class="switch switch-small" data-bind="css: {
+                            'on': config.layerActivated()
+                        }, click: function () {
+                            config.layerActivated(!config.layerActivated());
+                        }" onkeyup="if(event.which == 13 || event.keyCode == 13){ $(this).trigger('click'); }">
+                        <small></small>
+                    </span>
+                </div>
+            </div>
+            
+            <div class="btn-group map-server-basemap-button">
+                <button class="dropdown-toggle btn" data-toggle="dropdown" aria-expanded="false"><i class="fa fa-globe"></i></button>
+                <ul class="dropdown-menu dropdown-menu-right">
+                    <!-- ko foreach: basemaps -->
+                    <li><a href="#" data-bind="text: name, click: function () { select(); }"></a></li>
+                    <!-- /ko -->
+                </ul>
+            </div>
+
+        </div>
+
     </div>
-    <div class="btn-group map-server-basemap-button">
-        <button class="dropdown-toggle btn" data-toggle="dropdown" aria-expanded="false"><i class="fa fa-globe"></i></button>
-        <ul class="dropdown-menu dropdown-menu-right">
-            <!-- ko foreach: basemaps -->
-            <li><a href="#" data-bind="text: name, click: function () { select(); }"></a></li>
-            <!-- /ko -->
-        </ul>
-    </div>
+
     <!-- ko if: !loading() -->
     <div class="map-service-preview" style="padding:0;" data-bind="mapboxgl: {
             mapOptions: {
@@ -58,7 +70,7 @@
     <!-- Service Styling -->
     <div class="row map-service-container" style="padding-left: 13px; padding-right: 13px;">
         <div class="">
-            <div class="tab-base map-service-tabs" style="">
+            <div class="tab-base map-service-tabs">
 
                 <!-- Resource Styling Tabs -->
                 <ul class="nav nav-tabs map-service-nav-tabs">
@@ -85,17 +97,17 @@
                                     <div class="form-group">
                                         <label class="col-sm-3 control-label">{% trans "Layer Name:" %}</label>
                                         <div class="col-sm-9">
-                                            <input type="text" class="form-control" data-bind="valueUpdate: 'keyup', value: config.layerName, attr: { placeholder: layer.name }">
+                                            <input type="text" class="form-control" data-bind="valueUpdate: 'keyup', value: config.layerName, attr: { placeholder: layer.name, 'aria-label': layer.name }">
                                         </div>
                                     </div>
                                     <div class="form-group">
                                         <label class="col-sm-3 control-label">{% trans "Add to search map by default:" %}</label>
                                         <div class="col-sm-9">
-                                            <span class="switch switch-small service-switch-shim" data-bind="css: {
+                                            <span tabindex="0" class="switch switch-small service-switch-shim" data-bind="css: {
                                                     'on': config.addToMap()
                                                 }, click: function () {
                                                     config.addToMap(!config.addToMap());
-                                                }">
+                                                }" onkeyup="if(event.which == 13 || event.keyCode == 13){ $(this).trigger('click'); }">
                                                 <small></small>
                                             </span>
                                         </div>
@@ -111,10 +123,10 @@
                                                 </div>
 
                                                 <div style="position: absolute; left: 110px; top: 10px;">
-                                                    <input type="text" class="form-control" style="width: 366px; height: 36px;" placeholder="{% trans "Find an icon" %}" data-bind="value:iconFilter, valueUpdate: 'keyup'">
+                                                    <input type="text" class="form-control" style="width: 366px; height: 36px;" placeholder="{% trans "Find an icon" %}" aria-label="{% trans "Find an icon" %}" data-bind="value:iconFilter, valueUpdate: 'keyup'">
 
                                                     <!-- ko if: iconFilter() !== '' -->
-                                                    <span class="clear-search" style="position: absolute; left: 345px; top: 5px; color: #123; font-size: 17px;" data-bind="click: function () { iconFilter(''); }"><i class="fa fa-times-circle"></i></span>
+                                                    <span tabindex="0" class="clear-search" style="position: absolute; left: 345px; top: 5px; color: #123; font-size: 17px;" data-bind="click: function () { iconFilter(''); }" onkeyup="if(event.which == 13 || event.keyCode == 13){ $(this).trigger('click'); }"><i class="fa fa-times-circle"></i></span>
                                                     <!-- /ko -->
                                                 </div>
                                             </div>
@@ -125,7 +137,7 @@
                                             <div class="row">
 
                                                 <!-- ko foreach: icons -->
-                                                <div class="col-xs-6 col-md-3 col-sm-4 demo-icon-font" data-bind="css: {'selected': (cssclass === ($parent.config.layerIcon() || $parent.layer.icon))}, click: function() { $parent.config.layerIcon(cssclass) }">
+                                                <div tabindex="0" class="col-xs-6 col-md-3 col-sm-4 demo-icon-font" data-bind="css: {'selected': (cssclass === ($parent.config.layerIcon() || $parent.layer.icon))}, click: function() { $parent.config.layerIcon(cssclass) }" onkeyup="if(event.which == 13 || event.keyCode == 13){ $(this).trigger('click'); }">
                                                     <i data-bind="css: cssclass"></i> <span data-bind="text: name"></span>
                                                 </div>
                                                 <!-- /ko -->
@@ -152,11 +164,11 @@
                         <div class="row">
                             <div class="pull-right advanced-map-style-switch">
                                 <label class="control-label text-semibold">{% trans "Advanced:" %}</label>
-                                <span class="switch switch-small" data-bind="css: {
+                                <span tabindex="0" class="switch switch-small" data-bind="css: {
                                         'on': config.advancedStyling()
                                     }, click: function () {
                                         config.advancedStyling(!config.advancedStyling());
-                                    }">
+                                    }" onkeyup="if(event.which == 13 || event.keyCode == 13){ $(this).trigger('click'); }">
                                     <small></small>
                                 </span>
                             </div>
@@ -191,7 +203,7 @@
                                                             <label class="col-sm-3 control-label">{% trans "Color" %}</label>
                                                             <div class="col-sm-9">
                                                                 <div class="colorpicker-component input-group">
-                                                                    <input placeholder="{% trans "Color " %}" class="form-control input-lg widget-input" data-bind="colorPicker: {color: config.pointColor, format:'rgba'}">
+                                                                    <input placeholder="{% trans "Color " %}" aria-label="{% trans "Color " %}" class="form-control input-lg widget-input" data-bind="colorPicker: {color: config.pointColor, format:'rgba'}">
                                                                     <span class="input-group-addon"><i class="ion-stop resource-color-swatch" data-bind="style: {color: config.pointColor}"></i></span>
                                                                 </div>
                                                             </div>
@@ -200,7 +212,7 @@
                                                             <label class="col-sm-3 control-label">{% trans "Halo color" %}</label>
                                                             <div class="col-sm-9">
                                                                 <div class="colorpicker-component input-group">
-                                                                    <input placeholder="{% trans "Halo Color " %}" class="form-control input-lg widget-input" data-bind="colorPicker: {color: config.pointHaloColor, format:'rgba'}">
+                                                                    <input placeholder="{% trans "Halo Color " %}" aria-label="{% trans "Halo Color " %}" class="form-control input-lg widget-input" data-bind="colorPicker: {color: config.pointHaloColor, format:'rgba'}">
                                                                     <span class="input-group-addon"><i class="ion-stop resource-color-swatch" data-bind="style: {color: config.pointHaloColor}"></i></span>
                                                                 </div>
                                                             </div>
@@ -208,13 +220,13 @@
                                                         <div class="form-group">
                                                             <label class="col-sm-3 control-label">{% trans "Radius" %}</label>
                                                             <div class="col-sm-9">
-                                                                <input type="number" placeholder="" class="form-control" data-bind="valueUpdate: 'keyup', value: config.radius">
+                                                                <input type="number" aria-label="{% trans "Radius" %}" class="form-control" data-bind="valueUpdate: 'keyup', value: config.radius">
                                                             </div>
                                                         </div>
                                                         <div class="form-group">
                                                             <label class="col-sm-3 control-label">{% trans "Halo radius" %}</label>
                                                             <div class="col-sm-9">
-                                                                <input type="number" placeholder="" class="form-control" data-bind="valueUpdate: 'keyup', value: config.haloRadius">
+                                                                <input type="number" aria-label="{% trans "Halo radius" %}" class="form-control" data-bind="valueUpdate: 'keyup', value: config.haloRadius">
                                                             </div>
                                                         </div>
                                                     </div>
@@ -231,7 +243,7 @@
                                                             <label class="col-sm-3 control-label">{% trans "Color" %}</label>
                                                             <div class="col-sm-9">
                                                                 <div class="colorpicker-component input-group">
-                                                                    <input placeholder="{% trans "Color " %}" class="form-control input-lg widget-input" data-bind="colorPicker: {color: config.lineColor, format:'rgba'}">
+                                                                    <input placeholder="{% trans "Color " %}" aria-label="{% trans "Color " %}" class="form-control input-lg widget-input" data-bind="colorPicker: {color: config.lineColor, format:'rgba'}">
                                                                     <span class="input-group-addon"><i class="ion-stop resource-color-swatch" data-bind="style: {color: config.lineColor}"></i></span>
                                                                 </div>
                                                             </div>
@@ -240,7 +252,7 @@
                                                             <label class="col-sm-3 control-label">{% trans "Halo color" %}</label>
                                                             <div class="col-sm-9">
                                                                 <div class="colorpicker-component input-group">
-                                                                    <input placeholder="{% trans "Halo Color " %}" class="form-control input-lg widget-input" data-bind="colorPicker: {color: config.lineHaloColor, format:'rgba'}">
+                                                                    <input placeholder="{% trans "Halo Color " %}" aria-label="{% trans "Halo Color " %}" class="form-control input-lg widget-input" data-bind="colorPicker: {color: config.lineHaloColor, format:'rgba'}">
                                                                     <span class="input-group-addon"><i class="ion-stop resource-color-swatch" data-bind="style: {color: config.lineHaloColor}"></i></span>
                                                                 </div>
                                                             </div>
@@ -248,13 +260,13 @@
                                                         <div class="form-group">
                                                             <label class="col-sm-3 control-label">{% trans "Weight" %}</label>
                                                             <div class="col-sm-9">
-                                                                <input type="number" placeholder="" class="form-control" data-bind="valueUpdate: 'keyup', value: config.weight">
+                                                                <input type="number" aria-label="{% trans "Weight" %}" class="form-control" data-bind="valueUpdate: 'keyup', value: config.weight">
                                                             </div>
                                                         </div>
                                                         <div class="form-group">
                                                             <label class="col-sm-3 control-label">{% trans "Halo weight" %}</label>
                                                             <div class="col-sm-9">
-                                                                <input type="number" placeholder="" class="form-control" data-bind="valueUpdate: 'keyup', value: config.haloWeight">
+                                                                <input type="number" aria-label="{% trans "Halo weight" %}" class="form-control" data-bind="valueUpdate: 'keyup', value: config.haloWeight">
                                                             </div>
                                                         </div>
                                                     </div>
@@ -272,7 +284,7 @@
                                                             <label class="col-sm-3 control-label">{% trans "Fill Color" %}</label>
                                                             <div class="col-sm-9">
                                                                 <div class="colorpicker-component input-group">
-                                                                    <input placeholder="{% trans "Color " %}" class="form-control input-lg widget-input" data-bind="colorPicker: {color: config.fillColor, format:'rgba'}">
+                                                                    <input placeholder="{% trans "Color " %}" aria-label="{% trans "Color " %}" class="form-control input-lg widget-input" data-bind="colorPicker: {color: config.fillColor, format:'rgba'}">
                                                                     <span class="input-group-addon"><i class="ion-stop resource-color-swatch" data-bind="style: {color: config.fillColor}"></i></span>
                                                                 </div>
                                                             </div>
@@ -281,7 +293,7 @@
                                                             <label class="col-sm-3 control-label">{% trans "Outline color" %}</label>
                                                             <div class="col-sm-9">
                                                                 <div class="colorpicker-component input-group">
-                                                                    <input placeholder="{% trans "Halo Color " %}" class="form-control input-lg widget-input" data-bind="colorPicker: {color: config.outlineColor, format:'rgba'}">
+                                                                    <input placeholder="{% trans "Halo Color " %}" aria-label="{% trans "Halo Color " %}" class="form-control input-lg widget-input" data-bind="colorPicker: {color: config.outlineColor, format:'rgba'}">
                                                                     <span class="input-group-addon"><i class="ion-stop resource-color-swatch" data-bind="style: {color: config.outlineColor}"></i></span>
                                                                 </div>
                                                             </div>
@@ -289,7 +301,7 @@
                                                         <div class="form-group">
                                                             <label class="col-sm-3 control-label">{% trans "Outline weight" %}</label>
                                                             <div class="col-sm-9">
-                                                                <input type="number" placeholder="" class="form-control" data-bind="valueUpdate: 'keyup', value: config.outlineWeight">
+                                                                <input type="number" aria-label="{% trans "Outline weight" %}" class="form-control" data-bind="valueUpdate: 'keyup', value: config.outlineWeight">
                                                             </div>
                                                         </div>
                                                     </div>
@@ -311,25 +323,25 @@
                                     <div class="form-group">
                                         <label class="col-sm-3 control-label">{% trans "Cluster Distance:" %}</label>
                                         <div class="col-sm-9">
-                                            <input type="number" class="form-control" data-bind="valueUpdate: 'keyup', value: config.clusterDistance">
+                                            <input type="number" class="form-control" aria-label="{% trans "Cluster Distance" %}" data-bind="valueUpdate: 'keyup', value: config.clusterDistance">
                                         </div>
                                     </div>
                                     <div class="form-group">
                                         <label class="col-sm-3 control-label">{% trans "Cluster Max Zoom:" %}</label>
                                         <div class="col-sm-9">
-                                            <input type="number" class="form-control" data-bind="valueUpdate: 'keyup', value: config.clusterMaxZoom">
+                                            <input type="number" class="form-control" aria-label="{% trans "Cluster Max Zoom" %}" data-bind="valueUpdate: 'keyup', value: config.clusterMaxZoom">
                                         </div>
                                     </div>
                                     <div class="form-group">
                                         <label class="col-sm-3 control-label">{% trans "Cluster Min Points:" %}</label>
                                         <div class="col-sm-9">
-                                            <input type="number" class="form-control" data-bind="valueUpdate: 'keyup', value: config.clusterMinPoints">
+                                            <input type="number" class="form-control" aria-label="{% trans "Cluster Min Points" %}" data-bind="valueUpdate: 'keyup', value: config.clusterMinPoints">
                                         </div>
                                     </div>
                                     <div class="form-group">
                                         <label class="col-sm-3 control-label">{% trans "Vector Simplification:" %}</label>
                                         <div class="col-sm-9">
-                                            <input type="number" class="form-control" data-bind="valueUpdate: 'keyup', value: config.simplification">
+                                            <input type="number" class="form-control" aria-label="{% trans "Vector Simplification" %}" data-bind="valueUpdate: 'keyup', value: config.simplification">
                                         </div>
                                     </div>
                                     <div class="map-server-instructions">

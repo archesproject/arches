@@ -5,14 +5,14 @@
         {% trans "Concept Collection" %}
     </div>
     <div data-bind="if: conceptCollections().length > 0">
-        <select data-bind="disable: isEditable === false, placeholder: '{% trans "Select a concept collection" %}', value: topConcept, options: conceptCollections , optionsText: 'label', optionsValue: 'id', chosen: {width: '100%', allow_single_deselect: true}"></select>
+        <select data-bind="disable: isEditable === false, placeholder: '{% trans "Select a concept collection" %}', value: topConcept, options: conceptCollections , optionsText: 'label', optionsValue: 'id', chosen: {width: '100%', allow_single_deselect: true}, attr:{'aria-label': 'Select a concept collection'}"></select>
     </div>
 </div>
 <!-- /ko -->
 
 <!-- ko if: $data.search -->
 <div class="col-md-4 col-lg-3">
-    <select class="resources" data-bind="value: op, chosen: {width: '100%', disable_search_threshold: 15}">
+    <select class="resources" data-bind="value: op, chosen: {width: '100%', disable_search_threshold: 15}, attr:{'aria-label': 'Search criteria'}">
         <option value="">{% trans "Equals" %}</option>
         <option value="!">{% trans "Not" %}</option>
         <option value="null">{% trans "Has no value" %}</option>
@@ -28,6 +28,6 @@
                 select2Config: select2Config
             }
         ">
-    <span style="z-index: 100; position:absolute; right: 24px; top: 8px;" data-bind="visible: select2Config.isEmpty() === false, click: function(){select2Config.clear();}"><i class="fa fa-times-circle fa-lg"></i></span>
+    <span style="z-index: 100; position:absolute; right: 24px; top: 8px;" data-bind="visible: select2Config.isEmpty() === false, click: function(){select2Config.clear();}" tabindex="0" onkeyup="if(event.which == 13 || event.keyCode == 13){ $(this).trigger('click'); }"><i class="fa fa-times-circle fa-lg"></i></span>
 </div>
 <!-- /ko -->
