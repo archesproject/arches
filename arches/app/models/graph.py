@@ -33,6 +33,7 @@ from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializ
 from arches.app.search.search_engine_factory import SearchEngineFactory
 from django.utils.translation import ugettext as _
 from pyld.jsonld import compact, JsonLdError
+from django.db.models.base import Deferred
 
 logger = logging.getLogger(__name__)
 
@@ -115,7 +116,13 @@ class Graph(models.GraphModel):
                     for key, value in models.GraphModel.objects.get(pk=args[0]).__dict__.items():
                         setattr(self, key, value)
 
-                if self.publication and self.publication.serialized_graph:
+                has_deferred_args = False
+                for arg in args:
+                    if type(arg) == Deferred:
+                        has_deferred_args = True
+
+                #  accessing the graph publication while deferring args results in a recursive loop
+                if not has_deferred_args and self.publication and self.publication.serialized_graph:
                     self.serialized_graph = self.serialize()  # reads from graph_publication table and returns serialized graph as dict
 
                     nodes = models.Node.objects.filter(pk__in=[ node_dict['nodeid'] for node_dict in self.serialized_graph['nodes'] ])
@@ -133,14 +140,13 @@ class Graph(models.GraphModel):
                     edges = self.edge_set.all()
                     cards = self.cardmodel_set.all()
 
-                    edge_dicts = json.loads(JSONSerializer().serialize(edges))
-                    edge_lookup = {edge["edgeid"]: edge for edge in edge_dicts}
+                    edge_lookup = {edge["edgeid"]: edge for edge in json.loads(JSONSerializer().serialize(edges))}
 
                     for card in cards:
                         widgets = list(card.cardxnodexwidget_set.all())
                         for widget in widgets:
                             self.widgets[widget.pk] = widget
-
+                            
                 node_lookup = {}
                 for node in nodes:
                     self.add_node(node)
