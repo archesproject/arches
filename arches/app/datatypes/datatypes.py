@@ -100,9 +100,30 @@ class StringDataType(BaseDataType):
             errors.append(error_message)
         return errors
 
+    def rdf_transform(self, value):
+        default_language = models.Language.objects.get(code=get_language())
+        incoming_value = {}
+        for val in value:
+            if ("language" in val and val["language"] is not None) or ("@language" in val and val["@language"] is not None):
+                try:
+                    language = models.Language.objects.get(code=val["language"] if "language" in val else val["@language"])
+                    incoming_value = {**incoming_value, language.code: {"value": val["value"] if "value" in val else val["@value"], "direction": language.default_direction}}
+                except models.Language.DoesNotExist:
+                    ValueError("Language does not exist in Language table - cannot create string.")
+            else:
+                incoming_value = {**incoming_value, default_language.code: {"value": val["value"] if "value" in val else val["@value"], "direction": default_language.default_direction}}
+             
+        return incoming_value if len(incoming_value.keys()) > 0 else None
+
     def validate_from_rdf(self, value):
-        print(value)
-        return []
+        transformed_value = None
+        if isinstance(value, list):
+            transformed_value = self.rdf_transform(value)
+        elif isinstance(value, str):
+            transformed_value = self.rdf_transform([{"value": value}])
+        incoming_value = value if transformed_value is None else transformed_value
+        
+        return self.validate(incoming_value)
 
     def clean(self, tile, nodeid):
         if tile.data[nodeid] in ["", "''"]:
@@ -175,13 +196,14 @@ class StringDataType(BaseDataType):
         return value
 
     def from_rdf(self, json_ld_node):
-        # returns the string value only
-        # FIXME: Language?
-        value = get_value_from_jsonld(json_ld_node)
-        try:
-            return {value[1]: {"value": value[0], "direction": "ltr"}}
-        except (AttributeError, KeyError) as e:
-            pass
+        transformed_value = None
+        if isinstance(json_ld_node, list):
+            transformed_value = self.rdf_transform(json_ld_node)
+        else:
+            new_value = get_value_from_jsonld(json_ld_node)
+            if new_value is not None:
+                transformed_value = self.rdf_transform([{"value": new_value[0], "language": new_value[1]}])
+        return transformed_value
 
     def get_display_value(self, tile, node):
         data = self.get_tile_data(tile)
