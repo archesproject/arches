@@ -9,9 +9,9 @@
         <i data-bind="css: {'ion-asterisk widget-label-required': node.isrequired}"></i>
         <!-- /ko -->
         <div class="col-xs-12">
-            <div style="pad-hor">
+            <div class="pad-hor">
                 <div class="input-group date">
-                    <input type="text" data-bind="value: value, placeholder: placeholder, disable: disabled, datepicker: {format: dateFormat, viewMode: viewMode, maxDate: maxDate, minDate: minDate}" class="form-control input-lg"><span class="input-group-addon"><i class="fa fa-calendar fa-lg"></i></span>
+                    <input type="text" data-bind="value: value, placeholder: placeholder, disable: disabled, datepicker: {format: dateFormat, viewMode: viewMode, maxDate: maxDate, minDate: minDate}, attr:{'aria-label': label}" class="form-control input-lg"><span class="input-group-addon"><i class="fa fa-calendar fa-lg"></i></span>
                 </div>
             </div>
             <!-- <input type="text" data-bind="datepicker: value, placeholder: placeholder" class="form-control input-lg widget-input"> -->
@@ -35,28 +35,28 @@
         {% trans "Minimum Date" %}
 </div>
 <div class="col-xs-12 pad-no crud-widget-container">
-    <input type="" id="datetimepickermin" placeholder="{% trans "Minimum Date" %}" class="form-control input-md widget-input" data-bind="value: minDate, datepicker: {format: 'YYYY-MM-DD', viewMode: viewMode, minDate: false, maxDate: false}">
+    <input type="" id="datetimepickermin" placeholder="{% trans "Minimum Date" %}" aria-label="{% trans "Minimum Date" %}" class="form-control input-md widget-input" data-bind="value: minDate, datepicker: {format: 'YYYY-MM-DD', viewMode: viewMode, minDate: false, maxDate: false}">
 </div>
 <div class="control-label">
         {% trans "Maximum Date" %}
 </div>
 <div class="col-xs-12 pad-no crud-widget-container">
-    <input type="" id="datetimepickermax" placeholder="{% trans "Maximum Date" %}" class="form-control input-md widget-input" data-bind="value: maxDate, datepicker: {format: 'YYYY-MM-DD', viewMode: viewMode, minDate: false, maxDate: false}">
+    <input type="" id="datetimepickermax" placeholder="{% trans "Maximum Date" %}" aria-label="{% trans "Maximum Date" %}" class="form-control input-md widget-input" data-bind="value: maxDate, datepicker: {format: 'YYYY-MM-DD', viewMode: viewMode, minDate: false, maxDate: false}">
 </div>
 <div class="control-label">
         {% trans "View Mode" %}
 </div>
 <div class="col-xs-12 pad-no crud-widget-container">
-    <select type="" id="" placeholder="{% trans " View Mode " %}" data-bind="options:viewModeOptions, optionsText:'name', optionsValue:'id', event: {change: onViewModeSelection}, value: viewMode, chosen: {width: '100%', disable_search: true}"></select>
+    <select type="" placeholder="{% trans " View Mode " %}" aria-label="{% trans " View Mode " %}" data-bind="options:viewModeOptions, optionsText:'name', optionsValue:'id', event: {change: onViewModeSelection}, value: viewMode, chosen: {width: '100%', disable_search: true}"></select>
 </div>
 <div class="control-label">
     {% trans "Default Value" %}
 </div>
 <div>
     <div class="form-group col-xs-12 pad-no crud-widget-container">
-        <div style="pad-hor">
+        <div class="pad-hor">
             <div class="input-group date">
-                <input type="text" data-bind="value: defaultValue, placeholder: placeholder, datepicker: {format: dateFormat, viewMode: viewMode, maxDate: maxDate, minDate: minDate}" class="form-control input-md" style="height: 32px;"><span class="input-group-addon"><i class="fa fa-calendar fa-lg"></i></span>
+                <input type="text" data-bind="value: defaultValue, placeholder: placeholder, datepicker: {format: dateFormat, viewMode: viewMode, maxDate: maxDate, minDate: minDate}, attr:{'aria-label': placeholder}" class="form-control input-md" style="height: 32px;"><span class="input-group-addon"><i class="fa fa-calendar fa-lg"></i></span>
             </div>
         </div>
     </div>

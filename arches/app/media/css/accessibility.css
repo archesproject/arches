@@ -134,3 +134,23 @@
 .arches-toggle-subtitle {
     color: #465B72;
 }
+
+.btn-file-select {
+    background: #4824FF;
+}
+
+.btn-file-upload-reset, .btn-file-upload-limit {
+    color: #10599E;
+}
+
+.btn-file-upload-reset:hover, .btn-file-upload-reset:focus {
+    text-decoration: underline;
+}
+
+.btn-file-select:focus,
+.btn-file-upload-reset:focus,
+.file-upload-filter:focus,
+.btn-file-upload-limit:focus,
+.file-download:focus {
+    outline: #006600 solid 3px !important;
+}

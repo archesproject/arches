@@ -43,7 +43,7 @@
                 <h4>{% trans "Uploaded Files" %}</h4>
                 <div class="file-upload-options">
                     <!--ko if: filesJSON().length > 1-->
-                    <input data-bind="textInput: filter" type="text" placeholder="{% trans 'find a file...' %}" class="file-upload-filter">
+                    <input data-bind="textInput: filter" type="text" placeholder="{% trans 'find a file...' %}" aria-label="{% trans 'find a file...' %}" class="file-upload-filter">
                     <!-- /ko -->
 
                     <!-- Clear Search -->
@@ -55,12 +55,14 @@
                     <!-- ko if: (!filter() || filter() == "") -->
                     <span data-bind="text: filesJSON().length + '{% trans " file(s) uploaded" %}'"></span>
                     <!-- /ko -->
-                    <button type="button" class="btn btn-file-upload-reset" data-bind="click: reset">
-                        <span>{% trans "delete all files" %}</span>
-                    </button>
-                    <button type="button" class="btn btn-file-upload-reset dropzone fileinput-button dz-clickable" data-bind="css: uniqueidClass">
-                        <span>{% trans "add more files" %}</span>
-                    </button>
+                    <div class="pull-right">
+                        <button type="button" class="btn btn-file-upload-reset dropzone fileinput-button dz-clickable" data-bind="css: uniqueidClass">
+                            <span>{% trans "add more files" %}</span>
+                        </button>
+                        <button type="button" class="btn btn-file-upload-reset" data-bind="click: reset">
+                            <span>{% trans "delete all files" %}</span>
+                        </button>
+                    </div>
                 </div>
             </div>
             <div class="dz-previews" data-bind="css: uniqueidClass">
@@ -78,11 +80,15 @@
                                     <!-- ko if: $data.error -->
                                     <span class="dz-error text-danger text-sm" data-bind="text: '{% trans "error" %}'"></span>
                                     <!-- /ko -->
-                                    <span class="text-sm"><a data-bind="attr: {href: ko.unwrap(url) ? $parent.getFileUrl(url) : content, download: name}, click: function(){return ko.unwrap(url) ? true : false}, clickBubble: false"><span data-bind="text: ko.unwrap(url) ? '{% trans "Download" %}' : '{% trans "Unsaved" %}'"></span></a></span>
+                                    <span class="text-sm">
+                                        <a href="#" class="file-download" data-bind="attr: {href: ko.unwrap(url) ? url : content, download: name}, click: function(){return ko.unwrap(url) ? true : false}, clickBubble: false">
+                                            <span data-bind="text: ko.unwrap(url) ? '{% trans "Download" %}' : '{% trans "Unsaved" %}'"></span>
+                                        </a>
+                                    </span>
                                 </div>
                                 <div class="file-upload-card-detail-right">
                                     <div class="media-right" data-bind="click: $parent.removeFile">
-                                        <button class="btn btn-xs btn-danger btn-file-cancel"><i class="ion ion-close"></i></button>
+                                        <button class="btn btn-xs btn-danger btn-file-cancel" data-bind="attr:{'aria-label': 'Delete image - ' + name}"><i class="ion ion-close"></i></button>
                                     </div>
                                     <div class="file-size-label">
                                         <span class="text-sm" data-bind="html: $parent.formatSize($data)"></span>
@@ -114,7 +120,7 @@
                                     <div class="media-right" data-bind="click: $parent.removeFile">
                                         <button class="btn btn-xs btn-danger btn-file-cancel"><i class="ion ion-close"></i></button>
                                     </div>
-                                    <div class="">
+                                    <div>
                                         <span class="text-sm" data-bind="html: $parent.formatSize($data)"></span>
                                     </div>
                                 </div>
@@ -145,14 +151,14 @@
     {% trans "Accepted File Types" %}
 </div>
 <div class="col-xs-12 pad-no crud-widget-container">
-    <input type="" placeholder="{% trans "example: .jpg, .png, .txt" %}" id="" class="form-control input-md widget-input" data-bind="value: acceptedFiles, valueUpdate: 'keyup'">
+    <input type="" placeholder="{% trans "example: .jpg, .png, .txt" %}" class="form-control input-md widget-input" data-bind="value: acceptedFiles, valueUpdate: 'keyup'">
 </div>
 
 <div class="control-label">
     {% trans "Max File Size (mb)" %}
 </div>
 <div class="col-xs-12 pad-no crud-widget-container">
-    <input type="number" placeholder="{% trans "Max File Size (mb)" %}" id="" class="form-control input-md widget-input" data-bind="value: maxFilesize">
+    <input type="number" placeholder="{% trans "Max File Size (mb)" %}" class="form-control input-md widget-input" data-bind="value: maxFilesize">
 </div>
 
 {% endblock config_form %}
@@ -166,7 +172,7 @@
 
 <!-- ko foreach: reportFiles() -->
 <dd>
-    <a class="" data-bind="attr: {href: $parent.getFileUrl(url)}">
+    <a data-bind="attr: {href: url}">
         <i class="ion ion-forward"></i>
         <span data-bind="text: name"></span>
     </a>
@@ -178,8 +184,8 @@
     <div id="report-image-grid" class="report-image-grid">
         <!-- ko foreach: reportImages() -->
         <div class="rp-image-grid-item">
-            <a id="" class="" target="_blank" data-bind="attr: {href: $parent.getFileUrl(url)}">
-                <img class="img-responsive" data-bind="attr: {src: $parent.getFileUrl(url), alt: name}">
+            <a target="_blank" data-bind="attr: {href: url}">
+                <img class="img-responsive" data-bind="attr: {src: url, alt: name}">
             </a>
         </div>
         <!-- /ko -->

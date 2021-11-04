@@ -2238,9 +2238,14 @@ div.final-cons-step-separator>h4 {
     border-color: #E53211;
 }
 
-.install-buttons .btn-warning:hover {
+.install-buttons .btn-warning:hover,
+.install-buttons .btn-warning:focus {
     background: #E53211;
     border-color: #B02107;
+}
+
+.install-buttons .btn-warning:focus {
+    text-decoration: underline;
 }
 
 .install-buttons .btn-danger {
@@ -7859,7 +7864,6 @@ span.file-upload-clear-filter {
 .btn-file-upload-reset {
     color: #489EED;
     font-size: 12px;
-    float: right;
 }
 
 .file-upload-card-detail-right {
