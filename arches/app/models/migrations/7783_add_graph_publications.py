@@ -71,7 +71,7 @@ class Migration(migrations.Migration):
         migrations.AlterField(
             model_name="graphmodel",
             name="isactive",
-            field=models.BooleanField(verbose_name="isactive", default=False),
+            field=models.BooleanField(verbose_name="isactive", default=True),
         ),
         migrations.RemoveField(
             model_name="graphmodel",
