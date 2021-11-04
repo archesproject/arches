@@ -30,7 +30,8 @@
                     data-bind="
                         select2Query: {
                             select2Config: select2Config
-                        }
+                        },
+                        attr:{'aria-label': label}
                     ">
             </div>
 
@@ -41,8 +42,8 @@
         <!-- ko if: !!value() && value().length > 5-->
         <div class="rr-widget-filter-panel">
             <div class="list-filter">
-                <input type="text" class="form-control" style="width: 225px; height:28px;" placeholder="{% trans 'filter...' %}" data-bind="textInput: filter"></input>
-                <span class="clear-node-search" data-bind="visible: filter().length > 0, click: function() { filter('');}"><i class="fa fa-times-circle"></i></span>
+                <input type="text" class="form-control" style="width: 225px; height:28px;" placeholder="{% trans 'filter...' %}" aria-label="{% trans 'filter...' %}" data-bind="textInput: filter"></input>
+                <span class="clear-node-search" data-bind="visible: filter().length > 0, click: function() { filter('');}" tabindex="0" onkeyup="if(event.which == 13 || event.keyCode == 13){ $(this).trigger('click'); }"><i class="fa fa-times-circle"></i></span>
             </div>
         </div>
         <!-- /ko -->
@@ -67,7 +68,7 @@
                                 <i class="fa fa-info-circle"></i>
                             </button>
                         </div>
-                        <div class="rr-table-column" style="flex-grow: 1; cursor: pointer;" data-bind="click: function() { self.toggleSelectedResourceRelationship($data); }, clickBubble: false">
+                        <div class="rr-table-column" style="flex-grow: 1; cursor: pointer;" data-bind="click: function() { self.toggleSelectedResourceRelationship($data); }, clickBubble: false" tabindex="0" onkeyup="if(event.which == 13 || event.keyCode == 13){ $(this).trigger('click'); }">
                             <div class="rr-table-instance-label" style="padding-left: 10px;" data-bind="text: $data.resourceName()">
                             </div>
                         </div>
@@ -149,7 +150,7 @@
 <div class="create-resource-instance-card-component rr-table-pop"
     data-bind="style: {transform: !!reportResourceId() ? 'translate(0,0)' : 'translate(100%,0)'}">
     <div class="create-instance-header" style="display: flex; justify-content: space-between;">{% trans "Related Resource Summary" %}
-        <div data-bind="click: function(){reportResourceId(null)}, clickBubble: false" class="close-new-step">
+        <div data-bind="click: function(){reportResourceId(null)}, clickBubble: false" class="close-new-step" tabindex="0" onkeyup="if(event.which == 13 || event.keyCode == 13){ $(this).trigger('click'); }">
             <i class="fa fa-times-circle"></i>
         </div>
     </div>
@@ -171,6 +172,7 @@
     </div>
     <div class="col-xs-12 pad-no crud-widget-container">
         <input placeholder="{% trans "Placeholder" %}"
+            aria-label="{% trans "Placeholder" %}"
             class="form-control input-md widget-input"
             data-bind="value: placeholder, valueUpdate: 'keyup'">
     </div>

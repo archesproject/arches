@@ -90,26 +90,43 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                             </li>
                         {% else %}
                             <li>
-                                <a class="auth-welcome" href="{% url 'user_profile_manager' %}">
-                                    {% trans "Welcome, " %} {{ user.first_name|default:user.username }}
-                                </a>
+                                <a href="#info-block-1">{% trans "Arches Features" %}</a>
                             </li>
                             <li>
-                                <a class="application-login" href="{% url 'auth' %}?next={% url 'home' %}{% if user.username != 'anonymous' %}&logout=true{% endif %}">{% trans 'Log off' %}</a>
+                                <a href="{% url 'search_home' %}">{% trans "Search Arches" %}</a>
                             </li>
-                        {% endif %}
-                        {% if show_language_swtich %}
-                            <li>
-                                {% get_current_language as LANGUAGE_CODE %}
-                                <div class="lang-switch" style="max-width: none;" data-bind='component: {
-                                    name: "views/components/language-switcher",
-                                    params: {
-                                        current_language: "{{LANGUAGE_CODE}}"
-                                    }
-                                }'></div>
-                            </li>
-                        {% endif %}
-                    </ul>
+                            {% if user|can_create_resource_instance and user.username != 'anonymous' %}
+                                <li>
+                                    <a href="{% url 'resource' %}" target="_blank">{% trans "Manage" %}</a>
+                                </li>
+                            {% endif %}
+                            {% if user.username == 'anonymous' %}
+                                <li>
+                                    <a class="application-login" id="auth-link" href="{% url 'auth' %}?next={% url 'home' %}{% if user.username != 'anonymous' %}&logout=true{% endif %}">{% trans "Sign in" %}</a>
+                                </li>
+                            {% else %}
+                                <li>
+                                    <a class="auth-welcome" href="{% url 'user_profile_manager' %}">
+                                        {% trans "Welcome, " %} {{ user.first_name|default:user.username }}
+                                    </a>
+                                </li>
+                                <li>
+                                    <a class="application-login" href="{% url 'auth' %}?next={% url 'home' %}{% if user.username != 'anonymous' %}&logout=true{% endif %}">{% trans 'Log off' %}</a>
+                                </li>
+                            {% endif %}
+                            {% if show_language_swtich %}
+                                <li>
+                                    {% get_current_language as LANGUAGE_CODE %}
+                                    <div class="lang-switch" style="max-width: none;" data-bind='component: {
+                                        name: "views/components/language-switcher",
+                                        params: {
+                                            current_language: "{{LANGUAGE_CODE}}"
+                                        }
+                                    }'></div>
+                                </li>
+                            {% endif %}
+                        </ul>
+                    </div>
                 </div>
             </div>
         </nav>
