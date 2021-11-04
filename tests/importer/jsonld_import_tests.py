@@ -198,7 +198,8 @@ class JsonLDImportTests(ArchesTestCase):
         data = """{
             "@id": "http://localhost:8000/resources/221d1154-fa8e-11e9-9cbb-3af9d3b32b71",
             "@type": "http://www.cidoc-crm.org/cidoc-crm/E22_Man-Made_Object",
-            "http://www.cidoc-crm.org/cidoc-crm/P3_has_note": [{"@value": "test!", "@language": "en"}, {"@value": "prueba!", "@language": "es"}]
+            "http://www.cidoc-crm.org/cidoc-crm/P3_has_note": 
+                [{"@value": "test!", "@language": "en"}, {"@value": "prueba!", "@language": "es"}]
             }"""
 
         url = self._create_url(

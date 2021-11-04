@@ -455,8 +455,10 @@ class JsonLdReader(Reader):
                 raise ("Local reference not found")
 
     def is_multilingual_string_node(self, literal_node_values: list, graph_node: dict) -> bool:
+        """Test a graph node and literal node values to determine if the literals constitute a multilingual string."""
         # multilingual string nodes are imported as a chunk of values rather than discrete values.
-        # determined by graph node type (string), cardinality (1), number of jsonld literal values (> 1), and number of languages present in jsonld (> 1)
+        # determined by graph node type (string), cardinality (1), number of jsonld literal values (> 1),
+        # and number of languages present in jsonld (> 1)
         if (
             graph_node["datatype_type"] == "string"
             and graph_node["cardinality"] == "1"
