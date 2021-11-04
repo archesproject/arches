@@ -107,12 +107,24 @@ class StringDataType(BaseDataType):
             if ("language" in val and val["language"] is not None) or ("@language" in val and val["@language"] is not None):
                 try:
                     language = models.Language.objects.get(code=val["language"] if "language" in val else val["@language"])
-                    incoming_value = {**incoming_value, language.code: {"value": val["value"] if "value" in val else val["@value"], "direction": language.default_direction}}
+                    incoming_value = {
+                        **incoming_value,
+                        language.code: {
+                            "value": val["value"] if "value" in val else val["@value"],
+                            "direction": language.default_direction,
+                        },
+                    }
                 except models.Language.DoesNotExist:
                     ValueError("Language does not exist in Language table - cannot create string.")
             else:
-                incoming_value = {**incoming_value, default_language.code: {"value": val["value"] if "value" in val else val["@value"], "direction": default_language.default_direction}}
-             
+                incoming_value = {
+                    **incoming_value,
+                    default_language.code: {
+                        "value": val["value"] if "value" in val else val["@value"],
+                        "direction": default_language.default_direction,
+                    },
+                }
+
         return incoming_value if len(incoming_value.keys()) > 0 else None
 
     def validate_from_rdf(self, value):
@@ -122,7 +134,7 @@ class StringDataType(BaseDataType):
         elif isinstance(value, str):
             transformed_value = self.rdf_transform([{"value": value}])
         incoming_value = value if transformed_value is None else transformed_value
-        
+
         return self.validate(incoming_value)
 
     def clean(self, tile, nodeid):

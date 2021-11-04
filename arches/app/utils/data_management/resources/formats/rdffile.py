@@ -455,16 +455,17 @@ class JsonLdReader(Reader):
                 raise ("Local reference not found")
 
     def is_multilingual_string_node(self, literal_node_values: list, graph_node: dict) -> bool:
-        # multilingual string nodes are imported as a chunk of values rather than discrete values.  
+        # multilingual string nodes are imported as a chunk of values rather than discrete values.
         # determined by graph node type (string), cardinality (1), number of jsonld literal values (> 1), and number of languages present in jsonld (> 1)
-        if graph_node["datatype_type"] == "string" and \
-            graph_node["cardinality"] == "1" and \
-            len(literal_node_values) > 1 and \
-            len(set(val["language"] for val in literal_node_values)) > 1:
+        if (
+            graph_node["datatype_type"] == "string"
+            and graph_node["cardinality"] == "1"
+            and len(literal_node_values) > 1
+            and len(set(val["language"] for val in literal_node_values)) > 1
+        ):
             return True
         else:
             return False
-
 
     def data_walk(self, data_node, tree_node, result, tile=None):
         my_tiles = []
@@ -476,14 +477,19 @@ class JsonLdReader(Reader):
         for k, v in data_node.items():
             if k in ["@id", "@type"]:
                 continue
-            
+
             # extract all @values for the current node
-            values = [{
-                        "value": vi["@value"],
-                        "clss": vi.get("@type", "http://www.w3.org/2000/01/rdf-schema#Literal"),
-                        "language": vi.get("@language", None)
-                      } for vi in v if "@value" in vi and vi.get("@type", "http://www.w3.org/2000/01/rdf-schema#Literal") == "http://www.w3.org/2000/01/rdf-schema#Literal"]
-            
+            values = [
+                {
+                    "value": vi["@value"],
+                    "clss": vi.get("@type", "http://www.w3.org/2000/01/rdf-schema#Literal"),
+                    "language": vi.get("@language", None),
+                }
+                for vi in v
+                if "@value" in vi
+                and vi.get("@type", "http://www.w3.org/2000/01/rdf-schema#Literal") == "http://www.w3.org/2000/01/rdf-schema#Literal"
+            ]
+
             # always a list
             for vi in v:
                 if "@value" in vi:
@@ -561,9 +567,9 @@ class JsonLdReader(Reader):
                                 print(f"Errored testing concept {uri} in collection {collid}")
                         elif self.is_semantic_node(o):
                             if uri != "":
-                                if o['node_id'] in uri:
+                                if o["node_id"] in uri:
                                     possible.append([o, ""])
-                            else:    
+                            else:
                                 possible.append([o, ""])
                         elif o["datatype"].accepts_rdf_uri(uri):
                             # print(f"datatype for {o['name']} accepts uri")
@@ -603,7 +609,7 @@ class JsonLdReader(Reader):
                     graph_node = branch[0]
                     if self.is_multilingual_string_node(values, graph_node):
                         node_value = graph_node["datatype"].from_rdf(values)
-                    else: 
+                    else:
                         node_value = graph_node["datatype"].from_rdf(vi)
                     # node_value might be None if the validation of the datatype fails
                     # XXX Should we check this here, or raise in the datatype?
@@ -639,10 +645,12 @@ class JsonLdReader(Reader):
                 # This is going to be the result passed down if we recurse
                 bnode = {"data": [], "nodegroup_id": branch[0]["nodegroup_id"], "cardinality": branch[0]["cardinality"]}
 
-                if branch[0]["datatype"].collects_multiple_values() and tile and str(tile.nodegroup.pk) == branch[0]["nodegroup_id"] :
+                if branch[0]["datatype"].collects_multiple_values() and tile and str(tile.nodegroup.pk) == branch[0]["nodegroup_id"]:
                     # iterating through a root node *-list type
                     pass
-                elif bnodeid == branch[0]["nodegroup_id"] and not (self.is_multilingual_string_node(values, branch[0]) and bnodeid in result):
+                elif bnodeid == branch[0]["nodegroup_id"] and not (
+                    self.is_multilingual_string_node(values, branch[0]) and bnodeid in result
+                ):
                     # Used to pick the previous tile in loop which MIGHT be the parent (but might not)
                     parenttile_id = result["tile"].tileid if "tile" in result else None
                     tile = Tile(

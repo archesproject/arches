@@ -109,7 +109,7 @@ class JsonLDImportTests(ArchesTestCase):
             archesfile = JSONDeserializer().deserialize(f)
         ResourceGraphImporter(archesfile["graph"])
 
-        #Add Spanish language for testing
+        # Add Spanish language for testing
         cls.spanish = Language(code="es", name="Spanish", default_direction="ltr", scope="data")
         cls.spanish.save()
 
@@ -214,19 +214,10 @@ class JsonLDImportTests(ArchesTestCase):
             js = js[0]
 
         self.assertTrue("@id" in js)
-        self.assertEqual(
-            js["@id"], 
-            "http://localhost:8000/resources/221d1154-fa8e-11e9-9cbb-3af9d3b32b71"
-        )
+        self.assertEqual(js["@id"], "http://localhost:8000/resources/221d1154-fa8e-11e9-9cbb-3af9d3b32b71")
         self.assertTrue("http://www.cidoc-crm.org/cidoc-crm/P3_has_note" in js)
-        self.assertEqual(
-            set(note["@language"] for note in js["http://www.cidoc-crm.org/cidoc-crm/P3_has_note"]),
-            set(["en", "es"])
-        )
-        self.assertEqual(
-            set(note["@value"] for note in js["http://www.cidoc-crm.org/cidoc-crm/P3_has_note"]),
-            set(["prueba!", "test!"])
-        )
+        self.assertEqual(set(note["@language"] for note in js["http://www.cidoc-crm.org/cidoc-crm/P3_has_note"]), set(["en", "es"]))
+        self.assertEqual(set(note["@value"] for note in js["http://www.cidoc-crm.org/cidoc-crm/P3_has_note"]), set(["prueba!", "test!"]))
 
     def test_1b_basic_post(self):
         data = """{
