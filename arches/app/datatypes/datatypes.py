@@ -104,9 +104,13 @@ class StringDataType(BaseDataType):
         default_language = models.Language.objects.get(code=get_language())
         incoming_value = {}
         for val in value:
-            if ("language" in val and val["language"] is not None) or ("@language" in val and val["@language"] is not None):
+            if (
+                ("language" in val and val["language"] is not None) or
+                ("@language" in val and val["@language"] is not None)
+            ):
                 try:
-                    language = models.Language.objects.get(code=val["language"] if "language" in val else val["@language"])
+                    language_code = val["language"] if "language" in val else val["@language"]
+                    language = models.Language.objects.get(code=language_code)
                     incoming_value = {
                         **incoming_value,
                         language.code: {

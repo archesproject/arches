@@ -168,6 +168,23 @@ class JsonLDImportTests(ArchesTestCase):
         self.assertTrue(rdffile.docCache[data["@context"]]["expires"] > datetime.datetime.now())
         self.assertTrue(data["@context"] in rdffile.docCache)
 
+    def test_literal_cardinality_failure(self):
+        """Multiple literals without language should fail to import to card 1 node."""
+        data = """{
+            "@id": "http://localhost:8000/resources/221d1154-fa8e-11e9-9cbb-3af9d3b32b71",
+            "@type": "http://www.cidoc-crm.org/cidoc-crm/E22_Man-Made_Object",
+            "http://www.cidoc-crm.org/cidoc-crm/P3_has_note": ["test!", "prueba!"]
+            }"""
+
+
+        graph_id = "bf734b4e-f6b5-11e9-8f09-a4d18cec433a"
+        resource_id = "221d1154-fa8e-11e9-9cbb-3af9d3b32b71"
+        
+        with self.assertRaises(ValueError):
+            data = JSONDeserializer().deserialize(data)
+            reader = JsonLdReader()
+            reader.read_resource(data, resourceid=resource_id, graphid=graph_id)
+
     def test_1_basic_import(self):
         """Plain string should import and be automatically converted to i8ln string of default language"""
         data = """{
