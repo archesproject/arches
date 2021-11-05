@@ -58,7 +58,7 @@ class Migration(migrations.Migration):
             field=I18n_JSONField(blank=True, null=True),
         ),
         migrations.AlterField(
-            model_name="widgets",
+            model_name="widget",
             name="defaultconfig",
             field=I18n_JSONField(blank=True, null=True),
         ),
