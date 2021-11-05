@@ -150,10 +150,6 @@ class ResourceEditorView(MapBaseManagerView):
             creator = instance_creator["creatorid"]
             user_created_instance = instance_creator["user_can_edit_instance_permissions"]
 
-        serialized_graph = None
-        if graph.publication and graph.publication.serialized_graph:
-            serialized_graph = JSONDeserializer().deserialize(graph.publication.serialized_graph)
-
         ontologyclass = None
         nodegroups = []
         editable_nodegroups = []
@@ -213,6 +209,10 @@ class ResourceEditorView(MapBaseManagerView):
                 if append_tile is True:
                     provisionaltiles.append(tile)
             tiles = provisionaltiles
+
+        serialized_graph = None
+        if graph.publication and graph.publication.serialized_graph:
+            serialized_graph = JSONDeserializer().deserialize(graph.publication.serialized_graph)
 
         if serialized_graph:
             serialized_cards = serialized_graph['cards']
@@ -473,7 +473,7 @@ class ResourceEditLogView(BaseManagerView):
                 .order_by("-timestamp")[:100]
             )
             edited_ids = list({edit.resourceinstanceid for edit in recent_edits})
-            resources = Resource.objects.filter(resourceinstanceid__in=edited_ids)
+            resources = Resource.objects.filter(resourceinstanceid__in=edited_ids).select_related('graph')
             edit_type_lookup = {
                 "create": _("Resource Created"),
                 "delete": _("Resource Deleted"),
