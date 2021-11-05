@@ -633,10 +633,10 @@ class GeojsonFeatureCollectionDataType(BaseDataType):
                     arches_json_geometry["type"] = "Feature"
                     arches_json_geometry["id"] = str(uuid.uuid4())
                     arches_json_geometry["properties"] = {}
-                    
+
                     if "nodeid" in kwargs:
                         arches_json_geometry["properties"]["nodeId"] = kwargs["nodeid"]
-                    
+
                     arches_geojson["features"].append(arches_json_geometry)
             else:
                 arches_json_geometry = {}
@@ -644,10 +644,10 @@ class GeojsonFeatureCollectionDataType(BaseDataType):
                 arches_json_geometry["type"] = "Feature"
                 arches_json_geometry["id"] = str(uuid.uuid4())
                 arches_json_geometry["properties"] = {}
-                
+
                 if "nodeid" in kwargs:
                     arches_json_geometry["properties"]["nodeId"] = kwargs["nodeid"]
-                
+
                 arches_geojson["features"].append(arches_json_geometry)
 
         return arches_geojson

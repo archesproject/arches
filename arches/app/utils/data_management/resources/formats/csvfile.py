@@ -166,7 +166,12 @@ class CsvWriter(Writer):
                                 concept_export_value_type = None
                                 if k in concept_export_value_lookup:
                                     concept_export_value_type = concept_export_value_lookup[k]
-                                value = self.transform_value_for_export(self.node_datatypes[k], tile.data[k], concept_export_value_type, k,)
+                                value = self.transform_value_for_export(
+                                    self.node_datatypes[k],
+                                    tile.data[k],
+                                    concept_export_value_type,
+                                    k,
+                                )
                                 other_group_record[mapping[k]] = value
                         else:
                             del tile.data[k]
@@ -195,7 +200,10 @@ class CsvWriter(Writer):
             csvwriter = csv.DictWriter(dest, delimiter=",", fieldnames=csv_header)
             csvwriter.writeheader()
             csvs_for_export.append(
-                {"name": csv_name.split(".")[0] + "_groups." + csv_name.split(".")[1], "outputfile": dest,}
+                {
+                    "name": csv_name.split(".")[0] + "_groups." + csv_name.split(".")[1],
+                    "outputfile": dest,
+                }
             )
             for csv_record in other_group_records:
                 if "populated_node_groups" in csv_record:
@@ -797,7 +805,7 @@ class CsvReader(Reader):
                                 if collection_id is not None:
                                     value = concept_lookup.lookup_labelid_from_label(value, collection_id)
                         try:
-                            value = datatype_instance.transform_value_for_tile(value,nodeid=nodeid)
+                            value = datatype_instance.transform_value_for_tile(value, nodeid=nodeid)
                             errors = datatype_instance.validate(value, row_number=row_number, source=source, nodeid=nodeid)
                         except Exception as e:
                             errors.append(
