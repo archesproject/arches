@@ -24,6 +24,7 @@ from distutils.util import strtobool
 from django.core.exceptions import ObjectDoesNotExist, PermissionDenied
 from django.contrib.auth.models import User, Group, Permission
 from django.db import transaction
+from django.db.models.signals import pre_save
 from django.forms.models import model_to_dict
 from django.http import HttpResponseNotFound
 from django.http import HttpResponse
@@ -149,35 +150,30 @@ class ResourceEditorView(MapBaseManagerView):
             creator = instance_creator["creatorid"]
             user_created_instance = instance_creator["user_can_edit_instance_permissions"]
 
-        nodes = graph.node_set.all()
-        resource_graphs = (
-            models.GraphModel.objects.exclude(pk=settings.SYSTEM_SETTINGS_RESOURCE_MODEL_ID)
-            .exclude(isresource=False)
-            # .exclude(publication=None)
-        )
-        ontologyclass = [node for node in nodes if node.istopnode is True][0].ontologyclass or ""
-        relationship_type_values = get_resource_relationship_types()
+        serialized_graph = None
+        if graph.publication and graph.publication.serialized_graph:
+            serialized_graph = JSONDeserializer().deserialize(graph.publication.serialized_graph)
+
+        ontologyclass = None
         nodegroups = []
         editable_nodegroups = []
+
+        nodes = graph.node_set.all().select_related('nodegroup')
         for node in nodes:
+            if node.istopnode and not ontologyclass:
+                ontologyclass = node.ontologyclass
+
             if node.is_collector:
                 added = False
+
                 if request.user.has_perm("write_nodegroup", node.nodegroup):
                     editable_nodegroups.append(node.nodegroup)
                     nodegroups.append(node.nodegroup)
                     added = True
+                    
                 if not added and request.user.has_perm("read_nodegroup", node.nodegroup):
                     nodegroups.append(node.nodegroup)
 
-        nodes = nodes.filter(nodegroup__in=nodegroups)
-        cards = graph.cardmodel_set.order_by("sortorder").filter(nodegroup__in=nodegroups).prefetch_related("cardxnodexwidget_set")
-        cardwidgets = [
-            widget for widgets in [card.cardxnodexwidget_set.order_by("sortorder").all() for card in cards] for widget in widgets
-        ]
-        widgets = models.Widget.objects.all()
-        card_components = models.CardComponent.objects.all()
-        applied_functions = JSONSerializer().serialize(models.FunctionXGraph.objects.filter(graph=graph))
-        datatypes = models.DDataType.objects.all()
         user_is_reviewer = user_is_resource_reviewer(request.user)
         is_system_settings = False
 
@@ -217,19 +213,29 @@ class ResourceEditorView(MapBaseManagerView):
                 if append_tile is True:
                     provisionaltiles.append(tile)
             tiles = provisionaltiles
-        map_layers = models.MapLayer.objects.all()
-        map_markers = models.MapMarker.objects.all()
-        map_sources = models.MapSource.objects.all()
-        geocoding_providers = models.Geocoder.objects.all()
+
+        if serialized_graph:
+            serialized_cards = serialized_graph['cards']
+            cardwidgets = [
+                widget for widget in models.CardXNodeXWidget.objects.filter(pk__in=[ widget_dict['id'] for widget_dict in serialized_graph['widgets'] ])
+            ]
+        else:
+            cards = graph.cardmodel_set.order_by("sortorder").filter(nodegroup__in=nodegroups).prefetch_related("cardxnodexwidget_set")
+            serialized_cards = JSONSerializer().serializeToPython(cards)
+            cardwidgets = [
+                widget for widget in [card.cardxnodexwidget_set.order_by("sortorder").all() for card in cards]
+            ]
+
+        widgets = models.Widget.objects.all()
+        card_components = models.CardComponent.objects.all()
         templates = models.ReportTemplate.objects.all()
 
-        cards = JSONSerializer().serializeToPython(cards)
         editable_nodegroup_ids = [str(nodegroup.pk) for nodegroup in editable_nodegroups]
-        for card in cards:
+        for card in serialized_cards:
             card["is_writable"] = False
             if str(card["nodegroup_id"]) in editable_nodegroup_ids:
                 card["is_writable"] = True
-        can_delete = user_can_delete_resource(request.user, resourceid)
+
         context = self.get_context_data(
             main_script=main_script,
             resourceid=resourceid,
@@ -238,25 +244,29 @@ class ResourceEditorView(MapBaseManagerView):
             graphiconclass=graph.iconclass,
             graphname=graph.name,
             ontologyclass=ontologyclass,
-            resource_graphs=resource_graphs,
-            relationship_types=relationship_type_values,
+            resource_graphs=(
+                models.GraphModel.objects.exclude(pk=settings.SYSTEM_SETTINGS_RESOURCE_MODEL_ID)
+                .exclude(isresource=False)
+                # .exclude(publication=None)
+            ),
+            relationship_types=get_resource_relationship_types(),
             widgets=widgets,
             widgets_json=JSONSerializer().serialize(widgets),
             card_components=card_components,
             card_components_json=JSONSerializer().serialize(card_components),
             tiles=JSONSerializer().serialize(tiles),
-            cards=JSONSerializer().serialize(cards),
-            applied_functions=applied_functions,
+            cards=JSONSerializer().serialize(serialized_cards),
+            applied_functions=JSONSerializer().serialize(models.FunctionXGraph.objects.filter(graph=graph)),
             nodegroups=JSONSerializer().serialize(nodegroups),
-            nodes=JSONSerializer().serialize(nodes),
+            nodes=JSONSerializer().serialize(nodes.filter(nodegroup__in=nodegroups)),
             cardwidgets=JSONSerializer().serialize(cardwidgets),
-            datatypes_json=JSONSerializer().serialize(datatypes, exclude=["iconclass", "modulename", "classname"]),
-            map_layers=map_layers,
-            map_markers=map_markers,
-            map_sources=map_sources,
-            geocoding_providers=geocoding_providers,
+            datatypes_json=JSONSerializer().serialize(models.DDataType.objects.all(), exclude=["iconclass", "modulename", "classname"]),
+            map_layers=models.MapLayer.objects.all(),
+            map_markers=models.MapMarker.objects.all(),
+            map_sources=models.MapSource.objects.all(),
+            geocoding_providers=models.Geocoder.objects.all(),
             user_is_reviewer=json.dumps(user_is_reviewer),
-            user_can_delete_resource=can_delete,
+            user_can_delete_resource=user_can_delete_resource(request.user, resourceid),
             creator=json.dumps(creator),
             user_created_instance=json.dumps(user_created_instance),
             report_templates=templates,
@@ -693,7 +703,7 @@ class ResourceDescriptors(View):
 class ResourceReportView(MapBaseManagerView):
     def get(self, request, resourceid=None):
         resource = Resource.objects.only("graph_id").get(pk=resourceid)
-        graph = Graph.objects.only("name", "iconclass").get(graphid=resource.graph_id)
+        graph = Graph.objects.get(graphid=resource.graph_id)
 
         try:
             map_layers = models.MapLayer.objects.all()

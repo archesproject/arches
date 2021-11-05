@@ -70,7 +70,7 @@ class AdvancedSearch(BaseSearchFilter):
         resource_cards = models.CardModel.objects.filter(
             graph__isresource=True,
             # graph__publication=True
-        ).prefetch_related("nodegroup")
+        ).select_related("nodegroup")
         cardwidgets = models.CardXNodeXWidget.objects.filter(node__in=searchable_nodes)
         datatypes = models.DDataType.objects.all()
 
