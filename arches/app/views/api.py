@@ -359,8 +359,10 @@ class GeoJSON(APIBase):
                                 feature["properties"]["primary_name"] = self.get_name(tile.resourceinstance)
                             feature["properties"]["resourceinstanceid"] = tile.resourceinstance_id
                             feature["properties"]["tileid"] = tile.pk
-                            if feature["properties"]["nodeId"]:
+                            try:
                                 feature["properties"].pop("nodeId")
+                            except KeyError:
+                                pass
                             feature["properties"]["nodeid"] = node.pk
                             if include_geojson_link:
                                 feature["properties"]["geojson"] = "%s?tileid=%s&nodeid=%s" % (reverse("geojson"), tile.pk, node.pk)
