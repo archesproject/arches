@@ -242,9 +242,7 @@ def export_results(request):
                 ).format(**locals())
                 return JSONResponse({"success": True, "message": message})
             else:
-                message = _("Your search exceeds the {download_limit} instance download limit. Please refine your search").format(
-                    **locals()
-                )
+                message = _("Your search exceeds the {download_limit} instance download limit. Please refine your search").format(**locals())
                 return JSONResponse({"success": False, "message": message})
 
     elif format == "tilexl":
