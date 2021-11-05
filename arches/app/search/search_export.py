@@ -62,8 +62,7 @@ class SearchResultsExporter(object):
 
     def insert_subcard_below_parent_card(self, main_card_list, sub_card_list):
         for sub_card in sub_card_list:
-            nodegroup_obj = models.NodeGroup.objects.get(nodegroupid=sub_card.nodegroup_id)
-            parent_obj = nodegroup_obj.parentnodegroup_id
+            parent_obj = sub_card.nodegroup.parentnodegroup_id
             for main_card in main_card_list:
                 if main_card.nodegroup_id == parent_obj:
                     index_number = main_card_list.index(main_card) + 1
@@ -71,31 +70,17 @@ class SearchResultsExporter(object):
 
     def return_ordered_header(self, graphid, export_type):
 
-        # Will contain top level cards (i.e. for nodegroups with no parent) with sortorder populated
-        all_card_list_with_sort = []
-        # Will contain all cards with NO sortorder populated
-        card_list_no_sort = []
-        # Will contain cards for nodegroups with parent nodegroup with sortorder populated
         subcard_list_with_sort = []
-        # Will contain all cards as close to the order in the graph as possible
+        all_cards = models.CardModel.objects.filter(graph=graphid).prefetch_related("nodegroup")
+        all_card_list_with_sort = list(all_cards.exclude(sortorder=None).order_by("sortorder"))
+        card_list_no_sort = list(all_cards.filter(sortorder=None))
         sorted_card_list = []
-
-        graph_cards = list(models.CardModel.objects.filter(graph=graphid))
-
-        for graph_card in graph_cards:
-            if graph_card.sortorder == None:
-                card_list_no_sort.append(graph_card)
-            else:
-                all_card_list_with_sort.append(graph_card)
-        all_card_list_with_sort.sort(key=lambda x: x.sortorder)
 
         # Work out which cards with sort order are sub cards by looking at the
         # related nodegroup's parent nodegroup value
 
         for card_with_sortorder in all_card_list_with_sort:
-            nodegroup_obj = models.NodeGroup.objects.get(nodegroupid=card_with_sortorder.nodegroup_id)
-            parent_obj = nodegroup_obj.parentnodegroup_id
-            if parent_obj == None:
+            if card_with_sortorder.nodegroup.parentnodegroup_id is None:
                 sorted_card_list.append(card_with_sortorder)
             else:
                 subcard_list_with_sort.append(card_with_sortorder)
@@ -118,20 +103,15 @@ class SearchResultsExporter(object):
 
         ordered_list_all_nodes = []
         for sorted_card in sorted_card_list:
-            card_node_objects = list(models.CardXNodeXWidget.objects.filter(card_id=sorted_card.cardid))
+            card_node_objects = list(models.CardXNodeXWidget.objects.filter(card_id=sorted_card.cardid).prefetch_related("node"))
             if len(card_node_objects) > 0:
                 nodes_in_card = []
                 for card_node_object in card_node_objects:
-                    node_object = models.Node.objects.get(nodeid=card_node_object.node_id)
-                    if node_object.datatype != "semantic":
+                    if card_node_object.node.datatype != "semantic":
                         nodes_in_card.append(card_node_object)
-                    else:
-                        pass
-                node_object_list_sorted = sorted(nodes_in_card, key=lambda x: 0 if x.sortorder is None else x.sortorder)
+                node_object_list_sorted = sorted(nodes_in_card, key=lambda x: x.sortorder)
                 for sorted_node_object in node_object_list_sorted:
                     ordered_list_all_nodes.append(sorted_node_object)
-            else:
-                pass
 
         # Build the list of headers (in correct format for return file format) to be returned
         # from the ordered list of nodes, only where the exportable tag is true
@@ -139,14 +119,12 @@ class SearchResultsExporter(object):
         headers = []
         node_id_list = []
         for ordered_node in ordered_list_all_nodes:
-            node_object = models.Node.objects.get(nodeid=ordered_node.node_id)
-            if node_object.exportable == True:
+            node_object = ordered_node.node
+            if node_object.exportable is True:
                 if export_type == "csv":
                     if node_object.nodeid not in node_id_list:
                         headers.append(node_object.name)
                         node_id_list.append(node_object.nodeid)
-                    else:
-                        pass
 
                 elif export_type == "shp":
                     header_object = {}
@@ -156,12 +134,6 @@ class SearchResultsExporter(object):
                     if node_object.nodeid not in node_id_list:
                         headers.append(header_object)
                         node_id_list.append(node_object.nodeid)
-                    else:
-                        pass
-                else:
-                    pass
-            else:
-                pass
 
         return headers
 
@@ -199,7 +171,7 @@ class SearchResultsExporter(object):
 
             if format == "geojson":
 
-                if settings.EXPORT_DATA_FIELDS_IN_CARD_ORDER == True:
+                if settings.EXPORT_DATA_FIELDS_IN_CARD_ORDER is True:
                     headers = self.return_ordered_header(graph_id, "csv")
                 else:
                     headers = list(graph.node_set.filter(exportable=True).values_list("name", flat=True))
@@ -211,7 +183,7 @@ class SearchResultsExporter(object):
 
             if format == "tilecsv":
 
-                if settings.EXPORT_DATA_FIELDS_IN_CARD_ORDER == True:
+                if settings.EXPORT_DATA_FIELDS_IN_CARD_ORDER is True:
                     headers = self.return_ordered_header(graph_id, "csv")
                 else:
                     headers = list(graph.node_set.filter(exportable=True).values_list("name", flat=True))
@@ -223,7 +195,7 @@ class SearchResultsExporter(object):
 
             if format == "shp":
 
-                if settings.EXPORT_DATA_FIELDS_IN_CARD_ORDER == True:
+                if settings.EXPORT_DATA_FIELDS_IN_CARD_ORDER is True:
                     headers = self.return_ordered_header(graph_id, "shp")
                 else:
                     headers = graph.node_set.filter(exportable=True).values("fieldname", "datatype", "name")[::1]
