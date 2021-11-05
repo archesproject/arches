@@ -21,6 +21,14 @@ class Migration(migrations.Migration):
         '{{defaultValue}}', json_build_object('{0}', config->>'defaultValue')::jsonb, true) ||
         '{{"i18n_properties": ["label", "placeholder", "defaultValue"]}}'
         WHERE nodeid in (SELECT nodeid FROM nodes WHERE datatype = 'string');
+
+        UPDATE public.widgets
+        SET defaultconfig = defaultconfig || 
+            jsonb_set(
+                jsonb_set(defaultconfig, '{{defaultValue}}', json_build_object('{0}', defaultconfig->>'defaultValue')::jsonb, true), 
+            '{{placeholder}}', json_build_object('{0}', defaultconfig->>'placeholder')::jsonb, true) ||
+        '{"i18n_properties": ["placeholder", "defaultValue"]}'
+        WHERE datatype = 'string';
     """.format(
         settings.LANGUAGE_CODE
     )
@@ -31,7 +39,13 @@ class Migration(migrations.Migration):
         json_build_object('label', jsonb_extract_path(config, 'label', '{0}'))::jsonb ||
         json_build_object('placeholder', jsonb_extract_path(config, 'placeholder', '{0}'))::jsonb ||
         json_build_object('defaultValue', jsonb_extract_path(config, 'defaultValue', '{0}'))::jsonb
-        WHERE nodeid in (SELECT nodeid FROM nodes WHERE datatype = 'string')
+        WHERE nodeid in (SELECT nodeid FROM nodes WHERE datatype = 'string');
+
+        UPDATE public.widgets 
+        SET defaultconfig = defaultconfig - 'i18n_properties' || 
+        json_build_object('placeholder', jsonb_extract_path(defaultconfig, 'placeholder', '{0}'))::jsonb ||
+        json_build_object('defaultValue', jsonb_extract_path(defaultconfig, 'defaultValue', '{0}'))::jsonb
+        WHERE datatype = 'string';
     """.format(
         settings.LANGUAGE_CODE
     )
@@ -41,6 +55,11 @@ class Migration(migrations.Migration):
         migrations.AlterField(
             model_name="cardxnodexwidget",
             name="config",
+            field=I18n_JSONField(blank=True, null=True),
+        ),
+        migrations.AlterField(
+            model_name="widgets",
+            name="defaultconfig",
             field=I18n_JSONField(blank=True, null=True),
         ),
     ]
