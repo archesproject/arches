@@ -126,14 +126,10 @@ class StringDataType(BaseDataType):
     def get_search_terms(self, nodevalue, nodeid=None):
         terms = []
 
-        if nodevalue is not None:
-            if isinstance(nodevalue, str):
-                # TODO: fix tests where this condition fires
-                pass
-            else:
-                for key in nodevalue.keys():
-                    if settings.WORDS_PER_SEARCH_TERM is None or (len(nodevalue[key]["value"].split(" ")) < settings.WORDS_PER_SEARCH_TERM):
-                        terms.append({"language": key, "value": nodevalue[key]["value"]})
+        if nodevalue is not None and isinstance(nodevalue, dict):
+            for key in nodevalue.keys():
+                if settings.WORDS_PER_SEARCH_TERM is None or (len(nodevalue[key]["value"].split(" ")) < settings.WORDS_PER_SEARCH_TERM):
+                    terms.append({"language": key, "value": nodevalue[key]["value"]})
 
         return terms
 
