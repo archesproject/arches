@@ -27,7 +27,7 @@ class Migration(migrations.Migration):
             jsonb_set(
                 jsonb_set(defaultconfig, '{{defaultValue}}', json_build_object('{0}', defaultconfig->>'defaultValue')::jsonb, true),
             '{{placeholder}}', json_build_object('{0}', defaultconfig->>'placeholder')::jsonb, true) ||
-        '{"i18n_properties": ["placeholder", "defaultValue"]}'
+        '{{"i18n_properties": ["placeholder", "defaultValue"]}}'
         WHERE datatype = 'string';
     """.format(
         settings.LANGUAGE_CODE
