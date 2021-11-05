@@ -40,15 +40,29 @@ define([
             viewModel.isGraphPublished = ko.observable(ko.unwrap(data['graph'].publication_id));
             viewModel.graphPublicationNotes = ko.observable();
             viewModel.shouldShowGraphPublishButtons = ko.pureComputed(function() {
-                if (
-                    !viewModel.dirty()
-                    && !( viewModel.graphSettingsViewModel && viewModel.graphSettingsViewModel.dirty() ) 
-                    && !( viewModel.selectedNode() && viewModel.selectedNode().dirty() && viewModel.selectedNode().istopnode == false )
-                    && !( ko.unwrap(viewModel.cardTree.selection).model ? ko.unwrap(viewModel.cardTree.selection).model : ko.unwrap(viewModel.cardTree.selection).card ).dirty()
-                ) {
-                    return true;
+                var shouldShowGraphPublishButtons = true;
+
+                if (viewModel.dirty()) {
+                    shouldShowGraphPublishButtons = false;
                 }
-                return false;
+                else if (viewModel.graphSettingsViewModel && viewModel.graphSettingsViewModel.dirty()) {
+                    shouldShowGraphPublishButtons = false;
+                }
+                else if (viewModel.selectedNode() && viewModel.selectedNode().dirty() && viewModel.selectedNode().istopnode == false) {
+                    shouldShowGraphPublishButtons = false;
+                }
+                else if (ko.unwrap(viewModel.cardTree.selection)) {
+                    var selection = ko.unwrap(viewModel.cardTree.selection);
+
+                    if (selection.model && selection.model.dirty()) {
+                        shouldShowGraphPublishButtons = false
+                    }
+                    else if (selection.card && selection.card.dirty()) {
+                        shouldShowGraphPublishButtons = false
+                    }
+                }
+                
+                return shouldShowGraphPublishButtons;
             });
 
             var resources = ko.utils.arrayFilter(viewData.graphs, function(graph) {
