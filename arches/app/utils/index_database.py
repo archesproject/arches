@@ -33,8 +33,10 @@ def index_db(clear_index=True, batch_size=settings.BULK_IMPORT_BATCH_SIZE, quiet
     """
 
     index_concepts(clear_index=clear_index, batch_size=batch_size)
-    index_resources(clear_index=clear_index, batch_size=batch_size, quiet=quiet)
-    index_custom_indexes(clear_index=clear_index, batch_size=batch_size, quiet=quiet, use_subprocess=use_subprocess, max_subprocesses=max_subprocesses)
+    index_resources(
+        clear_index=clear_index, batch_size=batch_size, quiet=quiet, use_subprocess=use_subprocess, max_subprocesses=max_subprocesses
+    )
+    index_custom_indexes(clear_index=clear_index, batch_size=batch_size, quiet=quiet)
     index_resource_relations(clear_index=clear_index, batch_size=batch_size)
 
 
@@ -60,10 +62,19 @@ def index_resources(clear_index=True, batch_size=settings.BULK_IMPORT_BATCH_SIZE
         .exclude(graphid=settings.SYSTEM_SETTINGS_RESOURCE_MODEL_ID)
         .values_list("graphid", flat=True)
     )
-    index_resources_by_type(resource_types, clear_index=clear_index, batch_size=batch_size, quiet=quiet, use_subprocess=use_subprocess, max_subprocesses=max_subprocesses)
+    index_resources_by_type(
+        resource_types,
+        clear_index=clear_index,
+        batch_size=batch_size,
+        quiet=quiet,
+        use_subprocess=use_subprocess,
+        max_subprocesses=max_subprocesses,
+    )
 
 
-def index_resources_by_type(resource_types, clear_index=True, batch_size=settings.BULK_IMPORT_BATCH_SIZE, quiet=False, use_subprocess=False, max_subprocesses=0):
+def index_resources_by_type(
+    resource_types, clear_index=True, batch_size=settings.BULK_IMPORT_BATCH_SIZE, quiet=False, use_subprocess=False, max_subprocesses=0
+):
     """
     Indexes all resources of a given type(s)
 
@@ -76,55 +87,58 @@ def index_resources_by_type(resource_types, clear_index=True, batch_size=setting
     quiet -- Silences the status bar output during certain operations, use in celery operations for example
     use_subprocess (default False) -- runs the reindexing in multiple subprocesses to take advantage of parallel indexing
     max_subprocesses (default 0) -- by default (0) the use_subprocess function will create a subprocess per core. This overrides that setting.
-    
+
     """
-    
+
     status = ""
-    
+
     if isinstance(resource_types, str):
         resource_types = [resource_types]
 
     for resource_type in resource_types:
         start = datetime.now()
-        
+
         graph_name = models.GraphModel.objects.get(graphid=str(resource_type)).name
         print("Indexing resource type '{0}'".format(graph_name))
 
         os.environ["PYTHONWARNINGS"] = "ignore"
         q = Query(se=se)
-        
+
         term = Term(field="graph_id", term=str(resource_type))
         q.add_query(term)
         if clear_index:
             q.delete(index=RESOURCES_INDEX, refresh=True)
-        
-        #raise Exception("empty index")
+
+        # raise Exception("empty index")
 
         if use_subprocess:
-            resources = [str(rid) for rid in Resource.objects.filter(graph_id=str(resource_type)).values_list('resourceinstanceid',flat=True)]
+            resources = [
+                str(rid) for rid in Resource.objects.filter(graph_id=str(resource_type)).values_list("resourceinstanceid", flat=True)
+            ]
             resource_batches = []
             resource_count = 0
             batch_number = 0
             resource_batches.append([])
             for resource in resources:
-                resource_count+=1
+                resource_count += 1
                 resource_batches[batch_number].append(resource)
                 if resource_count == batch_size:
                     resource_batches.append([])
                     batch_number += 1
                     resource_count = 0
-            
+
             connections.close_all()
 
             if quiet is False:
                 bar = pyprind.ProgBar(len(resource_batches), bar_char="█") if len(resource_batches) > 1 else None
-            
+
             def process_complete_callback(result):
                 if quiet is False and bar is not None:
                     bar.update(item_id=result)
-                    
+
             def process_error_callback(err):
                 import traceback
+
                 if quiet is False and bar is not None:
                     bar.update()
                 try:
@@ -136,15 +150,17 @@ def index_resources_by_type(resource_types, clear_index=True, batch_size=setting
                     print(f"... error - type - {type(err)}")
                     print(f"... error - message - {err}")
                     print(f"... error - tracback - {tb}")
-                
+
             process_count = multiprocessing.cpu_count() if max_subprocesses == 0 else max_subprocesses
             pool = multiprocessing.Pool(processes=process_count)
             print(f"... resource type batch count (batch size={batch_size}): {batch_number}")
             for resource_batch in resource_batches:
-                pool.apply_async(_index_resource_batch, args=(resource_batch,), callback=process_complete_callback, error_callback=process_error_callback)
+                pool.apply_async(
+                    _index_resource_batch, args=(resource_batch,), callback=process_complete_callback, error_callback=process_error_callback
+                )
             pool.close()
             pool.join()
-                
+
         else:
             resources = Resource.objects.filter(graph_id=str(resource_type))
             datatype_factory = DataTypeFactory()
@@ -172,6 +188,7 @@ def index_resources_by_type(resource_types, clear_index=True, batch_size=setting
         )
     return status
 
+
 def _index_resource_batch(resourceids):
     os.environ.setdefault("PYTHONWARNINGS", "ignore")
     resources = Resource.objects.filter(resourceinstanceid__in=resourceids)
@@ -187,8 +204,9 @@ def _index_resource_batch(resourceids):
                 doc_indexer.add(index=RESOURCES_INDEX, id=document["resourceinstanceid"], data=document)
                 for term in terms:
                     term_indexer.add(index=TERMS_INDEX, id=term["_id"], data=term["_source"])
-    
+
     return os.getpid()
+
 
 def index_custom_indexes(index_name=None, clear_index=True, batch_size=settings.BULK_IMPORT_BATCH_SIZE, quiet=False):
     """
@@ -297,7 +315,6 @@ def index_concepts(clear_index=True, batch_size=settings.BULK_IMPORT_BATCH_SIZE)
             }
             concept_indexer.add(index=CONCEPTS_INDEX, id=doc["id"], data=doc)
             indexed_values.append(doc["id"])
-
 
         valueTypes = []
         for valuetype in models.DValueType.objects.filter(category="label").values_list("valuetype", flat=True):
