@@ -15,9 +15,9 @@ class Migration(migrations.Migration):
         GraphModel = apps.get_model("models", "GraphModel")
 
         for graph in GraphModel.objects.all():
-        # if graph.isactive:
-            graph_publication = GraphPublication.objects.create(graph=graph)
-            graph_publication.save()
+            if graph.isactive:
+                graph_publication = GraphPublication.objects.create(graph=graph)
+                graph_publication.save()
 
     def reverse_add_graph_transactions_table_data(apps, schema_editor):
         GraphPublication = apps.get_model("models", "GraphPublication")
@@ -38,8 +38,18 @@ class Migration(migrations.Migration):
         GraphModel = apps.get_model("models", "GraphModel")
 
         for graph in GraphModel.objects.all():
-            graph.publicationid = None
+            graph.publication = None
             graph.save()
+
+    def foo(apps, schema_editor):
+        pass
+
+    def bar(apps, schema_editor):
+        GraphModel = apps.get_model("models", "GraphModel")
+
+        for graph in GraphModel.objects.all():
+            if graph.publication:
+                graph.isactive = True
 
     operations = [
         migrations.CreateModel(
@@ -68,10 +78,11 @@ class Migration(migrations.Migration):
             field=models.ForeignKey(to="models.GraphPublication", db_column="publicationid", null=True, on_delete=models.SET_NULL),
         ),
         migrations.RunPython(forwards_add_graph_column_data, reverse_add_graph_column_data),
+        migrations.RunPython(foo, bar),
         migrations.AlterField(
             model_name="graphmodel",
             name="isactive",
-            field=models.BooleanField(verbose_name="isactive", default=True),
+            field=models.BooleanField(verbose_name="isactive", default=False),
         ),
         migrations.RemoveField(
             model_name="graphmodel",
