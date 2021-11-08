@@ -212,7 +212,7 @@ class ResourceEditorView(MapBaseManagerView):
 
         serialized_graph = None
         if graph.publication and graph.publication.serialized_graph:
-            serialized_graph = JSONDeserializer().deserialize(graph.publication.serialized_graph)
+            serialized_graph = graph.publication.serialized_graph
 
         if serialized_graph:
             serialized_cards = serialized_graph['cards']
@@ -247,7 +247,7 @@ class ResourceEditorView(MapBaseManagerView):
             resource_graphs=(
                 models.GraphModel.objects.exclude(pk=settings.SYSTEM_SETTINGS_RESOURCE_MODEL_ID)
                 .exclude(isresource=False)
-                # .exclude(publication=None)
+                .exclude(publication=None)
             ),
             relationship_types=get_resource_relationship_types(),
             widgets=widgets,
@@ -741,7 +741,7 @@ class RelatedResourcesView(BaseManagerView):
         models.GraphModel.objects.all()
         .exclude(pk=settings.SYSTEM_SETTINGS_RESOURCE_MODEL_ID)
         .exclude(isresource=False)
-        # .exclude(publication=None)
+        .exclude(publication=None)
     )
 
     def paginate_related_resources(self, related_resources, page, request):

@@ -1005,7 +1005,7 @@ class Card(APIBase):
 
         serialized_graph = None
         if graph.publication and graph.publication.serialized_graph:
-            serialized_graph = JSONDeserializer().deserialize(graph.publication.serialized_graph)
+            serialized_graph = graph.publication.serialized_graph
 
         if serialized_graph:
             serialized_cards = serialized_graph['cards']
@@ -1241,7 +1241,7 @@ class ResourceReport(APIBase):
         if "related_resources" not in exclude:
             resource_models = (
                 models.GraphModel.objects.filter(isresource=True)
-                # .exclude(publication=None)
+                .exclude(publication=None)
                 .exclude(pk=settings.SYSTEM_SETTINGS_RESOURCE_MODEL_ID)
             )
 
