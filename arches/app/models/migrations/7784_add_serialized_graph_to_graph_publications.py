@@ -2,6 +2,8 @@ from django.conf import settings
 from django.db import migrations, models
 from arches.app.models.graph import Graph
 from arches.app.utils.betterJSONSerializer import JSONSerializer
+from django.contrib.postgres.fields import JSONField
+
 
 
 class Migration(migrations.Migration):
@@ -31,8 +33,7 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name="graphpublication",
             name="serialized_graph",
-            field=models.TextField(default=""),
-            preserve_default=False,
+            field=JSONField(blank=True, db_column="serialized_graph", null=True),
         ),
         migrations.RunPython(forwards_add_serialized_graph_column_data, reverse_add_serialized_graph_column_data),
         migrations.AlterField(
