@@ -1576,7 +1576,7 @@ class Graph(models.GraphModel):
         """
         publication = models.GraphPublication.objects.create(
             graph=self,
-            serialized_graph=JSONSerializer().serialize(self),
+            serialized_graph=JSONSerializer().serialize(self, force_recalculation=True),
             notes=notes,
         )
         publication.save()

@@ -13,13 +13,9 @@ class Migration(migrations.Migration):
     ]
 
     def forwards_add_serialized_graph_column_data(apps, schema_editor):
-        GraphModel = apps.get_model("models", "GraphModel")
-
-        for graph in GraphModel.objects.all():
+        for graph in Graph.objects.all():
             if graph.publication:
-                arches_graph = Graph.objects.get(pk=graph.pk)
-                graph.publication.serialized_graph = JSONSerializer().serialize(arches_graph.serialize(force_recalculation=True))
-
+                graph.publication.serialized_graph = JSONSerializer().serialize(graph, force_recalculation=True)
                 graph.publication.save()
 
     def reverse_add_serialized_graph_column_data(apps, schema_editor):

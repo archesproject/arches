@@ -1,6 +1,8 @@
+import datetime
+import uuid
+
 from django.conf import settings
 from django.db import migrations, models
-import uuid
 import django.db.models.deletion
 
 
@@ -16,7 +18,10 @@ class Migration(migrations.Migration):
 
         for graph in GraphModel.objects.all():
             if graph.isactive:
-                graph_publication = GraphPublication.objects.create(graph=graph)
+                graph_publication = GraphPublication.objects.create(
+                    graph=graph,
+                    notes="Initial migration.",
+                )
                 graph_publication.save()
 
     def reverse_add_graph_transactions_table_data(apps, schema_editor):
@@ -57,7 +62,7 @@ class Migration(migrations.Migration):
                         null=True, db_column="userid", on_delete=django.db.models.deletion.CASCADE, to=settings.AUTH_USER_MODEL
                     ),
                 ),
-                ("published_time", models.DateTimeField(auto_now_add=True)),
+                ("published_time", models.DateTimeField(default=datetime.datetime.now())),
             ],
             options={
                 "db_table": "graph_publications",

@@ -49,6 +49,8 @@ class JSONSerializer(object):
         self.exclude = options.pop("exclude", None)
         self.use_natural_keys = options.pop("use_natural_keys", False)
         self.geom_format = options.pop("geom_format", "wkt")
+        self.force_recalculation = options.pop("force_recalculation", False)
+
         return self.handle_object(obj, self.selected_fields, self.exclude)
 
     def serialize(self, obj, **options):
@@ -61,6 +63,7 @@ class JSONSerializer(object):
         sort_keys = options.pop("sort_keys", True)
         options.pop("fields", None)
         options.pop("exclude", None)
+        options.pop('force_recalculation', False)
         return json.dumps(obj, cls=DjangoJSONEncoder, sort_keys=sort_keys, **options.copy())
 
     def handle_object(self, object, fields=None, exclude=None):
@@ -83,7 +86,16 @@ class JSONSerializer(object):
         elif isinstance(object, Model):
             if hasattr(object, "serialize"):
                 exclude = self.exclude
-                return self.handle_object(getattr(object, "serialize")(fields, exclude), fields, exclude)
+                serialize_function = getattr(object, "serialize")
+
+                # if the model's `serialize` method leverages a cache, force it recalculate all fields instead if arg is supplied
+                if self.force_recalculation:
+                    signature = inspect.signature(serialize_function)
+
+                    if 'force_recalculation' in [parameter.name for parameter in signature.parameters.values()]:
+                        return self.handle_object(serialize_function(fields, exclude, force_recalculation=True), fields, exclude)
+
+                return self.handle_object(serialize_function(fields, exclude), fields, exclude)
             else:
                 return self.handle_model(object, fields, self.exclude)
             # return PythonSerializer().serialize([object],**self.options.copy())[0]['fields']
