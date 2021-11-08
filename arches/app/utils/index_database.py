@@ -18,6 +18,8 @@ import multiprocessing
 import os
 import logging
 
+logger = logging.getLogger()
+
 
 def index_db(clear_index=True, batch_size=settings.BULK_IMPORT_BATCH_SIZE, quiet=False, use_subprocess=False, max_subprocesses=0):
     """
@@ -99,7 +101,7 @@ def index_resources_by_type(
         start = datetime.now()
 
         graph_name = models.GraphModel.objects.get(graphid=str(resource_type)).name
-        print("Indexing resource type '{0}'".format(graph_name))
+        logger.info("Indexing resource type '{0}'".format(graph_name))
 
         os.environ["PYTHONWARNINGS"] = "ignore"
         q = Query(se=se)
@@ -108,8 +110,6 @@ def index_resources_by_type(
         q.add_query(term)
         if clear_index:
             q.delete(index=RESOURCES_INDEX, refresh=True)
-
-        # raise Exception("empty index")
 
         if use_subprocess:
             resources = [
@@ -146,14 +146,14 @@ def index_resources_by_type(
                 except:
                     tb = traceback.format_exc()
                 finally:
-                    print(f"... error - PID: {os.getpid()}")
-                    print(f"... error - type - {type(err)}")
-                    print(f"... error - message - {err}")
-                    print(f"... error - tracback - {tb}")
+                    logger.debug(f"... error - PID: {os.getpid()}")
+                    logger.debug(f"... error - type - {type(err)}")
+                    logger.debug(f"... error - message - {err}")
+                    logger.debug(f"... error - tracback - {tb}")
 
             process_count = multiprocessing.cpu_count() if max_subprocesses == 0 else max_subprocesses
             pool = multiprocessing.Pool(processes=process_count)
-            print(f"... resource type batch count (batch size={batch_size}): {batch_number}")
+            logger.info(f"... resource type batch count (batch size={batch_size}): {batch_number}")
             for resource_batch in resource_batches:
                 pool.apply_async(
                     _index_resource_batch, args=(resource_batch,), callback=process_complete_callback, error_callback=process_error_callback
@@ -181,7 +181,7 @@ def index_resources_by_type(
 
         result_summary = {"database": len(resources), "indexed": se.count(index=RESOURCES_INDEX, body=q.dsl)}
         status = "Passed" if result_summary["database"] == result_summary["indexed"] else "Failed"
-        print(
+        logger.info(
             "Status: {0}, Resource Type: {1}, In Database: {2}, Indexed: {3}, Took: {4} seconds".format(
                 status, graph_name, result_summary["database"], result_summary["indexed"], (datetime.now() - start).seconds
             )
@@ -240,7 +240,7 @@ def index_resource_relations(clear_index=True, batch_size=settings.BULK_IMPORT_B
     """
 
     start = datetime.now()
-    print("Indexing resource to resource relations")
+    logger.info("Indexing resource to resource relations")
 
     cursor = connection.cursor()
     if clear_index:
@@ -275,7 +275,7 @@ def index_resource_relations(clear_index=True, batch_size=settings.BULK_IMPORT_B
             resource_relations_indexer.add(index=RESOURCE_RELATIONS_INDEX, id=doc["resourcexid"], data=doc)
 
     index_count = se.count(index=RESOURCE_RELATIONS_INDEX)
-    print(
+    logger.info(
         "Status: {0}, In Database: {1}, Indexed: {2}, Took: {3} seconds".format(
             "Passed" if cursor.rowcount == index_count else "Failed", cursor.rowcount, index_count, (datetime.now() - start).seconds
         )
@@ -293,7 +293,7 @@ def index_concepts(clear_index=True, batch_size=settings.BULK_IMPORT_BATCH_SIZE)
     """
 
     start = datetime.now()
-    print("Indexing concepts")
+    logger.info("Indexing concepts")
     cursor = connection.cursor()
     if clear_index:
         q = Query(se=se)
@@ -378,7 +378,7 @@ def index_concepts(clear_index=True, batch_size=settings.BULK_IMPORT_BATCH_SIZE)
     concept_count_in_db = cursor.fetchone()[0]
     index_count = se.count(index=CONCEPTS_INDEX)
 
-    print(
+    logger.info(
         "Status: {0}, In Database: {1}, Indexed: {2}, Took: {3} seconds".format(
             "Passed" if concept_count_in_db == index_count else "Failed", concept_count_in_db, index_count, (datetime.now() - start).seconds
         )
