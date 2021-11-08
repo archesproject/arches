@@ -50,7 +50,10 @@ class Migration(migrations.Migration):
         for graph in GraphModel.objects.all():
             if graph.publication:
                 graph.isactive = True
-                graph.save()
+            else:
+                graph.isactive = False
+
+            graph.save()
 
     operations = [
         migrations.CreateModel(
@@ -80,11 +83,11 @@ class Migration(migrations.Migration):
         ),
         migrations.RunPython(forwards_add_graph_column_data, reverse_add_graph_column_data),
         migrations.RunPython(forwards_update_isactive_column, backwards_update_isactive_column),
-        migrations.AlterField(
-            model_name="graphmodel",
-            name="isactive",
-            field=models.BooleanField(verbose_name="isactive", default=False),
-        ),
+        # migrations.AlterField(
+        #     model_name="graphmodel",
+        #     name="isactive",
+        #     field=models.BooleanField(verbose_name="isactive", default=False),
+        # ),
         migrations.RemoveField(
             model_name="graphmodel",
             name="isactive",
