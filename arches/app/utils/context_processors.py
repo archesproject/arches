@@ -78,6 +78,6 @@ def app_settings(request):
             "ACCESSIBILITY_MODE": settings.ACCESSIBILITY_MODE,
             "FORCE_SCRIPT_NAME": settings.FORCE_SCRIPT_NAME if settings.FORCE_SCRIPT_NAME is not None else "",
             "DEFAULT_LANGUAGE": get_language(),
-            "LANGUAGES": JSONSerializer().serialize(languages) if len(languages) is not 0 else JSONSerializer().serialize([]),
+            "LANGUAGES": JSONSerializer().serialize(languages) if len(languages) != 0 else JSONSerializer().serialize([]),
         }
     }

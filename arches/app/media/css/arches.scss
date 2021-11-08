@@ -4057,6 +4057,10 @@ div.dropdown-menu.open {
     line-height: 1.3333333;
 }
 
+.chosen-hide {
+    display: none;
+}
+
 .chosen-container-multi .chosen-choices li.search-field {
     margin: 2px 3px 0 10px;
 }
@@ -10616,6 +10620,17 @@ ul.pagination {
     margin-top: 0px;
     margin-bottom: 0px;
     padding: 10px 5px 0px 10px;
+}
+
+.search-listing-title.i8ln-alt a span {
+    font-size: 13px;
+}
+.search-listing-title.i8ln-alt a span::before {
+    content: "(";
+}
+
+.search-listing-title.i8ln-alt a span::after {
+    content: ")";
 }
 
 .search-listing-title.provisional-edits {

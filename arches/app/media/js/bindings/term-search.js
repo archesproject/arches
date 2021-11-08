@@ -25,7 +25,7 @@ define([
                 notifyValueChange(value);
             });
 
-            language.subscribe(function (value) {
+            language.subscribe((value) => {
                 notifyValueChange(value);
             });
 
