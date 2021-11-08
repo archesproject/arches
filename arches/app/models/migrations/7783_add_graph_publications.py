@@ -38,21 +38,10 @@ class Migration(migrations.Migration):
         GraphModel = apps.get_model("models", "GraphModel")
 
         for graph in GraphModel.objects.all():
-            graph.publication = None
-            graph.save()
-
-    def forwards_update_isactive_column(apps, schema_editor):
-        pass
-
-    def backwards_update_isactive_column(apps, schema_editor):
-        GraphModel = apps.get_model("models", "GraphModel")
-
-        for graph in GraphModel.objects.all():
             if graph.publication:
                 graph.isactive = True
-            else:
-                graph.isactive = False
 
+            graph.publication = None
             graph.save()
 
     operations = [
@@ -82,14 +71,4 @@ class Migration(migrations.Migration):
             field=models.ForeignKey(to="models.GraphPublication", db_column="publicationid", null=True, on_delete=models.SET_NULL),
         ),
         migrations.RunPython(forwards_add_graph_column_data, reverse_add_graph_column_data),
-        migrations.RunPython(forwards_update_isactive_column, backwards_update_isactive_column),
-        # migrations.AlterField(
-        #     model_name="graphmodel",
-        #     name="isactive",
-        #     field=models.BooleanField(verbose_name="isactive", default=False),
-        # ),
-        # migrations.RemoveField(
-        #     model_name="graphmodel",
-        #     name="isactive",
-        # ),
     ]
