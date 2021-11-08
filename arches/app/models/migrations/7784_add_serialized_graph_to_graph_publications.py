@@ -35,4 +35,13 @@ class Migration(migrations.Migration):
             preserve_default=False,
         ),
         migrations.RunPython(forwards_add_serialized_graph_column_data, reverse_add_serialized_graph_column_data),
+        migrations.AlterField(
+            model_name="graphmodel",
+            name="isactive",
+            field=models.BooleanField(verbose_name="isactive", default=False),
+        ),
+        migrations.RemoveField(
+            model_name="graphmodel",
+            name="isactive",
+        ),
     ]

@@ -88,8 +88,8 @@ class Migration(migrations.Migration):
         #     name="isactive",
         #     field=models.BooleanField(verbose_name="isactive", default=False),
         # ),
-        migrations.RemoveField(
-            model_name="graphmodel",
-            name="isactive",
-        ),
+        # migrations.RemoveField(
+        #     model_name="graphmodel",
+        #     name="isactive",
+        # ),
     ]
