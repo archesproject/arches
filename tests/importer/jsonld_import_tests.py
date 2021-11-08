@@ -4,6 +4,8 @@ import csv
 import base64
 import datetime
 from io import BytesIO
+
+from django.utils.translation import get_language
 from tests import test_settings
 from operator import itemgetter
 from django.core import management
@@ -174,7 +176,6 @@ class JsonLDImportTests(ArchesTestCase):
         )
 
         response = self.client.put(url, data=data, HTTP_AUTHORIZATION=f"Bearer {self.token}")
-
         self.assertEqual(response.status_code, 201)
 
         js = response.json()
@@ -184,7 +185,31 @@ class JsonLDImportTests(ArchesTestCase):
         self.assertTrue("@id" in js)
         self.assertTrue(js["@id"] == "http://localhost:8000/resources/221d1154-fa8e-11e9-9cbb-3af9d3b32b71")
         self.assertTrue("http://www.cidoc-crm.org/cidoc-crm/P3_has_note" in js)
-        self.assertTrue(js["http://www.cidoc-crm.org/cidoc-crm/P3_has_note"] == "test!")
+        self.assertTrue(js["http://www.cidoc-crm.org/cidoc-crm/P3_has_note"]["@value"] == "test!")
+
+    def test_1_basic_import_with_language(self):
+        data = """{
+            "@id": "http://localhost:8000/resources/221d1154-fa8e-11e9-9cbb-3af9d3b32b71",
+            "@type": "http://www.cidoc-crm.org/cidoc-crm/E22_Man-Made_Object",
+            "http://www.cidoc-crm.org/cidoc-crm/P3_has_note": {"@language": "es", "@value": "prueba!"}
+            }"""
+
+        url = self._create_url(
+            graph_id="bf734b4e-f6b5-11e9-8f09-a4d18cec433a",
+            resource_id="221d1154-fa8e-11e9-9cbb-3af9d3b32b71",
+        )
+        response = self.client.put(url, data=data, HTTP_AUTHORIZATION=f"Bearer {self.token}")
+        self.assertEqual(response.status_code, 201)
+
+        js = response.json()
+        if type(js) == list:
+            js = js[0]
+
+        self.assertTrue("@id" in js)
+        self.assertTrue(js["@id"] == "http://localhost:8000/resources/221d1154-fa8e-11e9-9cbb-3af9d3b32b71")
+        self.assertTrue("http://www.cidoc-crm.org/cidoc-crm/P3_has_note" in js)
+        self.assertTrue(js["http://www.cidoc-crm.org/cidoc-crm/P3_has_note"]["@value"] == "prueba!")
+        self.assertTrue(js["http://www.cidoc-crm.org/cidoc-crm/P3_has_note"]["@language"] == "es")
 
     def test_1b_basic_post(self):
         data = """{
@@ -207,7 +232,7 @@ class JsonLDImportTests(ArchesTestCase):
 
         self.assertTrue("@id" in js)
         self.assertTrue("http://www.cidoc-crm.org/cidoc-crm/P3_has_note" in js)
-        self.assertTrue(js["http://www.cidoc-crm.org/cidoc-crm/P3_has_note"] == "test!")
+        self.assertTrue(js["http://www.cidoc-crm.org/cidoc-crm/P3_has_note"]["@value"] == "test!")
 
     def test_2_complex_import_data(self):
         # Note that this tests #5136, as the P101 -> P2 is a concept with a concept
@@ -290,7 +315,7 @@ class JsonLDImportTests(ArchesTestCase):
         self.assertTrue(qual in proj)
         self.assertTrue(proj[qual] == "example")
         self.assertTrue(note in js)
-        self.assertTrue(js[note] == "Test Data")
+        self.assertTrue(js[note]["@value"] == "Test Data")
         self.assertTrue(pts in js)
         self.assertTrue(js[pts] == 12)
 
@@ -384,7 +409,7 @@ class JsonLDImportTests(ArchesTestCase):
         self.assertTrue(pts in js)
         self.assertTrue(set(js[pts]) == set([1, 2]))
         self.assertTrue(note in js)
-        self.assertTrue(set(js[note]) == set(["asdfasdfa", "1903-10-21"]))
+        self.assertTrue(set(x["@value"] for x in js[note]) == set(["asdfasdfa", "1903-10-21"]))
         self.assertTrue(temp in js)
         temps = js[temp]
         self.assertTrue(len(temps) == 4)
@@ -647,7 +672,7 @@ class JsonLDImportTests(ArchesTestCase):
 
         lo = js["http://www.cidoc-crm.org/cidoc-crm/P67i_is_referred_to_by"]
         self.assertTrue("http://www.cidoc-crm.org/cidoc-crm/P3_has_note" in lo)
-        self.assertTrue(lo["http://www.cidoc-crm.org/cidoc-crm/P3_has_note"] == "Test Content")
+        self.assertTrue(lo["http://www.cidoc-crm.org/cidoc-crm/P3_has_note"]["@value"] == "Test Content")
 
     def test_7b_5121_branches(self):
 
@@ -804,7 +829,7 @@ class JsonLDImportTests(ArchesTestCase):
         self.assertTrue(prod in js)
         prodjs = js[prod]
         self.assertTrue(note in prodjs)
-        self.assertTrue(prodjs[note] == "Production")
+        self.assertTrue(prodjs[note]["@value"] == "Production")
         self.assertTrue(note in js)
         self.assertTrue(js[note] == "#ff00ff")
 
@@ -863,11 +888,11 @@ class JsonLDImportTests(ArchesTestCase):
         self.assertTrue(len(contl) == 2)
         if note in contl[0]:
             print(f"note data: {contl[0]}")
-            self.assertTrue(contl[0][note] == "Import Note")
+            self.assertTrue(contl[0][note]["@value"] == "Import Note")
             jsts = contl[1][ts]
         else:
             print(f"note data: {contl[1]}")
-            self.assertTrue(contl[1][note] == "Import Note")
+            self.assertTrue(contl[1][note]["@value"] == "Import Note")
             jsts = contl[0][ts]
         self.assertTrue(jsts[botb]["@value"] == "2018-01-01")
 
