@@ -34,18 +34,22 @@ define(['knockout', 'underscore', 'viewmodels/widget', 'arches', 'bindings/chose
             }
 
             const init = async() => {
-                const languages = (await $.getJSON(arches.urls.languages))?.languages;
+                const languages = arches.languages;
+
                 const currentLanguage = languages?.find(element => element.code == arches.defaultLanguage);
                 self.languages(languages);
                 self.currentLanguage(currentLanguage);
     
-                if(!currentValue?.[currentLanguage.code]){
+                if (currentLanguage?.code && currentValue?.[currentLanguage?.code]){
+                    self.currentText(currentValue?.[currentLanguage.code]?.value);
+                    self.currentDirection(currentValue?.[currentLanguage.code]?.direction);
+                } else if (!currentLanguage?.code){
+                    self.currentText('');
+                    self.currentDirection('ltr');
+                } else {
                     self.currentText('');
                     self.currentDirection('ltr');
                     currentValue[currentLanguage.code] = {value: '', direction: 'ltr'}
-                } else {
-                    self.currentText(currentValue?.[currentLanguage.code]?.value);
-                    self.currentDirection(currentValue?.[currentLanguage.code]?.direction);
                 }
             }
 
