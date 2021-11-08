@@ -13666,6 +13666,15 @@ a.jstree-anchor.permissions-widget {
     top: 6px;
 }
 
+.i8ln-style-tools-collapser {
+    cursor: pointer;
+    font-size: 0.9em;
+    position: absolute;
+    padding: 0px 12px;
+    right: 0px;
+    z-index: 1;
+}
+
 .workbench-card-sidepanel .edtf-style-tools-collapser {
     left: 250px;
 }
@@ -13678,30 +13687,42 @@ a.jstree-anchor.permissions-widget {
     border-radius: 2px;
 }
 
-.edtf-style-tools-panel {
+.edtf-style-tools-panel, .i8ln-style-tools-panel {
     background: #fbfbfb;
     border: 1px solid #ddd;
-    padding: 10px 15px 5px 5px;
     margin-bottom: 5px;
     border-radius: 2px;
     height: 200px;
-    width: 600px;
-    overflow-y: scroll;
 }
 
-.edtf-style-tools-panel::-webkit-scrollbar {
+.edtf-style-tools-panel{
+    overflow-y: scroll;
+    height: 200px;
+    width: 600px;
+    padding: 10px 15px 5px 5px;
+}
+
+.i8ln-style-tools-panel {
+    padding: 10px;
+    height: 140px;
+    position: relative;
+    top: -10px;
+    width: 100%;
+}
+
+.edtf-style-tools-panel::-webkit-scrollbar, .i8ln-style-tools-panel::-webkit-scrollbar  {
     -webkit-appearance: none;
     width: 9px;
     border-left: 1px solid #ddd;
 }
 
-.edtf-style-tools-panel::-webkit-scrollbar-thumb {
+.edtf-style-tools-panel::-webkit-scrollbar-thumb, .i8ln-style-tools-panel::-webkit-scrollbar-thumb  {
     border-radius: 1px;
     background-color: rgba(0, 0, 0, .1);
     -webkit-box-shadow: 0 0 1px rgba(255, 255, 255, .5);
 }
 
-.workbench-card-sidepanel .edtf-style-tools-panel {
+.workbench-card-sidepanel .edtf-style-tools-panel, .workbench-card-sidepanel .i8ln-style-tools-panel {
     width: 340px;
 }
 
