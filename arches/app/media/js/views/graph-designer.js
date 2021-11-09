@@ -55,10 +55,10 @@ define([
                     var selection = ko.unwrap(viewModel.cardTree.selection);
 
                     if (selection.model && selection.model.dirty()) {
-                        shouldShowGraphPublishButtons = false
+                        shouldShowGraphPublishButtons = false;
                     }
                     else if (selection.card && selection.card.dirty()) {
-                        shouldShowGraphPublishButtons = false
+                        shouldShowGraphPublishButtons = false;
                     }
                 }
                 
