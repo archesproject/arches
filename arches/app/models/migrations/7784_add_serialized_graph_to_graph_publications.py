@@ -5,7 +5,6 @@ from arches.app.utils.betterJSONSerializer import JSONSerializer
 from django.contrib.postgres.fields import JSONField
 
 
-
 class Migration(migrations.Migration):
 
     dependencies = [

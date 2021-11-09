@@ -154,7 +154,7 @@ class ResourceEditorView(MapBaseManagerView):
         nodegroups = []
         editable_nodegroups = []
 
-        nodes = graph.node_set.all().select_related('nodegroup')
+        nodes = graph.node_set.all().select_related("nodegroup")
         for node in nodes:
             if node.istopnode and not ontologyclass:
                 ontologyclass = node.ontologyclass
@@ -166,7 +166,7 @@ class ResourceEditorView(MapBaseManagerView):
                     editable_nodegroups.append(node.nodegroup)
                     nodegroups.append(node.nodegroup)
                     added = True
-                    
+
                 if not added and request.user.has_perm("read_nodegroup", node.nodegroup):
                     nodegroups.append(node.nodegroup)
 
@@ -215,16 +215,17 @@ class ResourceEditorView(MapBaseManagerView):
             serialized_graph = graph.publication.serialized_graph
 
         if serialized_graph:
-            serialized_cards = serialized_graph['cards']
+            serialized_cards = serialized_graph["cards"]
             cardwidgets = [
-                widget for widget in models.CardXNodeXWidget.objects.filter(pk__in=[ widget_dict['id'] for widget_dict in serialized_graph['widgets'] ])
+                widget
+                for widget in models.CardXNodeXWidget.objects.filter(
+                    pk__in=[widget_dict["id"] for widget_dict in serialized_graph["widgets"]]
+                )
             ]
         else:
             cards = graph.cardmodel_set.order_by("sortorder").filter(nodegroup__in=nodegroups).prefetch_related("cardxnodexwidget_set")
             serialized_cards = JSONSerializer().serializeToPython(cards)
-            cardwidgets = [
-                widget for widget in [card.cardxnodexwidget_set.order_by("sortorder").all() for card in cards]
-            ]
+            cardwidgets = [widget for widget in [card.cardxnodexwidget_set.order_by("sortorder").all() for card in cards]]
 
         widgets = models.Widget.objects.all()
         card_components = models.CardComponent.objects.all()
@@ -473,7 +474,7 @@ class ResourceEditLogView(BaseManagerView):
                 .order_by("-timestamp")[:100]
             )
             edited_ids = list({edit.resourceinstanceid for edit in recent_edits})
-            resources = Resource.objects.filter(resourceinstanceid__in=edited_ids).select_related('graph')
+            resources = Resource.objects.filter(resourceinstanceid__in=edited_ids).select_related("graph")
             edit_type_lookup = {
                 "create": _("Resource Created"),
                 "delete": _("Resource Deleted"),
