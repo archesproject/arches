@@ -122,22 +122,22 @@ class StringDataType(BaseDataType):
     def transform_export_values(self, value, *args, **kwargs):
         language = kwargs.pop("language", None)
         if value is not None:
-            if language != None:
-                return value[language]["value"]
-            else:
-                return value[get_language()]["value"]
+            try:
+                if language is not None:
+                    return value[language]["value"]
+                else:
+                    return value[get_language()]["value"]
+            except KeyError:
+                # sometimes certain requested language values aren't populated.  Just pass back with implicit None.
+                pass
 
     def get_search_terms(self, nodevalue, nodeid=None):
         terms = []
 
-        if nodevalue is not None:
-            if isinstance(nodevalue, str):
-                # TODO: fix tests where this condition fires
-                pass
-            else:
-                for key in nodevalue.keys():
-                    if settings.WORDS_PER_SEARCH_TERM is None or (len(nodevalue[key]["value"].split(" ")) < settings.WORDS_PER_SEARCH_TERM):
-                        terms.append({"language": key, "value": nodevalue[key]["value"]})
+        if nodevalue is not None and isinstance(nodevalue, dict):
+            for key in nodevalue.keys():
+                if settings.WORDS_PER_SEARCH_TERM is None or (len(nodevalue[key]["value"].split(" ")) < settings.WORDS_PER_SEARCH_TERM):
+                    terms.append({"language": key, "value": nodevalue[key]["value"]})
 
         return terms
 

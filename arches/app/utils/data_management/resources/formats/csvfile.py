@@ -120,6 +120,19 @@ class CsvWriter(Writer):
         )
         return value
 
+    def get_language_values(self, node_id: str, mapping: list, tiledata: dict, concept_export_value_type: str) -> dict:
+        result = {}
+        for language_column in mapping[node_id]:
+            lang_regex = re.compile(".+ \(([A-Za-z-]+)\)")
+            matches = lang_regex.match(language_column)
+            if len(matches.groups()) > 0:
+                lang = matches.groups()[0]
+                value = self.transform_value_for_export(
+                    self.node_datatypes[node_id], tiledata[node_id], concept_export_value_type, node_id, lang
+                )
+                result[language_column] = value
+        return result
+
     def write_resources(self, graph_id=None, resourceinstanceids=None, **kwargs):
         # use the graph id from the mapping file, not the one passed in to the method
         graph_id = self.resource_export_configs[0]["resource_model_id"]
@@ -133,10 +146,12 @@ class CsvWriter(Writer):
         csv_header = ["ResourceID"]
         for resource_export_config in self.resource_export_configs:
             for node in resource_export_config["nodes"]:
-                if node["file_field_name"] != "" and node["export"] == True and node["data_type"] != "string":
+                if node["file_field_name"] == "ResourceID":
+                    pass
+                elif node["file_field_name"] != "" and node["export"] is True and node["data_type"] != "string":
                     mapping[node["arches_nodeid"]] = node["file_field_name"]
                     csv_header += [node["file_field_name"]]
-                elif node["file_field_name"] != "" and node["export"] == True and node["data_type"] == "string":
+                elif node["file_field_name"] != "" and node["export"] is True and node["data_type"] == "string":
                     columns = ["{column} ({code})".format(column=node["file_field_name"], code=code[0]) for code in language_codes]
                     csv_header += columns
                     mapping[node["arches_nodeid"]] = columns
@@ -173,15 +188,9 @@ class CsvWriter(Writer):
                                     concept_export_value_type = concept_export_value_lookup[k]
                                 if tile.data[k] is not None:
                                     if self.node_datatypes[k] == "string":
-                                        for language_column in mapping[k]:
-                                            lang_regex = re.compile(".+ \(([A-Za-z-]+)\)")
-                                            matches = lang_regex.match(language_column)
-                                            if len(matches.groups()) > 0:
-                                                lang = matches.groups()[0]
-                                                value = self.transform_value_for_export(
-                                                    self.node_datatypes[k], tile.data[k], concept_export_value_type, k, lang
-                                                )
-                                                csv_record[language_column] = value
+                                        language_values = self.get_language_values(k, mapping, tile.data, concept_export_value_type)
+                                        if language_values is not None:
+                                            csv_record = {**csv_record, **language_values}
                                     else:
                                         value = self.transform_value_for_export(
                                             self.node_datatypes[k], tile.data[k], concept_export_value_type, k
@@ -192,8 +201,18 @@ class CsvWriter(Writer):
                                 concept_export_value_type = None
                                 if k in concept_export_value_lookup:
                                     concept_export_value_type = concept_export_value_lookup[k]
-                                value = self.transform_value_for_export(self.node_datatypes[k], tile.data[k], concept_export_value_type, k,)
-                                other_group_record[mapping[k]] = value
+                                if self.node_datatypes[k] == "string":
+                                    language_values = self.get_language_values(k, mapping, tile.data, concept_export_value_type)
+                                    if language_values is not None:
+                                        other_group_record = {**other_group_record, **language_values}
+                                else:
+                                    value = self.transform_value_for_export(
+                                        self.node_datatypes[k],
+                                        tile.data[k],
+                                        concept_export_value_type,
+                                        k,
+                                    )
+                                    other_group_record[mapping[k]] = value
                         else:
                             del tile.data[k]
 
@@ -851,7 +870,7 @@ class CsvReader(Reader):
                         try:
                             if datatype == "string":
                                 language = None
-                                regex = re.compile("(^.+)\|([A-Za-z-]+)$", re.MULTILINE)
+                                regex = re.compile("(.+)\|([A-Za-z-]+)$", flags=re.DOTALL | re.MULTILINE)
                                 match = regex.match(value)
                                 if match is not None:
                                     language = match.groups()[1]

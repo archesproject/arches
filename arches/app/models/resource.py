@@ -395,7 +395,6 @@ class Resource(models.ResourceInstance):
                                                     },
                                                 }
                                             )
-        print(document)
         return document, terms
 
     def delete(self, user={}, index=True, transaction_id=None):
