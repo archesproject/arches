@@ -767,8 +767,9 @@ input[type="checkbox"] {
 }
 
 .tabbed-workflow-footer {
-    background-color: #fafafa;
-    border-top: 1px solid #ddd;
+    background-color: #445769;
+    border-top: 1px solid #0E2031;
+    color: #f9f9f9;
     padding: 10px 12px;
     display: flex;
     justify-content: space-between;
@@ -5887,6 +5888,29 @@ span.editable-card i.fa.fa-align-justify:hover {
     color: #5E29BA;
 }
 
+#resource-list .r-select-card {
+    overflow-y: auto;
+}
+
+#resource-list .r-select-circle {
+    position: relative;
+    top: auto;
+    left: auto;
+    margin: 10px 0;
+}
+
+#resource-list .r-desc-container {
+    position: relative;
+    left: auto;
+    right: auto;
+    bottom: auto;
+}
+
+#resource-list .r-select-desc {
+    overflow: inherit;
+    display: block;
+}
+
 .btn-resource-select {
     height: 50px;
     width: 100%;
@@ -8422,7 +8446,7 @@ a.mega-dropdown-toggle.disabled {
 }
 
 .create-resource-instance-card-component {
-    position: absolute;
+    position: fixed;
     background: #fcfcfc;
     z-index: 11;
     height: 95%;
@@ -8443,6 +8467,7 @@ a.mega-dropdown-toggle.disabled {
     overflow-x: hidden;
     transform: translate(100%, 0);
     transition: all 0.3s ease-out;
+    padding-left: 50px;
 }
 
 .create-resource-instance-card-component.rr-table-pop .rp-edit-buttons {
@@ -9468,6 +9493,7 @@ a#close-map-tools.map-widget-icon:hover {
     padding-left: 12px;
     border-radius: 3px;
     margin-bottom: 5px;
+    height: 75px;
 }
 
 .buffer-control h5 {
