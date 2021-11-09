@@ -18,10 +18,10 @@ import multiprocessing
 import os
 import logging
 
-logger = logging.getLogger()
+logger = logging.getLogger(__name__)
 
 
-def index_db(clear_index=True, batch_size=settings.BULK_IMPORT_BATCH_SIZE, quiet=False, use_subprocess=False, max_subprocesses=0):
+def index_db(clear_index=True, batch_size=settings.BULK_IMPORT_BATCH_SIZE, quiet=False, use_multiprocessing=False, max_subprocesses=0):
     """
     Deletes any existing indicies from elasticsearch and then indexes all
     concepts and resources from the database
@@ -30,19 +30,25 @@ def index_db(clear_index=True, batch_size=settings.BULK_IMPORT_BATCH_SIZE, quiet
     clear_index -- set to True to remove all the resources and concepts from the index before the reindexing operation
     batch_size -- the number of records to index as a group, the larger the number to more memory required
     quiet -- Silences the status bar output during certain operations, use in celery operations for example
-    use_subprocess (default False) -- runs the reindexing in multiple subprocesses to take advantage of parallel indexing
-    max_subprocesses (default 0) -- by default (0) the use_subprocess function will create a subprocess per core. This overrides that setting.
+    use_multiprocessing (default False) -- runs the reindexing in multiple subprocesses to take advantage of parallel indexing
+    max_subprocesses (default 0) -- by default (0) the use_multiprocessing function will create a subprocess per core. This overrides that setting.
     """
 
     index_concepts(clear_index=clear_index, batch_size=batch_size)
     index_resources(
-        clear_index=clear_index, batch_size=batch_size, quiet=quiet, use_subprocess=use_subprocess, max_subprocesses=max_subprocesses
+        clear_index=clear_index,
+        batch_size=batch_size,
+        quiet=quiet,
+        use_multiprocessing=use_multiprocessing,
+        max_subprocesses=max_subprocesses,
     )
     index_custom_indexes(clear_index=clear_index, batch_size=batch_size, quiet=quiet)
     index_resource_relations(clear_index=clear_index, batch_size=batch_size)
 
 
-def index_resources(clear_index=True, batch_size=settings.BULK_IMPORT_BATCH_SIZE, quiet=False, use_subprocess=False, max_subprocesses=0):
+def index_resources(
+    clear_index=True, batch_size=settings.BULK_IMPORT_BATCH_SIZE, quiet=False, use_multiprocessing=False, max_subprocesses=0
+):
     """
     Indexes all resources from the database
 
@@ -50,8 +56,8 @@ def index_resources(clear_index=True, batch_size=settings.BULK_IMPORT_BATCH_SIZE
     clear_index -- set to True to remove all the resources from the index before the reindexing operation
     batch_size -- the number of records to index as a group, the larger the number to more memory required
     quiet -- Silences the status bar output during certain operations, use in celery operations for example
-    use_subprocess (default False) -- runs the reindexing in multiple subprocesses to take advantage of parallel indexing
-    max_subprocesses (default 0) -- by default (0) the use_subprocess function will create a subprocess per core. This overrides that setting.
+    use_multiprocessing (default False) -- runs the reindexing in multiple subprocesses to take advantage of parallel indexing
+    max_subprocesses (default 0) -- by default (0) the use_multiprocessing function will create a subprocess per core. This overrides that setting.
 
     """
 
@@ -69,13 +75,13 @@ def index_resources(clear_index=True, batch_size=settings.BULK_IMPORT_BATCH_SIZE
         clear_index=clear_index,
         batch_size=batch_size,
         quiet=quiet,
-        use_subprocess=use_subprocess,
+        use_multiprocessing=use_multiprocessing,
         max_subprocesses=max_subprocesses,
     )
 
 
 def index_resources_by_type(
-    resource_types, clear_index=True, batch_size=settings.BULK_IMPORT_BATCH_SIZE, quiet=False, use_subprocess=False, max_subprocesses=0
+    resource_types, clear_index=True, batch_size=settings.BULK_IMPORT_BATCH_SIZE, quiet=False, use_multiprocessing=False, max_subprocesses=0
 ):
     """
     Indexes all resources of a given type(s)
@@ -87,8 +93,8 @@ def index_resources_by_type(
     clear_index -- set to True to remove all the resources of the types passed in from the index before the reindexing operation
     batch_size -- the number of records to index as a group, the larger the number to more memory required
     quiet -- Silences the status bar output during certain operations, use in celery operations for example
-    use_subprocess (default False) -- runs the reindexing in multiple subprocesses to take advantage of parallel indexing
-    max_subprocesses (default 0) -- by default (0) the use_subprocess function will create a subprocess per core. This overrides that setting.
+    use_multiprocessing (default False) -- runs the reindexing in multiple subprocesses to take advantage of parallel indexing
+    max_subprocesses (default 0) -- by default (0) the use_multiprocessing function will create a subprocess per core. This overrides that setting.
 
     """
 
@@ -103,7 +109,6 @@ def index_resources_by_type(
         graph_name = models.GraphModel.objects.get(graphid=str(resource_type)).name
         logger.info("Indexing resource type '{0}'".format(graph_name))
 
-        os.environ["PYTHONWARNINGS"] = "ignore"
         q = Query(se=se)
 
         term = Term(field="graph_id", term=str(resource_type))
@@ -111,7 +116,7 @@ def index_resources_by_type(
         if clear_index:
             q.delete(index=RESOURCES_INDEX, refresh=True)
 
-        if use_subprocess:
+        if use_multiprocessing:
             resources = [
                 str(rid) for rid in Resource.objects.filter(graph_id=str(resource_type)).values_list("resourceinstanceid", flat=True)
             ]
@@ -119,6 +124,10 @@ def index_resources_by_type(
             resource_count = 0
             batch_number = 0
             resource_batches.append([])
+
+            # batch_size needs to be >= 200 as read timeouts start occuring (at least on 16 thread i9)
+            batch_size = 200 if batch_size < 200 else batch_size
+
             for resource in resources:
                 resource_count += 1
                 resource_batches[batch_number].append(resource)
@@ -152,14 +161,18 @@ def index_resources_by_type(
                     logger.debug(f"... error - tracback - {tb}")
 
             process_count = multiprocessing.cpu_count() if max_subprocesses == 0 else max_subprocesses
-            pool = multiprocessing.Pool(processes=process_count)
+            # pool = multiprocessing.Pool(processes=process_count)
             logger.info(f"... resource type batch count (batch size={batch_size}): {batch_number}")
-            for resource_batch in resource_batches:
-                pool.apply_async(
-                    _index_resource_batch, args=(resource_batch,), callback=process_complete_callback, error_callback=process_error_callback
-                )
-            pool.close()
-            pool.join()
+            with multiprocessing.Pool(processes=process_count) as pool:
+                for resource_batch in resource_batches:
+                    pool.apply_async(
+                        _index_resource_batch,
+                        args=(resource_batch,),
+                        callback=process_complete_callback,
+                        error_callback=process_error_callback,
+                    )
+                pool.close()
+                pool.join()
 
         else:
             resources = Resource.objects.filter(graph_id=str(resource_type))
@@ -168,7 +181,7 @@ def index_resources_by_type(
             with se.BulkIndexer(batch_size=batch_size, refresh=True) as doc_indexer:
                 with se.BulkIndexer(batch_size=batch_size, refresh=True) as term_indexer:
                     if quiet is False:
-                        bar = pyprind.ProgBar(len(resources), bar_char="█") if len(resources) > 1 else None
+                        bar = pyprind.ProgBar(len(resources), bar_char="█", title=graph_name) if len(resources) > 1 else None
                     for resource in resources:
                         if quiet is False and bar is not None:
                             bar.update(item_id=resource)
@@ -195,8 +208,9 @@ def _index_resource_batch(resourceids):
     batch_size = len(resources)
     datatype_factory = DataTypeFactory()
     node_datatypes = {str(nodeid): datatype for nodeid, datatype in models.Node.objects.values_list("nodeid", "datatype")}
+
     with se.BulkIndexer(batch_size=batch_size, refresh=True) as doc_indexer:
-        with se.BulkIndexer(batch_size=batch_size, refresh=True) as term_indexer:
+        with se.BulkIndexer(batch_size=batch_size * 2, refresh=True) as term_indexer:
             for resource in resources:
                 document, terms = resource.get_documents_to_index(
                     fetchTiles=True, datatype_factory=datatype_factory, node_datatypes=node_datatypes
