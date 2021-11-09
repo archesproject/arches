@@ -954,7 +954,7 @@ class Card(APIBase):
 
         nodegroups = []
         editable_nodegroups = []
-        nodes = graph.node_set.all().select_related('nodegroup')
+        nodes = graph.node_set.all().select_related("nodegroup")
         for node in nodes:
             if node.is_collector:
                 added = False
@@ -1008,16 +1008,17 @@ class Card(APIBase):
             serialized_graph = graph.publication.serialized_graph
 
         if serialized_graph:
-            serialized_cards = serialized_graph['cards']
+            serialized_cards = serialized_graph["cards"]
             cardwidgets = [
-                widget for widget in models.CardXNodeXWidget.objects.filter(pk__in=[ widget_dict['id'] for widget_dict in serialized_graph['widgets'] ])
+                widget
+                for widget in models.CardXNodeXWidget.objects.filter(
+                    pk__in=[widget_dict["id"] for widget_dict in serialized_graph["widgets"]]
+                )
             ]
         else:
             cards = graph.cardmodel_set.order_by("sortorder").filter(nodegroup__in=nodegroups).prefetch_related("cardxnodexwidget_set")
             serialized_cards = JSONSerializer().serializeToPython(cards)
-            cardwidgets = [
-                widget for widget in [card.cardxnodexwidget_set.order_by("sortorder").all() for card in cards]
-            ]
+            cardwidgets = [widget for widget in [card.cardxnodexwidget_set.order_by("sortorder").all() for card in cards]]
 
         editable_nodegroup_ids = [str(nodegroup.pk) for nodegroup in editable_nodegroups]
         for card in serialized_cards:

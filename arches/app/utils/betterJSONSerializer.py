@@ -63,11 +63,11 @@ class JSONSerializer(object):
         sort_keys = options.pop("sort_keys", True)
         options.pop("fields", None)
         options.pop("exclude", None)
-        options.pop('force_recalculation', False)
+        options.pop("force_recalculation", False)
         return json.dumps(obj, cls=DjangoJSONEncoder, sort_keys=sort_keys, **options.copy())
 
     def handle_object(self, object, fields=None, exclude=None):
-        """ Called to handle everything, looks for the correct handling """
+        """Called to handle everything, looks for the correct handling"""
         # print type(object)
         # print object
         # print inspect.isclass(object)
@@ -92,7 +92,7 @@ class JSONSerializer(object):
                 if self.force_recalculation:
                     signature = inspect.signature(serialize_function)
 
-                    if 'force_recalculation' in [parameter.name for parameter in signature.parameters.values()]:
+                    if "force_recalculation" in [parameter.name for parameter in signature.parameters.values()]:
                         return self.handle_object(serialize_function(fields, exclude, force_recalculation=True), fields, exclude)
 
                 return self.handle_object(serialize_function(fields, exclude), fields, exclude)

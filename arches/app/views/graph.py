@@ -82,11 +82,13 @@ class GraphSettingsView(GraphBaseView):
             if node_model:
                 resource_data.append({"id": node_model.nodeid, "graph": res, "is_relatable": (node_model in relatable_resources)})
 
-        return JSONResponse({
-            "icons": JSONSerializer().serializeToPython(models.Icon.objects.order_by("name")),
-            "node_count": models.Node.objects.filter(graph=self.graph).count(),
-            "resources": JSONSerializer().serializeToPython(resource_data),
-        })
+        return JSONResponse(
+            {
+                "icons": JSONSerializer().serializeToPython(models.Icon.objects.order_by("name")),
+                "node_count": models.Node.objects.filter(graph=self.graph).count(),
+                "resources": JSONSerializer().serializeToPython(resource_data),
+            }
+        )
 
     def post(self, request, graphid):
         graph = Graph.objects.get(graphid=graphid)
@@ -185,8 +187,14 @@ class GraphDesignerView(GraphBaseView):
 
         restricted_nodegroups = []
         if not settings.OVERRIDE_RESOURCE_MODEL_LOCK:
-            restricted_nodegroups = models.TileModel.objects.filter(nodegroup__pk__in=[ nodegroup_dict['nodegroupid'] for nodegroup_dict in serialized_graph['nodegroups'] ]).values_list("nodegroup_id", flat=True).distinct()
-            
+            restricted_nodegroups = (
+                models.TileModel.objects.filter(
+                    nodegroup__pk__in=[nodegroup_dict["nodegroupid"] for nodegroup_dict in serialized_graph["nodegroups"]]
+                )
+                .values_list("nodegroup_id", flat=True)
+                .distinct()
+            )
+
         context = self.get_context_data(
             main_script="views/graph-designer",
             datatypes_json=JSONSerializer().serialize(datatypes, exclude=["modulename", "isgeometric"]),
@@ -200,42 +208,37 @@ class GraphDesignerView(GraphBaseView):
             widgets_json=JSONSerializer().serialize(widgets),
             card_components=card_components,
             card_components_json=JSONSerializer().serialize(card_components),
-            cards=JSONSerializer().serialize(serialized_graph['cards']),
-            cardwidgets=JSONSerializer().serialize(serialized_graph['widgets']),
+            cards=JSONSerializer().serialize(serialized_graph["cards"]),
+            cardwidgets=JSONSerializer().serialize(serialized_graph["widgets"]),
             map_layers=models.MapLayer.objects.all(),
             map_markers=models.MapMarker.objects.all(),
             map_sources=models.MapSource.objects.all(),
-            applied_functions=JSONSerializer().serialize(serialized_graph['functions']),
+            applied_functions=JSONSerializer().serialize(serialized_graph["functions"]),
             geocoding_providers=models.Geocoder.objects.all(),
             report_templates=models.ReportTemplate.objects.all(),
             restricted_nodegroups=[str(nodegroup) for nodegroup in restricted_nodegroups],
-            ontologies=JSONSerializer().serialize(
-                models.Ontology.objects.filter(parentontology=None), 
-                exclude=["version", "path"]
-            ),
-            ontology_classes=JSONSerializer().serialize(
-                models.OntologyClass.objects.values("source", "ontology_id")
-            ),
+            ontologies=JSONSerializer().serialize(models.Ontology.objects.filter(parentontology=None), exclude=["version", "path"]),
+            ontology_classes=JSONSerializer().serialize(models.OntologyClass.objects.values("source", "ontology_id")),
             graph_models=graph_models,
             graphs=JSONSerializer().serialize(graph_models, exclude=["functions"]),
             constraints=JSONSerializer().serialize(
-                models.ConstraintModel.objects.filter(card__pk__in=[ card_dict['cardid'] for card_dict in serialized_graph['cards'] ])
-            )
+                models.ConstraintModel.objects.filter(card__pk__in=[card_dict["cardid"] for card_dict in serialized_graph["cards"]])
+            ),
         )
 
         # reduces load sent to frontend
-        if serialized_graph.get('functions'):
-            serialized_graph['functions'] = None
-        if serialized_graph.get('cards'):
-            serialized_graph['cards'] = None
-        if serialized_graph.get('deploymentfile'):
-            serialized_graph['deploymentfile'] = None
-        if serialized_graph.get('deploymentdate'):
-            serialized_graph['deploymentdate'] = None
-        if serialized_graph.get('_nodegroups_to_delete'):
-            serialized_graph['_nodegroups_to_delete'] = None
-        if serialized_graph.get('_functions'):
-            serialized_graph['_functions'] = None
+        if serialized_graph.get("functions"):
+            serialized_graph["functions"] = None
+        if serialized_graph.get("cards"):
+            serialized_graph["cards"] = None
+        if serialized_graph.get("deploymentfile"):
+            serialized_graph["deploymentfile"] = None
+        if serialized_graph.get("deploymentdate"):
+            serialized_graph["deploymentdate"] = None
+        if serialized_graph.get("_nodegroups_to_delete"):
+            serialized_graph["_nodegroups_to_delete"] = None
+        if serialized_graph.get("_functions"):
+            serialized_graph["_functions"] = None
         context["graph"] = JSONSerializer().serialize(serialized_graph)
 
         context["nav"]["title"] = self.graph.name
