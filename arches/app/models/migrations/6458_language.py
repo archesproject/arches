@@ -6,7 +6,7 @@ from arches.app.models.system_settings import settings
 class Migration(migrations.Migration):
 
     dependencies = [
-        ("models", "7798_i18n_cards"),
+        ("models", "7794_i18n_string_datatype"),
     ]
     translation.activate(settings.LANGUAGE_CODE)
 
