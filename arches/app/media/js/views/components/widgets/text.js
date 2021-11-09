@@ -20,6 +20,7 @@ define(['knockout', 'underscore', 'viewmodels/widget', 'arches', 'bindings/chose
             self.languages = ko.observableArray();
             self.currentText = ko.observable();
             self.currentDirection = ko.observable();
+            self.showi8lnOptions = ko.observable(false);
             const initialCurrent = {};
             initialCurrent[arches.defaultLanguage] = {value: '', direction: 'ltr'};
             let currentValue = ko.unwrap(self.value) || initialCurrent;
