@@ -2,9 +2,10 @@ define([
     'jquery',
     'underscore',
     'knockout',
+    'arches',
     'ckeditor-jquery',
     'ckeditor',
-], function ($, _, ko) {
+], function ($, _, ko, arches) {
     /**
     * A knockout.js binding for the "ckeditor" rich text editor widget
     * - pass options to ckeditor using the following syntax in the knockout
@@ -18,13 +19,33 @@ define([
         init: function (element, valueAccessor, allBindings, viewModel, bindingContext) {
             var modelValue = valueAccessor();
             var value = ko.utils.unwrapObservable(valueAccessor());
+            const language = allBindings.get('language') || ko.observable(arches.defaultLanguage);
+            const direction = allBindings.get('direction') || ko.observable('ltr');
             var $element = $(element);
-            var options = {};
+            var options = {bodyId: 'ckeditor'};
 
             if (allBindings.has('ckeditorOptions')){
                 var opts = allBindings.get('ckeditorOptions');
                 options = (typeof opts === 'object') ? opts : {};
             };
+
+            const languageList = [];
+            for(const lang of Object.keys(arches.languages)){
+                languageList.push(`${lang}:${arches.languages[lang]}`)
+            }
+
+            CKEDITOR.config.language_list = languageList;
+            CKEDITOR.config.language = language();
+            CKEDITOR.config.contentsLangDirection = direction();
+
+            direction.subscribe(newValue => {
+                CKEDITOR.config.contentsLangDirection = newValue;
+                CKEDITOR.replace('ckeditor', CKEDITOR.config);
+            });
+
+            language.subscribe(newValue => {
+                CKEDITOR.config.language = newValue;
+            });
 
             // Set initial value and create the CKEditor
             $element.html(value);
@@ -44,6 +65,11 @@ define([
                 return true;
             };
             editor.on('change', onChange, modelValue, element);
+            editor.on('afterCommandExec', (event => {
+                if(event.data.name == 'language'){
+                    language(event.data.commandData);
+                }
+            }), modelValue, element);
 
             modelValue.subscribe(function(newValue){
                 var self = this;

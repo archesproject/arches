@@ -21,7 +21,7 @@
                     },
                     {
                         "data": {
-                            "6ace2508-071a-11ea-8dfe-acde48001122": "Production"
+                            "6ace2508-071a-11ea-8dfe-acde48001122":  {"en": {"value": "Production"}}
                         },
                         "nodegroup_id": "1ae420ba-071a-11ea-8d9a-acde48001122",
                         "parenttile_id": null,

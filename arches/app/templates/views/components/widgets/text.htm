@@ -8,8 +8,21 @@
         <!-- ko if: node -->
         <i data-bind="css: {'ion-asterisk widget-label-required': node.isrequired}"></i>
         <!-- /ko -->
-        <div class="col-xs-12">
-            <input type="text" data-bind="textInput: value, attr: {placeholder: placeholder, maxlength: maxLength, disabled: disable}" class="form-control input-lg widget-input">
+        <div class="col-xs-12" style="display:flex;flex-wrap: wrap;flex-direction: column;">
+            <input type="text" style="flex:1" data-bind="textInput: currentText, attr: {placeholder: placeholder, maxlength: maxLength, disabled: disable, dir: currentDirection}" class="form-control input-lg widget-input">
+            <div style="display: flex; flex-direction: row; max-width:600px">
+                <select id="lang_dd" style="flex:1" name="language" data-bind="options: languages, optionsText: function(item){return item.name + ' (' + item.code + ')'}, value: currentLanguage, chosen: {width:'100%'}">
+                </select>            
+                <select id="lang_dir" style="flex:1" name="language" data-bind="value: currentDirection, chosen: {
+                    'width':'100%'}">
+                    <option value="ltr">
+                        Left-to-Right
+                    </option>
+                    <option value="rtl">
+                        Right-to-Left
+                    </option>
+                </select>
+            </div>
         </div>
     </div>
 </div>
@@ -44,3 +57,18 @@
     </div>
 </div>
 {% endblock config_form %}
+
+<!-- ko if: !configForm  && state === 'display_value' -->
+{% block display_value %}
+<span data-bind="text: displayValue && displayValue() && currentLanguage() && displayValue()[currentLanguage().code] && displayValue()[currentLanguage().code]['value'] ? displayValue()[currentLanguage().code]['value'] : '' || '{% trans "None" %}'"></span>
+{% endblock display_value %}
+<!-- /ko -->
+
+<!-- ko if: !configForm  && state === 'report' -->
+<!-- ko if: !ko.unwrap(hideEmptyNodes) || ko.unwrap(hideEmptyNodes) === true && displayValue() -->
+{% block report %}
+<dt data-bind="text: label"></dt>
+<dd data-bind="text: displayValue() && currentLanguage() && displayValue()[currentLanguage().code] && displayValue()[currentLanguage().code]['value'] ? displayValue()[currentLanguage().code]['value'] : '{% trans "None" %}'"></dd>
+{% endblock report %}
+<!-- /ko -->
+<!-- /ko -->

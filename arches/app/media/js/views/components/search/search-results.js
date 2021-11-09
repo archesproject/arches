@@ -30,7 +30,7 @@ function($, _, BaseFilter, bootstrap, arches, select2, ko, koMapping, GraphModel
                 this.showRelationships = ko.observable();
                 this.relationshipCandidates = ko.observableArray();
                 this.selectedResourceId = ko.observable(null);
-
+                this.language = arches.defaultLanguage;
                 this.showRelationships.subscribe(function(res) {
                     this.selectedResourceId(res.resourceinstanceid);
                 }, this);
@@ -227,6 +227,23 @@ function($, _, BaseFilter, bootstrap, arches, select2, ko, koMapping, GraphModel
             zoomToFeature: function(evt){
                 var data = $(evt.currentTarget).data();
                 this.trigger('find_on_map', data.resourceid, data);
+            },
+
+            getLocalizedText: function(data){
+                const d = data.find((element) => {
+                    return arches.defaultLanguage == element.language;
+                });
+                if(!!d && d["value"] !== "") {
+                    return { displayText: d["value"], alternative: false };
+                } else {
+                    const allValues = data.filter((entry) => {
+                        return !!entry["value"];
+                    }).map((entry) => {
+                        return entry["value"];
+                    });
+
+                    return { displayText: allValues.join(","), alternative: true };
+                }
             }
         }),
         template: { require: 'text!templates/views/components/search/search-results.htm' }

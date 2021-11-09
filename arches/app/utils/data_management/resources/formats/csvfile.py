@@ -7,6 +7,7 @@ import sys
 import uuid
 import traceback
 import logging
+import re
 from time import time
 from copy import deepcopy
 from io import StringIO
@@ -20,6 +21,7 @@ from arches.app.models.models import (
     NodeGroup,
     ResourceXResource,
     ResourceInstance,
+    Language,
     FunctionXGraph,
     GraphXMapping,
     TileModel,
@@ -111,10 +113,25 @@ class CsvWriter(Writer):
 
         return configs
 
-    def transform_value_for_export(self, datatype, value, concept_export_value_type, node):
+    def transform_value_for_export(self, datatype, value, concept_export_value_type, node, language=None):
         datatype_instance = self.datatype_factory.get_instance(datatype)
-        value = datatype_instance.transform_export_values(value, concept_export_value_type=concept_export_value_type, node=node)
+        value = datatype_instance.transform_export_values(
+            value, concept_export_value_type=concept_export_value_type, node=node, language=language
+        )
         return value
+
+    def get_language_values(self, node_id: str, mapping: list, tiledata: dict, concept_export_value_type: str) -> dict:
+        result = {}
+        for language_column in mapping[node_id]:
+            lang_regex = re.compile(".+ \(([A-Za-z-]+)\)")
+            matches = lang_regex.match(language_column)
+            if len(matches.groups()) > 0:
+                lang = matches.groups()[0]
+                value = self.transform_value_for_export(
+                    self.node_datatypes[node_id], tiledata[node_id], concept_export_value_type, node_id, lang
+                )
+                result[language_column] = value
+        return result
 
     def write_resources(self, graph_id=None, resourceinstanceids=None, **kwargs):
         # use the graph id from the mapping file, not the one passed in to the method
@@ -122,16 +139,25 @@ class CsvWriter(Writer):
         super(CsvWriter, self).write_resources(graph_id=graph_id, resourceinstanceids=resourceinstanceids, **kwargs)
 
         csv_records = []
+        language_codes = Language.objects.values_list("code")
         other_group_records = []
         mapping = {}
         concept_export_value_lookup = {}
+        csv_header = ["ResourceID"]
         for resource_export_config in self.resource_export_configs:
             for node in resource_export_config["nodes"]:
-                if node["file_field_name"] != "" and node["export"] == True:
+                if node["file_field_name"] == "ResourceID":
+                    pass
+                elif node["file_field_name"] != "" and node["export"] is True and node["data_type"] != "string":
                     mapping[node["arches_nodeid"]] = node["file_field_name"]
+                    csv_header += [node["file_field_name"]]
+                elif node["file_field_name"] != "" and node["export"] is True and node["data_type"] == "string":
+                    columns = ["{column} ({code})".format(column=node["file_field_name"], code=code[0]) for code in language_codes]
+                    csv_header += columns
+                    mapping[node["arches_nodeid"]] = columns
                 if "concept_export_value" in node:
                     concept_export_value_lookup[node["arches_nodeid"]] = node["concept_export_value"]
-        csv_header = ["ResourceID"] + list(mapping.values())
+
         csvs_for_export = []
 
         for resourceinstanceid, tiles in self.resourceinstances.items():
@@ -152,22 +178,41 @@ class CsvWriter(Writer):
                 if tile.data != {}:
                     for k in list(tile.data.keys()):
                         if tile.data[k] != "" and k in mapping and tile.data[k] is not None:
-                            if mapping[k] not in csv_record and tile.nodegroup_id not in csv_record["populated_node_groups"]:
+                            if (
+                                (isinstance(mapping[k], str) and mapping[k] not in csv_record)
+                                or isinstance(mapping[k], list)
+                                and len(set(mapping[k]).intersection(csv_record)) == 0
+                            ) and tile.nodegroup_id not in csv_record["populated_node_groups"]:
                                 concept_export_value_type = None
                                 if k in concept_export_value_lookup:
                                     concept_export_value_type = concept_export_value_lookup[k]
                                 if tile.data[k] is not None:
-                                    value = self.transform_value_for_export(
-                                        self.node_datatypes[k], tile.data[k], concept_export_value_type, k
-                                    )
-                                    csv_record[mapping[k]] = value
+                                    if self.node_datatypes[k] == "string":
+                                        language_values = self.get_language_values(k, mapping, tile.data, concept_export_value_type)
+                                        if language_values is not None:
+                                            csv_record = {**csv_record, **language_values}
+                                    else:
+                                        value = self.transform_value_for_export(
+                                            self.node_datatypes[k], tile.data[k], concept_export_value_type, k
+                                        )
+                                        csv_record[mapping[k]] = value
                                 del tile.data[k]
                             else:
                                 concept_export_value_type = None
                                 if k in concept_export_value_lookup:
                                     concept_export_value_type = concept_export_value_lookup[k]
-                                value = self.transform_value_for_export(self.node_datatypes[k], tile.data[k], concept_export_value_type, k,)
-                                other_group_record[mapping[k]] = value
+                                if self.node_datatypes[k] == "string":
+                                    language_values = self.get_language_values(k, mapping, tile.data, concept_export_value_type)
+                                    if language_values is not None:
+                                        other_group_record = {**other_group_record, **language_values}
+                                else:
+                                    value = self.transform_value_for_export(
+                                        self.node_datatypes[k],
+                                        tile.data[k],
+                                        concept_export_value_type,
+                                        k,
+                                    )
+                                    other_group_record[mapping[k]] = value
                         else:
                             del tile.data[k]
 
@@ -525,6 +570,7 @@ class CsvReader(Reader):
 
         try:
             with transaction.atomic():
+                language_codes = Language.objects.values_list("code")
                 save_count = 0
                 try:
                     resourceinstanceid = process_resourceid(business_data[0]["ResourceID"], overwrite)
@@ -775,6 +821,17 @@ class CsvReader(Reader):
                             for row in mapping["nodes"]:
                                 if key.upper() == row["file_field_name"].upper():
                                     new_row.append({row["arches_nodeid"]: value})
+                                # there is no way to match the node value in the csv to a language, so a bar delimited format
+                                # is used to push this value deeper into the import process.  A later check will retrieve this
+                                # value and add it to the i8ln string object
+                                else:
+                                    column_regex = re.compile("{column} \(([A-Za-z-]+)\)$".format(column=row["file_field_name"].upper()))
+                                    column_match = column_regex.match(key.upper())
+                                    if column_match is not None:
+                                        language = column_match.groups()[0]
+                                        if language in [code[0].upper() for code in language_codes]:
+                                            new_row.append({row["arches_nodeid"]: value + "|" + language.lower()})
+
                     return new_row
 
                 def transform_value(datatype, value, source, nodeid):
@@ -797,7 +854,16 @@ class CsvReader(Reader):
                                 if collection_id is not None:
                                     value = concept_lookup.lookup_labelid_from_label(value, collection_id)
                         try:
-                            value = datatype_instance.transform_value_for_tile(value)
+                            if datatype == "string":
+                                language = None
+                                regex = re.compile("(.+)\|([A-Za-z-]+)$", flags=re.DOTALL | re.MULTILINE)
+                                match = regex.match(value)
+                                if match is not None:
+                                    language = match.groups()[1]
+                                    value = match.groups()[0]
+                                value = datatype_instance.transform_value_for_tile(value, language=language)
+                            else:
+                                value = datatype_instance.transform_value_for_tile(value)
                             errors = datatype_instance.validate(value, row_number=row_number, source=source, nodeid=nodeid)
                         except Exception as e:
                             errors.append(
@@ -904,8 +970,8 @@ class CsvReader(Reader):
 
                     row_keys = [list(b) for b in zip(*[list(a.keys()) for a in source_data])]
 
-                    missing_display_nodes = [n for n in display_nodes if n not in row_keys]
-                    if len(missing_display_nodes) > 0:
+                    missing_display_nodes = set(row_keys[0]).intersection_update(display_nodes)
+                    if missing_display_nodes is not None:
                         errors = []
                         for mdn in missing_display_nodes:
                             mdn_name = all_nodes.filter(nodeid=mdn).values_list("name", flat=True)[0]
@@ -970,12 +1036,20 @@ class CsvReader(Reader):
                                             for source_key in list(source_tile.keys()):
                                                 # Check for source and target key match.
                                                 if source_key == target_key:
-                                                    if tile_to_populate.data[source_key] is None:
+                                                    if tile_to_populate.data[source_key] is None or node_datatypes[source_key] == "string":
                                                         # If match populate target_tile node with transformed value.
                                                         value = transform_value(
                                                             node_datatypes[source_key], source_tile[source_key], row_number, source_key
                                                         )
-                                                        tile_to_populate.data[source_key] = value["value"]
+                                                        if node_datatypes[source_key] == "string" and isinstance(
+                                                            tile_to_populate.data[source_key], dict
+                                                        ):
+                                                            tile_to_populate.data[source_key] = {
+                                                                **tile_to_populate.data[source_key],
+                                                                **value["value"],
+                                                            }
+                                                        else:
+                                                            tile_to_populate.data[source_key] = value["value"]
                                                         # tile_to_populate.request = value['request']
                                                         # Delete key from source_tile so
                                                         # we do not populate another tile based on the same data.

@@ -133,6 +133,10 @@ def search_terms(request):
     for index in ["terms", "concepts"]:
         query = Query(se, start=0, limit=0)
         boolquery = Bool()
+
+        if lang != "*":
+            boolquery.must(Match(field="language", query=lang, type="phrase_prefix"))
+
         boolquery.should(Match(field="value", query=searchString.lower(), type="phrase_prefix"))
         boolquery.should(Match(field="value.folded", query=searchString.lower(), type="phrase_prefix"))
         boolquery.should(
