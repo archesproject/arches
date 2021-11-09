@@ -5812,6 +5812,29 @@ span.editable-card i.fa.fa-align-justify:hover {
     color: #5E29BA;
 }
 
+#resource-list .r-select-card {
+    overflow-y: auto;
+}
+
+#resource-list .r-select-circle {
+    position: relative;
+    top: auto;
+    left: auto;
+    margin: 10px 0;
+}
+
+#resource-list .r-desc-container {
+    position: relative;
+    left: auto;
+    right: auto;
+    bottom: auto;
+}
+
+#resource-list .r-select-desc {
+    overflow: inherit;
+    display: block;
+}
+
 .btn-resource-select {
     height: 50px;
     width: 100%;
