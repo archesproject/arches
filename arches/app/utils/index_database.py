@@ -67,7 +67,7 @@ def index_resources(
     """
 
     resource_types = (
-        models.CardProxyModel.objects.filter(isresource=True)
+        models.GraphModel.objects.filter(isresource=True)
         .exclude(graphid=settings.SYSTEM_SETTINGS_RESOURCE_MODEL_ID)
         .values_list("graphid", flat=True)
     )
