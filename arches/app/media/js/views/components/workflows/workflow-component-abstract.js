@@ -670,14 +670,19 @@ define([
         this.save = function(){};  /* overwritten by inherited components */
 
         this._saveComponent = function(componentBasedStepResolve) {
+
+            const assignSavedData = function() {
+                if (componentBasedStepResolve) {
+                    componentBasedStepResolve({
+                        [self.componentData.uniqueInstanceName]: self.savedData(),
+                    });
+                }
+            };
+
             var completeSubscription = self.complete.subscribe(function(complete) {
                 if (complete) {
 
-                    if (componentBasedStepResolve) {
-                        componentBasedStepResolve({
-                            [self.componentData.uniqueInstanceName]: self.savedData(),
-                        });
-                    }
+                    assignSavedData();
                     completeSubscription.dispose();  /* disposes after save */
                     errorSubscription.dispose();  /* disposes after save */
                 }
@@ -696,6 +701,11 @@ define([
             });
 
             self.save();
+
+            if (!self.saving() && self.complete()) {
+                assignSavedData();
+            }
+            
         };
 
         this._resetComponent = function(componentBasedStepResolve) {
