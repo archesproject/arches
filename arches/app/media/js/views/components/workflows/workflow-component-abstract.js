@@ -670,6 +670,7 @@ define([
         this.save = function(){};  /* overwritten by inherited components */
 
         this._saveComponent = function(componentBasedStepResolve) {
+            self.complete(false);
             var completeSubscription = self.complete.subscribe(function(complete) {
                 if (complete) {
 
