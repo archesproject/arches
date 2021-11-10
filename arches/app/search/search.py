@@ -40,8 +40,7 @@ class SearchEngine(object):
         self.prefix = kwargs.pop("prefix", "").lower()
         self.es = Elasticsearch(serializer=serializer, **kwargs)
         self.logger = logging.getLogger(__name__)
-        warnings.filterwarnings("ignore", category=ElasticsearchWarning) 
-
+        warnings.filterwarnings("ignore", category=ElasticsearchWarning)
 
     def _add_prefix(self, *args, **kwargs):
         if args:
