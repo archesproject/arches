@@ -1,6 +1,7 @@
 import django
 
 django.setup()
+
 import pyprind
 import sys
 from django.db import connection, connections
@@ -23,7 +24,6 @@ import os
 import logging
 
 logger = logging.getLogger(__name__)
-os.environ.setdefault("PYTHONWARNINGS", "ignore")
 
 
 def index_db(clear_index=True, batch_size=settings.BULK_IMPORT_BATCH_SIZE, quiet=False, use_multiprocessing=False, max_subprocesses=0):
