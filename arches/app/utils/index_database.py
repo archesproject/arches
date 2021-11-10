@@ -66,12 +66,8 @@ def index_resources(
 
     """
 
-    if clear_index:
-        q = Query(se=se)
-        q.delete(index=TERMS_INDEX)
-
     resource_types = (
-        models.GraphModel.objects.filter(isresource=True)
+        models.CardProxyModel.objects.filter(isresource=True)
         .exclude(graphid=settings.SYSTEM_SETTINGS_RESOURCE_MODEL_ID)
         .values_list("graphid", flat=True)
     )
@@ -114,11 +110,17 @@ def index_resources_by_type(
         graph_name = models.GraphModel.objects.get(graphid=str(resource_type)).name
         logger.info("Indexing resource type '{0}'".format(graph_name))
 
-        q = Query(se=se)
-
-        term = Term(field="graph_id", term=str(resource_type))
-        q.add_query(term)
         if clear_index:
+            q = Query(se=se)
+            cards = models.CardModel.objects.filter(graph_id=str(resource_type)).select_related("nodegroup")
+            for nodegroup in [card.nodegroup for card in cards]:
+                term = Term(field="nodegroupid", term=str(nodegroup.nodegroupid))
+                q.add_query(term)
+            q.delete(index=TERMS_INDEX, refresh=True)
+
+            q = Query(se=se)
+            term = Term(field="graph_id", term=str(resource_type))
+            q.add_query(term)
             q.delete(index=RESOURCES_INDEX, refresh=True)
 
         if use_multiprocessing:
