@@ -117,6 +117,7 @@ def index_resources_by_type(
             q.delete(index=RESOURCES_INDEX, refresh=True)
 
         if use_multiprocessing:
+            logger.debug(f"... multiprocessing method: {multiprocessing.get_start_method()}")
             resources = [
                 str(rid) for rid in Resource.objects.filter(graph_id=str(resource_type)).values_list("resourceinstanceid", flat=True)
             ]
@@ -203,14 +204,15 @@ def index_resources_by_type(
 
 
 def _index_resource_batch(resourceids):
+    from arches.app.search.search_engine_factory import SearchEngineInstance as _se #<<<<<<<<<<<<<<<<<<<<<<<<<<<< multiprocess client needed?
     os.environ.setdefault("PYTHONWARNINGS", "ignore")
     resources = Resource.objects.filter(resourceinstanceid__in=resourceids)
     batch_size = len(resources)
     datatype_factory = DataTypeFactory()
     node_datatypes = {str(nodeid): datatype for nodeid, datatype in models.Node.objects.values_list("nodeid", "datatype")}
 
-    with se.BulkIndexer(batch_size=batch_size, refresh=True) as doc_indexer:
-        with se.BulkIndexer(batch_size=batch_size * 2, refresh=True) as term_indexer:
+    with _se.BulkIndexer(batch_size=batch_size, refresh=True) as doc_indexer:
+        with _se.BulkIndexer(batch_size=batch_size * 2, refresh=True) as term_indexer:
             for resource in resources:
                 document, terms = resource.get_documents_to_index(
                     fetchTiles=True, datatype_factory=datatype_factory, node_datatypes=node_datatypes
