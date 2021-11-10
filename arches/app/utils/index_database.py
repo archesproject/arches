@@ -1,6 +1,4 @@
 import pyprind
-import django
-django.setup()
 from django.db import connection, connections
 from django.db.models import Q
 from arches.app.models import models
@@ -206,6 +204,8 @@ def index_resources_by_type(
 
 
 def _index_resource_batch(resourceids):
+    import django
+    django.setup()
     from arches.app.search.search_engine_factory import SearchEngineInstance as _se #<<<<<<<<<<<<<<<<<<<<<<<<<<<< multiprocess client needed?
     os.environ.setdefault("PYTHONWARNINGS", "ignore")
     resources = Resource.objects.filter(resourceinstanceid__in=resourceids)
