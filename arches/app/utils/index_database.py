@@ -102,7 +102,11 @@ def index_resources_by_type(
     status = ""
 
     if isinstance(resource_types, str):
-        resource_types = [resource_types]
+        try:
+            resource_types = resource_types.split(',')
+        except:
+            pass
+        #resource_types = [resource_types]
 
     for resource_type in resource_types:
         start = datetime.now()
@@ -111,21 +115,24 @@ def index_resources_by_type(
         logger.info("Indexing resource type '{0}'".format(graph_name))
 
         if clear_index:
-            q = Query(se=se)
+            tq = Query(se=se)
             cards = models.CardModel.objects.filter(graph_id=str(resource_type)).select_related("nodegroup")
             for nodegroup in [card.nodegroup for card in cards]:
                 term = Term(field="nodegroupid", term=str(nodegroup.nodegroupid))
-                q.add_query(term)
-            q.delete(index=TERMS_INDEX, refresh=True)
+                tq.add_query(term)
+            tq.delete(index=TERMS_INDEX, refresh=True)
 
-            q = Query(se=se)
+            rq = Query(se=se)
             term = Term(field="graph_id", term=str(resource_type))
-            q.add_query(term)
-            q.delete(index=RESOURCES_INDEX, refresh=True)
+            rq.add_query(term)
+            rq.delete(index=RESOURCES_INDEX, refresh=True)
 
         if use_multiprocessing:
-            # force spawn to mirror 3.8 windows and mac settings
-            multiprocessing.set_start_method("spawn")
+            try:
+                multiprocessing.set_start_method("spawn")
+            except:
+                pass
+
             logger.debug(f"... multiprocessing method: {multiprocessing.get_start_method()}")
             resources = [
                 str(rid) for rid in Resource.objects.filter(graph_id=str(resource_type)).values_list("resourceinstanceid", flat=True)
@@ -198,6 +205,9 @@ def index_resources_by_type(
                         for term in terms:
                             term_indexer.add(index=TERMS_INDEX, id=term["_id"], data=term["_source"])
 
+        q = Query(se=se)
+        term = Term(field="graph_id", term=str(resource_type))
+        q.add_query(term)
         result_summary = {"database": len(resources), "indexed": se.count(index=RESOURCES_INDEX, body=q.dsl)}
         status = "Passed" if result_summary["database"] == result_summary["indexed"] else "Failed"
         logger.info(
