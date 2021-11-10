@@ -1,4 +1,5 @@
 import django
+
 django.setup()
 import pyprind
 import sys
@@ -23,6 +24,7 @@ import logging
 
 logger = logging.getLogger(__name__)
 os.environ.setdefault("PYTHONWARNINGS", "ignore")
+
 
 def index_db(clear_index=True, batch_size=settings.BULK_IMPORT_BATCH_SIZE, quiet=False, use_multiprocessing=False, max_subprocesses=0):
     """
@@ -120,7 +122,7 @@ def index_resources_by_type(
             q.delete(index=RESOURCES_INDEX, refresh=True)
 
         if use_multiprocessing:
-            #force spawn to mirror 3.8 windows and mac settings
+            # force spawn to mirror 3.8 windows and mac settings
             multiprocessing.set_start_method("spawn")
             logger.debug(f"... multiprocessing method: {multiprocessing.get_start_method()}")
             resources = [
@@ -206,6 +208,7 @@ def index_resources_by_type(
 
 def _index_resource_batch(resourceids):
     from arches.app.search.search_engine_factory import SearchEngineInstance as _se
+
     resources = Resource.objects.filter(resourceinstanceid__in=resourceids)
     batch_size = len(resources)
     datatype_factory = DataTypeFactory()
