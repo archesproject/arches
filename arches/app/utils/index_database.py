@@ -1,4 +1,6 @@
 import pyprind
+import django
+django.setup()
 from django.db import connection, connections
 from django.db.models import Q
 from arches.app.models import models
