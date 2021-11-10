@@ -1,4 +1,7 @@
+import django
+django.setup()
 import pyprind
+import sys
 from django.db import connection, connections
 from django.db.models import Q
 from arches.app.models import models
@@ -19,7 +22,7 @@ import os
 import logging
 
 logger = logging.getLogger(__name__)
-
+os.environ.setdefault("PYTHONWARNINGS", "ignore")
 
 def index_db(clear_index=True, batch_size=settings.BULK_IMPORT_BATCH_SIZE, quiet=False, use_multiprocessing=False, max_subprocesses=0):
     """
@@ -117,6 +120,8 @@ def index_resources_by_type(
             q.delete(index=RESOURCES_INDEX, refresh=True)
 
         if use_multiprocessing:
+            #force spawn to mirror 3.8 windows and mac settings
+            multiprocessing.set_start_method("spawn")
             logger.debug(f"... multiprocessing method: {multiprocessing.get_start_method()}")
             resources = [
                 str(rid) for rid in Resource.objects.filter(graph_id=str(resource_type)).values_list("resourceinstanceid", flat=True)
@@ -140,7 +145,7 @@ def index_resources_by_type(
             connections.close_all()
 
             if quiet is False:
-                bar = pyprind.ProgBar(len(resource_batches), bar_char="█") if len(resource_batches) > 1 else None
+                bar = pyprind.ProgBar(len(resource_batches), bar_char="█", stream=sys.stdout) if len(resource_batches) > 1 else None
 
             def process_complete_callback(result):
                 if quiet is False and bar is not None:
@@ -156,14 +161,10 @@ def index_resources_by_type(
                 except:
                     tb = traceback.format_exc()
                 finally:
-                    logger.debug(f"... error - PID: {os.getpid()}")
-                    logger.debug(f"... error - type - {type(err)}")
-                    logger.debug(f"... error - message - {err}")
-                    logger.debug(f"... error - tracback - {tb}")
+                    logger.error(f"Error indexing resource batch, type {type(err)}, message: {err}, \n>>>>>>>>>>>>>> TRACEBACK: {tb}")
 
             process_count = multiprocessing.cpu_count() if max_subprocesses == 0 else max_subprocesses
-            # pool = multiprocessing.Pool(processes=process_count)
-            logger.info(f"... resource type batch count (batch size={batch_size}): {batch_number}")
+            logger.debug(f"... resource type batch count (batch size={batch_size}): {batch_number}")
             with multiprocessing.Pool(processes=process_count) as pool:
                 for resource_batch in resource_batches:
                     pool.apply_async(
@@ -204,10 +205,7 @@ def index_resources_by_type(
 
 
 def _index_resource_batch(resourceids):
-    import django
-    django.setup()
-    from arches.app.search.search_engine_factory import SearchEngineInstance as _se #<<<<<<<<<<<<<<<<<<<<<<<<<<<< multiprocess client needed?
-    os.environ.setdefault("PYTHONWARNINGS", "ignore")
+    from arches.app.search.search_engine_factory import SearchEngineInstance as _se
     resources = Resource.objects.filter(resourceinstanceid__in=resourceids)
     batch_size = len(resources)
     datatype_factory = DataTypeFactory()
