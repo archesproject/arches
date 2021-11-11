@@ -1,6 +1,6 @@
 {% load i18n %}
-<!-- ko if: !configForm -->
-<!-- ko if: !summary -->
+<!-- ko if: !$data.configForm -->
+<!-- ko if: !$data.summary -->
 {% block report %}
 
 
@@ -13,7 +13,7 @@
         <h4 class="report-toolbar-title"><span data-bind="text: report.get('name')"></span> - <span data-bind="text: report.get('displayname') "></span></h4>
 
         <!-- Tools -->
-        <div class="ep-form-toolbar-tools mar-no flex" style="position: relative;">
+        <div class="ep-form-toolbar-tools mar-no flex" style="position: relative; height: inherit">
             <p class="report-print-date">{% trans "Report Date:" %} <span data-bind="text: reportDate"></span></p>
             <div class="report-print-date" style="position: absolute; margin-top: 30px; margin-left: -11px; " data-bind="component: { name: 'views/components/simple-switch', params: {value: hideEmptyNodes, config:{ label: '{% trans "Hide Null Values" %}', subtitle: ''}}}"></div>
         </div>
@@ -51,7 +51,7 @@
                             state: 'report',
                             preview: $parent.report.preview,
                             card: card,
-                            pageVm: $root,
+                            pageVm: {...$root, report: $parent.report},
                             hideEmptyNodes: $parent.hideEmptyNodes
                         }
                     } --> <!-- /ko -->
@@ -118,7 +118,7 @@
 {% endblock report %}
 <!-- /ko -->
 
-<!-- ko if: summary -->
+<!-- ko if: $data.summary -->
 {% block summary %}
 <div class="relative report-title-bar">
 
@@ -160,7 +160,7 @@
 <!-- /ko -->
 
 
-<!-- ko if: configForm && (configType === 'header') -->
+<!-- ko if: $data.configForm && ($data.configType === 'header') -->
 {% block header_form %}
 {% endblock header_form %}
 <!-- /ko -->

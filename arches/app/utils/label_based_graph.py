@@ -51,7 +51,10 @@ class LabelBasedNode(object):
                 else:
                     display_data[formatted_node_name] = [previous_val, formatted_node_value]
 
-        if compact and not display_data:  # if compact and no child nodes
+        if compact and display_data:
+            if self.value is not NON_DATA_COLLECTING_NODE:
+                display_data[VALUE_KEY] = self.value
+        elif compact and not display_data:  # if compact and no child nodes
             display_data = self.value
         elif not compact:
             display_data[NODE_ID_KEY] = self.node_id
@@ -229,7 +232,6 @@ class LabelBasedGraph(object):
     def _build_graph(
         cls, input_node, input_tile, parent_tree, node_ids_to_tiles_reference, nodegroup_cardinality_reference, node_cache, datatype_factory
     ):
-        # if an input_tile doesn't have any nodes, it should associate itself
         for associated_tile in node_ids_to_tiles_reference.get(str(input_node.pk), [input_tile]):
             parent_tile = associated_tile.parenttile
 

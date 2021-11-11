@@ -89,6 +89,7 @@ INSTALLED_APPS = (
     'corsheaders',
     'oauth2_provider',
     'django_celery_results',
+    'compressor',
     '{{ project_name }}',
 )
 
@@ -96,7 +97,26 @@ ALLOWED_HOSTS = []
 
 SYSTEM_SETTINGS_LOCAL_PATH = os.path.join(APP_ROOT, 'system_settings', 'System_Settings.json')
 WSGI_APPLICATION = '{{ project_name }}.wsgi.application'
-STATIC_ROOT = '/var/www/media'
+
+# URL that handles the media served from MEDIA_ROOT, used for managing stored files.
+# It must end in a slash if set to a non-empty value.
+MEDIA_URL = '/files/'
+
+# Absolute filesystem path to the directory that will hold user-uploaded files.
+MEDIA_ROOT =  os.path.join(APP_ROOT)
+
+# URL prefix for static files.
+# Example: "http://media.lawrence.com/static/"
+STATIC_URL = '/media/'
+
+# Absolute path to the directory static files should be collected to.
+# Don't put anything in this directory yourself; store your static files
+# in apps' "static/" subdirectories and in STATICFILES_DIRS.
+# Example: "/home/media/media.lawrence.com/static/"
+STATIC_ROOT = ''
+
+# when hosting Arches under a sub path set this value to the sub path eg : "/{sub_path}/"
+FORCE_SCRIPT_NAME = None
 
 RESOURCE_IMPORT_LOG = os.path.join(APP_ROOT, 'logs', 'resource_import.log')
 DEFAULT_RESOURCE_IMPORT_USER = {'username': 'admin', 'userid': 1}
@@ -131,8 +151,6 @@ LOGGING = {
     }
 }
 
-# Absolute filesystem path to the directory that will hold user-uploaded files.
-MEDIA_ROOT =  os.path.join(APP_ROOT)
 
 # Sets default max upload size to 15MB
 DATA_UPLOAD_MAX_MEMORY_SIZE = 15728640
@@ -155,6 +173,10 @@ BYPASS_UNIQUE_CONSTRAINT_TILE_VALIDATION = False
 BYPASS_REQUIRED_VALUE_TILE_VALIDATION = False
 
 DATE_IMPORT_EXPORT_FORMAT = "%Y-%m-%d" # Custom date format for dates imported from and exported to csv
+
+# This is used to indicate whether the data in the CSV and SHP exports should be
+# ordered as seen in the resource cards or not.
+EXPORT_DATA_FIELDS_IN_CARD_ORDER = False
 
 #Identify the usernames and duration (seconds) for which you want to cache the time wheel
 CACHE_BY_USER = {'anonymous': 3600 * 24}
@@ -208,7 +230,13 @@ CELERY_BEAT_SCHEDULE = {
     "notification": {"task": "arches.app.tasks.message", "schedule": CELERY_SEARCH_EXPORT_CHECK, "args": ("Celery Beat is Running",),},
 }
 
-CANTALOUPE_DIR = os.path.join(ROOT_DIR, "cantaloupe")
+# Set to True if you want to send celery tasks to the broker without being able to detect celery.
+# This might be necessary if the worker pool is regulary fully active, with no idle workers, or if
+# you need to run the celery task using solo pool (e.g. on Windows). You may need to provide another
+# way of monitoring celery so you can detect the background task not being available.
+CELERY_CHECK_ONLY_INSPECT_BROKER = False
+
+CANTALOUPE_DIR = os.path.join(ROOT_DIR, "uploadedfiles")
 CANTALOUPE_HTTP_ENDPOINT = "http://localhost:8182/"
 
 ACCESSIBILITY_MODE = False
@@ -216,6 +244,10 @@ ACCESSIBILITY_MODE = False
 # By setting RESTRICT_MEDIA_ACCESS to True, media file requests outside of Arches will checked against nodegroup permissions.
 RESTRICT_MEDIA_ACCESS = False
 
+# By setting RESTRICT_CELERY_EXPORT_FOR_ANONYMOUS_USER to True, if the user is attempting
+# to export search results above the SEARCH_EXPORT_IMMEDIATE_DOWNLOAD_THRESHOLD
+# value and is not signed in with a user account then the request will not be allowed.
+RESTRICT_CELERY_EXPORT_FOR_ANONYMOUS_USER = False
 
 # see https://docs.djangoproject.com/en/1.9/topics/i18n/translation/#how-django-discovers-language-preference
 # to see how LocaleMiddleware tries to determine the user's language preference

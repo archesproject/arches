@@ -71,6 +71,7 @@ define([
         this.data = koMapping.fromJS(params.tile.data);
         this.provisionaledits = ko.observable(params.tile.provisionaledits);
         this.datatypeLookup = getDatatypeLookup(params);
+        this.transactionId = params.transactionId;
 
         _.extend(this, {
             filter: filter,
@@ -106,7 +107,7 @@ define([
                 return !!edits && _.keys(edits).length > 0;
             }, this),
             isfullyprovisional: ko.pureComputed(function() {
-                return !!ko.unwrap(self.provisionaledits()) && _.keys(koMapping.toJS(this.data)).length === 0;
+                return !!ko.unwrap(self.provisionaledits) && _.keys(koMapping.toJS(this.data)).length === 0;
             }, this),
             selected: ko.pureComputed({
                 read: function() {
@@ -131,7 +132,9 @@ define([
                 _.each(params.handlers['tile-reset'], function(handler) {
                     handler(self);
                 });
-                params.provisionalTileViewModel.selectedProvisionalEdit(undefined);
+                if (params.provisionalTileViewModel) {
+                    params.provisionalTileViewModel.selectedProvisionalEdit(undefined);
+                }
 
                 delete self.noDefaults;
             },
@@ -172,6 +175,14 @@ define([
                     self.formData.append('accepted_provisional', JSON.stringify(params.provisionalTileViewModel.selectedProvisionalEdit()));
                     params.provisionalTileViewModel.acceptProvisionalEdit();
                 }
+
+                if (self.transactionId) {
+                    self.formData.append(
+                        'transaction_id',
+                        self.transactionId
+                    );
+                }
+
                 self.formData.append(
                     'data',
                     JSON.stringify(
@@ -207,7 +218,7 @@ define([
                         // If the user is provisional ensure their edits are provisional
                         self.provisionaledits(self.data);
                     }
-                    if (params.userisreviewer === true && params.provisionalTileViewModel.selectedProvisionalEdit()) {
+                    if (params.userisreviewer === true && params.provisionalTileViewModel && params.provisionalTileViewModel.selectedProvisionalEdit()) {
                         if (JSON.stringify(params.provisionalTileViewModel.selectedProvisionalEdit().value) === koMapping.toJSON(self.data)) {
                             params.provisionalTileViewModel.removeSelectedProvisionalEdit();
                         }
@@ -257,8 +268,8 @@ define([
         if (!self.noDefaults && self.parent instanceof CardViewModel) {
             var widgets = ko.unwrap(self.parent.widgets) || [];
 
+            var _tileDataTemp = JSON.parse(self._tileData());
             var hasDefaultValue = false;
-
             widgets.forEach(function(widget) {
                 Object.keys(self.data).forEach(function(nodeId) {
                     if (nodeId === widget.node_id()) {
@@ -266,6 +277,7 @@ define([
 
                         if (defaultValue) {
                             self.data[nodeId](defaultValue);
+                            _tileDataTemp[nodeId] = defaultValue;
                             hasDefaultValue = true;
                         }
                     }
@@ -273,7 +285,7 @@ define([
             });
 
             if (hasDefaultValue) {
-                self._tileData(koMapping.toJSON(self.data));
+                self._tileData(JSON.stringify(_tileDataTemp));
             }
         }
 

@@ -163,7 +163,7 @@
                 <dd class="manifest-metadata-value" data-bind="html: $data"></dd>
                 <!--/ko -->
             </div>
-            <h4 data-bind="text: manifestAttribution"></h4>
+            <h4 class="manifest-attribution-key" data-bind="text: manifestAttribution"></h4>
             <img class="manifest-logo" data-bind="attr: {src: manifestLogo()}">
         </div>
         <!--/ko -->
@@ -227,7 +227,7 @@
                     </div>
                     <div style="display: inline-flex; padding: 5px">
                         <div class="iiif-gallery-sequence-label" data-bind="click: toggleManifestEditor">
-                            {% trans "Switch Manifest" %}
+                            {% trans "Switch Image Service" %}
                         </div>
                     </div>
                 </div>

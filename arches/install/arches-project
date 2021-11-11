@@ -58,7 +58,7 @@ class ArchesCommand(TemplateCommand):
         if complete_version[3] == 'final':
             options["arches_version"] = f"stable/{__version__}"
         elif complete_version[3] == 'beta':
-            options["arches_version"] = f"stable/{complete_version[0]}.{complete_version[1]}.x"
+            options["arches_version"] = f"dev/{complete_version[0]}.{complete_version[1]}.x"
 
         super(ArchesCommand, self).handle('project', project_name, target, **options)
 

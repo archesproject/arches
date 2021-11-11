@@ -222,8 +222,8 @@ ul.cons-splash-list > li > a:focus, ul.cons-splash-list > li > a:hover {
 
 .v5-splash-caption {
     background: rgba(0, 0, 0, 0.5);
-    padding: 5px;
-    left: 10vw;
+    padding: 5px!important;
+    left: 10vw!important;
 }
 
 .v5-splash-caption h2 {
@@ -238,6 +238,7 @@ ul.cons-splash-list > li > a:focus, ul.cons-splash-list > li > a:hover {
     font-weight: 300;
     color: #fff;
     line-height: 0.7;
+    padding: 0px 20px;
 }
 
 .navbar-brand-v5 {
@@ -421,6 +422,7 @@ ul.cons-splash-list > li > a:focus, ul.cons-splash-list > li > a:hover {
 
 .app-info-block.intro-section {
     padding: 0px;
+    height: 100vh;
 }
 
 .app-info-block:nth-child(even) {
@@ -430,6 +432,11 @@ ul.cons-splash-list > li > a:focus, ul.cons-splash-list > li > a:hover {
 .app-info-block.intro-section h2 {
     color: #fff;
     font-size: 55px;
+    padding: 10px 20px;
+}
+
+.app-info-block-header {
+    font-size: 20px;
 }
 
 .app-info-block-header {
@@ -676,6 +683,11 @@ footer .footer-links {
 .splash-img {
     border: none;
     padding: 0 20px;
+    text-align: center;
+}
+
+.splash-img img {
+    max-width: 100%;
 }
 
 .search-screen {
@@ -823,7 +835,7 @@ footer .footer-links {
         padding: 140px 10px 40px 10px;
     }
     .v5-splash-caption {
-        left: 0;
+        left: 0!important;
         width: 100%;
         padding: 10px !important;
     }

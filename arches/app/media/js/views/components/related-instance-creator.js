@@ -25,7 +25,6 @@ define([
         this.tile = ko.observable();
         this.tile.subscribe(function(tile) {
             if (tile && params.hasDirtyTile) {
-                console.log("line 41 ran");
                 tile.dirty.subscribe(function(val) {
                     ((self.card() && self.card().isDirty()) || val) ? params.hasDirtyTile(true) : params.hasDirtyTile(false);
                 });
@@ -130,12 +129,12 @@ define([
                         handlers[eventName].push(handler);
                     }
                 };
-                self.foo();
+                self.assignTile();
                 self.loading(false);
             });
         };
 
-        self.foo = function() {
+        self.assignTile = function() {
             self.topCards().forEach(function(item) { //do I need to flatten?
                 if (item.constructor.name === 'CardViewModel' && item.nodegroupid === params.nodegroupid) {
                     if (ko.unwrap(params.parenttileid) && item.parent && ko.unwrap(params.parenttileid) !== item.parent.tileid) {
@@ -152,6 +151,9 @@ define([
                         });                        
                     } else if (ko.unwrap(params.createTile) !== false) {
                         self.tile(item.getNewTile());
+                        if (self.resourceId()) {
+                            self.tile().resourceinstance_id = self.resourceId();
+                        }
                     }
                 }
             });
@@ -166,7 +168,7 @@ define([
         self.loadCard = function(card){
             self.card(card);
             params.nodegroupid = self.card().nodegroupid;
-            self.foo();
+            self.assignTile();
         };
 
         self.close = function(){
@@ -190,10 +192,10 @@ define([
         };
     }
 
-    ko.components.register('new-resource-instance', {
+    ko.components.register('related-instance-creator', {
         viewModel: viewModel,
         template: {
-            require: 'text!templates/views/components/workflows/new-resource-instance.htm'
+            require: 'text!templates/views/components/related-instance-creator.htm'
         }
     });
     return viewModel;
