@@ -217,9 +217,12 @@ class I18n_JSON(object):
         else:
             self.sql = self.attname
             params = []
-            for prop in self.raw_value["i18n_properties"]:
-                self.sql = f"jsonb_set({self.sql}, '{{{prop},{self.lang}}}', %s)"
-                params.append(json.dumps(self.raw_value[prop]))
+            for prop, value in self.raw_value.items():
+                if prop in self.i18n_properties and isinstance(value, str):
+                    self.sql = f"jsonb_set({self.sql}, '{{{prop},{self.lang}}}', %s)"
+                else:
+                    self.sql = f"jsonb_set({self.sql}, '{{{prop}}}', %s)"
+                params.append(json.dumps(value))
         return self.sql, params
 
     # need this to avoid a Django error when setting
