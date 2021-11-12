@@ -233,7 +233,7 @@ define([
                                     names.push(resourceInstance["_source"].displayname);
                                     self.displayValue(names.join(', '));
                                     val.resourceName(resourceInstance["_source"].displayname)
-                                    val.iconClass(self.graphLookup[resourceInstance["_source"].graph_id].iconclass)
+                                    val.iconClass(self.graphLookup[resourceInstance["_source"].graph_id]?.iconclass || 'fa fa-question')
                                     val.ontologyClass(resourceInstance["_source"].root_ontology_class);
                                 });
                         }
@@ -257,6 +257,7 @@ define([
 
         var makeObject = function(id, esSource){
             var graph = self.graphLookup[esSource.graph_id];
+            var iconClass = self.graphLookup[esSource.graph_id]?.iconclass  || 'fa fa-question';
 
             var ontologyProperty;
             var inverseOntologyProperty;
@@ -285,6 +286,7 @@ define([
             };            
             Object.defineProperty(ret, 'resourceName', {value: ko.observable(esSource.displayname)});
             Object.defineProperty(ret, 'ontologyClass', {value: ko.observable(esSource.root_ontology_class)});
+            Object.defineProperty(ret, 'iconClass', {value: ko.observable(iconClass)});
             if (!!params.configForm) {
                 ret.ontologyProperty.subscribe(function(){
                     self.defaultResourceInstance(self.value());
@@ -448,7 +450,7 @@ define([
             },
             formatResult: function(item) {
                 if (item._source) {
-                    iconclass = self.graphLookup[item._source.graph_id].iconclass
+                    iconclass = self.graphLookup[item._source.graph_id]?.iconclass  || 'fa fa-question'
                     return `<i class="fa ${iconclass} icon-wrap"></i> ${item._source.displayname}`;
                 } else {
                     if (self.allowInstanceCreation) {
@@ -458,7 +460,7 @@ define([
             },
             formatSelection: function(item) {
                 if (item._source) {
-                    iconclass = self.graphLookup[item._source.graph_id].iconclass
+                    iconclass = self.graphLookup[item._source.graph_id]?.iconclass || 'fa fa-question'
                     return `<i class="fa ${iconclass} icon-wrap"></i> ${item._source.displayname}`;
                 } else {
                     return item.name;
