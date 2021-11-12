@@ -445,7 +445,7 @@ define([
             formatResult: function(item) {
                 if (item._source) {
                     iconclass = self.graphLookup[item._source.graph_id].iconclass
-                    return '<i class="fa ' + iconclass + '"></i> '+ item._source.displayname;
+                    return `<i class="fa ${iconclass} icon-wrap"></i> ${item._source.displayname}`;
                 } else {
                     if (self.allowInstanceCreation) {
                         return '<b> ' + arches.translations.riSelectCreateNew.replace('${graphName}', item.name) + ' . . . </b>';
@@ -455,7 +455,7 @@ define([
             formatSelection: function(item) {
                 if (item._source) {
                     iconclass = self.graphLookup[item._source.graph_id].iconclass
-                    return '<i class="fa ' + iconclass + '"></i> '+ item._source.displayname;
+                    return `<i class="fa ${iconclass} icon-wrap"></i> ${item._source.displayname}`;
                 } else {
                     return item.name;
                 }
