@@ -225,11 +225,15 @@ define([
                             if(!val.ontologyClass) {
                                 Object.defineProperty(val, 'ontologyClass', {value:ko.observable()});
                             }
+                            if(!val.iconClass) {
+                                Object.defineProperty(val, 'iconClass', {value: ko.observable()});
+                            }
                             lookupResourceInstanceData(ko.unwrap(val.resourceId))
                                 .then(function(resourceInstance) {
                                     names.push(resourceInstance["_source"].displayname);
                                     self.displayValue(names.join(', '));
-                                    val.resourceName(resourceInstance["_source"].displayname);
+                                    val.resourceName(resourceInstance["_source"].displayname)
+                                    val.iconClass(self.graphLookup[resourceInstance["_source"].graph_id].iconclass)
                                     val.ontologyClass(resourceInstance["_source"].root_ontology_class);
                                 });
                         }
