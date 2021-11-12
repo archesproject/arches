@@ -68,7 +68,8 @@
                             </button>
                         </div>
                         <div class="rr-table-column" style="flex-grow: 1; cursor: pointer;" data-bind="click: function() { self.toggleSelectedResourceRelationship($data); }, clickBubble: false">
-                            <div class="rr-table-instance-label" style="padding-left: 10px;" data-bind="text: $data.resourceName()">
+                            <div class="rr-table-instance-label" style="padding-left: 10px;">
+                                <i class="sml-icon-wrap" data-bind="css: $data.iconClass()"></i><span data-bind="text: $data.resourceName()"></span>
                             </div>
                         </div>
                     </div>
