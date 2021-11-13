@@ -579,7 +579,7 @@ class Tile(models.TileModel):
 
     @staticmethod
     def get_blank_tile(nodeid, resourceid=None):
-        node = models.Node.objects.get(pk=nodeid)
+        node = models.Node.objects.filter(pk=nodeid).select_related('nodegroup')[0]
         parentnodegroup_id = node.nodegroup.parentnodegroup_id
         if parentnodegroup_id is not None:
             parent_tile = Tile.get_blank_tile_from_nodegroup_id(
