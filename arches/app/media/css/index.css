@@ -224,8 +224,6 @@ ul.cons-splash-list > li > a:focus, ul.cons-splash-list > li > a:hover {
     background: rgba(0, 0, 0, 0.5);
     padding: 5px!important;
     left: 10vw!important;
-    padding: 5px;
-    left: 10vw;
 }
 
 .v5-splash-caption h2 {
@@ -641,7 +639,7 @@ footer .footer-links {
     z-index: 100;
     color: #fff;
     background: #2a2a2a;
-    border: 1px solid #fff;
+    border: 3px solid #fff;
     border-radius: 50%;
 }
 
