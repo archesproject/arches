@@ -257,7 +257,7 @@ define([
 
         var makeObject = function(id, esSource){
             var graph = self.graphLookup[esSource.graph_id];
-            var iconClass = self.graphLookup[esSource.graph_id]?.iconclass  || 'fa fa-question';
+            var iconClass = graph.iconclass  || 'fa fa-question';
 
             var ontologyProperty;
             var inverseOntologyProperty;
@@ -450,8 +450,8 @@ define([
             },
             formatResult: function(item) {
                 if (item._source) {
-                    iconclass = self.graphLookup[item._source.graph_id]?.iconclass  || 'fa fa-question'
-                    return `<i class="fa ${iconclass} icon-wrap"></i> ${item._source.displayname}`;
+                    iconClass = self.graphLookup[item._source.graph_id].iconclass
+                    return `<i class="fa ${iconClass} sm-icon-wrap"></i> ${item._source.displayname}`;
                 } else {
                     if (self.allowInstanceCreation) {
                         return '<b> ' + arches.translations.riSelectCreateNew.replace('${graphName}', item.name) + ' . . . </b>';
@@ -460,8 +460,7 @@ define([
             },
             formatSelection: function(item) {
                 if (item._source) {
-                    iconclass = self.graphLookup[item._source.graph_id]?.iconclass || 'fa fa-question'
-                    return `<i class="fa ${iconclass} icon-wrap"></i> ${item._source.displayname}`;
+                    return `<i class="fa ${item._source.iconclass} sm-icon-wrap"></i> ${item._source.displayname}`;
                 } else {
                     return item.name;
                 }
@@ -494,7 +493,7 @@ define([
                     Promise.all(lookups).then(function(arr){
                         if (arr.length) {
                             var ret = arr.map(function(item) {
-                                return {"_source":{"displayname": item["_source"].displayname}, "_id":item["_id"]};
+                                return {"_source":{"displayname": item["_source"].displayname, "iconclass": self.graphLookup[item._source.graph_id]?.iconclass || 'fa fa-question'}, "_id":item["_id"]};
                             });
                             if(self.multiple === false) {
                                 ret = ret[0];
