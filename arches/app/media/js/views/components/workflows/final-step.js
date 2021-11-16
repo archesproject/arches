@@ -6,15 +6,7 @@ define([
         this.urls = arches.urls;
         this.loading = ko.observable(true);
         this.workflows = ko.observableArray();
-        try {
-            this.resourceid = ko.unwrap(params.workflow.resourceId);
-        } catch(e) {
-            try {
-                this.resourceid = ko.unwrap(params.form.resourceId);
-            } catch(e) {
-                // pass
-            }
-        }
+        this.resourceid = params.resourceid;
         //We may want to allow a user to navigate to any workflow, so we may want this
         window.fetch(arches.urls.plugin('init-workflow') + '?json=true')
             .then(response => response.json())
