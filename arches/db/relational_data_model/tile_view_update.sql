@@ -13,8 +13,8 @@ create or replace function __arches_tile_view_update() returns trigger as $$
         select graphid into graph_id from nodes where nodeid = group_id;
         view_namespace = format('%s.%s', tg_table_schema, tg_table_name);
         select obj_description(view_namespace::regclass, 'pg_class') into group_id;
-        select tiledata into old_json_data from tiles where tileid = tile_id;
         if (TG_OP = 'DELETE') then
+            select tiledata into old_json_data from tiles where tileid = old.tileid;
             delete from geojson_geometries where tileid = old.tileid;
             delete from public.tiles where tileid = old.tileid;
             insert into edit_log (
@@ -50,6 +50,7 @@ create or replace function __arches_tile_view_update() returns trigger as $$
             end if;
 
             if (TG_OP = 'UPDATE') then
+                select tiledata into old_json_data from tiles where tileid = tile_id;
                 edit_type = 'tile edit';
                 if (transaction_id = old.transactionid) then
                     transaction_id = public.uuid_generate_v1mc();
