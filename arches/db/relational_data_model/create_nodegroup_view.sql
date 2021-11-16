@@ -18,7 +18,7 @@ begin
     creation_sql = format(
         'drop view if exists %1$s.%2$s;
         create or replace view %1$s.%2$s as
-            select tileid,
+            select t.tileid,
         ',
         schema_name,
         view_name
@@ -42,7 +42,11 @@ begin
         where nodegroupid = group_id
             and d.defaultwidget is not null
     loop
-        creation_sql = creation_sql || __arches_get_node_value_sql(node);
+        creation_sql = creation_sql || format('
+            %s,',
+            __arches_get_node_value_sql(node)
+        );
+
         additional_sql = additional_sql || format('
                 comment on column %s.%s.%s is %L;
             ',
@@ -58,7 +62,7 @@ begin
 
     if parent_group_id is not null then
         creation_sql = creation_sql || format('
-            parenttileid as %s,
+            t.parenttileid as %s,
         ', parent_name);
         additional_sql = additional_sql || format('
             comment on column %1$s.%2$s.%3$s is %4$L;
@@ -71,10 +75,17 @@ begin
     end if;
 
     creation_sql = creation_sql || format('
-            resourceinstanceid,
-            nodegroupid
-        from tiles
-        where nodegroupid = %L;',
+            t.resourceinstanceid,
+            t.nodegroupid,
+            e1.transactionid
+        from tiles t
+        left outer join edit_log e1 on (t.tileid = e1.tileinstanceid::uuid)
+        left outer join edit_log e2 on (
+            t.tileid = e2.tileinstanceid::uuid
+            and e1.timestamp < e2.timestamp
+        )
+        where t.nodegroupid = %L
+        and e2.editlogid is null;',
         group_id
     );
 

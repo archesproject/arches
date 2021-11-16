@@ -3,7 +3,7 @@ create or replace function __arches_get_node_value_sql(
 ) returns text as $$
 declare
     node_value_sql text;
-    select_sql text = '(tiledata->>%L)';
+    select_sql text = '(t.tiledata->>%L)';
     datatype text = 'text';
 begin
     select_sql = format(select_sql, node.nodeid);
@@ -13,7 +13,7 @@ begin
                 st_collect(
                     array(
                         select st_transform(geom, 4326) from geojson_geometries
-                        where geojson_geometries.tileid = tiles.tileid and nodeid = %L
+                        where geojson_geometries.tileid = t.tileid and nodeid = %L
                     )
                 )',
                 node.nodeid
@@ -21,13 +21,15 @@ begin
             datatype = 'geometry';
         when 'number' then datatype = 'numeric';
         when 'boolean' then datatype = 'boolean';
+        when 'resource-instance' then datatype = 'jsonb';
+        when 'resource-instance-list' then datatype = 'jsonb';
         when 'concept-list' then
             select_sql = format('(
                     CASE
-                        WHEN tiles.tiledata->>%1$L is null THEN null
+                        WHEN t.tiledata->>%1$L is null THEN null
                         ELSE ARRAY(
                             SELECT jsonb_array_elements_text(
-                                    tiles.tiledata->%1$L
+                                    t.tiledata->%1$L
                                 ) AS jsonb_array_elements_text
                         )
                     END
@@ -38,8 +40,8 @@ begin
             datatype = 'text';
         end case;
 
-        node_value_sql = format('
-            %s::%s as %s,',
+        node_value_sql = format(
+            '%s::%s as %s',
             select_sql,
             datatype,
             __arches_slugify(node.name)
