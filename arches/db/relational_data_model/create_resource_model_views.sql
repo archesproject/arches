@@ -16,8 +16,19 @@ begin
         'drop schema if exists %1$s cascade;
         create schema %1$s;
         create or replace view %1$s.instances as
-            select * from resource_instances
-            where graphid = %2$L;
+            select r.*, e1.transactionid
+            from resource_instances r
+                left outer join edit_log e1 on (
+                    r.resourceinstanceid = e1.resourceinstanceid::uuid
+                    and e1.tileinstanceid is null
+                )
+                left outer join edit_log e2 on (
+                    r.resourceinstanceid = e2.resourceinstanceid::uuid
+                    and e2.tileinstanceid is null
+                    and e1.timestamp < e2.timestamp
+                )
+            where e2.editlogid is null
+            and r.graphid = %2$L;
         comment on view %1$s.instances is %2$L;
         create trigger %1$s_insert
             instead of insert or update or delete on %1$s.instances

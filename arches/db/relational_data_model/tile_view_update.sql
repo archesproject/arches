@@ -10,13 +10,36 @@ create or replace function __arches_tile_view_update() returns trigger as $$
         old_json_data jsonb;
         edit_type text;
     begin
+        select graphid into graph_id from nodes where nodeid = group_id;
+        view_namespace = format('%s.%s', tg_table_schema, tg_table_name);
+        select obj_description(view_namespace::regclass, 'pg_class') into group_id;
+        select tiledata into old_json_data from tiles where tileid = tile_id;
         if (TG_OP = 'DELETE') then
             delete from geojson_geometries where tileid = old.tileid;
             delete from public.tiles where tileid = old.tileid;
+            insert into edit_log (
+                resourceclassid,
+                resourceinstanceid,
+                nodegroupid,
+                tileinstanceid,
+                edittype,
+                oldvalue,
+                timestamp,
+                note,
+                transactionid
+            ) values (
+                graph_id,
+                old.resourceinstanceid,
+                group_id,
+                old.tileid,
+                'tile delete',
+                old_json_data,
+                now(),
+                'loaded via SQL backend',
+                public.uuid_generate_v1mc()
+            );
             return old;
         else
-            view_namespace = format('%s.%s', tg_table_schema, tg_table_name);
-            select obj_description(view_namespace::regclass, 'pg_class') into group_id;
             select __arches_get_json_data_for_view(new, tg_table_schema, tg_table_name) into json_data;
             select __arches_get_parent_id_for_view(new, tg_table_schema, tg_table_name) into parent_id;
             tile_id = new.tileid;
@@ -31,7 +54,6 @@ create or replace function __arches_tile_view_update() returns trigger as $$
                 if (transaction_id = old.transactionid) then
                     transaction_id = public.uuid_generate_v1mc();
                 end if;
-                select tiledata into old_json_data from tiles where tileid = tile_id;
                 update public.tiles
                 set tiledata = json_data,
                     nodegroupid = group_id,
@@ -39,6 +61,7 @@ create or replace function __arches_tile_view_update() returns trigger as $$
                     resourceinstanceid = new.resourceinstanceid
                 where tileid = new.tileid;
             elsif (TG_OP = 'INSERT') then
+                old_json_data = null;
                 edit_type = 'tile create';
                 if tile_id is null then
                     tile_id = public.uuid_generate_v1mc();
@@ -58,7 +81,6 @@ create or replace function __arches_tile_view_update() returns trigger as $$
                 );
             end if;
             perform refresh_tile_geojson_geometries(tile_id);
-            select graphid into graph_id from nodes where nodeid = group_id;
             insert into edit_log (
                 resourceclassid,
                 resourceinstanceid,
