@@ -18,7 +18,7 @@
         <!-- /ko -->
 
         <!-- ko if: componentData['tilesManaged'] === "many" -->
-            <!-- ko if: isDirty() -->
+            <!-- ko if: hasDirtyTiles -->
             <div style="display: flex; justify-content: flex-end; padding: 0 18px;">
                 <button 
                     class="btn btn-workflow-tile btn-danger" 
