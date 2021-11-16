@@ -22,6 +22,33 @@
 @import url(../packages/@mapbox/mapbox-gl-geocoder/dist/mapbox-gl-geocoder.css);
 @import url(../packages/leaflet.fullscreen/Control.FullScreen.css);
 
+#topskip {
+	position: absolute;
+	top: 0;
+	clip: rect(1px,1px,1px,1px);
+	width: 1px;
+	height: 1px;
+	margin: -1px;
+	overflow: hidden;
+	padding: 0;
+	background-color: #fae619;
+	color: #101010;
+	font-weight: bold;
+	opacity: .95;
+	text-align: center;
+}
+
+#topskip:active, #topskip:focus {
+	clip: auto;
+	overflow: visible;
+	width: 100%;
+	height: auto;
+	padding: 10px;
+	z-index: 9999;
+	outline: none !important;
+	text-decoration: underline !important;
+}
+
 img {
     image-orientation: from-image;
 }
