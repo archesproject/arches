@@ -64,7 +64,7 @@ define([
                         isfullyprovisional = true;
                     }
                 }
-                if ((data && _.keys(data).length === 0 && tile.provisionaledits()) ||  isfullyprovisional) {
+                if ((data && _.keys(data).length === 0 && ko.unwrap(tile.provisionaledits)) ||  isfullyprovisional) {
                     self.selectedProvisionalEdit(undefined);
                     if (this.provisionaledits().length > 0) {
                         this.provisionaledits()[0].isfullyprovisional(true);

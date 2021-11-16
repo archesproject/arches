@@ -52,6 +52,7 @@ class Command(BaseCommand):
                 "reindex_database",
                 "index_concepts",
                 "index_resources",
+                "index_resources_by_type",
                 "index_resource_relations",
                 "add_index",
                 "delete_index",
@@ -63,6 +64,7 @@ class Command(BaseCommand):
             + "'reindex_database'=Deletes and re-creates all indices in ElasticSearch, then indexes all data found in the database"
             + "'index_concepts'=Indexes all concepts from the database"
             + "'index_resources'=Indexes all resources from the database"
+            + "'index_resources_by_type'=Indexes only resources of a given resource_model/graph"
             + "'index_resource_relations'=Indexes all resource to resource relation records"
             + "'add_index'=Register a new index in Elasticsearch"
             + "'delete_index'=Deletes a named index from Elasticsearch",
@@ -74,6 +76,15 @@ class Command(BaseCommand):
 
         parser.add_argument(
             "-p", "--port", action="store", dest="port", default=settings.ELASTICSEARCH_HTTP_PORT, help="Port to use for elasticsearch."
+        )
+
+        parser.add_argument(
+            "-rt",
+            "--resource_type",
+            action="store",
+            dest="resource_types",
+            default="",
+            help="UUID of resource_model to index resources of.",
         )
 
         parser.add_argument(
@@ -133,6 +144,14 @@ class Command(BaseCommand):
         if options["operation"] == "index_resources":
             index_database_util.index_resources(
                 clear_index=options["clear_index"], batch_size=options["batch_size"], quiet=options["quiet"]
+            )
+
+        if options["operation"] == "index_resources_by_type":
+            index_database_util.index_resources_by_type(
+                resource_types=options["resource_types"],
+                clear_index=options["clear_index"],
+                batch_size=options["batch_size"],
+                quiet=options["quiet"],
             )
 
         if options["operation"] == "index_resource_relations":

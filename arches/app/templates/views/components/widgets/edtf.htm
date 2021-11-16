@@ -3,9 +3,12 @@
 
 {% block form %}
 <div class="row widget-wrapper">
-    <label class="control-label widget-input-label" for="" data-bind="text:label"></label>
-    <div class="form-group">
-        <div class="edtf-style-tools-collapser" data-bind="click: function() {
+        <label class="control-label widget-input-label" for="" data-bind="text:label"></label>
+        <!-- ko if: node -->
+        <i data-bind="css: {'ion-asterisk widget-label-required': node.isrequired}"></i>
+        <!-- /ko -->
+        <div class="form-group">
+          <div class="edtf-style-tools-collapser" data-bind=" click: function() {
               showEDTFFormats(!showEDTFFormats());
           }" tabindex="0" onkeyup="if(event.which == 13 || event.keyCode == 13){ $(this).trigger('click'); }">
             <i class="fa" data-bind="{
@@ -79,12 +82,9 @@
                             </dd>
                         </dl>
 
-                    </div>
-                </div>
-        </div>
-        <!-- ko if: node -->
-        <i data-bind="css: {'ion-asterisk widget-label-required': node.isrequired}"></i>
-        <!-- /ko -->
+                  </div>
+              </div>
+          </div>
         <div class="col-xs-12">
             <input type="text" data-bind="textInput: value, attr: {placeholder: placeholder, disabled: disabled}"
                 class="form-control input-lg widget-input">

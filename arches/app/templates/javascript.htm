@@ -69,6 +69,9 @@
             'dom-4': '{{ STATIC_URL }}packages/dom4/build/dom4',
             'numeral': '{{ STATIC_URL }}packages/numeral/numeral',
             'togeojson': '{{ STATIC_URL }}packages/@tmcw/togeojson/dist/togeojson.umd',
+            'cytoscape': '{{ STATIC_URL }}packages/cytoscape/dist/cytoscape.min',
+            'cytoscape-cola': '{{ STATIC_URL }}packages/cytoscape-cola/cytoscape-cola',
+            'webcola': '{{ STATIC_URL }}packages/webcola/WebCola/cola.min',
             {% block paths %}{% endblock paths %}
         },
         packages: [{
@@ -168,6 +171,7 @@
                 media: "{{ STATIC_URL }}",
                 rdm: "{% url 'rdm' ''%}",
                 uploadedfiles: "{{ MEDIA_URL }}",
+                url_subpath: "{{app_settings.FORCE_SCRIPT_NAME}}",
                 concept_tree: "{% url 'concept_tree' '' %}",
                 concept: "{% url 'concept' 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa' %}",
                 concept_search: "{% url 'concept_search' %}",
@@ -242,6 +246,7 @@
                 mobile_survey_resources: function(surveyid){return "{% url 'mobile_survey_resources' 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa' %}".replace('aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa', surveyid)},
                 collector_designer: function(surveyid){return "{% url 'collector_designer' 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa' %}".replace('aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa', surveyid)},
                 plugin: function(pluginid){return "{% url 'plugins' 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa' %}".replace('aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa', pluginid)},
+                transaction_reverse: function(transactionid) {return "{% url 'transaction_reverse' 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa' %}".replace('aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa', transactionid)},
                 mvt: function(nodeid){return decodeURI("{% url 'mvt' 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa' '{z}' '{x}' '{y}' %}").replace('aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa', nodeid)},
                 collector_manager: "{% url 'collector_manager' %}",
                 help_template: "{% url 'help_templates' %}",
@@ -254,6 +259,9 @@
                     return "{% url 'api_nodes' 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa' %}".replace('aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa', nodeid)
                 },
                 api_node_value: "{% url 'api_node_value' %}",
+                api_resource_report: function(resourceid){return "{% url 'api_resource_report' 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa' %}".replace('aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa', resourceid)},
+                api_bulk_resource_report: "{% url 'api_bulk_resource_report' %}",
+                api_bulk_disambiguated_resource_instance: "{% url 'api_bulk_disambiguated_resource_instance' %}",
                 api_resources: function(resourceid){return "{% url 'resources' 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa' %}".replace('aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa', resourceid)},
                 api_search_component_data: "{% url 'api_search_component_data' 'aaaa'%}".replace('aaaa', ''),
                 geojson: "{% url 'geojson' %}",
@@ -264,6 +272,7 @@
                 iiifannotations: "{% url 'iiifannotations' %}",
                 iiifannotationnodes: "{% url 'iiifannotationnodes' %}",
                 validatejson: "{% url 'validatejson' 'aaaa'%}".replace('aaaa', ''),
+                get_dsl: "{% url 'get_dsl' %}",
                 {% block urls %}{% endblock urls %}
             },
             geocoderPlaceHolder: "{% trans 'Find an address...' %}",
@@ -340,7 +349,7 @@
                 'is_resource_layer': false,
                 'centerx': {{ map_layer.centerx|default_if_none:"null"|unlocalize }},
                 'centery': {{ map_layer.centery|default_if_none:"null"|unlocalize }},
-                'zoom': {{ map_layer.zoom|default_if_none:"null" }}
+                'zoom': {{ map_layer.zoom|default_if_none:"null"|unlocalize }}
             },{% endfor %}{% for resource_map_layer in resource_map_layers %}{
                 'maplayerid': '{{ resource_map_layer.nodeid }}',
                 'name': '{{ resource_map_layer.name }}',
@@ -371,6 +380,9 @@
             },{% endfor %}{% endautoescape %}],
             userEmail: '{{ user.email }}',
             celeryRunning: '{{celery_running}}',
+            exportHtmlTemplates: [{% autoescape off %}{% for template in export_html_templates %}
+                '{{ template }}',
+            {% endfor %}{% endautoescape %}],
             graphs: {% autoescape off %}{{graphs|default:"[]"}}{% endautoescape %},
             translations: {
                 'deactivateSurveyTitle': '{% trans "You are deactivating an active survey" %}',
@@ -397,7 +409,8 @@
                 'mobileSurveyDesc': '{% trans "Summary of how this model participates in the survey" %}',
                 'groupingErrorTitle': '{% trans "Settings Conflict: Remove this card from grouped card?" %}',
                 'groupingErrorMessage': "{% trans 'The cardinality of this card can\'t be changed until you remove it from being grouped with the ${cardName} card.  Do you want to remove this card from being grouped with the ${cardName} card' %}",
-            }
+            },
+            version: '{{ app_settings.VERSION }}'
         };
     });
 
@@ -442,7 +455,8 @@
                 'componentname': '{{ template.componentname }}',
                 'component': '{{ template.component }}',
                 'defaultconfig': '{{ template.defaultconfig_json }}',
-                'name': '{{ template.name }}'
+                'name': '{{ template.name }}',
+                'preload_resource_data': '{{ template.preload_resource_data }}'
             },
         {% endfor %}{% endautoescape %}};
     });

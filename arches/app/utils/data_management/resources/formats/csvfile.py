@@ -22,6 +22,7 @@ from arches.app.models.models import (
     ResourceInstance,
     FunctionXGraph,
     GraphXMapping,
+    TileModel,
 )
 from arches.app.models.card import Card
 from arches.app.utils.data_management.resource_graphs import exporter as GraphExporter
@@ -165,7 +166,12 @@ class CsvWriter(Writer):
                                 concept_export_value_type = None
                                 if k in concept_export_value_lookup:
                                     concept_export_value_type = concept_export_value_lookup[k]
-                                value = self.transform_value_for_export(self.node_datatypes[k], tile.data[k], concept_export_value_type, k,)
+                                value = self.transform_value_for_export(
+                                    self.node_datatypes[k],
+                                    tile.data[k],
+                                    concept_export_value_type,
+                                    k,
+                                )
                                 other_group_record[mapping[k]] = value
                         else:
                             del tile.data[k]
@@ -194,7 +200,10 @@ class CsvWriter(Writer):
             csvwriter = csv.DictWriter(dest, delimiter=",", fieldnames=csv_header)
             csvwriter.writeheader()
             csvs_for_export.append(
-                {"name": csv_name.split(".")[0] + "_groups." + csv_name.split(".")[1], "outputfile": dest,}
+                {
+                    "name": csv_name.split(".")[0] + "_groups." + csv_name.split(".")[1],
+                    "outputfile": dest,
+                }
             )
             for csv_record in other_group_records:
                 if "populated_node_groups" in csv_record:
@@ -256,6 +265,13 @@ class CsvWriter(Writer):
 class TileCsvWriter(Writer):
     def __init__(self, **kwargs):
         super(TileCsvWriter, self).__init__(**kwargs)
+        self.node_datatypes = {}
+        self.datatype_factory = DataTypeFactory()
+
+        nodes = Node.objects.all().values("nodeid", "name")
+        self.node_name_lookup = {}
+        for node in nodes:
+            self.node_name_lookup[str(node["nodeid"])] = node["name"]
 
     def group_tiles(self, tiles, key):
         new_tiles = {}
@@ -271,19 +287,17 @@ class TileCsvWriter(Writer):
 
     def lookup_node_name(self, nodeid):
         try:
-            node_name = Node.objects.get(nodeid=nodeid).name
-        except Node.DoesNotExist:
+            node_name = self.node_name_lookup[nodeid]
+        except KeyError:
             node_name = nodeid
 
         return node_name
-
-    node_datatypes = {}
 
     def lookup_node_value(self, value, nodeid):
         if nodeid in self.node_datatypes:
             datatype = self.node_datatypes[nodeid]
         else:
-            datatype = DataTypeFactory().get_instance(Node.objects.get(nodeid=nodeid).datatype)
+            datatype = self.datatype_factory.get_instance(Node.objects.get(nodeid=nodeid).datatype)
             self.node_datatypes[nodeid] = datatype
 
         if value is not None:
@@ -301,14 +315,33 @@ class TileCsvWriter(Writer):
 
         return tile
 
+    def sort_field_names(self, columns=[]):
+        """
+        Moves sortorder, provisionaledits and nodegroup_id to last position and
+        ensures the first columns are ordered as tileid, parenttile_id, and resourceinstance_id.
+        """
+
+        columns_to_move_to_end = ["sortorder", "provisionaledits", "nodegroup_id"]
+        for name in columns_to_move_to_end:
+            columns.insert(len(columns) + 1, columns.pop(columns.index(name)))
+        columns_to_move_to_start = ["resourceinstance_id", "parenttile_id", "tileid"]
+        for name in columns_to_move_to_start:
+            columns.insert(0, columns.pop(columns.index(name)))
+
     def write_resources(self, graph_id=None, resourceinstanceids=None, **kwargs):
         super(TileCsvWriter, self).write_resources(graph_id=graph_id, resourceinstanceids=resourceinstanceids, **kwargs)
 
         csvs_for_export = []
 
-        tiles = self.group_tiles(
-            list(Tile.objects.filter(resourceinstance__graph_id=graph_id).order_by("nodegroup_id").values()), "nodegroup_id"
-        )
+        if graph_id:
+            tiles = self.group_tiles(
+                list(TileModel.objects.filter(resourceinstance__graph_id=graph_id).order_by("nodegroup_id").values()), "nodegroup_id"
+            )
+        else:
+            tiles = self.group_tiles(
+                list(TileModel.objects.filter(resourceinstance_id__in=resourceinstanceids).order_by("nodegroup_id").values()),
+                "nodegroup_id",
+            )
         semantic_nodes = [str(n[0]) for n in Node.objects.filter(datatype="semantic").values_list("nodeid")]
 
         for nodegroupid, nodegroup_tiles in tiles.items():
@@ -316,23 +349,26 @@ class TileCsvWriter(Writer):
             fieldnames = []
             for tile in nodegroup_tiles:
                 tile["tileid"] = str(tile["tileid"])
-                tile["resourceinstance_id"] = str(tile["resourceinstance_id"])
                 tile["parenttile_id"] = str(tile["parenttile_id"])
-                tile["nodegroup_id"] = str(tile["nodegroup_id"])
+                tile["resourceinstance_id"] = str(tile["resourceinstance_id"])
                 flattened_tile = self.flatten_tile(tile, semantic_nodes)
+                tile["nodegroup_id"] = str(tile["nodegroup_id"])
                 flattened_tiles.append(flattened_tile)
 
                 for fieldname in flattened_tile:
                     if fieldname not in fieldnames:
                         fieldnames.append(fieldname)
 
+            self.sort_field_names(fieldnames)
             tiles[nodegroupid] = sorted(flattened_tiles, key=lambda k: k["resourceinstance_id"])
-
-            ncsv_file = []
             dest = StringIO()
             csvwriter = csv.DictWriter(dest, delimiter=",", fieldnames=fieldnames)
             csvwriter.writeheader()
             csv_name = os.path.join("{0}.{1}".format(Card.objects.get(nodegroup_id=nodegroupid).name, "csv"))
+            forbidden_excel_sheet_name_characters = ["\\", "/", "?", "*", "[", "]"]
+            for character in forbidden_excel_sheet_name_characters:
+                if character in csv_name:
+                    csv_name = csv_name.replace(character, "_")
             for v in tiles[nodegroupid]:
                 csvwriter.writerow(v)
             csvs_for_export.append({"name": csv_name, "outputfile": dest})
@@ -356,6 +392,7 @@ class CsvReader(Reader):
         save_count,
         row_number,
         prevent_indexing,
+        transaction_id=None,
     ):
         # create a resource instance only if there are populated_tiles
         errors = []
@@ -372,11 +409,11 @@ class CsvReader(Reader):
             if bulk:
                 resources.append(newresourceinstance)
                 if len(resources) >= settings.BULK_IMPORT_BATCH_SIZE:
-                    Resource.bulk_save(resources=resources)
+                    Resource.bulk_save(resources=resources, transaction_id=transaction_id)
                     del resources[:]  # clear out the array
             else:
                 try:
-                    newresourceinstance.save(index=(not prevent_indexing))
+                    newresourceinstance.save(index=(not prevent_indexing), transaction_id=transaction_id)
 
                 except TransportError as e:
 
@@ -391,7 +428,7 @@ class CsvReader(Reader):
                     newresourceinstance.delete()
                     save_count = save_count - 1
                 except Exception as e:
-                    msg = "%s: WARNING: failed to index document in resource: %s %s. Exception detail:\n%s\n" % (
+                    msg = "%s: WARNING: failed to save document in resource: %s %s. Exception detail:\n%s\n" % (
                         datetime.datetime.now(),
                         resourceinstanceid,
                         row_number,
@@ -425,6 +462,7 @@ class CsvReader(Reader):
         create_concepts=False,
         create_collections=False,
         prevent_indexing=False,
+        transaction_id=None,
     ):
         # errors = businessDataValidator(self.business_data)
         celery_worker_running = task_management.check_if_celery_available()
@@ -525,7 +563,7 @@ class CsvReader(Reader):
                 }
                 display_nodes = get_display_nodes(graphid)
                 all_nodes = Node.objects.filter(graph_id=graphid)
-                node_list = {str(node.pk): node for node in all_nodes}
+                node_dict = {str(node.pk): node for node in all_nodes}
                 datatype_factory = DataTypeFactory()
                 concepts_to_create = {}
                 new_concepts = {}
@@ -791,11 +829,16 @@ class CsvReader(Reader):
 
                     return {"value": value, "request": request}
 
-                def get_blank_tile(source_data):
+                def get_blank_tile(source_data, child_only=False):
                     if len(source_data) > 0:
                         if source_data[0] != {}:
                             key = str(list(source_data[0].keys())[0])
-                            if key not in blanktilecache:
+                            source_node = node_dict[key]
+                            if child_only:
+                                blank_tile = Tile.get_blank_tile_from_nodegroup_id(str(source_node.nodegroup_id))
+                                blank_tile.tiles = []
+                                blank_tile.tileid = None
+                            elif key not in blanktilecache:
                                 blank_tile = Tile.get_blank_tile(key)
                                 cache(blank_tile)
                             else:
@@ -857,6 +900,7 @@ class CsvReader(Reader):
                             save_count,
                             row_number,
                             prevent_indexing,
+                            transaction_id=transaction_id,
                         )
 
                         # reset values for next resource instance
@@ -899,7 +943,7 @@ class CsvReader(Reader):
                         if "NodeGroupID" in row and row["NodeGroupID"] is not None:
                             target_tile.nodegroupid = row["NodeGroupID"]
 
-                        def populate_tile(source_data, target_tile):
+                        def populate_tile(source_data, tile_to_populate, appending_to_parent=False):
                             """
                             source_data = [{nodeid:value},{nodeid:value},{nodeid:value} . . .]
                             All nodes in source_data belong to the same resource.
@@ -908,39 +952,39 @@ class CsvReader(Reader):
                             """
                             need_new_tile = False
                             # Set target tileid to None because this will be a new tile, a new tileid will be created on save.
-                            target_tile.tileid = uuid.uuid4()
+                            tile_to_populate.tileid = uuid.uuid4()
                             if "TileID" in row and row["TileID"] is not None:
-                                target_tile.tileid = row["TileID"]
-                            target_tile.resourceinstance_id = resourceinstanceid
+                                tile_to_populate.tileid = row["TileID"]
+                            tile_to_populate.resourceinstance_id = resourceinstanceid
                             # Check the cardinality of the tile and check if it has been populated.
                             # If cardinality is one and the tile is populated the tile should not be populated again.
-                            if str(target_tile.nodegroup_id) in single_cardinality_nodegroups and "TileiD" not in row:
+                            if str(tile_to_populate.nodegroup_id) in single_cardinality_nodegroups and "TileiD" not in row:
                                 target_tile_cardinality = "1"
                             else:
                                 target_tile_cardinality = "n"
 
-                            if str(target_tile.nodegroup_id) not in populated_nodegroups[resourceinstanceid]:
-                                target_tile.nodegroup_id = str(target_tile.nodegroup_id)
+                            if str(tile_to_populate.nodegroup_id) not in populated_nodegroups[resourceinstanceid] or appending_to_parent:
+                                tile_to_populate.nodegroup_id = str(tile_to_populate.nodegroup_id)
                                 # Check if we are populating a parent tile by inspecting the target_tile.data array.
                                 source_data_has_target_tile_nodes = (
-                                    len(set([list(obj.keys())[0] for obj in source_data]) & set(target_tile.data.keys())) > 0
+                                    len(set([list(obj.keys())[0] for obj in source_data]) & set(tile_to_populate.data.keys())) > 0
                                 )
                                 if source_data_has_target_tile_nodes:
-                                    # Iterate through the target_tile nodes and begin populating by iterating througth source_data array.
-                                    # The idea is to populate as much of the target_tile as possible,
-                                    # before moving on to the next target_tile.
-                                    for target_key in list(target_tile.data.keys()):
+                                    # Iterate through tile_to_populate nodes and begin populating by iterating througth source_data array.
+                                    # The idea is to populate as much of the tile_to_populate as possible,
+                                    # before moving on to the next tile_to_populate.
+                                    for target_key in list(tile_to_populate.data.keys()):
                                         for source_tile in source_data:
                                             for source_key in list(source_tile.keys()):
                                                 # Check for source and target key match.
                                                 if source_key == target_key:
-                                                    if target_tile.data[source_key] is None:
+                                                    if tile_to_populate.data[source_key] is None:
                                                         # If match populate target_tile node with transformed value.
                                                         value = transform_value(
                                                             node_datatypes[source_key], source_tile[source_key], row_number, source_key
                                                         )
-                                                        target_tile.data[source_key] = value["value"]
-                                                        # target_tile.request = value['request']
+                                                        tile_to_populate.data[source_key] = value["value"]
+                                                        # tile_to_populate.request = value['request']
                                                         # Delete key from source_tile so
                                                         # we do not populate another tile based on the same data.
                                                         del source_tile[source_key]
@@ -948,10 +992,10 @@ class CsvReader(Reader):
                                     source_data[:] = [item for item in source_data if item != {}]
 
                                 # Check if we are populating a child tile(s) by inspecting the target_tiles.tiles array.
-                                elif target_tile.tiles is not None:
+                                elif tile_to_populate.tiles is not None:
                                     populated_child_tiles = []
                                     populated_child_nodegroups = []
-                                    for childtile in target_tile.tiles:
+                                    for childtile in tile_to_populate.tiles:
                                         if str(childtile.nodegroup_id) in single_cardinality_nodegroups:
                                             child_tile_cardinality = "1"
                                         else:
@@ -961,7 +1005,7 @@ class CsvReader(Reader):
                                             prototype_tile_copy = pickle.loads(pickle.dumps(childtile, -1))
                                             tileid = row["TileID"] if "TileID" in row else uuid.uuid4()
                                             prototype_tile_copy.tileid = tileid
-                                            prototype_tile_copy.parenttile = target_tile
+                                            prototype_tile_copy.parenttile = tile_to_populate
                                             parenttileid = (
                                                 row["ParentTileID"] if "ParentTileID" in row and row["ParentTileID"] is not None else None
                                             )
@@ -984,7 +1028,7 @@ class CsvReader(Reader):
                                                                     prototype_tile_copy.data[source_key] = value["value"]
                                                                     # print(prototype_tile_copy.data[source_key]
                                                                     # print('&'*80
-                                                                    # target_tile.request = value['request']
+                                                                    # tile_to_populate.request = value['request']
                                                                     del source_column[source_key]
                                                                 else:
                                                                     populate_child_tiles(source_data)
@@ -1002,16 +1046,16 @@ class CsvReader(Reader):
 
                                         populate_child_tiles(source_data)
 
-                                    target_tile.tiles = populated_child_tiles
+                                    tile_to_populate.tiles = populated_child_tiles
 
-                                if not target_tile.is_blank():
-                                    populated_tiles.append(target_tile)
+                                if not tile_to_populate.is_blank() and not appending_to_parent:
+                                    populated_tiles.append(tile_to_populate)
 
                                 if len(source_data) > 0:
                                     need_new_tile = True
 
                                 if target_tile_cardinality == "1" and "NodeGroupID" not in row:
-                                    populated_nodegroups[resourceinstanceid].append(str(target_tile.nodegroup_id))
+                                    populated_nodegroups[resourceinstanceid].append(str(tile_to_populate.nodegroup_id))
 
                                 if need_new_tile:
                                     new_tile = get_blank_tile(source_data)
@@ -1020,7 +1064,30 @@ class CsvReader(Reader):
 
                         # mock_request_object = HttpRequest()
 
-                        if target_tile is not None and len(source_data) > 0:
+                        # identify whether a tile for this nodegroup on this resource already exists
+                        preexisting_tile_for_nodegroup = list(
+                            filter(
+                                lambda t: str(t.resourceinstance_id) == str(row["ResourceID"])
+                                and str(t.nodegroup_id) == str(target_tile.nodegroup_id),
+                                populated_tiles,
+                            )
+                        )
+                        if len(preexisting_tile_for_nodegroup) > 0:
+                            preexisting_tile_for_nodegroup = preexisting_tile_for_nodegroup[0]
+                        else:
+                            preexisting_tile_for_nodegroup = False
+
+                        # aggregates a tile of the nodegroup associated with source_data (via get_blank_tile)
+                        # onto the pre-existing tile who would be its parent
+                        if target_tile.nodegroup.cardinality == "1" and preexisting_tile_for_nodegroup and len(source_data) > 0:
+                            target_tile = get_blank_tile(source_data, child_only=True)
+                            populate_tile(source_data, target_tile, appending_to_parent=True)
+                            target_tile.parenttile = preexisting_tile_for_nodegroup
+                            preexisting_tile_for_nodegroup.tiles.append(target_tile)
+
+                        # populates a tile from parent-level nodegroup because
+                        # parent cardinality is N or because none exists yet on resource
+                        elif target_tile is not None and len(source_data) > 0:
                             populate_tile(source_data, target_tile)
                             # Check that required nodes are populated. If not remove tile from populated_tiles array.
                             check_required_nodes(target_tile, target_tile, required_nodes, all_nodes)
@@ -1034,7 +1101,7 @@ class CsvReader(Reader):
                     if len(v) > 0:
                         errors.append(
                             {
-                                "type": "WARNING",
+                                "type": "INFO",
                                 "message": "{0} is null or not mapped on rows {1} and \
                                 participates in a display value function.".format(
                                     k, ",".join(v)
@@ -1055,11 +1122,12 @@ class CsvReader(Reader):
                         save_count,
                         row_number,
                         prevent_indexing,
+                        transaction_id=transaction_id,
                     )
 
                 if bulk:
                     print("Time to create resource and tile objects: %s" % datetime.timedelta(seconds=time() - self.start))
-                    Resource.bulk_save(resources=resources)
+                    Resource.bulk_save(resources=resources, transaction_id=transaction_id)
                 save_count = save_count + 1
                 print(_("Total resources saved: {save_count}").format(**locals()))
 

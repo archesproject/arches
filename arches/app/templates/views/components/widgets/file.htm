@@ -80,11 +80,7 @@
                                     <!-- ko if: $data.error -->
                                     <span class="dz-error text-danger text-sm" data-bind="text: '{% trans "error" %}'"></span>
                                     <!-- /ko -->
-                                    <span class="text-sm">
-                                        <a href="#" class="file-download" data-bind="attr: {href: ko.unwrap(url) ? url : content, download: name}, click: function(){return ko.unwrap(url) ? true : false}, clickBubble: false">
-                                            <span data-bind="text: ko.unwrap(url) ? '{% trans "Download" %}' : '{% trans "Unsaved" %}'"></span>
-                                        </a>
-                                    </span>
+                                    <span class="text-sm"><a data-bind="attr: {href: ko.unwrap(url) ? $parent.getFileUrl(url) : content, download: name}, click: function(){return ko.unwrap(url) ? true : false}, clickBubble: false"><span data-bind="text: ko.unwrap(url) ? '{% trans "Download" %}' : '{% trans "Unsaved" %}'"></span></a></span>
                                 </div>
                                 <div class="file-upload-card-detail-right">
                                     <div class="media-right" data-bind="click: $parent.removeFile">
@@ -114,7 +110,7 @@
                                     <!-- ko if: $data.error -->
                                     <span class="dz-error text-danger text-sm" data-bind="text: '{% trans "error" %}'"></span>
                                     <!-- /ko -->
-                                    <span class="text-sm"><a data-bind="attr: {href: ko.unwrap(url) ? url : content, download: name}, click: function(){return ko.unwrap(url) ? true : false}, clickBubble: false"><span data-bind="text: ko.unwrap(url) ? '{% trans "Download" %}' : '{% trans "Unsaved" %}'"></span></a></span>
+                                    <span class="text-sm"><a data-bind="attr: {href: ko.unwrap(url) ? $parent.getFileUrl(url) : content, download: name}, click: function(){return ko.unwrap(url) ? true : false}, clickBubble: false"><span data-bind="text: ko.unwrap(url) ? '{% trans "Download" %}' : '{% trans "Unsaved" %}'"></span></a></span>
                                 </div>
                                 <div class="file-upload-card-detail-right">
                                     <div class="media-right" data-bind="click: $parent.removeFile">
@@ -172,7 +168,7 @@
 
 <!-- ko foreach: reportFiles() -->
 <dd>
-    <a data-bind="attr: {href: url}">
+    <a class="" data-bind="attr: {href: $parent.getFileUrl(url)}">
         <i class="ion ion-forward"></i>
         <span data-bind="text: name"></span>
     </a>
@@ -184,8 +180,8 @@
     <div id="report-image-grid" class="report-image-grid">
         <!-- ko foreach: reportImages() -->
         <div class="rp-image-grid-item">
-            <a target="_blank" data-bind="attr: {href: url}">
-                <img class="img-responsive" data-bind="attr: {src: url, alt: name}">
+            <a id="" class="" target="_blank" data-bind="attr: {href: $parent.getFileUrl(url)}">
+                <img class="img-responsive" data-bind="attr: {src: $parent.getFileUrl(url), alt: name}">
             </a>
         </div>
         <!-- /ko -->

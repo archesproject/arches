@@ -470,7 +470,7 @@ class CardView(GraphBaseView):
 
 
 class DatatypeTemplateView(TemplateView):
-    def get(sefl, request, template="text"):
+    def get(self, request, template="text"):
         return render(request, "views/components/datatypes/%s.htm" % template)
 
 

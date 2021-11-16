@@ -10,11 +10,13 @@ define([
 ], function(_, ko, koMapping, L, uuid, geojsonExtent, IIIFViewerViewmodel) {
     var viewModel = function(params) {
         var self = this;
+
         var drawControl;
         var drawFeatures = ko.observableArray();
         var editItems = new L.FeatureGroup();
         var tools;
 
+        this.drawFeatures = drawFeatures;
         this.widgets = params.widgets || [];
         this.newNodeId = null;
         this.featureLookup = {};
@@ -26,6 +28,8 @@ define([
         this.lineOpacity = ko.observable(1);
         this.fillOpacity = ko.observable(0.2);
         this.showStylingTools = ko.observable(false);
+
+        this.hideEditorTab = params.hideEditorTab || ko.observable(false);
 
         this.cancelDrawing = function() {
             _.each(tools, function(tool) {
@@ -85,14 +89,17 @@ define([
                 var id = ko.unwrap(widget.node_id);
                 var features = [];
                 drawFeatures().forEach(function(feature){
-                    if (feature.properties.nodeId === id) features.push(feature);
+                    if (feature.properties.nodeId === id) {
+                        features.push(feature);
+                    }
                 });
                 if (ko.isObservable(self.tile.data[id])) {
                     self.tile.data[id]({
                         type: 'FeatureCollection',
                         features: features
                     });
-                } else {
+                } 
+                else {
                     self.tile.data[id].features(features);
                 }
             });
@@ -103,7 +110,7 @@ define([
             self.widgets.forEach(function(widget) {
                 var id = ko.unwrap(widget.node_id);
                 var featureCollection = koMapping.toJS(self.tile.data[id]);
-                if (featureCollection) {
+                if (featureCollection && featureCollection.features) {
                     featureCollection.features.forEach(function(feature) {
                         if (feature.properties.manifest && !params.manifest)
                             params.manifest = feature.properties.manifest;
@@ -119,10 +126,11 @@ define([
 
         IIIFViewerViewmodel.apply(this, [params]);
 
+
         var setTab = this.canvas.subscribe(function(val){
             if (val) {
                 self.expandGallery(false);
-                self.activeTab('editor');
+                self.activeTab(ko.unwrap(self.activeTab) || 'editor');
                 setTab.dispose();
             }
         });
@@ -140,7 +148,7 @@ define([
         };
 
         var disableEditing = function() {
-            if (editingFeature) editingFeature.editing.disable();
+            if (editingFeature && editingFeature.editing) editingFeature.editing.disable();
             editingFeature = undefined;
             self.selectedFeatureIds([]);
         };
@@ -175,6 +183,7 @@ define([
         });
 
         var featureClick;
+        this.featureClick = featureClick;
         var drawLayer = ko.computed(function() {
             var selectedFeatureIds = self.selectedFeatureIds();
             var styleProperties = self.styleProperties();
@@ -219,6 +228,7 @@ define([
                 }
             });
         });
+        this.drawLayer = drawLayer;
 
         drawLayer.subscribe(function(newDrawLayer) {
             var map = self.map();

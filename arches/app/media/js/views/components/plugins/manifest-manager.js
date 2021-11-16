@@ -17,9 +17,15 @@ define([
             this.metadataLabel = ko.observable('');
             this.metadataValues = ko.observable('');
             this.mainMenu = ko.observable(true);
+
+            this.shouldShowEditService = params.shouldShowEditService || ko.observable(true);
             this.editService = ko.observable(false);
+            
+            this.shouldShowCreateService = params.shouldShowCreateService || ko.observable(true);
             this.createService = ko.observable(true);
-            this.alert = params.alert;
+
+            this.remoteManifest = ko.observable(true);
+            this.alert = params.alert || ko.observable(); 
             this.addCanvas = function(canvas) { //the function name needs to be better
                 self.canvasesForDeletion.push(canvas);
                 self.canvas(canvas.images[0].resource.service['@id']);
@@ -214,12 +220,29 @@ define([
                 self.getManifestData(val);
                 self.mainMenu(false);
             });
+
+            this.manifestData.subscribe(function(manifestData) {
+                if (params.manifestData && ko.isObservable(params.manifestData)) {
+                    params.manifestData(manifestData);
+                }
+            });
+
+            this.manifest.subscribe(function(){
+                if (self.manifest() && self.manifest().charAt(0) == '/') {
+                    self.remoteManifest(false);
+                }
+                else {
+                    self.remoteManifest(true);
+                }
+                self.hideSidePanel();
+            }); 
           
             this.dropzoneOptions4create = {
                 url: "arches.urls.root",
                 dictDefaultMessage: '',
                 autoProcessQueue: false,
                 uploadMultiple: true,
+                acceptedFiles: ["image/jpeg", "image/png", "image/tiff"].join(','),
                 autoQueue: false,
                 clickable: ".fileinput-create-button." + this.uniqueidClass(),
                 previewsContainer: '#hidden-dz-create-previews',
