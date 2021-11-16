@@ -16,6 +16,7 @@ create or replace function __arches_tile_view_update() returns trigger as $$
         if (TG_OP = 'DELETE') then
             select tiledata into old_json_data from tiles where tileid = old.tileid;
             delete from geojson_geometries where tileid = old.tileid;
+            delete from resource_x_resource where tileid = old.tileid;
             delete from public.tiles where tileid = old.tileid;
             insert into edit_log (
                 resourceclassid,
@@ -82,6 +83,7 @@ create or replace function __arches_tile_view_update() returns trigger as $$
                 );
             end if;
             perform refresh_tile_geojson_geometries(tile_id);
+            perform __arches_refresh_tile_resource_relationships(tile_id);
             insert into edit_log (
                 resourceclassid,
                 resourceinstanceid,

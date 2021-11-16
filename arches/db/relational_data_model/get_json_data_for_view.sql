@@ -87,6 +87,19 @@ begin
             );
         end if;
         execute query into result using view_row;
+        if node_datatype in ('resource-instance-list', 'resource-instance') then
+            select jsonb_agg(
+                case
+                    when e->>'resourceXresourceId' = '' then jsonb_set(
+                        e,
+                        '{resourceXresourceId}',
+                        to_jsonb(public.uuid_generate_v1mc())
+                    )
+                    else e
+                end
+            ) into result
+            from jsonb_array_elements(result) e(e);
+        end if;
         tiledata = tiledata || jsonb_build_object(column_info.description, result);
     end loop;
 
