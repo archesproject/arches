@@ -23,19 +23,21 @@ begin
         when 'boolean' then datatype = 'boolean';
         when 'resource-instance' then datatype = 'jsonb';
         when 'resource-instance-list' then datatype = 'jsonb';
+        when 'url' then datatype = 'jsonb';
+        when 'concept' then datatype = 'uuid';
         when 'concept-list' then
             select_sql = format('(
                     CASE
                         WHEN t.tiledata->>%1$L is null THEN null
                         ELSE ARRAY(
                             SELECT jsonb_array_elements_text(
-                                    t.tiledata->%1$L
-                                ) AS jsonb_array_elements_text
+                                t.tiledata->%1$L
+                            )::uuid
                         )
                     END
                 )', node.nodeid
             );
-            datatype = 'text[]';
+            datatype = 'uuid[]';
         else
             datatype = 'text';
         end case;
