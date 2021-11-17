@@ -35,6 +35,10 @@ from arches.app.views.base import BaseManagerView
 from arches.app.utils.forms import ArchesUserProfileForm
 from arches.app.utils.response import JSONResponse
 from arches.app.utils.permission_backend import user_is_resource_reviewer
+import logging
+
+
+logger = logging.getLogger(__name__)
 
 
 class UserManagerView(BaseManagerView):
@@ -174,11 +178,12 @@ class UserManagerView(BaseManagerView):
                         + settings.APP_NAME
                         + " profile was just changed.  If this was unexpected, please contact your "
                         + settings.APP_NAME
-                        + " administrator at %s." % (admin_info)
+                        + " administrator"
+                        + (" at %s." % (admin_info) if (admin_info != "") else ".")
                     )
                     user.email_user(_("Your " + settings.APP_NAME + " Profile Has Changed"), message)
                 except Exception as e:
-                    print(e)
+                    logger.error("Error sending email", exc_info=True)
                 request.user = user
             context["form"] = form
 
