@@ -636,7 +636,7 @@ define([
                 TileBasedComponent.apply(self);
             }
             else if (self.componentData.tilesManaged === "many") {
-                MultipleTileBasedComponent.apply(self, [title] );
+                MultipleTileBasedComponent.apply(self, [params.title] );
             }
         }
 
