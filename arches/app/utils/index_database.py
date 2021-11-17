@@ -172,9 +172,9 @@ def index_resources_by_type(
                 finally:
                     logger.error(f"Error indexing resource batch, type {type(err)}, message: {err}, \n>>>>>>>>>>>>>> TRACEBACK: {tb}")
 
-            process_count = math.ceil(multiprocessing.cpu_count() / 2 ) if max_subprocesses == 0 else max_subprocesses
+            process_count = math.ceil(multiprocessing.cpu_count() / 2) if max_subprocesses == 0 else max_subprocesses
             logger.debug(f"... multiprocessing process count: {process_count}")
-            logger.debug(f"... resource type batch count (batch size={batch_size}): {batch_number}")
+            logger.debug(f"... resource type batch count (batch size={batch_size}): {len(resource_batches)}")
             with multiprocessing.Pool(processes=process_count) as pool:
                 for resource_batch in resource_batches:
                     pool.apply_async(
