@@ -133,7 +133,7 @@ class Command(BaseCommand):
             type=int,
             dest="max_subprocesses",
             default=0,
-            help="changes the pool size when using use_multiprocessing. default = cpu count",
+            help="Changes the process pool size when using use_multiprocessing. Default is ceil(cpu_count()/2)",
         )
 
     def handle(self, *args, **options):
