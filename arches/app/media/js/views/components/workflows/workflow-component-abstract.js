@@ -339,9 +339,9 @@ define([
 
             return hasDirtyTiles;
         });
-        self.hasDirtyTiles.subscribe(function(hasDirtyTiles) {
-            self.hasUnsavedData(hasDirtyTiles);
-        });
+        // self.hasDirtyTiles.subscribe(function(hasDirtyTiles) {
+        //     self.hasUnsavedData(hasDirtyTiles);
+        // });
         
         this.initialize = function() {
             self.loading(true);
