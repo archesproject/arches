@@ -21,6 +21,7 @@ from datetime import datetime
 
 import multiprocessing
 import os
+import math
 import logging
 
 logger = logging.getLogger(__name__)
@@ -103,10 +104,10 @@ def index_resources_by_type(
 
     if isinstance(resource_types, str):
         try:
-            resource_types = resource_types.split(',')
+            resource_types = resource_types.split(",")
         except:
             pass
-        #resource_types = [resource_types]
+        # resource_types = [resource_types]
 
     for resource_type in resource_types:
         start = datetime.now()
@@ -142,9 +143,6 @@ def index_resources_by_type(
             batch_number = 0
             resource_batches.append([])
 
-            # batch_size needs to be >= 200 as read timeouts start occuring (at least on 16 thread i9)
-            batch_size = 200 if batch_size < 200 else batch_size
-
             for resource in resources:
                 resource_count += 1
                 resource_batches[batch_number].append(resource)
@@ -174,7 +172,8 @@ def index_resources_by_type(
                 finally:
                     logger.error(f"Error indexing resource batch, type {type(err)}, message: {err}, \n>>>>>>>>>>>>>> TRACEBACK: {tb}")
 
-            process_count = multiprocessing.cpu_count() if max_subprocesses == 0 else max_subprocesses
+            process_count = math.ceil(multiprocessing.cpu_count() / 2 ) if max_subprocesses == 0 else max_subprocesses
+            logger.debug(f"... multiprocessing process count: {process_count}")
             logger.debug(f"... resource type batch count (batch size={batch_size}): {batch_number}")
             with multiprocessing.Pool(processes=process_count) as pool:
                 for resource_batch in resource_batches:
