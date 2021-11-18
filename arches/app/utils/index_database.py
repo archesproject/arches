@@ -221,12 +221,12 @@ def _index_resource_batch(resourceids):
     from arches.app.search.search_engine_factory import SearchEngineInstance as _se
 
     resources = Resource.objects.filter(resourceinstanceid__in=resourceids)
-    batch_size = len(resources)
+    batch_size = int(len(resourceids) / 2)
     datatype_factory = DataTypeFactory()
     node_datatypes = {str(nodeid): datatype for nodeid, datatype in models.Node.objects.values_list("nodeid", "datatype")}
 
     with _se.BulkIndexer(batch_size=batch_size, refresh=True, timeout=30, max_retries=10, retry_on_timeout=True) as doc_indexer:
-        with _se.BulkIndexer(batch_size=batch_size * 2, refresh=True, timeout=30, max_retries=10, retry_on_timeout=True) as term_indexer:
+        with _se.BulkIndexer(batch_size=batch_size, refresh=True, timeout=30, max_retries=10, retry_on_timeout=True) as term_indexer:
             for resource in resources:
                 document, terms = resource.get_documents_to_index(
                     fetchTiles=True, datatype_factory=datatype_factory, node_datatypes=node_datatypes
