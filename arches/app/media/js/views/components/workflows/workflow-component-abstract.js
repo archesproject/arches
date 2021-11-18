@@ -339,9 +339,9 @@ define([
 
             return hasDirtyTiles;
         });
-        self.hasDirtyTiles.subscribe(function(hasDirtyTiles) {
-            self.hasUnsavedData(hasDirtyTiles);
-        });
+        // self.hasDirtyTiles.subscribe(function(hasDirtyTiles) {
+        //     self.hasUnsavedData(hasDirtyTiles);
+        // });
         
         this.initialize = function() {
             self.loading(true);
@@ -636,7 +636,7 @@ define([
                 TileBasedComponent.apply(self);
             }
             else if (self.componentData.tilesManaged === "many") {
-                MultipleTileBasedComponent.apply(self, [title] );
+                MultipleTileBasedComponent.apply(self, [params.title] );
             }
         }
 
