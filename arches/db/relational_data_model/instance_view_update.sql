@@ -60,7 +60,6 @@ create or replace function __arches_instance_view_update() returns trigger as $$
                     new.legacyid,
                     now()
                 );
-                raise notice 'instance "%" created.', instance_id;
             end if;
             insert into edit_log (
                 resourceclassid,
