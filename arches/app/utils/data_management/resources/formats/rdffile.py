@@ -87,7 +87,7 @@ class RdfWriter(Writer):
             nodegroup = node.nodegroup
 
             def getchildedges(node):
-                for edge in models.Edge.objects.filter(domainnode=node).prefetch_related('rangenode').prefetch_related('domainnode'):
+                for edge in models.Edge.objects.filter(domainnode=node).prefetch_related("rangenode").prefetch_related("domainnode"):
                     if nodegroup == edge.rangenode.nodegroup:
                         edges.append(edge)
                         getchildedges(edge.rangenode)
@@ -97,7 +97,7 @@ class RdfWriter(Writer):
 
         def get_graph_parts(graphid):
             if graphid not in graph_cache:
-                print('getting from db')
+                print("getting from db")
                 graph_cache[graphid] = {
                     "rootedges": [],
                     "subgraphs": {},

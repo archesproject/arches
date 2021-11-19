@@ -119,9 +119,7 @@ class JSONSerializer(object):
             return object.name
         elif isinstance(object, uuid.UUID):
             return str(object)
-        elif (isinstance(object, I18n_JSON)
-            or isinstance(object, I18n_String)
-        ):
+        elif isinstance(object, I18n_JSON) or isinstance(object, I18n_String):
             use_raw_i18n_json = kwargs.get("use_raw_i18n_json", False)
             return getattr(object, "serialize")(use_raw_i18n_json)
         elif hasattr(object, "__dict__"):
