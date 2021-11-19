@@ -4,6 +4,7 @@ import json
 import uuid
 import requests
 import datetime
+from time import time
 import logging
 from io import StringIO
 from django.urls import reverse
@@ -54,7 +55,7 @@ def load_document_and_cache(url, cache=None):
 
 set_document_loader(load_document_and_cache)
 
-
+graph_cache = {}
 class RdfWriter(Writer):
     def __init__(self, **kwargs):
         self.format = kwargs.pop("format", "xml")
@@ -79,14 +80,14 @@ class RdfWriter(Writer):
 
         g = Graph()
         g.bind("archesproject", archesproject, False)
-        graph_cache = {}
+        # graph_cache = {}
 
         def get_nodegroup_edges_by_collector_node(node):
             edges = []
             nodegroup = node.nodegroup
 
             def getchildedges(node):
-                for edge in models.Edge.objects.filter(domainnode=node):
+                for edge in models.Edge.objects.filter(domainnode=node).prefetch_related('rangenode').prefetch_related('domainnode'):
                     if nodegroup == edge.rangenode.nodegroup:
                         edges.append(edge)
                         getchildedges(edge.rangenode)
@@ -96,6 +97,7 @@ class RdfWriter(Writer):
 
         def get_graph_parts(graphid):
             if graphid not in graph_cache:
+                print('getting from db')
                 graph_cache[graphid] = {
                     "rootedges": [],
                     "subgraphs": {},
@@ -189,7 +191,9 @@ class RdfWriter(Writer):
                 graph += rng_dt.to_rdf(pkg, edge)
 
         for resourceinstanceid, tiles in self.resourceinstances.items():
+            start = time()
             graph_info = get_graph_parts(self.graph_id)
+            print(f"time to get graph parts = {datetime.timedelta(seconds=time() - start)}")
 
             # add the edges for the group of nodes that include the root (this group of nodes has no nodegroup)
             for edge in graph_cache[self.graph_id]["rootedges"]:
@@ -217,11 +221,14 @@ class RdfWriter(Writer):
 
                 # add the edge from the parent node to this tile's root node
                 # where the tile has a parent tile
-                if graph_info["subgraphs"][tile.nodegroup]["parentnode_nodegroup"] is not None:
-                    edge = graph_info["subgraphs"][tile.nodegroup]["inedge"]
-                    domainnode = archesproject["tile/%s/node/%s" % (str(tile.parenttile.pk), str(edge.domainnode.pk))]
-                    rangenode = archesproject["tile/%s/node/%s" % (str(tile.pk), str(edge.rangenode.pk))]
-                    add_edge_to_graph(g, domainnode, rangenode, edge, tile, graph_info)
+                try:
+                    if graph_info["subgraphs"][tile.nodegroup]["parentnode_nodegroup"] is not None:
+                        edge = graph_info["subgraphs"][tile.nodegroup]["inedge"]
+                        domainnode = archesproject["tile/%s/node/%s" % (str(tile.parenttile.pk), str(edge.domainnode.pk))]
+                        rangenode = archesproject["tile/%s/node/%s" % (str(tile.pk), str(edge.rangenode.pk))]
+                        add_edge_to_graph(g, domainnode, rangenode, edge, tile, graph_info)
+                except:
+                    pass
         return g
 
 

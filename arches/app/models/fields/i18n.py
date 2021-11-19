@@ -81,8 +81,11 @@ class I18n_String(object):
         # eg I18n_String("toast") == "toast" would return True
         return str(self) == str(other)
 
-    def serialize(self):
-        return str(self)
+    def serialize(self, use_raw_i18n_json=False):
+        if use_raw_i18n_json:
+            return self.raw_value
+        else:
+            return str(self)
 
     # Use this to call all the sting methods on our class so
     # this class can emulate the "string" type
@@ -266,9 +269,9 @@ class I18n_JSON(object):
             return getattr(self.raw_value, name)
         raise AttributeError
 
-    def serialize(self):
+    def serialize(self, use_raw_i18n_json=False):
         ret = copy.deepcopy(self.raw_value)
-        if "i18n_properties" in ret:
+        if not use_raw_i18n_json and "i18n_properties" in ret:
             for prop in ret["i18n_properties"]:
                 try:
                     ret[prop] = str(I18n_String(ret[prop]))
