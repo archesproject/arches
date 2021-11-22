@@ -12,7 +12,7 @@ class Migration(migrations.Migration):
 
     sql = """
         UPDATE public.cards_x_nodes_x_widgets
-        SET config = 
+        SET config =
         jsonb_set(config, '{{placeholder}}', json_build_object('{0}', config->>'placeholder')::jsonb, true)||
         '{{"i18n_properties": ["placeholder"]}}'
         WHERE nodeid in (SELECT nodeid FROM nodes WHERE datatype = 'domain-value' OR datatype = 'domain-value-list');
@@ -28,8 +28,8 @@ class Migration(migrations.Migration):
     )
 
     reverse_sql = """
-        UPDATE public.cards_x_nodes_x_widgets 
-        set config = config - 'i18n_properties' || 
+        UPDATE public.cards_x_nodes_x_widgets
+        set config = config - 'i18n_properties' ||
         json_build_object('placeholder', jsonb_extract_path(config, 'placeholder', '{0}'))::jsonb
         WHERE nodeid in (SELECT nodeid FROM nodes WHERE datatype = 'domain-value' OR datatype = 'domain-value-list');
 
