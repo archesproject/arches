@@ -172,17 +172,12 @@ class UserManagerView(BaseManagerView):
             if form.is_valid():
                 user = form.save()
                 try:
-                    admin_info = settings.ADMINS[0][1] if settings.ADMINS else ""
+                    admin_info = settings.ADMINS[0][1] if settings.ADMINS else None
                     message = _(
-                        "Your "
-                        + settings.APP_NAME
-                        + " profile was just changed.  If this was unexpected, please contact your "
-                        + settings.APP_NAME
-                        + " administrator"
-                        + (" at %s." % (admin_info) if (admin_info != "") else ".")
+                        f"Your {settings.APP_NAME} profile was just changed.  If this was unexpected, please contact your {settings.APP_NAME} administrator{f' at {admin_info}.' if (admin_info and not str.isspace(admin_info)) else '.'}"
                     )
                     user.email_user(_("Your " + settings.APP_NAME + " Profile Has Changed"), message)
-                except Exception as e:
+                except:
                     logger.error("Error sending email", exc_info=True)
                 request.user = user
             context["form"] = form
