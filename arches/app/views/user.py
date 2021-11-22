@@ -174,7 +174,8 @@ class UserManagerView(BaseManagerView):
                 try:
                     admin_info = settings.ADMINS[0][1] if settings.ADMINS else None
                     message = _(
-                        f"Your {settings.APP_NAME} profile was just changed.  If this was unexpected, please contact your {settings.APP_NAME} administrator{f' at {admin_info}.' if (admin_info and not str.isspace(admin_info)) else '.'}"
+                        f"Your {settings.APP_NAME} profile was just changed.  If this was unexpected, please contact your "
+                        f"{settings.APP_NAME} administrator{f' at {admin_info}.' if (admin_info and not str.isspace(admin_info)) else '.'}"
                     )
                     user.email_user(_("Your " + settings.APP_NAME + " Profile Has Changed"), message)
                 except:
