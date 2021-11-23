@@ -18,10 +18,11 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 
 import json
 from arches import __version__
-from arches.app.models.models import GroupMapSettings
+from arches.app.models.models import GroupMapSettings, Language
 from arches.app.models.system_settings import settings
 from arches.app.utils.geo_utils import GeoUtils
 from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializer
+from django.utils.translation import get_language
 
 
 def livereload(request):
@@ -65,6 +66,7 @@ def map_info(request):
 
 
 def app_settings(request):
+    languages = Language.objects.all()
     return {
         "app_settings": {
             "VERSION": __version__,
@@ -75,5 +77,7 @@ def app_settings(request):
             "RENDERERS": settings.RENDERERS,
             "ACCESSIBILITY_MODE": settings.ACCESSIBILITY_MODE,
             "FORCE_SCRIPT_NAME": settings.FORCE_SCRIPT_NAME if settings.FORCE_SCRIPT_NAME is not None else "",
+            "DEFAULT_LANGUAGE": get_language(),
+            "LANGUAGES": JSONSerializer().serialize(languages) if len(languages) != 0 else JSONSerializer().serialize([]),
         }
     }

@@ -27,6 +27,7 @@ from django.db.models import Q
 from django.contrib.auth.models import User, Group, Permission
 from django.core.exceptions import ObjectDoesNotExist
 from django.utils.translation import ugettext as _
+from django.utils.translation import get_language
 from arches.app.models import models
 from arches.app.models.models import EditLog
 from arches.app.models.models import TileModel
@@ -143,6 +144,7 @@ class Resource(models.ResourceInstance):
         self.save_edit(user=user, edit_type="create", transaction_id=transaction_id)
         if index is True:
             self.index()
+            pass
 
     def get_root_ontology(self):
         """
@@ -265,8 +267,27 @@ class Resource(models.ResourceInstance):
         document["displayname"] = None
         document["root_ontology_class"] = self.get_root_ontology()
         document["legacyid"] = self.legacyid
-        document["displayname"] = self.displayname
-        document["displaydescription"] = self.displaydescription
+
+        document["displayname"] = []
+        if self.displayname is not None:
+            try:
+                display_name = JSONDeserializer().deserialize(self.displayname)
+                for key in display_name.keys():
+                    document["displayname"].append({"value": display_name[key]["value"], "language": key})
+            except:
+                display_name = {"value": self.displayname, "language": get_language()}
+                document["displayname"].append(display_name)
+
+        document["displaydescription"] = []
+        if self.displaydescription is not None:
+            try:
+                display_description = JSONDeserializer().deserialize(self.displaydescription)
+                for key in display_description.keys():
+                    document["displaydescription"].append({"value": display_description[key]["value"], "language": key})
+            except:
+                display_description = {"value": self.displaydescription, "language": get_language()}
+                document["displaydescription"].append(display_description)
+
         document["map_popup"] = self.map_popup
 
         tiles = list(models.TileModel.objects.filter(resourceinstance=self)) if fetchTiles else self.tiles
@@ -296,20 +317,38 @@ class Resource(models.ResourceInstance):
                     datatype_instance = datatype_factory.get_instance(datatype)
                     datatype_instance.append_to_document(document, nodevalue, nodeid, tile)
                     node_terms = datatype_instance.get_search_terms(nodevalue, nodeid)
+
                     for index, term in enumerate(node_terms):
-                        terms.append(
-                            {
-                                "_id": str(nodeid) + str(tile.tileid) + str(index),
-                                "_source": {
-                                    "value": term,
-                                    "nodeid": nodeid,
-                                    "nodegroupid": tile.nodegroup_id,
-                                    "tileid": tile.tileid,
-                                    "resourceinstanceid": tile.resourceinstance_id,
-                                    "provisional": False,
-                                },
-                            }
-                        )
+                        if datatype == "string":
+                            terms.append(
+                                {
+                                    "_id": str(nodeid) + str(tile.tileid) + str(index) + term["language"],
+                                    "_source": {
+                                        "value": term["value"],
+                                        "nodeid": nodeid,
+                                        "nodegroupid": tile.nodegroup_id,
+                                        "tileid": tile.tileid,
+                                        "language": term["language"],
+                                        "resourceinstanceid": tile.resourceinstance_id,
+                                        "provisional": False,
+                                    },
+                                }
+                            )
+                        else:
+                            terms.append(
+                                {
+                                    "_id": str(nodeid) + str(tile.tileid) + str(index),
+                                    "_source": {
+                                        "value": term,
+                                        "nodeid": nodeid,
+                                        "nodegroupid": tile.nodegroup_id,
+                                        "tileid": tile.tileid,
+                                        "language": get_language(),  # TODO: make dynamic based on system language
+                                        "resourceinstanceid": tile.resourceinstance_id,
+                                        "provisional": False,
+                                    },
+                                }
+                            )
 
             if tile.provisionaledits is not None:
                 provisionaledits = tile.provisionaledits
@@ -324,21 +363,38 @@ class Resource(models.ResourceInstance):
                                     datatype_instance = datatype_factory.get_instance(datatype)
                                     datatype_instance.append_to_document(document, nodevalue, nodeid, tile, True)
                                     node_terms = datatype_instance.get_search_terms(nodevalue, nodeid)
-                                    for index, term in enumerate(node_terms):
-                                        terms.append(
-                                            {
-                                                "_id": str(nodeid) + str(tile.tileid) + str(index),
-                                                "_source": {
-                                                    "value": term,
-                                                    "nodeid": nodeid,
-                                                    "nodegroupid": tile.nodegroup_id,
-                                                    "tileid": tile.tileid,
-                                                    "resourceinstanceid": tile.resourceinstance_id,
-                                                    "provisional": True,
-                                                },
-                                            }
-                                        )
 
+                                    for index, term in enumerate(node_terms):
+                                        if datatype == "string":
+                                            terms.append(
+                                                {
+                                                    "_id": str(nodeid) + str(tile.tileid) + str(index) + term["language"],
+                                                    "_source": {
+                                                        "value": term["value"],
+                                                        "nodeid": nodeid,
+                                                        "nodegroupid": tile.nodegroup_id,
+                                                        "tileid": tile.tileid,
+                                                        "language": term["language"],
+                                                        "resourceinstanceid": tile.resourceinstance_id,
+                                                        "provisional": True,
+                                                    },
+                                                }
+                                            )
+                                        else:
+                                            terms.append(
+                                                {
+                                                    "_id": str(nodeid) + str(tile.tileid) + str(index),
+                                                    "_source": {
+                                                        "value": term,
+                                                        "nodeid": nodeid,
+                                                        "nodegroupid": tile.nodegroup_id,
+                                                        "tileid": tile.tileid,
+                                                        "language": get_language(),
+                                                        "resourceinstanceid": tile.resourceinstance_id,
+                                                        "provisional": True,
+                                                    },
+                                                }
+                                            )
         return document, terms
 
     def delete(self, user={}, index=True, transaction_id=None):

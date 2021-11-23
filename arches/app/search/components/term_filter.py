@@ -21,12 +21,15 @@ class TermFilter(BaseSearchFilter):
     def append_dsl(self, search_results_object, permitted_nodegroups, include_provisional):
         search_query = Bool()
         querysting_params = self.request.GET.get(details["componentname"], "")
+        language = self.request.GET.get("language", "*")
         for term in JSONDeserializer().deserialize(querysting_params):
             if term["type"] == "term" or term["type"] == "string":
                 string_filter = Bool()
                 if term["type"] == "term":
                     string_filter.must(Match(field="strings.string", query=term["value"], type="phrase"))
                 elif term["type"] == "string":
+                    if language != "*":
+                        string_filter.must(Match(field="strings.language", query=language, type="phrase_prefix"))
                     string_filter.should(Match(field="strings.string", query=term["value"], type="phrase_prefix"))
                     string_filter.should(Match(field="strings.string.folded", query=term["value"], type="phrase_prefix"))
 

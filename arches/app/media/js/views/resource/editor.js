@@ -29,7 +29,21 @@ define([
     var loading = ko.observable(false);
     var selection = ko.observable('root');
     var scrollTo = ko.observable();
-    var displayname = ko.observable(data.displayname);
+    let parsedDisplayName = undefined;
+    try { 
+        if(typeof data.displayname == 'string') {
+            parsedDisplayName = JSON.parse(data.displayname)
+        }
+    } catch(e){}
+
+    let displayNameValue = undefined;
+    if(parsedDisplayName){
+        const defaultLanguageValue = parsedDisplayName?.[arches.defaultLanguage]?.value;
+        displayNameValue = defaultLanguageValue ? defaultLanguageValue : "(" + parsedDisplayName[Object.keys(parsedDisplayName).filter(languageKey => languageKey != arches.defaultLanguage)?.[0]]?.value + ")";
+    } else {
+        displayNameValue = data.displayname;
+    }
+    const displayname = ko.observable(displayNameValue);
     var resourceId = ko.observable(data.resourceid);
     var appliedFunctions = ko.observable(data['appliedFunctions']);
     var userIsCreator = data['useriscreator'];

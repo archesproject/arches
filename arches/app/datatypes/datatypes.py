@@ -11,6 +11,8 @@ import time
 from distutils import util
 from datetime import datetime
 from mimetypes import MimeTypes
+
+from django.db.models import fields
 from arches.app.datatypes.base import BaseDataType
 from arches.app.models import models
 from arches.app.models.system_settings import settings
@@ -34,6 +36,7 @@ from django.contrib.gis.geos import Polygon
 from django.core.exceptions import ObjectDoesNotExist
 from django.core.exceptions import ValidationError
 from django.db import connection, transaction
+from django.utils.translation import get_language
 
 from elasticsearch import Elasticsearch
 from elasticsearch.exceptions import NotFoundError
@@ -88,30 +91,54 @@ class StringDataType(BaseDataType):
         errors = []
         try:
             if value is not None:
-                value.upper()
+                for key in value.keys():
+                    isinstance(value[key]["value"], str)
+                    isinstance(value[key]["direction"], str)
         except:
             message = _("This is not a string")
             error_message = self.create_error_message(value, source, row_number, message)
             errors.append(error_message)
         return errors
 
+    def validate_from_rdf(self, value):
+        print(value)
+        return []
+
     def clean(self, tile, nodeid):
         if tile.data[nodeid] in ["", "''"]:
             tile.data[nodeid] = None
 
     def append_to_document(self, document, nodevalue, nodeid, tile, provisional=False):
-        val = {"string": nodevalue, "nodegroup_id": tile.nodegroup_id, "provisional": provisional}
-        document["strings"].append(val)
+        if nodevalue is not None:
+            for key in nodevalue.keys():
+                val = {
+                    "string": nodevalue[key]["value"],
+                    "language": key,
+                    "nodegroup_id": tile.nodegroup_id,
+                    "provisional": provisional,
+                }
+                document["strings"].append(val)
 
     def transform_export_values(self, value, *args, **kwargs):
+        language = kwargs.pop("language", None)
         if value is not None:
-            return value
+            try:
+                if language is not None:
+                    return value[language]["value"]
+                else:
+                    return value[get_language()]["value"]
+            except KeyError:
+                # sometimes certain requested language values aren't populated.  Just pass back with implicit None.
+                pass
 
     def get_search_terms(self, nodevalue, nodeid=None):
         terms = []
-        if nodevalue is not None:
-            if settings.WORDS_PER_SEARCH_TERM is None or (len(nodevalue.split(" ")) < settings.WORDS_PER_SEARCH_TERM):
-                terms.append(nodevalue)
+
+        if nodevalue is not None and isinstance(nodevalue, dict):
+            for key in nodevalue.keys():
+                if settings.WORDS_PER_SEARCH_TERM is None or (len(nodevalue[key]["value"].split(" ")) < settings.WORDS_PER_SEARCH_TERM):
+                    terms.append({"language": key, "value": nodevalue[key]["value"]})
+
         return terms
 
     def append_search_filters(self, value, node, query, request):
@@ -120,7 +147,11 @@ class StringDataType(BaseDataType):
                 self.append_null_search_filters(value, node, query, request)
             elif value["val"] != "":
                 match_type = "phrase_prefix" if "~" in value["op"] else "phrase"
-                match_query = Match(field="tiles.data.%s" % (str(node.pk)), query=value["val"], type=match_type)
+                if value["lang"]:
+                    match_query = Match(field="tiles.data.%s.%s.value" % (str(node.pk), value["lang"]), query=value["val"], type=match_type)
+                else:
+                    match_query = Match(field="tiles.data.%s" % (str(node.pk)), query=value["val"], type=match_type)
+
                 if "!" in value["op"]:
                     query.must_not(match_query)
                     query.filter(Exists(field="tiles.data.%s" % (str(node.pk))))
@@ -138,17 +169,48 @@ class StringDataType(BaseDataType):
         g = Graph()
         if edge_info["range_tile_data"] is not None:
             g.add((edge_info["d_uri"], RDF.type, URIRef(edge.domainnode.ontologyclass)))
-            g.add((edge_info["d_uri"], URIRef(edge.ontologyproperty), Literal(edge_info["range_tile_data"])))
+            for key in edge_info["range_tile_data"].keys():
+                g.add((edge_info["d_uri"], URIRef(edge.ontologyproperty), Literal(edge_info["range_tile_data"][key]["value"], lang=key)))
         return g
+
+    def transform_value_for_tile(self, value, **kwargs):
+        language = kwargs.pop("language", None)
+        if type(value) is str:
+            if language is not None:
+                language_objects = list(models.Language.objects.filter(code=language))
+                if len(language_objects) > 0:
+                    return {language: {"value": value, "direction": language_objects[0].default_direction}}
+
+            return {get_language(): {"value": value, "direction": "ltr"}}
+        return value
 
     def from_rdf(self, json_ld_node):
         # returns the string value only
         # FIXME: Language?
         value = get_value_from_jsonld(json_ld_node)
         try:
-            return value[0]
+            return {value[1]: {"value": value[0], "direction": "ltr"}}
         except (AttributeError, KeyError) as e:
             pass
+
+    def get_display_value(self, tile, node):
+        data = self.get_tile_data(tile)
+        if data:
+            raw_value = data.get(str(node.nodeid))
+            if raw_value is not None:
+                return raw_value
+
+    def default_es_mapping(self):
+        """
+        Default mapping if not specified is a text field
+        """
+        # languages = models.Language.objects.all()
+        # lang_mapping = {"properties": {"value": {"type": "text", "fields": {"keyword": {"ignore_above": 256, "type": "keyword"}}}}}
+        # for lang in languages:
+        #     text_mapping = {"properties": {lang.code: lang_mapping}}
+        text_mapping = {"properties": {}}
+        return text_mapping
+
 
 
 class NumberDataType(BaseDataType):
@@ -2116,10 +2178,16 @@ class AnnotationDataType(BaseDataType):
 
 def get_value_from_jsonld(json_ld_node):
     try:
-        return (json_ld_node[0].get("@value"), json_ld_node[0].get("@language"))
+        language = json_ld_node[0].get("@language")
+        if language is None:
+            language = get_language()
+        return (json_ld_node[0].get("@value"), language)
     except KeyError as e:
         try:
-            return (json_ld_node.get("@value"), json_ld_node.get("@language"))
+            language = json_ld_node.get("@language")
+            if language is None:
+                language = get_language()
+            return (json_ld_node.get("@value"), language)
         except AttributeError as e:
             return
     except IndexError as e:
