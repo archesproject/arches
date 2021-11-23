@@ -35,7 +35,7 @@ class Migration(migrations.Migration):
 
         UPDATE public.widgets
         SET defaultconfig = defaultconfig - 'i18n_properties' ||
-        json_build_object('placeholder', jsonb_extract_path(defaultconfig, 'placeholder', '{0}'))::jsonb ||
+        json_build_object('placeholder', jsonb_extract_path(defaultconfig, 'placeholder', '{0}'))::jsonb
         WHERE datatype = 'domain-value' OR datatype = 'domain-value-list';
 
 
