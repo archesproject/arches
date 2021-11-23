@@ -3,13 +3,43 @@
 
 {% block form %}
 <div class="row widget-wrapper">
-    <div class="form-group">
+    <div class="form-group">        
+        <div class="i8ln-style-tools-collapser" data-bind=" click: function() {
+            showi8lnOptions(!showi8lnOptions());
+        }">
+            <i class="fa" data-bind="{
+                css: {
+                    'fa-caret-down' : !showi8lnOptions(),
+                    'fa-caret-up' : showi8lnOptions(),
+                }
+            }"></i>
+            <span data-bind="text: '{% trans "Languages" %}'"></span>
+        </div>
+        <div class="form-horizontal" data-bind="if: showi8lnOptions">
+            <div class="i8ln-style-tools-panel">
+                <div style="display: flex; flex-direction: column; max-width:600px">
+                    <label class="widget-input-label i8ln-style-tools-label" for="lang_dd">{% trans "Language" %}</label>
+                    <select id="lang_dd" style="flex:1" name="language" data-bind="options: languages, optionsText: function(item){return item.name + ' (' + item.code + ')'}, value: currentLanguage, chosen: {width:'100%'}">
+                    </select>
+                    <label class="widget-input-label i8ln-style-tools-label" for="lang_dir">{% trans "Direction" %}</label>
+                    <select id="lang_dir" style="flex:1" name="language" data-bind="value: currentDirection, chosen: {
+                        'width':'100%'}">
+                        <option value="ltr">
+                            Left-to-Right
+                        </option>
+                        <option value="rtl">
+                            Right-to-Left
+                        </option>
+                    </select>
+                </div>
+            </div>
+        </div>
         <label class="control-label widget-input-label" for="" data-bind="text:label"></label>
         <!-- ko if: node -->
         <i data-bind="css: {'ion-asterisk widget-label-required': node.isrequired}"></i>
         <!-- /ko -->
         <div class="col-xs-12">
-            <textarea rows="10" cols="80" data-bind="ckeditor: value, ckeditorOptions: {},  valueUpdate: 'afterkeydown', attr: {disabled: disabled}"></textarea>
+            <textarea rows="10" cols="80" data-bind="ckeditor: currentText, language: currentLanguage.code, direction: currentDirection, ckeditorOptions: {},  valueUpdate: 'afterkeydown', attr: {disabled: disabled}"></textarea>
         </div>
     </div>
 </div>
@@ -17,17 +47,17 @@
 
 {% block report %}
 <dt data-bind="text: label"></dt>
-<dd data-bind="html: value() || '{% trans "None" %}'"></dd>
+<dd data-bind="html: strippedValue || '{% trans "None" %}'"></dd>
 {% endblock report %}
 
 {% block display_value %}
-<!-- ko if: value() && !ko.unwrap(displayfullvalue) -->
+<!-- ko if: value() && currentLanguage() && value()[currentLanguage().code] &&  value()[currentLanguage().code]['value'] && !ko.unwrap(displayfullvalue) -->
 <em>[{% trans "rich text" %}]</em>
 <!-- /ko -->
-<!-- ko if: value() && ko.unwrap(displayfullvalue) === true -->
-<div data-bind="html: value() || '{% trans "None" %}'"></div>
+<!-- ko if: value() && value()[currentLanguage().code] &&  value()[currentLanguage().code]['value'] && ko.unwrap(displayfullvalue) === true -->
+<div data-bind="html: value() && value()[currentLanguage()] &&  value()[currentLanguage()]['value'] ? strippedValue : '{% trans "None" %}'"></div>
 <!-- /ko -->
-<!-- ko if: !value() -->
+<!-- ko if: !value() || !value()[currentLanguage().code] || !value()[currentLanguage().code]['value'] -->
 {% trans "None" %}
 <!-- /ko -->
 {% endblock display_value %}

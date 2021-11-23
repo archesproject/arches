@@ -212,15 +212,32 @@ class I18n_JSON(object):
         """
 
         if len(self.i18n_properties) == 0 or isinstance(compiler, SQLInsertCompiler):
-            params = [json.dumps(self.raw_value)]
-            self.sql = "%s"
+            params = [json.dumps(self.localize())]
+            sql = "%s"
         else:
-            self.sql = self.attname
             params = []
-            for prop in self.raw_value["i18n_properties"]:
-                self.sql = f"jsonb_set({self.sql}, '{{{prop},{self.lang}}}', %s)"
-                params.append(json.dumps(self.raw_value[prop]))
-        return self.sql, params
+            sql = self.attname
+            for prop, value in self.raw_value.items():
+                if prop in self.i18n_properties and isinstance(value, str):
+                    sql = f"jsonb_set({sql}, '{{{prop},{self.lang}}}', %s)"
+                else:
+                    sql = f"jsonb_set({sql}, '{{{prop}}}', %s)"
+                params.append(json.dumps(value))
+
+            # If all of root keys of the json object we're saving are the same as what is 
+            # currently in that json value stored in the db then all we do is update those
+            # specific values using the jsonb_set method from above
+            # If on the other hand the root keys are different, then we assume that we can 
+            # just completely overwrite the saved object with our new json object
+            sql = f"""
+                CASE WHEN {self.attname} ?& ARRAY{list(self.raw_value.keys())}
+                THEN {sql}
+                ELSE %s
+                END
+            """
+            params.append(json.dumps(self.localize()))
+
+        return sql, tuple(params)
 
     # need this to avoid a Django error when setting
     # the default value on the I18n_JSONField
@@ -253,7 +270,20 @@ class I18n_JSON(object):
         ret = copy.deepcopy(self.raw_value)
         if "i18n_properties" in ret:
             for prop in ret["i18n_properties"]:
-                ret[prop] = str(I18n_String(ret[prop]))
+                try:
+                    ret[prop] = str(I18n_String(ret[prop]))
+                except:
+                    pass
+        return ret
+
+    def localize(self):
+        ret = copy.deepcopy(self.raw_value)
+        if "i18n_properties" in ret:
+            for prop in ret["i18n_properties"]:
+                if not isinstance(ret[prop], dict):
+                    ret[prop] = {
+                        self.lang: ret[prop]
+                    }
         return ret
 
 

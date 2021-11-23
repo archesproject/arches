@@ -272,7 +272,7 @@ class Customi18nJSONFieldTests(ArchesTestCase):
 
         translation.activate("de")
         updated_input = json.dumps(
-            {"i18n_properties": ["trueLabel", "falseLabel"], "trueLabel": "wahr", "falseLabel": "falsch", "min_length": 19}
+            {"i18n_properties": ["trueLabel", "falseLabel"], "trueLabel": "wahr", "falseLabel": "falsch", "min_length": 45}
         )
         m.config = updated_input
         m.save()
@@ -281,7 +281,7 @@ class Customi18nJSONFieldTests(ArchesTestCase):
             "i18n_properties": ["trueLabel", "falseLabel"],
             "trueLabel": {"en": "true", "es": "verdad", "de": "wahr"},
             "falseLabel": {"en": "false", "es": "falso", "de": "falsch"},
-            "min_length": 19,
+            "min_length": 45,
         }
         m = self.LocalizationTestJsonModel.objects.get(pk=2)
         self.assertEqual(m.config.raw_value, expected_output)

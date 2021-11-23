@@ -276,7 +276,7 @@ class GraphDataView(View):
             buffer.close()
 
             response = HttpResponse()
-            response["Content-Disposition"] = "attachment; filename=" + file_name + ".zip"
+            response["Content-Disposition"] = "attachment; filename=" + str(file_name) + ".zip"
             response["Content-length"] = str(len(zip_stream))
             response["Content-Type"] = "application/zip"
             response.write(zip_stream)

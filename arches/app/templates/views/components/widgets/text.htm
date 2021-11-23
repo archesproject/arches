@@ -3,13 +3,44 @@
 
 {% block form %}
 <div class="row widget-wrapper">
-    <div class="form-group">
+    <div class="form-group" style="position: relative; z-index: 0">
+        <div style="max-width: 600px; position: relative">
+        <div class="i8ln-style-tools-collapser" data-bind=" click: function() {
+            showi8lnOptions(!showi8lnOptions());
+        }">
+            <span><i class="fa" data-bind="{
+                css: {
+                    'fa-caret-down' : !showi8lnOptions(),
+                    'fa-caret-up' : showi8lnOptions(),
+                }
+            }"></i> {% trans "Languages" %}</span>
+        </div>
+        <div class="form-horizontal" data-bind="if: showi8lnOptions">
+            <div class="i8ln-style-tools-panel">
+                <div style="display: flex; flex-direction: column; max-width:600px">
+                    <label class="widget-input-label" for="lang_dd">{% trans "Language" %}</label>
+                    <select id="lang_dd" style="flex:1" name="language" data-bind="options: languages, optionsText: function(item){return item.name + ' (' + item.code + ')'}, value: currentLanguage, chosen: {width:'100%'}">
+                    </select>
+                    <label class="widget-input-label" for="lang_dir">{% trans "Direction" %}</label>
+                    <select id="lang_dir" style="flex:1" name="language" data-bind="value: currentDirection, chosen: {
+                        'width':'100%'}">
+                        <option value="ltr">
+                            Left-to-Right
+                        </option>
+                        <option value="rtl">
+                            Right-to-Left
+                        </option>
+                    </select>
+                </div>
+            </div>
+        </div>
         <label class="control-label widget-input-label" for="" data-bind="text:label"></label>
         <!-- ko if: node -->
         <i data-bind="css: {'ion-asterisk widget-label-required': node.isrequired}"></i>
         <!-- /ko -->
-        <div class="col-xs-12">
-            <input type="text" data-bind="textInput: value, attr: {placeholder: placeholder, maxlength: maxLength, disabled: disable}" class="form-control input-lg widget-input">
+        <div class="col-xs-12" style="display:flex;flex-wrap: wrap;flex-direction: column;">
+            <input type="text" style="flex:1" data-bind="textInput: currentText, attr: {placeholder: placeholder, maxlength: maxLength, disabled: disable, dir: currentDirection}" class="form-control input-lg widget-input">
+        </div>
         </div>
     </div>
 </div>
@@ -44,3 +75,18 @@
     </div>
 </div>
 {% endblock config_form %}
+
+<!-- ko if: !configForm  && state === 'display_value' -->
+{% block display_value %}
+<span data-bind="text: displayValue && displayValue() && currentLanguage() && displayValue()[currentLanguage().code] && displayValue()[currentLanguage().code]['value'] ? displayValue()[currentLanguage().code]['value'] : '' || '{% trans "None" %}'"></span>
+{% endblock display_value %}
+<!-- /ko -->
+
+<!-- ko if: !configForm  && state === 'report' -->
+<!-- ko if: !ko.unwrap(hideEmptyNodes) || ko.unwrap(hideEmptyNodes) === true && displayValue() -->
+{% block report %}
+<dt data-bind="text: label"></dt>
+<dd data-bind="text: displayValue() && currentLanguage() && displayValue()[currentLanguage().code] && displayValue()[currentLanguage().code]['value'] ? displayValue()[currentLanguage().code]['value'] : '{% trans "None" %}'"></dd>
+{% endblock report %}
+<!-- /ko -->
+<!-- /ko -->
