@@ -81,7 +81,7 @@ class I18n_String(object):
         # eg I18n_String("toast") == "toast" would return True
         return str(self) == str(other)
 
-    def serialize(self, use_raw_i18n_json=False):
+    def serialize(self, use_raw_i18n_json=False, **kwargs):
         if use_raw_i18n_json:
             return self.raw_value
         else:
@@ -269,7 +269,7 @@ class I18n_JSON(object):
             return getattr(self.raw_value, name)
         raise AttributeError
 
-    def serialize(self, use_raw_i18n_json=False):
+    def serialize(self, use_raw_i18n_json=False, **kwargs):
         ret = copy.deepcopy(self.raw_value)
         if not use_raw_i18n_json and "i18n_properties" in ret:
             for prop in ret["i18n_properties"]:

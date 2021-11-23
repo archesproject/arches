@@ -695,7 +695,7 @@ class Tile(models.TileModel):
                 return None
         return self
 
-    def serialize(self, fields=None, exclude=None):
+    def serialize(self, fields=None, exclude=None, **kwargs):
         """
         serialize to a different form then used by the internal class structure
 

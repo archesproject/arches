@@ -219,7 +219,7 @@ class MobileSurvey(models.MobileSurveyModel):
             logger.error("Could not parse {0}, {1}".format(ret["bounds"], e))
         return ret
 
-    def serialize(self, fields=None, exclude=None):
+    def serialize(self, fields=None, exclude=None, **kwargs):
         """
         serialize to a different form than used by the internal class structure
         used to append additional values (like parent ontology properties) that
