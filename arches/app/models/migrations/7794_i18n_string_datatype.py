@@ -24,9 +24,6 @@ class Migration(migrations.Migration):
 
         UPDATE public.widgets
         SET defaultconfig = defaultconfig ||
-            jsonb_set(
-                jsonb_set(defaultconfig, '{{defaultValue}}', json_build_object('{0}', defaultconfig->>'defaultValue')::jsonb, true),
-            '{{placeholder}}', json_build_object('{0}', defaultconfig->>'placeholder')::jsonb, true) ||
         '{{"i18n_properties": ["placeholder", "defaultValue"]}}'
         WHERE datatype = 'string';
     """.format(
@@ -43,8 +40,6 @@ class Migration(migrations.Migration):
 
         UPDATE public.widgets
         SET defaultconfig = defaultconfig - 'i18n_properties' ||
-        json_build_object('placeholder', jsonb_extract_path(defaultconfig, 'placeholder', '{0}'))::jsonb ||
-        json_build_object('defaultValue', jsonb_extract_path(defaultconfig, 'defaultValue', '{0}'))::jsonb
         WHERE datatype = 'string';
     """.format(
         settings.LANGUAGE_CODE
