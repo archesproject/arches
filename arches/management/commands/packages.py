@@ -376,7 +376,7 @@ class Command(BaseCommand):
                     output_file = existing_resource_graphs[graph["graphid"]]["path"]
                     if force is False:
                         graph_name = I18n_String(existing_resource_graphs[graph["graphid"]]["name"])
-                        msg = f"The \"{graph_name}\" graph already exists in this directory. Overwrite? (Y/N): "
+                        msg = f'The "{graph_name}" graph already exists in this directory. Overwrite? (Y/N): '
                         overwrite = input(msg)
                     else:
                         overwrite = "true"
