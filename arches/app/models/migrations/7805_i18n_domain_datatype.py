@@ -19,7 +19,6 @@ class Migration(migrations.Migration):
 
         UPDATE public.widgets
         SET defaultconfig = defaultconfig ||
-            jsonb_set(defaultconfig, '{{placeholder}}', json_build_object('{0}', defaultconfig->>'placeholder')::jsonb, true) ||
         '{{"i18n_properties": ["placeholder"]}}'
         WHERE datatype = 'domain-value' OR datatype = 'domain-value-list';
 
@@ -34,8 +33,7 @@ class Migration(migrations.Migration):
         WHERE nodeid in (SELECT nodeid FROM nodes WHERE datatype = 'domain-value' OR datatype = 'domain-value-list');
 
         UPDATE public.widgets
-        SET defaultconfig = defaultconfig - 'i18n_properties' ||
-        json_build_object('placeholder', jsonb_extract_path(defaultconfig, 'placeholder', '{0}'))::jsonb
+        SET defaultconfig = defaultconfig - 'i18n_properties'
         WHERE datatype = 'domain-value' OR datatype = 'domain-value-list';
 
 
@@ -48,11 +46,6 @@ class Migration(migrations.Migration):
         migrations.AlterField(
             model_name="cardxnodexwidget",
             name="config",
-            field=I18n_JSONField(blank=True, null=True),
-        ),
-        migrations.AlterField(
-            model_name="widget",
-            name="defaultconfig",
             field=I18n_JSONField(blank=True, null=True),
         ),
     ]
