@@ -333,7 +333,7 @@ define([
                     }
                 });
             }
-            self.multiTileUpdated(hasDirtyTiles)
+            self.multiTileUpdated(hasDirtyTiles);
             return hasDirtyTiles;
         });
         
