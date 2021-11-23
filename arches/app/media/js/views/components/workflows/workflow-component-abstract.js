@@ -295,7 +295,7 @@ define([
                 hasDirtyTiles = true; 
             }
             else if (self.savedData() ) {
-                if (self.savedData() !== tiles.length) {
+                if (self.savedData().length !== tiles.length) {
                     hasDirtyTiles = true;
                 }
 
@@ -333,15 +333,9 @@ define([
                     }
                 });
             }
-            // else if (self.dirty()) {
-            //     hasDirtyTiles = true;
-            // }
-
+            self.multiTileUpdated(hasDirtyTiles)
             return hasDirtyTiles;
         });
-        // self.hasDirtyTiles.subscribe(function(hasDirtyTiles) {
-        //     self.hasUnsavedData(hasDirtyTiles);
-        // });
         
         this.initialize = function() {
             self.loading(true);
@@ -457,10 +451,9 @@ define([
             self.tiles(filteredTiles);
         };
 
-        this.save = function() {
+        this.saveMultiTiles = function() {
             self.complete(false);
             self.saving(true);
-            self.savedData.removeAll();
             self.previouslyPersistedComponentData = [];
             
             var unorderedSavedData = ko.observableArray();
@@ -503,8 +496,8 @@ define([
                     self.saving(false);
 
                     var orderedSavedData = self.tiles().map(function(tile) {
-                        return savedData.find(function(zzz) {
-                            return zzz.tileid === tile.tileid;
+                        return savedData.find(function(datum) {
+                            return datum.tileid === tile.tileid;
                         });
                     });
 
@@ -570,16 +563,22 @@ define([
             self.setToLocalStorage('value', savedData);
         });
 
+        this.multiTileUpdated = ko.observable();
         this.hasUnsavedData = ko.computed(function() {
             var hasUnsavedData = false;
 
-            if (!_.isEqual(self.savedData(), self.value())) {
-                hasUnsavedData = true;
+            if (self.componentData.tilesManaged === "many") {
+                if (self.multiTileUpdated()) {
+                    hasUnsavedData = true;
+                }
+            } else {
+                if (!_.isEqual(self.savedData(), self.value())) {
+                    hasUnsavedData = true;
+                }
+                else if (self.dirty()) {
+                    hasUnsavedData = true;
+                }
             }
-            else if (self.dirty()) {
-                hasUnsavedData = true;
-            }
-
             return hasUnsavedData;
         });
 
@@ -696,7 +695,11 @@ define([
                 }
             });
 
-            self.save();
+            if (self.componentData.tilesManaged === "many"){
+                self.saveMultiTiles();
+            } else {
+                self.save();
+            }
         };
 
         this._resetComponent = function(componentBasedStepResolve) {
