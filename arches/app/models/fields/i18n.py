@@ -212,7 +212,7 @@ class I18n_JSON(object):
         """
 
         if len(self.i18n_properties) == 0 or isinstance(compiler, SQLInsertCompiler):
-            params = [json.dumps(self.raw_value)]
+            params = [json.dumps(self.localize())]
             sql = "%s"
         else:
             params = []
@@ -235,7 +235,7 @@ class I18n_JSON(object):
                 ELSE %s
                 END
             """
-            params.append(json.dumps(self.deserialize()))
+            params.append(json.dumps(self.localize()))
 
         return sql, tuple(params)
 
@@ -276,13 +276,14 @@ class I18n_JSON(object):
                     pass
         return ret
 
-    def deserialize(self):
+    def localize(self):
         ret = copy.deepcopy(self.raw_value)
         if "i18n_properties" in ret:
             for prop in ret["i18n_properties"]:
-                ret[prop] = {
-                    self.lang: ret[prop]
-                }
+                if not isinstance(ret[prop], dict):
+                    ret[prop] = {
+                        self.lang: ret[prop]
+                    }
         return ret
 
 
