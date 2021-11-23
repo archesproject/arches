@@ -7,7 +7,7 @@ from django.conf import settings
 class Migration(migrations.Migration):
 
     dependencies = [
-        ("models", "7794_i18n_string_datatype"),
+        ("models", "6458_language"),
     ]
 
     sql = """
