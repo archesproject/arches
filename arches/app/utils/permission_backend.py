@@ -1,4 +1,4 @@
-from arches.app.models.models import Node, TileModel, EditLog
+from arches.app.models.models import Node, TileModel, EditLog, NodeGroup
 from arches.app.models.system_settings import settings
 from guardian.backends import check_support
 from guardian.backends import ObjectPermissionBackend
@@ -22,8 +22,33 @@ from arches.app.search.elasticsearch_dsl_builder import Bool, Query, Terms, Nest
 from arches.app.search.mappings import RESOURCES_INDEX
 
 
+from guardian.core import ObjectPermissionChecker
+
+
+from django.core.cache import caches
+
+
 class PermissionBackend(ObjectPermissionBackend):
     def has_perm(self, user_obj, perm, obj=None):
+        foo_cache = caches['foo']
+        # import pdb; pdb.set_trace()
+        if not foo_cache.get(obj.__class__.__name__):
+            # import pdb; pdb.set_trace()
+
+            all_object_models = obj.__class__.objects.all()
+            # joe = User.objects.get(username='joe')
+            # projects = Project.objects.all()
+
+            checker = ObjectPermissionChecker(user_obj)
+            checker.prefetch_perms(all_object_models)
+            foo_cache.set(obj.__class__.__name__, checker)
+        else:
+            checker = foo_cache.get(obj.__class__.__name__)
+        # # Prefetch the permissions
+        # checker = ObjectPermissionChecker(user_obj)
+        # checker.prefetch_perms(all_object_models)
+
+
         # check if user_obj and object are supported (pulled directly from guardian)
         support, user_obj = check_support(user_obj, obj)
         if not support:
@@ -34,7 +59,8 @@ class PermissionBackend(ObjectPermissionBackend):
             if app_label != obj._meta.app_label:
                 raise WrongAppError("Passed perm has app label of '%s' and " "given obj has '%s'" % (app_label, obj._meta.app_label))
 
-        explicitly_defined_perms = get_perms(user_obj, obj)
+        explicitly_defined_perms = checker.get_perms(obj)
+        # explicitly_defined_perms = get_perms(user_obj, obj)
         if len(explicitly_defined_perms) > 0:
             if "no_access_to_nodegroup" in explicitly_defined_perms:
                 return False
@@ -48,6 +74,9 @@ class PermissionBackend(ObjectPermissionBackend):
                         return True
             return False
 
+
+    # def get_objects_for_user(self, user, perms, accept_global_perms=False, any_perm=None):
+    #     pass
 
 def get_restricted_users(resource):
     """
@@ -177,18 +206,46 @@ def get_nodegroups_by_perm(user, perms, any_perm=True):
     any_perm -- True to check ANY perm in "perms" or False to check ALL perms
 
     """
+    foo_cache = caches['foo']
 
-    A = set(
-        get_objects_for_user(
-            user,
-            ["models.read_nodegroup", "models.write_nodegroup", "models.delete_nodegroup", "models.no_access_to_nodegroup"],
-            accept_global_perms=False,
-            any_perm=True,
-        )
-    )
-    B = set(get_objects_for_user(user, perms, accept_global_perms=False, any_perm=any_perm))
-    C = set(get_objects_for_user(user, perms, accept_global_perms=True, any_perm=any_perm))
-    return list(C - A | B)
+    all_nodegroups = NodeGroup.objects.all()
+    if not foo_cache.get('NodeGroup'):
+        checker = ObjectPermissionChecker(user)
+        checker.prefetch_perms(all_nodegroups)
+        foo_cache.set('NodeGroup', checker)
+    else:
+        checker = foo_cache.get('NodeGroup')
+
+    foo = set()
+    baz = set()
+
+    for nodegroup in all_nodegroups:
+        perms = checker.get_perms(nodegroup)
+
+
+        for bar in ["models.read_nodegroup", "models.write_nodegroup", "models.delete_nodegroup", "models.no_access_to_nodegroup"]:
+            if bar in perms:
+                foo.add(nodegroup) 
+            else:
+                baz.add(nodegroup)
+
+    return baz
+
+    #     # import pdb; pdb.set_trace()
+
+    # A = set(
+    #     get_objects_for_user(
+    #         user,
+    #         ["models.read_nodegroup", "models.write_nodegroup", "models.delete_nodegroup", "models.no_access_to_nodegroup"],
+    #         accept_global_perms=False,
+    #         any_perm=True,
+    #     )
+    # )
+    # B = set(get_objects_for_user(user, perms, accept_global_perms=False, any_perm=any_perm))
+    # C = set(get_objects_for_user(user, perms, accept_global_perms=True, any_perm=any_perm))
+
+    # import pdb; pdb.set_trace()
+    # return list(C - A | B)
 
 
 def get_editable_resource_types(user):
