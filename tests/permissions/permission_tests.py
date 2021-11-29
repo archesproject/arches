@@ -40,6 +40,9 @@ from arches.app.utils.permission_backend import user_can_read_concepts
 from arches.app.utils.permission_backend import user_has_resource_model_permissions
 from arches.app.utils.permission_backend import get_restricted_users
 
+from django.core.cache import caches
+
+
 # these tests can be run from the command line via
 # python manage.py test tests/permissions/permission_tests.py --pattern="*.py" --settings="tests.test_settings"
 
@@ -55,6 +58,9 @@ class PermissionTests(ArchesTestCase):
         resource = Resource(pk=self.resource_instance_id)
         resource.graph_id = self.data_type_graphid
         resource.remove_resource_instance_permissions()
+
+        foo_cache = caches['foo']
+        foo_cache.clear()
 
     def tearDown(self):
         ResourceInstance.objects.filter(graph_id=self.data_type_graphid).delete()
@@ -101,23 +107,28 @@ class PermissionTests(ArchesTestCase):
         Tests if a user is allowed to view a resource with implicit permissions and explicit permissions, but
         not without explicit permission if a permission other than 'view_resourceinstance' is assigned.
         """
+        foo_cache = caches['foo']
 
         implicit_permission = user_can_read_resource(self.user, self.resource_instance_id)
         resource = ResourceInstance.objects.get(resourceinstanceid=self.resource_instance_id)
         assign_perm("change_resourceinstance", self.group, resource)
+
+        foo_cache.clear()
         can_access_without_view_permission = user_can_read_resource(self.user, self.resource_instance_id)
         assign_perm("view_resourceinstance", self.group, resource)
+
+        foo_cache.clear()
         can_access_with_view_permission = user_can_read_resource(self.user, self.resource_instance_id)
-        self.assertTrue(
-            implicit_permission is True and can_access_without_view_permission is False and can_access_with_view_permission is True
-        )
+        
+        self.assertEqual(implicit_permission, True) 
+        self.assertEqual(can_access_without_view_permission, False)
+        self.assertEqual(can_access_with_view_permission, True)
 
     def test_user_has_resource_model_permissions(self):
         """
         Tests that a user cannot access an instance if they have no access to any nodegroup.
         
         """
-
         resource = ResourceInstance.objects.get(resourceinstanceid=self.resource_instance_id)
         nodes = Node.objects.filter(graph_id=resource.graph_id)
         for node in nodes:

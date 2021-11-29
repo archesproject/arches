@@ -448,7 +448,13 @@ if DEBUG is True:
 # group to assign users who self sign up via the web ui
 USER_SIGNUP_GROUP = "Crowdsource Editor"
 
-CACHES = {"default": {"BACKEND": "django.core.cache.backends.locmem.LocMemCache", "LOCATION": "unique-snowflake"}}
+CACHES = {
+    "default": {"BACKEND": "django.core.cache.backends.locmem.LocMemCache", "LOCATION": "unique-snowflake"},
+    'foo': {
+        'BACKEND': 'django.core.cache.backends.locmem.LocMemCache',
+        'LOCATION': 'foo_cache',
+    }   
+}
 
 DEFAULT_RESOURCE_IMPORT_USER = {"username": "admin", "userid": 1}
 

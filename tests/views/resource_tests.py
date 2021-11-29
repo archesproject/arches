@@ -36,6 +36,8 @@ from django.contrib.auth.models import User
 from django.contrib.auth.models import Group
 from guardian.shortcuts import assign_perm, get_perms, remove_perm, get_group_perms, get_user_perms
 
+from django.core.cache import caches
+
 # these tests can be run from the command line via
 # python manage.py test tests/views/resource_tests.py --pattern="*.py" --settings="tests.test_settings"
 
@@ -77,6 +79,9 @@ class CommandLineTests(ArchesTestCase):
         for edit in edit_records:
             edit.userid = user.id
             edit.save()
+
+        foo_cache = caches['foo']
+        foo_cache.clear()
 
     def tearDown(self):
         ResourceInstance.objects.filter(graph_id=self.data_type_graphid).delete()
