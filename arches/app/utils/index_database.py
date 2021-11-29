@@ -63,7 +63,7 @@ def index_resources(
     batch_size -- the number of records to index as a group, the larger the number to more memory required
     quiet -- Silences the status bar output during certain operations, use in celery operations for example
     use_multiprocessing (default False) -- runs the reindexing in multiple subprocesses to take advantage of parallel indexing
-    max_subprocesses (default 0) -- by default (0) the use_multiprocessing function will create a subprocess per core. This overrides that setting.
+    max_subprocesses -- explicitly sets the size of process pool. Auto limits to cpu count if more than this.
 
     """
 
