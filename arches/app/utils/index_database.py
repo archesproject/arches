@@ -37,7 +37,7 @@ def index_db(clear_index=True, batch_size=settings.BULK_IMPORT_BATCH_SIZE, quiet
     batch_size -- the number of records to index as a group, the larger the number to more memory required
     quiet -- Silences the status bar output during certain operations, use in celery operations for example
     use_multiprocessing (default False) -- runs the reindexing in multiple subprocesses to take advantage of parallel indexing
-    max_subprocesses (default 0) -- by default (0) the use_multiprocessing function will create a subprocess per core. This overrides that setting.
+    max_subprocesses - limits multiprocessing to a this number of processes. Default is half cpu count.
     """
 
     index_concepts(clear_index=clear_index, batch_size=batch_size)
@@ -96,7 +96,7 @@ def index_resources_by_type(
     batch_size -- the number of records to index as a group, the larger the number to more memory required
     quiet -- Silences the status bar output during certain operations, use in celery operations for example
     use_multiprocessing (default False) -- runs the reindexing in multiple subprocesses to take advantage of parallel indexing
-    max_subprocesses (default 0) -- by default (0) the use_multiprocessing function will create a subprocess per core. This overrides that setting.
+    max_subprocesses (default 0) -- explicitly set the number of processes to use.
 
     """
 
@@ -172,7 +172,15 @@ def index_resources_by_type(
                 finally:
                     logger.error(f"Error indexing resource batch, type {type(err)}, message: {err}, \n>>>>>>>>>>>>>> TRACEBACK: {tb}")
 
-            process_count = math.ceil(multiprocessing.cpu_count() / 2) if max_subprocesses == 0 else max_subprocesses
+            default_process_count = math.ceil(multiprocessing.cpu_count() / 2)
+            if max_subprocesses == 0:
+                process_count = default_process_count
+            elif max_subprocesses > multiprocessing.cpu_count():
+                process_count = multiprocessing.cpu_count()
+                logger.debug(f"... max_subprocess count exceeds CPU count. Limiting to {process_count}")
+            else:
+                process_count = max_subprocesses
+
             logger.debug(f"... multiprocessing process count: {process_count}")
             logger.debug(f"... resource type batch count (batch size={batch_size}): {len(resource_batches)}")
             with multiprocessing.Pool(processes=process_count) as pool:
