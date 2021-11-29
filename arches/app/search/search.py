@@ -229,10 +229,10 @@ class SearchEngine(object):
             def __init__(self, **kwargs):
                 self.queue = []
                 self.batch_size = kwargs.pop("batch_size", 500)
-                kwargs.pop("maxsize","")
-                kwargs.pop("timeout","")
-                kwargs.pop("retry_on_timeout","")
-                kwargs.pop("max_retries","")
+                kwargs.pop("maxsize", "")
+                kwargs.pop("timeout", "")
+                kwargs.pop("retry_on_timeout", "")
+                kwargs.pop("max_retries", "")
                 self.kwargs = kwargs
 
             def add(self, op_type="index", index=None, id=None, data=None):
