@@ -24,29 +24,28 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 
 
 {% block main_content %}
-    <div class="content-panel flexrow" data-bind="click:function() { menuActive(false); }, visible: true" ,
-        style="display:none;">
+    <div class="content-panel flexrow" data-bind="click:function() { menuActive(false); }, visible: true", style="display:none;">
 
         <div class="flex search-results-panel">
             <div class="search-attribute-widget">
                 <div class="search-dropdown" data-bind="component: {
-                        name: 'term-filter',
-                        params: sharedStateObject
-                    }"></div>
+                    name: 'term-filter',
+                    params: sharedStateObject
+                }"></div>
 
                 <!-- Inline Filters (for QA and Resource Type) -->
                 <div class="search-inline-filters">
 
                     <div class="resource-filter" data-bind="component: {
-                                name: 'resource-type-filter',
-                                params: sharedStateObject
-                        }"></div>
+                            name: 'resource-type-filter',
+                            params: sharedStateObject
+                    }"></div>
 
                     <!--ko if: sharedStateObject.userIsReviewer-->
                     <div class="qa-filter" data-bind="component: {
-                            name: 'provisional-filter',
-                            params: sharedStateObject
-                        }"></div>
+                        name: 'provisional-filter',
+                        params: sharedStateObject
+                    }"></div>
                     <!--/ko-->
 
                 </div>
@@ -58,14 +57,13 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                 </div>
                 <div class="search-controls-container">
                     <!--ko if: ko.unwrap(sharedStateObject.filterApplied) -->
-                    <button class="btn-sm btn btn-mint btn-labeled clear-filter"
-                        data-bind="click: function() {sharedStateObject.clearQuery();}">{% trans "Clear Filters" %}</button>
+                    <button class="btn-sm btn btn-mint btn-labeled clear-filter" data-bind="click: function() {sharedStateObject.clearQuery();}">{% trans "Clear Filters" %}</button>
                     <!--/ko-->
                     <span style="width:125px">
                         <div data-bind="component: {
-                                name: 'sort-results',
-                                params: sharedStateObject
-                            }"></div>
+                            name: 'sort-results',
+                            params: sharedStateObject
+                        }"></div>
                     </span>
                 </div>
             </div>
@@ -74,15 +72,15 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                 <!-- Results Block -->
                 <div class="search-results-container">
                     <div data-bind="component: {
-                            name: 'search-results',
-                            params: sharedStateObject
-                        }"></div>
+                        name: 'search-results',
+                        params: sharedStateObject
+                    }"></div>
                 </div>
 
                 <div class="search-footer" data-bind="component: {
-                            name: 'paging-filter',
-                            params: sharedStateObject
-                        }"></div>
+                        name: 'paging-filter',
+                        params: sharedStateObject
+                    }"></div>
 
             </div>
         </div>
@@ -94,8 +92,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                 <div class="search-type-btn-panel" data-bind="foreach: {data: sharedStateObject.filtersList, as: 'filter'}">
                     <!-- ko if: filter.type === 'filter' && filter.enabled -->
                     {% if user_can_read %}
-                    <button class="search-type-btn relative" style=""
-                        data-bind="css: {'active': $parent.sharedStateObject.selectedTab() === filter.componentname}, click: function(){$parent.sharedStateObject.selectedTab(filter.componentname)}">
+                    <button class="search-type-btn relative" style="" data-bind="css: {'active': $parent.sharedStateObject.selectedTab() === filter.componentname}, click: function(){$parent.sharedStateObject.selectedTab(filter.componentname)}">
                         <i data-bind="css: filter.icon"></i>
                         <span data-bind="text: filter.name"></span>
                     </button>
@@ -108,8 +105,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                         <!-- ko if: filter.type === 'popup' && filter.enabled -->
                         <!-- ko if: filter.componentname !== "search-export" || "{{user.username}}" !== "anonymous" ||  filter.componentname === "search-export" && "{{user.username}}" === "anonymous" && "{{app_settings.DISABLE_EXPORT_FOR_ANONYMOUS_USER}}" !== "True" -->
                         {% if user_can_read %}
-                        <button class="saved-search-container search-type-btn-popup relative" style=""
-                            data-bind="css: {'active': $parent.sharedStateObject.selectedPopup() === filter.componentname}, click: function(){$parent.sharedStateObject.selectPopup(filter.componentname); setTimeout(function() {$(window).trigger('resize');}, 100);}">
+                        <button class="saved-search-container search-type-btn-popup relative" style="" data-bind="css: {'active': $parent.sharedStateObject.selectedPopup() === filter.componentname}, click: function(){$parent.sharedStateObject.selectPopup(filter.componentname); setTimeout(function() {$(window).trigger('resize');}, 100);}">
                             <i data-bind="css: filter.icon"></i>
                             <!-- <p data-bind="text: filter.name"></p> -->
                         </button>
@@ -125,15 +121,13 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 
                 <!-- Card Container -->
                 <div class="card-form-preview-container relative">
-                    <div class="tab-content relative"
-                        data-bind="foreach: {data: sharedStateObject.filtersList, as: 'filter'}">
+                    <div class="tab-content relative" data-bind="foreach: {data: sharedStateObject.filtersList, as: 'filter'}">
                         <!-- ko if: filter.type === 'filter' && filter.enabled -->
-                        <div class="tab-pane"
-                            data-bind="css: {'active': $parent.sharedStateObject.selectedTab() === filter.componentname}">
+                        <div class="tab-pane" data-bind="css: {'active': $parent.sharedStateObject.selectedTab() === filter.componentname}">
                             <div style="height: calc(100vh - 100px)" data-bind="component: {
-                                    name: filter.componentname,
-                                    params: $parent.sharedStateObject
-                                }"></div>
+                                name: filter.componentname,
+                                params: $parent.sharedStateObject
+                            }"></div>
                         </div>
                         <!-- /ko -->
                     </div>
@@ -141,12 +135,11 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                     <div class="tab-content search-popup-panel"
                         data-bind="foreach: {data: sharedStateObject.filtersList, as: 'filter'}, visible: sharedStateObject.selectedPopup() !== ''">
                         <!-- ko if: filter.type === 'popup' && filter.enabled -->
-                        <div class="tab-pane"
-                            data-bind="css: {'active': $parent.sharedStateObject.selectedPopup() === filter.componentname}">
+                        <div class="tab-pane" data-bind="css: {'active': $parent.sharedStateObject.selectedPopup() === filter.componentname}">
                             <div data-bind="component: {
-                                    name: filter.componentname,
-                                    params: $parent.sharedStateObject
-                                }"></div>
+                                name: filter.componentname,
+                                params: $parent.sharedStateObject
+                            }"></div>
                         </div>
                         <!-- /ko -->
                     </div>
@@ -154,10 +147,10 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
             </div>
         </div>
     </div>
-    {% endblock main_content %}
+{% endblock main_content %}
 
-    {% block tabs %}{% endblock tabs %}
+{% block tabs %}{% endblock tabs %}
 
-    {% block pre_require_js %}
-    {{block.super}}
-    {% endblock pre_require_js %}
+{% block pre_require_js %}
+{{block.super}}
+{% endblock pre_require_js %}
