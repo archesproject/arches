@@ -215,7 +215,10 @@ def export_results(request):
             message = _(
                 "Anonymous users are unable to download exports.  Please sign in with your {app_name} username and password."
             ).format(**locals())
-            return JSONResponse({"success": False, "message": message})
+
+            response = JSONResponse({"success": False, "message": message})
+            response.status_code = 403
+            return response
 
     else:
 
