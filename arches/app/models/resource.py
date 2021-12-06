@@ -223,7 +223,7 @@ class Resource(models.ResourceInstance):
             resource.save_edit(edit_type="create", transaction_id=transaction_id)
         for resource in existing_resources:
             resource.save_edit(edit_type="append", transaction_id=transaction_id)
-        
+
         try:
             resources[0].tiles[0].save_edit(
                 note=f"Bulk created: {len(tiles)} for {len(resources)} resources.",
