@@ -298,7 +298,6 @@ class ResourceEditorView(MapBaseManagerView):
         except PermissionDenied:
             return JSONErrorResponse(delete_error, delete_msg)
 
-
     def copy(self, request, resourceid=None):
         resource_instance = Resource.objects.get(pk=resourceid)
         return JSONResponse(resource_instance.copy())

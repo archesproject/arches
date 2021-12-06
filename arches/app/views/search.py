@@ -212,13 +212,13 @@ def export_results(request):
     app_name = settings.APP_NAME
 
     if (settings.DISABLE_EXPORT_FOR_ANONYMOUS_USER is True) and (request.user.username == "anonymous"):
-            message = _(
-                "Anonymous users are unable to download exports.  Please sign in with your {app_name} username and password."
-            ).format(**locals())
+        message = _("Anonymous users are unable to download exports.  Please sign in with your {app_name} username and password.").format(
+            **locals()
+        )
 
-            response = JSONResponse({"success": False, "message": message})
-            response.status_code = 403
-            return response
+        response = JSONResponse({"success": False, "message": message})
+        response.status_code = 403
+        return response
 
     else:
 
@@ -255,7 +255,9 @@ def export_results(request):
                     ).format(**locals())
                     return JSONResponse({"success": True, "message": message})
                 else:
-                    message = _("Your search exceeds the {download_limit} instance download limit. Please refine your search").format(**locals())
+                    message = _("Your search exceeds the {download_limit} instance download limit. Please refine your search").format(
+                        **locals()
+                    )
                     return JSONResponse({"success": False, "message": message})
 
         elif format == "tilexl":
