@@ -128,7 +128,7 @@ class Command(BaseCommand):
 
         parser.add_argument(
             "-mxp",
-            "--max-subprocesses",
+            "--max_subprocesses",
             action="store",
             type=int,
             dest="max_subprocesses",
