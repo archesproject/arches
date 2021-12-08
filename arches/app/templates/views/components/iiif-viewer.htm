@@ -225,9 +225,15 @@
                             <span class="clear-node-search" data-bind="visible: filter().length > 0, click: function() { filter(''); }"><i class="fa fa-times-circle"></i></span>
                         </div>
                     </div>
-                    <div style="display: inline-flex; padding: 5px">
+                    <div data-bind="if: compareMode()" style="display: inline-flex; padding: 0px">
+                        <span data-bind="if: !primaryCanvas()">{% trans "Select Primary Canvas" %}</span><span data-bind="if: primaryCanvas() && !secondaryCanvas()">{% trans "Select Secondary Canvas" %}</span>
+                    </div>
+                    <div style="display: inline-flex; padding: 0px">
                         <div class="iiif-gallery-sequence-label" data-bind="click: toggleManifestEditor">
                             {% trans "Switch Image Service" %}
+                        </div> | 
+                        <div class="iiif-gallery-sequence-label" style="padding:0px" data-bind="click: compareImages">
+                            {% trans "Compare Images" %}
                         </div>
                     </div>
                 </div>

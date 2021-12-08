@@ -8,6 +8,7 @@ define([
     'text!templates/views/components/iiif-popup.htm',
     'leaflet-iiif',
     'leaflet-fullscreen',
+    'leaflet-side-by-side',
     'bindings/select2-query',
     'bindings/leaflet'
 ], function(arches, $, ko, koMapping, L, WorkbenchViewmodel, iiifPopup) {
@@ -36,6 +37,20 @@ define([
         this.canvasLabel = ko.observable();
         this.zoomToCanvas = !(params.zoom && params.center);
         this.annotationNodes = ko.observableArray();
+        this.compareMode = ko.observable(false);
+        this.primaryCanvas = ko.observable();
+        this.secondaryCanvas = ko.observable();
+        this.compareInstruction = ko.observable();
+        this.compareReady = ko.observable(false);
+        this.primaryTilesLoaded = ko.observable(false);
+        this.secondaryTilesLoaded = ko.observable(false);
+
+        this.compareImages = () => {
+            this.compareMode(true);
+
+            this.compareInstruction();
+            console.log('switching to image compare mode')
+        }
 
         this.buildAnnotationNodes = params.buildAnnotationNodes || function(json) {
             self.annotationNodes(
@@ -301,7 +316,8 @@ define([
             afterRender: this.map
         };
 
-        var canvasLayer;
+        let canvasLayer;
+        let secondaryCanvasLayer;
         this.brightness = ko.observable(100);
         this.contrast = ko.observable(100);
         this.saturation = ko.observable(100);
@@ -348,6 +364,78 @@ define([
             }
             self.zoomToCanvas = false;
         };
+
+        const compareCanvasLayers = () => {
+            const map = self.map();
+            const primaryCanvas = self.canvas();
+            const secondaryCanvas = self.secondaryCanvas();
+            if (map && primaryCanvas && secondaryCanvas) {
+                if (canvasLayer) {
+                    map.removeLayer(canvasLayer);
+                    canvasLayer = undefined;
+                }
+
+                canvasLayer = L.tileLayer.iiif(primaryCanvas + '/info.json', {
+                    fitBounds: false
+                }).addTo(map);
+
+                secondaryCanvasLayer = L.tileLayer.iiif(secondaryCanvas + '/info.json', {
+                    fitBounds: false
+                }).addTo(map);
+
+                canvasLayer.on('tileload', () => {self.primaryTilesLoaded(true)})
+                secondaryCanvasLayer.on('tileload', () => {self.secondaryTilesLoaded(true)})
+                
+                const loadComparison = () => {
+                    if(self.primaryTilesLoaded() && self.secondaryTilesLoaded()){
+                        L.control.sideBySide(primaryCanvasLayer, secondaryCanvasLayer).addTo(map);
+                        map.fitBounds(map.getBounds())
+                        primarySubscription.dispose();
+                        secondarySubscription.dispose();
+                    }
+                }
+                const primarySubscription = self.primaryTilesLoaded.subscribe(loadComparison);
+                const secondarySubscription = self.secondaryTilesLoaded.subscribe(loadComparison);
+
+                updateCanvasLayerFilter();
+            }
+        };
+
+        const addCanvasLayers = function() {
+            const map = self.map();
+            const primaryCanvas = self.primaryCanvas();
+            const secondaryCanvas = self.secondaryCanvas();
+            if (map && primaryCanvas && secondaryCanvas) {
+                if (canvasLayer) {
+                    map.removeLayer(canvasLayer);
+                    canvasLayer = undefined;
+                }
+                primaryCanvasLayer = L.tileLayer.iiif(primaryCanvas + '/info.json', {
+                    fitBounds: false
+                }).addTo(map);
+                secondaryCanvasLayer = L.tileLayer.iiif(secondaryCanvas + '/info.json', {
+                    fitBounds: false
+                }).addTo(map);
+
+                primaryCanvasLayer.on('tileload', () => {self.primaryTilesLoaded(true)})
+                secondaryCanvasLayer.on('tileload', () => {self.secondaryTilesLoaded(true)})
+                
+                const loadComparison = () => {
+                    if(self.primaryTilesLoaded() && self.secondaryTilesLoaded()){
+                        L.control.sideBySide(primaryCanvasLayer, secondaryCanvasLayer).addTo(map);
+                        map.fitBounds(map.getBounds())
+                        primarySubscription.dispose();
+                        secondarySubscription.dispose();
+                    }
+                }
+                const primarySubscription = self.primaryTilesLoaded.subscribe(loadComparison);
+                const secondarySubscription = self.secondaryTilesLoaded.subscribe(loadComparison);
+
+                updateCanvasLayerFilter();
+            }
+            self.zoomToCanvas = false;
+        };
+
         this.map.subscribe(function(map) {
             L.control.fullscreen({
                 fullscreenElement: $(map.getContainer()).closest('.workbench-card-wrapper')[0]
@@ -356,14 +444,23 @@ define([
             map.addLayer(annotationFeatureGroup);
         });
         this.canvas.subscribe(addCanvasLayer);
+        this.compareReady.subscribe(addCanvasLayers)
 
         this.selectCanvas = function(canvas) {
-            var service = self.getCanvasService(canvas);
             self.zoomToCanvas = true;
-            if (service) self.canvas(service);
-
-            self.origCanvasLabel = self.getManifestDataValue(canvas, 'label', true);
-            self.canvasLabel(self.getManifestDataValue(canvas, 'label', true));
+            if(this.compareMode()){
+                if(!this.primaryCanvas()){
+                    this.primaryCanvas(self.getCanvasService(canvas));
+                } else if(this.primaryCanvas() && !this.secondaryCanvas()){
+                    this.secondaryCanvas(self.getCanvasService(canvas));
+                    this.compareReady(true);
+                }
+            } else {
+                var service = self.getCanvasService(canvas);
+                if (service) self.canvas(service);
+                self.origCanvasLabel = self.getManifestDataValue(canvas, 'label', true);
+                self.canvasLabel(self.getManifestDataValue(canvas, 'label', true));
+            }
         };
 
         this.canvasClick = function(canvas) {
