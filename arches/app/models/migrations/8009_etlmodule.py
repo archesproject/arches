@@ -37,6 +37,8 @@ add_csv_importer = """
         description,
         component,
         componentname,
+        modulename,
+        classname,
         config,
         icon,
         slug)
@@ -46,6 +48,8 @@ add_csv_importer = """
         'Import a Single CSV file to Arches',
         'views/components/etlmodules/import-single-csv',
         'import-single-csv',
+        'import_single_csv.py',
+        'ImportSingleCsv',
         '{"bgColor": "#9591ef", "circleColor": "#b0adf3"}',
         'fa fa-upload',
         'import-single-csv');
@@ -69,6 +73,8 @@ class Migration(migrations.Migration):
                 ('description', models.TextField(blank=True, null=True)),
                 ('component', models.TextField()),
                 ('componentname', models.TextField()),
+                ('modulename', models.TextField(blank=True, null=True)),
+                ('classname', models.TextField(blank=True, null=True)),
                 ('config', django.contrib.postgres.fields.jsonb.JSONField(blank=True, db_column='config', null=True)),
                 ('icon', models.TextField()),
                 ('slug', models.TextField(null=True, unique=True, validators=[django.core.validators.RegexValidator(re.compile('^[-a-zA-Z0-9_]+\\Z'), "Enter a valid 'slug' consisting of letters, numbers, underscores or hyphens.", 'invalid')])),

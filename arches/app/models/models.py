@@ -1404,6 +1404,8 @@ class ETLModule(models.Model):
     icon = models.TextField()
     component = models.TextField()
     componentname = models.TextField()
+    modulename = models.TextField(blank=True, null=True)
+    classname = models.TextField(blank=True, null=True)
     config = JSONField(blank=True, null=True, db_column="config")
     slug = models.TextField(validators=[validate_slug], unique=True, null=True)
     
@@ -1415,3 +1417,6 @@ class ETLModule(models.Model):
     class Meta:
         managed = True
         db_table = "etl_modules"
+
+    def get_class_module(self):
+        return get_class_from_modulename(self.modulename, self.classname, settings.ETL_MODULE_LOCATIONS)

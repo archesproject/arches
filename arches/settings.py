@@ -572,6 +572,10 @@ SEARCH_COMPONENT_LOCATIONS = [
     "arches.app.search.components",
 ]
 
+ETL_MODULE_LOCATIONS = [
+    "arches.app.etlmodules",
+]
+
 MAPBOX_API_KEY = ""  # Put your Mapbox key here!
 
 # links to sprites and glyphs for use on map
