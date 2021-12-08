@@ -219,10 +219,12 @@ class I18n_JSON(object):
             sql = self.attname
             for prop, value in self.raw_value.items():
                 if prop in self.i18n_properties and isinstance(value, str):
-                    sql = f"jsonb_set({sql}, '{{{prop},{self.lang}}}', %s)"
+                    sql = f"""CASE WHEN jsonb_typeof({self.attname}->'{prop}') = 'object'
+                    THEN jsonb_set({sql}, '{{{prop},{self.lang}}}', '{json.dumps(value)}')
+                    ELSE jsonb_set({sql}, '{{{prop}}}', jsonb_build_object('{self.lang}', '{value}'))
+                    END"""
                 else:
-                    sql = f"jsonb_set({sql}, '{{{prop}}}', %s)"
-                params.append(json.dumps(value))
+                    sql = f"jsonb_set({sql}, '{{{prop}}}', '{json.dumps(value)}')"
 
             # If all of root keys of the json object we're saving are the same as what is 
             # currently in that json value stored in the db then all we do is update those
