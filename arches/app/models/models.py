@@ -1397,3 +1397,21 @@ class GeoJSONGeometry(models.Model):
     class Meta:
         managed = True
         db_table = "geojson_geometries"
+
+class ETLModule(models.Model):
+    etlmoduleid = models.UUIDField(primary_key=True, default=uuid.uuid1)
+    name = models.TextField()
+    icon = models.TextField()
+    component = models.TextField()
+    componentname = models.TextField()
+    config = JSONField(blank=True, null=True, db_column="config")
+    slug = models.TextField(validators=[validate_slug], unique=True, null=True)
+    
+    description = models.TextField(blank=True, null=True)
+
+    def __str__(self):
+        return self.name
+
+    class Meta:
+        managed = True
+        db_table = "etl_modules"
