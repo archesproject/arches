@@ -271,7 +271,6 @@
                                 </div>
                             </div>
                             <div style="text-align: center; margin-left: 10px" data-bind="if: $parent.compareMode()">
-                                <span data-bind="text: console.log($parent.getCanvasService($data) == $parent.canvas(), $parent.canvas(), !!$parent.canvas(), !!$parent.secondaryCanvas())"></span>
                                 <span style="text-align: center; font-size: 0.9em; font-weight: 650; color: #5b9bd7; cursor: pointer" data-bind="if: $parent.getCanvasService($data) != $parent.canvas() && $parent.getCanvasService($data) != $parent.secondaryCanvas(), click: $parent.setSecondaryCanvas.bind($data), clickBubble: false">{% trans "Compare" %}</span>
                                 <span data-bind="if: !!$parent.canvas() && $parent.getCanvasService($data) == $parent.canvas()">
                                     Left
