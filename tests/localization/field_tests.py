@@ -301,3 +301,40 @@ class Customi18nJSONFieldTests(ArchesTestCase):
         # test item assignment
         j["new_property"] = "TACO"
         self.assertEqual(list(j.keys()), ["i18n_properties", "placeholder", "new_property"])
+
+    def test_i18nJSONField_can_handle_different_initial_states(self):
+        initial_json = {
+            "trueLabel": None,
+            "falseLabel": {},
+            "altLabel": "",
+            "min_length": 19,
+        }
+
+        json_to_save = {
+            "i18n_properties": ["trueLabel", "falseLabel", "altLabel"],
+            "trueLabel": "YES",
+            "falseLabel": "NO",
+            "altLabel": "taco",
+            "min_length": 19,
+        }
+
+        expected_output_json = {
+            "i18n_properties": ["trueLabel", "falseLabel", "altLabel"],
+            "trueLabel": {"en": "YES"},
+            "falseLabel": {"en": "NO"},
+            "altLabel": {"en": "taco"},
+            "min_length": 19,
+        }
+
+        translation.activate("en")
+        m = self.LocalizationTestJsonModel()
+        m.id = 3
+        m.config = initial_json
+        m.save()
+        m = self.LocalizationTestJsonModel.objects.get(pk=3)
+        self.assertEqual(m.config.raw_value, initial_json)
+
+        m.config = json_to_save
+        m.save()
+        m = self.LocalizationTestJsonModel.objects.get(pk=3)
+        self.assertEqual(m.config.raw_value, expected_output_json)

@@ -218,11 +218,14 @@ class I18n_JSON(object):
             params = []
             sql = self.attname
             for prop, value in self.raw_value.items():
+                escaped_value = json.dumps(value).replace("%", "%%")
                 if prop in self.i18n_properties and isinstance(value, str):
-                    sql = f"jsonb_set({sql}, '{{{prop},{self.lang}}}', %s)"
+                    sql = f"""CASE WHEN jsonb_typeof({self.attname}->'{prop}') = 'object'
+                    THEN jsonb_set({sql}, array['{prop}','{self.lang}'], '{escaped_value}')
+                    ELSE jsonb_set({sql}, array['{prop}'], jsonb_build_object('{self.lang}', '{escaped_value}'))
+                    END"""
                 else:
-                    sql = f"jsonb_set({sql}, '{{{prop}}}', %s)"
-                params.append(json.dumps(value))
+                    sql = f"jsonb_set({sql}, array['{prop}'], '{escaped_value}')"
 
             # If all of root keys of the json object we're saving are the same as what is
             # currently in that json value stored in the db then all we do is update those
@@ -235,7 +238,7 @@ class I18n_JSON(object):
                 ELSE %s
                 END
             """
-            params.append(json.dumps(self.localize()))
+            params.append(json.dumps(self.localize()).replace("%", "%%"))
 
         return sql, tuple(params)
 

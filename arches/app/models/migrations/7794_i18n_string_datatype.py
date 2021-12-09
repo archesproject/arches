@@ -15,18 +15,13 @@ class Migration(migrations.Migration):
         SET config = config ||
         jsonb_set(
             jsonb_set(
-                jsonb_set(
-                    config, '{{label}}', json_build_object('{0}', config->>'label')::jsonb, true),
-            '{{placeholder}}', json_build_object('{0}', config->>'placeholder')::jsonb, true),
+                config, '{{placeholder}}', json_build_object('{0}', config->>'placeholder')::jsonb, true),
         '{{defaultValue}}', json_build_object('{0}', config->>'defaultValue')::jsonb, true) ||
-        '{{"i18n_properties": ["label", "placeholder", "defaultValue"]}}'
+        '{{"i18n_properties": ["placeholder", "defaultValue"]}}'
         WHERE nodeid in (SELECT nodeid FROM nodes WHERE datatype = 'string');
 
         UPDATE public.widgets
         SET defaultconfig = defaultconfig ||
-            jsonb_set(
-                jsonb_set(defaultconfig, '{{defaultValue}}', json_build_object('{0}', defaultconfig->>'defaultValue')::jsonb, true),
-            '{{placeholder}}', json_build_object('{0}', defaultconfig->>'placeholder')::jsonb, true) ||
         '{{"i18n_properties": ["placeholder", "defaultValue"]}}'
         WHERE datatype = 'string';
     """.format(
@@ -36,15 +31,12 @@ class Migration(migrations.Migration):
     reverse_sql = """
         UPDATE public.cards_x_nodes_x_widgets
         SET config = config - 'i18n_properties' ||
-        json_build_object('label', jsonb_extract_path(config, 'label', '{0}'))::jsonb ||
         json_build_object('placeholder', jsonb_extract_path(config, 'placeholder', '{0}'))::jsonb ||
         json_build_object('defaultValue', jsonb_extract_path(config, 'defaultValue', '{0}'))::jsonb
         WHERE nodeid in (SELECT nodeid FROM nodes WHERE datatype = 'string');
 
         UPDATE public.widgets
-        SET defaultconfig = defaultconfig - 'i18n_properties' ||
-        json_build_object('placeholder', jsonb_extract_path(defaultconfig, 'placeholder', '{0}'))::jsonb ||
-        json_build_object('defaultValue', jsonb_extract_path(defaultconfig, 'defaultValue', '{0}'))::jsonb
+        SET defaultconfig = defaultconfig - 'i18n_properties'
         WHERE datatype = 'string';
     """.format(
         settings.LANGUAGE_CODE
@@ -55,11 +47,6 @@ class Migration(migrations.Migration):
         migrations.AlterField(
             model_name="cardxnodexwidget",
             name="config",
-            field=I18n_JSONField(blank=True, null=True),
-        ),
-        migrations.AlterField(
-            model_name="widget",
-            name="defaultconfig",
             field=I18n_JSONField(blank=True, null=True),
         ),
     ]
