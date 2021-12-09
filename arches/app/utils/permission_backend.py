@@ -1,5 +1,4 @@
 import inspect
-import re
 
 from arches.app.models.models import *
 from arches.app.models.system_settings import settings
@@ -482,7 +481,6 @@ class CachedUserPermissionChecker():
 
     def __init__(self, user):
         user_permission_cache = caches['user_permission']
-
         current_user_cached_permissions = user_permission_cache.get(user.pk, {})
 
         if current_user_cached_permissions.get('user_permissions'):

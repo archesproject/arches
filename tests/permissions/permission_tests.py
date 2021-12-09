@@ -107,7 +107,7 @@ class PermissionTests(ArchesTestCase):
         Tests if a user is allowed to view a resource with implicit permissions and explicit permissions, but
         not without explicit permission if a permission other than 'view_resourceinstance' is assigned.
         """
-        user_permission_cache = caches['foo']
+        user_permission_cache = caches['user_permission']
 
         implicit_permission = user_can_read_resource(self.user, self.resource_instance_id)
         resource = ResourceInstance.objects.get(resourceinstanceid=self.resource_instance_id)

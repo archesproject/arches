@@ -46,7 +46,7 @@ BUSISNESS_DATA_FILES = (
 
 CACHES = {
     "default": {"BACKEND": "django.core.cache.backends.dummy.DummyCache",},
-    'foo': {
+    'user_permission': {
         'BACKEND': 'django.core.cache.backends.locmem.LocMemCache',
         'LOCATION': 'user_permission_cache',
     }  
