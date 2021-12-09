@@ -498,4 +498,3 @@ class CachedUserPermissionChecker():
             return True
         else:
             return False
-        
