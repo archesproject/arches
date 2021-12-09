@@ -304,7 +304,10 @@ define([
         if (!params.manifest) params.expandGallery = true;
         this.expandGallery = ko.observable(params.expandGallery);
         this.expandGallery.subscribe(function(expandGallery) {
-            if (expandGallery) self.showGallery(true);
+            if (expandGallery) { 
+                self.compareMode(false);
+                self.showGallery(true);
+            }
         });
         this.showGallery.subscribe(function(showGallery) {
             if (!showGallery) self.expandGallery(false);
