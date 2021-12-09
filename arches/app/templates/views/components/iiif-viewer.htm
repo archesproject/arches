@@ -121,13 +121,15 @@
 <!--ko if: !ko.unwrap(self.mainMenu) -->
 <div class="workbench-card-container" data-bind="css: {
         'gallery-visible': showGallery,
-        'gallery-expanded': expandGallery
+        'gallery-expanded': expandGallery,
+        compare: compareMode
     }">
     <div class="iiif-leaflet" data-bind="leaflet: leafletConfig"></div>
 </div>
 <div class="show-gallery-control" data-bind="css: {
         'gallery-visible': showGallery,
-        'gallery-expanded': expandGallery
+        'gallery-expanded': expandGallery,
+        compare: compareMode
     }">
     <i class="fa" data-bind="css: {
         'fa-chevron-circle-up': !expandGallery(),
@@ -145,7 +147,7 @@
         'gallery-expanded': expandGallery
     }">
     <!--ko if: showGallery() -->
-    <div class="iiif-gallery-content">
+    <div class="iiif-gallery-content" data-bind="css: {compare: compareMode}">
 
         <!--ko if: expandGallery() && manifestData() -->
         <div class="manifest-details">
@@ -225,47 +227,57 @@
                             <span class="clear-node-search" data-bind="visible: filter().length > 0, click: function() { filter(''); }"><i class="fa fa-times-circle"></i></span>
                         </div>
                     </div>
-                    <div data-bind="if: compareMode()" style="display: inline-flex; padding: 0px">
-                        <span data-bind="if: !primaryCanvas()">{% trans "Select Primary Canvas" %}</span><span data-bind="if: primaryCanvas() && !secondaryCanvas()">{% trans "Select Secondary Canvas" %}</span>
-                    </div>
                     <div style="display: inline-flex; padding: 0px">
                         <div class="iiif-gallery-sequence-label" data-bind="click: toggleManifestEditor">
                             {% trans "Switch Image Service" %}
                         </div> | 
-                        <div class="iiif-gallery-sequence-label" style="padding:0px" data-bind="click: compareImages">
-                            {% trans "Compare Images" %}
+                        <div class="iiif-gallery-sequence-label" style="padding:0px" data-bind="click: toggleCompareMode">
+                            <span data-bind="if: !compareMode()">{% trans "Turn on Image Comparison" %}</span><span data-bind="if: compareMode()">{% trans "Turn off Image Comparison" %}</span>
                         </div>
                     </div>
                 </div>
                 {% endblock gallery_header %}
 
                 <div class="iiif-gallery-sequence">
-                    <div class="iiif-gallery-sequence-canvases" data-bind="foreach: canvases">
-                        <div class="iiif-gallery-canvas" data-bind="click: function() {
-                            canvasClick($data);
-                        },
-                        visible: label.toLowerCase().includes(self.filter().toLowerCase()),
-                        css: {
-                            active: getCanvasService($data) === selectedCanvas(),
-                            annotated: getAnnotationCount(getCanvasService($data))
-                        }">
-                            <div class="iiif-gallery-canvas-thumbnail">
-                                <img data-bind="attr: { src: $data.thumbnail || '{% static 'img/photo_missing.png' %}', title: $data.label}">
+                    <div class="iiif-gallery-sequence-canvases" style="display:flex" data-bind="foreach: canvases">
+                        <div style="display: inline-block; ">
+                            <div class="iiif-gallery-canvas" data-bind="click: function() {
+                                canvasClick($data);
+                            },
+                            visible: label.toLowerCase().includes(self.filter().toLowerCase()),
+                            css: {
+                                active: getCanvasService($data) === selectedCanvas(),
+                                annotated: getAnnotationCount(getCanvasService($data)),
+                                compare: $parent.compareMode
+                            }">
+                                <div style="text-align:center" class="iiif-gallery-canvas-thumbnail">
+                                    <img data-bind="attr: { src: $data.thumbnail || '{% static 'img/photo_missing.png' %}', title: $data.label}">
+                                </div>
+                                <div style="text-align:center;" class="iiif-gallery-canvas-label">
+                                    <!--ko if: getCanvasService($data) === selectedCanvas() -->
+                                    <span data-bind="text: $parent.canvasLabel"></span>
+                                    <!--/ko -->                                
+                                    <!--ko ifnot: getCanvasService($data) === selectedCanvas() -->
+                                    <span data-bind="text: label"></span>
+                                    <!--/ko -->                                
+                                    <span class="annotation-count">
+                                        <!--ko if: getAnnotationCount(getCanvasService($data)) -->
+                                        <span data-bind="text: getAnnotationCount(getCanvasService($data))"></span> {% trans "Annotation(s)" %}
+                                        <!--/ko -->
+                                        <!--ko if: !getAnnotationCount(getCanvasService($data)) -->
+                                        &nbsp;
+                                        <!--/ko -->
+                                    </span>
+                                </div>
                             </div>
-                            <div class="iiif-gallery-canvas-label">
-                                <!--ko if: getCanvasService($data) === selectedCanvas() -->
-                                <span data-bind="text: $parent.canvasLabel"></span>
-                                <!--/ko -->                                
-                                <!--ko ifnot: getCanvasService($data) === selectedCanvas() -->
-                                <span data-bind="text: label"></span>
-                                <!--/ko -->                                
-                                <span class="annotation-count">
-                                    <!--ko if: getAnnotationCount(getCanvasService($data)) -->
-                                    <span data-bind="text: getAnnotationCount(getCanvasService($data))"></span> {% trans "Annotation(s)" %}
-                                    <!--/ko -->
-                                    <!--ko if: !getAnnotationCount(getCanvasService($data)) -->
-                                    &nbsp;
-                                    <!--/ko -->
+                            <div style="text-align: center; margin-left: 10px" data-bind="if: $parent.compareMode()">
+                                <span data-bind="text: console.log($parent.getCanvasService($data) == $parent.canvas(), $parent.canvas(), !!$parent.canvas(), !!$parent.secondaryCanvas())"></span>
+                                <span style="text-align: center; font-size: 0.9em; font-weight: 650; color: #5b9bd7; cursor: pointer" data-bind="if: $parent.getCanvasService($data) != $parent.canvas() && $parent.getCanvasService($data) != $parent.secondaryCanvas(), click: $parent.setSecondaryCanvas.bind($data), clickBubble: false">{% trans "Compare" %}</span>
+                                <span data-bind="if: !!$parent.canvas() && $parent.getCanvasService($data) == $parent.canvas()">
+                                    Left
+                                </span>
+                                <span data-bind="if: !!$parent.secondaryCanvas() && $parent.getCanvasService($data) == $parent.secondaryCanvas()">
+                                    Right
                                 </span>
                             </div>
                         </div>

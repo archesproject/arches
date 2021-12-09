@@ -41,15 +41,20 @@ define([
         this.primaryCanvas = ko.observable();
         this.secondaryCanvas = ko.observable();
         this.compareInstruction = ko.observable();
-        this.compareReady = ko.observable(false);
         this.primaryTilesLoaded = ko.observable(false);
         this.secondaryTilesLoaded = ko.observable(false);
 
-        this.compareImages = () => {
-            this.compareMode(true);
+        this.toggleCompareMode = () => {
+            self.compareMode(!self.compareMode());
+            const map = self.map();
+            if(sideBySideControl){
+                map.removeControl(sideBySideControl);
+            }
 
-            this.compareInstruction();
-            console.log('switching to image compare mode')
+            if(secondaryCanvasLayer){
+                map.removeLayer(secondaryCanvasLayer)
+            }
+            self.secondaryCanvas(undefined);
         }
 
         this.buildAnnotationNodes = params.buildAnnotationNodes || function(json) {
@@ -318,6 +323,7 @@ define([
 
         let canvasLayer;
         let secondaryCanvasLayer;
+        let sideBySideControl;
         this.brightness = ko.observable(100);
         this.contrast = ko.observable(100);
         this.saturation = ko.observable(100);
@@ -370,70 +376,28 @@ define([
             const primaryCanvas = self.canvas();
             const secondaryCanvas = self.secondaryCanvas();
             if (map && primaryCanvas && secondaryCanvas) {
-                if (canvasLayer) {
-                    map.removeLayer(canvasLayer);
-                    canvasLayer = undefined;
+                if(secondaryCanvasLayer) {
+                    map.removeLayer(secondaryCanvasLayer);
+                    secondaryCanvasLayer = undefined;
                 }
-
-                canvasLayer = L.tileLayer.iiif(primaryCanvas + '/info.json', {
-                    fitBounds: false
-                }).addTo(map);
 
                 secondaryCanvasLayer = L.tileLayer.iiif(secondaryCanvas + '/info.json', {
                     fitBounds: false
                 }).addTo(map);
 
-                canvasLayer.on('tileload', () => {self.primaryTilesLoaded(true)})
-                secondaryCanvasLayer.on('tileload', () => {self.secondaryTilesLoaded(true)})
-                
                 const loadComparison = () => {
-                    if(self.primaryTilesLoaded() && self.secondaryTilesLoaded()){
-                        L.control.sideBySide(primaryCanvasLayer, secondaryCanvasLayer).addTo(map);
-                        map.fitBounds(map.getBounds())
-                        primarySubscription.dispose();
-                        secondarySubscription.dispose();
+                    if(sideBySideControl){
+                        map.removeControl(sideBySideControl);
                     }
+                    sideBySideControl = L.control.sideBySide(canvasLayer, secondaryCanvasLayer)
+                    sideBySideControl.addTo(map);
+                    map.fitBounds(map.getBounds())
                 }
-                const primarySubscription = self.primaryTilesLoaded.subscribe(loadComparison);
-                const secondarySubscription = self.secondaryTilesLoaded.subscribe(loadComparison);
 
+                secondaryCanvasLayer.on('tileload', loadComparison)
+                
                 updateCanvasLayerFilter();
             }
-        };
-
-        const addCanvasLayers = function() {
-            const map = self.map();
-            const primaryCanvas = self.primaryCanvas();
-            const secondaryCanvas = self.secondaryCanvas();
-            if (map && primaryCanvas && secondaryCanvas) {
-                if (canvasLayer) {
-                    map.removeLayer(canvasLayer);
-                    canvasLayer = undefined;
-                }
-                primaryCanvasLayer = L.tileLayer.iiif(primaryCanvas + '/info.json', {
-                    fitBounds: false
-                }).addTo(map);
-                secondaryCanvasLayer = L.tileLayer.iiif(secondaryCanvas + '/info.json', {
-                    fitBounds: false
-                }).addTo(map);
-
-                primaryCanvasLayer.on('tileload', () => {self.primaryTilesLoaded(true)})
-                secondaryCanvasLayer.on('tileload', () => {self.secondaryTilesLoaded(true)})
-                
-                const loadComparison = () => {
-                    if(self.primaryTilesLoaded() && self.secondaryTilesLoaded()){
-                        L.control.sideBySide(primaryCanvasLayer, secondaryCanvasLayer).addTo(map);
-                        map.fitBounds(map.getBounds())
-                        primarySubscription.dispose();
-                        secondarySubscription.dispose();
-                    }
-                }
-                const primarySubscription = self.primaryTilesLoaded.subscribe(loadComparison);
-                const secondarySubscription = self.secondaryTilesLoaded.subscribe(loadComparison);
-
-                updateCanvasLayerFilter();
-            }
-            self.zoomToCanvas = false;
         };
 
         this.map.subscribe(function(map) {
@@ -444,23 +408,24 @@ define([
             map.addLayer(annotationFeatureGroup);
         });
         this.canvas.subscribe(addCanvasLayer);
-        this.compareReady.subscribe(addCanvasLayers)
+        this.secondaryCanvas.subscribe(compareCanvasLayers)
+
+        this.setSecondaryCanvas = (canvas) => {
+            const service = self.getCanvasService(canvas);
+            if(service){
+                self.secondaryCanvas(service);
+            }
+        }
 
         this.selectCanvas = function(canvas) {
             self.zoomToCanvas = true;
-            if(this.compareMode()){
-                if(!this.primaryCanvas()){
-                    this.primaryCanvas(self.getCanvasService(canvas));
-                } else if(this.primaryCanvas() && !this.secondaryCanvas()){
-                    this.secondaryCanvas(self.getCanvasService(canvas));
-                    this.compareReady(true);
-                }
-            } else {
-                var service = self.getCanvasService(canvas);
-                if (service) self.canvas(service);
-                self.origCanvasLabel = self.getManifestDataValue(canvas, 'label', true);
-                self.canvasLabel(self.getManifestDataValue(canvas, 'label', true));
-            }
+            
+            var service = self.getCanvasService(canvas);
+            if (service) self.canvas(service);
+            self.secondaryCanvas(undefined);
+            self.origCanvasLabel = self.getManifestDataValue(canvas, 'label', true);
+            self.canvasLabel(self.getManifestDataValue(canvas, 'label', true));
+            
         };
 
         this.canvasClick = function(canvas) {
