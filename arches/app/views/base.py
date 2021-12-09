@@ -115,4 +115,3 @@ class MapBaseManagerView(BaseManagerView):
         context["resource_map_sources"] = resource_sources
 
         return context
-        
