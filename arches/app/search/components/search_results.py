@@ -4,10 +4,6 @@ from arches.app.search.elasticsearch_dsl_builder import Bool, Terms, NestedAgg, 
 from arches.app.search.components.base import BaseSearchFilter
 from arches.app.utils.permission_backend import user_is_resource_reviewer
 
-from django.core.cache import caches
-from guardian.core import ObjectPermissionChecker
-
-
 
 details = {
     "searchcomponentid": "",
@@ -67,21 +63,8 @@ class SearchResultsFilter(BaseSearchFilter):
 
 def get_nodegroups_by_datatype_and_perm(request, datatype, permission):
     nodes = []
-
-    foo_cache = caches['foo']
-    # checker = foo_cache.get('Nodegroup')
-
-
-    if not foo_cache.get('NodeGroup'):
-        checker = ObjectPermissionChecker(request.user)
-        checker.prefetch_perms(models.NodeGroup.objects.all())
-        foo_cache.set('NodeGroup', checker)
-    else:
-        checker = foo_cache.get('NodeGroup')
-
-
     for node in models.Node.objects.filter(datatype=datatype):
-        if checker.has_perm(permission, node.nodegroup):
+        if request.user.has_perm(permission, node.nodegroup):
             nodes.append(str(node.nodegroup_id))
     return nodes
 

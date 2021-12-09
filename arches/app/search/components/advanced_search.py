@@ -5,8 +5,6 @@ from arches.app.utils.betterJSONSerializer import JSONDeserializer
 from arches.app.search.elasticsearch_dsl_builder import Bool, Nested, Terms
 from arches.app.search.components.base import BaseSearchFilter
 
-from django.core.cache import caches
-
 
 details = {
     "searchcomponentid": "",
@@ -72,14 +70,10 @@ class AdvancedSearch(BaseSearchFilter):
         cardwidgets = models.CardXNodeXWidget.objects.filter(node__in=searchable_nodes)
         datatypes = models.DDataType.objects.all()
 
-
-        foo_cache = caches['foo']
-        checker = foo_cache.get('NodeGroup')
-
         # only allow cards that the user has permission to read
         searchable_cards = []
         for card in resource_cards:
-            if checker.has_perm("read_nodegroup", card.nodegroup):
+            if self.request.user.has_perm("read_nodegroup", card.nodegroup):
                 searchable_cards.append(card)
 
         ret["graphs"] = resource_graphs

@@ -7,8 +7,6 @@ from arches.app.search.elasticsearch_dsl_builder import Bool, Nested, Term, Term
 from arches.app.search.components.base import BaseSearchFilter
 from django.db.models import Q
 
-from django.core.cache import caches
-
 
 details = {
     "searchcomponentid": "",
@@ -116,12 +114,8 @@ class TimeFilter(BaseSearchFilter):
         date_nodes = models.Node.objects.filter(datatype__in=date_datatypes, graph__isresource=True, graph__isactive=True).prefetch_related(
             "nodegroup"
         )
-
-        foo_cache = caches['foo']
-        checker = foo_cache.get('NodeGroup')
-
         node_graph_dict = {
-            str(node.nodeid): str(node.graph_id) for node in date_nodes if checker.has_perm("read_nodegroup", node.nodegroup)
+            str(node.nodeid): str(node.graph_id) for node in date_nodes if self.request.user.has_perm("read_nodegroup", node.nodegroup)
         }
 
         date_cardxnodesxwidgets = models.CardXNodeXWidget.objects.filter(node_id__in=list(node_graph_dict.keys()))

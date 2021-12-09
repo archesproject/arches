@@ -1,6 +1,7 @@
 import inspect
+import re
 
-from arches.app.models.models import Node, TileModel, EditLog, NodeGroup
+from arches.app.models.models import *
 from arches.app.models.system_settings import settings
 from guardian.backends import check_support, ObjectPermissionBackend
 from django.core.exceptions import ObjectDoesNotExist
@@ -33,21 +34,21 @@ class PermissionBackend(ObjectPermissionBackend):
             if app_label != obj._meta.app_label:
                 raise WrongAppError("Passed perm has app label of '%s' and " "given obj has '%s'" % (app_label, obj._meta.app_label))
 
-        permissions_checker = PermissionsChecker(user_obj, obj)
-        explicitly_defined_perms = permissions_checker.get_perms(obj)
-        
+        FooPermissionChecker = CachedObjectPermissionChecker(user_obj, obj)
+        explicitly_defined_perms = FooPermissionChecker.get_perms(obj)
+
         if len(explicitly_defined_perms) > 0:
             if "no_access_to_nodegroup" in explicitly_defined_perms:
                 return False
             else:
                 return perm in explicitly_defined_perms
         else:
-            default_perms = []
-            for group in user_obj.groups.all():
-                for permission in group.permissions.all():
-                    if perm in permission.codename:
-                        return True
-            return False
+            BarPermissionChecker = CachedUserPermissionChecker(user_obj)
+            
+            if BarPermissionChecker.user_has_permission(perm):
+                return True
+            else:
+                return False
 
 def get_restricted_users(resource):
     """
@@ -178,7 +179,7 @@ def get_nodegroups_by_perm(user, perms, any_perm=True):
 
     """
     permitted_nodegroups = set()
-    NodegroupPermissionsChecker = PermissionsChecker(user, NodeGroup)
+    NodegroupPermissionsChecker = CachedObjectPermissionChecker(user, NodeGroup)
 
     for nodegroup in NodeGroup.objects.all():
         explicit_perms = NodegroupPermissionsChecker.get_perms(nodegroup)
@@ -300,7 +301,7 @@ def check_resource_instance_permissions(user, resourceid, permission):
         resource = ResourceInstance.objects.get(resourceinstanceid=resourceid)
         result["resource"] = resource
 
-        permissions_checker = PermissionsChecker(user, ResourceInstance)
+        permissions_checker = CachedObjectPermissionChecker(user, ResourceInstance)
         all_perms = permissions_checker.get_perms(resource)
 
         if len(all_perms) == 0:  # no permissions assigned. permission implied
@@ -443,7 +444,10 @@ def user_created_transaction(user, transactionid):
 
 
 
-class PermissionsChecker():
+class CachedObjectPermissionChecker():
+    """
+    """
+
     def __new__(cls, user, input):
         if inspect.isclass(input):
             classname = input.__name__
@@ -467,3 +471,31 @@ class PermissionsChecker():
             foo_cache.set(classname, checker)
 
         return checker
+
+
+class CachedUserPermissionChecker():
+    """
+    """
+
+    def __init__(self, user):
+        foo_cache = caches['foo']
+
+        if foo_cache.get('user_permissions'):
+            user_permissions = foo_cache.get('user_permissions')
+        else:
+            user_permissions = set()
+
+            for group in user.groups.all():
+                for permission in group.permissions.all():
+                    user_permissions.add(permission.codename)
+
+            foo_cache.set('user_permissions', user_permissions)
+
+        self.user_permissions = user_permissions
+
+    def user_has_permission(self, permission):
+        if permission in self.user_permissions:
+            return True
+        else:
+            return False
+        

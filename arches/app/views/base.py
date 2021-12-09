@@ -1,17 +1,14 @@
 """
 ARCHES - a program developed to inventory and manage immovable cultural heritage.
 Copyright (C) 2013 J. Paul Getty Trust and World Monuments Fund
-
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU Affero General Public License as
 published by the Free Software Foundation, either version 3 of the
 License, or (at your option) any later version.
-
 This program is distributed in the hope that it will be useful,
 but WITHOUT ANY WARRANTY; without even the implied warranty of
 MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 GNU Affero General Public License for more details.
-
 You should have received a copy of the GNU Affero General Public License
 along with this program. If not, see <http://www.gnu.org/licenses/>.
 """
@@ -31,11 +28,6 @@ from arches.app.utils.permission_backend import (
 )
 from arches.app.utils.permission_backend import get_createable_resource_types, user_is_resource_reviewer
 
-from django.core.cache import caches
-from guardian.core import ObjectPermissionChecker
-
-
-
 class BaseManagerView(TemplateView):
 
     template_name = ""
@@ -46,25 +38,8 @@ class BaseManagerView(TemplateView):
         context["graph_models"] = []
         context["graphs"] = "[]"
         context["plugins"] = []
-
-
-
-        foo_cache = caches['foo']
-        # checker = foo_cache.get('Plugin')
-
-        if not foo_cache.get('Plugin'):
-            checker = ObjectPermissionChecker(self.request.user)
-            checker.prefetch_perms(models.Plugin.objects.all())
-            foo_cache.set('Plugin', checker)
-        else:
-            checker = foo_cache.get('Plugin')
-
-        # import pdb; pdb.set_trace()
-
-
-
         for plugin in models.Plugin.objects.all().order_by("sortorder"):
-            if checker.has_perm("view_plugin", plugin):
+            if self.request.user.has_perm("view_plugin", plugin):
                 context["plugins"].append(plugin)
 
         createable = get_createable_resource_types(self.request.user)
@@ -122,26 +97,8 @@ class MapBaseManagerView(BaseManagerView):
         )
         resource_layers = []
         resource_sources = []
-
-
-
-
-        foo_cache = caches['foo']
-        # checker = foo_cache.get('Nodegroup')
-
-
-        if not foo_cache.get('NodeGroup'):
-            checker = ObjectPermissionChecker(self.request.user)
-            checker.prefetch_perms(models.NodeGroup.objects.all())
-            foo_cache.set('NodeGroup', checker)
-        else:
-            checker = foo_cache.get('NodeGroup')
-
-
-
-
         for node in geom_nodes:
-            if checker.has_perm("read_nodegroup", node.nodegroup):
+            if self.request.user.has_perm("read_nodegroup", node.nodegroup):
                 datatype = datatype_factory.get_instance(node.datatype)
                 map_source = datatype.get_map_source(node)
                 if map_source is not None:
