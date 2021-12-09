@@ -34,8 +34,8 @@ class PermissionBackend(ObjectPermissionBackend):
             if app_label != obj._meta.app_label:
                 raise WrongAppError("Passed perm has app label of '%s' and " "given obj has '%s'" % (app_label, obj._meta.app_label))
 
-        FooPermissionChecker = CachedObjectPermissionChecker(user_obj, obj)
-        explicitly_defined_perms = FooPermissionChecker.get_perms(obj)
+        ObjPermissionChecker = CachedObjectPermissionChecker(user_obj, obj)
+        explicitly_defined_perms = ObjPermissionChecker.get_perms(obj)
 
         if len(explicitly_defined_perms) > 0:
             if "no_access_to_nodegroup" in explicitly_defined_perms:
@@ -43,9 +43,9 @@ class PermissionBackend(ObjectPermissionBackend):
             else:
                 return perm in explicitly_defined_perms
         else:
-            BarPermissionChecker = CachedUserPermissionChecker(user_obj)
+            UserPermissionChecker = CachedUserPermissionChecker(user_obj)
             
-            if BarPermissionChecker.user_has_permission(perm):
+            if UserPermissionChecker.user_has_permission(perm):
                 return True
             else:
                 return False
@@ -458,9 +458,9 @@ class CachedObjectPermissionChecker():
         else:
             raise Exception("Cannot derive model from input.")
 
-        foo_cache = caches['foo']
+        user_permission_cache = caches['user_permission']
 
-        current_user_cached_permissions = foo_cache.get(user.pk, {})
+        current_user_cached_permissions = user_permission_cache.get(user.pk, {})
 
         if current_user_cached_permissions.get(classname):
             checker = current_user_cached_permissions.get(classname)
@@ -471,7 +471,7 @@ class CachedObjectPermissionChecker():
             )
 
             current_user_cached_permissions[classname] = checker
-            foo_cache.set(user.pk, current_user_cached_permissions)
+            user_permission_cache.set(user.pk, current_user_cached_permissions)
 
         return checker
 
@@ -481,9 +481,9 @@ class CachedUserPermissionChecker():
     """
 
     def __init__(self, user):
-        foo_cache = caches['foo']
+        user_permission_cache = caches['user_permission']
 
-        current_user_cached_permissions = foo_cache.get(user.pk, {})
+        current_user_cached_permissions = user_permission_cache.get(user.pk, {})
 
         if current_user_cached_permissions.get('user_permissions'):
             user_permissions = current_user_cached_permissions.get('user_permissions')
@@ -495,7 +495,7 @@ class CachedUserPermissionChecker():
                     user_permissions.add(permission.codename)
 
             current_user_cached_permissions['user_permissions'] = user_permissions
-            foo_cache.set(user.pk, current_user_cached_permissions)
+            user_permission_cache.set(user.pk, current_user_cached_permissions)
 
         self.user_permissions = user_permissions
 

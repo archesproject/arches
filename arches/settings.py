@@ -450,9 +450,9 @@ USER_SIGNUP_GROUP = "Crowdsource Editor"
 
 CACHES = {
     "default": {"BACKEND": "django.core.cache.backends.locmem.LocMemCache", "LOCATION": "unique-snowflake"},
-    # 'foo': {
+    # 'user_permission': {
     #     'BACKEND': 'django.core.cache.backends.locmem.LocMemCache',
-    #     'LOCATION': 'foo_cache',
+    #     'LOCATION': 'user_permission_cache',
     # }   
 }
 
