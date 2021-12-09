@@ -5,7 +5,6 @@ from arches.app.utils.betterJSONSerializer import JSONDeserializer
 from arches.app.search.elasticsearch_dsl_builder import Bool, Nested, Terms
 from arches.app.search.components.base import BaseSearchFilter
 
-
 details = {
     "searchcomponentid": "",
     "name": "Advanced",

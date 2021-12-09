@@ -4,7 +4,6 @@ from arches.app.search.elasticsearch_dsl_builder import Bool, Terms, NestedAgg, 
 from arches.app.search.components.base import BaseSearchFilter
 from arches.app.utils.permission_backend import user_is_resource_reviewer
 
-
 details = {
     "searchcomponentid": "",
     "name": "Search Results",

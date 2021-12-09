@@ -7,7 +7,6 @@ from arches.app.search.elasticsearch_dsl_builder import Bool, Nested, Term, Term
 from arches.app.search.components.base import BaseSearchFilter
 from django.db.models import Q
 
-
 details = {
     "searchcomponentid": "",
     "name": "Time Filter",
