@@ -40,9 +40,6 @@ from arches.app.utils.permission_backend import user_can_read_concepts
 from arches.app.utils.permission_backend import user_has_resource_model_permissions
 from arches.app.utils.permission_backend import get_restricted_users
 
-from django.core.cache import caches
-
-
 # these tests can be run from the command line via
 # python manage.py test tests/permissions/permission_tests.py --pattern="*.py" --settings="tests.test_settings"
 
@@ -120,7 +117,7 @@ class PermissionTests(ArchesTestCase):
         Tests that a user cannot access an instance if they have no access to any nodegroup.
         
         """
-        
+
         resource = ResourceInstance.objects.get(resourceinstanceid=self.resource_instance_id)
         nodes = Node.objects.filter(graph_id=resource.graph_id)
         for node in nodes:
