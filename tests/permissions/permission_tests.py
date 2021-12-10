@@ -59,9 +59,6 @@ class PermissionTests(ArchesTestCase):
         resource.graph_id = self.data_type_graphid
         resource.remove_resource_instance_permissions()
 
-        user_permission_cache = caches['user_permission']
-        user_permission_cache.clear()
-
     def tearDown(self):
         ResourceInstance.objects.filter(graph_id=self.data_type_graphid).delete()
 
@@ -107,17 +104,11 @@ class PermissionTests(ArchesTestCase):
         Tests if a user is allowed to view a resource with implicit permissions and explicit permissions, but
         not without explicit permission if a permission other than 'view_resourceinstance' is assigned.
         """
-        user_permission_cache = caches['user_permission']
-
         implicit_permission = user_can_read_resource(self.user, self.resource_instance_id)
         resource = ResourceInstance.objects.get(resourceinstanceid=self.resource_instance_id)
         assign_perm("change_resourceinstance", self.group, resource)
-
-        user_permission_cache.clear()
         can_access_without_view_permission = user_can_read_resource(self.user, self.resource_instance_id)
         assign_perm("view_resourceinstance", self.group, resource)
-
-        user_permission_cache.clear()
         can_access_with_view_permission = user_can_read_resource(self.user, self.resource_instance_id)
         
         self.assertEqual(implicit_permission, True) 

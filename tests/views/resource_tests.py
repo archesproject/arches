@@ -80,9 +80,6 @@ class CommandLineTests(ArchesTestCase):
             edit.userid = user.id
             edit.save()
 
-        user_permission_cache = caches['user_permission']
-        user_permission_cache.clear()
-
     def tearDown(self):
         ResourceInstance.objects.filter(graph_id=self.data_type_graphid).delete()
         EditLog.objects.filter(resourceinstanceid=self.resource_instance_id).filter(edittype="create").delete()

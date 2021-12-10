@@ -468,7 +468,7 @@ class CachedObjectPermissionChecker():
 
         user_permission_cache = caches['user_permission']
 
-        current_user_cached_permissions = user_permission_cache.get(user.pk, {})
+        current_user_cached_permissions = user_permission_cache.get(str(user.pk), {})
 
         if current_user_cached_permissions.get(classname):
             checker = current_user_cached_permissions.get(classname)
@@ -479,7 +479,7 @@ class CachedObjectPermissionChecker():
             )
 
             current_user_cached_permissions[classname] = checker
-            user_permission_cache.set(user.pk, current_user_cached_permissions)
+            user_permission_cache.set(str(user.pk), current_user_cached_permissions)
 
         return checker
 
@@ -490,7 +490,7 @@ class CachedUserPermissionChecker():
 
     def __init__(self, user):
         user_permission_cache = caches['user_permission']
-        current_user_cached_permissions = user_permission_cache.get(user.pk, {})
+        current_user_cached_permissions = user_permission_cache.get(str(user.pk), {})
 
         if current_user_cached_permissions.get('user_permissions'):
             user_permissions = current_user_cached_permissions.get('user_permissions')
@@ -502,7 +502,7 @@ class CachedUserPermissionChecker():
                     user_permissions.add(permission.codename)
 
             current_user_cached_permissions['user_permissions'] = user_permissions
-            user_permission_cache.set(user.pk, current_user_cached_permissions)
+            user_permission_cache.set(str(user.pk), current_user_cached_permissions)
 
         self.user_permissions = user_permissions
 
