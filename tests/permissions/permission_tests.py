@@ -104,22 +104,23 @@ class PermissionTests(ArchesTestCase):
         Tests if a user is allowed to view a resource with implicit permissions and explicit permissions, but
         not without explicit permission if a permission other than 'view_resourceinstance' is assigned.
         """
+
         implicit_permission = user_can_read_resource(self.user, self.resource_instance_id)
         resource = ResourceInstance.objects.get(resourceinstanceid=self.resource_instance_id)
         assign_perm("change_resourceinstance", self.group, resource)
         can_access_without_view_permission = user_can_read_resource(self.user, self.resource_instance_id)
         assign_perm("view_resourceinstance", self.group, resource)
         can_access_with_view_permission = user_can_read_resource(self.user, self.resource_instance_id)
-        
-        self.assertEqual(implicit_permission, True) 
-        self.assertEqual(can_access_without_view_permission, False)
-        self.assertEqual(can_access_with_view_permission, True)
+        self.assertTrue(
+            implicit_permission is True and can_access_without_view_permission is False and can_access_with_view_permission is True
+        )
 
     def test_user_has_resource_model_permissions(self):
         """
         Tests that a user cannot access an instance if they have no access to any nodegroup.
         
         """
+        
         resource = ResourceInstance.objects.get(resourceinstanceid=self.resource_instance_id)
         nodes = Node.objects.filter(graph_id=resource.graph_id)
         for node in nodes:

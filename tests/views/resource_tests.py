@@ -36,8 +36,6 @@ from django.contrib.auth.models import User
 from django.contrib.auth.models import Group
 from guardian.shortcuts import assign_perm, get_perms, remove_perm, get_group_perms, get_user_perms
 
-from django.core.cache import caches
-
 # these tests can be run from the command line via
 # python manage.py test tests/views/resource_tests.py --pattern="*.py" --settings="tests.test_settings"
 
