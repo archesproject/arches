@@ -43,11 +43,12 @@ class PermissionBackend(ObjectPermissionBackend):
                 return perm in explicitly_defined_perms
         else:
             UserPermissionChecker = CachedUserPermissionChecker(user_obj)
-            
+
             if UserPermissionChecker.user_has_permission(perm):
                 return True
             else:
                 return False
+
 
 def get_restricted_users(resource):
     """
@@ -183,8 +184,8 @@ def get_nodegroups_by_perm(user, perms, any_perm=True):
     formatted_perms = []
     # in some cases, `perms` can have a `model.` prefix
     for perm in perms:
-        if len(perm.split('.')) > 1:
-            formatted_perms.append(perm.split('.')[1])
+        if len(perm.split(".")) > 1:
+            formatted_perms.append(perm.split(".")[1])
         else:
             formatted_perms.append(perm)
 
@@ -197,7 +198,7 @@ def get_nodegroups_by_perm(user, perms, any_perm=True):
         if len(explicit_perms):
             if any_perm:
                 if len(set(formatted_perms) & set(explicit_perms)):
-                    permitted_nodegroups.add(nodegroup) 
+                    permitted_nodegroups.add(nodegroup)
             else:
                 if set(formatted_perms) == set(explicit_perms):
                     permitted_nodegroups.add(nodegroup)
@@ -452,9 +453,8 @@ def user_created_transaction(user, transactionid):
     return False
 
 
-class CachedObjectPermissionChecker():
-    """
-    """
+class CachedObjectPermissionChecker:
+    """ """
 
     def __new__(cls, user, input):
         if inspect.isclass(input):
@@ -466,7 +466,7 @@ class CachedObjectPermissionChecker():
         else:
             raise Exception("Cannot derive model from input.")
 
-        user_permission_cache = caches['user_permission']
+        user_permission_cache = caches["user_permission"]
 
         current_user_cached_permissions = user_permission_cache.get(str(user.pk), {})
 
@@ -474,9 +474,7 @@ class CachedObjectPermissionChecker():
             checker = current_user_cached_permissions.get(classname)
         else:
             checker = ObjectPermissionChecker(user)
-            checker.prefetch_perms(
-                globals()[classname].objects.all()
-            )
+            checker.prefetch_perms(globals()[classname].objects.all())
 
             current_user_cached_permissions[classname] = checker
             user_permission_cache.set(str(user.pk), current_user_cached_permissions)
@@ -484,16 +482,15 @@ class CachedObjectPermissionChecker():
         return checker
 
 
-class CachedUserPermissionChecker():
-    """
-    """
+class CachedUserPermissionChecker:
+    """ """
 
     def __init__(self, user):
-        user_permission_cache = caches['user_permission']
+        user_permission_cache = caches["user_permission"]
         current_user_cached_permissions = user_permission_cache.get(str(user.pk), {})
 
-        if current_user_cached_permissions.get('user_permissions'):
-            user_permissions = current_user_cached_permissions.get('user_permissions')
+        if current_user_cached_permissions.get("user_permissions"):
+            user_permissions = current_user_cached_permissions.get("user_permissions")
         else:
             user_permissions = set()
 
@@ -501,7 +498,7 @@ class CachedUserPermissionChecker():
                 for permission in group.permissions.all():
                     user_permissions.add(permission.codename)
 
-            current_user_cached_permissions['user_permissions'] = user_permissions
+            current_user_cached_permissions["user_permissions"] = user_permissions
             user_permission_cache.set(str(user.pk), current_user_cached_permissions)
 
         self.user_permissions = user_permissions

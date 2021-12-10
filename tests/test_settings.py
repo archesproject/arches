@@ -45,11 +45,13 @@ BUSISNESS_DATA_FILES = (
 )
 
 CACHES = {
-    "default": {"BACKEND": "django.core.cache.backends.dummy.DummyCache",},
-    'user_permission': {
-        'BACKEND': 'django.core.cache.backends.dummy.DummyCache',
-        'LOCATION': 'user_permission_cache',
-    }  
+    "default": {
+        "BACKEND": "django.core.cache.backends.dummy.DummyCache",
+    },
+    "user_permission": {
+        "BACKEND": "django.core.cache.backends.dummy.DummyCache",
+        "LOCATION": "user_permission_cache",
+    },
 }
 
 ELASTICSEARCH_PREFIX = "test"
