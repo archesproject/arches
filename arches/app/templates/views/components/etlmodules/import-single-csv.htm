@@ -1,12 +1,6 @@
 {% load i18n %}
 <!-- ko ifnot: loading() -->
 <!-- ko ifnot: fileAdded() -->
-<div>
-    <h3>File is not added</h3>
-    <h3>A dropzone here</h3>
-    <button data-bind="click: function () { fileAdded(true); }">Add File</button>
-</div>
-
 <div data-bind="dropzone: dropzoneOptions" class="file-select loader-select" style="height: 100%;">
     <div>
         <div class="manifest-manager-main-menu-circle loader-button">
@@ -39,26 +33,70 @@
 <!-- /ko -->
 
 <!-- ko if: fileAdded() -->
-<div>
-    <h3>File is added</h3>
-    <h3>Import management ui should be here</h3>
-
-    <button data-bind="click: function () { fileAdded(false); }" class="btn btn-rr">
-        <span>{% trans "Remove File" %}</span>
-    </button>
-    <button data-bind="click: console.log('format changed')" class="btn btn-rr">
-        <span>{% trans "Select a different format" %}</span>
-    </button>
-    <button data-bind="click: console.log('validated')" class="btn btn-success">
-        <span>{% trans "Validate data before import" %}</span>
-    </button>
-    <button data-bind="click: console.log('imported')" class="btn btn-success">
-        <span>{% trans "Import data" %}</span>
-    </button>
-    <button data-bind="click: function () { $parent.selectedModule(null); }" class="btn btn-danger">
-        <span>{% trans "Cancel File Import" %}</span>
-    </button>
-
+<div style="height: 100%;">
+    <div class="etl-module-mapping" style="width: 100%">
+        <h3>{% trans "Format: Single .csv File Import" %}</h3>
+        
+        <label class="form-checkbox form-normal form-primary" style="padding-left: 25px; padding-top: 3px;">
+            <input type="checkbox" data-bind="checked: hasHeaders">{% trans "Column names in the first row" %}
+        </label>
+        <div class="aher-table">
+            <table class="table table-striped" cellspacing="0" width="100%">
+                <thead>
+                    <tr>
+                        <th>{% trans "Copy From" %}</th>
+                        <th>{% trans "Import To" %}</th>
+                    </tr>
+                </thead>
+                <tbody data-bind="dataTablesForEach: { data: headers, dataTableOptions: createTableConfig(2) }">
+                    <tr>
+                        <td data-bind="text: $data"></td>
+                        <td><!--input style="width:30%; display:inline-block;"
+                            data-bind="select2Query: {select2Config: select2Config}"-->
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+    <div class="etl-module-preview" style="width: 100%">
+        <h3>{% trans "Data Preview" %}</h3>
+        <div class="aher-table">
+            <table class="table table-striped" cellspacing="0" width="100%">
+                <thead>
+                    <tr>
+                        <!-- ko foreach: headers -->
+                        <th data-bind="text: $data"></th>
+                        <!-- /ko -->
+                    </tr>
+                </thead>
+                <tbody data-bind="dataTablesForEach: { data: csvBody, dataTableOptions: previewTableConfig }">
+                    <tr>
+                        <!-- ko foreach: $data -->
+                        <td data-bind="text: $data"></td>
+                        <!-- /ko -->
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+    <div class="etl-module-buttons" style="width: 100%">
+        <button data-bind="click: function () { fileAdded(false); }" class="btn btn-primary">
+            <span>{% trans "Remove File" %}</span>
+        </button>
+        <button data-bind="click: console.log('format changed')" class="btn btn-primary">
+            <span>{% trans "Select a different format" %}</span>
+        </button>
+        <button data-bind="click: console.log('validated')" class="btn btn-success">
+            <span>{% trans "Validate data before import" %}</span>
+        </button>
+        <button data-bind="click: console.log('imported')" class="btn btn-success">
+            <span>{% trans "Import data" %}</span>
+        </button>
+        <button data-bind="click: function () { $parent.selectedModule(null); }" class="btn btn-danger">
+            <span>{% trans "Cancel File Import" %}</span>
+        </button>
+    </div>
 </div>
 <!-- /ko -->
 
