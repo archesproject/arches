@@ -177,6 +177,17 @@ def get_nodegroups_by_perm(user, perms, any_perm=True):
     any_perm -- True to check ANY perm in "perms" or False to check ALL perms
 
     """
+    if not isinstance(perms, list):
+        perms = [perms]
+
+    formatted_perms = []
+    # in some cases, `perms` can have a `model.` prefix
+    for perm in perms:
+        if len(perm.split('.')) > 1:
+            formatted_perms.append(perm.split('.')[1])
+        else:
+            formatted_perms.append(perm)
+
     permitted_nodegroups = set()
     NodegroupPermissionsChecker = CachedObjectPermissionChecker(user, NodeGroup)
 
@@ -185,13 +196,12 @@ def get_nodegroups_by_perm(user, perms, any_perm=True):
 
         if len(explicit_perms):
             if any_perm:
-                for perm in perms:
-                    if perm in explicit_perms:
-                        permitted_nodegroups.add(nodegroup) 
+                if len(set(formatted_perms) & set(explicit_perms)):
+                    permitted_nodegroups.add(nodegroup) 
             else:
-                if set(perms) == set(explicit_perms):
+                if set(formatted_perms) == set(explicit_perms):
                     permitted_nodegroups.add(nodegroup)
-        else:  # if no explicit permissions, object is considered accessible by all
+        else:  # if no explicit permissions, object is considered accessible by all with group permissions
             permitted_nodegroups.add(nodegroup)
 
     return permitted_nodegroups
@@ -440,7 +450,6 @@ def user_created_transaction(user, transactionid):
         if EditLog.objects.filter(transactionid=transactionid, userid=user.id).count() > 0:
             return True
     return False
-
 
 
 class CachedObjectPermissionChecker():
