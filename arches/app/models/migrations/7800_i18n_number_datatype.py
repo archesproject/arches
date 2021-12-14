@@ -17,9 +17,9 @@ class Migration(migrations.Migration):
         jsonb_set(
             jsonb_set(
                 jsonb_set(config, 
-                    '{{suffix}}', json_build_object('{0}', config->>'suffix')::jsonb, true), 
-                        '{{prefix}}', json_build_object('{0}', config->>'prefix')::jsonb, true),
-                            '{{placeholder}}', json_build_object('{0}', config->>'placeholder')::jsonb, true
+                '{{suffix}}', json_build_object('{0}', config->>'suffix')::jsonb, true), 
+            '{{prefix}}', json_build_object('{0}', config->>'prefix')::jsonb, true),
+        '{{placeholder}}', json_build_object('{0}', config->>'placeholder')::jsonb, true
         ) ||
         '{{"i18n_properties": ["placeholder", "prefix", "suffix"]}}'
         WHERE nodeid in (SELECT nodeid FROM nodes WHERE datatype = 'number');
