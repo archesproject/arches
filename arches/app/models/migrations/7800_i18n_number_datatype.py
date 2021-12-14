@@ -13,11 +13,10 @@ class Migration(migrations.Migration):
     sql = """
         UPDATE public.cards_x_nodes_x_widgets
         SET config =
-        
         jsonb_set(
             jsonb_set(
-                jsonb_set(config, 
-                '{{suffix}}', json_build_object('{0}', config->>'suffix')::jsonb, true), 
+                jsonb_set(config,
+                '{{suffix}}', json_build_object('{0}', config->>'suffix')::jsonb, true),
             '{{prefix}}', json_build_object('{0}', config->>'prefix')::jsonb, true),
         '{{placeholder}}', json_build_object('{0}', config->>'placeholder')::jsonb, true
         ) ||
