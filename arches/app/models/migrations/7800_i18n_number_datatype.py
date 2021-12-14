@@ -13,13 +13,20 @@ class Migration(migrations.Migration):
     sql = """
         UPDATE public.cards_x_nodes_x_widgets
         SET config =
-        jsonb_set(config, '{{placeholder}}', json_build_object('{0}', config->>'placeholder')::jsonb, true)||
-        '{{"i18n_properties": ["placeholder"]}}'
+        
+        jsonb_set(
+            jsonb_set(
+                jsonb_set(config, 
+                    '{{suffix}}', json_build_object('{0}', config->>'suffix')::jsonb, true), 
+                        '{{prefix}}', json_build_object('{0}', config->>'prefix')::jsonb, true),
+                            '{{placeholder}}', json_build_object('{0}', config->>'placeholder')::jsonb, true
+        ) ||
+        '{{"i18n_properties": ["placeholder", "prefix", "suffix"]}}'
         WHERE nodeid in (SELECT nodeid FROM nodes WHERE datatype = 'number');
 
         UPDATE public.widgets
         SET defaultconfig = defaultconfig ||
-        '{{"i18n_properties": ["placeholder"]}}'
+        '{{"i18n_properties": ["placeholder", "prefix", "suffix"]}}'
         WHERE datatype = 'number';
 
     """.format(
@@ -29,14 +36,14 @@ class Migration(migrations.Migration):
     reverse_sql = """
         UPDATE public.cards_x_nodes_x_widgets
         set config = config - 'i18n_properties' ||
-        json_build_object('placeholder', jsonb_extract_path(config, 'placeholder', '{0}'))::jsonb
+        json_build_object('placeholder', jsonb_extract_path(config, 'placeholder', '{0}'))::jsonb ||
+        json_build_object('prefix', jsonb_extract_path(config, 'prefix', '{0}'))::jsonb ||
+        json_build_object('suffix', jsonb_extract_path(config, 'suffix', '{0}'))::jsonb
         WHERE nodeid in (SELECT nodeid FROM nodes WHERE datatype = 'number');
 
         UPDATE public.widgets
         SET defaultconfig = defaultconfig - 'i18n_properties'
         WHERE datatype = 'number';
-
-
     """.format(
         settings.LANGUAGE_CODE
     )
