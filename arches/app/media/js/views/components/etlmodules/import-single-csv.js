@@ -5,7 +5,8 @@ define([
     'dropzone',
     'uuid',
     'arches',
-    'bindings/dropzone'
+    'bindings/dropzone',
+    'bindings/datatable'
 ], function(ko, koMapping, $, dropzone, uuid, arches) {
     return ko.components.register('import-single-csv', {
         viewModel: function(params) {
@@ -23,10 +24,10 @@ define([
 
             this.createTableConfig = function(col) {
                 return {
-                    // paging: false,
-                    // searching: false,
-                    // scrollCollapse: true,
-                    // info: false,
+                    paging: false,
+                    searching: false,
+                    scrollCollapse: true,
+                    info: false,
                     // columnDefs: [{
                     //     orderable: false,
                     //     targets: -1,

@@ -36,7 +36,7 @@
 <div style="height: 100%;">
     <div class="etl-module-mapping" style="width: 100%">
         <h3>{% trans "Format: Single .csv File Import" %}</h3>
-        
+
         <label class="form-checkbox form-normal form-primary" style="padding-left: 25px; padding-top: 3px;">
             <input type="checkbox" data-bind="checked: hasHeaders">{% trans "Column names in the first row" %}
         </label>
@@ -70,8 +70,8 @@
                         <!-- /ko -->
                     </tr>
                 </thead>
-                <tbody data-bind="dataTablesForEach: { data: csvBody, dataTableOptions: previewTableConfig }">
-                    <tr>
+                <tbody data-bind="dataTables: { data: csvBody(), dataTableOptions: previewTableConfig }">
+                     <tr>
                         <!-- ko foreach: $data -->
                         <td data-bind="text: $data"></td>
                         <!-- /ko -->
