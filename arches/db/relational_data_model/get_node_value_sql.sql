@@ -23,7 +23,26 @@ begin
         when 'boolean' then datatype = 'boolean';
         when 'resource-instance' then datatype = 'jsonb';
         when 'resource-instance-list' then datatype = 'jsonb';
+        when 'annotation' then datatype = 'jsonb';
+        when 'file-list' then datatype = 'jsonb';
         when 'url' then datatype = 'jsonb';
+        when 'date' then dataype= = 'timestamp';
+        when 'node-value' then datatype = 'uuid';
+        when 'domain-value' then datatype = 'uuid';
+        when 'domain-value-list' then select_sql = format(
+            '(
+                            CASE
+                                WHEN t.tiledata->>%1$L is null THEN null
+                                ELSE ARRAY(
+                                    SELECT jsonb_array_elements_text(
+                                        t.tiledata->%1$L
+                                    )::uuid
+                                )
+                            END
+                        )',
+            node.nodeid
+        );
+        datatype = 'uuid[]';
         when 'concept' then datatype = 'uuid';
         when 'concept-list' then
             select_sql = format('(
