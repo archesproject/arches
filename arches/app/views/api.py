@@ -359,8 +359,10 @@ class GeoJSON(APIBase):
                                 feature["properties"]["primary_name"] = self.get_name(tile.resourceinstance)
                             feature["properties"]["resourceinstanceid"] = tile.resourceinstance_id
                             feature["properties"]["tileid"] = tile.pk
-                            if feature["properties"]["nodeId"]:
+                            try:
                                 feature["properties"].pop("nodeId")
+                            except KeyError:
+                                pass
                             feature["properties"]["nodeid"] = node.pk
                             if include_geojson_link:
                                 feature["properties"]["geojson"] = "%s?tileid=%s&nodeid=%s" % (reverse("geojson"), tile.pk, node.pk)
@@ -1051,7 +1053,7 @@ class SearchExport(View):
         exporter = SearchResultsExporter(search_request=request)
         export_files, export_info = exporter.export(format, report_link)
         if format == "geojson" and total <= download_limit:
-            if settings.EXPORT_DATA_FIELDS_IN_CARD_ORDER is True:
+            if settings.EXPORT_DATA_FIELDS_IN_CARD_ORDER:
                 response = JSONResponse(export_files, sort_keys=False)
             else:
                 response = JSONResponse(export_files)
