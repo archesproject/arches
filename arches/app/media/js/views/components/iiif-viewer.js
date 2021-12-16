@@ -43,19 +43,49 @@ define([
         this.compareInstruction = ko.observable();
         this.primaryTilesLoaded = ko.observable(false);
         this.secondaryTilesLoaded = ko.observable(false);
+        this.selectPrimaryPanel = ko.observable(true);
+        this.secondaryLabel = ko.observable();
+        this.imageToolSelector = ko.observable(this.canvas());
 
-        this.toggleCompareMode = () => {
-            self.compareMode(!self.compareMode());
-            const map = self.map();
-            if(sideBySideControl){
-                map.removeControl(sideBySideControl);
+        this.selectPrimaryPanel.subscribe((value) => {
+            // if true, primary panel is being selected
+            if(value){
+                this.imageToolSelector(this.canvas());
+            } else {
+                this.imageToolSelector(this.secondaryCanvas());
             }
+        });
 
-            if(secondaryCanvasLayer){
-                map.removeLayer(secondaryCanvasLayer)
+        this.imageToolSelector.subscribe((value) => {
+            if(this.selectPrimaryPanel() && this.canvas() !== this.imageToolSelector()){
+                this.canvas(this.imageToolSelector());
+            } else if (!this.selectPrimaryPanel() && this.secondaryCanvas() !== this.imageToolSelector()){
+                this.secondaryCanvas(this.imageToolSelector());
             }
-            self.secondaryCanvas(undefined);
-        }
+        });
+
+        this.compareMode.subscribe((mode) => {
+            if(!mode){
+                const map = self.map();
+                if(sideBySideControl){
+                    map.removeControl(sideBySideControl);
+                }
+    
+                if(secondaryCanvasLayer){
+                    map.removeLayer(secondaryCanvasLayer)
+                }
+                self.secondaryCanvas(undefined);
+                self.secondaryLabel(undefined);
+            }
+        });
+
+        this.panelRadio = ko.pureComputed(() => {
+            if(!this.compareMode()){
+                return "single";
+            } else {
+                return "double";
+            }
+        });
 
         this.buildAnnotationNodes = params.buildAnnotationNodes || function(json) {
             self.annotationNodes(
@@ -264,6 +294,53 @@ define([
             }
         };
 
+        const splitSelectConfig = {
+            clickBubble: true,
+            multiple: false,
+            closeOnSelect: true,
+            allowClear: true,
+            data: () => {
+                results = this.canvases();
+                return { results };
+            },
+            id: function(item) {
+                return self.getCanvasService(item);
+            },
+            containerCssClass: "split-controls-drop",
+            dropdownCssClass: "split-controls-drop",
+            dropdownAutoWidth: true,
+            formatResult: function(item) {
+                return `<div class="image"><img src="${item.thumbnail}"/></div><div class="title">${item.label}</div>`; 
+            },
+            formatSelection: function(item) {
+                return item.label;
+            },
+            clear: function(abc) {
+                self.canvases('');
+            },
+            isEmpty: ko.computed(function() {
+                return self.canvases() === '' || !self.canvases();
+            }, this),
+            initSelection: function() {
+                return;
+            }
+        }
+
+        this.rightSideSelectConfig = {
+            ...splitSelectConfig,
+            value: this.canvas
+        };
+
+        this.leftSideSelectConfig = {
+            ...splitSelectConfig,
+            value: this.secondaryCanvas
+        };
+
+        this.imageToolConfig = {
+            ...splitSelectConfig,
+            value: this.imageToolSelector
+        };
+
         this.getManifestData = function() {
             var manifestURL = self.manifest();
             if (manifestURL) {
@@ -324,6 +401,14 @@ define([
             afterRender: this.map
         };
 
+        this.imagePropertyUpdate = (...params) => {
+            console.log(params);
+        };
+
+        this.fileUpdate = (...params) => {
+            console.log(params);
+        };
+
         let canvasLayer;
         let secondaryCanvasLayer;
         let sideBySideControl;
@@ -331,6 +416,7 @@ define([
         this.contrast = ko.observable(100);
         this.saturation = ko.observable(100);
         this.greyscale = ko.observable(false);
+
         this.canvasFilter = ko.pureComputed(function() {
             var b = self.brightness() / 100;
             var c = self.contrast() / 100;
@@ -339,6 +425,10 @@ define([
             return 'brightness(' + b + ') contrast(' + c + ') ' +
                 'saturate(' + s + ') grayscale(' + g + ')';
         });
+
+        this.canvasFilter.subscribe((value) => {
+            console.log(value);
+        })
         var updateCanvasLayerFilter = function() {
             var filter = self.canvasFilter();
             var map = self.map();
@@ -374,7 +464,7 @@ define([
             self.zoomToCanvas = false;
         };
 
-        const compareCanvasLayers = () => {
+        const compareCanvasLayers = (value) => {
             const map = self.map();
             const primaryCanvas = self.canvas();
             const secondaryCanvas = self.secondaryCanvas();
@@ -423,12 +513,16 @@ define([
         this.selectCanvas = function(canvas) {
             self.zoomToCanvas = true;
             
-            var service = self.getCanvasService(canvas);
-            if (service) self.canvas(service);
-            self.secondaryCanvas(undefined);
-            self.origCanvasLabel = self.getManifestDataValue(canvas, 'label', true);
-            self.canvasLabel(self.getManifestDataValue(canvas, 'label', true));
-            
+            const service = self.getCanvasService(canvas);
+
+            if (service && self.selectPrimaryPanel()) {
+                self.canvas(service);
+                self.origCanvasLabel = self.getManifestDataValue(canvas, 'label', true);
+                self.canvasLabel(self.getManifestDataValue(canvas, 'label', true));
+            } else {
+                self.secondaryCanvas(service);
+                self.secondaryLabel(self.getManifestDataValue(canvas, 'label', true));
+            }
         };
 
         this.canvasClick = function(canvas) {
