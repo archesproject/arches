@@ -46,13 +46,37 @@ define([
         this.selectPrimaryPanel = ko.observable(true);
         this.secondaryLabel = ko.observable();
         this.imageToolSelector = ko.observable(this.canvas());
+        let primaryPanelFilters
+        let secondaryPanelFilters;
 
         this.selectPrimaryPanel.subscribe((value) => {
             // if true, primary panel is being selected
             if(value){
                 this.imageToolSelector(this.canvas());
+                // preserve state of secondary filters, if secondaryCanvas is set
+                if(self.secondaryCanvas()) {
+                    secondaryPanelFilters = self.canvasFilterObject();
+                    if(primaryPanelFilters) {
+                        self.brightness(primaryPanelFilters.brightness);
+                        self.saturation(primaryPanelFilters.saturation);
+                        self.contrast(primaryPanelFilters.contrast);
+                        self.greyscale(primaryPanelFilters.greyscale);
+                    }
+                }
             } else {
                 this.imageToolSelector(this.secondaryCanvas());
+                primaryPanelFilters = self.canvasFilterObject();
+                if(secondaryPanelFilters) {
+                    self.brightness(secondaryPanelFilters.brightness);
+                    self.saturation(secondaryPanelFilters.saturation);
+                    self.contrast(secondaryPanelFilters.contrast);
+                    self.greyscale(secondaryPanelFilters.greyscale);
+                } else {
+                    self.brightness(100);
+                    self.saturation(100);
+                    self.contrast(100);
+                    self.greyscale(false);
+                }
             }
         });
 
@@ -321,19 +345,20 @@ define([
             isEmpty: ko.computed(function() {
                 return self.canvases() === '' || !self.canvases();
             }, this),
-            initSelection: function() {
-                return;
+            initSelection: function(element, callback) {
+                const canvasObject = self.canvases().find(canvas => self.getCanvasService(canvas) == element.val())
+                callback(canvasObject);
             }
         }
 
         this.rightSideSelectConfig = {
             ...splitSelectConfig,
-            value: this.canvas
+            value: this.secondaryCanvas
         };
 
         this.leftSideSelectConfig = {
             ...splitSelectConfig,
-            value: this.secondaryCanvas
+            value: this.canvas
         };
 
         this.imageToolConfig = {
@@ -426,14 +451,31 @@ define([
                 'saturate(' + s + ') grayscale(' + g + ')';
         });
 
+        this.canvasFilterObject = ko.pureComputed(() => {
+            const brightness = self.brightness();
+            const contrast = self.contrast();
+            const saturation = self.saturation();
+            const greyscale = self.greyscale();
+
+            return { brightness, contrast, saturation, greyscale };
+        })
+
         this.canvasFilter.subscribe((value) => {
             console.log(value);
         })
         var updateCanvasLayerFilter = function() {
             var filter = self.canvasFilter();
             var map = self.map();
+            let layer;
             if (map) {
-                map.getContainer().querySelector('.leaflet-tile-pane').style.filter = filter;
+                if(self.selectPrimaryPanel()){
+                    layer = map.getPane('tilePane').querySelector('.iiif-layer-primary')
+                } else {
+                    layer = map.getPane('tilePane').querySelector('.iiif-layer-secondary')
+                }
+                if(layer && layer !== null){
+                    layer.style.filter = filter;
+                }
             }
         };
         this.canvasFilter.subscribe(updateCanvasLayerFilter);
@@ -448,6 +490,11 @@ define([
         var addCanvasLayer = function() {
             var map = self.map();
             var canvas = self.canvas();
+
+            if(canvas && canvas != self.imageToolSelector()){
+                self.imageToolSelector(canvas);
+            }
+
             if (map && canvas) {
                 if (canvasLayer) {
                     map.removeLayer(canvasLayer);
@@ -455,7 +502,8 @@ define([
                 }
                 if (canvas) {
                     canvasLayer = L.tileLayer.iiif(canvas + '/info.json', {
-                        fitBounds: self.zoomToCanvas
+                        fitBounds: self.zoomToCanvas,
+                        className: "iiif-layer-primary"
                     });
                     canvasLayer.addTo(map);
                     updateCanvasLayerFilter();
@@ -468,6 +516,10 @@ define([
             const map = self.map();
             const primaryCanvas = self.canvas();
             const secondaryCanvas = self.secondaryCanvas();
+            if(secondaryCanvas && secondaryCanvas != self.imageToolSelector()){
+                self.imageToolSelector(secondaryCanvas);
+            }
+
             if (map && primaryCanvas && secondaryCanvas) {
                 if(secondaryCanvasLayer) {
                     map.removeLayer(secondaryCanvasLayer);
@@ -475,7 +527,8 @@ define([
                 }
 
                 secondaryCanvasLayer = L.tileLayer.iiif(secondaryCanvas + '/info.json', {
-                    fitBounds: false
+                    fitBounds: false,
+                    className: "iiif-layer-secondary"
                 }).addTo(map);
 
                 const loadComparison = () => {
