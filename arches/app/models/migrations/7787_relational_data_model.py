@@ -9,7 +9,7 @@ class Migration(migrations.Migration):
 
     operations = [
         migrations.RunSQL(
-        """
+            """
             create extension if not exists "unaccent";
 
             create or replace function __arches_slugify(
@@ -844,7 +844,7 @@ class Migration(migrations.Migration):
             end $$ language plpgsql volatile;
 
         """,
-        """
+            """
             drop function if exists __arches_slugify cascade;
             drop function if exists __arches_get_node_value_sql cascade;
             drop function if exists __arches_create_nodegroup_view cascade;
