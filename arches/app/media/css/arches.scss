@@ -13308,6 +13308,12 @@ a.jstree-anchor.permissions-widget {
     top: 9px;
 }
 
+@media(max-width: 1150px){
+    .iiif-leaflet .split-controls {
+        display: none;
+    }
+}
+
 .iiif-leaflet .split-controls.right {
     right: 9px;
 }
@@ -13657,6 +13663,7 @@ a.jstree-anchor.permissions-widget {
 .gallery-expanded .iiif-gallery-canvas-label {
     width: 100%;
 }
+
 
 .iiif-gallery-canvas-label .annotation-count {
     font-size: 0.8em;
