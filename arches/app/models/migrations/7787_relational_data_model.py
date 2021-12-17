@@ -107,7 +107,7 @@ class Migration(migrations.Migration):
                     end case;
 
                     node_value_sql = format(
-                        '%s::%s as %s',
+                        '%s::%s as "%s"',
                         select_sql,
                         datatype,
                         __arches_slugify(node.name)
@@ -134,8 +134,8 @@ class Migration(migrations.Migration):
                 end if;
 
                 creation_sql = format(
-                    'drop view if exists %1$s.%2$s;
-                    create or replace view %1$s.%2$s as
+                    'drop view if exists "%1$s"."%2$s";
+                    create or replace view "%1$s"."%2$s" as
                         select t.tileid,
                     ',
                     schema_name,
@@ -143,9 +143,9 @@ class Migration(migrations.Migration):
                 );
 
                 additional_sql = format('
-                    comment on view %1$s.%2$s is %3$L;
+                    comment on view "%1$s"."%2$s" is %3$L;
                     create trigger %2$s_insert
-                        instead of insert or update or delete on %1$s.%2$s
+                        instead of insert or update or delete on "%1$s"."%2$s"
                         for each row
                         execute function __arches_tile_view_update();
                     ',
@@ -166,7 +166,7 @@ class Migration(migrations.Migration):
                     );
 
                     additional_sql = additional_sql || format('
-                            comment on column %s.%s.%s is %L;
+                            comment on column "%s"."%s"."%s" is %L;
                         ',
                         schema_name,
                         view_name,
@@ -180,10 +180,10 @@ class Migration(migrations.Migration):
 
                 if parent_group_id is not null then
                     creation_sql = creation_sql || format('
-                        t.parenttileid as %s,
+                        t.parenttileid as "%s",
                     ', parent_name);
                     additional_sql = additional_sql || format('
-                        comment on column %1$s.%2$s.%3$s is %4$L;
+                        comment on column "%1$s"."%2$s"."%3$s" is %4$L;
                         ',
                         schema_name,
                         view_name,
@@ -228,9 +228,9 @@ class Migration(migrations.Migration):
                 end if;
 
                 creation_sql = format(
-                    'drop schema if exists %1$s cascade;
-                    create schema %1$s;
-                    create or replace view %1$s.instances as
+                    'drop schema if exists "%1$s" cascade;
+                    create schema "%1$s";
+                    create or replace view "%1$s".instances as
                         select r.*, e1.transactionid
                         from resource_instances r
                             left outer join edit_log e1 on (
@@ -244,9 +244,9 @@ class Migration(migrations.Migration):
                             )
                         where e2.editlogid is null
                         and r.graphid = %2$L;
-                    comment on view %1$s.instances is %2$L;
+                    comment on view "%1$s".instances is %2$L;
                     create trigger %1$s_insert
-                        instead of insert or update or delete on %1$s.instances
+                        instead of insert or update or delete on "%1$s".instances
                         for each row
                         execute function __arches_instance_view_update();
                     ',
@@ -845,18 +845,18 @@ class Migration(migrations.Migration):
 
         """,
         """
-            drop function if exists __arches_slugify;
-            drop function if exists __arches_get_node_value_sql;
-            drop function if exists __arches_create_nodegroup_view;
-            drop function if exists __arches_create_resource_model_views;
-            drop function if exists __arches_create_branch_views;
-            drop function if exists __arches_tile_view_update;
-            drop function if exists __arches_get_json_data_for_view;
-            drop function if exists __arches_get_parent_id_for_view;
-            drop function if exists __arches_instance_view_update;
-            drop function if exists __arches_refresh_tile_resource_relationships;
-            drop function if exists __arches_get_labels_for_concept_node;
-            drop function if exists __arches_get_node_id_for_view_column;
+            drop function if exists __arches_slugify cascade;
+            drop function if exists __arches_get_node_value_sql cascade;
+            drop function if exists __arches_create_nodegroup_view cascade;
+            drop function if exists __arches_create_resource_model_views cascade;
+            drop function if exists __arches_create_branch_views cascade;
+            drop function if exists __arches_tile_view_update cascade;
+            drop function if exists __arches_get_json_data_for_view cascade;
+            drop function if exists __arches_get_parent_id_for_view cascade;
+            drop function if exists __arches_instance_view_update cascade;
+            drop function if exists __arches_refresh_tile_resource_relationships cascade;
+            drop function if exists __arches_get_labels_for_concept_node cascade;
+            drop function if exists __arches_get_node_id_for_view_column cascade;
         """,
         )
     ]
