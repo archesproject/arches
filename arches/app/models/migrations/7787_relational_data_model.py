@@ -44,7 +44,7 @@ class Migration(migrations.Migration):
             $$ language sql strict immutable;
 
             create or replace function __arches_get_node_value_sql(
-                node record
+                node public.nodes
             ) returns text as $$
             declare
                 node_value_sql text;
@@ -125,7 +125,7 @@ class Migration(migrations.Migration):
             declare
                 creation_sql text;
                 additional_sql text;
-                node record;
+                node public.nodes;
                 parent_group_id uuid;
             begin
                 if view_name is null then
