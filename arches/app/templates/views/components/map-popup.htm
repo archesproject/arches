@@ -44,7 +44,7 @@
         {% block footer %}
         <!-- ko if: resourceinstanceid -->
         <a data-bind="click: function () {
-            window.open(reportURL + resourceinstanceid());
+            window.open(reportURL + ko.unwrap(resourceinstanceid));
         }" href="javascript:void(0)">
             <i class="ion-document-text"></i>
             {% trans "Report" %}
@@ -52,7 +52,7 @@
         <!--/ko-->
         <!-- ko if: showEditButton -->
         <a data-bind="click: function () {
-            window.open(editURL + resourceinstanceid());
+            window.open(editURL + ko.unwrap(resourceinstanceid));
         }" href="javascript:void(0)">
             <i class="ion-ios-refresh-empty"></i>
             {% trans "Edit" %}

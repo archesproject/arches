@@ -338,11 +338,11 @@ define([
 
         this.resourceLookup = {};
         this.getPopupData = function(features) {
+
             const popupFeatures = features.map(feature => {
                 var data = feature.properties;
                 var id = data.resourceinstanceid;
                 data.showEditButton = self.canEdit;
-                data.active = ko.observable(false);
                 if (id) {
                     if (!self.resourceLookup[id]){
                         data = _.defaults(data, {
@@ -381,25 +381,35 @@ define([
                     return data;
                 }
             });
-            popupFeatures[0].active(true);
-            
+
+            const unique = [];
+            const uniquePopupFeatures = popupFeatures.filter(feature => {
+                if (!unique.includes(feature)) {
+                    unique.push(feature);
+                    return true;
+                }
+            });
+            let popups = uniquePopupFeatures.map(feature => {feature.active = ko.observable(false); return feature;});
+            popups[0].active(true);
+
             return {
-                popupFeatures: popupFeatures,
+                popupFeatures: popups,
                 loading: ko.observable(false),
+                activeFeature: popups[0],
                 advanceFeature: function(direction) {
-                    const activeFeatureIndex = popupFeatures.findIndex(feature => feature.active());
-                    popupFeatures[activeFeatureIndex].active(false);
+                    const activeFeatureIndex = popups.findIndex(feature => feature.active());
+                    popups[activeFeatureIndex].active(false);
                     if (direction==='right') {
-                        if (activeFeatureIndex + 1 >= popupFeatures.length) {
-                            popupFeatures[0].active(true);
+                        if (activeFeatureIndex + 1 >= popups.length) {
+                            popups[0].active(true);
                         } else {
-                            popupFeatures[activeFeatureIndex + 1].active(true);
+                            popups[activeFeatureIndex + 1].active(true);
                         }
                     } else {
                         if (activeFeatureIndex == 0) {
-                            popupFeatures[popupFeatures.length - 1].active(true);
+                            popups[popups.length - 1].active(true);
                         } else {
-                            popupFeatures[activeFeatureIndex - 1].active(true);
+                            popups[activeFeatureIndex - 1].active(true);
                         }
                     }
                 }
@@ -417,11 +427,13 @@ define([
                 self.getPopupData(features),
                 self.popup._content
             );
-            // if (map.getStyle() && feature.id) map.setFeatureState(feature, { selected: true });
-            // self.popup.on('close', function() {
-            //     if (map.getStyle() && feature.id) map.setFeatureState(feature, { selected: false });
-            //     self.popup = undefined;
-            // });
+            features.forEach(feature=>{
+                if (map.getStyle() && feature.id) map.setFeatureState(feature, { selected: true });
+                self.popup.on('close', function() {
+                    if (map.getStyle() && feature.id) map.setFeatureState(feature, { selected: false });
+                    self.popup = undefined;
+                });
+            });
         };
 
         this.setupMap = function(map) {
