@@ -337,65 +337,91 @@ define([
         };
 
         this.resourceLookup = {};
-        this.getPopupData = function(feature) {
-            var data = feature.properties;
-            var id = data.resourceinstanceid;
-            data.showEditButton = self.canEdit;
-            if (id) {
-                if (!self.resourceLookup[id]){
-                    data = _.defaults(data, {
-                        'loading': true,
-                        'displayname': '',
-                        'graph_name': '',
-                        'map_popup': ''
-                    });
-                    if (data.permissions) {
-                        try {
-                            data.permissions = JSON.parse(ko.unwrap(data.permissions));
-                        } catch (err) {
-                            data.permissions = koMapping.toJS(ko.unwrap(data.permissions));
+        this.getPopupData = function(features) {
+            const popupFeatures = features.map(feature => {
+                var data = feature.properties;
+                var id = data.resourceinstanceid;
+                data.showEditButton = self.canEdit;
+                data.active = ko.observable(false);
+                if (id) {
+                    if (!self.resourceLookup[id]){
+                        data = _.defaults(data, {
+                            'loading': true,
+                            'displayname': '',
+                            'graph_name': '',
+                            'map_popup': ''
+                        });
+                        if (data.permissions) {
+                            try {
+                                data.permissions = JSON.parse(ko.unwrap(data.permissions));
+                            } catch (err) {
+                                data.permissions = koMapping.toJS(ko.unwrap(data.permissions));
+                            }
+                            if (data.permissions.users_without_edit_perm.indexOf(ko.unwrap(self.userid)) > 0) {
+                                data.showEditButton = false;
+                            }
                         }
-                        if (data.permissions.users_without_edit_perm.indexOf(ko.unwrap(self.userid)) > 0) {
-                            data.showEditButton = false;
+                        data = ko.mapping.fromJS(data);
+                        data.reportURL = arches.urls.resource_report;
+                        data.editURL = arches.urls.resource_editor;
+                        self.resourceLookup[id] = data;
+                        $.get(arches.urls.resource_descriptors + id, function(data) {
+                            data.loading = false;
+                            ko.mapping.fromJS(data, self.resourceLookup[id]);
+                        });
+                    }
+                    self.resourceLookup[id].feature = feature;
+                    self.resourceLookup[id].mapCard = self;
+                    return self.resourceLookup[id];
+                } else {
+                    data.resourceinstanceid = ko.observable(false);
+                    data.loading = ko.observable(false);
+                    data.feature = feature;
+                    data.mapCard = self;
+                    return data;
+                }
+            });
+            popupFeatures[0].active(true);
+            
+            return {
+                popupFeatures: popupFeatures,
+                loading: ko.observable(false),
+                advanceFeature: function(direction) {
+                    const activeFeatureIndex = popupFeatures.findIndex(feature => feature.active());
+                    popupFeatures[activeFeatureIndex].active(false);
+                    if (direction==='right') {
+                        if (activeFeatureIndex + 1 >= popupFeatures.length) {
+                            popupFeatures[0].active(true);
+                        } else {
+                            popupFeatures[activeFeatureIndex + 1].active(true);
+                        }
+                    } else {
+                        if (activeFeatureIndex == 0) {
+                            popupFeatures[popupFeatures.length - 1].active(true);
+                        } else {
+                            popupFeatures[activeFeatureIndex - 1].active(true);
                         }
                     }
-                    data = ko.mapping.fromJS(data);
-                    data.reportURL = arches.urls.resource_report;
-                    data.editURL = arches.urls.resource_editor;
-                    self.resourceLookup[id] = data;
-                    $.get(arches.urls.resource_descriptors + id, function(data) {
-                        data.loading = false;
-                        ko.mapping.fromJS(data, self.resourceLookup[id]);
-                    });
                 }
-                self.resourceLookup[id].feature = feature;
-                self.resourceLookup[id].mapCard = self;
-                return self.resourceLookup[id];
-            } else {
-                data.resourceinstanceid = ko.observable(false);
-                data.loading = ko.observable(false);
-                data.feature = feature;
-                data.mapCard = self;
-                return data;
-            }
+            };
         };
 
         this.popupTemplate = popupTemplate;
-        this.onFeatureClick = function(feature, lngLat) {
+        this.onFeatureClick = function(features, lngLat) {
             var map = self.map();
             self.popup = new mapboxgl.Popup()
                 .setLngLat(lngLat)
                 .setHTML(self.popupTemplate)
                 .addTo(map);
             ko.applyBindingsToDescendants(
-                self.getPopupData(feature),
+                self.getPopupData(features),
                 self.popup._content
             );
-            if (map.getStyle() && feature.id) map.setFeatureState(feature, { selected: true });
-            self.popup.on('close', function() {
-                if (map.getStyle() && feature.id) map.setFeatureState(feature, { selected: false });
-                self.popup = undefined;
-            });
+            // if (map.getStyle() && feature.id) map.setFeatureState(feature, { selected: true });
+            // self.popup.on('close', function() {
+            //     if (map.getStyle() && feature.id) map.setFeatureState(feature, { selected: false });
+            //     self.popup = undefined;
+            // });
         };
 
         this.setupMap = function(map) {
@@ -438,8 +464,12 @@ define([
                 map.draw_mode = null;
 
                 map.on('click', function(e) {
-                    if (hoverFeature) {
-                        self.onFeatureClick(hoverFeature, e.lngLat);
+                    const popupFeatures = _.filter(
+                        map.queryRenderedFeatures(e.point),
+                        self.isFeatureClickable
+                    );
+                    if (popupFeatures.length) {
+                        self.onFeatureClick(popupFeatures, e.lngLat);
                     }
                 });
 
