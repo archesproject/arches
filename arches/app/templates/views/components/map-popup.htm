@@ -17,9 +17,9 @@
         <div class="hover-feature-title">
             <!-- Add nav to support accessing content for multiple features with overlapping geometry -->
             <div style="display: flex; justify-content: space-between;">
-                <div data-bind="click: function(){$parent.advanceFeature('left')}" class="hover-feature-nav-left"><i class="fa fa-angle-left"></i></div>
+                <div data-bind="visible: $parent.popupFeatures.length > 1, click: function(){$parent.advanceFeature('left')}" class="hover-feature-nav-left"><i class="fa fa-angle-left"></i></div>
                 <div style="padding: 10px" data-bind="text: displayname"></div>
-                <div data-bind="click: function(){$parent.advanceFeature('right')}" class="hover-feature-nav-right"><i class="fa fa-angle-right"></i></div>
+                <div data-bind="visible: $parent.popupFeatures.length > 1, click: function(){$parent.advanceFeature('right')}" class="hover-feature-nav-right"><i class="fa fa-angle-right"></i></div>
             </div>
         </div>
         {% endblock title %}
