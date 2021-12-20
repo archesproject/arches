@@ -10000,6 +10000,14 @@ a.clear-geojson-button:hover {
     border-right: 1px solid #ddd;
 }
 
+.hover-feature-nav-left:hover {
+    background-color: #f4f4f4;;
+}
+
+.hover-feature-nav-right:hover {
+    background-color: #f4f4f4;;
+}
+
 .hover-feature-nav-left.disabled {
     display: none;
 }
