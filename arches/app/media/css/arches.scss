@@ -13273,8 +13273,13 @@ a.jstree-anchor.permissions-widget {
 }
 
 .iiif-viewer-gallery.gallery-expanded {
-    top: 10px;
-    padding-top: 30px;
+    top: 0px;
+    z-index: 1000;
+}
+
+.iiif-viewer-gallery.gallery-expanded .iiif-gallery-sequence-canvases{
+    margin-top: 10px;
+    height: auto;
     z-index: 1000;
 }
 
@@ -13338,6 +13343,9 @@ a.jstree-anchor.permissions-widget {
     display: flex;
 }
 
+.gallery-expanded .iiif-gallery-content {
+    border-top: none;
+}
 
 .iiif-gallery-content {
     height: 160px;
@@ -13397,6 +13405,29 @@ a.jstree-anchor.permissions-widget {
     }
 }
 
+.image-tools-floating.left, .image-tools-floating.right {
+    position: absolute;
+    display: block;
+    width: 238px;
+    border: 2px solid #ddd;
+    padding: 10px;
+    background-color: #fff;
+    z-index: 10000;
+    top: 45px;
+}
+
+.image-tools-floating.right {
+    right: 9px;
+}
+
+.image-tools-floating.right.sidepanel {
+    right: 409px;
+}
+
+.image-tools-floating.left {
+    left: 45px;
+}
+
 .iiif-leaflet .split-controls.right {
     right: 9px;
 }
@@ -13406,7 +13437,7 @@ a.jstree-anchor.permissions-widget {
 }
 
 .select2-drop.split-controls-drop {
-    max-width: 276px;
+    max-width: 238px;
     border: 2px solid #ddd;
     border-top: none;
 }
@@ -13512,6 +13543,11 @@ a.jstree-anchor.permissions-widget {
     white-space: nowrap;
     vertical-align: top;
 }
+.iiif-gallery-sequence-canvases {
+    height: 108px;
+    display: flex;
+    align-items: center;
+}
 
 .iiif-viewer-gallery.gallery-expanded .iiif-gallery-canvas,
 .iiif-viewer-gallery.gallery-expanded .iiif-gallery-sequence,
@@ -13579,7 +13615,6 @@ a.jstree-anchor.permissions-widget {
 
 .gallery-expanded .iiif-gallery-panel {
     padding-left: 15px;
-    margin-left: 225px;
 }
 
 .iiif-gallery-header {
@@ -13588,17 +13623,6 @@ a.jstree-anchor.permissions-widget {
     width: 100%;
     border-bottom: 1px solid #ddd;
     height: 50px;
-}
-
-.gallery-expanded .iiif-gallery-header {
-    padding-left: 20px;
-    padding-top: 15px;
-    position: sticky;
-    top: 5px;
-    margin-left: -10px;
-    margin-top: 0px;
-    margin-bottom: 5px;
-    background: #fafafa;
 }
 
 .iiif-widget-report {
@@ -13818,6 +13842,7 @@ a.jstree-anchor.permissions-widget {
     padding-bottom: 10px;
     width: 100%;
     padding-left: 20px;
+    margin: 20px;
 }
 
 .gallery-expanded .manifest-editor {
@@ -13826,7 +13851,7 @@ a.jstree-anchor.permissions-widget {
 }
 
 .manifest-details+.manifest-editor {
-    margin-left: 225px;
+    margin: 20px;
 }
 
 .manifest-editor-loading,

@@ -46,6 +46,8 @@ define([
         this.selectPrimaryPanel = ko.observable(true);
         this.secondaryLabel = ko.observable();
         this.imageToolSelector = ko.observable(this.canvas());
+        this.floatingLocation = ko.observable("left");
+        this.showImageModifiers = ko.observable(false);
         let primaryPanelFilters
         let secondaryPanelFilters;
 
@@ -100,6 +102,7 @@ define([
                 }
                 self.secondaryCanvas(undefined);
                 self.secondaryLabel(undefined);
+                self.showImageModifiers(false);
             }
         });
 
@@ -426,8 +429,17 @@ define([
             afterRender: this.map
         };
 
-        this.imagePropertyUpdate = (...params) => {
-            console.log(params);
+        this.imagePropertyUpdate = (location, viewmodel, event) => {
+            if(self.floatingLocation() == location || !self.showImageModifiers()){
+                self.showImageModifiers(!self.showImageModifiers());
+            }
+            self.floatingLocation(location);
+            if(self.floatingLocation() == "left") {
+                self.selectPrimaryPanel(true)
+            } else {
+                self.selectPrimaryPanel(false);
+            }
+
         };
 
         this.fileUpdate = (...params) => {
