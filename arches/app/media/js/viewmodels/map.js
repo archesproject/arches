@@ -349,7 +349,8 @@ define([
                             'loading': true,
                             'displayname': '',
                             'graph_name': '',
-                            'map_popup': ''
+                            'map_popup': '',
+                            'feature': feature,
                         });
                         if (data.permissions) {
                             try {
@@ -397,20 +398,36 @@ define([
                 loading: ko.observable(false),
                 activeFeature: popups[0],
                 advanceFeature: function(direction) {
+                    const map = self.map();
                     const activeFeatureIndex = popups.findIndex(feature => feature.active());
+                    let activeFeature;
                     popups[activeFeatureIndex].active(false);
                     if (direction==='right') {
                         if (activeFeatureIndex + 1 >= popups.length) {
-                            popups[0].active(true);
+                            activeFeature = popups[0]
                         } else {
-                            popups[activeFeatureIndex + 1].active(true);
+                            activeFeature = popups[activeFeatureIndex + 1];
                         }
                     } else {
                         if (activeFeatureIndex == 0) {
-                            popups[popups.length - 1].active(true);
+                            activeFeature = popups[popups.length - 1];
                         } else {
-                            popups[activeFeatureIndex - 1].active(true);
+                            activeFeature = popups[activeFeatureIndex - 1];
                         }
+                    }
+                    activeFeature.active(true);
+                    if (map.getStyle()) {
+                        popups.forEach(feature=>{
+                            const featureId = feature.feature.id;
+                            if (featureId) {
+                                if (featureId === activeFeature.feature.id) {
+                                    map.setFeatureState(activeFeature.feature, { hover: true });
+                                } else {
+                                    map.setFeatureState(feature.feature, { hover: false });
+                                }
+                            }
+                        });
+                    
                     }
                 }
             };
@@ -430,7 +447,10 @@ define([
             features.forEach(feature=>{
                 if (map.getStyle() && feature.id) map.setFeatureState(feature, { selected: true });
                 self.popup.on('close', function() {
-                    if (map.getStyle() && feature.id) map.setFeatureState(feature, { selected: false });
+                    if (map.getStyle() && feature.id) {
+                        map.setFeatureState(feature, { selected: false });
+                        map.setFeatureState(feature, { hover: false });
+                    };
                     self.popup = undefined;
                 });
             });
