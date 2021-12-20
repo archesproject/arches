@@ -10997,6 +10997,10 @@ table.table.dataTable {
     background: #f8f8f8;
     padding: 10px;
     padding-top: 15px;
+    display: inline-flex;
+    width: 100%;
+    justify-content: space-between;
+    color: steelblue;
 }
 
 .hover-feature-footer a {

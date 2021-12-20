@@ -41,6 +41,7 @@
     </div>
     <!--/ko-->
     <div class="hover-feature-footer">
+        <div>
         {% block footer %}
         <!-- ko if: resourceinstanceid -->
         <a data-bind="click: function () {
@@ -57,6 +58,14 @@
             <i class="ion-ios-refresh-empty"></i>
             {% trans "Edit" %}
         </a>
+        <!--/ko-->
+        </div>
+        <!-- ko if: $parent.popupFeatures.length > 1 -->
+        <div style="display: flex; flex-direction: row; width: 35px; justify-content: space-evenly;">
+            <div data-bind="text: 1 + $parent.popupFeatures.findIndex(feature => feature.active());"></div>
+            {% trans "of" %}
+            <div data-bind="text: $parent.popupFeatures.length"></div>
+        </div>
         <!--/ko-->
         {% endblock footer %}
     </div>
