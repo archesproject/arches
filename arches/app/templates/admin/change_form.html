@@ -1,0 +1,26 @@
+{% extends "admin/change_form.html" %}
+{% load staticfiles %}
+{% load template_tags %}
+{% load i18n %}
+
+{% block content %}
+    {{ block.super }}
+
+    {% if not request.session.has_cleared_cache %}
+        <div
+            class='foobar'
+            style="
+                position: fixed;
+                width: 80vw;
+                height: 80vh;
+            "
+        >
+            <form action="/clear-user-permission-cache/" method="post">
+                {% csrf_token %}
+                <input type="hidden" name="request_url" value="{{ request.get_full_path }}">
+                <input type="submit" value="OK">
+            </form>
+        </div>
+    {% endif %}
+
+{% endblock content %}
