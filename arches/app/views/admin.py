@@ -57,5 +57,5 @@ class ClearUserPermissionCache(View):
         user_permission_cache = caches["user_permission"]
         user_permission_cache.clear()
 
-        request.session['has_cleared_cache'] = True
-        return redirect(request.POST.get('request_url'))
+        request.session["has_cleared_cache"] = True
+        return redirect(request.POST.get("request_url"))
