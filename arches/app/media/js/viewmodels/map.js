@@ -338,7 +338,6 @@ define([
 
         this.resourceLookup = {};
         this.getPopupData = function(features) {
-
             const popupFeatures = features.map(feature => {
                 var data = feature.properties;
                 var id = data.resourceinstanceid;
