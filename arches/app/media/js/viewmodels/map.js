@@ -385,39 +385,39 @@ define([
 
             const unique = [];
             const uniquePopupFeatures = popupFeatures.filter(feature => {
+                feature.active = ko.observable(false);
                 if (!unique.includes(feature)) {
                     unique.push(feature);
                     return true;
                 }
             });
-            let popups = uniquePopupFeatures.map(feature => {feature.active = ko.observable(false); return feature;});
-            popups[0].active(true);
+            uniquePopupFeatures[0].active(true);
 
             return {
-                popupFeatures: popups,
+                popupFeatures: uniquePopupFeatures,
                 loading: ko.observable(false),
-                activeFeature: popups[0],
+                activeFeature: uniquePopupFeatures[0],
                 advanceFeature: function(direction) {
                     const map = self.map();
-                    const activeFeatureIndex = popups.findIndex(feature => feature.active());
+                    const activeFeatureIndex = uniquePopupFeatures.findIndex(feature => feature.active());
                     let activeFeature;
-                    popups[activeFeatureIndex].active(false);
+                    uniquePopupFeatures[activeFeatureIndex].active(false);
                     if (direction==='right') {
-                        if (activeFeatureIndex + 1 >= popups.length) {
-                            activeFeature = popups[0]
+                        if (activeFeatureIndex + 1 >= uniquePopupFeatures.length) {
+                            activeFeature = uniquePopupFeatures[0];
                         } else {
-                            activeFeature = popups[activeFeatureIndex + 1];
+                            activeFeature = uniquePopupFeatures[activeFeatureIndex + 1];
                         }
                     } else {
                         if (activeFeatureIndex == 0) {
-                            activeFeature = popups[popups.length - 1];
+                            activeFeature = uniquePopupFeatures[uniquePopupFeatures.length - 1];
                         } else {
-                            activeFeature = popups[activeFeatureIndex - 1];
+                            activeFeature = uniquePopupFeatures[activeFeatureIndex - 1];
                         }
                     }
                     activeFeature.active(true);
                     if (map.getStyle()) {
-                        popups.forEach(feature=>{
+                        uniquePopupFeatures.forEach(feature=>{
                             const featureId = feature.feature.id;
                             if (featureId) {
                                 if (featureId === activeFeature.feature.id) {
@@ -427,7 +427,6 @@ define([
                                 }
                             }
                         });
-                    
                     }
                 }
             };
