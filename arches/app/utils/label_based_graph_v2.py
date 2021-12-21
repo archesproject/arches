@@ -246,8 +246,8 @@ class LabelBasedGraph(object):
             parent_tile = associated_tile.parenttile
 
             if associated_tile == input_tile or parent_tile == input_tile:
-                if ( # don't instantiate `LabelBasedNode`s of cardinality `n` unless they are semantic or have value
-                    input_node.datatype == 'semantic' or str(input_node.pk) in associated_tile.data 
+                if (  # don't instantiate `LabelBasedNode`s of cardinality `n` unless they are semantic or have value
+                    input_node.datatype == "semantic" or str(input_node.pk) in associated_tile.data
                 ):
                     label_based_node = LabelBasedNode(
                         name=input_node.name,
