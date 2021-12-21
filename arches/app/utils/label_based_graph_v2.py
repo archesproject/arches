@@ -242,21 +242,19 @@ class LabelBasedGraph(object):
     def _build_graph(
         cls, input_node, input_tile, parent_tree, node_ids_to_tiles_reference, nodegroup_cardinality_reference, node_cache, datatype_factory
     ):
-        for associated_tile in node_ids_to_tiles_reference.get(str(input_node.pk), []):
+        for associated_tile in node_ids_to_tiles_reference.get(str(input_node.pk), [input_tile]):
             parent_tile = associated_tile.parenttile
 
             if associated_tile == input_tile or parent_tile == input_tile:
                 if ( # don't instantiate `LabelBasedNode`s of cardinality `n` unless they are semantic or have value
-                    input_node.nodegroup.cardinality != 'n'
-                    or input_node.nodegroup.cardinality == 'n' 
-                    and ( input_node.datatype == 'semantic' or str(input_node.pk) in associated_tile.data )
+                    input_node.datatype == 'semantic' or str(input_node.pk) in associated_tile.data 
                 ):
                     label_based_node = LabelBasedNode(
                         name=input_node.name,
                         node_id=str(input_node.pk),
                         tile_id=str(associated_tile.pk),
                         value=cls._get_display_value(tile=associated_tile, node=input_node, datatype_factory=datatype_factory),
-                        cardinality=nodegroup_cardinality_reference[str(associated_tile.nodegroup_id)],
+                        cardinality=nodegroup_cardinality_reference.get(str(associated_tile.nodegroup_id)),
                     )
 
                     if not parent_tree:  # if top node and
