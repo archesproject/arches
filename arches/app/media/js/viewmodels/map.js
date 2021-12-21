@@ -448,7 +448,7 @@ define([
                     if (map.getStyle() && feature.id) {
                         map.setFeatureState(feature, { selected: false });
                         map.setFeatureState(feature, { hover: false });
-                    };
+                    }
                     self.popup = undefined;
                 });
             });
