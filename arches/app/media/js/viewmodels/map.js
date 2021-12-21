@@ -337,64 +337,120 @@ define([
         };
 
         this.resourceLookup = {};
-        this.getPopupData = function(feature) {
-            var data = feature.properties;
-            var id = data.resourceinstanceid;
-            data.showEditButton = self.canEdit;
-            if (id) {
-                if (!self.resourceLookup[id]){
-                    data = _.defaults(data, {
-                        'loading': true,
-                        'displayname': '',
-                        'graph_name': '',
-                        'map_popup': ''
-                    });
-                    if (data.permissions) {
-                        try {
-                            data.permissions = JSON.parse(ko.unwrap(data.permissions));
-                        } catch (err) {
-                            data.permissions = koMapping.toJS(ko.unwrap(data.permissions));
+        this.getPopupData = function(features) {
+            const popupFeatures = features.map(feature => {
+                var data = feature.properties;
+                var id = data.resourceinstanceid;
+                data.showEditButton = self.canEdit;
+                if (id) {
+                    if (!self.resourceLookup[id]){
+                        data = _.defaults(data, {
+                            'loading': true,
+                            'displayname': '',
+                            'graph_name': '',
+                            'map_popup': '',
+                            'feature': feature,
+                        });
+                        if (data.permissions) {
+                            try {
+                                data.permissions = JSON.parse(ko.unwrap(data.permissions));
+                            } catch (err) {
+                                data.permissions = koMapping.toJS(ko.unwrap(data.permissions));
+                            }
+                            if (data.permissions.users_without_edit_perm.indexOf(ko.unwrap(self.userid)) > 0) {
+                                data.showEditButton = false;
+                            }
                         }
-                        if (data.permissions.users_without_edit_perm.indexOf(ko.unwrap(self.userid)) > 0) {
-                            data.showEditButton = false;
+                        data = ko.mapping.fromJS(data);
+                        data.reportURL = arches.urls.resource_report;
+                        data.editURL = arches.urls.resource_editor;
+                        self.resourceLookup[id] = data;
+                        $.get(arches.urls.resource_descriptors + id, function(data) {
+                            data.loading = false;
+                            ko.mapping.fromJS(data, self.resourceLookup[id]);
+                        });
+                    }
+                    self.resourceLookup[id].feature = feature;
+                    self.resourceLookup[id].mapCard = self;
+                    return self.resourceLookup[id];
+                } else {
+                    data.resourceinstanceid = ko.observable(false);
+                    data.loading = ko.observable(false);
+                    data.feature = feature;
+                    data.mapCard = self;
+                    return data;
+                }
+            });
+
+            const unique = [];
+            const uniquePopupFeatures = popupFeatures.filter(feature => {
+                feature.active = ko.observable(false);
+                if (!unique.includes(feature)) {
+                    unique.push(feature);
+                    return true;
+                }
+            });
+            uniquePopupFeatures[0].active(true);
+
+            return {
+                popupFeatures: uniquePopupFeatures,
+                loading: ko.observable(false),
+                activeFeature: uniquePopupFeatures[0],
+                advanceFeature: function(direction) {
+                    const map = self.map();
+                    const activeFeatureIndex = uniquePopupFeatures.findIndex(feature => feature.active());
+                    let activeFeature;
+                    uniquePopupFeatures[activeFeatureIndex].active(false);
+                    if (direction==='right') {
+                        if (activeFeatureIndex + 1 >= uniquePopupFeatures.length) {
+                            activeFeature = uniquePopupFeatures[0];
+                        } else {
+                            activeFeature = uniquePopupFeatures[activeFeatureIndex + 1];
+                        }
+                    } else {
+                        if (activeFeatureIndex == 0) {
+                            activeFeature = uniquePopupFeatures[uniquePopupFeatures.length - 1];
+                        } else {
+                            activeFeature = uniquePopupFeatures[activeFeatureIndex - 1];
                         }
                     }
-                    data = ko.mapping.fromJS(data);
-                    data.reportURL = arches.urls.resource_report;
-                    data.editURL = arches.urls.resource_editor;
-                    self.resourceLookup[id] = data;
-                    $.get(arches.urls.resource_descriptors + id, function(data) {
-                        data.loading = false;
-                        ko.mapping.fromJS(data, self.resourceLookup[id]);
-                    });
+                    activeFeature.active(true);
+                    if (map.getStyle()) {
+                        uniquePopupFeatures.forEach(feature=>{
+                            const featureId = feature.feature.id;
+                            if (featureId) {
+                                if (featureId === activeFeature.feature.id) {
+                                    map.setFeatureState(activeFeature.feature, { hover: true });
+                                } else {
+                                    map.setFeatureState(feature.feature, { hover: false });
+                                }
+                            }
+                        });
+                    }
                 }
-                self.resourceLookup[id].feature = feature;
-                self.resourceLookup[id].mapCard = self;
-                return self.resourceLookup[id];
-            } else {
-                data.resourceinstanceid = ko.observable(false);
-                data.loading = ko.observable(false);
-                data.feature = feature;
-                data.mapCard = self;
-                return data;
-            }
+            };
         };
 
         this.popupTemplate = popupTemplate;
-        this.onFeatureClick = function(feature, lngLat) {
+        this.onFeatureClick = function(features, lngLat) {
             var map = self.map();
             self.popup = new mapboxgl.Popup()
                 .setLngLat(lngLat)
                 .setHTML(self.popupTemplate)
                 .addTo(map);
             ko.applyBindingsToDescendants(
-                self.getPopupData(feature),
+                self.getPopupData(features),
                 self.popup._content
             );
-            if (map.getStyle() && feature.id) map.setFeatureState(feature, { selected: true });
-            self.popup.on('close', function() {
-                if (map.getStyle() && feature.id) map.setFeatureState(feature, { selected: false });
-                self.popup = undefined;
+            features.forEach(feature=>{
+                if (map.getStyle() && feature.id) map.setFeatureState(feature, { selected: true });
+                self.popup.on('close', function() {
+                    if (map.getStyle() && feature.id) {
+                        map.setFeatureState(feature, { selected: false });
+                        map.setFeatureState(feature, { hover: false });
+                    }
+                    self.popup = undefined;
+                });
             });
         };
 
@@ -438,8 +494,12 @@ define([
                 map.draw_mode = null;
 
                 map.on('click', function(e) {
-                    if (hoverFeature) {
-                        self.onFeatureClick(hoverFeature, e.lngLat);
+                    const popupFeatures = _.filter(
+                        map.queryRenderedFeatures(e.point),
+                        self.isFeatureClickable
+                    );
+                    if (popupFeatures.length) {
+                        self.onFeatureClick(popupFeatures, e.lngLat);
                     }
                 });
 
