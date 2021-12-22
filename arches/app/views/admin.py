@@ -57,11 +57,4 @@ class ClearUserPermissionCache(View):
         user_permission_cache = caches["user_permission"]
         user_permission_cache.clear()
 
-        request.session['has_cleared_cache'] = True
-        return redirect(request.POST.get('request_url'))
-
-
-class FooForm(View):
-    def post(self, request):
-        request.session['has_cleared_cache'] = False
-        return redirect(request.POST.get('request_url'))
+        return JSONResponse(status=200)

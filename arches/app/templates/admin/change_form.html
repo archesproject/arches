@@ -16,12 +16,30 @@
                 background-color: red;
             "
         >
-            <form action="/clear-user-permission-cache/" method="post">
-                {% csrf_token %}
-                <input type="hidden" name="request_url" value="{{ request.get_full_path }}">
-                <input type="submit" value="OK">
-            </form>
+            <p>{% csrf_token %}<button onclick="foo(this)"></button></p>
         </div>
+        <script type="text/javascript"> 
+            function foo(self) {
+                var xmlhttp = new XMLHttpRequest();
+                var csrftoken=self.parentElement.firstChild.value
+
+                xmlhttp.onreadystatechange = function() {
+                    if (xmlhttp.readyState == XMLHttpRequest.DONE) {   // XMLHttpRequest.DONE == 4
+                        if (xmlhttp.status == 200) {
+                            var modal = document.querySelector('.foobar');
+                            modal.style.display = "none";
+                        }
+                        else {
+                            alert('An error occured when attempting to clear the User Permission Cache. This can cause issues throughout the application.');
+                        }
+                    }
+                };
+
+                xmlhttp.open("POST", "/clear-user-permission-cache/", true);
+                xmlhttp.setRequestHeader("X-CSRFToken", csrftoken ); 
+                xmlhttp.send();
+            }
+        </script>
     {% endif %}
 
 {% endblock content %}

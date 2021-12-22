@@ -21,7 +21,7 @@ from django.contrib.auth import views as auth_views
 from django.conf.urls import include, url
 from django.contrib.staticfiles.urls import staticfiles_urlpatterns
 from arches.app.views import concept, main, map, search, graph, api
-from arches.app.views.admin import ReIndexResources, FileView, ClearUserPermissionCache, FooForm
+from arches.app.views.admin import ReIndexResources, FileView, ClearUserPermissionCache
 from arches.app.views.graph import (
     GraphDesignerView,
     GraphSettingsView,
@@ -292,7 +292,6 @@ urlpatterns = [
     url(r"^manifest/(?P<id>[0-9]+)$", api.Manifest.as_view(), name="manifest"),
     url(r"^image-service-manager", ManifestManagerView.as_view(), name="manifest_manager"),
     url(r"^clear-user-permission-cache", ClearUserPermissionCache.as_view(), name="clear_user_permission_cache"),
-    url(r"^foo-form", FooForm.as_view(), name="foo_form"),
 ]
 
 if settings.DEBUG:
