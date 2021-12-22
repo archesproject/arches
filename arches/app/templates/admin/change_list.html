@@ -1,0 +1,19 @@
+{% extends "admin/change_list.html" %}
+{% load staticfiles %}
+{% load template_tags %}
+{% load i18n %}
+
+{% block content %}
+    {{ block.super }}
+
+    {% if request.session.has_cleared_cache %}
+        <form action="/foo-form/" id='fooForm' method="post">
+            {% csrf_token %}
+            <input type="hidden" name="request_url" value="{{ request.get_full_path }}">
+        </form>
+        <script type="text/javascript"> 
+            document.forms['fooForm'].submit()
+        </script>
+    {% endif %}
+
+{% endblock content %}
