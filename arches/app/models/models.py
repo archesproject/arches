@@ -19,6 +19,7 @@ from arches.app.utils.module_importer import get_class_from_modulename
 from django.forms.models import model_to_dict
 from django.contrib.gis.db import models
 from django.contrib.postgres.fields import JSONField
+from django.core.cache import caches
 from django.core.files.storage import FileSystemStorage
 from django.core.mail import EmailMultiAlternatives, get_connection
 from django.template.loader import get_template, render_to_string
@@ -542,6 +543,12 @@ class Node(models.Model):
         ]
 
 
+@receiver(post_save, sender=Node)
+def clear_user_permission_cache(sender, instance, **kwargs):
+    user_permission_cache = caches["user_permission"]
+    if user_permission_cache:
+        user_permission_cache.clear()
+        
 class Ontology(models.Model):
     ontologyid = models.UUIDField(default=uuid.uuid1, primary_key=True)
     name = models.TextField()

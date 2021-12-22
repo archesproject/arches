@@ -48,7 +48,6 @@ define([
                         url: arches.urls.resource_permission_data,
                         data: JSON.stringify(payload),
                     }).done(function(data){
-                        self.clearUserPermissionCache();
                         self._startPermissions = JSON.stringify(data);
                         self._currentPermissions = JSON.parse(self._startPermissions);
                         self.dirty(koMapping.toJSON(self._currentPermissions) !== self._startPermissions);
@@ -184,7 +183,6 @@ define([
                     url: arches.urls.resource_permission_data,
                     data: {"instanceid": params.resourceId, "action": "restrict", "graphid": params.graphId}
                 }).done(function(data){
-                    self.clearUserPermissionCache();
                     self.openEditor(data['limitedaccess']);
                     var parsed = self.initPermissions(data);
                     self.instancePermissions(parsed);
@@ -200,19 +198,11 @@ define([
                         url: arches.urls.resource_permission_data,
                         data: {"instanceid": params.resourceId, "action": "open", "graphid": params.graphId}
                     }).done(function(data){
-                        self.clearUserPermissionCache();
                         var parsed = self.initPermissions(data);
                         self.instancePermissions(parsed);
                         self.openEditor(data['limitedaccess']);
                     });
                 }));
-            };
-
-            this.clearUserPermissionCache = function() {
-                return $.ajax({
-                    type: 'POST',
-                    url: '/clear-user-permission-cache/',
-                });
             };
 
             this.getInstancePermissions();
