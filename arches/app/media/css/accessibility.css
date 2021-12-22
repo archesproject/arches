@@ -174,3 +174,47 @@
 .file-download:focus {
     outline: #006600 solid 3px !important;
 }
+
+.mainnav-sm #mainnav-menu *:focus,
+.mainnav-sm #mainnav-menu a:hover {
+    text-decoration: none;
+}
+
+#mainnav-menu a {
+    transition: none;
+}
+
+#mainnav-menu *:focus,
+#mainnav-menu a:hover,
+.base-page .navbar-brand:focus,
+.collapsed-menu-trigger:focus {
+    -webkit-box-shadow: inset 5px 0 0 0 rgba(255,255,255,1) !important;
+    -moz-box-shadow: inset 5px 0 0 0 255,255,255,1 !important;
+    box-shadow: inset 5px 0 0 0 255,255,255,1 !important;
+    outline: none !important;
+    color: #fff;
+    text-decoration: underline;
+}
+
+#container.mainnav-sm #mainnav-menu>.active-link>a,
+#container.mainnav-sm #mainnav-menu>.active-sub>a,
+#container.mainnav-sm #mainnav-menu>.active-link a:hover,
+#container.mainnav-sm #mainnav-menu>.active-sub a:hover {
+	background-color: #184e6c;
+}
+
+#container.mainnav-sm #mainnav-menu>.active-sub>a:after {
+    width: 0;
+    height: 0;
+    border-style: solid;
+    border-width: 5px 10px 5px 0;
+    border-color: transparent #fff transparent transparent;
+    content: " ";
+    position: absolute;
+    top: calc(50% - 6px);
+    left: 40px;
+}
+
+#mainnav .list-header {
+    color: #fff;
+}
