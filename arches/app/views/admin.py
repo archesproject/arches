@@ -59,5 +59,5 @@ class ClearUserPermissionCache(View):
             user_permission_cache.clear()
         except Exception as e:
             return JSONResponse(str(e), status=500)
-            
+
         return JSONResponse(status=200)
