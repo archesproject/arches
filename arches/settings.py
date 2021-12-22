@@ -239,6 +239,13 @@ RESTRICT_MEDIA_ACCESS = False
 # value and is not signed in with a user account then the request will not be allowed.
 RESTRICT_CELERY_EXPORT_FOR_ANONYMOUS_USER = False
 
+
+# By setting DISABLE_EXPORT_FOR_ANONYMOUS_USER to True, if the user is attempting
+# to export search results and is not signed in with a user account then the request
+# will not be allowed.
+
+DISABLE_EXPORT_FOR_ANONYMOUS_USER = False
+
 # Absolute filesystem path to the directory that will hold user-uploaded files.
 MEDIA_ROOT = os.path.join(ROOT_DIR)
 
