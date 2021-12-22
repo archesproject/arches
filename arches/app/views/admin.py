@@ -54,7 +54,10 @@ class FileView(View):
 
 class ClearUserPermissionCache(View):
     def post(self, request):
-        user_permission_cache = caches["user_permission"]
-        user_permission_cache.clear()
-
+        try:
+            user_permission_cache = caches["user_permission"]
+            user_permission_cache.clear()
+        except Exception as e:
+            return JSONResponse(str(e), status=500)
+            
         return JSONResponse(status=200)

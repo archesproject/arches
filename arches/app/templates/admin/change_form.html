@@ -8,36 +8,70 @@
 
     {% if not request.session.has_cleared_cache %}
         <div
-            class='foobar'
+            class='permission-modal'
             style="
-                position: fixed;
-                width: 80vw;
-                height: 80vh;
-                background-color: red;
+                position: fixed; 
+                z-index: 1; 
+                left: 0;
+                top: 0;
+                width: 100%;
+                height: 100%; 
+                background-color: rgba(221, 217, 217, 0.5);
             "
         >
-            <p>{% csrf_token %}<button onclick="foo(this)"></button></p>
+            <div
+                style="
+                    margin: 10% auto;
+                    background-color: #fefefe;
+                    border: 1px solid #888;
+                    width: 70vw;
+                    height: 40vh;
+                "
+            > 
+                <div
+                    style="
+                        width: 100%;
+                        display: flex;
+                        justify-content: center;
+                        margin-top: 80px;
+                    "
+                >
+                    <h2>
+                        Warning!
+                    </h2>
+                </div>
+
+                <p
+                    style="margin: 40px 100px; text-align: center;"
+                >
+                    Updating Users, Groups, or Models via the Administrator panel can invalidate the data in UserPermissionCache. To continue, please clear the cache by clicking the button below.
+                </p>
+
+                <p style="text-align: center;">{% csrf_token %}<button onclick="clearUserPermissionCache(this)">Clear User Permission cache</button></p>
+            </div>
         </div>
         <script type="text/javascript"> 
-            function foo(self) {
-                var xmlhttp = new XMLHttpRequest();
-                var csrftoken=self.parentElement.firstChild.value
+            function clearUserPermissionCache(self) {
+                var request = new XMLHttpRequest();
 
-                xmlhttp.onreadystatechange = function() {
-                    if (xmlhttp.readyState == XMLHttpRequest.DONE) {   // XMLHttpRequest.DONE == 4
-                        if (xmlhttp.status == 200) {
-                            var modal = document.querySelector('.foobar');
+                request.onreadystatechange = function() {
+                    if (request.readyState == XMLHttpRequest.DONE) {   // XMLHttpRequest.DONE == 4
+                        if (request.status == 200) {
+                            var modal = document.querySelector('.permission-modal');
                             modal.style.display = "none";
                         }
                         else {
-                            alert('An error occured when attempting to clear the User Permission Cache. This can cause issues throughout the application.');
+                            alert('An error occured when attempting to clear the User Permission Cache.');
                         }
                     }
                 };
 
-                xmlhttp.open("POST", "/clear-user-permission-cache/", true);
-                xmlhttp.setRequestHeader("X-CSRFToken", csrftoken ); 
-                xmlhttp.send();
+                request.open("POST", "/clear-user-permission-cache/", true);
+
+                var csrftoken=self.parentElement.firstChild.value;
+                request.setRequestHeader("X-CSRFToken", csrftoken ); 
+
+                request.send();
             }
         </script>
     {% endif %}
