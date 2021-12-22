@@ -174,7 +174,7 @@ class Resource(models.ResourceInstance):
         return tiles
 
     @staticmethod
-    def bulk_save(resources, transaction_id=None, prevent_indexing=False):
+    def bulk_save(resources, transaction_id=None):
         """
         Saves and indexes a list of resources
 
@@ -193,63 +193,36 @@ class Resource(models.ResourceInstance):
             resource.tiles = resource.get_flattened_tiles()
             tiles.extend(resource.tiles)
 
-        # need to handle if the bulk load is appending tiles to existing resources/
-        existing_resources_ids = Resource.objects.filter(
-            resourceinstanceid__in=[resource.resourceinstanceid for resource in resources]
-        ).values_list("resourceinstanceid", flat=True)
-
-        existing_resources = [resource for resource in resources if resource.resourceinstanceid in existing_resources_ids]
-        resources_to_create = [resource for resource in resources if resource.resourceinstanceid not in existing_resources_ids]
-
+        # need to save the models first before getting the documents for index
         start = time()
-        Resource.objects.bulk_create(resources_to_create)
-
-        # need to run logic in pre_tile_save fro the datatypes otherwise resource relationships and file aren't loaded correctly.
-        # Needs to be some kind of bulk_pre_tile_save
-        for tile in tiles:
-            for nodeid in tile.data.keys():
-                try:
-                    node_datatype = datatype_factory.get_instance(node_datatypes[nodeid])
-                    node_datatype.pre_tile_save(tile, nodeid)
-                except:
-                    pass
-
+        Resource.objects.bulk_create(resources)
         TileModel.objects.bulk_create(tiles)
 
-        logger.info(f"Time to bulk save tiles and resources: {datetime.timedelta(seconds=time() - start)}")
+        print(f"Time to bulk create tiles and resources: {datetime.timedelta(seconds=time() - start)}")
 
         start = time()
-        for resource in resources_to_create:
+        for resource in resources:
             resource.save_edit(edit_type="create", transaction_id=transaction_id)
-        for resource in existing_resources:
-            resource.save_edit(edit_type="append", transaction_id=transaction_id)
-        
-        try:
-            resources[0].tiles[0].save_edit(
-                note=f"Bulk created: {len(tiles)} for {len(resources)} resources.",
-                edit_type="bulk_create",
-                transaction_id=transaction_id,
+
+        resources[0].tiles[0].save_edit(
+            note=f"Bulk created: {len(tiles)} for {len(resources)} resources.", edit_type="bulk_create", transaction_id=transaction_id
+        )
+
+        print("Time to save resource edits: %s" % datetime.timedelta(seconds=time() - start))
+
+        for resource in resources:
+            start = time()
+            document, terms = resource.get_documents_to_index(
+                fetchTiles=False, datatype_factory=datatype_factory, node_datatypes=node_datatypes
             )
-        except:
-            pass
 
-        logger.info("Time to save resource edits: %s" % datetime.timedelta(seconds=time() - start))
-        if not prevent_indexing:
-            for resource in resources:
-                start = time()
-                document, terms = resource.get_documents_to_index(
-                    fetchTiles=False, datatype_factory=datatype_factory, node_datatypes=node_datatypes
-                )
+            documents.append(se.create_bulk_item(index=RESOURCES_INDEX, id=document["resourceinstanceid"], data=document))
 
-                documents.append(se.create_bulk_item(index=RESOURCES_INDEX, id=document["resourceinstanceid"], data=document))
+            for term in terms:
+                term_list.append(se.create_bulk_item(index=TERMS_INDEX, id=term["_id"], data=term["_source"]))
 
-                for term in terms:
-                    term_list.append(se.create_bulk_item(index=TERMS_INDEX, id=term["_id"], data=term["_source"]))
-
-            se.bulk_index(documents)
-            se.bulk_index(term_list)
-        else:
-            logger.info("... defering indexing in resource bulk save")
+        se.bulk_index(documents)
+        se.bulk_index(term_list)
 
     def index(self):
         """
@@ -539,11 +512,10 @@ class Resource(models.ResourceInstance):
             return query.search(index=RESOURCE_RELATIONS_INDEX)
 
         resource_relations = get_relations(
-            resourceinstanceid=self.resourceinstanceid,
-            start=start,
-            limit=limit,
-            resourceinstance_graphid=resourceinstance_graphid,
+            resourceinstanceid=self.resourceinstanceid, start=start, limit=limit, resourceinstance_graphid=resourceinstance_graphid,
         )
+
+        
 
         ret["total"] = resource_relations["hits"]["total"]
         instanceids = set()

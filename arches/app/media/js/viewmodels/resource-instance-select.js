@@ -85,7 +85,6 @@ define([
                     .then(function(json){
                         self.graphLookup[graphid] = json.graph;
                         self.graphLookupKeys(Object.keys(self.graphLookup));
-                        self.value.valueHasMutated();
                         return json.graph;
                     });
             }
@@ -226,15 +225,11 @@ define([
                             if(!val.ontologyClass) {
                                 Object.defineProperty(val, 'ontologyClass', {value:ko.observable()});
                             }
-                            if(!val.iconClass) {
-                                Object.defineProperty(val, 'iconClass', {value: ko.observable()});
-                            }
                             lookupResourceInstanceData(ko.unwrap(val.resourceId))
                                 .then(function(resourceInstance) {
                                     names.push(resourceInstance["_source"].displayname);
                                     self.displayValue(names.join(', '));
-                                    val.resourceName(resourceInstance["_source"].displayname)
-                                    val.iconClass(self.graphLookup[resourceInstance["_source"].graph_id]?.iconclass || 'fa fa-question')
+                                    val.resourceName(resourceInstance["_source"].displayname);
                                     val.ontologyClass(resourceInstance["_source"].root_ontology_class);
                                 });
                         }
@@ -258,7 +253,6 @@ define([
 
         var makeObject = function(id, esSource){
             var graph = self.graphLookup[esSource.graph_id];
-            var iconClass = graph.iconclass  || 'fa fa-question';
 
             var ontologyProperty;
             var inverseOntologyProperty;
@@ -287,7 +281,6 @@ define([
             };            
             Object.defineProperty(ret, 'resourceName', {value: ko.observable(esSource.displayname)});
             Object.defineProperty(ret, 'ontologyClass', {value: ko.observable(esSource.root_ontology_class)});
-            Object.defineProperty(ret, 'iconClass', {value: ko.observable(iconClass)});
             if (!!params.configForm) {
                 ret.ontologyProperty.subscribe(function(){
                     self.defaultResourceInstance(self.value());
@@ -451,8 +444,7 @@ define([
             },
             formatResult: function(item) {
                 if (item._source) {
-                    iconClass = self.graphLookup[item._source.graph_id].iconclass
-                    return `<i class="fa ${iconClass} sm-icon-wrap"></i> ${item._source.displayname}`;
+                    return item._source.displayname;
                 } else {
                     if (self.allowInstanceCreation) {
                         return '<b> ' + arches.translations.riSelectCreateNew.replace('${graphName}', item.name) + ' . . . </b>';
@@ -461,7 +453,7 @@ define([
             },
             formatSelection: function(item) {
                 if (item._source) {
-                    return `<i class="fa ${item._source.iconclass} sm-icon-wrap"></i> ${item._source.displayname}`;
+                    return item._source.displayname;
                 } else {
                     return item.name;
                 }
@@ -494,7 +486,7 @@ define([
                     Promise.all(lookups).then(function(arr){
                         if (arr.length) {
                             var ret = arr.map(function(item) {
-                                return {"_source":{"displayname": item["_source"].displayname, "iconclass": self.graphLookup[item._source.graph_id]?.iconclass || 'fa fa-question'}, "_id":item["_id"]};
+                                return {"_source":{"displayname": item["_source"].displayname}, "_id":item["_id"]};
                             });
                             if(self.multiple === false) {
                                 ret = ret[0];

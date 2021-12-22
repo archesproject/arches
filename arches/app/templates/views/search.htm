@@ -103,14 +103,12 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                 <div class="search-type-btn-popup-panel">
                     <div class="popup-panel-row" data-bind="foreach: {data: sharedStateObject.filtersList, as: 'filter'}">
                         <!-- ko if: filter.type === 'popup' && filter.enabled -->
-                        <!-- ko if: filter.componentname !== "search-export" || "{{user.username}}" !== "anonymous" ||  filter.componentname === "search-export" && "{{user.username}}" === "anonymous" && "{{app_settings.DISABLE_EXPORT_FOR_ANONYMOUS_USER}}" !== "True" -->
                         {% if user_can_read %}
                         <button class="saved-search-container search-type-btn-popup relative" style="" data-bind="css: {'active': $parent.sharedStateObject.selectedPopup() === filter.componentname}, click: function(){$parent.sharedStateObject.selectPopup(filter.componentname); setTimeout(function() {$(window).trigger('resize');}, 100);}">
                             <i data-bind="css: filter.icon"></i>
                             <!-- <p data-bind="text: filter.name"></p> -->
                         </button>
                         {% endif %}
-                        <!-- /ko -->
                         <!-- /ko -->
                     </div>
                 </div>

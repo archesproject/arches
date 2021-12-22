@@ -249,13 +249,6 @@ RESTRICT_MEDIA_ACCESS = False
 # value and is not signed in with a user account then the request will not be allowed.
 RESTRICT_CELERY_EXPORT_FOR_ANONYMOUS_USER = False
 
-
-# By setting DISABLE_EXPORT_FOR_ANONYMOUS_USER to True, if the user is attempting
-# to export search results and is not signed in with a user account then the request
-# will not be allowed.
-
-DISABLE_EXPORT_FOR_ANONYMOUS_USER = False
-
 # see https://docs.djangoproject.com/en/1.9/topics/i18n/translation/#how-django-discovers-language-preference
 # to see how LocaleMiddleware tries to determine the user's language preference
 # (make sure to check your accept headers as they will override the LANGUAGE_CODE setting!)

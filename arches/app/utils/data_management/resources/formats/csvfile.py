@@ -409,7 +409,7 @@ class CsvReader(Reader):
             if bulk:
                 resources.append(newresourceinstance)
                 if len(resources) >= settings.BULK_IMPORT_BATCH_SIZE:
-                    Resource.bulk_save(resources=resources, transaction_id=transaction_id, prevent_indexing=prevent_indexing)
+                    Resource.bulk_save(resources=resources, transaction_id=transaction_id)
                     del resources[:]  # clear out the array
             else:
                 try:
@@ -1127,7 +1127,7 @@ class CsvReader(Reader):
 
                 if bulk:
                     print("Time to create resource and tile objects: %s" % datetime.timedelta(seconds=time() - self.start))
-                    Resource.bulk_save(resources=resources, transaction_id=transaction_id, prevent_indexing=prevent_indexing)
+                    Resource.bulk_save(resources=resources, transaction_id=transaction_id)
                 save_count = save_count + 1
                 print(_("Total resources saved: {save_count}").format(**locals()))
 
