@@ -77,5 +77,6 @@ def app_settings(request):
             "ACCESSIBILITY_MODE": settings.ACCESSIBILITY_MODE,
             "FORCE_SCRIPT_NAME": settings.FORCE_SCRIPT_NAME if settings.FORCE_SCRIPT_NAME is not None else "",
             "RESTRICT_CELERY_EXPORT_FOR_ANONYMOUS_USER": settings.RESTRICT_CELERY_EXPORT_FOR_ANONYMOUS_USER,
+            "DISABLE_EXPORT_FOR_ANONYMOUS_USER": settings.DISABLE_EXPORT_FOR_ANONYMOUS_USER
         }
     }
