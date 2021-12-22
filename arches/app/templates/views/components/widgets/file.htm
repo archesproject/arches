@@ -172,8 +172,7 @@
 
 <!-- ko foreach: reportFiles() -->
 <dd>
-    <a data-bind="attr: {href: url}">
-    <a class="" data-bind="attr: {href: $parent.getFileUrl(url)}">
+    <a data-bind="attr: {href: $parent.getFileUrl(url)}" target="_blank">
         <i class="ion ion-forward"></i>
         <span data-bind="text: name"></span>
     </a>
