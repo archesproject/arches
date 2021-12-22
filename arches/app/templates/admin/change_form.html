@@ -47,7 +47,7 @@
                     Updating Users, Groups, or Models via the Administrator panel can invalidate the data in UserPermissionCache. To continue, please clear the cache by clicking the button below.
                 </p>
 
-                <p style="text-align: center;">{% csrf_token %}<button onclick="clearUserPermissionCache(this)">Clear User Permission cache</button></p>
+                <p style="text-align: center;">{% csrf_token %}<button style="cursor: pointer;" onclick="clearUserPermissionCache(this)">Clear User Permission cache</button></p>
             </div>
         </div>
         <script type="text/javascript"> 
