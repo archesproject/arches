@@ -546,9 +546,10 @@ class Node(models.Model):
 @receiver(post_save, sender=Node)
 def clear_user_permission_cache(sender, instance, **kwargs):
     user_permission_cache = caches["user_permission"]
+    
     if user_permission_cache:
         user_permission_cache.clear()
-        
+
 class Ontology(models.Model):
     ontologyid = models.UUIDField(default=uuid.uuid1, primary_key=True)
     name = models.TextField()
