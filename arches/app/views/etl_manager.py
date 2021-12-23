@@ -26,15 +26,7 @@ class ETLManagerView(View):
         action = request.POST.get('action')
         module = request.POST.get('module')
         import_module = ETLModule.objects.get(slug=module).get_class_module()()
-
-        if action == 'add':
-            print(request.POST)
-            ret = {'csv': import_module.add(request=request)}
-        elif action == 'run':
-            print(request.POST)
-            ret = {'csv': import_module.run(request=request)}
-        elif action == 'validate':
-            print(request.POST)
-            ret = {'csv': import_module.validate(request=request)}
+        import_function = getattr(import_module, action)
+        ret = {'result': import_function(request=request)}
         return JSONResponse(ret)
 
