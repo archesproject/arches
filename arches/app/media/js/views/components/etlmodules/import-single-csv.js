@@ -5,14 +5,27 @@ define([
     'dropzone',
     'uuid',
     'arches',
+    'bindings/datatable',
     'bindings/dropzone',
-    'bindings/datatable'
+    'bindings/resizable-sidepanel',
 ], function(ko, koMapping, $, dropzone, uuid, arches) {
     return ko.components.register('import-single-csv', {
         viewModel: function(params) {
             self = this;
             this.loading = params.loading;
             this.loading(true);
+            this.graphs = ko.observable();
+            this.selectedGraph = ko.observable();
+            this.nodes = ko.observable();
+            this.selectedNode = ko.observable();
+            this.fileInfo = ko.observable({name:"", size:""});
+            this.hasHeaders = ko.observable(true);
+            this.csvArray = ko.observable();
+            this.headers = ko.observable();
+            this.fieldMapping = ko.observableArray();
+            this.csvBody = ko.observable();
+            this.numberOfCol = ko.observable();
+            this.numberOfRow = ko.observable();
 
             this.fileAdded = ko.observable(false);
             this.formData = new window.FormData();
@@ -36,21 +49,30 @@ define([
                 };
             };
 
-            this.hasHeaders = ko.observable(true);
-            this.csvArray = ko.observableArray();
-            this.headers = ko.observableArray();
-            this.csvBody = ko.observableArray();
-            this.numberOfCol = ko.observable();
-
             this.hasHeaders.subscribe(function(val){
+                self.headers(null);
                 if (val) {
                     self.headers(self.csvArray()[0]);
                     self.csvBody(self.csvArray().slice(1));
                 } else {
-                    self.headers(null);
+                    self.headers(Array.apply(0, Array(self.csvArray()[0].length)).map(function(_,b) { return b + 1; }))
                     self.csvBody(self.csvArray());
                 };
-            })
+            });
+
+            this.headers.subscribe(function(headers){
+                if (headers) {
+                    self.fieldMapping(
+                        headers.map(function(header){
+                            return {
+                                field: header,
+                                node: ko.observable(),
+                            }
+                        })
+                    )
+                    console.log(self.fieldMapping())    
+                }
+            });
 
             this.csvArray.subscribe(function(val){
                 self.numberOfCol(val[0].length);
@@ -61,25 +83,62 @@ define([
                     self.headers(null);
                     self.csvBody(val);
                 }
-                self.previewTableConfig = self.createTableConfig(self.numberOfCol())
+            });
+
+            this.csvBody.subscribe(val => {
+                self.numberOfRow(val.length);
+            });
+
+            this.getGraphs = function(){
+                self.loading(true);
+                self.submit('get_graphs').then(function(response){
+                    self.graphs(response.result);
+                    self.loading(false);
+                });
+            };
+
+            this.selectedGraph.subscribe(function(graph){
+                if (graph){
+                    self.loading(true);
+                    self.formData.append('graphid', graph);
+                    self.submit('get_nodes').then(function(response){
+                        self.nodes(response.result)
+                        self.loading(false);
+                    });    
+                }
             });
 
             this.addFile = function(file){
-                self.loading(true);;
-                console.log(file)
+                self.loading(true);
+                self.fileInfo({name: file.name, size: file.size});
                 self.formData.append('file', file, file.name);
-                self.submit('add').then(function(response){
+                self.submit('read').then(function(response){
                 //     if (response.ok) {
                 //         self.fileAdded(true);
                 //         return response.json;
                 //     }
                 // }).then(function(response){
-                    self.csvArray(response.csv)
+                    self.csvArray(response.result)
                     self.fileAdded(true);
                     self.loading(false);;
                 }).catch(function(err) {
+                    console.log(err);
                     self.loading(false);
                 })
+            };
+
+            this.write = function(){
+                fieldnames = koMapping.toJS(self.fieldMapping).map(fieldname => {return fieldname.node});
+                self.formData.append('fieldnames', fieldnames);
+                self.submit('write');
+            };
+
+            this.changeFormat =function(){
+                console.log("format changed");
+            };
+
+            this.validate =function(){
+                console.log("validated");
             };
 
             this.submit = function(action) {
@@ -121,7 +180,11 @@ define([
                     });    
                 }
             };
-            this.loading(false);
+            this.init = function(){
+                this.getGraphs();
+            }
+
+            this.init();
         },
         template: { require: 'text!templates/views/components/etlmodules/import-single-csv.htm' }
     });
