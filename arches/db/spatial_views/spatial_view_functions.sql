@@ -95,8 +95,11 @@ $$;
 
 create or replace function __arches_get_concept_list_label(concept_array jsonb) returns text language plpgsql as $$
 declare
-	concept_list text;
+	concept_list text := '';
 begin
+	if concept_array is null or concept_array::text = 'null' then
+		return concept_list;
+	end if;
 
 	select string_agg(d.label, ', ')
 	from
