@@ -191,6 +191,7 @@ begin
 		return return_label;
 	end if;
 	
+	
 	select r.graphid
 	into target_graphid
 	from resource_instances r
@@ -205,6 +206,7 @@ begin
 	
 	if target_graph_funct_config is null then
 		raise notice 'target_graph_funct_config is null for graphid (%)', target_graphid;
+		raise notice '...resourceid was (%)', target_resourceinstanceid::text;
 		return return_label;
 	end if;
 	
@@ -283,7 +285,7 @@ create or replace function __arches_get_resourceinstance_list_label(resourceinst
 declare
 	return_label text := '';
 begin
- 	if resourceinstance_value is null then
+ 	if resourceinstance_value is null OR resourceinstance_value::text = 'null' then
 		return '';
 	end if;
 	
@@ -292,12 +294,13 @@ begin
 	(
 		select __arches_get_resourceinstance_label(dv.resource_instance, label_type) as label
 		from (
-			select jsonb_array_elements_text(resourceinstance_value) as resource_instance
+			select jsonb_array_elements(resourceinstance_value) as resource_instance
 		) dv
 	 ) dvl
 	into return_label;
 	
-return return_label;
+	return return_label;
+
 end;
 $$;
 
@@ -647,40 +650,3 @@ begin
 	return success;
 end;
 $$;
-
-
-
------------------------------- EXAMPLES ----------------------------------
-
-/* -- CREATE EXAMPLE
-
-select __arches_create_spatial_view(
-	'heritage_assets', -- view name
-	'87d3d7dc-f44f-11eb-bee9-a87eeabdefba'::uuid, -- target geometry node
-	'325a2f33-efe4-11eb-b0bb-a87eeabdefba,
-		676d47ff-9c1c-11ea-b07f-f875a44e0e11,
-		ba345577-b554-11ea-a9ee-f875a44e0e11,
-		77e8f29d-efdc-11eb-b890-a87eeabdefba,
-		77e8f28d-efdc-11eb-afe4-a87eeabdefba,
-		b2133e72-efdc-11eb-a68d-a87eeabdefba,
-		b2133e6b-efdc-11eb-aa04-a87eeabdefba' -- attribute nodes
-	);
-
-*/
-
-/* -- UPDATE EXAMPLE
-select __arches_update_spatial_view(
-	'heritage_assets', -- view name
-	'87d3d7dc-f44f-11eb-bee9-a87eeabdefba'::uuid, -- target geometry node
-	'325a2f33-efe4-11eb-b0bb-a87eeabdefba,
-		676d47ff-9c1c-11ea-b07f-f875a44e0e11,
-		ba345577-b554-11ea-a9ee-f875a44e0e11' -- attribute nodes
-	);
-
-*/
-
-/* -- DELETE EXAMPLE
-
-elect __arches_delete_spatial_view('heritage_assets');
-
-*/
