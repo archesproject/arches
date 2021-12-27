@@ -77,8 +77,8 @@
             </div>                
             <div>
                 <h3>{% trans "File Info" %}</h3>
-                <div data-bind="text: fileInfo().size"></div>
-                <div data-bind="text: numberOfRow"></div>
+                <div data-bind="html: '{% trans "File Size: " %}' + formatSize(fileInfo().size)"></div>
+                <div data-bind="text: '{% trans "Number of Row: " %}' + numberOfRow()"></div>
             </div>
             <div class="aher-table">
                 <table class="table table-striped" cellspacing="0" width="90%">
@@ -90,7 +90,7 @@
                         </tr>
                     </thead>
                     <tbody>
-                        <!-- ko foreach: { data: csvBody, as: "row", noChildContext: true }-->
+                        <!-- ko foreach: { data: csvExample, as: "row", noChildContext: true }-->
                         <tr>
                             <!-- ko foreach: { data: row, as: "cell" }  -->
                             <td data-bind="text: cell"></td>

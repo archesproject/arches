@@ -24,6 +24,7 @@ define([
             this.headers = ko.observable();
             this.fieldMapping = ko.observableArray();
             this.csvBody = ko.observable();
+            this.csvExample = ko.observable();
             this.numberOfCol = ko.observable();
             this.numberOfRow = ko.observable();
 
@@ -74,6 +75,16 @@ define([
                 }
             });
 
+            this.formatSize = function(size) {
+                var bytes = size;
+                if(bytes == 0) return '0 Byte';
+                var k = 1024;
+                var dm = 2;
+                var sizes = ['Bytes', 'KB', 'MB', 'GB', 'TB', 'PB', 'EB', 'ZB', 'YB'];
+                var i = Math.floor(Math.log(bytes) / Math.log(k));
+                return '<strong>' + parseFloat((bytes / Math.pow(k, i)).toFixed(dm)) + '</strong> ' + sizes[i];
+            };
+
             this.csvArray.subscribe(function(val){
                 self.numberOfCol(val[0].length);
                 if (self.hasHeaders()) {
@@ -87,6 +98,7 @@ define([
 
             this.csvBody.subscribe(val => {
                 self.numberOfRow(val.length);
+                self.csvExample(val.slice(0, 5));
             });
 
             this.getGraphs = function(){
