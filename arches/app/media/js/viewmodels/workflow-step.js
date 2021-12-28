@@ -161,17 +161,23 @@ define([
         this.save = function() {
             self.saving(true);
 
-            return new Promise(function(resolve, _reject) {
+            return new Promise(function(resolve, reject) {
                 var savePromises = [];
             
                 Object.values(self.workflowComponentAbstractLookup()).forEach(function(workflowComponentAbstract) {
-                    savePromises.push(new Promise(function(resolve, _reject) {
-                        workflowComponentAbstract._saveComponent(resolve);
+                    savePromises.push(new Promise(function(resolve, reject) {
+                        workflowComponentAbstract._saveComponent(resolve, reject);
                     }));
                 });
     
-                Promise.all(savePromises).then(function(values) {
+                Promise.all(savePromises)
+                .then(function(values) {
                     resolve(...values);
+                })
+                .catch(function(error) {
+                    reject(error);
+                })
+                .finally(function() {
                     self.saving(false);
                 });
             });
