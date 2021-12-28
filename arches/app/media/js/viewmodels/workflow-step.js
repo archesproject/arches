@@ -82,7 +82,7 @@ define([
             /* cached ID logic */ 
             var cachedId = ko.unwrap(config.id);
             if (cachedId) {
-                self.id(cachedId)
+                self.id(cachedId);
             }
             else {
                 self.id(uuid.generate());
@@ -171,15 +171,15 @@ define([
                 });
     
                 Promise.all(savePromises)
-                .then(function(values) {
-                    resolve(...values);
-                })
-                .catch(function(error) {
-                    reject(error);
-                })
-                .finally(function() {
-                    self.saving(false);
-                });
+                    .then(function(values) {
+                        resolve(...values);
+                    })
+                    .catch(function(error) {
+                        reject(error);
+                    })
+                    .finally(function() {
+                        self.saving(false);
+                    });
             });
         };
 
@@ -242,7 +242,7 @@ define([
                     displayed: isDisplayed,
                     heading: config.informationboxdata['heading'],
                     text: config.informationboxdata['text'],
-                })
+                });
             }
         };
 
@@ -250,7 +250,7 @@ define([
             if (self.lockableExternalSteps.indexOf(step) > -1){
                 config.workflow.toggleStepLockedState(step, locked);
             } else {
-                throw new Error("The step, " + step + ", cannot be locked")
+                throw new Error("The step, " + step + ", cannot be locked");
             }
         };
 
