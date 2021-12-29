@@ -57,6 +57,7 @@ from arches.app.views.mobile_survey import MobileSurveyManagerView, MobileSurvey
 from arches.app.views.manifest_manager import ManifestManagerView
 from arches.app.views.manifest_manager import IIIFServerProxyView
 from arches.app.views.auth import (
+    FooView,
     LoginView,
     SignupView,
     ConfirmSignupView,
@@ -291,6 +292,7 @@ urlpatterns = [
     url(r"^iiifannotationnodes$", api.IIIFAnnotationNodes.as_view(), name="iiifannotationnodes"),
     url(r"^manifest/(?P<id>[0-9]+)$", api.Manifest.as_view(), name="manifest"),
     url(r"^image-service-manager", ManifestManagerView.as_view(), name="manifest_manager"),
+    url(r"^foo", FooView.as_view(), name="foo"),
 ]
 
 if settings.DEBUG:

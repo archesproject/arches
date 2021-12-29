@@ -16,6 +16,9 @@ You should have received a copy of the GNU Affero General Public License
 along with this program. If not, see <http://www.gnu.org/licenses/>.
 """
 
+import io
+import qrcode
+import pyotp
 import time
 import requests
 from datetime import datetime, timedelta
@@ -70,13 +73,64 @@ class LoginView(View):
         next = request.POST.get("next", reverse("home"))
 
         if user is not None and user.is_active:
-            login(request, user)
-            user.password = ""
-            auth_attempt_success = True
+
+            # import pdb; pdb.set_trace()
+            if settings.ENABLE_TWO_FACTOR_AUTHENTICATION:
+                login(request, user)
+                user.password = ""
+                auth_attempt_success = True
+
+                next = '/foo/'
+            else:
+                login(request, user)
+                user.password = ""
+                auth_attempt_success = True
+
             return redirect(next)
 
         return render(request, "login.htm", {"auth_failed": True, "next": next}, status=401)
 
+
+class FooView(View):
+    def get(self, request):
+        user_profile = models.UserProfile.objects.get(user=request.user)
+        mfa_hash = user_profile.mfa_hash
+
+        if mfa_hash:
+            uri = pyotp.totp.TOTP(mfa_hash).provisioning_uri(request.user.email,issuer_name="SecureApp")
+            # qrcode_uri = "https://www.google.com/chart?chs=200x200&chld=M|0&cht=qr&chl={}".format(uri)	
+
+            img = qrcode.make(uri)
+
+            import base64
+            # b64 = base64.b64encode(img).decode("utf-8")
+
+            foo = io.BytesIO()
+
+            img.save(foo)
+
+            # foo.seek(0)
+            # bar = foo.read()
+
+            base64_encoded_result_bytes = base64.b64encode(foo.getvalue())
+            base64_encoded_result_str = base64_encoded_result_bytes.decode('ascii')
+
+            # buffer = io.BytesIO()
+
+
+
+            # output = io.StringIO()
+            # img.save(output)
+            # contents = foo.getvalue().encode("base64")
+            foo.close()
+
+            # Create QR and write to buffer
+            # embedded_qr = create(url_input)
+            # img.png(buffer,scale=7)
+
+        # import pdb; pdb.set_trace()
+        return render(request, 'foo.htm', {'foo': base64_encoded_result_str })
+        
 
 @method_decorator(never_cache, name="dispatch")
 class SignupView(View):
