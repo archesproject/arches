@@ -337,11 +337,16 @@ class SearchResultsExporter(object):
         return flatten_dict(resource_json)
 
     def to_csv(self, instances, headers, name):
+        def html2txt(text):
+            import re
+            clean = re.compile('<.*?>')
+            return re.sub(clean, '', text)
+
         dest = StringIO()
         csvwriter = csv.DictWriter(dest, delimiter=",", fieldnames=headers)
         csvwriter.writeheader()
         for instance in instances:
-            csvwriter.writerow({k: str(v) for k, v in list(instance.items())})
+            csvwriter.writerow({k: html2txt(str(v)) for k, v in list(instance.items())})
         return {"name": f"{name}.csv", "outputfile": dest}
 
     def to_shp(self, instances, headers, name):
