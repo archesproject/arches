@@ -36,7 +36,6 @@ from arches.app.utils.geo_utils import GeoUtils
 from arches.app.utils.response import JSONResponse
 import arches.app.utils.zip as zip_utils
 from arches.app.views import search as SearchView
-from arches.app.models.system_settings import settings
 
 logger = logging.getLogger(__name__)
 
@@ -346,7 +345,10 @@ class SearchResultsExporter(object):
         csvwriter = csv.DictWriter(dest, delimiter=",", fieldnames=headers)
         csvwriter.writeheader()
         for instance in instances:
-            csvwriter.writerow({k: html2txt(str(v)) for k, v in list(instance.items())})
+            if settings.SEARCH_EXPORT_RETAIN_HTML_TAGS_CSV_EXPORT:
+                csvwriter.writerow({k: str(v) for k, v in list(instance.items())})
+            else:
+                csvwriter.writerow({k: html2txt(str(v)) for k, v in list(instance.items())})
         return {"name": f"{name}.csv", "outputfile": dest}
 
     def to_shp(self, instances, headers, name):
