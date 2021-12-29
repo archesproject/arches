@@ -338,8 +338,9 @@ class SearchResultsExporter(object):
     def to_csv(self, instances, headers, name):
         def html2txt(text):
             import re
-            clean = re.compile('<.*?>')
-            return re.sub(clean, '', text)
+
+            clean = re.compile("<.*?>")
+            return re.sub(clean, "", text)
 
         dest = StringIO()
         csvwriter = csv.DictWriter(dest, delimiter=",", fieldnames=headers)
