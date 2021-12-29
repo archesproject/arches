@@ -18,6 +18,7 @@ python-docx==0.8.10
 PyLD[requests]==1.0.5
 pyprind==2.11.3
 pycryptodome<4.0.0,>=3.3.1
+pyotp>=2.6.0
 pyshp==2.1.2
 requests[security]>=2.18.1
 python-slugify==4.0.0
