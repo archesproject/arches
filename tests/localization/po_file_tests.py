@@ -12,6 +12,8 @@ from unittest.mock import Mock, MagicMock
 
 # these tests can be run from the command line via
 # python manage.py test tests/localization/po_file_tests.py --settings="tests.test_settings"
+
+
 class PoFileTests(TestCase):
 
     def setUp(self):
