@@ -23,6 +23,7 @@ from django.core.management.base import BaseCommand
 
 logger = logging.getLogger(__name__)
 
+
 class Command(BaseCommand):
     """
     Commands for managing internationalization in Arches
@@ -36,11 +37,9 @@ class Command(BaseCommand):
             choices=["makemessages", "loadmessages"],
             help="Operation Type; "
             + "'makemessages'=Creates PO file messages from database "
-            + "'loadmessages'=Reads PO file messages to the database "
+            + "'loadmessages'=Reads PO file messages to the database ",
         )
-        parser.add_argument(
-            "-l", "--lang", action="store", dest="lang", default=None, help=""
-        )
+        parser.add_argument("-l", "--lang", action="store", dest="lang", default=None, help="")
 
     def handle(self, *args, **options):
         if options["operation"] == "makemessages":
@@ -54,7 +53,6 @@ class Command(BaseCommand):
         for file in files:
             ArchesPOWriter(file.file, settings.LANGUAGE_CODE, file.language).populate()
 
-    
     def load_messages(self, lang):
         """Loads translated strings from po file/s"""
         files = ArchesPOFileFetcher().get_po_files(lang)

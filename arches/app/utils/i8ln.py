@@ -10,10 +10,12 @@ from arches.app.models.system_settings import settings
 from arches.app.models.fields.i18n import I18n_String
 from arches.app.models.models import CardModel, CardXNodeXWidget
 
-ArchesPOFile = namedtuple('ArchesPOFile', ['language', 'file'])
+ArchesPOFile = namedtuple("ArchesPOFile", ["language", "file"])
 
-class ArchesPOFileFetcher():
+
+class ArchesPOFileFetcher:
     """Gets PO files for processing"""
+
     def get_po_file(self, lang, overwrite=False) -> polib.POFile:
         """Gets a graph PO file for a specific language"""
         path = settings.LOCALE_PATHS[0]
@@ -21,7 +23,7 @@ class ArchesPOFileFetcher():
         pathlib.Path(po_path).mkdir(parents=True, exist_ok=True)
         pofilepath = os.path.join(po_path, "graphs.po")
         if overwrite or not os.path.exists(pofilepath):
-            open(pofilepath, 'w').close()
+            open(pofilepath, "w").close()
             return self.setup_file(polib.pofile(pofilepath))
 
         for pofilepath in glob.glob(os.path.join(po_path, "graphs.po")):
@@ -30,7 +32,7 @@ class ArchesPOFileFetcher():
     def get_po_files(self, lang=None, overwrite=False) -> List[ArchesPOFile]:
         """Get an array of PO files being loaded or written"""
         files = []
-        
+
         if lang:
             files.append((lang, self.get_po_file(lang), overwrite))
         else:
@@ -43,19 +45,21 @@ class ArchesPOFileFetcher():
         current_time = datetime.now()
         pofile.check_for_duplicates = True
         pofile.metadata = {
-            'Project-Id-Version': '1.0',
-            'Report-Msgid-Bugs-To': "dev@fargeo.com",
-            'POT-Creation-Date': current_time.strftime("%Y-%m-%d %H:%M:%S%z"),
-            'PO-Revision-Date': current_time.strftime("%Y-%m-%d %H:%M:%S%z"),
-            'MIME-Version': '1.0',
-            'Content-Type': 'text/plain; charset=utf-8',
-            'Content-Transfer-Encoding': '8bit',
+            "Project-Id-Version": "1.0",
+            "Report-Msgid-Bugs-To": "dev@fargeo.com",
+            "POT-Creation-Date": current_time.strftime("%Y-%m-%d %H:%M:%S%z"),
+            "PO-Revision-Date": current_time.strftime("%Y-%m-%d %H:%M:%S%z"),
+            "MIME-Version": "1.0",
+            "Content-Type": "text/plain; charset=utf-8",
+            "Content-Transfer-Encoding": "8bit",
         }
 
         return pofile
 
-class ArchesPOWriter():
+
+class ArchesPOWriter:
     """Writes a PO file from arches graph tables"""
+
     def __init__(self, pofile: polib.POFile, id_language: str, target_language: str) -> None:
         self.pofile = pofile
         self.id_language = id_language
@@ -67,7 +71,7 @@ class ArchesPOWriter():
         self.populate_from_cards(CardModel.objects.all())
 
         self.pofile.save()
-    
+
     def populate_from_card_x_node_x_widget(self, queryset):
         for row in queryset:
             try:
@@ -77,15 +81,15 @@ class ArchesPOWriter():
                 self.append(row.label, "cards_x_nodes_x_widgets")
             except KeyError:
                 pass
-    
+
     def populate_from_cards(self, queryset):
         for row in queryset:
             try:
-                self.append(row.name, 'cards')
-                self.append(row.description, 'cards')
-                self.append(row.instructions, 'cards')
-                self.append(row.helptitle, 'cards')
-                self.append(row.helptext, 'cards')
+                self.append(row.name, "cards")
+                self.append(row.description, "cards")
+                self.append(row.instructions, "cards")
+                self.append(row.helptitle, "cards")
+                self.append(row.helptext, "cards")
             except KeyError:
                 pass
 
@@ -97,29 +101,31 @@ class ArchesPOWriter():
             occurrences = []
         else:
             occurrences = [(origin, "1")]
-        
+
         msgid = cell[self.id_language]
         if self.target_language in cell:
             msgstr = cell[self.target_language]
         else:
             msgstr = ""
 
-        if(msgid is not None and msgid != ""):
+        if msgid is not None and msgid != "":
             entry = polib.POEntry(msgid=msgid, msgstr=msgstr, occurrences=occurrences)
             try:
                 self.pofile.append(entry)
-            
+
             # happens when there are duplicates, no need to do anything with it
             except ValueError:
                 pass
 
-class ArchesPOLoader():
+
+class ArchesPOLoader:
     """Loads a PO file into arches graph tables"""
+
     def __init__(self, pofile: polib.POFile, id_language: str, target_language: str) -> None:
         self.pofile = pofile
         self.id_language = id_language
-        self.target_language = target_language 
-    
+        self.target_language = target_language
+
     def load(self):
         """Iterates through database, Loading translations from PO files"""
         cards_x_nodes_x_widgets = CardXNodeXWidget.objects.all()
@@ -134,7 +140,7 @@ class ArchesPOLoader():
                 i18n_properties = row.config["i18n_properties"]
                 for prop in i18n_properties:
                     entry = self.pofile.find(row.config[prop][self.id_language])
-                    if(entry is not None and entry.msgstr != ""):
+                    if entry is not None and entry.msgstr != "":
                         row.config[prop][self.target_language] = entry.msgstr
                     else:
                         row.config[prop].pop(self.target_language, None)
@@ -153,12 +159,12 @@ class ArchesPOLoader():
             self.update_i18n_string_cell(row.helptext)
 
             row.save()
-    
+
     def update_i18n_string_cell(self, cell: I18n_String):
         """Updates an i18n string field with a translated language value"""
         try:
             entry = self.pofile.find(cell[self.id_language])
-            if(entry is not None and entry.msgstr != ""):
+            if entry is not None and entry.msgstr != "":
                 cell[self.target_language] = entry.msgstr
             else:
                 cell.pop(self.target_language, None)
