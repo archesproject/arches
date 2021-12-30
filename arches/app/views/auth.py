@@ -71,22 +71,33 @@ class LoginView(View):
         password = request.POST.get("password", None)
         user = authenticate(username=username, password=password)
         next = request.POST.get("next", reverse("home"))
+        two_factor_authentication_string = request.POST.get('two-factor-authentication', None)
 
         if user is not None and user.is_active:
 
-            # import pdb; pdb.set_trace()
             if settings.ENABLE_TWO_FACTOR_AUTHENTICATION:
-                login(request, user)
-                user.password = ""
-                auth_attempt_success = True
+                user_profile = models.UserProfile.objects.get(user=user)
 
-                next = '/foo/'
-            else:
-                login(request, user)
-                user.password = ""
-                auth_attempt_success = True
+                # import pdb; pdb.set_trace()
 
-            return redirect(next)
+                if user_profile:
+                    totp = pyotp.TOTP(user_profile.mfa_hash)
+
+                    if totp.verify(two_factor_authentication_string):
+                        login(request, user)
+                        user.password = ""
+                        auth_attempt_success = True
+                        
+                        return redirect(next)
+
+
+                # next = '/foo/'
+            # else:
+            #     login(request, user)
+            #     user.password = ""
+            #     auth_attempt_success = True
+
+            # return redirect(next)
 
         return render(request, "login.htm", {"auth_failed": True, "next": next}, status=401)
 
@@ -97,7 +108,7 @@ class FooView(View):
         mfa_hash = user_profile.mfa_hash
 
         if mfa_hash:
-            uri = pyotp.totp.TOTP(mfa_hash).provisioning_uri(request.user.email,issuer_name="SecureApp")
+            uri = pyotp.totp.TOTP(mfa_hash).provisioning_uri(request.user.email, issuer_name=settings.APP_TITLE)
             # qrcode_uri = "https://www.google.com/chart?chs=200x200&chld=M|0&cht=qr&chl={}".format(uri)	
 
             img = qrcode.make(uri)
