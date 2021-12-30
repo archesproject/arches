@@ -15,7 +15,6 @@ from unittest.mock import Mock, MagicMock
 
 
 class PoFileTests(TestCase):
-
     def setUp(self):
         self.cardxnodexwidget_all = CardXNodeXWidget.objects.all
         self.cardmodel_all = CardModel.objects.all
