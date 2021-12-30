@@ -26,12 +26,12 @@ class PoFileTests(TestCase):
         builtins.open = self.open
         pathlib.Path.mkdir = self.mkdir
         polib.pofile = self.pofactory
-    
+
     def test_populate(self):
         m_po_file = Mock(polib.POFile)
         m_all_method = Mock()
         m_all_method.return_value = []
-        writer = ArchesPOWriter(m_po_file, 'en', 'en')
+        writer = ArchesPOWriter(m_po_file, "en", "en")
         CardXNodeXWidget.objects.all = m_all_method
         CardModel.objects.all = m_all_method
         writer.populate()
@@ -40,7 +40,7 @@ class PoFileTests(TestCase):
     def test_populate_from_card_x_node_x_widget(self):
         "Test to ensure PO Entries are appended with appropriate english messageids (no translations)"
         m_po_file = Mock(polib.POFile)
-        writer = ArchesPOWriter(m_po_file, 'en', 'en')
+        writer = ArchesPOWriter(m_po_file, "en", "en")
         model = MagicMock(CardXNodeXWidget)
         prop_dict = {"en": "configuration"}
         config_dict = {"i18n_properties": ["prop"], "prop": prop_dict}
@@ -50,11 +50,11 @@ class PoFileTests(TestCase):
         model.label.__getitem__.side_effect = label_dict.__getitem__
         writer.populate_from_card_x_node_x_widget([model])
         self.assertEqual(m_po_file.append.call_count, 2)
-    
+
     def test_populate_from_cards(self):
         "Test to ensure PO Entries are appended with appropriate english messageids (no translations)"
         m_po_file = Mock(polib.POFile)
-        writer = ArchesPOWriter(m_po_file, 'en', 'en')
+        writer = ArchesPOWriter(m_po_file, "en", "en")
         model = MagicMock(CardModel)
         name_dict = {"en": "name"}
         description_dict = {"en": "description"}
@@ -72,11 +72,11 @@ class PoFileTests(TestCase):
         self.assertEqual(m_po_file.append.call_args_list[0][0][0].msgstr, "")
         self.assertEqual(m_po_file.append.call_args_list[4][0][0].msgid, "helptext")
         self.assertEqual(m_po_file.append.call_args_list[4][0][0].msgstr, "")
-    
+
     def test_populate_from_cards_spanish(self):
         "Test to ensure PO Entries are appended with appropriate spanish translations"
         m_po_file = Mock(polib.POFile)
-        writer = ArchesPOWriter(m_po_file, 'en', 'es')
+        writer = ArchesPOWriter(m_po_file, "en", "es")
         model = MagicMock(CardModel)
         name_dict = {"en": "name", "es": "nombre"}
         description_dict = {"en": "description", "es": "descripción"}
@@ -99,10 +99,11 @@ class PoFileTests(TestCase):
         self.assertEqual(m_po_file.append.call_args_list[0][0][0].msgstr, "nombre")
         self.assertEqual(m_po_file.append.call_args_list[4][0][0].msgid, "helptext")
         self.assertEqual(m_po_file.append.call_args_list[4][0][0].msgstr, "título de la ayuda")
-    
+
     def test_po_write_duplicate_exception_caught(self):
         def throw_value_error(val):
             raise ValueError()
+
         m_po_file = MagicMock(polib.POFile)
         m_po_file.append.side_effect = throw_value_error
         model = MagicMock(CardXNodeXWidget)
@@ -112,9 +113,8 @@ class PoFileTests(TestCase):
         model.config.prop.__getitem__.side_effect = prop_dict.__getitem__
         label_dict = {"en": "label"}
         model.label.__getitem__.side_effect = label_dict.__getitem__
-        writer = ArchesPOWriter(m_po_file, 'en', 'es')
+        writer = ArchesPOWriter(m_po_file, "en", "es")
         writer.populate_from_card_x_node_x_widget([model])
-
 
     def test_arches_po_loader(self):
         """happy path test of arches po loader"""
@@ -137,7 +137,7 @@ class PoFileTests(TestCase):
         m_all_method_cardmodel.return_value = [m_card]
         CardModel.objects.all = m_all_method_cardmodel
 
-        loader = ArchesPOLoader(m_po_file, 'en', 'es')
+        loader = ArchesPOLoader(m_po_file, "en", "es")
         loader.load()
 
         m_card.save.assert_called()
@@ -164,7 +164,7 @@ class PoFileTests(TestCase):
         m_all_method_cardmodel.return_value = [m_card]
         CardModel.objects.all = m_all_method_cardmodel
 
-        loader = ArchesPOLoader(m_po_file, 'en', 'es')
+        loader = ArchesPOLoader(m_po_file, "en", "es")
         loader.load()
 
         m_card.save.assert_called()
@@ -199,7 +199,7 @@ class PoFileTests(TestCase):
         m_all_method_cardxnodexwidgets.return_value = [m_cardxnodexwidget]
         CardXNodeXWidget.objects.all = m_all_method_cardxnodexwidgets
 
-        loader = ArchesPOLoader(m_po_file, 'en', 'es')
+        loader = ArchesPOLoader(m_po_file, "en", "es")
         CardXNodeXWidget.objects.all = m_all_method_cardxnodexwidgets
         CardModel.objects.all = m_all_method_cardmodel
         loader.load()
@@ -213,11 +213,10 @@ class PoFileTests(TestCase):
         self.assertEqual(m_i18n_string.pop.call_count, 3)
 
         # test that a msgid key won't blow up the whole import
-        loader = ArchesPOLoader(m_po_file, 'ar', 'es')
+        loader = ArchesPOLoader(m_po_file, "ar", "es")
         CardXNodeXWidget.objects.all = m_all_method_cardxnodexwidgets
         CardModel.objects.all = m_all_method_cardmodel
         loader.load()
-
 
     def test_arches_po_loader_no_load_same_language(self):
         """Tests attempting to load same language - do not"""
@@ -237,7 +236,7 @@ class PoFileTests(TestCase):
         m_cardxnodexwidget.save.return_value = None
         m_all_method_cardxnodexwidgets.return_value = [m_cardxnodexwidget]
 
-        loader = ArchesPOLoader(m_po_file, 'en', 'en')
+        loader = ArchesPOLoader(m_po_file, "en", "en")
         CardXNodeXWidget.objects.all = m_all_method_cardxnodexwidgets
         CardModel.objects.all = m_all_method_cardmodel
         loader.load()
@@ -252,7 +251,7 @@ class PoFileTests(TestCase):
         m_pofile = MagicMock(polib.POFile)
         m_pofactory = MagicMock()
         m_pofactory.return_value = m_pofile
-        
+
         builtins.open = MagicMock()
         polib.pofile = m_pofactory
         files = fetcher.get_po_files(None, True)

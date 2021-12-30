@@ -60,7 +60,7 @@ class I18n_String(object):
     # adding this so that we can treat it like a dict object
     def __getitem__(self, *args):
         return self.raw_value.__getitem__(*args)
-    
+
     def __contains__(self, *args):
         return self.raw_value.__contains__(*args)
 
@@ -75,7 +75,7 @@ class I18n_String(object):
     # added to pop items like a dict
     def pop(self, *args):
         return self.raw_value.pop(*args)
-        
+
     def __str__(self):
         ret = None
         try:
