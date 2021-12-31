@@ -262,6 +262,19 @@
 {% endblock main_menu %}
 
 {% block gallery_header %}
+    <div>
+        <span class="iiif-gallery-manifest-label" data-bind="text: manifestData() ? manifestName() : '{% trans "No manifest selected..." %}'"></span>
+    </div>                 
+    <div>
+        <span class="iiif-gallery-sequence-label" data-bind="click: function(){expandGallery(!expandGallery())}">
+            <!-- ko if: !expandGallery() -->
+            {% trans "Info" %}
+            <!-- /ko -->
+            <!-- ko if: expandGallery() -->
+            {% trans "Close" %}
+            <!-- /ko -->
+        </span>
+    </div>
     <div 
         class="iiif-gallery-sequence-label" 
         style="padding:0 5px" 
@@ -284,7 +297,6 @@
     </div>
 
     <div>
-        <span class="iiif-gallery-manifest-label" data-bind="text: manifestData() ? manifestName() : '{% trans "No manifest selected..." %}'"></span>
         <span>{% trans "Filter" %}</span>
         <div class="list-filter" data-bind="">
             <input type="text" class="form-control" style="width: 100%;" placeholder="{% trans 'Filter images...' %}" data-bind="textInput: filter">
