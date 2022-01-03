@@ -274,14 +274,14 @@ class Command(BaseCommand):
             self.export_graphs(options["dest_dir"], options["graphs"], options["type"])
 
         if options["operation"] == "import_business_data":
-            defer_indexing = options["config_file"] is not None
+            defer_indexing = True
             if "defer_indexing" in options:
                 if isinstance(options["defer_indexing"], bool):
                     defer_indexing = options["defer_indexing"]
                 elif str(options["defer_indexing"])[0].lower() == "f":
                     defer_indexing = False
 
-            defer_indexing = defer_indexing and not options["bulk_load"]
+            defer_indexing = defer_indexing and not options["bulk_load"] and options["config_file"] is not None
             if defer_indexing:
                 concept_count = models.Value.objects.count()
                 relation_count = models.ResourceXResource.objects.count()
