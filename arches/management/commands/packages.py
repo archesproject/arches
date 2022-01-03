@@ -274,7 +274,7 @@ class Command(BaseCommand):
             self.export_graphs(options["dest_dir"], options["graphs"], options["type"])
 
         if options["operation"] == "import_business_data":
-            defer_indexing = True
+            defer_indexing = options["config_file"] is not None
             if "defer_indexing" in options:
                 if isinstance(options["defer_indexing"], bool):
                     defer_indexing = options["defer_indexing"]
