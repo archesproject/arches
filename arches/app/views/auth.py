@@ -74,11 +74,8 @@ class LoginView(View):
         two_factor_authentication_string = request.POST.get('two-factor-authentication', None)
 
         if user is not None and user.is_active:
-
             if settings.ENABLE_TWO_FACTOR_AUTHENTICATION:
                 user_profile = models.UserProfile.objects.get(user=user)
-
-                # import pdb; pdb.set_trace()
 
                 if user_profile:
                     totp = pyotp.TOTP(user_profile.mfa_hash)
@@ -86,18 +83,16 @@ class LoginView(View):
                     if totp.verify(two_factor_authentication_string):
                         login(request, user)
                         user.password = ""
-                        auth_attempt_success = True
-                        
+
                         return redirect(next)
 
 
                 # next = '/foo/'
-            # else:
-            #     login(request, user)
-            #     user.password = ""
-            #     auth_attempt_success = True
-
-            # return redirect(next)
+            else:
+                login(request, user)
+                user.password = ""
+                
+                return redirect(next)
 
         return render(request, "login.htm", {"auth_failed": True, "next": next}, status=401)
 
