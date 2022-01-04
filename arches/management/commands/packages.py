@@ -29,6 +29,7 @@ from arches.app.utils.data_management.resources.formats.format import Reader as 
 from arches.app.utils.data_management.resources.exporter import ResourceExporter
 from arches.app.models.system_settings import settings
 from arches.app.models import models
+from arches.app.models.fields.i18n import I18n_String
 import arches.app.utils.data_management.resource_graphs.importer as graph_importer
 import arches.app.utils.data_management.resource_graphs.exporter as graph_exporter
 import arches.app.utils.data_management.resources.remover as resource_remover
@@ -367,24 +368,21 @@ class Command(BaseCommand):
                 output_graph = {"graph": [graph], "metadata": system_metadata()}
                 graph_json = JSONSerializer().serialize(output_graph, indent=4)
                 if graph["graphid"] not in existing_resource_graphs:
-                    output_file = os.path.join(dest_dir, graph["name"] + ".json")
+                    output_file = os.path.join(dest_dir, str(I18n_String(graph["name"])) + ".json")
                     with open(output_file, "w") as f:
                         print("writing", output_file)
                         f.write(graph_json)
                 else:
                     output_file = existing_resource_graphs[graph["graphid"]]["path"]
                     if force is False:
-                        overwrite = input(
-                            '"{0}" already exists in this directory. \
-                        Overwrite? (Y/N): '.format(
-                                existing_resource_graphs[graph["graphid"]]["name"]
-                            )
-                        )
+                        graph_name = I18n_String(existing_resource_graphs[graph["graphid"]]["name"])
+                        msg = f'The "{graph_name}" graph already exists in this directory. Overwrite? (Y/N): '
+                        overwrite = input(msg)
                     else:
                         overwrite = "true"
                     if overwrite.lower() in ("t", "true", "y", "yes"):
                         with open(output_file, "w") as f:
-                            print("writing", output_file)
+                            print("   writing", output_file)
                             f.write(graph_json)
 
     def export_package_settings(self, dest_dir, force=False):
@@ -1198,7 +1196,7 @@ will be very jumbled."""
             else:
                 graphs = [graph.strip() for graph in graphs.split(",")]
             for graph in ResourceGraphExporter.get_graphs_for_export(graphids=graphs)["graph"]:
-                graph_name = graph["name"].replace("/", "-")
+                graph_name = I18n_String(graph["name"]).replace("/", "-")
                 with open(os.path.join(data_dest, graph_name + ".json"), "wb") as f:
                     f.write(JSONSerializer().serialize({"graph": [graph]}, indent=4).encode("utf-8"))
         else:

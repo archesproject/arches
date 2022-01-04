@@ -17,6 +17,8 @@ from django.forms.models import model_to_dict
 from django.contrib.gis.geos import GEOSGeometry
 from django.core.files import File
 
+from arches.app.models.fields.i18n import I18n_JSON, I18n_String
+
 
 class UnableToSerializeError(Exception):
     """ Error for not implemented classes """
@@ -49,7 +51,7 @@ class JSONSerializer(object):
         self.exclude = options.pop("exclude", None)
         self.use_natural_keys = options.pop("use_natural_keys", False)
         self.geom_format = options.pop("geom_format", "wkt")
-        return self.handle_object(obj, self.selected_fields, self.exclude)
+        return self.handle_object(obj, **self.options)
 
     def serialize(self, obj, **options):
         obj = self.serializeToPython(obj, **options)
@@ -63,7 +65,7 @@ class JSONSerializer(object):
         options.pop("exclude", None)
         return json.dumps(obj, cls=DjangoJSONEncoder, sort_keys=sort_keys, **options.copy())
 
-    def handle_object(self, object, fields=None, exclude=None):
+    def handle_object(self, object, **kwargs):
         """ Called to handle everything, looks for the correct handling """
         # print type(object)
         # print object
@@ -83,15 +85,15 @@ class JSONSerializer(object):
         elif isinstance(object, Model):
             if hasattr(object, "serialize"):
                 exclude = self.exclude
-                return self.handle_object(getattr(object, "serialize")(fields, exclude), fields, exclude)
+                return self.handle_object(getattr(object, "serialize")(**kwargs), **kwargs)
             else:
-                return self.handle_model(object, fields, self.exclude)
+                return self.handle_model(object, **kwargs)
             # return PythonSerializer().serialize([object],**self.options.copy())[0]['fields']
         elif isinstance(object, QuerySet):
             # return super(JSONSerializer,self).serialize(object, **self.options.copy())[0]
             ret = []
             for item in object:
-                ret.append(self.handle_object(item, fields, exclude))
+                ret.append(self.handle_object(item, **kwargs))
             return ret
         elif isinstance(object, bytes):
             return object.decode("utf-8")
@@ -117,6 +119,9 @@ class JSONSerializer(object):
             return object.name
         elif isinstance(object, uuid.UUID):
             return str(object)
+        elif isinstance(object, I18n_JSON) or isinstance(object, I18n_String):
+            use_raw_i18n_json = kwargs.get("use_raw_i18n_json", False)
+            return getattr(object, "serialize")(use_raw_i18n_json)
         elif hasattr(object, "__dict__"):
             # call an objects serialize method if it exists
             if hasattr(object, "serialize"):
@@ -147,23 +152,25 @@ class JSONSerializer(object):
         return arr
 
     # a slighty modified version of django.forms.models.model_to_dict
-    def handle_model(self, instance, fields=None, exclude=None):
+    def handle_model(self, instance, **kwargs):
         """
-        Returns a dict containing the data in ``instance`` suitable for passing as
-        a Form's ``initial`` keyword argument.
+        Returns a dict containing the data in ``instance``.
 
-        ``fields`` is an optional list of field names. If provided, only the named
-        fields will be included in the returned dict.
+        Keyword Arguments:
+            ``fields`` is an optional list of field names. If provided, only the named
+            fields will be included in the returned dict.
 
-        ``exclude`` is an optional list of field names. If provided, the named
-        fields will be excluded from the returned dict, even if they are listed in
-        the ``fields`` argument.
+            ``exclude`` is an optional list of field names. If provided, the named
+            fields will be excluded from the returned dict, even if they are listed in
+            the ``fields`` argument.
         """
         # avoid a circular import
         from django.db.models.fields.related import ManyToManyField, ForeignKey
 
         opts = instance._meta
         data = {}
+        fields = kwargs.get("fields", None)
+        exclude = kwargs.get("exclude", None)
         # print '='*40
         properties = [k for k, v in instance.__class__.__dict__.items() if type(v) is property]
         for property_name in properties:
@@ -171,7 +178,7 @@ class JSONSerializer(object):
                 continue
             if exclude and property_name in exclude:
                 continue
-            data[property_name] = self.handle_object(getattr(instance, property_name))
+            data[property_name] = self.handle_object(getattr(instance, property_name), **kwargs)
         for f in chain(opts.concrete_fields, opts.private_fields, opts.many_to_many):
             if not getattr(f, "editable", False):
                 continue
@@ -196,7 +203,7 @@ class JSONSerializer(object):
                     qs = f.value_from_object(instance)
                     data[f.name] = [item.pk for item in qs]
             else:
-                data[f.name] = self.handle_object(f.value_from_object(instance))
+                data[f.name] = self.handle_object(f.value_from_object(instance), **kwargs)
         return data
 
 
