@@ -342,6 +342,7 @@ define([
                 var data = feature.properties;
                 var id = data.resourceinstanceid;
                 data.showEditButton = self.canEdit;
+                const descriptionProperties = ['displayname', 'graph_name', 'map_popup'];
                 if (id) {
                     if (!self.resourceLookup[id]){
                         data = _.defaults(data, {
@@ -361,13 +362,13 @@ define([
                                 data.showEditButton = false;
                             }
                         }
-                        data = ko.mapping.fromJS(data);
+                        descriptionProperties.forEach(prop => data[prop] = ko.observable(data[prop]));
                         data.reportURL = arches.urls.resource_report;
                         data.editURL = arches.urls.resource_editor;
                         self.resourceLookup[id] = data;
                         $.get(arches.urls.resource_descriptors + id, function(data) {
                             data.loading = false;
-                            ko.mapping.fromJS(data, self.resourceLookup[id]);
+                            descriptionProperties.forEach(prop => self.resourceLookup[id][prop](data[prop]));
                         });
                     }
                     self.resourceLookup[id].feature = feature;
