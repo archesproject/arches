@@ -81,6 +81,12 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
             }
             if (isEscape) {
                 try {
+                    //Main left nav
+                    var leftnavcontainer = document.getElementsByClassName('mainnav-lg')[0];
+                    if(leftnavcontainer) {
+                        var el = document.getElementsByClassName('navbar-brand')[0];
+                        el.click();
+                    }
                     //Top message
                     var topdisplayed = document.getElementById('card-alert-panel');
                     if(topdisplayed) {
