@@ -240,7 +240,7 @@ class Card(models.CardModel):
 
         """
         exclude = [] if exclude is None else exclude
-        ret = JSONSerializer().handle_model(self, fields, exclude)
+        ret = JSONSerializer().handle_model(self, fields=fields, exclude=exclude)
 
         ret["cardinality"] = self.cardinality if "cardinality" not in exclude else ret.pop("cardinality", None)
         ret["cards"] = self.cards if "cards" not in exclude else ret.pop("cards", None)
