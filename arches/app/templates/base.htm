@@ -69,6 +69,86 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 </body>
 
 {% block javascript %}
+    <script>
+        //Check for escape key pressed, and if any modals/popups open, close them
+        document.onkeydown = function(evt) {
+            evt = evt || window.event;
+            var isEscape = false;
+            if ('key' in evt) {
+                isEscape = (evt.key === 'Escape' || evt.key === 'Esc');
+            } else {
+                isEscape = (evt.keyCode === 27);
+            }
+            if (isEscape) {
+                try {
+                    //Main left nav
+                    var leftnavcontainer = document.getElementsByClassName('mainnav-lg')[0];
+                    if(leftnavcontainer) {
+                        var el = document.getElementsByClassName('navbar-brand')[0];
+                        el.click();
+                    }
+                    //Top message
+                    var topdisplayed = document.getElementById('card-alert-panel');
+                    if(topdisplayed) {
+                        if(topdisplayed.style.display != 'none') {
+                            topdisplayed.style.display = 'none';
+                        }
+                    }
+                    //Sidebar panel
+                    var sidebarpanel = document.getElementsByClassName('workbench-card-sidepanel')[0];
+                    if(sidebarpanel) {
+                        var el = document.getElementsByClassName('workbench-card-sidepanel-header')[0];
+                        el.click();
+                    }
+                    //Notifications panel
+                    var notifpanel = document.getElementById('ep-notifs-panel');
+                    if(notifpanel) {
+                        if(notifpanel.style.display != 'none') {
+                            document.getElementsByClassName('ep-notifs-close')[0].click();
+                        }
+                    }
+                    //Edits panel
+                    var editspanel = document.getElementById('ep-edits-panel');
+                    if(editspanel) {
+                        if(editspanel.style.display != 'none') {
+                            document.getElementsByClassName('ep-edits-close')[0].click();
+                        }
+                    }
+                    //Help panel
+                    var helppanel = document.getElementById('ep-help-panel');
+                    if(helppanel) {
+                        if(helppanel.style.display != 'none') {
+                            document.getElementsByClassName('ep-help-close')[0].click();
+                        }
+                    }
+                    //Manage menu panel
+                    var managepanel = document.getElementById('menu-panel');
+                    if(managepanel) {
+                        if(managepanel.style.display != 'none') {
+                            document.getElementById('menu-control').click();
+                        }
+                    }
+                    //Profile popup form
+                    var profilepanel = document.getElementsByClassName('change-password-form')[0];
+                    if(profilepanel) {
+                        if(profilepanel.style.display != 'none') {
+                            document.getElementsByClassName('btn-profile-password')[0].click();
+                        }
+                    }
+                    //Search top right panels
+                    var toprightpanel = document.getElementsByClassName('active')[0];
+                    if(toprightpanel) {
+                        if(toprightpanel.style.display != 'none') {
+                            document.querySelectorAll('.saved-search-container.search-type-btn-popup.active')[0].click();
+                        }
+                    }
+                } catch (err) {
+                    return;
+                }
+            }
+        };
+    </script>
+
     <script src="{{ STATIC_URL }}packages/requirejs/require.js"></script>
 
     {% block pre_require_js %}

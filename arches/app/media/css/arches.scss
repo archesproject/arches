@@ -10083,16 +10083,6 @@ a.clear-geojson-button:hover {
     flex-direction: column;
 }
 
-#map-popup .hover-feature-title-bar {
-    height: 60px;
-    padding: 10px;
-    border-bottom: 1px solid #25476A;
-    border-top: none;
-    border-right: none;
-    border-left: none;
-    max-width: 290px;
-}
-
 .hover-feature-title-bar {
     height: 40px;
     padding: 10px;
@@ -10104,52 +10094,7 @@ a.clear-geojson-button:hover {
 
 .mapboxgl-popup-content .hover-feature-title-bar {
     margin-bottom: 0px;
-}
-
-#map-popup .mapboxgl-popup-close-button {
-    height: 61px !important;
-    width: 61px;
-    top: -1px;
-    margin-right: -1px;
-    padding-top: 7px;
-    border-radius: 0px;
-    font-size: 27px;
-    background: #fafafa;
-    color: #454545;
-    border-left: 1px solid #ddd;
-    border-bottom: 1px solid #25476A;
-}
-
-#map-popup .mapboxgl-popup-close-button:hover {
-    background: #f4f4f4;
-}
-
-#map-popup .status-ok .mapboxgl-popup-close-button {
-    background: #C4F267;
-    border-left: 1px solid #7AB503;
-}
-
-#map-popup .status-ok .mapboxgl-popup-close-button:hover {
-    background: #B3ED3F;
-}
-
-#map-popup .status-warning .mapboxgl-popup-close-button {
-    background: #FFFF70;
-    border-left: 1px solid #B9B900;
-}
-
-#map-popup .status-warning .mapboxgl-popup-close-button:hover {
-    background: #D3D300;
-}
-
-#map-popup .status-late .mapboxgl-popup-close-button {
-    background: #DA55A0;
-    border-left: 1px solid #9F005A;
-    color: #fff;
-}
-
-#map-popup .status-late .mapboxgl-popup-close-button:hover {
-    background: #D02F8A;
+    padding: 0px;
 }
 
 .mapboxgl-popup-close-button {
@@ -10175,30 +10120,29 @@ a.clear-geojson-button:hover {
     font-weight: 600;
 }
 
-#map-popup .hover-feature-title {
-    height: 40px;
-    text-align: center;
-    white-space: inherit;
-}
-
 .hover-feature-title {
     font-size: 14px;
     font-weight: 500;
-    max-width: 300px;
     color: #25476A;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
+    padding: 10px;
 }
 
 .hover-feature-nav-left {
-    position: absolute;
-    left: 0px;
-    top: 0px;
-    height: 40px;
+    height: 38px;
     background: #fafafa;
     padding: 10px;
-    border: 1px solid #ddd;
+    border-right: 1px solid #ddd;
+}
+
+.hover-feature-nav-left:hover {
+    background-color: #f4f4f4;;
+}
+
+.hover-feature-nav-right:hover {
+    background-color: #f4f4f4;;
 }
 
 .hover-feature-nav-left.disabled {
@@ -10206,33 +10150,14 @@ a.clear-geojson-button:hover {
 }
 
 .hover-feature-nav-right {
-    position: absolute;
-    right: 39px;
-    top: 0px;
-    height: 40px;
+    height: 38px;
     background: #fafafa;
     padding: 10px;
-    border: 1px solid #ddd;
+    border-left: 1px solid #ddd;
 }
 
 .hover-feature-nav-right.disabled {
     display: none;
-}
-
-#map-popup .hover-feature-body {
-    padding: 0px;
-    border-left: none;
-    border-right: none;
-}
-
-#map-popup img {
-    width: 100%;
-    height: auto;
-    margin-top: -25px;
-}
-
-#map-popup .cons-stubs {
-    padding: 10px 0px;
 }
 
 .hover-feature-body {
@@ -11201,18 +11126,6 @@ table.table.dataTable {
     display: none;
 }
 
-#map-popup .hover-feature-footer {
-    position: relative;
-    padding-left: 20px;
-    bottom: 15px;
-    left: 0px;
-    border-left: 0px solid transparent;
-    border-right: 0px solid transparent;
-    width: 350px;
-    background: #f4f4f4;
-    font-size: 14px;
-}
-
 .hover-feature-footer {
     height: 50px;
     border-top: 1px solid #ddd;
@@ -11221,6 +11134,10 @@ table.table.dataTable {
     background: #f8f8f8;
     padding: 10px;
     padding-top: 15px;
+    display: inline-flex;
+    width: 100%;
+    justify-content: space-between;
+    color: steelblue;
 }
 
 .hover-feature-footer a {
@@ -14346,6 +14263,7 @@ a.jstree-anchor.permissions-widget {
     .dl-horizontal dd {
         padding-right: 20px;
         margin-left: 220px;
+        word-break: break-word;
     }
 
     .dl-horizontal dt {
@@ -14379,6 +14297,7 @@ a.jstree-anchor.permissions-widget {
     .dl-horizontal dd {
         padding-right: 20px;
         margin-left: 320px;
+        word-break: break-word;
     }
 
     .rp-report-section-title {
@@ -14411,6 +14330,7 @@ a.jstree-anchor.permissions-widget {
     .report-related-resources .rp-card-section div div .dl-horizontal dd {
         padding-right: 20px;
         margin-left: 520px;
+        word-break: break-word;
     }
 }
 
@@ -14545,6 +14465,7 @@ a.jstree-anchor.permissions-widget {
     .dl-horizontal dd {
         margin-left: 280px;
         padding-right: 100px;
+        word-break: break-word;
     }
 
     .dl-horizontal dt {
