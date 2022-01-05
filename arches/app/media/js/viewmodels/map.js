@@ -433,7 +433,7 @@ define([
 
         this.popupTemplate = popupTemplate;
         this.onFeatureClick = function(features, lngLat) {
-            var map = self.map();
+            const mapStyle = map.getStyle();
             self.popup = new mapboxgl.Popup()
                 .setLngLat(lngLat)
                 .setHTML(self.popupTemplate)
@@ -443,9 +443,9 @@ define([
                 self.popup._content
             );
             features.forEach(feature=>{
-                if (map.getStyle() && feature.id) map.setFeatureState(feature, { selected: true });
+                if (mapStyle && feature.id) map.setFeatureState(feature, { selected: true });
                 self.popup.on('close', function() {
-                    if (map.getStyle() && feature.id) {
+                    if (mapStyle && feature.id) {
                         map.setFeatureState(feature, { selected: false });
                         map.setFeatureState(feature, { hover: false });
                     }
