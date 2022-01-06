@@ -16,6 +16,7 @@ You should have received a copy of the GNU Affero General Public License
 along with this program. If not, see <http://www.gnu.org/licenses/>.
 """
 
+import base64
 import io
 import qrcode
 import pyotp
@@ -97,44 +98,93 @@ class LoginView(View):
         return render(request, "login.htm", {"auth_failed": True, "next": next}, status=401)
 
 
+
+@method_decorator(never_cache, name="dispatch")
+class BarView(View):
+    # def get(self, request):
+    #     form = ArchesUserCreationForm(enable_captcha=settings.ENABLE_CAPTCHA)
+    #     postdata = {"first_name": "", "last_name": "", "email": ""}
+    #     showform = True
+    #     confirmation_message = ""
+
+    #     return render(
+    #         request,
+    #         "signup.htm",
+    #         {
+    #             "enable_captcha": settings.ENABLE_CAPTCHA,
+    #             "form": form,
+    #             "postdata": postdata,
+    #             "showform": showform,
+    #             "confirmation_message": confirmation_message,
+    #             "validation_help": validation.password_validators_help_texts(),
+    #         },
+    #     )
+
+    def post(self, request):
+        AES = AESCipher(settings.SECRET_KEY)
+
+        # import pdb; pdb.set_trace()
+        # request.user["ts"] = int(time.time())  # add timestamp so link can expire
+
+        foo = JSONSerializer().serialize({ 'ts': int(time.time()), 'user': request.user })
+
+
+        bar = AES.encrypt(foo)
+        baz = urlencode({"link": bar})
+
+
+        admin_email = settings.ADMINS[0][1] if settings.ADMINS else ""
+        email_context = {
+            "button_text": _("Update Two-Factor Authentication Settings"),
+            "link": request.build_absolute_uri(reverse("foo") + "?" + baz),
+            "greeting": _(
+                "Click on link below to update your two-factor authentication settings."
+            ),
+            "closing": _(
+                "This link expires in 15 minutes. If you did not request this change, \
+                contact your Administrator immediately."
+            ),
+        }
+
+        html_content = render_to_string("email/general_notification.htm", email_context)  # ...
+        text_content = strip_tags(html_content)  # this strips the html, so people will have the text as well.
+
+        # create the email, and attach the HTML version as well.
+        msg = EmailMultiAlternatives(_("Arches Two-Factor Authentication"), text_content, admin_email, [request.user.email])
+        msg.attach_alternative(html_content, "text/html")
+
+        msg.send()
+
+        return JSONResponse(status=200)
+
+
 class FooView(View):
     def get(self, request):
-        user_profile = models.UserProfile.objects.get(user=request.user)
-        mfa_hash = user_profile.mfa_hash
+        link = request.GET.get("link", None)
+        AES = AESCipher(settings.SECRET_KEY)
 
-        if mfa_hash:
-            uri = pyotp.totp.TOTP(mfa_hash).provisioning_uri(request.user.email, issuer_name=settings.APP_TITLE)
-            # qrcode_uri = "https://www.google.com/chart?chs=200x200&chld=M|0&cht=qr&chl={}".format(uri)	
+        foo = JSONDeserializer().deserialize(AES.decrypt(link))
+
+        if datetime.fromtimestamp(foo["ts"]) + timedelta(minutes=15) >= datetime.fromtimestamp(int(time.time())):
+            user_profile = models.UserProfile.objects.get(user=request.user)
+            user_profile.mfa_hash = pyotp.random_base32()
+            user_profile.save()
+
+            uri = pyotp.totp.TOTP(user_profile.mfa_hash).provisioning_uri(request.user.email, issuer_name=settings.APP_TITLE)
 
             img = qrcode.make(uri)
 
-            import base64
-            # b64 = base64.b64encode(img).decode("utf-8")
+            foobar = io.BytesIO()
 
-            foo = io.BytesIO()
+            img.save(foobar)
 
-            img.save(foo)
-
-            # foo.seek(0)
-            # bar = foo.read()
-
-            base64_encoded_result_bytes = base64.b64encode(foo.getvalue())
+            base64_encoded_result_bytes = base64.b64encode(foobar.getvalue())
             base64_encoded_result_str = base64_encoded_result_bytes.decode('ascii')
 
-            # buffer = io.BytesIO()
+            foobar.close()
+        else:
+            raise("ERROR")
 
-
-
-            # output = io.StringIO()
-            # img.save(output)
-            # contents = foo.getvalue().encode("base64")
-            foo.close()
-
-            # Create QR and write to buffer
-            # embedded_qr = create(url_input)
-            # img.png(buffer,scale=7)
-
-        # import pdb; pdb.set_trace()
         return render(request, 'foo.htm', {'foo': base64_encoded_result_str })
         
 
@@ -221,60 +271,6 @@ class SignupView(View):
             },
         )
         
-
-@method_decorator(never_cache, name="dispatch")
-class BarView(View):
-    # def get(self, request):
-    #     form = ArchesUserCreationForm(enable_captcha=settings.ENABLE_CAPTCHA)
-    #     postdata = {"first_name": "", "last_name": "", "email": ""}
-    #     showform = True
-    #     confirmation_message = ""
-
-    #     return render(
-    #         request,
-    #         "signup.htm",
-    #         {
-    #             "enable_captcha": settings.ENABLE_CAPTCHA,
-    #             "form": form,
-    #             "postdata": postdata,
-    #             "showform": showform,
-    #             "confirmation_message": confirmation_message,
-    #             "validation_help": validation.password_validators_help_texts(),
-    #         },
-    #     )
-
-    def post(self, request):
-        AES = AESCipher(settings.SECRET_KEY)
-        userinfo = JSONSerializer().serialize(request.user)
-        encrypted_userinfo = AES.encrypt(userinfo)
-        url_encrypted_userinfo = urlencode({"link": encrypted_userinfo})
-
-
-        admin_email = settings.ADMINS[0][1] if settings.ADMINS else ""
-        email_context = {
-            "button_text": _("Signup for Arches"),
-            "link": request.build_absolute_uri(reverse("confirm_signup") + "?" + url_encrypted_userinfo),
-            "greeting": _(
-                "Thanks for your interest in Arches. Click on link below \
-                to confirm your email address! Use your email address to login."
-            ),
-            "closing": _(
-                "This link expires in 24 hours.  If you can't get to it before then, \
-                don't worry, you can always try again with the same email address."
-            ),
-        }
-
-        html_content = render_to_string("email/general_notification.htm", email_context)  # ...
-        text_content = strip_tags(html_content)  # this strips the html, so people will have the text as well.
-
-        # create the email, and attach the HTML version as well.
-        msg = EmailMultiAlternatives(_("Welcome to Arches!"), text_content, admin_email, [request.user.email])
-        msg.attach_alternative(html_content, "text/html")
-
-        msg.send()
-
-        return JSONResponse(status=200)
-
 
 @method_decorator(never_cache, name="dispatch")
 class ConfirmSignupView(View):
