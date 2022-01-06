@@ -13,15 +13,15 @@ class Migration(migrations.Migration):
 
     sql = """
         UPDATE public.cards_x_nodes_x_widgets
-        SET config = 
+        SET config =
             config ||
             jsonb_set(
                 jsonb_set(
-                    config, 
+                    config,
                     '{{placeholder}}', json_build_object('{0}', config->>'placeholder')::jsonb, true
                 ),
-                '{{defaultValue}}', 
-                    json_build_object('{0}', 
+                '{{defaultValue}}',
+                    json_build_object('{0}',
                         json_build_object('value', config->>'defaultValue', 'direction', '{1}'))::jsonb, true)
                  ||
             '{{"i18n_properties": ["placeholder"]}}'
@@ -32,7 +32,7 @@ class Migration(migrations.Migration):
         '{{"i18n_properties": ["placeholder"]}}'
         WHERE datatype = 'string';
     """.format(
-        settings.LANGUAGE_CODE, "ltr" if get_language_info(settings.LANGUAGE_CODE)["bidi"] == False else "rtl"
+        settings.LANGUAGE_CODE, "ltr" if not get_language_info(settings.LANGUAGE_CODE)["bidi"] else "rtl"
     )
 
     reverse_sql = """
