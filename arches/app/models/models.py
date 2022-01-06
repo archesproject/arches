@@ -1110,10 +1110,7 @@ class UserProfile(models.Model):
 
 @receiver(post_save, sender=User)
 def save_profile(sender, instance, **kwargs):
-    UserProfile.objects.get_or_create(
-        user=instance,
-        defaults={'mfa_hash': pyotp.random_base32()},
-    )
+    UserProfile.objects.get_or_create(user=instance)
 
 
 @receiver(post_save, sender=User)

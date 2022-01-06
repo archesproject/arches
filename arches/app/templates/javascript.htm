@@ -166,6 +166,7 @@
     define('arches', [], function () {
         return {
             urls: {
+                bar:"{% url 'bar' %}",
                 root: "{% url 'root' %}",
                 home: "{% url 'home' %}",
                 media: "{{ STATIC_URL }}",
@@ -296,6 +297,10 @@
                 title: "{% trans 'Delete map layer?' %}",
                 text: "{% trans 'Deleting this map layer will remove it entirely.  You cannot undo this action.  Are you sure you would like to proceed?' %}"
             },
+            confirmSendTwoFactorAuthenticationEmail: {
+                title: "{% trans 'Send Two-Factor Authentication email?' %}",
+                text: "{% trans 'This will send an email containing instructions to change two-factor authentication settings to your registered email address.  Are you sure you would like to proceed?' %}"
+            },
             confirmSurveyDelete: {
                 title: "{% trans 'Delete survey?' %}",
                 text: "{% trans 'Deleting this survey will remove it entirely.  You cannot undo this action.  Are you sure you would like to proceed?' %}"
@@ -313,6 +318,10 @@
             resourceCopyFailed: {
                 title: "{% trans 'Resource Copy Failed...'%}",
                 text: "{% trans 'Sorry! The copy request failed. Please try again.  Contact your system administrator if the problem persists.' %}"
+            },
+            twoFactorAuthenticationEmailSuccess: {
+                title: "{% trans 'Email Sent!' %}",
+                text: "{% trans 'An email with instructions to change two-factor authentication settings was sent to your registered email address.' %}"
             },
             mapboxApiKey: '{{ map_info.mapbox_api_key }}',
             hexBinSize: {{ map_info.hex_bin_size | unlocalize }},

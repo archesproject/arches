@@ -220,6 +220,60 @@ class SignupView(View):
                 "validation_help": validation.password_validators_help_texts(),
             },
         )
+        
+
+@method_decorator(never_cache, name="dispatch")
+class BarView(View):
+    # def get(self, request):
+    #     form = ArchesUserCreationForm(enable_captcha=settings.ENABLE_CAPTCHA)
+    #     postdata = {"first_name": "", "last_name": "", "email": ""}
+    #     showform = True
+    #     confirmation_message = ""
+
+    #     return render(
+    #         request,
+    #         "signup.htm",
+    #         {
+    #             "enable_captcha": settings.ENABLE_CAPTCHA,
+    #             "form": form,
+    #             "postdata": postdata,
+    #             "showform": showform,
+    #             "confirmation_message": confirmation_message,
+    #             "validation_help": validation.password_validators_help_texts(),
+    #         },
+    #     )
+
+    def post(self, request):
+        AES = AESCipher(settings.SECRET_KEY)
+        userinfo = JSONSerializer().serialize(request.user)
+        encrypted_userinfo = AES.encrypt(userinfo)
+        url_encrypted_userinfo = urlencode({"link": encrypted_userinfo})
+
+
+        admin_email = settings.ADMINS[0][1] if settings.ADMINS else ""
+        email_context = {
+            "button_text": _("Signup for Arches"),
+            "link": request.build_absolute_uri(reverse("confirm_signup") + "?" + url_encrypted_userinfo),
+            "greeting": _(
+                "Thanks for your interest in Arches. Click on link below \
+                to confirm your email address! Use your email address to login."
+            ),
+            "closing": _(
+                "This link expires in 24 hours.  If you can't get to it before then, \
+                don't worry, you can always try again with the same email address."
+            ),
+        }
+
+        html_content = render_to_string("email/general_notification.htm", email_context)  # ...
+        text_content = strip_tags(html_content)  # this strips the html, so people will have the text as well.
+
+        # create the email, and attach the HTML version as well.
+        msg = EmailMultiAlternatives(_("Welcome to Arches!"), text_content, admin_email, [request.user.email])
+        msg.attach_alternative(html_content, "text/html")
+
+        msg.send()
+
+        return JSONResponse(status=200)
 
 
 @method_decorator(never_cache, name="dispatch")
