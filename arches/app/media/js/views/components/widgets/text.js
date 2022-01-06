@@ -63,17 +63,30 @@ define(['knockout', 'underscore', 'viewmodels/widget', 'arches', 'bindings/chose
                 const currentLanguage = self.currentLanguage();
                 if(!currentLanguage) { return; }
                 currentValue[currentLanguage.code].value = newValue;
-                self.value(currentValue);
+
+                if(!self.inResourceEditor){
+                    self.defaultValue(currentValue);
+                    self.widget.card._card.valueHasMutated();
+                } else {
+                    self.value(currentValue);
+                }
             });
 
             self.currentDirection.subscribe(newValue => {
                 const currentLanguage = self.currentLanguage();
                 if(!currentLanguage) { return; }
-                if(!currentValue?.[currentLanguage.code]){
-                    currentValue[currentLanguage.code] = {}
+
+                if(!self.inResourceEditor){
+                    currentValue[currentLanguage.code].direction = newValue;
+                    self.defaultValue(currentValue);
+                    self.widget.card._card.valueHasMutated();
+                } else {
+                    if(!currentValue?.[currentLanguage.code]){
+                        currentValue[currentLanguage.code] = {}
+                    }
+                    currentValue[currentLanguage.code].direction = newValue;
+                    self.value(currentValue);
                 }
-                currentValue[currentLanguage.code].direction = newValue;
-                self.value(currentValue);
             })
 
             self.currentLanguage.subscribe(() => {

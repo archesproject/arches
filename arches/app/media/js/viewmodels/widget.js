@@ -35,6 +35,7 @@ define([
         this.form = params.form || null;
         this.tile = params.tile || null;
         this.widget = params.widget || null;
+        this.inResourceEditor = (typeof params.inResourceEditor === "boolean" ? params.inResourceEditor : null)
         this.results = params.results || null;
         this.hideEmptyNodes = params.hideEmptyNodes;
         this.displayValue = ko.computed(function() {

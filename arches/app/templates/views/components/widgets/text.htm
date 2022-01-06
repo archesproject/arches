@@ -39,7 +39,12 @@
         <i data-bind="css: {'ion-asterisk widget-label-required': node.isrequired}"></i>
         <!-- /ko -->
         <div class="col-xs-12" style="display:flex;flex-wrap: wrap;flex-direction: column;">
+            <!-- ko if: !inResourceEditor -->
+            <input type="text" style="flex:1" placeholder="{% trans "Default Value" %}" data-bind="textInput: currentText, attr: {maxlength: maxLength, disabled: disable, dir: currentDirection}" class="form-control input-lg widget-input">
+            <!-- /ko -->
+            <!-- ko if: inResourceEditor -->
             <input type="text" style="flex:1" data-bind="textInput: currentText, attr: {placeholder: placeholder, maxlength: maxLength, disabled: disable, dir: currentDirection}" class="form-control input-lg widget-input">
+            <!-- /ko -->
         </div>
         </div>
     </div>
@@ -60,12 +65,6 @@
     <input type="" placeholder="{% trans "Max Length" %}" id="" class="form-control input-md widget-input" data-bind="textInput: maxLength">
 </div>
 
-<div class="control-label">
-    {% trans "Default Value" %}
-</div>
-<div class="col-xs-12 pad-no crud-widget-container">
-    <input type="" placeholder="{% trans "Default Value" %}" id="" class="form-control input-md widget-input" data-bind="textInput: defaultValue">
-</div>
 <div class="node-config-item">
     <div class="control-label">
         {% trans "Disabled" %}

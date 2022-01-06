@@ -2,6 +2,7 @@
 from arches.app.models.fields.i18n import I18n_JSONField
 from django.db import migrations
 from django.conf import settings
+from django.utils.translation import get_language_info
 
 
 class Migration(migrations.Migration):
@@ -12,27 +13,34 @@ class Migration(migrations.Migration):
 
     sql = """
         UPDATE public.cards_x_nodes_x_widgets
-        SET config = config ||
-        jsonb_set(
+        SET config = 
+            config ||
             jsonb_set(
-                config, '{{placeholder}}', json_build_object('{0}', config->>'placeholder')::jsonb, true),
-        '{{defaultValue}}', json_build_object('{0}', config->>'defaultValue')::jsonb, true) ||
-        '{{"i18n_properties": ["placeholder", "defaultValue"]}}'
+                jsonb_set(
+                    config, 
+                    '{{placeholder}}', json_build_object('{0}', config->>'placeholder')::jsonb, true
+                ),
+                '{{defaultValue}}', 
+                    json_build_object('{0}', 
+                        json_build_object('value', config->>'defaultValue', 'direction', '{1}'))::jsonb, true)
+                 ||
+            '{{"i18n_properties": ["placeholder"]}}'
         WHERE nodeid in (SELECT nodeid FROM nodes WHERE datatype = 'string');
 
         UPDATE public.widgets
         SET defaultconfig = defaultconfig ||
-        '{{"i18n_properties": ["placeholder", "defaultValue"]}}'
+        '{{"i18n_properties": ["placeholder"]}}'
         WHERE datatype = 'string';
     """.format(
-        settings.LANGUAGE_CODE
+        settings.LANGUAGE_CODE,
+        "ltr" if get_language_info(settings.LANGUAGE_CODE)['bidi'] == False else "rtl"
     )
 
     reverse_sql = """
         UPDATE public.cards_x_nodes_x_widgets
         SET config = config - 'i18n_properties' ||
-        json_build_object('placeholder', jsonb_extract_path(config, 'placeholder', '{0}'))::jsonb ||
-        json_build_object('defaultValue', jsonb_extract_path(config, 'defaultValue', '{0}'))::jsonb
+        json_build_object('defaultValue', jsonb_extract_path(config, 'defaultValue', '{0}', 'value'))::jsonb ||
+        json_build_object('placeholder', jsonb_extract_path(config, 'placeholder', '{0}'))::jsonb
         WHERE nodeid in (SELECT nodeid FROM nodes WHERE datatype = 'string');
 
         UPDATE public.widgets
