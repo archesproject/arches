@@ -141,7 +141,7 @@ class BarView(View):
                 "Click on link below to update your two-factor authentication settings."
             ),
             "closing": _(
-                "This link expires in 15 minutes. If you did not request this change, \
+                "This link expires in 5 minutes. If you did not request this change, \
                 contact your Administrator immediately."
             ),
         }
@@ -165,28 +165,54 @@ class FooView(View):
 
         foo = JSONDeserializer().deserialize(AES.decrypt(link))
 
-        if datetime.fromtimestamp(foo["ts"]) + timedelta(minutes=15) >= datetime.fromtimestamp(int(time.time())):
+        if True:
+        # if datetime.fromtimestamp(foo["ts"]) + timedelta(minutes=5) >= datetime.fromtimestamp(int(time.time())):
             user_profile = models.UserProfile.objects.get(user=request.user)
-            user_profile.mfa_hash = pyotp.random_base32()
-            user_profile.save()
 
-            uri = pyotp.totp.TOTP(user_profile.mfa_hash).provisioning_uri(request.user.email, issuer_name=settings.APP_TITLE)
 
-            img = qrcode.make(uri)
+            context = {
+                'ENABLE_TWO_FACTOR_AUTHENTICATION': settings.ENABLE_TWO_FACTOR_AUTHENTICATION,
+                'FORCE_TWO_FACTOR_AUTHENTICATION': settings.FORCE_TWO_FACTOR_AUTHENTICATION,
+                'user_has_enabled_two_factor_authentication': bool(user_profile.mfa_hash),
+            }
 
-            foobar = io.BytesIO()
 
-            img.save(foobar)
-
-            base64_encoded_result_bytes = base64.b64encode(foobar.getvalue())
-            base64_encoded_result_str = base64_encoded_result_bytes.decode('ascii')
-
-            foobar.close()
         else:
             raise("ERROR")
 
-        return render(request, 'foo.htm', {'foo': base64_encoded_result_str })
+        return render(request, 'foo.htm', context)
+        # return render(request, 'foo.htm', {'foo': base64_encoded_result_str })
         
+    def post(self, request):
+        user_profile = models.UserProfile.objects.get(user=request.user)
+
+        # import pdb; pdb.set_trace()
+
+        user_profile.mfa_hash = pyotp.random_base32()
+        user_profile.save()
+
+        uri = pyotp.totp.TOTP(user_profile.mfa_hash).provisioning_uri(request.user.email, issuer_name=settings.APP_TITLE)
+
+        img = qrcode.make(uri)
+
+        foobar = io.BytesIO()
+
+        img.save(foobar)
+
+        base64_encoded_result_bytes = base64.b64encode(foobar.getvalue())
+        base64_encoded_result_str = base64_encoded_result_bytes.decode('ascii')
+
+        foobar.close()
+
+        context = {
+            'ENABLE_TWO_FACTOR_AUTHENTICATION': settings.ENABLE_TWO_FACTOR_AUTHENTICATION,
+            'FORCE_TWO_FACTOR_AUTHENTICATION': settings.FORCE_TWO_FACTOR_AUTHENTICATION,
+            'user_has_enabled_two_factor_authentication': bool(user_profile.mfa_hash),
+            'new_mfa_hash': base64_encoded_result_str,
+        }
+
+        return render(request, "foo.htm", context)
+
 
 @method_decorator(never_cache, name="dispatch")
 class SignupView(View):

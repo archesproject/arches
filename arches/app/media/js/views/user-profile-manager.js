@@ -26,7 +26,7 @@ define([
 
             self.viewModel.isTwoFactorAuthenticationEnabled = data.two_factor_authentication_settings['ENABLE_TWO_FACTOR_AUTHENTICATION'];
             self.viewModel.isTwoFactorAuthenticationForced = data.two_factor_authentication_settings['FORCE_TWO_FACTOR_AUTHENTICATION'];
-            self.viewModel.hasUserEnabledTwoFactorAuthentication = ko.observable(data.two_factor_authentication_settings['FORCE_TWO_FACTOR_AUTHENTICATION']);
+            self.viewModel.hasUserEnabledTwoFactorAuthentication = ko.observable(data.two_factor_authentication_settings['user_has_enabled_two_factor_authentication']);
 
             console.log(data.two_factor_authentication_settings)
 

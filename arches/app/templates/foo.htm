@@ -1,10 +1,88 @@
+{% extends "base.htm" %}
 {% load staticfiles %}
-{% load template_tags %}
 {% load i18n %}
 
-<div>YOU HAVE NOT ENABLED 2FA!</div>
-<div>PLEASE CLICK THE BUTTON TO SEND AN EMAIL TO ENABLE 2FA!</div>
+{% block loading_mask %}
+{% endblock loading_mask %}
 
-<img src="data:image/png;base64, {{foo}} "/>
+{% block body %}
+<!-- <meta http-equiv="refresh" content="300;url={% url 'home' %}"> -->
 
-<button>FOOOOOOOOOOOOOOOOOOOO</button>
+<div id="container" class="cls-container arches-login">
+
+	<!-- BACKGROUND IMAGE -->
+	<!--===================================================
+	<div id="bg-overlay" class="bg-img img-login"></div>
+	-->
+
+	 <!-- LOGIN FORM -->
+	<div class="cls-content arches-signin">
+
+        <div class="cls-content-sm panel login-panel" style="width: 750px;">
+			<div class="panel-body" style="padding: 40px;">
+				<h3 class="login-panel-header arches-signin">{% trans "Arches Two-Factor Authentication Settings" %}</h3>
+				<p 
+                    class="login-panel-header arches-signin" 
+                    style="
+                        color: red;
+                        font-size: 16px;
+                    "
+                >
+                    {% trans "Warning: This page will expire in 5 minutes." %}
+                </p>
+                
+                <hr style="border-color: #eee;">
+
+                <div
+                    style="
+                        display: flex;
+                        padding: 0 20px;
+                        justify-content: space-between;
+                        align-items: center;
+                    "
+                >
+                    <h4>{% trans "Two-Factor Authentication:" %}</h4>
+
+                    {% if FORCE_TWO_FACTOR_AUTHENTICATION or user_has_enabled_two_factor_authentication %}
+                        <h4 style="color: green;">{% trans "ENABLED"%}</h4>
+                    {% else %}
+                        <h4 style="color: red;">{% trans "DISABLED"%}</h4>
+                    {% endif %}
+                </div>
+
+                <hr style="border-color: #eee;">
+
+                {% if new_mfa_hash %}
+                    <img src="data:image/png;base64, {{new_mfa_hash}} "/>
+                    <hr style="border-color: #eee;">
+                {% endif %}
+
+                <form action="{% url 'foo' %}" method="post">
+                    {% csrf_token %}
+                     <button type="submit" name='generate-mfa-hash-button' value='update' class="btn btn-success">{% trans "Click here to generate a new shared secret key" %}</button>
+
+                    {% if FORCE_TWO_FACTOR_AUTHENTICATION %}
+                        <hr style="border-color: #eee;">
+
+                        <div 
+                            class="login-panel-header arches-signin" 
+                            style="
+                                font-size: 14px;
+                            "
+                        >
+                            {% trans "To disable two-factor authentication, please contact your administrator." %}
+                        </div>
+                    {% else %}
+                        <button type="submit" name='delete-mfa-hash-button' value='disable' class="btn btn-danger">{% trans "Click here to disable two-factor authentication" %}</button>
+                    {% endif %}
+
+                </form>
+            </div>
+        </div>
+
+        
+    </div>
+</div>
+
+
+{% endblock body %}
