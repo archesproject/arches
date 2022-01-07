@@ -41,7 +41,8 @@ define([
                     }
 
                     $.getJSON(url, function(resp) {
-                        params.report.report_json = resp[params.report.attributes.resourceid];
+                        const resourceId = params.report.attributes.resourceid != '' ? params.report.attributes.resourceid : window.location.pathname.split("/")?.[2];
+                        params.report.report_json = resp?.[resourceId];
     
                         self.template(reportLookup[params.report.templateId()]);
                         self.report(params.report);
