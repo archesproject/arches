@@ -376,12 +376,14 @@ class MobileSurvey(models.MobileSurveyModel):
                         print("{0}: already saved".format(row.doc["_rev"]))
 
             for row in couch_docs:
+                tile_data = None
                 if row.doc["type"] == "tile" and ResourceInstance.objects.filter(pk=row.doc["resourceinstance_id"]).exists():
                     if self.check_if_revision_exists(row.doc) is False and self.check_if_tile_deleted(row.doc) is False:
                         if "provisionaledits" in row.doc and row.doc["provisionaledits"] is not None:
                             action = "update"
                             try:
                                 tile = Tile.objects.get(tileid=row.doc["tileid"])
+                                tile_data = tile.data
                                 prov_edit = self.get_provisional_edit(row.doc, tile, sync_user_id, db)
                                 if prov_edit is not None:
                                     tile.data = prov_edit
@@ -404,9 +406,10 @@ class MobileSurvey(models.MobileSurveyModel):
                                     tile.data = prov_edit
 
                             self.handle_reviewer_edits(sync_user, tile)
-                            tile.save(user=sync_user)
-                            self.save_revision_log(row.doc, synclog, action)
-                            print("Tile {0} Saved".format(row.doc["tileid"]))
+                            if tile.data != tile_data:
+                                tile.save(user=sync_user)
+                                self.save_revision_log(row.doc, synclog, action)
+                                logger.info("Tile {0} Saved".format(row.doc["tileid"]))
                             db.compact()
 
     def append_to_instances(self, request, instances, resource_type_id):

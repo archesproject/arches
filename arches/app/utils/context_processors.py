@@ -74,10 +74,12 @@ def app_settings(request):
             "GOOGLE_ANALYTICS_TRACKING_ID": settings.GOOGLE_ANALYTICS_TRACKING_ID,
             "USE_SEMANTIC_RESOURCE_RELATIONSHIPS": settings.USE_SEMANTIC_RESOURCE_RELATIONSHIPS,
             "SEARCH_EXPORT_IMMEDIATE_DOWNLOAD_THRESHOLD": settings.SEARCH_EXPORT_IMMEDIATE_DOWNLOAD_THRESHOLD,
+            "SEARCH_EXPORT_IMMEDIATE_DOWNLOAD_THRESHOLD_HTML_FORMAT": settings.SEARCH_EXPORT_IMMEDIATE_DOWNLOAD_THRESHOLD_HTML_FORMAT,
             "RENDERERS": settings.RENDERERS,
             "ACCESSIBILITY_MODE": settings.ACCESSIBILITY_MODE,
             "FORCE_SCRIPT_NAME": settings.FORCE_SCRIPT_NAME if settings.FORCE_SCRIPT_NAME is not None else "",
             "DEFAULT_LANGUAGE": get_language(),
             "LANGUAGES": JSONSerializer().serialize(languages) if len(languages) != 0 else JSONSerializer().serialize([]),
+            "RESTRICT_CELERY_EXPORT_FOR_ANONYMOUS_USER": settings.RESTRICT_CELERY_EXPORT_FOR_ANONYMOUS_USER,
         }
     }

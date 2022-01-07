@@ -240,7 +240,10 @@ class CsvWriter(Writer):
             csvwriter = csv.DictWriter(dest, delimiter=",", fieldnames=csv_header)
             csvwriter.writeheader()
             csvs_for_export.append(
-                {"name": csv_name.split(".")[0] + "_groups." + csv_name.split(".")[1], "outputfile": dest,}
+                {
+                    "name": csv_name.split(".")[0] + "_groups." + csv_name.split(".")[1],
+                    "outputfile": dest,
+                }
             )
             for csv_record in other_group_records:
                 if "populated_node_groups" in csv_record:
