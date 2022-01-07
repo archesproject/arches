@@ -64,7 +64,7 @@ from arches.app.views.auth import (
     ConfirmSignupView,
     ChangePasswordView,
     GetClientIdView,
-    TwoFactorAuthenticationLoginView,
+    BazView,
     UserProfileView,
     ServerSettingView,
     PasswordResetView,
@@ -296,7 +296,7 @@ urlpatterns = [
     url(r"^image-service-manager", ManifestManagerView.as_view(), name="manifest_manager"),
     url(r"^foo", FooView.as_view(), name="foo"),
     url(r"^bar", BarView.as_view(), name="bar"),
-    url(r"^baz", TwoFactorAuthenticationLoginView.as_view(), name="baz"),
+    url(r"^baz", BazView.as_view(), name="baz"),
 ]
 
 if settings.DEBUG:

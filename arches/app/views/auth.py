@@ -63,7 +63,16 @@ class LoginView(View):
             # need to redirect to 'auth' so that the user is set to anonymous via the middleware
             return redirect("auth")
         else:
-            return render(request, "login.htm", {"auth_failed": False, "next": next})
+            return render(
+                request, 
+                "login.htm", 
+                {
+                    'ENABLE_TWO_FACTOR_AUTHENTICATION': settings.ENABLE_TWO_FACTOR_AUTHENTICATION,
+                    'FORCE_TWO_FACTOR_AUTHENTICATION': settings.FORCE_TWO_FACTOR_AUTHENTICATION,
+                    "auth_failed": False, 
+                    "next": next
+                }
+            )
 
     def post(self, request):
         # POST request is taken to mean user is logging in
@@ -71,6 +80,7 @@ class LoginView(View):
         password = request.POST.get("password", None)
         user = authenticate(username=username, password=password)
         next = request.POST.get("next", reverse("home"))
+        two_factor_authentication_string = request.POST.get('two-factor-authentication', None)
 
         if user is not None and user.is_active:
             user_profile = models.UserProfile.objects.get(user=user)
@@ -81,19 +91,36 @@ class LoginView(View):
                     settings.ENABLE_TWO_FACTOR_AUTHENTICATION and user_profile.mfa_hash
                 )
             ):
-                next = reverse('baz')
+                user_profile = models.UserProfile.objects.get(user=user)
+                totp = pyotp.TOTP(user_profile.mfa_hash)
+
+                if totp.verify(two_factor_authentication_string):
+                    login(request, user)
+                    user.password = ""
+
+                    return redirect(next)
             else:
                 login(request, user)
                 user.password = ""
 
-            return redirect(next)
+                return redirect(next)
 
-        return render(request, "login.htm", {"auth_failed": True, "next": next}, status=401)
+        return render(
+            request, 
+            "login.htm", 
+            {
+                'ENABLE_TWO_FACTOR_AUTHENTICATION': settings.ENABLE_TWO_FACTOR_AUTHENTICATION,
+                'FORCE_TWO_FACTOR_AUTHENTICATION': settings.FORCE_TWO_FACTOR_AUTHENTICATION,
+                "auth_failed": True, 
+                "next": next,
+            }, 
+            status=401
+        )
 
 
 
 @method_decorator(never_cache, name="dispatch")
-class TwoFactorAuthenticationLoginView(View):
+class BazView(View):
     def get(self, request):
         link = request.GET.get("link", None)
         # AES = AESCipher(settings.SECRET_KEY)
@@ -116,24 +143,8 @@ class TwoFactorAuthenticationLoginView(View):
         # # return render(request, 'foo.htm', {'foo': base64_encoded_result_str })
 
     def post(self, request):
-        # POST request is taken to mean user is logging in
-        username = request.POST.get("username", None)
-        password = request.POST.get("password", None)
-        user = authenticate(username=username, password=password)
-        next = request.POST.get("next", reverse("home"))
-        two_factor_authentication_string = request.POST.get('two-factor-authentication', None)
-
-        import pdb; pdb.set_trace()
- 
-        if user is not None and user.is_active:
-            user_profile = models.UserProfile.objects.get(user=user)
-            totp = pyotp.TOTP(user_profile.mfa_hash)
-
-            if totp.verify(two_factor_authentication_string):
-                login(request, user)
-                user.password = ""
-
-                return redirect(next)
+        # look up email, if valid send instructions
+        pass
 
         return render(request, "baz.htm", {"auth_failed": True,})
 

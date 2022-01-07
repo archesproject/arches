@@ -16,41 +16,32 @@
 	<div class="cls-content arches-signin">
         <div class="cls-content-sm panel login-panel" style="">
 			<div class="panel-body" style="padding: 40px; padding-bottom: 20px;">
-				<h3 class="login-panel-header arches-signin">{% trans "Two-Factor Authentication" %}</h3>
+				<h3 class="login-panel-header arches-signin">{% trans "Reset Two-Factor Authentication" %}</h3>
                 
                 <hr style="border-color: #eee;">
 
                 <form action="{% url 'baz' %}" method="post">
                     {% csrf_token %}
 
-                    <p>{% trans 'Please enter your external authentication code below.' %}</p>
+                    <p>{% trans 'Please enter an email address below.' %} </p>
+                    <p>{% trans "If it is registered in our system it will receive instructions to reset two-factor authentication." %}</p>
+                    
+                    <hr style="border-color: #eee;">
 
                     <div class="form-group" style="margin-top: 20px;">
-                        <div class="input-group">
-                            <div class="input-group-addon"><i class="ion-lock-combination"></i></div>
-                            <input
-                                id='two-factor-authentication'
-                                name='two-factor-authentication'
-                                class="form-control input-lg"
-                                type="text"
-                                inputmode="numeric"
-                                pattern="[0-9]*"
-                                placeholder="Authentication code"
-                                autocomplete="one-time-code"
-                            />
+                        <div class="form-group">
+                            <div class="input-group">
+                                <div class="input-group-addon"><i class="text-lg ion-email"></i></div>
+                                <input type="text" class="form-control input-lg" placeholder="Email address" name='email' autofocus>
+                            </div>
                         </div>
                     </div>
 
-                    {% if auth_failed %}
-                        <p style="color: red;">{% trans 'Two-factor authentication failed. Please try again.' %}</p>
-                    {% endif %}
-
                     <hr style="border-color: #eee;">
-
+                    
                     <div>
-                        <button class="btn btn-success" style="min-width: 250px;">{% trans 'Submit' %}</button>
+                        <button type="submit" class="btn btn-success" style="min-width: 250px;">{% trans 'Submit' %}</button>
                     </div>
-
                 </form>
             </div>
         </div>
