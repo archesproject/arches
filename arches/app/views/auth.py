@@ -67,37 +67,75 @@ class LoginView(View):
 
     def post(self, request):
         # POST request is taken to mean user is logging in
-        auth_attempt_success = None
+        username = request.POST.get("username", None)
+        password = request.POST.get("password", None)
+        user = authenticate(username=username, password=password)
+        next = request.POST.get("next", reverse("home"))
+
+        if user is not None and user.is_active:
+            user_profile = models.UserProfile.objects.get(user=user)
+
+            if (
+                settings.FORCE_TWO_FACTOR_AUTHENTICATION
+                or (
+                    settings.ENABLE_TWO_FACTOR_AUTHENTICATION and user_profile.mfa_hash
+                )
+            ):
+                next = reverse('baz')
+            else:
+                login(request, user)
+                user.password = ""
+
+            return redirect(next)
+
+        return render(request, "login.htm", {"auth_failed": True, "next": next}, status=401)
+
+
+
+@method_decorator(never_cache, name="dispatch")
+class TwoFactorAuthenticationLoginView(View):
+    def get(self, request):
+        link = request.GET.get("link", None)
+        # AES = AESCipher(settings.SECRET_KEY)
+
+        # foo = JSONDeserializer().deserialize(AES.decrypt(link))
+
+        # if datetime.fromtimestamp(foo["ts"]) + timedelta(minutes=15) >= datetime.fromtimestamp(int(time.time())):
+        #     user_profile = models.UserProfile.objects.get(user=request.user)
+
+        #     context = {
+        #         'ENABLE_TWO_FACTOR_AUTHENTICATION': settings.ENABLE_TWO_FACTOR_AUTHENTICATION,
+        #         'FORCE_TWO_FACTOR_AUTHENTICATION': settings.FORCE_TWO_FACTOR_AUTHENTICATION,
+        #         'user_has_enabled_two_factor_authentication': bool(user_profile.mfa_hash),
+        #     }
+
+        # else:
+        #     raise("ERROR")
+
+        return render(request, 'baz.htm', {})
+        # # return render(request, 'foo.htm', {'foo': base64_encoded_result_str })
+
+    def post(self, request):
+        # POST request is taken to mean user is logging in
         username = request.POST.get("username", None)
         password = request.POST.get("password", None)
         user = authenticate(username=username, password=password)
         next = request.POST.get("next", reverse("home"))
         two_factor_authentication_string = request.POST.get('two-factor-authentication', None)
 
+        import pdb; pdb.set_trace()
+ 
         if user is not None and user.is_active:
-            if settings.ENABLE_TWO_FACTOR_AUTHENTICATION:
-                user_profile = models.UserProfile.objects.get(user=user)
+            user_profile = models.UserProfile.objects.get(user=user)
+            totp = pyotp.TOTP(user_profile.mfa_hash)
 
-                if user_profile:
-                    totp = pyotp.TOTP(user_profile.mfa_hash)
-
-                    if totp.verify(two_factor_authentication_string):
-                        login(request, user)
-                        user.password = ""
-
-                        return redirect(next)
-
-
-                # next = '/foo/'
-            else:
+            if totp.verify(two_factor_authentication_string):
                 login(request, user)
                 user.password = ""
-                
+
                 return redirect(next)
 
-        return render(request, "login.htm", {"auth_failed": True, "next": next}, status=401)
-
-
+        return render(request, "baz.htm", {"auth_failed": True,})
 
 @method_decorator(never_cache, name="dispatch")
 class BarView(View):
@@ -165,7 +203,8 @@ class FooView(View):
 
         foo = JSONDeserializer().deserialize(AES.decrypt(link))
 
-        if datetime.fromtimestamp(foo["ts"]) + timedelta(minutes=15) >= datetime.fromtimestamp(int(time.time())):
+        if True:
+        # if datetime.fromtimestamp(foo["ts"]) + timedelta(minutes=15) >= datetime.fromtimestamp(int(time.time())):
             user_profile = models.UserProfile.objects.get(user=request.user)
 
             context = {

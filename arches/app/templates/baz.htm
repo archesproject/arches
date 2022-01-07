@@ -1,0 +1,61 @@
+{% extends "base.htm" %}
+{% load staticfiles %}
+{% load i18n %}
+
+{% block loading_mask %}
+{% endblock loading_mask %}
+
+{% block body %}
+<div id="container" class="cls-container arches-login">
+
+	<!-- BACKGROUND IMAGE -->
+	<!--===================================================
+	<div id="bg-overlay" class="bg-img img-login"></div>
+	-->
+
+	<div class="cls-content arches-signin">
+        <div class="cls-content-sm panel login-panel" style="">
+			<div class="panel-body" style="padding: 40px; padding-bottom: 20px;">
+				<h3 class="login-panel-header arches-signin">{% trans "Two-Factor Authentication" %}</h3>
+                
+                <hr style="border-color: #eee;">
+
+                <form action="{% url 'baz' %}" method="post">
+                    {% csrf_token %}
+
+                    <p>{% trans 'Please enter your external authentication code below.' %}</p>
+
+                    <div class="form-group" style="margin-top: 20px;">
+                        <div class="input-group">
+                            <div class="input-group-addon"><i class="ion-lock-combination"></i></div>
+                            <input
+                                id='two-factor-authentication'
+                                name='two-factor-authentication'
+                                class="form-control input-lg"
+                                type="text"
+                                inputmode="numeric"
+                                pattern="[0-9]*"
+                                placeholder="Authentication code"
+                                autocomplete="one-time-code"
+                            />
+                        </div>
+                    </div>
+
+                    {% if auth_failed %}
+                        <p style="color: red;">{% trans 'Two-factor authentication failed. Please try again.' %}</p>
+                    {% endif %}
+
+                    <hr style="border-color: #eee;">
+
+                    <div>
+                        <button class="btn btn-success" style="min-width: 250px;">{% trans 'Submit' %}</button>
+                    </div>
+
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+{% endblock body %}
