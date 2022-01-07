@@ -6,7 +6,8 @@
 {% endblock loading_mask %}
 
 {% block body %}
-<!-- <meta http-equiv="refresh" content="300;url={% url 'home' %}"> -->
+<!-- redirects page after 5 minutes -->
+<meta http-equiv="refresh" content="300;url={% url 'home' %}">
 
 <div id="container" class="cls-container arches-login">
 
@@ -15,9 +16,7 @@
 	<div id="bg-overlay" class="bg-img img-login"></div>
 	-->
 
-	 <!-- LOGIN FORM -->
 	<div class="cls-content arches-signin">
-
         <div class="cls-content-sm panel login-panel" style="">
 			<div class="panel-body" style="padding: 40px; padding-bottom: 20px;">
 				<h3 class="login-panel-header arches-signin">{% trans "Two-Factor Authentication Settings" %}</h3>
@@ -60,7 +59,7 @@
                         name='generate-qr-code-button' 
                         value='generate_qr_code' 
                         class="btn btn-success" 
-                        style="width: fit-content;"
+                        style="width: fit-content; min-width: 250px; font-weight: bold;"
                     >
                         {% if user_has_enabled_two_factor_authentication %}
                             {% trans "Generate a new shared secret key" %}
@@ -116,6 +115,12 @@
                                     <tr>
                                         <td><p style="font-weight: bold;">{{ new_mfa_hash_manual_entry_data.new_mfa_hash }}</p></td>
                                     </tr>
+                                    <tr>
+                                        <td><p>{% trans 'Algorithm Type:' %}</p></td>
+                                    </tr>
+                                    <tr>
+                                        <td><p style="font-weight: bold;">{% trans 'Time based' %}</p></td>
+                                    </tr>
                                 </tbody>
                             </table>
 
@@ -143,14 +148,11 @@
                             {% trans "To disable two-factor authentication, please contact your administrator." %}
                         </div>
                     {% elif user_has_enabled_two_factor_authentication %}
-                        <button type="submit" name='delete-mfa-hash-button' value='delete' class="btn btn-danger" style="width: fit-content;">{% trans "Disable two-factor authentication" %}</button>
+                        <button type="submit" name='delete-mfa-hash-button' value='delete' class="btn btn-danger" style="width: fit-content; min-width: 250px;">{% trans "Disable two-factor authentication" %}</button>
                     {% endif %}
-
                 </form>
             </div>
         </div>
-
-        
     </div>
 </div>
 

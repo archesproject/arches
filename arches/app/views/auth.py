@@ -141,7 +141,7 @@ class BarView(View):
                 "Click on link below to update your two-factor authentication settings."
             ),
             "closing": _(
-                "This link expires in 5 minutes. If you did not request this change, \
+                "This link expires in 15 minutes. If you did not request this change, \
                 contact your Administrator immediately."
             ),
         }
@@ -165,17 +165,14 @@ class FooView(View):
 
         foo = JSONDeserializer().deserialize(AES.decrypt(link))
 
-        if True:
-        # if datetime.fromtimestamp(foo["ts"]) + timedelta(minutes=5) >= datetime.fromtimestamp(int(time.time())):
+        if datetime.fromtimestamp(foo["ts"]) + timedelta(minutes=15) >= datetime.fromtimestamp(int(time.time())):
             user_profile = models.UserProfile.objects.get(user=request.user)
-
 
             context = {
                 'ENABLE_TWO_FACTOR_AUTHENTICATION': settings.ENABLE_TWO_FACTOR_AUTHENTICATION,
                 'FORCE_TWO_FACTOR_AUTHENTICATION': settings.FORCE_TWO_FACTOR_AUTHENTICATION,
                 'user_has_enabled_two_factor_authentication': bool(user_profile.mfa_hash),
             }
-
 
         else:
             raise("ERROR")
