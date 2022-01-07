@@ -18,9 +18,9 @@
 	 <!-- LOGIN FORM -->
 	<div class="cls-content arches-signin">
 
-        <div class="cls-content-sm panel login-panel" style="width: 750px;">
-			<div class="panel-body" style="padding: 40px;">
-				<h3 class="login-panel-header arches-signin">{% trans "Arches Two-Factor Authentication Settings" %}</h3>
+        <div class="cls-content-sm panel login-panel" style="">
+			<div class="panel-body" style="padding: 40px; padding-bottom: 20px;">
+				<h3 class="login-panel-header arches-signin">{% trans "Two-Factor Authentication Settings" %}</h3>
 				<p 
                     class="login-panel-header arches-signin" 
                     style="
@@ -52,18 +52,88 @@
 
                 <hr style="border-color: #eee;">
 
-                {% if new_mfa_hash %}
-                    <img src="data:image/png;base64, {{new_mfa_hash}} "/>
-                    <hr style="border-color: #eee;">
-                {% endif %}
-
                 <form action="{% url 'foo' %}" method="post">
                     {% csrf_token %}
-                     <button type="submit" name='generate-mfa-hash-button' value='update' class="btn btn-success">{% trans "Click here to generate a new shared secret key" %}</button>
+
+                    <button 
+                        type="submit" 
+                        name='generate-qr-code-button' 
+                        value='generate_qr_code' 
+                        class="btn btn-success" 
+                        style="width: fit-content;"
+                    >
+                        {% if user_has_enabled_two_factor_authentication %}
+                            {% trans "Generate a new shared secret key" %}
+                        {% else %}
+                            {% trans "Enable two-factor authentication" %}
+                        {% endif %}
+                    </button>
+
+                    <hr style="border-color: #eee;">
+
+                    {% if new_mfa_hash_qr_code %}
+                        <p class="login-panel-header arches-signin" style="font-size: 16px;">{% trans 'Scan the QR code below with your external authentication application.' %}</p>
+
+                        <div style="display: flex; flex-direction: column; align-items: center;">
+                            <img style="width: 300px;" src="data:image/png;base64, {{new_mfa_hash_qr_code}} "/>
+                            <button 
+                                class="btn btn-link" 
+                                style="color: #579ddb;"
+                                type="submit" 
+                                name='generate-manual-key-button' 
+                                value='generate_manual_key'
+                            >
+                                {% trans 'Click here to generate data for manual entry.' %}
+                            </button>
+                        </div>
+                        
+                        <hr style="border-color: #eee;">
+                    {% endif %}
+
+                    {% if new_mfa_hash_manual_entry_data %}
+                        <p class="login-panel-header arches-signin" style="font-size: 16px;">{% trans 'Enter the data below into your external authentication application.' %}</p>
+
+                        <div
+                            style="display: flex; flex-direction: column; align-items: center; text-align: left;"
+                        >
+                            <table>
+                                <tbody>
+                                    <tr>
+                                        <td><p>{% trans 'Issuer Name:' %}</p></td>
+                                    </tr>
+                                    <tr>
+                                        <td><p style="font-weight: bold;">{{ new_mfa_hash_manual_entry_data.issuer_name }}</p></td>
+                                    </tr>
+                                    <tr>
+                                        <td><p>{% trans 'Account Name:' %}</p></td>
+                                    </tr>
+                                    <tr>
+                                        <td><p style="font-weight: bold;">{{ new_mfa_hash_manual_entry_data.name }}</p></td>
+                                    </tr>
+                                    <tr>
+                                        <td><p>{% trans 'Secret Key:' %}</p></td>
+                                    </tr>
+                                    <tr>
+                                        <td><p style="font-weight: bold;">{{ new_mfa_hash_manual_entry_data.new_mfa_hash }}</p></td>
+                                    </tr>
+                                </tbody>
+                            </table>
+
+                            <button 
+                                class="btn btn-link" 
+                                style="color: #579ddb;"
+                                type="submit" 
+                                name='generate-qr-code-button' 
+                                value='generate_qr_code' 
+                            >
+                                {% trans 'Click here to generate QR code.' %}
+                            </button>
+                        </div>
+                        
+                        <hr style="border-color: #eee;">
+                    {% endif %}
 
                     {% if FORCE_TWO_FACTOR_AUTHENTICATION %}
-                        <hr style="border-color: #eee;">
-
                         <div 
                             class="login-panel-header arches-signin" 
                             style="
@@ -72,8 +142,8 @@
                         >
                             {% trans "To disable two-factor authentication, please contact your administrator." %}
                         </div>
-                    {% else %}
-                        <button type="submit" name='delete-mfa-hash-button' value='disable' class="btn btn-danger">{% trans "Click here to disable two-factor authentication" %}</button>
+                    {% elif user_has_enabled_two_factor_authentication %}
+                        <button type="submit" name='delete-mfa-hash-button' value='delete' class="btn btn-danger" style="width: fit-content;">{% trans "Disable two-factor authentication" %}</button>
                     {% endif %}
 
                 </form>

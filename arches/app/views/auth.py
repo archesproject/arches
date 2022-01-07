@@ -186,29 +186,48 @@ class FooView(View):
     def post(self, request):
         user_profile = models.UserProfile.objects.get(user=request.user)
 
-        # import pdb; pdb.set_trace()
+        generate_qr_code = request.POST.get('generate-qr-code-button')
+        generate_manual_key = request.POST.get('generate-manual-key-button')
+        delete_mfa_hash = request.POST.get('delete-mfa-hash-button')
 
-        user_profile.mfa_hash = pyotp.random_base32()
+        new_mfa_hash_qr_code = None
+        new_mfa_hash_manual_entry_data = None
+        
+        if generate_qr_code or generate_manual_key:
+            user_profile.mfa_hash = pyotp.random_base32()
+
+            if generate_qr_code:
+                uri = pyotp.totp.TOTP(user_profile.mfa_hash).provisioning_uri(request.user.email, issuer_name=settings.APP_TITLE)
+
+                img = qrcode.make(uri)
+
+                foobar = io.BytesIO()
+
+                img.save(foobar)
+
+                base64_encoded_result_bytes = base64.b64encode(foobar.getvalue())
+
+                new_mfa_hash_qr_code = base64_encoded_result_bytes.decode('ascii')
+
+                foobar.close()
+            elif generate_manual_key:
+                new_mfa_hash_manual_entry_data = {
+                    'new_mfa_hash': user_profile.mfa_hash,
+                    'name': request.user.email,
+                    'issuer_name': settings.APP_TITLE
+                }
+
+        elif delete_mfa_hash and not settings.FORCE_TWO_FACTOR_AUTHENTICATION:
+            user_profile.mfa_hash = None
+
         user_profile.save()
-
-        uri = pyotp.totp.TOTP(user_profile.mfa_hash).provisioning_uri(request.user.email, issuer_name=settings.APP_TITLE)
-
-        img = qrcode.make(uri)
-
-        foobar = io.BytesIO()
-
-        img.save(foobar)
-
-        base64_encoded_result_bytes = base64.b64encode(foobar.getvalue())
-        base64_encoded_result_str = base64_encoded_result_bytes.decode('ascii')
-
-        foobar.close()
 
         context = {
             'ENABLE_TWO_FACTOR_AUTHENTICATION': settings.ENABLE_TWO_FACTOR_AUTHENTICATION,
             'FORCE_TWO_FACTOR_AUTHENTICATION': settings.FORCE_TWO_FACTOR_AUTHENTICATION,
             'user_has_enabled_two_factor_authentication': bool(user_profile.mfa_hash),
-            'new_mfa_hash': base64_encoded_result_str,
+            'new_mfa_hash_qr_code': new_mfa_hash_qr_code,
+            'new_mfa_hash_manual_entry_data': new_mfa_hash_manual_entry_data,
         }
 
         return render(request, "foo.htm", context)
