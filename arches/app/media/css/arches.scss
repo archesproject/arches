@@ -2617,6 +2617,10 @@ span.icon-wrap.icon-circle.bg-gray-dark:hover {
     color: #666;
 }
 
+.widget-config-container .widget-input-label {
+    font-weight: inherit;
+}
+
 .widget-input {
     border-radius: 2px;
 }
@@ -7082,6 +7086,11 @@ ul div .card-tree-list span .card-tree-list-item .card-tree-list-icon {
 
 .panel-config .form-divider {
     border-top: 1px solid #ccc;
+}
+
+.widget-config-container {
+    display: flex;
+    flex-direction: column;
 }
 
 .panel-config .widget-config-container {
