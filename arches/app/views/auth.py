@@ -18,6 +18,8 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 
 import base64
 import io
+
+from django.http import response
 import qrcode
 import pyotp
 import time
@@ -119,6 +121,45 @@ class LoginView(View):
 
 
 
+def _send_two_factor_authentication_email(request, user=None):
+        AES = AESCipher(settings.SECRET_KEY)
+
+        # request.user["ts"] = int(time.time())  # add timestamp so link can expire
+
+        if not user:
+            user = request.user
+            
+
+        foo = JSONSerializer().serialize({ 'ts': int(time.time()), 'user': user })
+
+
+        bar = AES.encrypt(foo)
+        baz = urlencode({"link": bar})
+
+
+        admin_email = settings.ADMINS[0][1] if settings.ADMINS else ""
+        email_context = {
+            "button_text": _("Update Two-Factor Authentication Settings"),
+            "link": request.build_absolute_uri(reverse("foo") + "?" + baz),
+            "greeting": _(
+                "Click on link below to update your two-factor authentication settings."
+            ),
+            "closing": _(
+                "This link expires in 15 minutes. If you did not request this change, \
+                contact your Administrator immediately."
+            ),
+        }
+
+        html_content = render_to_string("email/general_notification.htm", email_context)  # ...
+        text_content = strip_tags(html_content)  # this strips the html, so people will have the text as well.
+
+        # create the email, and attach the HTML version as well.
+        msg = EmailMultiAlternatives(_("Arches Two-Factor Authentication"), text_content, admin_email, [user.email])
+        msg.attach_alternative(html_content, "text/html")
+
+        msg.send()
+
+
 @method_decorator(never_cache, name="dispatch")
 class BazView(View):
     def get(self, request):
@@ -144,9 +185,15 @@ class BazView(View):
 
     def post(self, request):
         # look up email, if valid send instructions
-        pass
+        email = request.POST.get('email')
+        user = models.User.objects.get(email=email)
 
-        return render(request, "baz.htm", {"auth_failed": True,})
+        if user:
+            # import pdb; pdb.set_trace()
+
+            _send_two_factor_authentication_email(request, user=user)
+
+        return render(request, "baz.htm", {"email_sent": True,})
 
 @method_decorator(never_cache, name="dispatch")
 class BarView(View):
@@ -170,40 +217,7 @@ class BarView(View):
     #     )
 
     def post(self, request):
-        AES = AESCipher(settings.SECRET_KEY)
-
-        # import pdb; pdb.set_trace()
-        # request.user["ts"] = int(time.time())  # add timestamp so link can expire
-
-        foo = JSONSerializer().serialize({ 'ts': int(time.time()), 'user': request.user })
-
-
-        bar = AES.encrypt(foo)
-        baz = urlencode({"link": bar})
-
-
-        admin_email = settings.ADMINS[0][1] if settings.ADMINS else ""
-        email_context = {
-            "button_text": _("Update Two-Factor Authentication Settings"),
-            "link": request.build_absolute_uri(reverse("foo") + "?" + baz),
-            "greeting": _(
-                "Click on link below to update your two-factor authentication settings."
-            ),
-            "closing": _(
-                "This link expires in 15 minutes. If you did not request this change, \
-                contact your Administrator immediately."
-            ),
-        }
-
-        html_content = render_to_string("email/general_notification.htm", email_context)  # ...
-        text_content = strip_tags(html_content)  # this strips the html, so people will have the text as well.
-
-        # create the email, and attach the HTML version as well.
-        msg = EmailMultiAlternatives(_("Arches Two-Factor Authentication"), text_content, admin_email, [request.user.email])
-        msg.attach_alternative(html_content, "text/html")
-
-        msg.send()
-
+        _send_two_factor_authentication_email(request)
         return JSONResponse(status=200)
 
 
