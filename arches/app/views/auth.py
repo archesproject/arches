@@ -140,7 +140,7 @@ def _send_two_factor_authentication_email(request, user=None):
         admin_email = settings.ADMINS[0][1] if settings.ADMINS else ""
         email_context = {
             "button_text": _("Update Two-Factor Authentication Settings"),
-            "link": request.build_absolute_uri(reverse("foo") + "?" + baz),
+            "link": request.build_absolute_uri(reverse("two_factor_authentication_settings") + "?" + baz),
             "greeting": _(
                 "Click on link below to update your two-factor authentication settings."
             ),
@@ -221,7 +221,7 @@ class BarView(View):
         return JSONResponse(status=200)
 
 
-class FooView(View):
+class TwoFactorAuthenticationSettingsView(View):
     def get(self, request):
         link = request.GET.get("link", None)
         AES = AESCipher(settings.SECRET_KEY)
@@ -241,8 +241,7 @@ class FooView(View):
         else:
             raise("ERROR")
 
-        return render(request, 'foo.htm', context)
-        # return render(request, 'foo.htm', {'foo': base64_encoded_result_str })
+        return render(request, 'two_factor_authentication_settings.htm', context)
         
     def post(self, request):
         user_profile = models.UserProfile.objects.get(user=request.user)
@@ -271,13 +270,13 @@ class FooView(View):
                 new_mfa_hash_qr_code = base64_encoded_result_bytes.decode('ascii')
 
                 foobar.close()
+
             elif generate_manual_key:
                 new_mfa_hash_manual_entry_data = {
                     'new_mfa_hash': user_profile.mfa_hash,
                     'name': request.user.email,
                     'issuer_name': settings.APP_TITLE
                 }
-
         elif delete_mfa_hash and not settings.FORCE_TWO_FACTOR_AUTHENTICATION:
             user_profile.mfa_hash = None
 
@@ -291,7 +290,7 @@ class FooView(View):
             'new_mfa_hash_manual_entry_data': new_mfa_hash_manual_entry_data,
         }
 
-        return render(request, "foo.htm", context)
+        return render(request, "two_factor_authentication_settings.htm", context)
 
 
 @method_decorator(never_cache, name="dispatch")
