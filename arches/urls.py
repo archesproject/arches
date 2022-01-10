@@ -57,7 +57,7 @@ from arches.app.views.mobile_survey import MobileSurveyManagerView, MobileSurvey
 from arches.app.views.manifest_manager import ManifestManagerView
 from arches.app.views.manifest_manager import IIIFServerProxyView
 from arches.app.views.auth import (
-    BarView,
+    TwoFactorAuthenticationLoginView,
     TwoFactorAuthenticationSettingsView,
     LoginView,
     SignupView,
@@ -295,7 +295,7 @@ urlpatterns = [
     url(r"^manifest/(?P<id>[0-9]+)$", api.Manifest.as_view(), name="manifest"),
     url(r"^image-service-manager", ManifestManagerView.as_view(), name="manifest_manager"),
     url(r"^two-factor-authentication-settings", TwoFactorAuthenticationSettingsView.as_view(), name="two-factor-authentication-settings"),
-    url(r"^bar", BarView.as_view(), name="bar"),
+    url(r"^bar", TwoFactorAuthenticationLoginView.as_view(), name="bar"),
     url(r"^baz", BazView.as_view(), name="baz"),
 ]
 

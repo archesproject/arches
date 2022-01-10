@@ -75,29 +75,20 @@ class LoginView(View):
         next = request.POST.get("next", reverse("home"))
 
         if user is not None and user.is_active:
-            if (settings.ENABLE_TWO_FACTOR_AUTHENTICATION or settings.FORCE_TWO_FACTOR_AUTHENTICATION):
-                user_profile = models.UserProfile.objects.get(user=user)
+            user_profile = models.UserProfile.objects.get(user=user)
 
-                if settings.FORCE_TWO_FACTOR_AUTHENTICATION or (
-                    settings.ENABLE_TWO_FACTOR_AUTHENTICATION and user_profile.mfa_hash  # user has enabled two-factor authentication
-                ):
-                    # two_factor_authentication_success = request.POST.get("two_factor_authentication_success")
-
-                    # if two_factor_authentication_success:
-                    #     login(request, user)
-                    #     user.password = ""
-
-                    #     return redirect(next)
-                    # else:
-                    return render(
-                        request,
-                        'bar.htm',
-                        { 
-                            'username': username,  # user-input value, NOT source of truth
-                            'password': password,  # user-input value, NOT source of truth
-                            'next': next,
-                        },
-                    )
+            if settings.FORCE_TWO_FACTOR_AUTHENTICATION or (
+                settings.ENABLE_TWO_FACTOR_AUTHENTICATION and user_profile.mfa_hash  # user has enabled two-factor authentication
+            ):
+                return render(
+                    request,
+                    'two_factor_authentication_login.htm',
+                    { 
+                        'username': username,  # user-input value, NOT source of truth
+                        'password': password,  # user-input value, NOT source of truth
+                        'next': next,
+                    },
+                )
             else:
                 login(request, user)
                 user.password = ""
@@ -183,18 +174,7 @@ class BazView(View):
         return render(request, "baz.htm", {"email_sent": True,})
 
 @method_decorator(never_cache, name="dispatch")
-class BarView(View):
-    # def get(self, request):
-    #     username = request.POST.get("username", None)  # user-input value, NOT source of truth
-    #     password = request.POST.get("password", None)  # user-input value, NOT source of truth
-    #     next = request.POST.get("next", reverse("home"))
-
-    #     return render(
-    #         request,
-    #         'bar.htm',
-    #         { 'username': username, 'password': password, 'next': next },
-    #     )
-
+class TwoFactorAuthenticationLoginView(View):
     def post(self, request):
         username = request.POST.get("username", None)
         password = request.POST.get("password", None)
@@ -215,13 +195,10 @@ class BarView(View):
 
         return render(
             request, 
-            "bar.htm", 
+            "two_factor_authentication_login.htm", 
             { "auth_failed": True, "next": next, "username": username, "password": password }, 
             status=401
         )
-
-        # _send_two_factor_authentication_email(request)
-        # return JSONResponse(status=200)
 
 
 class TwoFactorAuthenticationSettingsView(View):
