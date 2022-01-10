@@ -99,6 +99,12 @@
                         <!-- /ko -->
                     </tbody>
                 </table>
+                <!-- ko if: csvExample().length >= 5-->
+                <div data-bind="text: '{% trans 'Showing First ' %}' + csvExample().length + '{% trans ' Rows' %}'"></div>
+                <!-- /ko -->
+                <!-- ko ifnot: csvExample().length >= 5 -->
+                <div data-bind="text: '{% trans 'Showing All ' %}' + csvExample().length + '{% trans ' Rows' %}'"></div>
+                <!-- /ko -->
             </div>
         </div>
     </div>

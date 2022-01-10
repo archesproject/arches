@@ -27,6 +27,7 @@ define([
             this.csvExample = ko.observable();
             this.numberOfCol = ko.observable();
             this.numberOfRow = ko.observable();
+            this.numberOfExampleRow = ko.observable();
 
             this.fileAdded = ko.observable(false);
             this.formData = new window.FormData();
