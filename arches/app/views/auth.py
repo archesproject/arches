@@ -69,8 +69,8 @@ class LoginView(View):
 
     def post(self, request):
         # POST request is taken to mean user is logging in
-        username = request.POST.get("username", None)
-        password = request.POST.get("password", None)
+        username = request.POST.get("username", None)  # user-input value, NOT source of truth
+        password = request.POST.get("password", None)  # user-input value, NOT source of truth
         user = authenticate(username=username, password=password)
         next = request.POST.get("next", reverse("home"))
 
@@ -83,11 +83,7 @@ class LoginView(View):
                 return render(
                     request,
                     'two_factor_authentication_login.htm',
-                    { 
-                        'username': username,  # user-input value, NOT source of truth
-                        'password': password,  # user-input value, NOT source of truth
-                        'next': next,
-                    },
+                    { 'username': username, 'password': password, 'next': next, },
                 )
             else:
                 login(request, user)
@@ -118,7 +114,7 @@ def _send_two_factor_authentication_email(request, user=None):
         admin_email = settings.ADMINS[0][1] if settings.ADMINS else ""
         email_context = {
             "button_text": _("Update Two-Factor Authentication Settings"),
-            "link": request.build_absolute_uri(reverse("two_factor_authentication_settings") + "?" + baz),
+            "link": request.build_absolute_uri(reverse("two-factor-authentication-settings") + "?" + baz),
             "greeting": _(
                 "Click on link below to update your two-factor authentication settings."
             ),

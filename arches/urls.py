@@ -295,7 +295,7 @@ urlpatterns = [
     url(r"^manifest/(?P<id>[0-9]+)$", api.Manifest.as_view(), name="manifest"),
     url(r"^image-service-manager", ManifestManagerView.as_view(), name="manifest_manager"),
     url(r"^two-factor-authentication-settings", TwoFactorAuthenticationSettingsView.as_view(), name="two-factor-authentication-settings"),
-    url(r"^bar", TwoFactorAuthenticationLoginView.as_view(), name="bar"),
+    url(r"^two-factor-authentication-login", TwoFactorAuthenticationLoginView.as_view(), name="two-factor-authentication-login"),
     url(r"^baz", BazView.as_view(), name="baz"),
 ]
 

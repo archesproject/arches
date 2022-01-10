@@ -20,7 +20,7 @@
                 
                 <hr style="border-color: #eee;">
 
-                <form action="{% url 'bar' %}" method="post" style="margin-bottom: 12px;">
+                <form action="{% url 'two_factor_authentication_login' %}" method="post" style="margin-bottom: 12px;">
 					{% csrf_token %}
 
 					<input type="hidden" name="username" value="{{ username }}" />
