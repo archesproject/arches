@@ -20,7 +20,7 @@
                 
                 <hr style="border-color: #eee;">
 
-                <form action="{% url 'bar' %}" method="post">
+                <form action="{% url 'bar' %}" method="post" style="margin-bottom: 12px;">
 					{% csrf_token %}
 
 					<input type="hidden" name="username" value="{{ username }}" />
@@ -43,31 +43,26 @@
                         </div>
                     </div>
 
+                    {% if auth_failed %}
+                        <p 
+                            class="login-panel-header arches-signin" 
+                            style="
+                                color: red;
+                                font-size: 14px;
+                            "
+                        >
+                            {% trans "Authentication failed. Please try again." %}
+                        </p>
+                    {% endif %}
+
                     <div>
                         <button type="submit" class="btn btn-success" style="min-width: 250px;">{% trans 'Submit' %}</button>
                     </div>
                 </form>
 
-                <hr style="border-color: #eee;">
-                
 				<div class="row account-management">
                     <a href="{% url 'baz' %}" class="btn btn-link account-link">{% trans "Need to reset two-factor authentication?" %}</a>
                 </div>
-
-                {% if auth_failed %}
-                    <hr style="border-color: #eee;">
-
-                    <p 
-                        class="login-panel-header arches-signin" 
-                        style="
-                            color: red;
-                            font-size: 16px;
-                        "
-                    >
-                        {% trans "Authentication failed." %}
-                    </p>
-                {% endif %}
-
             </div>
         </div>
     </div>
