@@ -53,10 +53,10 @@
                 </div>
 
                 <hr style="border-color: #eee;">
-
+                
                 <form action="{% url 'two-factor-authentication-settings' %}" method="post">
                     {% csrf_token %}
-
+                    
                     {% if not new_mfa_hash_qr_code and not new_mfa_hash_manual_entry_data %}
                         <button 
                             type="submit" 
@@ -71,10 +71,8 @@
                                 {% trans "Enable two-factor authentication" %}
                             {% endif %}
                         </button>
-                        
-                        <hr style="border-color: #eee;">
-                    {% endif %}
 
+                    {% endif %}
 
                     {% if new_mfa_hash_qr_code %}
                         <p class="login-panel-header arches-signin" style="font-size: 16px;">{% trans 'Scan the QR code below with your external authentication application.' %}</p>
@@ -91,8 +89,6 @@
                                 {% trans 'Click here to generate data for manual entry.' %}
                             </button>
                         </div>
-                        
-                        <hr style="border-color: #eee;">
                     {% endif %}
 
                     {% if new_mfa_hash_manual_entry_data %}
@@ -140,9 +136,9 @@
                                 {% trans 'Click here to generate QR code.' %}
                             </button>
                         </div>
-                        
-                        <hr style="border-color: #eee;">
                     {% endif %}
+
+                    <hr style="border-color: #eee;">
 
                     {% if FORCE_TWO_FACTOR_AUTHENTICATION %}
                         <div 
@@ -155,9 +151,7 @@
                         </div>
                     {% elif user_has_enabled_two_factor_authentication %}
                         <button type="submit" name='delete-mfa-hash-button' value='delete' class="btn btn-danger" style="width: fit-content; min-width: 250px;">{% trans "Disable two-factor authentication" %}</button>
-                        
                         <hr style="border-color: #eee;">
-
                     {% endif %}
                 </form>
 
