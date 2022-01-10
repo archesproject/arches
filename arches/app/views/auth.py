@@ -440,11 +440,14 @@ class TwoFactorAuthenticationSettingsView(View):
                     'name': user.email,
                     'issuer_name': settings.APP_TITLE
                 }
+
+            user_profile.save()
+            logout(request)
                 
         elif delete_mfa_hash and not settings.FORCE_TWO_FACTOR_AUTHENTICATION:
             user_profile.mfa_hash = None
-
-        user_profile.save()
+            user_profile.save()
+            logout(request)
 
         context = {
             'ENABLE_TWO_FACTOR_AUTHENTICATION': settings.ENABLE_TWO_FACTOR_AUTHENTICATION,
