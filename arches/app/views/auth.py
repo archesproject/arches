@@ -93,69 +93,28 @@ class LoginView(View):
 
         return render(request, "login.htm", {"auth_failed": True, "next": next}, status=401)
 
-
-
-def _send_two_factor_authentication_email(request, user=None):
-        AES = AESCipher(settings.SECRET_KEY)
-
-        # request.user["ts"] = int(time.time())  # add timestamp so link can expire
-
-        if not user:
-            user = request.user
-            
-
-        foo = JSONSerializer().serialize({ 'ts': int(time.time()), 'user': user })
-
-
-        bar = AES.encrypt(foo)
-        baz = urlencode({"link": bar})
-
-
-        admin_email = settings.ADMINS[0][1] if settings.ADMINS else ""
-        email_context = {
-            "button_text": _("Update Two-Factor Authentication Settings"),
-            "link": request.build_absolute_uri(reverse("two-factor-authentication-settings") + "?" + baz),
-            "greeting": _(
-                "Click on link below to update your two-factor authentication settings."
-            ),
-            "closing": _(
-                "This link expires in 15 minutes. If you did not request this change, \
-                contact your Administrator immediately."
-            ),
-        }
-
-        html_content = render_to_string("email/general_notification.htm", email_context)  # ...
-        text_content = strip_tags(html_content)  # this strips the html, so people will have the text as well.
-
-        # create the email, and attach the HTML version as well.
-        msg = EmailMultiAlternatives(_("Arches Two-Factor Authentication"), text_content, admin_email, [user.email])
-        msg.attach_alternative(html_content, "text/html")
-
-        msg.send()
-
-
 @method_decorator(never_cache, name="dispatch")
-class BazView(View):
-    def get(self, request):
-        link = request.GET.get("link", None)
-        # AES = AESCipher(settings.SECRET_KEY)
+class TwoFactorAuthenticationResetView(View):
+    # def get(self, request):
+    #     link = request.GET.get("link", None)
+    #     # AES = AESCipher(settings.SECRET_KEY)
 
-        # foo = JSONDeserializer().deserialize(AES.decrypt(link))
+    #     # foo = JSONDeserializer().deserialize(AES.decrypt(link))
 
-        # if datetime.fromtimestamp(foo["ts"]) + timedelta(minutes=15) >= datetime.fromtimestamp(int(time.time())):
-        #     user_profile = models.UserProfile.objects.get(user=request.user)
+    #     # if datetime.fromtimestamp(foo["ts"]) + timedelta(minutes=15) >= datetime.fromtimestamp(int(time.time())):
+    #     #     user_profile = models.UserProfile.objects.get(user=request.user)
 
-        #     context = {
-        #         'ENABLE_TWO_FACTOR_AUTHENTICATION': settings.ENABLE_TWO_FACTOR_AUTHENTICATION,
-        #         'FORCE_TWO_FACTOR_AUTHENTICATION': settings.FORCE_TWO_FACTOR_AUTHENTICATION,
-        #         'user_has_enabled_two_factor_authentication': bool(user_profile.mfa_hash),
-        #     }
+    #     #     context = {
+    #     #         'ENABLE_TWO_FACTOR_AUTHENTICATION': settings.ENABLE_TWO_FACTOR_AUTHENTICATION,
+    #     #         'FORCE_TWO_FACTOR_AUTHENTICATION': settings.FORCE_TWO_FACTOR_AUTHENTICATION,
+    #     #         'user_has_enabled_two_factor_authentication': bool(user_profile.mfa_hash),
+    #     #     }
 
-        # else:
-        #     raise("ERROR")
+    #     # else:
+    #     #     raise("ERROR")
 
-        return render(request, 'baz.htm', {})
-        # # return render(request, 'foo.htm', {'foo': base64_encoded_result_str })
+    #     return render(request, 'two_factor_authentication_reset.htm', {})
+    #     # # return render(request, 'foo.htm', {'foo': base64_encoded_result_str })
 
     def post(self, request):
         # look up email, if valid send instructions
@@ -163,11 +122,36 @@ class BazView(View):
         user = models.User.objects.get(email=email)
 
         if user:
-            # import pdb; pdb.set_trace()
+            AES = AESCipher(settings.SECRET_KEY)
 
-            _send_two_factor_authentication_email(request, user=user)
+            foo = JSONSerializer().serialize({ 'ts': int(time.time()), 'user': user })
 
-        return render(request, "baz.htm", {"email_sent": True,})
+            bar = AES.encrypt(foo)
+            baz = urlencode({"link": bar})
+
+            admin_email = settings.ADMINS[0][1] if settings.ADMINS else ""
+            email_context = {
+                "button_text": _("Update Two-Factor Authentication Settings"),
+                "link": request.build_absolute_uri(reverse("two-factor-authentication-settings") + "?" + baz),
+                "greeting": _(
+                    "Click on link below to update your two-factor authentication settings."
+                ),
+                "closing": _(
+                    "This link expires in 15 minutes. If you did not request this change, \
+                    contact your Administrator immediately."
+                ),
+            }
+
+            html_content = render_to_string("email/general_notification.htm", email_context)  # ...
+            text_content = strip_tags(html_content)  # this strips the html, so people will have the text as well.
+
+            # create the email, and attach the HTML version as well.
+            msg = EmailMultiAlternatives(_("Arches Two-Factor Authentication"), text_content, admin_email, [user.email])
+            msg.attach_alternative(html_content, "text/html")
+
+            msg.send()
+
+        return render(request, "two_factor_authentication_reset.htm", {"email_sent": True,})
 
 @method_decorator(never_cache, name="dispatch")
 class TwoFactorAuthenticationLoginView(View):

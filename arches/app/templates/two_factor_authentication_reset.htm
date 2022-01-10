@@ -20,7 +20,7 @@
                 
                 <hr style="border-color: #eee;">
 
-                <form action="{% url 'baz' %}" method="post">
+                <form action="{% url 'two-factor-authentication-reset' %}" method="post">
                     {% csrf_token %}
 
                     <p>{% trans 'Please enter an email address below.' %} </p>
