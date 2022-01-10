@@ -55,21 +55,6 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 						</div>
 					</div>
 					<div class="form-group">
-						<div class="input-group">
-							<div class="input-group-addon"><i class="ion-lock-combination"></i></div>
-							<input
-								id='two-factor-authentication'
-								name='two-factor-authentication'
-								class="form-control input-lg"
-								type="text"
-								inputmode="numeric"
-								pattern="[0-9]*"
-								placeholder="2-step verification code"
-								autocomplete="one-time-code"
-							/>
-						</div>
-					</div>
-					<div class="form-group">
                         <div class="arches-signin-btn">
                             <button class="btn btn-primary btn-lg btn-block" type="submit">{% trans "Sign In" %}</button>
                         </div>
@@ -85,11 +70,6 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 				<div class="row account-management">
 					<!-- <a href="arches_password_reminder.html" class="col-xs-5 btn btn-link mar-rgt" style="color:#515152;">{% trans "Forgot password ?" %}</a> -->
 					<a href="{% url 'password_reset' %}" class="btn btn-link account-link">{% trans "Forgot password?" %}</a>
-
-					{% if ENABLE_TWO_FACTOR_AUTHENTICATION or FORCE_TWO_FACTOR_AUTHENTICATION %}
-						<a href="{% url 'baz' %}" class="btn btn-link account-link">{% trans "Need to reset two-factor authentication?" %}</a>
-					{% endif %}
-
 					<a href="{% url 'signup' %}" class="btn btn-link account-link" target="_blank">{% trans "Create a new account" %}</a>
 				</div>
 			</div>

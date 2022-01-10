@@ -65,16 +65,7 @@ class LoginView(View):
             # need to redirect to 'auth' so that the user is set to anonymous via the middleware
             return redirect("auth")
         else:
-            return render(
-                request, 
-                "login.htm", 
-                {
-                    'ENABLE_TWO_FACTOR_AUTHENTICATION': settings.ENABLE_TWO_FACTOR_AUTHENTICATION,
-                    'FORCE_TWO_FACTOR_AUTHENTICATION': settings.FORCE_TWO_FACTOR_AUTHENTICATION,
-                    "auth_failed": False, 
-                    "next": next
-                }
-            )
+            return render(request, "login.htm", {"auth_failed": False, "next": next})
 
     def post(self, request):
         # POST request is taken to mean user is logging in
@@ -82,42 +73,38 @@ class LoginView(View):
         password = request.POST.get("password", None)
         user = authenticate(username=username, password=password)
         next = request.POST.get("next", reverse("home"))
-        two_factor_authentication_string = request.POST.get('two-factor-authentication', None)
 
         if user is not None and user.is_active:
-            user_profile = models.UserProfile.objects.get(user=user)
-
-            if (
-                settings.FORCE_TWO_FACTOR_AUTHENTICATION
-                or (
-                    settings.ENABLE_TWO_FACTOR_AUTHENTICATION and user_profile.mfa_hash
-                )
-            ):
+            if (settings.ENABLE_TWO_FACTOR_AUTHENTICATION or settings.FORCE_TWO_FACTOR_AUTHENTICATION):
                 user_profile = models.UserProfile.objects.get(user=user)
-                totp = pyotp.TOTP(user_profile.mfa_hash)
 
-                if totp.verify(two_factor_authentication_string):
-                    login(request, user)
-                    user.password = ""
+                if settings.FORCE_TWO_FACTOR_AUTHENTICATION or (
+                    settings.ENABLE_TWO_FACTOR_AUTHENTICATION and user_profile.mfa_hash  # user has enabled two-factor authentication
+                ):
+                    # two_factor_authentication_success = request.POST.get("two_factor_authentication_success")
 
-                    return redirect(next)
+                    # if two_factor_authentication_success:
+                    #     login(request, user)
+                    #     user.password = ""
+
+                    #     return redirect(next)
+                    # else:
+                    return render(
+                        request,
+                        'bar.htm',
+                        { 
+                            'username': username,  # user-input value, NOT source of truth
+                            'password': password,  # user-input value, NOT source of truth
+                            'next': next,
+                        },
+                    )
             else:
                 login(request, user)
                 user.password = ""
 
                 return redirect(next)
 
-        return render(
-            request, 
-            "login.htm", 
-            {
-                'ENABLE_TWO_FACTOR_AUTHENTICATION': settings.ENABLE_TWO_FACTOR_AUTHENTICATION,
-                'FORCE_TWO_FACTOR_AUTHENTICATION': settings.FORCE_TWO_FACTOR_AUTHENTICATION,
-                "auth_failed": True, 
-                "next": next,
-            }, 
-            status=401
-        )
+        return render(request, "login.htm", {"auth_failed": True, "next": next}, status=401)
 
 
 
@@ -198,27 +185,43 @@ class BazView(View):
 @method_decorator(never_cache, name="dispatch")
 class BarView(View):
     # def get(self, request):
-    #     form = ArchesUserCreationForm(enable_captcha=settings.ENABLE_CAPTCHA)
-    #     postdata = {"first_name": "", "last_name": "", "email": ""}
-    #     showform = True
-    #     confirmation_message = ""
+    #     username = request.POST.get("username", None)  # user-input value, NOT source of truth
+    #     password = request.POST.get("password", None)  # user-input value, NOT source of truth
+    #     next = request.POST.get("next", reverse("home"))
 
     #     return render(
     #         request,
-    #         "signup.htm",
-    #         {
-    #             "enable_captcha": settings.ENABLE_CAPTCHA,
-    #             "form": form,
-    #             "postdata": postdata,
-    #             "showform": showform,
-    #             "confirmation_message": confirmation_message,
-    #             "validation_help": validation.password_validators_help_texts(),
-    #         },
+    #         'bar.htm',
+    #         { 'username': username, 'password': password, 'next': next },
     #     )
 
     def post(self, request):
-        _send_two_factor_authentication_email(request)
-        return JSONResponse(status=200)
+        username = request.POST.get("username", None)
+        password = request.POST.get("password", None)
+        user = authenticate(username=username, password=password)
+
+        next = request.POST.get("next", reverse("home"))
+        two_factor_authentication_string = request.POST.get('two-factor-authentication', None)
+
+        if user is not None and user.is_active:
+            user_profile = models.UserProfile.objects.get(user_id=user.pk)
+            totp = pyotp.TOTP(user_profile.mfa_hash)
+
+            if totp.verify(two_factor_authentication_string):
+                login(request, user)
+                user.password = ""
+
+                return redirect(next)
+
+        return render(
+            request, 
+            "bar.htm", 
+            { "auth_failed": True, "next": next, "username": username, "password": password }, 
+            status=401
+        )
+
+        # _send_two_factor_authentication_email(request)
+        # return JSONResponse(status=200)
 
 
 class TwoFactorAuthenticationSettingsView(View):

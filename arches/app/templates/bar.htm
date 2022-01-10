@@ -1,0 +1,76 @@
+{% extends "base.htm" %}
+{% load staticfiles %}
+{% load i18n %}
+
+{% block loading_mask %}
+{% endblock loading_mask %}
+
+{% block body %}
+<div id="container" class="cls-container arches-login">
+
+	<!-- BACKGROUND IMAGE -->
+	<!--===================================================
+	<div id="bg-overlay" class="bg-img img-login"></div>
+	-->
+
+	<div class="cls-content arches-signin">
+        <div class="cls-content-sm panel login-panel" style="">
+			<div class="panel-body" style="padding: 40px; padding-bottom: 20px;">
+				<h3 class="login-panel-header arches-signin">{% trans "FOO" %}</h3>
+                
+                <hr style="border-color: #eee;">
+
+                <form action="{% url 'bar' %}" method="post">
+					{% csrf_token %}
+
+					<input type="hidden" name="username" value="{{ username }}" />
+					<input type="hidden" name="password" value="{{ password }}" />
+					<input type="hidden" name="next" value="{{ next }}" />
+
+                    <div class="form-group">
+                        <div class="input-group">
+                            <div class="input-group-addon"><i class="ion-lock-combination"></i></div>
+                            <input
+                                id='two-factor-authentication'
+                                name='two-factor-authentication'
+                                class="form-control input-lg"
+                                type="text"
+                                inputmode="numeric"
+                                pattern="[0-9]*"
+                                placeholder="2-step verification code"
+                                autocomplete="one-time-code"
+                            />
+                        </div>
+                    </div>
+
+                    <div>
+                        <button type="submit" class="btn btn-success" style="min-width: 250px;">{% trans 'Submit' %}</button>
+                    </div>
+                </form>
+
+                <hr style="border-color: #eee;">
+                
+				<div class="row account-management">
+                    <a href="{% url 'baz' %}" class="btn btn-link account-link">{% trans "Need to reset two-factor authentication?" %}</a>
+                </div>
+
+                {% if auth_failed %}
+                    <hr style="border-color: #eee;">
+
+                    <p 
+                        class="login-panel-header arches-signin" 
+                        style="
+                            color: red;
+                            font-size: 16px;
+                        "
+                    >
+                        {% trans "Authentication failed." %}
+                    </p>
+                {% endif %}
+
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock body %}
