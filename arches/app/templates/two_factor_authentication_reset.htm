@@ -22,7 +22,7 @@
 
                 {% if not email_sent %}
                     <p>{% trans 'Please enter an email address below.' %} </p>
-                    <p>{% trans "If it is registered in our system it will receive instructions to reset two-factor authentication." %}</p>
+                    <p>{% trans "If it is registered in our system it will receive instructions to update two-factor authentication." %}</p>
                     
                     <form action="{% url 'two-factor-authentication-reset' %}" method="post">
                         {% csrf_token %}

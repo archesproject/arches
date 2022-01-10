@@ -151,11 +151,11 @@
                         >
                             {% trans "To disable two-factor authentication, please contact your administrator." %}
                         </div>
+                        <hr style="border-color: #eee;">
                     {% elif user_has_enabled_two_factor_authentication %}
                         <button type="submit" name='delete-mfa-hash-button' value='delete' class="btn btn-danger" style="width: fit-content; min-width: 250px;">{% trans "Disable two-factor authentication" %}</button>
+                        <hr style="border-color: #eee;">
                     {% endif %}
-
-                    <hr style="border-color: #eee;">
                 </form>
 
                 <button name='close-tab' class="btn btn-link" onclick="window.close()" style="width: fit-content; min-width: 250px;">{% trans "Close Window" %}</button>
