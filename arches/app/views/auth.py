@@ -94,153 +94,6 @@ class LoginView(View):
         return render(request, "login.htm", {"auth_failed": True, "next": next}, status=401)
 
 @method_decorator(never_cache, name="dispatch")
-class TwoFactorAuthenticationResetView(View):
-    def get(self, request):
-        email_sent = request.GET.get('email_sent')
-        return render(request, "two_factor_authentication_reset.htm", {"email_sent": bool(email_sent),})
-
-    def post(self, request):
-        # look up email, if valid send instructions
-        email = request.POST.get('email')
-
-        if email:
-            user = models.User.objects.get(email=email)
-        else:
-            user = request.user
-
-        if user:
-            AES = AESCipher(settings.SECRET_KEY)
-
-            foo = JSONSerializer().serialize({ 'ts': int(time.time()), 'user': user })
-
-            bar = AES.encrypt(foo)
-            baz = urlencode({"link": bar})
-
-            admin_email = settings.ADMINS[0][1] if settings.ADMINS else ""
-            email_context = {
-                "button_text": _("Update Two-Factor Authentication Settings"),
-                "link": request.build_absolute_uri(reverse("two-factor-authentication-settings") + "?" + baz),
-                "greeting": _(
-                    "Click on link below to update your two-factor authentication settings."
-                ),
-                "closing": _(
-                    "This link expires in 15 minutes. If you did not request this change, \
-                    contact your Administrator immediately."
-                ),
-            }
-
-            html_content = render_to_string("email/general_notification.htm", email_context)  # ...
-            text_content = strip_tags(html_content)  # this strips the html, so people will have the text as well.
-
-            # create the email, and attach the HTML version as well.
-            msg = EmailMultiAlternatives(_("Arches Two-Factor Authentication"), text_content, admin_email, [user.email])
-            msg.attach_alternative(html_content, "text/html")
-
-            msg.send()
-
-        return render(request, "two_factor_authentication_reset.htm", {"email_sent": True,})
-
-@method_decorator(never_cache, name="dispatch")
-class TwoFactorAuthenticationLoginView(View):
-    def post(self, request):
-        username = request.POST.get("username", None)
-        password = request.POST.get("password", None)
-        user = authenticate(username=username, password=password)
-
-        next = request.POST.get("next", reverse("home"))
-        two_factor_authentication_string = request.POST.get('two-factor-authentication', None)
-
-        if user is not None and user.is_active:
-            user_profile = models.UserProfile.objects.get(user_id=user.pk)
-            totp = pyotp.TOTP(user_profile.mfa_hash)
-
-            if totp.verify(two_factor_authentication_string):
-                login(request, user)
-                user.password = ""
-
-                return redirect(next)
-
-        return render(
-            request, 
-            "two_factor_authentication_login.htm", 
-            { "auth_failed": True, "next": next, "username": username, "password": password }, 
-            status=401
-        )
-
-
-class TwoFactorAuthenticationSettingsView(View):
-    def get(self, request):
-        link = request.GET.get("link", None)
-        AES = AESCipher(settings.SECRET_KEY)
-
-        foo = JSONDeserializer().deserialize(AES.decrypt(link))
-
-        if True:
-        # if datetime.fromtimestamp(foo["ts"]) + timedelta(minutes=15) >= datetime.fromtimestamp(int(time.time())):
-            user_profile = models.UserProfile.objects.get(user=request.user)
-
-            context = {
-                'ENABLE_TWO_FACTOR_AUTHENTICATION': settings.ENABLE_TWO_FACTOR_AUTHENTICATION,
-                'FORCE_TWO_FACTOR_AUTHENTICATION': settings.FORCE_TWO_FACTOR_AUTHENTICATION,
-                'user_has_enabled_two_factor_authentication': bool(user_profile.mfa_hash),
-            }
-
-        else:
-            raise("ERROR")
-
-        return render(request, 'two_factor_authentication_settings.htm', context)
-        
-    def post(self, request):
-        user_profile = models.UserProfile.objects.get(user=request.user)
-
-        generate_qr_code = request.POST.get('generate-qr-code-button')
-        generate_manual_key = request.POST.get('generate-manual-key-button')
-        delete_mfa_hash = request.POST.get('delete-mfa-hash-button')
-
-        new_mfa_hash_qr_code = None
-        new_mfa_hash_manual_entry_data = None
-        
-        if generate_qr_code or generate_manual_key:
-            user_profile.mfa_hash = pyotp.random_base32()
-
-            if generate_qr_code:
-                uri = pyotp.totp.TOTP(user_profile.mfa_hash).provisioning_uri(request.user.email, issuer_name=settings.APP_TITLE)
-
-                img = qrcode.make(uri)
-
-                foobar = io.BytesIO()
-
-                img.save(foobar)
-
-                base64_encoded_result_bytes = base64.b64encode(foobar.getvalue())
-
-                new_mfa_hash_qr_code = base64_encoded_result_bytes.decode('ascii')
-
-                foobar.close()
-
-            elif generate_manual_key:
-                new_mfa_hash_manual_entry_data = {
-                    'new_mfa_hash': user_profile.mfa_hash,
-                    'name': request.user.email,
-                    'issuer_name': settings.APP_TITLE
-                }
-        elif delete_mfa_hash and not settings.FORCE_TWO_FACTOR_AUTHENTICATION:
-            user_profile.mfa_hash = None
-
-        user_profile.save()
-
-        context = {
-            'ENABLE_TWO_FACTOR_AUTHENTICATION': settings.ENABLE_TWO_FACTOR_AUTHENTICATION,
-            'FORCE_TWO_FACTOR_AUTHENTICATION': settings.FORCE_TWO_FACTOR_AUTHENTICATION,
-            'user_has_enabled_two_factor_authentication': bool(user_profile.mfa_hash),
-            'new_mfa_hash_qr_code': new_mfa_hash_qr_code,
-            'new_mfa_hash_manual_entry_data': new_mfa_hash_manual_entry_data,
-        }
-
-        return render(request, "two_factor_authentication_settings.htm", context)
-
-
-@method_decorator(never_cache, name="dispatch")
 class SignupView(View):
     def get(self, request):
         form = ArchesUserCreationForm(enable_captcha=settings.ENABLE_CAPTCHA)
@@ -454,6 +307,144 @@ class ServerSettingView(View):
             response = Http401Response()
 
         return response
+
+
+@method_decorator(never_cache, name="dispatch")
+class TwoFactorAuthenticationResetView(View):
+    def get(self, request):
+        email_sent = request.GET.get('email_sent')
+        return render(request, "two_factor_authentication_reset.htm", {"email_sent": bool(email_sent),})
+
+    def post(self, request):
+        email = request.POST.get('email')
+        user  = models.User.objects.get(email=email) if email else request.user
+
+        if user:
+            AES = AESCipher(settings.SECRET_KEY)
+
+            serialized_data = JSONSerializer().serialize({ 'ts': int(time.time()), 'user': user })
+            encrypted_url = urlencode({"link": AES.encrypt(serialized_data)})
+
+            admin_email = settings.ADMINS[0][1] if settings.ADMINS else ""
+            email_context = {
+                "button_text": _("Update Two-Factor Authentication Settings"),
+                "link": request.build_absolute_uri(reverse("two-factor-authentication-settings") + "?" + encrypted_url),
+                "greeting": _(
+                    "Click on link below to update your two-factor authentication settings."
+                ),
+                "closing": _(
+                    "This link expires in 15 minutes. If you did not request this change, \
+                    contact your Administrator immediately."
+                ),
+            }
+
+            html_content = render_to_string("email/general_notification.htm", email_context)  # ...
+            text_content = strip_tags(html_content)  # this strips the html, so people will have the text as well.
+
+            # create the email, and attach the HTML version as well.
+            msg = EmailMultiAlternatives(_("Arches Two-Factor Authentication"), text_content, admin_email, [user.email])
+            msg.attach_alternative(html_content, "text/html")
+
+            msg.send()
+
+        return render(request, "two_factor_authentication_reset.htm", {"email_sent": True,})
+
+
+@method_decorator(never_cache, name="dispatch")
+class TwoFactorAuthenticationLoginView(View):
+    def post(self, request):
+        username = request.POST.get("username", None)
+        password = request.POST.get("password", None)
+        user = authenticate(username=username, password=password)
+
+        next = request.POST.get("next", reverse("home"))
+        two_factor_authentication_string = request.POST.get('two-factor-authentication', None)
+
+        if user is not None and user.is_active:
+            user_profile = models.UserProfile.objects.get(user_id=user.pk)
+            totp = pyotp.TOTP(user_profile.mfa_hash)
+
+            if totp.verify(two_factor_authentication_string):
+                login(request, user)
+                user.password = ""
+
+                return redirect(next)
+
+        return render(
+            request, 
+            "two_factor_authentication_login.htm", 
+            { "auth_failed": True, "next": next, "username": username, "password": password }, 
+            status=401
+        )
+
+
+@method_decorator(never_cache, name="dispatch")
+class TwoFactorAuthenticationSettingsView(View):
+    def get(self, request):
+        link = request.GET.get("link", None)
+        AES = AESCipher(settings.SECRET_KEY)
+
+        decrypted_data = JSONDeserializer().deserialize(AES.decrypt(link))
+
+        if datetime.fromtimestamp(decrypted_data["ts"]) + timedelta(minutes=15) >= datetime.fromtimestamp(int(time.time())):
+            user_profile = models.UserProfile.objects.get(user=request.user)
+
+            context = {
+                'ENABLE_TWO_FACTOR_AUTHENTICATION': settings.ENABLE_TWO_FACTOR_AUTHENTICATION,
+                'FORCE_TWO_FACTOR_AUTHENTICATION': settings.FORCE_TWO_FACTOR_AUTHENTICATION,
+                'user_has_enabled_two_factor_authentication': bool(user_profile.mfa_hash),
+            }
+
+        else:
+            raise("ERROR")
+
+        return render(request, 'two_factor_authentication_settings.htm', context)
+        
+    def post(self, request):
+        user_profile = models.UserProfile.objects.get(user=request.user)
+
+        generate_qr_code = request.POST.get('generate-qr-code-button')
+        generate_manual_key = request.POST.get('generate-manual-key-button')
+        delete_mfa_hash = request.POST.get('delete-mfa-hash-button')
+
+        new_mfa_hash_qr_code = None
+        new_mfa_hash_manual_entry_data = None
+        
+        if generate_qr_code or generate_manual_key:
+            user_profile.mfa_hash = pyotp.random_base32()
+
+            if generate_qr_code:
+                uri = pyotp.totp.TOTP(user_profile.mfa_hash).provisioning_uri(request.user.email, issuer_name=settings.APP_TITLE)
+                uri_qrcode = qrcode.make(uri)
+
+                buffer = io.BytesIO()
+                uri_qrcode.save(buffer)
+
+                base64_encoded_result_bytes = base64.b64encode(buffer.getvalue())
+                new_mfa_hash_qr_code = base64_encoded_result_bytes.decode('ascii')
+
+                buffer.close()
+            elif generate_manual_key:
+                new_mfa_hash_manual_entry_data = {
+                    'new_mfa_hash': user_profile.mfa_hash,
+                    'name': request.user.email,
+                    'issuer_name': settings.APP_TITLE
+                }
+                
+        elif delete_mfa_hash and not settings.FORCE_TWO_FACTOR_AUTHENTICATION:
+            user_profile.mfa_hash = None
+
+        user_profile.save()
+
+        context = {
+            'ENABLE_TWO_FACTOR_AUTHENTICATION': settings.ENABLE_TWO_FACTOR_AUTHENTICATION,
+            'FORCE_TWO_FACTOR_AUTHENTICATION': settings.FORCE_TWO_FACTOR_AUTHENTICATION,
+            'user_has_enabled_two_factor_authentication': bool(user_profile.mfa_hash),
+            'new_mfa_hash_qr_code': new_mfa_hash_qr_code,
+            'new_mfa_hash_manual_entry_data': new_mfa_hash_manual_entry_data,
+        }
+
+        return render(request, "two_factor_authentication_settings.htm", context)
 
 
 @method_decorator(csrf_exempt, name="dispatch")
