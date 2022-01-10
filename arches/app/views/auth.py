@@ -363,7 +363,7 @@ class TwoFactorAuthenticationLoginView(View):
         user = authenticate(username=username, password=password)
 
         next = request.POST.get("next", reverse("home"))
-        user_has_enabled_two_factor_authentication = request.POST.get('user-has-enabled-ztwo-factor-authentication', None)
+        user_has_enabled_two_factor_authentication = request.POST.get('user-has-enabled-two-factor-authentication', None)
         two_factor_authentication_string = request.POST.get('two-factor-authentication', None)
 
         if user is not None and user.is_active and user_has_enabled_two_factor_authentication:

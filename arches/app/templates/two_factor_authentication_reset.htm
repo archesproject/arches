@@ -16,7 +16,7 @@
 	<div class="cls-content arches-signin">
         <div class="cls-content-sm panel login-panel" style="">
 			<div class="panel-body" style="padding: 40px; padding-bottom: 20px;">
-				<h3 class="login-panel-header arches-signin">{% trans "Reset Two-Factor Authentication" %}</h3>
+				<h3 class="login-panel-header arches-signin">{% trans "Update Two-Factor Authentication" %}</h3>
                 
                 <hr style="border-color: #eee;">
 
@@ -41,13 +41,6 @@
                         <div>
                             <button type="submit" class="btn btn-success" style="min-width: 250px;">{% trans 'Submit' %}</button>
                         </div>
-
-                        <hr style="border-color: #eee;">
-
-                        <div class="row account-management" style="border-top: 0;">
-                            <a href="{% url 'auth' %}" class="btn btn-link account-link" style="padding-top: 0">{% trans "Click here to return to login page" %}</a>
-                        </div>
-
                     </form>
                 {% else %}
                     <p 
@@ -60,6 +53,12 @@
                         {% trans "Email sent." %}
                     </p>
                 {% endif %}
+
+                <hr style="border-color: #eee;">
+
+                <div class="row account-management" style="border-top: 0;">
+                    <a href="{% url 'auth' %}" class="btn btn-link account-link" style="padding-top: 0">{% trans "Click here to return to login page" %}</a>
+                </div>
             </div>
         </div>
     </div>
