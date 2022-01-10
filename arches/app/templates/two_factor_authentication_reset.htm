@@ -20,12 +20,10 @@
                 
                 <hr style="border-color: #eee;">
 
-                <p>{% trans 'Please enter an email address below.' %} </p>
-                <p>{% trans "If it is registered in our system it will receive instructions to reset two-factor authentication." %}</p>
-                
-                <hr style="border-color: #eee;">
-
                 {% if not email_sent %}
+                    <p>{% trans 'Please enter an email address below.' %} </p>
+                    <p>{% trans "If it is registered in our system it will receive instructions to reset two-factor authentication." %}</p>
+                    
                     <form action="{% url 'two-factor-authentication-reset' %}" method="post">
                         {% csrf_token %}
 
@@ -43,6 +41,13 @@
                         <div>
                             <button type="submit" class="btn btn-success" style="min-width: 250px;">{% trans 'Submit' %}</button>
                         </div>
+
+                        <hr style="border-color: #eee;">
+
+                        <div class="row account-management" style="border-top: 0;">
+                            <a href="{% url 'auth' %}" class="btn btn-link account-link" style="padding-top: 0">{% trans "Click here to return to login page" %}</a>
+                        </div>
+
                     </form>
                 {% else %}
                     <p 

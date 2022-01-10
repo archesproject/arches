@@ -45,7 +45,7 @@
                 >
                     <h4>{% trans "Two-Factor Authentication:" %}</h4>
 
-                    {% if FORCE_TWO_FACTOR_AUTHENTICATION or user_has_enabled_two_factor_authentication %}
+                    {% if user_has_enabled_two_factor_authentication %}
                         <h4 style="color: green;">{% trans "ENABLED"%}</h4>
                     {% else %}
                         <h4 style="color: red;">{% trans "DISABLED"%}</h4>
@@ -56,6 +56,8 @@
                 
                 <form action="{% url 'two-factor-authentication-settings' %}" method="post">
                     {% csrf_token %}
+
+                    <input type="hidden" name="user-id" value="{{ user_id }}" />
                     
                     {% if not new_mfa_hash_qr_code and not new_mfa_hash_manual_entry_data %}
                         <button 
@@ -151,8 +153,9 @@
                         </div>
                     {% elif user_has_enabled_two_factor_authentication %}
                         <button type="submit" name='delete-mfa-hash-button' value='delete' class="btn btn-danger" style="width: fit-content; min-width: 250px;">{% trans "Disable two-factor authentication" %}</button>
-                        <hr style="border-color: #eee;">
                     {% endif %}
+
+                    <hr style="border-color: #eee;">
                 </form>
 
                 <button name='close-tab' class="btn btn-link" onclick="window.close()" style="width: fit-content; min-width: 250px;">{% trans "Close Window" %}</button>
