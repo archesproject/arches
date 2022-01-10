@@ -130,7 +130,7 @@ class UserManagerView(BaseManagerView):
             context["identities"] = JSONSerializer().serialize(user_details["identities"], sort_keys=False)
             context["resources"] = JSONSerializer().serialize(user_details["resources"], sort_keys=False, exclude=["is_editable"])
 
-            user_profile = models.UserProfile(pk=request.user.pk)
+            user_profile = models.UserProfile.objects.get(user_id=request.user.pk)
 
             context["two_factor_authentication_settings"] = JSONSerializer().serialize({
                 'ENABLE_TWO_FACTOR_AUTHENTICATION': settings.ENABLE_TWO_FACTOR_AUTHENTICATION,
@@ -192,7 +192,7 @@ class UserManagerView(BaseManagerView):
                 request.user = user
             context["form"] = form
 
-            user_profile = models.UserProfile(pk=request.user.pk)
+            user_profile = models.UserProfile.objects.get(user_id=request.user.pk)
 
             context["two_factor_authentication_settings"] = JSONSerializer().serialize({
                 'ENABLE_TWO_FACTOR_AUTHENTICATION': settings.ENABLE_TWO_FACTOR_AUTHENTICATION,

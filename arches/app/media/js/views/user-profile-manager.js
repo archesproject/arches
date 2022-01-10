@@ -161,22 +161,19 @@ define([
             self.viewModel.alertTwoFactorAuthenticationChange = function() {
                 var sendTwoFactorAuthenticationEmail = function() {
                     $.ajax({
-                        url: arches.urls.bar,
+                        url: arches.urls.two_factor_authentication_reset,
                         method: "POST",
+                        
                     }).done(function(data) {
                         console.log(data)
-
+                        self.viewModel.alert(
+                            new AlertViewModel(
+                                'ep-alert-blue',
+                                arches.twoFactorAuthenticationEmailSuccess.title,
+                                arches.twoFactorAuthenticationEmailSuccess.text,
+                            )
+                        )
                     });
-
-
-
-                    // self.viewModel.alert(
-                    //     new AlertViewModel(
-                    //         'ep-alert-blue',
-                    //         arches.twoFactorAuthenticationEmailSuccess.title,
-                    //         arches.twoFactorAuthenticationEmailSuccess.text,
-                    //     )
-                    // )
                 };
 
                 self.viewModel.alert(

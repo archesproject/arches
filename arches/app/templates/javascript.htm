@@ -166,6 +166,7 @@
     define('arches', [], function () {
         return {
             urls: {
+                two_factor_authentication_reset:"{% url 'two-factor-authentication-reset' %}",
                 root: "{% url 'root' %}",
                 home: "{% url 'home' %}",
                 media: "{{ STATIC_URL }}",
@@ -319,8 +320,8 @@
                 text: "{% trans 'Sorry! The copy request failed. Please try again.  Contact your system administrator if the problem persists.' %}"
             },
             twoFactorAuthenticationEmailSuccess: {
-                title: "{% trans 'Email Sent!' %}",
-                text: "{% trans 'An email with instructions to change two-factor authentication settings was sent to your registered email address.' %}"
+                title: "{% trans 'Success!' %}",
+                text: "{% trans 'An email with instructions to change two-factor authentication settings has been sent to your registered email address.' %}"
             },
             mapboxApiKey: '{{ map_info.mapbox_api_key }}',
             hexBinSize: {{ map_info.hex_bin_size | unlocalize }},

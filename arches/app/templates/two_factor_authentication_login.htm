@@ -16,9 +16,11 @@
 	<div class="cls-content arches-signin">
         <div class="cls-content-sm panel login-panel" style="">
 			<div class="panel-body" style="padding: 40px; padding-bottom: 20px;">
-				<h3 class="login-panel-header arches-signin">{% trans "FOO" %}</h3>
+				<h3 class="login-panel-header arches-signin">{% trans "Two-Factor Authentication" %}</h3>
                 
                 <hr style="border-color: #eee;">
+
+                <p>{% trans 'Please enter the code from your external authentication application below.' %} </p>
 
                 <form action="{% url 'two-factor-authentication-login' %}" method="post" style="margin-bottom: 12px;">
 					{% csrf_token %}

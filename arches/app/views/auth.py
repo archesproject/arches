@@ -102,7 +102,11 @@ class TwoFactorAuthenticationResetView(View):
     def post(self, request):
         # look up email, if valid send instructions
         email = request.POST.get('email')
-        user = models.User.objects.get(email=email)
+
+        if email:
+            user = models.User.objects.get(email=email)
+        else:
+            user = request.user
 
         if user:
             AES = AESCipher(settings.SECRET_KEY)

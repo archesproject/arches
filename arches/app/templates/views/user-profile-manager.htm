@@ -109,10 +109,10 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                                     <div class="col-sm-5">
                                         <div class="relative">
                                             <!-- ko if: hasUserEnabledTwoFactorAuthentication() -->
-                                            <h4 class="text-main" style="font-weight: 500;">ENABLED</h4>
+                                            <h4 class="text-main" style="font-weight: 500; color: green;">ENABLED</h4>
                                             <!-- /ko -->
                                             <!-- ko ifnot: hasUserEnabledTwoFactorAuthentication() -->
-                                            <h4 class="text-main" style="font-weight: 500;">DISABLED</h4>
+                                            <h4 class="text-main" style="font-weight: 500; color: red;">DISABLED</h4>
                                             <!-- /ko -->
                                             <p class="profile-label-shim">{% trans 'Two-Factor Authentication' %}</p>
                                         </div>
