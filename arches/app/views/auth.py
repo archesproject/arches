@@ -75,16 +75,21 @@ class LoginView(View):
         next = request.POST.get("next", reverse("home"))
 
         if user is not None and user.is_active:
-            user_profile = models.UserProfile.objects.get(user=user)
+            if settings.FORCE_TWO_FACTOR_AUTHENTICATION or settings.ENABLE_TWO_FACTOR_AUTHENTICATION:
+                user_profile = models.UserProfile.objects.get(user=user)
+                user_has_enabled_two_factor_authentication = bool(user_profile.mfa_hash)
 
-            if settings.FORCE_TWO_FACTOR_AUTHENTICATION or (
-                settings.ENABLE_TWO_FACTOR_AUTHENTICATION and user_profile.mfa_hash  # user has enabled two-factor authentication
-            ):
-                return render(
-                    request,
-                    'two_factor_authentication_login.htm',
-                    { 'username': username, 'password': password, 'next': next, },
-                )
+                if settings.FORCE_TWO_FACTOR_AUTHENTICATION or user_has_enabled_two_factor_authentication:  # user has enabled two-factor authentication
+                    return render(
+                        request,
+                        'two_factor_authentication_login.htm',
+                        { 'username': username, 'password': password, 'next': next, 'user_has_enabled_two_factor_authentication': user_has_enabled_two_factor_authentication, },
+                    )
+                else:
+                    login(request, user)
+                    user.password = ""
+
+                    return redirect(next)
             else:
                 login(request, user)
                 user.password = ""
@@ -358,9 +363,10 @@ class TwoFactorAuthenticationLoginView(View):
         user = authenticate(username=username, password=password)
 
         next = request.POST.get("next", reverse("home"))
+        user_has_enabled_two_factor_authentication = request.POST.get('user-has-enabled-ztwo-factor-authentication', None)
         two_factor_authentication_string = request.POST.get('two-factor-authentication', None)
 
-        if user is not None and user.is_active:
+        if user is not None and user.is_active and user_has_enabled_two_factor_authentication:
             user_profile = models.UserProfile.objects.get(user_id=user.pk)
             totp = pyotp.TOTP(user_profile.mfa_hash)
 
@@ -373,7 +379,7 @@ class TwoFactorAuthenticationLoginView(View):
         return render(
             request, 
             "two_factor_authentication_login.htm", 
-            { "auth_failed": True, "next": next, "username": username, "password": password }, 
+            { "auth_failed": True, "next": next, "username": username, "password": password, 'user_has_enabled_two_factor_authentication': user_has_enabled_two_factor_authentication }, 
             status=401
         )
 
