@@ -20,31 +20,41 @@
                 
                 <hr style="border-color: #eee;">
 
-                <form action="{% url 'two-factor-authentication-reset' %}" method="post">
-                    {% csrf_token %}
+                <p>{% trans 'Please enter an email address below.' %} </p>
+                <p>{% trans "If it is registered in our system it will receive instructions to reset two-factor authentication." %}</p>
+                
+                <hr style="border-color: #eee;">
 
-                    <p>{% trans 'Please enter an email address below.' %} </p>
-                    <p>{% trans "If it is registered in our system it will receive instructions to reset two-factor authentication." %}</p>
-                    
-                    <hr style="border-color: #eee;">
+                {% if not email_sent %}
+                    <form action="{% url 'two-factor-authentication-reset' %}" method="post">
+                        {% csrf_token %}
 
-                    <div class="form-group" style="margin-top: 20px;">
-                        <div class="form-group">
-                            <div class="input-group">
-                                <div class="input-group-addon"><i class="text-lg ion-email"></i></div>
-                                <input type="text" class="form-control input-lg" placeholder="Email address" name='email' autofocus>
+                        <div class="form-group" style="margin-top: 20px;">
+                            <div class="form-group">
+                                <div class="input-group">
+                                    <div class="input-group-addon"><i class="text-lg ion-email"></i></div>
+                                    <input type="text" class="form-control input-lg" placeholder="Email address" name='email' autofocus>
+                                </div>
                             </div>
                         </div>
-                    </div>
 
-                    <input type='hidden' name='csrf_token' value={{ csrf_token }}>
-
-                    <hr style="border-color: #eee;">
-                    
-                    <div>
-                        <button type="submit" class="btn btn-success" style="min-width: 250px;">{% trans 'Submit' %}</button>
-                    </div>
-                </form>
+                        <hr style="border-color: #eee;">
+                        
+                        <div>
+                            <button type="submit" class="btn btn-success" style="min-width: 250px;">{% trans 'Submit' %}</button>
+                        </div>
+                    </form>
+                {% else %}
+                    <p 
+                        class="login-panel-header arches-signin" 
+                        style="
+                            color: green;
+                            font-size: 14px;
+                        "
+                    >
+                        {% trans "Email sent." %}
+                    </p>
+                {% endif %}
             </div>
         </div>
     </div>

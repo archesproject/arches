@@ -95,26 +95,9 @@ class LoginView(View):
 
 @method_decorator(never_cache, name="dispatch")
 class TwoFactorAuthenticationResetView(View):
-    # def get(self, request):
-    #     link = request.GET.get("link", None)
-    #     # AES = AESCipher(settings.SECRET_KEY)
-
-    #     # foo = JSONDeserializer().deserialize(AES.decrypt(link))
-
-    #     # if datetime.fromtimestamp(foo["ts"]) + timedelta(minutes=15) >= datetime.fromtimestamp(int(time.time())):
-    #     #     user_profile = models.UserProfile.objects.get(user=request.user)
-
-    #     #     context = {
-    #     #         'ENABLE_TWO_FACTOR_AUTHENTICATION': settings.ENABLE_TWO_FACTOR_AUTHENTICATION,
-    #     #         'FORCE_TWO_FACTOR_AUTHENTICATION': settings.FORCE_TWO_FACTOR_AUTHENTICATION,
-    #     #         'user_has_enabled_two_factor_authentication': bool(user_profile.mfa_hash),
-    #     #     }
-
-    #     # else:
-    #     #     raise("ERROR")
-
-    #     return render(request, 'two_factor_authentication_reset.htm', {})
-    #     # # return render(request, 'foo.htm', {'foo': base64_encoded_result_str })
+    def get(self, request):
+        email_sent = request.GET.get('email_sent')
+        return render(request, "two_factor_authentication_reset.htm", {"email_sent": bool(email_sent),})
 
     def post(self, request):
         # look up email, if valid send instructions

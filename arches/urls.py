@@ -296,7 +296,7 @@ urlpatterns = [
     url(r"^image-service-manager", ManifestManagerView.as_view(), name="manifest_manager"),
     url(r"^two-factor-authentication-settings", TwoFactorAuthenticationSettingsView.as_view(), name="two-factor-authentication-settings"),
     url(r"^two-factor-authentication-login", TwoFactorAuthenticationLoginView.as_view(), name="two-factor-authentication-login"),
-    # url(r"^two-factor-authentication-reset", TwoFactorAuthenticationResetView.as_view(), name="two-factor-authentication-reset"),
+    url(r"^two-factor-authentication-reset", TwoFactorAuthenticationResetView.as_view(), name="two-factor-authentication-reset"),
 ]
 
 if settings.DEBUG:
