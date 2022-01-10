@@ -57,21 +57,24 @@
                 <form action="{% url 'two-factor-authentication-settings' %}" method="post">
                     {% csrf_token %}
 
-                    <button 
-                        type="submit" 
-                        name='generate-qr-code-button' 
-                        value='generate_qr_code' 
-                        class="btn btn-success" 
-                        style="width: fit-content; min-width: 250px; font-weight: bold;"
-                    >
-                        {% if user_has_enabled_two_factor_authentication %}
-                            {% trans "Generate a new shared secret key" %}
-                        {% else %}
-                            {% trans "Enable two-factor authentication" %}
-                        {% endif %}
-                    </button>
+                    {% if not new_mfa_hash_qr_code and not new_mfa_hash_manual_entry_data %}
+                        <button 
+                            type="submit" 
+                            name='generate-qr-code-button' 
+                            value='generate_qr_code' 
+                            class="btn btn-success" 
+                            style="width: fit-content; min-width: 250px; font-weight: bold;"
+                        >
+                            {% if user_has_enabled_two_factor_authentication %}
+                                {% trans "Generate a new shared secret key" %}
+                            {% else %}
+                                {% trans "Enable two-factor authentication" %}
+                            {% endif %}
+                        </button>
+                        
+                        <hr style="border-color: #eee;">
+                    {% endif %}
 
-                    <hr style="border-color: #eee;">
 
                     {% if new_mfa_hash_qr_code %}
                         <p class="login-panel-header arches-signin" style="font-size: 16px;">{% trans 'Scan the QR code below with your external authentication application.' %}</p>
@@ -152,8 +155,13 @@
                         </div>
                     {% elif user_has_enabled_two_factor_authentication %}
                         <button type="submit" name='delete-mfa-hash-button' value='delete' class="btn btn-danger" style="width: fit-content; min-width: 250px;">{% trans "Disable two-factor authentication" %}</button>
+                        
+                        <hr style="border-color: #eee;">
+
                     {% endif %}
                 </form>
+
+                <button name='close-tab' class="btn btn-link" onclick="window.close()" style="width: fit-content; min-width: 250px;">{% trans "Close Window" %}</button>
             </div>
         </div>
     </div>
