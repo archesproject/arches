@@ -84,7 +84,7 @@ class LoginView(View):
                     return render(
                         request,
                         'two_factor_authentication_login.htm',
-                        { 'username': username, 'password': password, 'next': next, 'user_has_enabled_two_factor_authentication': user_has_enabled_two_factor_authentication, },
+                        { 'username': username, 'password': password, 'next': next, 'email': user.email, 'user_has_enabled_two_factor_authentication': user_has_enabled_two_factor_authentication, },
                     )
                 else:
                     login(request, user)
@@ -316,13 +316,20 @@ class ServerSettingView(View):
 @method_decorator(never_cache, name="dispatch")
 class TwoFactorAuthenticationResetView(View):
     def get(self, request):
-        email_sent = request.GET.get('email_sent')
-        return render(request, "two_factor_authentication_reset.htm", {"email_sent": bool(email_sent),})
+        queried_email_address = request.GET.get('queried_email_address')
+        return render(request, "two_factor_authentication_reset.htm", {"queried_email_address": queried_email_address,})
 
     def post(self, request):
         email = request.POST.get('email')
-        user  = models.User.objects.get(email=email) if email else request.user
+        user = None
 
+        if email:
+            try:
+                user  = models.User.objects.get(email=email)
+            except Exception:
+                pass
+                
+                # else request.user
         if user:
             AES = AESCipher(settings.SECRET_KEY)
 
@@ -351,7 +358,7 @@ class TwoFactorAuthenticationResetView(View):
 
             msg.send()
 
-        return render(request, "two_factor_authentication_reset.htm", {"email_sent": True,})
+        return render(request, "two_factor_authentication_reset.htm", {"queried_email_address": email,})
 
 
 @method_decorator(never_cache, name="dispatch")
@@ -380,7 +387,14 @@ class TwoFactorAuthenticationLoginView(View):
         return render(
             request, 
             "two_factor_authentication_login.htm", 
-            { "auth_failed": True, "next": next, "username": username, "password": password, 'user_has_enabled_two_factor_authentication': user_has_enabled_two_factor_authentication }, 
+            { 
+                "auth_failed": True, 
+                "next": next, 
+                "username": username, 
+                "password": password, 
+                'email': user.email, 
+                'user_has_enabled_two_factor_authentication': user_has_enabled_two_factor_authentication,
+            }, 
             status=401
         )
 

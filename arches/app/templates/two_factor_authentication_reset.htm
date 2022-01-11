@@ -20,7 +20,7 @@
                 
                 <hr style="border-color: #eee;">
 
-                {% if not email_sent %}
+                {% if not queried_email_address %}
                     <p>{% trans 'Please enter an email address below.' %} </p>
                     <p>{% trans "If it is registered in our system it will receive instructions to update two-factor authentication." %}</p>
                     
@@ -44,14 +44,26 @@
                     </form>
                 {% else %}
                     <p 
-                        class="login-panel-header arches-signin" 
+                        class="arches-signin" 
                         style="
                             color: green;
-                            font-size: 14px;
+                            font-size: 16px;
                         "
                     >
-                        {% trans "Email sent." %}
+                        {% trans "Success!" %}
                     </p>
+                    <div class="arches-signin" style="display: flex;">
+                        <div style="margin-right: 10px;">
+                            {% trans "Email address:" %}
+                        </div>
+                        <div style="display: flex; align-items: center;">
+                            {{ queried_email_address }}
+                        </div>
+                    </div>
+                    <hr style="border-color: #eee;">
+                    <div class="arches-signin" style="margin-top: 10px;">
+                        {% trans "If this email address is registered, an email has been sent to it containing instructions to enable two-factor authentication." %}
+                    </div>
                 {% endif %}
 
                 <hr style="border-color: #eee;">
