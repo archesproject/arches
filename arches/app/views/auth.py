@@ -263,8 +263,6 @@ class UserProfileView(View):
         password = request.POST.get("password", None)
         user = authenticate(username=username, password=password)
         if user:
-            if hasattr(user, "userprofile") is not True:
-                models.UserProfile.objects.create(user=user)
             userDict = JSONSerializer().serializeToPython(user)
             userDict["password"] = None
             userDict["is_reviewer"] = user_is_resource_reviewer(user)
