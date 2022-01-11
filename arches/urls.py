@@ -78,6 +78,7 @@ from django.views.decorators.cache import cache_page
 from django.contrib import admin
 
 admin.autodiscover()
+admin.site.login_template = 'login.htm'
 
 uuid_regex = settings.UUID_REGEX
 
