@@ -375,17 +375,18 @@ class TwoFactorAuthenticationLoginView(View):
         if user is not None and user.is_active and user_has_enabled_two_factor_authentication:
             user_profile = models.UserProfile.objects.get(user_id=user.pk)
 
-            AES = AESCipher(settings.SECRET_KEY)
-            encrypted_mfa_hash = user_profile.encrypted_mfa_hash[1:len(user_profile.encrypted_mfa_hash)]  # removes outer string values
-            decrypted_mfa_hash = AES.decrypt(encrypted_mfa_hash)  
+            if user_profile.encrypted_mfa_hash:
+                AES = AESCipher(settings.SECRET_KEY)
+                encrypted_mfa_hash = user_profile.encrypted_mfa_hash[1:len(user_profile.encrypted_mfa_hash)]  # removes outer string values
+                decrypted_mfa_hash = AES.decrypt(encrypted_mfa_hash)  
 
-            totp = pyotp.TOTP(decrypted_mfa_hash)
+                totp = pyotp.TOTP(decrypted_mfa_hash)
 
-            if totp.verify(two_factor_authentication_string):
-                login(request, user)
-                user.password = ""
+                if totp.verify(two_factor_authentication_string):
+                    login(request, user)
+                    user.password = ""
 
-                return redirect(next)
+                    return redirect(next)
 
         return render(
             request, 
