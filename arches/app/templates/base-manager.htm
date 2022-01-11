@@ -106,8 +106,8 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 
                         <!-- Login -->
                         {% if nav.login %}
-                        <a href="{% url 'auth' %}?next={{ request.get_full_path }}{% if user.username != 'anonymous' %}&logout=true{% endif %}" class="ep-tools ep-tools-login">
-                            <div class="" data-placement="bottom" data-toggle="tooltip" data-original-title="{% if user.username != 'anonymous' %}Logout{% else %}Login{% endif %}">
+                        <a href="{% if user.username != 'anonymous' %}{% url 'user_profile_manager' %}{% else %}{% url 'auth' %}?next={{ request.get_full_path }}{% endif %}" class="ep-tools ep-tools-login">
+                            <div class="" data-placement="bottom" data-toggle="tooltip" data-original-title="{% if user.username != 'anonymous' %}{% trans 'Profile' %}{% else %}{% trans 'Login' %}{% endif %}">
                                 {% if user.username == 'anonymous' %}
                                 <h5 class="hidden-xs">{% trans "Login" %}</h5>
                                 {% else %}
@@ -180,6 +180,14 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                         <a href="javascript:void(0)" class="ep-help-toggle ep-tools ep-tools-right" data-bind="click: function(){ getHelp('{{ nav.help.template }}'); helpOpen(true) }">
                             <div class="" data-placement="bottom" data-toggle="tooltip" data-original-title='{% trans "Help" %}'>
                               <i class="ion-help"></i>
+                            </div>
+                        </a>
+                        {% endif %}
+
+                        {% if user.username != 'anonymous' %}
+                        <a href="{% url 'auth' %}?next={{ request.get_full_path }}{% if user.username != 'anonymous' %}&logout=true{% endif %}" class="ep-help-toggle ep-tools ep-tools-right">
+                            <div class="" data-placement="bottom" data-toggle="tooltip" data-original-title='{% trans "Logout" %}'>
+                              <i class="ion-log-out"></i>
                             </div>
                         </a>
                         {% endif %}
