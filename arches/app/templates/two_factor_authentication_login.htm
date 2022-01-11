@@ -68,6 +68,8 @@
                     <div class="row account-management">
                         <a href="{% url 'two-factor-authentication-reset' %}" class="btn btn-link account-link">{% trans "Need to reset two-factor authentication?" %}</a>
                     </div>
+
+                    <hr style="border-color: #eee;">
                 {% else %}
                     <div class="row account-management" style="border-top: 0;">
                         <p>{% trans 'The administrator has required that all users enable two-factor authentication.' %} </p>
