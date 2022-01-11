@@ -158,7 +158,9 @@
                     {% endif %}
                 </form>
 
-                <button name='close-tab' class="btn btn-link" onclick="window.close()" style="width: fit-content; min-width: 250px;">{% trans "Close Window" %}</button>
+                <a href="{% url 'auth' %}" class="btn btn-link" style="width: fit-content; min-width: 250px; color: #579ddb">{% trans "Click here to return to login page" %}</a>
+                
+                <hr style="border-color: #eee;">
             </div>
         </div>
     </div>
