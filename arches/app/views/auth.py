@@ -421,10 +421,10 @@ class TwoFactorAuthenticationSettingsView(View):
         new_mfa_hash_qr_code = None
         new_mfa_hash_manual_entry_data = None
         
-        if generate_qr_code or generate_manual_key:
-            user_profile.mfa_hash = pyotp.random_base32()
-
+        if generate_qr_code or generate_manual_key or delete_mfa_hash:
             if generate_qr_code:
+                user_profile.mfa_hash = pyotp.random_base32()
+
                 uri = pyotp.totp.TOTP(user_profile.mfa_hash).provisioning_uri(user.email, issuer_name=settings.APP_TITLE)
                 uri_qrcode = qrcode.make(uri)
 
@@ -436,23 +436,19 @@ class TwoFactorAuthenticationSettingsView(View):
 
                 buffer.close()
             elif generate_manual_key:
+                user_profile.mfa_hash = pyotp.random_base32()
+
                 new_mfa_hash_manual_entry_data = {
                     'new_mfa_hash': user_profile.mfa_hash,
                     'name': user.email,
                     'issuer_name': settings.APP_TITLE
                 }
+            elif delete_mfa_hash and not settings.FORCE_TWO_FACTOR_AUTHENTICATION:
+                user_profile.mfa_hash = None
 
             user_profile.save()
 
-            for session in Session.objects.all():
-                if str(session.get_decoded().get('_auth_user_id')) == str(user.id):
-                    session.delete()
-                
-        elif delete_mfa_hash and not settings.FORCE_TWO_FACTOR_AUTHENTICATION:
-            user_profile.mfa_hash = None
-            user_profile.save()
-
-            for session in Session.objects.all():
+            for session in Session.objects.all():  # logs user out of all sessions
                 if str(session.get_decoded().get('_auth_user_id')) == str(user.id):
                     session.delete()
 
