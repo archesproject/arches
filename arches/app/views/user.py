@@ -135,7 +135,7 @@ class UserManagerView(BaseManagerView):
             context["two_factor_authentication_settings"] = JSONSerializer().serialize({
                 'ENABLE_TWO_FACTOR_AUTHENTICATION': settings.ENABLE_TWO_FACTOR_AUTHENTICATION,
                 'FORCE_TWO_FACTOR_AUTHENTICATION': settings.FORCE_TWO_FACTOR_AUTHENTICATION,
-                'user_has_enabled_two_factor_authentication': bool(user_profile.mfa_hash),
+                'user_has_enabled_two_factor_authentication': bool(user_profile.encrypted_mfa_hash),
             })
 
             return render(request, "views/user-profile-manager.htm", context)
@@ -197,7 +197,7 @@ class UserManagerView(BaseManagerView):
             context["two_factor_authentication_settings"] = JSONSerializer().serialize({
                 'ENABLE_TWO_FACTOR_AUTHENTICATION': settings.ENABLE_TWO_FACTOR_AUTHENTICATION,
                 'FORCE_TWO_FACTOR_AUTHENTICATION': settings.FORCE_TWO_FACTOR_AUTHENTICATION,
-                'user_has_enabled_two_factor_authentication': bool(user_profile.mfa_hash),
+                'user_has_enabled_two_factor_authentication': bool(user_profile.encrypted_mfa_hash),
             })
 
             return render(request, "views/user-profile-manager.htm", context)

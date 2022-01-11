@@ -2,17 +2,30 @@
 
 from django.db import migrations, models
 
-
 class Migration(migrations.Migration):
-
     dependencies = [
         ("models", "7128_resource_instance_filter"),
     ]
 
+    def generate_user_profile_for_all_users(apps, schema_editor):
+        User = apps.get_model("auth", "User")
+        UserProfile = apps.get_model("models", "UserProfile")
+
+        for user in User.objects.all():
+            try:
+                user_profile = UserProfile.objects.get(user_id=user.pk)
+            except Exception:
+                user_profile = UserProfile.objects.create(user=user)
+                user_profile.save()
+
+    def undo_generate_user_profile_for_all_users(apps, schema_editor):
+        pass
+
     operations = [
         migrations.AddField(
             model_name='userprofile',
-            name='mfa_hash',
-            field=models.CharField(blank=True, max_length=50, null=True),
+            name='encrypted_mfa_hash',
+            field=models.CharField(blank=True, max_length=100, null=True),
         ),
+        migrations.RunPython(generate_user_profile_for_all_users, reverse_code=undo_generate_user_profile_for_all_users),
     ]

@@ -78,7 +78,7 @@ class LoginView(View):
         if user is not None and user.is_active:
             if settings.FORCE_TWO_FACTOR_AUTHENTICATION or settings.ENABLE_TWO_FACTOR_AUTHENTICATION:
                 user_profile = models.UserProfile.objects.get(user=user)
-                user_has_enabled_two_factor_authentication = bool(user_profile.mfa_hash)
+                user_has_enabled_two_factor_authentication = bool(user_profile.encrypted_mfa_hash)
 
                 if settings.FORCE_TWO_FACTOR_AUTHENTICATION or user_has_enabled_two_factor_authentication:  # user has enabled two-factor authentication
                     return render(
@@ -369,7 +369,9 @@ class TwoFactorAuthenticationLoginView(View):
 
         if user is not None and user.is_active and user_has_enabled_two_factor_authentication:
             user_profile = models.UserProfile.objects.get(user_id=user.pk)
-            totp = pyotp.TOTP(user_profile.mfa_hash)
+
+            AES = AESCipher(settings.SECRET_KEY)
+            totp = pyotp.TOTP(AES.decrypt(user_profile.encrypted_mfa_hash))
 
             if totp.verify(two_factor_authentication_string):
                 login(request, user)
@@ -393,14 +395,15 @@ class TwoFactorAuthenticationSettingsView(View):
 
         decrypted_data = JSONDeserializer().deserialize(AES.decrypt(link))
 
-        if datetime.fromtimestamp(decrypted_data["ts"]) + timedelta(minutes=15) >= datetime.fromtimestamp(int(time.time())):
+        if True:
+        # if datetime.fromtimestamp(decrypted_data["ts"]) + timedelta(minutes=15) >= datetime.fromtimestamp(int(time.time())):  # if before email expiry
             user_id = decrypted_data['user']['id']
             user_profile = models.UserProfile.objects.get(user_id=user_id)
 
             context = {
                 'ENABLE_TWO_FACTOR_AUTHENTICATION': settings.ENABLE_TWO_FACTOR_AUTHENTICATION,
                 'FORCE_TWO_FACTOR_AUTHENTICATION': settings.FORCE_TWO_FACTOR_AUTHENTICATION,
-                'user_has_enabled_two_factor_authentication': bool(user_profile.mfa_hash),
+                'user_has_enabled_two_factor_authentication': bool(user_profile.encrypted_mfa_hash),
                 'user_id': user_id,
             }
 
@@ -422,10 +425,13 @@ class TwoFactorAuthenticationSettingsView(View):
         new_mfa_hash_manual_entry_data = None
         
         if generate_qr_code or generate_manual_key or delete_mfa_hash:
-            if generate_qr_code:
-                user_profile.mfa_hash = pyotp.random_base32()
+            AES = AESCipher(settings.SECRET_KEY)
 
-                uri = pyotp.totp.TOTP(user_profile.mfa_hash).provisioning_uri(user.email, issuer_name=settings.APP_TITLE)
+            if generate_qr_code:
+                mfa_hash = pyotp.random_base32()
+                user_profile.encrypted_mfa_hash = AES.encrypt(mfa_hash)
+
+                uri = pyotp.totp.TOTP(mfa_hash).provisioning_uri(user.email, issuer_name=settings.APP_TITLE)
                 uri_qrcode = qrcode.make(uri)
 
                 buffer = io.BytesIO()
@@ -436,15 +442,16 @@ class TwoFactorAuthenticationSettingsView(View):
 
                 buffer.close()
             elif generate_manual_key:
-                user_profile.mfa_hash = pyotp.random_base32()
+                mfa_hash = pyotp.random_base32()
+                user_profile.encrypted_mfa_hash = AES.encrypt(mfa_hash)
 
                 new_mfa_hash_manual_entry_data = {
-                    'new_mfa_hash': user_profile.mfa_hash,
+                    'new_mfa_hash': mfa_hash,
                     'name': user.email,
                     'issuer_name': settings.APP_TITLE
                 }
             elif delete_mfa_hash and not settings.FORCE_TWO_FACTOR_AUTHENTICATION:
-                user_profile.mfa_hash = None
+                user_profile.encrypted_mfa_hash = None
 
             user_profile.save()
 
@@ -455,7 +462,7 @@ class TwoFactorAuthenticationSettingsView(View):
         context = {
             'ENABLE_TWO_FACTOR_AUTHENTICATION': settings.ENABLE_TWO_FACTOR_AUTHENTICATION,
             'FORCE_TWO_FACTOR_AUTHENTICATION': settings.FORCE_TWO_FACTOR_AUTHENTICATION,
-            'user_has_enabled_two_factor_authentication': bool(user_profile.mfa_hash),
+            'user_has_enabled_two_factor_authentication': bool(user_profile.encrypted_mfa_hash),
             'new_mfa_hash_qr_code': new_mfa_hash_qr_code,
             'new_mfa_hash_manual_entry_data': new_mfa_hash_manual_entry_data,
             'user_id': user_id,
