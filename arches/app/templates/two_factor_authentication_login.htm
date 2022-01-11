@@ -23,7 +23,7 @@
                 {% if user_has_enabled_two_factor_authentication %}
                     <p>{% trans 'Please enter the code from your external authentication application below.' %} </p>
 
-                    <form action="{% url 'two-factor-authentication-login' %}" method="post" style="margin-bottom: 12px;">
+                    <form name="foo" action="{% url 'two-factor-authentication-login' %}" method="post" style="margin-bottom: 12px;">
                         {% csrf_token %}
 
                         <input type="hidden" name="username" value="{{ username }}" />
@@ -43,6 +43,11 @@
                                     pattern="[0-9]*"
                                     placeholder="2-step verification code"
                                     autocomplete="one-time-code"
+                                    onkeyup="(function(input){   // IIFE
+                                        if (input.value.length == 6) {
+                                            document.forms['foo'].submit();
+                                        }
+                                    })(this)"
                                 />
                             </div>
                         </div>
@@ -58,10 +63,6 @@
                                 {% trans "Authentication failed. Please try again." %}
                             </p>
                         {% endif %}
-
-                        <div>
-                            <button type="submit" class="btn btn-success" style="min-width: 250px;">{% trans 'Submit' %}</button>
-                        </div>
                     </form>
 
                     <div class="row account-management">
