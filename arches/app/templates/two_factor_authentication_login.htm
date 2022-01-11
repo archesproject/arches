@@ -23,7 +23,7 @@
                 {% if user_has_enabled_two_factor_authentication %}
                     <p>{% trans 'Please enter the code from your external authentication application below.' %} </p>
 
-                    <form name="two-factor-authentication-form" action="{% url 'two-factor-authentication-login' %}" method="post" style="margin-bottom: 12px;">
+                    <form name="two-factor-authentication-form" action="{% url 'two-factor-authentication-login' %}" method="post" style="margin-top: 24px;">
                         {% csrf_token %}
 
                         <input type="hidden" name="username" value="{{ username }}" />
@@ -65,14 +65,16 @@
                         {% endif %}
                     </form>
 
-                    <div class="row account-management">
-                        <a href="{% url 'two-factor-authentication-reset' %}" class="btn btn-link account-link">{% trans "Need to reset two-factor authentication?" %}</a>
+                    <hr style="border-color: #eee;">
+                    
+                    <div class="row account-management" style="border-top: 0;">
+                        <a href="{% url 'two-factor-authentication-reset' %}" class="btn btn-link">{% trans "Need to reset two-factor authentication?" %}</a>
                     </div>
 
                     <hr style="border-color: #eee;">
                 {% else %}
                     <div class="row account-management" style="border-top: 0;">
-                        <form action="{% url 'two-factor-authentication-reset' %}" method="post">
+                        <form action="{% url 'two-factor-authentication-reset' %}" method="post" style="display: flex; flex-direction: column;">
                             {% csrf_token %}
                             <input type="hidden" name="email" value="{{ email }}" />
 

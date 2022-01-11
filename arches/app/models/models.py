@@ -1075,7 +1075,7 @@ class GraphXMapping(models.Model):
 class UserProfile(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
     phone = models.CharField(max_length=16, blank=True)
-    encrypted_mfa_hash = models.CharField(max_length=100, null=True, blank=True)
+    encrypted_mfa_hash = models.CharField(max_length=128, null=True, blank=True)
 
     def is_reviewer(self):
         """DEPRECATED Use new pattern:

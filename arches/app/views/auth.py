@@ -376,7 +376,10 @@ class TwoFactorAuthenticationLoginView(View):
             user_profile = models.UserProfile.objects.get(user_id=user.pk)
 
             AES = AESCipher(settings.SECRET_KEY)
-            totp = pyotp.TOTP(AES.decrypt(user_profile.encrypted_mfa_hash))
+            encrypted_mfa_hash = user_profile.encrypted_mfa_hash[1:len(user_profile.encrypted_mfa_hash)]  # removes outer string values
+            decrypted_mfa_hash = AES.decrypt(encrypted_mfa_hash)  
+
+            totp = pyotp.TOTP(decrypted_mfa_hash)
 
             if totp.verify(two_factor_authentication_string):
                 login(request, user)
@@ -439,9 +442,12 @@ class TwoFactorAuthenticationSettingsView(View):
         if generate_qr_code or generate_manual_key or delete_mfa_hash:
             AES = AESCipher(settings.SECRET_KEY)
 
-            if generate_qr_code:
+            if generate_qr_code or generate_manual_key:
                 mfa_hash = pyotp.random_base32()
-                user_profile.encrypted_mfa_hash = AES.encrypt(mfa_hash)
+                encrypted_mfa_hash = AES.encrypt(mfa_hash)
+
+            if generate_qr_code:
+                user_profile.encrypted_mfa_hash = encrypted_mfa_hash
 
                 uri = pyotp.totp.TOTP(mfa_hash).provisioning_uri(user.email, issuer_name=settings.APP_TITLE)
                 uri_qrcode = qrcode.make(uri)
@@ -454,8 +460,7 @@ class TwoFactorAuthenticationSettingsView(View):
 
                 buffer.close()
             elif generate_manual_key:
-                mfa_hash = pyotp.random_base32()
-                user_profile.encrypted_mfa_hash = AES.encrypt(mfa_hash)
+                user_profile.encrypted_mfa_hash = encrypted_mfa_hash
 
                 new_mfa_hash_manual_entry_data = {
                     'new_mfa_hash': mfa_hash,
