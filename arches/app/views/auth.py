@@ -411,8 +411,7 @@ class TwoFactorAuthenticationSettingsView(View):
 
         decrypted_data = JSONDeserializer().deserialize(AES.decrypt(link))
 
-        if True:
-        # if datetime.fromtimestamp(decrypted_data["ts"]) + timedelta(minutes=15) >= datetime.fromtimestamp(int(time.time())):  # if before email expiry
+        if datetime.fromtimestamp(decrypted_data["ts"]) + timedelta(minutes=15) >= datetime.fromtimestamp(int(time.time())):  # if before email expiry
             user_id = decrypted_data['user']['id']
             user_profile = models.UserProfile.objects.get(user_id=user_id)
 
@@ -424,7 +423,7 @@ class TwoFactorAuthenticationSettingsView(View):
             }
 
         else:
-            raise("ERROR")
+            raise Exception("Link Expired")
 
         return render(request, 'two_factor_authentication_settings.htm', context)
         
