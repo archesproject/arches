@@ -58,7 +58,7 @@
         <!--/ko-->
         </div>
         <!-- ko if: $parent.popupFeatures.length > 1 -->
-        <div style="display: flex; flex-direction: row; width: 35px; justify-content: space-evenly;">
+        <div style="display: flex; flex-direction: row; width: 50px; justify-content: space-evenly;">
             <div data-bind="text: 1 + $parent.popupFeatures.findIndex(feature => feature.active());"></div>
             {% trans "of" %}
             <div data-bind="text: $parent.popupFeatures.length"></div>
