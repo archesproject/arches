@@ -37,10 +37,11 @@ from django.utils.translation import ugettext as _
 from django.utils.http import urlencode
 from django.core.mail import EmailMultiAlternatives
 from django.urls import reverse
-from django.contrib.auth import authenticate, login, logout
+from django.contrib.auth import authenticate, login, logout, update_session_auth_hash
 from django.contrib.auth import views as auth_views
 from django.contrib.auth.models import User, Group
 from django.contrib.auth.decorators import login_required
+from django.contrib.sessions.models import Session
 from django.shortcuts import render, redirect
 import django.contrib.auth.password_validation as validation
 from arches import __version__
@@ -442,12 +443,18 @@ class TwoFactorAuthenticationSettingsView(View):
                 }
 
             user_profile.save()
-            logout(request)
+
+            for session in Session.objects.all():
+                if str(session.get_decoded().get('_auth_user_id')) == str(user.id):
+                    session.delete()
                 
         elif delete_mfa_hash and not settings.FORCE_TWO_FACTOR_AUTHENTICATION:
             user_profile.mfa_hash = None
             user_profile.save()
-            logout(request)
+
+            for session in Session.objects.all():
+                if str(session.get_decoded().get('_auth_user_id')) == str(user.id):
+                    session.delete()
 
         context = {
             'ENABLE_TWO_FACTOR_AUTHENTICATION': settings.ENABLE_TWO_FACTOR_AUTHENTICATION,
