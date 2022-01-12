@@ -30,7 +30,11 @@ define([
             $element.html(value);
             var editor = $element.ckeditor(options).editor;
 
-            allBindings()?.attr?.disabled?.subscribe(disabled => editor?.setReadOnly(disabled));
+            allBindings()?.attr?.disabled?.subscribe(disabled => {
+                if(CKEDITOR.currentInstance && disabled === true || disabled === false) {
+                    editor?.setReadOnly(disabled);
+                }
+            });
 
             // bind to change events and link it to the observable
             var onChange = function (e) {
