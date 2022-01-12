@@ -2,6 +2,7 @@
 
 from django.db import migrations, models
 
+
 class Migration(migrations.Migration):
     dependencies = [
         ("models", "7128_resource_instance_filter"),
@@ -23,8 +24,8 @@ class Migration(migrations.Migration):
 
     operations = [
         migrations.AddField(
-            model_name='userprofile',
-            name='encrypted_mfa_hash',
+            model_name="userprofile",
+            name="encrypted_mfa_hash",
             field=models.CharField(blank=True, max_length=128, null=True),
         ),
         migrations.RunPython(generate_user_profile_for_all_users, reverse_code=undo_generate_user_profile_for_all_users),
