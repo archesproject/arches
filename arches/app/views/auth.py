@@ -133,7 +133,6 @@ class SignupView(View):
             encrypted_userinfo = AES.encrypt(userinfo)
             url_encrypted_userinfo = urlencode({"link": encrypted_userinfo})
 
-
             admin_email = settings.ADMINS[0][1] if settings.ADMINS else ""
             email_context = {
                 "button_text": _("Signup for Arches"),
@@ -173,7 +172,7 @@ class SignupView(View):
                 "validation_help": validation.password_validators_help_texts(),
             },
         )
-        
+
 
 @method_decorator(never_cache, name="dispatch")
 class ConfirmSignupView(View):
