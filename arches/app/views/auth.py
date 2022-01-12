@@ -472,7 +472,7 @@ class TwoFactorAuthenticationSettingsView(View):
                     buffer.close()
                 elif generate_manual_key:
                     new_mfa_hash_manual_entry_data = {"new_mfa_hash": mfa_hash, "name": user.email, "issuer_name": settings.APP_TITLE}
-                    
+
             elif delete_mfa_hash and not settings.FORCE_TWO_FACTOR_AUTHENTICATION:
                 user_profile.encrypted_mfa_hash = None
 
