@@ -80,11 +80,19 @@ class LoginView(View):
                 user_profile = models.UserProfile.objects.get(user=user)
                 user_has_enabled_two_factor_authentication = bool(user_profile.encrypted_mfa_hash)
 
-                if settings.FORCE_TWO_FACTOR_AUTHENTICATION or user_has_enabled_two_factor_authentication:  # user has enabled two-factor authentication
+                if (
+                    settings.FORCE_TWO_FACTOR_AUTHENTICATION or user_has_enabled_two_factor_authentication
+                ):  # user has enabled two-factor authentication
                     return render(
                         request,
-                        'two_factor_authentication_login.htm',
-                        { 'username': username, 'password': password, 'next': next, 'email': user.email, 'user_has_enabled_two_factor_authentication': user_has_enabled_two_factor_authentication, },
+                        "two_factor_authentication_login.htm",
+                        {
+                            "username": username,
+                            "password": password,
+                            "next": next,
+                            "email": user.email,
+                            "user_has_enabled_two_factor_authentication": user_has_enabled_two_factor_authentication,
+                        },
                     )
                 else:
                     login(request, user)
@@ -307,32 +315,36 @@ class ServerSettingView(View):
 @method_decorator(never_cache, name="dispatch")
 class TwoFactorAuthenticationResetView(View):
     def get(self, request):
-        queried_email_address = request.GET.get('queried_email_address')
-        return render(request, "two_factor_authentication_reset.htm", {"queried_email_address": queried_email_address,})
+        queried_email_address = request.GET.get("queried_email_address")
+        return render(
+            request,
+            "two_factor_authentication_reset.htm",
+            {
+                "queried_email_address": queried_email_address,
+            },
+        )
 
     def post(self, request):
-        email = request.POST.get('email')
+        email = request.POST.get("email")
         user = None
 
         if email:
             try:
-                user  = models.User.objects.get(email=email)
+                user = models.User.objects.get(email=email)
             except Exception:
                 pass
-                
+
         if user:
             AES = AESCipher(settings.SECRET_KEY)
 
-            serialized_data = JSONSerializer().serialize({ 'ts': int(time.time()), 'user': user })
+            serialized_data = JSONSerializer().serialize({"ts": int(time.time()), "user": user})
             encrypted_url = urlencode({"link": AES.encrypt(serialized_data)})
 
             admin_email = settings.ADMINS[0][1] if settings.ADMINS else ""
             email_context = {
                 "button_text": _("Update Two-Factor Authentication Settings"),
                 "link": request.build_absolute_uri(reverse("two-factor-authentication-settings") + "?" + encrypted_url),
-                "greeting": _(
-                    "Click on link below to update your two-factor authentication settings."
-                ),
+                "greeting": _("Click on link below to update your two-factor authentication settings."),
                 "closing": _(
                     "This link expires in 15 minutes. If you did not request this change, \
                     contact your Administrator immediately."
@@ -348,7 +360,13 @@ class TwoFactorAuthenticationResetView(View):
 
             msg.send()
 
-        return render(request, "two_factor_authentication_reset.htm", {"queried_email_address": email,})
+        return render(
+            request,
+            "two_factor_authentication_reset.htm",
+            {
+                "queried_email_address": email,
+            },
+        )
 
 
 @method_decorator(never_cache, name="dispatch")
@@ -359,16 +377,18 @@ class TwoFactorAuthenticationLoginView(View):
         user = authenticate(username=username, password=password)
 
         next = request.POST.get("next", reverse("home"))
-        user_has_enabled_two_factor_authentication = request.POST.get('user-has-enabled-two-factor-authentication', None)
-        two_factor_authentication_string = request.POST.get('two-factor-authentication', None)
+        user_has_enabled_two_factor_authentication = request.POST.get("user-has-enabled-two-factor-authentication", None)
+        two_factor_authentication_string = request.POST.get("two-factor-authentication", None)
 
         if user is not None and user.is_active and user_has_enabled_two_factor_authentication:
             user_profile = models.UserProfile.objects.get(user_id=user.pk)
 
             if user_profile.encrypted_mfa_hash:
                 AES = AESCipher(settings.SECRET_KEY)
-                encrypted_mfa_hash = user_profile.encrypted_mfa_hash[1:len(user_profile.encrypted_mfa_hash)]  # removes outer string values
-                decrypted_mfa_hash = AES.decrypt(encrypted_mfa_hash)  
+                encrypted_mfa_hash = user_profile.encrypted_mfa_hash[
+                    1 : len(user_profile.encrypted_mfa_hash)
+                ]  # removes outer string values
+                decrypted_mfa_hash = AES.decrypt(encrypted_mfa_hash)
 
                 totp = pyotp.TOTP(decrypted_mfa_hash)
 
@@ -379,17 +399,17 @@ class TwoFactorAuthenticationLoginView(View):
                     return redirect(next)
 
         return render(
-            request, 
-            "two_factor_authentication_login.htm", 
-            { 
-                "auth_failed": True, 
-                "next": next, 
-                "username": username, 
-                "password": password, 
-                'email': user.email, 
-                'user_has_enabled_two_factor_authentication': user_has_enabled_two_factor_authentication,
-            }, 
-            status=401
+            request,
+            "two_factor_authentication_login.htm",
+            {
+                "auth_failed": True,
+                "next": next,
+                "username": username,
+                "password": password,
+                "email": user.email,
+                "user_has_enabled_two_factor_authentication": user_has_enabled_two_factor_authentication,
+            },
+            status=401,
         )
 
 
@@ -401,34 +421,36 @@ class TwoFactorAuthenticationSettingsView(View):
 
         decrypted_data = JSONDeserializer().deserialize(AES.decrypt(link))
 
-        if datetime.fromtimestamp(decrypted_data["ts"]) + timedelta(minutes=15) >= datetime.fromtimestamp(int(time.time())):  # if before email expiry
-            user_id = decrypted_data['user']['id']
+        if datetime.fromtimestamp(decrypted_data["ts"]) + timedelta(minutes=15) >= datetime.fromtimestamp(
+            int(time.time())
+        ):  # if before email expiry
+            user_id = decrypted_data["user"]["id"]
             user_profile = models.UserProfile.objects.get(user_id=user_id)
 
             context = {
-                'ENABLE_TWO_FACTOR_AUTHENTICATION': settings.ENABLE_TWO_FACTOR_AUTHENTICATION,
-                'FORCE_TWO_FACTOR_AUTHENTICATION': settings.FORCE_TWO_FACTOR_AUTHENTICATION,
-                'user_has_enabled_two_factor_authentication': bool(user_profile.encrypted_mfa_hash),
-                'user_id': user_id,
+                "ENABLE_TWO_FACTOR_AUTHENTICATION": settings.ENABLE_TWO_FACTOR_AUTHENTICATION,
+                "FORCE_TWO_FACTOR_AUTHENTICATION": settings.FORCE_TWO_FACTOR_AUTHENTICATION,
+                "user_has_enabled_two_factor_authentication": bool(user_profile.encrypted_mfa_hash),
+                "user_id": user_id,
             }
 
         else:
             raise Exception("Link Expired")
 
-        return render(request, 'two_factor_authentication_settings.htm', context)
-        
+        return render(request, "two_factor_authentication_settings.htm", context)
+
     def post(self, request):
-        user_id = request.POST.get('user-id')
+        user_id = request.POST.get("user-id")
         user = models.User.objects.get(pk=int(user_id))
         user_profile = models.UserProfile.objects.get(user_id=user_id)
 
-        generate_qr_code = request.POST.get('generate-qr-code-button')
-        generate_manual_key = request.POST.get('generate-manual-key-button')
-        delete_mfa_hash = request.POST.get('delete-mfa-hash-button')
+        generate_qr_code = request.POST.get("generate-qr-code-button")
+        generate_manual_key = request.POST.get("generate-manual-key-button")
+        delete_mfa_hash = request.POST.get("delete-mfa-hash-button")
 
         new_mfa_hash_qr_code = None
         new_mfa_hash_manual_entry_data = None
-        
+
         if generate_qr_code or generate_manual_key or delete_mfa_hash:
             AES = AESCipher(settings.SECRET_KEY)
 
@@ -446,33 +468,29 @@ class TwoFactorAuthenticationSettingsView(View):
                 uri_qrcode.save(buffer)
 
                 base64_encoded_result_bytes = base64.b64encode(buffer.getvalue())
-                new_mfa_hash_qr_code = base64_encoded_result_bytes.decode('ascii')
+                new_mfa_hash_qr_code = base64_encoded_result_bytes.decode("ascii")
 
                 buffer.close()
             elif generate_manual_key:
                 user_profile.encrypted_mfa_hash = encrypted_mfa_hash
 
-                new_mfa_hash_manual_entry_data = {
-                    'new_mfa_hash': mfa_hash,
-                    'name': user.email,
-                    'issuer_name': settings.APP_TITLE
-                }
+                new_mfa_hash_manual_entry_data = {"new_mfa_hash": mfa_hash, "name": user.email, "issuer_name": settings.APP_TITLE}
             elif delete_mfa_hash and not settings.FORCE_TWO_FACTOR_AUTHENTICATION:
                 user_profile.encrypted_mfa_hash = None
 
             user_profile.save()
 
             for session in Session.objects.all():  # logs user out of all sessions
-                if str(session.get_decoded().get('_auth_user_id')) == str(user.id):
+                if str(session.get_decoded().get("_auth_user_id")) == str(user.id):
                     session.delete()
 
         context = {
-            'ENABLE_TWO_FACTOR_AUTHENTICATION': settings.ENABLE_TWO_FACTOR_AUTHENTICATION,
-            'FORCE_TWO_FACTOR_AUTHENTICATION': settings.FORCE_TWO_FACTOR_AUTHENTICATION,
-            'user_has_enabled_two_factor_authentication': bool(user_profile.encrypted_mfa_hash),
-            'new_mfa_hash_qr_code': new_mfa_hash_qr_code,
-            'new_mfa_hash_manual_entry_data': new_mfa_hash_manual_entry_data,
-            'user_id': user_id,
+            "ENABLE_TWO_FACTOR_AUTHENTICATION": settings.ENABLE_TWO_FACTOR_AUTHENTICATION,
+            "FORCE_TWO_FACTOR_AUTHENTICATION": settings.FORCE_TWO_FACTOR_AUTHENTICATION,
+            "user_has_enabled_two_factor_authentication": bool(user_profile.encrypted_mfa_hash),
+            "new_mfa_hash_qr_code": new_mfa_hash_qr_code,
+            "new_mfa_hash_manual_entry_data": new_mfa_hash_manual_entry_data,
+            "user_id": user_id,
         }
 
         return render(request, "two_factor_authentication_settings.htm", context)
