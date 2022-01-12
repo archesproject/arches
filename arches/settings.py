@@ -589,7 +589,7 @@ MAP_MAX_ZOOM = 20
 # causing your application to break.
 OVERRIDE_RESOURCE_MODEL_LOCK = False
 
-# If True, users can set up two-factor authentication
+# If True, allows users to selectively enable two-factor authentication
 ENABLE_TWO_FACTOR_AUTHENTICATION = False
 
 # If True, users cannot log in unless they have enabled two-factor authentication
