@@ -457,24 +457,22 @@ class TwoFactorAuthenticationSettingsView(View):
             if generate_qr_code or generate_manual_key:
                 mfa_hash = pyotp.random_base32()
                 encrypted_mfa_hash = AES.encrypt(mfa_hash)
-
-            if generate_qr_code:
                 user_profile.encrypted_mfa_hash = encrypted_mfa_hash
 
-                uri = pyotp.totp.TOTP(mfa_hash).provisioning_uri(user.email, issuer_name=settings.APP_TITLE)
-                uri_qrcode = qrcode.make(uri)
+                if generate_qr_code:
+                    uri = pyotp.totp.TOTP(mfa_hash).provisioning_uri(user.email, issuer_name=settings.APP_TITLE)
+                    uri_qrcode = qrcode.make(uri)
 
-                buffer = io.BytesIO()
-                uri_qrcode.save(buffer)
+                    buffer = io.BytesIO()
+                    uri_qrcode.save(buffer)
 
-                base64_encoded_result_bytes = base64.b64encode(buffer.getvalue())
-                new_mfa_hash_qr_code = base64_encoded_result_bytes.decode("ascii")
+                    base64_encoded_result_bytes = base64.b64encode(buffer.getvalue())
+                    new_mfa_hash_qr_code = base64_encoded_result_bytes.decode("ascii")
 
-                buffer.close()
-            elif generate_manual_key:
-                user_profile.encrypted_mfa_hash = encrypted_mfa_hash
-
-                new_mfa_hash_manual_entry_data = {"new_mfa_hash": mfa_hash, "name": user.email, "issuer_name": settings.APP_TITLE}
+                    buffer.close()
+                elif generate_manual_key:
+                    new_mfa_hash_manual_entry_data = {"new_mfa_hash": mfa_hash, "name": user.email, "issuer_name": settings.APP_TITLE}
+                    
             elif delete_mfa_hash and not settings.FORCE_TWO_FACTOR_AUTHENTICATION:
                 user_profile.encrypted_mfa_hash = None
 

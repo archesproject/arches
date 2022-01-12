@@ -57,19 +57,19 @@ from arches.app.views.mobile_survey import MobileSurveyManagerView, MobileSurvey
 from arches.app.views.manifest_manager import ManifestManagerView
 from arches.app.views.manifest_manager import IIIFServerProxyView
 from arches.app.views.auth import (
-    TwoFactorAuthenticationLoginView,
-    TwoFactorAuthenticationSettingsView,
     LoginView,
     SignupView,
     ConfirmSignupView,
     ChangePasswordView,
     GetClientIdView,
-    TwoFactorAuthenticationResetView,
     UserProfileView,
     ServerSettingView,
     PasswordResetView,
     PasswordResetConfirmView,
     Token,
+    TwoFactorAuthenticationLoginView,
+    TwoFactorAuthenticationSettingsView,
+    TwoFactorAuthenticationResetView,
 )
 from arches.app.models.system_settings import settings
 from django.views.decorators.cache import cache_page
