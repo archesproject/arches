@@ -166,7 +166,6 @@
     define('arches', [], function () {
         return {
             urls: {
-                two_factor_authentication_reset:"{% url 'two-factor-authentication-reset' %}",
                 root: "{% url 'root' %}",
                 home: "{% url 'home' %}",
                 media: "{{ STATIC_URL }}",
@@ -228,6 +227,7 @@
                 apply_functions: "{% url 'apply_functions' 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa' %}".replace('aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa', ''),
                 remove_functions: "{% url 'remove_functions' 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa' %}".replace('aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa', ''),
                 time_wheel_config: "{% url 'time_wheel_config' %}",
+                two_factor_authentication_reset:"{% url 'two-factor-authentication-reset' %}",
                 reindex: "{% url 'reindex' %}",
                 permission_data: "{% url 'permission_data' %}",
                 resource_permission_data: "{% url 'resource_permission_data' %}",

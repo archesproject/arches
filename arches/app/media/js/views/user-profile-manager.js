@@ -28,8 +28,6 @@ define([
             self.viewModel.isTwoFactorAuthenticationForced = data.two_factor_authentication_settings['FORCE_TWO_FACTOR_AUTHENTICATION'];
             self.viewModel.hasUserEnabledTwoFactorAuthentication = ko.observable(data.two_factor_authentication_settings['user_has_enabled_two_factor_authentication']);
 
-            console.log(data.two_factor_authentication_settings)
-
             self.viewModel.toggleChangePasswordForm = function() {
                 this.showChangePasswordForm(!this.showChangePasswordForm());
                 if (this.showChangePasswordForm()) {

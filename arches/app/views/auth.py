@@ -151,18 +151,10 @@ class SignupView(View):
             html_content = render_to_string("email/general_notification.htm", email_context)  # ...
             text_content = strip_tags(html_content)  # this strips the html, so people will have the text as well.
 
-
-
             # create the email, and attach the HTML version as well.
             msg = EmailMultiAlternatives(_("Welcome to Arches!"), text_content, admin_email, [form.cleaned_data["email"]])
             msg.attach_alternative(html_content, "text/html")
-
-
-            # wrap in try/except with better message
-
             msg.send()
-
-
 
             confirmation_message = _(
                 "An email has been sent to <br><strong>%s</strong><br> with a link to activate your account" % form.cleaned_data["email"]
@@ -329,7 +321,6 @@ class TwoFactorAuthenticationResetView(View):
             except Exception:
                 pass
                 
-                # else request.user
         if user:
             AES = AESCipher(settings.SECRET_KEY)
 
