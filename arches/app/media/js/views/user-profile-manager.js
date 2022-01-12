@@ -162,14 +162,14 @@ define([
                         url: arches.urls.two_factor_authentication_reset,
                         method: "POST",
                         
-                    }).done(function(data) {
+                    }).done(function(_data) {
                         self.viewModel.alert(
                             new AlertViewModel(
                                 'ep-alert-blue',
                                 arches.twoFactorAuthenticationEmailSuccess.title,
                                 arches.twoFactorAuthenticationEmailSuccess.text,
                             )
-                        )
+                        );
                     });
                 };
 
@@ -181,7 +181,7 @@ define([
                         function(){},
                         sendTwoFactorAuthenticationEmail,
                     )
-                )
+                );
             };
 
             BaseManagerView.prototype.initialize.call(this, options);
