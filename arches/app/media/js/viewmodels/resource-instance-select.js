@@ -44,14 +44,10 @@ define([
             this.allowInstanceCreation = false;
         }
         this.renderContext = params.renderContext;
-
         /* 
             shoehorn logic to piggyback off of search context functionality. 
             Should be refactored when we get the chance for better component clarity.
         */ 
-        if (params.renderContext === 'workflow') {
-            self.renderContext = 'search';
-        }
 
         this.multiple = params.multiple || false;
         this.value = params.value || undefined;
@@ -59,7 +55,7 @@ define([
         this.rootOntologyClass = '';
         this.graphIsSemantic = false;
         this.resourceTypesToDisplayInDropDown = ko.observableArray(!!params.graphids ? ko.toJS(params.graphids) : []);
-        this.displayOntologyTable = this.renderContext !== 'search' && !!params.node;
+        this.displayOntologyTable = !['search','workflow'].includes(self.renderContext) && !!params.node;
 
         this.waitingForGraphToDownload = ko.computed(function(){
             if (!!params.node && this.resourceTypesToDisplayInDropDown().length > 0){
@@ -209,7 +205,7 @@ define([
             }
         };
         
-        if(self.renderContext !== 'search'){
+        if(!['search','workflow'].includes(self.renderContext)){
             var updateNameAndOntologyClass = function(values) {
                 var names = [];
                 var value = ko.unwrap(values);
@@ -303,24 +299,28 @@ define([
         });
         
         this.select2Config = {
-            value: self.renderContext === 'search' ? self.value : resourceToAdd,
+            value: ['search', 'workflow'].includes(self.renderContext) ? self.value : resourceToAdd,
             clickBubble: true,
             disabled: this.disabled,
             multiple: !self.displayOntologyTable ? params.multiple : false,
             placeholder: this.placeholder() || arches.translations.riSelectPlaceholder,
-            closeOnSelect: true,
-            allowClear: self.renderContext === 'search' ? true : false,
+            closeOnSelect: false,
+            allowClear: ['search','workflow'].includes(self.renderContext) ? true : false,
             onSelect: function(item) {
                 self.selectedItem(item);
-                if (self.renderContext !== 'search') {
+                if (!['search'].includes(self.renderContext)) {
                     if (item._source) {
-                        var ret = makeObject(item._id, item._source);
-                        setValue(ret);
-                        window.setTimeout(function() {
-                            if(self.displayOntologyTable){
-                                resourceToAdd("");
-                            }
-                        }, 250);
+                        if (self.renderContext === 'workflow'){
+                            self.value(item._id);
+                        } else {
+                            var ret = makeObject(item._id, item._source);
+                            setValue(ret);
+                            window.setTimeout(function() {
+                                if(self.displayOntologyTable){
+                                    resourceToAdd("");
+                                }
+                            }, 250);    
+                        }
                     } else {
                         // This section is used when creating a new resource Instance
                         if(!self.preview){
@@ -339,7 +339,11 @@ define([
                             };
                             params.complete.subscribe(function() {
                                 if (params.resourceid()) {
-                                    window.fetch(arches.urls.search_results + "?id=" + params.resourceid())
+                                    if (self.renderContext === 'workflow'){
+                                        self.value(params.resourceid());
+                                        clearNewInstance();
+                                    } else {
+                                        window.fetch(arches.urls.search_results + "?id=" + params.resourceid())
                                         .then(function(response){
                                             if(response.ok) {
                                                 return response.json();
@@ -354,6 +358,7 @@ define([
                                         .finally(function(){
                                             clearNewInstance();
                                         });
+                                    }
                                 } else {
                                     clearNewInstance();
                                 }
@@ -380,10 +385,11 @@ define([
                     } else {
                         url(arches.urls.search_results);
                         var queryString = new URLSearchParams();
-                        if (!!params.node && ko.unwrap(params.node.config.searchString) !== ""){
-                            var searchUrl = new URL(ko.unwrap(params.node.config.searchString));
+                        const searchString = ko.unwrap(params.node?.config.searchString) || ko.unwrap(params.searchString);
+                        if (searchString) {
+                            const searchUrl = new URL(searchString);
                             queryString = new URLSearchParams(searchUrl.search);
-                            self.allowInstanceCreation = false;
+                            //self.allowInstanceCreation = false;
                         } 
                         queryString.set('paging-filter', page);
 
@@ -422,7 +428,7 @@ define([
                     }
                 },
                 results: function(data, page) {
-                    if (!data['paging-filter'].paginator.has_next && self.renderContext !== 'search') {
+                    if (!data['paging-filter'].paginator.has_next && !['search'].includes(self.renderContext)) {
                         self.resourceTypesToDisplayInDropDown().forEach(function(graphid) {
                             var graph = self.graphLookup[graphid];
                             var val = {
@@ -459,7 +465,7 @@ define([
                 }
             },
             initSelection: function(ele, callback) {
-                if(self.renderContext === "search" && self.value() !== "") {
+                if(['search','workflow'].includes(self.renderContext) && !!self.value() && self.value() !== "") {
                     var values = self.value();
                     if(!Array.isArray(self.value())){
                         values = [self.value()];
