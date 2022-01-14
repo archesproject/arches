@@ -56,6 +56,7 @@ define([
         this.graphIsSemantic = false;
         this.resourceTypesToDisplayInDropDown = ko.observableArray(!!params.graphids ? ko.toJS(params.graphids) : []);
         this.displayOntologyTable = !['search','workflow'].includes(self.renderContext) && !!params.node;
+        this.graphIds = ko.observableArray();
 
         this.waitingForGraphToDownload = ko.computed(function(){
             if (!!params.node && this.resourceTypesToDisplayInDropDown().length > 0){
@@ -437,6 +438,9 @@ define([
                                 isGraph: true
                             };
                             data.results.hits.hits.push(val);
+                            if (!self.graphIds.includes(graphid)) {
+                                self.graphIds.push(graphid);
+                            }
                         });
                     }
                     return {
@@ -465,7 +469,7 @@ define([
                 }
             },
             initSelection: function(ele, callback) {
-                if(['search','workflow'].includes(self.renderContext) && !!self.value() && self.value() !== "") {
+                if(['search','workflow'].includes(self.renderContext) && self.value() !== "" && !self.graphIds().includes(self.value())) {
                     var values = self.value();
                     if(!Array.isArray(self.value())){
                         values = [self.value()];
@@ -500,6 +504,8 @@ define([
                             callback(ret);
                         }
                     });
+                } else if (self.graphIds().includes(self.value())){
+                    self.value(null);
                 }
             }
         };
