@@ -22,6 +22,7 @@ define([
     * @param  {boolean} params.graphids (optional) - if params.node is not supplied then you need to supply a list of graphids that can be used to get resource instances for the dropdown
     * @param  {boolean} params.multiple - whether to display multiple values in the dropdown/table
     * @param  {boolean} params.allowInstanceCreation - whether the dropdown will give the user the option to create a new resource instance
+    * @param  {string} params.searchString (optional) - will limit the search results by the search string (it has to be full URL) and will override node.config.searchString if there is one
     * @param  {function} params.termFilter (optional) - a function to override the default term filter used when typing into the dropdown to search for resources
     * this.termFilter = function(term, data){
     *    return data["advanced-search"] = JSON.stringify([{
@@ -57,6 +58,7 @@ define([
         this.resourceTypesToDisplayInDropDown = ko.observableArray(!!params.graphids ? ko.toJS(params.graphids) : []);
         this.displayOntologyTable = !['search','workflow'].includes(self.renderContext) && !!params.node;
         this.graphIds = ko.observableArray();
+        this.searchString = params.searchString || ko.unwrap(params.node?.config.searchString);
 
         this.waitingForGraphToDownload = ko.computed(function(){
             if (!!params.node && this.resourceTypesToDisplayInDropDown().length > 0){
@@ -386,9 +388,8 @@ define([
                     } else {
                         url(arches.urls.search_results);
                         var queryString = new URLSearchParams();
-                        const searchString = ko.unwrap(params.node?.config.searchString) || ko.unwrap(params.searchString);
-                        if (searchString) {
-                            const searchUrl = new URL(searchString);
+                        if (self.searchString) {
+                            const searchUrl = new URL(self.searchString);
                             queryString = new URLSearchParams(searchUrl.search);
                             //self.allowInstanceCreation = false;
                         } 
@@ -438,7 +439,7 @@ define([
                                 isGraph: true
                             };
                             data.results.hits.hits.push(val);
-                            if (!self.graphIds.includes(graphid)) {
+                            if (!self.graphIds().includes(graphid)) {
                                 self.graphIds.push(graphid);
                             }
                         });
