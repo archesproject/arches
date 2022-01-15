@@ -2074,7 +2074,7 @@ class NodeValueDataType(BaseDataType):
                 return datatype.get_display_value(value_tile, value_node)
             return ""
         except:
-            raise Exception(f"Node with name \"{node.name}\" is not configured correctly.")
+            raise Exception(f'Node with name "{node.name}" is not configured correctly.')
 
     def append_to_document(self, document, nodevalue, nodeid, tile, provisional=False):
         pass
