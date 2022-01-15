@@ -75,11 +75,11 @@ def export_search_results(self, userid, request_values, format, report_link):
             tmp.seek(0)
             stream = tmp.read()
             export_files[0]["outputfile"] = tmp
-            exportid = exporter.write_export_zipfile(export_files, export_info)
+            exportid = exporter.write_export_zipfile(export_files, export_info, export_name)
     else:
         exporter = SearchResultsExporter(search_request=new_request)
         files, export_info = exporter.export(format, report_link)
-        exportid = exporter.write_export_zipfile(files, export_info)
+        exportid = exporter.write_export_zipfile(files, export_info, export_name)
 
     search_history_obj = models.SearchExportHistory.objects.get(pk=exportid)
 
