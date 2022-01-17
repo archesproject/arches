@@ -1,3 +1,7 @@
+a:hover, a:focus {
+    text-decoration: underline;
+}
+
 .navbar-toggle {
     margin-top: 11px;
     background: #000;
@@ -71,4 +75,74 @@
 .link-spacing:hover {
     color: #7AD02F;
     text-decoration: underline;
+}
+
+.btn-primary, .library-icon .bg-primary {
+    background-color: #2B4E6D;
+}
+
+.btn-mint {
+    background-color: #15503f !important;
+}
+
+.btn-danger,
+.btn-warning {
+    background-color: #943725 !important;
+}
+
+.crud-card-main a {
+    color: #17568c;
+}
+
+a:focus, button:focus,
+input:focus,
+textarea:focus,
+.form-control:focus,
+i.report-expander:focus,
+.select-icon:focus,
+.chosen-container-active,
+.select2-container-active,
+.workbench-card-sidepanel-header:focus,
+.sp-header-alerts:focus,
+.timeline-entry:focus,
+.rr-splash-help-link:focus,
+.tabbed-report-tab-list li:focus {
+    outline: #006600 solid 3px !important;
+}
+
+.workbench-card-sidebar-tab:focus,
+.search-facet-item:focus,
+button.saved-search-container:focus,
+button.search-type-btn:focus {
+    box-shadow: inset 0 0 0 2px #006600;
+    outline: none !important;
+}
+
+.btn-mint:focus,
+.btn-primary:focus,
+.btn.viewstate-btn.active:focus,
+.btn-display-toggle:focus,
+.mpm-manager button:focus,
+#rr-splash button:focus {
+    outline: cyan solid 3px !important;
+    text-decoration: underline;
+}
+
+.mainnav-sm #mainnav-menu *:focus,
+.mainnav-sm #mainnav-menu a:hover {
+    text-decoration: none;
+}
+
+.pagination>.active>a,
+.pagination>.active>span,
+.pagination>.active>a:hover,
+.pagination>.active>span:hover,
+.pagination>.active>a:focus,
+.pagination>.active>span:focus {
+    background-color: #2B4E6D;
+    border-color: #2B4E6D;
+}
+
+.select2-container-multi .select2-choices .select2-search-choice {
+    background-color: #2B4E6D;
 }
