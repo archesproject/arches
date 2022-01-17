@@ -156,10 +156,12 @@ define([
         };
 
         this.saveActiveStep = function() {
-            return new Promise(function(resolve, _reject) {
-                self.activeStep().save().then(function(data) {        
-                    resolve(data);
-                });
+            self.activeStep().save()
+            .then(function(_data) {        
+                self.next();
+            })
+            .catch(function(error) {
+                console.error(error);
             });
         };
 
