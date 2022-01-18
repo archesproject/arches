@@ -2,7 +2,7 @@
 drop function if exists __arches_create_spatial_view;
 drop function if exists __arches_update_spatial_view;
 drop function if exists __arches_delete_spatial_view;
-drop function if exists __arches_create_attribute_view;
+drop function if exists __arches_create_spatial_view_attribute_table;
 drop aggregate if exists __arches_agg_get_node_display_value(in_tiledata jsonb, in_nodeid text);
 drop function if exists __arches_accum_get_node_display_value;
 drop function if exists __arches_get_node_display_value;
@@ -12,12 +12,11 @@ drop function if exists __arches_get_concept_label;
 drop function if exists __arches_get_domain_label;
 drop function if exists __arches_get_resourceinstance_label;
 drop function if exists __arches_get_nodevalue_label;
-drop function if exists __arches_slugify;
 drop role if exists arches_featureservices;
 */
 
 ----------- existing from ROB
-
+/*
 create or replace function __arches_slugify(
 	"value" text
 ) returns text as $$
@@ -48,6 +47,7 @@ create or replace function __arches_slugify(
 select "value"
 from "trimmed";
 $$ language sql strict immutable;
+*/
 ------------------------------
 
 -- ROLE
@@ -144,7 +144,7 @@ return return_label;
 end;
 $$;
 
---drop function if exists __arches_get_domain_list_label;
+
 create or replace function __arches_get_domain_list_label(domain_value_list jsonb, nodeid text) returns text language plpgsql as $$
 declare
 	return_label text := '';
@@ -166,6 +166,7 @@ begin
 return return_label;
 end;
 $$;
+
 
 create or replace function __arches_get_resourceinstance_label(resourceinstance_value jsonb, label_type text default 'name') returns text language plpgsql as $$
 declare
@@ -431,7 +432,7 @@ create or replace aggregate __arches_agg_get_node_display_value(in_tiledata json
 );
 
 
-create or replace function __arches_create_attribute_view(
+create or replace function __arches_create_spatial_view_attribute_table(
 	spatial_view_name_slug text,
 	geometry_node_id uuid,
 	attribute_node_list text
@@ -441,14 +442,13 @@ strict
 as 
 $$
 declare
-	att_view_name 	text;
+	att_table_name 	text;
 	tile_create 	text := '';
 	node_create 	text := '';
 	att_view 		text;
 	
 begin
-	att_view_name := format('attr_%s', spatial_view_name_slug);
-	raise notice 'att_view_name: %', att_view_name;
+	att_table_name := format('sv_attr_%s', spatial_view_name_slug);
 	attribute_node_list = replace(attribute_node_list,' ','');
 
 	declare
@@ -491,7 +491,7 @@ begin
 	-- pull together 
 	att_view := format(
 		'
-		create materialized view %s 
+		create table %s 
 		tablespace pg_default
 		as
 		(
@@ -510,15 +510,15 @@ begin
 		create unique index on %s (resourceinstanceid);
 		
 		',
-		att_view_name,
+		att_table_name,
 		node_create, 
 		geometry_node_id, 
 		tile_create,
-		att_view_name);
+		att_table_name);
 	
 	execute att_view;
 	
-	return att_view_name;
+	return att_table_name;
 end;
 $$;
 
@@ -537,16 +537,16 @@ declare
 	sv_name_slug_with_geom text;
 	success boolean := false;
 	sv_create text := '';
-	att_view_name text;
+	att_table_name text;
 	g record;
 	tmp_geom_type text;
 begin
 	sv_name_slug := __arches_slugify(spatial_view_name);
-	att_view_name := __arches_create_attribute_view(sv_name_slug, geometry_node_id, attribute_node_list);
+	att_table_name := __arches_create_spatial_view_attribute_table(sv_name_slug, geometry_node_id, attribute_node_list);
 
 	for g in select unnest(string_to_array('ST_Point,ST_LineString,ST_Polygon'::text,',')) as geometry_type
 	loop
-		if att_view_name <> 'error' then
+		if att_table_name <> 'error' then
 		
 			tmp_geom_type := g.geometry_type;
 			sv_name_slug_with_geom := format('%s_%s',sv_name_slug, lower(replace(tmp_geom_type,'ST_','')));
@@ -568,7 +568,7 @@ begin
 
 				',
 				sv_name_slug_with_geom,
-				att_view_name,
+				att_table_name,
 				geometry_node_id::text,
 				tmp_geom_type,
 				sv_name_slug_with_geom);
@@ -617,7 +617,7 @@ declare
 	sv_name_slug_with_geom text;
 	success boolean := false;
 	sv_delete text := '';
-	att_view_name text;
+	att_table_name text;
 	g record;
 	tmp_geom_type text;
 begin
@@ -631,18 +631,18 @@ begin
 
 		sv_delete := sv_delete || 
 			format('
-			drop view if exists %s cascade;
+			drop view if exists %s;
 			',
 			sv_name_slug_with_geom
 			);
 	end loop;
 	
-	att_view_name := format('attr_%s', sv_name_slug);
+	att_table_name := format('sv_attr_%s', sv_name_slug);
 	sv_delete := sv_delete || 
 			format('
-			drop materialized view if exists %s;
+			drop table if exists %s;
 			',
-			att_view_name
+			att_table_name
 			);
 	
 	
