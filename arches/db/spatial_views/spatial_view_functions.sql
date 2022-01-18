@@ -55,8 +55,8 @@ $$ language sql strict immutable;
 do
 $do$
 declare
-	database_name text;
-	fs_user_sql text;
+	database_name 	text;
+	fs_user_sql 	text;
 begin
 	if not exists (
 		select from pg_catalog.pg_roles
@@ -85,7 +85,7 @@ $do$;
 
 create or replace function __arches_get_concept_label(concept_value text) returns text language plpgsql as $$
 declare
-	concept_label text := '';
+	concept_label 	text := '';
 begin
 	select v.value
 	into concept_label
@@ -102,7 +102,7 @@ $$;
 
 create or replace function __arches_get_concept_list_label(concept_array jsonb) returns text language plpgsql as $$
 declare
-	concept_list text := '';
+	concept_list 	text := '';
 begin
 	if concept_array is null or concept_array::text = 'null' then
 		return concept_list;
@@ -126,8 +126,8 @@ $$;
 
 create or replace function __arches_get_domain_label(domain_value text, in_nodeid text) returns text language plpgsql as $$
 declare
-	in_node_config jsonb;
-	return_label text;
+	in_node_config 	jsonb;
+	return_label 	text;
 begin
  	if domain_value is null or domain_value = '' or in_nodeid = '' then
 		return '';
@@ -154,7 +154,7 @@ $$;
 
 create or replace function __arches_get_domain_list_label(domain_value_list jsonb, nodeid text) returns text language plpgsql as $$
 declare
-	return_label text := '';
+	return_label 	text := '';
 begin
  	if domain_value_list is null or in_nodeid = '' then
 		return '';
@@ -177,16 +177,15 @@ $$;
 
 create or replace function __arches_get_resourceinstance_label(resourceinstance_value jsonb, label_type text default 'name') returns text language plpgsql as $$
 declare
-	return_label text := '';
-	
-	target_resourceinstanceid uuid;
-	target_graph_funct_config jsonb;
-	target_graphid uuid;
-	target_nodegroupid uuid;
-	target_template text;
-	target_tiledata jsonb;
-	target_provisionaledits jsonb;
-	target_data jsonb;
+	return_label 				text := '';
+	target_resourceinstanceid 	uuid;
+	target_graph_funct_config 	jsonb;
+	target_graphid 				uuid;
+	target_nodegroupid 			uuid;
+	target_template 			text;
+	target_tiledata 			jsonb;
+	target_provisionaledits 	jsonb;
+	target_data 				jsonb;
 begin
 
  	if resourceinstance_value is null or resourceinstance_value::text = 'null' then
@@ -253,9 +252,9 @@ begin
 	target_data := '{}'::jsonb;
 	
 	declare
-		tiledata_keycount integer := 0;
+		tiledata_keycount 				integer := 0;
 		provisionaledits_users_keycount integer := 0;
-		provisionaledits_userid text;
+		provisionaledits_userid 		text;
 	begin
 		select count(*) from jsonb_object_keys(target_tiledata) into tiledata_keycount;
 		if tiledata_keycount > 0 then
@@ -294,7 +293,7 @@ $$;
 
 create or replace function __arches_get_resourceinstance_list_label(resourceinstance_value jsonb, label_type text default 'name') returns text language plpgsql as $$
 declare
-	return_label text := '';
+	return_label 	text := '';
 begin
  	if resourceinstance_value is null OR resourceinstance_value::text = 'null' then
 		return '';
@@ -317,9 +316,9 @@ $$;
 
 create or replace function __arches_get_nodevalue_label(node_value jsonb, in_nodeid text) returns text language plpgsql as $$
 declare
-	return_label text := '';
-	nodevalue_tileid text;
-	value_nodeid text;
+	return_label 		text := '';
+	nodevalue_tileid 	text;
+	value_nodeid 		text;
 begin
 
 	if node_value is null or in_nodeid is null or in_nodeid = '' then
@@ -346,9 +345,9 @@ $$;
 
 create or replace function __arches_get_node_display_value(in_tiledata jsonb, in_nodeid text) returns text language plpgsql as $$
 declare
-	display_value text := '';
-	in_node_type text;
-	in_node_config json;
+	display_value 	text := '';
+	in_node_type 	text;
+	in_node_config 	json;
 begin
 	if in_nodeid is null or in_nodeid = '' then
 		return '<invalid_nodeid>';
@@ -410,8 +409,8 @@ $$;
 
 create or replace function __arches_accum_get_node_display_value(init text, in_tiledata jsonb, in_nodeid text) returns text language plpgsql as $$
 declare
-	display_name text := '';
-	return_label text := '';
+	display_name 	text := '';
+	return_label 	text := '';
 begin
 
 	select __arches_get_node_display_value(in_tiledata, in_nodeid)
@@ -459,8 +458,8 @@ begin
 	attribute_node_list = replace(attribute_node_list,' ','');
 
 	declare
-		tmp_nodegroupid_slug text;
-		n record;
+		tmp_nodegroupid_slug 	text;
+		n 						record;
 	begin
 	
 		for n in 
@@ -540,13 +539,13 @@ strict
 as 
 $$
 declare
-	sv_name_slug text;
-	sv_name_slug_with_geom text;
-	success boolean := false;
-	sv_create text := '';
-	att_table_name text;
-	g record;
-	tmp_geom_type text;
+	sv_name_slug 			text;
+	sv_name_slug_with_geom 	text;
+	success 				boolean := false;
+	sv_create 				text := '';
+	att_table_name 			text;
+	g 						record;
+	tmp_geom_type 			text;
 begin
 	sv_name_slug := __arches_slugify(spatial_view_name);
 	att_table_name := __arches_create_spatial_view_attribute_table(sv_name_slug, geometry_node_id, attribute_node_list);
@@ -600,7 +599,7 @@ strict
 as 
 $$
 declare
-	success boolean := false;
+	success 	boolean := false;
 begin
 	success := __arches_delete_spatial_view(spatial_view_name);
 
@@ -620,13 +619,13 @@ strict
 as 
 $$
 declare
-	sv_name_slug text;
-	sv_name_slug_with_geom text;
-	success boolean := false;
-	sv_delete text := '';
-	att_table_name text;
-	g record;
-	tmp_geom_type text;
+	sv_name_slug 			text;
+	sv_name_slug_with_geom 	text;
+	success 				boolean := false;
+	sv_delete 				text := '';
+	att_table_name 			text;
+	g 						record;
+	tmp_geom_type 			text;
 begin
 	-- slugify the main view name
 	sv_name_slug := __arches_slugify(spatial_view_name);
