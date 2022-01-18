@@ -41,11 +41,11 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 				</p>
 
 				{% if registration_success %}
-				<hr style="border-color: #eee;">
-				<p style="color: green">
-					{% trans "Your account has been created. Please sign in." %}
-				</p>
-				<hr style="border-color: #eee;">
+					<hr style="border-color: #eee;">
+					<p style="color: green">
+						{% trans "Your account has been created. Please sign in." %}
+					</p>
+					<hr style="border-color: #eee;">
 				{% endif %}
 
 				<form id="login-form" action="?next={{ next }}" method='POST' {% if auth_failed %} autocomplete="off" {% endif %}>
