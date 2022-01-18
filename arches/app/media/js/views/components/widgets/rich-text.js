@@ -35,7 +35,7 @@ define(['knockout', 'underscore', 'viewmodels/widget', 'arches', 'bindings/ckedi
                 currentValue[currentLanguage.code] = {value: '', direction: 'ltr'}
             } else {
                 self.currentText = ko.observable(currentValue?.[currentLanguage.code]?.value);
-                self.currentDirection = ko.observable(currentValue?.[currentLanguage.code]?.direction);
+                self.currentDirection = ko.observable(ko.unwrap(currentValue?.[currentLanguage.code]?.direction));
             }
 
             self.strippedValue = ko.pureComputed(() => {
@@ -69,7 +69,7 @@ define(['knockout', 'underscore', 'viewmodels/widget', 'arches', 'bindings/ckedi
                 }
 
                 self.currentText(self.value()?.[currentLanguage.code]?.value);
-                self.currentDirection(self.value()?.[currentLanguage.code]?.direction);
+                self.currentDirection(ko.unwrap(self.value()?.[currentLanguage.code]?.direction));
                 
             });
 
