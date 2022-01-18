@@ -53,13 +53,23 @@ logger = logging.getLogger(__name__)
 class LoginView(View):
     def get(self, request):
         next = request.GET.get("next", reverse("home"))
+        registration_success = request.GET.get("registration_success")
 
         if request.GET.get("logout", None) is not None:
             logout(request)
             # need to redirect to 'auth' so that the user is set to anonymous via the middleware
             return redirect("auth")
         else:
-            return render(request, "login.htm", {"auth_failed": False, "next": next, "user_signup_enabled": settings.ENABLE_USER_SIGNUP})
+            return render(
+                request,
+                "login.htm", 
+                {
+                    "auth_failed": False, 
+                    "next": next, 
+                    "registration_success": registration_success,
+                    "user_signup_enabled": settings.ENABLE_USER_SIGNUP
+                }
+            )
 
     def post(self, request):
         # POST request is taken to mean user is logging in
@@ -180,7 +190,7 @@ class ConfirmSignupView(View):
                 user = form.save()
                 crowdsource_editor_group = Group.objects.get(name=settings.USER_SIGNUP_GROUP)
                 user.groups.add(crowdsource_editor_group)
-                return redirect("auth")
+                return redirect(reverse("auth") + "?registration_success=true")
             else:
                 try:
                     for error in form.errors.as_data()["username"]:
