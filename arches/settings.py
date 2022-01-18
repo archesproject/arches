@@ -161,6 +161,12 @@ EMAIL_HOST_USER = "xxxx@xxx.com"
 
 DEFAULT_FROM_EMAIL = EMAIL_HOST_USER
 
+# If True, allows for user self creation via the signup view. If False, users can only be created via the Django admin view.
+ENABLE_USER_SIGNUP = True
+
+# If True, users must authenticate their accout via email to complete the account creation process.
+FORCE_USER_SIGNUP_EMAIL_AUTHENTICATION = True
+
 POSTGIS_VERSION = (3, 0, 0)
 
 # If you set this to False, Django will make some optimizations so as not
