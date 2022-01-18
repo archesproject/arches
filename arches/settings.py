@@ -161,7 +161,7 @@ EMAIL_HOST_USER = "xxxx@xxx.com"
 
 DEFAULT_FROM_EMAIL = EMAIL_HOST_USER
 
-# If True, allows for user self creation via the signup view.
+# If True, allows for user self creation via the signup view. If False, users can only be created via the Django admin view.
 ENABLE_USER_SIGNUP = True
 
 # If True, users must authenticate their accout via email to complete the account creation process.
