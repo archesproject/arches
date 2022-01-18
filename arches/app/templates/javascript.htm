@@ -351,7 +351,7 @@
                 'is_resource_layer': false,
                 'centerx': {{ map_layer.centerx|default_if_none:"null"|unlocalize }},
                 'centery': {{ map_layer.centery|default_if_none:"null"|unlocalize }},
-                'zoom': {{ map_layer.zoom|default_if_none:"null" }}
+                'zoom': {{ map_layer.zoom|default_if_none:"null"|unlocalize }}
             },{% endfor %}{% for resource_map_layer in resource_map_layers %}{
                 'maplayerid': '{{ resource_map_layer.nodeid }}',
                 'name': '{{ resource_map_layer.name }}',

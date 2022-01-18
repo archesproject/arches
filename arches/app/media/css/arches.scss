@@ -725,8 +725,9 @@ input[type="checkbox"] {
 }
 
 .tabbed-workflow-footer {
-    background-color: #fafafa;
-    border-top: 1px solid #ddd;
+    background-color: #445769;
+    border-top: 1px solid #0E2031;
+    color: #f9f9f9;
     padding: 10px 12px;
     display: flex;
     justify-content: space-between;
@@ -14220,6 +14221,7 @@ a.jstree-anchor.permissions-widget {
     .dl-horizontal dd {
         padding-right: 20px;
         margin-left: 220px;
+        word-break: break-word;
     }
 
     .dl-horizontal dt {
@@ -14253,6 +14255,7 @@ a.jstree-anchor.permissions-widget {
     .dl-horizontal dd {
         padding-right: 20px;
         margin-left: 320px;
+        word-break: break-word;
     }
 
     .rp-report-section-title {
@@ -14285,6 +14288,7 @@ a.jstree-anchor.permissions-widget {
     .report-related-resources .rp-card-section div div .dl-horizontal dd {
         padding-right: 20px;
         margin-left: 520px;
+        word-break: break-word;
     }
 }
 
@@ -14384,6 +14388,7 @@ a.jstree-anchor.permissions-widget {
     .dl-horizontal dd {
         margin-left: 280px;
         padding-right: 100px;
+        word-break: break-word;
     }
 
     .dl-horizontal dt {
