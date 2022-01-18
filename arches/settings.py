@@ -161,6 +161,9 @@ EMAIL_HOST_USER = "xxxx@xxx.com"
 
 DEFAULT_FROM_EMAIL = EMAIL_HOST_USER
 
+ENABLE_USER_SIGNUP = True
+FORCE_USER_SIGNUP_EMAIL_AUTHENTICATION = True
+
 POSTGIS_VERSION = (3, 0, 0)
 
 # If you set this to False, Django will make some optimizations so as not
