@@ -427,11 +427,7 @@ class Graph(models.GraphModel):
                 super(Graph, self).delete()
         else:
             raise GraphValidationError(
-                _(
-                    "Your resource model: {0}, already has instances saved. You cannot delete a Resource Model with instances.".format(
-                        self.name
-                    )
-                )
+                _( "Your resource model: {0}, already has instances saved. You cannot delete a Resource Model with instances.").format(self.name)
             )
 
     def delete_instances(self, verbose=False):
@@ -574,11 +570,7 @@ class Graph(models.GraphModel):
             tile_count = models.TileModel.objects.filter(nodegroup_id=nodeToAppendTo.nodegroup_id).count()
             if tile_count > 0:
                 raise GraphValidationError(
-                    _(
-                        "Your resource model: {0}, already has instances saved. "
-                        + "You cannot modify a Resource Model with instances.".format(self.name)
-                    ),
-                    1006,
+                    _("Your resource model: {0}, already has instances saved. You cannot modify a Resource Model with instances.").format(self.name),1006,
                 )
 
         nodegroup = None
