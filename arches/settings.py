@@ -161,7 +161,9 @@ EMAIL_HOST_USER = "xxxx@xxx.com"
 
 DEFAULT_FROM_EMAIL = EMAIL_HOST_USER
 
+# Allows for user self creation via the signup view.
 ENABLE_USER_SIGNUP = True
+# If True, user must authenticate their accout via email to complete the account creation process.
 FORCE_USER_SIGNUP_EMAIL_AUTHENTICATION = True
 
 POSTGIS_VERSION = (3, 0, 0)

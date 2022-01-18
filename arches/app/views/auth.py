@@ -117,11 +117,15 @@ class SignupView(View):
             userinfo = JSONSerializer().serialize(form.cleaned_data)
             encrypted_userinfo = AES.encrypt(userinfo)
             url_encrypted_userinfo = urlencode({"link": encrypted_userinfo})
+            confirmation_link = request.build_absolute_uri(reverse("confirm_signup") + "?" + url_encrypted_userinfo)
+
+            if not settings.FORCE_USER_SIGNUP_EMAIL_AUTHENTICATION:  # bypasses email confirmation if setting is disabled
+                return redirect(confirmation_link)
 
             admin_email = settings.ADMINS[0][1] if settings.ADMINS else ""
             email_context = {
                 "button_text": _("Signup for Arches"),
-                "link": request.build_absolute_uri(reverse("confirm_signup") + "?" + url_encrypted_userinfo),
+                "link": confirmation_link,
                 "greeting": _(
                     "Thanks for your interest in Arches. Click on link below \
                     to confirm your email address! Use your email address to login."
