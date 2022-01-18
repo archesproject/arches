@@ -38,11 +38,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 {% block main_content %}
 <div 
     class="modal-background" 
-    data-bind="
-        style: { 'visibility': $data.isPublishModalOpen() ? 'visible' : 'hidden',}, 
-        click: function() { $data.isPublishModalOpen(false); }, 
-        clickBubble: false,
-    "
+    data-bind="visible: $data.shouldShowPublishModal, click: function() { $data.shouldShowPublishModal(false); }, clickBubble: false,"
 >
     <div class="modal-content-container" data-bind="click: function(){}, clickBubble: false,">
         <div 
@@ -175,7 +171,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
             <!-- ko ifnot: $data.isGraphPublished() -->
                 <!-- ko if: $data.shouldShowGraphPublishButtons() -->
                 <span>
-                    <button class="btn btn-sm btn-primary btn-labeled fa fa-check" data-bind="click: function() { $data.isPublishModalOpen(true); }">{% trans "Publish Graph" %}</button>
+                    <button class="btn btn-sm btn-primary btn-labeled fa fa-check" data-bind="click: function() { $data.shouldShowPublishModal(true); }">{% trans "Publish Graph" %}</button>
                 </span>
                 <!-- /ko -->
             <!-- /ko -->

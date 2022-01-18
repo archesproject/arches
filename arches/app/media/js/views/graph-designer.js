@@ -85,7 +85,7 @@ define([
                 window.open(arches.urls.export_mapping_file(viewModel.graph.graphid()), '_blank');
             };
 
-            viewModel.isPublishModalOpen = ko.observable(false);
+            viewModel.shouldShowPublishModal = ko.observable(false);
 
             viewModel.displayUnpublishWarning = function() {
                 viewModel.alert(new AlertViewModel('ep-alert-red', 'Unpublish the graph?', 'This will make the graph inaccessible to other users.', function() {}, viewModel.unpublishGraph));
@@ -108,7 +108,7 @@ define([
                             viewModel.alert(new JsonErrorAlertViewModel('ep-alert-red', response.responseJSON));
                         }
 
-                        viewModel.isPublishModalOpen(false);
+                        viewModel.shouldShowPublishModal(false);
                         viewModel.loading(false);
                     }
                 });
@@ -127,7 +127,7 @@ define([
                             viewModel.alert(new JsonErrorAlertViewModel('ep-alert-red', response.responseJSON));
                         }
 
-                        viewModel.isPublishModalOpen(false);
+                        viewModel.shouldShowPublishModal(false);
                         viewModel.loading(false);
                     }
                 });
