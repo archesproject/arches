@@ -62,13 +62,13 @@ class LoginView(View):
         else:
             return render(
                 request,
-                "login.htm", 
+                "login.htm",
                 {
-                    "auth_failed": False, 
-                    "next": next, 
+                    "auth_failed": False,
+                    "next": next,
                     "registration_success": registration_success,
-                    "user_signup_enabled": settings.ENABLE_USER_SIGNUP
-                }
+                    "user_signup_enabled": settings.ENABLE_USER_SIGNUP,
+                },
             )
 
     def post(self, request):
