@@ -100,14 +100,13 @@ define([
                     complete: function(response, status) {
                         if (status === 'success') {
                             viewModel.isGraphPublished(true);
-                            viewModel.graphPublicationNotes(null);
                             viewModel.alert(new AlertViewModel('ep-alert-blue', response.responseJSON.title, response.responseJSON.message));
                         }
                         else {
-                            viewModel.graphPublicationNotes(null);
                             viewModel.alert(new JsonErrorAlertViewModel('ep-alert-red', response.responseJSON));
                         }
-
+                        
+                        viewModel.graphPublicationNotes(null);
                         viewModel.shouldShowPublishModal(false);
                         viewModel.loading(false);
                     }
