@@ -59,7 +59,7 @@ class LoginView(View):
             # need to redirect to 'auth' so that the user is set to anonymous via the middleware
             return redirect("auth")
         else:
-            return render(request, "login.htm", {"auth_failed": False, "next": next, 'user_signup_enabled': settings.ENABLE_USER_SIGNUP})
+            return render(request, "login.htm", {"auth_failed": False, "next": next, "user_signup_enabled": settings.ENABLE_USER_SIGNUP})
 
     def post(self, request):
         # POST request is taken to mean user is logging in
@@ -75,7 +75,9 @@ class LoginView(View):
             auth_attempt_success = True
             return redirect(next)
 
-        return render(request, "login.htm", {"auth_failed": True, "next": next, 'user_signup_enabled': settings.ENABLE_USER_SIGNUP}, status=401)
+        return render(
+            request, "login.htm", {"auth_failed": True, "next": next, "user_signup_enabled": settings.ENABLE_USER_SIGNUP}, status=401
+        )
 
 
 @method_decorator(never_cache, name="dispatch")
@@ -87,7 +89,7 @@ class SignupView(View):
         confirmation_message = ""
 
         if not settings.ENABLE_USER_SIGNUP:
-            raise(Exception(_("User signup has been disabled. Please contact your administrator.")))
+            raise (Exception(_("User signup has been disabled. Please contact your administrator.")))
 
         return render(
             request,
@@ -110,7 +112,7 @@ class SignupView(View):
         form = ArchesUserCreationForm(postdata, enable_captcha=settings.ENABLE_CAPTCHA)
 
         if not settings.ENABLE_USER_SIGNUP:
-            raise(Exception(_("User signup has been disabled. Please contact your administrator.")))
+            raise (Exception(_("User signup has been disabled. Please contact your administrator.")))
 
         if form.is_valid():
             AES = AESCipher(settings.SECRET_KEY)
@@ -167,7 +169,7 @@ class SignupView(View):
 class ConfirmSignupView(View):
     def get(self, request):
         if not settings.ENABLE_USER_SIGNUP:
-            raise(Exception(_("User signup has been disabled. Please contact your administrator.")))
+            raise (Exception(_("User signup has been disabled. Please contact your administrator.")))
 
         link = request.GET.get("link", None)
         AES = AESCipher(settings.SECRET_KEY)
