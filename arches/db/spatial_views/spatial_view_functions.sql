@@ -54,10 +54,15 @@ $$ language sql strict immutable;
 
 do
 $do$
+declare
+	database_name text;
+	fs_user_sql text;
 begin
 	if not exists (
 		select from pg_catalog.pg_roles
 		where  rolname = 'arches_featureservices') then
+
+		select current_database() into database_name;
 
 		create role arches_featureservices with
 		login
@@ -69,7 +74,9 @@ begin
 		--encrypted password 'md5967438f66634c78452443a93cc7293a4';
 		password 'arches_featureservices';
 
-		grant connect on database aher to arches_featureservices;
+		fs_user_sql := format('grant connect on database %s to arches_featureservices;', database_name);
+		execute fs_user_sql;
+
 	end if;
 end
 $do$;
