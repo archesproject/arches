@@ -448,7 +448,7 @@ declare
 	att_view 		text;
 	
 begin
-	att_table_name := format('sv_attr_%s', spatial_view_name_slug);
+	att_table_name := format('sp_attr_%s', spatial_view_name_slug);
 	attribute_node_list = replace(attribute_node_list,' ','');
 
 	declare
@@ -637,7 +637,7 @@ begin
 			);
 	end loop;
 	
-	att_table_name := format('sv_attr_%s', sv_name_slug);
+	att_table_name := format('sp_attr_%s', sv_name_slug);
 	sv_delete := sv_delete || 
 			format('
 			drop table if exists %s;
