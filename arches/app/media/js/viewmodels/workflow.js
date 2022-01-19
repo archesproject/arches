@@ -403,12 +403,12 @@ define([
         };
 
         this.reverseWorkflowTransactions = function() {
-            config.loading(true)
+            config.loading(true);
             $.ajax({
                 type: "POST",
                 url: arches.urls.transaction_reverse(self.id())
             }).then(function() {
-                config.loading(false)
+                config.loading(false);
                 window.location.href = self.quitUrl;
             });
         };
