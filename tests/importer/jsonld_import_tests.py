@@ -279,7 +279,7 @@ class JsonLDImportTests(ArchesTestCase):
 
         P1_is_identified = "http://www.cidoc-crm.org/cidoc-crm/P1_is_identified_by"
         P3_has_note = "http://www.cidoc-crm.org/cidoc-crm/P3_has_note"
-        
+
         self.assertTrue("@id" in js)
         self.assertEqual(js["@id"], "http://localhost:8000/resources/b94b8bc3-ab26-4b0a-8080-9e8bde2979b4")
         languages = set()
