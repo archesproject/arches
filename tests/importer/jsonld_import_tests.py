@@ -62,6 +62,10 @@ class JsonLDImportTests(ArchesTestCase):
             archesfile = JSONDeserializer().deserialize(f)
         ResourceGraphImporter(archesfile["graph"])
 
+        with open(os.path.join("tests/fixtures/jsonld_base/models/test_1_basic_object_cardinality_n.json"), "rU") as f:
+            archesfile = JSONDeserializer().deserialize(f)
+        ResourceGraphImporter(archesfile["graph"])
+
         with open(os.path.join("tests/fixtures/jsonld_base/models/test_2_complex_object.json"), "rU") as f:
             archesfile2 = JSONDeserializer().deserialize(f)
         ResourceGraphImporter(archesfile2["graph"])
@@ -235,6 +239,58 @@ class JsonLDImportTests(ArchesTestCase):
         self.assertTrue("http://www.cidoc-crm.org/cidoc-crm/P3_has_note" in js)
         self.assertEqual(set(note["@language"] for note in js["http://www.cidoc-crm.org/cidoc-crm/P3_has_note"]), set(["en", "es"]))
         self.assertEqual(set(note["@value"] for note in js["http://www.cidoc-crm.org/cidoc-crm/P3_has_note"]), set(["prueba!", "test!"]))
+
+    def test_1_basic_import_with_language_cardinality_n(self):
+        """Add language values to jsonld and test import with a cardinality n node."""
+        data = """{
+            "@id": "http://localhost:8000/resources/b94b8bc3-ab26-4b0a-8080-9e8bde2979b4",
+            "@type": "http://www.cidoc-crm.org/cidoc-crm/E1_CRM_Entity",
+            "http://www.cidoc-crm.org/cidoc-crm/P1_is_identified_by": [
+                {
+                    "@id": "http://localhost:8000/tile/4d788140-cefe-4856-9266-4d7e75cefceb/node/abd41efa-7968-11ec-80f9-faffc210b420",
+                    "@type": "http://www.cidoc-crm.org/cidoc-crm/E41_Appellation",
+                    "http://www.cidoc-crm.org/cidoc-crm/P3_has_note": [
+                        {"@language": "es","@value": "Azul"},
+                        {"@language": "en","@value": "Blue"}
+                    ]
+                },
+                {
+                    "@id": "http://localhost:8000/tile/610cb383-222b-47e0-906f-8b303bb1b20b/node/abd41efa-7968-11ec-80f9-faffc210b420",
+                    "@type": "http://www.cidoc-crm.org/cidoc-crm/E41_Appellation",
+                    "http://www.cidoc-crm.org/cidoc-crm/P3_has_note": [
+                        {"@language": "es", "@value": "Blanco"},
+                        {"@language": "en", "@value": "White"}
+                    ]
+                }
+            ]
+        }"""
+
+        url = self._create_url(
+            graph_id="37b50648-78ef-11ec-9508-faffc210b420",
+            resource_id="b94b8bc3-ab26-4b0a-8080-9e8bde2979b4",
+        )
+
+        response = self.client.put(url, data=data, HTTP_AUTHORIZATION=f"Bearer {self.token}")
+        self.assertEqual(response.status_code, 201)
+
+        js = response.json()
+        if isinstance(js, list):
+            js = js[0]
+
+        P1_is_identified = "http://www.cidoc-crm.org/cidoc-crm/P1_is_identified_by"
+        P3_has_note = "http://www.cidoc-crm.org/cidoc-crm/P3_has_note"
+        
+        self.assertTrue("@id" in js)
+        self.assertEqual(js["@id"], "http://localhost:8000/resources/b94b8bc3-ab26-4b0a-8080-9e8bde2979b4")
+        languages = set()
+        values = set()
+        for identifier in js[P1_is_identified]:
+            self.assertTrue(isinstance(identifier[P3_has_note], list))
+            for note in identifier[P3_has_note]:
+                languages.add(note["@language"])
+                values.add(note["@value"])
+        self.assertEqual(languages, set(["en", "es"]))
+        self.assertEqual(values, set(["White", "Blanco", "Azul", "Blue"]))
 
     def test_1b_basic_post(self):
         data = """{
