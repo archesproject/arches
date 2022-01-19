@@ -29,6 +29,7 @@ from arches.app.utils.data_management.resources.formats.format import Reader as 
 from arches.app.utils.data_management.resources.exporter import ResourceExporter
 from arches.app.models.system_settings import settings
 from arches.app.models import models
+from arches.app.models.fields.i18n import I18n_String
 import arches.app.utils.data_management.resource_graphs.importer as graph_importer
 import arches.app.utils.data_management.resource_graphs.exporter as graph_exporter
 import arches.app.utils.data_management.resources.remover as resource_remover
@@ -211,7 +212,7 @@ class Command(BaseCommand):
             "--prevent_indexing",
             action="store_true",
             dest="prevent_indexing",
-            help="Prevents indexing the resources or concepts into Elasticsearch",
+            help="Prevents indexing the resources or concepts into Elasticsearch.  If set to True will override any 'defer_indexing' setting.",
         )
 
         parser.add_argument(
@@ -243,6 +244,7 @@ class Command(BaseCommand):
     def handle(self, *args, **options):
         print("operation: " + options["operation"])
         package_name = settings.PACKAGE_NAME
+        celery_worker_running = task_management.check_if_celery_available()
 
         if options["operation"] == "setup":
             self.setup(package_name, es_install_location=options["dest_dir"])
@@ -274,6 +276,19 @@ class Command(BaseCommand):
             self.export_graphs(options["dest_dir"], options["graphs"], options["type"])
 
         if options["operation"] == "import_business_data":
+            defer_indexing = True
+            if "defer_indexing" in options:
+                if isinstance(options["defer_indexing"], bool):
+                    defer_indexing = options["defer_indexing"]
+                elif str(options["defer_indexing"])[0].lower() == "f":
+                    defer_indexing = False
+
+            defer_indexing = defer_indexing and not options["bulk_load"] and not celery_worker_running
+            prevent_indexing = True if options["prevent_indexing"] else defer_indexing
+
+            if defer_indexing:
+                concept_count = models.Value.objects.count()
+                relation_count = models.ResourceXResource.objects.count()
 
             self.import_business_data(
                 options["source"],
@@ -283,8 +298,21 @@ class Command(BaseCommand):
                 options["create_concepts"],
                 use_multiprocessing=options["use_multiprocessing"],
                 force=options["yes"],
-                prevent_indexing=options["prevent_indexing"],
+                prevent_indexing=prevent_indexing,
             )
+
+            if defer_indexing and not prevent_indexing:
+                # index concepts if new concepts created
+                if concept_count != models.Value.objects.count():
+                    management.call_command("es", "index_concepts")
+                # index relations if new relations created via new r-i tiles created
+                if relation_count != models.ResourceXResource.objects.count():
+                    management.call_command("es", "index_resource_relations")
+                # index resources of this model only
+                path = utils.get_valid_path(options["config_file"])
+                mapping = json.load(open(path, "r"))
+                graphid = mapping["resource_model_id"]
+                management.call_command("es", "index_resources_by_type", resource_types=[graphid])
 
         if options["operation"] == "import_node_value_data":
             self.import_node_value_data(options["source"], options["overwrite"])
@@ -367,24 +395,21 @@ class Command(BaseCommand):
                 output_graph = {"graph": [graph], "metadata": system_metadata()}
                 graph_json = JSONSerializer().serialize(output_graph, indent=4)
                 if graph["graphid"] not in existing_resource_graphs:
-                    output_file = os.path.join(dest_dir, graph["name"] + ".json")
+                    output_file = os.path.join(dest_dir, str(I18n_String(graph["name"])) + ".json")
                     with open(output_file, "w") as f:
                         print("writing", output_file)
                         f.write(graph_json)
                 else:
                     output_file = existing_resource_graphs[graph["graphid"]]["path"]
                     if force is False:
-                        overwrite = input(
-                            '"{0}" already exists in this directory. \
-                        Overwrite? (Y/N): '.format(
-                                existing_resource_graphs[graph["graphid"]]["name"]
-                            )
-                        )
+                        graph_name = I18n_String(existing_resource_graphs[graph["graphid"]]["name"])
+                        msg = f'The "{graph_name}" graph already exists in this directory. Overwrite? (Y/N): '
+                        overwrite = input(msg)
                     else:
                         overwrite = "true"
                     if overwrite.lower() in ("t", "true", "y", "yes"):
                         with open(output_file, "w") as f:
-                            print("writing", output_file)
+                            print("   writing", output_file)
                             f.write(graph_json)
 
     def export_package_settings(self, dest_dir, force=False):
@@ -506,6 +531,11 @@ class Command(BaseCommand):
     ):
 
         celery_worker_running = task_management.check_if_celery_available()
+
+        # only defer indexing if the celery worker ISN'T running because celery processes
+        # are async and we currently don't have a celery process to index data.  Once
+        # we do, then we can think about deferring indexing in the celery task as well.
+        defer_indexing = False if celery_worker_running else defer_indexing
 
         def load_ontologies(package_dir):
             ontologies = glob.glob(os.path.join(package_dir, "ontologies/*"))
@@ -706,7 +736,7 @@ class Command(BaseCommand):
                 # assumes resources in csv do not depend on data being loaded prior from json in same dir
                 chord(
                     [
-                        import_business_data.s(data_source=path, overwrite=True, bulk_load=bulk_load, prevent_indexing=prevent_indexing)
+                        import_business_data.s(data_source=path, overwrite=True, bulk_load=bulk_load, prevent_indexing=False)
                         for path in valid_resource_paths
                     ]
                 )(package_load_complete.signature(kwargs={"valid_resource_paths": valid_resource_paths}).on_error(on_chord_error.s()))
@@ -1033,17 +1063,17 @@ class Command(BaseCommand):
         if data_source.endswith(".jsonl"):
             print(
                 """
-WARNING: Support for loading JSONL files is still experimental. Be aware that
-the format of logging and console messages has not been updated."""
+                WARNING: Support for loading JSONL files is still experimental. Be aware that
+                the format of logging and console messages has not been updated."""
             )
             if use_multiprocessing is True:
                 print(
                     """
-WARNING: Support for multiprocessing files is still experimental. While using
-multiprocessing to import resources, you will not be able to use ctrl+c (etc.)
-to cancel the operation. You will need to manually kill all of the processes
-with or just close the terminal. Also, be aware that print statements
-will be very jumbled."""
+                    WARNING: Support for multiprocessing files is still experimental. While using
+                    multiprocessing to import resources, you will not be able to use ctrl+c (etc.)
+                    to cancel the operation. You will need to manually kill all of the processes
+                    with or just close the terminal. Also, be aware that print statements
+                    will be very jumbled."""
                 )
                 if not force:
                     confirm = input("continue? Y/n ")
@@ -1198,7 +1228,7 @@ will be very jumbled."""
             else:
                 graphs = [graph.strip() for graph in graphs.split(",")]
             for graph in ResourceGraphExporter.get_graphs_for_export(graphids=graphs)["graph"]:
-                graph_name = graph["name"].replace("/", "-")
+                graph_name = I18n_String(graph["name"]).replace("/", "-")
                 with open(os.path.join(data_dest, graph_name + ".json"), "wb") as f:
                     f.write(JSONSerializer().serialize({"graph": [graph]}, indent=4).encode("utf-8"))
         else:

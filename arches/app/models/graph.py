@@ -427,11 +427,7 @@ class Graph(models.GraphModel):
                 super(Graph, self).delete()
         else:
             raise GraphValidationError(
-                _(
-                    "Your resource model: {0}, already has instances saved. You cannot delete a Resource Model with instances.".format(
-                        self.name
-                    )
-                )
+                _( "Your resource model: {0}, already has instances saved. You cannot delete a Resource Model with instances.").format(self.name)
             )
 
     def delete_instances(self, verbose=False):
@@ -574,11 +570,7 @@ class Graph(models.GraphModel):
             tile_count = models.TileModel.objects.filter(nodegroup_id=nodeToAppendTo.nodegroup_id).count()
             if tile_count > 0:
                 raise GraphValidationError(
-                    _(
-                        "Your resource model: {0}, already has instances saved. "
-                        + "You cannot modify a Resource Model with instances.".format(self.name)
-                    ),
-                    1006,
+                    _("Your resource model: {0}, already has instances saved. You cannot modify a Resource Model with instances.").format(self.name),1006,
                 )
 
         nodegroup = None
@@ -1199,7 +1191,7 @@ class Graph(models.GraphModel):
             if card.nodegroup.parentnodegroup is None:
                 return card
 
-    def get_cards(self, check_if_editable=True):
+    def get_cards(self, check_if_editable=True, use_raw_i18n_json=False):
         """
         get the card data (if any) associated with this graph
 
@@ -1227,27 +1219,26 @@ class Graph(models.GraphModel):
                         card.name = self.nodes[card.nodegroup_id].name
                     if str(card.description) in ["null", ""]:
                         card.description = self.nodes[card.nodegroup_id].description
-            card_dict = JSONSerializer().serializeToPython(card)
+            card_dict = JSONSerializer().serializeToPython(card, use_raw_i18n_json=use_raw_i18n_json)
             card_dict["is_editable"] = is_editable
             card_constraints = card.constraintmodel_set.all()
             card_dict["constraints"] = JSONSerializer().serializeToPython(card_constraints)
             cards.append(card_dict)
-            print(cards)
         return cards
 
-    def get_widgets(self):
+    def get_widgets(self, use_raw_i18n_json=False):
         """
         get the widget data (if any) associated with this graph
 
         """
         widgets = []
         for widget in self.widgets.values():
-            widget_dict = JSONSerializer().serializeToPython(widget)
+            widget_dict = JSONSerializer().serializeToPython(widget, use_raw_i18n_json=use_raw_i18n_json)
             widgets.append(widget_dict)
 
         return widgets
 
-    def serialize(self, fields=None, exclude=None):
+    def serialize(self, fields=None, exclude=None, use_raw_i18n_json=False, **kwargs):
         """
         serialize to a different form then used by the internal class structure
 
@@ -1257,7 +1248,7 @@ class Graph(models.GraphModel):
         """
         exclude = [] if exclude is None else exclude
 
-        ret = JSONSerializer().handle_model(self, fields, exclude)
+        ret = JSONSerializer().handle_model(self, fields=fields, exclude=exclude, use_raw_i18n_json=use_raw_i18n_json)
         ret["root"] = self.root
 
         if "relatable_resource_model_ids" not in exclude:
@@ -1267,10 +1258,14 @@ class Graph(models.GraphModel):
 
         check_if_editable = "is_editable" not in exclude
         ret["is_editable"] = self.is_editable() if check_if_editable else ret.pop("is_editable", None)
-        ret["cards"] = self.get_cards(check_if_editable=check_if_editable) if "cards" not in exclude else ret.pop("cards", None)
+        ret["cards"] = (
+            self.get_cards(check_if_editable=check_if_editable, use_raw_i18n_json=use_raw_i18n_json)
+            if "cards" not in exclude
+            else ret.pop("cards", None)
+        )
 
         if "widgets" not in exclude:
-            ret["widgets"] = self.get_widgets()
+            ret["widgets"] = self.get_widgets(use_raw_i18n_json=use_raw_i18n_json)
         ret["nodegroups"] = self.get_nodegroups() if "nodegroups" not in exclude else ret.pop("nodegroups", None)
         ret["domain_connections"] = (
             self.get_valid_domain_ontology_classes() if "domain_connections" not in exclude else ret.pop("domain_connections", None)
@@ -1290,13 +1285,13 @@ class Graph(models.GraphModel):
         if "nodes" not in exclude:
             ret["nodes"] = []
             for key, node in self.nodes.items():
-                nodeobj = JSONSerializer().serializeToPython(node)
+                nodeobj = JSONSerializer().serializeToPython(node, use_raw_i18n_json=use_raw_i18n_json)
                 nodeobj["parentproperty"] = parentproperties[node.nodeid]
                 ret["nodes"].append(nodeobj)
         else:
             ret.pop("nodes", None)
 
-        res = JSONSerializer().serializeToPython(ret)
+        res = JSONSerializer().serializeToPython(ret, use_raw_i18n_json=use_raw_i18n_json)
 
         return res
 

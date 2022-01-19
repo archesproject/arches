@@ -499,7 +499,6 @@ class ResourceEditLogView(BaseManagerView):
             permitted_edits = []
             for edit in edits:
                 if edit.nodegroupid is not None:
-                    nodegroup = models.NodeGroup.objects.get(pk=edit.nodegroupid)
                     if request.user.has_perm("read_nodegroup", edit.nodegroupid):
                         if edit.newvalue is not None:
                             self.getEditConceptValue(edit.newvalue)

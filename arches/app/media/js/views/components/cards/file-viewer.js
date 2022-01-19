@@ -136,7 +136,11 @@ define([
                 this.fileFormatRenderers.forEach(function(renderer){
                     var excludeExtensions = renderer.exclude ? renderer.exclude.split(",") : [];
                     var rawFileType = type;
-                    var rawExtension = file.name ? ko.unwrap(file.name).split('.').pop() : ko.unwrap(file).split('.').pop();
+                    try {
+                        rawExtension = ko.unwrap(file).split('.').pop();
+                    } catch (error) {
+                        var rawExtension = file.name ? ko.unwrap(file.name).split('.').pop() : undefined;
+                    }
                     if (renderer.type === rawFileType && renderer.ext === rawExtension)  {
                         defaultRenderers.push(renderer);
                     }

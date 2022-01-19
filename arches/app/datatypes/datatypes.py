@@ -154,20 +154,24 @@ class StringDataType(BaseDataType):
                 document["strings"].append(val)
 
     def transform_export_values(self, value, *args, **kwargs):
+        language = kwargs.pop("language", None)
         if value is not None:
-            return value[get_language()]["value"]
+            try:
+                if language is not None:
+                    return value[language]["value"]
+                else:
+                    return value[get_language()]["value"]
+            except KeyError:
+                # sometimes certain requested language values aren't populated.  Just pass back with implicit None.
+                pass
 
     def get_search_terms(self, nodevalue, nodeid=None):
         terms = []
 
-        if nodevalue is not None:
-            if isinstance(nodevalue, str):
-                # TODO: fix tests where this condition fires
-                pass
-            else:
-                for key in nodevalue.keys():
-                    if settings.WORDS_PER_SEARCH_TERM is None or (len(nodevalue[key]["value"].split(" ")) < settings.WORDS_PER_SEARCH_TERM):
-                        terms.append({"language": key, "value": nodevalue[key]["value"]})
+        if nodevalue is not None and isinstance(nodevalue, dict):
+            for key in nodevalue.keys():
+                if settings.WORDS_PER_SEARCH_TERM is None or (len(nodevalue[key]["value"].split(" ")) < settings.WORDS_PER_SEARCH_TERM):
+                    terms.append({"language": key, "value": nodevalue[key]["value"]})
 
         return terms
 
@@ -204,7 +208,13 @@ class StringDataType(BaseDataType):
         return g
 
     def transform_value_for_tile(self, value, **kwargs):
+        language = kwargs.pop("language", None)
         if type(value) is str:
+            if language is not None:
+                language_objects = list(models.Language.objects.filter(code=language))
+                if len(language_objects) > 0:
+                    return {language: {"value": value, "direction": language_objects[0].default_direction}}
+
             return {get_language(): {"value": value, "direction": "ltr"}}
         return value
 
@@ -253,6 +263,13 @@ class NumberDataType(BaseDataType):
             error_message = self.create_error_message(value, source, row_number, message)
             errors.append(error_message)
         return errors
+
+    def get_display_value(self, tile, node):
+        data = self.get_tile_data(tile)
+        if data:
+            display_value = data.get(str(node.nodeid))
+            if display_value is not None:
+                return str(display_value)
 
     def transform_value_for_tile(self, value, **kwargs):
         try:
@@ -435,19 +452,23 @@ class DateDataType(BaseDataType):
         return valid_date_format, valid
 
     def transform_value_for_tile(self, value, **kwargs):
-        if type(value) == list:
-            value = value[0]
-        valid_date_format, valid = self.get_valid_date_format(value)
-        if valid:
-            v = datetime.strptime(value, valid_date_format)
-        else:
-            v = datetime.strptime(value, settings.DATE_IMPORT_EXPORT_FORMAT)
-        # The .astimezone() function throws an error on Windows for dates before 1970
-        try:
-            v = v.astimezone()
-        except:
-            v = self.backup_astimezone(v)
-        value = v.isoformat(timespec="milliseconds")
+        value = None if value == "" else value
+        if value is not None:
+            if type(value) == list:
+                value = value[0]
+            elif type(value) == str and len(value) < 4 and value.startswith("-") is False:  # a year before 1000 but not BCE
+                value = value.zfill(4)
+            valid_date_format, valid = self.get_valid_date_format(value)
+            if valid:
+                v = datetime.strptime(value, valid_date_format)
+            else:
+                v = datetime.strptime(value, settings.DATE_IMPORT_EXPORT_FORMAT)
+            # The .astimezone() function throws an error on Windows for dates before 1970
+            try:
+                v = v.astimezone()
+            except:
+                v = self.backup_astimezone(v)
+            value = v.isoformat(timespec="milliseconds")
         return value
 
     def backup_astimezone(self, dt):

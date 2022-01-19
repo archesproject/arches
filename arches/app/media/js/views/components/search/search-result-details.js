@@ -55,20 +55,17 @@ define([
                     var graphId = source['graph_id'];
                     var resourceId = source['resourceinstanceid'];
 
-                    if (bulkResourceReportCache()[graphId] && bulkDisambiguatedResourceInstanceCache()[resourceId]) {
-                        self.createReport(sourceData, bulkResourceReportCache()[graphId], bulkDisambiguatedResourceInstanceCache()[resourceId]);
-                        self.loading(false)
-                    }
-                    else {
-                        var bulkResourceReportCacheSubscription = bulkResourceReportCache.subscribe(function(cache) {
-                            if (cache[graphId]) {
-                                self.createReport(sourceData, cache[graphId], bulkDisambiguatedResourceInstanceCache()[resourceId]);
+                    ko.computed(() => {
+                        bulkResourceReportCache();
+                        bulkDisambiguatedResourceInstanceCache();
 
-                                bulkResourceReportCacheSubscription.dispose(); /* terminates subscription */
-                                self.loading(false);
-                            }
-                        });
-                    }
+                        if(bulkResourceReportCache()[graphId] && bulkDisambiguatedResourceInstanceCache()[resourceId])
+                        {
+                            self.createReport(sourceData, bulkResourceReportCache()[graphId], bulkDisambiguatedResourceInstanceCache()[resourceId]);
+                            self.loading(false)
+                        }
+                    });
+
                 };
 
                 this.createReport = function(sourceData, bulkResourceReportCacheData, bulkDisambiguatedResourceInstanceCacheData) {

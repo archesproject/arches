@@ -215,6 +215,7 @@ define([
             var tiles = self.groupedTiles();
             var tile = self.groupedTiles()[0];
             tile.resourceinstance_id = ko.unwrap(self.form.resourceId);
+            tile.transactionId = params.form?.workflowId;
             self.saving = true;
 
             tile.save(function(response) {
@@ -225,6 +226,7 @@ define([
             }, function(){
                 var requests = _.map(_.rest(tiles), function(tile) {
                     tile.resourceinstance_id = ko.unwrap(self.form.resourceId);
+                    tile.transactionId = params.form?.workflowId;
                     return tile.save(function(response) {
                         errors.push(response);
                     });

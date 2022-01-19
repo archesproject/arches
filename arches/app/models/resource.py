@@ -395,7 +395,6 @@ class Resource(models.ResourceInstance):
                                                     },
                                                 }
                                             )
-        print(document)
         return document, terms
 
     def delete(self, user={}, index=True, transaction_id=None):
@@ -647,7 +646,7 @@ class Resource(models.ResourceInstance):
 
         return new_resource
 
-    def serialize(self, fields=None, exclude=None):
+    def serialize(self, fields=None, exclude=None, **kwargs):
         """
         Serialize to a different form then used by the internal class structure
 
