@@ -1,5 +1,5 @@
-define(['knockout', 'mapbox-gl', 'arches', 'geocoder-templates'],
-function (ko, mapboxgl, arches) {
+define(['knockout', 'arches', 'geocoder-templates'],
+function (ko, arches) {
     /**
      * A viewmodel used for geocoders
      *
@@ -10,6 +10,9 @@ function (ko, mapboxgl, arches) {
      */
     var BaseGeocoderViewModel = function(params) {
         var self = this;
+        require(['mapbox-gl'], (mapboxgl) => {
+            self.mapboxgl = mapboxgl;
+        });
         this.placeholder = params.placeholder || ko.observable('Locate a Place or Address');
         this.anchorLayerId = params.anchorLayerId;
         this.apiKey = params.api_key || arches.mapboxApiKey
@@ -91,7 +94,7 @@ function (ko, mapboxgl, arches) {
                 var coords = item.geometry.coordinates;
                 self.map.getSource('geocode-point').setData(item.geometry);
                 self.redrawLayer();
-                var centerPoint = new mapboxgl.LngLat(coords[0], coords[1])
+                var centerPoint = new self.mapboxgl.LngLat(coords[0], coords[1])
                 self.map.flyTo({
                     center: centerPoint
                 });

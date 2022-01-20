@@ -1,4 +1,4 @@
-define(['underscore', 'knockout', 'mapbox-gl-draw'], function(_, ko, MapboxDraw) {
+define(['underscore', 'knockout'], function(_, ko, MapboxDraw) {
     /**
      * A viewmodel used for managing a spatial search filter.
      *
@@ -7,6 +7,7 @@ define(['underscore', 'knockout', 'mapbox-gl-draw'], function(_, ko, MapboxDraw)
      *
      */
     var MapFilterViewModel = function(params) {
+        const MapboxDraw = require('mapbox-gl-draw');
         var self = this;
         this.searchContext = params.searchContext ||  ko.observable(true);
         this.map = params.map;

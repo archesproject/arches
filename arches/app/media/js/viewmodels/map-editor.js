@@ -5,7 +5,6 @@ define([
     'knockout',
     'knockout-mapping',
     'uuid',
-    'mapbox-gl-draw',
     'geojson-extent',
     'geojsonhint',
     'togeojson',
@@ -13,11 +12,15 @@ define([
     'views/components/map',
     'views/components/cards/select-feature-layers',
     'text!templates/views/components/cards/map-popup.htm'
-], function(arches, $, _, ko, koMapping, uuid, MapboxDraw, geojsonExtent, geojsonhint, toGeoJSON, proj4, MapComponentViewModel, selectFeatureLayersFactory, popupTemplate) {
+], function(arches, $, _, ko, koMapping, uuid, geojsonExtent, geojsonhint, toGeoJSON, proj4, MapComponentViewModel, selectFeatureLayersFactory, popupTemplate) {
     var viewModel = function(params) {
         var self = this;
         var padding = 40;
         var drawFeatures;
+        self.MapboxDraw = undefined;
+        require(['mapbox-gl-draw'], (mbdraw) => {
+            self.MapboxDraw = mbdraw
+        });
         var resourceId = params.tile ? params.tile.resourceinstance_id : '';
         if (this.widgets === undefined) { // could be [], so checking specifically for undefined
             this.widgets = params.widgets || [];
@@ -384,7 +387,7 @@ define([
         };
 
         var setupDraw = function(map) {
-            var modes = MapboxDraw.modes;
+            var modes = self.MapboxDraw.modes;
             modes.static = {
                 onSetup: function() {
                     this.setActionableState();
@@ -394,7 +397,7 @@ define([
                     display(geojson);
                 }
             };
-            self.draw = new MapboxDraw({
+            self.draw = new self.MapboxDraw({
                 displayControlsDefault: false,
                 modes: modes
             });

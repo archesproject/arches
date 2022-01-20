@@ -21,9 +21,9 @@
     <span class="map-sidebar-text">{% trans "Edit" %}</span>
 </div>
 <!--ko foreach: fileFormatRenderers-->
-        <!--ko if: ko.unwrap($parent.displayContent) && $parent.displayContent().renderer && ($parent.displayContent().renderer.id === $data.id) -->
+        <!--ko if: ko.unwrap($parent.displayContent) && $parent.displayContent().renderer && ($parent.displayContent().renderer.id === $data.id) && $parent.componentName -->
             <!-- ko component: {
-                name: $data.name,
+                name: $parent.componentName,
                 params: {
                     fileViewer: $parent,
                     card: $parent.card,
@@ -47,9 +47,9 @@
             <div id="hidden-dz-previews" style="display:none"></div>
             <!--ko if: displayContent() -->
                         <!--ko foreach: fileFormatRenderers-->
-                            <!--ko if: $data.id && $parent.displayContent().renderer && $parent.displayContent().renderer.id === $data.id -->
+                            <!--ko if: $data.id && $parent.displayContent().renderer && $parent.displayContent().renderer.id === $data.id && $parent.componentName -->
                                 <!-- ko component: {
-                                    name: $data.name,
+                                    name: $parent.componentName,
                                     params: {
                                         fileViewer: $parent,
                                         card: $parent.card,
@@ -458,9 +458,9 @@
 <!--/ko-->
 
 <!--ko foreach: fileFormatRenderers-->
-        <!--ko if: ko.unwrap($parent.displayContent) && $parent.displayContent().renderer && ($parent.displayContent().renderer.id === $data.id) -->
+        <!--ko if: ko.unwrap($parent.displayContent) && $parent.displayContent().renderer && ($parent.displayContent().renderer.id === $data.id) && $parent.componentName -->
     <!-- ko component: {
-        name: $data.name,
+        name: $parent.componentName,
         params: {
             fileViewer: $parent,
             card: $parent.card,

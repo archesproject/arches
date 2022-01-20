@@ -483,8 +483,8 @@
          return;
     });
 
-    define('file-renderers', [{% for renderer in app_settings.RENDERERS %}'{{ renderer.component }}',{% endfor %}], function () {
-        return [{% autoescape off %}{% for renderer in app_settings.RENDERERS %}
+    define('file-renderers', function () {
+        const renderers = [{% autoescape off %}{% for renderer in app_settings.RENDERERS %}
                 {'name': '{{ renderer.name }}',
                 'title': '{{ renderer.title }}',
                 'description': '{{ renderer.description }}',
@@ -494,9 +494,12 @@
                 'text': '{{ renderer.title }}',
                 'type': '{{ renderer.type }}',
                 'ext': '{{ renderer.ext }}',
+                'paths': '{{ renderer.paths }}',
                 'exclude': '{{ renderer.exclude }}',
                  },
                 {% endfor %}{% endautoescape %}];
+        
+        return renderers;
     });
 
     define('datatype-config-components',
