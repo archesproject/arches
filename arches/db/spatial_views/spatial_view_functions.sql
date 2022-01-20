@@ -94,7 +94,7 @@ return concept_list;
 end;
 $$;
 
-create or replace function __arches_get_domain_label(domain_value text, in_nodeid text) returns text language plpgsql as $$
+create or replace function __arches_get_domain_label(domain_value jsonb, in_nodeid text) returns text language plpgsql as $$
 declare
 	in_node_config 	jsonb;
 	return_label 	text;
@@ -111,7 +111,8 @@ begin
 	select opt.text
 		into return_label
 	from jsonb_populate_recordset(in_node_config -> 'options') opts
-	where opts.text = domain_value;
+	where opts.text = domain_value
+	limit 1;
 	
 	if return_label is null then
 		return_label = '';
