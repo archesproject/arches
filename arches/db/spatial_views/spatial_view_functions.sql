@@ -94,12 +94,12 @@ return concept_list;
 end;
 $$;
 
-create or replace function __arches_get_domain_label(domain_value jsonb, in_nodeid text) returns text language plpgsql as $$
+create or replace function __arches_get_domain_label(domain_value text, in_nodeid text) returns text language plpgsql as $$
 declare
     in_node_config     jsonb;
     return_label     text;
 begin
-     if domain_value is null or domain_value = '' or in_nodeid = '' then
+     if domain_value is null or in_nodeid = '' then
         return '';
     end if;    
 
@@ -108,11 +108,10 @@ begin
     from nodes n
     where n.nodeid = in_nodeid::uuid;
 
-    select opt.text
-        into return_label
-    from jsonb_populate_recordset(in_node_config -> 'options') opts
-    where opts.text = domain_value
-    limit 1;
+	select (opt ->> 'text')
+	 into return_label
+	from (select jsonb_array_elements(in_node_config -> 'options') AS opt) opts
+	where (opt ->> 'id') = domain_value::text;
     
     if return_label is null then
         return_label = '';
@@ -123,7 +122,7 @@ end;
 $$;
 
 
-create or replace function __arches_get_domain_list_label(domain_value_list jsonb, nodeid text) returns text language plpgsql as $$
+create or replace function __arches_get_domain_list_label(domain_value_list jsonb, in_nodeid text) returns text language plpgsql as $$
 declare
     return_label     text := '';
 begin
@@ -134,9 +133,9 @@ begin
     select string_agg(dvl.label, ', ')
     from
     (
-        select __arches_get_domain_label(dv.domain_value) as label
+        select __arches_get_domain_label(dv.domain_value::text, in_nodeid) as label
         from (
-            select jsonb_array_elements_text(domain_value_list::json) as domain_value
+            select jsonb_array_elements_text(domain_value_list) as domain_value
         ) dv
      ) dvl
     into return_label;
@@ -350,7 +349,7 @@ begin
         when 'file-list' then
             select string_agg(f.url,' | ') from (select (jsonb_array_elements(in_tiledata -> in_nodeid) -> 'name')::text as url) f into display_value;
         when 'domain-value' then
-            display_value := __arches_get_domain_label(in_tiledata -> in_nodeid, in_nodeid);
+            display_value := __arches_get_domain_label(in_tiledata ->> in_nodeid, in_nodeid);
         when 'domain-value-list' then
             display_value := __arches_get_domain_list_label(in_tiledata -> in_nodeid, in_nodeid);
         when 'url' then
@@ -425,7 +424,7 @@ declare
 begin
     sp_attr_trigger_function := format(
         '
-        create or replace function __arches_trigger_function_spatial_attributes_%1$s() -- sp_view_name_slug
+        create or replace function __arches_trg_fnc_spatial_attributes_%1$s() -- sp_view_name_slug
         returns trigger 
         language plpgsql
         as $func$
@@ -560,7 +559,7 @@ declare
     sp_attr_trigger_function text := '';
     success boolean := false;
 begin
-    sp_attr_trigger_function := format('drop function if exists __arches_trigger_function_spatial_attributes_%1$s', sp_view_name_slug);
+    sp_attr_trigger_function := format('drop function if exists __arches_trg_fnc_spatial_attributes_%1$s', sp_view_name_slug);
     execute sp_attr_trigger_function;
     success := true;
     return success;
@@ -588,12 +587,12 @@ begin
 
     -- create the trigger
     sp_attr_trigger := format('
-        create constraint trigger __arches_trigger_spatial_attribute_%1$s
+        create constraint trigger __arches_trg_spatial_attribute_%1$s
         after insert or update or delete
         on tiles
         deferrable initially deferred
         for each row
-            execute procedure __arches_trigger_function_spatial_attributes_%1$s()', sp_view_name_slug);
+            execute procedure __arches_trg_fnc_spatial_attributes_%1$s()', sp_view_name_slug);
     
     execute sp_attr_trigger;
 
@@ -615,7 +614,7 @@ declare
     t_fnc_deleted boolean := false;
     success boolean := false;
 begin
-    del_sp_attr_trigger := format('drop trigger if exists __arches_trigger_spatial_attribute_%1$s on tiles;', sp_view_name_slug);
+    del_sp_attr_trigger := format('drop trigger if exists __arches_trg_spatial_attribute_%1$s on tiles;', sp_view_name_slug);
     execute del_sp_attr_trigger;
     select __arches_delete_spatial_attribute_trigger_function(sp_view_name_slug) into t_fnc_deleted;
     success := true;
