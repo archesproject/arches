@@ -432,42 +432,34 @@ begin
             resource_geom_count     integer := 0;
             attr_nodeids            text    := replace(%2$L,'' '',''''); -- sp_nodeids_list;
             geometry_node_id        text    := %3$L; -- sp_geometry_node_id;
-            found_key_count         integer := 0;
+            found_attr_key_count    integer := 0;
             insert_attr             text    := '''';
+			trigger_tile            record;
         begin
-            -- truncate on tiles just requires the whole sp_attr table to be emptied.
-            if tg_op = ''TRUNCATE'' then 
-                delete from sp_attr_%1$s;
-                return new;
+            -- set the working context depending on the operation
+            if tg_op = ''DELETE'' then 
+                trigger_tile := old;
+			else
+				trigger_tile := new;
             end if;
 
-            -- checks --
+            -- checks to see if it needs regenerating--
 
             -- nodeid key check - are we working with a tile valid for this sp view?
-            select count(*) into found_key_count 
-            from (select jsonb_object_keys(new.tiledata) as node_id) keys
-            where keys.node_id::text in (select unnest(string_to_array(attr_nodeids,'','')) as node_id);
 
-            if found_key_count < 1 then
-                return new; --
+            select count(*) into found_attr_key_count 
+            from (select jsonb_object_keys(trigger_tile.tiledata) as node_id) keys
+            where keys.node_id::text in (select unnest(string_to_array(attr_nodeids,'','')) as node_id)
+				or keys.node_id::text = geometry_node_id;
+
+			-- stop if tile has nothing to do with this view
+            if found_attr_key_count < 1 then
+                return trigger_tile; 
             end if;
 
-            -- geom table check - does the resource have a geometry?
-            select count(*) into resource_geom_count 
-            from geojson_geometries 
-            where resourceinstanceid = new.resourceinstanceid;
-            if resource_geom_count < 1 then
-                return new;
-            end if;
-            
-            -- end checks --
+			-- delete the existing rows for this resource
+            delete from sp_attr_%1$s where resourceinstanceid = trigger_tile.resourceinstanceid;
 
-            -- sp_attr table update --
-            
-            -- delete the existing rows for this resource
-            delete from sp_attr_%1$s where resourceinstanceid = new.resourceinstanceid;
-            
-            
             -- insert the new attrs
             
             declare
@@ -531,9 +523,7 @@ begin
 					node_create, 
 					geometry_node_id::text, 
 					tile_create,
-					new.resourceinstanceid::text);
-
-				raise notice ''insert_attr: %%'', insert_attr;
+					trigger_tile.resourceinstanceid::text);
 
             end;
             
@@ -541,7 +531,7 @@ begin
 
             -- end insert --
 
-            return new;
+            return trigger_tile;
         end;
         $func$
         '
@@ -576,18 +566,6 @@ begin
 end;
 $$;
 
-/* example usage
-select public.__arches_create_spatial_attribute_trigger_function(
-	'heritageasset', 
-	'87d3d7dc-f44f-11eb-bee9-a87eeabdefba'::uuid, 
-	'325a2f33-efe4-11eb-b0bb-a87eeabdefba,676d47ff-9c1c-11ea-b07f-f875a44e0e11,77e8f28d-efdc-11eb-afe4-a87eeabdefba,77e8f29d-efdc-11eb-b890-a87eeabdefba,b2133e6b-efdc-11eb-aa04-a87eeabdefba,b2133e72-efdc-11eb-a68d-a87eeabdefba,ba345577-b554-11ea-a9ee-f875a44e0e11'
-);
-
-select public.__arches_delete_spatial_attribute_trigger_function(
-	'heritageasset'
-);
-*/
-
 -- FUNCTIONS - create spatial view triggers
 
 create or replace function __arches_create_spatial_attribute_trigger(
@@ -609,9 +587,10 @@ begin
 
     -- create the trigger
     sp_attr_trigger := format('
-        create trigger __arches_trigger_spatial_attribute_%1$s
+        create constraint trigger __arches_trigger_spatial_attribute_%1$s
         after insert or update or delete
         on tiles
+		deferrable initially deferred
         for each row
             execute procedure __arches_trigger_function_spatial_attributes_%1$s()', sp_view_name_slug);
     
