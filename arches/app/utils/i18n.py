@@ -107,14 +107,13 @@ class ArchesPOWriter:
 
         msgid = cell[self.id_language]
 
-        if(self.target_language != self.id_language):
+        if self.target_language != self.id_language:
             try:
                 msgstr = cell[self.target_language]
             except KeyError:
                 msgstr = ""
         else:
             msgstr = ""
-        
 
         if msgid is not None and msgid != "":
             entry = polib.POEntry(msgid=msgid, msgstr=msgstr, occurrences=occurrences)
