@@ -74,6 +74,7 @@ class ArchesPOWriter:
 
     def populate_from_card_x_node_x_widget(self, queryset):
         for row in queryset:
+            self.append(row.label, "cards_x_nodes_x_widgets")
             try:
                 i18n_properties = row.config["i18n_properties"]
                 for prop in i18n_properties:
@@ -81,7 +82,6 @@ class ArchesPOWriter:
                         self.append(row.config[prop], "cards_x_nodes_x_widgets")
                     except KeyError:
                         pass
-                self.append(row.label, "cards_x_nodes_x_widgets")
             except KeyError:
                 pass
 
