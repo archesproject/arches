@@ -22,7 +22,7 @@ define(['knockout', 'underscore', 'viewmodels/widget', 'arches', 'bindings/chose
             self.languages = ko.observableArray();
             self.currentText = ko.observable();
             self.currentDirection = ko.observable();
-            self.showi8lnOptions = ko.observable(false);
+            self.showi18nOptions = ko.observable(false);
 
             self.currentDefaultText = ko.observable();
             self.currentDefaultDirection = ko.observable();
