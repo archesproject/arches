@@ -189,7 +189,7 @@ class JsonLDImportTests(ArchesTestCase):
             reader.read_resource(data, resourceid=resource_id, graphid=graph_id)
 
     def test_1_basic_import(self):
-        """Plain string should import and be automatically converted to i8ln string of default language"""
+        """Plain string should import and be automatically converted to i18n string of default language"""
         data = """{
             "@id": "http://localhost:8000/resources/221d1154-fa8e-11e9-9cbb-3af9d3b32b71",
             "@type": "http://www.cidoc-crm.org/cidoc-crm/E22_Man-Made_Object",
