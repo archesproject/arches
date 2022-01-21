@@ -3,7 +3,7 @@ drop function if exists __arches_create_spatial_view;
 drop function if exists __arches_update_spatial_view;
 drop function if exists __arches_delete_spatial_view;
 drop function if exists __arches_create_spatial_view_attribute_table;
-drop function if exists __arches_delete_spatial_view_attribute_table
+drop function if exists __arches_delete_spatial_view_attribute_table;
 drop function if exists __arches_create_spatial_attribute_trigger_function;
 drop function if exists __arches_delete_spatial_attribute_trigger_function;
 drop function if exists __arches_create_spatial_attribute_trigger;
