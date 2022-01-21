@@ -110,7 +110,9 @@ class APITests(ArchesTestCase):
                     "data": {
                         "46f4da0c-95bd-11e8-8f87-acde48001122": None,
                         "4f553551-95bd-11e8-8b48-acde48001122": {"en": {"value": "Knights of Camelot", "direction": "ltr"}},
-                        "65f87f4c-95bd-11e8-b7a6-acde48001122": {"en": {"value": "We're knights of the Round Table, we dance whene'er we're able.", "direction": "ltr"}},
+                        "65f87f4c-95bd-11e8-b7a6-acde48001122": {
+                            "en": {"value": "We're knights of the Round Table, we dance whene'er we're able.", "direction": "ltr"}
+                        },
                     },
                     "nodegroup_id": "46f4da0c-95bd-11e8-8f87-acde48001122",
                     "parenttile_id": None,
@@ -272,9 +274,9 @@ class APITests(ArchesTestCase):
         # ==Arrange=========================================================================================
 
         # modify test_resource_simple
-        test_resource_simple["tiles"][0]["data"][
-            "65f87f4c-95bd-11e8-b7a6-acde48001122"
-        ] = {"en": {"value": "We do routines and chorus scenes with footwork impec-cable..", "direction": "ltr"}}
+        test_resource_simple["tiles"][0]["data"]["65f87f4c-95bd-11e8-b7a6-acde48001122"] = {
+            "en": {"value": "We do routines and chorus scenes with footwork impec-cable..", "direction": "ltr"}
+        }
         test_resource_simple["legacyid"] = "we eat ham and jam and Spam a lot."  # legacyid has a unique index constraint.
         payload_modified = JSONSerializer().serialize(test_resource_simple)
 
@@ -311,7 +313,7 @@ class APITests(ArchesTestCase):
         # ==Assert==========================================================================================
         self.assertEqual(resp_put_get_confirm.status_code, 200)  # Success, we got one.
         data_put_get_confirm = JSONDeserializer().deserialize(resp_put_get_confirm.content)
-        
+
         self.assertEqual(
             data_put_get_confirm["tiles"][0]["data"]["65f87f4c-95bd-11e8-b7a6-acde48001122"]["en"]["value"],
             "We do routines and chorus scenes with footwork impec-cable..",
