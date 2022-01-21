@@ -6,7 +6,7 @@ import polib
 import importlib
 from arches.app.models.fields.i18n import I18n_String, I18n_JSON
 from arches.app.models.models import CardModel, CardXNodeXWidget
-from arches.app.utils.i8ln import ArchesPOFileFetcher, ArchesPOLoader, ArchesPOWriter
+from arches.app.utils.i18n import ArchesPOFileFetcher, ArchesPOLoader, ArchesPOWriter
 from arches.app.models.system_settings import settings
 from unittest.mock import Mock, MagicMock
 
@@ -45,13 +45,13 @@ class PoFileTests(TestCase):
         writer = ArchesPOWriter(m_po_file, "en", "en")
         model = MagicMock(CardXNodeXWidget)
         prop_dict = {"en": "configuration"}
-        config_dict = {"i18n_properties": ["prop"], "prop": prop_dict}
+        config_dict = {"i18n_properties": ["prop", "bob", "fred"], "prop": prop_dict, "fred": prop_dict}
         model.config.__getitem__.side_effect = config_dict.__getitem__
         model.config.prop.__getitem__.side_effect = prop_dict.__getitem__
         label_dict = {"en": "label"}
         model.label.__getitem__.side_effect = label_dict.__getitem__
         writer.populate_from_card_x_node_x_widget([model])
-        self.assertEqual(m_po_file.append.call_count, 2)
+        self.assertEqual(m_po_file.append.call_count, 3)
 
     def test_populate_from_cards(self):
         "Test to ensure PO Entries are appended with appropriate english messageids (no translations)"

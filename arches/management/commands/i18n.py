@@ -17,7 +17,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 """
 
 import logging
-from arches.app.utils.i8ln import ArchesPOFileFetcher, ArchesPOLoader, ArchesPOWriter
+from arches.app.utils.i18n import ArchesPOFileFetcher, ArchesPOLoader, ArchesPOWriter
 from arches.app.models.system_settings import settings
 from django.core.management.base import BaseCommand
 

@@ -77,7 +77,10 @@ class ArchesPOWriter:
             try:
                 i18n_properties = row.config["i18n_properties"]
                 for prop in i18n_properties:
-                    self.append(row.config[prop], "cards_x_nodes_x_widgets")
+                    try:
+                        self.append(row.config[prop], "cards_x_nodes_x_widgets")
+                    except KeyError:
+                        pass
                 self.append(row.label, "cards_x_nodes_x_widgets")
             except KeyError:
                 pass
