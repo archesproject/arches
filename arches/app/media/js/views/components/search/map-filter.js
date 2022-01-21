@@ -18,8 +18,14 @@ define([
         viewModel: BaseFilter.extend({
             initialize: function(options) {
                 var self = this;
-                self.mapboxgl = require('mapbox-gl');
-                self.MapboxDraw = require('mapbox-gl-draw');
+
+                let mapboxgl;
+                let MapboxDraw;
+
+                require(['mapbox-gl', 'mapbox-gl-draw'], (mapbox, mbdraw) => {
+                    mapboxgl = mapbox;
+                    MapboxDraw = mbdraw;
+                })
 
                 options.name = "Map Filter";
                 BaseFilter.prototype.initialize.call(this, options);
@@ -132,7 +138,7 @@ define([
                         geoJSON.features = geoJSON.features.slice(0, 1);
                         if(geoJSON.features.length > 0){
                             var extent = geojsonExtent(geoJSON);
-                            var bounds = new self.mapboxgl.LngLatBounds(extent);
+                            var bounds = new mapboxgl.LngLatBounds(extent);
                             this.map().fitBounds(bounds, {
                                 padding: parseInt(this.buffer(), 10)
                             });
@@ -283,7 +289,7 @@ define([
                     if (self.filter.feature_collection() && self.filter.feature_collection()['features'].length > 0) {
                         var geojsonFC = self.filter.feature_collection();
                         var extent = geojsonExtent(geojsonFC);
-                        var bounds = new self.mapboxgl.LngLatBounds(extent);
+                        var bounds = new mapboxgl.LngLatBounds(extent);
                         self.map().fitBounds(bounds, {
                             padding: self.buffer()
                         });
@@ -353,13 +359,13 @@ define([
 
             setupDraw: function() {
                 var self = this;
-                var modes = self.MapboxDraw.modes;
+                var modes = MapboxDraw.modes;
                 modes.static = {
                     toDisplayFeatures: function(state, geojson, display) {
                         display(geojson);
                     }
                 };
-                this.draw = new self.MapboxDraw({
+                this.draw = new MapboxDraw({
                     displayControlsDefault: false,
                     modes: modes
                 });
@@ -484,7 +490,7 @@ define([
                         "features": []
                     }
                 });
-                var bounds = new self.mapboxgl.LngLatBounds(geojsonExtent(mapData.geom));
+                var bounds = new mapboxgl.LngLatBounds(geojsonExtent(mapData.geom));
                 var maxZoom = ko.unwrap(this.maxZoom);
                 this.map().fitBounds(bounds, {
                     maxZoom: maxZoom > 17 ? 17 : maxZoom

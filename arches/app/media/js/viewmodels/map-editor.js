@@ -17,9 +17,9 @@ define([
         var self = this;
         var padding = 40;
         var drawFeatures;
-        self.MapboxDraw = undefined;
+        let MapboxDraw;
         require(['mapbox-gl-draw'], (mbdraw) => {
-            self.MapboxDraw = mbdraw
+            MapboxDraw = mbdraw
         });
         var resourceId = params.tile ? params.tile.resourceinstance_id : '';
         if (this.widgets === undefined) { // could be [], so checking specifically for undefined
@@ -387,7 +387,7 @@ define([
         };
 
         var setupDraw = function(map) {
-            var modes = self.MapboxDraw.modes;
+            var modes = MapboxDraw.modes;
             modes.static = {
                 onSetup: function() {
                     this.setActionableState();
@@ -397,7 +397,7 @@ define([
                     display(geojson);
                 }
             };
-            self.draw = new self.MapboxDraw({
+            self.draw = new MapboxDraw({
                 displayControlsDefault: false,
                 modes: modes
             });

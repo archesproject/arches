@@ -7,7 +7,11 @@ define(['underscore', 'knockout'], function(_, ko, MapboxDraw) {
      *
      */
     var MapFilterViewModel = function(params) {
-        const MapboxDraw = require('mapbox-gl-draw');
+        let MapboxDraw;
+
+        require('mapbox-gl-draw', (draw) => {
+            MapboxDraw = draw;
+        });
         var self = this;
         this.searchContext = params.searchContext ||  ko.observable(true);
         this.map = params.map;

@@ -10,9 +10,12 @@ function (ko, arches) {
      */
     var BaseGeocoderViewModel = function(params) {
         var self = this;
-        require(['mapbox-gl'], (mapboxgl) => {
-            self.mapboxgl = mapboxgl;
+        let mapboxgl;
+
+        require(['mapbox-gl'], (mapbox) => {
+            mapboxgl = mapbox;
         });
+        
         this.placeholder = params.placeholder || ko.observable('Locate a Place or Address');
         this.anchorLayerId = params.anchorLayerId;
         this.apiKey = params.api_key || arches.mapboxApiKey
