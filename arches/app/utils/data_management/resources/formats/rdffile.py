@@ -461,7 +461,6 @@ class JsonLdReader(Reader):
         # and number of languages present in jsonld (> 1)
         if (
             graph_node["datatype_type"] == "string"
-            and graph_node["cardinality"] == "1"
             and len(literal_node_values) > 1
             and len(set(val["language"] for val in literal_node_values)) > 1
         ):

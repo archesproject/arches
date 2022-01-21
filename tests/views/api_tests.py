@@ -109,8 +109,8 @@ class APITests(ArchesTestCase):
                 {
                     "data": {
                         "46f4da0c-95bd-11e8-8f87-acde48001122": None,
-                        "4f553551-95bd-11e8-8b48-acde48001122": "Knights of Camelot",
-                        "65f87f4c-95bd-11e8-b7a6-acde48001122": "We're knights of the Round Table, we dance whene'er we're able.",
+                        "4f553551-95bd-11e8-8b48-acde48001122": {"en": {"value": "Knights of Camelot", "direction": "ltr"}},
+                        "65f87f4c-95bd-11e8-b7a6-acde48001122": {"en": {"value": "We're knights of the Round Table, we dance whene'er we're able.", "direction": "ltr"}},
                     },
                     "nodegroup_id": "46f4da0c-95bd-11e8-8f87-acde48001122",
                     "parenttile_id": None,
@@ -264,7 +264,7 @@ class APITests(ArchesTestCase):
         self.assertEqual(resp_get_confirm.status_code, 200)  # Success, we got one.
         data_get_confirm = JSONDeserializer().deserialize(resp_get_confirm.content)
         self.assertEqual(
-            data_get_confirm["tiles"][0]["data"]["65f87f4c-95bd-11e8-b7a6-acde48001122"],
+            data_get_confirm["tiles"][0]["data"]["65f87f4c-95bd-11e8-b7a6-acde48001122"]["en"]["value"],
             "We're knights of the Round Table, we dance whene'er we're able.",
         )  # Success, we got the right one.
         # ==================================================================================================
@@ -274,7 +274,7 @@ class APITests(ArchesTestCase):
         # modify test_resource_simple
         test_resource_simple["tiles"][0]["data"][
             "65f87f4c-95bd-11e8-b7a6-acde48001122"
-        ] = "We do routines and chorus scenes with footwork impec-cable.."
+        ] = {"en": {"value": "We do routines and chorus scenes with footwork impec-cable..", "direction": "ltr"}}
         test_resource_simple["legacyid"] = "we eat ham and jam and Spam a lot."  # legacyid has a unique index constraint.
         payload_modified = JSONSerializer().serialize(test_resource_simple)
 
@@ -311,8 +311,9 @@ class APITests(ArchesTestCase):
         # ==Assert==========================================================================================
         self.assertEqual(resp_put_get_confirm.status_code, 200)  # Success, we got one.
         data_put_get_confirm = JSONDeserializer().deserialize(resp_put_get_confirm.content)
+        
         self.assertEqual(
-            data_put_get_confirm["tiles"][0]["data"]["65f87f4c-95bd-11e8-b7a6-acde48001122"],
+            data_put_get_confirm["tiles"][0]["data"]["65f87f4c-95bd-11e8-b7a6-acde48001122"]["en"]["value"],
             "We do routines and chorus scenes with footwork impec-cable..",
         )  # Success, we got the right one.
         # ==================================================================================================
@@ -357,7 +358,7 @@ class APITests(ArchesTestCase):
         self.assertEqual(resp_get_confirm_mod.status_code, 200)  # Success, we got one.
         data_get_confirm_mod = JSONDeserializer().deserialize(resp_get_confirm_mod.content)
         self.assertEqual(
-            data_get_confirm_mod["tiles"][0]["data"]["65f87f4c-95bd-11e8-b7a6-acde48001122"],
+            data_get_confirm_mod["tiles"][0]["data"]["65f87f4c-95bd-11e8-b7a6-acde48001122"]["en"]["value"],
             "We do routines and chorus scenes with footwork impec-cable..",
         )
         # ==================================================================================================
