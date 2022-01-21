@@ -19,7 +19,7 @@ define([
     
             var self = this;
             this.fileFormatRenderers = fileRenderers;
-            this.componentName = ko.observable();
+            this.rendererComponentName = ko.observable();
 
             this.fileFormatRenderers.forEach(function(r){
                 r.state = {};
@@ -49,7 +49,7 @@ define([
             const renderer = fileRenderers.find(renderer => renderer.id === this.fileRenderer());
             if(renderer) {
                 require([renderer.component], function (component){
-                    self.componentName(renderer.name);
+                    self.rendererComponentName(renderer.name);
                 });
             }
 
