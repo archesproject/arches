@@ -762,6 +762,11 @@ input[type="checkbox"] {
     padding: 8px 15px;
 }
 
+.tabbed-workflow-title-bar .btn:focus,
+.tabbed-workflow-footer .btn:focus {
+    border: 1px dashed rgba(255, 255, 255, 0.6);
+}
+
 .tabbed-workflow-title-bar .btn>i,
 .tabbed-workflow-title-bar .btn>span,
 .tabbed-workflow-footer .btn>i,
