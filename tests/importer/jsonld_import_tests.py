@@ -15,7 +15,7 @@ from django.urls import reverse
 from django.db import connection
 from tests.base_test import ArchesTestCase, CREATE_TOKEN_SQL
 from arches.app.utils.skos import SKOSReader
-from arches.app.models.models import TileModel, ResourceInstance
+from arches.app.models.models import TileModel, ResourceInstance, Language
 from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializer
 from arches.app.utils.data_management.resources.importer import BusinessDataImporter
 from arches.app.utils.data_management.resources.exporter import ResourceExporter as BusinessDataExporter
@@ -59,6 +59,10 @@ class JsonLDImportTests(ArchesTestCase):
 
         # Load up the models and data only once
         with open(os.path.join("tests/fixtures/jsonld_base/models/test_1_basic_object.json"), "rU") as f:
+            archesfile = JSONDeserializer().deserialize(f)
+        ResourceGraphImporter(archesfile["graph"])
+
+        with open(os.path.join("tests/fixtures/jsonld_base/models/test_1_basic_object_cardinality_n.json"), "rU") as f:
             archesfile = JSONDeserializer().deserialize(f)
         ResourceGraphImporter(archesfile["graph"])
 
@@ -109,11 +113,16 @@ class JsonLDImportTests(ArchesTestCase):
             archesfile = JSONDeserializer().deserialize(f)
         ResourceGraphImporter(archesfile["graph"])
 
+        # Add Spanish language for testing
+        cls.spanish = Language(code="es", name="Spanish", default_direction="ltr", scope="data")
+        cls.spanish.save()
+
     def setUp(self):
         pass
 
     @classmethod
     def tearDownClass(cls):
+        cls.spanish.delete()
         pass
 
     def tearDown(self):
@@ -163,7 +172,24 @@ class JsonLDImportTests(ArchesTestCase):
         self.assertTrue(rdffile.docCache[data["@context"]]["expires"] > datetime.datetime.now())
         self.assertTrue(data["@context"] in rdffile.docCache)
 
+    def test_literal_cardinality_failure(self):
+        """Multiple literals without language should fail to import to card 1 node."""
+        data = """{
+            "@id": "http://localhost:8000/resources/221d1154-fa8e-11e9-9cbb-3af9d3b32b71",
+            "@type": "http://www.cidoc-crm.org/cidoc-crm/E22_Man-Made_Object",
+            "http://www.cidoc-crm.org/cidoc-crm/P3_has_note": ["test!", "prueba!"]
+            }"""
+
+        graph_id = "bf734b4e-f6b5-11e9-8f09-a4d18cec433a"
+        resource_id = "221d1154-fa8e-11e9-9cbb-3af9d3b32b71"
+
+        with self.assertRaises(ValueError):
+            data = JSONDeserializer().deserialize(data)
+            reader = JsonLdReader()
+            reader.read_resource(data, resourceid=resource_id, graphid=graph_id)
+
     def test_1_basic_import(self):
+        """Plain string should import and be automatically converted to i18n string of default language"""
         data = """{
             "@id": "http://localhost:8000/resources/221d1154-fa8e-11e9-9cbb-3af9d3b32b71",
             "@type": "http://www.cidoc-crm.org/cidoc-crm/E22_Man-Made_Object",
@@ -179,7 +205,7 @@ class JsonLDImportTests(ArchesTestCase):
         self.assertEqual(response.status_code, 201)
 
         js = response.json()
-        if type(js) == list:
+        if isinstance(js, list):
             js = js[0]
 
         self.assertTrue("@id" in js)
@@ -188,28 +214,83 @@ class JsonLDImportTests(ArchesTestCase):
         self.assertTrue(js["http://www.cidoc-crm.org/cidoc-crm/P3_has_note"]["@value"] == "test!")
 
     def test_1_basic_import_with_language(self):
+        """Add language values to jsonld and test import with a cardinality 1 node."""
         data = """{
             "@id": "http://localhost:8000/resources/221d1154-fa8e-11e9-9cbb-3af9d3b32b71",
             "@type": "http://www.cidoc-crm.org/cidoc-crm/E22_Man-Made_Object",
-            "http://www.cidoc-crm.org/cidoc-crm/P3_has_note": {"@language": "es", "@value": "prueba!"}
+            "http://www.cidoc-crm.org/cidoc-crm/P3_has_note":
+                [{"@value": "test!", "@language": "en"}, {"@value": "prueba!", "@language": "es"}]
             }"""
 
         url = self._create_url(
             graph_id="bf734b4e-f6b5-11e9-8f09-a4d18cec433a",
             resource_id="221d1154-fa8e-11e9-9cbb-3af9d3b32b71",
         )
+
         response = self.client.put(url, data=data, HTTP_AUTHORIZATION=f"Bearer {self.token}")
         self.assertEqual(response.status_code, 201)
 
         js = response.json()
-        if type(js) == list:
+        if isinstance(js, list):
             js = js[0]
 
         self.assertTrue("@id" in js)
-        self.assertTrue(js["@id"] == "http://localhost:8000/resources/221d1154-fa8e-11e9-9cbb-3af9d3b32b71")
+        self.assertEqual(js["@id"], "http://localhost:8000/resources/221d1154-fa8e-11e9-9cbb-3af9d3b32b71")
         self.assertTrue("http://www.cidoc-crm.org/cidoc-crm/P3_has_note" in js)
-        self.assertTrue(js["http://www.cidoc-crm.org/cidoc-crm/P3_has_note"]["@value"] == "prueba!")
-        self.assertTrue(js["http://www.cidoc-crm.org/cidoc-crm/P3_has_note"]["@language"] == "es")
+        self.assertEqual(set(note["@language"] for note in js["http://www.cidoc-crm.org/cidoc-crm/P3_has_note"]), set(["en", "es"]))
+        self.assertEqual(set(note["@value"] for note in js["http://www.cidoc-crm.org/cidoc-crm/P3_has_note"]), set(["prueba!", "test!"]))
+
+    def test_1_basic_import_with_language_cardinality_n(self):
+        """Add language values to jsonld and test import with a cardinality n node."""
+        data = """{
+            "@id": "http://localhost:8000/resources/b94b8bc3-ab26-4b0a-8080-9e8bde2979b4",
+            "@type": "http://www.cidoc-crm.org/cidoc-crm/E1_CRM_Entity",
+            "http://www.cidoc-crm.org/cidoc-crm/P1_is_identified_by": [
+                {
+                    "@id": "http://localhost:8000/tile/4d788140-cefe-4856-9266-4d7e75cefceb/node/abd41efa-7968-11ec-80f9-faffc210b420",
+                    "@type": "http://www.cidoc-crm.org/cidoc-crm/E41_Appellation",
+                    "http://www.cidoc-crm.org/cidoc-crm/P3_has_note": [
+                        {"@language": "es","@value": "Azul"},
+                        {"@language": "en","@value": "Blue"}
+                    ]
+                },
+                {
+                    "@id": "http://localhost:8000/tile/610cb383-222b-47e0-906f-8b303bb1b20b/node/abd41efa-7968-11ec-80f9-faffc210b420",
+                    "@type": "http://www.cidoc-crm.org/cidoc-crm/E41_Appellation",
+                    "http://www.cidoc-crm.org/cidoc-crm/P3_has_note": [
+                        {"@language": "es", "@value": "Blanco"},
+                        {"@language": "en", "@value": "White"}
+                    ]
+                }
+            ]
+        }"""
+
+        url = self._create_url(
+            graph_id="37b50648-78ef-11ec-9508-faffc210b420",
+            resource_id="b94b8bc3-ab26-4b0a-8080-9e8bde2979b4",
+        )
+
+        response = self.client.put(url, data=data, HTTP_AUTHORIZATION=f"Bearer {self.token}")
+        self.assertEqual(response.status_code, 201)
+
+        js = response.json()
+        if isinstance(js, list):
+            js = js[0]
+
+        P1_is_identified = "http://www.cidoc-crm.org/cidoc-crm/P1_is_identified_by"
+        P3_has_note = "http://www.cidoc-crm.org/cidoc-crm/P3_has_note"
+
+        self.assertTrue("@id" in js)
+        self.assertEqual(js["@id"], "http://localhost:8000/resources/b94b8bc3-ab26-4b0a-8080-9e8bde2979b4")
+        languages = set()
+        values = set()
+        for identifier in js[P1_is_identified]:
+            self.assertTrue(isinstance(identifier[P3_has_note], list))
+            for note in identifier[P3_has_note]:
+                languages.add(note["@language"])
+                values.add(note["@value"])
+        self.assertEqual(languages, set(["en", "es"]))
+        self.assertEqual(values, set(["White", "Blanco", "Azul", "Blue"]))
 
     def test_1b_basic_post(self):
         data = """{
@@ -815,7 +896,7 @@ class JsonLDImportTests(ArchesTestCase):
         response = self.client.put(url, data=data, HTTP_AUTHORIZATION=f"Bearer {self.token}")
         print(f"Test 9 response: {response.content}")
 
-        self.assertTrue(response.status_code == 201)
+        self.assertEqual(response.status_code, 201)
 
         js = response.json()
         if type(js) == list:
