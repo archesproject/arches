@@ -120,7 +120,7 @@ class SystemSettings(LazySettings):
                     if node.datatype != "semantic":
                         try:
                             if node.datatype == "string":
-                                # with i8ln, only one value matters for system settings, regardless of language.  Pick first available
+                                # with i18n, only one value matters for system settings, regardless of language.  Pick first available
                                 val = tile.data[str(node.nodeid)][list(tile.data[str(node.nodeid)].keys())[0]]["value"]
                                 setattr(self, node.name, val)
                             else:

@@ -4,24 +4,24 @@
 {% block form %}
 <div class="row widget-wrapper">
     <div class="form-group">        
-        <div class="i8ln-style-tools-collapser" data-bind=" click: function() {
-            showi8lnOptions(!showi8lnOptions());
+        <div class="i18n-style-tools-collapser" data-bind=" click: function() {
+            showi18nOptions(!showi18nOptions());
         }">
             <i class="fa" data-bind="{
                 css: {
-                    'fa-caret-down' : !showi8lnOptions(),
-                    'fa-caret-up' : showi8lnOptions(),
+                    'fa-caret-down' : !showi18nOptions(),
+                    'fa-caret-up' : showi18nOptions(),
                 }
             }"></i>
             <span data-bind="text: '{% trans "Languages" %}'"></span>
         </div>
-        <div class="form-horizontal" data-bind="if: showi8lnOptions">
-            <div class="i8ln-style-tools-panel">
+        <div class="form-horizontal" data-bind="if: showi18nOptions">
+            <div class="i18n-style-tools-panel">
                 <div style="display: flex; flex-direction: column; max-width:600px">
-                    <label class="widget-input-label i8ln-style-tools-label" for="lang_dd">{% trans "Language" %}</label>
+                    <label class="widget-input-label i18n-style-tools-label" for="lang_dd">{% trans "Language" %}</label>
                     <select id="lang_dd" style="flex:1" name="language" data-bind="options: languages, optionsText: function(item){return item.name + ' (' + item.code + ')'}, value: currentLanguage, chosen: {width:'100%'}">
                     </select>
-                    <label class="widget-input-label i8ln-style-tools-label" for="lang_dir">{% trans "Direction" %}</label>
+                    <label class="widget-input-label i18n-style-tools-label" for="lang_dir">{% trans "Direction" %}</label>
                     <select id="lang_dir" style="flex:1" name="language" data-bind="value: currentDirection, chosen: {
                         'width':'100%'}">
                         <option value="ltr">

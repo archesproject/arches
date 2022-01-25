@@ -12,7 +12,7 @@ define(['knockout', 'underscore', 'viewmodels/widget', 'arches', 'bindings/ckedi
             const self = this;
             WidgetViewModel.apply(self, [params]);
             const initialCurrent = {};
-            self.showi8lnOptions = ko.observable(false);
+            self.showi18nOptions = ko.observable(false);
             initialCurrent[arches.defaultLanguage] = {value: '', direction: 'ltr'};
             let currentValue = ko.unwrap(self.value) || initialCurrent;
             const currentLanguage = {"code": arches.defaultLanguage};

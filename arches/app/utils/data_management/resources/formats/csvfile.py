@@ -826,7 +826,7 @@ class CsvReader(Reader):
                                     new_row.append({row["arches_nodeid"]: value})
                                 # there is no way to match the node value in the csv to a language, so a bar delimited format
                                 # is used to push this value deeper into the import process.  A later check will retrieve this
-                                # value and add it to the i8ln string object
+                                # value and add it to the i18n string object
                                 else:
                                     column_regex = re.compile("{column} \(([A-Za-z-]+)\)$".format(column=row["file_field_name"].upper()))
                                     column_match = column_regex.match(key.upper())
