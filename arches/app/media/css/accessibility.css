@@ -146,3 +146,11 @@ button.search-type-btn:focus {
 .select2-container-multi .select2-choices .select2-search-choice {
     background-color: #2B4E6D;
 }
+
+.btn-u {
+    background: #3D588A;
+}
+
+.btn-u.btn-u-default {
+    background: #4D5B5B;
+}
