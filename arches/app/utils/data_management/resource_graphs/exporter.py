@@ -138,7 +138,7 @@ def get_graphs_for_export(graphids=None):
             print("*" * 80)
             sys.exit()
 
-    resource_graph_query = JSONSerializer().serializeToPython(resource_graphs, exclude=["widgets"])
+    resource_graph_query = JSONSerializer().serializeToPython(resource_graphs, exclude=["widgets"], use_raw_i18n_json=True)
 
     for resource_graph in resource_graph_query:
         function_ids = []

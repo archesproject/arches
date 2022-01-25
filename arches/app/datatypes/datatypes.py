@@ -100,9 +100,43 @@ class StringDataType(BaseDataType):
             errors.append(error_message)
         return errors
 
+    def rdf_transform(self, value):
+        default_language = models.Language.objects.get(code=get_language())
+        incoming_value = {}
+        for val in value:
+            if ("language" in val and val["language"] is not None) or ("@language" in val and val["@language"] is not None):
+                try:
+                    language_code = val["language"] if "language" in val else val["@language"]
+                    language = models.Language.objects.get(code=language_code)
+                    incoming_value = {
+                        **incoming_value,
+                        language.code: {
+                            "value": val["value"] if "value" in val else val["@value"],
+                            "direction": language.default_direction,
+                        },
+                    }
+                except models.Language.DoesNotExist:
+                    ValueError("Language does not exist in Language table - cannot create string.")
+            else:
+                incoming_value = {
+                    **incoming_value,
+                    default_language.code: {
+                        "value": val["value"] if "value" in val else val["@value"],
+                        "direction": default_language.default_direction,
+                    },
+                }
+
+        return incoming_value if len(incoming_value.keys()) > 0 else None
+
     def validate_from_rdf(self, value):
-        print(value)
-        return []
+        transformed_value = None
+        if isinstance(value, list):
+            transformed_value = self.rdf_transform(value)
+        elif isinstance(value, str):
+            transformed_value = self.rdf_transform([{"value": value}])
+        incoming_value = value if transformed_value is None else transformed_value
+
+        return self.validate(incoming_value)
 
     def clean(self, tile, nodeid):
         if tile.data[nodeid] in ["", "''"]:
@@ -185,13 +219,14 @@ class StringDataType(BaseDataType):
         return value
 
     def from_rdf(self, json_ld_node):
-        # returns the string value only
-        # FIXME: Language?
-        value = get_value_from_jsonld(json_ld_node)
-        try:
-            return {value[1]: {"value": value[0], "direction": "ltr"}}
-        except (AttributeError, KeyError) as e:
-            pass
+        transformed_value = None
+        if isinstance(json_ld_node, list):
+            transformed_value = self.rdf_transform(json_ld_node)
+        else:
+            new_value = get_value_from_jsonld(json_ld_node)
+            if new_value is not None:
+                transformed_value = self.rdf_transform([{"value": new_value[0], "language": new_value[1]}])
+        return transformed_value
 
     def get_display_value(self, tile, node):
         data = self.get_tile_data(tile)
@@ -228,6 +263,13 @@ class NumberDataType(BaseDataType):
             error_message = self.create_error_message(value, source, row_number, message)
             errors.append(error_message)
         return errors
+
+    def get_display_value(self, tile, node):
+        data = self.get_tile_data(tile)
+        if data:
+            display_value = data.get(str(node.nodeid))
+            if display_value is not None:
+                return str(display_value)
 
     def transform_value_for_tile(self, value, **kwargs):
         try:
@@ -410,19 +452,23 @@ class DateDataType(BaseDataType):
         return valid_date_format, valid
 
     def transform_value_for_tile(self, value, **kwargs):
-        if type(value) == list:
-            value = value[0]
-        valid_date_format, valid = self.get_valid_date_format(value)
-        if valid:
-            v = datetime.strptime(value, valid_date_format)
-        else:
-            v = datetime.strptime(value, settings.DATE_IMPORT_EXPORT_FORMAT)
-        # The .astimezone() function throws an error on Windows for dates before 1970
-        try:
-            v = v.astimezone()
-        except:
-            v = self.backup_astimezone(v)
-        value = v.isoformat(timespec="milliseconds")
+        value = None if value == "" else value
+        if value is not None:
+            if type(value) == list:
+                value = value[0]
+            elif type(value) == str and len(value) < 4 and value.startswith("-") is False:  # a year before 1000 but not BCE
+                value = value.zfill(4)
+            valid_date_format, valid = self.get_valid_date_format(value)
+            if valid:
+                v = datetime.strptime(value, valid_date_format)
+            else:
+                v = datetime.strptime(value, settings.DATE_IMPORT_EXPORT_FORMAT)
+            # The .astimezone() function throws an error on Windows for dates before 1970
+            try:
+                v = v.astimezone()
+            except:
+                v = self.backup_astimezone(v)
+            value = v.isoformat(timespec="milliseconds")
         return value
 
     def backup_astimezone(self, dt):

@@ -75,11 +75,11 @@ def export_search_results(self, userid, request_values, format, report_link):
             tmp.seek(0)
             stream = tmp.read()
             export_files[0]["outputfile"] = tmp
-            exportid = exporter.write_export_zipfile(export_files, export_info)
+            exportid = exporter.write_export_zipfile(export_files, export_info, export_name)
     else:
         exporter = SearchResultsExporter(search_request=new_request)
         files, export_info = exporter.export(format, report_link)
-        exportid = exporter.write_export_zipfile(files, export_info)
+        exportid = exporter.write_export_zipfile(files, export_info, export_name)
 
     search_history_obj = models.SearchExportHistory.objects.get(pk=exportid)
 
@@ -116,7 +116,12 @@ def import_business_data(
     self, data_source="", overwrite="", bulk_load=False, create_concepts=False, create_collections=False, prevent_indexing=False
 ):
     management.call_command(
-        "packages", operation="import_business_data", source=data_source, overwrite=True, prevent_indexing=prevent_indexing
+        "packages",
+        operation="import_business_data",
+        source=data_source,
+        bulk_load=bulk_load,
+        overwrite=overwrite,
+        prevent_indexing=prevent_indexing,
     )
 
 

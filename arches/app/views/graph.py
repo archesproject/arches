@@ -37,6 +37,7 @@ from arches.app.models import models
 from arches.app.models.graph import Graph, GraphValidationError
 from arches.app.models.card import Card
 from arches.app.models.concept import Concept
+from arches.app.models.fields.i18n import I18n_String
 from arches.app.models.system_settings import settings
 from arches.app.models.resource import ModelInactiveError
 from arches.app.utils.data_management.resource_graphs.exporter import get_graphs_for_export, create_mapping_configuration_file
@@ -253,9 +254,8 @@ class GraphDataView(View):
         if self.action == "export_graph":
             graph = get_graphs_for_export([graphid])
             graph["metadata"] = system_metadata()
+            graph_name = I18n_String(graph["graph"][0]["name"])
             f = JSONSerializer().serialize(graph, indent=4)
-            graph_name = JSONDeserializer().deserialize(f)["graph"][0]["name"]
-
             response = HttpResponse(f, content_type="json/plain")
             response["Content-Disposition"] = 'attachment; filename="%s.json"' % (graph_name)
             return response
