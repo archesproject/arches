@@ -226,7 +226,6 @@ class PoFileTests(TestCase):
         m_cardxnodexwidget.save.assert_called()
         self.assertEqual(m_i18n_string.pop.call_count, 1)
 
-
     def test_arches_po_loader_removal(self):
         """Tests removing entries from the database when PO entry is empty string"""
         m_po_entry = MagicMock(polib.POEntry)
