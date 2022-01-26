@@ -29,6 +29,43 @@
     <h4 class="workbench-card-sidepanel-header" data-bind="click: hideSidePanel">{% trans "Image Tools" %}</h4>
 </div>
 <div class="iiif-image-tools">
+    <div class="layout">
+        <div>Panel Layout</div>
+        <div class="mode-selector">
+            <div data-bind="click: function(){ compareMode(false) }, css: { selected: !compareMode() }">
+                <div class="selector-button"></div>
+                <input name="panelGroup" value="single" type="radio" data-bind="checked: panelRadio"> Single Panel
+            </div>
+            <div data-bind="click: function(){ compareMode(true) }, css: { selected: compareMode() }">
+                <div>
+                    <div class="selector-button"></div>
+                    <div class="selector-button"></div>
+                </div>
+                <input name="panelGroup" value="double" type="radio" data-bind="checked: panelRadio"> Double Panel
+            </div>
+        </div>
+
+        <div class="panel-selector">
+            Selected Panel Layout
+            <div class="selector">
+                <div data-bind="css: { selected: selectPrimaryPanel() }">
+                    <div data-bind="click: function(){selectPrimaryPanel(true)}" class="primary" >Panel 1</div>
+                </div>
+                <div data-bind="css: { selected: !selectPrimaryPanel() }, if: compareMode()">
+                    <div class="secondary" data-bind="click: function(){selectPrimaryPanel(false)}">Panel 2</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div style="width: 96%; margin: 20px 0px;">
+        <input class="form-control input-lg widget-input"
+            data-bind="value: imageToolSelector,
+            select2Query: {
+                select2Config: imageToolConfig
+            }">
+    </div>
+
     <div class="iiif-image-tool-slider">
         <div class="iiif-image-tool-label">
             <i class="fa fa-lightbulb-o"></i>
@@ -123,30 +160,117 @@
         'gallery-visible': showGallery,
         'gallery-expanded': expandGallery
     }">
-    <div class="iiif-leaflet" data-bind="leaflet: leafletConfig"></div>
-</div>
-<div class="show-gallery-control" data-bind="css: {
-        'gallery-visible': showGallery,
-        'gallery-expanded': expandGallery
-    }">
-    <i class="fa" data-bind="css: {
-        'fa-chevron-circle-up': !expandGallery(),
-        'fa-chevron-circle-down': expandGallery()
-    }, click: function() { expandGallery(!expandGallery()); }"></i>
-    <h3>{% trans "Gallery" %}</h3>
-    <a href="javascript: void(0)" data-bind="
-        click: toggleGallery,
-        text: showGallery() ? '{% trans "hide" %}' : '{% trans "show" %}'
-    "></a>
 
+    <div class="iiif-leaflet" data-bind="leaflet: leafletConfig">
+        <div class="split-controls left" data-bind="if: secondaryCanvas">
+            <div style="width: 200px">
+                <input class="form-control input-lg widget-input"
+                    data-bind="value: canvas(),
+                    select2Query: {
+                        select2Config: leftSideSelectConfig
+                    }">
+            </div>
+            <div class="button" data-bind="click: imagePropertyUpdate.bind($data,'left')">
+                <i class="fa fa-picture-o"></i>
+            </div>
+        </div>
+        <div class="split-controls right" data-bind="if: secondaryCanvas">
+            <div style="width: 200px;">
+                <input class="form-control input-lg widget-input"
+                    data-bind="value: secondaryCanvas(),
+                    select2Query: {
+                        select2Config: rightSideSelectConfig
+                    }">
+            </div>
+            <div class="button" data-bind="click: imagePropertyUpdate.bind($data,'right')">
+                <i class="fa fa-picture-o"></i>
+            </div>
+        </div>
+    </div>
+    <div class="image-tools-floating" data-bind="style: {display: showImageModifiers() ? 'inherit': 'none'}, css: {left: floatingLocation() == 'left', right: floatingLocation() == 'right', sidepanel: activeTab()}">
+        <div class="iiif-image-tool-slider">
+            <div class="iiif-image-tool-label">
+                <i class="fa fa-lightbulb-o"></i>
+                {% trans "Brightness" %}
+            </div>
+            <div class="iiif-image-tool-slider-wrap">
+                <input type="range" min="0" max="200" step="1" data-bind="value: brightness, valueUpdate: 'input'">
+            </div>
+            <div class="iiif-image-tool-value">
+                <span data-bind="text: brightness"></span>%
+            </div>
+        </div>
+        <div class="iiif-image-tool-slider">
+            <div class="iiif-image-tool-label">
+                <i class="fa fa-adjust"></i>
+                {% trans "Contrast" %}
+            </div>
+            <div class="iiif-image-tool-slider-wrap">
+                <input type="range" min="0" max="200" step="1" data-bind="value: contrast, valueUpdate: 'input'">
+            </div>
+            <div class="iiif-image-tool-value">
+                <span data-bind="text: contrast"></span>%
+            </div>
+        </div>
+        <div class="iiif-image-tool-slider">
+            <div class="iiif-image-tool-label">
+                <i class="fa fa-eyedropper"></i>
+                {% trans "Saturation" %}
+            </div>
+            <div class="iiif-image-tool-slider-wrap">
+                <input type="range" min="0" max="200" step="1" data-bind="value: saturation, valueUpdate: 'input'">
+            </div>
+            <div class="iiif-image-tool-value">
+                <span data-bind="text: saturation"></span>%
+            </div>
+        </div>
+        <div class="iiif-image-tool-slider">
+            <div class="iiif-image-tool-label">
+                <i class="fa fa-image"></i>
+                {% trans "Greyscale" %}
+            </div>
+            <div class="toggle-container">
+                <span class="switch switch-small switch-widget" data-bind="css: {'on': greyscale()}, click: function() { greyscale(!greyscale()); }"><small></small></span>
+                <div style="display:flex; flex-direction:row;">
+                    <div class="arches-toggle-sm" data-bind="click: function() { greyscale(!greyscale()); }">{% trans "Display as greyscale" %}</div>
+                </div>
+            </div>
+        </div>
+    </div>
 </div>
-<!--ko let: {canvasClick: canvasClick, getCanvasService: getCanvasService, selectedCanvas: canvas, getAnnotationCount: getAnnotationCount} -->
+<div class="show-gallery-control" data-bind="click: toggleGallery, css: {
+        'gallery-visible': showGallery,
+        'gallery-expanded': expandGallery,
+    }">
+    <h3>{% trans "Show Gallery" %}</h3>
+</div>
+<!--ko let: {canvasClick: canvasClick, getCanvasService: getCanvasService, selectedCanvas: selectPrimaryPanel() ? canvas: secondaryCanvas, getAnnotationCount: getAnnotationCount} -->
 <div class="iiif-viewer-gallery" data-bind="css: {
         'gallery-expanded': expandGallery
     }">
     <!--ko if: showGallery() -->
     <div class="iiif-gallery-content">
-
+        <div class="panel-controls">
+            <div class="hide-gallery-control" data-bind="click: toggleGallery">
+                <span>{% trans "Hide Gallery" %}</span>
+            </div>
+            <div class="mode-selector">
+                <div>Panels</div>
+                <div class="mode-selector-buttons" >
+                    <div class="single-panel" data-bind="click: function(){compareMode(false)}, css: {selected: !compareMode()}">
+                        <div></div>
+                    </div>
+                    <div class="two-panel" data-bind="click: function(){compareMode(true)}, css: {selected: compareMode()}">
+                        <div></div>
+                        <div></div>
+                    </div>
+                </div>
+                <div class="panel-selector-buttons">
+                    <div data-bind="click: function(){selectPrimaryPanel(true)}, css: { selected: selectPrimaryPanel() }">{% trans "Panel 1" %}</div>
+                    <div data-bind="click: function(){selectPrimaryPanel(false)}, css: { selected: !selectPrimaryPanel(), hide: !compareMode() }">{% trans "Panel 2" %}</div>
+                </div>
+            </div>
+        </div>
         <!--ko if: expandGallery() && manifestData() -->
         <div class="manifest-details">
             <h3>
@@ -212,55 +336,73 @@
             <!--/ko -->
             <!--ko if: !manifestLoading() -->
             <div class="iiif-gallery-panel" style="overflow-x: auto;">
-                {% block gallery_header %}
-                <div class="iiif-gallery-header">
-                    <div>
-                        <span class="iiif-gallery-manifest-label" data-bind="text: manifestData() ? manifestName() : '{% trans "No manifest selected..." %}'"></span>
-                        <span class="iiif-gallery-manifest-label">|</span>
-                        <span>{% trans "Filter" %}</span>
-                        <div class="list-filter" data-bind="">
-                            <input type="text" class="form-control" style="width: 100%;" placeholder="{% trans 'Filter images...' %}" data-bind="textInput: filter">
+                <div class="iiif-gallery-header" style="display:flex">
+                    <div style="display: flex; align-items: center">
+                        {% block gallery_header %}
+                        <div>
+                            <span class="iiif-gallery-manifest-label" data-bind="text: manifestData() ? manifestName() : '{% trans "No manifest selected..." %}'"></span>
+                        </div>
+                        <div>
+                            <span class="iiif-gallery-sequence-label" data-bind="click: function(){expandGallery(!expandGallery())}">
+                                <!-- ko if: !expandGallery() -->
+                                {% trans "Info" %}
+                                <!-- /ko -->
+                                <!-- ko if: expandGallery() -->
+                                {% trans "Close" %}
+                                <!-- /ko -->
+                            </span>
+                        </div>
+                        <div>
+                            <span class="iiif-gallery-sequence-label" data-bind="click: toggleManifestEditor">
+                                {% trans "Switch Image Service" %}
+                            </span>
+                        </div>
+                        <div>
+                            <span>{% trans "Filter" %}</span>
+                            <div class="list-filter" data-bind="">
+                                <input type="text" class="form-control" style="width: 100%;" placeholder="{% trans 'Filter images...' %}" data-bind="textInput: filter">
 
-                            <!-- Clear Search -->
-                            <span class="clear-node-search" data-bind="visible: filter().length > 0, click: function() { filter(''); }"><i class="fa fa-times-circle"></i></span>
+                                <!-- Clear Search -->
+                                <span class="clear-node-search" data-bind="visible: filter().length > 0, click: function() { filter(''); }"><i class="fa fa-times-circle"></i></span>
+                            </div>
                         </div>
-                    </div>
-                    <div style="display: inline-flex; padding: 5px">
-                        <div class="iiif-gallery-sequence-label" data-bind="click: toggleManifestEditor">
-                            {% trans "Switch Image Service" %}
-                        </div>
+                        {% endblock gallery_header %}
                     </div>
                 </div>
-                {% endblock gallery_header %}
 
                 <div class="iiif-gallery-sequence">
                     <div class="iiif-gallery-sequence-canvases" data-bind="foreach: canvases">
-                        <div class="iiif-gallery-canvas" data-bind="click: function() {
-                            canvasClick($data);
-                        },
-                        visible: label.toLowerCase().includes(self.filter().toLowerCase()),
-                        css: {
-                            active: getCanvasService($data) === selectedCanvas(),
-                            annotated: getAnnotationCount(getCanvasService($data))
-                        }">
-                            <div class="iiif-gallery-canvas-thumbnail">
-                                <img data-bind="attr: { src: $data.thumbnail || '{% static 'img/photo_missing.png' %}', title: $data.label}">
-                            </div>
-                            <div class="iiif-gallery-canvas-label">
-                                <!--ko if: getCanvasService($data) === selectedCanvas() -->
-                                <span data-bind="text: $parent.canvasLabel"></span>
-                                <!--/ko -->                                
-                                <!--ko ifnot: getCanvasService($data) === selectedCanvas() -->
-                                <span data-bind="text: label"></span>
-                                <!--/ko -->                                
-                                <span class="annotation-count">
-                                    <!--ko if: getAnnotationCount(getCanvasService($data)) -->
-                                    <span data-bind="text: getAnnotationCount(getCanvasService($data))"></span> {% trans "Annotation(s)" %}
+                        <div style="display: inline-block; ">
+                            <div class="iiif-gallery-canvas" data-bind="click: function() {
+                                canvasClick($data);
+                            },
+                            visible: label.toLowerCase().includes(self.filter().toLowerCase()),
+                            css: {
+                                active: getCanvasService($data) === selectedCanvas(),
+                                annotated: getAnnotationCount(getCanvasService($data))
+                            }">
+                                <div style="text-align:center" class="iiif-gallery-canvas-thumbnail">
+                                    <img data-bind="attr: { src: $data.thumbnail || '{% static 'img/photo_missing.png' %}', title: $data.label}">
+                                </div>
+                                <div style="text-align:center;" class="iiif-gallery-canvas-label">
+                                    <!--ko if: getCanvasService($data) === selectedCanvas() && $parent.selectPrimaryPanel()  -->
+                                    <span data-bind="text: $parent.canvasLabel"></span>
                                     <!--/ko -->
-                                    <!--ko if: !getAnnotationCount(getCanvasService($data)) -->
-                                    &nbsp;
-                                    <!--/ko -->
-                                </span>
+                                    <!--ko if: getCanvasService($data) === selectedCanvas() && !$parent.selectPrimaryPanel() -->
+                                    <span data-bind="text: $parent.secondaryLabel"></span>
+                                    <!--/ko -->   
+                                    <!--ko ifnot: getCanvasService($data) === selectedCanvas() -->
+                                    <span data-bind="text: label"></span>
+                                    <!--/ko -->                                
+                                    <span class="annotation-count">
+                                        <!--ko if: getAnnotationCount(getCanvasService($data)) -->
+                                        <span data-bind="text: getAnnotationCount(getCanvasService($data))"></span> {% trans "Annotation(s)" %}
+                                        <!--/ko -->
+                                        <!--ko if: !getAnnotationCount(getCanvasService($data)) -->
+                                        &nbsp;
+                                        <!--/ko -->
+                                    </span>
+                                </div>
                             </div>
                         </div>
                     </div>
