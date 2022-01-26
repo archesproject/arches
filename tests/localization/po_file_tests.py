@@ -21,6 +21,7 @@ class PoFileTests(TestCase):
         self.open = builtins.open
         self.mkdir = pathlib.Path.mkdir
         self.pofactory = polib.pofile
+        self.languages = settings.LANGUAGES
 
     def tearDown(self):
         CardXNodeXWidget.objects.all = self.cardxnodexwidget_all
@@ -28,6 +29,7 @@ class PoFileTests(TestCase):
         builtins.open = self.open
         pathlib.Path.mkdir = self.mkdir
         polib.pofile = self.pofactory
+        settings.LANGUAGES = self.languages
 
     def test_populate(self):
         m_po_file = Mock(polib.POFile)
@@ -184,7 +186,46 @@ class PoFileTests(TestCase):
         loader.load()
 
         m_card.save.assert_called()
-        m_cardxnodexwidget.save.assert_not_called()
+        m_cardxnodexwidget.save.assert_called()
+
+    def test_po_loader_no_i18n_properties(self):
+        """Tests removing entries from the database when PO entry is empty string"""
+        m_po_entry = MagicMock(polib.POEntry)
+        m_po_entry.msgid = "doom"
+        m_po_entry.msgstr = ""
+        m_po_file = MagicMock(polib.POFile)
+        m_po_file.find.return_value = m_po_entry
+
+        m_all_method_cardmodel = Mock()
+        m_card = MagicMock(CardModel)
+        m_card.save.return_value = None
+        m_i18n_string = MagicMock(I18n_String)
+        m_card.name = m_i18n_string
+        i18n_string_dict = {"en": "doom", "es": ""}
+        m_i18n_string.__getitem__.side_effect = i18n_string_dict.__getitem__
+        m_i18n_string.pop = Mock()
+        m_all_method_cardmodel.return_value = [m_card]
+
+        m_all_method_cardxnodexwidgets = Mock()
+        m_cardxnodexwidget = MagicMock(CardXNodeXWidget)
+        i18n_json_dict = {"test": {"en": "test"}, "label": "doom"}
+        m_i18n_json_field = MagicMock(I18n_JSON)
+        m_i18n_json_field.__getitem__ = Mock()
+        m_i18n_json_field.__getitem__.side_effect = i18n_json_dict.__getitem__
+        m_cardxnodexwidget.config = m_i18n_json_field
+        m_cardxnodexwidget.save.return_value = None
+        m_all_method_cardxnodexwidgets.return_value = [m_cardxnodexwidget]
+        CardXNodeXWidget.objects.all = m_all_method_cardxnodexwidgets
+
+        loader = ArchesPOLoader(m_po_file, "en", "es")
+        CardXNodeXWidget.objects.all = m_all_method_cardxnodexwidgets
+        CardModel.objects.all = m_all_method_cardmodel
+        loader.load()
+
+        m_card.save.assert_called()
+        m_cardxnodexwidget.save.assert_called()
+        self.assertEqual(m_i18n_string.pop.call_count, 1)
+
 
     def test_arches_po_loader_removal(self):
         """Tests removing entries from the database when PO entry is empty string"""
@@ -221,7 +262,7 @@ class PoFileTests(TestCase):
         loader.load()
 
         m_card.save.assert_called()
-        m_cardxnodexwidget.save.assert_not_called()
+        m_cardxnodexwidget.save.assert_called()
         self.assertEqual(m_i18n_string.pop.call_count, 1)
 
         i18n_json_dict["test2"] = m_i18n_string
@@ -264,6 +305,13 @@ class PoFileTests(TestCase):
         fetcher = ArchesPOFileFetcher()
         m_mkdir = MagicMock()
         pathlib.Path.mkdir = m_mkdir
+        settings.LANGUAGES = [
+            ("de", ("German")),
+            ("en", ("English")),
+            ("en-gb", ("British English")),
+            ("es", ("Spanish")),
+            ("ar", ("Arabic")),
+        ]
         m_pofile = MagicMock(polib.POFile)
         m_pofactory = MagicMock()
         m_pofactory.return_value = m_pofile

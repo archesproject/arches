@@ -143,6 +143,8 @@ class ArchesPOLoader:
             return
 
         for row in cards_x_nodes_x_widgets:
+            self.update_i18n_string_cell(row.label)
+            row.save()
             try:
                 i18n_properties = row.config["i18n_properties"]
                 for prop in i18n_properties:
@@ -151,8 +153,6 @@ class ArchesPOLoader:
                         row.config[prop][self.target_language] = entry.msgstr
                     else:
                         row.config[prop].pop(self.target_language, None)
-
-                self.update_i18n_string_cell(row.label)
 
                 row.save()
             except KeyError:
