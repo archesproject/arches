@@ -62,6 +62,7 @@
             'leaflet-iiif': '{{ STATIC_URL }}packages/leaflet-iiif/leaflet-iiif',
             'leaflet-draw': '{{ STATIC_URL }}packages/leaflet-draw/dist/leaflet.draw',
             'leaflet-fullscreen': '{{ STATIC_URL }}packages/leaflet.fullscreen/Control.FullScreen',
+            'leaflet-side-by-side': '{{ STATIC_URL }}plugins/leaflet-side-by-side/index',
             'metismenu': '{{ STATIC_URL }}packages/metismenu/dist/metisMenu.min',
             'knockstrap': '{{ STATIC_URL }}packages/knockstrap/build/knockstrap.min',
             'jqtree': '{{ STATIC_URL }}packages/jqtree/tree.jquery',
@@ -409,6 +410,7 @@
                 'mobileSurveyDesc': '{% trans "Summary of how this model participates in the survey" %}',
                 'groupingErrorTitle': '{% trans "Settings Conflict: Remove this card from grouped card?" %}',
                 'groupingErrorMessage': "{% trans 'The cardinality of this card can\'t be changed until you remove it from being grouped with the ${cardName} card.  Do you want to remove this card from being grouped with the ${cardName} card' %}",
+                'modelDoesNotExist': '{% trans "!! Referenced model does not exist -- Delete and select a new model !!" %}',
             },
             version: '{{ app_settings.VERSION }}'
         };
