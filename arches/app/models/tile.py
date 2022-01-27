@@ -638,6 +638,8 @@ class Tile(models.TileModel):
                     tile = Tile.update_node_value(
                         nodeid, value, nodegroupid=nodegroupid, resourceinstanceid=resourceinstanceid, transaction_id=transaction_id
                     )
+
+        tile.after_update_all()
         return tile
 
     def __preSave(self, request=None):

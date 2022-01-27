@@ -5,18 +5,18 @@
 <div class="row widget-wrapper">
     <div class="form-group" style="position: relative; z-index: 0">
         <div style="max-width: 600px; position: relative">
-        <div class="i8ln-style-tools-collapser" data-bind=" click: function() {
-            showi8lnOptions(!showi8lnOptions());
+        <div class="i18n-style-tools-collapser" data-bind=" click: function() {
+            showi18nOptions(!showi18nOptions());
         }">
             <span><i class="fa" data-bind="{
                 css: {
-                    'fa-caret-down' : !showi8lnOptions(),
-                    'fa-caret-up' : showi8lnOptions(),
+                    'fa-caret-down' : !showi18nOptions(),
+                    'fa-caret-up' : showi18nOptions(),
                 }
             }"></i> {% trans "Languages" %}</span>
         </div>
-        <div class="form-horizontal" data-bind="if: showi8lnOptions">
-            <div class="i8ln-style-tools-panel">
+        <div class="form-horizontal" data-bind="if: showi18nOptions">
+            <div class="i18n-style-tools-panel">
                 <div style="display: flex; flex-direction: column; max-width:600px">
                     <label class="widget-input-label" for="lang_dd">{% trans "Language" %}</label>
                     <select id="lang_dd" style="flex:1" name="language" data-bind="options: languages, optionsText: function(item){return item.name + ' (' + item.code + ')'}, value: currentLanguage, chosen: {width:'100%'}">
@@ -61,18 +61,18 @@
 </div>
 <div class="form-group" style="position: relative; z-index: 0">
     <div style="max-width: 600px; position: relative">
-    <div class="i8ln-style-tools-collapser" data-bind=" click: function() {
-        showi8lnOptions(!showi8lnOptions());
+    <div class="i18n-style-tools-collapser" data-bind=" click: function() {
+        showi18nOptions(!showi18nOptions());
     }">
         <span><i class="fa" data-bind="{
             css: {
-                'fa-caret-down' : !showi8lnOptions(),
-                'fa-caret-up' : showi8lnOptions(),
+                'fa-caret-down' : !showi18nOptions(),
+                'fa-caret-up' : showi18nOptions(),
             }
         }"></i> {% trans "Languages" %}</span>
     </div>
-    <div class="form-horizontal" data-bind="if: showi8lnOptions">
-        <div class="i8ln-style-tools-panel">
+    <div class="form-horizontal" data-bind="if: showi18nOptions">
+        <div class="i18n-style-tools-panel">
             <div style="display: flex; flex-direction: column; max-width:600px">
                 <label class="widget-input-label" for="lang_dd">{% trans "Language" %}</label>
                 <select id="lang_dd" style="flex:1" name="language" data-bind="options: languages, optionsText: function(item){return item.name + ' (' + item.code + ')'}, value: currentDefaultLanguage, chosen: {width:'100%'}">
