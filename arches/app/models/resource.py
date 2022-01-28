@@ -604,15 +604,7 @@ class Resource(models.ResourceInstance):
 
         return JSONSerializer().serializeToPython(ret)
 
-    def to_json(
-        self, 
-        compact=True, 
-        hide_empty_nodes=False, 
-        user=None, 
-        perm=None, 
-        version=None, 
-        hide_hidden_nodes=False
-    ):
+    def to_json(self, compact=True, hide_empty_nodes=False, user=None, perm=None, version=None, hide_hidden_nodes=False):
         """
         Returns resource represented as disambiguated JSON graph
 
@@ -622,20 +614,11 @@ class Resource(models.ResourceInstance):
         """
         if version is None:
             return LabelBasedGraph.from_resource(
-                resource=self, 
-                compact=compact, 
-                hide_empty_nodes=hide_empty_nodes, 
-                user=user, perm=perm, 
-                hide_hidden_nodes=hide_hidden_nodes
+                resource=self, compact=compact, hide_empty_nodes=hide_empty_nodes, user=user, perm=perm, hide_hidden_nodes=hide_hidden_nodes
             )
         elif version == "beta":
             return LabelBasedGraphV2.from_resource(
-                resource=self, 
-                compact=compact, 
-                hide_empty_nodes=hide_empty_nodes, 
-                user=user, 
-                perm=perm, 
-                hide_hidden_nodes=hide_hidden_nodes
+                resource=self, compact=compact, hide_empty_nodes=hide_empty_nodes, user=user, perm=perm, hide_hidden_nodes=hide_hidden_nodes
             )
 
     @staticmethod
