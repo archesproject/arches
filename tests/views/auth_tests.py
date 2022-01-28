@@ -135,7 +135,7 @@ class AuthTests(ArchesTestCase):
         self.assertTrue(response.status_code == 302)
         self.assertTrue(response.get("location") == reverse("auth"))
 
-    @mock.patch('arches.app.models.models.UserProfile.encrypted_mfa_hash', new_callable=mock.PropertyMock)
+    @mock.patch("arches.app.models.models.UserProfile.encrypted_mfa_hash", new_callable=mock.PropertyMock)
     def test_login_redirect_with_enable_two_factor_authentication_enabled(self, encrypted_mfa_hash):
         """
         Tests that a user can login and is redirected to the two-factor authentication page if they have enabled two-factor authentication
@@ -143,10 +143,10 @@ class AuthTests(ArchesTestCase):
         """
         settings.ENABLE_TWO_FACTOR_AUTHENTICATION = True
 
-        encrypted_mfa_hash.return_value = '123456'
-        
+        encrypted_mfa_hash.return_value = "123456"
+
         response = self.client.post(reverse("auth"), {"username": "test", "password": "password"})
-        self.assertTemplateUsed(response, 'two_factor_authentication_login.htm')
+        self.assertTemplateUsed(response, "two_factor_authentication_login.htm")
 
     def test_login_redirect_with_force_two_factor_authentication_enabled(self):
         """
@@ -154,9 +154,9 @@ class AuthTests(ArchesTestCase):
 
         """
         settings.FORCE_TWO_FACTOR_AUTHENTICATION = True
-        
+
         response = self.client.post(reverse("auth"), {"username": "test", "password": "password"})
-        self.assertTemplateUsed(response, 'two_factor_authentication_login.htm')
+        self.assertTemplateUsed(response, "two_factor_authentication_login.htm")
 
     def test_user_cannot_pass_two_factor_authentication_with_incorrect_2fa_code(self):
         """
@@ -164,13 +164,18 @@ class AuthTests(ArchesTestCase):
 
         """
         settings.ENABLE_TWO_FACTOR_AUTHENTICATION = True
-        
+
         response = self.client.post(
-            reverse("two-factor-authentication-login"), 
-            {"username": "test", "password": "password", "user-has-enabled-two-factor-authentication": True, 'two-factor-authentication': 123456}
+            reverse("two-factor-authentication-login"),
+            {
+                "username": "test",
+                "password": "password",
+                "user-has-enabled-two-factor-authentication": True,
+                "two-factor-authentication": 123456,
+            },
         )
 
-        self.assertTemplateUsed(response, 'two_factor_authentication_login.htm')
+        self.assertTemplateUsed(response, "two_factor_authentication_login.htm")
         self.assertTrue(response.status_code == 401)
 
     def test_user_passes_two_factor_authentication_with_correct_2fa_code(self):
@@ -179,13 +184,18 @@ class AuthTests(ArchesTestCase):
 
         """
         settings.ENABLE_TWO_FACTOR_AUTHENTICATION = True
-        
-        with mock.patch('arches.app.models.models.UserProfile.encrypted_mfa_hash', new_callable=mock.PropertyMock, return_value='123456'):
-            with mock.patch('arches.app.utils.arches_crypto.AESCipher.decrypt', return_value='123456'):
-                with mock.patch('pyotp.TOTP.verify', return_value=True):
+
+        with mock.patch("arches.app.models.models.UserProfile.encrypted_mfa_hash", new_callable=mock.PropertyMock, return_value="123456"):
+            with mock.patch("arches.app.utils.arches_crypto.AESCipher.decrypt", return_value="123456"):
+                with mock.patch("pyotp.TOTP.verify", return_value=True):
                     response = self.client.post(
-                        reverse("two-factor-authentication-login"), 
-                        {"username": "test", "password": "password", "user-has-enabled-two-factor-authentication": True, 'two-factor-authentication': '123456'}
+                        reverse("two-factor-authentication-login"),
+                        {
+                            "username": "test",
+                            "password": "password",
+                            "user-has-enabled-two-factor-authentication": True,
+                            "two-factor-authentication": "123456",
+                        },
                     )
 
                     user = get_user(self.client)
@@ -200,14 +210,11 @@ class AuthTests(ArchesTestCase):
         """
         settings.ENABLE_TWO_FACTOR_AUTHENTICATION = True
 
-        user_profile = UserProfile.objects.get(user_id=self.user.pk)      
+        user_profile = UserProfile.objects.get(user_id=self.user.pk)
         original_mfa_hash = user_profile.encrypted_mfa_hash
 
-        self.client.post(
-            reverse("two-factor-authentication-settings"), 
-            {'user-id': self.user.pk, "generate-qr-code-button":True}
-        )
-        
+        self.client.post(reverse("two-factor-authentication-settings"), {"user-id": self.user.pk, "generate-qr-code-button": True})
+
         user_profile = UserProfile.objects.get(user_id=self.user.pk)  # updated UserProfile
         updated_mfa_hash = user_profile.encrypted_mfa_hash
 
