@@ -355,8 +355,7 @@ class LabelBasedGraph_FromResourceTests(TestCase):
         def filter_side_effect(nodegroup_id=None):
             if nodegroup_id:
                 return filter_mock
-            else:
-                return mock.MagicMock()
+            return mock.MagicMock()
 
         mock_CardModel.objects.filter.side_effect = filter_side_effect
         filter_mock.first.return_value = self.hidden_card
