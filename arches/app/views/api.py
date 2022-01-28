@@ -1432,7 +1432,10 @@ class BulkDisambiguatedResourceInstance(APIBase):
         if hidden == "false":
             hide_hidden_nodes = True
         return JSONResponse(
-            {resource.pk: resource.to_json(compact=compact, version=version, hide_hidden_nodes=hide_hidden_nodes) for resource in Resource.objects.filter(pk__in=resource_ids)}
+            {
+                resource.pk: resource.to_json(compact=compact, version=version, hide_hidden_nodes=hide_hidden_nodes)
+                for resource in Resource.objects.filter(pk__in=resource_ids)
+            }
         )
 
 

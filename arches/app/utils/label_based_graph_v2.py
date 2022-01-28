@@ -32,16 +32,18 @@ class LabelBasedNode(object):
     def as_json(self, compact=False, include_empty_nodes=True, include_hidden_nodes=True):
         display_data = {}
 
-        if(not include_hidden_nodes):
+        if not include_hidden_nodes:
             card = models.CardModel.objects.filter(nodegroup_id=self.node_id).first()
             try:
-                if(not card.visible):
+                if not card.visible:
                     return None
             except AttributeError:
                 pass
 
         for child_node in self.child_nodes:
-            formatted_node = child_node.as_json(compact=compact, include_empty_nodes=include_empty_nodes, include_hidden_nodes=include_hidden_nodes)
+            formatted_node = child_node.as_json(
+                compact=compact, include_empty_nodes=include_empty_nodes, include_hidden_nodes=include_hidden_nodes
+            )
             if formatted_node is not None:
                 formatted_node_name, formatted_node_value = formatted_node.popitem()
 
@@ -143,7 +145,16 @@ class LabelBasedGraph(object):
 
     @classmethod
     def from_resource(
-        cls, resource, datatype_factory=None, node_cache=None, compact=False, hide_empty_nodes=False, as_json=True, user=None, perm=None, hide_hidden_nodes=False
+        cls,
+        resource,
+        datatype_factory=None,
+        node_cache=None,
+        compact=False,
+        hide_empty_nodes=False,
+        as_json=True,
+        user=None,
+        perm=None,
+        hide_hidden_nodes=False,
     ):
         """
         Generates a label-based graph from a given resource
@@ -180,7 +191,9 @@ class LabelBasedGraph(object):
                 root_label_based_node.child_nodes.append(label_based_graph)
 
         if as_json:
-            root_label_based_node_json = root_label_based_node.as_json(compact=compact, include_empty_nodes=bool(not hide_empty_nodes), include_hidden_nodes=bool(not hide_hidden_nodes))
+            root_label_based_node_json = root_label_based_node.as_json(
+                compact=compact, include_empty_nodes=bool(not hide_empty_nodes), include_hidden_nodes=bool(not hide_hidden_nodes)
+            )
 
             _dummy_resource_name, resource_graph = root_label_based_node_json.popitem()
 

@@ -353,7 +353,7 @@ class LabelBasedGraph_FromResourceTests(TestCase):
         filter_mock = mock.MagicMock()
 
         def filter_side_effect(nodegroup_id=None):
-            if(nodegroup_id):
+            if nodegroup_id:
                 return filter_mock
             else:
                 return mock.MagicMock()
@@ -367,6 +367,6 @@ class LabelBasedGraph_FromResourceTests(TestCase):
 
         self.test_resource.tiles.append(self.string_tile)
 
-        label_based_graph = LabelBasedGraph.from_resource(self.test_resource,compact=False, hide_empty_nodes=False, hide_hidden_nodes=True)
-        
+        label_based_graph = LabelBasedGraph.from_resource(self.test_resource, compact=False, hide_empty_nodes=False, hide_hidden_nodes=True)
+
         self.assertEqual(label_based_graph, {})
