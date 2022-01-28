@@ -604,7 +604,7 @@ class Resource(models.ResourceInstance):
 
         return JSONSerializer().serializeToPython(ret)
 
-    def to_json(self, compact=True, hide_empty_nodes=False, user=None, perm=None, version=None):
+    def to_json(self, compact=True, hide_empty_nodes=False, user=None, perm=None, version=None, hide_hidden_nodes=False):
         """
         Returns resource represented as disambiguated JSON graph
 
@@ -613,9 +613,9 @@ class Resource(models.ResourceInstance):
         hide_empty_nodes -- type bool: hide nodes without data
         """
         if version is None:
-            return LabelBasedGraph.from_resource(resource=self, compact=compact, hide_empty_nodes=hide_empty_nodes, user=user, perm=perm)
+            return LabelBasedGraph.from_resource(resource=self, compact=compact, hide_empty_nodes=hide_empty_nodes, user=user, perm=perm, hide_hidden_nodes=hide_hidden_nodes)
         elif version == "beta":
-            return LabelBasedGraphV2.from_resource(resource=self, compact=compact, hide_empty_nodes=hide_empty_nodes, user=user, perm=perm)
+            return LabelBasedGraphV2.from_resource(resource=self, compact=compact, hide_empty_nodes=hide_empty_nodes, user=user, perm=perm, hide_hidden_nodes=hide_hidden_nodes)
 
     @staticmethod
     def to_json__bulk(resources, compact=True, hide_empty_nodes=False, version=None):

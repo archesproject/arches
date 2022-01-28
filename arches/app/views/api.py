@@ -1424,11 +1424,15 @@ class BulkDisambiguatedResourceInstance(APIBase):
         resource_ids = request.GET.get("resource_ids").split(",")
         uncompacted_value = request.GET.get("uncompacted")
         version = request.GET.get("v")
+        hidden = request.GET.get("hidden")
         compact = True
+        hide_hidden_nodes = False
         if uncompacted_value == "true":
             compact = False
+        if hidden == "false":
+            hide_hidden_nodes = True
         return JSONResponse(
-            {resource.pk: resource.to_json(compact=compact, version=version) for resource in Resource.objects.filter(pk__in=resource_ids)}
+            {resource.pk: resource.to_json(compact=compact, version=version, hide_hidden_nodes=hide_hidden_nodes) for resource in Resource.objects.filter(pk__in=resource_ids)}
         )
 
 
