@@ -588,11 +588,23 @@ class Resources(APIBase):
                 hide_empty_nodes = bool(request.GET.get("hide_empty_nodes", "false").lower() == "true")  # default False
 
                 if version == "beta":
-                    out = resource.to_json(compact=compact, hide_empty_nodes=hide_empty_nodes, user=user, perm=perm, version=version, hide_hidden_nodes=hide_hidden_nodes)
+                    out = resource.to_json(
+                        compact=compact,
+                        hide_empty_nodes=hide_empty_nodes,
+                        user=user,
+                        perm=perm,
+                        version=version,
+                        hide_hidden_nodes=hide_hidden_nodes,
+                    )
                 else:
                     out = {
                         "resource": resource.to_json(
-                            compact=compact, hide_empty_nodes=hide_empty_nodes, user=user, perm=perm, version=version, hide_hidden_nodes=hide_hidden_nodes
+                            compact=compact,
+                            hide_empty_nodes=hide_empty_nodes,
+                            user=user,
+                            perm=perm,
+                            version=version,
+                            hide_hidden_nodes=hide_hidden_nodes,
                         ),
                         "displaydescription": resource.displaydescription,
                         "displayname": resource.displayname,
