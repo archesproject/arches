@@ -566,6 +566,7 @@ class Resources(APIBase):
 
         allowed_formats = ["json", "json-ld", "arches-json"]
         format = request.GET.get("format", "json-ld")
+        hide_hidden_nodes = bool(request.GET.get("hidden", "true").lower() == "false")
         user = request.user
         perm = "read_nodegroup"
 
@@ -587,11 +588,11 @@ class Resources(APIBase):
                 hide_empty_nodes = bool(request.GET.get("hide_empty_nodes", "false").lower() == "true")  # default False
 
                 if version == "beta":
-                    out = resource.to_json(compact=compact, hide_empty_nodes=hide_empty_nodes, user=user, perm=perm, version=version)
+                    out = resource.to_json(compact=compact, hide_empty_nodes=hide_empty_nodes, user=user, perm=perm, version=version, hide_hidden_nodes=hide_hidden_nodes)
                 else:
                     out = {
                         "resource": resource.to_json(
-                            compact=compact, hide_empty_nodes=hide_empty_nodes, user=user, perm=perm, version=version
+                            compact=compact, hide_empty_nodes=hide_empty_nodes, user=user, perm=perm, version=version, hide_hidden_nodes=hide_hidden_nodes
                         ),
                         "displaydescription": resource.displaydescription,
                         "displayname": resource.displayname,
@@ -1422,15 +1423,10 @@ class BulkResourceReport(APIBase):
 class BulkDisambiguatedResourceInstance(APIBase):
     def get(self, request):
         resource_ids = request.GET.get("resource_ids").split(",")
-        uncompacted_value = request.GET.get("uncompacted")
         version = request.GET.get("v")
-        hidden = request.GET.get("hidden")
-        compact = True
-        hide_hidden_nodes = False
-        if uncompacted_value == "true":
-            compact = False
-        if hidden == "false":
-            hide_hidden_nodes = True
+        hide_hidden_nodes = bool(request.GET.get("hidden", "true").lower() == "false")
+        compact = bool(request.GET.get("uncompacted", "false").lower() == "false")
+
         return JSONResponse(
             {
                 resource.pk: resource.to_json(compact=compact, version=version, hide_hidden_nodes=hide_hidden_nodes)
