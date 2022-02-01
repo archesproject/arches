@@ -690,14 +690,14 @@ begin
         as
         (
             select 
-                r.resourceinstanceid
+                r.resourceinstanceid::text as resourceinstanceid
                 %s
             from resource_instances r
-                join geojson_geometries geo on geo.resourceinstanceid = r.resourceinstanceid
+                join geojson_geometries geo on geo.resourceinstanceid::text = r.resourceinstanceid::text
                     and geo.nodeid = ''%s''
                 %s
             group by
-                r.resourceinstanceid
+                r.resourceinstanceid::text
         )
         with data;
         
@@ -785,11 +785,11 @@ begin
             create or replace view %s AS
             select 
                 geo.id AS gid,
-                geo.tileid, 
-                geo.nodeid,
+                geo.tileid::text AS tileid, 
+                geo.nodeid::text AS nodeid,
                 geo.geom, att.*
                 FROM geojson_geometries geo
-                    join %s att ON geo.resourceinstanceid = att.resourceinstanceid
+                    join %s att ON geo.resourceinstanceid::text = att.resourceinstanceid::text
             where geo.nodeid = ''%s''
                 and ST_GeometryType(geo.geom) = ''%s'';
 
