@@ -38,7 +38,7 @@ from arches.app.models.graph import Graph, GraphValidationError
 from arches.app.models.card import Card
 from arches.app.models.concept import Concept
 from arches.app.models.system_settings import settings
-from arches.app.models.resource import ModelInactiveError
+from arches.app.models.resource import PublishedModelError
 from arches.app.utils.data_management.resource_graphs.exporter import get_graphs_for_export, create_mapping_configuration_file
 from arches.app.utils.data_management.resource_graphs import importer as GraphImporter
 from arches.app.utils.system_metadata import system_metadata
@@ -97,7 +97,6 @@ class GraphSettingsView(GraphBaseView):
                 "ontology_id",
                 "version",
                 "subtitle",
-                "isactive",
                 "color",
                 "jsonldcontext",
                 "slug",
@@ -394,7 +393,7 @@ class GraphDataView(View):
             return JSONResponse(ret)
         except GraphValidationError as e:
             return JSONErrorResponse(e.title, e.message, {"status": "Failed"})
-        except ModelInactiveError as e:
+        except PublishedModelError as e:
             return JSONErrorResponse(e.title, e.message)
         except RequestError as e:
             return JSONErrorResponse(
@@ -428,14 +427,14 @@ class GraphDataView(View):
                 )
             except GraphValidationError as e:
                 return JSONErrorResponse(e.title, e.message)
-            except ModelInactiveError as e:
+            except PublishedModelError as e:
                 return JSONErrorResponse(e.title, e.message)
         elif self.action == "delete_graph":
             try:
                 graph = Graph.objects.get(graphid=graphid)
                 if graph.isresource:
                     graph.delete_instances()
-                    graph.isactive = False
+                    graph.publication = None
                     graph.save(validate=False)
                 graph.delete()
                 return JSONResponse({"success": True})
@@ -443,6 +442,28 @@ class GraphDataView(View):
                 return JSONErrorResponse(e.title, e.message)
 
         return HttpResponseNotFound()
+
+
+class GraphPublicationView(View):
+    action = None
+
+    def post(self, request, graphid):
+        graph = Graph.objects.get(pk=graphid)
+
+        try:
+            notes = None
+            if request.body:
+                data = JSONDeserializer().deserialize(request.body)
+                notes = data.get("notes")
+
+            if self.action == "publish":
+                graph.publish(notes)
+            elif self.action == "unpublish":
+                graph.unpublish()
+        except Exception as e:
+            return JSONErrorResponse(e)
+
+        return JSONResponse({"graph": graph, "title": "Success!", "message": "The graph has been successfully updated."})
 
 
 @method_decorator(group_required("Graph Editor"), name="dispatch")

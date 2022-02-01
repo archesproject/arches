@@ -56,7 +56,6 @@ class Graph(models.GraphModel):
         # self.deploymentdate = None
         # self.version = ''
         # self.isresource = False
-        # self.isactive = False
         # self.iconclass = ''
         # self.color = ''
         # self.subtitle = ''
@@ -144,7 +143,6 @@ class Graph(models.GraphModel):
             description="",
             version="",
             isresource=is_resource,
-            isactive=not is_resource,
             iconclass="",
             ontology=None,
             slug=None,
@@ -1336,7 +1334,6 @@ class Graph(models.GraphModel):
                         "iconclass",
                         "author",
                         "description",
-                        "isactive",
                         "color",
                         "nodes",
                         "edges",
@@ -1521,6 +1518,27 @@ class Graph(models.GraphModel):
             graphs_with_matching_slug = models.GraphModel.objects.exclude(slug__isnull=True).filter(slug=self.slug)
             if graphs_with_matching_slug.exists() and graphs_with_matching_slug[0].graphid != self.graphid:
                 raise GraphValidationError(_("Another resource modal already uses the slug '{self.slug}'").format(**locals()), 1007)
+
+    def publish(self, notes=None):
+        """
+        Adds a row to the GraphPublication table
+        Assigns GraphPublication id to Graph
+        """
+        publication = models.GraphPublication(
+            graph=self,
+            notes=notes,
+        )
+        publication.save()
+
+        self.publication = publication
+        self.save()
+
+    def unpublish(self):
+        """
+        Unassigns GraphPublication id from Graph
+        """
+        self.publication = None
+        self.save()
 
 
 class GraphValidationError(Exception):

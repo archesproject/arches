@@ -49,7 +49,6 @@ class GraphTests(ArchesTestCase):
             "description": "Represents a single node in a graph",
             "graphid": cls.SINGLE_NODE_GRAPHID,
             "iconclass": "fa fa-circle",
-            "isactive": True,
             "isresource": False,
             "name": "Node",
             "ontology_id": "e6e8db47-2ccf-11e6-927e-b8f6b115d7dd",
@@ -82,7 +81,6 @@ class GraphTests(ArchesTestCase):
             "description": "Represents a node and node type pairing",
             "graphid": cls.NODE_NODETYPE_GRAPHID,
             "iconclass": "fa fa-angle-double-down",
-            "isactive": True,
             "isresource": False,
             "name": "Node/Node Type",
             "ontology_id": "e6e8db47-2ccf-11e6-927e-b8f6b115d7dd",
@@ -170,7 +168,6 @@ class GraphTests(ArchesTestCase):
         graph.description = "ARCHES TEST GRAPH"
         graph.ontology_id = "e6e8db47-2ccf-11e6-927e-b8f6b115d7dd"
         graph.version = "v1.0.0"
-        graph.isactive = False
         graph.iconclass = "fa fa-building"
         graph.nodegroups = []
         graph.save()
@@ -220,7 +217,6 @@ class GraphTests(ArchesTestCase):
             "description": "ARCHES TEST GRAPH",
             "version": "v1.0.0",
             "isresource": True,
-            "isactive": False,
             "iconclass": "fa fa-building",
             "nodegroups": [],
             "nodes": [
@@ -285,7 +281,6 @@ class GraphTests(ArchesTestCase):
         self.assertEqual(graph_obj["description"], graph.description)
         self.assertEqual(graph_obj["version"], graph.version)
         self.assertEqual(graph_obj["isresource"], graph.isresource)
-        self.assertEqual(graph_obj["isactive"], graph.isactive)
         self.assertEqual(graph_obj["iconclass"], graph.iconclass)
 
     def test_nodes_are_byref(self):
@@ -1062,7 +1057,6 @@ class GraphTests(ArchesTestCase):
         graph.description = "ARCHES TEST GRAPH"
         graph.ontology = models.Ontology.objects.get(pk="e6e8db47-2ccf-11e6-927e-b8f6b115d7dd")
         graph.version = "v1.0.0"
-        graph.isactive = False
         graph.iconclass = "fa fa-building"
         graph.nodegroups = []
 

@@ -256,7 +256,6 @@
             "graphid": "c9b37a14-17b3-11eb-a708-acde48001122",
             "iconclass": "fa fa-adjust",
             "is_editable": true,
-            "isactive": true,
             "isresource": true,
             "jsonldcontext": null,
             "name": "Resource Test Model",

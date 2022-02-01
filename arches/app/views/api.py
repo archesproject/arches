@@ -1236,7 +1236,7 @@ class ResourceReport(APIBase):
         if "related_resources" not in exclude:
             resource_models = (
                 models.GraphModel.objects.filter(isresource=True)
-                .exclude(isactive=False)
+                # .exclude(publication=None)
                 .exclude(pk=settings.SYSTEM_SETTINGS_RESOURCE_MODEL_ID)
             )
 

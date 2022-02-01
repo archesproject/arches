@@ -129,7 +129,6 @@
             "graphid": "d5456066-107c-11ea-b7e9-acde48001122",
             "iconclass": "",
             "is_editable": false,
-            "isactive": true,
             "isresource": true,
             "jsonldcontext": null,
             "name": "test string to path",

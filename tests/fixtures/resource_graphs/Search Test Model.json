@@ -184,7 +184,6 @@
             "graphid": "d291a445-fa5f-11e6-afa8-14109fd34195",
             "iconclass": "fa fa-adjust",
             "is_editable": true,
-            "isactive": true,
             "isresource": true,
             "jsonldcontext": null,
             "name": "Search Test Model",
