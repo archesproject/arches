@@ -236,13 +236,13 @@ class SearchResultsExporter(object):
 
         return ret, search_export_info
 
-    def write_export_zipfile(self, files_for_export, export_info):
+    def write_export_zipfile(self, files_for_export, export_info, export_name=None):
         """
         Writes a list of file like objects out to a zip file
         """
         zip_stream = zip_utils.create_zip_file(files_for_export, "outputfile")
         today = datetime.datetime.now().isoformat()
-        name = f"{settings.APP_NAME}_{today}.zip"
+        name = f"{export_name}.zip" if (export_name is not None and export_name != "Arches Export") else f"{settings.APP_NAME}_{today}.zip"
         search_history_obj = models.SearchExportHistory.objects.get(pk=export_info.searchexportid)
         f = BytesIO(zip_stream)
         download = File(f)
