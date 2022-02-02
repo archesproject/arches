@@ -63,6 +63,6 @@ class Migration(migrations.Migration):
             FROM alias_table
             WHERE nodes.nodeid = alias_table.nodeid;
             """,
-            """SELECT 1=1;"""
+            """SELECT 1=1;""",
         ),
     ]
