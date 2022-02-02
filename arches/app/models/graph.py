@@ -1385,11 +1385,11 @@ class Graph(models.GraphModel):
 
     def create_node_alias(self, node):
         """
-        Slugifies a node's name and creates an alias for the node that is unique to it's graph 
+        Slugifies a node's name and creates an alias for the node that is unique to it's graph
         """
 
         with connection.cursor() as cursor:
-            cursor.callproc('__arches_slugify', [node.name])
+            cursor.callproc("__arches_slugify", [node.name])
             row = cursor.fetchone()
             aliases = [n.alias for n in self.nodes.values() if node.alias != n.alias]
             node.alias = self.make_name_unique(row[0], aliases, "_n")

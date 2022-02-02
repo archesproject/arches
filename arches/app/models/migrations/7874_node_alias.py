@@ -6,18 +6,18 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('models', '8085_relational_data_model_handle_dates'),
+        ("models", "8085_relational_data_model_handle_dates"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='node',
-            name='alias',
+            model_name="node",
+            name="alias",
             field=models.TextField(blank=True, null=True),
         ),
         migrations.AddConstraint(
-            model_name='node',
-            constraint=models.UniqueConstraint(fields=('alias', 'graph'), name='unique_alias_graph'),
+            model_name="node",
+            constraint=models.UniqueConstraint(fields=("alias", "graph"), name="unique_alias_graph"),
         ),
         migrations.RunSQL(
             """
@@ -63,5 +63,5 @@ class Migration(migrations.Migration):
             FROM alias_table
             WHERE nodes.nodeid = alias_table.nodeid;
             """,
-        )
+        ),
     ]
