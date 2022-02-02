@@ -1385,7 +1385,7 @@ class Graph(models.GraphModel):
 
     def create_node_alias(self, node):
         """
-        Slugifies a node's name and creates an alias for the node that is unique to its graph 
+        Slugifies a node's name and creates an alias for the node that is unique to its graph
         """
 
         with connection.cursor() as cursor:
