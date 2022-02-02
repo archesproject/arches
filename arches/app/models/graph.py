@@ -543,7 +543,7 @@ class Graph(models.GraphModel):
 
     def make_name_unique(self, name, names_to_check, suffix_delimiter="_"):
         """
-        Makes a name unique among a list of name
+        Makes a name unique among a list of names
 
         Arguments:
         name -- the name to check and modfiy to make unique in the list of "names_to_check"
@@ -1384,6 +1384,10 @@ class Graph(models.GraphModel):
                     raise GraphValidationError(message)
 
     def create_node_alias(self, node):
+        """
+        Slugifies a node's name and creates an alias for the node that is unique to it's graph 
+        """
+
         with connection.cursor() as cursor:
             cursor.callproc('__arches_slugify', [node.name])
             row = cursor.fetchone()
