@@ -1389,7 +1389,7 @@ class Graph(models.GraphModel):
         """
 
         with connection.cursor() as cursor:
-            cursor.callproc('__arches_slugify', [node.name])
+            cursor.callproc("__arches_slugify", [node.name])
             row = cursor.fetchone()
             aliases = [n.alias for n in self.nodes.values() if node.alias != n.alias]
             node.alias = self.make_name_unique(row[0], aliases, "_n")
