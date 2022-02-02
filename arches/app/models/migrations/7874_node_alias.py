@@ -26,8 +26,8 @@ class Migration(migrations.Migration):
             If the slugified node name is unique to the graph, the alias is the slugified node name. 
             However if the slugified node name occurs more than once in a graph, the first occurance of the name is the slugified node name.
             Each following occurance is the slugified node name with the ordinal ranking appended to it. 
-            For example, if there are three nodes named language within a graph, the aliases would be language, language_1, and language_2. 
-            If another graph were to have four nodes named language, those nodes would be language, language_1, language_2, language_3
+            For example, if there are three nodes named language within a graph, the aliases would be language, language_n1, and language_n2. 
+            If another graph were to have four nodes named language, those nodes would be language, language_n1, language_n2, language_n3
             */
 
             WITH alias_table AS (
