@@ -30,26 +30,37 @@ class LabelBasedNode(object):
 
         return is_empty
 
-    def as_json(self, compact=False, include_empty_nodes=True):
+    def as_json(self, compact=False, include_empty_nodes=True, include_hidden_nodes=True):
         display_data = {}
 
+        if not include_hidden_nodes:
+            card = models.CardModel.objects.filter(nodegroup_id=self.node_id).first()
+            try:
+                if not card.visible:
+                    return None
+            except AttributeError:
+                pass
+
         for child_node in self.child_nodes:
-            formatted_node = child_node.as_json(compact=compact, include_empty_nodes=include_empty_nodes)
+            formatted_node = child_node.as_json(
+                compact=compact, include_empty_nodes=include_empty_nodes, include_hidden_nodes=include_hidden_nodes
+            )
 
-            formatted_node_name, formatted_node_value = formatted_node.popitem()
+            if formatted_node is not None:
+                formatted_node_name, formatted_node_value = formatted_node.popitem()
 
-            if include_empty_nodes or not child_node.is_empty():
-                previous_val = display_data.get(formatted_node_name)
-                cardinality = child_node.cardinality
+                if include_empty_nodes or not child_node.is_empty():
+                    previous_val = display_data.get(formatted_node_name)
+                    cardinality = child_node.cardinality
 
-                # let's handle multiple identical node names
-                if not previous_val:
-                    should_create_new_array = cardinality == "n" and self.tile_id != child_node.tile_id
-                    display_data[formatted_node_name] = [formatted_node_value] if should_create_new_array else formatted_node_value
-                elif isinstance(previous_val, list):
-                    display_data[formatted_node_name].append(formatted_node_value)
-                else:
-                    display_data[formatted_node_name] = [previous_val, formatted_node_value]
+                    # let's handle multiple identical node names
+                    if not previous_val:
+                        should_create_new_array = cardinality == "n" and self.tile_id != child_node.tile_id
+                        display_data[formatted_node_name] = [formatted_node_value] if should_create_new_array else formatted_node_value
+                    elif isinstance(previous_val, list):
+                        display_data[formatted_node_name].append(formatted_node_value)
+                    else:
+                        display_data[formatted_node_name] = [previous_val, formatted_node_value]
 
         if compact and display_data:
             if self.value is not NON_DATA_COLLECTING_NODE:
@@ -133,7 +144,16 @@ class LabelBasedGraph(object):
 
     @classmethod
     def from_resource(
-        cls, resource, datatype_factory=None, node_cache=None, compact=False, hide_empty_nodes=False, as_json=True, user=None, perm=None
+        cls,
+        resource,
+        datatype_factory=None,
+        node_cache=None,
+        compact=False,
+        hide_empty_nodes=False,
+        as_json=True,
+        user=None,
+        perm=None,
+        hide_hidden_nodes=False,
     ):
         """
         Generates a label-based graph from a given resource
@@ -170,7 +190,9 @@ class LabelBasedGraph(object):
                 root_label_based_node.child_nodes.append(label_based_graph)
 
         if as_json:
-            root_label_based_node_json = root_label_based_node.as_json(compact=compact, include_empty_nodes=bool(not hide_empty_nodes))
+            root_label_based_node_json = root_label_based_node.as_json(
+                compact=compact, include_empty_nodes=bool(not hide_empty_nodes), include_hidden_nodes=bool(not hide_hidden_nodes)
+            )
 
             _dummy_resource_name, resource_graph = root_label_based_node_json.popitem()
 
