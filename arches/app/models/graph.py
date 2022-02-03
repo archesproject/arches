@@ -125,18 +125,27 @@ class Graph(models.GraphModel):
                 if not has_deferred_args and self.publication and self.publication.serialized_graph:
                     self.serialized_graph = self.serialize()  # reads from graph_publication table and returns serialized graph as dict
 
-                    nodes = models.Node.objects.filter(pk__in=[node_dict["nodeid"] for node_dict in self.serialized_graph["nodes"]])
-                    cards = models.CardModel.objects.filter(pk__in=[card_dict["cardid"] for card_dict in self.serialized_graph["cards"]])
-                    edges = models.Edge.objects.filter(pk__in=[edge_dict["edgeid"] for edge_dict in self.serialized_graph["edges"]])
+                    # filter out keys from the serialized_graph that would cause an error on instantiation
+                    node_slugs = []
+                    for node_dict in self.serialized_graph["nodes"]:
+                        node_slugs.append({
+                            key: value for key, value in node_dict.items() if key not in [ 'is_collector', 'parentproperty' ]
+                        })
+
+                    # filter out keys from the serialized_graph that would cause an error on instantiation
+                    card_slugs = []
+                    for card_dict in self.serialized_graph["cards"]:
+                        card_slugs.append({
+                            key: value for key, value in card_dict.items() if key not in [ 'constraints', 'is_editable' ]
+                        })
+
+                    nodes = [ models.Node(**node_slug) for node_slug in node_slugs ]
+                    cards = [ models.CardModel(**card_slug) for card_slug in card_slugs ]
+                    edges = [ models.Edge(**edge_dict) for edge_dict in self.serialized_graph["edges"] ]
+                    card_x_node_x_widgets = [ models.CardXNodeXWidget(**card_x_node_x_widget_dict) for card_x_node_x_widget_dict in self.serialized_graph["widgets"] ]
 
                     edge_lookup = {edge["edgeid"]: edge for edge in self.serialized_graph["edges"]}
-
-                    self.widgets = {
-                        widget.pk: widget
-                        for widget in models.CardXNodeXWidget.objects.filter(
-                            pk__in=[widget_dict["id"] for widget_dict in self.serialized_graph["widgets"]]
-                        )
-                    }
+                    self.widgets = { widget.pk: widget for widget in card_x_node_x_widgets }
                 else:
                     nodes = self.node_set.all()
                     edges = self.edge_set.all()
@@ -1187,9 +1196,7 @@ class Graph(models.GraphModel):
 
         """
         if self.serialized_graph:
-            return models.NodeGroup.objects.filter(
-                pk__in=[nodegroup_dict["nodegroupid"] for nodegroup_dict in self.serialized_graph["nodegroups"]]
-            )
+            return [models.NodeGroup(**nodegroup_dict) for nodegroup_dict in self.serialized_graph["nodegroups"]]
         else:
             nodegroups = set()
             for node in self.nodes.values():

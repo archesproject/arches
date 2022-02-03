@@ -24,7 +24,6 @@ from distutils.util import strtobool
 from django.core.exceptions import ObjectDoesNotExist, PermissionDenied
 from django.contrib.auth.models import User, Group, Permission
 from django.db import transaction
-from django.db.models.signals import pre_save
 from django.forms.models import model_to_dict
 from django.http import HttpResponseNotFound
 from django.http import HttpResponse
@@ -217,10 +216,7 @@ class ResourceEditorView(MapBaseManagerView):
         if serialized_graph:
             serialized_cards = serialized_graph["cards"]
             cardwidgets = [
-                widget
-                for widget in models.CardXNodeXWidget.objects.filter(
-                    pk__in=[widget_dict["id"] for widget_dict in serialized_graph["widgets"]]
-                )
+                models.CardXNodeXWidget(**card_x_node_x_widget_dict) for card_x_node_x_widget_dict in serialized_graph["widgets"]
             ]
         else:
             cards = graph.cardmodel_set.order_by("sortorder").filter(nodegroup__in=nodegroups).prefetch_related("cardxnodexwidget_set")
