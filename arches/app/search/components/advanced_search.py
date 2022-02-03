@@ -69,10 +69,9 @@ class AdvancedSearch(BaseSearchFilter):
             issearchable=True,
         )
 
-        resource_cards = models.CardModel.objects.filter(
-            graph__isresource=True, 
-            graph__publication__isnull=False
-        ).select_related("nodegroup")
+        resource_cards = models.CardModel.objects.filter(graph__isresource=True, graph__publication__isnull=False).select_related(
+            "nodegroup"
+        )
         cardwidgets = models.CardXNodeXWidget.objects.filter(node__in=searchable_nodes)
         datatypes = models.DDataType.objects.all()
 
