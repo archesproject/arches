@@ -762,10 +762,23 @@ input[type="checkbox"] {
     padding: 8px 15px;
 }
 
-.tabbed-workflow-title-bar .btn:focus,
-.tabbed-workflow-footer .btn:focus {
-    border: 1px dashed rgba(255, 255, 255, 0.6);
+.tabbed-workflow-title-bar .btn-primary:focus,
+.tabbed-workflow-footer .btn-primary:focus {
+    background-color: #265a88;
+    background-position: 0 -15px;
 }
+
+.tabbed-workflow-title-bar .btn-success:focus,
+.tabbed-workflow-footer .btn-success:focus {
+    background-color: #419641;
+    background-position: 0 -15px;
+}
+
+.tabbed-workflow-title-bar .btn-danger:focus,
+.tabbed-workflow-footer .btn-danger:focus {
+    background-color: #c12e2a;
+    background-position: 0 -15px;
+}  
 
 .tabbed-workflow-title-bar .btn>i,
 .tabbed-workflow-title-bar .btn>span,
