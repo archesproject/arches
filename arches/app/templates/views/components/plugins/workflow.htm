@@ -22,7 +22,6 @@
                 <button 
                     data-bind="click: finishWorkflow"
                     class="btn btn-success"
-                    tabindex="0"
                 >
                 <i class="fa fa-check"></i>
                 <span>
@@ -33,7 +32,6 @@
                 <button 
                     data-bind="click: quitWorkflow" 
                     class="btn btn-danger"
-                    tabindex="0"
                 >
                     <i class=" ion-android-cancel"></i>
                     <span>
@@ -135,7 +133,6 @@
                 <button 
                     class="btn btn-primary"
                     data-bind="click: back"
-                    tabindex="0"
                 >
                     <i class="fa fa-caret-left"></i>
                     <span>
@@ -153,7 +150,6 @@
                             },
                             click: activeStep().undo
                         }"
-                        tabindex="0"
                     >
                         <i class="fa fa-undo"></i>
                         <span>
@@ -167,7 +163,6 @@
                         data-bind="
                             click: $data.saveActiveStep
                         "
-                        tabindex="0"
                     >
                         <i class="ion-android-cloud-done"></i>
                         <span>
@@ -186,7 +181,6 @@
                                     disabled: activeStep().required() && !activeStep().complete(),
                                 }
                             "
-                            tabindex="0"
                         >
                             <span>
                                 {% trans  "Next Step" %}
@@ -206,7 +200,6 @@
                                 disabled: activeStep().required() && !activeStep().complete(),
                             }
                         "
-                        tabindex="0"
                     >
                         <span>
                             {% trans  "Next Step" %}
