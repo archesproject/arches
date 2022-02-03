@@ -9,7 +9,7 @@ import django.db.models.deletion
 class Migration(migrations.Migration):
 
     dependencies = [
-        ("models", "8085_relational_data_model_handle_dates"),
+        ("models", "7128_resource_instance_filter"),
     ]
 
     def forwards_add_graph_transactions_table_data(apps, schema_editor):
