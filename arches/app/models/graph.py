@@ -1308,13 +1308,13 @@ class Graph(models.GraphModel):
         exclude = [] if exclude is None else exclude
 
         if self.publication and not force_recalculation:
-            serialized_graph = self.publication.serialized_graph  # changes from string to dict
+            deserialized_graph = JSONDeserializer().deserialize(self.publication.serialized_graph)
 
             for key in exclude:
-                if serialized_graph.get(key) is not None:  # explicit None comparison so falsey values will still return
-                    serialized_graph[key] = None
+                if deserialized_graph.get(key) is not None:  # explicit None comparison so falsey values will still return
+                    deserialized_graph[key] = None
 
-            return serialized_graph
+            return deserialized_graph
         else:
             ret = JSONSerializer().handle_model(self, fields, exclude)
             ret["root"] = self.root
