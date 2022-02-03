@@ -4,7 +4,7 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ("models", "7784_add_serialized_graph_to_graph_publications"),
+        ("models", "7128_resource_instance_filter"),
     ]
 
     operations = [
