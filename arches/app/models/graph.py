@@ -128,24 +128,23 @@ class Graph(models.GraphModel):
                     # filter out keys from the serialized_graph that would cause an error on instantiation
                     node_slugs = []
                     for node_dict in self.serialized_graph["nodes"]:
-                        node_slugs.append({
-                            key: value for key, value in node_dict.items() if key not in [ 'is_collector', 'parentproperty' ]
-                        })
+                        node_slugs.append({key: value for key, value in node_dict.items() if key not in ["is_collector", "parentproperty"]})
 
                     # filter out keys from the serialized_graph that would cause an error on instantiation
                     card_slugs = []
                     for card_dict in self.serialized_graph["cards"]:
-                        card_slugs.append({
-                            key: value for key, value in card_dict.items() if key not in [ 'constraints', 'is_editable' ]
-                        })
+                        card_slugs.append({key: value for key, value in card_dict.items() if key not in ["constraints", "is_editable"]})
 
-                    nodes = [ models.Node(**node_slug) for node_slug in node_slugs ]
-                    cards = [ models.CardModel(**card_slug) for card_slug in card_slugs ]
-                    edges = [ models.Edge(**edge_dict) for edge_dict in self.serialized_graph["edges"] ]
-                    card_x_node_x_widgets = [ models.CardXNodeXWidget(**card_x_node_x_widget_dict) for card_x_node_x_widget_dict in self.serialized_graph["widgets"] ]
+                    nodes = [models.Node(**node_slug) for node_slug in node_slugs]
+                    cards = [models.CardModel(**card_slug) for card_slug in card_slugs]
+                    edges = [models.Edge(**edge_dict) for edge_dict in self.serialized_graph["edges"]]
+                    card_x_node_x_widgets = [
+                        models.CardXNodeXWidget(**card_x_node_x_widget_dict)
+                        for card_x_node_x_widget_dict in self.serialized_graph["widgets"]
+                    ]
 
                     edge_lookup = {edge["edgeid"]: edge for edge in self.serialized_graph["edges"]}
-                    self.widgets = { widget.pk: widget for widget in card_x_node_x_widgets }
+                    self.widgets = {widget.pk: widget for widget in card_x_node_x_widgets}
                 else:
                     nodes = self.node_set.all()
                     edges = self.edge_set.all()
