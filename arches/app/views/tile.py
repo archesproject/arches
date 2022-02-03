@@ -150,6 +150,9 @@ class TileData(View):
                                     except PublishedModelError as e:
                                         message = _("Unable to save. Please verify the model is not currently published.")
                                         return JSONResponse({"status": "false", "message": [_(e.title), _(str(message))]}, status=500)
+                                    except Exception as e:
+                                        title = _("Unable to save.")
+                                        return self.handle_save_error(e, tile_id, title=title, message=str(e))
                                 else:
                                     if accepted_provisional is not None:
                                         provisional_editor = User.objects.get(pk=accepted_provisional_edit["user"])
