@@ -67,7 +67,7 @@ define([
                     _.each(graphs, function(graph) {
                         if (
                             graph.isresource 
-                            && graph.publication
+                            && graph.publication_id
                         ) {
                             var graphCards = _.filter(response.cards, function(card) {
                                 return card.graph_id === graph.graphid && card.nodes.length > 0;
