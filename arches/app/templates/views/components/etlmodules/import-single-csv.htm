@@ -1,7 +1,7 @@
 {% load i18n %}
 <!-- ko ifnot: loading() -->
 <!-- ko ifnot: fileAdded() -->
-<div data-bind="dropzone: dropzoneOptions" class="file-select loader-select" style="height: 100%;">
+<div data-bind="dropzone: dropzoneOptions" class="file-select loader-select" style="height: 100%; width: 100%">
     <div>
         <div class="manifest-manager-main-menu-circle loader-button">
             <span><i style="color: #000" class="fa fa-cloud-upload r-select-icon"></i></span>
@@ -12,10 +12,10 @@
             <div style="display:flex; flex-direction: column;">
                 <div>
                     <div class="dropzone-photo-upload">
-                        <div style="border-top: 1px solid #c4c4c4; margin-bottom: 15px;" class="btn btn-rr btn-labeled btn-lg fa fa-image fileinput-button dz-clickable" data-bind="css: uniqueidClass" role="button">
+                        <div style="border-top: 1px solid #c4c4c4; margin-bottom: 15px;" class="btn btn-primary btn-labeled btn-lg fa fa-file fileinput-button dz-clickable" data-bind="css: uniqueidClass" role="button">
                         {% trans 'Select File' %}
                         </div>
-                        <div style="border-top: 1px solid #c4c4c4; margin-bottom: 15px;" class="btn btn-rr btn-labeled btn-lg fa fa-image" data-bind="click: function() { $parent.selectedModule(null) }" role="button">
+                        <div style="border-top: 1px solid #c4c4c4; margin-bottom: 15px;" class="btn btn-danger btn-labeled btn-lg fa fa-times-circle" data-bind="click: function() { $parent.selectedModule(null) }" role="button">
                             {% trans 'Cancel File Import' %}
                         </div>
                         <div style="min-height: 100%;">
@@ -33,22 +33,30 @@
 <!-- /ko -->
 
 <!-- ko if: fileAdded() -->
-<div class="etl-module-writer-container" style="display: inline-flex; flex-direction: column; padding-bottom: 25px;">
-    <div class="etl-module-preview-container" style="display: inline-flex; flex-direction: row; padding-bottom: 25px;">
-        <div class="etl-module-mapping">
+<div class="etl-module-writer-container" style="display: inline-flex; flex-direction: column;">
+    <div class="etl-module-preview-container" style="display: inline-flex; flex-direction: row;">
+        <div class="etl-module-mapping" style="height: calc(100vh - 50px); width: 400px; padding: 25px; overflow: scroll;" data-bind="resizableSidepanel:true">
             <h3>{% trans "Format: Single .csv File Import" %}</h3>
 
             <div class="etl-module-mapping">
                 <h4>{% trans "Target Model" %}</h4>
-                <select data-bind="value: selectedGraph, options: graphs, optionsText: 'name', optionsValue: 'graphid', optionsCaption: '{% trans "Select a Resource Model..." %}', valueAllowUnset: true, chosen: {disable_search_threshold: 10, width: '100%'}"></select>
+                <select data-bind="
+                    value: selectedGraph,
+                    options: graphs,
+                    optionsText: 'name',
+                    optionsValue: 'graphid',
+                    optionsCaption: '{% trans "Select a Resource Model..." %}',
+                    valueAllowUnset: true,
+                    chosen: {width: '100%'}"
+                ></select>
             </div>
 
             <h4>{% trans "Import Details" %}</h4>
             <label class="form-checkbox form-normal form-primary" style="padding-left: 25px; padding-top: 3px;">
                 <input type="checkbox" data-bind="checked: hasHeaders">{% trans "Column names in the first row" %}
             </label>
-            <div class="aher-table">
-                <table class="table table-striped" cellspacing="0" width="100%">
+            <div class="etl-table">
+                <table class="table table-striped" style="margin-top: 25px; border: 1px solid rgba(0,0,0,0.14)">
                     <thead>
                         <tr>
                             <th>{% trans "Copy From" %}</th>
@@ -70,18 +78,18 @@
                 </table>
             </div>
         </div>
-        <div class="etl-module-preview" style="width: 100%">
+        <div class="etl-module-preview" style="height: calc(100vh - 50px); width: calc(100vw - 400px); padding: 25px; overflow: scroll;">
             <h3>{% trans "Data Preview" %}</h3>
-            <div>
+            <div class="etl-module-info" style="font-size: 10pt;">
                 <div data-bind="text: fileInfo().name"></div>
             </div>                
-            <div>
+            <div class="etl-module-info" style="font-size: 10pt;">
                 <h3>{% trans "File Info" %}</h3>
                 <div data-bind="html: '{% trans "File Size: " %}' + formatSize(fileInfo().size)"></div>
                 <div data-bind="text: '{% trans "Number of Row: " %}' + numberOfRow()"></div>
             </div>
-            <div class="aher-table">
-                <table class="table table-striped" cellspacing="0" width="90%">
+            <div class="etl-table">
+                <table class="table table-striped" style="margin-top: 25px; border: 1px solid rgba(0,0,0,0.14)" width="100%">
                     <thead>
                         <tr>
                             <!-- ko foreach: headers -->
@@ -106,24 +114,24 @@
                 <div data-bind="text: '{% trans 'Showing All ' %}' + csvExample().length + '{% trans ' Rows' %}'"></div>
                 <!-- /ko -->
             </div>
+            <div class="etl-module-buttons" style="display: inline-flex; flex-direction:row; justify-content: flex-end; margin-top: 25px;">
+                <button data-bind="click: function () { fileAdded(false); }" class="btn btn-primary" style="margin-right: 10px;">
+                    <span>{% trans "Remove File" %}</span>
+                </button>
+                <button data-bind="click: changeFormat()" class="btn btn-primary" style="margin-right: 10px;">
+                    <span>{% trans "Select a different format" %}</span>
+                </button>
+                <button data-bind="click: validate()" class="btn btn-success" style="margin-right: 10px;">
+                    <span>{% trans "Validate data before import" %}</span>
+                </button>
+                <button data-bind="click: write()" class="btn btn-success" style="margin-right: 10px;">
+                    <span>{% trans "Import data" %}</span>
+                </button>
+                <button data-bind="click: function () { $parent.selectedModule(null); }" class="btn btn-danger" style="margin-right: 10px;">
+                    <span>{% trans "Cancel File Import" %}</span>
+                </button>
+            </div>    
         </div>
-    </div>
-    <div class="etl-module-buttons" style="width: 100%">
-        <button data-bind="click: function () { fileAdded(false); }" class="btn btn-primary">
-            <span>{% trans "Remove File" %}</span>
-        </button>
-        <button data-bind="click: changeFormat()" class="btn btn-primary">
-            <span>{% trans "Select a different format" %}</span>
-        </button>
-        <button data-bind="click: validate()" class="btn btn-success">
-            <span>{% trans "Validate data before import" %}</span>
-        </button>
-        <button data-bind="click: write()" class="btn btn-success">
-            <span>{% trans "Import data" %}</span>
-        </button>
-        <button data-bind="click: function () { $parent.selectedModule(null); }" class="btn btn-danger">
-            <span>{% trans "Cancel File Import" %}</span>
-        </button>
     </div>
 </div>
 <!-- /ko -->
