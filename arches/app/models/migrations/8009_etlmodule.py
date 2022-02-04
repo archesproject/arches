@@ -58,30 +58,44 @@ remove_csv_importer = """
     delete from etl_modules where etlmoduleid = '0a0cea7e-b59a-431a-93d8-e9f8c41bdd6b';
     """
 
+
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('models', '7128_resource_instance_filter'),
+        ("models", "7128_resource_instance_filter"),
     ]
 
     operations = [
         migrations.CreateModel(
-            name='ETLModule',
+            name="ETLModule",
             fields=[
-                ('etlmoduleid', models.UUIDField(default=uuid.uuid1, primary_key=True, serialize=False)),
-                ('name', models.TextField()),
-                ('description', models.TextField(blank=True, null=True)),
-                ('component', models.TextField()),
-                ('componentname', models.TextField()),
-                ('modulename', models.TextField(blank=True, null=True)),
-                ('classname', models.TextField(blank=True, null=True)),
-                ('config', django.contrib.postgres.fields.jsonb.JSONField(blank=True, db_column='config', null=True)),
-                ('icon', models.TextField()),
-                ('slug', models.TextField(null=True, unique=True, validators=[django.core.validators.RegexValidator(re.compile('^[-a-zA-Z0-9_]+\\Z'), "Enter a valid 'slug' consisting of letters, numbers, underscores or hyphens.", 'invalid')])),
+                ("etlmoduleid", models.UUIDField(default=uuid.uuid1, primary_key=True, serialize=False)),
+                ("name", models.TextField()),
+                ("description", models.TextField(blank=True, null=True)),
+                ("component", models.TextField()),
+                ("componentname", models.TextField()),
+                ("modulename", models.TextField(blank=True, null=True)),
+                ("classname", models.TextField(blank=True, null=True)),
+                ("config", django.contrib.postgres.fields.jsonb.JSONField(blank=True, db_column="config", null=True)),
+                ("icon", models.TextField()),
+                (
+                    "slug",
+                    models.TextField(
+                        null=True,
+                        unique=True,
+                        validators=[
+                            django.core.validators.RegexValidator(
+                                re.compile("^[-a-zA-Z0-9_]+\\Z"),
+                                "Enter a valid 'slug' consisting of letters, numbers, underscores or hyphens.",
+                                "invalid",
+                            )
+                        ],
+                    ),
+                ),
             ],
             options={
-                'db_table': 'etl_modules',
-                'managed': True,
+                "db_table": "etl_modules",
+                "managed": True,
             },
         ),
         migrations.RunSQL(

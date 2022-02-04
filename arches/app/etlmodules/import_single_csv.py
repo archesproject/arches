@@ -13,25 +13,33 @@ from arches.app.utils.response import JSONResponse
 
 logger = logging.getLogger(__name__)
 
+
 class ImportSingleCsv:
     def __init__(self, request=None):
         self.request = request
 
     def get_graphs(self, request):
         print("getting graphs")
-        graphs = GraphModel.objects.all().exclude(pk=settings.SYSTEM_SETTINGS_RESOURCE_MODEL_ID).exclude(isresource=False).exclude(isactive=False).order_by(Lower('name'))
+        graphs = (
+            GraphModel.objects.all()
+            .exclude(pk=settings.SYSTEM_SETTINGS_RESOURCE_MODEL_ID)
+            .exclude(isresource=False)
+            .exclude(isactive=False)
+            .order_by(Lower("name"))
+        )
         return graphs
 
     def get_nodes(self, request):
         """
         Only returing nodes that belong to the top cards at the moment
         """
+
         def is_top_nodegroup(nodegroupid):
             return NodeGroup.objects.get(nodegroupid=nodegroupid).parentnodegroup == None
 
         print("getting top nodes")
-        graphid = request.POST.get('graphid')
-        nodes = Node.objects.filter(graph_id=graphid).exclude(datatype__in=['semantic']).order_by(Lower('name'))
+        graphid = request.POST.get("graphid")
+        nodes = Node.objects.filter(graph_id=graphid).exclude(datatype__in=["semantic"]).order_by(Lower("name"))
         filteredNodes = []
         for node in nodes:
             if is_top_nodegroup(node.nodegroup_id):
@@ -45,9 +53,9 @@ class ImportSingleCsv:
         Returns the reader object to display in a mapper && in a preview display
         """
         print("reading")
-        file = request.FILES.get('file')
-        csvfile = file.read().decode('utf-8')
-        reader = csv.reader(io.StringIO(csvfile)) # returns iterator
+        file = request.FILES.get("file")
+        csvfile = file.read().decode("utf-8")
+        reader = csv.reader(io.StringIO(csvfile))  # returns iterator
         data = [line for line in reader]
         return data
 
@@ -64,7 +72,7 @@ class ImportSingleCsv:
         except:
             success = False
             message = "There was an error"
-        return JSONResponse({'success': False, 'message': message })
+        return JSONResponse({"success": False, "message": message})
 
     def write(self, request):
         """
@@ -73,12 +81,12 @@ class ImportSingleCsv:
         Must be a transaction
         Will sys.exit() work for stop in the middle of importing?
         """
-        print("writing")        
-        file = request.FILES.get('file')
-        header = request.POST.get('header')
-        graphid = request.POST.get('graphid')
-        fieldnames = request.POST.get('fieldnames').split(',')
-        csvfile = file.read().decode('utf-8')
+        print("writing")
+        file = request.FILES.get("file")
+        header = request.POST.get("header")
+        graphid = request.POST.get("graphid")
+        fieldnames = request.POST.get("fieldnames").split(",")
+        csvfile = file.read().decode("utf-8")
         reader = csv.DictReader(io.StringIO(csvfile), fieldnames=fieldnames)
         if header:
             next(reader)
@@ -97,10 +105,10 @@ class ImportSingleCsv:
             for key in row:
                 nodegroupid = str(Node.objects.get(nodeid=key).nodegroup_id)
                 if nodegroupid in dict_by_nodegroup:
-                    dict_by_nodegroup[nodegroupid].append({key:row[key]}) # data structure here is weird thus line 105
+                    dict_by_nodegroup[nodegroupid].append({key: row[key]})  # data structure here is weird thus line 105
                 else:
-                    dict_by_nodegroup[nodegroupid] = [{key:row[key]}]
-        
+                    dict_by_nodegroup[nodegroupid] = [{key: row[key]}]
+
             for nodegroup in dict_by_nodegroup:
                 tile = Tile.get_blank_tile_from_nodegroup_id(nodegroup)
                 tile.resourceinstance_id = resource.pk
@@ -109,4 +117,4 @@ class ImportSingleCsv:
                         tile.data[key] = node[key]
                 tile.save()
 
-        return True # what would be the right thing to return
+        return True  # what would be the right thing to return
