@@ -5,25 +5,25 @@ define([
 ], function(ko, arches) {
     return ko.components.register('etl-manager', {
         viewModel: function(params) {
-            self = this;
+            var self = this;
             this.loading = params.loading;
             this.loading(true);
             this.selectedModule = ko.observable();
 
             this.init = function(){
                 window.fetch(arches.urls.etl_manager)
-                .then(function(response){
-                    if(response.ok){
-                        return response.json();
-                    }
-                })
-                .then(function(data){
-                    self.etlmodules = data.map(function(etl){
-                        etl.config.loading = self.loading;
-                        return etl;
+                    .then(function(response){
+                        if(response.ok){
+                            return response.json();
+                        }
+                    })
+                    .then(function(data){
+                        self.etlmodules = data.map(function(etl){
+                            etl.config.loading = self.loading;
+                            return etl;
+                        });
+                        self.loading(false);
                     });
-                    self.loading(false);
-                })
             };
 
             this.init();

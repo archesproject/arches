@@ -35,7 +35,7 @@ class ImportSingleCsv:
         """
 
         def is_top_nodegroup(nodegroupid):
-            return NodeGroup.objects.get(nodegroupid=nodegroupid).parentnodegroup == None
+            return NodeGroup.objects.get(nodegroupid=nodegroupid).parentnodegroup is None
 
         print("getting top nodes")
         graphid = request.POST.get("graphid")

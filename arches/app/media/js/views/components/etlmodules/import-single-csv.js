@@ -57,9 +57,9 @@ define([
                     self.headers(self.csvArray()[0]);
                     self.csvBody(self.csvArray().slice(1));
                 } else {
-                    self.headers(Array.apply(0, Array(self.csvArray()[0].length)).map(function(_,b) { return b + 1; }))
+                    self.headers(Array.apply(0, Array(self.csvArray()[0].length)).map(function(_,b) { return b + 1; }));
                     self.csvBody(self.csvArray());
-                };
+                }
             });
 
             this.headers.subscribe(function(headers){
@@ -69,10 +69,10 @@ define([
                             return {
                                 field: header,
                                 node: ko.observable(),
-                            }
+                            };
                         })
-                    )
-                    console.log(self.fieldMapping())    
+                    );
+                    console.log(self.fieldMapping());
                 }
             });
 
@@ -116,7 +116,7 @@ define([
                     self.loading(true);
                     self.formData.append('graphid', graph);
                     self.submit('get_nodes').then(function(response){
-                        self.nodes(response.result)
+                        self.nodes(response.result);
                         self.loading(false);
                     });    
                 }
@@ -132,17 +132,17 @@ define([
                 //         return response.json;
                 //     }
                 // }).then(function(response){
-                    self.csvArray(response.result)
+                    self.csvArray(response.result);
                     self.fileAdded(true);
-                    self.loading(false);;
+                    self.loading(false);
                 }).catch(function(err) {
                     console.log(err);
                     self.loading(false);
-                })
+                });
             };
 
             this.write = function(){
-                fieldnames = koMapping.toJS(self.fieldMapping).map(fieldname => {return fieldname.node});
+                const fieldnames = koMapping.toJS(self.fieldMapping).map(fieldname => {return fieldname.node;});
                 self.formData.append('fieldnames', fieldnames);
                 self.formData.append('header', self.headers());
                 self.formData.append('graphid', self.selectedGraph());
@@ -160,7 +160,7 @@ define([
             this.submit = function(action) {
                 self.formData.append('action', action);
                 self.formData.append('transaction_id', self.transaction_id);
-                self.formData.append('module','import-single-csv')
+                self.formData.append('module','import-single-csv');
                 return $.ajax({
                     type: "POST",
                     url: arches.urls.etl_manager,
@@ -198,7 +198,7 @@ define([
             };
             this.init = function(){
                 this.getGraphs();
-            }
+            };
 
             this.init();
         },
