@@ -11,13 +11,13 @@ define([
 ], function(ko, koMapping, $, dropzone, uuid, arches) {
     return ko.components.register('import-single-csv', {
         viewModel: function(params) {
-            self = this;
+            var self = this;
             this.loading = params.loading;
             this.loading(true);
             this.graphs = ko.observable();
             this.selectedGraph = ko.observable();
             this.nodes = ko.observable();
-            this.selectedNode = ko.observable();
+            // this.selectedNode = ko.observable();
             this.fileInfo = ko.observable({name:"", size:""});
             this.hasHeaders = ko.observable(true);
             this.csvArray = ko.observable();
@@ -106,6 +106,7 @@ define([
                 self.loading(true);
                 self.submit('get_graphs').then(function(response){
                     self.graphs(response.result);
+                    self.selectedGraph(self.graphs()[0].graphid);
                     self.loading(false);
                 });
             };
