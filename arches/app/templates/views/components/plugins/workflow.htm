@@ -161,11 +161,7 @@
                     <button
                         class="btn btn-success"
                         data-bind="
-                            click: function() {
-                                $data.saveActiveStep().then(function() {
-                                    $data.next();
-                                });
-                            },
+                            click: $data.saveActiveStep
                         "
                     >
                         <i class="ion-android-cloud-done"></i>
