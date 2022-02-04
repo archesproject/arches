@@ -143,6 +143,8 @@ define([
             this.write = function(){
                 fieldnames = koMapping.toJS(self.fieldMapping).map(fieldname => {return fieldname.node});
                 self.formData.append('fieldnames', fieldnames);
+                self.formData.append('header', self.headers());
+                self.formData.append('graphid', self.selectedGraph());
                 self.submit('write');
             };
 

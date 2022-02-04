@@ -69,7 +69,15 @@
                             <td data-bind="text: mapping.field"></td>
                             <!-- ko if: nodes() -->
                             <td>
-                                <select data-bind="value: mapping.node, options: nodes, optionsText: 'name', optionsCaption: '{% trans "Select a Node..." %}', optionsValue: 'nodeid', valueAllowUnset: true, chosen: {disable_search_threshold: 10, width: '100%'}"></select>
+                                <select data-bind="
+                                    value: mapping.node,
+                                    options: nodes,
+                                    optionsText: 'name',
+                                    optionsCaption: '{% trans "Select a Node..." %}',
+                                    optionsValue: 'nodeid',
+                                    valueAllowUnset: true,
+                                    chosen: {width: '100%'}"
+                                ></select>
                             </td>
                             <!-- /ko -->
                         </tr>
@@ -81,10 +89,8 @@
         <div class="etl-module-preview" style="height: calc(100vh - 50px); width: calc(100vw - 400px); padding: 25px; overflow: scroll;">
             <h3>{% trans "Data Preview" %}</h3>
             <div class="etl-module-info" style="font-size: 10pt;">
-                <div data-bind="text: fileInfo().name"></div>
-            </div>                
-            <div class="etl-module-info" style="font-size: 10pt;">
                 <h3>{% trans "File Info" %}</h3>
+                <div data-bind="text: fileInfo().name"></div>
                 <div data-bind="html: '{% trans "File Size: " %}' + formatSize(fileInfo().size)"></div>
                 <div data-bind="text: '{% trans "Number of Row: " %}' + numberOfRow()"></div>
             </div>
