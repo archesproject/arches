@@ -150,7 +150,7 @@ def get_graphs_for_export(graphids=None):
         del resource_graph["functions"]
         del resource_graph["domain_connections"]
         resource_graph["cards_x_nodes_x_widgets"] = JSONSerializer().serializeToPython(
-            get_card_x_node_x_widget_data_for_export(resource_graph)
+            get_card_x_node_x_widget_data_for_export(resource_graph), use_raw_i18n_json=True
         )
         resource_graph["resource_2_resource_constraints"] = JSONSerializer().serializeToPython(r2r_constraints_for_export(resource_graph))
         graphs["graph"].append(resource_graph)
