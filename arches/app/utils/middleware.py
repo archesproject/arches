@@ -4,7 +4,6 @@ from django.http import HttpResponse
 from django.contrib.auth.models import User, AnonymousUser
 from django.utils.deprecation import MiddlewareMixin
 from django.utils.functional import SimpleLazyObject
-from django.utils.six import text_type
 from django.utils.translation import ugettext as _
 from arches.app.models.system_settings import settings
 from arches.app.utils.response import Http401Response
@@ -49,7 +48,7 @@ class TokenMiddleware(MiddlewareMixin):
         Hide some test client ickyness where the header can be unicode.
         """
         auth = request.META.get("HTTP_AUTHORIZATION", b"").replace("Bearer ", "")
-        if isinstance(auth, text_type):
+        if isinstance(auth, str):
             # Work around django test client oddness
             auth = auth.encode(HTTP_HEADER_ENCODING)
         return auth
