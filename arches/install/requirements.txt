@@ -1,4 +1,4 @@
-Django==2.2.24
+Django==3.2.12
 psycopg2-binary==2.8.4
 elasticsearch>=7.11.0,<8.0.0
 rdflib==4.2.2
@@ -11,7 +11,7 @@ SPARQLWrapper==1.8.5
 django-recaptcha==2.0.6
 edtf==4.0.1
 couchdb==1.2
-django-revproxy==0.9.15
+django-revproxy==0.10.0
 django-cors-headers==3.1.1
 django-oauth-toolkit==1.2.0
 python-docx==0.8.10
@@ -24,5 +24,5 @@ python-slugify==4.0.0
 pillow>=7.0.0
 arcgis2geojson==2.0.0
 openpyxl==3.0.7
-django_compressor==2.2
+django_compressor==3.1
 django-libsass==0.7
