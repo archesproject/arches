@@ -1,7 +1,8 @@
 import json
 import copy
-from django.utils.translation import gettext_lazy as _
 from arches.app.models.system_settings import settings
+from arches.app.utils import import_class_from_string
+from django.utils.translation import gettext_lazy as _
 from django.contrib.postgres.fields import JSONField
 from django.db.models.sql.compiler import SQLInsertCompiler
 from django.utils.translation import get_language
@@ -60,7 +61,7 @@ class I18n_String(object):
     def __str__(self):
         ret = None
         try:
-            ret = self.raw_value[get_language()]
+            ret = self.raw_value[self.lang]
         except KeyError as e:
             try:
                 # if you can't return the requested language because the value doesn't exist then
@@ -185,6 +186,7 @@ class I18n_JSON(object):
         self.value = value
         self.raw_value = {}
         self.i18n_properties = []
+        self.function = None
         self.lang = get_language() if lang is None else lang
 
         self._parse(self.value, self.lang, use_nulls)
@@ -204,6 +206,10 @@ class I18n_JSON(object):
 
         if "i18n_properties" in self.raw_value:
             self.i18n_properties = self.raw_value["i18n_properties"]
+        try:
+            self.function = self.raw_value["i18n_config"]["fn"]
+        except:
+            pass
 
     def as_sql(self, compiler, connection):
         """
@@ -214,21 +220,25 @@ class I18n_JSON(object):
         https://www.postgresql.org/docs/9.5/functions-json.html
         """
 
-        if len(self.i18n_properties) == 0 or isinstance(compiler, SQLInsertCompiler):
+        if (len(self.i18n_properties) == 0 and self.function is None) or isinstance(compiler, SQLInsertCompiler):
             params = [json.dumps(self.localize())]
             sql = "%s"
         else:
             params = []
-            sql = self.attname
-            for prop, value in self.raw_value.items():
-                escaped_value = json.dumps(value).replace("%", "%%")
-                if prop in self.i18n_properties and isinstance(value, str):
-                    sql = f"""CASE WHEN jsonb_typeof({self.attname}->'{prop}') = 'object'
-                    THEN jsonb_set({sql}, array['{prop}','{self.lang}'], '{escaped_value}')
-                    ELSE jsonb_set({sql}, array['{prop}'], jsonb_build_object('{self.lang}', '{escaped_value}'))
-                    END"""
-                else:
-                    sql = f"jsonb_set({sql}, array['{prop}'], '{escaped_value}')"
+            if self.function is not None:
+                clss = import_class_from_string(self.function)()
+                sql = clss.i18n_as_sql(self, compiler, connection)
+            else:
+                sql = self.attname
+                for prop, value in self.raw_value.items():
+                    escaped_value = json.dumps(value).replace("%", "%%")
+                    if prop in self.i18n_properties and isinstance(value, str):
+                        sql = f"""CASE WHEN jsonb_typeof({self.attname}->'{prop}') = 'object'
+                        THEN jsonb_set({sql}, array['{prop}','{self.lang}'], '{escaped_value}')
+                        ELSE jsonb_set({sql}, array['{prop}'], jsonb_build_object('{self.lang}', '{escaped_value}'))
+                        END"""
+                    else:
+                        sql = f"jsonb_set({sql}, array['{prop}'], '{escaped_value}')"
 
             # If all of root keys of the json object we're saving are the same as what is
             # currently in that json value stored in the db then all we do is update those
@@ -273,21 +283,32 @@ class I18n_JSON(object):
         raise AttributeError
 
     def serialize(self, use_raw_i18n_json=False, **kwargs):
-        ret = copy.deepcopy(self.raw_value)
-        if not use_raw_i18n_json and "i18n_properties" in ret:
-            for prop in ret["i18n_properties"]:
-                try:
-                    ret[prop] = str(I18n_String(ret[prop]))
-                except:
-                    pass
-        return ret
+        if use_raw_i18n_json or ("i18n_properties" not in self.raw_value and "i18n_config" not in self.raw_value):
+            return self.raw_value
+        else:
+            if self.function is not None:
+                clss = import_class_from_string(self.function)()
+                ret = clss.i18n_serialize(self)
+            else:
+                ret = copy.deepcopy(self.raw_value)
+                if not use_raw_i18n_json and "i18n_properties" in ret:
+                    for prop in ret["i18n_properties"]:
+                        try:
+                            ret[prop] = str(I18n_String(ret[prop]))
+                        except:
+                            pass
+            return ret
 
     def localize(self):
-        ret = copy.deepcopy(self.raw_value)
-        if "i18n_properties" in ret:
-            for prop in ret["i18n_properties"]:
-                if not isinstance(ret[prop], dict):
-                    ret[prop] = {self.lang: ret[prop]}
+        if self.function is not None:
+            clss = import_class_from_string(self.function)()
+            ret = clss.i18n_localize(self)
+        else:
+            ret = copy.deepcopy(self.raw_value)
+            if "i18n_properties" in ret:
+                for prop in ret["i18n_properties"]:
+                    if not isinstance(ret[prop], dict):
+                        ret[prop] = {self.lang: ret[prop]}
         return ret
 
 

@@ -1,3 +1,4 @@
+import copy
 import uuid
 import json
 import decimal
@@ -16,6 +17,7 @@ from django.db.models import fields
 from arches.app.datatypes.base import BaseDataType
 from arches.app.models import models
 from arches.app.models.system_settings import settings
+from arches.app.models.fields.i18n import I18n_JSONField, I18n_String
 from arches.app.utils.betterJSONSerializer import JSONDeserializer
 from arches.app.utils.betterJSONSerializer import JSONSerializer
 from arches.app.utils.date_utils import ExtendedDateFormat
@@ -100,9 +102,43 @@ class StringDataType(BaseDataType):
             errors.append(error_message)
         return errors
 
+    def rdf_transform(self, value):
+        default_language = models.Language.objects.get(code=get_language())
+        incoming_value = {}
+        for val in value:
+            if ("language" in val and val["language"] is not None) or ("@language" in val and val["@language"] is not None):
+                try:
+                    language_code = val["language"] if "language" in val else val["@language"]
+                    language = models.Language.objects.get(code=language_code)
+                    incoming_value = {
+                        **incoming_value,
+                        language.code: {
+                            "value": val["value"] if "value" in val else val["@value"],
+                            "direction": language.default_direction,
+                        },
+                    }
+                except models.Language.DoesNotExist:
+                    ValueError("Language does not exist in Language table - cannot create string.")
+            else:
+                incoming_value = {
+                    **incoming_value,
+                    default_language.code: {
+                        "value": val["value"] if "value" in val else val["@value"],
+                        "direction": default_language.default_direction,
+                    },
+                }
+
+        return incoming_value if len(incoming_value.keys()) > 0 else None
+
     def validate_from_rdf(self, value):
-        print(value)
-        return []
+        transformed_value = None
+        if isinstance(value, list):
+            transformed_value = self.rdf_transform(value)
+        elif isinstance(value, str):
+            transformed_value = self.rdf_transform([{"value": value}])
+        incoming_value = value if transformed_value is None else transformed_value
+
+        return self.validate(incoming_value)
 
     def clean(self, tile, nodeid):
         if tile.data[nodeid] in ["", "''"]:
@@ -185,13 +221,14 @@ class StringDataType(BaseDataType):
         return value
 
     def from_rdf(self, json_ld_node):
-        # returns the string value only
-        # FIXME: Language?
-        value = get_value_from_jsonld(json_ld_node)
-        try:
-            return {value[1]: {"value": value[0], "direction": "ltr"}}
-        except (AttributeError, KeyError) as e:
-            pass
+        transformed_value = None
+        if isinstance(json_ld_node, list):
+            transformed_value = self.rdf_transform(json_ld_node)
+        else:
+            new_value = get_value_from_jsonld(json_ld_node)
+            if new_value is not None:
+                transformed_value = self.rdf_transform([{"value": new_value[0], "language": new_value[1]}])
+        return transformed_value
 
     def get_display_value(self, tile, node):
         data = self.get_tile_data(tile)
@@ -1717,6 +1754,30 @@ class DomainDataType(BaseDomainDataType):
         except (AttributeError, KeyError, TypeError) as e:
             print(e)
 
+    def i18n_as_sql(self, i81n_json_field, compiler, connection):
+        sql = i81n_json_field.attname
+        for prop, value in i81n_json_field.raw_value.items():
+            escaped_value = json.dumps(value).replace("%", "%%")
+            if prop == "options":
+                sql = f"""
+                    __arches_i18n_update_jsonb_array('options.text', '{{"options": {escaped_value}}}', {sql}, '{i81n_json_field.lang}')
+                """
+            else:
+                sql = f"jsonb_set({sql}, array['{prop}'], '{escaped_value}')"
+        return sql
+
+    def i18n_serialize(self, i81n_json_field: I18n_JSONField):
+        ret = copy.deepcopy(i81n_json_field.raw_value)
+        for option in ret["options"]:
+            option["text"] = str(I18n_String(option["text"]))
+        return ret  
+
+    def i18n_localize(self, i81n_json_field: I18n_JSONField):
+        ret = copy.deepcopy(i81n_json_field.raw_value)
+        for option in ret["options"]:
+            option["text"] = {i81n_json_field.lang: option["text"]}
+        return ret  
+
 
 class DomainListDataType(BaseDomainDataType):
     def transform_value_for_tile(self, value, **kwargs):
@@ -2126,14 +2187,17 @@ class NodeValueDataType(BaseDataType):
 
     def get_display_value(self, tile, node):
         datatype_factory = DataTypeFactory()
-        value_node = models.Node.objects.get(nodeid=node.config["nodeid"])
-        data = self.get_tile_data(tile)
-        tileid = data[str(node.pk)]
-        if tileid:
-            value_tile = models.TileModel.objects.get(tileid=tileid)
-            datatype = datatype_factory.get_instance(value_node.datatype)
-            return datatype.get_display_value(value_tile, value_node)
-        return ""
+        try:
+            value_node = models.Node.objects.get(nodeid=node.config["nodeid"])
+            data = self.get_tile_data(tile)
+            tileid = data[str(node.pk)]
+            if tileid:
+                value_tile = models.TileModel.objects.get(tileid=tileid)
+                datatype = datatype_factory.get_instance(value_node.datatype)
+                return datatype.get_display_value(value_tile, value_node)
+            return ""
+        except:
+            raise Exception(f'Node with name "{node.name}" is not configured correctly.')
 
     def append_to_document(self, document, nodevalue, nodeid, tile, provisional=False):
         pass
