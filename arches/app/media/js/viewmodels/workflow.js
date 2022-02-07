@@ -28,7 +28,7 @@ define([
 
         this.pan = ko.observable();
         this.alert = config.alert || ko.observable(null);
-        this.quitUrl = config.quitUrl || self.quitUrl || arches.urls.plugin('init-workflow');
+        this.quitUrl = config.quitUrl || arches.urls.search_home;
         this.isWorkflowFinished = ko.observable(false);
         
         this.stepConfig;  /* overwritten in workflow.js file */
@@ -403,10 +403,12 @@ define([
         };
 
         this.reverseWorkflowTransactions = function() {
+            config.loading(true);
             $.ajax({
                 type: "POST",
                 url: arches.urls.transaction_reverse(self.id())
             }).then(function() {
+                config.loading(false);
                 window.location.href = self.quitUrl;
             });
         };
