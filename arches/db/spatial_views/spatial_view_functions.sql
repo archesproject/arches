@@ -53,10 +53,14 @@ $do$;
 
 -- FUNCTIONS - DISPLAY VALUES
 
-create or replace function __arches_get_concept_label(concept_value text) returns text language plpgsql as $$
+create or replace function __arches_get_concept_label(concept_value uuid) returns text language plpgsql as $$
 declare
     concept_label     text := '';
 begin
+    if concept_array is null then
+        return concept_label;
+    end if;
+
     select v.value
     into concept_label
     from values v
@@ -81,7 +85,7 @@ begin
     select string_agg(d.label, ', ')
     from
     (
-        select __arches_get_concept_label(x.conceptid) as label
+        select __arches_get_concept_label(x.conceptid::uuid) as label
         from (select json_array_elements_text(concept_array::json) as conceptid) x
      ) d
     into concept_list;
@@ -94,12 +98,12 @@ return concept_list;
 end;
 $$;
 
-create or replace function __arches_get_domain_label(domain_value text, in_nodeid text) returns text language plpgsql as $$
+create or replace function __arches_get_domain_label(domain_value uuid, in_nodeid uuid) returns text language plpgsql as $$
 declare
-    in_node_config     jsonb;
-    return_label     text;
+    in_node_config      jsonb;
+    return_label        text;
 begin
-     if domain_value is null or in_nodeid = '' then
+     if domain_value is null or in_nodeid is null then
         return '';
     end if;    
 
@@ -122,18 +126,18 @@ end;
 $$;
 
 
-create or replace function __arches_get_domain_list_label(domain_value_list jsonb, in_nodeid text) returns text language plpgsql as $$
+create or replace function __arches_get_domain_list_label(domain_value_list jsonb, in_nodeid uuid) returns text language plpgsql as $$
 declare
     return_label     text := '';
 begin
-     if domain_value_list is null or in_nodeid = '' then
+     if domain_value_list is null or in_nodeid is null then
         return '';
     end if;
     
     select string_agg(dvl.label, ', ')
     from
     (
-        select __arches_get_domain_label(dv.domain_value::text, in_nodeid) as label
+        select __arches_get_domain_label(dv.domain_value::uuid, in_nodeid) as label
         from (
             select jsonb_array_elements_text(domain_value_list) as domain_value
         ) dv
@@ -159,7 +163,6 @@ declare
 begin
 
      if resourceinstance_value is null or resourceinstance_value::text = 'null' then
-        raise notice 'resourceinstance_value is null';
         return return_label;
     end if;
     
@@ -284,14 +287,14 @@ begin
 end;
 $$;
 
-create or replace function __arches_get_nodevalue_label(node_value jsonb, in_nodeid text) returns text language plpgsql as $$
+create or replace function __arches_get_nodevalue_label(node_value jsonb, in_nodeid uuid) returns text language plpgsql as $$
 declare
     return_label         text := '';
     nodevalue_tileid     text;
     value_nodeid         text;
 begin
 
-    if node_value is null or in_nodeid is null or in_nodeid = '' then
+    if node_value is null or in_nodeid is null then
         return '';
     end if;
 
@@ -313,13 +316,13 @@ return return_label;
 end;
 $$;
 
-create or replace function __arches_get_node_display_value(in_tiledata jsonb, in_nodeid text) returns text language plpgsql as $$
+create or replace function __arches_get_node_display_value(in_tiledata jsonb, in_nodeid uuid) returns text language plpgsql as $$
 declare
     display_value     text := '';
     in_node_type     text;
     in_node_config     json;
 begin
-    if in_nodeid is null or in_nodeid = '' then
+    if in_nodeid is null or in_nodeid is null then
         return '<invalid_nodeid>';
     end if;
     
@@ -341,25 +344,25 @@ begin
     
     case in_node_type
         when 'concept' then
-            display_value := __arches_get_concept_label(in_tiledata ->> in_nodeid);
+            display_value := __arches_get_concept_label((in_tiledata ->> in_nodeid::text)::uuid);
         when 'concept-list' then
-            display_value := __arches_get_concept_list_label(in_tiledata -> in_nodeid);
+            display_value := __arches_get_concept_list_label(in_tiledata -> in_nodeid::text);
         when 'edtf' then
-            display_value := ((in_tiledata -> in_nodeid) ->> 'value');
+            display_value := ((in_tiledata -> in_nodeid::text) ->> 'value');
         when 'file-list' then
-            select string_agg(f.url,' | ') from (select (jsonb_array_elements(in_tiledata -> in_nodeid) -> 'name')::text as url) f into display_value;
+            select string_agg(f.url,' | ') from (select (jsonb_array_elements(in_tiledata -> in_nodeid::text) -> 'name')::text as url) f into display_value;
         when 'domain-value' then
-            display_value := __arches_get_domain_label(in_tiledata ->> in_nodeid, in_nodeid);
+            display_value := __arches_get_domain_label((in_tiledata ->> in_nodeid::text)::uuid, in_nodeid);
         when 'domain-value-list' then
             display_value := __arches_get_domain_list_label(in_tiledata -> in_nodeid, in_nodeid);
         when 'url' then
-            display_value := (in_tiledata -> in_nodeid ->> 'url');
+            display_value := (in_tiledata -> in_nodeid::text ->> 'url');
         when 'node-value' then
-            display_value := __arches_get_nodevalue_label(in_tiledata -> in_nodeid, in_nodeid);
+            display_value := __arches_get_nodevalue_label(in_tiledata -> in_nodeid::text, in_nodeid);
         when 'resource-instance' then
-            display_value := __arches_get_resourceinstance_label(in_tiledata -> in_nodeid, 'name');
+            display_value := __arches_get_resourceinstance_label(in_tiledata -> in_nodeid::text, 'name');
         when 'resource-instance-list' then
-            display_value := __arches_get_resourceinstance_list_label(in_tiledata -> in_nodeid, 'name');
+            display_value := __arches_get_resourceinstance_list_label(in_tiledata -> in_nodeid::text, 'name');
         else
             -- print the content of the json
             -- 'string'
@@ -369,7 +372,7 @@ begin
             -- 'geojson-feature-collection'
             -- 'annotation'
             -- 'any other custom datatype - will need a pattern to handle this'
-            display_value := (in_tiledata ->> in_nodeid)::text;
+            display_value := (in_tiledata ->> in_nodeid::text)::text;
         
         end case;
             
@@ -377,7 +380,7 @@ begin
 end;
 $$;
 
-create or replace function __arches_accum_get_node_display_value(init text, in_tiledata jsonb, in_nodeid text) returns text language plpgsql as $$
+create or replace function __arches_accum_get_node_display_value(init text, in_tiledata jsonb, in_nodeid uuid) returns text language plpgsql as $$
 declare
     display_name     text := '';
     return_label     text := '';
@@ -400,7 +403,7 @@ begin
 end;
 $$;
 
-create or replace aggregate __arches_agg_get_node_display_value(in_tiledata jsonb, in_nodeid text)
+create or replace aggregate __arches_agg_get_node_display_value(in_tiledata jsonb, in_nodeid uuid)
 (
     initcond = '',
     stype = text,
@@ -879,6 +882,26 @@ begin
     
     success := true;
     
+    return success;
+end;
+$$;
+
+create or replace function __arches_setup_spatial_view_components(
+    --schema_name text default 'public'
+) returns boolean
+language plpgsql 
+strict
+as 
+$$
+declare
+    success                 boolean := false;
+begin
+    -- create the spatial view management tables
+
+    -- create the tile trigger - only one
+
+    -- create the trigger function - only one which will check for affected views in the management table
+    success := true;
     return success;
 end;
 $$;
