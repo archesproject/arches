@@ -373,6 +373,7 @@ class CsvReader(Reader):
             newresourceinstance.tiles = populated_tiles
             # if bulk saving then append the resources to a list otherwise just save the resource
             if bulk:
+                newresourceinstance.tiles = self.verify_flattened_tiles(populated_tiles)
                 resources.append(newresourceinstance)
                 if len(resources) >= settings.BULK_IMPORT_BATCH_SIZE:
                     Resource.bulk_save(resources=resources, flat=True)
@@ -1199,6 +1200,8 @@ class CsvReader(Reader):
                     )
 
                 if bulk:
+                    for r in resources:
+                        r.tiles = self.verify_flattened_tiles(r.tiles)
                     Resource.bulk_save(resources=resources, flat=True)
                     del resources[:]  # clear out the array
                     print("Time to create resource and tile objects: %s" % datetime.timedelta(seconds=time() - self.start))
