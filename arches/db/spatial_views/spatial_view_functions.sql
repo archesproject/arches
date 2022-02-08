@@ -461,7 +461,7 @@ begin
             end if;
 
             -- delete the existing rows for this resource
-            delete from sp_attr_%1$s where resourceinstanceid = trigger_tile.resourceinstanceid;
+            delete from sp_attr_%1$s where resourceinstanceid::uuid = trigger_tile.resourceinstanceid;
 
             -- insert the new attrs
             
