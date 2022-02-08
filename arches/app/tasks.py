@@ -127,21 +127,21 @@ def import_business_data(
 
 
 @shared_task(bind=True)
-def index_(self, module, index_name, _id, tile_ids):
-    from arches.app.models. import   # avoids circular import
+def index_resource(self, module, index_name, resource_id, tile_ids):
+    from arches.app.models.resource import Resource  # avoids circular import
 
-     = .objects.get(pk=_id)
+    resource = Resource.objects.get(pk=resource_id)
     tiles = [ models.TileModel.objects.get(pk=tile_id) for tile_id in tile_ids ]
 
     es_index = import_class_from_string(module)(index_name)
-    document, document_id = es_index.get_documents_to_index(, tiles)
+    document, document_id = es_index.get_documents_to_index(resource, tiles)
 
     return es_index.index_document(document=document, id=document_id)
 
 
 @shared_task
 def package_load_complete(*args, **kwargs):
-    valid__paths = kwargs.get("valid__paths")
+    valid_resource_paths = kwargs.get("valid_resource_paths")
 
     msg = _("Resources have completed loading.")
     notifytype_name = "Package Load Complete"
