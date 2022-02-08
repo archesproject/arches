@@ -72,7 +72,8 @@ ELASTICSEARCH_PREFIX = "arches"
 ELASTICSEARCH_CUSTOM_INDEXES = []
 # [{
 #     'module': 'my_project.search_indexes.sample_index.SampleIndex',
-#     'name': 'my_new_custom_index'
+#     'name': 'my_new_custom_index',
+#     'should_update_asynchronously': False
 # }]
 
 
