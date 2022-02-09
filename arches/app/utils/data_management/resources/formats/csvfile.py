@@ -539,6 +539,7 @@ class CsvReader(Reader):
                 populated_nodegroups = {}
                 populated_nodegroups[resourceinstanceid] = []
                 previous_row_resourceid = None
+                group_no_to_tileids = {}
                 populated_tiles = []
                 target_resource_model = None
                 single_cardinality_nodegroups = [
@@ -878,8 +879,11 @@ class CsvReader(Reader):
                 missing_display_values = {}
 
                 for row_number, row in enumerate(business_data):
-                    row_number = "on line " + str(row_number + 2)  # to represent the row in a csv accounting for the header and 0 index
-                    if row["ResourceID"] != previous_row_resourceid and previous_row_resourceid is not None:
+                    # row_number = "on line " + str(row_number + 2)  # to represent the row in a csv accounting for the header and 0 index
+                    resource_changed = row["ResourceID"] != previous_row_resourceid and previous_row_resourceid is not None
+                    if resource_changed:
+                        if business_data[row_number-1]["ResourceID"] in group_no_to_tileids:
+                            del group_no_to_tileids[business_data[row_number-1]["ResourceID"]] # garbage collection of past resources
 
                         save_count = save_count + 1
                         self.save_resource(
@@ -929,7 +933,74 @@ class CsvReader(Reader):
                                 if celery_worker_running is False:  # prevents celery chord from breaking on WorkerLostError
                                     sys.exit()
 
+                        # IF GROUP_NO IS SAME AND PREFIX IS SAME, PARENT_TILE REMAINS SAME, i.e. AGGREGATE ON PARENT_TILE:
+                        populate_preexisting = False
+                        preexisting_tile_for_nodegroup = False
                         target_tile = get_blank_tile(source_data)
+                        target_tile.tileid = uuid.uuid4()
+                        # # { resourceid: {group_no: {nodegroupid: tileid} } }
+                        if str(target_tile.nodegroup_id) in [evaluation_nodegroupid, component_nodegroupid] and row["ResourceID"] not in group_no_to_tileids:
+                            group_no_to_tileids[row["ResourceID"]] = {}
+                        if row['GROUP_NO'] and row['GROUP_NO'] != '' and row['GROUP_NO'] not in group_no_to_tileids[row["ResourceID"]]:
+                            group_no_to_tileids[row["ResourceID"]][row['GROUP_NO']] = {}
+                            
+                        # all the tiles should be flat except for the first appearance of a NG on a resource???
+                        
+                        # if there's an object in source_data that is node integiry, elgibility, or one of the component concept-list nodes, then aggregate on tile
+                        # TODO: figure out how to aggregate values without changing tiles (maybe don't append to populated_tiles later?)
+                        # append what we need to to the source data
+                        # if row['COMP_SORTORDER']
+                        # nodegroup_type = 'other'
+                        preexisting_tile_for_resource_group_nodegroup = False
+                        preexisting_parenttile = False
+                        sort_str = False
+
+                        last_prefix = None
+                        prefix_same = False
+
+                        if 'COMP_SORTORDER' in row and row['COMP_SORTORDER'] and row['COMP_SORTORDER'] != '':
+                            sort_str = row['COMP_SORTORDER']
+                        
+                        if str(target_tile.nodegroup_id) in [evaluation_nodegroupid, component_nodegroupid] and row['GROUP_NO'] and row['GROUP_NO'] != '':
+
+                            if str(target_tile.nodegroup_id) == evaluation_nodegroupid:
+                                # checks for whether a parent tile exists since get_blank_tile starts out getting parent
+                                preexisting_parenttile_for_resource_group_nodegroup = row["ResourceID"] in group_no_to_tileids and row['GROUP_NO'] in group_no_to_tileids[row["ResourceID"]] and str(target_tile.nodegroup_id) in group_no_to_tileids[row["ResourceID"]][row['GROUP_NO']]
+                                if preexisting_parenttile_for_resource_group_nodegroup:
+                                    preexisting_parenttile = get_preexisting_tile(target_tile, populated_tiles, row["ResourceID"], tileid=group_no_to_tileids[row["ResourceID"]][row['GROUP_NO']][str(target_tile.nodegroup_id)])
+                                    # we know theres a parenttile for this group already
+                                if preexisting_parenttile: # lets see if theres a child for our source_data's nodegroup
+                                    prototype_child_tile = get_blank_tile(source_data, child_only=True)
+
+                                    # we could also ask if a tile exists for this group in the group dict
+                                    # { resourceid: {group_no: {nodegroupid: tileid} } }
+                                    preexisting_childtile_for_resource_group_nodegroup = row["ResourceID"] in group_no_to_tileids and row['GROUP_NO'] in group_no_to_tileids[row["ResourceID"]] and str(prototype_child_tile.nodegroup_id) in group_no_to_tileids[row["ResourceID"]][row['GROUP_NO']]
+                                    if preexisting_childtile_for_resource_group_nodegroup:
+                                        target_tile = get_preexisting_tile(target_tile, populated_tiles, row["ResourceID"], tileid=group_no_to_tileids[row["ResourceID"]][row['GROUP_NO']][str(prototype_child_tile.nodegroup_id)])
+                                    else:
+                                        target_tile = prototype_child_tile
+                                        target_tile.tileid = uuid.uuid4()
+                                        target_tile.parenttile = preexisting_parenttile
+                                        group_no_to_tileids[row["ResourceID"]][row['GROUP_NO']][str(target_tile.nodegroup_id)] = str(target_tile.tileid)
+                                    
+                            elif str(target_tile.nodegroup_id) == component_nodegroupid:
+                                # TODO: Comp_sortorder must be used for Components so that all component tiles for a resource/group don't get merged into a single one
+                                # only need to know if prefix_changed, prefix functions same way as group
+
+                                if sort_str and '-' in sort_str: # component or eval
+                                    prefix = sort_str[0:2]
+                                    if '-' in business_data[row_number-1]['COMP_SORTORDER']:
+                                        last_prefix = business_data[row_number-1]['COMP_SORTORDER'][0:2]
+
+                                    prefix_same = prefix == last_prefix
+
+                                    preexisting_parenttile_for_resource_group_nodegroup = row["ResourceID"] in group_no_to_tileids and row['GROUP_NO'] in group_no_to_tileids[row["ResourceID"]] and str(target_tile.nodegroup_id) in group_no_to_tileids[row["ResourceID"]][row['GROUP_NO']]
+
+                                    if prefix_same and preexisting_parenttile_for_resource_group_nodegroup:
+                                        preexisting_parenttile = get_preexisting_tile(target_tile, populated_tiles, row["ResourceID"], tileid=group_no_to_tileids[row["ResourceID"]][row['GROUP_NO']][str(target_tile.nodegroup_id)])
+                                        target_tile = preexisting_parenttile
+                                
+                        
                         if "TileID" in row and row["TileID"] is not None:
                             target_tile.tileid = row["TileID"]
                         if "NodeGroupID" in row and row["NodeGroupID"] is not None:
@@ -949,6 +1020,9 @@ class CsvReader(Reader):
                             if "TileID" in row and row["TileID"] is not None:
                                 tile_to_populate.tileid = row["TileID"]
                             tile_to_populate.resourceinstance_id = resourceinstanceid
+                            if row['GROUP_NO'] and row['GROUP_NO'] != '' and row['GROUP_NO'] in group_no_to_tileids[row["ResourceID"]] and str(tile_to_populate.nodegroup_id) not in group_no_to_tileids[row["ResourceID"]][row['GROUP_NO']]:
+                                group_no_to_tileids[row["ResourceID"]][row['GROUP_NO']][str(tile_to_populate.nodegroup_id)] = str(tile_to_populate.tileid)
+                            
                             # Check the cardinality of the tile and check if it has been populated.
                             # If cardinality is one and the tile is populated the tile should not be populated again.
                             if str(tile_to_populate.nodegroup_id) in single_cardinality_nodegroups and "TileiD" not in row:
@@ -1035,6 +1109,8 @@ class CsvReader(Reader):
                                             if parenttileid is not None:
                                                 prototype_tile_copy.parenttile.tileid = parenttileid
                                             prototype_tile_copy.resourceinstance_id = resourceinstanceid
+                                            if row['GROUP_NO'] and row['GROUP_NO'] != '' and row['GROUP_NO'] in group_no_to_tileids[row["ResourceID"]] and str(prototype_tile_copy.nodegroup_id) not in group_no_to_tileids[row["ResourceID"]][row['GROUP_NO']]:
+                                                group_no_to_tileids[row["ResourceID"]][row['GROUP_NO']][str(prototype_tile_copy.nodegroup_id)] = str(prototype_tile_copy.tileid)
                                             if str(prototype_tile_copy.nodegroup_id) not in populated_child_nodegroups:
                                                 prototype_tile_copy.nodegroup_id = str(prototype_tile_copy.nodegroup_id)
                                                 for target_key in list(prototype_tile_copy.data.keys()):
