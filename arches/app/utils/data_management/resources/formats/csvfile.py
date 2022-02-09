@@ -959,6 +959,7 @@ class CsvReader(Reader):
                         populated_nodegroups[resourceinstanceid] = []
 
                     source_data = column_names_to_targetids(row, mapping, row_number)
+                    populate_preexisting = False
 
                     row_keys = [list(b) for b in zip(*[list(a.keys()) for a in source_data])]
 
@@ -989,7 +990,6 @@ class CsvReader(Reader):
                                     sys.exit()
 
                         # IF GROUP_NO IS SAME AND PREFIX IS SAME, PARENT_TILE REMAINS SAME, i.e. AGGREGATE ON PARENT_TILE:
-                        populate_preexisting = False
                         preexisting_tile_for_nodegroup = False
                         target_tile = get_blank_tile(source_data)
                         target_tile.tileid = uuid.uuid4()
