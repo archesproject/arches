@@ -26,28 +26,32 @@
                     border: 1px solid #888;
                     width: 70vw;
                     height: 40vh;
+                    display: flex;
+                    flex-direction: column;
+                    align-items: center;
+                    justify-content: center;
                 "
             > 
                 <div
                     style="
                         width: 100%;
                         display: flex;
-                        justify-content: center;
-                        margin-top: 80px;
+                        flex-direction: column;
                     "
                 >
-                    <h2>
-                        Warning!
+                    <h2 style="text-align: center;">
+                        {% trans "Attention:" %}
                     </h2>
+                    <div style="display: flex; justify-content: center;">
+                        <p
+                            style=" text-align: center; width: 600px;"
+                        >
+                            {% trans "The user permission cache must be cleared before making any changes to Users, Groups, or Models. This may temporarily slow performance for some users. To continue, please clear the cache by clicking the button below." %}
+                        </p>
+                    </div>
                 </div>
 
-                <p
-                    style="margin: 40px 100px; text-align: center;"
-                >
-                    Updating Users, Groups, or Models via the Administrator panel can invalidate the data in UserPermissionCache. To continue, please clear the cache by clicking the button below.
-                </p>
-
-                <p style="text-align: center;">{% csrf_token %}<button style="cursor: pointer;" onclick="clearUserPermissionCache(this)">Clear User Permission cache</button></p>
+                <p style="text-align: center; margin-top: 20px;">{% csrf_token %}<button style="cursor: pointer;" onclick="clearUserPermissionCache(this)">Clear User Permission cache</button></p>
             </div>
         </div>
         <script type="text/javascript"> 

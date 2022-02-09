@@ -40,14 +40,10 @@ class PermissionBackend(ObjectPermissionBackend):
             if "no_access_to_nodegroup" in explicitly_defined_perms:
                 return False
             else:
-                return perm in explicitly_defined_perms
+                return bool(perm in explicitly_defined_perms)
         else:
             UserPermissionChecker = CachedUserPermissionChecker(user_obj)
-
-            if UserPermissionChecker.user_has_permission(perm):
-                return True
-            else:
-                return False
+            return bool(UserPermissionChecker.user_has_permission(perm))
 
 
 def get_restricted_users(resource):
@@ -311,8 +307,7 @@ def check_resource_instance_permissions(user, resourceid, permission):
         resource = ResourceInstance.objects.get(resourceinstanceid=resourceid)
         result["resource"] = resource
 
-        permissions_checker = CachedObjectPermissionChecker(user, ResourceInstance)
-        all_perms = permissions_checker.get_perms(resource)
+        all_perms = get_perms(user, resource)
 
         if len(all_perms) == 0:  # no permissions assigned. permission implied
             result["permitted"] = "unknown"
@@ -454,7 +449,9 @@ def user_created_transaction(user, transactionid):
 
 
 class CachedObjectPermissionChecker:
-    """ """
+    """ 
+        A permission checker that leverages the 'user_permission' cache to check object-level user permissions.
+    """
 
     def __new__(cls, user, input):
         if inspect.isclass(input):
@@ -483,7 +480,9 @@ class CachedObjectPermissionChecker:
 
 
 class CachedUserPermissionChecker:
-    """ """
+    """ 
+        A permission checker that leverages the 'user_permission' cache to check user-level user permissions.
+    """
 
     def __init__(self, user):
         user_permission_cache = caches["user_permission"]
