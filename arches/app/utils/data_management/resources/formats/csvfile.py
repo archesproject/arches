@@ -836,18 +836,52 @@ class CsvReader(Reader):
                     # return deepcopy(blank_tile)
                     return pickle.loads(pickle.dumps(blank_tile, -1))
 
-                def get_preexisting_tile(target_tile, populated_tiles, row):
-                    preexisting_tile_for_nodegroup = list(
+                def get_preexisting_tile(target_tile, populated_tiles, resourceid, parenttileid=None, tileid=None):
+                    # finds a pre-existing tile for a particular nodegroup on a resource_instance
+                    # assumes tiles are flat/un-nested, otherwise recurses through child tiles
+                    if tileid:
+                        preexisting_tile_for_nodegroup = list(
+                            filter(
+                                lambda t: str(t.tileid) == str(tileid),
+                                populated_tiles
+                            )
+                        )
+                    elif parenttileid:
+                        preexisting_tile_for_nodegroup = list(
+                            filter(
+                                lambda t: str(t.resourceinstance_id) == str(resourceid)
+                                and str(t.nodegroup_id) == str(target_tile.nodegroup_id)
+                                and str(t.parenttile.tileid) == str(parenttileid),
+                                populated_tiles,
+                            )
+                        )
+                    else:
+                        preexisting_tile_for_nodegroup = list(
+                            filter(
+                                lambda t: str(t.resourceinstance_id) == str(resourceid)
+                                and str(t.nodegroup_id) == str(target_tile.nodegroup_id),
+                                populated_tiles,
+                            )
+                        )
+                    if len(preexisting_tile_for_nodegroup) > 0:
+                        return preexisting_tile_for_nodegroup[0]
+                    for t in populated_tiles:
+                        get_preexisting_tile(target_tile, t.tiles, resourceid, parenttileid, tileid)
+
+
+                def get_preexisting_parenttileid(tileid, populated_tiles):
+                    preexisting_parenttile = list(
                         filter(
-                            lambda t: str(t.resourceinstance_id) == str(row["ResourceID"])
-                            and str(t.nodegroup_id) == str(target_tile.nodegroup_id),
+                            lambda t: str(t.tileid) == str(tileid),
                             populated_tiles,
                         )
                     )
-                    if len(preexisting_tile_for_nodegroup) > 0:
-                        return preexisting_tile_for_nodegroup[0]
-                    return False
+                    if len(preexisting_parenttile) > 0:
+                        return str(preexisting_parenttile[0].tileid)
+                    for t in populated_tiles:
+                        get_preexisting_parenttileid(tileid, t.tiles)
 
+                
                 def check_required_nodes(tile, parent_tile, required_nodes):
                     # Check that each required node in a tile is populated.
                     if settings.BYPASS_REQUIRED_VALUE_TILE_VALIDATION:
