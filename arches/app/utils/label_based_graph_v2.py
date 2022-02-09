@@ -263,13 +263,24 @@ class LabelBasedGraph(object):
     def _build_graph(
         cls, input_node, input_tile, parent_tree, node_ids_to_tiles_reference, nodegroup_cardinality_reference, node_cache, datatype_factory
     ):
+        def is_valid_semantic_node(node, tile):
+            if node.datatype == 'semantic':
+                child_nodes = node.get_direct_child_nodes()
+                semantic_child_nodes = [ child_node for child_node in child_nodes if child_node.datatype == 'semantic' ]
+                non_semantic_child_nodes = [ child_node for child_node in child_nodes if child_node.datatype != 'semantic' ]
+
+                for non_semantic_child_node in non_semantic_child_nodes:
+                    if str(non_semantic_child_node.pk) in tile.data:
+                        return True
+
+                for semantic_child_node in semantic_child_nodes:
+                    return is_valid_semantic_node(semantic_child_node, tile)
+
         for associated_tile in node_ids_to_tiles_reference.get(str(input_node.pk), [input_tile]):
             parent_tile = associated_tile.parenttile
 
             if associated_tile == input_tile or parent_tile == input_tile:
-                if (  # don't instantiate `LabelBasedNode`s of cardinality `n` unless they are semantic or have value
-                    input_node.datatype == "semantic" or str(input_node.pk) in associated_tile.data
-                ):
+                if is_valid_semantic_node(input_node, associated_tile) or str(input_node.pk) in associated_tile.data:
                     label_based_node = LabelBasedNode(
                         name=input_node.name,
                         node_id=str(input_node.pk),
