@@ -1133,6 +1133,26 @@ class CsvReader(Reader):
                                                         del source_data[i]
                                                 except KeyError:  # semantic datatype
                                                     pass
+                                            elif s_tile_value and tile_to_populate.data[target_key] and isinstance(tile_to_populate.data[target_key], list): # weve found a pre-existing value for this node on tile
+                                                try:
+                                                    value = transform_value(
+                                                        node_datatypes[target_key], s_tile_value, row_number, target_key
+                                                    )
+                                                    value = value["value"]
+                                                    if (isinstance(value, str) is False or isinstance(value, uuid) is False) and isinstance(value, list):
+                                                        value = value[0]
+
+                                                    tile_to_populate.data[target_key].append(value)
+                                                    found = list(
+                                                        filter(lambda x: x.get(target_key, "not found") != "not found", source_data)
+                                                    )
+                                                    if len(found) > 0:
+                                                        found = found[0]
+                                                        i = source_data.index(found)
+                                                        del source_dict[target_key]
+                                                        del source_data[i]
+                                                except KeyError:  # semantic datatype
+                                                    pass
                                             elif s_tile_value is None:
                                                 found = list(filter(lambda x: x.get(target_key, "not found") != "not found", source_data))
                                                 if len(found) > 0:
@@ -1207,6 +1227,27 @@ class CsvReader(Reader):
                                                                     del source_data[i]
                                                             except KeyError:  # semantic datatype
                                                                 pass
+                                                        elif s_tile_value and prototype_tile_copy.data[target_key] and isinstance(prototype_tile_copy.data[target_key], list): # weve found a pre-existing value for this node on tile
+                                                            try:
+                                                                value = transform_value(
+                                                                    node_datatypes[target_key], s_tile_value, row_number, target_key
+                                                                )
+                                                                value = value["value"]
+                                                                if (isinstance(value, str) is False or isinstance(value, uuid) is False) and isinstance(value, list):
+                                                                    value = value[0]
+
+                                                                prototype_tile_copy.data[target_key].append(value)
+                                                                found = list(
+                                                                    filter(lambda x: x.get(target_key, "not found") != "not found", source_data)
+                                                                )
+                                                                if len(found) > 0:
+                                                                    found = found[0]
+                                                                    i = source_data.index(found)
+                                                                    del source_dict[target_key]
+                                                                    del source_data[i]
+                                                            except KeyError:  # semantic datatype
+                                                                pass
+
                                                         elif s_tile_value is None:
                                                             found = list(
                                                                 filter(lambda x: x.get(target_key, "not found") != "not found", source_data)
