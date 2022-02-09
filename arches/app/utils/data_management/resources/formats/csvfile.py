@@ -1312,7 +1312,7 @@ class CsvReader(Reader):
                                 preexisting_tile_for_nodegroup.tiles.append(target_tile)
                             while len(source_data) > 0:
                                 target_tile = get_blank_tile(source_data)
-                                preexisting_tile_for_nodegroup = get_preexisting_tile(target_tile, populated_tiles, row)
+                                preexisting_tile_for_nodegroup = get_preexisting_tile(target_tile, populated_tiles, row["ResourceID"])
                                 if preexisting_tile_for_nodegroup:
                                     target_tile = get_blank_tile(source_data, child_only=True)
                                     target_tile.parenttile = preexisting_tile_for_nodegroup
@@ -1330,7 +1330,7 @@ class CsvReader(Reader):
                             populate_tile(source_data, target_tile)
                             while len(source_data) > 0:
                                 target_tile = get_blank_tile(source_data)
-                                preexisting_tile_for_nodegroup = get_preexisting_tile(target_tile, populated_tiles, row)
+                                preexisting_tile_for_nodegroup = get_preexisting_tile(target_tile, populated_tiles, row["ResourceID"])
                                 if preexisting_tile_for_nodegroup:
                                     target_tile = get_blank_tile(source_data, child_only=True)
                                     target_tile.parenttile = preexisting_tile_for_nodegroup
