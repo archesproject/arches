@@ -959,7 +959,6 @@ class CsvReader(Reader):
                         populated_nodegroups[resourceinstanceid] = []
 
                     source_data = column_names_to_targetids(row, mapping, row_number)
-                    populate_preexisting = False
 
                     row_keys = [list(b) for b in zip(*[list(a.keys()) for a in source_data])]
 
