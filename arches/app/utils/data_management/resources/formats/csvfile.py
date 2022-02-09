@@ -1300,7 +1300,8 @@ class CsvReader(Reader):
                         # mock_request_object = HttpRequest()
 
                         # identify whether a tile for this nodegroup on this resource already exists
-                        preexisting_tile_for_nodegroup = get_preexisting_tile(target_tile, populated_tiles, row)
+                        if not preexisting_tile_for_nodegroup and not preexisting_parenttile:
+                            preexisting_tile_for_nodegroup = get_preexisting_tile(target_tile, populated_tiles, row["ResourceID"])
 
                         # aggregates a tile of the nodegroup associated with source_data (via get_blank_tile)
                         # onto the pre-existing tile who would be its parent
