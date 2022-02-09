@@ -944,7 +944,8 @@ class CsvReader(Reader):
                             """
                             need_new_tile = False
                             # Set target tileid to None because this will be a new tile, a new tileid will be created on save.
-                            tile_to_populate.tileid = uuid.uuid4()
+                            if tile_to_populate.tileid is None:
+                                tile_to_populate.tileid = uuid.uuid4()
                             if "TileID" in row and row["TileID"] is not None:
                                 tile_to_populate.tileid = row["TileID"]
                             tile_to_populate.resourceinstance_id = resourceinstanceid
