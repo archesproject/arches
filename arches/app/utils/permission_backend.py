@@ -449,8 +449,8 @@ def user_created_transaction(user, transactionid):
 
 
 class CachedObjectPermissionChecker:
-    """ 
-        A permission checker that leverages the 'user_permission' cache to check object-level user permissions.
+    """
+    A permission checker that leverages the 'user_permission' cache to check object-level user permissions.
     """
 
     def __new__(cls, user, input):
@@ -480,8 +480,8 @@ class CachedObjectPermissionChecker:
 
 
 class CachedUserPermissionChecker:
-    """ 
-        A permission checker that leverages the 'user_permission' cache to check user-level user permissions.
+    """
+    A permission checker that leverages the 'user_permission' cache to check user-level user permissions.
     """
 
     def __init__(self, user):
