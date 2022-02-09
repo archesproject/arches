@@ -82,7 +82,7 @@ define([
             /* cached ID logic */ 
             var cachedId = ko.unwrap(config.id);
             if (cachedId) {
-                self.id(cachedId)
+                self.id(cachedId);
             }
             else {
                 self.id(uuid.generate());
@@ -161,19 +161,25 @@ define([
         this.save = function() {
             self.saving(true);
 
-            return new Promise(function(resolve, _reject) {
+            return new Promise(function(resolve, reject) {
                 var savePromises = [];
             
                 Object.values(self.workflowComponentAbstractLookup()).forEach(function(workflowComponentAbstract) {
-                    savePromises.push(new Promise(function(resolve, _reject) {
-                        workflowComponentAbstract._saveComponent(resolve);
+                    savePromises.push(new Promise(function(resolve, reject) {
+                        workflowComponentAbstract._saveComponent(resolve, reject);
                     }));
                 });
     
-                Promise.all(savePromises).then(function(values) {
-                    resolve(...values);
-                    self.saving(false);
-                });
+                Promise.all(savePromises)
+                    .then(function(values) {
+                        resolve(...values);
+                    })
+                    .catch(function(error) {
+                        reject(error);
+                    })
+                    .finally(function() {
+                        self.saving(false);
+                    });
             });
         };
 
@@ -236,7 +242,7 @@ define([
                     displayed: isDisplayed,
                     heading: config.informationboxdata['heading'],
                     text: config.informationboxdata['text'],
-                })
+                });
             }
         };
 
@@ -244,7 +250,7 @@ define([
             if (self.lockableExternalSteps.indexOf(step) > -1){
                 config.workflow.toggleStepLockedState(step, locked);
             } else {
-                throw new Error("The step, " + step + ", cannot be locked")
+                throw new Error("The step, " + step + ", cannot be locked");
             }
         };
 
