@@ -1,13 +1,15 @@
+import datetime
+import uuid
+
 from django.conf import settings
 from django.db import migrations, models
-import uuid
 import django.db.models.deletion
 
 
 class Migration(migrations.Migration):
 
     dependencies = [
-        ("models", "7128_resource_instance_filter"),
+        ("models", "8085_relational_data_model_handle_dates"),
     ]
 
     def forwards_add_graph_transactions_table_data(apps, schema_editor):
@@ -16,7 +18,10 @@ class Migration(migrations.Migration):
 
         for graph in GraphModel.objects.all():
             if graph.isactive:
-                graph_publication = GraphPublication.objects.create(graph=graph)
+                graph_publication = GraphPublication.objects.create(
+                    graph=graph,
+                    notes="Initial migration.",
+                )
                 graph_publication.save()
 
     def reverse_add_graph_transactions_table_data(apps, schema_editor):
@@ -38,7 +43,10 @@ class Migration(migrations.Migration):
         GraphModel = apps.get_model("models", "GraphModel")
 
         for graph in GraphModel.objects.all():
-            graph.publicationid = None
+            if graph.publication:
+                graph.isactive = True
+
+            graph.publication = None
             graph.save()
 
     operations = [
@@ -54,7 +62,7 @@ class Migration(migrations.Migration):
                         null=True, db_column="userid", on_delete=django.db.models.deletion.CASCADE, to=settings.AUTH_USER_MODEL
                     ),
                 ),
-                ("published_time", models.DateTimeField(auto_now_add=True)),
+                ("published_time", models.DateTimeField(default=datetime.datetime.now())),
             ],
             options={
                 "db_table": "graph_publications",
@@ -68,13 +76,4 @@ class Migration(migrations.Migration):
             field=models.ForeignKey(to="models.GraphPublication", db_column="publicationid", null=True, on_delete=models.SET_NULL),
         ),
         migrations.RunPython(forwards_add_graph_column_data, reverse_add_graph_column_data),
-        migrations.AlterField(
-            model_name="graphmodel",
-            name="isactive",
-            field=models.BooleanField(verbose_name="isactive", default=False),
-        ),
-        migrations.RemoveField(
-            model_name="graphmodel",
-            name="isactive",
-        ),
     ]

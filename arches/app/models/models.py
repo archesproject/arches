@@ -400,8 +400,8 @@ class GraphModel(models.Model):
     def disable_instance_creation(self):
         if not self.isresource:
             return _("Only resource models may be edited - branches are not editable")
-        # if self.publication:
-        #     return _("This Model is currently published and not available for editing")
+        if not self.publication:
+            return _("This Model is currently unpublished and not available for instance creation.")
         return False
 
     def is_editable(self):
@@ -424,6 +424,7 @@ class GraphPublication(models.Model):
     publicationid = models.UUIDField(primary_key=True, serialize=False, default=uuid.uuid1)
     notes = models.TextField(blank=True, null=True)
     graph = models.ForeignKey(GraphModel, db_column="graphid", on_delete=models.CASCADE)
+    serialized_graph = JSONField(blank=True, null=True, db_column="serialized_graph")
     user = models.ForeignKey(User, db_column="userid", null=True, on_delete=models.CASCADE)
     published_time = models.DateTimeField(auto_now_add=True, null=False)
 
