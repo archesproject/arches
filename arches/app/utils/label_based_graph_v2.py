@@ -265,10 +265,10 @@ class LabelBasedGraph(object):
         cls, input_node, input_tile, parent_tree, node_ids_to_tiles_reference, nodegroup_cardinality_reference, node_cache, datatype_factory
     ):
         def is_valid_semantic_node(node, tile):
-            if node.datatype == 'semantic':
+            if node.datatype == "semantic":
                 child_nodes = node.get_direct_child_nodes()
-                semantic_child_nodes = [ child_node for child_node in child_nodes if child_node.datatype == 'semantic' ]
-                non_semantic_child_nodes = [ child_node for child_node in child_nodes if child_node.datatype != 'semantic' ]
+                semantic_child_nodes = [child_node for child_node in child_nodes if child_node.datatype == "semantic"]
+                non_semantic_child_nodes = [child_node for child_node in child_nodes if child_node.datatype != "semantic"]
 
                 for non_semantic_child_node in non_semantic_child_nodes:
                     if str(non_semantic_child_node.pk) in tile.data or str(non_semantic_child_node.pk) in node_ids_to_tiles_reference:
