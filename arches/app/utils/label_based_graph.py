@@ -270,7 +270,7 @@ class LabelBasedGraph(object):
                 for semantic_child_node in semantic_child_nodes:
                     if is_valid_semantic_node(semantic_child_node, tile):
                         has_valid_child_semantic_node = True
-                        
+
                 return has_valid_child_semantic_node
 
         for associated_tile in node_ids_to_tiles_reference.get(str(input_node.pk), [input_tile]):
