@@ -953,10 +953,10 @@ class Card(APIBase):
             resourceid = None
             resource_instance = None
             pass
-        nodes = graph.node_set.all()
 
         nodegroups = []
         editable_nodegroups = []
+        nodes = graph.node_set.all().select_related("nodegroup")
         for node in nodes:
             if node.is_collector:
                 added = False
@@ -967,15 +967,7 @@ class Card(APIBase):
                 if not added and request.user.has_perm("read_nodegroup", node.nodegroup):
                     nodegroups.append(node.nodegroup)
 
-        nodes = nodes.filter(nodegroup__in=nodegroups)
-        cards = graph.cardmodel_set.order_by("sortorder").filter(nodegroup__in=nodegroups).prefetch_related("cardxnodexwidget_set")
-        cardwidgets = [
-            widget for widgets in [card.cardxnodexwidget_set.order_by("sortorder").all() for card in cards] for widget in widgets
-        ]
-        datatypes = models.DDataType.objects.all()
         user_is_reviewer = user_is_resource_reviewer(request.user)
-        widgets = models.Widget.objects.all()
-        card_components = models.CardComponent.objects.all()
 
         if resource_instance is None:
             tiles = []
@@ -1013,9 +1005,25 @@ class Card(APIBase):
                     provisionaltiles.append(tile)
             tiles = provisionaltiles
 
-        cards = JSONSerializer().serializeToPython(cards)
+        serialized_graph = None
+        if graph.publication and graph.publication.serialized_graph:
+            serialized_graph = graph.publication.serialized_graph
+
+        if serialized_graph:
+            serialized_cards = serialized_graph["cards"]
+            cardwidgets = [
+                widget
+                for widget in models.CardXNodeXWidget.objects.filter(
+                    pk__in=[widget_dict["id"] for widget_dict in serialized_graph["widgets"]]
+                )
+            ]
+        else:
+            cards = graph.cardmodel_set.order_by("sortorder").filter(nodegroup__in=nodegroups).prefetch_related("cardxnodexwidget_set")
+            serialized_cards = JSONSerializer().serializeToPython(cards)
+            cardwidgets = [widget for widget in [card.cardxnodexwidget_set.order_by("sortorder").all() for card in cards]]
+
         editable_nodegroup_ids = [str(nodegroup.pk) for nodegroup in editable_nodegroups]
-        for card in cards:
+        for card in serialized_cards:
             card["is_writable"] = False
             if str(card["nodegroup_id"]) in editable_nodegroup_ids:
                 card["is_writable"] = True
@@ -1024,14 +1032,14 @@ class Card(APIBase):
             "resourceid": resourceid,
             "displayname": displayname,
             "tiles": tiles,
-            "cards": cards,
+            "cards": serialized_cards,
             "nodegroups": nodegroups,
-            "nodes": nodes,
+            "nodes": nodes.filter(nodegroup__in=nodegroups),
             "cardwidgets": cardwidgets,
-            "datatypes": datatypes,
+            "datatypes": models.DDataType.objects.all(),
             "userisreviewer": user_is_reviewer,
-            "widgets": widgets,
-            "card_components": card_components,
+            "widgets": models.Widget.objects.all(),
+            "card_components": models.CardComponent.objects.all(),
         }
 
         return JSONResponse(context, indent=4)
@@ -1236,7 +1244,7 @@ class ResourceReport(APIBase):
         if "related_resources" not in exclude:
             resource_models = (
                 models.GraphModel.objects.filter(isresource=True)
-                # .exclude(publication=None)
+                .exclude(publication=None)
                 .exclude(pk=settings.SYSTEM_SETTINGS_RESOURCE_MODEL_ID)
             )
 

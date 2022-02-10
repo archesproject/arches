@@ -96,7 +96,7 @@ class MapBaseManagerView(BaseManagerView):
         geom_datatypes = [d.pk for d in models.DDataType.objects.filter(isgeometric=True)]
         geom_nodes = models.Node.objects.filter(
             graph__isresource=True,
-            # graph__publication=True,
+            graph__publication__isnull=False,
             datatype__in=geom_datatypes,
         ).exclude(graph__graphid=settings.SYSTEM_SETTINGS_RESOURCE_MODEL_ID)
         resource_layers = []

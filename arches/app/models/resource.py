@@ -469,7 +469,7 @@ class Resource(models.ResourceInstance):
                 models.GraphModel.objects.all()
                 .exclude(pk=settings.SYSTEM_SETTINGS_RESOURCE_MODEL_ID)
                 .exclude(isresource=False)
-                # .exclude(publication=None)
+                .exclude(publication=None)
             )
 
         graph_lookup = {

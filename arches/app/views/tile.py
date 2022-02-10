@@ -125,9 +125,7 @@ class TileData(View):
                         return JSONResponse({"status": "false", "message": [_(e.title), _(str(message))]}, status=500)
                 tile_id = data["tileid"]
                 resource_instance = models.ResourceInstance.objects.get(pk=data["resourceinstance_id"])
-                # TODO: cbyrd 7783 undo is_active override
-                is_active = True
-                # is_active = resource_instance.graph.publication
+                is_active = resource_instance.graph.publication
                 if tile_id is not None and tile_id != "":
                     try:
                         old_tile = Tile.objects.get(pk=tile_id)
@@ -232,10 +230,8 @@ class TileData(View):
             with transaction.atomic():
                 try:
                     tile = Tile.objects.get(tileid=data["tileid"])
-                    # TODO: cbyrd 7783 undo is_active override
-                    is_active = True
-                    # resource_instance = tile.resourceinstance
-                    # is_active = resource_instance.graph.publication
+                    resource_instance = tile.resourceinstance
+                    is_active = resource_instance.graph.publication
                 except ObjectDoesNotExist:
                     return JSONErrorResponse(_("This tile is no longer available"), _("It was likely already deleted by another user"))
                 user_is_reviewer = user_is_resource_reviewer(request.user)
