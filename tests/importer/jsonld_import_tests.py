@@ -114,7 +114,7 @@ class JsonLDImportTests(ArchesTestCase):
         ResourceGraphImporter(archesfile["graph"])
 
         # Add Spanish language for testing
-        cls.spanish = Language(code="es", name="Spanish", default_direction="ltr", scope="data")
+        cls.spanish = Language(code="es", name="Spanish", default_direction="ltr", scope="data", isdefault=True)
         cls.spanish.save()
 
     def setUp(self):

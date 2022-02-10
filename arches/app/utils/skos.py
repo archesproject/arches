@@ -15,6 +15,7 @@ GNU Affero General Public License for more details.
 You should have received a copy of the GNU Affero General Public License
 along with this program. If not, see <http://www.gnu.org/licenses/>.
 """
+from gettext import translation
 import os
 import uuid
 import re
@@ -73,7 +74,7 @@ class SKOSReader(object):
         """
 
         baseuuid = uuid.uuid4()
-        allowed_languages = models.DLanguage.objects.values_list("pk", flat=True)
+        allowed_languages = models.Language.objects.values_list("code", flat=True)
         default_lang = settings.LANGUAGE_CODE
 
         value_types = models.DValueType.objects.all()
@@ -97,7 +98,7 @@ class SKOSReader(object):
                         "valuetype", flat=True
                     ):
                         if not self.language_exists(object, allowed_languages):
-                            allowed_languages = models.DLanguage.objects.values_list("pk", flat=True)
+                            allowed_languages = models.Language.objects.values_list("code", flat=True)
 
                         try:
                             # first try and get any values associated with the concept_scheme
@@ -157,7 +158,7 @@ class SKOSReader(object):
                     for predicate, object in graph.predicate_objects(subject=s):
                         if str(SKOS) in predicate or str(ARCHES) in predicate:
                             if not self.language_exists(object, allowed_languages):
-                                allowed_languages = models.DLanguage.objects.values_list("pk", flat=True)
+                                allowed_languages = models.Language.objects.values_list("code", flat=True)
 
                             # this is essentially the skos element type within a <skos:Concept>
                             # element (eg: prefLabel, broader, etc...)
@@ -222,7 +223,7 @@ class SKOSReader(object):
                 for predicate, object in graph.predicate_objects(subject=s):
                     if str(SKOS) in predicate or str(ARCHES) in predicate:
                         if not self.language_exists(object, allowed_languages):
-                            allowed_languages = models.DLanguage.objects.values_list("pk", flat=True)
+                            allowed_languages = models.Language.objects.values_list("code", flat=True)
 
                         # this is essentially the skos element type within a <skos:Concept>
                         # element (eg: prefLabel, broader, etc...)
@@ -361,10 +362,20 @@ class SKOSReader(object):
             and rdf_tag.language is not None
             and rdf_tag.language.strip() != ""
         ):
-            newlang = models.DLanguage()
-            newlang.pk = rdf_tag.language
-            newlang.languagename = rdf_tag.language
-            newlang.isdefault = False
+            language_info = translation.get_language_info(rdf_tag.language)
+
+            newlang = models.Language()
+            newlang.code = rdf_tag.language
+            
+            if language_info:
+                newlang.name = language_info["name"]
+                newlang.default_direction = "rtl" if language_info["bidi"] else "ltr"
+                newlang.isdefault = False
+            else:
+                newlang.name = rdf_tag.language
+                newlang.default_direction = "ltr"
+                newlang.isdefault = False
+
             newlang.save()
             return False
         return True
