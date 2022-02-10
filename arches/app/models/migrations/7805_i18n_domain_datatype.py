@@ -169,9 +169,8 @@ class Migration(migrations.Migration):
     ]
 
 
-
 # -----------------------------------------------------------------------------
-# -- This is a test that calls the function "__arches_i18n_update_jsonb_array" 
+# -- This is a test that calls the function "__arches_i18n_update_jsonb_array"
 # -- and should return w/o failing
 # do $body$
 # declare

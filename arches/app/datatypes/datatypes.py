@@ -1770,13 +1770,13 @@ class DomainDataType(BaseDomainDataType):
         ret = copy.deepcopy(i81n_json_field.raw_value)
         for option in ret["options"]:
             option["text"] = str(I18n_String(option["text"]))
-        return ret  
+        return ret
 
     def i18n_localize(self, i81n_json_field: I18n_JSONField):
         ret = copy.deepcopy(i81n_json_field.raw_value)
         for option in ret["options"]:
             option["text"] = {i81n_json_field.lang: option["text"]}
-        return ret  
+        return ret
 
 
 class DomainListDataType(BaseDomainDataType):

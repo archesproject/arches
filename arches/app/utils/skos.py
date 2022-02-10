@@ -366,7 +366,7 @@ class SKOSReader(object):
 
             newlang = models.Language()
             newlang.code = rdf_tag.language
-            
+
             if language_info:
                 newlang.name = language_info["name"]
                 newlang.default_direction = "rtl" if language_info["bidi"] else "ltr"
