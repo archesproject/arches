@@ -274,8 +274,13 @@ class LabelBasedGraph(object):
                     if str(non_semantic_child_node.pk) in tile.data or str(non_semantic_child_node.pk) in node_ids_to_tiles_reference:
                         return True
 
+                has_valid_child_semantic_node = False
+
                 for semantic_child_node in semantic_child_nodes:
-                    return is_valid_semantic_node(semantic_child_node, tile)
+                    if is_valid_semantic_node(semantic_child_node, tile):
+                        has_valid_child_semantic_node = True
+                        
+                return has_valid_child_semantic_node
 
         for associated_tile in node_ids_to_tiles_reference.get(str(input_node.pk), [input_tile]):
             parent_tile = associated_tile.parenttile
