@@ -56,7 +56,7 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name="notification",
             name="context",
-            field=django.contrib.postgres.fields.jsonb.JSONField(blank=True, default=dict, null=True),
+            field=django.contrib.postgres.fields.JSONField(blank=True, default=dict, null=True),
         ),
         migrations.RunSQL(
             """
