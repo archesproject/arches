@@ -232,10 +232,16 @@ class StringDataType(BaseDataType):
 
     def get_display_value(self, tile, node):
         data = self.get_tile_data(tile)
+        current_language = get_language()
+        if not current_language:
+            current_language = settings.LANGUAGE_CODE
         if data:
             raw_value = data.get(str(node.nodeid))
             if raw_value is not None:
-                return JSONSerializer().serialize(raw_value)
+                try:
+                    return raw_value[current_language]["value"]
+                except KeyError:
+                    pass
 
     def default_es_mapping(self):
         """
@@ -257,6 +263,10 @@ class StringDataType(BaseDataType):
         else:
             return False
 
+    def to_json(self, tile, node):
+        data = self.get_tile_data(tile)
+        if data:
+            return self.compile_json(tile, node, **data.get(str(node.nodeid)))
 
 class NumberDataType(BaseDataType):
     def validate(self, value, row_number=None, source="", node=None, nodeid=None, strict=False):
