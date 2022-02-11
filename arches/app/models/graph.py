@@ -235,6 +235,13 @@ class Graph(models.GraphModel):
 
         edge.graph = self
 
+        try:
+            edge.rangenode
+            edge.domainnode
+        except:
+            edge.rangenode = self.nodes[edge.rangenode_id]
+            edge.domainnode = self.nodes[edge.domainnode_id]
+
         if edge.pk is None:
             edge.pk = uuid.uuid1()
         if self.ontology is None:
@@ -958,9 +965,9 @@ class Graph(models.GraphModel):
             incoming_edge = list(filter(lambda x: x.rangenode_id == node.nodeid, self.edges.values()))[0]
             parent_node_id = incoming_edge.domainnode_id
             sibling_nodes = [
-                edge.rangenode
+                self.nodes[edge.rangenode_id]
                 for edge in filter(lambda x: x.domainnode_id == parent_node_id, self.edges.values())
-                if edge.rangenode.nodeid != node.nodeid
+                if edge.rangenode_id != node.nodeid
             ]
         return sibling_nodes
 
@@ -1466,11 +1473,11 @@ class Graph(models.GraphModel):
                     )
                 property_found = False
                 okay = False
-                ontology_classes = self.ontology.ontologyclasses.get(source=edge.domainnode.ontologyclass)
+                ontology_classes = self.ontology.ontologyclasses.get(source=self.nodes[edge.domainnode_id].ontologyclass)
                 for classes in ontology_classes.target["down"]:
                     if classes["ontology_property"] == edge.ontologyproperty:
                         property_found = True
-                        if edge.rangenode.ontologyclass in classes["ontology_classes"]:
+                        if self.nodes[edge.rangenode_id].ontologyclass in classes["ontology_classes"]:
                             okay = True
                             break
 
