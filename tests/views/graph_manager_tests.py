@@ -169,11 +169,11 @@ class GraphManagerViewTests(ArchesTestCase):
         graph.isactive = False
         graph.iconclass = "fa fa-building"
         graph.nodegroups = []
+        graph.root.ontologyclass = "http://www.cidoc-crm.org/cidoc-crm/E1_CRM_Entity"
         graph.save()
 
         graph.root.name = "ROOT NODE"
         graph.root.description = "Test Root Node"
-        graph.root.ontologyclass = "http://www.cidoc-crm.org/cidoc-crm/E1_CRM_Entity"
         graph.root.datatype = "semantic"
         graph.root.save()
         graph = Graph.objects.get(graphid=graph.pk)
