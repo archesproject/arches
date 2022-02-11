@@ -66,7 +66,7 @@ class ImportSingleCsv:
         when import is done the database should be deleted
         """
         with connection.cursor() as cursor:
-            cursor.execute('DROP TABLE etl_staging;')
+            cursor.execute("DROP TABLE etl_staging;")
 
     def validate(self, request):
         """
@@ -84,14 +84,14 @@ class ImportSingleCsv:
         if header:
             next(reader)
 
-        column_names = [fieldname for fieldname in fieldnames if fieldname != '']
+        column_names = [fieldname for fieldname in fieldnames if fieldname != ""]
         if len(column_names) == 0:
             message = "No valid node is selected"
             return {"success": False, "message": message}  # what would be the right thing to return
 
         timestamp = int(datetime.now().timestamp())
-        staging_table_name = 'etl_staging_{}'.format(timestamp)
-        staging_table_name = 'etl_staging'
+        staging_table_name = "etl_staging_{}".format(timestamp)
+        staging_table_name = "etl_staging"
 
         with connection.cursor() as cursor:
             cursor.execute("CALL __arches_create_staging_db(%s);", [column_names])
@@ -122,7 +122,7 @@ class ImportSingleCsv:
         fieldnames = request.POST.get("fieldnames").split(",")
         csvfile = file.read().decode("utf-8")
         reader = csv.DictReader(io.StringIO(csvfile), fieldnames=fieldnames)
-        column_names = [fieldname for fieldname in fieldnames if fieldname != '']
+        column_names = [fieldname for fieldname in fieldnames if fieldname != ""]
         if len(column_names):
             message = "No valid node is selected"
             return {"success": False, "message": message}  # what would be the right thing to return
