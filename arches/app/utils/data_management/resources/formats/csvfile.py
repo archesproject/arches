@@ -35,7 +35,7 @@ import arches.app.utils.task_management as task_management
 from django.core.exceptions import ObjectDoesNotExist
 from django.db import transaction
 from django.db.models import Q
-from django.utils.translation import ugettext as _
+from django.utils.translation import ugettext as _, get_language
 
 logger = logging.getLogger(__name__)
 
@@ -139,7 +139,18 @@ class CsvWriter(Writer):
         super(CsvWriter, self).write_resources(graph_id=graph_id, resourceinstanceids=resourceinstanceids, **kwargs)
 
         csv_records = []
-        language_codes = Language.objects.values_list("code")
+        languages = kwargs.get("languages")
+
+        # Return data for specified languages - current language if none are specified, or if specified languages are all invalid
+        if languages == None:
+            language_codes = [get_language()]
+        elif languages == "all":
+            language_codes = Language.objects.values_list("code", flat=True)
+        else:
+            language_codes = [value for value in languages.split(",") if value in Language.objects.values_list("code", flat=True)]
+            if len(language_codes) < 1:
+                language_codes = [get_language()]
+        
         other_group_records = []
         mapping = {}
         concept_export_value_lookup = {}
@@ -152,7 +163,7 @@ class CsvWriter(Writer):
                     mapping[node["arches_nodeid"]] = node["file_field_name"]
                     csv_header += [node["file_field_name"]]
                 elif node["file_field_name"] != "" and node["export"] is True and node["data_type"] == "string":
-                    columns = ["{column} ({code})".format(column=node["file_field_name"], code=code[0]) for code in language_codes]
+                    columns = ["{column} ({code})".format(column=node["file_field_name"], code=code) for code in language_codes]
                     csv_header += columns
                     mapping[node["arches_nodeid"]] = columns
                 if "concept_export_value" in node:
@@ -573,7 +584,7 @@ class CsvReader(Reader):
 
         try:
             with transaction.atomic():
-                language_codes = Language.objects.values_list("code")
+                language_codes = Language.objects.values_list("code", flat=True)
                 save_count = 0
                 try:
                     resourceinstanceid = process_resourceid(business_data[0]["ResourceID"], overwrite)
@@ -832,7 +843,7 @@ class CsvReader(Reader):
                                     column_match = column_regex.match(key.upper())
                                     if column_match is not None:
                                         language = column_match.groups()[0]
-                                        if language in [code[0].upper() for code in language_codes]:
+                                        if language in [code.upper() for code in language_codes]:
                                             new_row.append({row["arches_nodeid"]: value + "|" + language.lower()})
 
                     return new_row

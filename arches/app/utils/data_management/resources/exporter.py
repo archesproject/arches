@@ -29,6 +29,6 @@ class ResourceExporter(object):
         kwargs["format"] = format
         self.writer = import_class_from_string(settings.RESOURCE_FORMATTERS[format])(**kwargs)
 
-    def export(self, graph_id=None, resourceinstanceids=None):
-        resources = self.writer.write_resources(graph_id=graph_id, resourceinstanceids=resourceinstanceids)
+    def export(self, graph_id=None, resourceinstanceids=None, languages:str=None):
+        resources = self.writer.write_resources(graph_id=graph_id, resourceinstanceids=resourceinstanceids, languages=languages)
         return resources
