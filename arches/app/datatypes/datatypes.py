@@ -250,11 +250,9 @@ class StringDataType(BaseDataType):
 
     def get_first_language_value_from_node(self, tile, nodeid):
         return tile.data[str(nodeid)][list(tile.data[str(nodeid)].keys())[0]]["value"]
-    
+
     def is_multilingual_rdf(self, rdf):
-        if (len(rdf) > 1
-            and len(set(val["language"] for val in rdf)) > 1
-        ):
+        if len(rdf) > 1 and len(set(val["language"] for val in rdf)) > 1:
             return True
         else:
             return False

@@ -532,7 +532,7 @@ class JsonLdReader(Reader):
                     # print(f"Considering:\n  {vi}\n  {o['name']}")
                     if is_literal and o["datatype"].is_a_literal_in_rdf():
                         # import each value separately if there are no languages in the values and this is card n string
-                        if(o["datatype"].is_multilingual_rdf(values)):
+                        if o["datatype"].is_multilingual_rdf(values):
                             if len(o["datatype"].validate_from_rdf(values)) == 0:
                                 possible.append([o, values])
                             else:
