@@ -1,9 +1,11 @@
 import csv
+from datetime import datetime
 import io
 from importlib import import_module
 import json
 import logging
 import uuid
+from django.db import connection
 from django.db.models.functions import Lower
 from arches.app.models.models import GraphModel, Node, NodeGroup, ResourceInstance
 from arches.app.models.resource import Resource
@@ -59,6 +61,13 @@ class ImportSingleCsv:
         data = [line for line in reader]
         return data
 
+    def drop_staging_db(self):
+        """
+        when import is done the database should be deleted
+        """
+        with connection.cursor() as cursor:
+            cursor.execute('DROP TABLE etl_staging;')
+
     def validate(self, request):
         """
         Validate the csv file and return true / false
@@ -66,13 +75,38 @@ class ImportSingleCsv:
         Instantiate datatypes and validate the datatype?
         """
         print("validating")
-        try:
-            success = True
-            message = "Everything looks good"
-        except:
-            success = False
-            message = "There was an error"
-        return JSONResponse({"success": False, "message": message})
+        file = request.FILES.get("file")
+        header = request.POST.get("header")
+        graphid = request.POST.get("graphid")
+        fieldnames = request.POST.get("fieldnames").split(",")
+        csvfile = file.read().decode("utf-8")
+        reader = csv.DictReader(io.StringIO(csvfile), fieldnames=fieldnames)
+        if header:
+            next(reader)
+
+        column_names = [fieldname for fieldname in fieldnames if fieldname != '']
+        if len(column_names) == 0:
+            message = "No valid node is selected"
+            return {"success": False, "message": message}  # what would be the right thing to return
+
+        timestamp = int(datetime.now().timestamp())
+        staging_table_name = 'etl_staging_{}'.format(timestamp)
+        staging_table_name = 'etl_staging'
+
+        with connection.cursor() as cursor:
+            cursor.execute("CALL __arches_create_staging_db(%s);", [column_names])
+
+        for row in reader:
+            values = [row[column_name] for column_name in column_names]
+            with connection.cursor() as cursor:
+                cursor.execute("CALL __arches_populate_staging_db(%s, %s);", [column_names, values])
+
+        with connection.cursor() as cursor:
+            cursor.execute("SELECT * FROM __arches_validate_staging_db(%s);", [graphid])
+            result_table = cursor.fetchall()
+            results = dict((row, message) for row, message in result_table)
+
+        return {"results": results}
 
     def write(self, request):
         """
@@ -88,26 +122,28 @@ class ImportSingleCsv:
         fieldnames = request.POST.get("fieldnames").split(",")
         csvfile = file.read().decode("utf-8")
         reader = csv.DictReader(io.StringIO(csvfile), fieldnames=fieldnames)
+        column_names = [fieldname for fieldname in fieldnames if fieldname != '']
+        if len(column_names):
+            message = "No valid node is selected"
+            return {"success": False, "message": message}  # what would be the right thing to return
+
         if header:
             next(reader)
 
-        # for debugging purpose if you have to store the data
-        # data = [line for line in reader]
-        # if header:
-        #     data.pop(0)
-        # for row in data:
-
         for row in reader:
+            values = [row[column_name] for column_name in column_names]
             resource = Resource()
             resource.graph_id = graphid
             resource.save()
             dict_by_nodegroup = {}
-            for key in row:
-                nodegroupid = str(Node.objects.get(nodeid=key).nodegroup_id)
+            for key in values:
+                current_node = Node.objects.filter(name=key).filter(graph_id=graphid)[0]
+                nodegroupid = str(current_node.nodegroup_id)
+                node = str(current_node.nodeid)
                 if nodegroupid in dict_by_nodegroup:
-                    dict_by_nodegroup[nodegroupid].append({key: row[key]})  # data structure here is weird thus line 105
+                    dict_by_nodegroup[nodegroupid].append({node: row[key]})  # data structure here is weird thus line 105
                 else:
-                    dict_by_nodegroup[nodegroupid] = [{key: row[key]}]
+                    dict_by_nodegroup[nodegroupid] = [{node: row[key]}]
 
             for nodegroup in dict_by_nodegroup:
                 tile = Tile.get_blank_tile_from_nodegroup_id(nodegroup)
@@ -117,4 +153,5 @@ class ImportSingleCsv:
                         tile.data[key] = node[key]
                 tile.save()
 
-        return True  # what would be the right thing to return
+        message = "write succeeded"
+        return {"success": True, "message": message}  # what would be the right thing to return

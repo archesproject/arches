@@ -154,7 +154,11 @@ define([
             };
 
             this.validate =function(){
-                console.log("validated");
+                const fieldnames = koMapping.toJS(self.fieldMapping).map(fieldname => fieldname.node);
+                self.formData.append('fieldnames', fieldnames);
+                self.formData.append('header', self.headers());
+                self.formData.append('graphid', self.selectedGraph());
+                self.submit('validate').then(results => console.log(results));
             };
 
             this.submit = function(action) {
