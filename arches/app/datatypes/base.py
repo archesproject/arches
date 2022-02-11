@@ -295,6 +295,12 @@ class BaseDataType(object):
         """
         pass
 
+    def get_first_language_value_from_node(self, tile, nodeid):
+        """
+        If value is internationalized, return only the first value in the i18n object
+        """
+        return tile.data[str(nodeid)]
+
     def pre_tile_save(self, tile, nodeid):
         """
         Called during tile.save operation but before the tile is actually saved to the database
@@ -308,6 +314,12 @@ class BaseDataType(object):
 
         """
         pass
+
+    def is_multilingual_rdf(self, rdf):
+        """
+        Determines if the rdf snippet contains multiple languages that can be processed by a given datatype
+        """
+        return False
 
     def is_a_literal_in_rdf(self):
         """
