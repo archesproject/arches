@@ -235,13 +235,6 @@ class Graph(models.GraphModel):
 
         edge.graph = self
 
-        try:
-            edge.rangenode
-            edge.domainnode
-        except:
-            edge.rangenode = self.nodes[edge.rangenode_id]
-            edge.domainnode = self.nodes[edge.domainnode_id]
-
         if edge.pk is None:
             edge.pk = uuid.uuid1()
         if self.ontology is None:
@@ -740,8 +733,17 @@ class Graph(models.GraphModel):
         for edge_id, edge in copy_of_self.edges.items():
             edge.pk = uuid.uuid1()
             edge.graph = copy_of_self
+            copied_domainnode = edge.domainnode
+            copied_rangenode = edge.rangenode
+            # edge.domainnode_id and rangenode_id refer to orignial nodeid - not new id.
+            # edge.domainnode and edge.rangenode point to the new copied nodes
+            # We have to update those identifiers here
             edge.domainnode_id = edge.domainnode.pk
             edge.rangenode_id = edge.rangenode.pk
+            # in Django 3, this breaks the reference to the domainnode and rangenode
+            # so we have to repair them here
+            edge.domainnode = copied_domainnode
+            edge.rangenode = copied_rangenode
 
         copy_of_self.edges = {edge.pk: edge for edge_id, edge in copy_of_self.edges.items()}
 
