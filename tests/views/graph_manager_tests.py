@@ -339,7 +339,7 @@ class GraphManagerViewTests(ArchesTestCase):
         node_count = len(graph_json["graph"][0]["nodes"])
         self.assertTrue(response._container[0])
         self.assertEqual(node_count, self.NODE_COUNT)
-        self.assertEqual(list(response._headers["content-type"])[1], "json/plain")
+        self.assertEqual(response.headers["content-type"], "json/plain")
 
     def test_graph_import(self):
         """
