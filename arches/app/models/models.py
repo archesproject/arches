@@ -18,7 +18,7 @@ from datetime import timedelta
 from arches.app.utils.module_importer import get_class_from_modulename
 from django.forms.models import model_to_dict
 from django.contrib.gis.db import models
-from django.contrib.postgres.fields import JSONField
+from django.db.models import JSONField
 from django.core.files.storage import FileSystemStorage
 from django.core.mail import EmailMultiAlternatives, get_connection
 from django.template.loader import get_template, render_to_string
@@ -203,7 +203,7 @@ class DDataType(models.Model):
     defaultconfig = JSONField(blank=True, null=True, db_column="defaultconfig")
     configcomponent = models.TextField(blank=True, null=True)
     configname = models.TextField(blank=True, null=True)
-    issearchable = models.NullBooleanField(default=False)
+    issearchable = models.BooleanField(default=False, null=True)
     isgeometric = models.BooleanField()
 
     def __str__(self):
