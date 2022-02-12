@@ -187,7 +187,7 @@ class Concept(models.Model):
     def __init__(self, *args, **kwargs):
         super(Concept, self).__init__(*args, **kwargs)
         if not self.conceptid:
-            self.conceptid = uuid.uuid1() 
+            self.conceptid = uuid.uuid1()
 
     class Meta:
         managed = True
@@ -275,7 +275,7 @@ class Edge(models.Model):
     def __init__(self, *args, **kwargs):
         super(Edge, self).__init__(*args, **kwargs)
         if not self.edgeid:
-            self.edgeid = uuid.uuid1() 
+            self.edgeid = uuid.uuid1()
 
     class Meta:
         managed = True
@@ -315,7 +315,7 @@ class EditLog(models.Model):
     def __init__(self, *args, **kwargs):
         super(EditLog, self).__init__(*args, **kwargs)
         if not self.editlogid:
-            self.editlogid = uuid.uuid1() 
+            self.editlogid = uuid.uuid1()
 
     class Meta:
         managed = True
@@ -339,7 +339,7 @@ class MobileSyncLog(models.Model):
     def __init__(self, *args, **kwargs):
         super(MobileSyncLog, self).__init__(*args, **kwargs)
         if not self.logid:
-            self.logid = uuid.uuid1() 
+            self.logid = uuid.uuid1()
 
     class Meta:
         managed = True
@@ -363,7 +363,7 @@ class ResourceRevisionLog(models.Model):
     def __init__(self, *args, **kwargs):
         super(ResourceRevisionLog, self).__init__(*args, **kwargs)
         if not self.logid:
-            self.logid = uuid.uuid1() 
+            self.logid = uuid.uuid1()
 
     class Meta:
         managed = True
@@ -388,7 +388,7 @@ class TileRevisionLog(models.Model):
     def __init__(self, *args, **kwargs):
         super(TileRevisionLog, self).__init__(*args, **kwargs)
         if not self.logid:
-            self.logid = uuid.uuid1() 
+            self.logid = uuid.uuid1()
 
     class Meta:
         managed = True
@@ -408,7 +408,8 @@ class File(models.Model):
     def __init__(self, *args, **kwargs):
         super(File, self).__init__(*args, **kwargs)
         if not self.fileid:
-            self.fileid = uuid.uuid1() 
+            self.fileid = uuid.uuid1()
+
     class Meta:
         managed = True
         db_table = "files"
@@ -474,7 +475,7 @@ class Function(models.Model):
     def __init__(self, *args, **kwargs):
         super(Function, self).__init__(*args, **kwargs)
         if not self.functionid:
-            self.functionid = uuid.uuid1() 
+            self.functionid = uuid.uuid1()
 
     class Meta:
         managed = True
@@ -503,7 +504,7 @@ class FunctionXGraph(models.Model):
     def __init__(self, *args, **kwargs):
         super(FunctionXGraph, self).__init__(*args, **kwargs)
         if not self.id:
-            self.id = uuid.uuid1() 
+            self.id = uuid.uuid1()
 
     class Meta:
         managed = True
@@ -512,7 +513,7 @@ class FunctionXGraph(models.Model):
 
 
 class GraphModel(models.Model):
-    graphid = models.UUIDField(primary_key=True)  
+    graphid = models.UUIDField(primary_key=True)
     name = models.TextField(blank=True, null=True)
     description = models.TextField(blank=True, null=True)
     deploymentfile = models.TextField(blank=True, null=True)
@@ -562,7 +563,7 @@ class GraphModel(models.Model):
     def __init__(self, *args, **kwargs):
         super(GraphModel, self).__init__(*args, **kwargs)
         if not self.graphid:
-            self.graphid = uuid.uuid1() 
+            self.graphid = uuid.uuid1()
 
     class Meta:
         managed = True
@@ -580,13 +581,13 @@ class Icon(models.Model):
 
 
 class NodeGroup(models.Model):
-    nodegroupid = models.UUIDField(primary_key=True)  
+    nodegroupid = models.UUIDField(primary_key=True)
     legacygroupid = models.TextField(blank=True, null=True)
     cardinality = models.TextField(blank=True, default="1")
     parentnodegroup = models.ForeignKey(
         "self", db_column="parentnodegroupid", blank=True, null=True, on_delete=models.CASCADE
     )  # Allows nodegroups within nodegroups
-    
+
     def __init__(self, *args, **kwargs):
         super(NodeGroup, self).__init__(*args, **kwargs)
         if not self.nodegroupid:
@@ -703,7 +704,6 @@ class Node(models.Model):
         if not self.nodeid:
             self.nodeid = uuid.uuid1()
 
-
     class Meta:
         managed = True
         db_table = "nodes"
@@ -730,7 +730,7 @@ class Ontology(models.Model):
     def __init__(self, *args, **kwargs):
         super(Ontology, self).__init__(*args, **kwargs)
         if not self.ontologyid:
-            self.ontologyid = uuid.uuid1() 
+            self.ontologyid = uuid.uuid1()
 
     class Meta:
         managed = True
@@ -778,7 +778,7 @@ class OntologyClass(models.Model):
     source = models.TextField()
     target = JSONField(null=True)
     ontology = models.ForeignKey("Ontology", db_column="ontologyid", related_name="ontologyclasses", on_delete=models.CASCADE)
-    
+
     def save(self, *args, **kwargs):
         if not self.ontologyclassid:
             self.ontologyclassid = uuid.uuid1()
@@ -787,7 +787,7 @@ class OntologyClass(models.Model):
     def __init__(self, *args, **kwargs):
         super(OntologyClass, self).__init__(*args, **kwargs)
         if not self.ontologyclassid:
-            self.ontologyclassid = uuid.uuid1() 
+            self.ontologyclassid = uuid.uuid1()
 
     class Meta:
         managed = True
@@ -799,7 +799,7 @@ class Relation(models.Model):
     conceptfrom = models.ForeignKey(Concept, db_column="conceptidfrom", related_name="relation_concepts_from", on_delete=models.CASCADE)
     conceptto = models.ForeignKey(Concept, db_column="conceptidto", related_name="relation_concepts_to", on_delete=models.CASCADE)
     relationtype = models.ForeignKey(DRelationType, db_column="relationtype", on_delete=models.CASCADE)
-    relationid = models.UUIDField(primary_key=True)  
+    relationid = models.UUIDField(primary_key=True)
 
     def save(self, *args, **kwargs):
         if not self.relationid:
@@ -809,7 +809,7 @@ class Relation(models.Model):
     def __init__(self, *args, **kwargs):
         super(Relation, self).__init__(*args, **kwargs)
         if not self.relationid:
-            self.relationid = uuid.uuid1() 
+            self.relationid = uuid.uuid1()
 
     class Meta:
         managed = True
@@ -830,7 +830,7 @@ class ReportTemplate(models.Model):
     def defaultconfig_json(self):
         json_string = json.dumps(self.defaultconfig)
         return json_string
-    
+
     def save(self, *args, **kwargs):
         if not self.templateid:
             self.templateid = uuid.uuid1()
@@ -839,7 +839,7 @@ class ReportTemplate(models.Model):
     def __init__(self, *args, **kwargs):
         super(ReportTemplate, self).__init__(*args, **kwargs)
         if not self.templateid:
-            self.templateid = uuid.uuid1() 
+            self.templateid = uuid.uuid1()
 
     class Meta:
         managed = True
@@ -847,7 +847,7 @@ class ReportTemplate(models.Model):
 
 
 class Resource2ResourceConstraint(models.Model):
-    resource2resourceid = models.UUIDField(primary_key=True)  
+    resource2resourceid = models.UUIDField(primary_key=True)
     resourceclassfrom = models.ForeignKey(
         Node,
         db_column="resourceclassfrom",
@@ -868,7 +868,7 @@ class Resource2ResourceConstraint(models.Model):
     def __init__(self, *args, **kwargs):
         super(Resource2ResourceConstraint, self).__init__(*args, **kwargs)
         if not self.resource2resourceid:
-            self.resource2resourceid = uuid.uuid1() 
+            self.resource2resourceid = uuid.uuid1()
 
     class Meta:
         managed = True
@@ -876,7 +876,7 @@ class Resource2ResourceConstraint(models.Model):
 
 
 class ResourceXResource(models.Model):
-    resourcexid = models.UUIDField(primary_key=True)  
+    resourcexid = models.UUIDField(primary_key=True)
     resourceinstanceidfrom = models.ForeignKey(
         "ResourceInstance",
         db_column="resourceinstanceidfrom",
@@ -986,11 +986,10 @@ class ResourceXResource(models.Model):
         se.index_data(index=RESOURCE_RELATIONS_INDEX, body=document, idfield="resourcexid")
         super(ResourceXResource, self).save()
 
-    
     def __init__(self, *args, **kwargs):
         super(ResourceXResource, self).__init__(*args, **kwargs)
         if not self.resourcexid:
-            self.resourcexid = uuid.uuid1() 
+            self.resourcexid = uuid.uuid1()
 
     class Meta:
         managed = True
@@ -998,7 +997,7 @@ class ResourceXResource(models.Model):
 
 
 class ResourceInstance(models.Model):
-    resourceinstanceid = models.UUIDField(primary_key=True)  
+    resourceinstanceid = models.UUIDField(primary_key=True)
     graph = models.ForeignKey(GraphModel, db_column="graphid", on_delete=models.CASCADE)
     legacyid = models.TextField(blank=True, unique=True, null=True)
     createdtime = models.DateTimeField(auto_now_add=True)
@@ -1011,7 +1010,7 @@ class ResourceInstance(models.Model):
     def __init__(self, *args, **kwargs):
         super(ResourceInstance, self).__init__(*args, **kwargs)
         if not self.resourceinstanceid:
-            self.resourceinstanceid = uuid.uuid1() 
+            self.resourceinstanceid = uuid.uuid1()
 
     class Meta:
         managed = True
@@ -1020,7 +1019,7 @@ class ResourceInstance(models.Model):
 
 
 class SearchComponent(models.Model):
-    searchcomponentid = models.UUIDField(primary_key=True)  
+    searchcomponentid = models.UUIDField(primary_key=True)
     name = models.TextField()
     icon = models.TextField(default=None)
     modulename = models.TextField(blank=True, null=True)
@@ -1042,7 +1041,7 @@ class SearchComponent(models.Model):
     def __init__(self, *args, **kwargs):
         super(SearchComponent, self).__init__(*args, **kwargs)
         if not self.searchcomponentid:
-            self.searchcomponentid = uuid.uuid1() 
+            self.searchcomponentid = uuid.uuid1()
 
     class Meta:
         managed = True
@@ -1143,13 +1142,13 @@ class TileModel(models.Model):  # Tile
 
     """
 
-    tileid = models.UUIDField(primary_key=True)  
+    tileid = models.UUIDField(primary_key=True)
     resourceinstance = models.ForeignKey(ResourceInstance, db_column="resourceinstanceid", on_delete=models.CASCADE)
     parenttile = models.ForeignKey("self", db_column="parenttileid", blank=True, null=True, on_delete=models.CASCADE)
-    data = JSONField(blank=True, null=True, db_column="tiledata")  
+    data = JSONField(blank=True, null=True, db_column="tiledata")
     nodegroup = models.ForeignKey(NodeGroup, db_column="nodegroupid", on_delete=models.CASCADE)
     sortorder = models.IntegerField(blank=True, null=True, default=0)
-    provisionaledits = JSONField(blank=True, null=True, db_column="provisionaledits")  
+    provisionaledits = JSONField(blank=True, null=True, db_column="provisionaledits")
 
     class Meta:
         managed = True
@@ -1172,7 +1171,7 @@ class TileModel(models.Model):  # Tile
 
 
 class Value(models.Model):
-    valueid = models.UUIDField(primary_key=True)  
+    valueid = models.UUIDField(primary_key=True)
     concept = models.ForeignKey("Concept", db_column="conceptid", on_delete=models.CASCADE)
     valuetype = models.ForeignKey(DValueType, db_column="valuetype", on_delete=models.CASCADE)
     value = models.TextField()
@@ -1183,11 +1182,10 @@ class Value(models.Model):
             self.valueid = uuid.uuid1()
         super(Value, self).save(*args, **kwargs)
 
-
     def __init__(self, *args, **kwargs):
         super(Value, self).__init__(*args, **kwargs)
         if not self.valueid:
-            self.valueid = uuid.uuid1() 
+            self.valueid = uuid.uuid1()
 
     class Meta:
         managed = True
@@ -1195,7 +1193,7 @@ class Value(models.Model):
 
 
 class FileValue(models.Model):
-    valueid = models.UUIDField(primary_key=True)  
+    valueid = models.UUIDField(primary_key=True)
     concept = models.ForeignKey("Concept", db_column="conceptid", on_delete=models.CASCADE)
     valuetype = models.ForeignKey("DValueType", db_column="valuetype", on_delete=models.CASCADE)
     value = models.FileField(upload_to="concepts")
@@ -1209,7 +1207,7 @@ class FileValue(models.Model):
     def __init__(self, *args, **kwargs):
         super(FileValue, self).__init__(*args, **kwargs)
         if not self.valueid:
-            self.valueid = uuid.uuid1() 
+            self.valueid = uuid.uuid1()
 
     class Meta:
         managed = False
@@ -1268,7 +1266,7 @@ def auto_delete_file_on_change(sender, instance, **kwargs):
 
 
 class Widget(models.Model):
-    widgetid = models.UUIDField(primary_key=True)  
+    widgetid = models.UUIDField(primary_key=True)
     name = models.TextField(unique=True)
     component = models.TextField(unique=True)
     defaultconfig = JSONField(blank=True, null=True, db_column="defaultconfig")
@@ -1292,7 +1290,7 @@ class Widget(models.Model):
         super(Widget, self).__init__(*args, **kwargs)
         if not self.widgetid:
             self.widgetid = uuid.uuid1()
-    
+
     class Meta:
         managed = True
         db_table = "widgets"
@@ -1315,7 +1313,7 @@ class Geocoder(models.Model):
     def __init__(self, *args, **kwargs):
         super(Geocoder, self).__init__(*args, **kwargs)
         if not self.geocoderid:
-            self.geocoderid = uuid.uuid1() 
+            self.geocoderid = uuid.uuid1()
 
     class Meta:
         managed = True
@@ -1369,7 +1367,7 @@ class MapLayer(models.Model):
     def __init__(self, *args, **kwargs):
         super(MapLayer, self).__init__(*args, **kwargs)
         if not self.maplayerid:
-            self.maplayerid = uuid.uuid1() 
+            self.maplayerid = uuid.uuid1()
 
     class Meta:
         managed = True
@@ -1389,7 +1387,7 @@ class GraphXMapping(models.Model):
     def __init__(self, *args, **kwargs):
         super(GraphXMapping, self).__init__(*args, **kwargs)
         if not self.id:
-            self.id = uuid.uuid1() 
+            self.id = uuid.uuid1()
 
     class Meta:
         managed = True
@@ -1463,7 +1461,7 @@ class UserXTask(models.Model):
     def __init__(self, *args, **kwargs):
         super(UserXTask, self).__init__(*args, **kwargs)
         if not self.id:
-            self.id = uuid.uuid1() 
+            self.id = uuid.uuid1()
 
     class Meta:
         managed = True
@@ -1490,7 +1488,7 @@ class NotificationType(models.Model):
     def __init__(self, *args, **kwargs):
         super(NotificationType, self).__init__(*args, **kwargs)
         if not self.typeid:
-            self.typeid = uuid.uuid1() 
+            self.typeid = uuid.uuid1()
 
     class Meta:
         managed = True
@@ -1519,7 +1517,7 @@ class Notification(models.Model):
     def __init__(self, *args, **kwargs):
         super(Notification, self).__init__(*args, **kwargs)
         if not self.id:
-            self.id = uuid.uuid1() 
+            self.id = uuid.uuid1()
 
     class Meta:
         managed = True
@@ -1545,11 +1543,10 @@ class UserXNotification(models.Model):
             self.id = uuid.uuid1()
         super(UserXNotification, self).save(*args, **kwargs)
 
-
     def __init__(self, *args, **kwargs):
         super(UserXNotification, self).__init__(*args, **kwargs)
         if not self.id:
-            self.id = uuid.uuid1() 
+            self.id = uuid.uuid1()
 
     class Meta:
         managed = True
@@ -1579,7 +1576,7 @@ class UserXNotificationType(models.Model):
     def __init__(self, *args, **kwargs):
         super(UserXNotificationType, self).__init__(*args, **kwargs)
         if not self.id:
-            self.id = uuid.uuid1() 
+            self.id = uuid.uuid1()
 
     class Meta:
         managed = True
@@ -1649,7 +1646,7 @@ class MobileSurveyModel(models.Model):
     def __init__(self, *args, **kwargs):
         super(MobileSurveyModel, self).__init__(*args, **kwargs)
         if not self.id:
-            self.id = uuid.uuid1() 
+            self.id = uuid.uuid1()
 
     class Meta:
         managed = True
@@ -1682,7 +1679,7 @@ class MobileSurveyXUser(models.Model):
     def __init__(self, *args, **kwargs):
         super(MobileSurveyXUser, self).__init__(*args, **kwargs)
         if not self.mobile_survey_x_user_id:
-            self.mobile_survey_x_user_id = uuid.uuid1() 
+            self.mobile_survey_x_user_id = uuid.uuid1()
 
     class Meta:
         managed = True
@@ -1703,7 +1700,7 @@ class MobileSurveyXGroup(models.Model):
     def __init__(self, *args, **kwargs):
         super(MobileSurveyXGroup, self).__init__(*args, **kwargs)
         if not self.mobile_survey_x_group_id:
-            self.mobile_survey_x_group_id = uuid.uuid1() 
+            self.mobile_survey_x_group_id = uuid.uuid1()
 
     class Meta:
         managed = True
@@ -1725,7 +1722,7 @@ class MobileSurveyXCard(models.Model):
     def __init__(self, *args, **kwargs):
         super(MobileSurveyXCard, self).__init__(*args, **kwargs)
         if not self.mobile_survey_x_card_id:
-            self.mobile_survey_x_card_id = uuid.uuid1() 
+            self.mobile_survey_x_card_id = uuid.uuid1()
 
     class Meta:
         managed = True
@@ -1746,7 +1743,7 @@ class MapMarker(models.Model):
 
 
 class Plugin(models.Model):
-    pluginid = models.UUIDField(primary_key=True)  
+    pluginid = models.UUIDField(primary_key=True)
     name = models.TextField()
     icon = models.TextField(default=None)
     component = models.TextField()
@@ -1763,8 +1760,7 @@ class Plugin(models.Model):
     def __init__(self, *args, **kwargs):
         super(Plugin, self).__init__(*args, **kwargs)
         if not self.pluginid:
-            self.pluginid = uuid.uuid1() 
-
+            self.pluginid = uuid.uuid1()
 
     def __str__(self):
         return self.name
@@ -1819,7 +1815,7 @@ class VwAnnotation(models.Model):
     def __init__(self, *args, **kwargs):
         super(VwAnnotation, self).__init__(*args, **kwargs)
         if not self.feature_id:
-            self.feature_id = uuid.uuid1() 
+            self.feature_id = uuid.uuid1()
 
     class Meta:
         managed = False
