@@ -1696,7 +1696,7 @@ class DomainDataType(BaseDomainDataType):
     def append_to_document(self, document, nodevalue, nodeid, tile, provisional=False):
         node = models.Node.objects.get(nodeid=nodeid)
         domain_text = self.get_option_text(node, nodevalue)
-        
+
         for key in domain_text.keys():
             val = {
                 "string": domain_text[key],
