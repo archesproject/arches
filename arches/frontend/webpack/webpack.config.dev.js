@@ -5,6 +5,7 @@ const StylelintPlugin = require('stylelint-webpack-plugin');
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 
 const ESLintPlugin = require('eslint-webpack-plugin');
+const HtmlWebpackPlugin = require('html-webpack-plugin');
 
 const common = require('./webpack.common.js');
 
@@ -19,12 +20,15 @@ module.exports = merge(common, {
         hot: true,
     },
     plugins: [
-        // new ESLintPlugin({
-        //     extensions: [`js`, `jsx`],
-        //     // include: [
-        //     //     Path.resolve(__dirname, '../src')
-        //     // ],
-        // }),
+        new ESLintPlugin({
+            extensions: [`js`, `jsx`],
+            // include: [
+            //     Path.resolve(__dirname, '../src')
+            // ],
+        }),
+        new HtmlWebpackPlugin({
+            template: Path.resolve(__dirname, '../src/index.html')
+        }),
         new Webpack.DefinePlugin({
             'process.env.NODE_ENV': JSON.stringify('development'),
         }),
@@ -35,13 +39,6 @@ module.exports = merge(common, {
     ],
     module: {
         rules: [
-            {
-                test: /\.html/,
-                include: Path.resolve(__dirname, '../src'),
-                use: {
-                    loader: 'html-loader',
-                }
-            },
             {
                 test: /\.js$/,
                 include: Path.resolve(__dirname, '../src'),
