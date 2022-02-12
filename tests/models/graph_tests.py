@@ -402,8 +402,8 @@ class GraphTests(ArchesTestCase):
         for newedge in list(graph_copy.edges.values()):
             self.assertIsNotNone(graph_copy.nodes[newedge.domainnode_id])
             self.assertIsNotNone(graph_copy.nodes[newedge.rangenode_id])
-            self.assertEqual(newedge.domainnode_id, graph_copy.nodes[newedge.domainnode_id].nodeid)
-            self.assertEqual(newedge.rangenode_id, graph_copy.nodes[newedge.rangenode_id].nodeid)
+            self.assertEqual(newedge.domainnode, graph_copy.nodes[newedge.domainnode.pk])
+            self.assertEqual(newedge.rangenode, graph_copy.nodes[newedge.rangenode.pk])
             with self.assertRaises(KeyError):
                 graph.edges[newedge.pk]
 

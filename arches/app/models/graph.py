@@ -967,9 +967,9 @@ class Graph(models.GraphModel):
             incoming_edge = list(filter(lambda x: x.rangenode_id == node.nodeid, self.edges.values()))[0]
             parent_node_id = incoming_edge.domainnode_id
             sibling_nodes = [
-                self.nodes[edge.rangenode_id]
+                edge.rangenode
                 for edge in filter(lambda x: x.domainnode_id == parent_node_id, self.edges.values())
-                if edge.rangenode_id != node.nodeid
+                if edge.rangenode.nodeid != node.nodeid
             ]
         return sibling_nodes
 
@@ -1475,11 +1475,11 @@ class Graph(models.GraphModel):
                     )
                 property_found = False
                 okay = False
-                ontology_classes = self.ontology.ontologyclasses.get(source=self.nodes[edge.domainnode_id].ontologyclass)
+                ontology_classes = self.ontology.ontologyclasses.get(source=edge.domainnode.ontologyclass)
                 for classes in ontology_classes.target["down"]:
                     if classes["ontology_property"] == edge.ontologyproperty:
                         property_found = True
-                        if self.nodes[edge.rangenode_id].ontologyclass in classes["ontology_classes"]:
+                        if edge.rangenode.ontologyclass in classes["ontology_classes"]:
                             okay = True
                             break
 
