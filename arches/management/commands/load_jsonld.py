@@ -385,12 +385,13 @@ def monkey_get_documents_to_index(self, node_info):
                         {
                             "_id": f"{nodeid}{tile.tileid}{index}",
                             "_source": {
-                                "value": term,
+                                "value": term.value,
                                 "nodeid": nodeid,
                                 "nodegroupid": tile.nodegroup_id,
                                 "tileid": tile.tileid,
+                                "language": term.lang,
                                 "resourceinstanceid": tile.resourceinstance_id,
-                                "provisional": False,
+                                "provisional": False
                             },
                         }
                     )

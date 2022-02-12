@@ -24,9 +24,10 @@ from arches.app.utils.date_utils import ExtendedDateFormat
 from arches.app.utils.module_importer import get_class_from_modulename
 from arches.app.utils.permission_backend import user_is_resource_reviewer
 from arches.app.utils.geo_utils import GeoUtils
-import arches.app.utils.task_management as task_management
+from arches.app.utils.i18n import get_localized_value
 from arches.app.search.elasticsearch_dsl_builder import Query, Dsl, Bool, Match, Range, Term, Terms, Nested, Exists, RangeDSLException
 from arches.app.search.search_engine_factory import SearchEngineInstance as se
+from arches.app.search.search_term import SearchTerm
 from arches.app.search.mappings import RESOURCES_INDEX, RESOURCE_RELATIONS_INDEX
 from django.core.cache import cache
 from django.core.files.base import ContentFile
@@ -172,9 +173,11 @@ class StringDataType(BaseDataType):
 
         if nodevalue is not None and isinstance(nodevalue, dict):
             for key in nodevalue.keys():
-                if settings.WORDS_PER_SEARCH_TERM is None or (len(nodevalue[key]["value"].split(" ")) < settings.WORDS_PER_SEARCH_TERM):
-                    terms.append({"language": key, "value": nodevalue[key]["value"]})
-
+                try:
+                    if settings.WORDS_PER_SEARCH_TERM is None or (len(nodevalue[key]["value"].split(" ")) < settings.WORDS_PER_SEARCH_TERM):
+                        terms.append(SearchTerm(value=nodevalue[key]["value"], lang=key))
+                except:
+                    pass
         return terms
 
     def append_search_filters(self, value, node, query, request):
@@ -1342,7 +1345,7 @@ class FileListDataType(BaseDataType):
         terms = []
         for file_obj in nodevalue:
             if file_obj["name"] is not None:
-                terms.append(file_obj["name"])
+                terms.append(SearchTerm(value=file_obj["name"]))
 
         return terms
 
@@ -1642,7 +1645,13 @@ class BaseDomainDataType(BaseDataType):
         for option in node.config["options"]:
             if option["id"] == option_id:
                 return option["text"]
-        return ""
+        return {}
+
+    def get_localized_option_text(self, node, option_id):
+        for option in node.config["options"]:
+            if option["id"] == option_id:
+                return get_localized_value(option["text"])
+        return {}
 
     def get_option_id_from_text(self, value):
         # this could be better written with most of the logic in SQL tbh
@@ -1679,36 +1688,42 @@ class DomainDataType(BaseDomainDataType):
         terms = []
         node = models.Node.objects.get(nodeid=nodeid)
         domain_text = self.get_option_text(node, nodevalue)
-        if domain_text is not None:
-            if settings.WORDS_PER_SEARCH_TERM is None or (len(domain_text.split(" ")) < settings.WORDS_PER_SEARCH_TERM):
-                terms.append(domain_text)
+        for lang, text in domain_text.items():
+            if settings.WORDS_PER_SEARCH_TERM is None or (len(text.split(" ")) < settings.WORDS_PER_SEARCH_TERM):
+                terms.append(SearchTerm(value=text, lang=lang))
         return terms
 
     def append_to_document(self, document, nodevalue, nodeid, tile, provisional=False):
-        domain_text = None
-        for tile in document["tiles"]:
-            for k, v in tile.data.items():
-                if v == nodevalue:
-                    node = models.Node.objects.get(nodeid=k)
-                    domain_text = self.get_option_text(node, v)
-
-        if domain_text not in document["strings"] and domain_text is not None:
-            document["strings"].append({"string": domain_text, "nodegroup_id": tile.nodegroup_id, "provisional": provisional})
+        node = models.Node.objects.get(nodeid=nodeid)
+        domain_text = self.get_option_text(node, nodevalue)
+        
+        for key in domain_text.keys():
+            val = {
+                "string": domain_text[key],
+                "language": key,
+                "nodegroup_id": tile.nodegroup_id,
+                "provisional": provisional,
+            }
+            document["strings"].append(val)
 
     def get_display_value(self, tile, node):
         data = self.get_tile_data(tile)
-        return self.get_option_text(node, data[str(node.nodeid)])
+        try:
+            return self.get_localized_option_text(node, data[str(node.nodeid)])
+        except:
+            return ""
 
     def transform_export_values(self, value, *args, **kwargs):
+        print("in transform_export_values")
         ret = ""
         if (
             kwargs["concept_export_value_type"] is None
             or kwargs["concept_export_value_type"] == ""
             or kwargs["concept_export_value_type"] == "label"
         ):
-            ret = self.get_option_text(models.Node.objects.get(nodeid=kwargs["node"]), value)
+            ret = self.get_localized_option_text(models.Node.objects.get(nodeid=kwargs["node"]), value)
         elif kwargs["concept_export_value_type"] == "both":
-            ret = value + "|" + self.get_option_text(models.Node.objects.get(nodeid=kwargs["node"]), value)
+            ret = value + "|" + self.get_localized_option_text(models.Node.objects.get(nodeid=kwargs["node"]), value)
         elif kwargs["concept_export_value_type"] == "id":
             ret = value
         return ret
@@ -1799,33 +1814,37 @@ class DomainListDataType(BaseDomainDataType):
         node = models.Node.objects.get(nodeid=nodeid)
         for val in nodevalue:
             domain_text = self.get_option_text(node, val)
-            if domain_text is not None:
-                if settings.WORDS_PER_SEARCH_TERM is None or (len(domain_text.split(" ")) < settings.WORDS_PER_SEARCH_TERM):
-                    terms.append(domain_text)
+            for lang, text in domain_text.items():
+                if settings.WORDS_PER_SEARCH_TERM is None or (len(text.split(" ")) < settings.WORDS_PER_SEARCH_TERM):
+                    terms.append(SearchTerm(value=text, lang=lang))
 
         return terms
 
     def append_to_document(self, document, nodevalue, nodeid, tile, provisional=False):
         domain_text_values = set([])
-        for tile in document["tiles"]:
-            for k, v in tile.data.items():
-                if v == nodevalue:
-                    node = models.Node.objects.get(nodeid=k)
-                    for value in nodevalue:
-                        text_value = self.get_option_text(node, value)
-                        domain_text_values.add(text_value)
-
-        for value in domain_text_values:
-            if value not in document["strings"]:
-                document["strings"].append({"string": value, "nodegroup_id": tile.nodegroup_id, "provisional": provisional})
+        node = models.Node.objects.get(nodeid=nodeid)
+        for value in nodevalue:
+            domain_text = self.get_option_text(node, value)
+            # domain_text_values.add(text_value)
+            for key in domain_text.keys():
+                val = {
+                    "string": domain_text[key],
+                    "language": key,
+                    "nodegroup_id": tile.nodegroup_id,
+                    "provisional": provisional,
+                }
+                document["strings"].append(val)
 
     def get_display_value(self, tile, node):
         new_values = []
         data = self.get_tile_data(tile)
         if data[str(node.nodeid)] is not None:
             for val in data[str(node.nodeid)]:
-                option = self.get_option_text(node, val)
-                new_values.append(option)
+                try:
+                    option = self.get_localized_option_text(node, val)
+                    new_values.append(option)
+                except:
+                    pass
         return ",".join(new_values)
 
     def transform_export_values(self, value, *args, **kwargs):
@@ -1836,9 +1855,9 @@ class DomainListDataType(BaseDomainDataType):
                 or kwargs["concept_export_value_type"] == ""
                 or kwargs["concept_export_value_type"] == "label"
             ):
-                new_values.append(self.get_option_text(models.Node.objects.get(nodeid=kwargs["node"]), val))
+                new_values.append(self.get_localized_option_text(models.Node.objects.get(nodeid=kwargs["node"]), val))
             elif kwargs["concept_export_value_type"] == "both":
-                new_values.append(val + "|" + self.get_option_text(models.Node.objects.get(nodeid=kwargs["node"]), val))
+                new_values.append(val + "|" + self.get_localized_option_text(models.Node.objects.get(nodeid=kwargs["node"]), val))
             elif kwargs["concept_export_value_type"] == "id":
                 new_values.append(val)
         return ",".join(new_values)
@@ -2229,10 +2248,6 @@ class AnnotationDataType(BaseDataType):
             # data should come in as json but python list is accepted as well
             if isinstance(value, list):
                 return value
-
-    def get_search_terms(self, nodevalue, nodeid=None):
-        # return [nodevalue["address"]]
-        return []
 
     def default_es_mapping(self):
         mapping = {

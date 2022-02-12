@@ -319,36 +319,20 @@ class Resource(models.ResourceInstance):
                     node_terms = datatype_instance.get_search_terms(nodevalue, nodeid)
 
                     for index, term in enumerate(node_terms):
-                        if datatype == "string":
-                            terms.append(
-                                {
-                                    "_id": str(nodeid) + str(tile.tileid) + str(index) + term["language"],
-                                    "_source": {
-                                        "value": term["value"],
-                                        "nodeid": nodeid,
-                                        "nodegroupid": tile.nodegroup_id,
-                                        "tileid": tile.tileid,
-                                        "language": term["language"],
-                                        "resourceinstanceid": tile.resourceinstance_id,
-                                        "provisional": False,
-                                    },
-                                }
-                            )
-                        else:
-                            terms.append(
-                                {
-                                    "_id": str(nodeid) + str(tile.tileid) + str(index),
-                                    "_source": {
-                                        "value": term,
-                                        "nodeid": nodeid,
-                                        "nodegroupid": tile.nodegroup_id,
-                                        "tileid": tile.tileid,
-                                        "language": get_language(),  # TODO: make dynamic based on system language
-                                        "resourceinstanceid": tile.resourceinstance_id,
-                                        "provisional": False,
-                                    },
-                                }
-                            )
+                        terms.append(
+                            {
+                                "_id": str(nodeid) + str(tile.tileid) + str(index) + term.lang,
+                                "_source": {
+                                    "value": term.value,
+                                    "nodeid": nodeid,
+                                    "nodegroupid": tile.nodegroup_id,
+                                    "tileid": tile.tileid,
+                                    "language": term.lang,
+                                    "resourceinstanceid": tile.resourceinstance_id,
+                                    "provisional": False,
+                                },
+                            }
+                        )
 
             if tile.provisionaledits is not None:
                 provisionaledits = tile.provisionaledits
@@ -365,36 +349,20 @@ class Resource(models.ResourceInstance):
                                     node_terms = datatype_instance.get_search_terms(nodevalue, nodeid)
 
                                     for index, term in enumerate(node_terms):
-                                        if datatype == "string":
-                                            terms.append(
-                                                {
-                                                    "_id": str(nodeid) + str(tile.tileid) + str(index) + term["language"],
-                                                    "_source": {
-                                                        "value": term["value"],
-                                                        "nodeid": nodeid,
-                                                        "nodegroupid": tile.nodegroup_id,
-                                                        "tileid": tile.tileid,
-                                                        "language": term["language"],
-                                                        "resourceinstanceid": tile.resourceinstance_id,
-                                                        "provisional": True,
-                                                    },
-                                                }
-                                            )
-                                        else:
-                                            terms.append(
-                                                {
-                                                    "_id": str(nodeid) + str(tile.tileid) + str(index),
-                                                    "_source": {
-                                                        "value": term,
-                                                        "nodeid": nodeid,
-                                                        "nodegroupid": tile.nodegroup_id,
-                                                        "tileid": tile.tileid,
-                                                        "language": get_language(),
-                                                        "resourceinstanceid": tile.resourceinstance_id,
-                                                        "provisional": True,
-                                                    },
-                                                }
-                                            )
+                                        terms.append(
+                                            {
+                                                "_id": str(nodeid) + str(tile.tileid) + str(index) + term.lang,
+                                                "_source": {
+                                                    "value": term.value,
+                                                    "nodeid": nodeid,
+                                                    "nodegroupid": tile.nodegroup_id,
+                                                    "tileid": tile.tileid,
+                                                    "language": term.lang,
+                                                    "resourceinstanceid": tile.resourceinstance_id,
+                                                    "provisional": True,
+                                                },
+                                            }
+                                        )
         return document, terms
 
     def delete(self, user={}, index=True, transaction_id=None):
