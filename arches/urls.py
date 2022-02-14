@@ -295,8 +295,6 @@ urlpatterns = [
 
 if settings.DEBUG:
     try:
-        import debug_toolbar
-
-        urlpatterns = [url(r"^__debug__/", include(debug_toolbar.urls))] + urlpatterns
+        urlpatterns += [url('silk/', include('silk.urls', namespace='silk'))]
     except:
         pass

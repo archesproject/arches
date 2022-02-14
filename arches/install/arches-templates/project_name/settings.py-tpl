@@ -91,8 +91,27 @@ INSTALLED_APPS = (
     'oauth2_provider',
     'django_celery_results',
     'compressor',
+    # "silk.apps.SilkAppConfig",
     '{{ project_name }}',
 )
+
+MIDDLEWARE = [
+    # 'debug_toolbar.middleware.DebugToolbarMiddleware',
+    "corsheaders.middleware.CorsMiddleware",
+    "django.middleware.security.SecurityMiddleware",
+    "django.contrib.sessions.middleware.SessionMiddleware",
+    #'arches.app.utils.middleware.TokenMiddleware',
+    "django.middleware.locale.LocaleMiddleware",
+    "django.middleware.common.CommonMiddleware",
+    "django.middleware.csrf.CsrfViewMiddleware",
+    "arches.app.utils.middleware.ModifyAuthorizationHeader",
+    "oauth2_provider.middleware.OAuth2TokenMiddleware",
+    "django.contrib.auth.middleware.AuthenticationMiddleware",
+    "django.contrib.messages.middleware.MessageMiddleware",
+    # "django.middleware.clickjacking.XFrameOptionsMiddleware",
+    "arches.app.utils.middleware.SetAnonymousUser",
+    # "silk.middleware.SilkyMiddleware",
+]
 
 ALLOWED_HOSTS = []
 
