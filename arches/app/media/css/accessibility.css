@@ -86,7 +86,8 @@ i.report-expander:focus,
 .sp-header-alerts:focus,
 .timeline-entry:focus,
 .rr-splash-help-link:focus,
-.tabbed-report-tab-list li:focus {
+.tabbed-report-tab-list li:focus,
+.jstree-icon:focus {
     outline: #000000 solid 3px !important;
 }
 
@@ -100,4 +101,15 @@ button.search-type-btn:focus {
 
 .search-listing-footer a:focus {
     background: none;
+}
+
+.r-select-card-footer a:focus,
+.install-buttons button:focus,
+.tree-display-tool:focus,
+.tree-display-tool:hover {
+    text-decoration: underline;
+}
+
+a.tree-display-tool, a.tree-display-tool:hover {
+    color: #000;
 }
