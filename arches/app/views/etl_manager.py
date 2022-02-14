@@ -27,9 +27,8 @@ class ETLManagerView(View):
         import_function = getattr(import_module, action)
         response = import_function(request=request)
         print(response)
-        if (response['success']):
-            ret = {"result": response['data']}
+        if response["success"]:
+            ret = {"result": response["data"]}
             return JSONResponse(ret)
         else:
-            return JSONResponse(status=400, reason=response['error'])
-
+            return JSONResponse(status=400, reason=response["error"])
