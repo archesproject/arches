@@ -25,5 +25,11 @@ class ETLManagerView(View):
         module = request.POST.get("module")
         import_module = ETLModule.objects.get(slug=module).get_class_module()()
         import_function = getattr(import_module, action)
-        ret = {"result": import_function(request=request)}
-        return JSONResponse(ret)
+        response = import_function(request=request)
+        print(response)
+        if (response['success']):
+            ret = {"result": response['data']}
+            return JSONResponse(ret)
+        else:
+            return JSONResponse(status=400, reason=response['error'])
+

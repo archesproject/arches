@@ -21,7 +21,6 @@ class ImportSingleCsv:
         self.request = request
 
     def get_graphs(self, request):
-        print("getting graphs")
         graphs = (
             GraphModel.objects.all()
             .exclude(pk=settings.SYSTEM_SETTINGS_RESOURCE_MODEL_ID)
@@ -29,7 +28,7 @@ class ImportSingleCsv:
             .exclude(isactive=False)
             .order_by(Lower("name"))
         )
-        return graphs
+        return {"success": True, "data": graphs}
 
     def get_nodes(self, request):
         """
@@ -39,14 +38,13 @@ class ImportSingleCsv:
         def is_top_nodegroup(nodegroupid):
             return NodeGroup.objects.get(nodegroupid=nodegroupid).parentnodegroup is None
 
-        print("getting top nodes")
         graphid = request.POST.get("graphid")
         nodes = Node.objects.filter(graph_id=graphid).exclude(datatype__in=["semantic"]).order_by(Lower("name"))
         filteredNodes = []
         for node in nodes:
             if is_top_nodegroup(node.nodegroup_id):
                 filteredNodes.append(node)
-        return filteredNodes
+        return {"success": True, "data": filteredNodes}
 
     def read(self, request):
         """
@@ -54,12 +52,12 @@ class ImportSingleCsv:
         Reuiqres csv file and a flag indicating there is a header (can be handled in the front-end)
         Returns the reader object to display in a mapper && in a preview display
         """
-        print("reading")
+
         file = request.FILES.get("file")
         csvfile = file.read().decode("utf-8")
         reader = csv.reader(io.StringIO(csvfile))  # returns iterator
         data = [line for line in reader]
-        return data
+        return {"success": True, "data": data}
 
     def drop_staging_db(self):
         """
@@ -74,7 +72,7 @@ class ImportSingleCsv:
         User mapping is required
         Instantiate datatypes and validate the datatype?
         """
-        print("validating")
+
         file = request.FILES.get("file")
         header = request.POST.get("header")
         graphid = request.POST.get("graphid")
@@ -87,7 +85,7 @@ class ImportSingleCsv:
         column_names = [fieldname for fieldname in fieldnames if fieldname != ""]
         if len(column_names) == 0:
             message = "No valid node is selected"
-            return {"success": False, "message": message}  # what would be the right thing to return
+            return {"success": False, "error": message}  # what would be the right thing to return
 
         timestamp = int(datetime.now().timestamp())
         staging_table_name = "etl_staging_{}".format(timestamp)
@@ -106,7 +104,7 @@ class ImportSingleCsv:
             result_table = cursor.fetchall()
             results = dict((row, message) for row, message in result_table)
 
-        return {"results": results}
+        return {"success": True, "data": results}
 
     def write(self, request):
         """
@@ -115,7 +113,7 @@ class ImportSingleCsv:
         Must be a transaction
         Will sys.exit() work for stop in the middle of importing?
         """
-        print("writing")
+
         file = request.FILES.get("file")
         header = request.POST.get("header")
         graphid = request.POST.get("graphid")
@@ -125,7 +123,7 @@ class ImportSingleCsv:
         column_names = [fieldname for fieldname in fieldnames if fieldname != ""]
         if len(column_names):
             message = "No valid node is selected"
-            return {"success": False, "message": message}  # what would be the right thing to return
+            return {"success": False, "error": message}  # what would be the right thing to return
 
         if header:
             next(reader)
@@ -154,4 +152,4 @@ class ImportSingleCsv:
                 tile.save()
 
         message = "write succeeded"
-        return {"success": True, "message": message}  # what would be the right thing to return
+        return {"success": True, "data": message}  # what would be the right thing to return

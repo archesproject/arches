@@ -38,7 +38,7 @@
         <div class="etl-module-mapping" style="height: calc(100vh - 50px); width: 400px; padding: 25px; overflow: scroll;" data-bind="resizableSidepanel:true">
             <h3>{% trans "Format: Single .csv File Import" %}</h3>
 
-            <div class="etl-module-mapping">
+            <div class="etl-module-mapping" style="margin: 50px 0px;">
                 <h4>{% trans "Target Model" %}</h4>
                 <select data-bind="
                     value: selectedGraph,
@@ -88,13 +88,13 @@
         </div>
         <div class="etl-module-preview" style="height: calc(100vh - 50px); width: calc(100vw - 400px); padding: 25px; overflow: scroll;">
             <h3>{% trans "Data Preview" %}</h3>
-            <div class="etl-module-info" style="font-size: 10pt;">
-                <h3>{% trans "File Info" %}</h3>
+            <div class="etl-module-info" style="font-size: 10pt; margin: 50px 0px;">
+                <h4>{% trans "File Info" %}</h4>
                 <div data-bind="text: fileInfo().name"></div>
                 <div data-bind="html: '{% trans "File Size: " %}' + formatSize(fileInfo().size)"></div>
                 <div data-bind="text: '{% trans "Number of Row: " %}' + numberOfRow()"></div>
             </div>
-            <div class="etl-table">
+            <div class="etl-table" style="margin-bottom: 50px;">
                 <table class="table table-striped" style="margin-top: 25px; border: 1px solid rgba(0,0,0,0.14)" width="100%">
                     <thead>
                         <tr>
@@ -120,19 +120,53 @@
                 <div data-bind="text: '{% trans 'Showing All ' %}' + csvExample().length + '{% trans ' Rows' %}'"></div>
                 <!-- /ko -->
             </div>
+            <div>
+                <!-- ko if: validated -->
+                <h4>{% trans "Validation Errors" %}</h4>
+                <table class="table table-striped" style="margin-top: 25px; border: 1px solid rgba(0,0,0,0.14)" width="100%">
+                    <thead>
+                        <tr>
+                            <th data-bind="text: 'Column Name'"></th>
+                            <th data-bind="text: 'Error Message'"></th>
+                            <th data-bind="text: 'Examples'"></th>
+                        </tr>
+                    </thead>
+                    <!-- ko if: validationError().length -->
+                    <tbody>
+                        <!-- ko foreach: validationError -->
+                        <tr>
+                            <td data-bind="text: column"></td>
+                            <td data-bind="text: error"></td>
+                            <td data-bind="text: example"></td>
+                        </tr>
+                        <!-- /ko -->
+                    </tbody>
+                    <!-- /ko -->
+                    <!-- ko ifnot: validationError().length -->
+                    <tbody>
+                        <tr>
+                            <td colspan="3">{% trans "No Error Found" %}</td>
+                        </tr>
+                    </tbody>
+                    <!-- /ko -->                
+                </table>
+                <!-- /ko -->
+            </div>
             <div class="etl-module-buttons" style="display: inline-flex; flex-direction:row; justify-content: flex-end; margin-top: 25px;">
                 <button data-bind="click: function () { fileAdded(false); }" class="btn btn-primary" style="margin-right: 10px;">
                     <span>{% trans "Remove File" %}</span>
                 </button>
-                <button data-bind="click: changeFormat()" class="btn btn-primary" style="margin-right: 10px;">
+                <button data-bind="click: changeFormat()" class="btn btn-primary" style="display: none; margin-right: 10px;">
                     <span>{% trans "Select a different format" %}</span>
                 </button>
                 <button data-bind="click: validate()" class="btn btn-success" style="margin-right: 10px;">
                     <span>{% trans "Validate data before import" %}</span>
                 </button>
+                <!-- ko if: validated() && validationError().length === 0 -->
                 <button data-bind="click: write()" class="btn btn-success" style="margin-right: 10px;">
                     <span>{% trans "Import data" %}</span>
                 </button>
+                <!-- /ko-->
                 <button data-bind="click: function () { $parent.selectedModule(null); }" class="btn btn-danger" style="margin-right: 10px;">
                     <span>{% trans "Cancel File Import" %}</span>
                 </button>

@@ -30,6 +30,8 @@ define([
             this.numberOfExampleRow = ko.observable();
 
             this.fileAdded = ko.observable(false);
+            this.validated = ko.observable();
+            this.validationError = ko.observableArray();
             this.formData = new window.FormData();
             this.transaction_id = uuid.generate();
             this.uniqueId = uuid.generate();
@@ -72,7 +74,6 @@ define([
                             };
                         })
                     );
-                    console.log(self.fieldMapping());
                 }
             });
 
@@ -86,8 +87,10 @@ define([
                 return '<strong>' + parseFloat((bytes / Math.pow(k, i)).toFixed(dm)) + '</strong> ' + sizes[i];
             };
 
-            this.csvArray.subscribe(function(val){
+            this.csvArray.subscribe(function(val){ //array of array
+                console.log(val)
                 self.numberOfCol(val[0].length);
+                let i = 1;
                 if (self.hasHeaders()) {
                     self.headers(val[0]);
                     self.csvBody(val.slice(1));
@@ -153,12 +156,54 @@ define([
                 console.log("format changed");
             };
 
+            const findField = (node) => {
+                return koMapping.toJS(self.fieldMapping).find(mapping => 
+                    node.toLowerCase() === mapping.node.toLowerCase()
+                ).field;
+            };
+
             this.validate =function(){
+                self.validated(false);
                 const fieldnames = koMapping.toJS(self.fieldMapping).map(fieldname => fieldname.node);
                 self.formData.append('fieldnames', fieldnames);
                 self.formData.append('header', self.headers());
                 self.formData.append('graphid', self.selectedGraph());
-                self.submit('validate').then(results => console.log(results));
+                self.submit('validate').then(data => {
+                    const response = data.result;
+                    self.validated(true);
+
+                    let errorByColumn = {};
+                    for (const rowNumber in response) {
+                        for (const columnName in response[rowNumber]) {
+                            if (columnName in errorByColumn) {
+                                errorByColumn[columnName].push(
+                                    response[rowNumber][columnName]
+                                );
+                            } else {
+                                errorByColumn[columnName] = [
+                                    response[rowNumber][columnName]
+                                ];
+                            }
+                        };
+                    };
+                    for (columnName in errorByColumn) {
+                        const error = Object.keys(errorByColumn[columnName][0])[0];
+                        const example = errorByColumn[columnName].reduce(
+                                (acc, error) => {
+                                    Object.values(error)[0]
+                                    acc = [acc, Object.values(error)[0]].filter(Boolean).join(", ")
+                                    return acc;
+                            }, '');
+                        const header = findField(columnName)
+                        this.validationError.push(
+                            {
+                                column: header,
+                                error: error,
+                                example: example
+                            }
+                        );
+                    }    
+                }).fail(error => console.log(error));
             };
 
             this.submit = function(action) {
