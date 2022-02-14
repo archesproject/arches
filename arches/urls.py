@@ -295,6 +295,6 @@ urlpatterns = [
 
 if settings.DEBUG:
     try:
-        urlpatterns += [url('silk/', include('silk.urls', namespace='silk'))]
+        urlpatterns += [url("silk/", include("silk.urls", namespace="silk"))]
     except:
         pass
