@@ -291,8 +291,8 @@ class Resource(models.ResourceInstance):
 
         for tile in document["tiles"]:
             for nodeid, nodevalue in tile.data.items():
-                datatype = node_datatypes[nodeid]
                 if nodevalue != "" and nodevalue != [] and nodevalue != {} and nodevalue is not None:
+                    datatype = node_datatypes[nodeid]
                     datatype_instance = datatype_factory.get_instance(datatype)
                     datatype_instance.append_to_document(document, nodevalue, nodeid, tile)
                     node_terms = datatype_instance.get_search_terms(nodevalue, nodeid)
@@ -319,8 +319,8 @@ class Resource(models.ResourceInstance):
                     for user, edit in provisionaledits.items():
                         if edit["status"] == "review":
                             for nodeid, nodevalue in edit["value"].items():
-                                datatype = node_datatypes[nodeid]
                                 if nodevalue != "" and nodevalue != [] and nodevalue != {} and nodevalue is not None:
+                                    datatype = node_datatypes[nodeid]
                                     datatype_instance = datatype_factory.get_instance(datatype)
                                     datatype_instance.append_to_document(document, nodevalue, nodeid, tile, True)
                                     node_terms = datatype_instance.get_search_terms(nodevalue, nodeid)
@@ -604,7 +604,7 @@ class Resource(models.ResourceInstance):
 
         return JSONSerializer().serializeToPython(ret)
 
-    def to_json(self, compact=True, hide_empty_nodes=False, user=None, perm=None, version=None):
+    def to_json(self, compact=True, hide_empty_nodes=False, user=None, perm=None, version=None, hide_hidden_nodes=False):
         """
         Returns resource represented as disambiguated JSON graph
 
@@ -613,9 +613,13 @@ class Resource(models.ResourceInstance):
         hide_empty_nodes -- type bool: hide nodes without data
         """
         if version is None:
-            return LabelBasedGraph.from_resource(resource=self, compact=compact, hide_empty_nodes=hide_empty_nodes, user=user, perm=perm)
+            return LabelBasedGraph.from_resource(
+                resource=self, compact=compact, hide_empty_nodes=hide_empty_nodes, user=user, perm=perm, hide_hidden_nodes=hide_hidden_nodes
+            )
         elif version == "beta":
-            return LabelBasedGraphV2.from_resource(resource=self, compact=compact, hide_empty_nodes=hide_empty_nodes, user=user, perm=perm)
+            return LabelBasedGraphV2.from_resource(
+                resource=self, compact=compact, hide_empty_nodes=hide_empty_nodes, user=user, perm=perm, hide_hidden_nodes=hide_hidden_nodes
+            )
 
     @staticmethod
     def to_json__bulk(resources, compact=True, hide_empty_nodes=False, version=None):

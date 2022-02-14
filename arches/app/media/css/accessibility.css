@@ -196,7 +196,8 @@ a:hover, a:focus {
     color: #17568c;
 }
 
-a:focus, button:focus,
+a:focus,
+button:focus,
 input:focus,
 textarea:focus,
 .form-control:focus,
@@ -208,15 +209,16 @@ i.report-expander:focus,
 .sp-header-alerts:focus,
 .timeline-entry:focus,
 .rr-splash-help-link:focus,
-.tabbed-report-tab-list li:focus {
-    outline: #006600 solid 3px !important;
+.tabbed-report-tab-list li:focus,
+.jstree-icon:focus {
+    outline: #000000 solid 3px !important;
 }
 
 .workbench-card-sidebar-tab:focus,
 .search-facet-item:focus,
 button.saved-search-container:focus,
 button.search-type-btn:focus {
-    box-shadow: inset 0 0 0 2px #006600;
+    box-shadow: inset 0 0 0 2px #000000;
     outline: none !important;
 }
 
@@ -294,4 +296,19 @@ button.search-type-btn:focus {
 
 .btn-u.btn-u-default {
     background: #4D5B5B;
+}
+
+.search-listing-footer a:focus {
+    background: none;
+}
+
+.r-select-card-footer a:focus,
+.install-buttons button:focus,
+.tree-display-tool:focus,
+.tree-display-tool:hover {
+    text-decoration: underline;
+}
+
+a.tree-display-tool, a.tree-display-tool:hover {
+    color: #000;
 }
