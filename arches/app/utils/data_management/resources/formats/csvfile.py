@@ -142,15 +142,16 @@ class CsvWriter(Writer):
         languages = kwargs.get("languages")
 
         # Return data for specified languages - current language if none are specified, or if specified languages are all invalid
-        if languages == None:
-            language_codes = [get_language()]
-        elif languages == "all":
-            language_codes = Language.objects.values_list("code", flat=True)
-        else:
-            language_codes = [value for value in languages.split(",") if value in Language.objects.values_list("code", flat=True)]
-            if len(language_codes) < 1:
-                language_codes = [get_language()]
-        
+        language_codes = Language.objects.values_list("code", flat=True)
+
+        if not(languages == None or languages == "all"):
+            try:
+                requested_languages = [value for value in languages.split(",") if value in Language.objects.values_list("code", flat=True)]
+                if len(requested_languages) > 0:
+                    language_codes = requested_languages
+            except:
+                pass
+
         other_group_records = []
         mapping = {}
         concept_export_value_lookup = {}
