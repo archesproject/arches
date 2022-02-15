@@ -122,12 +122,12 @@ class MapBaseManagerView(BaseManagerView):
         map_sources = []
         allowed_sourcenames = []
 
-        if self.request.user.is_superuser == True:
+        if self.request.user.is_superuser is True:
             map_layers = all_map_layers
             map_sources = all_map_sources
         else:
             for m in all_map_layers:
-                if m.addtomap == True:
+                if m.addtomap is True:
                     map_layers.append(m)
                     source_names = list(dict.fromkeys([x["source"] for x in m.layerdefinitions if "source" in x]))
                     allowed_sourcenames.extend(source_names)
