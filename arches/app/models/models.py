@@ -1031,6 +1031,8 @@ class MapSource(models.Model):
     class Meta:
         managed = True
         db_table = "map_sources"
+        default_permissions = ()
+        permissions = (("no_access_to_mapsource", "No access to map source"),)
 
 
 class MapLayer(models.Model):
@@ -1058,6 +1060,8 @@ class MapLayer(models.Model):
     class Meta:
         managed = True
         db_table = "map_layers"
+        default_permissions = ()
+        permissions = (("no_access_to_maplayer", "No access to map layer"),)
 
 
 class GraphXMapping(models.Model):
@@ -1358,6 +1362,7 @@ class IIIFManifest(models.Model):
     class Meta:
         managed = True
         db_table = "iiif_manifests"
+
 
 class GroupMapSettings(models.Model):
     group = models.OneToOneField(Group, on_delete=models.CASCADE)

@@ -217,9 +217,7 @@ class ResourceEditorView(MapBaseManagerView):
                 if append_tile is True:
                     provisionaltiles.append(tile)
             tiles = provisionaltiles
-        map_layers = models.MapLayer.objects.all()
         map_markers = models.MapMarker.objects.all()
-        map_sources = models.MapSource.objects.all()
         geocoding_providers = models.Geocoder.objects.all()
         templates = models.ReportTemplate.objects.all()
 
@@ -251,9 +249,7 @@ class ResourceEditorView(MapBaseManagerView):
             nodes=JSONSerializer().serialize(nodes),
             cardwidgets=JSONSerializer().serialize(cardwidgets),
             datatypes_json=JSONSerializer().serialize(datatypes, exclude=["iconclass", "modulename", "classname"]),
-            map_layers=map_layers,
             map_markers=map_markers,
-            map_sources=map_sources,
             geocoding_providers=geocoding_providers,
             user_is_reviewer=json.dumps(user_is_reviewer),
             user_can_delete_resource=can_delete,
@@ -297,7 +293,6 @@ class ResourceEditorView(MapBaseManagerView):
             return HttpResponseNotFound()
         except PermissionDenied:
             return JSONErrorResponse(delete_error, delete_msg)
-
 
     def copy(self, request, resourceid=None):
         resource_instance = Resource.objects.get(pk=resourceid)
@@ -696,9 +691,7 @@ class ResourceReportView(MapBaseManagerView):
         graph = Graph.objects.only("name", "iconclass").get(graphid=resource.graph_id)
 
         try:
-            map_layers = models.MapLayer.objects.all()
             map_markers = models.MapMarker.objects.all()
-            map_sources = models.MapSource.objects.all()
             geocoding_providers = models.Geocoder.objects.all()
         except AttributeError:
             raise Http404(_("No active report template is available for this resource."))
@@ -709,9 +702,7 @@ class ResourceReportView(MapBaseManagerView):
             report_templates=models.ReportTemplate.objects.all(),
             card_components=models.CardComponent.objects.all(),
             widgets=models.Widget.objects.all(),
-            map_layers=map_layers,
             map_markers=map_markers,
-            map_sources=map_sources,
             geocoding_providers=geocoding_providers,
         )
 

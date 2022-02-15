@@ -194,9 +194,7 @@ class MobileSurveyDesignerView(MapBaseManagerView):
             )
 
         history = {"lastsync": "", "edits": 0, "editors": {}}
-        map_layers = models.MapLayer.objects.all()
         map_markers = models.MapMarker.objects.all()
-        map_sources = models.MapSource.objects.all()
         geocoding_providers = models.Geocoder.objects.all()
 
         survey_exists = models.MobileSurveyModel.objects.filter(pk=surveyid).exists()
@@ -233,9 +231,7 @@ class MobileSurveyDesignerView(MapBaseManagerView):
 
         serializer = JSONSerializer()
         context = self.get_context_data(
-            map_layers=map_layers,
             map_markers=map_markers,
-            map_sources=map_sources,
             history=serializer.serialize(history),
             geocoding_providers=geocoding_providers,
             mobile_survey=serializer.serialize(mobile_survey, sort_keys=False),
