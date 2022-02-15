@@ -250,7 +250,7 @@ class StringDataType(BaseDataType):
 
     def has_multicolumn_data(self):
         return True
-    
+
     def get_column_header(self, node, **kwargs):
         """
         Returns a CSV column header or headers for a given node ID of this type

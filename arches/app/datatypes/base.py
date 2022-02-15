@@ -434,14 +434,14 @@ class BaseDataType(object):
         ret = {"@display_value": self.get_display_value(tile, node)}
         ret.update(kwargs)
         return ret
-    
+
     def has_multicolumn_data(self):
-        """ 
-        Used primarily for csv exports - true if data 
+        """
+        Used primarily for csv exports - true if data
         for a node can span multiple columns
         """
         return False
-    
+
     def get_column_header(self, node, **kwargs):
         """
         Returns a CSV column header or headers for a given node ID of this type

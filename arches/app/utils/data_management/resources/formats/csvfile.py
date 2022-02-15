@@ -115,7 +115,7 @@ class CsvWriter(Writer):
 
     def transform_value_for_export(self, datatype, value, concept_export_value_type, node, column=None):
         datatype_instance = self.datatype_factory.get_instance(datatype)
-        
+
         # for export of multilingual nodes/columns
         if column:
             lang_regex = re.compile(".+ \(([A-Za-z-]+)\)")
@@ -126,9 +126,7 @@ class CsvWriter(Writer):
                     value, concept_export_value_type=concept_export_value_type, node=node, language=lang
                 )
 
-        return datatype_instance.transform_export_values(
-            value, concept_export_value_type=concept_export_value_type, node=node
-        )
+        return datatype_instance.transform_export_values(value, concept_export_value_type=concept_export_value_type, node=node)
 
     def write_resources(self, graph_id=None, resourceinstanceids=None, **kwargs):
         # use the graph id from the mapping file, not the one passed in to the method
@@ -141,7 +139,7 @@ class CsvWriter(Writer):
         # Return data for specified languages - current language if none are specified, or if specified languages are all invalid
         language_codes = Language.objects.values_list("code", flat=True)
 
-        if not(languages == None or languages == "all"):
+        if not (languages == None or languages == "all"):
             try:
                 requested_languages = [value for value in languages.split(",") if value in Language.objects.values_list("code", flat=True)]
                 if len(requested_languages) > 0:
@@ -1048,12 +1046,15 @@ class CsvReader(Reader):
                                                 # Check for source and target key match.
                                                 if source_key == target_key:
                                                     datatype_instance = datatype_factory.get_instance(node_datatypes[source_key])
-                                                    if tile_to_populate.data[source_key] is None or datatype_instance.has_multicolumn_data():
+                                                    if (
+                                                        tile_to_populate.data[source_key] is None
+                                                        or datatype_instance.has_multicolumn_data()
+                                                    ):
                                                         # If match populate target_tile node with transformed value.
                                                         value = transform_value(
                                                             node_datatypes[source_key], source_tile[source_key], row_number, source_key
                                                         )
-                                                        
+
                                                         # if a multicolumn data type with value as dict, those should be merged.
                                                         if datatype_instance.has_multicolumn_data() and isinstance(
                                                             tile_to_populate.data[source_key], dict

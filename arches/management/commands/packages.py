@@ -265,7 +265,12 @@ class Command(BaseCommand):
 
         if options["operation"] == "export_business_data":
             self.export_business_data(
-                options["dest_dir"], options["format"], options["config_file"], options["graphs"], options["single_file"], options["languages"]
+                options["dest_dir"],
+                options["format"],
+                options["config_file"],
+                options["graphs"],
+                options["single_file"],
+                options["languages"],
             )
 
         if options["operation"] == "import_reference_data":
@@ -990,7 +995,7 @@ class Command(BaseCommand):
         management.call_command("es", operation="delete_indexes")
 
     def export_business_data(
-        self, data_dest=None, file_format=None, config_file=None, graphid=None, single_file=False, languages:str=None
+        self, data_dest=None, file_format=None, config_file=None, graphid=None, single_file=False, languages: str = None
     ):
         graphids = []
         if graphid is False and file_format == "json":
