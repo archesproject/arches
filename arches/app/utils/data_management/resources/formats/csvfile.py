@@ -113,25 +113,22 @@ class CsvWriter(Writer):
 
         return configs
 
-    def transform_value_for_export(self, datatype, value, concept_export_value_type, node, language=None):
+    def transform_value_for_export(self, datatype, value, concept_export_value_type, node, column=None):
         datatype_instance = self.datatype_factory.get_instance(datatype)
-        value = datatype_instance.transform_export_values(
-            value, concept_export_value_type=concept_export_value_type, node=node, language=language
-        )
-        return value
-
-    def get_language_values(self, node_id: str, mapping: list, tiledata: dict, concept_export_value_type: str) -> dict:
-        result = {}
-        for language_column in mapping[node_id]:
+        
+        # for export of multilingual nodes/columns
+        if column:
             lang_regex = re.compile(".+ \(([A-Za-z-]+)\)")
-            matches = lang_regex.match(language_column)
+            matches = lang_regex.match(column)
             if len(matches.groups()) > 0:
                 lang = matches.groups()[0]
-                value = self.transform_value_for_export(
-                    self.node_datatypes[node_id], tiledata[node_id], concept_export_value_type, node_id, lang
+                return datatype_instance.transform_export_values(
+                    value, concept_export_value_type=concept_export_value_type, node=node, language=lang
                 )
-                result[language_column] = value
-        return result
+
+        return datatype_instance.transform_export_values(
+            value, concept_export_value_type=concept_export_value_type, node=node
+        )
 
     def write_resources(self, graph_id=None, resourceinstanceids=None, **kwargs):
         # use the graph id from the mapping file, not the one passed in to the method
@@ -158,15 +155,13 @@ class CsvWriter(Writer):
         csv_header = ["ResourceID"]
         for resource_export_config in self.resource_export_configs:
             for node in resource_export_config["nodes"]:
+                datatype_instance = self.datatype_factory.get_instance(node["data_type"])
                 if node["file_field_name"] == "ResourceID":
                     pass
-                elif node["file_field_name"] != "" and node["export"] is True and node["data_type"] != "string":
-                    mapping[node["arches_nodeid"]] = node["file_field_name"]
-                    csv_header += [node["file_field_name"]]
-                elif node["file_field_name"] != "" and node["export"] is True and node["data_type"] == "string":
-                    columns = ["{column} ({code})".format(column=node["file_field_name"], code=code) for code in language_codes]
-                    csv_header += columns
-                    mapping[node["arches_nodeid"]] = columns
+                elif node["file_field_name"] != "" and node["export"] is True:
+                    column_headers = datatype_instance.get_column_header(node, language_codes=language_codes)
+                    mapping[node["arches_nodeid"]] = column_headers
+                    csv_header += column_headers if isinstance(column_headers, list) else [column_headers]
                 if "concept_export_value" in node:
                     concept_export_value_lookup[node["arches_nodeid"]] = node["concept_export_value"]
 
@@ -199,30 +194,30 @@ class CsvWriter(Writer):
                                 if k in concept_export_value_lookup:
                                     concept_export_value_type = concept_export_value_lookup[k]
                                 if tile.data[k] is not None:
-                                    if self.node_datatypes[k] == "string":
-                                        language_values = self.get_language_values(k, mapping, tile.data, concept_export_value_type)
-                                        if language_values is not None:
-                                            csv_record = {**csv_record, **language_values}
+                                    if isinstance(mapping[k], list):
+                                        for column in mapping[k]:
+                                            csv_record[column] = self.transform_value_for_export(
+                                                self.node_datatypes[k], tile.data[k], concept_export_value_type, k, column
+                                            )
                                     else:
                                         value = self.transform_value_for_export(
                                             self.node_datatypes[k], tile.data[k], concept_export_value_type, k
                                         )
                                         csv_record[mapping[k]] = value
+
                                 del tile.data[k]
                             else:
                                 concept_export_value_type = None
                                 if k in concept_export_value_lookup:
                                     concept_export_value_type = concept_export_value_lookup[k]
-                                if self.node_datatypes[k] == "string":
-                                    language_values = self.get_language_values(k, mapping, tile.data, concept_export_value_type)
-                                    if language_values is not None:
-                                        other_group_record = {**other_group_record, **language_values}
+                                if isinstance(mapping[k], list):
+                                    for column in mapping[k]:
+                                        other_group_record[column] = self.transform_value_for_export(
+                                            self.node_datatypes[k], tile.data[k], concept_export_value_type, k, column
+                                        )
                                 else:
                                     value = self.transform_value_for_export(
-                                        self.node_datatypes[k],
-                                        tile.data[k],
-                                        concept_export_value_type,
-                                        k,
+                                        self.node_datatypes[k], tile.data[k], concept_export_value_type, k
                                     )
                                     other_group_record[mapping[k]] = value
                         else:
@@ -869,16 +864,17 @@ class CsvReader(Reader):
                                 if collection_id is not None:
                                     value = concept_lookup.lookup_labelid_from_label(value, collection_id)
                         try:
-                            if datatype == "string":
-                                language = None
+                            language = None
+                            try:
                                 regex = re.compile("(.+)\|([A-Za-z-]+)$", flags=re.DOTALL | re.MULTILINE)
                                 match = regex.match(value)
                                 if match is not None:
                                     language = match.groups()[1]
                                     value = match.groups()[0]
-                                value = datatype_instance.transform_value_for_tile(value, language=language)
-                            else:
-                                value = datatype_instance.transform_value_for_tile(value)
+                            except:
+                                pass
+
+                            value = datatype_instance.transform_value_for_tile(value, language=language)
                             errors = datatype_instance.validate(value, row_number=row_number, source=source, nodeid=nodeid)
                         except Exception as e:
                             errors.append(
@@ -1051,12 +1047,15 @@ class CsvReader(Reader):
                                             for source_key in list(source_tile.keys()):
                                                 # Check for source and target key match.
                                                 if source_key == target_key:
-                                                    if tile_to_populate.data[source_key] is None or node_datatypes[source_key] == "string":
+                                                    datatype_instance = datatype_factory.get_instance(node_datatypes[source_key])
+                                                    if tile_to_populate.data[source_key] is None or datatype_instance.has_multicolumn_data():
                                                         # If match populate target_tile node with transformed value.
                                                         value = transform_value(
                                                             node_datatypes[source_key], source_tile[source_key], row_number, source_key
                                                         )
-                                                        if node_datatypes[source_key] == "string" and isinstance(
+                                                        
+                                                        # if a multicolumn data type with value as dict, those should be merged.
+                                                        if datatype_instance.has_multicolumn_data() and isinstance(
                                                             tile_to_populate.data[source_key], dict
                                                         ):
                                                             tile_to_populate.data[source_key] = {
