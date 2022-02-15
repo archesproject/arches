@@ -139,7 +139,7 @@ class CsvWriter(Writer):
         # Return data for specified languages - current language if none are specified, or if specified languages are all invalid
         language_codes = Language.objects.values_list("code", flat=True)
 
-        if not (languages == None or languages == "all"):
+        if not (languages is None or languages == "all"):
             try:
                 requested_languages = [value for value in languages.split(",") if value in Language.objects.values_list("code", flat=True)]
                 if len(requested_languages) > 0:
