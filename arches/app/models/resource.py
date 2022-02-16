@@ -89,7 +89,7 @@ class Resource(models.ResourceInstance):
     def displayname(self):
         return self.get_descriptor("name")
 
-    def save_edit(self, user={}, note="", edit_type=""):
+    def save_edit(self, user={}, note="", edit_type="", transaction_id=None):
         timestamp = datetime.datetime.now()
         edit = EditLog()
         edit.resourceclassid = self.graph_id
@@ -100,6 +100,8 @@ class Resource(models.ResourceInstance):
         edit.user_lastname = getattr(user, "last_name", "")
         edit.note = note
         edit.timestamp = timestamp
+        if transaction_id is not None:
+            edit.transactionid = transaction_id
         edit.edittype = edit_type
         edit.save()
 
@@ -168,7 +170,7 @@ class Resource(models.ResourceInstance):
         return [flat_tile for tile in self.tiles for flat_tile in tile.get_flattened_tiles()]
 
     @staticmethod
-    def bulk_save(resources, flat=False):
+    def bulk_save(resources, flat=False, transaction_id=None):
         """
         Saves and indexes a list of resources
 
@@ -190,15 +192,36 @@ class Resource(models.ResourceInstance):
             tiles = [tile for resource in resources for tile in resource.tiles]
 
         # need to save the models first before getting the documents for index
-        Resource.objects.bulk_create(resources)
+        # need to handle if the bulk load is appending tiles to existing resources/
+        existing_resources_ids = Resource.objects.filter(
+            resourceinstanceid__in=[resource.resourceinstanceid for resource in resources]
+        ).values_list("resourceinstanceid", flat=True)
+
+        resources_to_update = [resource for resource in resources if resource.resourceinstanceid in existing_resources_ids]
+        resources_to_create = [resource for resource in resources if resource.resourceinstanceid not in existing_resources_ids]
+
+
+        Resource.objects.bulk_create(resources_to_create)
         TileModel.objects.bulk_create(tiles)
+        
+        for resource in resources_to_update:
+            resource.save_edit(edit_type="append", transaction_id=transaction_id)
+        
+        for resource in resources_to_create:
+            resource.save_edit(edit_type="create", transaction_id=transaction_id)
 
         for resource in resources:
-            resource.save_edit(edit_type="create")
+            try:
+                resource.tiles[0].save_edit(
+                    note=f"Bulk created: {len(resource.tiles)} for resourceid {resource.resourceinstanceid} ",
+                    edit_type="bulk_create",
+                    transaction_id=transaction_id,
+                )
+            except:
+                pass
 
-        resources[0].tiles[0].save_edit(note=f"Bulk created: {len(tiles)} for {len(resources)} resources.", edit_type="bulk_create")
-
-        for resource in resources:
+        # refetch new AND updated resources and index
+        for resource in Resource.objects.filter(resourceinstanceid__in=[resource.resourceinstanceid for resource in resources]):
             document, terms = resource.get_documents_to_index(
                 fetchTiles=False, datatype_factory=datatype_factory, node_datatypes=node_datatypes
             )
