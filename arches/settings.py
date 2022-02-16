@@ -272,7 +272,7 @@ STATICFILES_DIRS = (
     # Put strings here, like "/home/html/static" or "C:/www/django/static".
     # Always use forward slashes, even on Windows.
     # Don't forget to use absolute paths, not relative paths.
-    os.path.join(ROOT_DIR, "frontend", "build"),
+    os.path.join(ROOT_DIR, 'app', "frontend", "build"),
     # os.path.join(ROOT_DIR, "app", "media"),
 )
 
@@ -384,7 +384,7 @@ MIDDLEWARE = [
 
 WEBPACK_LOADER = {
     'DEFAULT': {
-        'STATS_FILE': os.path.join(ROOT_DIR, "frontend", "webpack-stats.json"),
+        'STATS_FILE': os.path.join(ROOT_DIR, "app", "frontend", "webpack-stats.json"),
     },
 }
 
