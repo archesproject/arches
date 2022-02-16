@@ -6,7 +6,7 @@ const BundleTracker = require('webpack-bundle-tracker');
 
 module.exports = {
     entry: {
-        app: Path.resolve(__dirname, '../src/scripts/index.js'),
+        app: Path.resolve(__dirname, '../media/js/config-manager.js'),
     },
     output: {
         path: Path.join(__dirname, '../build'),
