@@ -16,7 +16,18 @@ module.exports = {
     optimization: {
         splitChunks: {
             chunks: 'all',
-            name: 'vendors',
+            cacheGroups: {
+                vendor: {
+                    test: /[\\/]node_modules[\\/]/,
+                    name(module) {
+                        // Extracts node_modules to separate packages
+                        const packageName = module.context.match(
+                            /[\\/]node_modules[\\/](.*?)([\\/]|$)/
+                        )[1];
+                        return `npm.${packageName.replace("@", "")}`;
+                    }
+                },
+            }
         },
     },
     plugins: [
