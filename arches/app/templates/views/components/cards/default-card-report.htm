@@ -43,10 +43,10 @@
                     <!-- ko if: $parent.inResourceEditor -->
                     <div class="rp-edit-buttons">
                         <!-- ko if: tile.parent.selected() && tile.parent.cardinality == 'n' -->
-                        <i class="fa fa-copy" data-bind="click: function(){tile.parent.copyTile(tile)}"></i>
+                        <i tabindex="0" class="fa fa-copy" data-bind="click: function(){tile.parent.copyTile(tile)}" onkeyup="if(event.which == 13 || event.keyCode == 13){ $(this).trigger('click'); }"></i>
                         <!-- /ko -->
-                        <i class="fa fa-pencil" data-bind="click: function(){tile.selected(true)}"></i>
-                        <i class="fa fa-trash" data-bind="click: function(){console.log(tile); tile.deleteTile()}"></i>
+                        <i tabindex="0" class="fa fa-pencil" data-bind="click: function(){tile.selected(true)}" onkeyup="if(event.which == 13 || event.keyCode == 13){ $(this).trigger('click'); }"></i>
+                        <i tabindex="0" class="fa fa-trash" data-bind="click: function(){console.log(tile); tile.deleteTile()}" onkeyup="if(event.which == 13 || event.keyCode == 13){ $(this).trigger('click'); }"></i>
                     </div>
                     <!-- /ko -->
                     </div>
@@ -87,7 +87,7 @@
             </div>
             <!-- ko if: $parent.inResourceEditor -->
             <div class="rp-edit-buttons" style="justify-content: flex-end;">
-            <i class="fa fa-plus-circle" data-bind="click: function(){$parent.revealForm(card)}"></i>
+            <i tabindex="0" class="fa fa-plus-circle" data-bind="click: function(){$parent.revealForm(card)}" onkeyup="if(event.which == 13 || event.keyCode == 13){ $(this).trigger('click'); }"></i>
 
             </div>
             <!-- /ko -->
