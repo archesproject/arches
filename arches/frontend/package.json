@@ -60,6 +60,7 @@
     "@babel/polyfill": "^7.12.1",
     "bootstrap": "^5.1.3",
     "core-js": "^3.20.3",
-    "jquery": "^3.6.0"
+    "jquery": "^3.6.0",
+    "webpack-bundle-tracker": "^1.4.0"
   }
 }

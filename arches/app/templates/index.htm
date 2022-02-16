@@ -1,10 +1,11 @@
 {% load static %}
+{% load render_bundle from webpack_loader %}
 
 <!DOCTYPE html>
 <html>
 <head>
   <meta charset="UTF-8">
-  <link href="{% static 'css/app.css' %}" rel="stylesheet">
+  {% render_bundle 'app' 'css' %}
 </head>
 <body>
 
@@ -19,7 +20,6 @@
 
 </body>
 
-<script src="{% static 'js/vendors.js' %}"></script>
-<script src="{% static 'js/app.js' %}"></script>
+    {% render_bundle 'app' 'js' %}
 
 </html>

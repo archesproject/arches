@@ -1,0 +1,38 @@
+{
+  "status": "done",
+  "assets": {
+    "css/app.css": {
+      "name": "css/app.css",
+      "path": "/Users/cbyrd/Projects/arches/arches/frontend/build/css/app.css",
+      "publicPath": "/foo/css/app.css"
+    },
+    "js/app.js": {
+      "name": "js/app.js",
+      "path": "/Users/cbyrd/Projects/arches/arches/frontend/build/js/app.js",
+      "publicPath": "/foo/js/app.js"
+    },
+    "js/vendors.js": {
+      "name": "js/vendors.js",
+      "path": "/Users/cbyrd/Projects/arches/arches/frontend/build/js/vendors.js",
+      "publicPath": "/foo/js/vendors.js"
+    },
+    "public/.gitkeep": {
+      "name": "public/.gitkeep",
+      "path": "/Users/cbyrd/Projects/arches/arches/frontend/build/public/.gitkeep",
+      "publicPath": "/foo/public/.gitkeep"
+    },
+    "index.html": {
+      "name": "index.html",
+      "path": "/Users/cbyrd/Projects/arches/arches/frontend/build/index.html",
+      "publicPath": "/foo/index.html"
+    }
+  },
+  "chunks": {
+    "app": [
+      "js/vendors.js",
+      "css/app.css",
+      "js/app.js"
+    ]
+  },
+  "publicPath": "/foo/"
+}

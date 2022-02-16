@@ -22,9 +22,6 @@ module.exports = merge(common, {
     plugins: [
         new ESLintPlugin({
             extensions: [`js`, `jsx`],
-            // include: [
-            //     Path.resolve(__dirname, '../src')
-            // ],
         }),
         new HtmlWebpackPlugin({
             template: Path.resolve(__dirname, '../src/index.html')

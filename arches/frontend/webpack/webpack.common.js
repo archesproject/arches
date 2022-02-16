@@ -2,6 +2,7 @@ const Path = require('path');
 const { CleanWebpackPlugin } = require('clean-webpack-plugin');
 const CopyWebpackPlugin = require('copy-webpack-plugin');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
+const BundleTracker = require('webpack-bundle-tracker');
 
 module.exports = {
     entry: {
@@ -10,6 +11,7 @@ module.exports = {
     output: {
         path: Path.join(__dirname, '../build'),
         filename: 'js/[name].js',
+        publicPath: '/foo/',
     },
     optimization: {
         splitChunks: {
@@ -19,12 +21,11 @@ module.exports = {
     },
     plugins: [
         new CleanWebpackPlugin(),
-        new CopyWebpackPlugin({
-            patterns: [{ from: Path.resolve(__dirname, '../public'), to: 'public' }],
-        }),
+        new CopyWebpackPlugin({ patterns: [{ from: Path.resolve(__dirname, '../public'), to: 'public' }] }),
         new HtmlWebpackPlugin({
             template: Path.resolve(__dirname, '../src/index.html'),
         }),
+        new BundleTracker({ filename: './webpack-stats.json' }),
     ],
     resolve: {
         alias: {
@@ -39,12 +40,13 @@ module.exports = {
                 type: 'javascript/auto',
             },
             {
-                test: /\.html$/i,
-                loader: 'html-loader',
-            },
-            {
                 test: /\.(ico|jpg|jpeg|png|gif|eot|otf|webp|svg|ttf|woff|woff2)(\?.*)?$/,
-                type: 'asset'
+                use: {
+                    loader: 'file-loader',
+                    options: {
+                        name: '[path][name].[ext]',
+                    },
+                },
             },
         ],
     },
