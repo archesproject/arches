@@ -1,17 +1,14 @@
 """
 ARCHES - a program developed to inventory and manage immovable cultural heritage.
 Copyright (C) 2013 J. Paul Getty Trust and World Monuments Fund
-
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU Affero General Public License as
 published by the Free Software Foundation, either version 3 of the
 License, or (at your option) any later version.
-
 This program is distributed in the hope that it will be useful,
 but WITHOUT ANY WARRANTY; without even the implied warranty of
 MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 GNU Affero General Public License for more details.
-
 You should have received a copy of the GNU Affero General Public License
 along with this program. If not, see <http://www.gnu.org/licenses/>.
 """
@@ -37,6 +34,7 @@ from arches.app.search.mappings import TERMS_INDEX, RESOURCE_RELATIONS_INDEX, RE
 from arches.app.search.elasticsearch_dsl_builder import Query, Bool, Terms, Nested
 from arches.app.utils import import_class_from_string
 from arches.app.utils.label_based_graph import LabelBasedGraph
+from arches.app.utils.label_based_graph_v2 import LabelBasedGraph as LabelBasedGraphV2
 from guardian.shortcuts import assign_perm, remove_perm
 from guardian.exceptions import NotUserNorGroup
 from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializer
@@ -108,12 +106,10 @@ class Resource(models.ResourceInstance):
     def save(self, *args, **kwargs):
         """
         Saves and indexes a single resource
-
         Keyword Arguments:
         request -- the request object
         user -- the user to associate the edit with if the user can't be derived from the request
         index -- True(default) to index the resource, otherwise don't index the resource
-
         """
         graph = models.GraphModel.objects.get(graphid=self.graph_id)
         if graph.isactive is False:
@@ -122,10 +118,11 @@ class Resource(models.ResourceInstance):
         request = kwargs.pop("request", None)
         user = kwargs.pop("user", None)
         index = kwargs.pop("index", True)
+        transaction_id = kwargs.pop("transaction_id", None)
         super(Resource, self).save(*args, **kwargs)
         for tile in self.tiles:
             tile.resourceinstance_id = self.resourceinstanceid
-            saved_tile = tile.save(request=request, index=False)
+            saved_tile = tile.save(request=request, index=False, transaction_id=transaction_id)
         if request is None:
             if user is None:
                 user = {}
@@ -138,14 +135,13 @@ class Resource(models.ResourceInstance):
         except NotUserNorGroup:
             pass
 
-        self.save_edit(user=user, edit_type="create")
+        self.save_edit(user=user, edit_type="create", transaction_id=transaction_id)
         if index is True:
             self.index()
 
     def get_root_ontology(self):
         """
         Finds and returns the ontology class of the instance's root node
-
         """
         root_ontology_class = None
         graph_nodes = models.Node.objects.filter(graph_id=self.graph_id).filter(istopnode=True)
@@ -157,7 +153,6 @@ class Resource(models.ResourceInstance):
     def load_tiles(self, user=None, perm=None):
         """
         Loads the resource's tiles array with all the tiles from the database as a flat list
-
         """
 
         if user:
@@ -173,11 +168,8 @@ class Resource(models.ResourceInstance):
     def bulk_save(resources, flat=False, transaction_id=None):
         """
         Saves and indexes a list of resources
-
         Arguments:
         resources -- a list of resource models
-        flat -- boolean value whether incoming resource.tiles list already flat or instead nested
-
         """
 
         datatype_factory = DataTypeFactory()
@@ -236,7 +228,6 @@ class Resource(models.ResourceInstance):
     def index(self):
         """
         Indexes all the nessesary items values of a resource to support search
-
         """
 
         if str(self.graph_id) != str(settings.SYSTEM_SETTINGS_RESOURCE_MODEL_ID):
@@ -258,12 +249,10 @@ class Resource(models.ResourceInstance):
         """
         Gets all the documents nessesary to index a single resource
         returns a tuple of a document and list of terms
-
         Keyword Arguments:
         fetchTiles -- instead of fetching the tiles from the database get them off the model itself
         datatype_factory -- refernce to the DataTypeFactory instance
         node_datatypes -- a dictionary of datatypes keyed to node ids
-
         """
 
         document = {}
@@ -300,8 +289,8 @@ class Resource(models.ResourceInstance):
 
         for tile in document["tiles"]:
             for nodeid, nodevalue in tile.data.items():
-                datatype = node_datatypes[nodeid]
                 if nodevalue != "" and nodevalue != [] and nodevalue != {} and nodevalue is not None:
+                    datatype = node_datatypes[nodeid]
                     datatype_instance = datatype_factory.get_instance(datatype)
                     datatype_instance.append_to_document(document, nodevalue, nodeid, tile)
                     node_terms = datatype_instance.get_search_terms(nodevalue, nodeid)
@@ -330,8 +319,8 @@ class Resource(models.ResourceInstance):
                     for user, edit in provisionaledits.items():
                         if edit["status"] == "review":
                             for nodeid, nodevalue in edit["value"].items():
-                                datatype = node_datatypes[nodeid]
                                 if nodevalue != "" and nodevalue != [] and nodevalue != {} and nodevalue is not None:
+                                    datatype = node_datatypes[nodeid]
                                     datatype_instance = datatype_factory.get_instance(datatype)
                                     datatype_instance.append_to_document(document, nodevalue, nodeid, tile, True)
                                     node_terms = datatype_instance.get_search_terms(nodevalue, nodeid)
@@ -354,10 +343,9 @@ class Resource(models.ResourceInstance):
 
         return document, terms
 
-    def delete(self, user={}, index=True):
+    def delete(self, user={}, index=True, transaction_id=None):
         """
         Deletes a single resource and any related indexed data
-
         """
 
         # note that deferring index will require:
@@ -391,7 +379,7 @@ class Resource(models.ResourceInstance):
                 self.delete_index()
 
             try:
-                self.save_edit(edit_type="delete", user=user, note=self.displayname)
+                self.save_edit(edit_type="delete", user=user, note=self.displayname, transaction_id=transaction_id)
             except:
                 pass
             super(Resource, self).delete()
@@ -401,7 +389,6 @@ class Resource(models.ResourceInstance):
     def delete_index(self, resourceinstanceid=None):
         """
         Deletes all references to a resource from all indexes
-
         Keyword Arguments:
         resourceinstanceid -- the resource instance id to delete from related indexes, if supplied will use this over self.resourceinstanceid
         """
@@ -470,18 +457,25 @@ class Resource(models.ResourceInstance):
         return errors
 
     def get_related_resources(
-        self, lang="en-US", limit=settings.RELATED_RESOURCES_EXPORT_LIMIT, start=0, page=0, user=None, resourceinstance_graphid=None,
+        self,
+        lang="en-US",
+        limit=settings.RELATED_RESOURCES_EXPORT_LIMIT,
+        start=0,
+        page=0,
+        user=None,
+        resourceinstance_graphid=None,
+        graphs=None,
     ):
         """
         Returns an object that lists the related resources, the relationship types, and a reference to the current resource
-
         """
-        graphs = (
-            models.GraphModel.objects.all()
-            .exclude(pk=settings.SYSTEM_SETTINGS_RESOURCE_MODEL_ID)
-            .exclude(isresource=False)
-            .exclude(isactive=False)
-        )
+        if not graphs:
+            graphs = list(
+                models.GraphModel.objects.all()
+                .exclude(pk=settings.SYSTEM_SETTINGS_RESOURCE_MODEL_ID)
+                .exclude(isresource=False)
+                .exclude(isactive=False)
+            )
 
         graph_lookup = {
             str(graph.graphid): {"name": graph.name, "iconclass": graph.iconclass, "fillColor": graph.color} for graph in graphs
@@ -563,7 +557,6 @@ class Resource(models.ResourceInstance):
     def copy(self):
         """
         Returns a copy of this resource instance including a copy of all tiles associated with this resource instance
-
         """
         # need this here to prevent a circular import error
         from arches.app.models.tile import Tile
@@ -598,10 +591,8 @@ class Resource(models.ResourceInstance):
     def serialize(self, fields=None, exclude=None):
         """
         Serialize to a different form then used by the internal class structure
-
         used to append additional values (like parent ontology properties) that
         internal objects (like models.Nodes) don't support
-
         """
 
         ret = JSONSerializer().handle_model(self)
@@ -609,27 +600,32 @@ class Resource(models.ResourceInstance):
 
         return JSONSerializer().serializeToPython(ret)
 
-    def to_json(self, compact=True, hide_empty_nodes=False, user=None, perm=None):
+    def to_json(self, compact=True, hide_empty_nodes=False, user=None, perm=None, version=None):
         """
         Returns resource represented as disambiguated JSON graph
-
         Keyword Arguments:
         compact -- type bool: hide superfluous node data
         hide_empty_nodes -- type bool: hide nodes without data
         """
-        return LabelBasedGraph.from_resource(resource=self, compact=compact, hide_empty_nodes=hide_empty_nodes, user=user, perm=perm)
+        if version is None:
+            return LabelBasedGraph.from_resource(resource=self, compact=compact, hide_empty_nodes=hide_empty_nodes, user=user, perm=perm)
+        elif version == "beta":
+            return LabelBasedGraphV2.from_resource(resource=self, compact=compact, hide_empty_nodes=hide_empty_nodes, user=user, perm=perm)
 
     @staticmethod
-    def to_json__bulk(resources, compact=True, hide_empty_nodes=False):
+    def to_json__bulk(resources, compact=True, hide_empty_nodes=False, version=None):
         """
         Returns list of resources represented as disambiguated JSON graphs
-
         Keyword Arguments:
         resources -- list of Resource
         compact -- type bool: hide superfluous node data
         hide_empty_nodes -- type bool: hide nodes without data
         """
-        return LabelBasedGraph.from_resources(resources=resources, compact=compact, hide_empty_nodes=hide_empty_nodes)
+
+        if version is None:
+            return LabelBasedGraph.from_resources(resources=resources, compact=compact, hide_empty_nodes=hide_empty_nodes)
+        elif version == "beta":
+            return LabelBasedGraphV2.from_resources(resources=resources, compact=compact, hide_empty_nodes=hide_empty_nodes)
 
     def get_node_values(self, node_name):
         """
