@@ -336,8 +336,8 @@ AUTHENTICATION_BACKENDS = (
     "arches.app.utils.email_auth_backend.EmailAuthenticationBackend",
     "oauth2_provider.backends.OAuth2Backend",
     "django.contrib.auth.backends.ModelBackend",  # this is default
-    "guardian.backends.ObjectPermissionBackend",
     "arches.app.utils.permission_backend.PermissionBackend",
+    "guardian.backends.ObjectPermissionBackend",
 )
 
 INSTALLED_APPS = (
@@ -449,7 +449,13 @@ if DEBUG is True:
 # group to assign users who self sign up via the web ui
 USER_SIGNUP_GROUP = "Crowdsource Editor"
 
-CACHES = {"default": {"BACKEND": "django.core.cache.backends.locmem.LocMemCache", "LOCATION": "unique-snowflake"}}
+CACHES = {
+    "default": {"BACKEND": "django.core.cache.backends.locmem.LocMemCache", "LOCATION": "unique-snowflake"},
+    "user_permission": {
+        "BACKEND": "django.core.cache.backends.db.DatabaseCache",
+        "LOCATION": "user_permission_cache",
+    },
+}
 
 DEFAULT_RESOURCE_IMPORT_USER = {"username": "admin", "userid": 1}
 

@@ -44,7 +44,15 @@ BUSISNESS_DATA_FILES = (
     # Don't forget to use absolute paths, not relative paths.
 )
 
-CACHES = {"default": {"BACKEND": "django.core.cache.backends.dummy.DummyCache",}}
+CACHES = {
+    "default": {
+        "BACKEND": "django.core.cache.backends.dummy.DummyCache",
+    },
+    "user_permission": {
+        "BACKEND": "django.core.cache.backends.dummy.DummyCache",
+        "LOCATION": "user_permission_cache",
+    },
+}
 
 ELASTICSEARCH_PREFIX = "test"
 
