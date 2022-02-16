@@ -17,7 +17,7 @@
 
 <template id="mobile-survey-tree">
     <li role="treeitem" class="jstree-node jstree-open" data-bind="css: {'jstree-open': (node.childNodes().length > 0 && node.expanded), 'jstree-closed' : (node.childNodes().length > 0 && !node.expanded()), 'jstree-leaf': node.childNodes().length === 0}, container: '.mobile-survey-tree'">
-        <i class="jstree-icon jstree-ocl" role="presentation" data-bind="click: function(){node.expanded(!node.expanded())}"></i>
+        <i tabindex="0" class="jstree-icon jstree-ocl" role="presentation" data-bind="click: function(){node.expanded(!node.expanded())}" onkeyup="if(event.which == 13 || event.keyCode == 13){ $(this).trigger('click'); }"></i>
         <a class="jstree-anchor" href="#" data-bind="click: tree.selectItem.bind(tree), css:{'jstree-clicked': node.selected, 'child-selected': tree.isChildSelected(node), 'filtered': tree.filter().length > 0 && !node.filtered()}">
             <div style="display:flex; align-items: center;">
                 <!--ko if: node.id === 'root' && tree.status().incomplete -->

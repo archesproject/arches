@@ -54,7 +54,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                     <div class="resource-editor-tree">
                         <ul class="jstree-container-ul jstree-children" aria-expanded="true">
                         <li role="treeitem" class="jstree-node" data-bind="css: {'jstree-open': rootExpanded, 'jstree-closed' : !rootExpanded()}">
-                            <i tabindex="0" class="jstree-icon jstree-ocl" role="presentation" data-bind="click: function(){rootExpanded(!rootExpanded())}" onkeypress="$(this).trigger('click');"></i>
+                            <i tabindex="0" class="jstree-icon jstree-ocl" role="presentation" data-bind="click: function(){rootExpanded(!rootExpanded())}" onkeyup="if(event.which == 13 || event.keyCode == 13){ $(this).trigger('click'); }"></i>
                             <a class="jstree-anchor" href="#" data-bind="click: function () { selection('root'); }, css: {'jstree-clicked': selection() === 'root'}">
                                 <strong>
                                     <i data-bind="css: graphiconclass != (null || '') ? graphiconclass : 'fa fa-question'" role="presentation"></i>
@@ -180,7 +180,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 
                     <div class="card-breadcrumbs">
 
-                        <a href="" class="toggle-tree"><i class="ion-arrow-left-b"></i></a>
+                        <a href="#" class="toggle-tree"><i class="ion-arrow-left-b"></i></a>
 
                         <!-- ko foreach: { data: selectionBreadcrumbs(), as: 'crumb' } -->
                             <!-- ko if: crumb.tileid -->
@@ -251,9 +251,9 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                         <!-- /ko -->
 
                         <!-- ko if: selectedCard().cardinality === 'n' && selectedTile().tileid  -->
-                        <span class="add-new-crumb current-crumb" data-bind="click: function() {
+                        <span tabindex="0" class="add-new-crumb current-crumb" data-bind="click: function() {
                             selectedCard().selected(true); setTimeout(function(){selectedCard().showForm(true)}, 50);
-                        }">
+                        }" onkeyup="if(event.which == 13 || event.keyCode == 13){ $(this).trigger('click'); }">
                             <i class="fa fa-plus"></i>
                             {% trans 'Add New' %}
                         </span>

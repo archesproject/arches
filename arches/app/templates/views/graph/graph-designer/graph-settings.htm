@@ -87,11 +87,11 @@
                             </div>
 
                             <div class="col-xs-12">
-                                <div class="">
-                                    <label data-bind="css: { 'active': graph.isactive() }, click: function () { graph.isactive(true) }" class="form-radio form-normal form-text">
+                                <div>
+                                    <label tabindex="0" data-bind="css: { 'active': graph.isactive() }, click: function () { graph.isactive(true) }" class="form-radio form-normal form-text" onkeyup="if(event.which == 13 || event.keyCode == 13){ $(this).trigger('click'); }">
                                         <input type="radio" name="stat-w-label" data-bind="checked: graph.isactive" value="true"> {% trans "Active" %}
                                     </label>
-                                    <label data-bind="css: { 'active': !graph.isactive() }, click: function () { graph.isactive(false) }" class="form-radio form-normal form-text">
+                                    <label tabindex="0" data-bind="css: { 'active': !graph.isactive() }, click: function () { graph.isactive(false) }" class="form-radio form-normal form-text"  onkeyup="if(event.which == 13 || event.keyCode == 13){ $(this).trigger('click'); }">
                                         <input type="radio" name="stat-w-label" data-bind="checked: graph.isactive" value="false"> {% trans "Inactive" %}
                                     </label>
                                 </div>
@@ -155,7 +155,7 @@
                             <div class="col-xs-12">
                                 <div class="columns">
                                     <!-- ko foreach: graphSettingsViewModel.relatable_resources -->
-                                    <label class="form-checkbox form-normal form-primary" data-bind="css: {'form-text': true,  'active': isRelatable()}, click: function () {$data.isRelatable(!$data.isRelatable())}">
+                                    <label tabindex="0" class="form-checkbox form-normal form-primary" data-bind="css: {'form-text': true,  'active': isRelatable()}, click: function () {$data.isRelatable(!$data.isRelatable())}" onkeyup="if(event.which == 13 || event.keyCode == 13){ $(this).trigger('click'); }">
                                         <input type="checkbox" data-bind="checked:isRelatable">
                                         <!-- ko if: graph.graphid === $parent.graph.graphid() -->
                                         <span data-bind="text: $parent.graph.name"></span>
@@ -275,7 +275,7 @@
                                 <div class="row">
 
                                     <!-- ko foreach: graphSettingsViewModel.icons() -->
-                                    <div class="col-xs-6 col-md-3 col-sm-4 demo-icon-font" data-bind="css: {'selected': (cssclass === $root.graph.iconclass())}, click: function() { $root.graph.iconclass(cssclass) }">
+                                    <div tabindex="0" class="col-xs-6 col-md-3 col-sm-4 demo-icon-font" data-bind="css: {'selected': (cssclass === $root.graph.iconclass())}, click: function() { $root.graph.iconclass(cssclass) }" onkeypress="$(this).trigger('click');">
                                         <i data-bind="css: cssclass"></i> <span data-bind="text: name"></span>
                                     </div>
                                     <!-- /ko -->
