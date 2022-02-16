@@ -131,7 +131,7 @@
                         <div class="form-group">
                             <div class="relative">
                                 <label class="col-xs-12 control-label widget-input-label">
-                                    <span class="switch switch-small arches-switch on disabled"><small></small></span>
+                                    <span tabindex="0" class="switch switch-small arches-switch on disabled" onkeyup="if(event.which == 13 || event.keyCode == 13){ $(this).trigger('click'); }"><small></small></span>
                                 </label>
                             </div>
                             <div class="col-xs-12">

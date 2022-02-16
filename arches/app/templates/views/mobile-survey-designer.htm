@@ -155,8 +155,8 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                                     <div class="box-inline">
                                         <div class="mpm-item-listing-header">{% trans 'Activate Project' %}
                                             <span class="toggle-container">
-                                                <span class="switch switch-small" data-bind="css: {'on': mobilesurvey.active(), 'disabled': surveyReady().incomplete}, click: function(){
-                                                    if (!surveyReady().incomplete) {mobilesurvey.active(!mobilesurvey.active())};}"><small></small>
+                                                <span tabindex="0" class="switch switch-small" data-bind="css: {'on': mobilesurvey.active(), 'disabled': surveyReady().incomplete}, click: function(){
+                                                    if (!surveyReady().incomplete) {mobilesurvey.active(!mobilesurvey.active())};}" onkeyup="if(event.which == 13 || event.keyCode == 13){ $(this).trigger('click'); }"><small></small>
                                                 </span>
                                             </span>
                                         </div>
@@ -498,8 +498,8 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                                 {% trans 'Allow users to download data' %}
                                 <span class="toggle-container">
                                     <!--ko ifnot: locked-->
-                                    <span class="switch switch-small" data-bind="css: {'on': mobilesurvey.datadownloadconfig.download()}, click: function(){
-                                        mobilesurvey.datadownloadconfig.download(!mobilesurvey.datadownloadconfig.download());}"><small></small></span>
+                                    <span tabindex="0" class="switch switch-small" data-bind="css: {'on': mobilesurvey.datadownloadconfig.download()}, click: function(){
+                                        mobilesurvey.datadownloadconfig.download(!mobilesurvey.datadownloadconfig.download());}" onkeyup="if(event.which == 13 || event.keyCode == 13){ $(this).trigger('click'); }"><small></small></span>
                                     <!--/ko-->
                                     <!--ko if: locked-->
                                     <span class="switch switch-small disabled" data-bind="css: {'on': mobilesurvey.datadownloadconfig.download()}"><small></small></span>

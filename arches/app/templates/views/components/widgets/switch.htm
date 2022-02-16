@@ -3,7 +3,7 @@
 
 {% block form %}
 <div class="toggle-container">
-    <span class="switch switch-small switch-widget" data-bind="css: {'on': getvalue() === true, 'null': getvalue() === null, 'disabled': disabled }, click: setvalue"><small></small></span>
+    <span tabindex="0" class="switch switch-small switch-widget" data-bind="css: {'on': getvalue() === true, 'null': getvalue() === null, 'disabled': disabled }, click: setvalue" onkeyup="if(event.which == 13 || event.keyCode == 13){ $(this).trigger('click'); }"><small></small></span>
             <div style="display:flex; flex-direction:row;">
             <div class="arches-toggle-sm" data-bind="text:label, css: {'disabled': disabled}"></div>
                 <div style="margin-top: -17px;">
@@ -27,7 +27,7 @@
   {% trans "Default Value" %}
 </div>
 <div class="toggle-container">
-    <span class="switch switch-small switch-widget" data-bind="css: {'on': getdefault() === true, 'null': getdefault() === null}, click: setdefault"><small></small></span>
+    <span tabindex="0" class="switch switch-small switch-widget" data-bind="css: {'on': getdefault() === true, 'null': getdefault() === null}, click: setdefault" onkeyup="if(event.which == 13 || event.keyCode == 13){ $(this).trigger('click'); }"><small></small></span>
             <div style="display:flex; flex-direction:row;">
             <div class="arches-toggle-sm" data-bind="text:label"></div>
             </div>

@@ -5,45 +5,45 @@
 {% block workbench_wrapper_classes %}related-resources-graph-workbench{% endblock workbench_wrapper_classes %}
 
 {% block tabs %}
-<div class="workbench-card-sidebar-tab" data-bind="click: function() {
+<div tabindex="0" class="workbench-card-sidebar-tab" data-bind="click: function() {
     toggleTab('information');
 }, css: {
     'active': activeTab() === 'information'
-}">
+}" onkeyup="if(event.which == 13 || event.keyCode == 13){ $(this).trigger('click'); }">
     <i class="fa fa-info"></i>
     <span class="map-sidebar-text">{% trans "Info" %}</span>
 </div>
-<div class="workbench-card-sidebar-tab" data-bind="click: function() {
+<div tabindex="0" class="workbench-card-sidebar-tab" data-bind="click: function() {
     toggleTab('search');
 }, css: {
     'active': activeTab() === 'search'
-}">
+}" onkeyup="if(event.which == 13 || event.keyCode == 13){ $(this).trigger('click'); }">
     <i class="fa fa-search"></i>
     <span class="map-sidebar-text">{% trans "Search" %}</span>
 </div>
 {% comment %} Uncomment this section to show additional tabs...
-<div class="workbench-card-sidebar-tab" data-bind="click: function() {
+<div tabindex="0" class="workbench-card-sidebar-tab" data-bind="click: function() {
     toggleTab('analyze');
 }, css: {
     'active': activeTab() === 'analyze'
-}">
+}" onkeyup="if(event.which == 13 || event.keyCode == 13){ $(this).trigger('click'); }">
     <i class="fa fa-line-chart"></i>
     <span class="map-sidebar-text">{% trans "Analyze" %}</span>
 </div>
-<div class="workbench-card-sidebar-tab" data-bind="click: function() {
+<div tabindex="0" class="workbench-card-sidebar-tab" data-bind="click: function() {
     toggleTab('settings');
 }, css: {
     'active': activeTab() === 'settings'
-}">
+}" onkeyup="if(event.which == 13 || event.keyCode == 13){ $(this).trigger('click'); }">
     <i class="fa fa-cog"></i>
     <span class="map-sidebar-text">{% trans "Settings" %}</span>
 </div>
 {% endcomment %}
-<div class="workbench-card-sidebar-tab" data-bind="click: function() {
+<div tabindex="0" class="workbench-card-sidebar-tab" data-bind="click: function() {
     toggleTab('legend');
 }, css: {
     'active': activeTab() === 'legend'
-}">
+}" onkeyup="if(event.which == 13 || event.keyCode == 13){ $(this).trigger('click'); }">
     <i class="fa fa-list"></i>
     <span class="map-sidebar-text">{% trans "Legend" %}</span>
 </div>
@@ -52,7 +52,7 @@
 {% block sidepanel %}
 <!--ko if: activeTab() === 'information' -->
 <div class="workbench-card-sidepanel-header-container">
-    <h4 class="workbench-card-sidepanel-header" data-bind="click: hideSidePanel">{% trans "Resource Information" %}</h4>
+    <h4 tabindex="0" class="workbench-card-sidepanel-header" data-bind="click: hideSidePanel" onkeyup="if(event.which == 13 || event.keyCode == 13){ $(this).trigger('click'); }">{% trans "Resource Information" %}</h4>
 </div>
 <div class="related-resource-graph-information-content" data-bind="using: informationElement">
     <!--ko if: $data -->
@@ -169,7 +169,7 @@
 <!--/ko -->
 <!--ko if: activeTab() === 'search' -->
 <div class="workbench-card-sidepanel-header-container">
-    <h4 class="workbench-card-sidepanel-header" data-bind="click: hideSidePanel">{% trans "Search Network" %}</h4>
+    <h4 tabindex="0" class="workbench-card-sidepanel-header" data-bind="click: hideSidePanel" onkeyup="if(event.which == 13 || event.keyCode == 13){ $(this).trigger('click'); }">{% trans "Search Network" %}</h4>
 </div>
 <div class="related-reasources-search-container">
     <input type="text" class="form-control" placeholder="{% trans "Filter..." %}" data-bind="value: nodeSearchFilter, valueUpdate: 'afterkeydown'">
@@ -205,17 +205,17 @@
 <!--/ko -->
 <!--ko if: activeTab() === 'analyze' -->
 <div class="workbench-card-sidepanel-header-container">
-    <h4 class="workbench-card-sidepanel-header" data-bind="click: hideSidePanel">{% trans "Analyze Network" %}</h4>
+    <h4 tabindex="0" class="workbench-card-sidepanel-header" data-bind="click: hideSidePanel" onkeyup="if(event.which == 13 || event.keyCode == 13){ $(this).trigger('click'); }">{% trans "Analyze Network" %}</h4>
 </div>
 <!--/ko -->
 <!--ko if: activeTab() === 'settings' -->
 <div class="workbench-card-sidepanel-header-container">
-    <h4 class="workbench-card-sidepanel-header" data-bind="click: hideSidePanel">{% trans "Settings" %}</h4>
+    <h4 tabindex="0" class="workbench-card-sidepanel-header" data-bind="click: hideSidePanel" onkeyup="if(event.which == 13 || event.keyCode == 13){ $(this).trigger('click'); }">{% trans "Settings" %}</h4>
 </div>
 <!--/ko -->
 <!--ko if: activeTab() === 'legend' -->
 <div class="workbench-card-sidepanel-header-container">
-    <h4 class="workbench-card-sidepanel-header" data-bind="click: hideSidePanel">{% trans "Legend" %}</h4>
+    <h4 tabindex="0" class="workbench-card-sidepanel-header" data-bind="click: hideSidePanel" onkeyup="if(event.which == 13 || event.keyCode == 13){ $(this).trigger('click'); }">{% trans "Legend" %}</h4>
 </div>
 <div class="legend-listing-container" data-bind="foreach: legendEntries">
     <div class="legend-listing related-resource-legend">
