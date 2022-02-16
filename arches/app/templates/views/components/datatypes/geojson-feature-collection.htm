@@ -15,11 +15,11 @@
     <div class="map-service-manage-buttons">
         <div class="form-group">
             <label class="control-label text-semibold">{% trans "Activated:" %}</label>
-            <span class="switch switch-small" data-bind="css: {
+            <span tabindex="0" class="switch switch-small" data-bind="css: {
                     'on': config.layerActivated()
                 }, click: function () {
                     config.layerActivated(!config.layerActivated());
-                }">
+                }" onkeyup="if(event.which == 13 || event.keyCode == 13){ $(this).trigger('click'); }">
                 <small></small>
             </span>
         </div>
@@ -91,11 +91,11 @@
                                     <div class="form-group">
                                         <label class="col-sm-3 control-label">{% trans "Add to search map by default:" %}</label>
                                         <div class="col-sm-9">
-                                            <span class="switch switch-small service-switch-shim" data-bind="css: {
+                                            <span tabindex="0" class="switch switch-small service-switch-shim" data-bind="css: {
                                                     'on': config.addToMap()
                                                 }, click: function () {
                                                     config.addToMap(!config.addToMap());
-                                                }">
+                                                }" onkeyup="if(event.which == 13 || event.keyCode == 13){ $(this).trigger('click'); }">
                                                 <small></small>
                                             </span>
                                         </div>
@@ -125,7 +125,7 @@
                                             <div class="row">
 
                                                 <!-- ko foreach: icons -->
-                                                <div class="col-xs-6 col-md-3 col-sm-4 demo-icon-font" data-bind="css: {'selected': (cssclass === ($parent.config.layerIcon() || $parent.layer.icon))}, click: function() { $parent.config.layerIcon(cssclass) }">
+                                                <div tabindex="0" class="col-xs-6 col-md-3 col-sm-4 demo-icon-font" data-bind="css: {'selected': (cssclass === ($parent.config.layerIcon() || $parent.layer.icon))}, click: function() { $parent.config.layerIcon(cssclass) }" onkeyup="if(event.which == 13 || event.keyCode == 13){ $(this).trigger('click'); }">
                                                     <i data-bind="css: cssclass"></i> <span data-bind="text: name"></span>
                                                 </div>
                                                 <!-- /ko -->
@@ -152,11 +152,11 @@
                         <div class="row">
                             <div class="pull-right advanced-map-style-switch">
                                 <label class="control-label text-semibold">{% trans "Advanced:" %}</label>
-                                <span class="switch switch-small" data-bind="css: {
+                                <span tabindex="0" class="switch switch-small" data-bind="css: {
                                         'on': config.advancedStyling()
                                     }, click: function () {
                                         config.advancedStyling(!config.advancedStyling());
-                                    }">
+                                    }" onkeyup="if(event.which == 13 || event.keyCode == 13){ $(this).trigger('click'); }">
                                     <small></small>
                                 </span>
                             </div>

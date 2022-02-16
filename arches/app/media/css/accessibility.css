@@ -3,7 +3,8 @@
     background: #000;
 }
 
-.nav>li>a:focus:not(.graph-designer-tab), .navbar-toggle:focus:not(.graph-designer-tab) {
+.nav>li>a:focus:not(.graph-designer-tab):not(.config-title-tab),
+.navbar-toggle:focus:not(.graph-designer-tab):not(.config-title-tab) {
     box-shadow: inset 0 0 0 3px #13ce67;
     color: #000;
     text-decoration: underline;

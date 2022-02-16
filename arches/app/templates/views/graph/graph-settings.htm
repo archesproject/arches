@@ -230,7 +230,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                                                             <div class="row">
 
                                                                 <!-- ko foreach: icons -->
-                                                                <div class="col-xs-6 col-md-3 col-sm-4 demo-icon-font" data-bind="css: {'selected': (cssclass === $root.graph.iconclass())}, click: function() { $root.graph.iconclass(cssclass) }">
+                                                                <div tabindex="0" class="col-xs-6 col-md-3 col-sm-4 demo-icon-font" data-bind="css: {'selected': (cssclass === $root.graph.iconclass())}, click: function() { $root.graph.iconclass(cssclass) }" onkeyup="if(event.which == 13 || event.keyCode == 13){ $(this).trigger('click'); }">
                                                                     <i data-bind="css: cssclass"></i> <span data-bind="text: name"></span>
                                                                 </div>
                                                                 <!-- /ko -->
