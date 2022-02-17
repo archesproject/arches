@@ -192,13 +192,12 @@ class Resource(models.ResourceInstance):
         resources_to_update = [resource for resource in resources if resource.resourceinstanceid in existing_resources_ids]
         resources_to_create = [resource for resource in resources if resource.resourceinstanceid not in existing_resources_ids]
 
-
         Resource.objects.bulk_create(resources_to_create)
         TileModel.objects.bulk_create(tiles)
-        
+
         for resource in resources_to_update:
             resource.save_edit(edit_type="append", transaction_id=transaction_id)
-        
+
         for resource in resources_to_create:
             resource.save_edit(edit_type="create", transaction_id=transaction_id)
 
