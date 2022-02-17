@@ -17,18 +17,17 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 """
 
 import os
+from mock import Mock
 from tests import test_settings
+from tests.base_test import ArchesTestCase
 from arches.app.utils.betterJSONSerializer import JSONDeserializer
 from arches.app.utils.data_management.resource_graphs.importer import import_graph as ResourceGraphImporter
-from arches.app.models.models import ResourceInstance
-from tests.base_test import ArchesTestCase
 from arches.app.utils.skos import SKOSReader
-from arches.app.models.concept import Concept
+from arches.app.models.models import ResourceInstance
 from arches.app.datatypes.datatypes import DataTypeFactory
-from rdflib import Namespace, URIRef, Literal, Graph
+from rdflib import Namespace, URIRef, Literal
 from rdflib.namespace import RDF, RDFS, XSD
-from arches.app.utils.data_management.resources.formats.rdffile import RdfWriter
-from mock import Mock
+from django.utils import translation
 
 # these tests can be run from the command line via
 # python manage.py test tests/exporter/datatype_to_rdf_tests.py --settings="tests.test_settings"
@@ -138,25 +137,34 @@ class RDFExportUnitTests(ArchesTestCase):
         for res_inst in res_inst_list:
             self.assertTrue((edge_info["d_uri"], edge.ontologyproperty, ARCHES_NS["resources/{0}".format(res_inst["resourceId"])]) in graph)
 
-    def test_rdf_domain(self):
+    def test_localized_rdf_domain(self):
         dt = self.DT.get_instance("domain-value")
         edge_info, edge = mock_edge(1, CIDOC_NS["some_value"], None, "", "3f0aaf74-f7d9-44ae-82cf-196c76d8cbc3")
         # will have to further mock the range node for domain
         append_domain_config_to_node(edge.rangenode)
+        
+        translation.activate("en")
         graph = dt.to_rdf(edge_info, edge)
-        self.assertTrue((edge_info["d_uri"], edge.ontologyproperty, Literal("one")) in graph)
+        self.assertTrue((edge_info["d_uri"], edge.ontologyproperty, Literal("one", lang="en")) in graph)
+        
+        translation.activate("es")
+        graph = dt.to_rdf(edge_info, edge)
+        self.assertTrue((edge_info["d_uri"], edge.ontologyproperty, Literal("uno", lang="es")) in graph)
 
-    def test_rdf_domain_list(self):
+    def test_localized_rdf_domain_list(self):
         dt = self.DT.get_instance("domain-value-list")
         dom_list = ["3f0aaf74-f7d9-44ae-82cf-196c76d8cbc3", "11755d2b-36ee-4de7-8639-6914925a1f86", "ebd99837-c7d9-4be0-b5f5-87f387ae0661"]
-        dom_text = ["one", "four", "six"]
+        dom_text = [{"en":"one", "es": "uno"}, {"en": "four", "es": "quatro"}, {"en": "six", "es": "seis"}]
 
         edge_info, edge = mock_edge(1, CIDOC_NS["some_value"], None, "", dom_list)
         # will have to further mock the range node for domain
         append_domain_config_to_node(edge.rangenode)
+        
+        translation.activate("es")
         graph = dt.to_rdf(edge_info, edge)
+        
         for item in dom_text:
-            self.assertTrue((edge_info["d_uri"], edge.ontologyproperty, Literal(item)) in graph)
+            self.assertTrue((edge_info["d_uri"], edge.ontologyproperty, Literal(item["es"], lang="es")) in graph)
         self.assertFalse((edge_info["d_uri"], edge.ontologyproperty, Literal("Not Domain Text")) in graph)
 
     def test_rdf_concept(self):
@@ -206,12 +214,12 @@ class RDFExportUnitTests(ArchesTestCase):
 def append_domain_config_to_node(node):
     node.config = {
         "options": [
-            {"id": "3f0aaf74-f7d9-44ae-82cf-196c76d8cbc3", "selected": False, "text": "one"},
-            {"id": "eccaa586-284b-4f98-b4db-bdf8bdc9efcb", "selected": False, "text": "two"},
-            {"id": "ac843999-864a-4d43-9bb9-aa3197958c7a", "selected": False, "text": "three"},
-            {"id": "11755d2b-36ee-4de7-8639-6914925a1f86", "selected": False, "text": "four"},
-            {"id": "848a65b7-51f6-47f2-8ced-4c5398e956d4", "selected": False, "text": "five"},
-            {"id": "ebd99837-c7d9-4be0-b5f5-87f387ae0661", "selected": False, "text": "six"},
+            {"id": "3f0aaf74-f7d9-44ae-82cf-196c76d8cbc3", "selected": False, "text": {"en":"one", "es": "uno"}},
+            {"id": "eccaa586-284b-4f98-b4db-bdf8bdc9efcb", "selected": False, "text": {"en":"two", "es": "dos"}},
+            {"id": "ac843999-864a-4d43-9bb9-aa3197958c7a", "selected": False, "text": {"en":"three", "es": "tres"}},
+            {"id": "11755d2b-36ee-4de7-8639-6914925a1f86", "selected": False, "text": {"en":"four", "es": "quatro"}},
+            {"id": "848a65b7-51f6-47f2-8ced-4c5398e956d4", "selected": False, "text": {"en":"five", "es": "cinco"}},
+            {"id": "ebd99837-c7d9-4be0-b5f5-87f387ae0661", "selected": False, "text": {"en":"six", "es": "seis"}},
         ]
     }
 

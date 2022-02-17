@@ -39,7 +39,7 @@ from django.contrib.gis.geos import Polygon
 from django.core.exceptions import ObjectDoesNotExist
 from django.core.exceptions import ValidationError
 from django.db import connection, transaction
-from django.utils.translation import get_language
+from django.utils.translation import get_language, ugettext as _
 
 from elasticsearch import Elasticsearch
 from elasticsearch.exceptions import NotFoundError
@@ -1647,41 +1647,53 @@ class BaseDomainDataType(BaseDataType):
                 return option["text"]
         return {}
 
-    def get_localized_option_text(self, node, option_id):
+    def get_localized_option_text(self, node, option_id, return_lang=False):
         for option in node.config["options"]:
             if option["id"] == option_id:
-                return get_localized_value(option["text"])
-        return {}
+                return get_localized_value(option["text"], return_lang=return_lang)
+        raise Exception(_("No domain option found for option id {0}, in node conifg: {1}".format(option_id, node.config["options"])))
 
     def get_option_id_from_text(self, value):
         # this could be better written with most of the logic in SQL tbh
-        for dnode in models.Node.objects.filter(config__contains={"options": [{"text": value}]}):
-            for option in dnode.config["options"]:
-                if option["text"] == value:
-                    yield option["id"], dnode.nodeid
+        # this returns the FIRST option that matches the text, but there could be 
+        # more than 1 option with that value!!.  If we knew the node then we could fix this issue.
+
+        found_option = None
+        dt = self.datatype_model.datatype
+        domain_val_node_query = models.Node.objects.filter(datatype=dt)
+        try:
+            for x in domain_val_node_query:
+                for option in x.config["options"]:
+                    for option_text in option["text"].values():
+                        if value == option_text:
+                            found_option = option["id"]
+                            # once we find at least one value we can just 
+                            # exit the nested loops by raising an excpetion
+                            raise Exception()
+        except:
+            pass
+
+        return found_option
 
     def is_a_literal_in_rdf(self):
         return True
 
 
 class DomainDataType(BaseDomainDataType):
-    def validate(self, value, row_number=None, source="", node=None, nodeid=None, strict=False):
+    def validate(self, value, row_number="", source="", node=None, nodeid=None, strict=False):
+        found_option = False
         errors = []
-        key = "id"
         if value is not None:
             try:
                 uuid.UUID(str(value))
+                found_option = len(models.Node.objects.filter(config__contains={"options": [{"id": value}]})) > 0
             except ValueError as e:
-                key = "text"
+                found_option = True if self.get_option_id_from_text(value) is not None else False 
 
-            domain_val_node_query = models.Node.objects.filter(config__contains={"options": [{key: value}]})
-
-            if len(domain_val_node_query) != 1:
-                row_number = row_number if row_number else ""
-                if len(domain_val_node_query) == 0:
-                    message = _("Invalid domain id. Please check the node this value is mapped to for a list of valid domain ids.")
-                    error_message = self.create_error_message(value, source, row_number, message)
-                    errors.append(error_message)
+            if not found_option:
+                message = _("Invalid domain id. Please check the node this value is mapped to for a list of valid domain ids.")
+                error_message = self.create_error_message(value, source, row_number, message)
+                errors.append(error_message)
         return errors
 
     def get_search_terms(self, nodevalue, nodeid=None):
@@ -1714,7 +1726,6 @@ class DomainDataType(BaseDomainDataType):
             return ""
 
     def transform_export_values(self, value, *args, **kwargs):
-        print("in transform_export_values")
         ret = ""
         if (
             kwargs["concept_export_value_type"] is None
@@ -1748,12 +1759,15 @@ class DomainDataType(BaseDomainDataType):
         # type and the number as a numeric literal (as this is how it is in the JSON)
         g = Graph()
         if edge_info["range_tile_data"] is not None:
+            option = self.get_localized_option_text(edge.rangenode, edge_info["range_tile_data"], return_lang=True)
+            lang = list(option.keys())[0]
+            text = option[lang]
             g.add((edge_info["d_uri"], RDF.type, URIRef(edge.domainnode.ontologyclass)))
             g.add(
                 (
                     edge_info["d_uri"],
                     URIRef(edge.ontologyproperty),
-                    Literal(self.get_option_text(edge.rangenode, edge_info["range_tile_data"])),
+                    Literal(text, lang=lang),
                 )
             )
         return g
@@ -1764,10 +1778,7 @@ class DomainDataType(BaseDomainDataType):
         # a string may be present in multiple domains for instance
         # via models.Node.objects.filter(config__options__contains=[{"text": value}])
         value = get_value_from_jsonld(json_ld_node)
-        try:
-            return [str(v_id) for v_id, n_id in self.get_option_id_from_text(value[0])][0]
-        except (AttributeError, KeyError, TypeError) as e:
-            print(e)
+        return self.get_option_id_from_text(value[0])
 
     def i18n_as_sql(self, i81n_json_field, compiler, connection):
         sql = i81n_json_field.attname
@@ -1790,7 +1801,8 @@ class DomainDataType(BaseDomainDataType):
     def i18n_localize(self, i81n_json_field: I18n_JSONField):
         ret = copy.deepcopy(i81n_json_field.raw_value)
         for option in ret["options"]:
-            option["text"] = {i81n_json_field.lang: option["text"]}
+            if not isinstance(option["text"], dict):
+                option["text"] = {i81n_json_field.lang: option["text"]}
         return ret  
 
 
