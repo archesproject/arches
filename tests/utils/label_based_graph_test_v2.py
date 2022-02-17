@@ -163,7 +163,7 @@ class LabelBasedGraph_FromResourceTests(TestCase):
         cls.grouping_node = models.Node(datatype="semantic", name="Test Node Grouping", nodegroup=cls.nodegroup)
         cls.string_node = models.Node(datatype="string", name="Test Node", nodegroup=cls.nodegroup)
         cls.grouping_tile = models.TileModel(data={}, nodegroup_id=str(cls.grouping_node.pk))
-        cls.string_tile = models.TileModel(data={str(cls.string_node.pk): "value_1"}, nodegroup_id=str(cls.string_node.pk))
+        cls.string_tile = models.TileModel(data={str(cls.string_node.pk): {"en": {"value": "value_1", "direction": "ltr"}}}, nodegroup_id=str(cls.string_node.pk))
 
         cls.grouping_node.nodegroupid = cls.grouping_node.nodeid
         cls.string_node.nodegroupid = cls.string_node.nodeid
@@ -205,7 +205,8 @@ class LabelBasedGraph_FromResourceTests(TestCase):
                     self.string_node.name: {
                         NODE_ID_KEY: str(self.string_node.pk),
                         TILE_ID_KEY: str(self.string_tile.pk),
-                        self.VALUE_KEY: self.string_tile.data[str(self.string_node.pk)],
+                        self.VALUE_KEY: self.string_tile.data[str(self.string_node.pk)]["en"]["value"],
+                        **self.string_tile.data[str(self.string_node.pk)]
                     },
                 },
                 self.DISPLAY_DESCRIPTION_KEY: mock.ANY,
@@ -222,7 +223,7 @@ class LabelBasedGraph_FromResourceTests(TestCase):
         mock_NodeGroup.objects.filter.return_value.values.return_value = [
             {"nodegroupid": self.string_tile.nodegroup_id, "cardinality": "1"}
         ]
-        duplicate_node_tile = models.TileModel(data={str(self.string_node.pk): "value_2"}, nodegroup_id=str(self.string_node.pk))
+        duplicate_node_tile = models.TileModel(data={str(self.string_node.pk): {"en": {"value": "value_2", "direction": "ltr"}}}, nodegroup_id=str(self.string_node.pk))
 
         self.test_resource.tiles.append(self.string_tile)
         self.test_resource.tiles.append(duplicate_node_tile)
@@ -237,12 +238,14 @@ class LabelBasedGraph_FromResourceTests(TestCase):
                         {
                             NODE_ID_KEY: str(self.string_node.pk),
                             TILE_ID_KEY: str(self.string_tile.pk),
-                            self.VALUE_KEY: self.string_tile.data[str(self.string_node.pk)],
+                            self.VALUE_KEY: self.string_tile.data[str(self.string_node.pk)]["en"]["value"],
+                            **self.string_tile.data[str(self.string_node.pk)]
                         },
                         {
                             NODE_ID_KEY: str(self.string_node.pk),
                             TILE_ID_KEY: str(duplicate_node_tile.pk),
-                            self.VALUE_KEY: duplicate_node_tile.data[str(self.string_node.pk)],
+                            self.VALUE_KEY: duplicate_node_tile.data[str(self.string_node.pk)]["en"]["value"],
+                            **duplicate_node_tile.data[str(self.string_node.pk)]
                         },
                     ],
                 },
@@ -291,7 +294,7 @@ class LabelBasedGraph_FromResourceTests(TestCase):
 
         self.grouping_node.get_direct_child_nodes = mock.Mock(return_value=[self.string_node])
 
-        self.grouping_tile.data = {str(self.string_node.pk): "value_2"}
+        self.grouping_tile.data = {str(self.string_node.pk): {"en": {"value": "value_2", "direction": "ltr"}}}
         self.test_resource.tiles.append(self.grouping_tile)
 
         label_based_graph = LabelBasedGraph.from_resource(resource=self.test_resource, compact=False, hide_empty_nodes=False)
@@ -306,7 +309,8 @@ class LabelBasedGraph_FromResourceTests(TestCase):
                         self.string_node.name: {
                             NODE_ID_KEY: str(self.string_node.pk),
                             TILE_ID_KEY: str(self.grouping_tile.pk),
-                            self.VALUE_KEY: self.grouping_tile.data[str(self.string_node.pk)],
+                            self.VALUE_KEY: self.grouping_tile.data[str(self.string_node.pk)]["en"]["value"],
+                            **self.grouping_tile.data[str(self.string_node.pk)]
                         },
                     },
                 },
@@ -345,7 +349,8 @@ class LabelBasedGraph_FromResourceTests(TestCase):
                         self.string_node.name: {
                             NODE_ID_KEY: str(self.string_node.pk),
                             TILE_ID_KEY: str(self.string_tile.pk),
-                            self.VALUE_KEY: self.string_tile.data[str(self.string_node.pk)],
+                            self.VALUE_KEY: self.string_tile.data[str(self.string_node.pk)]["en"]["value"],
+                            **self.string_tile.data[str(self.string_node.pk)]
                         },
                     },
                 },
@@ -385,7 +390,8 @@ class LabelBasedGraph_FromResourceTests(TestCase):
                             {
                                 NODE_ID_KEY: str(self.string_node.pk),
                                 TILE_ID_KEY: str(self.string_tile.pk),
-                                self.VALUE_KEY: self.string_tile.data[str(self.string_node.pk)],
+                                self.VALUE_KEY: self.string_tile.data[str(self.string_node.pk)]["en"]["value"],
+                                **self.string_tile.data[str(self.string_node.pk)]
                             }
                         ],
                     },
