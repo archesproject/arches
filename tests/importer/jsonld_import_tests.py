@@ -394,7 +394,7 @@ class JsonLDImportTests(ArchesTestCase):
         self.assertTrue(temp in js)
         proj = js[temp]
         self.assertTrue(qual in proj)
-        self.assertTrue(proj[qual] == "example")
+        self.assertTrue(proj[qual]["@value"] == "example")
         self.assertTrue(note in js)
         self.assertTrue(js[note]["@value"] == "Test Data")
         self.assertTrue(pts in js)
@@ -496,7 +496,7 @@ class JsonLDImportTests(ArchesTestCase):
         self.assertTrue(len(temps) == 4)
         for t in temps:
             if qual in t:
-                self.assertTrue(t[qual] in ["example", "example 2"])
+                self.assertTrue(t[qual]["@value"] in ["example", "example 2"])
             if botb in t:
                 self.assertTrue(t[botb]["@value"] in ["2019-11-15", "1903-10-28"])
 

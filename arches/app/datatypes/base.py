@@ -222,7 +222,7 @@ class BaseDataType(object):
 
     def get_search_terms(self, nodevalue, nodeid=None):
         """
-        Returns a nodevalue if it qualifies as a search term
+        Returns an array of arches.app.search_term.SearchTerm objects
         """
         return []
 
