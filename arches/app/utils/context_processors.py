@@ -21,8 +21,8 @@ from arches import __version__
 from arches.app.models.models import GroupMapSettings, Language
 from arches.app.models.system_settings import settings
 from arches.app.utils.geo_utils import GeoUtils
-from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializer
-from django.utils.translation import get_language
+from arches.app.utils.betterJSONSerializer import JSONSerializer
+from django.utils.translation import get_language, get_language_info
 
 
 def livereload(request):
@@ -66,6 +66,23 @@ def map_info(request):
 
 
 def app_settings(request):
+    if settings.LANGUAGES:
+        for lang in settings.LANGUAGES:
+            found_language = Language.objects.filter(code=lang[0]).first()
+
+            # no need to add the language if it already exists
+            if found_language:
+                continue
+
+            language_info = get_language_info(lang[0])
+            Language.objects.create(
+                code=lang[0],
+                name=language_info["name"],
+                default_direction="rtl" if language_info["bidi"] else "ltr",
+                scope="system",
+                isdefault=False
+            )
+    
     languages = Language.objects.all()
     return {
         "app_settings": {
