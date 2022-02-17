@@ -61,7 +61,7 @@ class BusinessDataExportTests(ArchesTestCase):
     def test_csv_export(self):
         BusinessDataImporter("tests/fixtures/data/csv/resource_export_test.csv").import_business_data()
 
-        export = BusinessDataExporter("csv", configs="tests/fixtures/data/csv/resource_export_test.mapping", single_file=True).export()
+        export = BusinessDataExporter("csv", configs="tests/fixtures/data/csv/resource_export_test.mapping", single_file=True).export(languages="en")
 
         csv_output = list(csv.DictReader(export[0]["outputfile"].getvalue().split("\r\n")))[0]
         csvinputfile = "tests/fixtures/data/csv/resource_export_test.csv"
