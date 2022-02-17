@@ -52,7 +52,11 @@ class Migration(migrations.Migration):
             --RAISE NOTICE '%', dynsql;
             --RAISE NOTICE 'val: %', val;
             
-            res = jsonb_build_object(lang, jsonb_extract_path(j.element, text_property_name));
+            IF jsonb_typeof(jsonb_extract_path(j.element, text_property_name)) = 'object' THEN
+				res = jsonb_extract_path(j.element, text_property_name);
+			ELSE
+            	res = jsonb_build_object(lang, jsonb_extract_path(j.element, text_property_name));
+            END IF;
             --RAISE NOTICE '%', res;
             
             IF val IS NOT NULL THEN
