@@ -43,7 +43,6 @@
             "graphid": "69008234-e13c-11e8-9f60-f23c91527491", 
             "iconclass": "", 
             "is_editable": true, 
-            "isactive": true, 
             "isresource": true, 
             "jsonldcontext": null, 
             "name": "Graph_with_filelist", 

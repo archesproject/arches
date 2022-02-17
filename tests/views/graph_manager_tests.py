@@ -50,7 +50,6 @@ class GraphManagerViewTests(ArchesTestCase):
                 "description": "Represents a single node in a graph",
                 "graphid": "22000000-0000-0000-0000-000000000000",
                 "iconclass": "fa fa-circle",
-                "isactive": True,
                 "isresource": False,
                 "name": "Node",
                 "ontology_id": "e6e8db47-2ccf-11e6-927e-b8f6b115d7dd",
@@ -83,7 +82,6 @@ class GraphManagerViewTests(ArchesTestCase):
                 "description": "Represents a node and node type pairing",
                 "graphid": "22000000-0000-0000-0000-000000000001",
                 "iconclass": "fa fa-angle-double-down",
-                "isactive": True,
                 "isresource": False,
                 "name": "Node/Node Type",
                 "ontology_id": "e6e8db47-2ccf-11e6-927e-b8f6b115d7dd",
@@ -166,7 +164,6 @@ class GraphManagerViewTests(ArchesTestCase):
         graph.description = "ARCHES TEST GRAPH"
         graph.ontology_id = "e6e8db47-2ccf-11e6-927e-b8f6b115d7dd"
         graph.version = "v1.0.0"
-        graph.isactive = False
         graph.iconclass = "fa fa-building"
         graph.nodegroups = []
         graph.save()

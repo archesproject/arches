@@ -595,7 +595,6 @@
             "graphid": "96867672-fbef-11e9-9ca4-3af9d3b32b71",
             "iconclass": "",
             "is_editable": false,
-            "isactive": true,
             "isresource": true,
             "jsonldcontext": null,
             "name": "Nesting Test",

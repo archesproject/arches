@@ -303,26 +303,6 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 
                                         <!-- Form -->
                                         <div class="col-xs-12" style="padding-bottom: 10px;">
-
-                                            <div class="row widget-container">
-                                                <div class="form-group">
-                                                    <div class="relative">
-                                                        <label class="col-xs-12 control-label widget-input-label"> {% trans "Status" %} <i class="ion-ios-checkmark-outline"></i></label>
-                                                    </div>
-
-                                                    <div class="col-xs-12">
-                                                        <div class="pad-hor">
-                                                            <label data-bind="css: { 'active': graph.isactive() }, click: function () { graph.isactive(true) }" class="form-radio form-normal form-text">
-                                                                <input type="radio" name="stat-w-label" data-bind="checked: graph.isactive" value="true"> {% trans "Active" %}
-                                                            </label>
-                                                            <label data-bind="css: { 'active': !graph.isactive() }, click: function () { graph.isactive(false) }" class="form-radio form-normal form-text">
-                                                                <input type="radio" name="stat-w-label" data-bind="checked: graph.isactive" value="false"> {% trans "Inactive" %}
-                                                            </label>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            </div>
-
                                             <div class="row widget-container" data-bind="visible: graph.isresource()">
                                                 <div class="form-group">
                                                     <div class="relative">

@@ -9759,7 +9759,6 @@
             "graphid": "f5624ce7-b66c-11e6-84a5-026d961c88e6",
             "iconclass": "fa fa-calendar",
             "is_editable": false,
-            "isactive": true,
             "isresource": true,
             "jsonldcontext": null,
             "name": "Historic Event",

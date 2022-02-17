@@ -1016,7 +1016,6 @@
             "graphid": "ff623370-fa12-11e6-b98b-6c4008b05c4c",
             "iconclass": "fa fa-sliders",
             "is_editable": false,
-            "isactive": true,
             "isresource": true,
             "name": "Arches System Settings",
             "nodegroups": [

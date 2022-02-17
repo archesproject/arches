@@ -96,7 +96,6 @@
             "graphid": "1065d6de-95e6-11e8-9ddd-14109fd34195",
             "iconclass": "",
             "is_editable": true,
-            "isactive": true,
             "isresource": true,
             "jsonldcontext": null,
             "name": "API Test Graph (unique)",

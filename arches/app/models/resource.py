@@ -117,10 +117,7 @@ class Resource(models.ResourceInstance):
         index -- True(default) to index the resource, otherwise don't index the resource
 
         """
-        graph = models.GraphModel.objects.get(graphid=self.graph_id)
-        if graph.isactive is False:
-            message = _("This model is not yet active; unable to save.")
-            raise ModelInactiveError(message)
+        # TODO: 7783 cbyrd throw error if graph is unpublished
         request = kwargs.pop("request", None)
         user = kwargs.pop("user", None)
         index = kwargs.pop("index", True)
@@ -358,10 +355,7 @@ class Resource(models.ResourceInstance):
         # - that the index for the to-be-deleted resource gets deleted
 
         permit_deletion = False
-        graph = models.GraphModel.objects.get(graphid=self.graph_id)
-        if graph.isactive is False:
-            message = _("This model is not yet active; unable to delete.")
-            raise ModelInactiveError(message)
+        # TODO: 7783 cbyrd throw error if graph is unpublished
         if user != {}:
             user_is_reviewer = user_is_resource_reviewer(user)
             if user_is_reviewer is False:
@@ -481,7 +475,7 @@ class Resource(models.ResourceInstance):
                 models.GraphModel.objects.all()
                 .exclude(pk=settings.SYSTEM_SETTINGS_RESOURCE_MODEL_ID)
                 .exclude(isresource=False)
-                .exclude(isactive=False)
+                .exclude(publication=None)
             )
 
         graph_lookup = {
@@ -705,9 +699,19 @@ def is_uuid(value_to_test):
         return False
 
 
-class ModelInactiveError(Exception):
+class PublishedModelError(Exception):
     def __init__(self, message, code=None):
-        self.title = _("Model Inactive Error")
+        self.title = _("Published Model Error")
+        self.message = message
+        self.code = code
+
+    def __str__(self):
+        return repr(self.message)
+
+
+class UnpublishedModelError(Exception):
+    def __init__(self, message, code=None):
+        self.title = _("Unpublished Model Error")
         self.message = message
         self.code = code
 

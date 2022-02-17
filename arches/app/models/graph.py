@@ -33,6 +33,7 @@ from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializ
 from arches.app.search.search_engine_factory import SearchEngineFactory
 from django.utils.translation import ugettext as _
 from pyld.jsonld import compact, JsonLdError
+from django.db.models.base import Deferred
 
 logger = logging.getLogger(__name__)
 
@@ -56,7 +57,6 @@ class Graph(models.GraphModel):
         # self.deploymentdate = None
         # self.version = ''
         # self.isresource = False
-        # self.isactive = False
         # self.iconclass = ''
         # self.color = ''
         # self.subtitle = ''
@@ -73,6 +73,7 @@ class Graph(models.GraphModel):
         self._card_constraints = []
         self._constraints_x_nodes = []
         self.temp_node_name = _("New Node")
+        self.serialized_graph = None
 
         if args:
             if isinstance(args[0], dict):
@@ -115,22 +116,61 @@ class Graph(models.GraphModel):
                     for key, value in models.GraphModel.objects.get(pk=args[0]).__dict__.items():
                         setattr(self, key, value)
 
-                nodes = self.node_set.all()
-                edges = self.edge_set.all()
-                cards = self.cardmodel_set.all()
-                edge_dicts = json.loads(JSONSerializer().serialize(edges))
+                has_deferred_args = False
+                for arg in args:
+                    if type(arg) == Deferred:
+                        has_deferred_args = True
+
+                #  accessing the graph publication while deferring args results in a recursive loop
+                if not has_deferred_args and self.publication and self.publication.serialized_graph:
+                    self.serialized_graph = self.serialize()  # reads from graph_publication table and returns serialized graph as dict
+
+                    # filter out keys from the serialized_graph that would cause an error on instantiation
+                    node_slugs = []
+                    for node_dict in self.serialized_graph["nodes"]:
+                        node_slugs.append({key: value for key, value in node_dict.items() if key not in ["is_collector", "parentproperty"]})
+
+                    # filter out keys from the serialized_graph that would cause an error on instantiation
+                    card_slugs = []
+                    for card_dict in self.serialized_graph["cards"]:
+                        card_slugs.append({key: value for key, value in card_dict.items() if key not in ["constraints", "is_editable"]})
+
+                    nodes = [models.Node(**node_slug) for node_slug in node_slugs]
+                    cards = [models.CardModel(**card_slug) for card_slug in card_slugs]
+                    edges = [models.Edge(**edge_dict) for edge_dict in self.serialized_graph["edges"]]
+                    card_x_node_x_widgets = [
+                        models.CardXNodeXWidget(**card_x_node_x_widget_dict)
+                        for card_x_node_x_widget_dict in self.serialized_graph["widgets"]
+                    ]
+
+                    edge_lookup = {edge["edgeid"]: edge for edge in self.serialized_graph["edges"]}
+                    self.widgets = {widget.pk: widget for widget in card_x_node_x_widgets}
+                else:
+                    nodes = self.node_set.all()
+                    edges = self.edge_set.all()
+                    cards = self.cardmodel_set.all()
+
+                    edge_lookup = {edge["edgeid"]: edge for edge in json.loads(JSONSerializer().serialize(edges))}
+
+                    for card in cards:
+                        widgets = list(card.cardxnodexwidget_set.all())
+                        for widget in widgets:
+                            self.widgets[widget.pk] = widget
+
                 node_lookup = {}
-                edge_lookup = {edge["edgeid"]: edge for edge in edge_dicts}
                 for node in nodes:
                     self.add_node(node)
                     node_lookup[str(node.nodeid)] = node
-                for card in cards:
-                    self.add_card(card)
+
                 for edge in edges:
                     edge_dict = edge_lookup[str(edge.edgeid)]
                     edge.domainnode = node_lookup[edge_dict["domainnode_id"]]
                     edge.rangenode = node_lookup[edge_dict["rangenode_id"]]
                     self.add_edge(edge)
+
+                for card in cards:
+                    self.add_card(card)
+
                 self.populate_null_nodegroups()
 
     @staticmethod
@@ -144,7 +184,6 @@ class Graph(models.GraphModel):
             description="",
             version="",
             isresource=is_resource,
-            isactive=not is_resource,
             iconclass="",
             ontology=None,
             slug=None,
@@ -289,10 +328,6 @@ class Graph(models.GraphModel):
             card.pk = uuid.uuid1()
 
         self.cards[card.pk] = card
-
-        widgets = list(card.cardxnodexwidget_set.all())
-        for widget in widgets:
-            self.widgets[widget.pk] = widget
 
         return card
 
@@ -475,11 +510,12 @@ class Graph(models.GraphModel):
         """
 
         tree = self.get_tree()
+        nodegroups = self.get_nodegroups()
 
         def traverse_tree(tree, current_nodegroup=None):
             if tree["node"]:
                 if tree["node"].is_collector:
-                    nodegroup = self.get_or_create_nodegroup(nodegroupid=tree["node"].nodegroup_id)
+                    nodegroup = self.get_or_create_nodegroup(nodegroupid=tree["node"].nodegroup_id, nodegroups_list=nodegroups)
                     nodegroup.parentnodegroup = current_nodegroup
                     current_nodegroup = nodegroup
 
@@ -759,7 +795,7 @@ class Graph(models.GraphModel):
         nodegroup = None
         node = self.nodes[uuid.UUID(str(nodeid))]
 
-        graph_dict = self.serialize()
+        graph_dict = self.serialized_graph or self.serialize()
         graph_dict["nodes"] = []
         graph_dict["edges"] = []
         graph_dict["cards"] = []
@@ -1098,11 +1134,18 @@ class Graph(models.GraphModel):
             out_edges = self.get_out_edges(nodeid)
 
             ontology_classes = set()
+
+            ontology_dict = {
+                ontology.source: ontology
+                for ontology in models.OntologyClass.objects.filter(
+                    source__in=[edge.rangenode.ontologyclass for edge in out_edges], ontology_id=self.ontology_id
+                )
+            }
+
             if len(out_edges) > 0:
                 for edge in out_edges:
-                    for ontology_property in models.OntologyClass.objects.get(
-                        source=edge.rangenode.ontologyclass, ontology_id=self.ontology_id
-                    ).target["up"]:
+
+                    for ontology_property in ontology_dict.get(edge.rangenode.ontologyclass).target["up"]:
                         if edge.ontologyproperty == ontology_property["ontology_property"]:
                             if len(ontology_classes) == 0:
                                 ontology_classes = set(ontology_property["ontology_classes"])
@@ -1146,21 +1189,23 @@ class Graph(models.GraphModel):
                     ret = [{"ontology_property": "", "ontology_classes": list(ontology_classes)}]
         return ret
 
-    def get_nodegroups(self, nodegroupid=None):
+    def get_nodegroups(self):
         """
         get the nodegroups associated with this graph
 
         """
+        if self.serialized_graph:
+            return [models.NodeGroup(**nodegroup_dict) for nodegroup_dict in self.serialized_graph["nodegroups"]]
+        else:
+            nodegroups = set()
+            for node in self.nodes.values():
+                if node.is_collector:
+                    nodegroups.add(node.nodegroup)
+            for card in self.cards.values():
+                nodegroups.add(card.nodegroup)
+            return list(nodegroups)
 
-        nodegroups = set()
-        for node in self.nodes.values():
-            if node.is_collector:
-                nodegroups.add(node.nodegroup)
-        for card in self.cards.values():
-            nodegroups.add(card.nodegroup)
-        return list(nodegroups)
-
-    def get_or_create_nodegroup(self, nodegroupid):
+    def get_or_create_nodegroup(self, nodegroupid, nodegroups_list=[]):
         """
         get a nodegroup from an id by first looking through the nodes and cards associated with this graph.
         if not found then get the nodegroup instance from the database, otherwise return a new instance of a nodegroup
@@ -1168,10 +1213,10 @@ class Graph(models.GraphModel):
         Keyword Arguments
 
         nodegroupid -- return a nodegroup with this id
-
+        nodegroups_list -- list of nodegroups from which to filter
         """
 
-        for nodegroup in self.get_nodegroups():
+        for nodegroup in nodegroups_list or self.get_nodegroups():
             if str(nodegroup.nodegroupid) == str(nodegroupid):
                 return nodegroup
         try:
@@ -1240,16 +1285,20 @@ class Graph(models.GraphModel):
         get the widget data (if any) associated with this graph
 
         """
-        widgets = []
-        for widget in self.widgets.values():
-            widget_dict = JSONSerializer().serializeToPython(widget)
-            widgets.append(widget_dict)
+        if self.serialized_graph:
+            return self.serialized_graph["widgets"]
+        else:
+            widgets = []
 
-        return widgets
+            for widget in self.widgets.values():
+                widget_dict = JSONSerializer().serializeToPython(widget)
+                widgets.append(widget_dict)
 
-    def serialize(self, fields=None, exclude=None):
+            return widgets
+
+    def serialize(self, fields=None, exclude=None, force_recalculation=False):
         """
-        serialize to a different form then used by the internal class structure
+        serialize to a different form than used by the internal class structure
 
         used to append additional values (like parent ontology properties) that
         internal objects (like models.Nodes) don't support
@@ -1257,48 +1306,59 @@ class Graph(models.GraphModel):
         """
         exclude = [] if exclude is None else exclude
 
-        ret = JSONSerializer().handle_model(self, fields, exclude)
-        ret["root"] = self.root
+        if self.publication and not force_recalculation:
+            deserialized_graph = JSONDeserializer().deserialize(self.publication.serialized_graph)
 
-        if "relatable_resource_model_ids" not in exclude:
-            ret["relatable_resource_model_ids"] = [str(relatable_node.graph_id) for relatable_node in self.root.get_relatable_resources()]
+            for key in exclude:
+                if deserialized_graph.get(key) is not None:  # explicit None comparison so falsey values will still return
+                    deserialized_graph[key] = None
+
+            return deserialized_graph
         else:
-            ret.pop("relatable_resource_model_ids", None)
+            ret = JSONSerializer().handle_model(self, fields, exclude)
+            ret["root"] = self.root
 
-        check_if_editable = "is_editable" not in exclude
-        ret["is_editable"] = self.is_editable() if check_if_editable else ret.pop("is_editable", None)
-        ret["cards"] = self.get_cards(check_if_editable=check_if_editable) if "cards" not in exclude else ret.pop("cards", None)
+            if "relatable_resource_model_ids" not in exclude:
+                ret["relatable_resource_model_ids"] = [
+                    str(relatable_node.graph_id) for relatable_node in self.root.get_relatable_resources()
+                ]
+            else:
+                ret.pop("relatable_resource_model_ids", None)
 
-        if "widgets" not in exclude:
-            ret["widgets"] = self.get_widgets()
-        ret["nodegroups"] = self.get_nodegroups() if "nodegroups" not in exclude else ret.pop("nodegroups", None)
-        ret["domain_connections"] = (
-            self.get_valid_domain_ontology_classes() if "domain_connections" not in exclude else ret.pop("domain_connections", None)
-        )
-        ret["is_editable"] = self.is_editable() if "is_editable" not in exclude else ret.pop("is_editable", None)
-        ret["functions"] = (
-            models.FunctionXGraph.objects.filter(graph_id=self.graphid) if "functions" not in exclude else ret.pop("functions", None)
-        )
+            check_if_editable = "is_editable" not in exclude
+            ret["is_editable"] = self.is_editable() if check_if_editable else ret.pop("is_editable", None)
+            ret["cards"] = self.get_cards(check_if_editable=check_if_editable) if "cards" not in exclude else ret.pop("cards", None)
 
-        parentproperties = {self.root.nodeid: ""}
+            if "widgets" not in exclude:
+                ret["widgets"] = self.get_widgets()
+            ret["nodegroups"] = self.get_nodegroups() if "nodegroups" not in exclude else ret.pop("nodegroups", None)
+            ret["domain_connections"] = (
+                self.get_valid_domain_ontology_classes() if "domain_connections" not in exclude else ret.pop("domain_connections", None)
+            )
+            ret["is_editable"] = self.is_editable() if "is_editable" not in exclude else ret.pop("is_editable", None)
+            ret["functions"] = (
+                models.FunctionXGraph.objects.filter(graph_id=self.graphid) if "functions" not in exclude else ret.pop("functions", None)
+            )
 
-        for edge_id, edge in self.edges.items():
-            parentproperties[edge.rangenode_id] = edge.ontologyproperty
+            parentproperties = {self.root.nodeid: ""}
 
-        ret["edges"] = [edge for key, edge in self.edges.items()] if "edges" not in exclude else ret.pop("edges", None)
+            for edge_id, edge in self.edges.items():
+                parentproperties[edge.rangenode_id] = edge.ontologyproperty
 
-        if "nodes" not in exclude:
-            ret["nodes"] = []
-            for key, node in self.nodes.items():
-                nodeobj = JSONSerializer().serializeToPython(node)
-                nodeobj["parentproperty"] = parentproperties[node.nodeid]
-                ret["nodes"].append(nodeobj)
-        else:
-            ret.pop("nodes", None)
+            ret["edges"] = [edge for key, edge in self.edges.items()] if "edges" not in exclude else ret.pop("edges", None)
 
-        res = JSONSerializer().serializeToPython(ret)
+            if "nodes" not in exclude:
+                ret["nodes"] = []
+                for key, node in self.nodes.items():
+                    nodeobj = JSONSerializer().serializeToPython(node)
+                    nodeobj["parentproperty"] = parentproperties[node.nodeid]
+                    ret["nodes"].append(nodeobj)
+            else:
+                ret.pop("nodes", None)
 
-        return res
+            res = JSONSerializer().serializeToPython(ret)
+
+            return res
 
     def check_if_resource_is_editable(self):
         def find_unpermitted_edits(obj_a, obj_b, ignore_list, obj_type):
@@ -1336,7 +1396,6 @@ class Graph(models.GraphModel):
                         "iconclass",
                         "author",
                         "description",
-                        "isactive",
                         "color",
                         "nodes",
                         "edges",
@@ -1521,6 +1580,28 @@ class Graph(models.GraphModel):
             graphs_with_matching_slug = models.GraphModel.objects.exclude(slug__isnull=True).filter(slug=self.slug)
             if graphs_with_matching_slug.exists() and graphs_with_matching_slug[0].graphid != self.graphid:
                 raise GraphValidationError(_("Another resource modal already uses the slug '{self.slug}'").format(**locals()), 1007)
+
+    def publish(self, notes=None):
+        """
+        Adds a row to the GraphPublication table
+        Assigns GraphPublication id to Graph
+        """
+        publication = models.GraphPublication.objects.create(
+            graph=self,
+            serialized_graph=JSONSerializer().serialize(self, force_recalculation=True),
+            notes=notes,
+        )
+        publication.save()
+
+        self.publication = publication
+        self.save()
+
+    def unpublish(self):
+        """
+        Unassigns GraphPublication id from Graph
+        """
+        self.publication = None
+        self.save()
 
 
 class GraphValidationError(Exception):
