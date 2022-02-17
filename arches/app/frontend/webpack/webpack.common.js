@@ -4,13 +4,72 @@ const CopyWebpackPlugin = require('copy-webpack-plugin');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const BundleTracker = require('webpack-bundle-tracker');
 
+// const webpack = require('webpack');
+const path = require('path');
+const fs = require('fs');
+
+const fileNames = function(path, outer_acc) {
+    return fs.readdirSync(path).reduce((acc, v) => {
+        const lastThreeCharacters = v.slice(v.length - 3);
+    
+        if (lastThreeCharacters === '.js') {
+            var foo = (path + '/' + v).slice(5)
+            return { ...acc, [foo]: `./js/${foo}` };
+        }
+        else {
+            console.log(path + '/' + v)
+            return fileNames(path + '/' + v, acc);
+        }
+    }, outer_acc);
+};
+
+
+var bar = fileNames('./js', {});
+
+// console.log("hi", fileNames)
+
+// var glob = require('glob');
+// var path = require('path');
+
+// const fs = require("fs")
+// const path = require("path")
+
+// const getAllFiles = function (dirPath, arrayOfFiles) {
+//     var files = fs.readdirSync(dirPath)
+
+//     arrayOfFiles = arrayOfFiles || []
+
+//     files.forEach(function (file) {
+//         if (fs.statSync(dirPath + "/" + file).isDirectory()) {
+//             arrayOfFiles = getAllFiles(dirPath + "/" + file, arrayOfFiles)
+//         } else {
+//             arrayOfFiles.push(path.join(__dirname, dirPath, "/", file))
+//         }
+//     })
+
+//     return arrayOfFiles
+// }
+
+// var foo = getAllFiles(Path.join(__dirname, '../js'))
+
+// var bar = {};
+
+// foo.forEach(function(path) {
+//     var relativePathName = path.replace(Path.join(__dirname, '../js'), '')
+//     bar[relativePathName] = path;
+// });
+
+console.log("HI", bar)
+
 module.exports = {
-    entry: {
-        app: Path.resolve(__dirname, '../media/js/config-manager.js'),
-    },
+    // entry: glob.sync('./js/**.js').reduce(function(obj, el) {
+    //     obj[path.parse(el).name] = el;
+    //     return obj;
+    // }, {}),
+    entry: bar,
     output: {
         path: Path.join(__dirname, '../build'),
-        filename: 'js/[name].js',
+        filename: 'js/[name]',
         publicPath: '/foo/',
     },
     optimization: {

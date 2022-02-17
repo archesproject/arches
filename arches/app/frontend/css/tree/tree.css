@@ -1,0 +1,509 @@
+/* jsTree default theme */
+.jstree>.header {
+    height: 75px;
+    padding-left: 13px;
+    padding-right: 13px;
+    background-color: #ecf0f5;
+    border-bottom: 1px solid #ddd;
+    padding-top: 10px;
+    font-size: 11px;
+}
+.jstree>.header>a:hover {
+    cursor: pointer;
+    color: #337A89;
+}
+
+.jstree.jstree-default {
+    background: #ecf0f5;
+}
+
+a.tree-display-tool {
+    margin-left: 0px;
+    padding: 3px 6px;
+    color: #888;
+}
+
+a.tree-display-tool:hover {
+    cursor: pointer;
+    background: #ddd;
+    color: #454545;
+}
+
+.filtered {
+    font-weight: 600;
+    color: #fff;
+    background: #3acaa1;
+}
+
+.filtered i {
+    color: #fff;
+}
+
+.filtered-leaf {
+    font-weight: 600;
+    color: #fff;
+    background: #3acaa1;
+}
+
+.filtered-leaf strong span {
+    color: #fff;
+}
+
+.filtered-leaf strong span:hover {
+    color: #7a878e;
+}
+
+
+.filtered-leaf i {
+    color: #fff;
+}
+
+a.filtered > span {
+    color: #fff;
+}
+
+a.filtered > span:hover {
+    color: #7a878e;
+}
+
+.jstree-node,
+.jstree-children,
+.jstree-container-ul {
+    display: block;
+    margin: 0;
+    padding: 0;
+    list-style-type: none;
+    list-style-image: none;
+}
+
+.jstree-container-ul {
+    margin: 10px 0;
+    padding-bottom: 40px;
+}
+
+.jstree-node {
+    white-space: nowrap;
+}
+
+.jstree-anchor {
+    display: inline-block;
+    color: black;
+    white-space: nowrap;
+    padding: 0 6px 0px 6px;
+    margin: -2px 0 0 -14px;
+    vertical-align: top;
+}
+
+.jstree-anchor:focus {
+    outline: 0;
+}
+
+.jstree-anchor,
+.jstree-anchor:link,
+.jstree-anchor:visited,
+.jstree-anchor:active {
+    text-decoration: none;
+    color: #576065; /* #7a878e*/
+}
+
+.jstree-anchor:hover,
+.jstree-anchor.hover {
+    background-color: rgba(105,132,160,0.15);
+    color: #425965;
+}
+
+.jstree-icon {
+    display: inline-block;
+    text-decoration: none;
+    margin: 0;
+    padding: 0;
+    vertical-align: top;
+    text-align: center;
+}
+
+.jstree-icon:empty {
+    display: inline-block;
+    text-decoration: none;
+    margin: 0;
+    padding: 0;
+    vertical-align: top;
+    text-align: center;
+}
+
+.jstree-ocl {
+    cursor: pointer;
+}
+
+.jstree-leaf>.jstree-ocl {
+    cursor: default;
+}
+
+.jstree .jstree-open>.jstree-children {
+    display: block;
+}
+
+.jstree .jstree-closed>.jstree-children,
+.jstree .jstree-leaf>.jstree-children {
+    display: none;
+}
+
+.jstree-anchor>.jstree-themeicon {
+    margin-right: 2px;
+}
+
+.jstree-no-icons .jstree-themeicon,
+.jstree-anchor>.jstree-themeicon-hidden {
+    display: none;
+}
+
+.jstree-hidden,
+.jstree-node.jstree-hidden {
+    display: none;
+}
+
+#jstree-marker {
+    position: absolute;
+    top: 0;
+    left: 0;
+    margin: -5px 0 0 0;
+    padding: 0;
+    border-right: 0;
+    border-top: 5px solid transparent;
+    border-bottom: 5px solid transparent;
+    border-left: 5px solid;
+    width: 0;
+    height: 0;
+    font-size: 0;
+    line-height: 0;
+}
+
+.jstree-default .jstree-node,
+.jstree-default .jstree-icon {
+    background-repeat: no-repeat;
+    background-color: transparent;
+}
+
+.jstree-default .jstree-anchor,
+.jstree-default .jstree-animated,
+.jstree-default .jstree-wholerow {
+    transition: background-color 0.15s, box-shadow 0.15s;
+}
+
+.jstree-default .jstree-hovered {
+    background: #e7f4f9;
+    border-radius: 2px;
+    box-shadow: inset 0 0 1px #cccccc;
+}
+
+.jstree-default .child-selected {
+    background-color: rgba(105,132,160,0.15);
+    color: #425965;
+}
+
+.jstree-default .func-node {
+    background: #72D3C9;
+    color: #01766A;
+    border-width: 2px;
+}
+
+.jstree-default .unsaved-edit {
+    background: #ffdb70;
+    color: #fff;
+    border-width: 2px;
+}
+
+.jstree-default .child-selected.filtered {
+    background: #3acaa1;
+    color: #fff;
+}
+
+.jstree-default .jstree-context {
+    background: #e7f4f9;
+    border-radius: 2px;
+    box-shadow: inset 0 0 1px #cccccc;
+}
+
+
+.jstree-default .jstree-clicked {
+    background: #25476a;
+    color: #fff;
+    border-radius: 2px;
+    box-shadow: inset 0 0 1px #999999;
+}
+
+.jstree-node-action-icon {
+    display: none;
+}
+
+.jstree-leading-icon + .tooltip {
+    margin-left: 25px;
+}
+
+.jstree-leading-icon + .tooltip.top .tooltip-arrow  {
+    margin-left: -28px;
+}
+
+.jstree-leading-icon {
+    padding-right: 2px;
+    padding-left: 5px;
+}
+
+.jstree-clicked .jstree-node-action-icon {
+    font: normal normal normal 14px/1 FontAwesome;
+    color: white;
+    display: inline-block;
+    width: 23px;
+    height: 23px;
+    padding: 4px 4px 4px 6px;
+    background-color: #0b2342;
+    border-radius: 2px;
+    margin-right: -2px;
+}
+
+.jstree-anchor.jstree-addnew {
+    background: rgba(95,218,184,0.85);
+    color: #fff;
+    cursor: pointer;
+}
+
+.jstree-anchor.jstree-addnew:hover {
+    background: #3acaa1;
+    color: #fff;
+}
+
+.jstree-anchor.jstree-addnew:active {
+    background: #3acaa1;
+    color: #fff;
+}
+
+.jstree-default .jstree-no-icons .jstree-anchor>.jstree-themeicon {
+    display: none;
+}
+
+.jstree-default .jstree-disabled {
+    background: transparent;
+    color: #666666;
+}
+
+.jstree-default .jstree-disabled.jstree-hovered {
+    background: transparent;
+    box-shadow: none;
+}
+
+.jstree-default .jstree-disabled.jstree-clicked {
+    background: #efefef;
+}
+
+.jstree-default .jstree-disabled>.jstree-icon {
+    opacity: 0.8;
+    filter: url("data:image/svg+xml;utf8,<svg xmlns=\'http://www.w3.org/2000/svg\'><filter id=\'jstree-grayscale\'><feColorMatrix type=\'matrix\' values=\'0.3333 0.3333 0.3333 0 0 0.3333 0.3333 0.3333 0 0 0.3333 0.3333 0.3333 0 0 0 0 0 1 0\'/></filter></svg>#jstree-grayscale");
+    /* Firefox 10+ */
+    filter: gray;
+    /* IE6-9 */
+    -webkit-filter: grayscale(100%);
+    /* Chrome 19+ & Safari 6+ */
+}
+
+.jstree-default .jstree-search {
+    font-style: italic;
+    color: #8b0000;
+    font-weight: bold;
+}
+
+.jstree-default .jstree-no-checkboxes .jstree-checkbox {
+    display: none !important;
+}
+
+.jstree-default.jstree-checkbox-no-clicked .jstree-clicked {
+    background: transparent;
+    box-shadow: none;
+}
+
+.jstree-default.jstree-checkbox-no-clicked .jstree-clicked.jstree-hovered {
+    background: #e7f4f9;
+}
+
+.jstree-default>.jstree-striped {
+    min-width: 100%;
+    display: inline-block;
+    background: url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAAkCAMAAAB/qqA+AAAABlBMVEUAAAAAAAClZ7nPAAAAAnRSTlMNAMM9s3UAAAAXSURBVHjajcEBAQAAAIKg/H/aCQZ70AUBjAATb6YPDgAAAABJRU5ErkJggg==") left top repeat;
+}
+
+.jstree-default .jstree-node {
+    min-height: 28px;
+    line-height: 28px;
+    margin-left: 28px;
+    min-width: 28px;
+}
+
+ul.jstree-container-ul > li.jstree-node.jstree-open {
+    margin-left: 4px;
+}
+
+ul.jstree-container-ul > li.jstree-node.jstree-closed {
+    margin-left: 4px;
+}
+
+.jstree-default .jstree-anchor {
+    line-height: 26px;
+    height: 26px;
+}
+
+.jstree-default .jstree-icon {
+    width: 28px;
+    height: 28px;
+    line-height: 28px;
+}
+
+.jstree-default .jstree-icon:empty {
+    width: 32px;
+    height: 24px;
+    line-height: 32px;
+}
+
+.jstree-default.jstree-rtl .jstree-node {
+    margin-right: 32px;
+}
+
+.jstree-default .jstree-wholerow {
+    height: 32px;
+}
+
+.jstree-default .jstree-node,
+.jstree-default .jstree-icon {
+    background-image: url("32px.png");
+}
+
+.jstree-default .jstree-node {
+    background-position: -292px -4px;
+    background-repeat: repeat-y;
+}
+
+.jstree-default .jstree-last {
+    background: transparent;
+}
+
+.jstree-default li:last-child {
+    background: transparent;
+}
+
+.jstree-container-ul>div>:first-child {
+    margin-left: 4px;
+}
+
+.jstree-default .jstree-open>.jstree-ocl {
+    background-position: -132px -4px;
+}
+
+.jstree-default .jstree-closed>.jstree-ocl {
+    background-position: -100px -4px;
+}
+
+.jstree-default .jstree-leaf>.jstree-ocl {
+    background-position: -68px -4px;
+}
+
+.jstree-default .jstree-themeicon {
+    background-position: -260px -4px;
+}
+
+.jstree-default>.jstree-no-dots .jstree-node,
+.jstree-default>.jstree-no-dots .jstree-leaf>.jstree-ocl {
+    background: transparent;
+}
+
+.jstree-default>.jstree-no-dots .jstree-open>.jstree-ocl {
+    background-position: -36px -4px;
+}
+
+.jstree-default>.jstree-no-dots .jstree-closed>.jstree-ocl {
+    background-position: -4px -4px;
+}
+
+.jstree-default .jstree-disabled {
+    background: transparent;
+}
+
+.jstree-default .jstree-disabled.jstree-hovered {
+    background: transparent;
+}
+
+.jstree-default .jstree-disabled.jstree-clicked {
+    background: #efefef;
+}
+
+.jstree-default .jstree-checkbox {
+    background-position: -164px -4px;
+}
+
+.jstree-default .jstree-checkbox:hover {
+    background-position: -164px -36px;
+}
+
+.jstree-default.jstree-checkbox-selection .jstree-clicked>.jstree-checkbox,
+.jstree-default .jstree-checked>.jstree-checkbox {
+    background-position: -228px -4px;
+}
+
+.jstree-default.jstree-checkbox-selection .jstree-clicked>.jstree-checkbox:hover,
+.jstree-default .jstree-checked>.jstree-checkbox:hover {
+    background-position: -228px -36px;
+}
+
+.jstree-default .jstree-anchor>.jstree-undetermined {
+    background-position: -196px -4px;
+}
+
+.jstree-default .jstree-anchor>.jstree-undetermined:hover {
+    background-position: -196px -36px;
+}
+
+.jstree-default .jstree-checkbox-disabled {
+    opacity: 0.8;
+    filter: url("data:image/svg+xml;utf8,<svg xmlns=\'http://www.w3.org/2000/svg\'><filter id=\'jstree-grayscale\'><feColorMatrix type=\'matrix\' values=\'0.3333 0.3333 0.3333 0 0 0.3333 0.3333 0.3333 0 0 0.3333 0.3333 0.3333 0 0 0 0 0 1 0\'/></filter></svg>#jstree-grayscale");
+    /* Firefox 10+ */
+    filter: gray;
+    /* IE6-9 */
+    -webkit-filter: grayscale(100%);
+    /* Chrome 19+ & Safari 6+ */
+}
+
+.jstree-default>.jstree-striped {
+    background-size: auto 48px;
+}
+
+.jstree-default .jstree-themeicon-custom {
+    background-color: transparent;
+    background-image: none;
+    background-position: 0 0;
+}
+
+.jstree-default>.jstree-container-ul .jstree-loading>.jstree-ocl {
+    background: url("throbber.gif") center center no-repeat;
+}
+
+.jstree-default .jstree-file {
+    background: url("32px.png") -100px -68px no-repeat;
+}
+
+.jstree-default .jstree-folder {
+    background: url("32px.png") -260px -4px no-repeat;
+}
+
+.jstree-default>.jstree-container-ul>.jstree-node {
+    margin-left: 0;
+    margin-right: 0;
+}
+
+.jstree-default .jstree-ellipsis {
+    overflow: hidden;
+}
+
+.jstree-default .jstree-ellipsis .jstree-anchor {
+    width: calc(100% - 29px);
+    text-overflow: ellipsis;
+    overflow: hidden;
+}
+
+.jstree-default .jstree-ellipsis.jstree-no-icons .jstree-anchor {
+    width: calc(100% - 5px);

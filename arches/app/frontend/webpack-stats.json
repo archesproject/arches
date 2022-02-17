@@ -1,44 +1,8 @@
 {
-  "status": "done",
-  "assets": {
-    "css/app.css": {
-      "name": "css/app.css",
-      "path": "/Users/cbyrd/Projects/arches/arches/app/frontend/build/css/app.css",
-      "publicPath": "/foo/css/app.css"
-    },
-    "js/app.js": {
-      "name": "js/app.js",
-      "path": "/Users/cbyrd/Projects/arches/arches/app/frontend/build/js/app.js",
-      "publicPath": "/foo/js/app.js"
-    },
-    "js/npm.jquery.js": {
-      "name": "js/npm.jquery.js",
-      "path": "/Users/cbyrd/Projects/arches/arches/app/frontend/build/js/npm.jquery.js",
-      "publicPath": "/foo/js/npm.jquery.js"
-    },
-    "js/npm.bootstrap.js": {
-      "name": "js/npm.bootstrap.js",
-      "path": "/Users/cbyrd/Projects/arches/arches/app/frontend/build/js/npm.bootstrap.js",
-      "publicPath": "/foo/js/npm.bootstrap.js"
-    },
-    "public/.gitkeep": {
-      "name": "public/.gitkeep",
-      "path": "/Users/cbyrd/Projects/arches/arches/app/frontend/build/public/.gitkeep",
-      "publicPath": "/foo/public/.gitkeep"
-    },
-    "index.html": {
-      "name": "index.html",
-      "path": "/Users/cbyrd/Projects/arches/arches/app/frontend/build/index.html",
-      "publicPath": "/foo/index.html"
-    }
-  },
-  "chunks": {
-    "app": [
-      "js/npm.jquery.js",
-      "js/npm.bootstrap.js",
-      "css/app.css",
-      "js/app.js"
-    ]
-  },
-  "publicPath": "/foo/"
+  "status": "error",
+  "assets": {},
+  "chunks": {},
+  "publicPath": "/foo/",
+  "error": "ModuleNotFoundError",
+  "message": "Module not found: Error: Can't resolve 'core-js/modules/es.object.to-string.js' in '/Users/cbyrd/Projects/arches/arches/app/frontend/js/bindings'"
 }
