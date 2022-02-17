@@ -4,5 +4,5 @@
   "chunks": {},
   "publicPath": "/foo/",
   "error": "ModuleNotFoundError",
-  "message": "Module not found: Error: Can't resolve 'core-js/modules/es.object.to-string.js' in '/Users/cbyrd/Projects/arches/arches/app/frontend/js/bindings'"
+  "message": "Module not found: Error: Can't resolve 'jquery-ui/sortable' in '/Users/cbyrd/Projects/arches/arches/app/frontend/js/bindings'"
 }

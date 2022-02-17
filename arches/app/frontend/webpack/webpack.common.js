@@ -4,8 +4,6 @@ const CopyWebpackPlugin = require('copy-webpack-plugin');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const BundleTracker = require('webpack-bundle-tracker');
 
-// const webpack = require('webpack');
-const path = require('path');
 const fs = require('fs');
 
 const fileNames = function(path, outer_acc) {
@@ -17,7 +15,6 @@ const fileNames = function(path, outer_acc) {
             return { ...acc, [foo]: `./js/${foo}` };
         }
         else {
-            console.log(path + '/' + v)
             return fileNames(path + '/' + v, acc);
         }
     }, outer_acc);
@@ -26,40 +23,14 @@ const fileNames = function(path, outer_acc) {
 
 var bar = fileNames('./js', {});
 
-// console.log("hi", fileNames)
+var baz = Object.keys(bar).reduce((acc, key) => {
+    var foo = (key).slice(0, key.length - 3)
+    acc[foo] = Path.resolve(__dirname, '../js', key)
+    return acc;
+}, {});
 
-// var glob = require('glob');
-// var path = require('path');
-
-// const fs = require("fs")
-// const path = require("path")
-
-// const getAllFiles = function (dirPath, arrayOfFiles) {
-//     var files = fs.readdirSync(dirPath)
-
-//     arrayOfFiles = arrayOfFiles || []
-
-//     files.forEach(function (file) {
-//         if (fs.statSync(dirPath + "/" + file).isDirectory()) {
-//             arrayOfFiles = getAllFiles(dirPath + "/" + file, arrayOfFiles)
-//         } else {
-//             arrayOfFiles.push(path.join(__dirname, dirPath, "/", file))
-//         }
-//     })
-
-//     return arrayOfFiles
-// }
-
-// var foo = getAllFiles(Path.join(__dirname, '../js'))
-
-// var bar = {};
-
-// foo.forEach(function(path) {
-//     var relativePathName = path.replace(Path.join(__dirname, '../js'), '')
-//     bar[relativePathName] = path;
-// });
-
-console.log("HI", bar)
+// console.log("HI", bar)
+console.log("HI", baz)
 
 module.exports = {
     // entry: glob.sync('./js/**.js').reduce(function(obj, el) {
@@ -98,9 +69,8 @@ module.exports = {
         new BundleTracker({ filename: './webpack-stats.json' }),
     ],
     resolve: {
-        alias: {
-            '~': Path.resolve(__dirname, '../src'),
-        },
+        // moduleDirectories: [__dirname, "node_modules"]
+        alias: baz,
     },
     module: {
         rules: [

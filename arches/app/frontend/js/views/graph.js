@@ -23,8 +23,6 @@ require([
         * @return {object} an instance of GraphView
         */
         initialize: function(options) {
-            const foo = 'hi';
-            
             var self = this;
             /**
             * creates a request to add a new graph; redirects to the graph settings
