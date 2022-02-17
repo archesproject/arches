@@ -391,7 +391,7 @@ def monkey_get_documents_to_index(self, node_info):
                                 "tileid": tile.tileid,
                                 "language": term.lang,
                                 "resourceinstanceid": tile.resourceinstance_id,
-                                "provisional": False
+                                "provisional": False,
                             },
                         }
                     )

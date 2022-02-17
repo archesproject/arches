@@ -47,7 +47,7 @@ class SampleDataType(BaseDataType):
         if nodevalue is not None:
             if settings.WORDS_PER_SEARCH_TERM is None or (len(nodevalue.split(" ")) < settings.WORDS_PER_SEARCH_TERM):
                 terms.append(SearchTerm(value=nodevalue))
-                
+
         return terms
 
     def append_search_filters(self, value, node, query, request):
