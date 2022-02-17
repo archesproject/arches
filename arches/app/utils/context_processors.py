@@ -80,9 +80,9 @@ def app_settings(request):
                 name=language_info["name"],
                 default_direction="rtl" if language_info["bidi"] else "ltr",
                 scope="system",
-                isdefault=False
+                isdefault=False,
             )
-    
+
     languages = Language.objects.all()
     return {
         "app_settings": {
