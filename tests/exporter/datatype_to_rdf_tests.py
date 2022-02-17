@@ -142,11 +142,11 @@ class RDFExportUnitTests(ArchesTestCase):
         edge_info, edge = mock_edge(1, CIDOC_NS["some_value"], None, "", "3f0aaf74-f7d9-44ae-82cf-196c76d8cbc3")
         # will have to further mock the range node for domain
         append_domain_config_to_node(edge.rangenode)
-        
+
         translation.activate("en")
         graph = dt.to_rdf(edge_info, edge)
         self.assertTrue((edge_info["d_uri"], edge.ontologyproperty, Literal("one", lang="en")) in graph)
-        
+
         translation.activate("es")
         graph = dt.to_rdf(edge_info, edge)
         self.assertTrue((edge_info["d_uri"], edge.ontologyproperty, Literal("uno", lang="es")) in graph)
@@ -154,15 +154,15 @@ class RDFExportUnitTests(ArchesTestCase):
     def test_localized_rdf_domain_list(self):
         dt = self.DT.get_instance("domain-value-list")
         dom_list = ["3f0aaf74-f7d9-44ae-82cf-196c76d8cbc3", "11755d2b-36ee-4de7-8639-6914925a1f86", "ebd99837-c7d9-4be0-b5f5-87f387ae0661"]
-        dom_text = [{"en":"one", "es": "uno"}, {"en": "four", "es": "quatro"}, {"en": "six", "es": "seis"}]
+        dom_text = [{"en": "one", "es": "uno"}, {"en": "four", "es": "quatro"}, {"en": "six", "es": "seis"}]
 
         edge_info, edge = mock_edge(1, CIDOC_NS["some_value"], None, "", dom_list)
         # will have to further mock the range node for domain
         append_domain_config_to_node(edge.rangenode)
-        
+
         translation.activate("es")
         graph = dt.to_rdf(edge_info, edge)
-        
+
         for item in dom_text:
             self.assertTrue((edge_info["d_uri"], edge.ontologyproperty, Literal(item["es"], lang="es")) in graph)
         self.assertFalse((edge_info["d_uri"], edge.ontologyproperty, Literal("Not Domain Text")) in graph)
@@ -214,12 +214,12 @@ class RDFExportUnitTests(ArchesTestCase):
 def append_domain_config_to_node(node):
     node.config = {
         "options": [
-            {"id": "3f0aaf74-f7d9-44ae-82cf-196c76d8cbc3", "selected": False, "text": {"en":"one", "es": "uno"}},
-            {"id": "eccaa586-284b-4f98-b4db-bdf8bdc9efcb", "selected": False, "text": {"en":"two", "es": "dos"}},
-            {"id": "ac843999-864a-4d43-9bb9-aa3197958c7a", "selected": False, "text": {"en":"three", "es": "tres"}},
-            {"id": "11755d2b-36ee-4de7-8639-6914925a1f86", "selected": False, "text": {"en":"four", "es": "quatro"}},
-            {"id": "848a65b7-51f6-47f2-8ced-4c5398e956d4", "selected": False, "text": {"en":"five", "es": "cinco"}},
-            {"id": "ebd99837-c7d9-4be0-b5f5-87f387ae0661", "selected": False, "text": {"en":"six", "es": "seis"}},
+            {"id": "3f0aaf74-f7d9-44ae-82cf-196c76d8cbc3", "selected": False, "text": {"en": "one", "es": "uno"}},
+            {"id": "eccaa586-284b-4f98-b4db-bdf8bdc9efcb", "selected": False, "text": {"en": "two", "es": "dos"}},
+            {"id": "ac843999-864a-4d43-9bb9-aa3197958c7a", "selected": False, "text": {"en": "three", "es": "tres"}},
+            {"id": "11755d2b-36ee-4de7-8639-6914925a1f86", "selected": False, "text": {"en": "four", "es": "quatro"}},
+            {"id": "848a65b7-51f6-47f2-8ced-4c5398e956d4", "selected": False, "text": {"en": "five", "es": "cinco"}},
+            {"id": "ebd99837-c7d9-4be0-b5f5-87f387ae0661", "selected": False, "text": {"en": "six", "es": "seis"}},
         ]
     }
 

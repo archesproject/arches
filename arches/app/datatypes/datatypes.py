@@ -1655,7 +1655,7 @@ class BaseDomainDataType(BaseDataType):
 
     def get_option_id_from_text(self, value):
         # this could be better written with most of the logic in SQL tbh
-        # this returns the FIRST option that matches the text, but there could be 
+        # this returns the FIRST option that matches the text, but there could be
         # more than 1 option with that value!!.  If we knew the node then we could fix this issue.
 
         found_option = None
@@ -1667,7 +1667,7 @@ class BaseDomainDataType(BaseDataType):
                     for option_text in option["text"].values():
                         if value == option_text:
                             found_option = option["id"]
-                            # once we find at least one value we can just 
+                            # once we find at least one value we can just
                             # exit the nested loops by raising an excpetion
                             raise Exception()
         except:
@@ -1688,7 +1688,7 @@ class DomainDataType(BaseDomainDataType):
                 uuid.UUID(str(value))
                 found_option = len(models.Node.objects.filter(config__contains={"options": [{"id": value}]})) > 0
             except ValueError as e:
-                found_option = True if self.get_option_id_from_text(value) is not None else False 
+                found_option = True if self.get_option_id_from_text(value) is not None else False
 
             if not found_option:
                 message = _("Invalid domain id. Please check the node this value is mapped to for a list of valid domain ids.")
@@ -1796,14 +1796,14 @@ class DomainDataType(BaseDomainDataType):
         ret = copy.deepcopy(i81n_json_field.raw_value)
         for option in ret["options"]:
             option["text"] = str(I18n_String(option["text"]))
-        return ret  
+        return ret
 
     def i18n_localize(self, i81n_json_field: I18n_JSONField):
         ret = copy.deepcopy(i81n_json_field.raw_value)
         for option in ret["options"]:
             if not isinstance(option["text"], dict):
                 option["text"] = {i81n_json_field.lang: option["text"]}
-        return ret  
+        return ret
 
 
 class DomainListDataType(BaseDomainDataType):
