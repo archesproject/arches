@@ -348,7 +348,7 @@ class CsvReader(Reader):
         self.errors = []
         super(CsvReader, self).__init__()
 
-    def verify_flattened_tiles(tiles):
+    def verify_flattened_tiles(self, tiles):
         return [t for tile in tiles for t in tile.get_flattened_tiles()]
 
     def save_resource(
