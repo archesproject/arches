@@ -142,7 +142,9 @@ class LabelBasedGraph_FromResourceTests(TestCase):
         cls.grouping_node = models.Node(datatype="semantic", name="Test Node Grouping", nodegroup=cls.nodegroup)
         cls.string_node = models.Node(datatype="string", name="Test Node", nodegroup=cls.nodegroup)
         cls.grouping_tile = models.TileModel(data={}, nodegroup_id=str(cls.grouping_node.pk))
-        cls.string_tile = models.TileModel(data={str(cls.string_node.pk): {"en": {"value": "value_1", "direction": "ltr"}}}, nodegroup_id=str(cls.string_node.pk))
+        cls.string_tile = models.TileModel(
+            data={str(cls.string_node.pk): {"en": {"value": "value_1", "direction": "ltr"}}}, nodegroup_id=str(cls.string_node.pk)
+        )
 
         # let's mock Resource since it's minimally used
         # and complex to get `displayname`
@@ -180,7 +182,9 @@ class LabelBasedGraph_FromResourceTests(TestCase):
             {"nodegroupid": self.string_tile.nodegroup_id, "cardinality": "1"}
         ]
 
-        duplicate_node_tile = models.TileModel(data={str(self.string_node.pk): {"en": {"value": "value_2", "direction": "ltr"}}}, nodegroup_id=str(self.string_node.pk))
+        duplicate_node_tile = models.TileModel(
+            data={str(self.string_node.pk): {"en": {"value": "value_2", "direction": "ltr"}}}, nodegroup_id=str(self.string_node.pk)
+        )
 
         self.test_resource.tiles.append(self.string_tile)
         self.test_resource.tiles.append(duplicate_node_tile)
