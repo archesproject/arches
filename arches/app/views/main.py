@@ -27,7 +27,7 @@ from django.http import HttpResponseNotFound, HttpResponse
 def index(request):
     return render(
         request,
-        "index.htm",
+        "index.html",
         {
             "main_script": "index",
             "active_page": "Home",

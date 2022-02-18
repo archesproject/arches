@@ -29,18 +29,43 @@ var baz = Object.keys(bar).reduce((acc, key) => {
     return acc;
 }, {});
 
+
+// images
+const fooFileNames = function(path, outer_acc) {
+    return fs.readdirSync(path).reduce((acc, v) => {
+        if (fs.lstatSync(path + '/' + v).isDirectory() ) {
+            return fooFileNames(path + '/' + v, acc);
+        }
+        else {
+            var foo = (path + '/' + v).slice(6)
+            return { ...acc, [foo]: { 'import': `./img/${foo}`, 'filename': `./img/${foo}` } };
+        }
+
+    }, outer_acc);
+};
+
+
+var bar_img = fooFileNames('./img', {});
+
+var baz_img = Object.keys(bar).reduce((acc, key) => {
+    var foo = (key).slice(0, key.length - 4)
+    acc[foo] = Path.resolve(__dirname, '../img', key)
+    return acc;
+}, {});
+
 // const foo_plugins = fileNames('./plugins', {})
 // var bar_plugins = Object.keys(foo_plugins).reduce((acc, key) => {
 //     var foo = (key).slice(0, key.length - 3)
 //     acc[foo] = Path.resolve(__dirname, '../js', key)
 //     return acc;
 // }, {});
-console.log("HI", bar);
+console.log("HI", bar_img);
 // console.log("HI", baz)
 
 module.exports = {
     entry: {
         ...bar,
+        // ...bar_img,
         'arches': { 'import': './css/arches.scss', 'filename': './css/arches.scss' },
     },
     output: {
@@ -76,12 +101,12 @@ module.exports = {
         new CleanWebpackPlugin(),
         new CopyWebpackPlugin({ patterns: [{ from: Path.resolve(__dirname, '../public'), to: 'public' }] }),
         new HtmlWebpackPlugin({
-            template: Path.resolve(__dirname, '../src/index.html'),
+            template: Path.resolve(__dirname, '../../templates/index.htm'),
         }),
         new BundleTracker({ filename: './webpack-stats.json' }),
     ],
     resolve: {
-        // moduleDirectories: [__dirname, "node_modules"]
+        // moduleDirectories: [__dirname, "node_modules"],
         alias: {
             ...baz,
             'arches': Path.resolve(__dirname, '../templates', 'javascript.htm'),
@@ -101,6 +126,7 @@ module.exports = {
             'jquery-validate': Path.resolve(__dirname, '../node_modules/jquery-validation/dist', 'jquery.validate.min'),
             'jquery-ui/draggable': Path.resolve(__dirname, '../node_modules/jqueryui', 'jquery-ui.min.js'),
             'jquery-ui/sortable': Path.resolve(__dirname, '../node_modules/jqueryui', 'jquery-ui.min.js'),
+            // 'require': Path.resolve(__dirname, '../node_modules/requirejs', 'require.js'),
         },
     },
     module: {

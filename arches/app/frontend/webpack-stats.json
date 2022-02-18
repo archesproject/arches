@@ -1,395 +1,395 @@
 {
   "status": "done",
   "assets": {
-    "css/css/tree/32px.png": {
-      "name": "css/css/tree/32px.png",
-      "path": "/Users/cbyrd/Projects/arches/arches/app/frontend/build/css/css/tree/32px.png",
-      "publicPath": "/foo/css/css/tree/32px.png"
-    },
-    "8fec76f7125afc9fa1c8.png": {
-      "name": "8fec76f7125afc9fa1c8.png",
-      "path": "/Users/cbyrd/Projects/arches/arches/app/frontend/build/8fec76f7125afc9fa1c8.png",
-      "publicPath": "/foo/8fec76f7125afc9fa1c8.png"
-    },
-    "css/img/select2-spinner.gif": {
-      "name": "css/img/select2-spinner.gif",
-      "path": "/Users/cbyrd/Projects/arches/arches/app/frontend/build/css/img/select2-spinner.gif",
-      "publicPath": "/foo/css/img/select2-spinner.gif"
-    },
-    "7dacf26009d240d542a1.gif": {
-      "name": "7dacf26009d240d542a1.gif",
-      "path": "/Users/cbyrd/Projects/arches/arches/app/frontend/build/7dacf26009d240d542a1.gif",
-      "publicPath": "/foo/7dacf26009d240d542a1.gif"
-    },
-    "css/img/backgrounds/easter_island_night.jpg": {
-      "name": "css/img/backgrounds/easter_island_night.jpg",
-      "path": "/Users/cbyrd/Projects/arches/arches/app/frontend/build/css/img/backgrounds/easter_island_night.jpg",
-      "publicPath": "/foo/css/img/backgrounds/easter_island_night.jpg"
-    },
-    "5ce5f41ffab7a2888cad.jpg": {
-      "name": "5ce5f41ffab7a2888cad.jpg",
-      "path": "/Users/cbyrd/Projects/arches/arches/app/frontend/build/5ce5f41ffab7a2888cad.jpg",
-      "publicPath": "/foo/5ce5f41ffab7a2888cad.jpg"
-    },
-    "css/node_modules/bootstrap/dist/fonts/glyphicons-halflings-regular.eot": {
-      "name": "css/node_modules/bootstrap/dist/fonts/glyphicons-halflings-regular.eot",
-      "path": "/Users/cbyrd/Projects/arches/arches/app/frontend/build/css/node_modules/bootstrap/dist/fonts/glyphicons-halflings-regular.eot",
-      "publicPath": "/foo/css/node_modules/bootstrap/dist/fonts/glyphicons-halflings-regular.eot"
-    },
-    "a6d607fb25ab86d9f917.eot": {
-      "name": "a6d607fb25ab86d9f917.eot",
-      "path": "/Users/cbyrd/Projects/arches/arches/app/frontend/build/a6d607fb25ab86d9f917.eot",
-      "publicPath": "/foo/a6d607fb25ab86d9f917.eot"
-    },
-    "css/node_modules/bootstrap/dist/fonts/glyphicons-halflings-regular.woff2": {
-      "name": "css/node_modules/bootstrap/dist/fonts/glyphicons-halflings-regular.woff2",
-      "path": "/Users/cbyrd/Projects/arches/arches/app/frontend/build/css/node_modules/bootstrap/dist/fonts/glyphicons-halflings-regular.woff2",
-      "publicPath": "/foo/css/node_modules/bootstrap/dist/fonts/glyphicons-halflings-regular.woff2"
-    },
-    "d4e6f32cc4c3221a038e.woff2": {
-      "name": "d4e6f32cc4c3221a038e.woff2",
-      "path": "/Users/cbyrd/Projects/arches/arches/app/frontend/build/d4e6f32cc4c3221a038e.woff2",
-      "publicPath": "/foo/d4e6f32cc4c3221a038e.woff2"
-    },
-    "css/node_modules/bootstrap/dist/fonts/glyphicons-halflings-regular.woff": {
-      "name": "css/node_modules/bootstrap/dist/fonts/glyphicons-halflings-regular.woff",
-      "path": "/Users/cbyrd/Projects/arches/arches/app/frontend/build/css/node_modules/bootstrap/dist/fonts/glyphicons-halflings-regular.woff",
-      "publicPath": "/foo/css/node_modules/bootstrap/dist/fonts/glyphicons-halflings-regular.woff"
-    },
-    "fc288083af96ec16d747.woff": {
-      "name": "fc288083af96ec16d747.woff",
-      "path": "/Users/cbyrd/Projects/arches/arches/app/frontend/build/fc288083af96ec16d747.woff",
-      "publicPath": "/foo/fc288083af96ec16d747.woff"
-    },
-    "css/node_modules/bootstrap/dist/fonts/glyphicons-halflings-regular.svg": {
-      "name": "css/node_modules/bootstrap/dist/fonts/glyphicons-halflings-regular.svg",
-      "path": "/Users/cbyrd/Projects/arches/arches/app/frontend/build/css/node_modules/bootstrap/dist/fonts/glyphicons-halflings-regular.svg",
-      "publicPath": "/foo/css/node_modules/bootstrap/dist/fonts/glyphicons-halflings-regular.svg"
-    },
-    "fa0fce017cc64bab7828.svg": {
-      "name": "fa0fce017cc64bab7828.svg",
-      "path": "/Users/cbyrd/Projects/arches/arches/app/frontend/build/fa0fce017cc64bab7828.svg",
-      "publicPath": "/foo/fa0fce017cc64bab7828.svg"
-    },
-    "css/node_modules/bootstrap/dist/fonts/glyphicons-halflings-regular.ttf": {
-      "name": "css/node_modules/bootstrap/dist/fonts/glyphicons-halflings-regular.ttf",
-      "path": "/Users/cbyrd/Projects/arches/arches/app/frontend/build/css/node_modules/bootstrap/dist/fonts/glyphicons-halflings-regular.ttf",
-      "publicPath": "/foo/css/node_modules/bootstrap/dist/fonts/glyphicons-halflings-regular.ttf"
-    },
-    "9f73c0d382fad13ec601.ttf": {
-      "name": "9f73c0d382fad13ec601.ttf",
-      "path": "/Users/cbyrd/Projects/arches/arches/app/frontend/build/9f73c0d382fad13ec601.ttf",
-      "publicPath": "/foo/9f73c0d382fad13ec601.ttf"
-    },
-    "css/node_modules/leaflet-draw/dist/images/spritesheet.png": {
-      "name": "css/node_modules/leaflet-draw/dist/images/spritesheet.png",
-      "path": "/Users/cbyrd/Projects/arches/arches/app/frontend/build/css/node_modules/leaflet-draw/dist/images/spritesheet.png",
-      "publicPath": "/foo/css/node_modules/leaflet-draw/dist/images/spritesheet.png"
-    },
-    "8a591aaf3e5eda28824e.png": {
-      "name": "8a591aaf3e5eda28824e.png",
-      "path": "/Users/cbyrd/Projects/arches/arches/app/frontend/build/8a591aaf3e5eda28824e.png",
-      "publicPath": "/foo/8a591aaf3e5eda28824e.png"
-    },
-    "css/node_modules/leaflet-draw/dist/images/spritesheet.svg": {
-      "name": "css/node_modules/leaflet-draw/dist/images/spritesheet.svg",
-      "path": "/Users/cbyrd/Projects/arches/arches/app/frontend/build/css/node_modules/leaflet-draw/dist/images/spritesheet.svg",
-      "publicPath": "/foo/css/node_modules/leaflet-draw/dist/images/spritesheet.svg"
-    },
-    "d395238c26e7010f97e1.svg": {
-      "name": "d395238c26e7010f97e1.svg",
-      "path": "/Users/cbyrd/Projects/arches/arches/app/frontend/build/d395238c26e7010f97e1.svg",
-      "publicPath": "/foo/d395238c26e7010f97e1.svg"
-    },
-    "css/node_modules/leaflet-draw/dist/images/spritesheet-2x.png": {
-      "name": "css/node_modules/leaflet-draw/dist/images/spritesheet-2x.png",
-      "path": "/Users/cbyrd/Projects/arches/arches/app/frontend/build/css/node_modules/leaflet-draw/dist/images/spritesheet-2x.png",
-      "publicPath": "/foo/css/node_modules/leaflet-draw/dist/images/spritesheet-2x.png"
-    },
-    "366d164808311cdc8044.png": {
-      "name": "366d164808311cdc8044.png",
-      "path": "/Users/cbyrd/Projects/arches/arches/app/frontend/build/366d164808311cdc8044.png",
-      "publicPath": "/foo/366d164808311cdc8044.png"
-    },
-    "css/node_modules/leaflet/dist/images/layers.png": {
-      "name": "css/node_modules/leaflet/dist/images/layers.png",
-      "path": "/Users/cbyrd/Projects/arches/arches/app/frontend/build/css/node_modules/leaflet/dist/images/layers.png",
-      "publicPath": "/foo/css/node_modules/leaflet/dist/images/layers.png"
-    },
-    "266eadfe95e6f015d96d.png": {
-      "name": "266eadfe95e6f015d96d.png",
-      "path": "/Users/cbyrd/Projects/arches/arches/app/frontend/build/266eadfe95e6f015d96d.png",
-      "publicPath": "/foo/266eadfe95e6f015d96d.png"
-    },
-    "css/node_modules/leaflet/dist/images/layers-2x.png": {
-      "name": "css/node_modules/leaflet/dist/images/layers-2x.png",
-      "path": "/Users/cbyrd/Projects/arches/arches/app/frontend/build/css/node_modules/leaflet/dist/images/layers-2x.png",
-      "publicPath": "/foo/css/node_modules/leaflet/dist/images/layers-2x.png"
-    },
-    "3a3c86ec2bed1c1d4b6a.png": {
-      "name": "3a3c86ec2bed1c1d4b6a.png",
-      "path": "/Users/cbyrd/Projects/arches/arches/app/frontend/build/3a3c86ec2bed1c1d4b6a.png",
-      "publicPath": "/foo/3a3c86ec2bed1c1d4b6a.png"
-    },
-    "css/node_modules/leaflet/dist/images/marker-icon.png": {
-      "name": "css/node_modules/leaflet/dist/images/marker-icon.png",
-      "path": "/Users/cbyrd/Projects/arches/arches/app/frontend/build/css/node_modules/leaflet/dist/images/marker-icon.png",
-      "publicPath": "/foo/css/node_modules/leaflet/dist/images/marker-icon.png"
-    },
-    "23af595a8fa8c049c1e7.png": {
-      "name": "23af595a8fa8c049c1e7.png",
-      "path": "/Users/cbyrd/Projects/arches/arches/app/frontend/build/23af595a8fa8c049c1e7.png",
-      "publicPath": "/foo/23af595a8fa8c049c1e7.png"
-    },
-    "css/node_modules/ionicons/fonts/ionicons.eot": {
-      "name": "css/node_modules/ionicons/fonts/ionicons.eot",
-      "path": "/Users/cbyrd/Projects/arches/arches/app/frontend/build/css/node_modules/ionicons/fonts/ionicons.eot",
-      "publicPath": "/foo/css/node_modules/ionicons/fonts/ionicons.eot"
-    },
-    "fe0046f72f03741ceb02.eot?v=2.0.1": {
-      "name": "fe0046f72f03741ceb02.eot?v=2.0.1",
-      "path": "/Users/cbyrd/Projects/arches/arches/app/frontend/build/fe0046f72f03741ceb02.eot",
-      "publicPath": "/foo/fe0046f72f03741ceb02.eot?v=2.0.1"
-    },
-    "css/node_modules/ionicons/fonts/ionicons.ttf": {
-      "name": "css/node_modules/ionicons/fonts/ionicons.ttf",
-      "path": "/Users/cbyrd/Projects/arches/arches/app/frontend/build/css/node_modules/ionicons/fonts/ionicons.ttf",
-      "publicPath": "/foo/css/node_modules/ionicons/fonts/ionicons.ttf"
-    },
-    "f098afe570b9a3c29ce1.ttf?v=2.0.1": {
-      "name": "f098afe570b9a3c29ce1.ttf?v=2.0.1",
-      "path": "/Users/cbyrd/Projects/arches/arches/app/frontend/build/f098afe570b9a3c29ce1.ttf",
-      "publicPath": "/foo/f098afe570b9a3c29ce1.ttf?v=2.0.1"
-    },
-    "css/node_modules/ionicons/fonts/ionicons.woff": {
-      "name": "css/node_modules/ionicons/fonts/ionicons.woff",
-      "path": "/Users/cbyrd/Projects/arches/arches/app/frontend/build/css/node_modules/ionicons/fonts/ionicons.woff",
-      "publicPath": "/foo/css/node_modules/ionicons/fonts/ionicons.woff"
-    },
-    "66348314ecad9c3f6cb6.woff?v=2.0.1": {
-      "name": "66348314ecad9c3f6cb6.woff?v=2.0.1",
-      "path": "/Users/cbyrd/Projects/arches/arches/app/frontend/build/66348314ecad9c3f6cb6.woff",
-      "publicPath": "/foo/66348314ecad9c3f6cb6.woff?v=2.0.1"
-    },
-    "css/node_modules/ionicons/fonts/ionicons.svg": {
-      "name": "css/node_modules/ionicons/fonts/ionicons.svg",
-      "path": "/Users/cbyrd/Projects/arches/arches/app/frontend/build/css/node_modules/ionicons/fonts/ionicons.svg",
-      "publicPath": "/foo/css/node_modules/ionicons/fonts/ionicons.svg"
-    },
-    "a7cd49fe7e33294fc2ae.svg?v=2.0.1": {
-      "name": "a7cd49fe7e33294fc2ae.svg?v=2.0.1",
-      "path": "/Users/cbyrd/Projects/arches/arches/app/frontend/build/a7cd49fe7e33294fc2ae.svg",
-      "publicPath": "/foo/a7cd49fe7e33294fc2ae.svg?v=2.0.1"
-    },
-    "css/node_modules/font-awesome/fonts/fontawesome-webfont.eot": {
-      "name": "css/node_modules/font-awesome/fonts/fontawesome-webfont.eot",
-      "path": "/Users/cbyrd/Projects/arches/arches/app/frontend/build/css/node_modules/font-awesome/fonts/fontawesome-webfont.eot",
-      "publicPath": "/foo/css/node_modules/font-awesome/fonts/fontawesome-webfont.eot"
-    },
-    "9cf7f9a4c70423b49d1e.eot?v=4.6.3": {
-      "name": "9cf7f9a4c70423b49d1e.eot?v=4.6.3",
-      "path": "/Users/cbyrd/Projects/arches/arches/app/frontend/build/9cf7f9a4c70423b49d1e.eot",
-      "publicPath": "/foo/9cf7f9a4c70423b49d1e.eot?v=4.6.3"
-    },
-    "9cf7f9a4c70423b49d1e.eot": {
-      "name": "9cf7f9a4c70423b49d1e.eot",
-      "path": "/Users/cbyrd/Projects/arches/arches/app/frontend/build/9cf7f9a4c70423b49d1e.eot",
-      "publicPath": "/foo/9cf7f9a4c70423b49d1e.eot"
-    },
-    "css/node_modules/font-awesome/fonts/fontawesome-webfont.woff2": {
-      "name": "css/node_modules/font-awesome/fonts/fontawesome-webfont.woff2",
-      "path": "/Users/cbyrd/Projects/arches/arches/app/frontend/build/css/node_modules/font-awesome/fonts/fontawesome-webfont.woff2",
-      "publicPath": "/foo/css/node_modules/font-awesome/fonts/fontawesome-webfont.woff2"
-    },
-    "79ee45c5e8a674e7466e.woff2?v=4.6.3": {
-      "name": "79ee45c5e8a674e7466e.woff2?v=4.6.3",
-      "path": "/Users/cbyrd/Projects/arches/arches/app/frontend/build/79ee45c5e8a674e7466e.woff2",
-      "publicPath": "/foo/79ee45c5e8a674e7466e.woff2?v=4.6.3"
-    },
-    "css/node_modules/font-awesome/fonts/fontawesome-webfont.woff": {
-      "name": "css/node_modules/font-awesome/fonts/fontawesome-webfont.woff",
-      "path": "/Users/cbyrd/Projects/arches/arches/app/frontend/build/css/node_modules/font-awesome/fonts/fontawesome-webfont.woff",
-      "publicPath": "/foo/css/node_modules/font-awesome/fonts/fontawesome-webfont.woff"
-    },
-    "5767341ebe58965ccf05.woff?v=4.6.3": {
-      "name": "5767341ebe58965ccf05.woff?v=4.6.3",
-      "path": "/Users/cbyrd/Projects/arches/arches/app/frontend/build/5767341ebe58965ccf05.woff",
-      "publicPath": "/foo/5767341ebe58965ccf05.woff?v=4.6.3"
-    },
-    "css/node_modules/font-awesome/fonts/fontawesome-webfont.svg": {
-      "name": "css/node_modules/font-awesome/fonts/fontawesome-webfont.svg",
-      "path": "/Users/cbyrd/Projects/arches/arches/app/frontend/build/css/node_modules/font-awesome/fonts/fontawesome-webfont.svg",
-      "publicPath": "/foo/css/node_modules/font-awesome/fonts/fontawesome-webfont.svg"
-    },
-    "ee761e6ffc3075098a4f.svg?v=4.6.3": {
-      "name": "ee761e6ffc3075098a4f.svg?v=4.6.3",
-      "path": "/Users/cbyrd/Projects/arches/arches/app/frontend/build/ee761e6ffc3075098a4f.svg",
-      "publicPath": "/foo/ee761e6ffc3075098a4f.svg?v=4.6.3"
-    },
-    "css/node_modules/font-awesome/fonts/fontawesome-webfont.ttf": {
-      "name": "css/node_modules/font-awesome/fonts/fontawesome-webfont.ttf",
-      "path": "/Users/cbyrd/Projects/arches/arches/app/frontend/build/css/node_modules/font-awesome/fonts/fontawesome-webfont.ttf",
-      "publicPath": "/foo/css/node_modules/font-awesome/fonts/fontawesome-webfont.ttf"
-    },
-    "75bba49b2f26cee5285d.ttf?v=4.6.3": {
-      "name": "75bba49b2f26cee5285d.ttf?v=4.6.3",
-      "path": "/Users/cbyrd/Projects/arches/arches/app/frontend/build/75bba49b2f26cee5285d.ttf",
-      "publicPath": "/foo/75bba49b2f26cee5285d.ttf?v=4.6.3"
-    },
-    "css/node_modules/leaflet.fullscreen/icon-fullscreen.png": {
-      "name": "css/node_modules/leaflet.fullscreen/icon-fullscreen.png",
-      "path": "/Users/cbyrd/Projects/arches/arches/app/frontend/build/css/node_modules/leaflet.fullscreen/icon-fullscreen.png",
-      "publicPath": "/foo/css/node_modules/leaflet.fullscreen/icon-fullscreen.png"
-    },
-    "907486295bc93872438c.png": {
-      "name": "907486295bc93872438c.png",
-      "path": "/Users/cbyrd/Projects/arches/arches/app/frontend/build/907486295bc93872438c.png",
-      "publicPath": "/foo/907486295bc93872438c.png"
-    },
-    "css/node_modules/leaflet.fullscreen/icon-fullscreen-2x.png": {
-      "name": "css/node_modules/leaflet.fullscreen/icon-fullscreen-2x.png",
-      "path": "/Users/cbyrd/Projects/arches/arches/app/frontend/build/css/node_modules/leaflet.fullscreen/icon-fullscreen-2x.png",
-      "publicPath": "/foo/css/node_modules/leaflet.fullscreen/icon-fullscreen-2x.png"
-    },
-    "24d01d705c066c85d361.png": {
-      "name": "24d01d705c066c85d361.png",
-      "path": "/Users/cbyrd/Projects/arches/arches/app/frontend/build/24d01d705c066c85d361.png",
-      "publicPath": "/foo/24d01d705c066c85d361.png"
-    },
-    "css/node_modules/select2/select2.png": {
-      "name": "css/node_modules/select2/select2.png",
-      "path": "/Users/cbyrd/Projects/arches/arches/app/frontend/build/css/node_modules/select2/select2.png",
-      "publicPath": "/foo/css/node_modules/select2/select2.png"
-    },
-    "946486267a420cfef876.png": {
-      "name": "946486267a420cfef876.png",
-      "path": "/Users/cbyrd/Projects/arches/arches/app/frontend/build/946486267a420cfef876.png",
-      "publicPath": "/foo/946486267a420cfef876.png"
-    },
-    "css/node_modules/select2/select2-spinner.gif": {
-      "name": "css/node_modules/select2/select2-spinner.gif",
-      "path": "/Users/cbyrd/Projects/arches/arches/app/frontend/build/css/node_modules/select2/select2-spinner.gif",
-      "publicPath": "/foo/css/node_modules/select2/select2-spinner.gif"
-    },
-    "99b78cf610871ad0be11.gif": {
-      "name": "99b78cf610871ad0be11.gif",
-      "path": "/Users/cbyrd/Projects/arches/arches/app/frontend/build/99b78cf610871ad0be11.gif",
-      "publicPath": "/foo/99b78cf610871ad0be11.gif"
-    },
-    "css/node_modules/select2/select2x2.png": {
-      "name": "css/node_modules/select2/select2x2.png",
-      "path": "/Users/cbyrd/Projects/arches/arches/app/frontend/build/css/node_modules/select2/select2x2.png",
-      "publicPath": "/foo/css/node_modules/select2/select2x2.png"
-    },
-    "9b90891ca84dd32f77a7.png": {
-      "name": "9b90891ca84dd32f77a7.png",
-      "path": "/Users/cbyrd/Projects/arches/arches/app/frontend/build/9b90891ca84dd32f77a7.png",
-      "publicPath": "/foo/9b90891ca84dd32f77a7.png"
-    },
-    "css/node_modules/chosen-js/chosen-sprite.png": {
-      "name": "css/node_modules/chosen-js/chosen-sprite.png",
-      "path": "/Users/cbyrd/Projects/arches/arches/app/frontend/build/css/node_modules/chosen-js/chosen-sprite.png",
-      "publicPath": "/foo/css/node_modules/chosen-js/chosen-sprite.png"
-    },
-    "cf6a29650315b4f76e70.png": {
-      "name": "cf6a29650315b4f76e70.png",
-      "path": "/Users/cbyrd/Projects/arches/arches/app/frontend/build/cf6a29650315b4f76e70.png",
-      "publicPath": "/foo/cf6a29650315b4f76e70.png"
-    },
-    "css/node_modules/chosen-js/chosen-sprite@2x.png": {
-      "name": "css/node_modules/chosen-js/chosen-sprite@2x.png",
-      "path": "/Users/cbyrd/Projects/arches/arches/app/frontend/build/css/node_modules/chosen-js/chosen-sprite@2x.png",
-      "publicPath": "/foo/css/node_modules/chosen-js/chosen-sprite@2x.png"
-    },
-    "f2cd1409eb73c250d029.png": {
-      "name": "f2cd1409eb73c250d029.png",
-      "path": "/Users/cbyrd/Projects/arches/arches/app/frontend/build/f2cd1409eb73c250d029.png",
-      "publicPath": "/foo/f2cd1409eb73c250d029.png"
-    },
-    "css/node_modules/lt-themify-icons/fonts/themify.eot": {
-      "name": "css/node_modules/lt-themify-icons/fonts/themify.eot",
-      "path": "/Users/cbyrd/Projects/arches/arches/app/frontend/build/css/node_modules/lt-themify-icons/fonts/themify.eot",
-      "publicPath": "/foo/css/node_modules/lt-themify-icons/fonts/themify.eot"
-    },
-    "c904e5a3ea0a346781d1.eot?-fvbane": {
-      "name": "c904e5a3ea0a346781d1.eot?-fvbane",
-      "path": "/Users/cbyrd/Projects/arches/arches/app/frontend/build/c904e5a3ea0a346781d1.eot",
-      "publicPath": "/foo/c904e5a3ea0a346781d1.eot?-fvbane"
-    },
-    "c904e5a3ea0a346781d1.eot": {
-      "name": "c904e5a3ea0a346781d1.eot",
-      "path": "/Users/cbyrd/Projects/arches/arches/app/frontend/build/c904e5a3ea0a346781d1.eot",
-      "publicPath": "/foo/c904e5a3ea0a346781d1.eot"
-    },
-    "css/node_modules/lt-themify-icons/fonts/themify.woff": {
-      "name": "css/node_modules/lt-themify-icons/fonts/themify.woff",
-      "path": "/Users/cbyrd/Projects/arches/arches/app/frontend/build/css/node_modules/lt-themify-icons/fonts/themify.woff",
-      "publicPath": "/foo/css/node_modules/lt-themify-icons/fonts/themify.woff"
-    },
-    "09208ece6f8a2e04f553.woff?-fvbane": {
-      "name": "09208ece6f8a2e04f553.woff?-fvbane",
-      "path": "/Users/cbyrd/Projects/arches/arches/app/frontend/build/09208ece6f8a2e04f553.woff",
-      "publicPath": "/foo/09208ece6f8a2e04f553.woff?-fvbane"
-    },
-    "css/node_modules/lt-themify-icons/fonts/themify.svg": {
-      "name": "css/node_modules/lt-themify-icons/fonts/themify.svg",
-      "path": "/Users/cbyrd/Projects/arches/arches/app/frontend/build/css/node_modules/lt-themify-icons/fonts/themify.svg",
-      "publicPath": "/foo/css/node_modules/lt-themify-icons/fonts/themify.svg"
-    },
-    "e2c452c6c2cee725de5b.svg?-fvbane": {
-      "name": "e2c452c6c2cee725de5b.svg?-fvbane",
-      "path": "/Users/cbyrd/Projects/arches/arches/app/frontend/build/e2c452c6c2cee725de5b.svg",
-      "publicPath": "/foo/e2c452c6c2cee725de5b.svg?-fvbane"
-    },
-    "css/node_modules/lt-themify-icons/fonts/themify.ttf": {
-      "name": "css/node_modules/lt-themify-icons/fonts/themify.ttf",
-      "path": "/Users/cbyrd/Projects/arches/arches/app/frontend/build/css/node_modules/lt-themify-icons/fonts/themify.ttf",
-      "publicPath": "/foo/css/node_modules/lt-themify-icons/fonts/themify.ttf"
-    },
-    "accdec255770ee608de0.ttf?-fvbane": {
-      "name": "accdec255770ee608de0.ttf?-fvbane",
-      "path": "/Users/cbyrd/Projects/arches/arches/app/frontend/build/accdec255770ee608de0.ttf",
-      "publicPath": "/foo/accdec255770ee608de0.ttf?-fvbane"
-    },
-    "css/css/fonts/1ORHCpsQm3Vp6mXoaTYnF5uFdDttMLvmWuJdhhgs.ttf": {
-      "name": "css/css/fonts/1ORHCpsQm3Vp6mXoaTYnF5uFdDttMLvmWuJdhhgs.ttf",
-      "path": "/Users/cbyrd/Projects/arches/arches/app/frontend/build/css/css/fonts/1ORHCpsQm3Vp6mXoaTYnF5uFdDttMLvmWuJdhhgs.ttf",
-      "publicPath": "/foo/css/css/fonts/1ORHCpsQm3Vp6mXoaTYnF5uFdDttMLvmWuJdhhgs.ttf"
-    },
-    "e304d549aac96e9e30ae.ttf": {
-      "name": "e304d549aac96e9e30ae.ttf",
-      "path": "/Users/cbyrd/Projects/arches/arches/app/frontend/build/e304d549aac96e9e30ae.ttf",
-      "publicPath": "/foo/e304d549aac96e9e30ae.ttf"
-    },
-    "css/css/fonts/KeOuBrn4kERxqtaUH3aCWcynf_cDxXwCLxiixG1c.ttf": {
-      "name": "css/css/fonts/KeOuBrn4kERxqtaUH3aCWcynf_cDxXwCLxiixG1c.ttf",
-      "path": "/Users/cbyrd/Projects/arches/arches/app/frontend/build/css/css/fonts/KeOuBrn4kERxqtaUH3aCWcynf_cDxXwCLxiixG1c.ttf",
-      "publicPath": "/foo/css/css/fonts/KeOuBrn4kERxqtaUH3aCWcynf_cDxXwCLxiixG1c.ttf"
-    },
-    "12a6930feedca7bb6781.ttf": {
-      "name": "12a6930feedca7bb6781.ttf",
-      "path": "/Users/cbyrd/Projects/arches/arches/app/frontend/build/12a6930feedca7bb6781.ttf",
-      "publicPath": "/foo/12a6930feedca7bb6781.ttf"
-    },
-    "css/css/fonts/_ySUJH_bn48VBG8sNSonF5uFdDttMLvmWuJdhhgs.ttf": {
-      "name": "css/css/fonts/_ySUJH_bn48VBG8sNSonF5uFdDttMLvmWuJdhhgs.ttf",
-      "path": "/Users/cbyrd/Projects/arches/arches/app/frontend/build/css/css/fonts/_ySUJH_bn48VBG8sNSonF5uFdDttMLvmWuJdhhgs.ttf",
-      "publicPath": "/foo/css/css/fonts/_ySUJH_bn48VBG8sNSonF5uFdDttMLvmWuJdhhgs.ttf"
-    },
-    "8daf23f8b42e90902c06.ttf": {
-      "name": "8daf23f8b42e90902c06.ttf",
-      "path": "/Users/cbyrd/Projects/arches/arches/app/frontend/build/8daf23f8b42e90902c06.ttf",
-      "publicPath": "/foo/8daf23f8b42e90902c06.ttf"
-    },
-    "css/css/fonts/702ZOKiLJc3WVjuplzInF5uFdDttMLvmWuJdhhgs.ttf": {
-      "name": "css/css/fonts/702ZOKiLJc3WVjuplzInF5uFdDttMLvmWuJdhhgs.ttf",
-      "path": "/Users/cbyrd/Projects/arches/arches/app/frontend/build/css/css/fonts/702ZOKiLJc3WVjuplzInF5uFdDttMLvmWuJdhhgs.ttf",
-      "publicPath": "/foo/css/css/fonts/702ZOKiLJc3WVjuplzInF5uFdDttMLvmWuJdhhgs.ttf"
-    },
-    "18054f6e1d9485c6f614.ttf": {
-      "name": "18054f6e1d9485c6f614.ttf",
-      "path": "/Users/cbyrd/Projects/arches/arches/app/frontend/build/18054f6e1d9485c6f614.ttf",
-      "publicPath": "/foo/18054f6e1d9485c6f614.ttf"
+    "css/tree/32px.png": {
+      "name": "css/tree/32px.png",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/frontend/build/css/tree/32px.png",
+      "publicPath": "/foo/css/tree/32px.png"
+    },
+    "22188090d2a352389ac3.png": {
+      "name": "22188090d2a352389ac3.png",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/frontend/build/22188090d2a352389ac3.png",
+      "publicPath": "/foo/22188090d2a352389ac3.png"
+    },
+    "img/select2-spinner.gif": {
+      "name": "img/select2-spinner.gif",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/frontend/build/img/select2-spinner.gif",
+      "publicPath": "/foo/img/select2-spinner.gif"
+    },
+    "b0660e0d75f62bcbbd98.gif": {
+      "name": "b0660e0d75f62bcbbd98.gif",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/frontend/build/b0660e0d75f62bcbbd98.gif",
+      "publicPath": "/foo/b0660e0d75f62bcbbd98.gif"
+    },
+    "img/backgrounds/easter_island_night.jpg": {
+      "name": "img/backgrounds/easter_island_night.jpg",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/frontend/build/img/backgrounds/easter_island_night.jpg",
+      "publicPath": "/foo/img/backgrounds/easter_island_night.jpg"
+    },
+    "89c45f9fcd3d55bedddb.jpg": {
+      "name": "89c45f9fcd3d55bedddb.jpg",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/frontend/build/89c45f9fcd3d55bedddb.jpg",
+      "publicPath": "/foo/89c45f9fcd3d55bedddb.jpg"
+    },
+    "node_modules/bootstrap/dist/fonts/glyphicons-halflings-regular.eot": {
+      "name": "node_modules/bootstrap/dist/fonts/glyphicons-halflings-regular.eot",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/frontend/build/node_modules/bootstrap/dist/fonts/glyphicons-halflings-regular.eot",
+      "publicPath": "/foo/node_modules/bootstrap/dist/fonts/glyphicons-halflings-regular.eot"
+    },
+    "171e261ea812679202ea.eot": {
+      "name": "171e261ea812679202ea.eot",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/frontend/build/171e261ea812679202ea.eot",
+      "publicPath": "/foo/171e261ea812679202ea.eot"
+    },
+    "node_modules/bootstrap/dist/fonts/glyphicons-halflings-regular.woff2": {
+      "name": "node_modules/bootstrap/dist/fonts/glyphicons-halflings-regular.woff2",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/frontend/build/node_modules/bootstrap/dist/fonts/glyphicons-halflings-regular.woff2",
+      "publicPath": "/foo/node_modules/bootstrap/dist/fonts/glyphicons-halflings-regular.woff2"
+    },
+    "181f6fc8e39ec59c6d79.woff2": {
+      "name": "181f6fc8e39ec59c6d79.woff2",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/frontend/build/181f6fc8e39ec59c6d79.woff2",
+      "publicPath": "/foo/181f6fc8e39ec59c6d79.woff2"
+    },
+    "node_modules/bootstrap/dist/fonts/glyphicons-halflings-regular.woff": {
+      "name": "node_modules/bootstrap/dist/fonts/glyphicons-halflings-regular.woff",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/frontend/build/node_modules/bootstrap/dist/fonts/glyphicons-halflings-regular.woff",
+      "publicPath": "/foo/node_modules/bootstrap/dist/fonts/glyphicons-halflings-regular.woff"
+    },
+    "8feedc44fb50c2ccb550.woff": {
+      "name": "8feedc44fb50c2ccb550.woff",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/frontend/build/8feedc44fb50c2ccb550.woff",
+      "publicPath": "/foo/8feedc44fb50c2ccb550.woff"
+    },
+    "node_modules/bootstrap/dist/fonts/glyphicons-halflings-regular.ttf": {
+      "name": "node_modules/bootstrap/dist/fonts/glyphicons-halflings-regular.ttf",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/frontend/build/node_modules/bootstrap/dist/fonts/glyphicons-halflings-regular.ttf",
+      "publicPath": "/foo/node_modules/bootstrap/dist/fonts/glyphicons-halflings-regular.ttf"
+    },
+    "b91d4ec329ba1299a2ea.ttf": {
+      "name": "b91d4ec329ba1299a2ea.ttf",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/frontend/build/b91d4ec329ba1299a2ea.ttf",
+      "publicPath": "/foo/b91d4ec329ba1299a2ea.ttf"
+    },
+    "node_modules/bootstrap/dist/fonts/glyphicons-halflings-regular.svg": {
+      "name": "node_modules/bootstrap/dist/fonts/glyphicons-halflings-regular.svg",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/frontend/build/node_modules/bootstrap/dist/fonts/glyphicons-halflings-regular.svg",
+      "publicPath": "/foo/node_modules/bootstrap/dist/fonts/glyphicons-halflings-regular.svg"
+    },
+    "0a10a52a41a52170f53b.svg": {
+      "name": "0a10a52a41a52170f53b.svg",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/frontend/build/0a10a52a41a52170f53b.svg",
+      "publicPath": "/foo/0a10a52a41a52170f53b.svg"
+    },
+    "node_modules/leaflet-draw/dist/images/spritesheet.png": {
+      "name": "node_modules/leaflet-draw/dist/images/spritesheet.png",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/frontend/build/node_modules/leaflet-draw/dist/images/spritesheet.png",
+      "publicPath": "/foo/node_modules/leaflet-draw/dist/images/spritesheet.png"
+    },
+    "284a8e11d05f81f1d19f.png": {
+      "name": "284a8e11d05f81f1d19f.png",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/frontend/build/284a8e11d05f81f1d19f.png",
+      "publicPath": "/foo/284a8e11d05f81f1d19f.png"
+    },
+    "node_modules/leaflet-draw/dist/images/spritesheet.svg": {
+      "name": "node_modules/leaflet-draw/dist/images/spritesheet.svg",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/frontend/build/node_modules/leaflet-draw/dist/images/spritesheet.svg",
+      "publicPath": "/foo/node_modules/leaflet-draw/dist/images/spritesheet.svg"
+    },
+    "ef071f98858f31e647e8.svg": {
+      "name": "ef071f98858f31e647e8.svg",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/frontend/build/ef071f98858f31e647e8.svg",
+      "publicPath": "/foo/ef071f98858f31e647e8.svg"
+    },
+    "node_modules/leaflet-draw/dist/images/spritesheet-2x.png": {
+      "name": "node_modules/leaflet-draw/dist/images/spritesheet-2x.png",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/frontend/build/node_modules/leaflet-draw/dist/images/spritesheet-2x.png",
+      "publicPath": "/foo/node_modules/leaflet-draw/dist/images/spritesheet-2x.png"
+    },
+    "177b65d59145edc2c3e2.png": {
+      "name": "177b65d59145edc2c3e2.png",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/frontend/build/177b65d59145edc2c3e2.png",
+      "publicPath": "/foo/177b65d59145edc2c3e2.png"
+    },
+    "node_modules/leaflet/dist/images/layers.png": {
+      "name": "node_modules/leaflet/dist/images/layers.png",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/frontend/build/node_modules/leaflet/dist/images/layers.png",
+      "publicPath": "/foo/node_modules/leaflet/dist/images/layers.png"
+    },
+    "619bcfcfd93c8f4bbd82.png": {
+      "name": "619bcfcfd93c8f4bbd82.png",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/frontend/build/619bcfcfd93c8f4bbd82.png",
+      "publicPath": "/foo/619bcfcfd93c8f4bbd82.png"
+    },
+    "node_modules/leaflet/dist/images/layers-2x.png": {
+      "name": "node_modules/leaflet/dist/images/layers-2x.png",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/frontend/build/node_modules/leaflet/dist/images/layers-2x.png",
+      "publicPath": "/foo/node_modules/leaflet/dist/images/layers-2x.png"
+    },
+    "f45aeed65313f4d6db54.png": {
+      "name": "f45aeed65313f4d6db54.png",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/frontend/build/f45aeed65313f4d6db54.png",
+      "publicPath": "/foo/f45aeed65313f4d6db54.png"
+    },
+    "node_modules/leaflet/dist/images/marker-icon.png": {
+      "name": "node_modules/leaflet/dist/images/marker-icon.png",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/frontend/build/node_modules/leaflet/dist/images/marker-icon.png",
+      "publicPath": "/foo/node_modules/leaflet/dist/images/marker-icon.png"
+    },
+    "51f31254dedc076e769f.png": {
+      "name": "51f31254dedc076e769f.png",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/frontend/build/51f31254dedc076e769f.png",
+      "publicPath": "/foo/51f31254dedc076e769f.png"
+    },
+    "node_modules/ionicons/fonts/ionicons.eot": {
+      "name": "node_modules/ionicons/fonts/ionicons.eot",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/frontend/build/node_modules/ionicons/fonts/ionicons.eot",
+      "publicPath": "/foo/node_modules/ionicons/fonts/ionicons.eot"
+    },
+    "9482b189bacdf5b6952d.eot?v=2.0.1": {
+      "name": "9482b189bacdf5b6952d.eot?v=2.0.1",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/frontend/build/9482b189bacdf5b6952d.eot",
+      "publicPath": "/foo/9482b189bacdf5b6952d.eot?v=2.0.1"
+    },
+    "node_modules/ionicons/fonts/ionicons.ttf": {
+      "name": "node_modules/ionicons/fonts/ionicons.ttf",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/frontend/build/node_modules/ionicons/fonts/ionicons.ttf",
+      "publicPath": "/foo/node_modules/ionicons/fonts/ionicons.ttf"
+    },
+    "7c024456c1e5594e5314.ttf?v=2.0.1": {
+      "name": "7c024456c1e5594e5314.ttf?v=2.0.1",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/frontend/build/7c024456c1e5594e5314.ttf",
+      "publicPath": "/foo/7c024456c1e5594e5314.ttf?v=2.0.1"
+    },
+    "node_modules/ionicons/fonts/ionicons.woff": {
+      "name": "node_modules/ionicons/fonts/ionicons.woff",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/frontend/build/node_modules/ionicons/fonts/ionicons.woff",
+      "publicPath": "/foo/node_modules/ionicons/fonts/ionicons.woff"
+    },
+    "6625c4ac58273a1d775e.woff?v=2.0.1": {
+      "name": "6625c4ac58273a1d775e.woff?v=2.0.1",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/frontend/build/6625c4ac58273a1d775e.woff",
+      "publicPath": "/foo/6625c4ac58273a1d775e.woff?v=2.0.1"
+    },
+    "node_modules/ionicons/fonts/ionicons.svg": {
+      "name": "node_modules/ionicons/fonts/ionicons.svg",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/frontend/build/node_modules/ionicons/fonts/ionicons.svg",
+      "publicPath": "/foo/node_modules/ionicons/fonts/ionicons.svg"
+    },
+    "b74e3b4f9a375edfd15e.svg?v=2.0.1": {
+      "name": "b74e3b4f9a375edfd15e.svg?v=2.0.1",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/frontend/build/b74e3b4f9a375edfd15e.svg",
+      "publicPath": "/foo/b74e3b4f9a375edfd15e.svg?v=2.0.1"
+    },
+    "node_modules/font-awesome/fonts/fontawesome-webfont.eot": {
+      "name": "node_modules/font-awesome/fonts/fontawesome-webfont.eot",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/frontend/build/node_modules/font-awesome/fonts/fontawesome-webfont.eot",
+      "publicPath": "/foo/node_modules/font-awesome/fonts/fontawesome-webfont.eot"
+    },
+    "624cce53d0884ce76773.eot?v=4.6.3": {
+      "name": "624cce53d0884ce76773.eot?v=4.6.3",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/frontend/build/624cce53d0884ce76773.eot",
+      "publicPath": "/foo/624cce53d0884ce76773.eot?v=4.6.3"
+    },
+    "624cce53d0884ce76773.eot": {
+      "name": "624cce53d0884ce76773.eot",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/frontend/build/624cce53d0884ce76773.eot",
+      "publicPath": "/foo/624cce53d0884ce76773.eot"
+    },
+    "node_modules/font-awesome/fonts/fontawesome-webfont.woff2": {
+      "name": "node_modules/font-awesome/fonts/fontawesome-webfont.woff2",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/frontend/build/node_modules/font-awesome/fonts/fontawesome-webfont.woff2",
+      "publicPath": "/foo/node_modules/font-awesome/fonts/fontawesome-webfont.woff2"
+    },
+    "1eeb86bbb0aa9ef36dd7.woff2?v=4.6.3": {
+      "name": "1eeb86bbb0aa9ef36dd7.woff2?v=4.6.3",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/frontend/build/1eeb86bbb0aa9ef36dd7.woff2",
+      "publicPath": "/foo/1eeb86bbb0aa9ef36dd7.woff2?v=4.6.3"
+    },
+    "node_modules/font-awesome/fonts/fontawesome-webfont.woff": {
+      "name": "node_modules/font-awesome/fonts/fontawesome-webfont.woff",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/frontend/build/node_modules/font-awesome/fonts/fontawesome-webfont.woff",
+      "publicPath": "/foo/node_modules/font-awesome/fonts/fontawesome-webfont.woff"
+    },
+    "1bee3c75618cdadb0cdd.woff?v=4.6.3": {
+      "name": "1bee3c75618cdadb0cdd.woff?v=4.6.3",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/frontend/build/1bee3c75618cdadb0cdd.woff",
+      "publicPath": "/foo/1bee3c75618cdadb0cdd.woff?v=4.6.3"
+    },
+    "node_modules/font-awesome/fonts/fontawesome-webfont.ttf": {
+      "name": "node_modules/font-awesome/fonts/fontawesome-webfont.ttf",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/frontend/build/node_modules/font-awesome/fonts/fontawesome-webfont.ttf",
+      "publicPath": "/foo/node_modules/font-awesome/fonts/fontawesome-webfont.ttf"
+    },
+    "9c3ab41daa6c7740a204.ttf?v=4.6.3": {
+      "name": "9c3ab41daa6c7740a204.ttf?v=4.6.3",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/frontend/build/9c3ab41daa6c7740a204.ttf",
+      "publicPath": "/foo/9c3ab41daa6c7740a204.ttf?v=4.6.3"
+    },
+    "node_modules/font-awesome/fonts/fontawesome-webfont.svg": {
+      "name": "node_modules/font-awesome/fonts/fontawesome-webfont.svg",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/frontend/build/node_modules/font-awesome/fonts/fontawesome-webfont.svg",
+      "publicPath": "/foo/node_modules/font-awesome/fonts/fontawesome-webfont.svg"
+    },
+    "d5009ac4cc2ae3aacef7.svg?v=4.6.3": {
+      "name": "d5009ac4cc2ae3aacef7.svg?v=4.6.3",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/frontend/build/d5009ac4cc2ae3aacef7.svg",
+      "publicPath": "/foo/d5009ac4cc2ae3aacef7.svg?v=4.6.3"
+    },
+    "node_modules/leaflet.fullscreen/icon-fullscreen.png": {
+      "name": "node_modules/leaflet.fullscreen/icon-fullscreen.png",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/frontend/build/node_modules/leaflet.fullscreen/icon-fullscreen.png",
+      "publicPath": "/foo/node_modules/leaflet.fullscreen/icon-fullscreen.png"
+    },
+    "7c5fc267664242d01280.png": {
+      "name": "7c5fc267664242d01280.png",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/frontend/build/7c5fc267664242d01280.png",
+      "publicPath": "/foo/7c5fc267664242d01280.png"
+    },
+    "node_modules/leaflet.fullscreen/icon-fullscreen-2x.png": {
+      "name": "node_modules/leaflet.fullscreen/icon-fullscreen-2x.png",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/frontend/build/node_modules/leaflet.fullscreen/icon-fullscreen-2x.png",
+      "publicPath": "/foo/node_modules/leaflet.fullscreen/icon-fullscreen-2x.png"
+    },
+    "23346def825013b930a4.png": {
+      "name": "23346def825013b930a4.png",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/frontend/build/23346def825013b930a4.png",
+      "publicPath": "/foo/23346def825013b930a4.png"
+    },
+    "node_modules/select2/select2-spinner.gif": {
+      "name": "node_modules/select2/select2-spinner.gif",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/frontend/build/node_modules/select2/select2-spinner.gif",
+      "publicPath": "/foo/node_modules/select2/select2-spinner.gif"
+    },
+    "7820f1d217e9c8f62b95.gif": {
+      "name": "7820f1d217e9c8f62b95.gif",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/frontend/build/7820f1d217e9c8f62b95.gif",
+      "publicPath": "/foo/7820f1d217e9c8f62b95.gif"
+    },
+    "node_modules/select2/select2.png": {
+      "name": "node_modules/select2/select2.png",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/frontend/build/node_modules/select2/select2.png",
+      "publicPath": "/foo/node_modules/select2/select2.png"
+    },
+    "7ed3063546da09011773.png": {
+      "name": "7ed3063546da09011773.png",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/frontend/build/7ed3063546da09011773.png",
+      "publicPath": "/foo/7ed3063546da09011773.png"
+    },
+    "node_modules/select2/select2x2.png": {
+      "name": "node_modules/select2/select2x2.png",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/frontend/build/node_modules/select2/select2x2.png",
+      "publicPath": "/foo/node_modules/select2/select2x2.png"
+    },
+    "f0f737d464b45b24cef1.png": {
+      "name": "f0f737d464b45b24cef1.png",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/frontend/build/f0f737d464b45b24cef1.png",
+      "publicPath": "/foo/f0f737d464b45b24cef1.png"
+    },
+    "node_modules/chosen-js/chosen-sprite@2x.png": {
+      "name": "node_modules/chosen-js/chosen-sprite@2x.png",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/frontend/build/node_modules/chosen-js/chosen-sprite@2x.png",
+      "publicPath": "/foo/node_modules/chosen-js/chosen-sprite@2x.png"
+    },
+    "156901d989866733893b.png": {
+      "name": "156901d989866733893b.png",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/frontend/build/156901d989866733893b.png",
+      "publicPath": "/foo/156901d989866733893b.png"
+    },
+    "node_modules/chosen-js/chosen-sprite.png": {
+      "name": "node_modules/chosen-js/chosen-sprite.png",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/frontend/build/node_modules/chosen-js/chosen-sprite.png",
+      "publicPath": "/foo/node_modules/chosen-js/chosen-sprite.png"
+    },
+    "f27e7a671f57953ac350.png": {
+      "name": "f27e7a671f57953ac350.png",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/frontend/build/f27e7a671f57953ac350.png",
+      "publicPath": "/foo/f27e7a671f57953ac350.png"
+    },
+    "node_modules/lt-themify-icons/fonts/themify.eot": {
+      "name": "node_modules/lt-themify-icons/fonts/themify.eot",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/frontend/build/node_modules/lt-themify-icons/fonts/themify.eot",
+      "publicPath": "/foo/node_modules/lt-themify-icons/fonts/themify.eot"
+    },
+    "3cb4ff73968b4cc24c43.eot?-fvbane": {
+      "name": "3cb4ff73968b4cc24c43.eot?-fvbane",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/frontend/build/3cb4ff73968b4cc24c43.eot",
+      "publicPath": "/foo/3cb4ff73968b4cc24c43.eot?-fvbane"
+    },
+    "3cb4ff73968b4cc24c43.eot": {
+      "name": "3cb4ff73968b4cc24c43.eot",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/frontend/build/3cb4ff73968b4cc24c43.eot",
+      "publicPath": "/foo/3cb4ff73968b4cc24c43.eot"
+    },
+    "node_modules/lt-themify-icons/fonts/themify.woff": {
+      "name": "node_modules/lt-themify-icons/fonts/themify.woff",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/frontend/build/node_modules/lt-themify-icons/fonts/themify.woff",
+      "publicPath": "/foo/node_modules/lt-themify-icons/fonts/themify.woff"
+    },
+    "b2e83349bcf78cd7d37f.woff?-fvbane": {
+      "name": "b2e83349bcf78cd7d37f.woff?-fvbane",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/frontend/build/b2e83349bcf78cd7d37f.woff",
+      "publicPath": "/foo/b2e83349bcf78cd7d37f.woff?-fvbane"
+    },
+    "node_modules/lt-themify-icons/fonts/themify.svg": {
+      "name": "node_modules/lt-themify-icons/fonts/themify.svg",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/frontend/build/node_modules/lt-themify-icons/fonts/themify.svg",
+      "publicPath": "/foo/node_modules/lt-themify-icons/fonts/themify.svg"
+    },
+    "909a0f346914ec623826.svg?-fvbane": {
+      "name": "909a0f346914ec623826.svg?-fvbane",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/frontend/build/909a0f346914ec623826.svg",
+      "publicPath": "/foo/909a0f346914ec623826.svg?-fvbane"
+    },
+    "node_modules/lt-themify-icons/fonts/themify.ttf": {
+      "name": "node_modules/lt-themify-icons/fonts/themify.ttf",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/frontend/build/node_modules/lt-themify-icons/fonts/themify.ttf",
+      "publicPath": "/foo/node_modules/lt-themify-icons/fonts/themify.ttf"
+    },
+    "25e7dafe4dfaf6127dc3.ttf?-fvbane": {
+      "name": "25e7dafe4dfaf6127dc3.ttf?-fvbane",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/frontend/build/25e7dafe4dfaf6127dc3.ttf",
+      "publicPath": "/foo/25e7dafe4dfaf6127dc3.ttf?-fvbane"
+    },
+    "css/fonts/1ORHCpsQm3Vp6mXoaTYnF5uFdDttMLvmWuJdhhgs.ttf": {
+      "name": "css/fonts/1ORHCpsQm3Vp6mXoaTYnF5uFdDttMLvmWuJdhhgs.ttf",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/frontend/build/css/fonts/1ORHCpsQm3Vp6mXoaTYnF5uFdDttMLvmWuJdhhgs.ttf",
+      "publicPath": "/foo/css/fonts/1ORHCpsQm3Vp6mXoaTYnF5uFdDttMLvmWuJdhhgs.ttf"
+    },
+    "5228e2a15c9c96c2c8a6.ttf": {
+      "name": "5228e2a15c9c96c2c8a6.ttf",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/frontend/build/5228e2a15c9c96c2c8a6.ttf",
+      "publicPath": "/foo/5228e2a15c9c96c2c8a6.ttf"
+    },
+    "css/fonts/KeOuBrn4kERxqtaUH3aCWcynf_cDxXwCLxiixG1c.ttf": {
+      "name": "css/fonts/KeOuBrn4kERxqtaUH3aCWcynf_cDxXwCLxiixG1c.ttf",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/frontend/build/css/fonts/KeOuBrn4kERxqtaUH3aCWcynf_cDxXwCLxiixG1c.ttf",
+      "publicPath": "/foo/css/fonts/KeOuBrn4kERxqtaUH3aCWcynf_cDxXwCLxiixG1c.ttf"
+    },
+    "2ee5a1c930cfcbff94d1.ttf": {
+      "name": "2ee5a1c930cfcbff94d1.ttf",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/frontend/build/2ee5a1c930cfcbff94d1.ttf",
+      "publicPath": "/foo/2ee5a1c930cfcbff94d1.ttf"
+    },
+    "css/fonts/_ySUJH_bn48VBG8sNSonF5uFdDttMLvmWuJdhhgs.ttf": {
+      "name": "css/fonts/_ySUJH_bn48VBG8sNSonF5uFdDttMLvmWuJdhhgs.ttf",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/frontend/build/css/fonts/_ySUJH_bn48VBG8sNSonF5uFdDttMLvmWuJdhhgs.ttf",
+      "publicPath": "/foo/css/fonts/_ySUJH_bn48VBG8sNSonF5uFdDttMLvmWuJdhhgs.ttf"
+    },
+    "4e94a859590b22d64134.ttf": {
+      "name": "4e94a859590b22d64134.ttf",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/frontend/build/4e94a859590b22d64134.ttf",
+      "publicPath": "/foo/4e94a859590b22d64134.ttf"
+    },
+    "css/fonts/702ZOKiLJc3WVjuplzInF5uFdDttMLvmWuJdhhgs.ttf": {
+      "name": "css/fonts/702ZOKiLJc3WVjuplzInF5uFdDttMLvmWuJdhhgs.ttf",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/frontend/build/css/fonts/702ZOKiLJc3WVjuplzInF5uFdDttMLvmWuJdhhgs.ttf",
+      "publicPath": "/foo/css/fonts/702ZOKiLJc3WVjuplzInF5uFdDttMLvmWuJdhhgs.ttf"
+    },
+    "bdd47203cf6472ecb6d6.ttf": {
+      "name": "bdd47203cf6472ecb6d6.ttf",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/frontend/build/bdd47203cf6472ecb6d6.ttf",
+      "publicPath": "/foo/bdd47203cf6472ecb6d6.ttf"
     },
     "./js/bindings/chosen.js": {
       "name": "./js/bindings/chosen.js",
