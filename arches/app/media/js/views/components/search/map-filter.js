@@ -105,6 +105,7 @@ define([
                 this.maxBuffer = 100000;
                 this.maxBufferUnits = 'm';
                 this.maxZoom = arches.mapDefaultMaxZoom;
+                this.searchMapLoadAll = arches.searchMapLoadAll;
                 this.filter.feature_collection = ko.observable({
                     "type": "FeatureCollection",
                     "features": []
@@ -141,6 +142,8 @@ define([
                         this.draw.set(geoJSON);
                     }
                 }, this);
+
+                this.mapSearchResults = {};
 
                 this.getGeoJSONErrors = function(geoJSONString) {
                     var hint = geojsonhint.hint(geoJSONString);
@@ -323,7 +326,7 @@ define([
                 this.filters[componentName](this);
                 this.map.subscribe(function(){
                     this.setupDraw();
-                    this.restoreState();
+                    if (!this.pageLoaded) {this.restoreState();}
 
                     var filterUpdated = ko.computed(function() {
                         return JSON.stringify(ko.toJS(this.filter.feature_collection())) + this.filter.inverted();
@@ -475,15 +478,32 @@ define([
             },
 
             zoomToGeoJSON: function(data) {
-                var mapData = data.properties.geometries.reduce(function(fc1, fc2) {
-                    fc1.geom.features = fc1.geom.features.concat(fc2.geom.features);
-                    return fc1;
-                }, {
-                    "geom": {
-                        "type": "FeatureCollection",
-                        "features": []
-                    }
-                });
+                var mapData;
+                if (data.properties.geometries) {
+                    mapData = data.properties.geometries.reduce(function(fc1, fc2) {
+                        fc1.geom.features = fc1.geom.features.concat(fc2.geom.features);
+                        return fc1;
+                    }, {
+                        "geom": {
+                            "type": "FeatureCollection",
+                            "features": []
+                        }
+                    });
+                } else {
+                    mapData = {
+                        "geom": {
+                            "type": "FeatureCollection",
+                            "features": [{
+                                "geometry": {
+                                    "coordinates": [data.properties.points[0]["point"]["lon"], data.properties.points[0]["point"]["lat"]],
+                                    "type": "Point"
+                                },
+                                "properties": {},
+                                "type": "Feature"
+                            }]
+                        }
+                    };
+                }
                 var bounds = new mapboxgl.LngLatBounds(geojsonExtent(mapData.geom));
                 var maxZoom = ko.unwrap(this.maxZoom);
                 this.map().fitBounds(bounds, {
@@ -540,15 +560,79 @@ define([
             },
 
             updateResults: function() {
-                if (!!this.searchResults.results){
-                    this.searchAggregations({
-                        results: this.searchResults.results.hits.hits,
-                        geo_aggs: this.searchResults.results.aggregations.geo_aggs.inner.buckets[0]
-                    });
-                    this.fitToAggregationBounds();
+                var initQuery, queryChanged, queryString, querySansPage, lastQuery;
+                if (this.searchMapLoadAll) {
+                    this.loading(true);
+                    initQuery = false, queryChanged = false;
+                    queryString = JSON.parse(this.queryString());
+                    queryString['points_only'] = true;
+                    queryString['tiles'] = false;
+                    if (this.updateRequest) { this.updateRequest.abort(); }
+                    querySansPage = JSON.parse(this.queryString());
+                    lastQuery = JSON.parse(this.lastQueryString());
+                    querySansPage = Object.keys(querySansPage).sort().reduce(function(obj, key) {
+                        obj[key] = querySansPage[key];
+                        return obj;
+                    }, {});
+                    if (Object.keys(this.lastQuery()).length > 0) {
+                        lastQuery = Object.keys(lastQuery).sort().reduce(function(obj, key) {
+                            obj[key] = lastQuery[key];
+                            return obj;
+                        }, {});
+                    }
+                    delete querySansPage["paging-filter"];
+                    if (lastQuery["paging-filter"])
+                        delete lastQuery["paging-filter"];
+                    querySansPage = JSON.stringify(querySansPage);
+                    lastQuery = JSON.stringify(lastQuery);
+                    initQuery = lastQuery == '{}';
+                    queryChanged = querySansPage != lastQuery;
+                    if ((queryChanged && !initQuery) || !this.pageLoaded) {
+                        $.ajax({
+                            type: "GET",
+                            url: arches.urls.search_results,
+                            data: queryString,
+                            context: this,
+                            success: function(response) {
+                                this.mapSearchResults = {};
+                                _.each(response, function(value, key, response) {
+                                    this.mapSearchResults[key] = value;
+                                }, this);
+                            },
+                            error: function(response, status, error) {
+                                console.log(response);
+                                this.loading(false);
+                            },
+                            complete: function(request, status) {
+                                this.searchAggregations({
+                                    results: this.mapSearchResults.results.hits.hits,
+                                    geo_aggs: this.mapSearchResults.results.aggregations.geo_aggs.inner.buckets[0]
+                                });
+                                this.fitToAggregationBounds();
+                                this.setSearchBuffer();
+                                this.loading(false);
+                            }
+                        });
+                    } else {
+                        this.setSearchBuffer();
+                        this.loading(false);
+                    }
+                } else {
+                    if (!!this.searchResults.results){
+                        this.searchAggregations({
+                            results: this.searchResults.results.hits.hits,
+                            geo_aggs: this.searchResults.results.aggregations.geo_aggs.inner.buckets[0]
+                        });
+                        this.fitToAggregationBounds();
+                    }
+                    this.setSearchBuffer();
                 }
+            },
+
+            setSearchBuffer: function() {
+                var buffer;
                 if(!!this.searchResults[componentName]) {
-                    var buffer = this.searchResults[componentName].search_buffer;
+                    buffer = this.searchResults[componentName].search_buffer;
                     this.map().getSource('geojson-search-buffer-data').setData(buffer);
                 }
             },

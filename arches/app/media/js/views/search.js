@@ -120,9 +120,16 @@ define([
             this.viewModel.sharedStateObject.loading = this.viewModel.loading;
             this.viewModel.sharedStateObject.userCanEditResources = this.viewModel.userCanEditResources;
             this.viewModel.sharedStateObject.userCanReadResources = this.viewModel.userCanReadResources;
+            this.lastQuery = ko.observable({});
+            this.lastQueryString = ko.computed(function() {
+                return JSON.stringify(this.lastQuery());
+            }, this);
             this.queryString = ko.computed(function() {
                 return JSON.stringify(this.query());
             }, this);
+            this.viewModel.sharedStateObject.lastQuery = this.lastQuery;
+            this.viewModel.sharedStateObject.lastQueryString = this.lastQueryString;
+            this.viewModel.sharedStateObject.queryString = this.queryString;
 
             this.queryString.subscribe(function() {
                 this.doQuery();
@@ -135,11 +142,11 @@ define([
 
         doQuery: function() {
             var queryString = JSON.parse(this.queryString());
-
+            queryString['points_only'] = false;
             if (this.updateRequest) {
                 this.updateRequest.abort();
             }
-
+            this.viewModel.loading(true);
             this.updateRequest = $.ajax({
                 type: "GET",
                 url: arches.urls.search_results,
@@ -161,6 +168,7 @@ define([
                     this.viewModel.sharedStateObject.userid(response.userid);
                     this.viewModel.total(response.total_results);
                     this.viewModel.alert(false);
+                    this.lastQuery(this.query());
                 },
                 error: function(response, status, error) {
                     if(this.updateRequest.statusText !== 'abort'){

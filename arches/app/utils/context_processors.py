@@ -60,6 +60,7 @@ def map_info(request):
             "hex_bin_bounds": json.dumps(hex_bin_bounds),
             "geocoder_default": settings.DEFAULT_GEOCODER,
             "preferred_coordinate_systems": JSONSerializer().serialize(settings.PREFERRED_COORDINATE_SYSTEMS),
+            "search_map_load_all": JSONSerializer().serialize(settings.SEARCH_MAP_OWN_REQUEST),
         }
     }
 
