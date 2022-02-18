@@ -448,7 +448,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                             <!--ko foreach: {data: selectedNode().cards, as: 'card'} -->
                             <div class="checkbox">
                                 <label class="form-checkbox form-normal form-primary" data-bind="css: {'active': card.approved, 'disabled': $parent.locked}" style="padding-left: 25px; padding-top: 3px;">
-                                    <input type="checkbox" data-bind="checked: card.approved, attr: {disabled: $parent.locked}"/>
+                                    <input tabindex="0" type="checkbox" data-bind="checked: card.approved, attr: {disabled: $parent.locked}"/>
                                     <span data-bind="text: card.name"></span>
                                 </label>
                             </div>
@@ -540,10 +540,10 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 
                             <!-- Download Selector -->
                             <div class="msm-download-selector pad-top" style="display: block;">
-                                <div id="standard-download" class="category-title" href="" data-bind="css: {active: mobilesurvey.showCustomDataDownload() === false }, click: function(){ mobilesurvey.showCustomDataDownload(false)}">
+                                <div tabindex="0" id="standard-download" class="category-title" data-bind="css: {active: mobilesurvey.showCustomDataDownload() === false }, click: function(){ mobilesurvey.showCustomDataDownload(false)}">
                                     {% trans 'Download Records' %}
                                 </div>
-                                <div id="custom-download" class="category-title" href="" data-bind="css: {active: mobilesurvey.showCustomDataDownload() === true}, click: function(){ mobilesurvey.showCustomDataDownload(true)}">
+                                <div tabindex="0" id="custom-download" class="category-title" data-bind="css: {active: mobilesurvey.showCustomDataDownload() === true}, click: function(){ mobilesurvey.showCustomDataDownload(true)}">
                                     {% trans 'Custom Download' %}
                                 </div>
                             </div>
@@ -555,7 +555,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                                     <!-- Inline Checkboxes -->
                                     <div class="checkbox">
                                         <!-- ko foreach: {data:allResources, as: 'resource'} -->
-                                        <label class="form-checkbox form-normal form-primary" data-bind="text: resource.name, css: {'form-text' : true, active: _.contains($parent.mobilesurvey.datadownloadconfig.resources(), resource.id), disabled: resource.hasApprovedCards() === false || $parent.locked}, click: function(r){if (r.hasApprovedCards()){$parent.mobilesurvey.updateResourceDownloadList(r)}}"><input type="checkbox"></label>
+                                        <label tabindex="0" class="form-checkbox form-normal form-primary" data-bind="text: resource.name, css: {'form-text' : true, active: _.contains($parent.mobilesurvey.datadownloadconfig.resources(), resource.id), disabled: resource.hasApprovedCards() === false || $parent.locked}, click: function(r){if (r.hasApprovedCards()){$parent.mobilesurvey.updateResourceDownloadList(r)}}" onkeyup="if(event.which == 13 || event.keyCode == 13){ $(this).trigger('click'); }"><input type="checkbox"></label>
                                         <!-- /ko -->
                                     </div>
                                 </div>
@@ -625,7 +625,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                                             <div class="msm-filter-panel">
                                                 <span class="msm-identity-filter">
                                                     <input type="text" class="form-control" style="width: 100%;" placeholder="{% trans 'Find a user...' %}" data-bind="textInput: mobilesurvey.userFilter">
-                                                    <span class="clear-node-search" style="top: 11px; right: 10px;" data-bind="visible: true, click: function() { mobilesurvey.userFilter(''); }"><i class="fa fa-times-circle"></i></span>
+                                                    <span tabindex="0" class="clear-node-search" style="top: 11px; right: 10px;" data-bind="visible: true, click: function() { mobilesurvey.userFilter(''); }" onkeyup="if(event.which == 13 || event.keyCode == 13){ $(this).trigger('click'); }"><i class="fa fa-times-circle"></i></span>
                                                 </span>
                                                 <div class="msm-filter-tools-panel">
                                                     <a class="filter-tools" data-bind="click: selectAllGroupUsers"><i class="ion-checkmark"></i> {% trans 'Select all' %}</a>
@@ -638,7 +638,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                                             <!--ko if: selectedNode().type === 'group' -->
                                             <div class="msm-user-account-panel">
                                                 <!--ko foreach: {data: selectedNode().fullusers, as: 'user'} -->
-                                                <div class="msm-user-account-item checkbox" data-bind="click: function(){$parent.mobilesurvey.selectedUser(user); return true;};, css: {selected: user.id === $parent.mobilesurvey.selectedUser().id}, visible: user.filtered() === false" class="userrow">
+                                                <div tabindex="0" class="msm-user-account-item checkbox" data-bind="click: function(){$parent.mobilesurvey.selectedUser(user); return true;};, css: {selected: user.id === $parent.mobilesurvey.selectedUser().id}, visible: user.filtered() === false" class="userrow" onkeyup="if(event.which == 13 || event.keyCode == 13){ $(this).trigger('click'); }">
                                                     <label class="form-checkbox form-normal form-primary" data-bind="css: {'active': user.approved, 'disabled': $parent.locked}" style="padding-left: 25px; padding-top: 3px;">
                                                         <input type="checkbox" data-bind="checked: user.approved, event: {'change': $parent.mobilesurvey.toggleIdentity}, attr: {disabled: $parent.locked}"/>
                                                     </label>

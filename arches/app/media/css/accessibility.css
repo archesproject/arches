@@ -116,3 +116,15 @@ button.search-type-btn:focus {
 a.tree-display-tool, a.tree-display-tool:hover {
     color: #000;
 }
+
+.resource-grid-item:focus-within .graph-btn {
+    display: block;
+}
+
+.resource-grid-main-container {
+    height: auto;
+}
+
+.resource-grid-main.mpm-manager .mpm-title {
+    width: calc(100% - 55px);
+}
