@@ -4131,7 +4131,6 @@ div.dropdown-menu.open {
 
 .loading-mask {
     position: fixed;
-    opacity: 1;
     background-color: grey;
     top: 0;
     bottom: 0;
@@ -4142,7 +4141,6 @@ div.dropdown-menu.open {
 
 .loading-mask:after {
     position: fixed;
-    opacity: .5;
     color: #454545;
     content: '\f110';
     -webkit-animation: fa-spin 2s infinite linear;
@@ -4192,7 +4190,6 @@ div.dropdown-menu.open {
     width: 50%;
     padding: 36px;
     text-align: center;
-    opacity: .5;
     z-index: 100000001;
 }
 
@@ -4239,7 +4236,6 @@ div.dropdown-menu.open {
 
 .card-form-preview-container.loading-mask {
     position: relative;
-    opacity: .5;
     background-color: gray;
     top: 0;
     bottom: 0;
@@ -4250,7 +4246,6 @@ div.dropdown-menu.open {
 
 .card-form-preview-container.loading-mask::before {
     position: fixed;
-    opacity: .5;
     color: #000;
     content: '\f110';
     -webkit-animation: fa-spin 2s infinite linear;
@@ -12765,6 +12760,10 @@ a.jstree-anchor.permissions-widget {
 
 .card-summary-section .card-summary .card-summary-add {
     margin-left: 2px;
+}
+
+.card-summary-section .card-summary .card-summary-add:hover {
+    cursor: pointer;
 }
 
 .card-summary-section .card-summary {

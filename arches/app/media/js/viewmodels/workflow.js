@@ -28,7 +28,7 @@ define([
 
         this.pan = ko.observable();
         this.alert = config.alert || ko.observable(null);
-        this.quitUrl = config.quitUrl || self.quitUrl || arches.urls.plugin('init-workflow');
+        this.quitUrl = config.quitUrl || arches.urls.search_home;
         this.isWorkflowFinished = ko.observable(false);
         
         this.stepConfig;  /* overwritten in workflow.js file */
