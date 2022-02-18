@@ -39,9 +39,9 @@ define([
         init: (element, valueAccessor) => {
             require(['codemirror','codemirror/mode/javascript/javascript'], (codemirror) => {
                 initialize(element, valueAccessor, codemirror);
-            })
+            });
         }
-    }
+    };
 
     return ko.bindingHandlers.codemirror;
 });

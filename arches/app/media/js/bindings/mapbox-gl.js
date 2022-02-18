@@ -84,13 +84,13 @@ define([
         ko.utils.domNodeDisposal.addDisposeCallback(element, function() {
             map.remove();
         });
-    }
+    };
 
     ko.bindingHandlers.mapboxgl = {
         init: (element, valueAccessor) => {
             require(['mapbox-gl'], (mapbox) => {
                 initialize(element, valueAccessor, mapbox);
-            })
+            });
         }
     };
 

@@ -1,6 +1,6 @@
 define(
     ['knockout', 'arches', 'geocoder-templates'],
-    function (ko, arches) {
+    function(ko, arches) {
         /**
          * A viewmodel used for geocoders
          *
@@ -19,7 +19,7 @@ define(
             
             this.placeholder = params.placeholder || ko.observable('Locate a Place or Address');
             this.anchorLayerId = params.anchorLayerId;
-            this.apiKey = params.api_key || arches.mapboxApiKey
+            this.apiKey = params.api_key || arches.mapboxApiKey;
             this.map = params.map;
             this.pointstyle = {
                 "id": "geocode-point",
@@ -35,19 +35,19 @@ define(
             this.selection = ko.observable(null);
             this.focusItem = ko.observable(null);
             this.options = ko.observableArray();
-            this.options.subscribe(function () {
+            this.options.subscribe(function() {
                 self.selection(null);
             });
             this.loading = ko.observable(false);
             this.isFocused = ko.observable(false).extend({
                 throttle: 200
             });
-            this.isFocused.subscribe(function () {
+            this.isFocused.subscribe(function() {
                 self.focusItem(null);
             });
             this.query = ko.observable();
 
-            this.handleKeys = function (vm, e) {
+            this.handleKeys = function(vm, e) {
                 var down = 40;
                 var up = 38;
                 var enter = 13;
@@ -64,9 +64,9 @@ define(
                         }
                     }
                     if (focusIndex >= 0 && focusIndex < options.length) {
-                        self.focusItem(options[focusIndex])
+                        self.focusItem(options[focusIndex]);
                     } else {
-                        self.focusItem(null)
+                        self.focusItem(null);
                     }
                     return false;
                 }
@@ -98,7 +98,7 @@ define(
                     var coords = item.geometry.coordinates;
                     self.map.getSource('geocode-point').setData(item.geometry);
                     self.redrawLayer();
-                    var centerPoint = new self.mapboxgl.LngLat(coords[0], coords[1])
+                    var centerPoint = new self.mapboxgl.LngLat(coords[0], coords[1]);
                     self.map.flyTo({
                         center: centerPoint
                     });

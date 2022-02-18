@@ -17,7 +17,6 @@ define([
         var self = this;
         var padding = 40;
         var drawFeatures;
-        let MapboxDraw;
         
         var resourceId = params.tile ? params.tile.resourceinstance_id : '';
         if (this.widgets === undefined) { // could be [], so checking specifically for undefined
