@@ -32,7 +32,7 @@ module.exports = merge(common, {
         new StylelintPlugin({
             files: Path.join('src', '**/*.s?(a|c)ss'),
         }),
-        new MiniCssExtractPlugin({ filename: 'css/app.css', })
+        new MiniCssExtractPlugin()
     ],
     module: {
         rules: [

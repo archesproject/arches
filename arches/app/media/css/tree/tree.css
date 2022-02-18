@@ -479,7 +479,7 @@ ul.jstree-container-ul > li.jstree-node.jstree-closed {
 }
 
 .jstree-default>.jstree-container-ul .jstree-loading>.jstree-ocl {
-    background: url("throbber.gif") center center no-repeat;
+    /* background: url("throbber.gif") center center no-repeat; */
 }
 
 .jstree-default .jstree-file {
@@ -507,3 +507,4 @@ ul.jstree-container-ul > li.jstree-node.jstree-closed {
 
 .jstree-default .jstree-ellipsis.jstree-no-icons .jstree-anchor {
     width: calc(100% - 5px);
+}

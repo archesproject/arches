@@ -38,7 +38,7 @@ const fooFileNames = function(path, outer_acc) {
         }
         else {
             var foo = (path + '/' + v).slice(6)
-            return { ...acc, [foo]: { 'import': `./img/${foo}`, 'filename': `./img/${foo}` } };
+            return { ...acc, [foo]: { 'import': `../media/img/${foo}`, 'filename': `./img/${foo}` } };
         }
 
     }, outer_acc);
@@ -53,20 +53,43 @@ var baz_img = Object.keys(bar).reduce((acc, key) => {
     return acc;
 }, {});
 
+
+// css files
+const quxFileNames = function(path, outer_acc) {
+    return fs.readdirSync(path).reduce((acc, v) => {
+        if (fs.lstatSync(path + '/' + v).isDirectory() ) {
+            return quxFileNames(path + '/' + v, acc);
+        }
+        else {
+            var foo = (path + '/' + v).slice(6)
+            return { ...acc, [foo]: { 'import': `../media/css/${foo}`, 'filename': `./css/${foo}` } };
+        }
+
+    }, outer_acc);
+};
+
+qux_css = quxFileNames('./css', {})
+
+qux = Object.keys(qux_css).reduce((acc, key) => {
+    var foo = (key).slice(0, key.length - 4)
+    acc[foo] = Path.resolve(__dirname, '../css', key)
+    return acc;
+}, {});
+
 // const foo_plugins = fileNames('./plugins', {})
 // var bar_plugins = Object.keys(foo_plugins).reduce((acc, key) => {
 //     var foo = (key).slice(0, key.length - 3)
 //     acc[foo] = Path.resolve(__dirname, '../js', key)
 //     return acc;
 // }, {});
-console.log("HI", bar_img);
+console.log("HI", qux_css);
 // console.log("HI", baz)
 
 module.exports = {
     entry: {
         ...bar,
-        // ...bar_img,
-        'arches': { 'import': './css/arches.scss', 'filename': './css/arches.scss' },
+        ...bar_img,
+        ...qux_css,
     },
     output: {
         path: Path.join(__dirname, '../build'),
@@ -109,6 +132,7 @@ module.exports = {
         // moduleDirectories: [__dirname, "node_modules"],
         alias: {
             ...baz,
+            // ...qux,
             'arches': Path.resolve(__dirname, '../templates', 'javascript.htm'),
             'resource-edit-history-data': Path.resolve(__dirname, '../templates/views/resource', 'edit-log.htm'),
             'plugin-data': Path.resolve(__dirname, '../templates/views', 'plugin.htm'),

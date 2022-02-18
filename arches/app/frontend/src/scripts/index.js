@@ -20,5 +20,5 @@ require([
     'knockout',
 ], function($) {
     const foo = $();
-    console.log(foo);
+    conso
 });
