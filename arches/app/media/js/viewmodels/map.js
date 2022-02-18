@@ -9,13 +9,6 @@ define([
     const viewModel = function(params) {
 
         var self = this;
-        let mapboxgl; 
-        let MapboxGeocoder;
-
-        require(['mapbox-gl', 'mapbox-gl-geocoder'], function(mapbox, geocoder) {
-            mapboxgl = mapbox;
-            MapboxGeocoder = geocoder;
-        });
 
         var geojsonSourceFactory = function() {
             return {
@@ -389,9 +382,10 @@ define([
         this.popupTemplate = popupTemplate;
 
         
-        this.onFeatureClick = function(feature, lngLat) {
+        this.onFeatureClick = function(feature, lngLat, MapboxGl) {
             const map = self.map();
-            self.popup = new mapboxgl.Popup()
+            
+            self.popup = new MapboxGl.Popup()
                 .setLngLat(lngLat)
                 .setHTML(self.popupTemplate)
                 .addTo(map);
@@ -408,63 +402,65 @@ define([
 
         this.setupMap = function(map) {
             map.on('load', function() {
-                map.addControl(new mapboxgl.NavigationControl(), 'top-left');
-                map.addControl(new mapboxgl.FullscreenControl({
-                    container: $(map.getContainer()).closest('.workbench-card-wrapper')[0]
-                }), 'top-left');
-                map.addControl(new MapboxGeocoder({
-                    accessToken: mapboxgl.accessToken,
-                    mapboxgl: mapboxgl,
-                    placeholder: arches.geocoderPlaceHolder,
-                    bbox: arches.hexBinBounds
-                }), 'top-right');
+                require(['mapbox-gl', 'mapbox-gl-geocoder'], function(MapboxGl, MapboxGeocoder) {
+                    map.addControl(new MapboxGl.NavigationControl(), 'top-left');
+                    map.addControl(new MapboxGl.FullscreenControl({
+                        container: $(map.getContainer()).closest('.workbench-card-wrapper')[0]
+                    }), 'top-left');
+                    map.addControl(new MapboxGeocoder({
+                        accessToken: MapboxGl.accessToken,
+                        mapboxgl: MapboxGl,
+                        placeholder: arches.geocoderPlaceHolder,
+                        bbox: arches.hexBinBounds
+                    }), 'top-right');
 
-                self.layers.subscribe(self.updateLayers);
+                    self.layers.subscribe(self.updateLayers);
 
-                var hoverFeature;
+                    var hoverFeature;
 
-                map.on('mousemove', function(e) {
-                    var style = map.getStyle();
-                    if (hoverFeature && hoverFeature.id && style) map.setFeatureState(hoverFeature, { hover: false });
-                    hoverFeature = _.find(
-                        map.queryRenderedFeatures(e.point),
-                        self.isFeatureClickable
-                    );
-                    if (hoverFeature && hoverFeature.id && style) map.setFeatureState(hoverFeature, { hover: true });
+                    map.on('mousemove', function(e) {
+                        var style = map.getStyle();
+                        if (hoverFeature && hoverFeature.id && style) map.setFeatureState(hoverFeature, { hover: false });
+                        hoverFeature = _.find(
+                            map.queryRenderedFeatures(e.point),
+                            self.isFeatureClickable
+                        );
+                        if (hoverFeature && hoverFeature.id && style) map.setFeatureState(hoverFeature, { hover: true });
 
-                    map.getCanvas().style.cursor = hoverFeature ? 'pointer' : '';
-                    if (self.map().draw_mode) {
-                        var crosshairModes = [
-                            "draw_point",
-                            "draw_line_string",
-                            "draw_polygon",
-                        ];
-                        map.getCanvas().style.cursor = crosshairModes.includes(self.map().draw_mode) ? "crosshair" : "";
-                    }
+                        map.getCanvas().style.cursor = hoverFeature ? 'pointer' : '';
+                        if (self.map().draw_mode) {
+                            var crosshairModes = [
+                                "draw_point",
+                                "draw_line_string",
+                                "draw_polygon",
+                            ];
+                            map.getCanvas().style.cursor = crosshairModes.includes(self.map().draw_mode) ? "crosshair" : "";
+                        }
+                    });
+
+                    map.draw_mode = null;
+
+                    map.on('click', function(e) {
+                        if (hoverFeature) {
+                            self.onFeatureClick(hoverFeature, e.lngLat, MapboxGl);
+                        }
+                    });
+
+                    map.on('zoomend', function() {
+                        self.zoom(
+                            parseFloat(map.getZoom())
+                        );
+                    });
+
+                    map.on('dragend', function() {
+                        var center = map.getCenter();
+                        
+                        self.centerX(parseFloat(center.lng));
+                        self.centerY(parseFloat(center.lat));
+                    });
+
+                    self.map(map);
                 });
-
-                map.draw_mode = null;
-
-                map.on('click', function(e) {
-                    if (hoverFeature) {
-                        self.onFeatureClick(hoverFeature, e.lngLat);
-                    }
-                });
-
-                map.on('zoomend', function() {
-                    self.zoom(
-                        parseFloat(map.getZoom())
-                    );
-                });
-
-                map.on('dragend', function() {
-                    var center = map.getCenter();
-                    
-                    self.centerX(parseFloat(center.lng));
-                    self.centerY(parseFloat(center.lat));
-                });
-
-                self.map(map);
             });
         };
     };
