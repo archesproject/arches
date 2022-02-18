@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+{% load i18n %}
+<!-- this html is included in help-panel-base.htm -->
+<div class="ep-help-content">
+    <div>
+        <a href="javascript:void(0)" class="ep-help-topic-toggle">
+            <h4>{% trans "Creating Resource Data" %}</h4>
+            &nbsp;<i class="ep-help-topic-toggle-icon fa fa-chevron-right"></i>
+        </a>
+        <div class="ep-help-topic-content">
+          <p>{% blocktrans %}The Resource Editor is used to create new or edit existing Resources. What you see on the left-hand side of the page is this Resource's "card tree", which shows all of the data entry cards that you can edit. Think of "creating data" as "adding cards".{% endblocktrans %}</p>
+          <p>{% blocktrans %}To begin, select a card, enter data, and click <strong>Add</strong>. Some cards may allow multiple instances, in which case you will be able to add as many of the same type as you want.{% endblocktrans %}</p>
+          <p>{% blocktrans %}Note that in the demonstration below, the "Define Resource Descriptors" function has already been configured to set the Name card value as the resource display name.{% endblocktrans %}</p>
+            <div>
+                <p>
+                    <a href="javascript:void(0)" class="ep-help-topic-toggle">{% trans "basic card data enty - click to view" %}</a>
+                    <span class="ep-help-img-link">
+                        <a href="{{ STATIC_URL }}img/help/edit-resource-simple-card.gif" target="_blank">{% trans "open in new tab" %}&nbsp;&nbsp;<i class="fa fa-external-link-square" aria-hidden="true"></i>
+                        </a>
+                    </span>
+                    <img class="reloadable-img ep-help-topic-content" src="{{ STATIC_URL }}img/help/edit-resource-simple-card.gif"></img>
+                </p>
+            </div>
+            <p>{% blocktrans %}Once you have saved data for a resource, you can see a full summary by selecting the top card. This is the resource report.{% endblocktrans %}</p>
+            <p>{% blocktrans %}In some cases, cards will be nested within other cards, as in the example of adding a geo-location below.{% endblocktrans %}</p>
+            
+            <div>
+                <p>
+                    <a href="javascript:void(0)" class="ep-help-topic-toggle">{% trans "nested card data enty - click to view" %}</a>
+                    <span class="ep-help-img-link">
+                        <a href="{{ STATIC_URL }}img/help/edit-resource-nested-card.gif" target="_blank">{% trans "open in new tab" %}&nbsp;&nbsp;<i class="fa fa-external-link-square" aria-hidden="true"></i>
+                        </a>
+                    </span>
+                    <img class="reloadable-img ep-help-topic-content" src="{{ STATIC_URL }}img/help/edit-resource-nested-card.gif"></img>
+                </p>
+            </div>
+            
+        </div>
+    </div>
+    <div>
+        <a href="javascript:void(0)" class="ep-help-topic-toggle">
+            <h4>{% trans "Creating Resources Relations" %}</h4>
+            &nbsp;<i class="ep-help-topic-toggle-icon fa fa-chevron-right"></i>
+        </a>
+        <div class="ep-help-topic-content">
+          
+            <p>{% blocktrans %}In the Resource Editor you can also access the <strong>Related Resources Editor</strong> . To create a relationship between this resource and another in your database, open the editor, find the resource, and click <strong>Add</strong>.{% endblocktrans %}</p>
+            <p>{% blocktrans %}Your Resource Model will need to be configured to allow relations with the target Resource Model. If relations are not allowed, resources in the dropdown menu will not be selectable.{% endblocktrans %}</p>
+            <div>
+                <p>
+                    <a href="javascript:void(0)" class="ep-help-topic-toggle">{% trans "create resource relation - click to view" %}</a>
+                    <span class="ep-help-img-link">
+                        <a href="{{ STATIC_URL }}img/help/create-resource-relation.gif" target="_blank">{% trans "open in new tab" %}&nbsp;&nbsp;<i class="fa fa-external-link-square" aria-hidden="true"></i>
+                        </a>
+                    </span>
+                    <img class="reloadable-img ep-help-topic-content" src="{{ STATIC_URL }}img/help/create-resource-relation.gif"></img>
+                </p>
+            </div>
+        </div>
+    </div>
+</div>

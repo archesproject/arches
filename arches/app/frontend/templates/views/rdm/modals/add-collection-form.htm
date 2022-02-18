@@ -1,0 +1,36 @@
+{% load i18n %}
+<!-- Modal window for adding a new concept -->
+<form action="" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="labelmodal" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header arches-modal-header">
+                <button aria-hidden="true" data-dismiss="modal" class="close" type="button">×</button>
+                <h4 class="modal-title">{% trans "Add Collection" %}</h4>
+            </div>
+            <div class="modal-body">
+                <div class="row">
+                    <div class="col-md-12">
+                        <h5 class="arches-modal-section">{% trans "ConceptScheme Name" %}</h5>
+                        <p><input class="form-control" type="text" name="label" required/></p>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-6">
+                        <h5 class="arches-modal-section">{% trans "Language" %}</h5>
+                        <p> 
+                            <select style="width:100%" class="select2" name="language_dd" required>
+                                {% for language in languages %}
+                                  <option value="{{language.languageid}}" {% if language.isdefault %} selected="selected" {% endif %}>{{language.languageid}} ({{language.languagename}})</option>
+                                {% endfor %}
+                            </select>
+                        </p>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn-u btn-u-default" data-dismiss="modal">{% trans "Close" %}</button>
+                <button type="submit" class="btn-u btn-u-primary">{% trans "Save changes" %}</button>
+            </div>
+        </div>
+    </div>
+</form>

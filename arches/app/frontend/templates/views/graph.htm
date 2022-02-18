@@ -1,0 +1,154 @@
+<!--
+ARCHES - a program developed to inventory and manage immovable cultural heritage.
+Copyright (C) 2013 J. Paul Getty Trust and World Monuments Fund
+
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU Affero General Public License as
+published by the Free Software Foundation, either version 3 of the
+License, or (at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+GNU Affero General Public License for more details.
+
+You should have received a copy of the GNU Affero General Public License
+along with this program. If not, see <http://www.gnu.org/licenses/>.
+-->
+{% extends "base-manager.htm" %}
+{% load staticfiles %}
+{% load i18n %}
+
+{% block title %}
+{{ block.super }}
+{% trans "Graphs" %}
+{% endblock title %}
+
+
+{% block main_content %}
+<div class="scroll-y">
+    <div class="graph-list-header" data-bind="css: {'alert-active': (alert() && alert().active())}">
+
+        <!-- Toolbar -->
+        <div class="relative resource-toolbar" style="">
+
+            <!-- Search -->
+            <div class="edit-panel-search-bar">
+
+                <!-- Find Button -->
+                <div class="">
+                    <a class="page-header text-overflow graph-find" href="#" data-bind="click: function () { showFind(!showFind()) }"> {% trans "Find" %} </a>
+                </div>
+
+                <!-- Find widget -->
+                <div class="find-widget" style="display: none;" data-bind="visible: showFind()">
+                    <div>
+                        <!-- ko if: groupedGraphs -->
+                        <select data-bind="template: { name: 'selectGraphTemplate', data: groupedGraphs }, chosen: {width: '100%'}, value: graphId"></select>
+                        <!-- /ko -->
+                        <script type="text/html" id="selectGraphTemplate">
+                            <option disabled selected value>{% trans "Find a Resource Model/Branch..." %}</option>
+                            <!-- ko foreach: groups -->
+                                <optgroup data-bind="attr: { 'label': (name==='Resource Models')?'{% trans "Resource Models" %}':'{% trans "Branches" %}' }, foreach: items">
+                                    <option data-bind="value: graphid, text: name"></option>
+                                </optgroup>
+                            <!-- /ko -->
+                        </script>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Resource/Graph Toggle -->
+            <div class="resource-tools relative" data-bind="visible: !showFind()">
+                <a class="resource-grid-title" href="javascript:void(0);" data-bind="css: {'active': showResources()}, click: function () { showResources(true) }">{% trans "Resource Models" %}</a>
+                <a class="resource-grid-title" href="javascript:void(0);" data-bind="css: {'active': !showResources()}, click: function () { showResources(false) }">{% trans "Branches" %}</a>
+            </div>
+
+            <div class="btn-group" style="position: absolute; right: 70px; top: 12px;">
+                <button class="btn btn-primary dropdown-toggle" data-toggle="dropdown" type="button" aria-expanded="false">
+                    {% trans "Add" %} <i class="ion-more"></i>
+                </button>
+                <ul class="dropdown-menu dropdown-menu-right" data-bind="event: {mouseleave: leaveDropdown}">
+                    <li><a href="#" data-bind="click: newResource">{% trans "New Resource Model" %}</a></li>
+                    <li><a href="#" data-bind="click: newGraph">{% trans "New Branch" %}</a></li>
+                    <li class="file-upload upload">
+                            <form id="data">
+                                <input type="file" class="upload" id="fileupload" data-bind="event: {change: importGraph}" accept=".json"/>
+                            </form>
+                            <a href="#" class="arches-tool-item file-upload" data-bind="{click: importButtonClick}">{% trans "Import Branch/Resource Model" %}</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+
+
+    </div>
+
+
+    <!-- Default Page content-->
+    <div id="page-content" style="padding: 0 50px 240px; margin-top: -1px;">
+
+        <div id="report-image-grid" class="report-image-grid">
+
+            <!-- ko foreach: currentList -->
+            <div class="resource-grid-item relative">
+                <!-- Resource Type -->
+                <a href="#" data-bind="click:function(){ $parent.navigate($parent.arches.urls.graph_designer(graphid)) }, attr: { href: $parent.arches.urls.graph_designer(graphid) }">
+                    <div class="resource-grid-main-container" data-bind="hover: hover, css: {active: hover}, event: {mouseleave: $parent.leaveDropdown}">
+                        <div class="resource-grid-main">
+                            <h1 class="page-header text-overflow resource-grid-title"><i data-bind="css: (iconclass() || 'fa fa-question') + ' icon-wrap resource-grid-icon' + (hover() ? ' resource-grid-icon-highlight':'')"></i> <span data-bind="text:name"></span></h1>
+                            <p class="resource-grid-subtitle" data-bind='text:subtitle'></p>
+                        </div>
+                    </div>
+                </a>
+
+                <div class="resource-grid-tools-container" data-bind="clickBubble: false, hover: hover">
+                    <div class="btn-group" style="float:right;">
+                        <button class="btn btn-sm btn-mint dropdown-toggle graph-btn" data-toggle="dropdown" type="button" aria-expanded="false"> {% trans "Manage" %} <i class="ion-ios-more"></i></button>
+                        <ul class="dropdown-menu dropdown-menu-right manage-menu" data-bind="event: {mouseleave: $parent.leaveDropdown}">
+                            <li>
+                                <a href="#" data-bind="click:function() { $parent.navigate($parent.arches.urls.graph_designer(graphid)) }, attr: { href: $parent.arches.urls.graph_designer(graphid) }"><i class="fa fa-sitemap"></i> {% trans "Manage Graph" %}</a>
+                            </li>
+                            <!-- ko if: $parent.showResources() -->
+                             <li>
+                                <a href="#" data-bind="click:function () { $parent.navigate($parent.arches.urls.function_manager(graphid)) }, attr: { href: $parent.arches.urls.function_manager(graphid)}"><i class="fa fa-code"></i> {% trans "Manage Functions" %}</a>
+                            </li>
+                            <li>
+                                <a href="#" data-bind="click:exportMappingFile"><i class="fa fa-file"></i> {% trans "Create Mapping File" %}</a>
+                            </li>
+                            <li>
+                                <a href="#" data-bind="click:deleteInstances"><i class="fa fa-trash"></i> {% trans "Delete Instances" %}</a>
+                            </li>
+                            <!-- /ko -->
+                            <li class="divider"></li>
+                            <li><a href="#" data-bind="click:exportGraph">{% trans "Export" %}</a>
+                            </li>
+                            <li><a href="#" data-bind="click:clone">{% trans "Clone" %}</a>
+                            </li>
+                            <!-- ko if: _.contains($parent.protectedGraphs, graphid) === false  -->
+                            <li><a href="#" data-bind="click:deleteGraph">{% trans "Delete" %}</a>
+                            </li>
+                            <!--/ko-->
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            <!-- /ko -->
+
+        </div>
+
+    </div>
+</div>
+
+{% endblock main_content %}
+
+{% block pre_require_js %}
+{{ block.super }}
+<script>{% autoescape off %}
+define('graph-manager-data', [], function () {
+    return {
+        root_nodes: {{ root_nodes }}
+    };
+});
+{% endautoescape %}</script>
+{% endblock pre_require_js %}

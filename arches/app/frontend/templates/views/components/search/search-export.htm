@@ -1,0 +1,90 @@
+{% load i18n %}
+<div class="search-container time-search-container relative" style="overflow-y: scroll;">
+    <div class="filter-title">{% trans "Export Search Results" %}
+    </div>
+    <hr class="title-underline">
+
+    <div class="search-export">
+        <div class="instruction">
+            <h2 class=""> {% trans "1. Format" %} </h2>
+            <h4 class=""> {% trans "Select the format you'd like for your export data. (tile excel and geojson formats require a resource type filter)" %} </h4>
+        </div>
+        <div class="parameter">
+            <div>
+                <label data-bind="css: { 'active': format() === 'tilecsv' }, click: function () { format('tilecsv') }" class="form-radio form-normal form-text">
+                    <input type="radio" name="stat-w-label" data-bind="checked: format() === 'tilecsv'" value="true"> {% trans "csv" %}
+                </label>
+                <!-- ko if: hasExportHtmlTemplates() -->
+                <label data-bind="css: { 'active': format() === 'html', 'disabled': (celeryRunning() !== 'True' && total() > {{app_settings.SEARCH_EXPORT_IMMEDIATE_DOWNLOAD_THRESHOLD_HTML_FORMAT}}) }, click: function () { if((celeryRunning() === 'True' || total() <= {{app_settings.SEARCH_EXPORT_IMMEDIATE_DOWNLOAD_THRESHOLD_HTML_FORMAT}})) {format('html')} }" class="form-radio form-normal form-text">
+                    <input type="radio" name="stat-w-label" data-bind="checked: format() === 'html'" value="false"> {% trans "html" %}
+                </label>
+                <!-- /ko -->
+                <label data-bind="css: { 'active': format() === 'shp' }, click: function () { format('shp') }" class="form-radio form-normal form-text">
+                    <input type="radio" name="stat-w-label" data-bind="checked: format() === 'shp'" value="false"> {% trans "shapefile" %}
+                </label>
+
+                <label data-bind="css: { 'active': format() === 'tilexl', 'disabled': !hasResourceTypeFilter() }, click: function () { if (hasResourceTypeFilter()) {format('tilexl')} }" class="form-radio form-normal form-text">
+                    <input type="radio" name="stat-w-label" data-bind="checked: format() === 'tilexl'" value="false"> {% trans "tile excel" %}
+                </label>
+                <!-- ko if: total() < {{app_settings.SEARCH_EXPORT_IMMEDIATE_DOWNLOAD_THRESHOLD}} -->
+                <label data-bind="css: { 'active': format() === 'geojson', 'disabled': !hasResourceTypeFilter()}, click: function () { if (hasResourceTypeFilter()) {format('geojson')} }" class="form-radio form-normal form-text">
+                    <input type="radio" name="stat-w-label" data-bind="checked: format() === 'geojson'" value="false"> {% trans "geojson url" %}
+                </label>
+                <!-- ko if: format() === 'geojson' && hasResourceTypeFilter -->
+                <div data-bind="clipboard: geojsonUrl">
+                    <div style="padding: 5px 0px"><textarea style="width: 300px;" data-bind="value: geojsonUrl"></textarea></div>
+                    <button class="btn btn-shim btn-labeled btn-sm fa fa-clipboard btn-primary">{% trans "Copy to clipboard" %}</button>
+                </div>
+                <!-- /ko -->
+                <!-- /ko -->
+            </div>
+        </div>
+
+        <div class="instruction">
+                <h2 class=""> {% trans "2. Coordinate Precision" %} </h2>
+                <h4 class=""> {% trans "Tell us how many decimal places of precision you'd like for geo-data results" %} </h4>
+        </div>
+        <div class="parameter">
+            <input type="number" class="form-control input-md widget-input precision" data-bind="textInput: precision"></input>
+        </div>
+        
+        <div class="instruction">
+            <h2 class=""> {% trans "3. Report Link" %} </h2>
+            <h4 class=""> {% trans "Only applicable to CSV and shapefile exports" %} </h4>
+        </div>
+        <div class="parameter">
+            <div data-bind="component: { name: 'views/components/simple-switch', params: {value: reportlink, config:{ label: '{% trans "Include the report link in the export?" %}', subtitle: ''}}}"></div>
+        </div>
+        <!-- ko if: ((total() > {{app_settings.SEARCH_EXPORT_IMMEDIATE_DOWNLOAD_THRESHOLD}} && celeryRunning() === "True") || (format() === "html" && total() > {{app_settings.SEARCH_EXPORT_IMMEDIATE_DOWNLOAD_THRESHOLD_HTML_FORMAT}} && celeryRunning() === "True")) && ("{{app_settings.RESTRICT_CELERY_EXPORT_FOR_ANONYMOUS_USER}}" === "False" || "{{app_settings.RESTRICT_CELERY_EXPORT_FOR_ANONYMOUS_USER}}" === "True" && "{{user.username}}" !== "anonymous")-->
+        <div>
+            <div class="instruction">
+                <h2>{% trans "4. Name this export" %}</h2>
+            </div>
+            <div class="parameter">
+                <input type="" class="form-control input-md widget-input" data-bind="textInput: exportName" placeholder="Arches Export"></input>
+            </div>
+        </div>
+        <div class="">
+            <div class="instruction">
+                    <h2 class=""> {% trans "5. Email Address" %} </h2>
+                    <h4 class=""> {% trans "This download may take some time.  Tell us where to email a download link to your results" %} </h4>
+            </div>
+            <div class="parameter">
+                <input type="" class="form-control input-md widget-input" data-bind="textInput: emailInput" placeholder="No Email saved for User"></input>
+            </div>
+        </div>
+        <!-- /ko -->
+    </div>
+
+    <div data-bind="visible: ((total() > {{app_settings.SEARCH_EXPORT_IMMEDIATE_DOWNLOAD_THRESHOLD}}) && (celeryRunning() !== 'True') || (format() === 'html' && total() > {{app_settings.SEARCH_EXPORT_IMMEDIATE_DOWNLOAD_THRESHOLD_HTML_FORMAT}} && celeryRunning() !== 'True')), text: ('Arches is currently running without Celery. Exports will be limited to {{app_settings.SEARCH_EXPORT_IMMEDIATE_DOWNLOAD_THRESHOLD}} records. The html option is only allowed with a selection of up to {{app_settings.SEARCH_EXPORT_IMMEDIATE_DOWNLOAD_THRESHOLD_HTML_FORMAT}} resources.')"></div>
+    <div class="search-export download" data-bind="">
+        <button class="btn btn-lg btn-primary btn-active-primary"
+            type="button"
+            aria-expanded="true"
+            data-bind="css: {disabled: (total() === 0) || (total() > {{app_settings.SEARCH_EXPORT_IMMEDIATE_DOWNLOAD_THRESHOLD}} && celeryRunning() !== 'True') || (format() === 'html' && total() > {{app_settings.SEARCH_EXPORT_IMMEDIATE_DOWNLOAD_THRESHOLD_HTML_FORMAT}} && celeryRunning() !== 'True') },click: function(){if (format() === 'html') { executeExport( {{app_settings.SEARCH_EXPORT_IMMEDIATE_DOWNLOAD_THRESHOLD_HTML_FORMAT}} ) } else { executeExport( {{app_settings.SEARCH_EXPORT_IMMEDIATE_DOWNLOAD_THRESHOLD}} ) }}"> {% trans "Download" %}
+            <i class="fa fa-spin fa-spinner" data-bind="visible: downloadPending() === true"></i>
+        </button>
+    </div>
+    <div class="download-message" data-bind="text: result, fadeVisible: downloadStarted, delay:0, fade: 600">
+    </div>
+</div>

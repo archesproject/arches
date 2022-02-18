@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+{% load i18n %}
+<!-- this html is included in help-panel-base.htm -->
+<div class="ep-help-content">
+    <div>
+        <h4>{% trans "Graph Tab" %}</h4>
+    </div>
+    <div>
+        <a href="javascript:void(0)" class="ep-help-topic-toggle">
+            <h4>{% trans "Overview" %}</h4>
+            &nbsp;<i class="ep-help-topic-toggle-icon fa fa-chevron-down"></i>
+        </a>
+        <div class="ep-help-topic-content" style="display:block;">
+            <p>{% blocktrans %}In this tab you will design the graph&mdash;the core of a Resource Model or Branch. In fact, sometimes Resource Models and Branches are generically referred to as "graphs".{% endblocktrans %}</p>
+            <p>{% blocktrans %}For the first step in building a graph, you should fill out the <strong>top-level settings</strong>. Some of these may be changed later while others can't, so make sure to do a lot of testing while developing a graph. With the top-level settings in place, it's time to <strong>construct the graph</strong> by adding nodes (or full Branches) to the graph tree. Along the way, you'll need to set the <strong>node-level settings</strong> for each node you create.{% endblocktrans %}</p>
+            <p>{% blocktrans %}Once you've finished creating this Resource Model or Branch make sure to set its status to "active".{% endblocktrans %}</p>
+        </div>
+    </div>
+    <div>
+        <a href="javascript:void(0)" class="ep-help-topic-toggle">
+            <h4>{% trans "Top-Level Settings" %}</h4>
+            &nbsp;<i class="ep-help-topic-toggle-icon fa fa-chevron-right"></i>
+        </a>
+        <div class="ep-help-topic-content">
+            <span class="ep-help-table-header">{% trans "Identifiers" %}</span>
+            <table class="ep-help-table">
+                <tr>
+                    <td>{% trans "Name" %}</td>
+                    <td>{% trans "Used to identify this Resource Model throughout the app interface. Default is New Resource Model." %}</td>
+                </tr>
+                <tr>
+                    <td>{% trans "Subtitle" %}</td>
+                    <td>{% trans "Optional subtitle, displayed on the Arches Designer home page." %}</td>
+                </tr>
+                <tr>
+                    <td>{% trans "Ontology" %}</td>
+                    <td>{% blocktrans %}Decide whether an ontology will be enforced in this graph. To learn more about what this means, read <a href="https://arches.readthedocs.io/en/stable/ontologies-in-arches" target="_blank">Ontologies in Arches</a>. By default, you are allowed to choose between using the CIDOC CRM v6.2, or using no ontology. Once a node or branch has been added to this graph the <strong>Ontology</strong> setting <em>cannot be modified</em>.{% endblocktrans %}</td>
+                </tr>
+                <tr>
+                    <td>{% trans "Root Class" %}</td>
+                    <td>{% blocktrans %}This setting is only necessary if an "Ontology" has been chosen. Define the ontology class of the root node for this graph.{% endblocktrans %}</td>
+                </tr>
+            </table>
+            <span class="ep-help-table-header">{% trans "Configuration" %}</span>
+            <table class="ep-help-table">
+                <tr>
+                    <td>{% trans "Status" %}</td>
+                    <td>{% blocktrans %}Set to "inactive" to disallow use of this graph during development. Inactive Resource Models cannot be used to create new resources, and inactive Branches can not be added to a Resource Model.{% endblocktrans %}</td>
+                </tr>
+                {% if graph.isresource %}
+                <tr>
+                    <td>{% trans "Resource models that may be related" %}</td>
+                    <td>{% blocktrans %}Choose which Resource Models can be related to this one with resource-to-resource relationships.{% endblocktrans %}</td>
+                </tr>
+                {% endif %}
+                {% if not graph.isresource %}
+                <tr>
+                    <td>{% trans "Root Node Data Type" %}</td>
+                    <td>{% blocktrans %}Choose what data type to use for the root node of this Branch.{% endblocktrans %}</td>
+                </tr>
+                {% endif %}
+            </table>
+            <span class="ep-help-table-header">{% trans "Description" %}</span>
+            <table class="ep-help-table">
+                <tr>
+                    <td>{% trans "Author" %}</td>
+                    <td>{% blocktrans %}You can optionally add an <strong>Author</strong> to this graph. Only administrators will see this information.{% endblocktrans %}</td>
+                </tr>
+                <tr>
+                    <td>{% trans "Abstract" %}</td>
+                    <td>{% blocktrans %}You can optionally add an <strong>Abstract</strong> to this graph.{% endblocktrans %} {% if graph.isresource %}{% blocktrans %}Users will see this abstract when they are presented with a choice of what Resource Model to use to create a new resource.{% endblocktrans %}{% else %}{% blocktrans %}This abstract will be shown in the Branch Library which is used during graph construction.{% endblocktrans %}{% endif %}</td>
+                </tr>
+                {% if graph.isresource %}
+                <tr>
+                    <td>{% trans "JSON-LD Context" %}</td>
+                    <td>{% blocktrans %}Add a <a href="https://www.w3.org/TR/json-ld/">JSON-LD Context</a> for this Resource Model. This allows you to namespace common URI endpoints that are used within a JSON-LD output of the resource. You can enter a plain URL (<code>"http://www.cidoc-crm.org/cidoc-crm/"</code>), or JSON that defines multiple keys (<code>{"crm":"http://www.cidoc-crm.org/cidoc-crm/","rdf":"http://www.w3.org/1999/02/22-rdf-syntax-ns#"}</code>).{% endblocktrans %}</td>
+                </tr>
+                {% endif %}
+            </table>
+            <span class="ep-help-table-header">{% trans "Appearance" %}</span>
+            <table class="ep-help-table">
+                {% if graph.isresource %}
+                <tr>
+                    <td>{% trans "Color" %}</td>
+                    <td>{% blocktrans %}Choose a color for this Resource Model to be used in the related resources force directed graph.{% endblocktrans %}</td>
+                </tr>
+                {% endif %}
+                <tr>
+                    <td>{% trans "Icon" %}</td>
+                    <td>{% blocktrans %}Choose an icon to identify this graph throughout the app interface. You can browse the icons to select one, or type in the search bar to filter them. Arches uses the <a href="http://fontawesome.io/" target="_blank">Font Awesome</a> icon library; custom icons are not supported.{% endblocktrans %}</td>
+                </tr>
+            </table>
+        </div>
+    </div>
+
+    <div>
+        <a href="javascript:void(0)" class="ep-help-topic-toggle">
+            <h4>{% trans "Construct the Graph" %}</h4>
+            &nbsp;<i class="ep-help-topic-toggle-icon fa fa-chevron-right"></i>
+        </a>
+        <div class="ep-help-topic-content">
+            <p>{% blocktrans %}Use the graph tree on the left side of the page to construct the graph. Every new graph starts with a <strong>Top Node</strong>, which will take the name of the new Resource Model or Branch. From this node, you can either <strong>Add Child Node</strong> to add a single node, or <strong>Add Branch</strong> to add an entire existing Branch.{% endblocktrans %}</p>
+            <p>{% blocktrans %}At any point during construction you can switch from <strong>Design</strong> mode to <strong>Preview</strong> to see the full shape of your graph.{% endblocktrans %}</p>
+            <p>{% blocktrans %}If you have created a branch structure in a Resource Model that you would like to use in a different Resource Model, you can export it from the graph tree.{% endblocktrans %}</p>
+            <!-- NEED TO UPDATE THE GIF BELOW
+            <div class="col-xs-6">
+                <p><a href="{{ STATIC_URL }}img/help/node-manager.png" target="_blank"><img src="{{ STATIC_URL }}img/help/node-manager.png" style="border: 2px solid #eee"></img></a></p>
+            </div>
+            <p>
+				<a href="javascript:void(0)" class="ep-help-topic-toggle">{% trans "add a node and branch to new graph - click to view" %}</a>
+				<span class="ep-help-img-link">
+					<a href="{{ STATIC_URL }}img/help/add-node-to-branch.gif" target="_blank">{% trans "open in new tab" %}&nbsp;&nbsp;<i class="fa fa-external-link-square" aria-hidden="true"></i>
+					</a>
+				</span>
+				<img class="reloadable-img ep-help-topic-content" src="{{ STATIC_URL }}img/help/add-node-to-branch.gif"></img>
+			</p>
+            -->
+        </div>
+    </div>
+    <div>
+        <a href="javascript:void(0)" class="ep-help-topic-toggle">
+            <h4>{% trans "Node-Level Settings" %}</h4>
+            &nbsp;<i class="ep-help-topic-toggle-icon fa fa-chevron-right"></i>
+        </a>
+        <div class="ep-help-topic-content">
+            <span class="ep-help-table-header">{% trans "Node Identifiers" %}</span>
+            <table class="ep-help-table">
+                <tr>
+                    <td>{% trans "Node Name" %}</td>
+                    <td>{% trans "Set the name for this node. This will be used by default in the user interface, but a different name for display can be configured at the widget level." %}</td>
+                </tr>
+                <tr>
+                    <td>{% trans "Ontology Class" %}</td>
+                    <td><em>{% blocktrans%}only present if this graph uses an ontology{% endblocktrans %}</em><br>{% blocktrans %}This setting assigns an ontological class to this node. To learn more, read <a href="https://arches.readthedocs.io/en/stable/managing-resources/#ontologies-in-arches" target="_blank">Ontologies in Arches</a>{% endblocktrans %}</td>
+                </tr>
+                <tr>
+                    <td>{% trans "Relationship to..." %}</td>
+                    <td>{% blocktrans %}Define what relationship this node has with its parent node (the one directly above it in the graph tree). A verbalization of your choice is shown in the <strong>Semantics</strong> section below this setting.{% endblocktrans %}</td>
+                </tr>
+            </table>
+            <span class="ep-help-table-header">{% trans "Node Data Type and Settings" %}</span>
+            <p>{% blocktrans %}Depending on which data type you choose, you may have many more settings to fill out. Those listed below will be present for every node no matter the data type.{% endblocktrans %}</p>
+            <table class="ep-help-table">
+                <tr>
+                    <td>{% trans "Data type" %}</td>
+                    <td>{% trans "Choose the data type for this node. Please see the <strong>Default Data Types</strong> section below. Once data is collected for this node, this setting cannot be changed." %}</td>
+                </tr>
+                <tr>
+                    <td>{% trans "Expose to Advanced Search" %}</td>
+                    <td>{% blocktrans%}If true users will be able to add this node to an Advanced Search query.{% endblocktrans %}</td>
+                </tr>
+                <tr>
+                    <td>{% trans "Required" %}</td>
+                    <td>{% blocktrans %}If true a value must be entered for this node in order to save it. Once data is collected for this node, this setting cannot be changed.{% endblocktrans %}</td>
+                </tr>
+                <tr>
+                    <td>{% trans "Place node(s) in a separate card" %}</td>
+                    <td><em>{% blocktrans%}only present if this node is not already the top node for a card{% endblocktrans %}</em><br>{% blocktrans %}If true this node will be set in a different card from its parent. This affects data entry, and you are encouraged to test both states of this setting while building you graph. Once data is collected for this node, this setting cannot be changed.{% endblocktrans %}</td>
+                </tr>
+            </table>
+        </div>
+    </div>
+    <div>
+        <a href="javascript:void(0)" class="ep-help-topic-toggle">
+            <h4>{% trans "Default Data Types" %}</h4>
+            &nbsp;<i class="ep-help-topic-toggle-icon fa fa-chevron-right"></i>
+        </a>
+        <div class="ep-help-topic-content">
+            <p>{% trans "The data type of a node determines what kind of data that node will store. Once chosen, some data types will require further configuration." %}</p>
+            <p>{% blocktrans %}Developers can <a href="https://arches.readthedocs.io/en/stable/functions-widgets-datatypes/#datatypes" target="_blank">create new datatypes</a>.{% endblocktrans %}</p>
+            <table class="ep-help-table">
+                <tr>
+                    <td>{% trans "boolean" %}</td>
+                    <td>{% blocktrans %}Use this to store a "yes"/"no" or "true"/"false" value.{% endblocktrans %}</td>
+                </tr>
+                <tr>
+                    <td>{% trans "concept" %}</td>
+                    <td>{% trans "Stores one of a series of concepts from the Reference Data Manager. Users will choose a concept in a dropdown list or set of radio buttons. You'll further be prompted to choose a <strong>Concept Collection</strong>&mdash;this controls which concepts the user is able to choose from." %}</td>
+                </tr>
+                <tr>
+                    <td>{% trans "concept-list" %}</td>
+                    <td>{% trans "Stores multiple concepts in a single node." %}</td>
+                </tr>
+                <tr>
+                    <td>{% trans "date" %}</td>
+                    <td>{% trans "Stores a CE calendar date. See etdf for BCE and fuzzy date handling." %}</td>
+                </tr>
+                <tr>
+                    <td>{% trans "edtf" %}</td>
+                    <td>{% trans "Stores an <a href='https://www.loc.gov/standards/datetime/' target='_blank'>Extended Date/Time Format</a> value. Use this data type for BCE dates or dates with uncertainty. This datatype requires extra configuration to inform the database search methods how to interpret EDTF values. Data entry users can enter edtf dates using formats listed in the <a href='https://www.loc.gov/standards/datetime/pre-submission.html' target='_blank'>EDTF draft specification</a>." %}</td>
+                </tr>
+                <tr>
+                    <td>{% trans "file-list" %}</td>
+                    <td>{% trans "Stores one or mores files. Use this to upload images, documents, etc." %}</td>
+                </tr>
+                <tr>
+                    <td>{% trans "iiif-drawing" %}</td>
+                    <td>{% trans "Used to store an <a href='http://iiif.io/' target='_blank'>IIIF compliant</a> image." %}</td>
+                </tr>
+                <tr>
+                    <td>{% trans "geojson-feature-collection" %}</td>
+                    <td>{% trans "Stores geographic coordinates, and is used to show a resource on the map." %}</td>
+                </tr>
+                <tr>
+                    <td>{% trans "domain-value" %}</td>
+                    <td>{% trans 'Similar to "concept", choose this to present the user with a dropdown list or set of radio buttons. Unlike "concept" this dropdown menu will not come from your system-wide controlled vocubulary, but from a list of values that you must define here.' %}</td>
+                </tr>
+                <tr>
+                    <td>{% trans "domain-value-list" %}</td>
+                    <td>{% trans "Stores multiple domain-values in a single node." %}</td>
+                </tr>
+                <tr>
+                    <td>{% trans "csv-chart-json" %}</td>
+                    <td>{% trans "Stores a csv chart formatted as JSON." %}</td>
+                </tr>
+                <tr>
+                    <td>{% trans "node-value" %}</td>
+                    <td>{% trans "Stores a reference to a different node in this graph. This would allow you to store duplicate data in more than one branch." %}</td>
+                </tr>
+                <tr>
+                    <td>{% trans "number" %}</td>
+                    <td>{% trans "Stores a number." %}</td>
+                </tr>
+                <tr>
+                    <td>{% trans "resource-instance" %}</td>
+                    <td>{% trans 'Embeds a separate resource instance into this node. For example, you could add a node called "Assessed By" to a condition assessment branch, and use this data type. This would allow you to associate an individual stored in your database as an Actor resource with a specific condition assessment. Note that this construction is different from making a "resource-to-resource relationship". ' %}</td>
+                </tr>
+                <tr>
+                    <td>{% trans "resource-instance-list" %}</td>
+                    <td>{% trans "Stores a list of resource instances in a single node." %}</td>
+                </tr>
+                <tr>
+                    <td>{% trans "semantic" %}</td>
+                    <td>{% trans "<em>A semantic node does not store data.</em> Semantic nodes are used where necessary to make symbolic connections between other nodes, generally in order to follow ontological rules. The top node of every graph is a semantic node." %}</td>
+                </tr>
+                <tr>
+                    <td>{% trans "string" %}</td>
+                    <td>{% trans "Stores a string of text. This could be something simple like a name, or more something elaborate like a descriptive paragraph with formatting and hyperlinks." %}</td>
+                </tr>
+            </table>
+        </div>
+    </div>
+</div>

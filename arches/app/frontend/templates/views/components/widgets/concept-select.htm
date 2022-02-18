@@ -1,0 +1,64 @@
+{% extends "views/components/widgets/base.htm" %}
+{% load i18n %}
+
+{% block form %}
+<div class="row widget-wrapper">
+    <div class="form-group">
+        <label class="control-label widget-input-label" data-bind="text:label">
+        </label>
+        <!-- ko if: node -->
+        <i data-bind="css: {'ion-asterisk widget-label-required': node.isrequired}"></i>
+        <!-- /ko -->
+        <div class="col-xs-12 resource-instance-wrapper">
+            <input style="display:inline-block;"
+                data-bind="
+                    value: value,
+                    disable: disabled,
+                    select2Query: {
+                        select2Config: select2Config
+                    }
+                ">
+        </div>
+    </div>
+</div>
+{% endblock form %}
+
+{% block config_form %}
+<div>
+    <div class="control-label">
+        {% trans "Placeholder" %}
+    </div>
+    <div class="col-xs-12 pad-no crud-widget-container">
+        <input placeholder="{% trans "Placeholder" %}"
+            class="form-control input-md widget-input"
+            data-bind="value: placeholder, valueUpdate: 'keyup'">
+    </div>
+</div>
+<div class="control-label">
+    {% trans "Default Value" %}
+</div>
+<div class="row widget-wrapper">
+    <div class="form-group">
+        <div class="col-xs-12 resource-instance-wrapper">
+            <input style="display:inline-block;"
+                data-bind="
+                    value: defaultValue,
+                    select2Query: {
+                        select2Config: select2Config
+                    }
+                ">
+        </div>
+    </div>
+</div>
+{% endblock config_form %}
+
+{% block report %}
+<dt data-bind="text: label"></dt>
+<!-- ko foreach: valueObjects -->
+    <dd data-bind="text: name">
+    </dd>
+<!-- /ko -->
+<!-- ko if: valueObjects().length === 0 -->
+<dd>{% trans "None" %}</dd>
+<!-- /ko -->
+{% endblock report %}

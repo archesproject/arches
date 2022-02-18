@@ -1,0 +1,41 @@
+{% load i18n %}
+<!-- ko ifnot: $data.search -->
+<div class="node-widget-label new-option-field">
+    <div class="control-label">
+        {% trans "Domain options" %}
+    </div>
+    <div class="domain-container">
+        <div data-bind="text: $data.search"></div>
+        <input class="domain-input" type="text" placeholder="{% trans "Add new option..." %}" class="form-control library-search" data-bind="disable: !isEditable, value: newOptionLabel, valueUpdate: 'keyup'">
+        <a href="#" data-bind="disable: !$parent.isEditable, click: function(){if(isEditable){addNewOption()}}">
+             <i class="fa fa-plus-circle pull-right"></i>
+        </a>
+        <div data-bind="sortable: {data: options}">
+            <div class="added-domain-option">
+                <span class="domain-drag-handle">
+                    <i class="fa fa-ellipsis-v option-drag-handle" aria-hidden="true">  </i>
+                </span>
+                <input class="domain-input-item"  type="text" class="form-control library-search" data-bind="disable: !$parent.isEditable, value: text, valueUpdate: 'keyup'">
+                <a href="#" data-bind="disable: !$parent.isEditable, click: function(){if($parent.isEditable){remove()}}">
+                     <i class="fa fa-minus-circle pull-right"></i>
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- /ko -->
+
+<!-- ko if: $data.search -->
+<div class="col-md-4 col-lg-3">
+    <select class="resources" data-bind="value: op, chosen: {width: '100%', disable_search_threshold: 15}">
+        <option value="">{% trans "Equals" %}</option>
+        <option value="!">{% trans "Not" %}</option>
+        <option value="null">{% trans "Has no value" %}</option>
+        <option value="not_null">{% trans "Has any value" %}</option>
+    </select>
+</div>
+<div class="col-md-8 col-lg-9" data-bind="visible: op() !== 'null' && op() !== 'not_null'">
+    <select  type="" placeholder="{% trans " Value " %}" class="form-control library-search" data-bind="options: options, optionsText: 'text', optionsValue: 'id', value: searchValue, chosen: {width: '100%', disable_search: true}"></select>
+</div>
+<!-- /ko -->
+

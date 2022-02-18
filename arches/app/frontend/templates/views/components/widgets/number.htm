@@ -1,0 +1,115 @@
+{% extends "views/components/widgets/base.htm" %}
+{% load i18n %}
+
+{% block form %}
+<div class="row widget-wrapper">
+    <div class="form-group">
+        <label class="control-label widget-input-label" for="" data-bind="text:label"></label>
+        <!-- ko if: node -->
+        <i data-bind="css: {'ion-asterisk widget-label-required': node.isrequired}"></i>
+        <!-- /ko -->
+        <div class="col-xs-12">
+            <div class="input-group" data-bind="style: {width: width}">
+            <!-- ko if: prefix -->
+            <span class="input-group-addon" data-bind="text: prefix"></span>
+            <!-- /ko -->
+            <!-- ko if: format -->
+            <input type="text" data-bind="formattedNumber: value, format: format, attr: {placeholder: placeholder, max: max, min: min, step: step, disabled: disable}, style: {width: width}, valueUpdate: 'keyup'" class="form-control input-lg widget-input">
+            <!-- /ko -->
+            <!-- ko ifnot: format -->
+            <input type="number" data-bind="value: value, attr: {placeholder: placeholder, max: max, min: min, step: step, disabled: disable}, style: {width: width}, valueUpdate: 'keyup'" class="form-control input-lg widget-input">
+            <!-- /ko -->
+            <!-- ko if: suffix -->
+            <span class="input-group-addon" data-bind="text: suffix"></span>
+            <!-- /ko -->
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock form %}
+
+{% block report %}
+<dt data-bind="text: label"></dt>
+<dd>
+    <div class='number-widget-report'>
+    <!-- ko if: displayValue -->
+    <span data-bind="text: prefix(), css: {'number-prefix': prefix()}"></span>
+        <!-- ko if: format -->
+        <span data-bind="formattedNumber: displayValue(), format: format || '{% trans "None" %}'"></span>
+        <!-- /ko -->
+        <!-- ko ifnot: format -->
+        <span data-bind="text: displayValue()"></span>
+        <!-- /ko -->
+    <span data-bind="text: suffix(), css: {'number-suffix': suffix()}"></span>
+    <!-- /ko -->
+    <!-- ko ifnot: displayValue -->
+    <span data-bind="text: '{% trans "None" %}'"></span>
+    <!-- /ko -->
+    </div>
+</dd>
+{% endblock report %}
+
+{% block config_form %}
+<div class="control-label">
+    {% trans "Placeholder" %}
+</div>
+<div class="col-xs-12 pad-no crud-widget-container">
+    <input type="" placeholder="{% trans "Placeholder" %}" id="" class="form-control input-md widget-input" data-bind="value: placeholder, valueUpdate: 'keyup'">
+</div>
+<div class="control-label">
+    {% trans "Min" %}
+</div>
+<div class="col-xs-12 pad-no crud-widget-container">
+    <input type="number" placeholder="{% trans "Min" %}" id="" class="form-control input-md widget-input" data-bind="value: min, valueUpdate: 'keyup'">
+</div>
+<div class="control-label">
+    {% trans "Max" %}
+</div>
+<div class="col-xs-12 pad-no crud-widget-container">
+    <input type="number" placeholder="{% trans "Max" %}" id="" class="form-control input-md widget-input" data-bind="value: max, valueUpdate: 'keyup'">
+</div>
+<div class="control-label">
+    {% trans "Increment" %}
+</div>
+<div class="col-xs-12 pad-no crud-widget-container" >
+    <input type="number" placeholder="{% trans "Increment size" %}" id="" class="form-control input-md widget-input" data-bind="value: step, valueUpdate: 'keyup', disable: format">
+</div>
+<div class="control-label">
+    {% trans "Decimal Places" %}
+</div>
+<div class="col-xs-12 pad-no crud-widget-container">
+    <input type="number" placeholder="{% trans "Number of decimal places" %}" id="" class="form-control input-md widget-input" data-bind="value: precision, valueUpdate: 'keyup'">
+</div>
+<div class="control-label">
+    {% trans "Prefix" %}
+</div>
+<div class="col-xs-12 pad-no crud-widget-container">
+    <input type="" placeholder="{% trans "Field prefix" %}" id="" class="form-control input-md widget-input" data-bind="value: prefix, valueUpdate: 'keyup'">
+</div>
+<div class="control-label">
+    {% trans "Suffix" %}
+</div>
+<div class="col-xs-12 pad-no crud-widget-container">
+    <input type="" placeholder="{% trans "Field suffix" %}" id="" class="form-control input-md widget-input" data-bind="value: suffix, valueUpdate: 'keyup'">
+</div>
+<div class="control-label">
+    {% trans "Default Value" %}
+</div>
+<div class="col-xs-12 pad-no crud-widget-container">
+    <input type="number" placeholder="{% trans "Default Value" %}" id="" class="form-control input-md widget-input" data-bind="value: defaultValue, valueUpdate: 'keyup'">
+</div>
+<div class="control-label">
+  {% trans "Format" %} <a href="http://numeraljs.com/#format" target="_blank">{% trans "(view valid formats)" %}</a>
+</div>
+<div class="col-xs-12 pad-no crud-widget-container">
+  <input type="" placeholder="{% trans "Format" %}" id="" class="form-control input-md widget-input" data-bind="value: format, valueUpdate: 'keyup'">
+</div>
+<div class="node-config-item">
+    <div class="control-label">
+        {% trans "Disabled" %}
+    </div>
+    <div class="pad-no">
+        <div data-bind="component: { name: 'views/components/simple-switch', params: {value: uneditable, config:{label: '{% trans "Disable Editing" %}', subtitle: '{% trans "Prevent users from editing value" %}'}}}"></div>
+    </div>
+</div>
+{% endblock config_form %}

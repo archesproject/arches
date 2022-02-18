@@ -1,0 +1,49 @@
+{% extends "views/components/widgets/base.htm" %}
+{% load i18n %}
+
+{% block form %}
+<div class="row widget-wrapper">
+    <div class="form-group">
+        <label class="control-label widget-input-label" data-bind="text:label">
+        </label>
+        <!-- ko if: node -->
+        <i data-bind="css: {'ion-asterisk widget-label-required': node.isrequired}"></i>
+        <!-- /ko -->
+        <div class="col-xs-12">
+            <div class="pad-hor columns option-input" data-bind="foreach: flatOptions">
+                <label class="form-checkbox form-normal form-primary form-text"
+                    data-bind="css: {
+                        'active': $parent.isOptionSelected($data),
+                        'disabled': $parent.disabled
+                    },
+                    click: $parent.toggleOptionSelection">
+                    <input type="checkbox" data-bind="checked: $parent.isOptionSelected($data)">
+                    <span data-bind="text:text"></span>
+                </label>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock form %}
+
+{% block config_form %}
+<div>
+    <div class="form-group">
+        <div class="control-label">
+            {% trans "Default Value" %}
+        </div>
+        <div class="col-xs-12">
+            <div class="pad-hor columns checkbox-panel option-input-config" data-bind="foreach: flatOptions">
+                <label class="form-checkbox form-normal form-primary form-text"
+                    data-bind="css: {
+                        'active': $parent.isOptionSelected($data)
+                    },
+                    click: $parent.toggleOptionSelection">
+                    <input type="checkbox" data-bind="checked: $parent.isOptionSelected($data)">
+                    <span data-bind="text:text"></span>
+                </label>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock config_form %}

@@ -1,0 +1,84 @@
+<!--
+ARCHES - a program developed to inventory and manage immovable cultural heritage.
+Copyright (C) 2013 J. Paul Getty Trust and World Monuments Fund
+
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU Affero General Public License as
+published by the Free Software Foundation, either version 3 of the
+License, or (at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+GNU Affero General Public License for more details.
+
+You should have received a copy of the GNU Affero General Public License
+along with this program. If not, see <http://www.gnu.org/licenses/>.
+-->
+{% extends "base.htm" %}
+{% load staticfiles %}
+{% load i18n %}
+
+{% block loading_mask %}
+{% endblock loading_mask %}
+
+{% block body %}
+
+<div id="container" class="cls-container arches-login">
+
+	<!-- BACKGROUND IMAGE -->
+	<!--===================================================
+	<div id="bg-overlay" class="bg-img img-login"></div>
+	-->
+
+	 <!-- LOGIN FORM -->
+	<div class="cls-content arches-signin">
+	 	<div class="cls-content-sm panel login-panel" style="width: 350px;">
+			<div class="panel-body">
+				<h3 class="login-panel-header arches-signin">{% trans "Sign In" %}</h3>
+				<p class="arches-signin-subtext">
+					{% trans "Sign in to Arches to access your data modeling, editing, and discovery tools." %}
+				</p>
+				<form id="login-form" action="?next={{ next }}" method='POST' {% if auth_failed %} autocomplete="off" {% endif %}>
+					{% csrf_token %}
+					<input type="hidden" name="next" value="{{ next }}" />
+					<div class="form-group">
+						<div class="input-group">
+							<div class="input-group-addon"><i class="text-lg ion-log-in"></i></div>
+							<input type="text" class="form-control input-lg" placeholder="Email or Username" name='username' autofocus>
+						</div>
+					</div>
+					<div class="form-group">
+						<div class="input-group">
+							<div class="input-group-addon"><i class="ion-asterisk"></i></div>
+							<input type="password" class="form-control input-lg" placeholder="Password" name='password'>
+						</div>
+					</div>
+					<div class="form-group">
+                        <div class="arches-signin-btn">
+                            <button class="btn btn-primary btn-lg btn-block" type="submit">{% trans "Sign In" %}</button>
+                        </div>
+                    </div>
+					<div class="row" style="padding-top:10px; margin: -20px 0px 5px 0px;">
+						<div style="{% if not auth_failed %}display:none;{% endif %}" id="login-failed-alert" class="alert alert-danger fade in" role="alert">
+							<button type="button" class="close" data-dismiss="alert"><span aria-hidden="true">&times;</span><span class="sr-only">{% trans "Close" %}</span></button>
+							<h4>{% trans "Login failed" %}</h4>
+							<span>{% trans "Invalid username and/or password." %}</span>
+						</div>
+					</div>
+				</form>
+				<div class="row account-management">
+					<!-- <a href="arches_password_reminder.html" class="col-xs-5 btn btn-link mar-rgt" style="color:#515152;">{% trans "Forgot password ?" %}</a> -->
+					<a href="{% url 'password_reset' %}" class="btn btn-link account-link">{% trans "Forgot password?" %}</a>
+					<a href="{% url 'signup' %}" class="btn btn-link account-link" target="_blank">{% trans "Create a new account" %}</a>
+				</div>
+			</div>
+
+			<div class="panel-footer">
+				{% trans "Learn more about <a href='http://www.archesproject.org'>Arches</a>" %}
+			</div>
+		</div>
+	</div>
+</div>
+
+{% endblock body %}

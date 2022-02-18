@@ -1,0 +1,18 @@
+{% extends "views/report-templates/default.htm" %}
+{% load i18n %}
+
+{% block header %}
+<div data-bind="carousel: { content: { name: 'carouselItemTemplate', data: imgs } }"></div>
+
+<template id="carouselItemTemplate">
+</template>
+{% endblock header %}
+
+{% block header_form %}
+<div class="control-label">
+    {% trans "Included Image Nodes" %}
+</div>
+<div class="col-xs-12 pad-no crud-widget-container">
+    <select class="design" data-placeholder="{% trans "Select image nodes to include..." %}" multiple data-bind="selectedOptions: nodes, options: nodeOptions, optionsText: 'name', optionsValue: 'nodeid', chosen: {disable_search_threshold: 10, width: '100%'}"></select>
+</div>
+{% endblock header_form %}

@@ -1,0 +1,55 @@
+{% load i18n %}
+<!-- ko if: !$data.search && $data.graph -->
+<div class="node-widget-label pad-btm">
+    <div class="control-label">
+        {% trans "Related Node" %}
+    </div>
+    <div>
+        <select data-bind="
+            disable: isEditable === false,
+            placeholder: '{% trans "Select a node" %}',
+            value: config.nodeid,
+            options: nodes,
+            optionsText: 'name',
+            optionsValue: 'id',
+            chosen: {
+                width: '100%'
+            }
+        "></select>
+    </div>
+</div>
+<div class="node-widget-label pad-btm">
+    <div class="control-label">
+        {% trans "Relationship to Node" %}
+    </div>
+    <div data-bind="if: properties().length > 0">
+        <select data-bind="
+            disable: isEditable === false,
+            placeholder: '{% trans "Select a property" %}',
+            value: config.property,
+            options: properties,
+            optionsText: 'name',
+            optionsValue: 'id',
+            chosen: {
+                width: '100%'
+            }
+        "></select>
+    </div>
+</div>
+<div class="node-value-widget-ontology" style="margin-bottom:10px;" data-bind="if: properties().length > 0 && config.property()">
+    <div>
+        (<strong data-bind="text: node.name"></strong>
+        <em data-bind="text: propertyName"></em>
+        <strong data-bind="text: relatedNodeName"></strong>)
+    </div>
+</div>
+<!-- /ko -->
+
+<!-- ko if: $data.search -->
+<div class="col-md-4 col-lg-3">
+
+</div>
+<div class="col-md-8 col-lg-9 resource-instance-search">
+
+</div>
+<!-- /ko -->

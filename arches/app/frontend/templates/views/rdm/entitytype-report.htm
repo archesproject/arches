@@ -1,0 +1,200 @@
+﻿ {% load i18n %}
+ {% load staticfiles %}
+<div class="col-xs-12 concept-report-loading hidden">{% trans "Loading..." %}</div>
+
+<div class="col-xs-12 concept-report-content">
+    <!-- Concept Preferred Label -->
+    <div class="headline arches-RDM-headline"><h3 class="arches-RDM-Concept">{{prefLabel.value}} ({{prefLabel.language}})</h3>
+
+        <!-- Spacer for xs screens -->
+        <div class="divider hidden-sm hidden-md hidden-lg"></div>
+
+        <!-- Concept Type Label -->
+        <span class="arches-search-filter-font text-muted" style="">
+            ({{concept.nodetype}})
+        </span>
+
+    </div>
+    <!-- End Concept Preferred Label -->
+
+    <!-- Associative Concepts-->
+    <div class="margin-bottom-10 padding-left-10">
+        <dl>
+
+            <dt>
+                <h5 id="" class="section-headline">{% trans "Member Hierarchy" %}
+                    <span>
+                        <a href="javascript:void(0);" class="arches-RDM-link pull-right" data-toggle="#related-member-form">{% trans "Add dropdown entry" %}</a>
+                    <span>
+                </h5>
+            </dt>
+
+            <div class="concept-tree">
+                {% for path in concept_paths%}
+                {% with forloop.last as show_children %}
+                <div>
+                    <dl>
+                    {% for parent_concept in path %}
+                        <dd class="arches-concept-heirarchy {% if forloop.last %}selected-concept{% endif %}" >
+                            {% with ''|center:forloop.counter0 as range %}
+                            <span class="text-muted" style="padding-left:13px;">{% for i in range %}...{% endfor %}</span>
+                            {% endwith %}
+                            <a href="javascript:void(0);" class="arches-CRUD-child" title="{% trans "Expand this entry" %}" data-action="viewddconcept" data-conceptid="{{parent_concept.id}}"> {{parent_concept.label}}</a>
+
+                        </dd>
+                    {% if forloop.last %}{% with ''|center:forloop.counter as range %}
+                        {% if show_children%}
+                            {% for childmember in concept.subconcepts %}
+                            <dd class="arches-concept-heirarchy">
+                                <i class=" {% if childmember.hassubconcepts %}fa fa-expand{% endif %}" style="color:#aaa"></i><span class="text-muted"{% if not childmember.hassubconcepts %}style="padding-left:13px;"{% endif %}>...{% for i in range %}...{% endfor %}</span>
+                                <a href="javascript:void(0);"><i class="arches-CRUD-delete fa fa-times-circle" title="{% trans "Remove this entry from the dropdown" %}" data-id="{{childmember.id}}" data-action="delete-relationship" data-message="{{childmember.prefLabel.value}}"></i></a>
+                                <a href="javascript:void(0);" class="arches-CRUD-child" title="{% trans "Expand this entry" %}" data-action="viewddconcept" data-conceptid="{{childmember.id}}">{{childmember.prefLabel.value}}</a>
+                            </dd>
+                            {% endfor %}
+                        {% endif %}
+                    {% endwith %}{% endif %}
+                    {% endfor %}
+                    </dl>
+                </div>
+                {% endwith %}
+                {% endfor %}
+            </div>
+
+        </dl>
+    </div>
+    <!-- End Associative Concepts -->
+
+    <hr class="devider arches-RDM-divider">
+
+
+    <!-- Concept Labels -->
+    <div class="margin-bottom-10 padding-left-10">
+        <dl>
+            <dt>
+                <h5 id="" class="section-headline">{% trans "Labels" %}
+                    <span>
+                        <a href="javascript:void(0);" class="arches-RDM-link pull-right edit-value" data-category="label" data-target="#labelmodal">{% trans "Add label" %}</a>
+                    <span>
+                </h5>
+            </dt>
+            {% for value in labels %}
+                <dd class="arches-RDM-label-highlighted">
+                    {% if labels|length > 1 %}
+                        <a href="javascript:void(0);"><i class="arches-CRUD-delete fa fa-times-circle" title="{% trans "Delete this label?" %}" data-id="{{value.id}}" data-action="delete-value" data-message="{{value.value}}" data-category="{{value.category}}"></i></a>
+                    {% endif %}
+                    <a href="javascript:void(0);" class="arches-CRUD-child edit-value" title='{% trans "Edit this label" %}' data-action="edit" data-target="#labelmodal" data-id="{{value.id}}" data-datatype="{{value.datatype}}" data-type="{{value.type}}" data-category="{{value.category}}" data-value="{{value.value}}" data-language="{{value.language}}">{{value.value}} </a>
+                    <span class="text-muted"> ({% if value.type == 'prefLabel' %}preferred, {% endif %}{{value.language}})</span>
+                </dd>
+            {% endfor %}
+
+        </dl>
+    </div>
+
+    <hr class="devider arches-RDM-divider">
+
+    <!-- Scope Notes -->
+    <div class="margin-bottom-10 padding-left-10">
+        <dl>
+            <dt>
+                <h5 id="" class="section-headline">{% trans "Notes" %}
+                    <span>
+                        <a href="javascript:void(0);" class="arches-RDM-link pull-right edit-value" data-category="note" data-target="#notemodal">{% trans "Add note" %}</a>
+                    <span>
+                </h5>
+            </dt>
+            {% for value in concept.values %}
+                {% if value.category == 'note' %}
+                <dd class="arches-RDM-label">
+                    <a href="javascript:void(0);"><i class="arches-CRUD-delete fa fa-times-circle" title="{% trans "Delete this note?" %}" data-id="{{value.id}}" data-action="delete-value" data-message="{{value.value}}" data-category="{{value.category}}"></i></a>
+                    <a href="javascript:void(0);" class="arches-CRUD-child edit-value" title='{% trans "Edit this note" %}' data-action="edit" data-target="#notemodal" data-id="{{value.id}}" data-datatype="{{value.datatype}}" data-type="{{value.type}}" data-category="{{value.category}}" data-value="{{value.value}}" data-language="{{value.language}}">{{value.type}}</a>
+                    <span class="text-muted"> ({{value.language}})</span>
+                </dd>
+
+                <dd class="arches-RDM-note">
+                    {{value.value}}
+                </dd>
+                {% endif %}
+            {% endfor %}
+        </dl>
+    </div>
+    <!-- End Scope Notes -->
+
+    <hr class="devider arches-RDM-divider">
+
+    <!-- Related Values -->
+    <div class="margin-bottom-10 padding-left-10">
+        <dl>
+            <dt>
+                <h5 id="" class="section-headline">{% trans "Values" %}
+                    <span>
+                        <a href="javascript:void(0);" class="arches-RDM-link pull-right edit-value" data-category="" data-target="#related_valuemodal">{% trans "Add value" %}</a>
+                    <span>
+                </h5>
+            </dt>
+            {% for value in concept.values %}
+                {% if value.category == 'undefined' %}
+                <dd class="arches-RDM-label-highlighted">
+                    <a href="javascript:void(0);"><i class="color-red fa fa-times-circle" title="{% trans "Delete this value?" %}" data-id="{{value.id}}" data-action="delete-value" data-message="{{value.value}}" data-category="{{value.category}}"></i></a>
+                    <a href="javascript:void(0);" title="{% trans "Edit this value" %}" data-action="edit" class="edit-value" data-target="#related_valuemodal" data-id="{{value.id}}" data-datatype="{{value.datatype}}" data-type="{{value.type}}" data-category="{{value.category}}" data-value="{{value.value}}" data-language="{{value.language}}">{{value.type}}</a>
+                    <span class="arches-RDM-note">{{value.value}}</span>
+                </dd>
+                {% endif %}
+            {% endfor %}
+       </dl>
+
+    </div>
+    <!-- End Related Values -->
+
+    <hr class="devider arches-RDM-divider">
+
+
+    <!-- Concept Unique Ids -->
+    <div class="padding-left-10">
+        <dl>
+            <dt>
+                <h5 id="arches-names-form" class="section-headline">
+                    {% trans "Identifiers" %}
+                </h5>
+            </dt>
+
+            <dd class="arches-RDM-note">
+                {% trans "Arches ID:" %} {{concept.id}} </br>
+                <!-- URI: http://purl.org/heritagedataschemes/560/concepts/142513 -->
+            </dd>
+
+        </dl>
+    </div>
+    <!-- End Concept Unique Ids -->
+</div>
+
+
+<div action="" class="modal fade confirm-delete-modal" tabindex="-1" role="dialog" aria-labelledby="alertmodal" aria-hidden="true">
+    <div class="modal-dialog confirm-delete">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                <h4 class="modal-title">{% trans "Are you ready to delete this item?" %}</h4>
+            </div>
+            <div class="modal-body">
+                <h5 name="warning-text">
+                </h5>
+                <div name="additional-info">
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn-u btn-u-default" data-dismiss="modal">{% trans "No" %}</button>
+                <button class="btn-u btn-u-red confirm-delete-yes" href="javascript:void(0);" data-id="" data-action="delete">{% trans "Yes" %}</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<!-- End Modal window for adding a new concept -->
+<div id="value-form">
+    {% include "views/rdm/modals/value-form.htm" %}
+</div>
+
+<div id="related-member-form">
+    {% include "views/rdm/modals/related-member-form.htm" %}
+</div>

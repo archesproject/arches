@@ -1,0 +1,12 @@
+{% load i18n %}
+<div class="row widget-container">
+    <div class="form-group">
+        <div class="relative">
+            <label class="col-xs-12 control-label widget-input-label"> {% trans "Triggering Nodegroups" %}</label>
+        </div>
+
+        <div class="col-xs-12">
+            <select data-placeholder="{% trans "Select a nodegroup" %}" multiple data-bind="chosen: {width: '100%'}, selectedOptions: triggering_nodegroups, options: cards, optionsText: 'name', optionsValue: 'nodegroup_id'"></select>
+        </div>
+    </div>
+</div>

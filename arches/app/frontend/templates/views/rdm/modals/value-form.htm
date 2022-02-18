@@ -1,0 +1,233 @@
+{% load i18n %}
+ <!-- Modal editing window for labels -->
+<form class="modal fade" id="labelmodal" tabindex="-1" role="dialog" aria-labelledby="labelmodal" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content no-corners">
+
+            <!-- Form Header -->
+            <div class="modal-header arches-modal-header">
+                <button aria-hidden="true" data-dismiss="modal" class="close" type="button">×</button>
+                <h4 class="modal-title" id="labelmodaltitle" data-edit-title="{% trans "Edit Concept Label" %}" data-add-title="{% trans "Add Concept Label" %}">{% trans "Manage Concept Label" %}</h4>
+            </div>
+            <!-- End Form Header -->
+
+            <!-- Form -->
+            <div class="modal-body">
+
+                <div class="row">
+                    <div class="col-xs-12">
+
+                        <form class="form-inline" role="form">
+
+                            <div class="form-group arches-modal-form-group">
+
+                                <h5 id="" class="arches-modal-section">{% trans "Label Information" %}</h5>
+                                <input class="form-control value-input" style="width: 100%;" id="concept-label" placeholder="Concept Label">
+                                <input id="label_id" class="id-input" type="hidden"/>
+                                <!-- Spacer (for xs screens) -->
+                                <div class="margin-top-10"></div>
+
+                                <div class="row">
+
+                                    <!-- Label Type -->
+                                    <div class="col-xs-6">
+                                        <h5 id="" class="arches-modal-section">{% trans "Type" %}</h5>
+                                        <select style="width:100%;" class="select2 value-type-input" id="label-type" name="label-type" placeholder='{% trans "Label type" %}' required>
+                                            {% for label in valuetype_labels %}
+                                              <option value="{{label.valuetype}}">{{label.valuetype}}</option>
+                                            {% endfor %}
+                                        </select>
+                                    </div>
+                                    <!-- End Label Type -->
+
+                                    <!-- Language -->
+                                    <div class="col-xs-6">
+                                        <h5 id="" class="arches-modal-section">{% trans "Language" %}</h5>
+                                        <select style="width:100%;" class="select2 language language-input" id="label-language" name="label-language" placeholder='{% trans "Language" %}' required>
+                                            {% for language in languages %}
+                                              <option value="{{language.languageid}}" {% if language.isdefault %} selected="selected" {% endif %}>{{language.languageid}} ({{language.languagename}})</option>
+                                            {% endfor %}
+                                        </select>
+                                    </div>
+                                    <!-- End Language -->
+                                </div>
+
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+            <!-- End Form (modal body) -->
+
+            <div class="modal-footer">
+                <button data-dismiss="modal" class="btn-u btn-u-default" type="button">{% trans "Cancel" %}</button>
+                <button class="btn-u" type="submit">{% trans "Save" %}</button>
+            </div>
+
+        {% for value in labels %}
+            <div style="display:none;" class="pref-label-data" data-id="{{value.id}}" data-type="{{value.type}}" data-language="{{value.language}}"> </div>
+        {% endfor %}
+            <div style="display:none;" class="pref-label-validation-message">{% trans "Only one preferred label may exist for each language." %}</div>
+          </div>
+    </div>
+</form>
+<!-- End Modal editing window for labels -->
+
+<!-- Modal editing window for notes -->
+<form class="modal fade" id="notemodal" tabindex="-1" role="dialog" aria-labelledby="notemodal" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content no-corners">
+
+            <!-- Form Header -->
+            <div class="modal-header arches-modal-header">
+                <button aria-hidden="true" data-dismiss="modal" class="close" type="button">×</button>
+                <h4 id="notemodaltitle" data-edit-title="Edit Concept Note" data-add-title="{% trans "Add Concept Note" %}" class="modal-title">{% trans "Manage Concept Note" %}</h4>
+            </div>
+            <!-- End Form Header -->
+
+            <!-- Form -->
+            <div class="modal-body">
+
+                <div class="row">
+                    <div class="col-xs-12">
+
+                        <form class="form-inline" role="form">
+
+                            <div class="form-group arches-modal-form-group">
+
+                                <h5 id="" class="arches-modal-section">{% trans "Note Editor" %}</h5>
+
+                                <!-- Simple HTML Editor -->
+                                <div class="arches-html-editor">
+                                    <textarea class="form-control value-input textarea textarea-resizable" rows="3" id="note_value" type="text" required></textarea>
+                                    <input id="note_id" class="id-input" type="hidden"/>
+                                </div>
+
+                                <!-- Spacer (for xs screens) -->
+                                <div class="margin-top-10"></div>
+
+                                <div class="row">
+
+                                    <!-- Note Type -->
+                                    <div class="col-xs-6">
+                                        <h5 id="" class="arches-modal-section">{% trans "Type" %}</h5>
+                                        <select style="width:100%;" class="select2 value-type-input" name="note_valuetype_dd" id="note_valuetype_dd" required placeholder="Note type">
+                                        {% for note in valuetype_notes %}
+                                          <option value="{{note.valuetype}}">{{note.valuetype}}</option>
+                                        {% endfor %}
+                                        </select>
+                                    </div>
+                                    <!-- End Label Type -->
+
+                                    <!-- Language -->
+                                    <div class="col-xs-6">
+                                        <h5 id="" class="arches-modal-section">{% trans "Language" %}</h5>
+                                        <select style="width:100%;" class="select2 language language-input" name="note_language_dd" id="note_language_dd" required placeholder="Language">
+                                        {% for language in languages %}
+                                          <option value="{{language.languageid}}" {% if language.isdefault %} selected="selected" {% endif %}>{{language.languageid}} ({{language.languagename}})</option>
+                                        {% endfor %}
+                                        </select>
+                                    </div>
+                                    <!-- End Language -->
+                                </div>
+
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+            <!-- End Form (modal body) -->
+
+            <div class="modal-footer">
+                <button data-dismiss="modal" class="btn-u btn-u-default" type="button">{% trans "Cancel" %}</button>
+                <button class="btn-u" type="submit">{% trans "Save" %}</button>
+            </div>
+
+        {% for value in concept.values %}
+            {% if value.category == 'note' %}
+            <div style="display:none;" class="note-data" data-id="{{value.id}}" data-language="{{value.language}}" data-valuetype="{{value.type}}"> </div>
+            {% endif %}
+        {% endfor %}
+            <div style="display:none;" class="note-validation-message">{% trans "Only one note of each type may exist for each language." %}</div>
+          </div>
+    </div>
+</form>
+<!-- End Modal editing window for notes -->
+
+<!-- Modal editing window for related_value -->
+<form class="modal fade" id="related_valuemodal" tabindex="-1" role="dialog" aria-labelledby="related_valuemodal" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content no-corners">
+
+            <!-- Form Header -->
+            <div class="modal-header arches-modal-header">
+                <button aria-hidden="true" data-dismiss="modal" class="close" type="button">×</button>
+                <h4 class="modal-title" id="related_valuemodaltitle" data-edit-title="Edit Concept Value" data-add-title="{% trans "Add Concept Value" %}">{% trans "Manage Concept Values" %}</h4>
+            </div>
+            <!-- End Form Header -->
+
+            <!-- Form -->
+            <div class="modal-body">
+
+                <div class="row">
+                    <div class="col-xs-12">
+
+                        <form class="form-inline" role="form">
+
+                            <div class="form-group arches-modal-form-group">
+
+                                <h5 id="" class="arches-modal-section">{% trans "Define a value" %}</h5>
+
+                                <input class="form-control value-input" style="width: 100%;" id="related_value_value" placeholder="Value">
+                                <input id="related_value_id" class="id-input" type="hidden"/>
+
+                                <!-- Spacer (for xs screens) -->
+                                <div class="margin-top-10"></div>
+
+                                <div class="row">
+
+                                    <!-- Value Type -->
+                                    <div class="col-xs-6">
+                                        <h5 id="" class="arches-modal-section">{% trans "Type" %}</h5>
+                                        <select style="width:100%;" class="select2 value value-type-input" name="related_value_valuetype_dd" id="related_value_valuetype_dd" required placeholder='{% trans "Value type" %}'>
+                                        {% for related_value in valuetype_related_values %}
+                                          <option value="{{related_value.valuetype}}">{{related_value.valuetype}}</option>
+                                        {% endfor %}
+                                        </select>
+                                    </div>
+                                    <!-- End Value Type -->
+
+                                    <!-- Language -->
+                                    <div class="col-xs-6">
+                                        <h5 id="" class="arches-modal-section">{% trans "Language" %}</h5>
+                                        <select style="width:100%;" class="select2 language language-input" name="related_value_language_dd" id="related_value_language_dd" required placeholder='{% trans "Language" %}'>
+                                        {% for language in languages %}
+                                          <option value="{{language.languageid}}" {% if language.isdefault %} selected="selected" {% endif %}>{{language.languageid}} ({{language.languagename}})</option>
+                                        {% endfor %}
+                                        </select>
+                                    </div>
+                                    <!-- End Language -->
+                                </div>
+
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+            <!-- End Form (modal body) -->
+
+            <div class="modal-footer">
+                <button data-dismiss="modal" class="btn-u btn-u-default" type="button">{% trans "Cancel" %}</button>
+                <button class="btn-u" type="submit">{% trans "Save" %}</button>
+            </div>
+          </div>
+
+        {% for value in concept.values %}
+            {% if value.type == 'sortorder' %}
+            <div style="display:none;" class="sortorder-data" data-id="{{value.id}}" data-language="{{value.language}}"> </div>
+            {% endif %}
+        {% endfor %}
+            <div style="display:none;" class="sortorder-validation-message">{% trans "Only one sort order value can be assigned to a concept." %}</div>
+    </div>
+</form>
+<!-- End Modal editing window for related_value -->

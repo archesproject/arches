@@ -1,0 +1,23 @@
+{% load static %}
+{% load render_bundle from webpack_loader %}
+
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  {% render_bundle 'app' 'css' %}
+</head>
+<body>
+
+<div class="jumbotron">
+  <div class="container">
+    <h1 class="display-3" style="background-color: bisque;">Hello, world!</h1>
+    <p>This is a template for a simple marketing or informational website. It includes a large callout called a
+      jumbotron and three supporting pieces of content. Use it as a starting point to create something more unique.</p>
+    <p><a class="btn btn-primary btn-lg" href="#" role="button">Learn more »</a></p>
+  </div>
+</div>
+
+</body>
+    {% render_bundle 'app' 'js' %}
+</html>

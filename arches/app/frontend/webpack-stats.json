@@ -1,8 +1,2367 @@
 {
-  "status": "error",
-  "assets": {},
-  "chunks": {},
-  "publicPath": "/foo/",
-  "error": "ModuleNotFoundError",
-  "message": "Module not found: Error: Can't resolve 'jquery-ui/sortable' in '/Users/cbyrd/Projects/arches/arches/app/frontend/js/bindings'"
+  "status": "done",
+  "assets": {
+    "js/bindings/chosen.js": {
+      "name": "js/bindings/chosen.js",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/frontend/build/js/bindings/chosen.js",
+      "publicPath": "/foo/js/bindings/chosen.js"
+    },
+    "js/bindings/ckeditor.js": {
+      "name": "js/bindings/ckeditor.js",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/frontend/build/js/bindings/ckeditor.js",
+      "publicPath": "/foo/js/bindings/ckeditor.js"
+    },
+    "js/bindings/clipboard.js": {
+      "name": "js/bindings/clipboard.js",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/frontend/build/js/bindings/clipboard.js",
+      "publicPath": "/foo/js/bindings/clipboard.js"
+    },
+    "js/bindings/codemirror.js": {
+      "name": "js/bindings/codemirror.js",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/frontend/build/js/bindings/codemirror.js",
+      "publicPath": "/foo/js/bindings/codemirror.js"
+    },
+    "js/bindings/color-picker.js": {
+      "name": "js/bindings/color-picker.js",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/frontend/build/js/bindings/color-picker.js",
+      "publicPath": "/foo/js/bindings/color-picker.js"
+    },
+    "js/bindings/cytoscape.js": {
+      "name": "js/bindings/cytoscape.js",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/frontend/build/js/bindings/cytoscape.js",
+      "publicPath": "/foo/js/bindings/cytoscape.js"
+    },
+    "js/bindings/datatable.js": {
+      "name": "js/bindings/datatable.js",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/frontend/build/js/bindings/datatable.js",
+      "publicPath": "/foo/js/bindings/datatable.js"
+    },
+    "js/bindings/datepicker.js": {
+      "name": "js/bindings/datepicker.js",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/frontend/build/js/bindings/datepicker.js",
+      "publicPath": "/foo/js/bindings/datepicker.js"
+    },
+    "js/bindings/dragDrop.js": {
+      "name": "js/bindings/dragDrop.js",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/frontend/build/js/bindings/dragDrop.js",
+      "publicPath": "/foo/js/bindings/dragDrop.js"
+    },
+    "js/bindings/dropzone.js": {
+      "name": "js/bindings/dropzone.js",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/frontend/build/js/bindings/dropzone.js",
+      "publicPath": "/foo/js/bindings/dropzone.js"
+    },
+    "js/bindings/fadeVisible.js": {
+      "name": "js/bindings/fadeVisible.js",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/frontend/build/js/bindings/fadeVisible.js",
+      "publicPath": "/foo/js/bindings/fadeVisible.js"
+    },
+    "js/bindings/formattedNumber.js": {
+      "name": "js/bindings/formattedNumber.js",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/frontend/build/js/bindings/formattedNumber.js",
+      "publicPath": "/foo/js/bindings/formattedNumber.js"
+    },
+    "js/bindings/gallery.js": {
+      "name": "js/bindings/gallery.js",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/frontend/build/js/bindings/gallery.js",
+      "publicPath": "/foo/js/bindings/gallery.js"
+    },
+    "js/bindings/hover.js": {
+      "name": "js/bindings/hover.js",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/frontend/build/js/bindings/hover.js",
+      "publicPath": "/foo/js/bindings/hover.js"
+    },
+    "js/bindings/leaflet.js": {
+      "name": "js/bindings/leaflet.js",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/frontend/build/js/bindings/leaflet.js",
+      "publicPath": "/foo/js/bindings/leaflet.js"
+    },
+    "js/bindings/let.js": {
+      "name": "js/bindings/let.js",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/frontend/build/js/bindings/let.js",
+      "publicPath": "/foo/js/bindings/let.js"
+    },
+    "js/bindings/map-controls.js": {
+      "name": "js/bindings/map-controls.js",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/frontend/build/js/bindings/map-controls.js",
+      "publicPath": "/foo/js/bindings/map-controls.js"
+    },
+    "js/bindings/mapbox-gl.js": {
+      "name": "js/bindings/mapbox-gl.js",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/frontend/build/js/bindings/mapbox-gl.js",
+      "publicPath": "/foo/js/bindings/mapbox-gl.js"
+    },
+    "js/bindings/moment-date.js": {
+      "name": "js/bindings/moment-date.js",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/frontend/build/js/bindings/moment-date.js",
+      "publicPath": "/foo/js/bindings/moment-date.js"
+    },
+    "js/bindings/nouislider.js": {
+      "name": "js/bindings/nouislider.js",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/frontend/build/js/bindings/nouislider.js",
+      "publicPath": "/foo/js/bindings/nouislider.js"
+    },
+    "js/bindings/related-resources-graph.js": {
+      "name": "js/bindings/related-resources-graph.js",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/frontend/build/js/bindings/related-resources-graph.js",
+      "publicPath": "/foo/js/bindings/related-resources-graph.js"
+    },
+    "js/bindings/resizable-sidepanel.js": {
+      "name": "js/bindings/resizable-sidepanel.js",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/frontend/build/js/bindings/resizable-sidepanel.js",
+      "publicPath": "/foo/js/bindings/resizable-sidepanel.js"
+    },
+    "js/bindings/scroll-to-file.js": {
+      "name": "js/bindings/scroll-to-file.js",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/frontend/build/js/bindings/scroll-to-file.js",
+      "publicPath": "/foo/js/bindings/scroll-to-file.js"
+    },
+    "js/bindings/scrollTo.js": {
+      "name": "js/bindings/scrollTo.js",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/frontend/build/js/bindings/scrollTo.js",
+      "publicPath": "/foo/js/bindings/scrollTo.js"
+    },
+    "js/bindings/select2-query.js": {
+      "name": "js/bindings/select2-query.js",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/frontend/build/js/bindings/select2-query.js",
+      "publicPath": "/foo/js/bindings/select2-query.js"
+    },
+    "js/bindings/select2v4.js": {
+      "name": "js/bindings/select2v4.js",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/frontend/build/js/bindings/select2v4.js",
+      "publicPath": "/foo/js/bindings/select2v4.js"
+    },
+    "js/bindings/slide.js": {
+      "name": "js/bindings/slide.js",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/frontend/build/js/bindings/slide.js",
+      "publicPath": "/foo/js/bindings/slide.js"
+    },
+    "js/bindings/smartresize.js": {
+      "name": "js/bindings/smartresize.js",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/frontend/build/js/bindings/smartresize.js",
+      "publicPath": "/foo/js/bindings/smartresize.js"
+    },
+    "js/bindings/sortable.js": {
+      "name": "js/bindings/sortable.js",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/frontend/build/js/bindings/sortable.js",
+      "publicPath": "/foo/js/bindings/sortable.js"
+    },
+    "js/bindings/term-search.js": {
+      "name": "js/bindings/term-search.js",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/frontend/build/js/bindings/term-search.js",
+      "publicPath": "/foo/js/bindings/term-search.js"
+    },
+    "js/bindings/time-wheel.js": {
+      "name": "js/bindings/time-wheel.js",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/frontend/build/js/bindings/time-wheel.js",
+      "publicPath": "/foo/js/bindings/time-wheel.js"
+    },
+    "js/config-manager.js": {
+      "name": "js/config-manager.js",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/frontend/build/js/config-manager.js",
+      "publicPath": "/foo/js/config-manager.js"
+    },
+    "js/models/abstract.js": {
+      "name": "js/models/abstract.js",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/frontend/build/js/models/abstract.js",
+      "publicPath": "/foo/js/models/abstract.js"
+    },
+    "js/models/card-widget.js": {
+      "name": "js/models/card-widget.js",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/frontend/build/js/models/card-widget.js",
+      "publicPath": "/foo/js/models/card-widget.js"
+    },
+    "js/models/card.js": {
+      "name": "js/models/card.js",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/frontend/build/js/models/card.js",
+      "publicPath": "/foo/js/models/card.js"
+    },
+    "js/models/concept-parents.js": {
+      "name": "js/models/concept-parents.js",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/frontend/build/js/models/concept-parents.js",
+      "publicPath": "/foo/js/models/concept-parents.js"
+    },
+    "js/models/concept.js": {
+      "name": "js/models/concept.js",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/frontend/build/js/models/concept.js",
+      "publicPath": "/foo/js/models/concept.js"
+    },
+    "js/models/config.js": {
+      "name": "js/models/config.js",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/frontend/build/js/models/config.js",
+      "publicPath": "/foo/js/models/config.js"
+    },
+    "js/models/function-x-graph.js": {
+      "name": "js/models/function-x-graph.js",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/frontend/build/js/models/function-x-graph.js",
+      "publicPath": "/foo/js/models/function-x-graph.js"
+    },
+    "js/models/function.js": {
+      "name": "js/models/function.js",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/frontend/build/js/models/function.js",
+      "publicPath": "/foo/js/models/function.js"
+    },
+    "js/models/graph.js": {
+      "name": "js/models/graph.js",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/frontend/build/js/models/graph.js",
+      "publicPath": "/foo/js/models/graph.js"
+    },
+    "js/models/mobile-survey.js": {
+      "name": "js/models/mobile-survey.js",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/frontend/build/js/models/mobile-survey.js",
+      "publicPath": "/foo/js/models/mobile-survey.js"
+    },
+    "js/models/node.js": {
+      "name": "js/models/node.js",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/frontend/build/js/models/node.js",
+      "publicPath": "/foo/js/models/node.js"
+    },
+    "js/models/report.js": {
+      "name": "js/models/report.js",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/frontend/build/js/models/report.js",
+      "publicPath": "/foo/js/models/report.js"
+    },
+    "js/models/tile.js": {
+      "name": "js/models/tile.js",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/frontend/build/js/models/tile.js",
+      "publicPath": "/foo/js/models/tile.js"
+    },
+    "js/models/value.js": {
+      "name": "js/models/value.js",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/frontend/build/js/models/value.js",
+      "publicPath": "/foo/js/models/value.js"
+    },
+    "js/rdm.js": {
+      "name": "js/rdm.js",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/frontend/build/js/rdm.js",
+      "publicPath": "/foo/js/rdm.js"
+    },
+    "js/reports/default.js": {
+      "name": "js/reports/default.js",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/frontend/build/js/reports/default.js",
+      "publicPath": "/foo/js/reports/default.js"
+    },
+    "js/reports/image.js": {
+      "name": "js/reports/image.js",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/frontend/build/js/reports/image.js",
+      "publicPath": "/foo/js/reports/image.js"
+    },
+    "js/reports/map-header.js": {
+      "name": "js/reports/map-header.js",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/frontend/build/js/reports/map-header.js",
+      "publicPath": "/foo/js/reports/map-header.js"
+    },
+    "js/reports/map.js": {
+      "name": "js/reports/map.js",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/frontend/build/js/reports/map.js",
+      "publicPath": "/foo/js/reports/map.js"
+    },
+    "js/reports/tabbed.js": {
+      "name": "js/reports/tabbed.js",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/frontend/build/js/reports/tabbed.js",
+      "publicPath": "/foo/js/reports/tabbed.js"
+    },
+    "js/utils/dispose.js": {
+      "name": "js/utils/dispose.js",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/frontend/build/js/utils/dispose.js",
+      "publicPath": "/foo/js/utils/dispose.js"
+    },
+    "js/utils/ontology.js": {
+      "name": "js/utils/ontology.js",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/frontend/build/js/utils/ontology.js",
+      "publicPath": "/foo/js/utils/ontology.js"
+    },
+    "js/utils/resource.js": {
+      "name": "js/utils/resource.js",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/frontend/build/js/utils/resource.js",
+      "publicPath": "/foo/js/utils/resource.js"
+    },
+    "js/utils/set-csrf-token.js": {
+      "name": "js/utils/set-csrf-token.js",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/frontend/build/js/utils/set-csrf-token.js",
+      "publicPath": "/foo/js/utils/set-csrf-token.js"
+    },
+    "js/utils.js": {
+      "name": "js/utils.js",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/frontend/build/js/utils.js",
+      "publicPath": "/foo/js/utils.js"
+    },
+    "js/viewmodels/alert-json.js": {
+      "name": "js/viewmodels/alert-json.js",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/frontend/build/js/viewmodels/alert-json.js",
+      "publicPath": "/foo/js/viewmodels/alert-json.js"
+    },
+    "js/viewmodels/alert.js": {
+      "name": "js/viewmodels/alert.js",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/frontend/build/js/viewmodels/alert.js",
+      "publicPath": "/foo/js/viewmodels/alert.js"
+    },
+    "js/viewmodels/card-component.js": {
+      "name": "js/viewmodels/card-component.js",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/frontend/build/js/viewmodels/card-component.js",
+      "publicPath": "/foo/js/viewmodels/card-component.js"
+    },
+    "js/viewmodels/card-constraints.js": {
+      "name": "js/viewmodels/card-constraints.js",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/frontend/build/js/viewmodels/card-constraints.js",
+      "publicPath": "/foo/js/viewmodels/card-constraints.js"
+    },
+    "js/viewmodels/card-multi-select.js": {
+      "name": "js/viewmodels/card-multi-select.js",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/frontend/build/js/viewmodels/card-multi-select.js",
+      "publicPath": "/foo/js/viewmodels/card-multi-select.js"
+    },
+    "js/viewmodels/card.js": {
+      "name": "js/viewmodels/card.js",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/frontend/build/js/viewmodels/card.js",
+      "publicPath": "/foo/js/viewmodels/card.js"
+    },
+    "js/viewmodels/concept-select.js": {
+      "name": "js/viewmodels/concept-select.js",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/frontend/build/js/viewmodels/concept-select.js",
+      "publicPath": "/foo/js/viewmodels/concept-select.js"
+    },
+    "js/viewmodels/concept-widget.js": {
+      "name": "js/viewmodels/concept-widget.js",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/frontend/build/js/viewmodels/concept-widget.js",
+      "publicPath": "/foo/js/viewmodels/concept-widget.js"
+    },
+    "js/viewmodels/domain-widget.js": {
+      "name": "js/viewmodels/domain-widget.js",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/frontend/build/js/viewmodels/domain-widget.js",
+      "publicPath": "/foo/js/viewmodels/domain-widget.js"
+    },
+    "js/viewmodels/file-widget.js": {
+      "name": "js/viewmodels/file-widget.js",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/frontend/build/js/viewmodels/file-widget.js",
+      "publicPath": "/foo/js/viewmodels/file-widget.js"
+    },
+    "js/viewmodels/function.js": {
+      "name": "js/viewmodels/function.js",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/frontend/build/js/viewmodels/function.js",
+      "publicPath": "/foo/js/viewmodels/function.js"
+    },
+    "js/viewmodels/graph-settings.js": {
+      "name": "js/viewmodels/graph-settings.js",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/frontend/build/js/viewmodels/graph-settings.js",
+      "publicPath": "/foo/js/viewmodels/graph-settings.js"
+    },
+    "js/viewmodels/map-controls.js": {
+      "name": "js/viewmodels/map-controls.js",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/frontend/build/js/viewmodels/map-controls.js",
+      "publicPath": "/foo/js/viewmodels/map-controls.js"
+    },
+    "js/viewmodels/map-editor.js": {
+      "name": "js/viewmodels/map-editor.js",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/frontend/build/js/viewmodels/map-editor.js",
+      "publicPath": "/foo/js/viewmodels/map-editor.js"
+    },
+    "js/viewmodels/map-filter.js": {
+      "name": "js/viewmodels/map-filter.js",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/frontend/build/js/viewmodels/map-filter.js",
+      "publicPath": "/foo/js/viewmodels/map-filter.js"
+    },
+    "js/viewmodels/map-report.js": {
+      "name": "js/viewmodels/map-report.js",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/frontend/build/js/viewmodels/map-report.js",
+      "publicPath": "/foo/js/viewmodels/map-report.js"
+    },
+    "js/viewmodels/map.js": {
+      "name": "js/viewmodels/map.js",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/frontend/build/js/viewmodels/map.js",
+      "publicPath": "/foo/js/viewmodels/map.js"
+    },
+    "js/viewmodels/mobile-survey.js": {
+      "name": "js/viewmodels/mobile-survey.js",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/frontend/build/js/viewmodels/mobile-survey.js",
+      "publicPath": "/foo/js/viewmodels/mobile-survey.js"
+    },
+    "js/viewmodels/node-value-select.js": {
+      "name": "js/viewmodels/node-value-select.js",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/frontend/build/js/viewmodels/node-value-select.js",
+      "publicPath": "/foo/js/viewmodels/node-value-select.js"
+    },
+    "js/viewmodels/photo-gallery.js": {
+      "name": "js/viewmodels/photo-gallery.js",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/frontend/build/js/viewmodels/photo-gallery.js",
+      "publicPath": "/foo/js/viewmodels/photo-gallery.js"
+    },
+    "js/viewmodels/provisional-tile.js": {
+      "name": "js/viewmodels/provisional-tile.js",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/frontend/build/js/viewmodels/provisional-tile.js",
+      "publicPath": "/foo/js/viewmodels/provisional-tile.js"
+    },
+    "js/viewmodels/remote-domain-widget.js": {
+      "name": "js/viewmodels/remote-domain-widget.js",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/frontend/build/js/viewmodels/remote-domain-widget.js",
+      "publicPath": "/foo/js/viewmodels/remote-domain-widget.js"
+    },
+    "js/viewmodels/report.js": {
+      "name": "js/viewmodels/report.js",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/frontend/build/js/viewmodels/report.js",
+      "publicPath": "/foo/js/viewmodels/report.js"
+    },
+    "js/viewmodels/resource-instance-select.js": {
+      "name": "js/viewmodels/resource-instance-select.js",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/frontend/build/js/viewmodels/resource-instance-select.js",
+      "publicPath": "/foo/js/viewmodels/resource-instance-select.js"
+    },
+    "js/viewmodels/tabbed-report.js": {
+      "name": "js/viewmodels/tabbed-report.js",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/frontend/build/js/viewmodels/tabbed-report.js",
+      "publicPath": "/foo/js/viewmodels/tabbed-report.js"
+    },
+    "js/viewmodels/tile.js": {
+      "name": "js/viewmodels/tile.js",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/frontend/build/js/viewmodels/tile.js",
+      "publicPath": "/foo/js/viewmodels/tile.js"
+    },
+    "js/viewmodels/widget.js": {
+      "name": "js/viewmodels/widget.js",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/frontend/build/js/viewmodels/widget.js",
+      "publicPath": "/foo/js/viewmodels/widget.js"
+    },
+    "js/viewmodels/workflow-step.js": {
+      "name": "js/viewmodels/workflow-step.js",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/frontend/build/js/viewmodels/workflow-step.js",
+      "publicPath": "/foo/js/viewmodels/workflow-step.js"
+    },
+    "js/viewmodels/workflow.js": {
+      "name": "js/viewmodels/workflow.js",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/frontend/build/js/viewmodels/workflow.js",
+      "publicPath": "/foo/js/viewmodels/workflow.js"
+    },
+    "js/viewmodels/xy-input.js": {
+      "name": "js/viewmodels/xy-input.js",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/frontend/build/js/viewmodels/xy-input.js",
+      "publicPath": "/foo/js/viewmodels/xy-input.js"
+    },
+    "js/views/base-manager.js": {
+      "name": "js/views/base-manager.js",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/frontend/build/js/views/base-manager.js",
+      "publicPath": "/foo/js/views/base-manager.js"
+    },
+    "js/views/components/cards/default.js": {
+      "name": "js/views/components/cards/default.js",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/frontend/build/js/views/components/cards/default.js",
+      "publicPath": "/foo/js/views/components/cards/default.js"
+    },
+    "js/views/components/cards/file-renderers/imagereader.js": {
+      "name": "js/views/components/cards/file-renderers/imagereader.js",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/frontend/build/js/views/components/cards/file-renderers/imagereader.js",
+      "publicPath": "/foo/js/views/components/cards/file-renderers/imagereader.js"
+    },
+    "js/views/components/cards/file-renderers/pdfreader.js": {
+      "name": "js/views/components/cards/file-renderers/pdfreader.js",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/frontend/build/js/views/components/cards/file-renderers/pdfreader.js",
+      "publicPath": "/foo/js/views/components/cards/file-renderers/pdfreader.js"
+    },
+    "js/views/components/cards/file-viewer.js": {
+      "name": "js/views/components/cards/file-viewer.js",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/frontend/build/js/views/components/cards/file-viewer.js",
+      "publicPath": "/foo/js/views/components/cards/file-viewer.js"
+    },
+    "js/views/components/cards/grouping.js": {
+      "name": "js/views/components/cards/grouping.js",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/frontend/build/js/views/components/cards/grouping.js",
+      "publicPath": "/foo/js/views/components/cards/grouping.js"
+    },
+    "js/views/components/cards/iiif-card.js": {
+      "name": "js/views/components/cards/iiif-card.js",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/frontend/build/js/views/components/cards/iiif-card.js",
+      "publicPath": "/foo/js/views/components/cards/iiif-card.js"
+    },
+    "js/views/components/cards/map.js": {
+      "name": "js/views/components/cards/map.js",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/frontend/build/js/views/components/cards/map.js",
+      "publicPath": "/foo/js/views/components/cards/map.js"
+    },
+    "js/views/components/cards/photo-gallery-card.js": {
+      "name": "js/views/components/cards/photo-gallery-card.js",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/frontend/build/js/views/components/cards/photo-gallery-card.js",
+      "publicPath": "/foo/js/views/components/cards/photo-gallery-card.js"
+    },
+    "js/views/components/cards/related-resources-map.js": {
+      "name": "js/views/components/cards/related-resources-map.js",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/frontend/build/js/views/components/cards/related-resources-map.js",
+      "publicPath": "/foo/js/views/components/cards/related-resources-map.js"
+    },
+    "js/views/components/cards/select-feature-layers.js": {
+      "name": "js/views/components/cards/select-feature-layers.js",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/frontend/build/js/views/components/cards/select-feature-layers.js",
+      "publicPath": "/foo/js/views/components/cards/select-feature-layers.js"
+    },
+    "js/views/components/cards/select-related-feature-layers.js": {
+      "name": "js/views/components/cards/select-related-feature-layers.js",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/frontend/build/js/views/components/cards/select-related-feature-layers.js",
+      "publicPath": "/foo/js/views/components/cards/select-related-feature-layers.js"
+    },
+    "js/views/components/datatypes/boolean.js": {
+      "name": "js/views/components/datatypes/boolean.js",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/frontend/build/js/views/components/datatypes/boolean.js",
+      "publicPath": "/foo/js/views/components/datatypes/boolean.js"
+    },
+    "js/views/components/datatypes/concept.js": {
+      "name": "js/views/components/datatypes/concept.js",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/frontend/build/js/views/components/datatypes/concept.js",
+      "publicPath": "/foo/js/views/components/datatypes/concept.js"
+    },
+    "js/views/components/datatypes/date.js": {
+      "name": "js/views/components/datatypes/date.js",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/frontend/build/js/views/components/datatypes/date.js",
+      "publicPath": "/foo/js/views/components/datatypes/date.js"
+    },
+    "js/views/components/datatypes/domain-value.js": {
+      "name": "js/views/components/datatypes/domain-value.js",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/frontend/build/js/views/components/datatypes/domain-value.js",
+      "publicPath": "/foo/js/views/components/datatypes/domain-value.js"
+    },
+    "js/views/components/datatypes/edtf.js": {
+      "name": "js/views/components/datatypes/edtf.js",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/frontend/build/js/views/components/datatypes/edtf.js",
+      "publicPath": "/foo/js/views/components/datatypes/edtf.js"
+    },
+    "js/views/components/datatypes/file-list.js": {
+      "name": "js/views/components/datatypes/file-list.js",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/frontend/build/js/views/components/datatypes/file-list.js",
+      "publicPath": "/foo/js/views/components/datatypes/file-list.js"
+    },
+    "js/views/components/datatypes/geojson-feature-collection.js": {
+      "name": "js/views/components/datatypes/geojson-feature-collection.js",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/frontend/build/js/views/components/datatypes/geojson-feature-collection.js",
+      "publicPath": "/foo/js/views/components/datatypes/geojson-feature-collection.js"
+    },
+    "js/views/components/datatypes/node-value.js": {
+      "name": "js/views/components/datatypes/node-value.js",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/frontend/build/js/views/components/datatypes/node-value.js",
+      "publicPath": "/foo/js/views/components/datatypes/node-value.js"
+    },
+    "js/views/components/datatypes/number.js": {
+      "name": "js/views/components/datatypes/number.js",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/frontend/build/js/views/components/datatypes/number.js",
+      "publicPath": "/foo/js/views/components/datatypes/number.js"
+    },
+    "js/views/components/datatypes/resource-instance.js": {
+      "name": "js/views/components/datatypes/resource-instance.js",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/frontend/build/js/views/components/datatypes/resource-instance.js",
+      "publicPath": "/foo/js/views/components/datatypes/resource-instance.js"
+    },
+    "js/views/components/datatypes/string.js": {
+      "name": "js/views/components/datatypes/string.js",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/frontend/build/js/views/components/datatypes/string.js",
+      "publicPath": "/foo/js/views/components/datatypes/string.js"
+    },
+    "js/views/components/datatypes/url.js": {
+      "name": "js/views/components/datatypes/url.js",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/frontend/build/js/views/components/datatypes/url.js",
+      "publicPath": "/foo/js/views/components/datatypes/url.js"
+    },
+    "js/views/components/functions/local-file-storage.js": {
+      "name": "js/views/components/functions/local-file-storage.js",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/frontend/build/js/views/components/functions/local-file-storage.js",
+      "publicPath": "/foo/js/views/components/functions/local-file-storage.js"
+    },
+    "js/views/components/functions/primary-descriptors.js": {
+      "name": "js/views/components/functions/primary-descriptors.js",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/frontend/build/js/views/components/functions/primary-descriptors.js",
+      "publicPath": "/foo/js/views/components/functions/primary-descriptors.js"
+    },
+    "js/views/components/geocoders/base-geocoder.js": {
+      "name": "js/views/components/geocoders/base-geocoder.js",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/frontend/build/js/views/components/geocoders/base-geocoder.js",
+      "publicPath": "/foo/js/views/components/geocoders/base-geocoder.js"
+    },
+    "js/views/components/geocoders/mapbox.js": {
+      "name": "js/views/components/geocoders/mapbox.js",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/frontend/build/js/views/components/geocoders/mapbox.js",
+      "publicPath": "/foo/js/views/components/geocoders/mapbox.js"
+    },
+    "js/views/components/iiif-annotation.js": {
+      "name": "js/views/components/iiif-annotation.js",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/frontend/build/js/views/components/iiif-annotation.js",
+      "publicPath": "/foo/js/views/components/iiif-annotation.js"
+    },
+    "js/views/components/iiif-viewer.js": {
+      "name": "js/views/components/iiif-viewer.js",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/frontend/build/js/views/components/iiif-viewer.js",
+      "publicPath": "/foo/js/views/components/iiif-viewer.js"
+    },
+    "js/views/components/language-switcher.js": {
+      "name": "js/views/components/language-switcher.js",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/frontend/build/js/views/components/language-switcher.js",
+      "publicPath": "/foo/js/views/components/language-switcher.js"
+    },
+    "js/views/components/map.js": {
+      "name": "js/views/components/map.js",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/frontend/build/js/views/components/map.js",
+      "publicPath": "/foo/js/views/components/map.js"
+    },
+    "js/views/components/nodegroup-selector.js": {
+      "name": "js/views/components/nodegroup-selector.js",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/frontend/build/js/views/components/nodegroup-selector.js",
+      "publicPath": "/foo/js/views/components/nodegroup-selector.js"
+    },
+    "js/views/components/notification.js": {
+      "name": "js/views/components/notification.js",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/frontend/build/js/views/components/notification.js",
+      "publicPath": "/foo/js/views/components/notification.js"
+    },
+    "js/views/components/plugins/manifest-manager.js": {
+      "name": "js/views/components/plugins/manifest-manager.js",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/frontend/build/js/views/components/plugins/manifest-manager.js",
+      "publicPath": "/foo/js/views/components/plugins/manifest-manager.js"
+    },
+    "js/views/components/plugins/map.js": {
+      "name": "js/views/components/plugins/map.js",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/frontend/build/js/views/components/plugins/map.js",
+      "publicPath": "/foo/js/views/components/plugins/map.js"
+    },
+    "js/views/components/related-instance-creator.js": {
+      "name": "js/views/components/related-instance-creator.js",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/frontend/build/js/views/components/related-instance-creator.js",
+      "publicPath": "/foo/js/views/components/related-instance-creator.js"
+    },
+    "js/views/components/related-resources-graph.js": {
+      "name": "js/views/components/related-resources-graph.js",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/frontend/build/js/views/components/related-resources-graph.js",
+      "publicPath": "/foo/js/views/components/related-resources-graph.js"
+    },
+    "js/views/components/resource-report-abstract.js": {
+      "name": "js/views/components/resource-report-abstract.js",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/frontend/build/js/views/components/resource-report-abstract.js",
+      "publicPath": "/foo/js/views/components/resource-report-abstract.js"
+    },
+    "js/views/components/search/advanced-search.js": {
+      "name": "js/views/components/search/advanced-search.js",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/frontend/build/js/views/components/search/advanced-search.js",
+      "publicPath": "/foo/js/views/components/search/advanced-search.js"
+    },
+    "js/views/components/search/base-filter.js": {
+      "name": "js/views/components/search/base-filter.js",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/frontend/build/js/views/components/search/base-filter.js",
+      "publicPath": "/foo/js/views/components/search/base-filter.js"
+    },
+    "js/views/components/search/map-filter.js": {
+      "name": "js/views/components/search/map-filter.js",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/frontend/build/js/views/components/search/map-filter.js",
+      "publicPath": "/foo/js/views/components/search/map-filter.js"
+    },
+    "js/views/components/search/paging-filter.js": {
+      "name": "js/views/components/search/paging-filter.js",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/frontend/build/js/views/components/search/paging-filter.js",
+      "publicPath": "/foo/js/views/components/search/paging-filter.js"
+    },
+    "js/views/components/search/provisional-filter.js": {
+      "name": "js/views/components/search/provisional-filter.js",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/frontend/build/js/views/components/search/provisional-filter.js",
+      "publicPath": "/foo/js/views/components/search/provisional-filter.js"
+    },
+    "js/views/components/search/related-resources-filter.js": {
+      "name": "js/views/components/search/related-resources-filter.js",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/frontend/build/js/views/components/search/related-resources-filter.js",
+      "publicPath": "/foo/js/views/components/search/related-resources-filter.js"
+    },
+    "js/views/components/search/resource-type-filter.js": {
+      "name": "js/views/components/search/resource-type-filter.js",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/frontend/build/js/views/components/search/resource-type-filter.js",
+      "publicPath": "/foo/js/views/components/search/resource-type-filter.js"
+    },
+    "js/views/components/search/saved-searches.js": {
+      "name": "js/views/components/search/saved-searches.js",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/frontend/build/js/views/components/search/saved-searches.js",
+      "publicPath": "/foo/js/views/components/search/saved-searches.js"
+    },
+    "js/views/components/search/search-export.js": {
+      "name": "js/views/components/search/search-export.js",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/frontend/build/js/views/components/search/search-export.js",
+      "publicPath": "/foo/js/views/components/search/search-export.js"
+    },
+    "js/views/components/search/search-result-details.js": {
+      "name": "js/views/components/search/search-result-details.js",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/frontend/build/js/views/components/search/search-result-details.js",
+      "publicPath": "/foo/js/views/components/search/search-result-details.js"
+    },
+    "js/views/components/search/search-results.js": {
+      "name": "js/views/components/search/search-results.js",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/frontend/build/js/views/components/search/search-results.js",
+      "publicPath": "/foo/js/views/components/search/search-results.js"
+    },
+    "js/views/components/search/sort-results.js": {
+      "name": "js/views/components/search/sort-results.js",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/frontend/build/js/views/components/search/sort-results.js",
+      "publicPath": "/foo/js/views/components/search/sort-results.js"
+    },
+    "js/views/components/search/term-filter.js": {
+      "name": "js/views/components/search/term-filter.js",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/frontend/build/js/views/components/search/term-filter.js",
+      "publicPath": "/foo/js/views/components/search/term-filter.js"
+    },
+    "js/views/components/search/time-filter.js": {
+      "name": "js/views/components/search/time-filter.js",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/frontend/build/js/views/components/search/time-filter.js",
+      "publicPath": "/foo/js/views/components/search/time-filter.js"
+    },
+    "js/views/components/simple-switch.js": {
+      "name": "js/views/components/simple-switch.js",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/frontend/build/js/views/components/simple-switch.js",
+      "publicPath": "/foo/js/views/components/simple-switch.js"
+    },
+    "js/views/components/widgets/concept-checkbox.js": {
+      "name": "js/views/components/widgets/concept-checkbox.js",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/frontend/build/js/views/components/widgets/concept-checkbox.js",
+      "publicPath": "/foo/js/views/components/widgets/concept-checkbox.js"
+    },
+    "js/views/components/widgets/concept-multiselect.js": {
+      "name": "js/views/components/widgets/concept-multiselect.js",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/frontend/build/js/views/components/widgets/concept-multiselect.js",
+      "publicPath": "/foo/js/views/components/widgets/concept-multiselect.js"
+    },
+    "js/views/components/widgets/concept-radio.js": {
+      "name": "js/views/components/widgets/concept-radio.js",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/frontend/build/js/views/components/widgets/concept-radio.js",
+      "publicPath": "/foo/js/views/components/widgets/concept-radio.js"
+    },
+    "js/views/components/widgets/concept-select.js": {
+      "name": "js/views/components/widgets/concept-select.js",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/frontend/build/js/views/components/widgets/concept-select.js",
+      "publicPath": "/foo/js/views/components/widgets/concept-select.js"
+    },
+    "js/views/components/widgets/datepicker.js": {
+      "name": "js/views/components/widgets/datepicker.js",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/frontend/build/js/views/components/widgets/datepicker.js",
+      "publicPath": "/foo/js/views/components/widgets/datepicker.js"
+    },
+    "js/views/components/widgets/domain-checkbox.js": {
+      "name": "js/views/components/widgets/domain-checkbox.js",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/frontend/build/js/views/components/widgets/domain-checkbox.js",
+      "publicPath": "/foo/js/views/components/widgets/domain-checkbox.js"
+    },
+    "js/views/components/widgets/domain-multiselect.js": {
+      "name": "js/views/components/widgets/domain-multiselect.js",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/frontend/build/js/views/components/widgets/domain-multiselect.js",
+      "publicPath": "/foo/js/views/components/widgets/domain-multiselect.js"
+    },
+    "js/views/components/widgets/domain-radio.js": {
+      "name": "js/views/components/widgets/domain-radio.js",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/frontend/build/js/views/components/widgets/domain-radio.js",
+      "publicPath": "/foo/js/views/components/widgets/domain-radio.js"
+    },
+    "js/views/components/widgets/domain-select.js": {
+      "name": "js/views/components/widgets/domain-select.js",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/frontend/build/js/views/components/widgets/domain-select.js",
+      "publicPath": "/foo/js/views/components/widgets/domain-select.js"
+    },
+    "js/views/components/widgets/edtf.js": {
+      "name": "js/views/components/widgets/edtf.js",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/frontend/build/js/views/components/widgets/edtf.js",
+      "publicPath": "/foo/js/views/components/widgets/edtf.js"
+    },
+    "js/views/components/widgets/file.js": {
+      "name": "js/views/components/widgets/file.js",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/frontend/build/js/views/components/widgets/file.js",
+      "publicPath": "/foo/js/views/components/widgets/file.js"
+    },
+    "js/views/components/widgets/iiif.js": {
+      "name": "js/views/components/widgets/iiif.js",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/frontend/build/js/views/components/widgets/iiif.js",
+      "publicPath": "/foo/js/views/components/widgets/iiif.js"
+    },
+    "js/views/components/widgets/map/bin-feature-collection.js": {
+      "name": "js/views/components/widgets/map/bin-feature-collection.js",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/frontend/build/js/views/components/widgets/map/bin-feature-collection.js",
+      "publicPath": "/foo/js/views/components/widgets/map/bin-feature-collection.js"
+    },
+    "js/views/components/widgets/map/map-styles.js": {
+      "name": "js/views/components/widgets/map/map-styles.js",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/frontend/build/js/views/components/widgets/map/map-styles.js",
+      "publicPath": "/foo/js/views/components/widgets/map/map-styles.js"
+    },
+    "js/views/components/widgets/map.js": {
+      "name": "js/views/components/widgets/map.js",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/frontend/build/js/views/components/widgets/map.js",
+      "publicPath": "/foo/js/views/components/widgets/map.js"
+    },
+    "js/views/components/widgets/node-value-select.js": {
+      "name": "js/views/components/widgets/node-value-select.js",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/frontend/build/js/views/components/widgets/node-value-select.js",
+      "publicPath": "/foo/js/views/components/widgets/node-value-select.js"
+    },
+    "js/views/components/widgets/number.js": {
+      "name": "js/views/components/widgets/number.js",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/frontend/build/js/views/components/widgets/number.js",
+      "publicPath": "/foo/js/views/components/widgets/number.js"
+    },
+    "js/views/components/widgets/radio-boolean.js": {
+      "name": "js/views/components/widgets/radio-boolean.js",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/frontend/build/js/views/components/widgets/radio-boolean.js",
+      "publicPath": "/foo/js/views/components/widgets/radio-boolean.js"
+    },
+    "js/views/components/widgets/resource-instance-multiselect.js": {
+      "name": "js/views/components/widgets/resource-instance-multiselect.js",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/frontend/build/js/views/components/widgets/resource-instance-multiselect.js",
+      "publicPath": "/foo/js/views/components/widgets/resource-instance-multiselect.js"
+    },
+    "js/views/components/widgets/resource-instance-select.js": {
+      "name": "js/views/components/widgets/resource-instance-select.js",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/frontend/build/js/views/components/widgets/resource-instance-select.js",
+      "publicPath": "/foo/js/views/components/widgets/resource-instance-select.js"
+    },
+    "js/views/components/widgets/rich-text.js": {
+      "name": "js/views/components/widgets/rich-text.js",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/frontend/build/js/views/components/widgets/rich-text.js",
+      "publicPath": "/foo/js/views/components/widgets/rich-text.js"
+    },
+    "js/views/components/widgets/switch.js": {
+      "name": "js/views/components/widgets/switch.js",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/frontend/build/js/views/components/widgets/switch.js",
+      "publicPath": "/foo/js/views/components/widgets/switch.js"
+    },
+    "js/views/components/widgets/text.js": {
+      "name": "js/views/components/widgets/text.js",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/frontend/build/js/views/components/widgets/text.js",
+      "publicPath": "/foo/js/views/components/widgets/text.js"
+    },
+    "js/views/components/widgets/urldatatype.js": {
+      "name": "js/views/components/widgets/urldatatype.js",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/frontend/build/js/views/components/widgets/urldatatype.js",
+      "publicPath": "/foo/js/views/components/widgets/urldatatype.js"
+    },
+    "js/views/components/workbench.js": {
+      "name": "js/views/components/workbench.js",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/frontend/build/js/views/components/workbench.js",
+      "publicPath": "/foo/js/views/components/workbench.js"
+    },
+    "js/views/components/workflows/final-step.js": {
+      "name": "js/views/components/workflows/final-step.js",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/frontend/build/js/views/components/workflows/final-step.js",
+      "publicPath": "/foo/js/views/components/workflows/final-step.js"
+    },
+    "js/views/components/workflows/new-multi-tile-step.js": {
+      "name": "js/views/components/workflows/new-multi-tile-step.js",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/frontend/build/js/views/components/workflows/new-multi-tile-step.js",
+      "publicPath": "/foo/js/views/components/workflows/new-multi-tile-step.js"
+    },
+    "js/views/components/workflows/new-tile-step.js": {
+      "name": "js/views/components/workflows/new-tile-step.js",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/frontend/build/js/views/components/workflows/new-tile-step.js",
+      "publicPath": "/foo/js/views/components/workflows/new-tile-step.js"
+    },
+    "js/views/components/workflows/workflow-component-abstract.js": {
+      "name": "js/views/components/workflows/workflow-component-abstract.js",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/frontend/build/js/views/components/workflows/workflow-component-abstract.js",
+      "publicPath": "/foo/js/views/components/workflows/workflow-component-abstract.js"
+    },
+    "js/views/concept-search.js": {
+      "name": "js/views/concept-search.js",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/frontend/build/js/views/concept-search.js",
+      "publicPath": "/foo/js/views/concept-search.js"
+    },
+    "js/views/edit-history.js": {
+      "name": "js/views/edit-history.js",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/frontend/build/js/views/edit-history.js",
+      "publicPath": "/foo/js/views/edit-history.js"
+    },
+    "js/views/form.js": {
+      "name": "js/views/form.js",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/frontend/build/js/views/form.js",
+      "publicPath": "/foo/js/views/form.js"
+    },
+    "js/views/graph/card-configuration/card-component-form.js": {
+      "name": "js/views/graph/card-configuration/card-component-form.js",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/frontend/build/js/views/graph/card-configuration/card-component-form.js",
+      "publicPath": "/foo/js/views/graph/card-configuration/card-component-form.js"
+    },
+    "js/views/graph/card-configuration/card-components-tree.js": {
+      "name": "js/views/graph/card-configuration/card-components-tree.js",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/frontend/build/js/views/graph/card-configuration/card-components-tree.js",
+      "publicPath": "/foo/js/views/graph/card-configuration/card-components-tree.js"
+    },
+    "js/views/graph/card-configuration/card-form-preview.js": {
+      "name": "js/views/graph/card-configuration/card-form-preview.js",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/frontend/build/js/views/graph/card-configuration/card-form-preview.js",
+      "publicPath": "/foo/js/views/graph/card-configuration/card-form-preview.js"
+    },
+    "js/views/graph/function-manager/applied-function-list.js": {
+      "name": "js/views/graph/function-manager/applied-function-list.js",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/frontend/build/js/views/graph/function-manager/applied-function-list.js",
+      "publicPath": "/foo/js/views/graph/function-manager/applied-function-list.js"
+    },
+    "js/views/graph/function-manager/function-list.js": {
+      "name": "js/views/graph/function-manager/function-list.js",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/frontend/build/js/views/graph/function-manager/function-list.js",
+      "publicPath": "/foo/js/views/graph/function-manager/function-list.js"
+    },
+    "js/views/graph/function-manager.js": {
+      "name": "js/views/graph/function-manager.js",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/frontend/build/js/views/graph/function-manager.js",
+      "publicPath": "/foo/js/views/graph/function-manager.js"
+    },
+    "js/views/graph/graph-designer/card-tree.js": {
+      "name": "js/views/graph/graph-designer/card-tree.js",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/frontend/build/js/views/graph/graph-designer/card-tree.js",
+      "publicPath": "/foo/js/views/graph/graph-designer/card-tree.js"
+    },
+    "js/views/graph/graph-designer/graph-tree.js": {
+      "name": "js/views/graph/graph-designer/graph-tree.js",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/frontend/build/js/views/graph/graph-designer/graph-tree.js",
+      "publicPath": "/foo/js/views/graph/graph-designer/graph-tree.js"
+    },
+    "js/views/graph/graph-designer/node-form.js": {
+      "name": "js/views/graph/graph-designer/node-form.js",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/frontend/build/js/views/graph/graph-designer/node-form.js",
+      "publicPath": "/foo/js/views/graph/graph-designer/node-form.js"
+    },
+    "js/views/graph/graph-manager/branch-list.js": {
+      "name": "js/views/graph/graph-manager/branch-list.js",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/frontend/build/js/views/graph/graph-manager/branch-list.js",
+      "publicPath": "/foo/js/views/graph/graph-manager/branch-list.js"
+    },
+    "js/views/graph/graph-manager/graph-base.js": {
+      "name": "js/views/graph/graph-manager/graph-base.js",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/frontend/build/js/views/graph/graph-manager/graph-base.js",
+      "publicPath": "/foo/js/views/graph/graph-manager/graph-base.js"
+    },
+    "js/views/graph/graph-page-view.js": {
+      "name": "js/views/graph/graph-page-view.js",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/frontend/build/js/views/graph/graph-page-view.js",
+      "publicPath": "/foo/js/views/graph/graph-page-view.js"
+    },
+    "js/views/graph/graph-settings.js": {
+      "name": "js/views/graph/graph-settings.js",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/frontend/build/js/views/graph/graph-settings.js",
+      "publicPath": "/foo/js/views/graph/graph-settings.js"
+    },
+    "js/views/graph/permission-designer.js": {
+      "name": "js/views/graph/permission-designer.js",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/frontend/build/js/views/graph/permission-designer.js",
+      "publicPath": "/foo/js/views/graph/permission-designer.js"
+    },
+    "js/views/graph/permission-manager/identity-list.js": {
+      "name": "js/views/graph/permission-manager/identity-list.js",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/frontend/build/js/views/graph/permission-manager/identity-list.js",
+      "publicPath": "/foo/js/views/graph/permission-manager/identity-list.js"
+    },
+    "js/views/graph/permission-manager/permission-settings-form.js": {
+      "name": "js/views/graph/permission-manager/permission-settings-form.js",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/frontend/build/js/views/graph/permission-manager/permission-settings-form.js",
+      "publicPath": "/foo/js/views/graph/permission-manager/permission-settings-form.js"
+    },
+    "js/views/graph-designer.js": {
+      "name": "js/views/graph-designer.js",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/frontend/build/js/views/graph-designer.js",
+      "publicPath": "/foo/js/views/graph-designer.js"
+    },
+    "js/views/graph.js": {
+      "name": "js/views/graph.js",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/frontend/build/js/views/graph.js",
+      "publicPath": "/foo/js/views/graph.js"
+    },
+    "js/views/list.js": {
+      "name": "js/views/list.js",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/frontend/build/js/views/list.js",
+      "publicPath": "/foo/js/views/list.js"
+    },
+    "js/views/map-layer-manager.js": {
+      "name": "js/views/map-layer-manager.js",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/frontend/build/js/views/map-layer-manager.js",
+      "publicPath": "/foo/js/views/map-layer-manager.js"
+    },
+    "js/views/mobile-survey-designer.js": {
+      "name": "js/views/mobile-survey-designer.js",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/frontend/build/js/views/mobile-survey-designer.js",
+      "publicPath": "/foo/js/views/mobile-survey-designer.js"
+    },
+    "js/views/mobile-survey-manager/identity-list.js": {
+      "name": "js/views/mobile-survey-manager/identity-list.js",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/frontend/build/js/views/mobile-survey-manager/identity-list.js",
+      "publicPath": "/foo/js/views/mobile-survey-manager/identity-list.js"
+    },
+    "js/views/mobile-survey-manager/mobile-survey-tree.js": {
+      "name": "js/views/mobile-survey-manager/mobile-survey-tree.js",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/frontend/build/js/views/mobile-survey-manager/mobile-survey-tree.js",
+      "publicPath": "/foo/js/views/mobile-survey-manager/mobile-survey-tree.js"
+    },
+    "js/views/mobile-survey-manager.js": {
+      "name": "js/views/mobile-survey-manager.js",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/frontend/build/js/views/mobile-survey-manager.js",
+      "publicPath": "/foo/js/views/mobile-survey-manager.js"
+    },
+    "js/views/notifications-list.js": {
+      "name": "js/views/notifications-list.js",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/frontend/build/js/views/notifications-list.js",
+      "publicPath": "/foo/js/views/notifications-list.js"
+    },
+    "js/views/page-view.js": {
+      "name": "js/views/page-view.js",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/frontend/build/js/views/page-view.js",
+      "publicPath": "/foo/js/views/page-view.js"
+    },
+    "js/views/plugin.js": {
+      "name": "js/views/plugin.js",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/frontend/build/js/views/plugin.js",
+      "publicPath": "/foo/js/views/plugin.js"
+    },
+    "js/views/provisional-history-list.js": {
+      "name": "js/views/provisional-history-list.js",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/frontend/build/js/views/provisional-history-list.js",
+      "publicPath": "/foo/js/views/provisional-history-list.js"
+    },
+    "js/views/rdm/concept-report.js": {
+      "name": "js/views/rdm/concept-report.js",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/frontend/build/js/views/rdm/concept-report.js",
+      "publicPath": "/foo/js/views/rdm/concept-report.js"
+    },
+    "js/views/rdm/concept-tree.js": {
+      "name": "js/views/rdm/concept-tree.js",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/frontend/build/js/views/rdm/concept-tree.js",
+      "publicPath": "/foo/js/views/rdm/concept-tree.js"
+    },
+    "js/views/rdm/modals/add-child-form.js": {
+      "name": "js/views/rdm/modals/add-child-form.js",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/frontend/build/js/views/rdm/modals/add-child-form.js",
+      "publicPath": "/foo/js/views/rdm/modals/add-child-form.js"
+    },
+    "js/views/rdm/modals/add-collection-form.js": {
+      "name": "js/views/rdm/modals/add-collection-form.js",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/frontend/build/js/views/rdm/modals/add-collection-form.js",
+      "publicPath": "/foo/js/views/rdm/modals/add-collection-form.js"
+    },
+    "js/views/rdm/modals/add-image-form.js": {
+      "name": "js/views/rdm/modals/add-image-form.js",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/frontend/build/js/views/rdm/modals/add-image-form.js",
+      "publicPath": "/foo/js/views/rdm/modals/add-image-form.js"
+    },
+    "js/views/rdm/modals/add-scheme-form.js": {
+      "name": "js/views/rdm/modals/add-scheme-form.js",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/frontend/build/js/views/rdm/modals/add-scheme-form.js",
+      "publicPath": "/foo/js/views/rdm/modals/add-scheme-form.js"
+    },
+    "js/views/rdm/modals/delete-collection-form.js": {
+      "name": "js/views/rdm/modals/delete-collection-form.js",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/frontend/build/js/views/rdm/modals/delete-collection-form.js",
+      "publicPath": "/foo/js/views/rdm/modals/delete-collection-form.js"
+    },
+    "js/views/rdm/modals/delete-scheme-form.js": {
+      "name": "js/views/rdm/modals/delete-scheme-form.js",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/frontend/build/js/views/rdm/modals/delete-scheme-form.js",
+      "publicPath": "/foo/js/views/rdm/modals/delete-scheme-form.js"
+    },
+    "js/views/rdm/modals/export-scheme-form.js": {
+      "name": "js/views/rdm/modals/export-scheme-form.js",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/frontend/build/js/views/rdm/modals/export-scheme-form.js",
+      "publicPath": "/foo/js/views/rdm/modals/export-scheme-form.js"
+    },
+    "js/views/rdm/modals/import-concept-form.js": {
+      "name": "js/views/rdm/modals/import-concept-form.js",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/frontend/build/js/views/rdm/modals/import-concept-form.js",
+      "publicPath": "/foo/js/views/rdm/modals/import-concept-form.js"
+    },
+    "js/views/rdm/modals/import-scheme-form.js": {
+      "name": "js/views/rdm/modals/import-scheme-form.js",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/frontend/build/js/views/rdm/modals/import-scheme-form.js",
+      "publicPath": "/foo/js/views/rdm/modals/import-scheme-form.js"
+    },
+    "js/views/rdm/modals/manage-parent-form.js": {
+      "name": "js/views/rdm/modals/manage-parent-form.js",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/frontend/build/js/views/rdm/modals/manage-parent-form.js",
+      "publicPath": "/foo/js/views/rdm/modals/manage-parent-form.js"
+    },
+    "js/views/rdm/modals/related-concept-form.js": {
+      "name": "js/views/rdm/modals/related-concept-form.js",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/frontend/build/js/views/rdm/modals/related-concept-form.js",
+      "publicPath": "/foo/js/views/rdm/modals/related-concept-form.js"
+    },
+    "js/views/rdm/modals/related-member-form.js": {
+      "name": "js/views/rdm/modals/related-member-form.js",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/frontend/build/js/views/rdm/modals/related-member-form.js",
+      "publicPath": "/foo/js/views/rdm/modals/related-member-form.js"
+    },
+    "js/views/rdm/modals/value-form.js": {
+      "name": "js/views/rdm/modals/value-form.js",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/frontend/build/js/views/rdm/modals/value-form.js",
+      "publicPath": "/foo/js/views/rdm/modals/value-form.js"
+    },
+    "js/views/resource/edit-log.js": {
+      "name": "js/views/resource/edit-log.js",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/frontend/build/js/views/resource/edit-log.js",
+      "publicPath": "/foo/js/views/resource/edit-log.js"
+    },
+    "js/views/resource/editor.js": {
+      "name": "js/views/resource/editor.js",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/frontend/build/js/views/resource/editor.js",
+      "publicPath": "/foo/js/views/resource/editor.js"
+    },
+    "js/views/resource/permissions-manager.js": {
+      "name": "js/views/resource/permissions-manager.js",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/frontend/build/js/views/resource/permissions-manager.js",
+      "publicPath": "/foo/js/views/resource/permissions-manager.js"
+    },
+    "js/views/resource/related-resources-manager.js": {
+      "name": "js/views/resource/related-resources-manager.js",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/frontend/build/js/views/resource/related-resources-manager.js",
+      "publicPath": "/foo/js/views/resource/related-resources-manager.js"
+    },
+    "js/views/resource/related-resources-node-list.js": {
+      "name": "js/views/resource/related-resources-node-list.js",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/frontend/build/js/views/resource/related-resources-node-list.js",
+      "publicPath": "/foo/js/views/resource/related-resources-node-list.js"
+    },
+    "js/views/resource/report.js": {
+      "name": "js/views/resource/report.js",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/frontend/build/js/views/resource/report.js",
+      "publicPath": "/foo/js/views/resource/report.js"
+    },
+    "js/views/resource.js": {
+      "name": "js/views/resource.js",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/frontend/build/js/views/resource.js",
+      "publicPath": "/foo/js/views/resource.js"
+    },
+    "js/views/search.js": {
+      "name": "js/views/search.js",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/frontend/build/js/views/search.js",
+      "publicPath": "/foo/js/views/search.js"
+    },
+    "js/views/simple-search.js": {
+      "name": "js/views/simple-search.js",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/frontend/build/js/views/simple-search.js",
+      "publicPath": "/foo/js/views/simple-search.js"
+    },
+    "js/views/tree-view.js": {
+      "name": "js/views/tree-view.js",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/frontend/build/js/views/tree-view.js",
+      "publicPath": "/foo/js/views/tree-view.js"
+    },
+    "js/views/user-profile-manager.js": {
+      "name": "js/views/user-profile-manager.js",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/frontend/build/js/views/user-profile-manager.js",
+      "publicPath": "/foo/js/views/user-profile-manager.js"
+    },
+    "js/js_views_form_js-js_views_page-view_js.chunk.js": {
+      "name": "js/js_views_form_js-js_views_page-view_js.chunk.js",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/frontend/build/js/js_views_form_js-js_views_page-view_js.chunk.js",
+      "publicPath": "/foo/js/js_views_form_js-js_views_page-view_js.chunk.js"
+    },
+    "js/js_models_concept_js-js_viewmodels_alert-json_js-js_views_base-manager_js-js_views_concept-se-cd426f.chunk.js": {
+      "name": "js/js_models_concept_js-js_viewmodels_alert-json_js-js_views_base-manager_js-js_views_concept-se-cd426f.chunk.js",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/frontend/build/js/js_models_concept_js-js_viewmodels_alert-json_js-js_views_base-manager_js-js_views_concept-se-cd426f.chunk.js",
+      "publicPath": "/foo/js/js_models_concept_js-js_viewmodels_alert-json_js-js_views_base-manager_js-js_views_concept-se-cd426f.chunk.js"
+    },
+    "js/js_bindings_datatable_js-js_views_base-manager_js.chunk.js": {
+      "name": "js/js_bindings_datatable_js-js_views_base-manager_js.chunk.js",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/frontend/build/js/js_bindings_datatable_js-js_views_base-manager_js.chunk.js",
+      "publicPath": "/foo/js/js_bindings_datatable_js-js_views_base-manager_js.chunk.js"
+    },
+    "js/js_models_function-x-graph_js-js_models_function_js-js_viewmodels_alert-json_js-js_views_grap-985f7d.chunk.js": {
+      "name": "js/js_models_function-x-graph_js-js_models_function_js-js_viewmodels_alert-json_js-js_views_grap-985f7d.chunk.js",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/frontend/build/js/js_models_function-x-graph_js-js_models_function_js-js_viewmodels_alert-json_js-js_views_grap-985f7d.chunk.js",
+      "publicPath": "/foo/js/js_models_function-x-graph_js-js_models_function_js-js_viewmodels_alert-json_js-js_views_grap-985f7d.chunk.js"
+    },
+    "js/js_bindings_color-picker_js-js_views_graph_graph-page-view_js-templates_views_graph_graph-set-27f1c5.chunk.js": {
+      "name": "js/js_bindings_color-picker_js-js_views_graph_graph-page-view_js-templates_views_graph_graph-set-27f1c5.chunk.js",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/frontend/build/js/js_bindings_color-picker_js-js_views_graph_graph-page-view_js-templates_views_graph_graph-set-27f1c5.chunk.js",
+      "publicPath": "/foo/js/js_bindings_color-picker_js-js_views_graph_graph-page-view_js-templates_views_graph_graph-set-27f1c5.chunk.js"
+    },
+    "js/js_bindings_chosen_js-js_bindings_hover_js-js_viewmodels_alert-json_js-js_viewmodels_alert_js-5ae457.chunk.js": {
+      "name": "js/js_bindings_chosen_js-js_bindings_hover_js-js_viewmodels_alert-json_js-js_viewmodels_alert_js-5ae457.chunk.js",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/frontend/build/js/js_bindings_chosen_js-js_bindings_hover_js-js_viewmodels_alert-json_js-js_viewmodels_alert_js-5ae457.chunk.js",
+      "publicPath": "/foo/js/js_bindings_chosen_js-js_bindings_hover_js-js_viewmodels_alert-json_js-js_viewmodels_alert_js-5ae457.chunk.js"
+    },
+    "js/js_bindings_chosen_js-js_views_base-manager_js-templates_views_resource_edit-log_htm-node_mod-a4da01.chunk.js": {
+      "name": "js/js_bindings_chosen_js-js_views_base-manager_js-templates_views_resource_edit-log_htm-node_mod-a4da01.chunk.js",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/frontend/build/js/js_bindings_chosen_js-js_views_base-manager_js-templates_views_resource_edit-log_htm-node_mod-a4da01.chunk.js",
+      "publicPath": "/foo/js/js_bindings_chosen_js-js_views_base-manager_js-templates_views_resource_edit-log_htm-node_mod-a4da01.chunk.js"
+    },
+    "js/js_views_base-manager_js-js_views_components_resource-report-abstract_js.chunk.js": {
+      "name": "js/js_views_base-manager_js-js_views_components_resource-report-abstract_js.chunk.js",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/frontend/build/js/js_views_base-manager_js-js_views_components_resource-report-abstract_js.chunk.js",
+      "publicPath": "/foo/js/js_views_base-manager_js-js_views_components_resource-report-abstract_js.chunk.js"
+    },
+    "js/js_bindings_chosen_js-js_views_base-manager_js-node_modules_uuid_index_js.chunk.js": {
+      "name": "js/js_bindings_chosen_js-js_views_base-manager_js-node_modules_uuid_index_js.chunk.js",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/frontend/build/js/js_bindings_chosen_js-js_views_base-manager_js-node_modules_uuid_index_js.chunk.js",
+      "publicPath": "/foo/js/js_bindings_chosen_js-js_views_base-manager_js-node_modules_uuid_index_js.chunk.js"
+    },
+    "js/npm.core-js": {
+      "name": "js/npm.core-js",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/frontend/build/js/npm.core-js",
+      "publicPath": "/foo/js/npm.core-js"
+    },
+    "js/npm.knockout": {
+      "name": "js/npm.knockout",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/frontend/build/js/npm.knockout",
+      "publicPath": "/foo/js/npm.knockout"
+    },
+    "js/npm.jquery": {
+      "name": "js/npm.jquery",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/frontend/build/js/npm.jquery",
+      "publicPath": "/foo/js/npm.jquery"
+    },
+    "js/npm.underscore": {
+      "name": "js/npm.underscore",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/frontend/build/js/npm.underscore",
+      "publicPath": "/foo/js/npm.underscore"
+    },
+    "js/npm.jqueryui": {
+      "name": "js/npm.jqueryui",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/frontend/build/js/npm.jqueryui",
+      "publicPath": "/foo/js/npm.jqueryui"
+    },
+    "js/npm.moment": {
+      "name": "js/npm.moment",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/frontend/build/js/npm.moment",
+      "publicPath": "/foo/js/npm.moment"
+    },
+    "js/npm.backbone": {
+      "name": "js/npm.backbone",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/frontend/build/js/npm.backbone",
+      "publicPath": "/foo/js/npm.backbone"
+    },
+    "js/npm.knockout-mapping": {
+      "name": "js/npm.knockout-mapping",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/frontend/build/js/npm.knockout-mapping",
+      "publicPath": "/foo/js/npm.knockout-mapping"
+    },
+    "js/npm.regenerator-runtime": {
+      "name": "js/npm.regenerator-runtime",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/frontend/build/js/npm.regenerator-runtime",
+      "publicPath": "/foo/js/npm.regenerator-runtime"
+    },
+    "js/npm.bootstrap.chunk.js": {
+      "name": "js/npm.bootstrap.chunk.js",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/frontend/build/js/npm.bootstrap.chunk.js",
+      "publicPath": "/foo/js/npm.bootstrap.chunk.js"
+    },
+    "js/npm.webcola": {
+      "name": "js/npm.webcola",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/frontend/build/js/npm.webcola",
+      "publicPath": "/foo/js/npm.webcola"
+    },
+    "js/npm.jquery-validation.chunk.js": {
+      "name": "js/npm.jquery-validation.chunk.js",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/frontend/build/js/npm.jquery-validation.chunk.js",
+      "publicPath": "/foo/js/npm.jquery-validation.chunk.js"
+    },
+    "js/npm.numeral": {
+      "name": "js/npm.numeral",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/frontend/build/js/npm.numeral",
+      "publicPath": "/foo/js/npm.numeral"
+    },
+    "js/npm.lodash.topath": {
+      "name": "js/npm.lodash.topath",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/frontend/build/js/npm.lodash.topath",
+      "publicPath": "/foo/js/npm.lodash.topath"
+    },
+    "js/npm.lodash.set": {
+      "name": "js/npm.lodash.set",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/frontend/build/js/npm.lodash.set",
+      "publicPath": "/foo/js/npm.lodash.set"
+    },
+    "js/npm.lodash.get": {
+      "name": "js/npm.lodash.get",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/frontend/build/js/npm.lodash.get",
+      "publicPath": "/foo/js/npm.lodash.get"
+    },
+    "js/npm.lodash.debounce": {
+      "name": "js/npm.lodash.debounce",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/frontend/build/js/npm.lodash.debounce",
+      "publicPath": "/foo/js/npm.lodash.debounce"
+    },
+    "js/npm.dropzone": {
+      "name": "js/npm.dropzone",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/frontend/build/js/npm.dropzone",
+      "publicPath": "/foo/js/npm.dropzone"
+    },
+    "js/npm.cytoscape": {
+      "name": "js/npm.cytoscape",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/frontend/build/js/npm.cytoscape",
+      "publicPath": "/foo/js/npm.cytoscape"
+    },
+    "js/npm.cytoscape-cola": {
+      "name": "js/npm.cytoscape-cola",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/frontend/build/js/npm.cytoscape-cola",
+      "publicPath": "/foo/js/npm.cytoscape-cola"
+    },
+    "js/npm.codemirror": {
+      "name": "js/npm.codemirror",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/frontend/build/js/npm.codemirror",
+      "publicPath": "/foo/js/npm.codemirror"
+    },
+    "js/npm.turf": {
+      "name": "js/npm.turf",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/frontend/build/js/npm.turf",
+      "publicPath": "/foo/js/npm.turf"
+    },
+    "js/templates_javascript_htm": {
+      "name": "js/templates_javascript_htm",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/frontend/build/js/templates_javascript_htm",
+      "publicPath": "/foo/js/templates_javascript_htm"
+    },
+    "js/js_bindings_sortable_js": {
+      "name": "js/js_bindings_sortable_js",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/frontend/build/js/js_bindings_sortable_js",
+      "publicPath": "/foo/js/js_bindings_sortable_js"
+    },
+    "js/js_viewmodels_resource-instance-select_js": {
+      "name": "js/js_viewmodels_resource-instance-select_js",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/frontend/build/js/js_viewmodels_resource-instance-select_js",
+      "publicPath": "/foo/js/js_viewmodels_resource-instance-select_js"
+    },
+    "js/js_viewmodels_map_js": {
+      "name": "js/js_viewmodels_map_js",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/frontend/build/js/js_viewmodels_map_js",
+      "publicPath": "/foo/js/js_viewmodels_map_js"
+    },
+    "js/js_viewmodels_mobile-survey_js": {
+      "name": "js/js_viewmodels_mobile-survey_js",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/frontend/build/js/js_viewmodels_mobile-survey_js",
+      "publicPath": "/foo/js/js_viewmodels_mobile-survey_js"
+    },
+    "js/js_models_node_js": {
+      "name": "js/js_models_node_js",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/frontend/build/js/js_models_node_js",
+      "publicPath": "/foo/js/js_models_node_js"
+    },
+    "js/js_models_mobile-survey_js": {
+      "name": "js/js_models_mobile-survey_js",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/frontend/build/js/js_models_mobile-survey_js",
+      "publicPath": "/foo/js/js_models_mobile-survey_js"
+    },
+    "js/js_views_components_workflows_new-tile-step_js": {
+      "name": "js/js_views_components_workflows_new-tile-step_js",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/frontend/build/js/js_views_components_workflows_new-tile-step_js",
+      "publicPath": "/foo/js/js_views_components_workflows_new-tile-step_js"
+    },
+    "public/.gitkeep": {
+      "name": "public/.gitkeep",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/frontend/build/public/.gitkeep",
+      "publicPath": "/foo/public/.gitkeep"
+    },
+    "index.html": {
+      "name": "index.html",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/frontend/build/index.html",
+      "publicPath": "/foo/index.html"
+    }
+  },
+  "chunks": {
+    "bindings/chosen.js": [
+      "js/npm.core-js",
+      "js/bindings/chosen.js"
+    ],
+    "bindings/ckeditor.js": [
+      "js/npm.core-js",
+      "js/bindings/ckeditor.js"
+    ],
+    "bindings/clipboard.js": [
+      "js/npm.core-js",
+      "js/bindings/clipboard.js"
+    ],
+    "bindings/codemirror.js": [
+      "js/npm.knockout",
+      "js/npm.codemirror",
+      "js/bindings/codemirror.js"
+    ],
+    "bindings/color-picker.js": [
+      "js/npm.core-js",
+      "js/bindings/color-picker.js"
+    ],
+    "bindings/cytoscape.js": [
+      "js/npm.knockout",
+      "js/npm.underscore",
+      "js/npm.webcola",
+      "js/npm.lodash.topath",
+      "js/npm.lodash.set",
+      "js/npm.lodash.get",
+      "js/npm.lodash.debounce",
+      "js/npm.cytoscape",
+      "js/npm.cytoscape-cola",
+      "js/bindings/cytoscape.js"
+    ],
+    "bindings/datatable.js": [
+      "js/npm.core-js",
+      "js/bindings/datatable.js"
+    ],
+    "bindings/datepicker.js": [
+      "js/npm.core-js",
+      "js/bindings/datepicker.js"
+    ],
+    "bindings/dragDrop.js": [
+      "js/npm.core-js",
+      "js/bindings/dragDrop.js"
+    ],
+    "bindings/dropzone.js": [
+      "js/npm.core-js",
+      "js/bindings/dropzone.js"
+    ],
+    "bindings/fadeVisible.js": [
+      "js/npm.knockout",
+      "js/npm.jquery",
+      "js/bindings/fadeVisible.js"
+    ],
+    "bindings/formattedNumber.js": [
+      "js/npm.knockout",
+      "js/npm.jquery",
+      "js/npm.numeral",
+      "js/bindings/formattedNumber.js"
+    ],
+    "bindings/gallery.js": [
+      "js/npm.core-js",
+      "js/bindings/gallery.js"
+    ],
+    "bindings/hover.js": [
+      "js/npm.knockout",
+      "js/bindings/hover.js"
+    ],
+    "bindings/leaflet.js": [
+      "js/npm.core-js",
+      "js/bindings/leaflet.js"
+    ],
+    "bindings/let.js": [
+      "js/npm.knockout",
+      "js/bindings/let.js"
+    ],
+    "bindings/map-controls.js": [
+      "js/npm.knockout",
+      "js/npm.jquery",
+      "js/bindings/map-controls.js"
+    ],
+    "bindings/mapbox-gl.js": [
+      "js/npm.core-js",
+      "js/bindings/mapbox-gl.js"
+    ],
+    "bindings/moment-date.js": [
+      "js/npm.core-js",
+      "js/npm.knockout",
+      "js/npm.moment",
+      "js/bindings/moment-date.js"
+    ],
+    "bindings/nouislider.js": [
+      "js/npm.core-js",
+      "js/bindings/nouislider.js"
+    ],
+    "bindings/related-resources-graph.js": [
+      "js/npm.core-js",
+      "js/bindings/related-resources-graph.js"
+    ],
+    "bindings/resizable-sidepanel.js": [
+      "js/npm.knockout",
+      "js/npm.jquery",
+      "js/bindings/resizable-sidepanel.js"
+    ],
+    "bindings/scroll-to-file.js": [
+      "js/npm.knockout",
+      "js/npm.jquery",
+      "js/bindings/scroll-to-file.js"
+    ],
+    "bindings/scrollTo.js": [
+      "js/npm.knockout",
+      "js/npm.jquery",
+      "js/bindings/scrollTo.js"
+    ],
+    "bindings/select2-query.js": [
+      "js/npm.core-js",
+      "js/bindings/select2-query.js"
+    ],
+    "bindings/select2v4.js": [
+      "js/npm.core-js",
+      "js/bindings/select2v4.js"
+    ],
+    "bindings/slide.js": [
+      "js/npm.knockout",
+      "js/npm.jquery",
+      "js/bindings/slide.js"
+    ],
+    "bindings/smartresize.js": [
+      "js/npm.core-js",
+      "js/bindings/smartresize.js"
+    ],
+    "bindings/sortable.js": [
+      "js/npm.core-js",
+      "js/npm.knockout",
+      "js/npm.jquery",
+      "js/npm.jqueryui",
+      "js/js_bindings_sortable_js",
+      "js/bindings/sortable.js"
+    ],
+    "bindings/term-search.js": [
+      "js/npm.core-js",
+      "js/bindings/term-search.js"
+    ],
+    "bindings/time-wheel.js": [
+      "js/npm.core-js",
+      "js/bindings/time-wheel.js"
+    ],
+    "config-manager.js": [
+      "js/config-manager.js"
+    ],
+    "models/abstract.js": [
+      "js/npm.core-js",
+      "js/models/abstract.js"
+    ],
+    "models/card-widget.js": [
+      "js/npm.core-js",
+      "js/models/card-widget.js"
+    ],
+    "models/card.js": [
+      "js/npm.core-js",
+      "js/models/card.js"
+    ],
+    "models/concept-parents.js": [
+      "js/npm.core-js",
+      "js/templates_javascript_htm",
+      "js/models/concept-parents.js"
+    ],
+    "models/concept.js": [
+      "js/npm.core-js",
+      "js/models/concept.js"
+    ],
+    "models/config.js": [
+      "js/npm.core-js",
+      "js/templates_javascript_htm",
+      "js/models/config.js"
+    ],
+    "models/function-x-graph.js": [
+      "js/npm.core-js",
+      "js/models/function-x-graph.js"
+    ],
+    "models/function.js": [
+      "js/npm.core-js",
+      "js/models/function.js"
+    ],
+    "models/graph.js": [
+      "js/npm.core-js",
+      "js/models/graph.js"
+    ],
+    "models/mobile-survey.js": [
+      "js/npm.core-js",
+      "js/js_models_mobile-survey_js",
+      "js/models/mobile-survey.js"
+    ],
+    "models/node.js": [
+      "js/npm.core-js",
+      "js/js_models_node_js",
+      "js/models/node.js"
+    ],
+    "models/report.js": [
+      "js/npm.core-js",
+      "js/models/report.js"
+    ],
+    "models/tile.js": [
+      "js/npm.core-js",
+      "js/models/tile.js"
+    ],
+    "models/value.js": [
+      "js/npm.core-js",
+      "js/templates_javascript_htm",
+      "js/models/value.js"
+    ],
+    "rdm.js": [
+      "js/rdm.js"
+    ],
+    "reports/default.js": [
+      "js/npm.core-js",
+      "js/npm.knockout",
+      "js/reports/default.js"
+    ],
+    "reports/image.js": [
+      "js/npm.core-js",
+      "js/reports/image.js"
+    ],
+    "reports/map-header.js": [
+      "js/npm.core-js",
+      "js/reports/map-header.js"
+    ],
+    "reports/map.js": [
+      "js/npm.core-js",
+      "js/npm.knockout",
+      "js/npm.underscore",
+      "js/npm.knockout-mapping",
+      "js/reports/map.js"
+    ],
+    "reports/tabbed.js": [
+      "js/npm.core-js",
+      "js/npm.knockout",
+      "js/reports/tabbed.js"
+    ],
+    "utils/dispose.js": [
+      "js/npm.knockout",
+      "js/utils/dispose.js"
+    ],
+    "utils/ontology.js": [
+      "js/npm.core-js",
+      "js/utils/ontology.js"
+    ],
+    "utils/resource.js": [
+      "js/npm.core-js",
+      "js/utils/resource.js"
+    ],
+    "utils/set-csrf-token.js": [
+      "js/npm.core-js",
+      "js/utils/set-csrf-token.js"
+    ],
+    "utils.js": [
+      "js/npm.core-js",
+      "js/utils.js"
+    ],
+    "viewmodels/alert-json.js": [
+      "js/npm.knockout",
+      "js/templates_javascript_htm",
+      "js/viewmodels/alert-json.js"
+    ],
+    "viewmodels/alert.js": [
+      "js/npm.knockout",
+      "js/viewmodels/alert.js"
+    ],
+    "viewmodels/card-component.js": [
+      "js/npm.core-js",
+      "js/npm.regenerator-runtime",
+      "js/viewmodels/card-component.js"
+    ],
+    "viewmodels/card-constraints.js": [
+      "js/npm.core-js",
+      "js/viewmodels/card-constraints.js"
+    ],
+    "viewmodels/card-multi-select.js": [
+      "js/npm.knockout",
+      "js/viewmodels/card-multi-select.js"
+    ],
+    "viewmodels/card.js": [
+      "js/npm.core-js",
+      "js/npm.regenerator-runtime",
+      "js/viewmodels/card.js"
+    ],
+    "viewmodels/concept-select.js": [
+      "js/npm.core-js",
+      "js/viewmodels/concept-select.js"
+    ],
+    "viewmodels/concept-widget.js": [
+      "js/npm.core-js",
+      "js/viewmodels/concept-widget.js"
+    ],
+    "viewmodels/domain-widget.js": [
+      "js/npm.core-js",
+      "js/viewmodels/domain-widget.js"
+    ],
+    "viewmodels/file-widget.js": [
+      "js/npm.core-js",
+      "js/viewmodels/file-widget.js"
+    ],
+    "viewmodels/function.js": [
+      "js/viewmodels/function.js"
+    ],
+    "viewmodels/graph-settings.js": [
+      "js/npm.core-js",
+      "js/viewmodels/graph-settings.js"
+    ],
+    "viewmodels/map-controls.js": [
+      "js/npm.core-js",
+      "js/viewmodels/map-controls.js"
+    ],
+    "viewmodels/map-editor.js": [
+      "js/npm.core-js",
+      "js/viewmodels/map-editor.js"
+    ],
+    "viewmodels/map-filter.js": [
+      "js/npm.core-js",
+      "js/viewmodels/map-filter.js"
+    ],
+    "viewmodels/map-report.js": [
+      "js/npm.core-js",
+      "js/viewmodels/map-report.js"
+    ],
+    "viewmodels/map.js": [
+      "js/npm.core-js",
+      "js/js_viewmodels_map_js",
+      "js/viewmodels/map.js"
+    ],
+    "viewmodels/mobile-survey.js": [
+      "js/npm.core-js",
+      "js/js_viewmodels_mobile-survey_js",
+      "js/viewmodels/mobile-survey.js"
+    ],
+    "viewmodels/node-value-select.js": [
+      "js/npm.core-js",
+      "js/viewmodels/node-value-select.js"
+    ],
+    "viewmodels/photo-gallery.js": [
+      "js/npm.knockout",
+      "js/viewmodels/photo-gallery.js"
+    ],
+    "viewmodels/provisional-tile.js": [
+      "js/npm.core-js",
+      "js/viewmodels/provisional-tile.js"
+    ],
+    "viewmodels/remote-domain-widget.js": [
+      "js/npm.core-js",
+      "js/npm.jquery",
+      "js/npm.underscore",
+      "js/viewmodels/remote-domain-widget.js"
+    ],
+    "viewmodels/report.js": [
+      "js/npm.core-js",
+      "js/viewmodels/report.js"
+    ],
+    "viewmodels/resource-instance-select.js": [
+      "js/npm.core-js",
+      "js/js_viewmodels_resource-instance-select_js",
+      "js/viewmodels/resource-instance-select.js"
+    ],
+    "viewmodels/tabbed-report.js": [
+      "js/npm.core-js",
+      "js/viewmodels/tabbed-report.js"
+    ],
+    "viewmodels/tile.js": [
+      "js/npm.core-js",
+      "js/viewmodels/tile.js"
+    ],
+    "viewmodels/widget.js": [
+      "js/npm.core-js",
+      "js/viewmodels/widget.js"
+    ],
+    "viewmodels/workflow-step.js": [
+      "js/npm.core-js",
+      "js/viewmodels/workflow-step.js"
+    ],
+    "viewmodels/workflow.js": [
+      "js/npm.core-js",
+      "js/viewmodels/workflow.js"
+    ],
+    "viewmodels/xy-input.js": [
+      "js/npm.core-js",
+      "js/viewmodels/xy-input.js"
+    ],
+    "views/base-manager.js": [
+      "js/npm.core-js",
+      "js/views/base-manager.js"
+    ],
+    "views/components/cards/default.js": [
+      "js/npm.core-js",
+      "js/npm.knockout",
+      "js/npm.regenerator-runtime",
+      "js/views/components/cards/default.js"
+    ],
+    "views/components/cards/file-renderers/imagereader.js": [
+      "js/npm.knockout",
+      "js/views/components/cards/file-renderers/imagereader.js"
+    ],
+    "views/components/cards/file-renderers/pdfreader.js": [
+      "js/npm.knockout",
+      "js/views/components/cards/file-renderers/pdfreader.js"
+    ],
+    "views/components/cards/file-viewer.js": [
+      "js/npm.core-js",
+      "js/views/components/cards/file-viewer.js"
+    ],
+    "views/components/cards/grouping.js": [
+      "js/npm.core-js",
+      "js/views/components/cards/grouping.js"
+    ],
+    "views/components/cards/iiif-card.js": [
+      "js/npm.core-js",
+      "js/views/components/cards/iiif-card.js"
+    ],
+    "views/components/cards/map.js": [
+      "js/npm.core-js",
+      "js/views/components/cards/map.js"
+    ],
+    "views/components/cards/photo-gallery-card.js": [
+      "js/npm.core-js",
+      "js/views/components/cards/photo-gallery-card.js"
+    ],
+    "views/components/cards/related-resources-map.js": [
+      "js/npm.core-js",
+      "js/views/components/cards/related-resources-map.js"
+    ],
+    "views/components/cards/select-feature-layers.js": [
+      "js/npm.core-js",
+      "js/views/components/cards/select-feature-layers.js"
+    ],
+    "views/components/cards/select-related-feature-layers.js": [
+      "js/npm.core-js",
+      "js/views/components/cards/select-related-feature-layers.js"
+    ],
+    "views/components/datatypes/boolean.js": [
+      "js/npm.core-js",
+      "js/views/components/datatypes/boolean.js"
+    ],
+    "views/components/datatypes/concept.js": [
+      "js/npm.core-js",
+      "js/views/components/datatypes/concept.js"
+    ],
+    "views/components/datatypes/date.js": [
+      "js/npm.core-js",
+      "js/views/components/datatypes/date.js"
+    ],
+    "views/components/datatypes/domain-value.js": [
+      "js/npm.core-js",
+      "js/views/components/datatypes/domain-value.js"
+    ],
+    "views/components/datatypes/edtf.js": [
+      "js/npm.core-js",
+      "js/views/components/datatypes/edtf.js"
+    ],
+    "views/components/datatypes/file-list.js": [
+      "js/npm.core-js",
+      "js/views/components/datatypes/file-list.js"
+    ],
+    "views/components/datatypes/geojson-feature-collection.js": [
+      "js/npm.core-js",
+      "js/views/components/datatypes/geojson-feature-collection.js"
+    ],
+    "views/components/datatypes/node-value.js": [
+      "js/npm.core-js",
+      "js/views/components/datatypes/node-value.js"
+    ],
+    "views/components/datatypes/number.js": [
+      "js/npm.core-js",
+      "js/views/components/datatypes/number.js"
+    ],
+    "views/components/datatypes/resource-instance.js": [
+      "js/npm.core-js",
+      "js/views/components/datatypes/resource-instance.js"
+    ],
+    "views/components/datatypes/string.js": [
+      "js/npm.core-js",
+      "js/views/components/datatypes/string.js"
+    ],
+    "views/components/datatypes/url.js": [
+      "js/npm.core-js",
+      "js/views/components/datatypes/url.js"
+    ],
+    "views/components/functions/local-file-storage.js": [
+      "js/npm.core-js",
+      "js/npm.knockout",
+      "js/npm.knockout-mapping",
+      "js/views/components/functions/local-file-storage.js"
+    ],
+    "views/components/functions/primary-descriptors.js": [
+      "js/npm.core-js",
+      "js/views/components/functions/primary-descriptors.js"
+    ],
+    "views/components/geocoders/base-geocoder.js": [
+      "js/npm.core-js",
+      "js/views/components/geocoders/base-geocoder.js"
+    ],
+    "views/components/geocoders/mapbox.js": [
+      "js/npm.core-js",
+      "js/views/components/geocoders/mapbox.js"
+    ],
+    "views/components/iiif-annotation.js": [
+      "js/npm.core-js",
+      "js/views/components/iiif-annotation.js"
+    ],
+    "views/components/iiif-viewer.js": [
+      "js/npm.core-js",
+      "js/views/components/iiif-viewer.js"
+    ],
+    "views/components/language-switcher.js": [
+      "js/npm.knockout",
+      "js/views/components/language-switcher.js"
+    ],
+    "views/components/map.js": [
+      "js/npm.core-js",
+      "js/npm.knockout",
+      "js/npm.jquery",
+      "js/npm.underscore",
+      "js/npm.jqueryui",
+      "js/templates_javascript_htm",
+      "js/js_bindings_sortable_js",
+      "js/js_viewmodels_map_js",
+      "js/views/components/map.js"
+    ],
+    "views/components/nodegroup-selector.js": [
+      "js/npm.core-js",
+      "js/views/components/nodegroup-selector.js"
+    ],
+    "views/components/notification.js": [
+      "js/npm.core-js",
+      "js/views/components/notification.js"
+    ],
+    "views/components/plugins/manifest-manager.js": [
+      "js/npm.core-js",
+      "js/views/components/plugins/manifest-manager.js"
+    ],
+    "views/components/plugins/map.js": [
+      "js/npm.core-js",
+      "js/npm.knockout",
+      "js/views/components/plugins/map.js"
+    ],
+    "views/components/related-instance-creator.js": [
+      "js/npm.core-js",
+      "js/views/components/related-instance-creator.js"
+    ],
+    "views/components/related-resources-graph.js": [
+      "js/npm.core-js",
+      "js/views/components/related-resources-graph.js"
+    ],
+    "views/components/resource-report-abstract.js": [
+      "js/npm.core-js",
+      "js/views/components/resource-report-abstract.js"
+    ],
+    "views/components/search/advanced-search.js": [
+      "js/npm.core-js",
+      "js/views/components/search/advanced-search.js"
+    ],
+    "views/components/search/base-filter.js": [
+      "js/npm.core-js",
+      "js/views/components/search/base-filter.js"
+    ],
+    "views/components/search/map-filter.js": [
+      "js/npm.core-js",
+      "js/views/components/search/map-filter.js"
+    ],
+    "views/components/search/paging-filter.js": [
+      "js/npm.core-js",
+      "js/views/components/search/paging-filter.js"
+    ],
+    "views/components/search/provisional-filter.js": [
+      "js/npm.core-js",
+      "js/views/components/search/provisional-filter.js"
+    ],
+    "views/components/search/related-resources-filter.js": [
+      "js/npm.core-js",
+      "js/views/components/search/related-resources-filter.js"
+    ],
+    "views/components/search/resource-type-filter.js": [
+      "js/npm.core-js",
+      "js/views/components/search/resource-type-filter.js"
+    ],
+    "views/components/search/saved-searches.js": [
+      "js/npm.core-js",
+      "js/views/components/search/saved-searches.js"
+    ],
+    "views/components/search/search-export.js": [
+      "js/npm.core-js",
+      "js/views/components/search/search-export.js"
+    ],
+    "views/components/search/search-result-details.js": [
+      "js/npm.core-js",
+      "js/views/components/search/search-result-details.js"
+    ],
+    "views/components/search/search-results.js": [
+      "js/npm.core-js",
+      "js/views/components/search/search-results.js"
+    ],
+    "views/components/search/sort-results.js": [
+      "js/npm.core-js",
+      "js/views/components/search/sort-results.js"
+    ],
+    "views/components/search/term-filter.js": [
+      "js/npm.core-js",
+      "js/views/components/search/term-filter.js"
+    ],
+    "views/components/search/time-filter.js": [
+      "js/npm.core-js",
+      "js/views/components/search/time-filter.js"
+    ],
+    "views/components/simple-switch.js": [
+      "js/npm.core-js",
+      "js/npm.knockout",
+      "js/views/components/simple-switch.js"
+    ],
+    "views/components/widgets/concept-checkbox.js": [
+      "js/npm.core-js",
+      "js/npm.knockout",
+      "js/views/components/widgets/concept-checkbox.js"
+    ],
+    "views/components/widgets/concept-multiselect.js": [
+      "js/npm.core-js",
+      "js/npm.knockout",
+      "js/views/components/widgets/concept-multiselect.js"
+    ],
+    "views/components/widgets/concept-radio.js": [
+      "js/npm.core-js",
+      "js/npm.knockout",
+      "js/views/components/widgets/concept-radio.js"
+    ],
+    "views/components/widgets/concept-select.js": [
+      "js/npm.core-js",
+      "js/npm.knockout",
+      "js/views/components/widgets/concept-select.js"
+    ],
+    "views/components/widgets/datepicker.js": [
+      "js/npm.core-js",
+      "js/npm.knockout",
+      "js/npm.underscore",
+      "js/npm.moment",
+      "js/templates_javascript_htm",
+      "js/views/components/widgets/datepicker.js"
+    ],
+    "views/components/widgets/domain-checkbox.js": [
+      "js/npm.core-js",
+      "js/npm.knockout",
+      "js/views/components/widgets/domain-checkbox.js"
+    ],
+    "views/components/widgets/domain-multiselect.js": [
+      "js/npm.core-js",
+      "js/npm.knockout",
+      "js/views/components/widgets/domain-multiselect.js"
+    ],
+    "views/components/widgets/domain-radio.js": [
+      "js/npm.core-js",
+      "js/npm.knockout",
+      "js/views/components/widgets/domain-radio.js"
+    ],
+    "views/components/widgets/domain-select.js": [
+      "js/npm.core-js",
+      "js/npm.knockout",
+      "js/views/components/widgets/domain-select.js"
+    ],
+    "views/components/widgets/edtf.js": [
+      "js/npm.core-js",
+      "js/npm.knockout",
+      "js/npm.underscore",
+      "js/views/components/widgets/edtf.js"
+    ],
+    "views/components/widgets/file.js": [
+      "js/npm.core-js",
+      "js/npm.knockout",
+      "js/npm.jquery",
+      "js/npm.underscore",
+      "js/npm.dropzone",
+      "js/views/components/widgets/file.js"
+    ],
+    "views/components/widgets/iiif.js": [
+      "js/npm.core-js",
+      "js/views/components/widgets/iiif.js"
+    ],
+    "views/components/widgets/map/bin-feature-collection.js": [
+      "js/npm.knockout",
+      "js/npm.turf",
+      "js/templates_javascript_htm",
+      "js/views/components/widgets/map/bin-feature-collection.js"
+    ],
+    "views/components/widgets/map/map-styles.js": [
+      "js/views/components/widgets/map/map-styles.js"
+    ],
+    "views/components/widgets/map.js": [
+      "js/npm.core-js",
+      "js/views/components/widgets/map.js"
+    ],
+    "views/components/widgets/node-value-select.js": [
+      "js/npm.core-js",
+      "js/npm.knockout",
+      "js/views/components/widgets/node-value-select.js"
+    ],
+    "views/components/widgets/number.js": [
+      "js/npm.core-js",
+      "js/views/components/widgets/number.js"
+    ],
+    "views/components/widgets/radio-boolean.js": [
+      "js/npm.core-js",
+      "js/npm.knockout",
+      "js/npm.underscore",
+      "js/views/components/widgets/radio-boolean.js"
+    ],
+    "views/components/widgets/resource-instance-multiselect.js": [
+      "js/npm.core-js",
+      "js/npm.knockout",
+      "js/js_viewmodels_resource-instance-select_js",
+      "js/views/components/widgets/resource-instance-multiselect.js"
+    ],
+    "views/components/widgets/resource-instance-select.js": [
+      "js/npm.core-js",
+      "js/npm.knockout",
+      "js/js_viewmodels_resource-instance-select_js",
+      "js/views/components/widgets/resource-instance-select.js"
+    ],
+    "views/components/widgets/rich-text.js": [
+      "js/npm.core-js",
+      "js/npm.knockout",
+      "js/npm.underscore",
+      "js/views/components/widgets/rich-text.js"
+    ],
+    "views/components/widgets/switch.js": [
+      "js/npm.core-js",
+      "js/npm.knockout",
+      "js/npm.underscore",
+      "js/views/components/widgets/switch.js"
+    ],
+    "views/components/widgets/text.js": [
+      "js/npm.core-js",
+      "js/npm.knockout",
+      "js/npm.underscore",
+      "js/views/components/widgets/text.js"
+    ],
+    "views/components/widgets/urldatatype.js": [
+      "js/npm.core-js",
+      "js/npm.knockout",
+      "js/views/components/widgets/urldatatype.js"
+    ],
+    "views/components/workbench.js": [
+      "js/npm.core-js",
+      "js/npm.knockout",
+      "js/npm.jquery",
+      "js/npm.underscore",
+      "js/npm.jqueryui",
+      "js/templates_javascript_htm",
+      "js/js_bindings_sortable_js",
+      "js/views/components/workbench.js"
+    ],
+    "views/components/workflows/final-step.js": [
+      "js/npm.core-js",
+      "js/views/components/workflows/final-step.js"
+    ],
+    "views/components/workflows/new-multi-tile-step.js": [
+      "js/npm.core-js",
+      "js/npm.knockout",
+      "js/js_views_components_workflows_new-tile-step_js",
+      "js/views/components/workflows/new-multi-tile-step.js"
+    ],
+    "views/components/workflows/new-tile-step.js": [
+      "js/npm.core-js",
+      "js/js_views_components_workflows_new-tile-step_js",
+      "js/views/components/workflows/new-tile-step.js"
+    ],
+    "views/components/workflows/workflow-component-abstract.js": [
+      "js/npm.core-js",
+      "js/views/components/workflows/workflow-component-abstract.js"
+    ],
+    "views/concept-search.js": [
+      "js/npm.core-js",
+      "js/views/concept-search.js"
+    ],
+    "views/edit-history.js": [
+      "js/views/edit-history.js"
+    ],
+    "views/form.js": [
+      "js/npm.core-js",
+      "js/views/form.js"
+    ],
+    "views/graph/card-configuration/card-component-form.js": [
+      "js/npm.core-js",
+      "js/views/graph/card-configuration/card-component-form.js"
+    ],
+    "views/graph/card-configuration/card-components-tree.js": [
+      "js/npm.core-js",
+      "js/npm.knockout",
+      "js/npm.jquery",
+      "js/npm.jqueryui",
+      "js/npm.backbone",
+      "js/js_bindings_sortable_js",
+      "js/views/graph/card-configuration/card-components-tree.js"
+    ],
+    "views/graph/card-configuration/card-form-preview.js": [
+      "js/npm.core-js",
+      "js/npm.knockout",
+      "js/npm.jquery",
+      "js/npm.underscore",
+      "js/npm.jqueryui",
+      "js/npm.backbone",
+      "js/templates_javascript_htm",
+      "js/js_bindings_sortable_js",
+      "js/views/graph/card-configuration/card-form-preview.js"
+    ],
+    "views/graph/function-manager/applied-function-list.js": [
+      "js/npm.core-js",
+      "js/views/graph/function-manager/applied-function-list.js"
+    ],
+    "views/graph/function-manager/function-list.js": [
+      "js/npm.core-js",
+      "js/views/graph/function-manager/function-list.js"
+    ],
+    "views/graph/function-manager.js": [
+      "js/npm.core-js",
+      "js/views/graph/function-manager.js"
+    ],
+    "views/graph/graph-designer/card-tree.js": [
+      "js/npm.core-js",
+      "js/views/graph/graph-designer/card-tree.js"
+    ],
+    "views/graph/graph-designer/graph-tree.js": [
+      "js/npm.core-js",
+      "js/views/graph/graph-designer/graph-tree.js"
+    ],
+    "views/graph/graph-designer/node-form.js": [
+      "js/npm.core-js",
+      "js/views/graph/graph-designer/node-form.js"
+    ],
+    "views/graph/graph-manager/branch-list.js": [
+      "js/npm.core-js",
+      "js/views/graph/graph-manager/branch-list.js"
+    ],
+    "views/graph/graph-manager/graph-base.js": [
+      "js/npm.core-js",
+      "js/views/graph/graph-manager/graph-base.js"
+    ],
+    "views/graph/graph-page-view.js": [
+      "js/npm.core-js",
+      "js/views/graph/graph-page-view.js"
+    ],
+    "views/graph/graph-settings.js": [
+      "js/npm.core-js",
+      "js/views/graph/graph-settings.js"
+    ],
+    "views/graph/permission-designer.js": [
+      "js/npm.core-js",
+      "js/views/graph/permission-designer.js"
+    ],
+    "views/graph/permission-manager/identity-list.js": [
+      "js/npm.core-js",
+      "js/npm.knockout",
+      "js/views/graph/permission-manager/identity-list.js"
+    ],
+    "views/graph/permission-manager/permission-settings-form.js": [
+      "js/npm.core-js",
+      "js/views/graph/permission-manager/permission-settings-form.js"
+    ],
+    "views/graph-designer.js": [
+      "js/npm.core-js",
+      "js/views/graph-designer.js"
+    ],
+    "views/graph.js": [
+      "js/npm.core-js",
+      "js/views/graph.js"
+    ],
+    "views/list.js": [
+      "js/npm.core-js",
+      "js/views/list.js"
+    ],
+    "views/map-layer-manager.js": [
+      "js/npm.core-js",
+      "js/views/map-layer-manager.js"
+    ],
+    "views/mobile-survey-designer.js": [
+      "js/npm.core-js",
+      "js/npm.knockout",
+      "js/npm.jquery",
+      "js/npm.underscore",
+      "js/templates_javascript_htm",
+      "js/js_viewmodels_mobile-survey_js",
+      "js/js_models_mobile-survey_js",
+      "js/views/mobile-survey-designer.js"
+    ],
+    "views/mobile-survey-manager/identity-list.js": [
+      "js/npm.core-js",
+      "js/views/mobile-survey-manager/identity-list.js"
+    ],
+    "views/mobile-survey-manager/mobile-survey-tree.js": [
+      "js/npm.core-js",
+      "js/views/mobile-survey-manager/mobile-survey-tree.js"
+    ],
+    "views/mobile-survey-manager.js": [
+      "js/npm.core-js",
+      "js/views/mobile-survey-manager.js"
+    ],
+    "views/notifications-list.js": [
+      "js/npm.core-js",
+      "js/views/notifications-list.js"
+    ],
+    "views/page-view.js": [
+      "js/npm.core-js",
+      "js/views/page-view.js"
+    ],
+    "views/plugin.js": [
+      "js/npm.core-js",
+      "js/npm.knockout",
+      "js/views/plugin.js"
+    ],
+    "views/provisional-history-list.js": [
+      "js/npm.core-js",
+      "js/views/provisional-history-list.js"
+    ],
+    "views/rdm/concept-report.js": [
+      "js/npm.core-js",
+      "js/views/rdm/concept-report.js"
+    ],
+    "views/rdm/concept-tree.js": [
+      "js/npm.core-js",
+      "js/views/rdm/concept-tree.js"
+    ],
+    "views/rdm/modals/add-child-form.js": [
+      "js/npm.core-js",
+      "js/views/rdm/modals/add-child-form.js"
+    ],
+    "views/rdm/modals/add-collection-form.js": [
+      "js/npm.core-js",
+      "js/views/rdm/modals/add-collection-form.js"
+    ],
+    "views/rdm/modals/add-image-form.js": [
+      "js/npm.core-js",
+      "js/views/rdm/modals/add-image-form.js"
+    ],
+    "views/rdm/modals/add-scheme-form.js": [
+      "js/npm.core-js",
+      "js/views/rdm/modals/add-scheme-form.js"
+    ],
+    "views/rdm/modals/delete-collection-form.js": [
+      "js/npm.core-js",
+      "js/views/rdm/modals/delete-collection-form.js"
+    ],
+    "views/rdm/modals/delete-scheme-form.js": [
+      "js/npm.core-js",
+      "js/views/rdm/modals/delete-scheme-form.js"
+    ],
+    "views/rdm/modals/export-scheme-form.js": [
+      "js/npm.core-js",
+      "js/views/rdm/modals/export-scheme-form.js"
+    ],
+    "views/rdm/modals/import-concept-form.js": [
+      "js/npm.core-js",
+      "js/views/rdm/modals/import-concept-form.js"
+    ],
+    "views/rdm/modals/import-scheme-form.js": [
+      "js/npm.core-js",
+      "js/views/rdm/modals/import-scheme-form.js"
+    ],
+    "views/rdm/modals/manage-parent-form.js": [
+      "js/npm.core-js",
+      "js/views/rdm/modals/manage-parent-form.js"
+    ],
+    "views/rdm/modals/related-concept-form.js": [
+      "js/npm.core-js",
+      "js/views/rdm/modals/related-concept-form.js"
+    ],
+    "views/rdm/modals/related-member-form.js": [
+      "js/npm.core-js",
+      "js/views/rdm/modals/related-member-form.js"
+    ],
+    "views/rdm/modals/value-form.js": [
+      "js/npm.core-js",
+      "js/views/rdm/modals/value-form.js"
+    ],
+    "views/resource/edit-log.js": [
+      "js/npm.core-js",
+      "js/views/resource/edit-log.js"
+    ],
+    "views/resource/editor.js": [
+      "js/npm.core-js",
+      "js/views/resource/editor.js"
+    ],
+    "views/resource/permissions-manager.js": [
+      "js/npm.core-js",
+      "js/views/resource/permissions-manager.js"
+    ],
+    "views/resource/related-resources-manager.js": [
+      "js/npm.core-js",
+      "js/views/resource/related-resources-manager.js"
+    ],
+    "views/resource/related-resources-node-list.js": [
+      "js/npm.core-js",
+      "js/views/resource/related-resources-node-list.js"
+    ],
+    "views/resource/report.js": [
+      "js/npm.core-js",
+      "js/views/resource/report.js"
+    ],
+    "views/resource.js": [
+      "js/views/resource.js"
+    ],
+    "views/search.js": [
+      "js/npm.core-js",
+      "js/views/search.js"
+    ],
+    "views/simple-search.js": [
+      "js/npm.core-js",
+      "js/views/simple-search.js"
+    ],
+    "views/tree-view.js": [
+      "js/npm.core-js",
+      "js/views/tree-view.js"
+    ],
+    "views/user-profile-manager.js": [
+      "js/npm.core-js",
+      "js/views/user-profile-manager.js"
+    ]
+  },
+  "publicPath": "/foo/"
 }

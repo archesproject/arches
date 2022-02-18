@@ -1,0 +1,14 @@
+<!-- ko if: tile() && card() -->
+    <!-- ko component: {
+        name: cardComponentLookup[card().model.component_id()].componentname,
+        params: {
+            card: card(),
+            tile: tile(),
+            provisionalTileViewModel: provisionalTileViewModel,
+            reviewer: reviewer,
+            loading: loading,
+            form: $data,
+            pageVm: $root
+        }
+    } --><!-- /ko -->
+<!-- /ko -->

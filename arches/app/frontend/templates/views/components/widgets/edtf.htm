@@ -1,0 +1,93 @@
+{% extends "views/components/widgets/base.htm" %}
+{% load i18n %}
+
+{% block form %}
+<div class="row widget-wrapper">
+        <label class="control-label widget-input-label" for="" data-bind="text:label"></label>
+        <!-- ko if: node -->
+        <i data-bind="css: {'ion-asterisk widget-label-required': node.isrequired}"></i>
+        <!-- /ko -->
+        <div class="form-group">
+          <div class="edtf-style-tools-collapser" data-bind=" click: function() {
+              showEDTFFormats(!showEDTFFormats());
+          }">
+              <i class="fa" data-bind="{
+                  css: {
+                      'fa-caret-down' : !showEDTFFormats(),
+                      'fa-caret-up' : showEDTFFormats(),
+                  }
+              }"></i>
+              <span data-bind="text: showEDTFFormats() ? '{% trans "EDTF Formats" %}' : '{% trans "EDTF Formats" %}'"></span>
+          </div>
+          <div class="form-horizontal" data-bind="if: showEDTFFormats">
+              <div class="edtf-style-tools-panel">
+                  <div class="widget-help-panel">
+                    <h2 class="">{% trans "Extended Date/Time Formats (EDTF)" %}</h2>
+                    <h3 class="">
+                      {% trans "The EDTF datatype allows you to describe dates (even uncertain dates).  You can find a summary of the standard here:" %}
+                      <a class="" target="_blank" data-bind="attr: { href: 'https://www.loc.gov/standards/datetime'}, click: function() { return true;}, clickBubble: false">{% trans "EDTF Date Specfication (Library of Congress)" %}</a>
+                    </h3>
+                    <h3 class="">
+                      {% trans "Some common encodings:" %}
+                    </h3>
+
+                    <dl class="">
+                        <dt class="">2021-04-12 <span class="text-thin">{% trans ' [year][“-”][month][“-”][day]'%}</span></dt>
+                        <dd class="mar-btm">{% trans "Refers to the calendar date 2021 April 12th with day precision" %}</dd>
+
+                        <dt class="">2021-04 <span class="text-thin">{% trans ' [year][“-”][month]'%}</span></dt>
+                        <dd class="mar-btm">{% trans "Refers to the calendar month April 2021 with month precision" %}</dd>
+
+                        <dt class="">2021 <span class="text-thin">{% trans ' [year]'%}</span></dt>
+                        <dd class="mar-btm">{% trans "Refers to the year 2021 with year precision" %}</dd>
+
+                        <dt class="">1964/2008 </dt>
+                        <dd class="mar-btm">{% trans "A time interval with calendar year precision, beginning sometime in 1964 and ending sometime in 2008" %}</dd>
+
+                        <dt class="">2004-06/2006-08 </dt>
+                        <dd class="mar-btm">{% trans "A time interval with calendar month precision, beginning sometime in June 2004 and ending sometime in August of 2006" %}</dd>
+
+                        <dt class="">2004-02-01/2005 </dt>
+                        <dd class="mar-btm">{% trans "A time interval beginning sometime on February 1, 2004 and ending sometime in 2005. The start endpoint has calendar day precision and the end endpoint has calendar year precision." %}</dd>
+
+                        <dt class="">Y-100000 </dt>
+                        <dd class="mar-btm">{% trans "The year -100000.  'Y' may be used at the beginning of the date string to signify that the date is a year, when (and only when) the year exceeds four digits, i.e. for years later than 9999 or earlier than -9999." %}</dd>
+
+                        <dt class="">2001-21 </dt>
+                        <dd class="mar-btm">{% trans "Spring, 2001. The values 21, 22, 23, 24 may be used used to signify ' Spring', 'Summer', 'Autumn', 'Winter', respectively, in place of a month value (01 through 12) for a year-and-month format string" %}</dd>
+
+                        <dt class="">1984? </dt>
+                        <dd class="mar-btm">{% trans "Year uncertain (possibly the year 1984, but not definitely)" %}</dd>
+
+                        <dt class="">2004-06~ </dt>
+                        <dd class="mar-btm">{% trans "Year-month approximate" %}</dd>
+
+                        <dt class="">2004-06-11% </dt>
+                        <dd class="mar-btm">{% trans "Entire date (year-month-day) uncertain and approximate" %}</dd>
+                    </dl>
+
+                  </div>
+              </div>
+          </div>
+        <div class="col-xs-12">
+            <input type="text" data-bind="textInput: value, attr: {placeholder: placeholder, disabled: disabled}" class="form-control input-lg widget-input">
+        </div>
+    </div>
+</div>
+{% endblock form %}
+
+{% block config_form %}
+<div class="control-label">
+    {% trans "Placeholder" %}
+</div>
+<div class="col-xs-12 pad-no crud-widget-container">
+    <input type="" placeholder="{% trans "Placeholder" %}" id="" class="form-control input-md widget-input" data-bind="textInput: placeholder">
+</div>
+
+<div class="control-label">
+    {% trans "Default Value" %}
+</div>
+<div class="col-xs-12 pad-no crud-widget-container">
+    <input type="" placeholder="{% trans "Default Value" %}" id="" class="form-control input-md widget-input" data-bind="textInput: defaultValue">
+</div>
+{% endblock config_form %}

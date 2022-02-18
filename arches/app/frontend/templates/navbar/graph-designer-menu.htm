@@ -1,0 +1,112 @@
+{% load staticfiles %}
+{% load i18n %}
+<div id="menu-panel" class="ep-menu" style="display: none;" data-bind="visible:menuActive()">
+    <div class="panel ep-menu-panel relative" style="">
+
+        <!-- Menu List -->
+        <div class="panel-body">
+            <ul class="list-group ep-menu-list">
+                <!-- Menu Item -->
+                <li class="edit-menu-item">
+                    <a href="{% url 'graph' '' %}" data-bind="click: newResource">
+                        <div class="media-body">
+                            <div class="menu-item-title"><i class="fa fa-sitemap"></i> {% trans "New Model" %}</div>
+                            <span class="text-muted menu-item-subtitle">{% trans "Create new Resource Model" %} </span>
+                        </div>
+                    </a>
+                </li>
+                <!-- Menu Item -->
+                <li class="edit-menu-item">
+                    <a href="{% url 'graph' '' %}" data-bind="click: newBranch">
+                        <div class="media-body">
+                            <div class="menu-item-title"><i class="fa ion-merge"></i> {% trans "New Branch" %}</div>
+                            <span class="text-muted menu-item-subtitle">{% trans "Create new Branch" %} </span>
+                        </div>
+                    </a>
+                </li>
+                <!-- Menu Item -->
+                <li class="edit-menu-item file-upload upload">
+                    <form id="data">
+                        <input type="file" class="upload" id="fileupload" data-bind="event: {change: importGraph}" accept=".json"/>
+                    </form>
+                    <a href="{% url 'graph' '' %}" data-bind="click: importButtonClick">
+                        <div class="media-body">
+                            <div class="menu-item-title"><i class="fa fa-upload"></i> {% trans "Import Model" %}</div>
+                            <span class="text-muted menu-item-subtitle">{% trans "Import Model by uploading a json file" %} </span>
+                        </div>
+                    </a>
+                </li>
+                <!-- Menu Item -->
+                <li class="edit-menu-item">
+                    <a href="{% url 'graph' '' %}" data-bind="click: cloneGraph">
+                        <div class="media-body">
+                            <div class="menu-item-title"><i class="fa fa-clone"></i><span data-bind="text: graph.isresource() ? ' {% trans "Clone Model" %}' : ' {% trans "Clone Branch" %}' "></span></div>
+                            <span class="text-muted menu-item-subtitle" data-bind="text: graph.isresource() ? ' {% trans "Clone the existing Resource Model" %}' : ' {% trans "Clone the existing Branch" %}' "></span>
+                        </div>
+                    </a>
+                </li>
+                <!-- Menu Item -->
+                <li class="edit-menu-item">
+                    <a href="{% url 'graph' '' %}" data-bind="click: exportGraph">
+                        <div class="media-body">
+                            <div class="menu-item-title"><i class="fa fa-download"></i><span data-bind="text: graph.isresource() ? ' {% trans "Export Model" %}' : ' {% trans "Export Branch" %}' "></span></div>
+                            <span class="text-muted menu-item-subtitle" data-bind="text: graph.isresource() ? ' {% trans "Export the existing Resource Model" %}' : ' {% trans "Export the existing Branch" %}' "></span>
+                        </div>
+                    </a>
+                </li>
+                <!-- Menu Item -->
+                <li class="edit-menu-item" data-bind="visible: graph.isresource">
+                    <a href="{% url 'function_manager' graphid %}" data-bind="click:function () { navigate('{% url 'function_manager' graphid %}'); }">
+                        <div class="media-body">
+                            <div class="menu-item-title"><i class="fa fa-code"></i> {% trans "Functions" %}</div>
+                            <span class="text-muted menu-item-subtitle">{% trans "Configure functions attached to this Resource Model" %} </span>
+                        </div>
+                    </a>
+                </li>
+                <!-- Menu Item -->
+                <li class="edit-menu-item" data-bind="visible: graph.isresource">
+                    <a data-bind="click: exportMappingFile">
+                        <div class="media-body">
+                            <div class="menu-item-title"><i class="fa fa-download"></i> {% trans "Export Mapping File" %}</div>
+                            <span
+                                class="text-muted menu-item-subtitle">{% trans "Use a mapping file with import/export of business data" %}
+                            </span>
+                        </div>
+                    </a>
+                </li>
+                <!-- Menu Item -->
+                <li class="edit-menu-item" data-bind="visible: graph.isresource">
+                    <a href="{% url 'graph' '' %}" data-bind="click: deleteInstances">
+                        <div class="media-body">
+                            <div class="menu-item-title"><i class="fa fa-trash"></i> {% trans "Delete Associated Instances" %}</div>
+                            <span class="text-muted menu-item-subtitle">{% trans "Delete All Associated Instances with this Model" %}</span>
+                        </div>
+                    </a>
+                </li>
+                <!-- Menu Item -->
+                <li class="edit-menu-item">
+                    <a href="{% url 'graph' '' %}" data-bind="click: deleteGraph">
+                        <div class="media-body">
+                            <div class="menu-item-title"><i class="fa fa-trash"></i><span data-bind="text: graph.isresource() ? ' {% trans "Delete Model" %}' : ' {% trans "Delete Branch" %}' "></span></div>
+                            <span class="text-muted menu-item-subtitle" data-bind="text: graph.isresource() ? ' {% trans "Delete the existing Resource Model" %}' : ' {% trans "Delete the existing Branch" %}' "></span>
+                        </div>
+                    </a>
+                </li>
+
+                <!-- Menu Item -->
+                <li class="edit-menu-item">
+                    <a href="{% url 'graph' '' %}" data-bind="click:function () { navigate('{% url 'graph' '' %}') }">
+                        <div class="media-body">
+                            <div class="menu-item-title"><i class="fa fa-tag"></i> {% trans "Return to Arches Designer" %}</div>
+                            <span class="text-muted menu-item-subtitle">{% trans "Create Arches Resource Models and Branches" %} </span>
+                        </div>
+                    </a>
+                </li>
+            </ul>
+        </div>
+        <div class="panel-footer ep-menu-footer hidden">
+
+            {% trans "footer" %}
+        </div>
+    </div>
+</div>

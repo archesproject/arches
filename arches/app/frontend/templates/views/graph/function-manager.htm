@@ -1,0 +1,170 @@
+<!--
+ARCHES - a program developed to inventory and manage immovable cultural heritage.
+Copyright (C) 2013 J. Paul Getty Trust and World Monuments Fund
+
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU Affero General Public License as
+published by the Free Software Foundation, either version 3 of the
+License, or (at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+GNU Affero General Public License for more details.
+
+You should have received a copy of the GNU Affero General Public License
+along with this program. If not, see <http://www.gnu.org/licenses/>.
+-->
+{% extends "views/graph/graph-base.htm" %}
+{% load staticfiles %}
+{% load i18n %}
+
+{% block graph_header_title %}
+{% trans "Function Manager" %}
+{% endblock graph_header_title %}
+
+{% block graph_header_buttons %}
+<span data-bind="if: dirty">
+    <button class="btn btn-sm btn-danger btn-labeled fa fa-trash" data-bind="click: cancel">{% trans "Discard Edits" %}</button>
+    <button class="btn btn-sm btn-primary btn-labeled fa fa-check" data-bind="click: save">{% trans "Save Edits" %}</button>
+</span>
+{{ block.super }}
+{% endblock graph_header_buttons %}
+
+{% block content %}
+<div class="flex">
+
+    <!--Form Listing -->
+    <div class="left-column-crud-container form-list">
+        <!-- Title Block -->
+        <div class="title-block-title">
+            <h4 class="title-block-title"> {% trans "Selected Functions" %}</h4>
+        </div>
+
+
+        <!-- Default Message -->
+        <div class="left-column-message" style="display: none;" data-bind="visible: appliedFunctionList.items().length === 0">
+            {% trans "You haven't added any functions yet." %}
+            <br><br>
+            {% trans "Select functions from the library to add new capabilities to your resource." %}
+        </div>
+
+
+        <div id="function-list" class="report-image-grid" style="margin-top: 5px; display: none;" data-bind="visible: appliedFunctionList.items().length > 0">
+            <!-- Toolbar -->
+            <div class="href-toolbar">
+                <a class="href-button" href="#" data-bind="visible: !selectedFunction(), click: toggleFunctionLibrary">{% trans "Close Function Library" %}</a>
+                <a class="href-button" href="#" data-bind="visible: !!selectedFunction(), click: toggleFunctionLibrary">{% trans "Show Function Library" %}</a>
+            </div>
+
+            <!-- ko with: appliedFunctionList -->
+            {% include 'views/graph/function-manager/applied-function-list.htm' %}
+            <!-- /ko -->
+        </div>
+
+    </div>
+
+
+    <!-- Card Container -->
+    <div class="card-form-preview-container">
+        <div style="display: none;" class="card-form-preview-container library-container" data-bind="visible: !selectedFunction()">
+            <div class="">
+
+                <!-- Header -->
+                <div class="library-header" style="">
+
+                    <!-- Search -->
+                    <div>
+
+                        <!-- Find Button -->
+                        <div class="">
+                            <a class="library-find" href="#"> {% trans "Find" %} </a>
+                        </div>
+
+                        <!-- Find widget -->
+                        <div class="find-widget" style="display: none;">
+                            <div class="">
+
+                                {% trans "Library filter goes here" %}
+
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Resource/Graph Toggle -->
+                    <div style="display: block;">
+                        <a id="" class="library-grid-title active" href="">{% trans "Function Library" %}</a>
+                    </div>
+                </div>
+
+                <!-- Function Grid Container -->
+                <div id="page-content">
+
+                    <!-- Function Grid -->
+                    <div id="function-list" class="report-image-grid" style="margin-top: 5px;" data-bind="with: functionList">
+                        {% include 'views/graph/function-manager/function-list.htm' %}
+                    </div>
+                </div>
+            </div>
+        </div>
+
+
+        <!-- Right Panel: Config Form -->
+        <div style="display: none;" class="card-form-preview-container" data-bind="visible: !!selectedFunction(), with: selectedFunction">
+
+            <div class="pad-all">
+
+                <div class="panel panel-padding-bottom">
+                    <div class="panel-heading">
+                        <h3 class="panel-title card-main-title" data-bind="text: $data.get('function').name">{% trans "Function Name" %}</h3>
+                        <a href="#" class="library-tools-icon" style="padding-right: 0px;" data-bind="click: $root.delete">
+                            <i class="ion-ios-trash add-tooltip record-delete" data-placement="bottom" data-toggle="tooltip" data-original-title='{% trans "Delete" %}'></i>
+                        </a>
+                    </div>
+
+                    <!--Tabs Content-->
+                    <div class="card-content-tab primary-descriptors-card-container">
+
+                        <div data-bind="if: !!($data.get('function').component())">
+                            <div data-bind="component: {
+                                name: $data.get('function').component(),
+                                params: $data
+                            }"></div>
+                        </div>
+
+                        <div data-bind="if: !($data.get('function').component())">
+                            <h3 class="panel-title card-main-title">
+                                {% trans "This Function doesn't require any configuration." %}
+                            </h3>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+        </div>
+
+
+
+
+    </div>
+
+</div>
+{% endblock content %}
+
+{% block pre_require_js %}
+{{block.super}}
+<script>
+    {% autoescape off %}
+    define('graph-functions-data', [], function () {
+        return {
+            functions: {{functions}},
+            applied_functions: {{applied_functions}},
+            // datatypes: {{ datatypes_json }},
+            // widgets: {{ widgets_json }},
+            // resourceid: '{{resourceid}}',
+            // graph: {{graph_json}},
+        };
+    });
+    {% endautoescape %}
+</script>
+{% endblock pre_require_js %}

@@ -1,0 +1,166 @@
+{% load i18n %}
+<!-- ko if: !$data.configForm -->
+<!-- ko if: !$data.summary -->
+{% block report %}
+
+
+{% block report_title_bar %}
+<!-- Report Title Bar -->
+<div class="relative report-title-bar">
+
+    <!-- Title Block -->
+    <div class="report-toolbar-preview ep-form-toolbar">
+        <h4 class="report-toolbar-title"><span data-bind="text: report.get('name')"></span> - <span data-bind="text: report.get('displayname') "></span></h4>
+
+        <!-- Tools -->
+        <div class="ep-form-toolbar-tools mar-no flex" style="position: relative; height: inherit">
+            <p class="report-print-date">{% trans "Report Date:" %} <span data-bind="text: reportDate"></span></p>
+            <div class="report-print-date" style="position: absolute; margin-top: 30px; margin-left: -11px; " data-bind="component: { name: 'views/components/simple-switch', params: {value: hideEmptyNodes, config:{ label: '{% trans "Hide Null Values" %}', subtitle: ''}}}"></div>
+        </div>
+    </div>
+</div>
+{% endblock report_title_bar %}
+
+
+<!-- Report Content -->
+<div class="rp-report-container-preview">
+
+    {% block header %}
+    {% endblock header %}
+
+    {% block body %}
+    <!--ko if: hasProvisionalData() && (editorContext === false) -->
+    <div class="report-provisional-flag">{% trans 'This resource has provisional edits (not displayed in this report) that are pending review' %}</div>
+    <!--/ko-->
+    <!--ko if: hasProvisionalData() && (editorContext === true && report.userisreviewer === true) -->
+    <div class="report-provisional-flag">{% trans 'This resource has provisional edits (not displayed in this report) that are pending review' %}</div>
+    <!--/ko-->
+    <!--ko if: hasProvisionalData() && (editorContext === true && report.userisreviewer === false) -->
+    <div class="report-provisional-flag">{% trans 'This resource has provisional edits that are pending review' %}</div>
+    <!--/ko-->
+
+    <div class="rp-report-section relative rp-report-section-root">
+        <div class="rp-report-section-title">
+            <!-- ko foreach: { data: report.cards, as: 'card' } -->
+                <!-- ko if: $parent.hideEmptyNodes() === false || card.tiles().length > 0 -->
+                <!-- ko if: $index() !== 0 --><hr class="rp-tile-separator"><!-- /ko -->
+                <div class="rp-card-section">
+                    <!-- ko component: {
+                        name: card.model.cardComponentLookup[card.model.component_id()].componentname,
+                        params: {
+                            state: 'report',
+                            preview: $parent.report.preview,
+                            card: card,
+                            pageVm: {...$root, report: $parent.report},
+                            hideEmptyNodes: $parent.hideEmptyNodes
+                        }
+                    } --> <!-- /ko -->
+                </div>
+                <!-- /ko -->
+            <!-- /ko -->
+        </div>
+    </div>
+    {% endblock body %}
+    
+    
+    {% block related_resources %}
+    <div class="rp-report-section relative report-related-resources">
+        <div class="rp-report-section-title">
+            <h4 class="rp-section-title">{% trans 'Related Resources' %}</h4>
+        </div>
+        
+        <!-- ko foreach: { data: Object.values(report.relatedResourcesLookup()), as: 'resourceData' } -->
+        <!-- ko if: resourceData.totalRelatedResources > 0 || !$parent.hideEmptyNodes() -->
+        <h5 class="rp-tile-title">
+            <span class="rp-tile-title-float" data-bind="text: resourceData.name"></span>
+        </h5>
+
+        <div class="rp-card-section">
+            <!-- ko foreach: { data: resourceData.loadedRelatedResources(), as: 'relatedResource' } -->
+            <div class="rp-report-container-tile">
+                <div class="row rp-report-tile">
+                    <dl class="dl-horizontal">
+                        <dt><a data-bind="text: relatedResource.displayName, attr: {href: relatedResource.link}"></a></dt>
+                        <!-- ko if: relatedResource.relationship -->
+                        <dd data-bind="text: '( ' + relatedResource.relationship + ' )'"></dd>
+                        <!-- /ko -->
+                    </dl>
+                </div>
+            </div>
+            <!-- /ko -->
+
+            <!-- ko if: resourceData.paginator() && resourceData.paginator().has_next -->
+            <button class="btn btn-primary" data-bind="click: $parent.report.getRelatedResources.bind($parent.report, false)">
+                {% trans "Load More" %}
+                <span data-bind="text: '(' + resourceData.remainingResources() + ')'"></span>
+            </button>
+
+            <button class="btn btn-primary" data-bind="click: $parent.report.getRelatedResources.bind($parent.report, true)">
+                {% trans "Load All" %}
+                <span data-bind="text: '(' + (resourceData.totalRelatedResources - resourceData.loadedRelatedResources().length) + ')'"></span>
+            </button>
+            <!-- /ko -->
+                
+            <!--ko if: resourceData.totalRelatedResources === 0 -->	
+            <div class="rp-report-container-tile">	
+                <div class="row rp-report-tile rp-no-data">{% trans 'No relationships added' %}</div>	
+            </div>	
+            <!--/ko-->
+        </div>
+        <!-- /ko -->
+        <!-- /ko -->    
+    </div>  
+    {% endblock related_resources %}
+
+    {% block footer %}
+    {% endblock footer %}
+</div>
+{% endblock report %}
+<!-- /ko -->
+
+<!-- ko if: $data.summary -->
+{% block summary %}
+<div class="relative report-title-bar">
+
+    <!-- Title Block -->
+    <div class="report-toolbar-preview ep-form-toolbar">
+        <h4 class="report-toolbar-title"><span data-bind="text: report.get('name')"></span> - <span data-bind="text: report.get('displayname') "></span></h4>
+
+        <!-- Tools -->
+        <div class="ep-form-toolbar-tools mar-no flex">
+            <p class="report-print-date">{% trans "Report Date:" %} <span data-bind="text: reportDate"></span></p>
+        </div>
+    </div>
+</div>
+
+<div class="rp-report-container-preview">
+    <div class="rp-report-section relative rp-report-section-root">
+        <div class="rp-report-section-title">
+            <!-- ko if: report.cards.length > 0 -->
+                <!--ko let: { card: report.cards[0] }-->
+                <div class="rp-card-section">
+                    <!-- ko component: {
+                        name: card.model.cardComponentLookup[card.model.component_id()].componentname,
+                        params: {
+                        state: 'report',
+                        preview: report.preview,
+                        card: card,
+                        pageVm: $root
+                    }
+                    } --> <!-- /ko -->
+                </div>
+                <!--/ko-->
+            <!-- /ko -->
+        </div>
+    </div>
+</div>
+{% endblock summary %}
+<!-- /ko -->
+<!-- end of not configForm -->
+<!-- /ko -->
+
+
+<!-- ko if: $data.configForm && ($data.configType === 'header') -->
+{% block header_form %}
+{% endblock header_form %}
+<!-- /ko -->

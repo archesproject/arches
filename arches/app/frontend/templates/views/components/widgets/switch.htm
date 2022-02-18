@@ -1,0 +1,36 @@
+{% extends "views/components/widgets/base.htm" %}
+{% load i18n %}
+
+{% block form %}
+<div class="toggle-container">
+    <span class="switch switch-small switch-widget" data-bind="css: {'on': getvalue() === true, 'null': getvalue() === null, 'disabled': disabled }, click: setvalue"><small></small></span>
+            <div style="display:flex; flex-direction:row;">
+            <div class="arches-toggle-sm" data-bind="text:label, css: {'disabled': disabled}"></div>
+                <div style="margin-top: -17px;">
+                <!-- ko if: node -->
+                <i data-bind="css: {'ion-asterisk widget-label-required': node.isrequired}"></i>
+                <!-- /ko -->
+                </div>
+            </div>
+    <span class="arches-toggle-subtitle" data-bind="text: subtitle"></span>
+</div>
+{% endblock form %}
+
+{% block config_form %}
+<div class="control-label">
+  {% trans "Subtitle" %}
+</div>
+<div class="col-xs-12 pad-no crud-widget-container">
+  <input type="" id="" class="form-control input-md widget-input" data-bind="value: subtitle, valueUpdate: 'keyup'">
+</div>
+<div class="control-label">
+  {% trans "Default Value" %}
+</div>
+<div class="toggle-container">
+    <span class="switch switch-small switch-widget" data-bind="css: {'on': getdefault() === true, 'null': getdefault() === null}, click: setdefault"><small></small></span>
+            <div style="display:flex; flex-direction:row;">
+            <div class="arches-toggle-sm" data-bind="text:label"></div>
+            </div>
+    <span class="arches-toggle-subtitle" data-bind="text: subtitle"></span>
+</div>
+{% endblock config_form %}

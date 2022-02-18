@@ -1,0 +1,96 @@
+{% load i18n %}
+{% load staticfiles %}
+
+<!--ko let: { self: $data }-->
+<div class="search-container advanced-search-container relative">
+
+    <!-- Advanced Search Panel -->
+    <div class="facets-container" style="">
+        <div class="list-group search-facets">
+            <div class="search-facet-item header">
+                <h4 class="search-facet-item-heading">{% trans "Search Facets" %}</h4>
+                <div class="list-filter relative">
+                    <input type="text" class="form-control" style="" placeholder="{% trans "Find ..." %}" data-bind="value: facetFilterText, valueUpdate: 'keyup'">
+                    <!-- Clear Filter -->
+                    <span class="clear-node-search" data-bind="click: function () { facetFilterText(''); }"><i class="fa fa-times-circle"></i></span>
+                </div>
+            </div>
+            <!-- ko foreach: searchableGraphs -->
+                <!-- ko if: cards().length > 0  -->
+                <div class="search-facet-item disabled">
+                    <h4 class="search-facet-item-heading">
+                        <strong data-bind="text: name"></strong>
+                        <span><i class="fa report-expander print-hide" data-bind="css: {'fa-angle-down': !collapsed(), 'fa-angle-right': collapsed()}, click: function () { collapsed(!collapsed()) }"></i></span>
+                    </h4>
+                </div>
+                <div data-bind="visible: !collapsed()">
+                    <!-- ko foreach: cards -->
+                    <a href="#" class="search-facet-item" data-bind="click: addFacet">
+                        <h4 class="search-facet-item-heading" data-bind="text: name"></h4>
+                        <p class="list-group-item-text"></p>
+                    </a>
+                    <!-- /ko -->
+                </div>
+                <!-- /ko -->
+            <!-- /ko -->
+        </div>
+    </div>
+
+    <div class="facets-search-container" style="">
+
+        <div data-bind="visible: filter.facets().length === 0">
+            <div id="rr-splash" class="rr-splash">
+                <!-- Image -->
+                <div class="img-lg img-circle rr-splash-img-container">
+                    <img class="rr-splash-img" src="{% static 'img/inspection.png' %}" alt="Advanced Search">
+                </div>
+
+                <!-- Splash Title -->
+                <div class="rr-splash-title">{% trans "Advanced Search" %}</div>
+
+                <!-- Splash Instructions -->
+                <div class="rr-splash-description">{% trans "With Advanced Search you can build more sophisticated search queries." %}</div>
+                <div class="rr-splash-description">{% trans "Select the search facets you wish to query from the list on the right.  Then enter your" %}</div>
+                <div class="rr-splash-description">{% trans "criteria to customize your search filters" %}</div>
+            </div>
+        </div>
+
+        <!-- ko foreach: filter.facets -->
+
+        <!-- ko if: $index  -->
+        <div class="btn-group btn-group-sm facet-btn-group">
+            <button class="btn btn-warning btn-active-dark facet-btn" data-bind="css: {'selected': value.op() === 'and'}, click: function () { value.op('and'); }">{% trans "And" %}</button>
+            <button class="btn btn-warning btn-active-dark facet-btn" data-bind="css: {'selected': value.op() === 'or'}, click: function () { value.op('or'); }">{% trans "Or" %}</button>
+        </div>
+        <!-- /ko -->
+
+        <div class="faceted-search-card-container">
+            <div class="facet-name" data-bind="text: ko.unwrap(card.getGraph().name) + ' - ' + card.name"></div>
+            <div class="row facet-search-criteria">
+                <!-- ko foreach: card.nodes -->
+                <div class="facet-body">
+
+                    <div class="facet-label" data-bind="text: $data.label"></div>
+                    <div data-bind="component: {
+                        name: self.datatypelookup[datatype].configname,
+                        params: {
+                            search: true,
+                            filterValue: $parent.value[nodeid],
+                            node: $data,
+                            datatype: self.datatypelookup[datatype]
+                        }
+                    }">
+                    </div>
+
+                </div>
+                <!-- /ko -->
+
+                <div class="facet-search-button pull-right">
+                    <button class="btn btn-sm btn-primary" data-bind="click: function (facet) { self.filter.facets.remove(facet); }">{% trans "Remove" %}</button>
+                </div>
+            </div>
+        </div>
+        <!-- /ko -->
+    </div>
+</div>
+<!-- /ko -->

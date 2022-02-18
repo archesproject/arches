@@ -1,0 +1,26 @@
+{% load i18n %}
+<!-- Upload File Modal -->
+<div class="modal fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content no-corners">
+
+            <!-- Form Header -->
+            <div class="modal-header arches-modal-header">
+                <button aria-hidden="true" class="close" type="button">×</button>
+                <h4 class="modal-title">{% trans "Import Images" %}<small> {% trans "(Click on panel or drag and drop files onto panel to upload)" %}</small></h4>
+            </div>
+            <!-- End Form Header -->
+
+            <div class="modal-body">
+
+                <form action="upload.php" class="dropzone"></form>
+
+            </div>
+
+            <div class="modal-footer">
+                <button class="btn-u" type="button">{% trans "Done" %}</button>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- End Upload File Modal -->

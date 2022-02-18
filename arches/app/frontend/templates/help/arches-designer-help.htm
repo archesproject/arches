@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+{% load i18n %}
+<!-- this html is included in help-panel-base.htm -->
+<div class="ep-help-content">
+    <div>
+        <a href="javascript:void(0)" class="ep-help-topic-toggle">
+            <h4>{% trans "Overview" %}</h4>
+            &nbsp;<i class="ep-help-topic-toggle-icon fa fa-chevron-down"></i>
+        </a>
+        <div class="ep-help-topic-content" style="display:block">
+            <p>{% blocktrans %}This page is where you manage all of your <strong>Resource Models</strong> and <strong>Branches</strong>.{% endblocktrans %}</p>
+            <p>{% blocktrans %}If you don't see any listed here, you may want to consider <a href="https://arches.readthedocs.io/en/stable/projects-and-packages" target="_blank">loading a package</a>. Alternatively, you can directly import individual Resource Model files through <strong>Add ...</strong> (close this panel to find the button). Finally, to start from scratch just <strong>Add ... > New Resource Model</strong>.{% endblocktrans %}</p>
+            <p>{% blocktrans %}Once you have some graphs loaded, there are a few management operations which are only accessible through this page. Use <strong>Manage ...</strong> on a graph to perform the following actions:{% endblocktrans %}</p>
+            <table class="ep-help-table">
+                <tr>
+                    <td>{% trans "Manage Graph" %}</td>
+                    <td>{% trans "Enter the Graph Designer. This is where the magic happens!" %}</td>
+                </tr>
+                <tr>
+                    <td>{% trans "Manage Functions" %}</td>
+                    <td><em>{% blocktrans %}Resource Models only{% endblocktrans %}</em><br>{% blocktrans %}Enter the Function Manager. <strong>You must use the Function Manager to configure the display names of your resources!</strong> Otherwise, all your resources will just be labeled "Untitled" in the search results and on the map.{% endblocktrans %}</td>
+                </tr>
+                <tr>
+                    <td>{% trans "Create Mapping File" %}</td>
+                    <td><em>{% blocktrans %}Resource Models only{% endblocktrans %}</em><br>{% blocktrans %}You will need a Mapping File if you plan to <a href="https://arches.readthedocs.io/en/stable/import-export" target="_blank">bulk import resources</a> from a CSV file.{% endblocktrans %}</td>
+                </tr>
+                <tr>
+                    <td>{% trans "Delete Instances" %}</td>
+                    <td><em>{% blocktrans %}Resource Models only{% endblocktrans %}</em><br>{% blocktrans %}Delete all resource instances that have been made with this Resource Model. <strong>This operation is not reversible!</strong> It's likely this operation would never be used outside of initial installation and testing.{% endblocktrans %}</td>
+                </tr>
+                <tr>
+                    <td>{% trans "Export" %}</td>
+                    <td>{% trans "Export this graph to a .json file. It can then be imported into a different Arches installation, or copied into a package." %}</td>
+                </tr>
+                <tr>
+                    <td>{% trans "Clone" %}</td>
+                    <td>{% trans "Create a duplicate of this graph. Useful during development if you want to alter a Resource Model that already has resource instances saved." %}</td>
+                </tr>
+                <tr>
+                    <td>{% trans "Delete" %}</td>
+                    <td>{% trans "Delete this graph. If this is a Resource Model, all resource instances that have been made with it will also be deleted (as with <strong>Delete Instances</strong> operation above)." %}</td>
+                </tr>
+            </table>
+        </div>
+    </div>
+    <div>
+        <a href="javascript:void(0)" class="ep-help-topic-toggle">
+            <h4>{% trans "What are Resource Models and Branches?" %}</h4>
+            &nbsp;<i class="ep-help-topic-toggle-icon fa fa-chevron-right"></i>
+        </a>
+        <div class="ep-help-topic-content">
+            <p>{% blocktrans %}At the core of an Arches database are a series of structures called "graphs", of which there are two types:{% endblocktrans %}</p>
+            <p>{% blocktrans %}<strong>Resource Models</strong> -  When creating new Resources, a data entry user must decide which Resource Model to use, determining what information is collected for the Resource. Think of different Resource Models as categories of records in your database&mdash;"Buildings" vs. "Archaeological Sites" vs. "Cemeteries", for example. Every Arches database must have at least one Resource Model.{% endblocktrans %}</em></p>
+            <p>{% blocktrans %}<strong>Branches</strong> - You can think of Branches as "partial" graphs that can be aggregated to form the "full" graph of a Resource Model. They function as resuable building blocks, allowing you to avoid having to manually recreate complex structures in multiple Resource Models.{% endblocktrans %}</p>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,27 @@
+{% extends "views/report-templates/default.htm" %}
+{% load i18n %}
+
+{% block header %}
+<div>
+  <!-- ko if: featureCount() > 0 || report.preview -->
+  <div data-bind="component: {
+      name: 'report-header-map',
+      params: $data
+  }" class="report-map-header-component"></div>
+  <!-- /ko -->
+</div>
+{% endblock header %}
+
+{% block header_form %}
+<!-- ko component: {
+    name: 'map-widget',
+    params: {
+        config: report.configJSON,
+        node: null,
+        value: null,
+        configForm: true,
+        type: "report-header",
+        graph: report.graph
+    }
+} --><!-- /ko -->
+{% endblock header_form %}

@@ -1,0 +1,21 @@
+{% load i18n %}
+
+<div class="workflows-get-tile-value padded-workflow-step">
+    <div style='display:flex; justify-content: space-between;'>
+        <h4>{% trans "Workflow Complete" %}</h4>
+        <div>
+            <a href="#" target="_self" type="button" class="btn btn-primary"
+                data-bind="attr: { href: workflowUrl}">
+                <i class="fa fa-plus"></i>
+                <span>{% trans "New" %}</span>
+            </a>
+            <!-- ko if: resourceid -->
+            <a href="#" target="_self" type="button" class="btn btn-primary"
+                data-bind="attr: { href: resourceEditUrl}">
+                <i class="fa fa-pencil"></i>
+                <span>{% trans "Edit" %}</span>
+            </a>
+            <!-- /ko -->
+        </div>
+    </div>
+</div>

@@ -1,0 +1,164 @@
+{% load i18n %}
+<!-- ko foreach: { data: [$data], as: 'self' } -->
+<!-- Card Manager Panels and Forms -->
+<div class="ep-card-crud-container">
+    <!-- Card Preview -->
+    <div id="card-preview">
+
+        <div id="" class="panel">
+            <div class="panel-heading">
+                <div class="">
+                    <h3 id="cc-title" class="panel-title card-main-title" data-bind="text: card.get('name')"></h3>
+                </div>
+            </div>
+
+            <!-- Data Entry -->
+            <div id="card-preview-crud" class="panel-body card-body fade in" style="padding-top: 0px;">
+                <div id="cards" class="tab-base outline relative" style="margin-bottom: 15px; margin-top: -2px;">
+                    <!--Nav Tabs-->
+                    <ul class="nav nav-tabs card-nav-container"  data-bind="sortable: {
+                        data: card.isContainer() ? card.get('cards') : [card],
+                        beforeMove: self.beforeMove
+                    }">
+                        <li id="summary-group" data-bind="css: {
+                            'active': self.currentTabIndex()===$index()
+                        }, click: self.selection">
+                            <a id="summary-tab" href="#" class="card-tab-title" data-bind="click: function(){window.setTimeout(function(){window.dispatchEvent(new Event('resize'))}, 100)}">
+                                <!-- Editable Span -->
+                                <span class="editable-card">
+                                    <i class="fa fa-align-justify"></i> <span data-bind="text: get('name')"></span>
+                                </span>
+                            </a>
+                        </li>
+                    </ul>
+
+                    <!--Tabs Content-->
+                    <div class="tab-content card-content-tab" style="margin-left: 0px;">
+
+                        <!-- ko foreach: {
+                            data: card.isContainer() ? card.get('cards') : [card],
+                            as: 'card'
+                        } -->
+                        <!-- Card -->
+                        <div class="tab-pane fade" data-bind="css: {
+                            'active in': self.currentTabIndex()===$index()
+                        }">
+                            <div class="panel-body card-panel-body">
+                                <div id="" class="card-content">
+
+                                    <div class="card-instructions">
+                                        <span data-bind="text: card.get('instructions')"></span>
+
+                                        <!-- Help link -->
+                                        <span>
+                                            <a class="pull-right card-help help editable-help" data-bind="visible: self.currentTabCard() && self.currentTabCard().get('helpenabled'), click: function () { self.helpPreviewActive(true) }" style="display: none; cursor:pointer;"> {% trans "Help" %} <i class="fa fa-question-circle"></i></a>
+                                        </span>
+                                    </div>
+
+                                    <!-- Form -->
+                                    <div class="col-xs-12 card-form-container" style="">
+
+                                        <form class="widgets row" style="margin-bottom: 20px;" data-bind="sortable: {
+                                                data:card.get('widgets'),
+                                                beforeMove: self.beforeMove
+                                            }">
+                                            <div class='widget-preview' data-bind='component: {
+                                                name: self.widgetLookup[get("widget_id")()].name,
+                                                params: {
+                                                    config: configJSON,
+                                                    value: ko.observable(null),
+                                                    node: node,
+                                                    disabled: card.get("disabled"),
+                                                    graph: self.graph
+                                                }
+                                            }, css:{
+                                                "active": self.selection() === $data
+                                            }, click: self.selection() === $data ? null : self.selection'></div>
+                                        </form>
+
+                                        <!-- Save/Add Button -->
+
+                                        <!-- ko if: !card.get('disabled') -->
+                                        <div id="card-save-tile-btn" class="install-buttons" data-bind="visible: card.get('cardinality')() === 'n'" style="display: none;">
+                                            <button id="" class="btn btn-shim btn-mint btn-labeled btn-lg fa fa-plus" disabled>{% trans "Add" %}</button>
+                                        </div>
+                                        <!-- /ko -->
+                                    </div>
+                                </div>
+                            </div>
+                            <div id="card-save-tile-list" class="list-group" style="margin: 0px 15px 30px 10px; display: block;" data-bind="visible: card.get('cardinality')() === 'n'">
+
+                                <!-- Title -->
+                                <div class="card-tab-title mar-btm">
+                                    {% trans "Saved" %} <span data-bind="text: card.get('name')"/>
+                                </div>
+
+                            </div>
+                        </div>
+                        <!-- /ko -->
+
+                    </div>
+
+                    <aside id="card-help-panel" class="card-help-panel" style="display: none;" data-bind="visible: self.helpPreviewActive">
+                        <div class="relative">
+                            <a id="add-basemap-wizard-help-close" href="#" class="help-close fa fa-times fa-lg" style="" data-bind="click: function () { self.helpPreviewActive(false) }"></a>
+                        </div>
+                        <div id="add-basemap-wizard-help-content">
+                            <div>
+                                <div class="panel-heading">
+                                    <h3 class="panel-title" style="padding: 0 10px 0 10px;">
+                                        <span class="help-text-small">{% trans "Help" %}</span>
+                                        <span data-bind="text: self.currentTabCard() ? self.currentTabCard().get('helptitle') : ''"></span>
+                                    </h3>
+                                </div>
+                                <div class="panel-body" style="padding: 10px 10px 15px 10px;" data-bind="html: self.currentTabCard() ? self.currentTabCard().get('helptext') : ''">
+                                </div>
+                            </div>
+                        </div>
+                    </aside>
+                </div>
+
+                <!-- Wizard Level Buttons -->
+                <div class="ep-form-toolbar" style="background: transparent; border-bottom: none; padding-bottom: 20px;">
+                    <div class="ep-form-toolbar-tools mar-no flex">
+                        <span>
+                            <button disabled class="btn btn-danger btn-lg btn-labeled fa fa-trash">{% trans "Discard" %}</button>
+                            <button disabled class="btn btn-primary btn-lg btn-labeled fa fa-check">{% trans "Save" %}</button>
+                        </span>
+                    </div>
+                </div>
+
+                <div class="relative" style="margin-bottom: 0px; margin-top: 10px; padding-bottom: 10px;" data-bind="visible: card.get('cardinality')() === 'n' && card.isContainer()" style="display: none;">
+
+                    <!-- Title -->
+                    <div class="card-tab-title mar-btm">
+                        {% trans "Saved" %} <span data-bind="text: card.get('name')"/>
+                    </div>
+
+                    <!-- Wizard Tile -->
+                    <div id="wizard-tile-card" class="tab-base outline" style="margin-bottom: 20px; margin-top: -2px;">
+
+                        <ul class="nav nav-tabs card-nav-container" data-bind="foreach: card.get('cards')" style="margin-bottom: 0px;">
+                            <li id="summary-group" data-bind="css: {'active': $index() === self.currentTabIndex()}" style="margin-bottom: 0px;">
+                                <a id="summary-tab" href="#" class="card-tab-title" data-bind="click: self.selection">
+                                    <!-- Editable Span -->
+                                    <span class="card-tab-title">
+                                        <span data-bind="text: get('name')"></span>
+                                    </span>
+                                </a>
+                            </li>
+                            <li class="wizard-card-tools" data-bind="if: $index() === ($parent.card.isContainer() ? ($parent.card.get('cards')().length - 1) : 0) ">
+                                <i class="ion-ios-trash add-tooltip library-tools-icon" data-placement="bottom" data-toggle="tooltip" data-original-title="Delete"></i>
+                                <i class="ion-ios-loop-strong add-tooltip library-tools-icon" data-placement="bottom" data-toggle="tooltip" data-original-title="Show/Hide"></i>
+                            </li>
+                        </ul>
+                    </div>
+
+                </div>
+            </div>
+
+
+        </div>
+    </div>
+</div>
+<!-- /ko -->

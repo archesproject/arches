@@ -29,14 +29,16 @@ var baz = Object.keys(bar).reduce((acc, key) => {
     return acc;
 }, {});
 
+// const foo_plugins = fileNames('./plugins', {})
+// var bar_plugins = Object.keys(foo_plugins).reduce((acc, key) => {
+//     var foo = (key).slice(0, key.length - 3)
+//     acc[foo] = Path.resolve(__dirname, '../js', key)
+//     return acc;
+// }, {});
 // console.log("HI", bar)
-console.log("HI", baz)
+// console.log("HI", baz)
 
 module.exports = {
-    // entry: glob.sync('./js/**.js').reduce(function(obj, el) {
-    //     obj[path.parse(el).name] = el;
-    //     return obj;
-    // }, {}),
     entry: bar,
     output: {
         path: Path.join(__dirname, '../build'),
@@ -70,7 +72,26 @@ module.exports = {
     ],
     resolve: {
         // moduleDirectories: [__dirname, "node_modules"]
-        alias: baz,
+        alias: {
+            ...baz,
+            'arches': Path.resolve(__dirname, '../templates', 'javascript.htm'),
+            'resource-edit-history-data': Path.resolve(__dirname, '../templates/views/resource', 'edit-log.htm'),
+            'plugin-data': Path.resolve(__dirname, '../templates/views', 'plugin.htm'),
+            'mobile-survey-manager-data': Path.resolve(__dirname, '../templates/views', 'mobile-survey-designer.htm'),
+            'graph-settings-data': Path.resolve(__dirname, '../templates/views/graph', 'graph-settings.htm'),
+            'graph-functions-data': Path.resolve(__dirname, '../templates/views/graph', 'function-manager.htm'),
+            'graph-base-data': Path.resolve(__dirname, '../templates/views/graph', 'graph-base.htm'),
+            'function-templates': Path.resolve(__dirname, '../templates', 'javascript.htm'),
+            'component-templates': Path.resolve(__dirname, '../templates', 'javascript.htm'),
+            'widgets': Path.resolve(__dirname, '../templates', 'javascript.htm'),
+            'view-data': Path.resolve(__dirname, '../templates', 'base-manager.htm'),
+            'graph-manager-data': Path.resolve(__dirname, '../templates/views', 'graph.htm'),
+            'turf': Path.resolve(__dirname, '../node_modules/@turf/turf', 'turf.min'),
+            'plugins/knockout-select2': Path.resolve(__dirname, '../plugins', 'knockout-select2.js'),
+            'jquery-validate': Path.resolve(__dirname, '../node_modules/jquery-validation/dist', 'jquery.validate.min'),
+            'jquery-ui/draggable': Path.resolve(__dirname, '../node_modules/jqueryui', 'jquery-ui.min.js'),
+            'jquery-ui/sortable': Path.resolve(__dirname, '../node_modules/jqueryui', 'jquery-ui.min.js'),
+        },
     },
     module: {
         rules: [
@@ -78,6 +99,10 @@ module.exports = {
                 test: /\.mjs$/,
                 include: /node_modules/,
                 type: 'javascript/auto',
+            },
+            {
+                test: /\.htm$/i,
+                loader: "html-loader",
             },
             {
                 test: /\.(ico|jpg|jpeg|png|gif|eot|otf|webp|svg|ttf|woff|woff2)(\?.*)?$/,

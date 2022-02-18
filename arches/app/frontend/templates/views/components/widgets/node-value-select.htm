@@ -1,0 +1,59 @@
+{% extends "views/components/widgets/base.htm" %}
+{% load i18n %}
+
+
+{% block form %}
+<div class="row widget-wrapper">
+    <div class="form-group">
+        <label class="control-label widget-input-label" data-bind="text:label">
+        </label>
+        <!-- ko if: node -->
+        <i data-bind="css: {'ion-asterisk widget-label-required': node.isrequired}"></i>
+        <!-- /ko -->
+        <div class="col-xs-12 resource-instance-wrapper">
+            <input style="width:30%; display:inline-block;"
+                data-bind="
+                value: value,
+                select2Query: {
+                    select2Config: select2Config
+                }
+            ">
+
+        </div>
+    </div>
+</div>
+{% endblock form %}
+
+
+{% block config_form %}
+<div>
+    <div class="control-label">
+        {% trans "Placeholder" %}
+    </div>
+    <div class="col-xs-12 pad-no crud-widget-container">
+        <div class='node-config-item'>
+        <input placeholder="{% trans "Placeholder" %}"
+            class="form-control input-md widget-input"
+            data-bind="value: placeholder, valueUpdate: 'keyup'">
+        </div>
+        <div class='node-config-item'>
+        <div class='control-label'>{% trans "Dropdown Format" %}
+        </div>
+        <div class="toggle-container">
+            <span class="switch switch-small" data-bind="css: {'on': displayOnlySelectedNode()}, click: toggleDisplayOnlySelected"><small></small></span>
+                    <div style="display:flex; flex-direction:row;">
+                    <div class="arches-toggle-sm" data-bind="text:'Show only the value of the selected node in the dropdown options'"></div>
+                    </div>
+            <span class="arches-toggle-subtitle" data-bind="text: 'Check to limit the dropdown to only this widget\'s node rather than all nodes in the tile.'"></span>
+        </div>
+        </div>
+    </div>
+</div>
+{% endblock config_form %}
+
+{% block report %}
+<dt data-bind="text: label"></dt>
+<dd>
+    <a data-bind="attr: { href: '#' + value() }, text: displayValue"></a>
+</dd>
+{% endblock report %}

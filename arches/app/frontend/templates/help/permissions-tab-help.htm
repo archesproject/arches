@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+{% load i18n %}
+<!-- this html is included in help-panel-base.htm -->
+<div class="ep-help-content">
+    <div>
+        <h4>{% trans "Permissions Tab" %}</h4>
+    </div>
+    <div>
+        <a href="javascript:void(0)" class="ep-help-topic-toggle">
+            <h4>{% trans "Overview" %}</h4>
+            &nbsp;<i class="ep-help-topic-toggle-icon fa fa-chevron-down"></i>
+        </a>
+        <div class="ep-help-topic-content" style="display:block;">
+            <p>{% blocktrans %}Arches allows you to define user and user group permissions on a per-nodegroup basis. For example, you may want to hide the coordinates of a Resource from the public, or allow a certain group of users to only update the condition assessment section of a Resource Model. Rules like these are all enforced using permissions.{% endblocktrans %}</p>
+            <span class="ep-help-table-header">{% trans "Permissions Levels" %}</span>
+            <table class="ep-help-table">
+                <tr>
+                    <td><i class="ion-android-delete"></i>&nbsp;{% trans "Delete" %}</td>
+                    <td>{% blocktrans %}Allows users to delete instances of this nodegroup. Note, this is not the same as being allowed to delete an entire resource, permissions for which are not handled here.{% endblocktrans %}</td>
+                </tr>
+                <tr>
+                    <td><i class="ion-close"></i>&nbsp;{% trans "No Access" %}</td>
+                    <td>{% blocktrans%}Disallows users from seeing or editing instances of this nodegroup. Use this permission level to hide sensitive data from non-authenticated users (the public).{% endblocktrans %}</td>
+                </tr>
+                <tr>
+                    <td><i class="ion-ios-book"></i>&nbsp;{% trans "Read" %}</td>
+                    <td>{% trans "Allows users to see this nodegroup's card. If disallowed, the card/nodegroup will be hidden from the map and resource reports." %}</td>
+                </tr>
+                <tr>
+                    <td><i class="ion-edit"></i>&nbsp;{% trans "Create/Update" %}</td>
+                    <td>{% blocktrans%}Allows users to create or edit instances of this nodegroup. This provides the ability to let users edit some information about a resource, while be restricted from editing other information.{% endblocktrans %}</td>
+                </tr>
+            </table>
+            <span class="ep-help-table-header">{% trans "Non-Authenticated Users" %}</span>
+            <p>{% blocktrans %}You may notice that by default Arches comes with a "Guest" group, as well as user named "anonymous" who is a member of that group. <strong>Any non-authenticated user is treated as the "anonymous" user.</strong> This means that all permissions applied to the Guest group will be given to anyone who views the website without logging in.{% endblocktrans %}</p>
+            
+        </div>
+    </div>
+    
+            <!-- NEED TO UPDATE THE GIF BELOW
+            <div class="col-xs-6">
+                <p><a href="{{ STATIC_URL }}img/help/node-manager.png" target="_blank"><img src="{{ STATIC_URL }}img/help/node-manager.png" style="border: 2px solid #eee"></img></a></p>
+            </div>
+            <p>
+				<a href="javascript:void(0)" class="ep-help-topic-toggle">{% trans "add a node and branch to new graph - click to view" %}</a>
+				<span class="ep-help-img-link">
+					<a href="{{ STATIC_URL }}img/help/add-node-to-branch.gif" target="_blank">{% trans "open in new tab" %}&nbsp;&nbsp;<i class="fa fa-external-link-square" aria-hidden="true"></i>
+					</a>
+				</span>
+				<img class="reloadable-img ep-help-topic-content" src="{{ STATIC_URL }}img/help/add-node-to-branch.gif"></img>
+			</p>
+            -->
+        </div>
+    </div>
+</div>
+

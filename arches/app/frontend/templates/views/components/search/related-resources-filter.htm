@@ -1,0 +1,29 @@
+<div data-bind="if: ready" class="related-resources-filter">
+    <!--ko ifnot: ko.unwrap(options.searchResultsVm.selectedResourceId) -->
+    <div style="padding-top:5px; width:100%; height: 100%; background-color: white;">
+    <div id="rr-splash" class="rr-splash" style="padding-top: 75px">
+        <!-- Image -->
+        <div class="img-lg img-circle rr-splash-img-container">
+            <img class="rr-splash-img" data-bind="attr: {'src': urls.media + 'img/Workflow.png'}" alt="Saved Search">
+        </div>
+
+        <!-- Splash Title -->
+        <div class="rr-splash-title">Related Resources</div>
+
+        <!-- Splash Instructions -->
+        <div class="rr-splash-description">Arches keeps track of how resources are related. Click the "related resources" link</div>
+        <div class="rr-splash-description">on a search result from the list on the left</div>
+        <div class="rr-splash-description">to see its relatives displayed in an interactive graph</div>
+    </div>
+</div>
+    <!-- /ko -->
+
+    <!--ko if: ko.unwrap(options.searchResultsVm.selectedResourceId) -->
+    <!-- ko component: {
+        name: 'related-resources-graph',
+        params: {
+            resourceId: options.searchResultsVm.selectedResourceId
+        }
+    } --><!-- /ko -->
+    <!-- /ko -->
+</div>

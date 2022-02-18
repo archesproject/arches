@@ -1,0 +1,58 @@
+{% load i18n %}
+<!-- New Parent Concept Modal Data Entry Form -->
+<form action="" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content no-corners">
+            
+            <!-- Form Header -->
+            <div class="modal-header arches-modal-header">
+                <button aria-hidden="true" data-dismiss="modal" class="close" type="button">×</button>
+                <h4 id="" class="modal-title">{% trans "Import Concept" %}</h4>
+            </div>
+            <!-- End Form Header -->
+            
+            <!-- Form -->
+            <div class="modal-body">
+                <div class="row">
+                    <div class="col-xs-12">  
+                        <div class="form-group arches-modal-form-group">
+                            <div class="row form-group">
+                                <div class="col-xs-8">  
+                                    <input class="select2 concept_import" name="" style="width:100%" placeholder="{% trans "Search for a concept..." %}" value="">
+                                </div>
+                                <div class="col-xs-4">
+                                    <select style="width:100%;" class="select2" id="sparql_endpoint" placeholder="{% trans "Organization" %}">
+                                        {% for key, provider in sparql_providers.items %}
+                                          <option value="{{provider.endpoint}}">{{provider.name}}</option>
+                                        {% endfor %}
+                                    </select>
+                                </div>
+                            </div>    
+                            <div class="row">
+                                <div class="col-md-12">
+                                    <h4>{% trans "Concept Indentifiers" %}</h4>
+                                    <p><textarea class="form-control textarea textarea-resizable" rows="1" type="text" name="concept_identifiers"></textarea></p>
+                                </div>
+                            </div>
+                            <div class="row hidden">
+                                <div class="col-md-12">
+                                    <div class="alert alert-warning">
+                                        <h4>{% trans "Error" %}</h4>
+                                        <p id='error_text' style="max-height:300px; overflow-y:scroll;"></p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>   
+                    </div> 
+                </div>
+            </div>
+            <!-- End Form (modal body) -->
+
+            <div class="modal-footer">
+                <button data-dismiss="modal" class="btn-u btn-u-default" type="button">{% trans "Cancel" %}</button>
+                <button type="submit" class="btn-u savebtn">{% trans "Import" %}</button>
+            </div>
+          </div>
+    </div>
+</form>
+<!-- End New Parent Concept Modal Data Entry Form -->

@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+{% load i18n %}
+<!-- this html is included in help-panel-base.htm -->
+<div class="ep-help-content">
+    <div>
+        <a href="javascript:void(0)" class="ep-help-topic-toggle">
+            <h4>{% trans "Overview" %}</h4>
+            &nbsp;<i class="ep-help-topic-toggle-icon fa fa-chevron-down"></i>
+        </a>
+        <div class="ep-help-topic-content" style="display:block;">
+          {% blocktrans %}
+            <p>Functions are discrete operations that can be associated with a Resource Model and are run on specific nodes or cards whenever a user clicks creates or modify's a Resource. Here in the Function Manager you will associate Functions with this Resource Model and configure them appropriately.</p>
+            <p>To add a Function to this Resource Model, click on it in Function Library, and notice that it is added to the list of Selected Functions. To delete a Function, use the <i class="ion-ios-trash add-tooltip" style="color:lightcoral;"></i> symbol in the upper right corner.
+              {% endblocktrans %}
+            <div>
+                <p><a href="javascript:void(0)" class="ep-help-topic-toggle">{% trans "adding a function - click to view" %}</a><span class="ep-help-img-link"><a href="{{ STATIC_URL }}img/help/add-remove-function.gif" target="_blank">{% trans "open in new tab" %}&nbsp;&nbsp;<i class="fa fa-external-link-square" aria-hidden="true"></i></a></span></p>
+                <p><img class="reloadable-img ep-help-topic-content" src="{{ STATIC_URL }}img/help/add-remove-function.gif"></img></p>
+            </div>
+            {% blocktrans %}
+            <p>Arches comes with three default functions (see below). However, functions are envisioned as the hook through which developers can easily customize Arches capabilities, because new Functions can be added to your individual Arches installation. Learn more <a href="https://github.com/archesproject/arches/wiki/Creating-New-Functions%2C-DataTypes%2C-and-Widgets" target="_blank">here</a>.</p>
+            {% endblocktrans %}
+        </div>
+    </div>
+    <div>
+        <a href="javascript:void(0)" class="ep-help-topic-toggle">
+            <h4>{% trans "Define Resource Descriptors" %}</h4>
+            &nbsp;<i class="ep-help-topic-toggle-icon fa fa-chevron-right"></i>
+        </a>
+        <div class="ep-help-topic-content">
+            
+            <p>{% blocktrans %}This function will generate one or more descriptors for Resources that are created with this Resource Model. These descriptors are used throughout the database interface, but are not saved as part of the resource. This gives you control over the way Resources are identified and described in search results and elsewhere.{% endblocktrans %}</p>
+            <p>{% blocktrans %}Once added to the Resource Model, use the appropriate tab to configure a descriptor template. Choose a card, and variables corresponding to each node in that card will be added to the template, demarcated with <code>&lt; &gt;</code>. You can rearrange these variables and add text to customize the descriptor. When you have set the descriptors, click <strong>Re-Index</strong> to update any existing resources in your database.{% endblocktrans %}</p>
+            <p>{% blocktrans %}If there are multiple instances of a given card in a Resource, the first one added will be used to create these descriptors. To manually change this, edit the Resource in question and drag the desired tile to the top of the list.{% endblocktrans %}</p>
+            <p><em>{% blocktrans %}Any user with read access permission to a resource will be seeing these resource descriptors wherever it shows up in search results or on the map. <strong>If a card is intended to be hidden from any group of users, it should not be used in this function.</strong>{% endblocktrans %}</em></p>
+            <hr>
+            {% blocktrans %}
+            <h5>Example</h5>
+            <p>Consider a Resource where the <strong>Name</strong> node value is <em>Folsom School</em> and <strong>Name Type</strong> node value is <em>Primary</em>.</p>
+            <p>Selecting the <strong>Name</strong> card will populate the template with <code>&lt;Name Type&gt;, &lt;Name&gt;</code>. The resulting descriptor would read <em>Primary, Folsom School</em>. Changing the template to <code>Building Name: &lt;Name&gt;</code> would yield <em>Building Name: Folsom School</em>.</p>
+            {% endblocktrans %}
+        </div>
+    </div>
+</div>

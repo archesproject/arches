@@ -1,0 +1,76 @@
+{% extends "views/components/widgets/base.htm" %}
+{% load i18n %}
+
+{% block form %}
+<div class="row widget-wrapper">
+    <div class="form-group">
+        <!-- ko if: node -->
+        <i data-bind="css: {'ion-asterisk widget-label-required': node.isrequired}"></i>
+        <!-- /ko -->
+        <div class="control-label">
+            <label class="control-label widget-input-label" for="">Link text (Optional)</label>
+        </div>
+        <div class="col-xs-12">
+            <input type="string" data-bind="textInput: url_label, attr: {placeholder: url_label_placeholder}" class="form-control input-lg widget-input" style="margin-bottom: 5px">
+        </div>
+        <div class="control-label">
+            <label class="control-label widget-input-label" for="">URL for link</label>
+        </div>
+        <div class="col-xs-12">
+            <input type="string" data-bind="textInput: url, attr: {placeholder: url_placeholder}" class="form-control
+            input-lg widget-input" style="margin-bottom: 5px">
+        </div>
+        <div class="col-xs-12">
+            <label class="control-label widget-input-label" for="">Preview</label>
+            <div style='margin-bottom:2px'>
+                <a target="_blank" data-bind="attr: {href: url}, style: { color: link_color }">
+                    <span data-bind="text: urlPreviewText()"></span>
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock form %}
+
+
+{% block config_form %}
+<div class="control-label">
+    {% trans "URL Placeholder" %}
+</div>
+<div class="col-xs-12 crud-widget-container">
+    <input type="" id="" class="form-control input-md widget-input"
+    data-bind="textInput: url_placeholder">
+</div>
+<div class="control-label">
+    {% trans "URL Label Placeholder" %}
+</div>
+<div class="col-xs-12 crud-widget-container">
+    <input type="" id="" class="form-control input-md widget-input"
+    data-bind="textInput: url_label_placeholder">
+</div>
+<div class="control-label">
+    {% trans "URL Link color" %}
+</div>
+<div class="col-xs-12 crud-widget-container">
+    <input type="" id="" class="form-control input-md widget-input"
+    data-bind="textInput: link_color">
+</div>
+{% endblock config_form %}
+
+
+{% block report %}
+<dt data-bind="text: label"></dt>
+<dd>
+    <div style='margin-bottom:2px'>
+        <a data-bind="attr: {href: url}, style: { color: link_color }">
+            <span data-bind="text: urlPreviewText()"></span>
+        </a>
+    </div>
+</dd>
+{% endblock report %}
+
+{% block display_value %}
+<a data-bind="attr: {href: url}, style: { color: link_color }">
+    <span data-bind="text: urlPreviewText()"></span>
+</a>
+{% endblock display_value %}

@@ -1,0 +1,13 @@
+{% load i18n %}
+<div class="resource-selector-button pull-right">
+    <div class="btn-group btn-group-xs">
+        <button class="btn btn-primary btn-active-primary dropdown-toggle" data-toggle="dropdown" type="button" aria-expanded="true"> {% trans "QA Type" %} <i class="dropdown-caret fa fa-caret-down"></i>
+        </button>
+        <ul class="dropdown-menu dropdown-menu-right">
+            <li><a href="#" data-bind="click: selectProvisional.bind($data, null)">{% trans "All edits" %}</a></li>
+            <!-- ko foreach: provisionalOptions -->
+            <li><a href="#" data-bind="text: name, click: $parent.selectProvisional.bind($parent)"></a></li>
+            <!-- /ko -->
+        </ul>
+    </div>
+</div>

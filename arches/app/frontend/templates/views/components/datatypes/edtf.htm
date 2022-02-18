@@ -1,0 +1,66 @@
+{% load i18n %}
+<!-- ko if: $data.search -->
+<div class="col-md-4 col-lg-3">
+    <select class="resources" tabindex="-1" style="display: none;" data-bind="value: op, chosen: {width: '100%', disable_search_threshold: 15}">
+        <option value="overlaps"> {% trans "overlaps" %} </option>
+        <option value="eq"> = </option>
+        <option value="gt"> > </option>
+        <option value="lt"> < </option>
+        <option value="gte"> >= </option>
+        <option value="lte"> <= </option>
+        <option value="null">{% trans "Has no value" %}</option>
+        <option value="not_null">{% trans "Has any value" %}</option>
+    </select>
+</div>
+<div class="col-md-8 col-lg-9" data-bind="visible: op() !== 'null' && op() !== 'not_null'">
+    <input type="text" placeholder='{% trans "Name" %}' class="form-control input-lg" style="height: 36px;" data-bind="textInput: searchValue">
+</div>
+<!-- /ko -->
+
+<!-- ko ifnot: $data.search -->
+<div class="node-widget-label concept-label">
+
+    <div class="control-label">
+        {% trans "Fuzzy Year Padding" %}
+    </div>
+    <div class="edtf-input">
+        <input type="number" placeholder="{% trans "Fuzzy Year Padding" %}" class="form-control input-md widget-input" data-bind="textInput: config.fuzzy_year_padding">
+    </div>
+    <div class="control-label">
+        {% trans "Fuzzy Month Padding" %}
+    </div>
+    <div  class="edtf-input">
+        <input type="number" placeholder="{% trans "Fuzzy Month Padding" %}" class="form-control input-md widget-input" data-bind="textInput: config.fuzzy_month_padding">
+    </div>
+    <div class="control-label">
+        {% trans "Fuzzy Day Padding" %}
+    </div>
+    <div class="edtf-input">
+        <input type="number" placeholder="{% trans "Fuzzy Day Padding" %}" class="form-control input-md widget-input" data-bind="textInput: config.fuzzy_day_padding">
+    </div>
+    <div class="control-label">
+        {% trans "Fuzzy Season Padding (weeks)" %}
+    </div>
+    <div class="edtf-input">
+        <input type="number" placeholder="{% trans "Fuzzy Season Padding" %}" class="form-control input-md widget-input" data-bind="textInput: config.fuzzy_season_padding">
+    </div>
+    <div class="control-label">
+        {% trans "Multiplier if Date is Uncertain (?)" %}
+    </div>
+    <div class="edtf-input">
+        <input type="number" placeholder="{% trans "Multiplier if Uncertain" %}" class="form-control input-md widget-input" data-bind="textInput: config.multiplier_if_uncertain">
+    </div>
+    <div class="control-label">
+        {% trans "Multiplier if Date is Approximate (~)" %}
+    </div>
+    <div class="edtf-input">
+        <input type="number" placeholder="{% trans "Multiplier if Approximate" %}" class="form-control input-md widget-input" data-bind="textInput: config.multiplier_if_approximate">
+    </div>
+    <div class="control-label">
+        {% trans "Multiplier if Both (? and ~)" %}
+    </div>
+    <div class="edtf-input">
+        <input type="number" placeholder="{% trans "Multiplier if Both" %}" class="form-control input-md widget-input" data-bind="textInput: config.multiplier_if_both">
+    </div>
+</div>
+<!-- /ko -->

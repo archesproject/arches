@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+{% load i18n %}
+<!-- this html is included in help-panel-base.htm -->
+<div class="ep-help-content">
+    <div>
+      {% blocktrans %}
+        <p>Three categories of Map Layers will appear on your map: <strong>Resource Layers</strong> (the contents of your database), <strong>Basemaps</strong> (static background layers), and <strong>Overlays</strong> (custom data layers from outside your database). To configure a layer, first select its category in the top bar, and then choose it from the list at left.</p>
+      {% endblocktrans %}
+    </div>
+    <div>
+        <a href="javascript:void(0)" class="ep-help-topic-toggle"><h4>{% trans "Resource Layers" %}</h4></a>
+        <div class="ep-help-topic-content">
+            <p>{% trans "Resource Layers display the resource layers in your database. One Resource Layer is created for each node with a geospatial datatype (for example, <code>geojson-feature-collection</code>). You are able to customize the appearance and visibility of each Resource Layer in the following ways." %}</p>
+            <h4>{% trans "Service Styling" %}</h4>
+            <p>{% trans "Define the way features will look on the map. The example map has demonstration features that give you a preview of the changes you make. You can choose to use <strong>Advanced Editing</strong> to create a more nuanced style. Note that changes made in Advanced Editing will not be reflected if you switch back to basic editing. For styling reference, checkout the <a href='https://www.mapbox.com/mapbox-gl-js/style-spec/' target='_blank'>MapBox Style Specification</a>." %}</p>
+            <h4>{% trans "Settings" %}</h4>
+            <p>{% trans "You can change the name of this overlay if desired; by default it will use the name of its Resource Model. You make also set the layer to be added to the search map by default, or choose a custom icon for it." %}</p>
+            <h4>{% trans "Clustering" %}</h4>
+            <p>{% trans "Arches uses 'clustering' to better display resources at low zoom levels (zoomed out). You are able to control the clustering settings for each layer individually." %}</p>
+            <p>
+                {% trans "<strong>Cluster Distance</strong> - distance (in pixels) within which resources will be clustered" %}<br>
+                {% trans "<strong>Cluster Max Zoom</strong> - zoom level after which clustering will <em>stop</em> being used" %}<br>
+                {% trans "<strong>Cluster Min Points</strong> - minimum number of points needed to create a cluster" %}
+            </p>
+            <h4>{% trans "Permissions" %}</h4>
+            <p>{% trans "This tab shows the permissions for the nodegroup whose geometry is displayed in this Resource Layer. Permissions are defined in the Graph Designer." %}</p>
+        </div>
+    </div>
+
+    <div>
+        <a href="javascript:void(0)" class="ep-help-topic-toggle"><h4>{% trans "Basemaps" %}</h4></a>
+        <div class="ep-help-topic-content">
+            <p>{% trans "A Basemap will always be present in your map. Arches comes with a few default basemaps, but advanced users are able to add more. Once added, there are few ways to configure each basemap." %}</p>
+            <h4>{% trans "Service Styling" %}</h4>
+            <p>{% trans "Define a style for this basemap. Note that depending on the type of layer, there are different styling options. For styling reference, checkout the <a href='https://www.mapbox.com/mapbox-gl-js/style-spec/#layers' target='_blank'>MapBox Style Specification</a>." %}</p>
+            <h4>{% trans "Settings" %}</h4>
+            <p>
+                {% trans "<strong>Layer name</strong> - enter a name to identify this basemap" %}<br>
+                {% trans "<strong>Default search map</strong> - choose this layer to be the default basemap" %}<br>
+                {% trans "<strong>Layer icon</strong> - associate an icon with this layer" %}
+            </p>
+        </div>
+    </div>
+
+    <div>
+        <a href="javascript:void(0)" class="ep-help-topic-toggle"><h4>{% trans "Overlays" %}</h4></a>
+        <div class="ep-help-topic-content">
+            <p>{% trans "Overlays allow you to incorporate map layers from external sources. Note that Search Results and Search Markets are treated as overlays, and can be customize separately. New overlays can be added with a little behind-the-scenes work. Once added, there are few ways to configure each overlay." %}</p>
+            <h4>{% trans "Service Styling" %}</h4>
+            <p>{% trans "Define a style for this overlay. Note that depending on the type of layer, there are different styling options. For styling reference, checkout the <a href='https://www.mapbox.com/mapbox-gl-js/style-spec/#layers' target='_blank'>MapBox Style Specification</a>." %}</p>
+            <h4>{% trans "Settings" %}</h4>
+            <p>
+                {% trans "<strong>Layer name</strong> - enter a name to identify this overlay" %}<br>
+                {% trans "<strong>Default search map</strong> - choose whether this overlay should be shown in the search map by default. Note that in the search map itself you can change the order of the layers." %}<br>
+                {% trans "<strong>Layer icon</strong> - associate an icon with this layer" %}
+            </p>
+        </div>
+    </div>
+</div>

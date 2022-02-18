@@ -1,0 +1,33 @@
+{% load i18n %}
+<!-- ko ifnot: $data.search -->
+<div class="node-config-item">
+    <div class="control-label">
+        {% trans "Concept Collection" %}
+    </div>
+    <div data-bind="if: conceptCollections().length > 0">
+        <select data-bind="disable: isEditable === false, placeholder: '{% trans "Select a concept collection" %}', value: topConcept, options: conceptCollections , optionsText: 'label', optionsValue: 'id', chosen: {width: '100%', allow_single_deselect: true}"></select>
+    </div>
+</div>
+<!-- /ko -->
+
+<!-- ko if: $data.search -->
+<div class="col-md-4 col-lg-3">
+    <select class="resources" data-bind="value: op, chosen: {width: '100%', disable_search_threshold: 15}">
+        <option value="">{% trans "Equals" %}</option>
+        <option value="!">{% trans "Not" %}</option>
+        <option value="null">{% trans "Has no value" %}</option>
+        <option value="not_null">{% trans "Has any value" %}</option>
+    </select>
+</div>
+
+<div class="col-md-8 col-lg-9" data-bind="visible: op() !== 'null' && op() !== 'not_null'">
+    <input style="display:inline-block;"
+        data-bind="
+            value: searchValue,
+            select2Query: {
+                select2Config: select2Config
+            }
+        ">
+    <span style="z-index: 100; position:absolute; right: 24px; top: 8px;" data-bind="visible: select2Config.isEmpty() === false, click: function(){select2Config.clear();}"><i class="fa fa-times-circle fa-lg"></i></span>
+</div>
+<!-- /ko -->

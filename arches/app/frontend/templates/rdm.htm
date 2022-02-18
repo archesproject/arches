@@ -1,0 +1,175 @@
+{% extends "base-manager.htm" %}
+{% load i18n %}
+
+{% load staticfiles %}
+
+{% block title %}
+{{ block.super }}
+{% trans "Reference Data Manager" %}
+{% endblock title %}
+
+{% block css %}
+    <link rel="stylesheet" href="{% static 'css/main.css' %}">
+    <link rel="stylesheet" href="{% static 'css/plugins/smartadmin-production.css' %}" type="text/css" media="screen">
+    {{ block.super }}
+    <link rel="stylesheet" href="{% static 'packages/jqtree/jqtree.css' %}">
+{% endblock css %}
+
+{% block main_content %}
+
+
+    <!--=== App Header ===-->
+    <div class="breadcrumbs sticky" id="appheader" style="">
+
+        <!-- Search Terms -->
+        <div class="container">
+            <div class="row">
+
+                <!-- Concept Search -->
+                <div class="col-xs-12 col-sm-7 col-lg-8" id='rdm-concept-search-container'>
+                    <div class="form-group margin-bottom-20">
+                        {% include 'views/concept-search.htm' %}
+                    </div>
+                </div>
+                <!-- End Concept Search -->
+
+            </div>
+        </div>
+        <!-- End Search Terms -->
+
+    </div>
+    <!--=== End App Header ===-->
+
+    <!-- Main Content -->
+    <div class="block-description arches-secondary-header" id="main-container">
+
+        <div class="container content arches-forms-container" id="forms-container">
+
+            <!-- RDM Tree and CRUD Forms -->
+            <div class="row">
+
+                <!-- Begin RDM Tree -->
+                <div class="col-md-5 col-lg-4">
+
+
+
+                    <div class="left-inner arches-box-grey-border padding-10 hidden-xs hidden-sm" id="sidebar" style="background: #ffffff;">
+
+
+                        <ul class="nav nav-tabs map-service-nav-tabs">
+                            <li class="active">
+                                <a class="config-title-tab mar-no" data-toggle="tab" href="#rdm-panel" aria-expanded="false"><i class="ion-android-share-alt"></i> {% trans "Thesauri" %} </a>
+                            </li>
+                            <li class="">
+                                <a class="config-title-tab mar-no" data-toggle="tab" href="#dropdown-panel" aria-expanded="false"><i class="ion-ios-browsers-outline"></i> {% trans "Collections" %} </a>
+                            </li>
+                        </ul>
+
+
+
+
+                        <!-- RDM Tree Container -->
+                        <div class="tab-content" style="margin-top: 8px;">
+                            <section id="rdm-panel" role="tabpanel" class="tab-pane active" style="height: 600px; overflow-y: scroll; overflow-x:hidden;">
+                                <div class="concept_tree" id="jqtree">
+                                </div>
+                            </section>
+
+                            <section id="dropdown-panel" role="tabpanel" class="tab-pane" style="height: 600px; overflow-y: scroll; overflow-x:hidden;">
+                                <div class="concept_tree" id="ddtree">
+                                </div>
+                            </section>
+
+                            <div class="btn-group pull-right hidden-xs" style="top: 15px; position: absolute; right: 14px;">
+                                <button type="button" class="btn btn-primary dropdown-toggle" data-toggle="dropdown">{% trans "Tools" %}
+                                    <i class="fa fa-chevron-down"></i>
+                                    <span class="sr-only">{% trans "Toggle Dropdown" %}</span>
+                                </button>
+                                <ul class="dropdown-menu" role="menu">
+                                    <li><a href="javascript:void(0);" data-toggle="#add-scheme-form">{% trans "Add Thesauri" %}</a></li>
+                                    <li><a href="javascript:void(0);" data-toggle="#import-scheme-form">{% trans "Import Thesauri" %}</a></li>
+                                    <li><a href="javascript:void(0);" data-toggle="#export-scheme-form">{% trans "Export Thesauri" %}</a></li>
+                                    <li><a href="javascript:void(0);" data-toggle="#delete-scheme-form">{% trans "Delete Thesauri" %}</a></li>
+                                    <li class="divider"></li>
+                                    <li><a href="javascript:void(0);" data-toggle="#add-collection-form">{% trans "Add Collection" %}</a></li>
+                                    <li><a href="javascript:void(0);" data-toggle="#delete-collection-form">{% trans "Delete Collection" %}</a></li>
+                                    <li><a href="javascript:void(0);" data-toggle="#export-all-collections">{% trans "Export All Collections" %}</a></li>
+                                    <li class="divider"></li>
+                                    <li><a href="javascript:void(0);">{% trans "Close" %}</a></li>
+                                </ul>
+                            </div>
+                        </div>
+                        <!-- End RDM Tree Container -->
+
+                    </div>
+                </div>
+                <!-- End RDM Tree -->
+
+
+                <!-- Spacer for small screens -->
+                <div class="margin-top-10 hidden-md hidden-lg"></div>
+
+
+                <!-- Concept CRUD Form -->
+                <div class="col-md-7 col-lg-8">
+
+                    <!-- Concept Summary -->
+                    <div class="right-inner arches-box-grey-border rdm-concept-panel" id="crud" style="background: #ffffff;">
+                        <div class="row">
+
+                            <!-- Concept Managment Tools -->
+                            <div class="col-xs-12">
+
+                                <div class="row margin-bottom-30" id="concept_report">
+                                    <div class="col-xs-12 hidden arches-RDM-loading" id="concept_report_loading">{% trans "Loading..." %}</div>
+                                </div><!--/row-->
+
+                            </div>
+                            <!-- End Concept Managment Tools -->
+
+                        </div>
+                    </div>
+                    <!-- End Descriptions and Lists -->
+
+                    <div class="clearfix"></div>
+
+                </div>
+                <!-- End CRUD Form -->
+
+            </div>
+            <!-- End RDM Tree and CRUD Forms -->
+
+        </div>
+    </div>
+    <!--=== End Content Part ===-->
+
+    <div style="display:none;" id="concept-data">
+        <input type="hidden" id="selected-conceptid" value="{{conceptid}}">
+    </div>
+
+<div id="add-scheme-form">
+    {% include "views/rdm/modals/add-scheme-form.htm" %}
+</div>
+
+<div id="export-scheme-form">
+    {% include "views/rdm/modals/export-scheme-form.htm" %}
+</div>
+
+<div id="delete-scheme-form">
+    {% include "views/rdm/modals/delete-scheme-form.htm" %}
+</div>
+
+<div id="import-scheme-form">
+    {% include "views/rdm/modals/import-scheme-form.htm" %}
+</div>
+
+<div id="add-collection-form">
+    {% include "views/rdm/modals/add-collection-form.htm" %}
+</div>
+
+<div id="delete-collection-form">
+    {% include "views/rdm/modals/delete-collection-form.htm" %}
+</div>
+
+
+{% endblock main_content %}

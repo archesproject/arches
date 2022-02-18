@@ -1,0 +1,40 @@
+{% extends "views/components/widgets/base.htm" %}
+{% load i18n %}
+
+{% block form %}
+<div class="row widget-wrapper">
+  <div class="form-group">
+      <div style="display:flex; flex-direction: row"><div><p class="control-label widget-input-label" data-bind="text:label"></p></div><div>
+          <!-- ko if: node -->
+          <i data-bind="css: {'ion-asterisk widget-label-required': node.isrequired}"></i>
+          <!-- /ko -->
+      </div></div>
+      <div class="col-xs-12">
+        <div style="pad-hor">
+        <label data-bind="css: { 'active': value() === true, 'disabled': disabled }, click: function(e){setValue(true)}" class="form-radio form-normal form-text">
+            <input type="radio" name="stat-w-label" data-bind="checked: value() === true"><span data-bind="text:node.config.trueLabel"></span>
+        </label>
+        <label data-bind="css: { 'active': value() === false, 'disabled': disabled }, click: function(e){setValue(false)}" class="form-radio form-normal form-text">
+            <input type="radio" name="stat-w-label" data-bind="checked: value() === false"><span data-bind="text:node.config.falseLabel"></span>
+        </label>
+     </div>
+   </div>
+  </div>
+</div>
+{% endblock form %}
+
+{% block config_form %}
+<div class="control-label">
+    {% trans "Default Value" %}
+</div>
+<div class="col-xs-12" style="display:flex; flex-direction: column; height: 50px">
+  <div style="pad-hor">
+      <label data-bind="css: { 'active': defaultValue() === true }, click: function(e){setDefaultValue(true)}" class="form-radio form-normal form-text">
+          <input type="radio" name="stat-w-label" data-bind="checked: defaultValue() === true"><span data-bind="text: node.config.trueLabel"></span>
+      </label>
+      <label data-bind="css: { 'active': defaultValue() === false }, click: function(e){setDefaultValue(false)}" class="form-radio form-normal form-text">
+          <input type="radio" name="stat-w-label" data-bind="checked: defaultValue() === false"><span data-bind="text: node.config.falseLabel"></span>
+      </label>
+  </div>
+</div>
+{% endblock config_form %}

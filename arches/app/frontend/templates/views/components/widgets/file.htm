@@ -1,0 +1,193 @@
+{% extends "views/components/widgets/base.htm" %}
+{% load i18n %}
+
+{% block form %}
+<div class="row widget-wrapper">
+    <div class="form-group">
+        <label class="control-label widget-input-label" for="" data-bind="text:label"></label>
+        <!-- ko if: node -->
+        <i data-bind="css: {'ion-asterisk widget-label-required': node.isrequired}"></i>
+        <!-- /ko -->
+        <div class="col-xs-12 dropzone" data-bind="dropzone: dropzoneOptions">
+            <div class="file-select-window" data-bind="visible: filesJSON().length === 0">
+                <div class="bord-top pad-ver file-select">
+                    <div style="padding: 5px">
+                        <h2>{% trans "Upload Documents" %}</h2>
+                        <h4>{% trans "Drag & Drop your files onto this panel" %}</h4>
+                    </div>
+                    <button type="button" class="btn btn-lg btn-file-select fileinput-button dz-clickable" data-bind="css: uniqueidClass, disable: disabled">
+                        <i class="fa fa-file"></i>
+                        <span>{% trans "Select Files" %}</span>
+                    </button>
+                    <br>
+                    <div style="padding: 10px">{% trans "Adding documents to this record is " %}
+                        <span><strong>{% trans "optional." %}</strong></span>
+                        <br>
+                        {% trans "You may upload as many documents as you wish, but the maximum size of any single file is " %}
+                        <span data-bind="text: maxFilesize() + 'MB.'"></span>
+                    </div>
+
+                    <!-- <div class="btn-group pull-right">
+                        <button id="dz-remove-btn" class="btn btn-danger cancel" type="reset" data-bind="click: reset">
+                            <i class="ion ion-close"></i>
+                        </button>
+                    </div> -->
+                </div>
+                <div class="file-upload-footer">
+                    <span>{% trans "Allowed document formats:" %} <span data-bind="text: (acceptedFiles() || 'Any') + '. '"></span>
+                </div>
+            </div>
+            <div data-bind="visible: filesJSON().length > 0">
+                <!-- note that data-bind=visible must be in place (instead of ko if:) as DZ instantiates only once;
+                    elements with its class name must exist at time of init -->
+                <h4>{% trans "Uploaded Files" %}</h4>
+                <div class="file-upload-options">
+                    <!--ko if: filesJSON().length > 1-->
+                    <input data-bind="textInput: filter" type="text" placeholder="{% trans 'find a file...' %}" class="file-upload-filter">
+                    <!-- /ko -->
+
+                    <!-- Clear Search -->
+                    <span class="file-upload-clear-filter" data-bind="visible: filter().length > 0, click: function() { filter(''); }"><i class="fa fa-times-circle"></i></span>
+
+                    <!-- ko if: filter() -->
+                    <span data-bind="text: filteredList().length+' out of '+filesJSON().length+' files match filter'"></span>
+                    <!-- /ko -->
+                    <!-- ko if: (!filter() || filter() == "") -->
+                    <span data-bind="text: filesJSON().length + '{% trans " file(s) uploaded" %}'"></span>
+                    <!-- /ko -->
+                    <button type="button" class="btn btn-file-upload-reset" data-bind="click: reset">
+                        <span>{% trans "delete all files" %}</span>
+                    </button>
+                    <button type="button" class="btn btn-file-upload-reset dropzone fileinput-button dz-clickable" data-bind="css: uniqueidClass">
+                        <span>{% trans "add more files" %}</span>
+                    </button>
+                </div>
+            </div>
+            <div class="dz-previews" data-bind="css: uniqueidClass">
+            <!-- ko if: !filter() -->
+                <!-- ko foreach: pagedList(filesJSON()) -->
+                <div class="file-upload-card">
+                    <div class="media-body">
+                        <div class="media-block">
+                            <div class="media-left">
+                                <span><i class="fa fa-file fa-lg"></i></span>
+                            </div>
+                            <div class="media-body file-upload-card-detail">
+                                <div class="media-left">
+                                    <span class="text-main mar-no text-overflow" data-bind="text: name"></span>
+                                    <!-- ko if: $data.error -->
+                                    <span class="dz-error text-danger text-sm" data-bind="text: '{% trans "error" %}'"></span>
+                                    <!-- /ko -->
+                                    <span class="text-sm"><a data-bind="attr: {href: ko.unwrap(url) ? $parent.getFileUrl(url) : content, download: name}, click: function(){return ko.unwrap(url) ? true : false}, clickBubble: false"><span data-bind="text: ko.unwrap(url) ? '{% trans "Download" %}' : '{% trans "Unsaved" %}'"></span></a></span>
+                                </div>
+                                <div class="file-upload-card-detail-right">
+                                    <div class="media-right" data-bind="click: $parent.removeFile">
+                                        <button class="btn btn-xs btn-danger btn-file-cancel"><i class="ion ion-close"></i></button>
+                                    </div>
+                                    <div class="file-size-label">
+                                        <span class="text-sm" data-bind="html: $parent.formatSize($data)"></span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!-- /ko -->
+            <!-- /ko -->
+            <!-- ko if: filter() -->
+                <!-- ko foreach: pagedList(filteredList()) -->
+                <div class="file-upload-card">
+                    <div class="media-body">
+                        <div class="media-block">
+                            <div class="media-left">
+                                <span><i class="fa fa-file fa-lg"></i></span>
+                            </div>
+                            <div class="media-body file-upload-card-detail">
+                                <div class="media-left">
+                                    <span class="text-main mar-no text-overflow" data-bind="text: name"></span>
+                                    <!-- ko if: $data.error -->
+                                    <span class="dz-error text-danger text-sm" data-bind="text: '{% trans "error" %}'"></span>
+                                    <!-- /ko -->
+                                    <span class="text-sm"><a data-bind="attr: {href: ko.unwrap(url) ? $parent.getFileUrl(url) : content, download: name}, click: function(){return ko.unwrap(url) ? true : false}, clickBubble: false"><span data-bind="text: ko.unwrap(url) ? '{% trans "Download" %}' : '{% trans "Unsaved" %}'"></span></a></span>
+                                </div>
+                                <div class="file-upload-card-detail-right">
+                                    <div class="media-right" data-bind="click: $parent.removeFile">
+                                        <button class="btn btn-xs btn-danger btn-file-cancel"><i class="ion ion-close"></i></button>
+                                    </div>
+                                    <div class="">
+                                        <span class="text-sm" data-bind="html: $parent.formatSize($data)"></span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!-- /ko -->
+            <!-- /ko -->
+            </div>
+            <div data-bind="style: {visibility: pageCtReached()}">
+                <select type="button" class="btn btn-file-upload-limit" data-bind="value: pageCt">
+                    <option value="5"><span>{% trans "Show first 5 files" %} <i class="fa fa-caret-down"></i></span></option>
+                    <option value="10"><span>{% trans "Show first 10 files" %} <i class="fa fa-caret-down"></i></span></option>
+                    <option value="25"><span>{% trans "Show first 25 files" %} <i class="fa fa-caret-down"></i></span></option>
+                    <option value="100"><span>{% trans "Show all files" %} <i class="fa fa-caret-down"></i></span></option>
+                </select>
+            </div>
+        </div>
+    </div>
+</div>
+
+<template id="file-widget-dz-preview"><span></span></template>
+{% endblock form %}
+
+{% block config_form %}
+<div class="control-label">
+    {% trans "Accepted File Types" %}
+</div>
+<div class="col-xs-12 pad-no crud-widget-container">
+    <input type="" placeholder="{% trans "example: .jpg, .png, .txt" %}" id="" class="form-control input-md widget-input" data-bind="value: acceptedFiles, valueUpdate: 'keyup'">
+</div>
+
+<div class="control-label">
+    {% trans "Max File Size (mb)" %}
+</div>
+<div class="col-xs-12 pad-no crud-widget-container">
+    <input type="number" placeholder="{% trans "Max File Size (mb)" %}" id="" class="form-control input-md widget-input" data-bind="value: maxFilesize">
+</div>
+
+{% endblock config_form %}
+
+{% block report %}
+<dt data-bind="text: label"></dt>
+
+<!-- ko if: uploadedFiles().length === 0 -->
+<dd>{% trans "None" %}</dd>
+<!-- /ko -->
+
+<!-- ko foreach: reportFiles() -->
+<dd>
+    <a data-bind="attr: {href: $parent.getFileUrl(url)}" target="_blank">
+        <i class="ion ion-forward"></i>
+        <span data-bind="text: name"></span>
+    </a>
+</dd>
+<!-- /ko -->
+
+<!-- ko if: reportImages().length > 0 -->
+<dd>
+    <div id="report-image-grid" class="report-image-grid">
+        <!-- ko foreach: reportImages() -->
+        <div class="rp-image-grid-item">
+            <a id="" class="" target="_blank" data-bind="attr: {href: $parent.getFileUrl(url)}">
+                <img class="img-responsive" data-bind="attr: {src: $parent.getFileUrl(url), alt: name}">
+            </a>
+        </div>
+        <!-- /ko -->
+    </div>
+</dd>
+<!-- /ko -->
+{% endblock report %}
+
+{% block display_value %}
+<span data-bind="text: Number.isInteger(displayValue()) ? displayValue() + ' {% trans "files uploaded" %}' : displayValue()"></span>
+{% endblock display_value %}

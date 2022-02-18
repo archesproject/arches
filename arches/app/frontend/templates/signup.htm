@@ -1,0 +1,166 @@
+<!--
+ARCHES - a program developed to inventory and manage immovable cultural heritage.
+Copyright (C) 2013 J. Paul Getty Trust and World Monuments Fund
+
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU Affero General Public License as
+published by the Free Software Foundation, either version 3 of the
+License, or (at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+GNU Affero General Public License for more details.
+
+You should have received a copy of the GNU Affero General Public License
+along with this program. If not, see <http://www.gnu.org/licenses/>.
+-->
+{% extends "base.htm" %} {% load staticfiles %} {% load i18n %} {% block loading_mask %} {% endblock loading_mask %} {% block body %}
+
+<div id="container" class="cls-container arches-login">
+
+    <!-- BACKGROUND IMAGE -->
+    <!--===================================================
+    <div id="bg-overlay" class="bg-img img-login"></div>
+    -->
+
+    <!-- LOGIN FORM -->
+    <div class="cls-content arches-signin">
+        <div class="cls-content-sm panel login-panel" style="width: 350px;">
+            <div class="panel-body">
+                <h3 class="login-panel-header arches-signin">{% trans "Create Account" %}</h3>
+                <p class="arches-signin-subtext">
+                    {% trans "Register to access data modeling, editing, and discovery tools." %}
+                </p>
+                <form class="change-password-form" action="?next={{ next }}" method='POST' {% if auth_failed %} autocomplete="off" {% endif %}>
+                    {% csrf_token %}
+                    <div>
+                        {% if form.errors %}
+                        <p class="errornote">
+                            {% if form.errors.items|length == 1 %}{% trans "Please correct the error below." %}{% else %}{% trans "Please correct the errors below." %}{% endif %}
+                            {% if form.ts.errors %}
+                            {% for error in form.ts.errors %}
+                                <div style="color:darkred">{{ error|escape }}</div>
+                            {% endfor %}
+                            {% endif %}
+                        </p>
+                        {% endif %}
+
+                        {{ confirmation_message | safe }}
+
+                        {% if showform %}
+                        <div class="form-group">
+                            <div class="input-group">
+                                    <div class="input-group-addon"><i class="ion-compose"></i></div>
+                                    <input type="text" class="form-control input-lg" placeholder="Username" name='username' autofocus value='{{postdata.username}}'>
+                            </div>
+                            {% if form.username.errors %}
+                            {% for error in form.username.errors %}
+                                <div style="color:darkred">{{ error|escape }}</div>
+                            {% endfor %}
+                            {% endif %}
+                        </div>
+
+                        <div class="form-group">
+                            <div class="input-group">
+                                    <div class="input-group-addon"><i class="ion-compose"></i></div>
+                                    <input type="text" class="form-control input-lg" placeholder="First Name" name='first_name' autofocus value='{{postdata.first_name}}'>
+                            </div>
+                            {% if form.first_name.errors %}
+                            {% for error in form.first_name.errors %}
+                                <div style="color:darkred">{{ error|escape }}</div>
+                            {% endfor %}
+                            {% endif %}
+                        </div>
+
+                        <div class="form-group">
+                            <div class="input-group">
+                                    <div class="input-group-addon"><i class="ion-compose"></i></div>
+                                    <input type="text" class="form-control input-lg" placeholder="Last Name" name='last_name' value='{{postdata.last_name}}'>
+                            </div>
+                            {% if form.last_name.errors %}
+                            {% for error in form.last_name.errors %}
+                                <div style="color:darkred">{{ error|escape }}</div>
+                            {% endfor %}
+                            {% endif %}
+                        </div>
+
+                        <div class="form-group">
+                            <div class="input-group">
+                                    <div class="input-group-addon"><i class="ion-email"></i></div>
+                                    <input type="text" class="form-control input-lg" placeholder="Email" name='email' value='{{postdata.email}}'>
+                            </div>
+                            {% if form.email.errors %}
+                            {% for error in form.email.errors %}
+                                <div style="color:darkred">{{ error|escape }}</div>
+                            {% endfor %}
+                            {% endif %}
+                        </div>
+
+                        <div class="form-group">
+                            <div class="input-group">
+                                    <div class="input-group-addon"><i class="ion-asterisk"></i></div>
+                                    <input type="password" class="form-control input-lg" placeholder="Password" name='password1'>
+                            </div>
+                            {% if form.password1.errors %}
+                            {% for error in form.password1.errors %}
+                                <div style="color:darkred">{{ error|escape }}</div>
+                            {% endfor %}
+                            {% endif %}
+                        </div>
+
+                        <div class="form-group">
+                            <div class="input-group">
+                                    <div class="input-group-addon"><i class="ion-asterisk"></i></div>
+                                    <input type="password" class="form-control input-lg" placeholder="Confirm Password" name='password2'>
+                            </div>
+                            {% if form.password2.errors %}
+                            {% for error in form.password2.errors %}
+                                <div style="color:darkred">{{ error|escape }}</div>
+                            {% endfor %}
+                            {% endif %}
+                        </div>
+
+                        <div class="form-group">
+                            <div class="arches-signin-btn" style="padding-bottom: 0px;">
+                                {% if showform %}
+                                <button class="btn btn-primary btn-lg btn-block" type="submit">{% trans "Signup" %}</button>
+                                {% endif %}
+                            </div>
+                        </div>
+
+                        <div class="password-rules text-left">
+                            {% trans 'Your password must:' %}
+                            <ul class="list-unstyled">
+                                {% for message in validation_help %}
+                                <li class="password-rule"><i class="ion-checkmark-circled"></i><span>{{ message }}</span></li>
+                                {% endfor %}
+                            </ul>
+                        </div>
+
+                        {% if enable_captcha %}
+                        <div class="form-group">
+                        {{form.captcha}}
+                        </div>
+                        {% endif %}
+
+                        {% endif %}
+                    </div>
+                </form>
+            </div>
+
+            <div class="panel-footer">
+                {% trans "Learn more about <a href='http://www.archesproject.org'>Arches</a>" %}
+            </div>
+
+        </div>
+    </div>
+    <div class="pad-ver hidden">
+        <a href="arches_password_reminder.html" class="btn-link mar-rgt">{% trans "Forgot password ?" %}</a>
+        <a href="arches_register.html" class="btn-link mar-lft">{% trans "Create a new account" %}</a>
+    </div>
+</div>
+
+</div>
+
+{% endblock body %}

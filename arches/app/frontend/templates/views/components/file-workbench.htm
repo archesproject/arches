@@ -1,0 +1,477 @@
+{% extends "views/components/workbench.htm" %}
+{% load i18n %}
+
+{% block tabs %}
+<div class="workbench-card-sidebar-tab" data-bind="click: function(){ if (self.card.tiles().length) {
+        toggleTab('manage');
+    }
+}, css: {'disabled': self.card.tiles().length === 0, 
+    'active': activeTab() === 'manage'
+}">
+    <i class="fa fa-pencil"></i>
+    <span class="map-sidebar-text">{% trans "Manage" %}</span>
+</div>
+<div class="workbench-card-sidebar-tab" data-bind="click: function(){ if (self.card.tiles().length) {
+    toggleTab('edit');
+}
+}, css: {'disabled': self.card.tiles().length === 0, 
+    'active': activeTab() === 'edit'
+}">
+    <i class="fa fa-pencil"></i>
+    <span class="map-sidebar-text">{% trans "Edit" %}</span>
+</div>
+<!--ko foreach: fileFormatRenderers-->
+        <!--ko if: ko.unwrap($parent.displayContent) && $parent.displayContent().renderer && ($parent.displayContent().renderer.id === $data.id) -->
+            <!-- ko component: {
+                name: $data.name,
+                params: {
+                    fileViewer: $parent,
+                    card: $parent.card,
+                    selected: $parent.selected,
+                    state: $data.state,
+                    displayContent: ko.unwrap($parent.displayContent),
+                    context: 'tab'
+                }
+            } --> <!-- /ko -->
+    <!--/ko-->
+<!--/ko-->
+{{ block.super }}
+{% endblock tabs %}
+
+
+{% block content_management %}
+<!-- ko if: card.widgets().length > 0 -->
+<div>
+    <div class="card-display-panel">
+        <div>
+            <div id="hidden-dz-previews" style="display:none"></div>
+            <!--ko if: displayContent() -->
+                        <!--ko foreach: fileFormatRenderers-->
+                            <!--ko if: $data.id && $parent.displayContent().renderer && $parent.displayContent().renderer.id === $data.id -->
+                                <!-- ko component: {
+                                    name: $data.name,
+                                    params: {
+                                        fileViewer: $parent,
+                                        card: $parent.card,
+                                        selected: $parent.selected,
+                                        state: $data.state,
+                                        displayContent: $parent.displayContent,
+                                        context: 'render',
+                                        loading: $parent.loading
+                                        }
+                                    } --> 
+                                <!-- /ko -->
+                            <!--/ko-->
+                        <!--/ko-->
+                    <!--ko if: !$parent.displayContent().renderer || $parent.displayContent().validRenderer() === false -->
+                    <div class="file-chart-upload-panel">
+                        <div class="gallery-controls new-tile">
+                            <div class="dropzone-photo-upload">
+                                <div class="file-select-window">
+                                    <!--ko if: $parent.displayContent().availableRenderers.length === 0 -->
+                                    <div class="bord-top file-select" style="padding-bottom: 90px;">
+
+                                        <!-- Image -->
+                                        <div class="img-lg img-circle rr-splash-img-container">
+                                            <img class="rr-splash-img" src="/media/img/answers.png" alt="Resource Editor">
+                                        </div>
+
+                                        <!-- Splash Title -->
+                                        <h2 class="rr-splash-title">{% trans 'Unable to display the selected file' %}</h2>
+
+                                        <!-- Splash Instructions -->
+                                        <h3 class="rr-splash-description">{% trans "This file can't be displayed." %}</h3>
+
+                                        <!-- Splash Instructions -->
+                                        <h3 class="rr-splash-description">{% trans "It may be a proprietary format or there isn't a loader available yet " %}</h3>
+
+                                        <!-- Splash Instructions -->
+                                        <h3 class="rr-splash-description">{% trans "to present it in this webpage." %}</h3>
+                                    </div>
+                                    <!--/ko-->
+                                    
+                                    <!--ko if: $parent.displayContent().availableRenderers.length > 0 -->
+                                    <div class="bord-top file-select loader-select">
+                                        <div class="">
+                                            <!--ko if: $parent.displayContent().validRenderer() === false -->
+                                            <h4 class="loader-error-message">{% trans 'Unable to parse your file with the '%}
+                                                <span data-bind="text:$parent.displayContent().renderer.title"></span>{% trans ' loader'%}
+                                            </h4>
+                                            <!--/ko-->
+                                            
+                                            <h2>{% trans 'Select File Loader' %}</h2>
+                                            <h4>{% trans 'Select the loader best suited for processing and visualizing the selected file' %}</h4>
+                                            <div style="display: flex; flex-flow: wrap; padding: 15px 25px;">
+
+                                            <!--ko foreach: $parent.displayContent().availableRenderers -->
+                                            <div>
+                                                <div class="r-grid-item relative" style="border: 1px solid #c4c4c4">
+                                                    <div class="" style="display:flex; flex-direction: column; background-color: #fdfdfd">
+                                                        <h4 class="r-select-title" data-bind="text: $data.title"></h4>
+                                                    </div>
+                                                    <div>
+                                                        <div class="r-select-card" style="color: #30517a; background-color: #fdfdfd">
+                                                            <div class="r-select-circle loader-button" style="top: 55px">
+                                                                <span><i data-bind="attr:{class: ($data.iconclass +' r-select-icon')}" class="fa fa fa-user r-select-icon"></i></span>
+                                                            </div>
+                                                            <div class="r-desc-container">
+                                                                <p data-bind="text: $data.description" style="color: #30517a; background-color: #fdfdfd" class="r-select-desc"></p> 
+                                                            </div>  
+                                                        </div>
+                                                    </div>
+                                    
+                                                    <!-- card Tools -->
+                                                    <div class="r-select-card-footer">
+                                                        <div class="">
+                                                            <div data-bind="click: function(){$parent.applyRendererToSelected($data)}" style="border-top: 1px solid #c4c4c4;" class="btn btn-primary btn-resource-select" role="button">
+                                                            {% trans 'Select' %}
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <!--/ko-->
+                                        </div>
+                                    </div>
+                                    <br>  
+                                </div>
+                                <div class="file-upload-footer">
+                                    <span class="loader-selector" data-bind="component: { name: 'views/components/simple-switch', params: {value: applyToAll, config:{label: '{% trans "Apply the same loader to all selected files in the dataset" %}'}}}"></span>
+                                </div>
+                                <!--/ko-->
+                               </div>
+                    
+                            </div>
+                        </div>
+                    
+                    </div>
+
+                        <!--/ko-->
+                    <!--/ko-->
+
+        </div>
+    </div>
+
+    <!--ko if: self.displayContent() === undefined -->
+    <div class="file-chart-upload-panel">
+        <div class="gallery-controls new-tile">
+            <div class="dropzone-photo-upload" data-bind="dropzone: dropzoneOptions">
+                <div class="file-select-window">
+                   <div class="bord-top pad-ver file-select">
+                       <div class="" style="padding: 5px">
+                           <h2>{% trans 'Upload Files' %}</h2>
+                           <h4>{% trans 'Drag & Drop your files onto this panel to upload' %}</h4>
+                       </div>
+                       <button type="button" class="btn btn-lg btn-file-select fileinput-button dz-clickable" data-bind="css: uniqueidClass">
+                           <i class="fa fa-file"></i>
+                           <span>{% trans "Select Files" %}</span>
+                       </button>
+                       <br>
+                       <div style="padding: 10px">{% trans "Adding files to this record is " %}
+                           <span><strong>{% trans "optional." %}</strong></span>
+                           <br>
+                           {% trans "You may upload as many files as you wish; check with the site admin on the maximum file size." %}
+                       </div>
+
+                   </div>
+                   <div class="file-upload-footer">
+                       <!-- ko if: acceptedFiles() !== null -->
+                       <span data-bind="text: ('The following file formats may be uploaded: ' + acceptedFiles())"></span>
+                       <!-- /ko -->
+                       <!-- ko if: !acceptedFiles() -->
+                       <span>{% trans 'Images formatted as .jpg, .png files may be uploaded. Other formats may require a loader to view.' %}</span>
+                       <!-- /ko -->
+                   </div>
+               </div>
+
+            </div>
+        </div>
+    </div>
+    <!--/ko-->
+
+
+</div>
+<!-- /ko -->
+{% endblock content_management %}
+
+
+{% block sidepanel %}
+<!--ko if: activeTab() === 'manage' -->
+<div class="workbench-header-buffer">
+    <div class="workbench-card-sidepanel-header-container">
+        <h4 class="workbench-card-sidepanel-header" data-bind="click: hideSidePanel, text: 'Manage Files/Loaders'"></h4>
+    </div>
+</div>
+<div class="file-workbench-filter">
+    <h2 class="file-workbench-filter-header">{% trans "File Filter" %}</h2>
+    <input type="text" class="form-control" style="width: 100%; height:initial" placeholder="{% trans 'e.g.: .txt' %}" data-bind="textInput: filter"></input>
+    <span class="clear-node-search" data-bind="visible: filter().length > 0, click: function() { filter(''); }"><i class="fa fa-times-circle"></i></span>
+</div>
+<div class='file-workbench-files'>
+<!-- ko foreach: { data: card.tiles(), as: 'tile'} -->
+    <!--ko if: $parent.getUrl(tile) && ($parent.filter().length === 0 || $parent.isFiltered(tile)) -->
+    <div class='file-workbench-file' style="display: inline-flex;" data-bind="css: {'staged': $parent.card.staging.indexOf(tile.tileid) > -1}, click: $parent.card.stageTile">
+    <i role="presentation" data-bind="class: $parent.getUrl(tile).iconclass || 'fa fa-file'"></i>
+    <div class='file-name' data-bind="text: $parent.getUrl(tile).name"></div>
+    </div>
+    <!--/ko-->
+<!-- /ko -->
+</div>
+<div class='file-workbench-filecount' style="display:inline-flex; justify-content: space-between; width: 100%">
+    <div style="display: inline-flex; justify-content: space-between;">
+    <div data-bind='text: card.tiles().length + "{% trans ' files uploaded' %}"'></div>
+    <div style='padding-left: 15px;' data-bind='text: card.staging().length + "{% trans ' files selected' %}"'></div>
+    </div>
+    <div data-bind="dropzone: dropzoneOptions">
+        <button type="button" class="btn-file-select fileinput-button dz-clickable" style='width: 65px; margin: 0;' data-bind="css: uniqueidClass">
+            <div>{% trans 'add files' %}</div>
+        </button>
+    </div>
+</div>
+<div class="file-workbench-button-container">
+    <div class="file-workbench-buttons">
+        <button style="width: 50%; margin-right: 2px;" class="btn btn-md btn-primary" data-bind="click: function(){stageFiltered()}"
+        ><i class="fa fa-check-square"></i> {% trans 'Select All' %}</button>
+        <button style="width: 50%; margin-left: 2px;" class="btn btn-md btn-primary" data-bind="click: function(){clearStaging()}, css: {
+            disabled: card.staging().length === 0
+        }"><i class="fa fa-eraser"></i> {% trans 'Clear All' %}</button>
+    </div>
+</div>
+
+<div class="file-workbench-selected-buttons" data-bind="visible: card.staging().length > 0">
+    <button class="btn btn-lg btn-workbench btn-warning" data-bind="click: function(){removeTiles()}"><i class="fa fa-trash"></i> {% trans 'Delete Selected' %}</button>
+    <button class="btn btn-lg btn-workbench btn-primary" data-bind="click: function(){downloadSelection()}"><i class="fa fa-download"></i> {% trans 'Download Selected' %}</button>
+</div>
+
+<div class="col-xs-12 pad-no crud-widget-container">
+    <h2 class="file-workbench-filter-header">{% trans 'Loader' %}</h2>
+    <input style="display:inline-block;"
+    data-bind="select2Query: {
+        select2Config: {
+            clickBubble: true,
+            disabled: false,
+            data: fileFormatRenderers,
+            value: managerRenderer,
+            allowClear: false,
+            multiple: false,
+            placeholder: {% trans "'File Renderer'" %}}}">
+    <div style="padding-top: 10px">
+        <button style="margin-right: 3px;" class="btn btn-lg btn-workbench btn-primary" data-bind="click: function(){$parent.applyRendererToStaged($parent.getFileFormatRenderer(managerRenderer()))}"><i class="fa fa-gears"></i> {% trans 'Apply to Selected Files' %}</button>
+    </div>
+</div>
+<!--/ko-->
+
+<!--ko if: activeTab() === 'edit' -->
+<div class="workbench-header-buffer">
+    <div class="workbench-card-sidepanel-header-container">
+        <h4 class="workbench-card-sidepanel-header" data-bind="click: hideSidePanel, text: card.model.name"></h4>
+    </div>
+</div>
+<div class="file-workbench-filter">
+    <h2 class="file-workbench-filter-header">{% trans 'File Filter' %}</h2>
+    <input type="text" class="form-control" style="width: 100%; height:initial" placeholder="{% trans 'e.g.: .txt' %}" data-bind="textInput: filter"></input>
+    <span class="clear-node-search" data-bind="visible: filter().length > 0, click: function() { filter(''); }"><i class="fa fa-times-circle"></i></span>
+</div>
+<div class='file-workbench-files'>
+<!-- ko foreach: { data: card.tiles(), as: 'tile'} -->
+    <!--ko if: $parent.getUrl(tile) && ($parent.filter().length === 0 || $parent.isFiltered(tile)) -->
+    <div class='file-workbench-file' style="display: inline-flex;" data-bind="css: {'selected-photo': ko.unwrap(selected)}, click: $parent.selectItem, scrollToFile: $parent.displayContent() && $parent.displayContent().tile === tile ? $parent.displayContent().tile : undefined, container: '.file-workbench-files'">
+    <i role="presentation" data-bind="class: $parent.getUrl(tile).iconclass || 'fa fa-file'"></i>
+    <div class='file-name' data-bind="text: $parent.getUrl(tile).name"></div>
+    </div>
+    <!--/ko-->
+<!-- /ko -->
+</div>
+<div class='file-workbench-filecount' data-bind='text: card.tiles().length + "{% trans ' files uploaded' %}"'></div>
+
+<div class="workbench-sidepanel-card-container" data-bind="css: card.model.cssclass">
+
+    <!-- ko if: reviewer && provisionalTileViewModel.selectedProvisionalEdit() -->
+    <div class="edit-message-container">
+        <span>{% trans 'Currently showing edits by' %}</span>
+        <span class="edit-message-container-user" data-bind="text: provisionalTileViewModel.selectedProvisionalEdit().username() + '.'"></span>
+        <!-- ko if: !provisionalTileViewModel.tileIsFullyProvisional() -->
+        <a class="reset-authoritative" href='' data-bind="click: function(){provisionalTileViewModel.resetAuthoritative();}">{% trans 'Return to approved edits' %}</a>
+        <!-- /ko-->
+        <!-- ko if: provisionalTileViewModel.selectedProvisionalEdit().isfullyprovisional -->
+        <span>{% trans ' This is a new contribution by a provisional editor.' %}</span>
+        <!-- /ko-->
+    </div>
+    <!-- /ko-->
+
+    <!-- ko if: reviewer && provisionalTileViewModel.provisionaledits().length > 0 && !provisionalTileViewModel.selectedProvisionalEdit()-->
+    <div class="edit-message-container approved">
+        <div>{% trans 'Currently showing the most recent approved edits' %}</div>
+    </div>
+    <!-- /ko-->
+
+    <div class="new-provisional-edit-card-container">
+        <!-- ko if: reviewer && provisionalTileViewModel.provisionaledits().length > 0 -->
+        <!-- ko if: !provisionalTileViewModel.tileIsFullyProvisional() -->
+        <div class='new-provisional-edits-list'>
+            <div class='new-provisional-edits-header'>
+                <div class='new-provisional-edits-title'>{% trans 'Provisional Edits' %}</div>
+                <div class="btn btn-shim btn-danger btn-labeled btn-xs fa fa-trash new-provisional-edits-delete-all" style="padding: 3px;" data-bind="click: function(){
+                        provisionalTileViewModel.deleteAllProvisionalEdits();
+                    }">{% trans 'Delete all edits' %}</div>
+            </div>
+            <!-- ko foreach: { data: provisionalTileViewModel.provisionaledits(), as: 'pe' } -->
+            <div class='new-provisional-edit-entry' data-bind="css: {
+                    'selected': pe === $parent.provisionalTileViewModel.selectedProvisionalEdit()
+                }, click: function(){
+                    $parent.provisionalTileViewModel.selectProvisionalEdit(pe);
+                }">
+                <div class='title'>
+                    <div class='field'>
+                        <span data-bind="text : pe.username"></span>
+                    </div>
+                    <a href='' class='field fa fa-times-circle new-delete-provisional-edit' data-bind="click : function(){
+                        $parent.provisionalTileViewModel.rejectProvisionalEdit(pe);
+                    }"></a>
+                </div>
+                <div class="field timestamp">
+                    <span data-bind="text : pe.displaydate">@</span>
+                    <span data-bind="text : pe.displaytimestamp"></span>
+                </div>
+            </div>
+            <!-- /ko -->
+        </div>
+        <!-- /ko-->
+        <!-- /ko-->
+
+        <div class="card">
+            {% block form_header %}
+            <!-- ko if: card.model.helpenabled -->
+            <span>
+                <a class="pull-right card-help help editable-help" data-bind="click: function () {
+                    card.model.get('helpactive')(true)
+                }" style="cursor:pointer;">
+                    {% trans "Help" %}
+                    <i class="fa fa-question-circle"></i>
+                </a>
+            </span>
+            <!-- /ko -->
+            <h5 data-bind="text: card.model.instructions"></h5>
+            {% endblock form_header %}
+            <!-- ko if: card.widgets().length > 0 -->
+            {% block form_widgets %}
+            <!-- ko foreach: { data: card.tiles(), as: 'tile'} -->
+                <!--ko if: $parent.getUrl(tile) && tile.selected() -->
+            <form class="widgets" style="margin-bottom: 20px;">
+                <div data-bind="foreach: {
+                        data: $parent.card.widgets, as: 'widget'
+                    }">
+                    <!-- ko if: ko.unwrap(self.form.nodeLookup[widget.node_id()].datatype) !== 'file-list' -->
+                    <div data-bind='component: {
+                        name: self.form.widgetLookup[widget.widget_id()].name,
+                        params: {
+                            formData: tile.formData,
+                            tile: tile,
+                            form: self.form,
+                            config: widget.configJSON,
+                            label: widget.label(),
+                            value: tile.data[widget.node_id()],
+                            node: self.form.nodeLookup[widget.node_id()],
+                            expanded: self.expanded,
+                            graph: self.form.graph,
+                            type: "resource-editor",
+                            disabled: !self.card.isWritable && !self.preview
+                        }
+                    }, css:{
+                        "active": widget.selected,
+                        "hover": widget.hovered,
+                        "widget-preview": self.preview
+                    }, click: function(data, e) {
+                        if (!widget.selected() && self.preview) widget.selected(true);
+                    }, event: {
+                        mouseover: function(){
+                            if (self.preview) widget.hovered(true);
+                        },
+                        mouseout: function(){
+                            if (self.preview) widget.hovered(null);
+                        }
+                    }, visible: widget.visible'>
+                </div>
+                <!--/ko-->
+                </div>
+            </form>
+            <!--/ko-->
+        <!-- /ko -->
+
+            {% endblock form_widgets %}
+            <!-- /ko -->
+            {% block form_buttons %}
+            <!-- ko foreach: { data: card.tiles(), as: 'tile'} -->
+                <!--ko if: $parent.getUrl(tile) && tile.selected()-->
+            <div class="install-buttons">
+                <!-- ko if: tile && self.deleteTile -->
+                <button class="btn btn-shim btn-labeled btn-lg fa fa-trash" data-bind="click: $parent.removeTile, css: {
+                    disabled: (!$parent.card.isWritable && !self.preview),
+                    'btn-warning': $parent.card.isWritable
+                }">{% trans 'Delete' %}</button>
+                <!-- /ko -->
+                <!-- ko if: tile.dirty() -->
+                    <!-- ko if: $parent.provisionalTileViewModel && !$parent.provisionalTileViewModel.tileIsFullyProvisional() && $parent.card.isWritable -->
+                    <button class="btn btn-shim btn-danger btn-labeled btn-lg fa fa-times" data-bind="click: function(){tile.reset()}">{% trans 'Cancel' %}</button>
+                    <!-- /ko -->
+                    <!-- ko if: tile.tileid -->
+                    <button class="btn btn-shim btn-labeled btn-lg fa fa-plus" data-bind="click: tile.save, css: {
+                        disabled: (!$parent.card.isWritable && !self.preview),
+                        'btn-mint': $parent.card.isWritable
+                    }">{% trans 'Save' %}</button>
+                    <!-- /ko -->
+                <!-- /ko -->
+                <!-- ko if: !tile.tileid -->
+                <button class="btn btn-shim btn-labeled btn-lg fa fa-plus" data-bind="click: self.saveTile, css: {
+                    disabled: (!$parent.card.isWritable && !self.preview),
+                    'btn-mint': $parent.card.isWritable
+                }">{% trans 'Add'  %}</button>
+                <!-- /ko -->
+            </div>
+                <!--/ko-->
+            <!-- /ko -->
+
+            {% endblock form_buttons %}
+
+            <aside id="card-help-panel" class="card-help-panel" style="display: none;" data-bind="visible: card.model.get('helpactive')">
+                <div class="relative">
+                    <a id="add-basemap-wizard-help-close" href="#" class="help-close fa fa-times fa-lg" style="" data-bind="click: function () {
+                        card.model.get('helpactive')(false);
+                    }"></a>
+                </div>
+                <div id="add-basemap-wizard-help-content">
+                    <div>
+                        <div class="panel-heading">
+                            <h3 class="panel-title help-panel-title">
+                                <span data-bind="html: card.model.get('helptitle')"></span>
+                            </h3>
+                        </div>
+                        <div class="panel-body" style="padding: 10px 10px 15px 10px;" data-bind="html: card.model.get('helptext')">
+                        </div>
+                    </div>
+                </div>
+            </aside>
+        </div>
+    </div>
+</div>
+
+<!--/ko-->
+
+<!--ko foreach: fileFormatRenderers-->
+        <!--ko if: ko.unwrap($parent.displayContent) && $parent.displayContent().renderer && ($parent.displayContent().renderer.id === $data.id) -->
+    <!-- ko component: {
+        name: $data.name,
+        params: {
+            fileViewer: $parent,
+            card: $parent.card,
+            selected: $parent.selected,
+            state: $data.state,
+            displayContent: $parent.displayContent,
+            context: 'tab-contents'
+        }
+    } --> <!-- /ko -->
+    <!--/ko-->
+<!--/ko-->
+
+{{ block.super }}
+{% endblock sidepanel %}

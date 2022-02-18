@@ -1,0 +1,764 @@
+<!--
+ARCHES - a program developed to inventory and manage immovable cultural heritage.
+Copyright (C) 2013 J. Paul Getty Trust and World Monuments Fund
+
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU Affero General Public License as
+published by the Free Software Foundation, either version 3 of the
+License, or (at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+GNU Affero General Public License for more details.
+
+You should have received a copy of the GNU Affero General Public License
+along with this program. If not, see <http://www.gnu.org/licenses/>.
+-->
+{% extends "base-manager.htm" %}
+{% load staticfiles %}
+{% load i18n %}
+
+{% block graph_title %}
+<div class="ep-tools-title">
+    <h1 class="page-header text-overflow mobile-designer-title">
+        <span data-bind="text: mobilesurvey.name() || '{% trans 'Unnamed' %}'"></span>
+    </h1>
+</div>
+{% endblock graph_title %}
+
+{% block main_content %}
+<div class="content-panel mobile-project-manager-editor">
+    <div class="flex">
+
+        <!-- Left Panel -->
+        <div class="left-panel graph-designer msm-tree" data-bind="resizableSidepanel:true">
+            <div class="left-panel-inner-container">
+                <div class="" data-bind="with: tree" style="height: inherit">
+                    {% include 'views/mobile-survey-manager/mobile-survey-tree.htm' %}
+                </div>
+            </div>
+        </div>
+
+
+        <div class="msm-designer-panel">
+
+            <!-- Header -->
+            <div class="relative library-header" style="height: 55px;">
+
+                <!-- Add Project -->
+                <div>
+                    <!--ko if: mobilesurvey-->
+                    <ul class="msm-edit-buttons mobile-project-category-header">
+                        <!--ko if: selectedNode().selected()-->
+                        <li data-bind="text: selectedNode().namelong"></li>
+                        <!--/ko-->
+                    </ul>
+                    <ul class="msm-edit-buttons">
+                        <button class="btn btn-mint btn-labeled btn-active-dark fa fa-undo" data-bind="click: discardEdits, css: {'disabled': mobilesurvey.dirty()==false}">{% trans 'Discard Edits' %}</button>
+                        <button id="btn-save-edits" class="btn btn-primary btn-labeled btn-active-dark fa fa-check" data-bind="click: saveMobileSurvey, css: {'disabled': mobilesurvey.dirty()==false}">{% trans 'Save Edits' %}</button>
+                    </ul>
+                    <!--/ko-->
+                </div>
+            </div>
+
+            <div class="msm-summary-panel" style="display:none;" data-bind="visible: true">
+                <!-- ko if: mobilesurvey -->
+                <!--Project Details-->
+
+                <div id="cards" style="margin: 0px; margin-top: 0px;">
+
+                    <!--Tabs Content-->
+                    <div style="margin-left: 0px;">
+
+                        <!-- Report Page -->
+                        <!--ko if: activePage() === 'root'-->
+                        <div id="project-summary-card" class="mpm-card">
+
+                            <!-- Project Summary Panel -->
+                            <div class="mpm-activation-panel">
+
+                            <!--ko if: surveyReady().incomplete === false-->
+                            <!-- Survey Status Panel -->
+                            <div class="mpm-card-content" data-bind="css: {'active-survey': mobilesurvey.activatedOnServer()}">
+
+                                <!-- Icon and Status warning -->
+                                <div class="mpm-survey-status-header">
+                                    <i class="msm-icon-wrap fa fa-check"></i>
+                                    <div class="msm-survey-requirements-text">
+                                        {% trans 'Project Requirements: Complete' %}
+                                    </div>
+                                    <div class="msm-survey-status-text" data-bind="text: mobilesurvey.activatedOnServer() === true ? '{% trans "Project Status: Active" %}' : '{% trans " Project Status: Inactive" %}'"></div>
+
+                                    <div class="msm-survey-message" data-bind="visible: mobilesurvey.activatedOnServer() === false">
+                                        {% trans "This project is ready, and only requires <br> you to activate it to allow your field team to collect data." %}
+                                    </div>
+
+                                    <div class="msm-survey-message" data-bind="visible: mobilesurvey.activatedOnServer() === true">
+                                        {% trans "This project is now active! Mobile app users can download this project and begin <br> collecting and editing data using their mobile device." %}
+                                    </div>
+                                </div>
+
+                                <!--ko if: mobilesurvey.activatedOnServer() === false && mobilesurvey.active() === true -->
+                                <div class="msm-survey-status-instructions">{% trans "You are activating this project. Confirm your settings before you save: you won't be able <br> to change the models, cards, or groups after you save your project" %}</div>
+                                <!--/ko-->
+
+                                <!--ko if: mobilesurvey.activatedOnServer() === true && mobilesurvey.active() === false -->
+                                <div class="msm-survey-status-instructions">{% trans 'You are deactivating this project. Users will be unable to download this project.' %}</div>
+                                <!--/ko-->
+
+                                <!--ko if: mobilesurvey.dirty() === true -->
+                                <div class="msm-save-message">{% trans 'Save to commit your changes' %}</div>
+                                <!--/ko-->
+
+                            </div>
+                            <!--/ko-->
+
+                            <!--ko if: surveyReady().incomplete -->
+                            <div class="mpm-card-content incomplete" data-bind="css: {'active-survey': mobilesurvey.activatedOnServer()}">
+
+                                <!-- Icon and Status warning -->
+                                <div class="mpm-survey-status-header">
+                                    <i class="msm-icon-wrap fa fa-exclamation-triangle"></i>
+                                    <div class="msm-survey-requirements-text">{% trans 'Project Requirements: Incomplete' %}</div>
+                                    <div class="msm-survey-status-text" data-bind="text: mobilesurvey.activatedOnServer() === true ? '{% trans "Project Status: Active" %}' : '{% trans " Project Status: Inactive" %}'"></div>
+                                </div>
+
+                                <!--ko if: mobilesurvey.activatedOnServer() === true && mobilesurvey.active() === false -->
+                                <div class="msm-survey-status-instructions" style="display: flex; flex-direction: column">
+                                    <span>{% trans 'Incomplete projects cannot be active.' %}</span>
+                                    <span>{% trans 'By saving an incomplete project it will be deactivated.' %}</span>
+                                    <span>{% trans 'You must complete the following before saving this project as active:' %}
+                                </div>
+                                <!--/ko-->
+
+                                <!--ko if: mobilesurvey.activatedOnServer() === false -->
+                                <div class="msm-survey-status-instructions">{% trans 'You won’t be able to activate this project until you have addressed the following items:' %}</div>
+                                <!--/ko-->
+
+                                <div class="text-center">
+                                    <ul class="msm-survey-issues">
+                                        <li data-bind = "visible: surveyReady().cards == false">{% trans 'Select the Model(s) and associated data entry cards to include in the project' %}</li>
+                                        <li data-bind = "visible: surveyReady().identities == false">{% trans 'Select the People that you want to invite to the project' %}</li>
+                                        <li data-bind = "visible: surveyReady().daterange == false">{% trans 'Define the start and end dates of your project' %}</li>
+                                        <li data-bind = "visible: surveyReady().mapsources == false">{% trans 'Define either an online or offline basemap source' %}</li>
+                                        <li data-bind = "visible: surveyReady().bounds == false">{% trans 'Define a map extent' %}</li>
+                                        <li data-bind = "visible: surveyReady().unexpired == false">{% trans 'End date must be after the current date' %}</li>
+                                    </ul>
+                                </div>
+
+                            </div>
+                            <!--/ko-->
+
+                                <div class="msm-report-section active">
+                                    <!-- Activate Switch -->
+                                    <div class="box-inline">
+                                        <div class="mpm-item-listing-header">{% trans 'Activate Project' %}
+                                            <span class="toggle-container">
+                                                <span class="switch switch-small" data-bind="css: {'on': mobilesurvey.active(), 'disabled': surveyReady().incomplete}, click: function(){
+                                                    if (!surveyReady().incomplete) {mobilesurvey.active(!mobilesurvey.active())};}"><small></small>
+                                                </span>
+                                            </span>
+                                        </div>
+                                    </div>
+
+                                    <div class="account-tips" style="margin-left: 10px; margin-top: 10px;">
+                                        {% trans 'By activating the project you will send users an email with the information needed to begin data editing activitites.' %}
+                                    </div>
+                                </div>
+
+                                <!-- Survey Summary -->
+                                <div class="msm-settings-summary">
+
+                                    <!-- Survey Settings -->
+                                    <div class="msm-report-section">
+                                        <p class="mpm-item-listing-header">
+                                            {% trans 'Project Status Summary' %}
+                                        </p>
+
+                                        <!-- Survey Stats -->
+                                        <div class="msm-stats-panel">
+                                            <div class="col-xs-16 col-sm-4">
+                                                <div class="msm-stat">
+                                                    <!--ko if: history.lastsync.isValid() -->
+                                                    <span class="msm-stat-time" data-bind="text: history.lastsync.format('H:mm:ss');"></span>
+                                                    <span class="msm-stat-date" data-bind="text: history.lastsync.format('MMMM Do YYYY');"></span>
+                                                    <!--/ko-->
+                                                    <!--ko ifnot: history.lastsync.isValid() -->
+                                                    <span class="msm-stat-time">{% trans 'Not synced' %}</span>
+                                                    <!--/ko-->
+                                                </div>
+                                                <div class="msm-stat-label">
+                                                    {% trans 'Last Sync' %}
+                                                </div>
+                                            </div>
+
+                                            <div class="col-xs-12 col-sm-3">
+                                                <div class="msm-stat" data-bind="text: history.edits"></div>
+                                                <div class="msm-stat-label">
+                                                    {% trans 'Resources Edited' %}
+                                                </div>
+                                            </div>
+
+                                            <div class="col-xs-12 col-sm-3">
+                                                <div class="msm-stat" data-bind="text: _.keys(history.editors).length"></div>
+                                                <div class="msm-stat-label">
+                                                    {% trans 'Editors' %}
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <!-- User Summary -->
+                                    <div class="msm-report-section">
+                                        <p class="mpm-item-listing-header">
+                                            {% trans 'Groups/Users' %}
+                                        </p>
+                                        <ul class="mpm-node-detail-metadata">
+                                            <li class="">
+                                                {% trans 'Groups' %} (<span data-bind="text: mobilesurvey.approvedGroupNames().length"></span>)
+                                                <ul class="mpm-node-detail-metadata">
+                                                    <li class="" data-bind="text:  mobilesurvey.approvedGroupNames().join(', ')">
+                                                    </li>
+                                                </ul>
+                                            </li>
+                                        </ul>
+                                        <ul class="mpm-node-detail-metadata">
+                                            <li class="">
+                                                {% trans 'Users' %} (<span data-bind="text: mobilesurvey.approvedUserNames().length"></span>)
+                                                <ul class="mpm-node-detail-metadata">
+                                                    <li class="" data-bind="text: mobilesurvey.approvedUserNames().join(', ')">
+
+                                                    </li>
+                                                </ul>
+                                            </li>
+                                        </ul>
+                                    </div>
+
+                                    <!-- Data Summary -->
+                                    <div class="msm-report-section">
+                                        <p class="mpm-item-listing-header">
+                                            {% trans 'Data download' %}
+                                        </p>
+                                        <!--ko if: mobilesurvey.datadownloadconfig.resources().length === 0 -->
+                                        <ul class="mpm-node-detail-metadata">{% trans 'No data selected for download' %}</ul>
+                                        <!--/ko-->
+                                        <!--ko if: mobilesurvey.datadownloadconfig.resources().length > 0 -->
+                                        <ul class="mpm-node-detail-metadata">
+                                            <li class="">
+                                                {% trans 'Limit:' %} <span data-bind="text: mobilesurvey.datadownloadconfig.count()"></span>
+                                            </li>
+                                        </ul>
+                                        <div class="mpm-node-detail-metadata">
+                                            <ul>{% trans 'Resource Types:' %}
+                                                <ul class="mpm-node-detail-metadata">
+                                                    <!-- ko foreach: {data:allResources, as: 'resource'} -->
+                                                    <li class="" data-bind="text: resource.name, visible: _.contains($parent.mobilesurvey.datadownloadconfig.resources(), resource.id)"></li>
+                                                    <!-- /ko -->
+                                                </ul>
+                                            </ul>
+                                        </div>
+                                        <!--/ko-->
+                                    </div>
+
+
+                                    <div class="msm-report-section">
+                                        <p class="mpm-item-listing-header">
+                                            {% trans 'Models and Data Entry Cards' %}
+                                        </p>
+                                        <!--ko if: selectedResources -->
+                                        <!--ko foreach: {data: selectedResources, as: 'resource'} -->
+                                        <ul class="mpm-node-detail-metadata">
+                                            <li class="">
+                                                <div data-bind="text: resource.name + ' (' + resource.cards().length + ' data entry cards)'"></div>
+                                                <!--ko foreach: {data: resource.cards, as: 'card'} -->
+                                                <ul class="mpm-node-detail-metadata">
+                                                    <!--ko if: card.approved -->
+                                                    <li data-bind="text: card.name"></li>
+                                                    <!--/ko-->
+                                                </ul>
+                                                <!--/ko-->
+                                                <div class="mpm-node-detail-metadata" style="padding-left:20px;" data-bind="visible: resource.hasApprovedCards() === false">{% trans 'No cards added' %}</div>
+                                            </li>
+                                        </ul>
+                                        <!--/ko-->
+                                        <!--/ko-->
+                                        <!--ko ifnot: selectedResources().length > 0 -->
+                                        <ul class="mpm-node-detail-metadata">
+                                            <li class="">
+                                                <div>{% trans 'No models selected' %}</div>
+                                            </li>
+                                        </ul>
+                                        <!--/ko-->
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <!--/ko-->
+
+                        <!-- Data Entry Pages -->
+                        <!--ko if: activePage() === 'settings'-->
+                        <div id="summary-card" class="mpm-card" style="">
+
+                            <div class="panel-body project-card-body">
+                                <div id="" class="card-content">
+
+                                    <!-- Project Info -->
+                                    <div id="account-crud" class="">
+                                        <div class="msm-crud-section">
+                                            <div class="row">
+                                                <div class="col-sm-5">
+                                                    <div class="form-group">
+                                                        <label class="control-label account-label">{% trans 'Project name' %}</label>
+                                                        <input type="text" class="form-control input-lg account-input" placeholder="{% trans 'Project name' %}" data-bind="value: mobilesurvey.name, valueUpdate: 'keyup'">
+                                                    </div>
+                                                </div>
+
+                                                <div class="col-sm-6">
+                                                    <p class="account-tips">
+                                                        {% trans 'Pick a concise name that makes it easy for people to find your project' %}
+                                                    </p>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="msm-crud-section">
+                                            <div class="row">
+                                                <div class="col-sm-5">
+                                                    <div class="form-group">
+                                                        <label class="control-label account-label">{% trans 'Project start date' %}</label>
+                                                        <input class="form-control input-lg account-input" data-bind="datepicker: {format: dateFormat, minDate: false, maxDate: mobilesurvey.enddate}, value: mobilesurvey.startdate">
+                                                    </div>
+                                                </div>
+
+                                                <div class="col-sm-6">
+                                                    <p class="account-tips">
+                                                        {% trans 'The project start and end dates are used to limit when people can add or edit data to your project. Use these dates to enfore the beginning and end of your field data collection effort' %}
+                                                    </p>
+                                                </div>
+                                            </div>
+
+                                            <div class="row" style="margin-top: 10px;">
+                                                <div class="col-sm-5">
+                                                    <div class="form-group">
+                                                        <label class="control-label account-label">{% trans 'Project end date' %}</label>
+                                                        <input class="form-control input-lg account-input" data-bind="datepicker: {format: dateFormat, minDate: mobilesurvey.startdate, maxDate: false}, value: mobilesurvey.enddate">
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <div class="msm-crud-section">
+                                            <div class="form-group">
+                                                <label class="control-label account-label">{% trans 'Description' %}</label>
+                                                <div>
+                                                    <textarea class="form-control textarea textarea-resizable" rows="3" type="text" data-bind="value: mobilesurvey.description, valueUpdate: 'keyup'"></textarea>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <!--/ko-->
+
+                        <!--ko if: activePage() === 'mapextent'-->
+                        <div class="mapboxgl-map">
+                            <div class="msm-map-container">
+                              <!-- ko component: {
+                                  name: 'map-widget',
+                                  params: {
+                                    type: 'survey-bounds',
+                                    configForm: false,
+                                    node: null,
+                                    value: mobilesurvey.bounds,
+                                    state: 'form',
+                                    tile: {
+                                        data: {
+                                            surveyextent: mobilesurvey.bounds
+                                        }
+                                    },
+                                    widget: {
+                                        node_id: ko.observable('surveyextent'),
+                                        config:{
+                                            geometryTypes: [{'id':'Polygon','text':'{% trans "Polygon" %}'}]
+                                        },
+                                        datatype: {
+                                            datatype: 'geojson-feature-collection'
+                                        }
+                                    },
+                                    config: {
+                                        basemap: basemap.name,
+                                        bearing: 0,
+                                        centerX: defaultCenterX,
+                                        centerY: defaultCenterY,
+                                        featureColor: "rgba(55,32,196,0.85)",
+                                        featureEditingDisabled: false,
+                                        featureLineWidth: 2,
+                                        featurePointSize: 6,
+                                        geocodePlaceholder: "Locate a Place or Address",
+                                        geocodeProvider: geocoderDefault,
+                                        geocoderVisible: true,
+                                        geometryTypes: [{'id':'Polygon','text':'{% trans "Polygon" %}'}],
+                                        mapControlsHidden: false,
+                                        maxZoom: mapDefaultMaxZoom,
+                                        minZoom: mapDefaultMinZoom,
+                                        label: '{% trans "Project extent" %}',
+                                        overlayConfigs: [],
+                                        overlayOpacity: 0,
+                                        pitch: 0,
+                                        zoom: mapDefaultZoom
+                                    }
+                                }
+                              } --><!-- /ko -->
+                            </div>
+                        </div>
+                        <!--/ko-->
+
+                        <!--ko if: activePage() === 'mapsources'-->
+                        <div class="msm-location-card ">
+
+                            <div class="msm-crud-section">
+                                <div class="form-group" style="margin-bottom: 10px;">
+                                    <label class="control-label account-label">{% trans 'Basemap location (MBTiles file url)' %}</label>
+                                    <input type="text" class="form-control input-lg" data-bind="value: mobilesurvey.tilecache, valueUpdate: 'keyup'" placeholder="e.g.: http://arches_domain_name/media/lincoln.mbtiles">
+                                </div>
+                                <div class="msm-basemap-subtitle">
+                                    {% trans 'Arches uses the mbtiles that you specific to ensure that your field crew has a basemap, even when they do not have access to a cell network or WiFi connection.  You can create an mbtile file using your own geospatial data and GIS tools.  Or you can obtain high quality and inexpensive mbtiles from sites such as <strong><a href="https://openmaptiles.com" class="" target="_blank">https://openmaptiles.com</a></strong>.  Note that large files will require longer downloads and more storage space on mobile devices.' %}
+                                </div>
+                            </div>
+                            <div class="msm-crud-section">
+                                <div class="form-group" style="margin-bottom: 10px;">
+                                    <label class="control-label account-label">{% trans 'Online Basemap URL' %}</label>
+                                    <input type="text" class="form-control input-lg" data-bind="value: mobilesurvey.onlinebasemap, valueUpdate: 'keyup'" placeholder="e.g.: mapbox://styles/mapbox/light-v9">
+                                </div>
+                                <div class="msm-basemap-subtitle">
+                                    {% trans 'Arches uses the Online Basemap URL that you specify as the default basemap for your field team when a cell network or WiFi connection is available. You may use your own map service, or any online basemap service (such as those created with ESRI, GeoServer, or other mapping servers).  You will need to reference or create and host a MapBox style json file (see <strong><a href="https://docs.mapbox.com/mapbox-gl-js/style-spec" class="" target="_blank">https://docs.mapbox.com/mapbox-gl-js/style-spec</a></strong>)' %}
+                                </div>
+                            </div>
+                        </div>
+                        <!--/ko-->
+
+                        <!--ko if: activePage() === 'resourcemodel'-->
+                        <div class='msm-locked-warning' data-bind="visible: locked">{% trans 'These options cannot be modified because users have already synced with this project.' %}</div>
+                        <div class="mpm-card-content mpm-crud-section">
+
+                            <div class="account-label" style="margin-top: -15px;">{% trans 'Data entry cards selected for this project:' %}</div>
+
+                            <!--ko if: selectedNode().cards -->
+                            <!--ko foreach: {data: selectedNode().cards, as: 'card'} -->
+                            <div class="checkbox">
+                                <label class="form-checkbox form-normal form-primary" data-bind="css: {'active': card.approved, 'disabled': $parent.locked}" style="padding-left: 25px; padding-top: 3px;">
+                                    <input type="checkbox" data-bind="checked: card.approved, attr: {disabled: $parent.locked}"/>
+                                    <span data-bind="text: card.name"></span>
+                                </label>
+                            </div>
+                            <!--/ko-->
+                            <!--/ko-->
+
+                        </div>
+                        <!--/ko-->
+
+                        <!-- Models Card -->
+                        <!--ko if: activePage() === 'models'-->
+                        <div class='msm-locked-warning' data-bind="visible: locked">{% trans 'These options cannot be modified because users have already synced with this project.' %}</div>
+                        <div class="mpm-card-content selection-page model-selection">
+
+                            <!-- Icon and Title -->
+                            <div class="mpm-survey-status-header">
+                                <i class="msm-icon-wrap fa fa-code-fork"></i>
+                                <div class="msm-survey-status-text">{% trans 'Model Data Collection' %}</div>
+                            </div>
+
+                            <!-- Model Selection Dropdown -->
+                            <div class="mpm-resource-selection">
+                                <div class="resource-dropdown">
+                                    <input class="" style="display:inline-block;"
+                                    data-bind="select2Query: {
+                                        select2Config: getSelect2ResourcesConfig()
+                                    }, attr: {disabled: locked}">
+                                </div>
+                            </div>
+
+                            <!-- Model Selection Instructions -->
+                            <div class="text-center">
+                                <ul class="msm-survey-issues">
+                                    <li>{% trans "Arches allows you to create and edit data in the field using mobile devices. Select those resources that should participate <br>in the project. Once you have selected the models, click on a model in the tree to <br> select which data entry forms to include in your project." %}</li>
+                                </ul>
+                            </div>
+                        </div>
+                        <!--/ko-->
+                        <!-- End Models Card -->
+
+                        <!-- Data Card -->
+                        <!--ko if: activePage() === 'data'-->
+                        <div class='msm-locked-warning' data-bind="visible: locked">{% trans 'These options cannot be modified because users have already synced with this project.' %}</div>
+                        <div class="msm-crud-section" style="height: 200px; border-bottom: transparent;">
+                            <!-- Allow Data Downloads Switch -->
+                            <div class="mpm-item-listing-header data-panel">
+                                {% trans 'Allow users to download data' %}
+                                <span class="toggle-container">
+                                    <!--ko ifnot: locked-->
+                                    <span class="switch switch-small" data-bind="css: {'on': mobilesurvey.datadownloadconfig.download()}, click: function(){
+                                        mobilesurvey.datadownloadconfig.download(!mobilesurvey.datadownloadconfig.download());}"><small></small></span>
+                                    <!--/ko-->
+                                    <!--ko if: locked-->
+                                    <span class="switch switch-small disabled" data-bind="css: {'on': mobilesurvey.datadownloadconfig.download()}"><small></small></span>
+                                    <!--/ko-->
+                                </span>
+                            </div>
+
+                            <!-- Help Message-->
+                            <div class="">
+                                <p class="account-tips">
+                                    {% trans 'Downloading data allows users to access and edit existing Arches information in the field. You can decide which models your field team can access, and the number of resources to download.' %}
+                                </p>
+                            </div>
+                        </div>
+
+                        <!-- ko if: mobilesurvey.datadownloadconfig.download() -->
+                        <div id="data-definition" class="mpm-summary-panel">
+
+                            <!-- Download Header -->
+                            <div class="msm-download-header">
+                                {% trans 'Download Details' %}
+                            </div>
+
+                            <!-- Download Limit -->
+                            <div>
+                                <div class="pad-top">
+                                    <label style="display:flex; align-items:center">{% trans 'Limit ' %}
+                                        <input type="number" class="form-control" style="width: 100px; margin-left: 7px;" placeholder="Search query URL" data-bind="textInput: mobilesurvey.datadownloadconfig.count, event: {'change': convertCountToInt}, attr: {disabled: locked}"></input>
+                                    </label>
+                                </div>
+
+                                <div class="pad-btm">
+                                    <p class="text-muted">
+                                        {% trans "Total number of instances to download for the resource models you've associated with this project." %}
+                                    </p>
+                                </div>
+                            </div>
+
+                            <!-- Download Selector -->
+                            <div class="msm-download-selector pad-top" style="display: block;">
+                                <div id="standard-download" class="category-title" href="" data-bind="css: {active: mobilesurvey.showCustomDataDownload() === false }, click: function(){ mobilesurvey.showCustomDataDownload(false)}">
+                                    {% trans 'Download Records' %}
+                                </div>
+                                <div id="custom-download" class="category-title" href="" data-bind="css: {active: mobilesurvey.showCustomDataDownload() === true}, click: function(){ mobilesurvey.showCustomDataDownload(true)}">
+                                    {% trans 'Custom Download' %}
+                                </div>
+                            </div>
+
+                            <!-- Standard Download -->
+                            <div id="standard-download-panel" class="msm-download-panel" data-bind="visible: mobilesurvey.showCustomDataDownload() === false">
+
+                                <div class="form-group msm-data-selection">
+                                    <!-- Inline Checkboxes -->
+                                    <div class="checkbox">
+                                        <!-- ko foreach: {data:allResources, as: 'resource'} -->
+                                        <label class="form-checkbox form-normal form-primary" data-bind="text: resource.name, css: {'form-text' : true, active: _.contains($parent.mobilesurvey.datadownloadconfig.resources(), resource.id), disabled: resource.hasApprovedCards() === false || $parent.locked}, click: function(r){if (r.hasApprovedCards()){$parent.mobilesurvey.updateResourceDownloadList(r)}}"><input type="checkbox"></label>
+                                        <!-- /ko -->
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Custom Query -->
+                            <div id="custom-download-panel" class="msm-download-panel" data-bind="visible: mobilesurvey.showCustomDataDownload() === true">
+                                <p class="text-muted">
+                                    {% trans 'To define records for download' %} <strong> {% trans 'copy and paste the URL from Arches search page' %}</strong>
+                                </p>
+
+                                <div class="form-group">
+                                    <input type="text" id="" class="form-control" placeholder="Search query URL" data-bind="textInput: mobilesurvey.datadownloadconfig.custom, attr: {disabled: locked}">
+                                </div>
+                            </div>
+                        </div>
+                        <!--/ko -->
+                        <!--/ko-->
+
+                        <!--ko if: activePage() === 'people'-->
+                        <div class='msm-locked-warning' data-bind="visible: locked">{% trans 'These options cannot be modified because users have already synced with this project.' %}</div>
+                        <div id="models-card">
+                            <div class="mpm-card-content selection-page model-selection">
+
+                                <!-- Icon and Title -->
+                                <div class="mpm-survey-status-header">
+                                    <i class="msm-icon-wrap fa fa-group" style="padding-left: 2px;"></i>
+                                    <div class="msm-survey-status-text">{% trans 'Project Participants' %}</div>
+                                </div>
+
+                                <!-- Group Selection Dropdown -->
+                                <div class="mpm-resource-selection">
+                                    <div class="resource-dropdown">
+                                        <input style="width:30%; display:inline-block;"
+                                        data-bind="select2Query: {
+                                            select2Config: getSelect2GroupsConfig()
+                                        }, attr: {disabled: locked}">
+                                    </div>
+                                </div>
+
+                                <!-- Group Selection Instructions -->
+                                <div class="text-center">
+                                    <ul class="msm-survey-issues">
+                                        <li>{% trans "Arches allows you to select the user groups you want to include in a field data collection effort. <br> Select the groups that should participate in the project.  Once you have selected the groups, click on a group in <br> the tree to select specific users who should join your survery." %}</li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                        <!--/ko-->
+
+                        <!--ko if: activePage() === 'identity'-->
+                        <div class='msm-locked-warning' data-bind="visible: locked">{% trans "These options cannot be modified because users have already synced with this project." %}</div>
+                        <div id="models-card">
+                            <div class="mpm-card-content group-page">
+                                <div style="display: flex">
+
+                                    <!-- Account Listing -->
+                                    <div class="msm-account-listing-panel">
+
+                                        <div class="mpm-group-panel-header" style="">
+
+                                            <div class="msm-group-label">
+                                                {% trans "Accounts in this group" %}
+                                            </div>
+
+                                            <!-- User filter panel -->
+                                            <div class="msm-filter-panel">
+                                                <span class="msm-identity-filter">
+                                                    <input type="text" class="form-control" style="width: 100%;" placeholder="{% trans 'Find a user...' %}" data-bind="textInput: mobilesurvey.userFilter">
+                                                    <span class="clear-node-search" style="top: 11px; right: 10px;" data-bind="visible: true, click: function() { mobilesurvey.userFilter(''); }"><i class="fa fa-times-circle"></i></span>
+                                                </span>
+                                                <div class="msm-filter-tools-panel">
+                                                    <a class="filter-tools" data-bind="click: selectAllGroupUsers"><i class="ion-checkmark"></i> {% trans 'Select all' %}</a>
+                                                    <a class="filter-tools" data-bind="click: clearAllGroupUsers"><i class="ion-close"></i> {% trans 'Clear all' %}</a>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <div class="mpm-group-panel-content list">
+                                            <!--ko if: selectedNode().type === 'group' -->
+                                            <div class="msm-user-account-panel">
+                                                <!--ko foreach: {data: selectedNode().fullusers, as: 'user'} -->
+                                                <div class="msm-user-account-item checkbox" data-bind="click: function(){$parent.mobilesurvey.selectedUser(user); return true;};, css: {selected: user.id === $parent.mobilesurvey.selectedUser().id}, visible: user.filtered() === false" class="userrow">
+                                                    <label class="form-checkbox form-normal form-primary" data-bind="css: {'active': user.approved, 'disabled': $parent.locked}" style="padding-left: 25px; padding-top: 3px;">
+                                                        <input type="checkbox" data-bind="checked: user.approved, event: {'change': $parent.mobilesurvey.toggleIdentity}, attr: {disabled: $parent.locked}"/>
+                                                    </label>
+                                                    <span style="vertical-align: top" data-bind="text: user.name"></span>
+                                                </div>
+                                                <!--/ko-->
+                                            </div>
+                                            <!--/ko-->
+                                        </div>
+                                    </div>
+
+                                    <!-- Account Summary Panel -->
+                                    <div class="msm-account-summary-panel">
+                                        <div class="mpm-group-panel-header">
+                                            <h4 class="msm-group-label">{% trans "Account Summary" %}</h4>
+                                            <div class="msm-basemap-subtitle">
+                                                {% trans "User identification and data editing statistics" %}
+                                            </div>
+                                        </div>
+
+                                        <div class="mpm-user-panel-content">
+                                            <!--ko if: mobilesurvey.selectedUser() -->
+                                                <!-- User Name -->
+                                                <!--ko if: mobilesurvey.selectedUser().first_name || mobilesurvey.selectedUser().last_name-->
+                                                <div class="msm-stat-user-panel">
+                                                    <span class="msm-stat-user" data-bind="text: mobilesurvey.selectedUser().first_name + ' ' + mobilesurvey.selectedUser().last_name"></span>
+                                                </div>
+                                                <!--/ko-->
+                                                <!--ko ifnot: mobilesurvey.selectedUser().first_name || mobilesurvey.selectedUser().last_name-->
+                                                <div class="msm-stat-user-panel">
+                                                    <span class="msm-stat-user">{% trans 'Not set' %}</span>
+                                                </div>
+                                                <!--/ko-->
+                                                <div class="msm-stat-label">
+                                                    {% trans 'User Name' %}
+                                                </div>
+
+                                                <!--ko ifnot: mobilesurvey.selectedUser().email -->
+                                                <div class="msm-stat-user-panel">
+                                                    <span class="msm-stat-user">{% trans 'Not set' %}</span>
+                                                </div>
+                                                <!--/ko-->
+                                                <!--ko if: mobilesurvey.selectedUser().email -->
+                                                <div class="msm-stat-user-panel">
+                                                    <span class="msm-stat-user" data-bind="text: mobilesurvey.selectedUser().email"></span>
+                                                </div>
+                                                <!--/ko-->
+                                                <div class="msm-stat-label">
+                                                    {% trans 'User Email' %}
+                                                </div>
+
+                                                <div class="msm-stat-user-panel">
+                                                    <span class="msm-stat-user" data-bind="text:mobilesurvey.selectedUser().groups"></span>
+                                                </div>
+                                                <div class="msm-stat-label">
+                                                    {% trans 'Assigned Groups' %}
+                                                </div>
+
+
+                                                <!-- Last Synch -->
+                                                 <div class="msm-stat-user-panel">
+                                                    <div class="msm-stat">
+                                                        <!--ko if: _.contains(_.keys(history.editors), String(mobilesurvey.selectedUser().id)) -->
+                                                        <span class="msm-stat-time" data-bind="text: history.editors[mobilesurvey.selectedUser().id].lastsync.format('H:mm:ss')"></span>
+                                                        <span class="msm-stat-date" data-bind="text: history.editors[mobilesurvey.selectedUser().id].lastsync.format('MMMM Do YYYY');"></span>
+                                                        <!--/ko-->
+                                                        <!--ko ifnot: _.contains(_.keys(history.editors), String(mobilesurvey.selectedUser().id)) -->
+                                                        <span class="msm-stat-user">{% trans 'Not yet synced' %}</span>
+                                                        <!--/ko-->
+                                                    </div>
+                                                    <div class="msm-stat-label">
+                                                        {% trans 'Last Synch' %}
+                                                    </div>
+                                                </div>
+                                                <!--/ko-->
+
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <!--/ko-->
+
+                    </div>
+                </div>
+
+                <!-- /ko -->
+
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock main_content %}
+
+{% block tabs %}{% endblock tabs %}
+
+{% block pre_require_js %}
+{{block.super}}
+    <script>
+        {% autoescape off %}define('mobile-survey-manager-data', [], function() {
+            return {
+                mobilesurvey: {{mobile_survey}},
+                resources: {{resources}},
+                identities: {{identities}},
+                history: {{history}},
+                transstrings: {
+                    identity: {name: {% trans "'Name'" %}, namelong: {% trans "'Name'" %}, description: {% trans "'Manage users that participate in this project'" %}},
+                    resourcemodel: {name: {% trans "'Model Details'" %}, namelong: {% trans "'Model Details'" %}, description: {% trans "'Summary of how this model participates in the project'" %}},
+                    root: {name: {% trans "'Summary'" %}, namelong: {% trans "'Summary'" %}, description: {% trans "'Project summary and status'" %}},
+                    settings: {name: {% trans "'Settings'" %}, namelong: {% trans "'Project Settings'" %}, description: {% trans "'Define data collection parameters for your project'" %}},
+                    mapextent: {name: {% trans "'Map Extent'" %}, namelong: {% trans "'Map Extent'" %}, description: {% trans "'Draw a polygon to define the area over which you want to collect data in this survery'" %}},
+                    mapsources: {name: {% trans "'Map Sources'" %}, namelong: {% trans "'Basemap Source'" %}, description: {% trans "'Provide a basemap source url. Use an offline source for users without access to cell/wi-fi service'" %}},
+                    models: {name: {% trans "'Models'" %}, namelong: {% trans "'Models'" %}, description: {% trans "'Summary of models in this project'" %}},
+                    data: {name: {% trans "'Data'" %}, namelong: {% trans "'Data Download'" %}, description: {% trans "'Define the data you will allow users to download'" %}},
+                    people: {name: {% trans "'People'" %}, namelong: {% trans "'People'" %}, description: {% trans "'Summary of people invited to participate in this project'" %}},
+                    groupplaceholder: {% trans "'Select one or more groups...'" %},
+                    modelplaceholder: {% trans "'Select one or more resource models...'" %},
+                    loadingmessage: {% trans "'Preparing project - this may take a few minutes'" %}
+                }
+            };
+        });{% endautoescape %}
+    </script>
+{% endblock pre_require_js %}

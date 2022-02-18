@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+{% load i18n %}
+<!-- this html is included in help-panel-base.htm -->
+<div class="ep-help-content">
+    <div>
+        <h4>{% trans "Cards Tab" %}</h4>
+    </div>
+    <div>
+        <a href="javascript:void(0)" class="ep-help-topic-toggle">
+            <h4>{% trans "Overview" %}</h4>
+            &nbsp;<i class="ep-help-topic-toggle-icon fa fa-chevron-down"></i>
+        </a>
+        <div class="ep-help-topic-content" style="display:block;">
+            <p>{% blocktrans %}In this tab you will configure the user-facing aspects of your graph. There are multiple levels to doing so, which are reflected in the levels of the graph tree. <strong>Report Configuration</strong> where you choose the template for the resource report, <strong>Card Configuration</strong> where you'll specify card-related settings, and the <strong>Widget Manager</strong> where you will choose and configure the data entry widget for each node in the graph.{% endblocktrans %}</p>
+        </div>
+    </div>
+    <div>
+        <a href="javascript:void(0)" class="ep-help-topic-toggle">
+            <h4>{% trans "Report Configuration" %}</h4>
+            &nbsp;<i class="ep-help-topic-toggle-icon fa fa-chevron-right"></i>
+        </a>
+        <div class="ep-help-topic-content">
+            <p>{% blocktrans %}Each Resource Model must be configured with a report template. Reports show data for all nodes in a resource instance for which the user has Read permissions.{% endblocktrans %}</p>
+            <p><span class="ep-help-table-header">{% trans "No Header Template" %}</span></p>
+            <p>{% blocktrans %}Lists all node data, no special header at the top of the page.{% endblocktrans %}</p>
+            <p><span class="ep-help-table-header">{% trans "Image Header Template" %}</span></p>
+            <p>{% blocktrans %}Use this template for Resource Models that will be be primarily used to record images.{% endblocktrans %}</p>
+            <table class="ep-help-table">
+                <tr>
+                    <td>{% trans "Included Image Nodes" %}</td>
+                    <td>{% blocktrans %}Choose one or more nodes that hold images in this Resource Model. These images will be presented as a slideshow in the report header.{% endblocktrans %}</td>
+                </tr>
+            </table>
+            <span class="ep-help-table-header">{% trans "Map Header Template" %}</span>
+            <p>{% blocktrans %}Use this template for Resource Models that will be be primarily used to record resources that have a geo-location. There are number of settings you should fill out to control the appearance of the map in the header.{% endblocktrans %}</p>
+            <table class="ep-help-table">
+                <tr>
+                    <td>{% trans "Map Controls" %}</td>
+                    <td>{% trans "Choose whether or not the user has access to the Map Tools." %}</td>
+                </tr>
+                <tr>
+                    <td>{% trans "Position" %}</td>
+                    <td>{% blocktrans %}You can set the position by panning the map. On report load, the map will automatically pan and zoom to the resource geo-location if there is one (also see <strong>Default Value</strong> below). Pitch values are 0-60 (higher = more oblique), <strong>Bearing</strong> values can be positive or negative (270 faces west; -180 faces south). Use <code>ctrl + click</code> then pan the map to change Pitch and Bearing.{% endblocktrans %}</td>
+                </tr>
+                <tr>
+                    <td>{% trans "Zoom" %}</td>
+                    <td>{% blocktrans %}Zoom levels go from 0 (zoomed out) to 20 (zoomed in). On report load, the map will automatically pan and zoom to the resource geo-location if there is one.{% endblocktrans %}</td>
+                </tr>
+                <tr>
+                    <td>{% trans "Geocoder" %}</td>
+                    <td>{% blocktrans %}Configure which geocoding service the address search bar will use, and whether or not to show the bar at all.{% endblocktrans %}</td>
+                </tr>
+                <tr>
+                    <td>{% trans "Resource Properties" %}</td>
+                    <td>{% blocktrans %}Configure some styling options for how the resource appears on the map.{% endblocktrans %}</td>
+                </tr>
+                <tr>
+                    <td>{% trans "Default Value" %}</td>
+                    <td>{% blocktrans %}Choose whether the map should zoom to the resource geo-location if available or the geo-location of the user.{% endblocktrans %}</td>
+                </tr>
+            </table>
+        </div>
+    </div>
+    
+    <div>
+        <a href="javascript:void(0)" class="ep-help-topic-toggle">
+            <h4>{% trans "Card Configuration" %}</h4>
+            &nbsp;<i class="ep-help-topic-toggle-icon fa fa-chevron-right"></i>
+        </a>
+        <div class="ep-help-topic-content">
+            <p>{% blocktrans %}The settings for Cards are mostly related yo how you want a user to see the card, but some have a more direct bearing on data structure as well. The preview shows what the card will look like to users.{% endblocktrans %}</p>
+            <table class="ep-help-table">
+                <tr>
+                    <td>{% trans "Card Type" %}</td>
+                    <td>{% trans "Choose the Card Component to use. Only the Default Card is available initially, but custom Card Components are a way for developers to enhance the user experience." %}</td>
+                </tr>
+                <tr>
+                    <td>{% trans "Card Title" %}</td>
+                    <td>{% blocktrans %}Users will see this title when performing data entry.{% endblocktrans %}</td>
+                </tr>
+                <tr>
+                    <td>{% trans "Subtitle" %}</td>
+                    <td>{% blocktrans %}Users will see this subtitle when performing data entry.{% endblocktrans %}</td>
+                </tr>
+                <tr>
+                    <td>{% trans "CSS Classes" %}</td>
+                    <td>{% blocktrans %}You can add your own CSS classes to this Card to customize its look and feel. Define these classes in your project's "package.css" file.{% endblocktrans %}</td>
+                </tr>
+                <tr>
+                    <td>{% trans "Make Card Visible" %}</td>
+                    <td>{% blocktrans %}Show this Card by default. Developers could hide a card initially, and show it based other variables.{% endblocktrans %}</td>
+                </tr>
+                <tr>
+                    <td>{% trans "Allow Multiple Values" %}</td>
+                    <td>{% blocktrans %}While certain node data types allow the storage of multiple values in a single node, "concept-list" for example, this setting is how you control cardinality at a higher level. When determining whether or not to use this setting, we recommend testing out the resource editor interface directly.{% endblocktrans %}</td>
+                </tr>
+                <tr>
+                    <td>{% trans "Enable Card-level Help" %}</td>
+                    <td>{% blocktrans %}To aid data entry users when using this Card, you may want to add some extra guidance. Enable setting to do so, and design the content of this guidance with the Card-Level Help menu.{% endblocktrans %}</td>
+                </tr>
+            </table>
+        </div>
+    </div>
+    <div>
+        <a href="javascript:void(0)" class="ep-help-topic-toggle">
+            <h4>{% trans "Widget Management" %}</h4>
+            &nbsp;<i class="ep-help-topic-toggle-icon fa fa-chevron-right"></i>
+        </a>
+        <div class="ep-help-topic-content">
+            <p>{% blocktrans %}Widgets are data entry helpers for each node that collects information; it's often easier to pick a date from a calendar than to type it in, for example. Generally, the data type of the node will determine which Widget template is used. However, in some cases you will have a choice: For example, in the case of a <code>concept</code> node, you can choose a dropdown menu or a set of radio buttons. Similarly, for a <code>string</code> node you can choose a basic text box or a rich text editor.{% endblocktrans %}</p>
+            <p>{% trans "Depending on the Widget, there are more settings you can configure, most of which are optional and all come with acceptable defaults." %}</p>
+            <span class="ep-help-table-header">{% trans "Common Settings" %}</span>
+            <table class="ep-help-table">
+                <tr>
+                    <td>{% trans "Widget Label" %}</td>
+                    <td>{% trans "This will be used in the user interface. The default label comes from the node name." %}</td>
+                </tr>
+                <tr>
+                    <td>{% trans "Template" %}</td>
+                    <td><em>{% blocktrans%}The list of available Widgets is determined by the node's data type, though developers can <a href="https://arches.readthedocs.io/en/stable/functions-widgets-datatypes/#widgets" target="_blank">create new Widgets</a>.{% endblocktrans %}</td>
+                </tr>
+                <tr>
+                    <td>{% trans "Placeholder" %}</td>
+                    <td>{% blocktrans %}Shown in the input area before the user has entered anything.{% endblocktrans %}</td>
+                </tr>
+                <tr>
+                    <td>{% trans "Default Value" %}</td>
+                    <td>{% blocktrans %}If desired, you can define a default value.{% endblocktrans %}</td>
+                </tr>
+            </table>
+            <span class="ep-help-table-header">{% trans "Other Settings by Widget" %}</span>
+            <table class="ep-help-table">
+                <tr>
+                    <td>{% trans "map-widget" %}</td>
+                    <td>{% trans "The map widget allows for a good deal of customization, from the default center and zoom level to default layers." %}</td>
+                </tr>
+                <tr>
+                    <td>{% trans "datepicker-widget" %}</td>
+                    <td>{% blocktrans%}This widget is used for the normal date data type, not the extended date/time format data type. You can set minumum or maximum dates, change how specific the calendar is when user first opens it, or set the display of the date. However, note that real YYYY-MM-DD dates are stored in the database whether no matter what display format you have chosed for this widget. So if you have set YYYY for the <strong>Date Format</strong> and a user enters "2005", then "2005-01-01" will be saved in the database.{% endblocktrans %}</td>
+                </tr>
+            </table>
+        </div>
+    </div>
+</div>
+

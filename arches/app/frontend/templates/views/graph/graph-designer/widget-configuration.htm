@@ -1,0 +1,70 @@
+{% load i18n %}
+
+<!-- Title Block -->
+<div>
+    <div class="panel-section-title dark-colored-text">
+        {% trans "Widget Manager" %}
+    </div>
+</div>
+
+<!-- Tabs Content -->
+<div class="tab-content listing-container form-divider">
+
+    <div id="widget-crud-settings" class="tab-pane fade in active">
+
+        <div class="node-config-item" style="">
+            <div class="control-label">
+                {% trans "Widget Label" %}
+            </div>
+            <div class="pad-no">
+                <input type="" placeholder="{% trans "Widget Label" %}" id="" class="form-control input-md widget-input" data-bind="textInput: label">
+            </div>
+        </div>
+
+        <div class="node-config-item" style="">
+            <div class="control-label">
+                {% trans "Template" %}
+            </div>
+            <div class="pad-no">
+                <select class="design" data-bind="value: widget_id, options: widgetList(), optionsText: 'name', optionsValue: 'id', chosen: {disable_search_threshold: 10, width: '100%'}"></select>
+            </div>
+        </div>
+
+        <div class="node-config-item" style="">
+            <div class="control-label">
+                {% trans "Visibility" %}
+            </div>
+            <div class="pad-no">
+                <div data-bind="component: { name: 'views/components/simple-switch', params: {value: visible, config:{label: '{% trans "Make Widget Visible" %}', subtitle: '{% trans "Show this widget by default" %}'}}}"></div>
+            </div>
+        </div>
+
+        <div class="widget-config-container" style="margin-top: 5px;" data-bind='component: {
+            name: widgetLookup[widget_id()].name,
+            params: {
+                config: configJSON,
+                configForm: true,
+                value: ko.observable(null),
+                node: node
+            }
+        }'></div>
+
+
+
+        <!-- ko if: ko.isObservable(card) -->
+        <div class="node-config-item switch-panel" data-bind="css: {'disabled': checkIfImmutable() }">
+
+            <span class="switch switch-small arches-switch" data-bind="css: {'on': node.isrequired(), 'disabled': checkIfImmutable() }, click: toggleRequired"><small></small></span>
+
+            <p class="control-label" style="margin-left: 40px; margin-top: -17px; margin-bottom: 0px;">
+                {% trans "Required" %}
+            </p>
+            <span style="margin-left: 40px; display: inline-block; color: #8ba2b9; font-size: 10px;">
+                {% trans "Activate to require that data be collected for this node when a card value is edited" %}
+            </span>
+        </div>
+        <!-- /ko -->
+
+    </div>
+
+</div>

@@ -1,0 +1,67 @@
+{% load staticfiles %}
+{% load i18n %}
+
+<!-- Menu -->
+<div id="menu-panel" class="ep-menu" style="display: none;" data-bind="visible:menuActive()">
+    <div class="panel ep-menu-panel relative" style="">
+
+        <!-- Menu List -->
+        <div class="panel-body">
+            <ul class="list-group ep-menu-list editor-tools">
+
+                <!-- Menu Item -->
+                <li id="settings-manager" class="edit-menu-item" data-bind="css: {'disabled': !resourceId()}">
+                    <a href="" target="" class="" data-bind="click: copyResource">
+                        <div class="media-body">
+                            <div class="menu-item-title"><i class="fa fa-copy"></i> {% trans "Copy Resource" %} </div>
+                            <span class="text-muted menu-item-subtitle">{% trans "Make a copy and start editing" %}</span>
+                        </div>
+                    </a>
+                </li>
+
+                <!-- Menu Item -->
+                {% if user_can_delete_resource %}
+                <li id="card-manager" class="edit-menu-item" data-bind="css: {'disabled': !resourceId()}">
+                    <a href="" target="" class="" data-bind="click: deleteResource">
+                        <div class="media-body">
+                            <div class="menu-item-title"><i class="fa fa-trash"></i> {% trans "Delete Resource" %} </div>
+                            <span class="text-muted menu-item-subtitle">{% trans "Permanently delete this resource" %}</span>
+                        </div>
+                    </a>
+                </li>
+                {% endif %}
+
+                <!-- Menu Item -->
+                <li id="history-manager" class="edit-menu-item" data-bind="css: {'disabled': !resourceId()}">
+                    <a id="edit-history-btn" href="#" data-bind="click: viewEditHistory">
+                        <div class="media-body">
+                            <div class="menu-item-title"><i class="fa fa-step-backward"></i> {% trans "Review Edit History" %}</div>
+                            <span class="text-muted menu-item-subtitle">{% trans "View changes to this resource record" %}</span>
+                        </div>
+                    </a>
+                </li>
+
+                <!-- Menu Item -->
+                <li id="report-manager" class="edit-menu-item" data-bind="css: {'disabled': !resourceId()}">
+                    <a href="#" data-bind="click: function() { viewReport(false) }">
+                        <div class="media-body">
+                            <div class="menu-item-title"><i class="fa fa-book"></i> {% trans "Jump to Report" %}</div>
+                            <span class="text-muted menu-item-subtitle">{% trans "View the full resource report" %}</span>
+                        </div>
+                    </a>
+                </li>
+
+                <li id="report-manager" class="edit-menu-item" data-bind="css: {'disabled': !resourceId()}">
+                    <a href="#" data-bind="click: function() { viewReport(true) }">
+                        <div class="media-body">
+                            <div class="menu-item-title"><i class="fa fa-print"></i> {% trans "Print Report" %}</div>
+                            <span class="text-muted menu-item-subtitle">{% trans "Print the full resource report" %}</span>
+                        </div>
+                    </a>
+                </li>
+
+            </ul>
+        </div>
+
+    </div>
+</div>

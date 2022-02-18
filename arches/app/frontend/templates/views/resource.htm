@@ -1,0 +1,105 @@
+<!--
+ARCHES - a program developed to inventory and manage immovable cultural heritage.
+Copyright (C) 2013 J. Paul Getty Trust and World Monuments Fund
+
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU Affero General Public License as
+published by the Free Software Foundation, either version 3 of the
+License, or (at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+GNU Affero General Public License for more details.
+
+You should have received a copy of the GNU Affero General Public License
+along with this program. If not, see <http://www.gnu.org/licenses/>.
+-->
+{% extends "base-manager.htm" %}
+{% load staticfiles %}
+{% load i18n %}
+
+{% block title %}
+{{ block.super }}
+{% trans "Resource Manager" %}
+{% endblock title %}
+
+
+{% block main_content %}
+<div class="scroll-y">
+    <div class="graph-list-header" data-bind="css: {'alert-active': (alert() && alert().active())}">
+
+        <!-- Toolbar -->
+        <div class="relative resource-toolbar" style="">
+
+            <!-- Search -->
+            <div class="edit-panel-search-bar">
+
+                <!-- Find Button -->
+                <div class="">
+                    <a class="page-header text-overflow graph-find" href="#" data-bind="click: function () { showFind(!showFind()) }"> {% trans "Find" %} </a>
+                </div>
+
+                <!-- Find resource -->
+                <div class="find-widget" style="display: none;" data-bind="visible: showFind()">
+                    <div>
+                        <select data-bind="chosen: {width: '100%'}, value: graphId, options: resources, optionsText: 'name', optionsValue: 'graphid', optionsCaption: '{% trans "Select a resource..." %}', optionsAfterRender: setResourceOptionDisable"></select>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Resource/Graph Toggle -->
+            <div class="resource-tools relative" data-bind="visible: !showFind()">
+                <span class="resource-grid-title">{% trans "Resources" %}</span>
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <!-- Default Page content-->
+    <div id="page-content" style="padding: 0 50px 160px; margin-top: 30px;">
+        <div id="resource-list" class="report-image-grid" style="margin-top: 5px;">
+            
+            <!-- ko foreach: createableResources -->
+            <div class="r-grid-item relative" data-bind="css: { 'disabled': disable_instance_creation}">
+                <div data-bind="attr: {href: '#', title: name, target: '_blank'}" href="#">
+                    <div class="r-select-card">
+                        <h4 class="r-select-title" data-bind="text: name"></h4>
+                        <div class="r-select-circle" data-bind="attr:{style: ('background: ' + color)}">
+                            <span>
+                                <i data-bind="attr:{class: ('fa '+ iconclass +' r-select-icon')}"></i>
+                            </span>
+                        </div>
+                        <div class="r-desc-container">
+                            <p data-bind="text: subtitle" class="r-select-desc"></p> 
+                        </div>  
+                    </div>
+                </div>
+
+                <!-- card Tools -->
+                <div class="r-select-card-footer">
+                    <!-- ko if: disable_instance_creation -->
+                    <div class="r-warning">
+                      <i class="fa fa-warning"></i> <span class="form-warning" style="" data-bind="text: disable_instance_creation"></span>
+                    </div>
+                    <!-- /ko -->
+                    <!-- ko if: !disable_instance_creation-->
+                    <div class="">
+                        <a href="#" class="btn btn-primary btn-resource-select" role="button" data-bind="
+                        attr: { href: $parent.arches.urls.add_resource(graphid), 'data-arches-graphid': graphid},
+                        css: { 'disabled': disable_instance_creation }">
+                        {% trans "Create Resource" %}</a>
+                    </div>
+                    <!-- /ko -->
+
+                </div>
+            </div>
+            <!-- /ko -->
+
+        </div>
+    </div>
+</div>
+
+{% endblock main_content %}

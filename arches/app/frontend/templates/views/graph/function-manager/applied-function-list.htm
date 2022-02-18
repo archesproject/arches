@@ -1,0 +1,21 @@
+{% extends "views/list.htm" %}
+{% load staticfiles %}
+{% load i18n %}
+
+{% block header %}{% endblock header %}
+
+{% block listitem %}
+
+    <div class="library-icon" style="">
+        <span class="icon-wrap icon-wrap-sm icon-circle branch-icon bg-primary">
+            <i class="fa fa-code"></i>
+        </span>
+    </div>
+    <div class="crud-card-main">
+        <a class="listitem_name" data-bind="text: $data.function.name">
+        </a>
+    </div>
+    <div class="crud-card-subtitle" data-bind="text: $data.function.functionType">
+    </div>
+
+{% endblock %}

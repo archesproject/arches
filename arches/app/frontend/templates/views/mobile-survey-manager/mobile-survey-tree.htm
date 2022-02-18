@@ -1,0 +1,47 @@
+{% load i18n %}
+<!-- ko foreach: { data: [$data], as: 'tree' } -->
+<div class="jstree jstree-default msm-tree">
+    <div class="left-panel-overflow msm-tree">
+        <!-- <div data-bind="sortable: $data"> -->
+        <ul class="jstree-container-ul jstree-children" aria-expanded="true">
+            <div class="" data-bind="template: {
+                name: 'mobile-survey-tree',
+                foreach: items,
+                as: 'node'
+            }"></div>
+        </ul>
+        <!-- </div> -->
+    </div>
+</div>
+<!-- /ko -->
+
+<template id="mobile-survey-tree">
+    <li role="treeitem" class="jstree-node jstree-open" data-bind="css: {'jstree-open': (node.childNodes().length > 0 && node.expanded), 'jstree-closed' : (node.childNodes().length > 0 && !node.expanded()), 'jstree-leaf': node.childNodes().length === 0}, container: '.mobile-survey-tree'">
+        <i class="jstree-icon jstree-ocl" role="presentation" data-bind="click: function(){node.expanded(!node.expanded())}"></i>
+        <a class="jstree-anchor" href="#" data-bind="click: tree.selectItem.bind(tree), css:{'jstree-clicked': node.selected, 'child-selected': tree.isChildSelected(node), 'filtered': tree.filter().length > 0 && !node.filtered()}">
+            <div style="display:flex; align-items: center;">
+                <!--ko if: node.id === 'root' && tree.status().incomplete -->
+                <i class="fa fa-exclamation-triangle" style="color: orange" role="presentation"></i>
+                <!--/ko-->
+                <!--ko ifnot: node.id === 'root' && tree.status().incomplete -->
+                <i data-bind="css: node.iconclass" role="presentation"></i>
+                <!--/ko-->
+
+                <div data-bind="text: ko.unwrap(node.name) || 'Unnamed'" style="padding-left:5px"></div>
+            <!-- ko if: node.istopnode -->
+            <!-- <i class="jstree-node-action-icon fa fa-trash" role="presentation" data-bind="" data-toggle="tooltip" data-original-title="{% trans "Delete Project" %}"></i> -->
+            <!-- /ko -->
+            </div>
+        </a>
+        <ul class="jstree-children" aria-expanded="true" data-bind="if: node.childNodes().length > 0">
+            <div data-bind="sortable: {
+                template: 'mobile-survey-tree',
+                data: node.childNodes,
+                as: 'node',
+                beforeMove: tree.beforeMove,
+                afterMove: tree.reorderNodes
+            }">
+            </div>
+        </ul>
+    </li>
+</template>

@@ -1,0 +1,251 @@
+{% load i18n %}
+
+<div style="height: 100%;" id="external-page-content">
+    <div class="settings-panel">
+
+        <div class="settings-panel-heading">
+            <div class="graph-designer-title">
+                <div data-bind="text: (node() && node().name()) ? node().name() : '{% trans 'Unnamed node' %}'"></div>
+                <span class="graph-crm-class">
+                    (
+                    <!-- ko if: hasOntology -->
+                    <span data-bind="text: node().ontologyclass_friendlyname()"></span> -
+                    <!-- /ko -->
+                    <span data-bind="text: node().datatype()"></span>
+                    )
+                </span>
+
+            </div>
+        </div>
+
+        <!-- Settings Forms -->
+        <div 
+            style="padding: 20px;"
+            class="settings-panel-body set-variable-pixel-height"
+        >
+
+            <div class="graph-designer-header">{% trans 'Node Identifiers' %}</div>
+            <!-- ko if: node() -->
+            <div class="graph-settings-panel-body fade in">
+
+                <form class="widgets">
+                    <div class="row widget-container">
+                        <div class="form-group">
+                            <div class="relative">
+                                <!-- ko if: isFuncNode() -->
+                                <h4 class="function-node-alert" data-bind="text: isFuncNode()"></h4>
+                                <!-- /ko -->
+                                <label class="col-xs-12 control-label widget-input-label">
+                                    {% trans "Node Name" %}
+                                </label>
+                            </div>
+
+                            <div class="col-xs-12">
+                                <input type="text" placeholder="{% trans 'Enter node name here...' %}"class="form-control" style="" placeholder="{% trans 'node name' %}" data-bind="value:node().name, valueUpdate: 'keyup'">
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- ko if: hasOntology -->
+                    <!-- ko if: !node().istopnode -->
+                    <div class="row widget-container">
+                        <div class="form-group">
+                            <div class="relative">
+                                <label class="col-xs-12 control-label widget-input-label">
+                                    <span style="display:flex"><div class="node-form ontology">{% trans "Relationship to" %}</div><div class="node-form node-name" data-bind="text: graphModel.getParentNode(node()).name"></div><div style="margin-top: 1px;">({% trans "parent" %})</div></span>
+                                </label>
+                            </div>
+
+                            <div class="col-xs-12 crm-selector">
+                                <select class="design" data-bind="value: node().parentproperty, options: node().validproperties, optionsText: node().getFriendlyOntolgyName.bind(node()), valueAllowUnset: true, optionsCaption: '{% trans "Choose a property" %}', chosen: {disable_search_threshold: 10, width: '500px'}"></select>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row widget-container">
+                        <div class="form-group">
+                            <div class="relative">
+                                <label class="col-xs-12 control-label widget-input-label">
+                                    {% trans "Ontology Class" %}
+
+                                </label>
+                            </div>
+
+                            <div class="col-xs-12 crm-selector">
+                                <select class="" data-bind="value: node().ontologyclass, options: node().validclasses, optionsText: node().getFriendlyOntolgyName.bind(node()), valueAllowUnset: true, optionsCaption: '{% trans 'Choose a class'%}', chosen: {disable_search_threshold: 10, width: '500px'}"></select>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row widget-container">
+                        <div class="form-group">
+                            <div class="relative">
+                                <label class="col-xs-12 control-label widget-input-label">
+                                    {% trans "Semantics" %}
+                                </label>
+                            </div>
+
+                            <div class="col-xs-12">
+                                <span class="node-semantic-description">
+                                    <div class="node-form node-name" data-bind="text: graphModel.getParentNode(node()).name"></div>
+                                    <div class="node-form ontology" data-bind="text: '(' + graphModel.getParentNode(node()).ontologyclass_friendlyname() + '; parent)'"></div>
+                                    <div class="node-form ontology" data-bind="text: node().parentproperty_friendlyname"></div>
+                                    <div class="node-form node-name" data-bind="text: node().name"></div>
+                                    <div class="node-form ontology" data-bind="text: '(' + node().ontologyclass_friendlyname()  + ')'"></div>
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- /ko -->
+                    <!-- /ko -->
+
+                    <div class="row widget-container">
+                        <div class="form-group">
+                            <div class="relative">
+                                <label class="col-xs-12 control-label widget-input-label">
+                                    {% trans "Description" %}
+
+                                </label>
+                            </div>
+
+                            <div class="col-xs-12 crm-selector">
+                                <textarea placeholder="{% trans 'description' %}" rows="6" class="form-control" data-bind="textInput: node().description"></textarea>
+                            </div>
+                        </div>
+                    </div>
+
+                </form>
+            </div>
+
+            <div class="graph-designer-header">{% trans 'Node Data Type and Configuration' %}</div>
+            <div class="graph-settings-panel-body fade in">
+                <form class="widgets">
+                    <div class="row widget-container data-type">
+                        <div class="form-group">
+                            <div class="relative">
+                                <label class="col-xs-12 control-label widget-input-label">
+                                    {% trans "Data type" %}
+                                </label>
+                            </div>
+
+                            <div class="col-xs-12 crm-selector">
+                                <select class="design" data-bind="disable: disableDatatype(), value: node().datatype, options: datatypes, optionsCaption: '{% trans 'Choose a data type' %}', chosen: {disable_search_threshold: 10, width: '500px'}"></select>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- ko if: node().datatypeConfigComponent -->
+                    <div class="row widget-container data-type-config">
+                        <div class="form-group">
+                            <div class="col-xs-12 crm-selector">
+                                <div data-bind='component: {
+                                    name: node().datatypeConfigComponent,
+                                    params: _.extend(node(), {isEditable: !checkIfImmutable()})}' style="width: 500px;">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- /ko -->
+                </form>
+            </div>
+
+            <div class="graph-designer-header" style="margin-top: 20px;">{% trans 'Node Settings' %}</div>
+            <div class="graph-settings-panel-body fade in">
+                <form>
+                    <!-- ko if: node().datatypeIsSearchable() -->
+                    <div class="row widget-container graph-settings-switch">
+                        <div class="form-group">
+                            <div class="relative">
+                                <label class="col-xs-12 control-label widget-input-label">
+                                    <span class="switch switch-small arches-switch" data-bind="css: {'on': node().issearchable()}, click: function () { node().issearchable(!node().issearchable()); }"><small></small></span>
+                                </label>
+                            </div>
+
+                            <div class="col-xs-12">
+                                <p class="control-label graph-settings-switch-label">
+                                {% trans "Expose to Advanced Search" %}
+                                </p>
+                                <span class="graph-settings-switch-subtitle">
+                                    {% trans "Activate to use this node in Advanced Search." %}
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- /ko -->
+
+                    <div class="row widget-container graph-settings-switch">
+                        <div class="form-group">
+                            <div class="relative">
+                                <label class="col-xs-12 control-label widget-input-label">
+                                    <span class="switch switch-small arches-switch" data-bind="css: {'on': node().isrequired(), 'disabled': checkIfImmutable()}, click: toggleRequired"><small></small></span>
+                                </label>
+                            </div>
+
+                            <div class="col-xs-12">
+                                <p class="control-label graph-settings-switch-label">
+                                {% trans "Required" %}
+                                </p>
+                                <span class="graph-settings-switch-subtitle">
+                                    {% trans "Activate to require that data be collected for this node when a card value is edited" %}
+                                </span>
+
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- ko if: node() && node().datatypeDataBearing() -->
+                    <div class="row widget-container graph-settings-switch">
+                        <div class="form-group">
+                            <div class="relative">
+                                <label class="col-xs-12 control-label widget-input-label">
+                                    <span class="switch switch-small arches-switch" data-bind="css: {'on': node().exportable()}, click: function(){node().exportable(!node().exportable())}"><small></small></span>
+                                </label>
+                            </div>
+
+                            <div class="col-xs-12">
+                                <p class="control-label graph-settings-switch-label">
+                                {% trans "Export via Search Results" %}
+                                </p>
+                                <span class="graph-settings-switch-subtitle">
+                                    {% trans "Provide a field name for shapefiles. " %} <strong>{% trans "Limited to 10 characters to meet shapefile requirements." %}</strong>
+                                </span>
+                                <div class="exportable-field-name">
+                                    <input class="form-control input-md widget-input" placeholder="{% trans 'shapefile fieldname' %}" type="text" maxlength="10" data-bind="textInput: node().fieldname, disable: !node().exportable(), css: {'disabled': !node().exportable()}"></input>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <!--/ko-->
+
+                    <!-- ko if: node() && !isResourceTopNode() && displayMakeCard() === true -->
+                    <div class="row widget-container graph-settings-switch">
+                        <div class="form-group">
+                            <div class="relative">
+                                <label class="col-xs-12 control-label widget-input-label">
+                                    <span class="switch switch-small arches-switch" data-bind="css: {'on': node().isCollector(), 'disabled': checkIfImmutable()}, click: toggleIsCollector"><small></small></span>
+                                </label>
+                            </div>
+
+                            <div class="col-xs-12">
+                                <p class="control-label graph-settings-switch-label">
+                                    <span data-bind="text: (node().nodeGroupId() && !node().isCollector() || graphModel.isNodeInChildGroup(node())) ? '{% trans "Place node(s) in a separate card" %}' : '{% trans "Make card" %}'"></span>
+                                </p>
+                                <span class="graph-settings-switch-subtitle">
+                                    <!-- ko if: node().istopnode -->
+                                    {% trans "Data from nodes not collected in other cards will be collected in the root card's form section" %}
+                                    <!-- /ko -->
+                                    <!-- ko if: !node().istopnode -->
+                                    {% trans "Data from this node and downstream nodes will be collected in a single form section" %}
+                                    <!-- /ko -->
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- /ko -->
+                </form>
+            </div>
+            <!-- /ko -->
+        </div>
+    </div>
+</div>

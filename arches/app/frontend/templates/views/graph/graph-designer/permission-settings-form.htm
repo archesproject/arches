@@ -1,0 +1,107 @@
+{% load i18n %}
+<div id="" class="graph-designer-graph-content permission-manager">
+<!--ko if: permissionsDesigner.showPermissionsForm() === true -->
+    <div class="settings-panel">
+        <div class="settings-panel-heading">
+            <div class="graph-designer-title">
+                <div class="name">
+                    <i class="ion-lock-combination"></i> {% trans "Permissions" %}
+                </div>
+            </div>
+        </div>
+
+        <div 
+            style="padding: 20px;"
+            class="settings-panel-body set-variable-pixel-height"
+        >
+            <!-- Help/Instructions -->
+            <div class="permissions-instructions-panel">
+                <span class="mpm-instruction-title">{% trans "To set permissions: " %} </span>
+                <div class="mpm-instruction">
+                    {% trans "<strong> 1. Select one or more cards </strong>from the card tree." %}
+                </div>
+                <div class="mpm-instruction">
+                    {% trans "<strong> 2. Select a Group or User Account </strong>from the dropdown below." %}
+                </div> 
+                <div class="mpm-instruction">
+                    {% trans "<strong> 3. Apply Permissions </strong>to set your changes.  You'll see your selections reflected by the icons in the card tree." %}
+                </div>
+            </div>
+    
+            <!-- Group/Account Selector -->
+            <div class="graph-selector-panel">
+                <div class="control-label">
+                    {% trans "Set permissions for:" %}
+                </div>
+                <div class="graph-selector" data-bind="">
+                    <!-- ko if: permissionsDesigner.permissionSettingsForm.groupedIdentities -->
+                    <select data-bind="template: { name: 'selectAccountTemplate', data: permissionsDesigner.permissionSettingsForm.groupedIdentities }, chosen: {width: '100%'}, value: permissionsDesigner.permissionSettingsForm.identityid"></select>
+                    <!-- /ko -->
+                    <script type="text/html" id="selectAccountTemplate">
+                        <option disabled selected value>{% trans "Select a Group/Account..." %}</option>
+                        <!-- ko foreach: groups -->
+                            <optgroup data-bind="attr: { 'label': (name==='Groups')?'{% trans "Groups" %}':'{% trans "Accounts" %}' }, foreach: items">
+                                <option data-bind="value: combinedId, text: name"></option>
+                            </optgroup>
+                        <!-- /ko -->
+                    </script>
+                </div>
+            </div>
+    
+    
+            <!-- Permissions Selector -->   
+            <div class="form-group">
+                <div class="permission-selector">
+                    <div>{% trans 'Permissions' %}</div>
+                    <ul class="permissions-options" style="list-style: none; margin-left: -5px;" data-bind="foreach: permissionsDesigner.permissionSettingsForm.nodegroupPermissions">
+                        <li>
+                        <label class="form-checkbox form-normal form-primary form-text permission-option"
+                            data-bind="css: {
+                                'active': $data.selected
+                            },
+                            click: $data.selected.bind($data, !$data.selected())">
+                            <input type="checkbox" data-bind="checked: $data.selected">
+                            <i data-bind="css: $data.icon"></i> <span data-bind="text: $data.name"></span>
+                        </label>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+            
+    
+            <!-- Buttons -->
+            <!-- ko with: permissionsDesigner.permissionSettingsForm -->
+            <div class="permission-buttons mar-btm">
+                <button id="cc-delete-btn" class="btn btn-shim btn-danger btn-labeled btn-lg fa fa-times mar-rgt disabled" data-bind="click: revert, css: {'disabled': selectedCards().length === 0 || selectedIdentities().length === 0}">{% trans "Revert Permissions" %}
+                </button>
+                <button id="cc-save-btn" class="btn btn-shim btn-primary btn-labeled btn-lg fa fa-check disabled" data-bind="click: save, css: {'disabled': selectedCards().length === 0 || selectedIdentities().length === 0}">{% trans "Apply Permissions" %}</button>
+            </div>
+            <!--/ko-->
+    
+            <!-- Selection Summary -->
+            <div>
+                <div class="control-panel">
+                    <div class="permissions-list">
+                        <div class="node-list-panel">
+                            <span class="permissions-title">{% trans "Selected Cards" %}</span>
+                            <ul class="permissions-selected" data-bind="visible: permissionsDesigner.permissionSettingsForm.selectedCards().length === 0">
+                                <li class="no-cards-selected">
+                                    <i class="confirmation ion-information-circled"></i> <span>{% trans "No cards selected" %}</span>
+                                </li>
+                            </ul>
+                            <ul class="permissions-selected" style="display:none;" data-bind="foreach: permissionsDesigner.permissionSettingsForm.selectedCards, visible: permissionsDesigner.permissionSettingsForm.selectedCards().length !== 0">
+                                <!-- ko if $data.permsLiteral: -->
+                                <li class="permissions-node-row">
+                                    <span class="permissions-node" data-bind="text: $data.model.name()"></span>
+                                    <span class="permissions-readout" data-bind="text: $data.permsLiteral"></span>
+                                </li>
+                                <!--/ko -->
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!--/ko-->
+</div>

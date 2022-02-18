@@ -1,0 +1,78 @@
+{% extends "views/components/widgets/base.htm" %}
+{% load i18n %}
+{% load template_tags %}
+
+{% block form %}
+<div class="row widget-wrapper">
+    <div class="form-group">
+        <label class="control-label widget-input-label" for="" data-bind="text:label"></label>
+        <!-- ko if: node -->
+        <i data-bind="css: {'ion-asterisk widget-label-required': node.isrequired}"></i>
+        <!-- /ko -->
+        <div class="col-xs-12">
+            {% include 'views/components/map-widget-editor.htm' %}
+        </div>
+    </div>
+</div>
+{% endblock form %}
+
+{% block report %}
+<dt data-bind="text: label"></dt>
+<!-- ko if: summaryDetails.length === 0 -->
+<dd>{% trans "None" %}</dd>
+<!-- /ko -->
+<dd data-bind="foreach: summaryDetails">
+  <div style='margin-bottom:2px' data-bind="text: JSON.stringify($data.geometry)"></div>
+</dd>
+{% endblock report %}
+
+{% block config_form %}
+<div class="control-label">
+    {% trans "Available Geometry Types" %}
+</div>
+<div class="col-xs-12 pad-no crud-widget-container">
+    <input style="display:inline-block;"
+        data-bind="select2Query: {
+            select2Config: {
+                clickBubble: true,
+                value: geometryTypeList,
+                multiple: true,
+                allowClear: true,
+                minimumInputLength: 0,
+                placeholder: '{% trans "Available Geometry Types" %}',
+                data: [{
+                    text: '{% trans "Point" %}',
+                    id: 'Point'
+                }, {
+                    text: '{% trans "Line" %}',
+                    id: 'Line'
+                }, {
+                    text: '{% trans "Polygon" %}',
+                    id: 'Polygon'
+                }]
+            }
+        }">
+</div>
+<div class="control-label">
+    {% trans "Map Center Longitude" %}
+</div>
+<div class="col-xs-12 pad-no crud-widget-container">
+    <input type="number" id="" placeholder="{% trans " Longitude (x coordinate) " %}" class="form-control input-md widget-input" data-bind="value: centerX, valueUpdate: 'keyup'">
+</div>
+<div class="control-label">
+    {% trans "Map Center Latitude" %}
+</div>
+<div class="col-xs-12 pad-no crud-widget-container">
+    <input type="number" id="" placeholder="{% trans " Latitude (y coordinate) " %}" class="form-control input-md widget-input" data-bind="value: centerY, valueUpdate: 'keyup'">
+</div>
+<div class="control-label">
+    {% trans "Default Zoom" %}
+</div>
+<div class="col-xs-12 pad-no crud-widget-container">
+    <input type="number" min=1 max=20 id="" placeholder="{% trans " Zoom Level " %}" class="form-control input-md widget-input" data-bind="value: zoom, valueUpdate: 'keyup'">
+</div>
+{% endblock config_form %}
+
+{% block display_value %}
+<span data-bind="text: displayValue()"></span> {% trans "feature(s)" %}
+{% endblock display_value %}

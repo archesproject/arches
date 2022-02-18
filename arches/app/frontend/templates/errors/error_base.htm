@@ -1,0 +1,79 @@
+<!--
+ARCHES - a program developed to inventory and manage immovable cultural heritage.
+Copyright (C) 2013 J. Paul Getty Trust and World Monuments Fund
+
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU Affero General Public License as
+published by the Free Software Foundation, either version 3 of the
+License, or (at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+GNU Affero General Public License for more details.
+
+You should have received a copy of the GNU Affero General Public License
+along with this program. If not, see <http://www.gnu.org/licenses/>.
+-->
+{% load staticfiles %}
+{% load i18n %}
+{% load compress %}
+
+<!DOCTYPE html>
+<!--[if IE 8]> <html lang="en" class="ie8"> <![endif]-->
+<!--[if IE 9]> <html lang="en" class="ie9"> <![endif]-->
+<!--[if !IE]><!--> <html lang="en"> <!--<![endif]-->
+
+{% if debug %}
+    <script>document.write('<script src="http://' + (location.host || 'localhost').split(':')[0] + ':{{ livereload_port }}/livereload.js?snipver=1"></' + 'script>')</script>
+{% endif %}
+
+<head>
+    <title>{% block title %}{{ app_settings.APP_NAME }} {{ app_settings.VERSION }} - {% endblock title %}</title>
+
+    <!-- Meta -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="">
+    <meta name="author" content="">
+
+    <link rel="shortcut icon" href="{% static 'img/favicon.png' %}" />
+
+    {% block css %}
+        {% compress css %}
+        <link type="text/x-scss" href="{% static 'css/arches.scss' %}" rel="stylesheet" media="screen">
+    	{% endcompress %}
+        {% if app_settings.ACCESSIBILITY_MODE %}
+        <link href="{% static 'css/accessibility.css' %}" rel="stylesheet">
+        {% endif %}
+        <link href="{% static 'css/package.css' %}" rel="stylesheet">
+        <link href="{% static 'css/project.css' %}" rel="stylesheet">
+    {% endblock css%}
+
+</head>
+
+<body {% block body_attributes %}class="scroll-y-hidden"{% endblock %}>
+    {% block body %}
+
+    {% endblock body %}
+</body>
+
+{% block javascript %}
+
+    {% if app_settings.GOOGLE_ANALYTICS_TRACKING_ID != None %}
+
+        <script>
+            (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+                (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+                m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+            })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+            ga('create', '{{app_settings.GOOGLE_ANALYTICS_TRACKING_ID}}', 'auto');
+            ga('send', 'pageview');
+        </script>
+
+    {% endif %}
+
+{% endblock javascript %}
+
+</html>

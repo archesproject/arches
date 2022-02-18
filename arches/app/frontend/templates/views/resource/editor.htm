@@ -1,0 +1,321 @@
+<!--
+ARCHES - a program developed to inventory and manage immovable cultural heritage.
+Copyright (C) 2013 J. Paul Getty Trust and World Monuments Fund
+
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU Affero General Public License as
+published by the Free Software Foundation, either version 3 of the
+License, or (at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+GNU Affero General Public License for more details.
+
+You should have received a copy of the GNU Affero General Public License
+along with this program. If not, see <http://www.gnu.org/licenses/>.
+-->
+{% extends "views/resource/resource-base.htm" %}
+{% load staticfiles %}
+{% load i18n %}
+
+{% block graph_header_title %}
+{% trans "Resource Editor" %}
+{% endblock graph_header_title %}
+
+{% block graph_title %}
+<!-- Page Title and Icon -->
+<div class="ep-tools-title">
+    <h1 class="page-header text-overflow ep-graph-title">
+        <i class="fa text-center icon-wrap bg-gray ep-graph-title-icon" data-bind="css: graphiconclass != (null || '') ? graphiconclass : 'fa fa-question'"></i>
+        <span data-bind="text: displayname"></span>
+    </h1>
+</div>
+{% endblock graph_title %}
+
+{% block main_content %}
+<div class="content-panel">
+    <div style="height: inherit;" class="flex">
+        <div class="left-panel graph-designer" data-bind="resizableSidepanel:true">
+            <div class="left-panel-inner-container">
+                <div class="jstree jstree-default" data-bind="visible: true" style="display: none;">
+                    <div class="header">
+                        <div class="list-filter" data-bind="">
+                            <input type="text" class="form-control" style="width: 100%;" placeholder="{% trans 'Find a card...' %}" data-bind="textInput: filter, event: {keypress: filterEnterKeyHandler}">
+
+                            <!-- Clear Search -->
+                            <span class="clear-node-search" data-bind="visible: filter().length > 0, click: function() { filter(''); }"><i class="fa fa-times-circle"></i></span>
+                        </div>
+                        <div>
+                            <a class="tree-display-tool" data-bind="click: expandAll"><i class="ion-plus"></i>{% trans ' Expand' %}</a>
+                            <a class="tree-display-tool" data-bind="click: collapseAll"><i class="ion-minus"></i>{% trans ' Collapse' %}</a>
+                        </div>
+                    </div>
+                    <div class="resource-editor-tree">
+                        <ul class="jstree-container-ul jstree-children" aria-expanded="true">
+                        <li role="treeitem" class="jstree-node" data-bind="css: {'jstree-open': rootExpanded, 'jstree-closed' : !rootExpanded()}">
+                            <i class="jstree-icon jstree-ocl" role="presentation" data-bind="click: function(){rootExpanded(!rootExpanded())}"></i>
+                            <a class="jstree-anchor" href="#" tabindex="-1" data-bind="click: function () { selection('root'); }, css: {'jstree-clicked': selection() === 'root'}">
+                                <strong>
+                                    <i data-bind="css: graphiconclass != (null || '') ? graphiconclass : 'fa fa-question'" role="presentation"></i>
+                                    <span data-bind="text: displayname"></span> (<span data-bind="text: graphname"></span>)
+                                </strong>
+                            </a>
+                            <!-- ko foreach: { data: [$data], as: 'self' } -->
+                            <ul class="jstree-children" aria-expanded="true" data-bind="foreach: {
+                                data: topCards,
+                                as: 'card'
+                            }">
+                                <!-- ko component: {
+                                    name: self.cardComponentLookup[card.model.component_id()].componentname,
+                                    params: {
+                                        state: 'editor-tree',
+                                        card: card,
+                                        tile: null,
+                                        loading: self.loading,
+                                        form: self,
+                                        pageVm: $root
+                                    }
+                                } --> <!-- /ko -->
+                            </ul>
+                            <!-- /ko -->
+                        </li>
+                        <!--ko ifnot: issystemsettings -->
+                        <li role="treeitem" class="jstree-node jstree-open" data-bind="css: {'disabled': resourceId()}">
+                            <i class="jstree-icon jstree-ocl" role="presentation"></i>
+                            <a class="jstree-anchor" href="#" tabindex="-1" data-bind="click: function(){if (resourceId()){showRelatedResourcesManager()}}, css: {'jstree-clicked': selection() === 'related-resources', 'disabled': resourceId() === ''}">
+                                <strong>
+                                    <i class="fa fa-link" role="presentation"></i>
+                                    <span>{% trans 'Related Resources' %}</span>
+                                </strong>
+                            </a>
+                        </li>
+                        <!--/ko-->
+                        <li role="treeitem" class="jstree-node jstree-open" data-bind="css: {'disabled': resourceId()}">
+                            <i class="jstree-icon jstree-ocl" role="presentation"></i>
+                            <a class="jstree-anchor" href="#" tabindex="-1" data-bind="click: function(){if (resourceId()){showInstancePermissionsManager(self)}}, css: {'jstree-clicked': selection() === 'resource-permissions', 'disabled': resourceId() === '' || userIsCreator === false }">
+                                <strong>
+                                    <i class="fa fa-lock" role="presentation"></i>
+                                    <span>{% trans 'Manage Permissions' %}</span>
+                                </strong>
+                            </a>
+                        </li>
+                    </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="main-panel card-component-panel" style="display:none;" data-bind="visible: true">
+
+
+            <!--ko if: selection() === 'related-resources' -->
+            <div>
+                 <div data-bind="component: {
+                    name: 'related-resources-manager',
+                    params: relatedResourcesManagerObj
+                }"></div>
+            </div>
+            <!--/ko -->
+
+            <!--ko if: selection() === 'permissions-manager' -->
+            <div>
+                <div data-bind="component: {
+                    name: 'permissions-manager',
+                    params: {
+                        graphId: graphid,
+                        resourceId: resourceId,
+                        creator: creator,
+                        userIsCreator: userIsCreator,
+                        alert: alert,
+                        permissionLabelLookup: {
+                            'view_resourceinstance':'{% trans 'Read' %}',
+                            'change_resourceinstance':'{% trans 'Update' %}',
+                            'no_access_to_resourceinstance':'{% trans 'No Access' %}',
+                            'delete_resourceinstance':'{% trans 'Delete' %}',
+                        },
+                        alertTitle: '{% trans 'You are about assign normal user access to this instance' %}',
+                        alertMessage: '{% trans 'Would you like to proceed?' %}'},
+                }"></div>
+            </div>
+            <!--/ko -->
+
+            <!--ko if: selection() === 'root' -->
+                <!--ko if: resourceId() -->
+                <div class='resource-report editor-report' data-bind='component: {
+                    name: "resource-report-abstract",
+                    params: {
+                        report: report,
+                        editorContext: true,
+                        cache: false
+                    }
+                }'></div>
+                <!--/ko -->
+                <!--ko if: !resourceId() -->
+                <div id="rr-splash" class="rr-splash">
+
+                    <!-- Image -->
+                    <div class="img-lg img-circle rr-splash-img-container">
+                        <img class="rr-splash-img" src="{% static "/img/inspection.png" %}" alt="Resource Editor">
+                    </div>
+
+                    <!-- Splash Title -->
+                    <div class="rr-splash-title">{% trans "Welcome to Arches' Resource Editor" %}</div>
+
+                    <!-- Splash Instructions -->
+                    <div class="rr-splash-description">{% trans "You are about to create a new resource record.  Select any data card from the list on the left and start entering information." %}</div>
+                    <div class="rr-splash-description">{% trans "Don't worry if you decide not to enter any data just yet." %}</div>
+                    <div class="rr-splash-description">{% trans "Arches will create your new resource record once you've saved a data entry card." %}</div>
+                </div>
+                <!--/ko -->
+            <!--/ko -->
+
+            <!-- ko if: !selection() && topCards.length == 0 -->
+            <div class="card-header">{% trans "No cards are available for this model." %}</div>
+            <!-- /ko -->
+
+            <!-- ko if: selectedTile() && selectedCard() -->
+            <div class="card-header">
+                <div class="card-header-title">
+
+
+                    <div class="card-breadcrumbs">
+
+                        <a href="" class="toggle-tree"><i class="ion-arrow-left-b"></i></a>
+
+                        <!-- ko foreach: { data: selectionBreadcrumbs(), as: 'crumb' } -->
+                            <!-- ko if: crumb.tileid -->
+                            <a href="#" data-bind="click: function () { crumb.selected(true) }">
+                                <!-- ko if: crumb.parent.widgets.length > 0 -->
+                                <span data-bind="text: crumb.parent.widgets[0].label || crumb.parent.model.name"></span>:
+                                <div style="display: inline;" data-bind="component: {
+                                    name: $parent.widgetLookup[crumb.parent.widgets[0].widget_id].name,
+                                    params: {
+                                        tile: crumb,
+                                        node: $parent.nodeLookup[crumb.parent.widgets[0].node_id],
+                                        config: $parent.widgetLookup[crumb.parent.widgets[0].widget_id].config,
+                                        label: $parent.widgetLookup[crumb.parent.widgets[0].widget_id].label,
+                                        value: crumb.data[crumb.parent.widgets[0].node_id],
+                                        type: 'resource-editor',
+                                        state: 'display_value'
+                                    }
+                                }"></div> &gt;
+                                <!-- /ko -->
+                                <!-- ko if: crumb.parent.widgets.length === 0 -->
+                                <span data-bind="text: crumb.parent.model.name"></span> &gt;
+                                <!-- /ko -->
+                            </a>
+                            <!-- /ko -->
+                        <!-- /ko -->
+                        <span class="current-crumb">
+                            <!-- ko if: selectedTile().tileid -->
+                                <!-- ko if: selectedCard().widgets.length > 0 -->
+                                <span data-bind="text: selectedCard().widgets[0].label || selectedCard().model.name"></span>:
+                                <div style="display: inline;" data-bind="component: {
+                                    name: widgetLookup[selectedCard().widgets[0].widget_id].name,
+                                    params: {
+                                        tile: selectedTile(),
+                                        node: nodeLookup[selectedCard().widgets[0].node_id],
+                                        config: widgetLookup[selectedCard().widgets[0].widget_id].config,
+                                        label: widgetLookup[selectedCard().widgets[0].widget_id].label,
+                                        value: selectedTile().data[selectedCard().widgets[0].node_id],
+                                        type: 'resource-editor',
+                                        state: 'display_value'
+                                    }
+                                }"></div>
+                                <!-- /ko -->
+                                <!-- ko if: selectedCard().widgets.length === 0 -->
+                                <span data-bind="text: selectedCard().model.name"></span>
+                                <!-- /ko -->
+                            <!-- /ko -->
+                            <!-- ko if: !selectedTile().tileid -->
+                            {% trans "New" %} <span data-bind="text: selectedCard().model.name"></span>
+                            <!-- /ko -->
+                        </span>
+                        <!-- ko if: selectedTile().tileid && selectedTile().cards.length > 0 -->
+                        &gt;
+                        <!-- ko if: addableCards().length > 0 -->
+                        <span class="dropdown">
+                            <a class="dropdown-toggle" href="javascript:void(0)" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
+                                {% trans "Add new" %}... <i class="fa fa-caret-down"></i>
+                            </a>
+                            <ul class="dropdown-menu" style="padding-bottom: 5px;">
+                                <!-- ko foreach: { data: addableCards(), as: 'card' } -->
+                                    <li>
+                                        <a href="javascript:void(0)" data-bind="text: card.model.name, click: function () { card.selected(true) }"></a>
+                                    </li>
+                                <!-- /ko -->
+                            </ul>
+                        </span>
+                        <!-- /ko -->
+
+                        <!-- /ko -->
+
+                        <!-- ko if: selectedCard().cardinality === 'n' && selectedTile().tileid  -->
+                        <span class="add-new-crumb current-crumb" data-bind="click: function() {
+                            selectedCard().selected(true); setTimeout(function(){selectedCard().showForm(true)}, 50);
+                        }">
+                            <i class="fa fa-plus"></i>
+                            {% trans 'Add New' %}
+                        </span>
+                        <!-- /ko -->
+                    </div>
+                </div>
+            </div>
+
+            <!-- ko if: !selectedCard().isWritable -->
+            <div class='msm-locked-warning'>{% trans 'You do not have permission to edit this card.' %}</div>
+            <!-- /ko -->
+
+            <div class="card-component-wrapper-editor" data-bind="component: {
+                name: cardComponentLookup[selectedCard().model.component_id()].componentname,
+                params: {
+                    card: selectedCard(),
+                    tile: selectedTile(),
+                    provisionalTileViewModel: provisionalTileViewModel,
+                    reviewer: reviewer,
+                    loading: loading,
+                    form: $data,
+                    pageVm: $root
+
+                }
+            }"></div>
+            <!-- /ko -->
+        </div>
+    </div>
+</div>
+{% endblock main_content %}
+
+{% block tabs %}{% endblock tabs %}
+
+{% block pre_require_js %}
+{{block.super}}
+    <script>
+        {% autoescape off %}define('resource-editor-data', [], function() {
+            return {
+                resourceid: '{{resourceid}}',
+                graphid: '{{graphid}}',
+                graphiconclass: '{{graphiconclass}}',
+                graphname: '{{graphname | escapejs}}',
+                displayname: '{{displayname | escapejs}}',
+                tiles: {{tiles}},
+                cards: {{cards}},
+                nodes: {{nodes}},
+                cardwidgets: {{cardwidgets}},
+                widgets: {{widgets_json}},
+                ontologyclass: '{{ontologyclass}}',
+                relationship_types: {{ relationship_types }},
+                datatypes: {{datatypes_json}},
+                appliedFunctions: {{applied_functions}},
+                cardComponents: {{card_components_json}},
+                nodegroups: {{nodegroups}},
+                userisreviewer:  JSON.parse('{{ user_is_reviewer }}'.toLowerCase()),
+                creator:  JSON.parse('{{ creator }}'.toLowerCase()),
+                useriscreator:  JSON.parse('{{ user_created_instance }}'.toLowerCase()),
+                templates: {{templates_json}},
+                graph: {{graph_json}},
+                issystemsettings: {{is_system_settings|yesno:"true,false"}}
+            };ƒ
+        });{% endautoescape %}
+    </script>
+{% endblock pre_require_js %}

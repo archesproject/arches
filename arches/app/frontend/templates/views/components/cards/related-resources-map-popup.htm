@@ -1,0 +1,25 @@
+{% extends "views/components/map-popup.htm" %}
+{% load i18n %}
+
+{% block footer %}
+<!-- ko foreach: {data: mapCard.widgets, as: 'widget'} -->
+    <!-- ko if: widget.datatype.datatype === 'resource-instance-list' || widget.datatype.datatype === 'resource-instance' -->
+    <a href="javascript:void(0)" data-bind="if: $parent.mapCard.isSelectable($parent.feature), click: function() {
+        if (!!$parent.mapCard.tile.data[widget.node_id()]() && $parent.mapCard.tile.data[widget.node_id()]().filter(function(val){return ko.unwrap(val.resourceId) === $parent.resourceinstanceid()}).length > 0) {
+            $parent.mapCard.unrelateResource($parent, widget);
+        } else {
+            $parent.mapCard.relateResource($parent, widget);
+        }
+    }">
+        <i class="ion-ios-refresh-empty"></i>
+        <!-- ko if: !!$parent.mapCard.tile.data[widget.node_id()]() && $parent.mapCard.tile.data[widget.node_id()]().filter(function(val){return ko.unwrap(val.resourceId) === $parent.resourceinstanceid()}).length > 0 -->
+        <span data-bind="text: 'Unrelate ' + widget.label()"></span>
+        <!-- /ko -->
+        <!-- ko if: !$parent.mapCard.tile.data[widget.node_id()]() || $parent.mapCard.tile.data[widget.node_id()]().filter(function(val){return ko.unwrap(val.resourceId) === $parent.resourceinstanceid()}).length === 0 -->
+        <span data-bind="text: 'Relate ' + widget.label()"></span>
+        <!-- /ko -->
+    </a>
+    <!-- /ko -->
+<!-- /ko -->
+{{ block.super }}
+{% endblock footer %}

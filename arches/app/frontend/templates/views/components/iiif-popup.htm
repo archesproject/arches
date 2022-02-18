@@ -1,0 +1,29 @@
+{% load i18n %}
+
+<div class="mapboxgl-popup-content">
+    <button class="mapboxgl-popup-close-button" type="button" aria-label="Close popup" data-bind="click: closePopup">×</button>
+    <div class="hover-feature-title-bar">
+        <div class="hover-feature-title">
+            <span class="" data-bind="text: name"></span>
+        </div>
+    </div>
+    <div class="hover-feature-body">
+        <div class="hover-feature" data-bind="html: description"></div>
+        <div class="hover-feature-metadata">
+            {% trans "Resource Model:" %}
+            <span data-bind="text: graphName"></span>
+        </div>
+        <div class="hover-feature-metadata">
+            {% trans "ID:" %}
+            <span data-bind="text: resourceinstanceid"></span>
+        </div>
+    </div>
+    <div class="hover-feature-footer">
+        <a data-bind="click: function () {
+            window.open(reportURL + resourceinstanceid);
+        }" href="javascript:void(0)">
+            <i class="ion-document-text"></i>
+            {% trans "Report" %}
+        </a>
+    </div>
+</div>

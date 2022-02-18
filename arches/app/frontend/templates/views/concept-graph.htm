@@ -1,0 +1,29 @@
+{% load i18n %}
+{% load staticfiles %}
+
+<!-- Graph -->
+<div style="background: #ffffff; border: 1px solid rgba(0,0,0,.1); height: 600px;" class="svg"></div>
+
+<!-- Panel to display selected node info -->
+<div class="row">
+
+    <div class="col-xs-4 col-xs-offset-6">
+        <div class="hidden node_info" style="margin-top: -580px; margin-right: 40px;">
+
+            <button aria-hidden="true" class="close" type="button">×</button>
+            <h6 style="margin-top: 0px; margin-bottom: 5px;">{% trans "Concept" %}</h6>
+
+            <dl>
+                <dd class="arches-concept-heirarchy">
+
+                    <a href="javascript:void(0);" title="{% trans "Delete this concept" %}"><i class="arches-CRUD-delete fa fa-times-circle graph-concept-delete-link" data-id="" data-action="delete-concept" data-nodetype="Concept" data-message="{% trans "Delete this concept and all of it's sub concepts." %}"></i></a>
+                    <a href="javascript:void(0);" class="concept-label arches-CRUD-child" title="{% trans "Jump to this concept" %}" data-action="viewconcept" data-conceptid="">{% trans "More Child Concept" %}</a>
+
+                </dd>
+            </dl>
+
+        </div>
+    </div>
+</div>
+
+<div style="display:none;" class="graph_json_content">{{graph_json}}</div>

@@ -1,0 +1,43 @@
+{% extends "views/components/widgets/base.htm" %}
+{% load i18n %}
+
+{% block form %}
+<div class="row widget-wrapper">
+    <div class="form-group">
+        <label class="control-label widget-input-label" for="" data-bind="text:label"></label>
+        <!-- ko if: node -->
+        <i data-bind="css: {'ion-asterisk widget-label-required': node.isrequired}"></i>
+        <!-- /ko -->
+        <div class="col-xs-12">
+            {% include 'views/components/iiif-widget-annotation.htm' %}
+        </div>
+    </div>
+</div>
+{% endblock form %}
+
+{% block config_form %}
+<div class="control-label">
+    {% trans "Default Manifest URL" %}
+</div>
+<div class="col-xs-12 crud-widget-container">
+    <input type="" placeholder="{% trans "Enter manifest URL" %}" id="" class="form-control input-md widget-input" data-bind="textInput: defaultManifest">
+</div>
+{% endblock config_form %}
+
+{% block report %}
+<dt data-bind="text: label"></dt>
+<!-- ko if: canvasConfigs.length === 0 -->
+<dd data-bind="text: displayValue() || '{% trans "None" %}'"></dd>
+<!-- /ko -->
+<!-- ko if: canvasConfigs.length > 0 -->
+<div class="iiif-widget-report">
+<!-- ko foreach: canvasConfigs -->
+    <div class="iiif-leaflet" data-bind="leaflet: $data"></div>
+<!-- /ko -->
+</div>
+<!-- /ko -->
+{% endblock report %}
+
+{% block display_value %}
+<span data-bind="text: displayValue()"></span> {% trans "annotation(s)" %}
+{% endblock display_value %}

@@ -1,0 +1,40 @@
+{% load i18n %}
+
+<div class="notifications-container" >
+    {% block listitem %}
+
+    <div>
+        <div class='entry'><i data-bind=""></i>
+            <span class='time-label' data-bind="text: displaytime" ></span>
+        </div>
+        
+        <div class="notification-message">
+            <span data-bind="text: message"></span> 
+
+            <ul>
+                <!-- ko foreach: loadedResources -->
+                <li>
+                    <span data-bind="text: $data"></span>
+                </li>
+                <!-- /ko -->
+            </ul>
+        </div>
+
+        <!-- ko if: link -->
+        <div class='entry'>
+            <button data-bind="click: getExportFile" class='btn btn-notifs-download btn-labeled btn-sm fa fa-download'>{% trans 'Download File' %}</button>
+            <div style="padding-left: 10px;" data-bind="text: info"></div>
+        </div>
+        <!-- /ko -->
+    </div>
+
+    <div class='entry relative'>
+        <a href="javascript:void(0);" data-bind="click: function() { dismiss($parents[1]) }" class="ep-notifs-toggle ep-notifs-close">
+            <div class="" data-placement="bottom" data-toggle="tooltip" data-original-title='{% trans "Dismiss" %}'>
+                <i class="fa fa-times-circle fa-sm"></i>
+            </div>
+        </a>
+    </div>
+
+    {% endblock %}
+</div>

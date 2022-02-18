@@ -1,0 +1,49 @@
+{% extends "views/list.htm" %}
+{% load staticfiles %}
+{% load i18n %}
+
+{% block header %}{% endblock header %}
+
+
+{% block list_wrapper %}
+
+    <!-- Card -->
+    <!-- ko foreach: $data.items -->
+    <div data-bind="visible: $data.filtered() == false, click: $parent.selectItem.bind($parent)">
+
+    {% block listitem %}
+
+        <!-- Function -->
+        <div class="card-grid-item">
+            <div class="panel mar-no">
+                <!-- Function Name -->
+                <div class="panel-heading">
+                    <h3 id="f1-name" class="panel-title library-card-panel-title"><i class="text-center fa fa-code"></i> <span data-bind="text: $data.name">{% trans "Function Name" %}</span></h3>
+                </div>
+
+                <!-- Abstract -->
+                <div class="panel-body library-card-body">
+                    <p data-bind="text: $data.description">{% trans "Function Description" %}</p>
+                </div>
+
+                <!-- Selectable -->
+                <div class="selectable" style="display: none;">
+                    <i class="ion-ios-checkmark"></i>
+                </div>
+
+                <!-- card Tools -->
+                <div class="panel-footer" style="height: 53px;">
+                    <div class="pull-right">
+                        <button id="f1" class="add-function-button btn btn-primary btn-labeled fa fa-plus ">{% trans "Select Function" %}</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    {% endblock %}
+
+    </div>
+
+    <!-- /ko -->
+
+{% endblock list_wrapper %}

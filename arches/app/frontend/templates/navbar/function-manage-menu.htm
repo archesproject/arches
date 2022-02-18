@@ -1,0 +1,40 @@
+{% load staticfiles %}
+{% load i18n %}
+<div id="menu-panel" class="ep-menu" style="display: none;" data-bind="visible:menuActive()">
+    <div class="panel ep-menu-panel relative" style="">
+
+        <!-- Menu List -->
+        <div class="panel-body">
+           <ul class="list-group ep-menu-list">
+                <!-- Menu Item -->
+                <li class="resource-selector" data-bind="click: function() { menuActive(true); }, clickBubble: false">
+                    <select data-placeholder="{% trans "Select a graph..." %}" class="design" style="width:100px;" data-bind="value: graphid, options: allGraphs, optionsText: 'name', optionsValue: 'graphid', chosen: {'width': '100%'}"></select>
+                </li>
+
+                <!-- Menu Item -->
+                <li id="graph-manager" class="edit-menu-item {% if main_script == "views/graph/graph-manager" %} selected{% endif %}">
+                    <a href="{% url 'graph_designer' graphid %}" data-bind="click:function () { navigate('{% url 'graph_designer' graphid %}') }">
+                        <div class="media-body">
+                            <div class="menu-item-title"><i class="fa fa-sitemap"></i> {% trans "Graphs/Semantics" %}</div>
+                            <span class="text-muted menu-item-subtitle">{% trans "Define graph" %}</span>
+                        </div>
+                    </a>
+                </li>
+
+                <!-- Menu Item -->
+                <li class="edit-menu-item">
+                    <a href="{% url 'graph' '' %}" data-bind="click:function () { navigate('{% url 'graph' '' %}') }">
+                        <div class="media-body">
+                            <div class="menu-item-title"><i class="fa fa-tag"></i> {% trans "Return to Arches Designer" %}</div>
+                            <span class="text-muted menu-item-subtitle">{% trans "Create Arches Resource Models and Branches" %} </span>
+                        </div>
+                    </a>
+                </li>
+            </ul>
+        </div>
+        <div class="panel-footer ep-menu-footer hidden">
+
+            {% trans "footer" %}
+        </div>
+    </div>
+</div>

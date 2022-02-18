@@ -1,0 +1,33 @@
+{% extends "views/components/widgets/base.htm" %}
+{% load i18n %}
+
+{% block form %}
+<div class="row widget-wrapper">
+    <div class="form-group">
+        <label class="control-label widget-input-label" for="" data-bind="text:label"></label>
+        <!-- ko if: node -->
+        <i data-bind="css: {'ion-asterisk widget-label-required': node.isrequired}"></i>
+        <!-- /ko -->
+        <div class="col-xs-12">
+            <textarea rows="10" cols="80" data-bind="ckeditor: value, ckeditorOptions: {},  valueUpdate: 'afterkeydown', attr: {disabled: disabled}"></textarea>
+        </div>
+    </div>
+</div>
+{% endblock form %}
+
+{% block report %}
+<dt data-bind="text: label"></dt>
+<dd data-bind="html: value() || '{% trans "None" %}'"></dd>
+{% endblock report %}
+
+{% block display_value %}
+<!-- ko if: value() && !ko.unwrap(displayfullvalue) -->
+<em>[{% trans "rich text" %}]</em>
+<!-- /ko -->
+<!-- ko if: value() && ko.unwrap(displayfullvalue) === true -->
+<div data-bind="html: value() || '{% trans "None" %}'"></div>
+<!-- /ko -->
+<!-- ko if: !value() -->
+{% trans "None" %}
+<!-- /ko -->
+{% endblock display_value %}

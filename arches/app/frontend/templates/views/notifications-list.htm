@@ -1,0 +1,40 @@
+{% load staticfiles %}
+{% load i18n %}
+{% block header %}
+
+<!-- Title -->
+<span>
+    <!--ko with: notifsList -->
+    <div>
+        <button class="btn btn-lg btn-notifs-dismiss-all"
+            data-bind="click: dismissAll, css: {hidden: $data.items().length === 0}" >{% trans 'Dismiss All' %}
+        </button>
+    </div>
+    <!-- /ko -->
+    
+    {% block filter %}
+    {% endblock %}
+</span>
+{% endblock %}
+
+{% block list_wrapper %}
+<div class="list-wrapper">
+    <div class="grid-list provisional-edit-history">
+        <!--ko with: notifsList -->
+        <!-- ko if: items().length === 0 -->
+        <div class="new-provisional-edit-history">
+            {% trans "You're up-to-date and do not have any notifications. When you trigger a notification (for example, when you request a large download) it will display here." %}
+        </div>
+        <!-- /ko -->
+        <!-- ko if: items().length > 0 -->
+        <!-- ko foreach: items -->
+        <div data-bind="component: {
+            name: 'notification',
+            params: { ...$data },
+        }"></div>
+        <!-- /ko -->
+        <!-- /ko -->
+        <!-- /ko -->
+    </div>
+</div>
+{% endblock list_wrapper %}

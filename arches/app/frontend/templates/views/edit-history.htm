@@ -1,0 +1,58 @@
+{% extends "base-manager.htm" %}
+{% load i18n %}
+{% load staticfiles %}
+
+{% block title %} {{ block.super }} {% trans "Recent Edits" %} {% endblock title %}
+
+
+{% block main_content %}
+
+    <div class="pad-all">
+        <div class="resource-grid-title">{% trans "Recently Added Resources" %}</div>
+        <div class="recent-additions-container">
+          <table data-bind="datatable: resourceTableConfig" class="table table-striped table-bordered" cellspacing="0" width="100%">
+              <thead>
+                  <tr>
+                      <th>{% trans "Resource Id" %}</th>
+                      <th>{% trans "Resource Name" %}</th>
+                      <th>{% trans "Resource Type" %}</th>
+                      <th class="min-desktop">{% trans "Edited" %}</th>
+                      <th>{% trans "Edit Type" %}</th>
+                      <th>{% trans "Editor" %}</th>
+                      <th class="min-tablet"></th>
+                      <th class="min-tablet" style="display:none"></th>
+                  </tr>
+              </thead>
+              <tbody>
+                  {% for edit in recent_edits %}
+                  <tr>
+                    {% if edit.deleted == True %}
+                      <td><div>{{edit.resourceinstanceid}}<span>{% trans " (Resource Deleted)" %}</span></div></td>
+                    {% else %}
+                      <td><a href="{% url 'resource_editor' edit.resourceinstanceid %}" class="regular-link" target="_blank">{{edit.resourceinstanceid}}</a></td>
+                    {% endif %}
+                      <td>{{edit.resourcedisplayname}}</td>
+                      <td>{{edit.resource_model_name}}</td>
+                      <td>{{edit.timestamp}}</td>
+                      <td>{{edit.friendly_edittype}}</td>
+                      {% if edit.user_firstname == '' and edit.user_lastname == '' %}
+                        <td>{{edit.user_username}}</td>
+                      {% else %}
+                        <td>{{edit.user_firstname}} {{edit.user_lastname}}</td>
+                      {% endif %}
+                      <td>
+                        {% if edit.deleted == True %}
+                          <a href="" class="btn btn-primary" disabled>{% trans "View Report" %}</a>
+                        {% else %}
+                          <a href="{% url 'resource_report' edit.resourceinstanceid %}" target="_blank" class="btn btn-primary">{% trans "View Report" %}</a>
+                        {% endif %}
+                      </td>
+                      <td style="display:none">{{edit.timestamp|date:"U"}}</td>
+                  </tr>
+                  {% endfor %}
+              </tbody>
+          </table>
+        </div>
+    </div>
+
+{% endblock main_content %}

@@ -1,0 +1,17 @@
+{% load i18n %}
+
+
+<!--ko if: params.context === 'render' -->
+<div class="">
+    <!--ko if: params.selected() -->
+    <div class="preview" style="width: 100%; height: 100%">
+        <img style="width: 100%" data-bind="attr: {src: ko.unwrap(displayContent.url)}" ></img>
+    </div>
+    <!--/ko-->
+</div>
+<!--/ko-->
+<!--ko if: params.context === 'tab' -->
+<!--/ko-->
+<!--ko if: params.context === 'tab-contents' -->
+<!--/ko-->
+

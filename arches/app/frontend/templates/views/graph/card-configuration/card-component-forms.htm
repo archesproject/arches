@@ -1,0 +1,17 @@
+{% load i18n %}
+<!-- Card Container CRUD -->
+<div id="ep-card-container-crud">
+
+    <!-- ko if: 'cardid' in selection()-->
+    <div id="card-configuration" style="display:none">
+        {% include 'views/graph/card-configuration/component-forms/card-configuration.htm' %}
+    </div>
+    <!-- /ko -->
+
+    <!-- ko if: 'node' in selection()-->
+    <div id="widget-configuration" style="display:none">
+        {% include 'views/graph/card-configuration/component-forms/widget-configuration.htm' %}
+    </div>
+    <!-- /ko -->
+
+</div>

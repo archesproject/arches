@@ -1,0 +1,75 @@
+{% extends "views/components/cards/default.htm" %}
+{% load i18n %}
+
+{% block form %}
+{% include 'views/components/related-resources-map-editor.htm' %}
+{% endblock form %}
+
+{% block config %}
+<div>
+    <div class="node-config-item">
+        <label class="control-label" for="">{% trans "Related instance map sources" %}</label>
+        <input type="text" data-bind="textInput: selectRelatedSource" class="form-control input-md widget-input">
+    </div>
+    <div class="node-config-item">
+        <label class="control-label" for="">{% trans "Related instance map source layers (optional)" %}</label>
+        <input type="text" data-bind="textInput: selectRelatedSourceLayer" class="form-control input-md widget-input">
+    </div>
+    <div>{% trans "Intersection layer configuration" %}</div>
+    <div style="padding: 5px 10px 5px; background-color: #eaeaea;">
+        <div class="node-config-item">
+            <label class="control-label" for="">{% trans "Default Color" %}</label>
+            <input type="text" data-bind="textInput: defaultcolor" class="form-control input-md widget-input">
+        </div>
+        <div class="node-config-item">
+            <label class="control-label" for="">{% trans "Selected Feature Color" %}</label>
+            <input type="text" data-bind="textInput: selectioncolor" class="form-control input-md widget-input">
+        </div>
+        <div class="node-config-item">
+            <label class="control-label" for="">{% trans "Hovered Feature Color" %}</label>
+            <input type="text" data-bind="textInput: hovercolor" class="form-control input-md widget-input">
+        </div>
+        <div class="node-config-item">
+            <label class="control-label" for="">{% trans "Layer Color Palette" %}</label>
+            <textarea type="text" data-bind="textInput: colorpalette" class="form-control input-md widget-input"></textarea>
+        </div>
+        <div class="node-config-item">
+            <label class="control-label" for="">{% trans "Fill Opacity" %}</label>
+            <input type="text" data-bind="textInput: fillopacity" class="form-control input-md widget-input">
+        </div>
+        <div class="node-config-item">
+            <label class="control-label" for="">{% trans "Overview Zoom" %}</label>
+            <input type="text" data-bind="textInput: overviewzoom" class="form-control input-md widget-input">
+        </div>
+        <div class="node-config-item">
+            <label class="control-label" for="">{% trans "Min Zoom" %}</label>
+            <input type="text" data-bind="textInput: minzoom" class="form-control input-md widget-input">
+        </div>
+        <div class="node-config-item">
+            <label class="control-label" for="">{% trans "Point Radius" %}</label>
+            <input type="text" data-bind="textInput: pointradius" class="form-control input-md widget-input">
+        </div>
+        <div class="node-config-item">
+            <label class="control-label" for="">{% trans "Line Width" %}</label>
+            <input type="text" data-bind="textInput: linewidth" class="form-control input-md widget-input">
+        </div>
+        <div class="node-config-item">
+            <label class="control-label" for="">{% trans "Stroke Color" %}</label>
+            <input type="text" data-bind="textInput: strokecolor" class="form-control input-md widget-input">
+        </div>
+        <div class="node-config-item">
+            <label class="control-label" for="">{% trans "Stroke Width" %}</label>
+            <input type="text" data-bind="textInput: strokelinewidth" class="form-control input-md widget-input">
+        </div>
+        <div class="node-config-item">
+            <label class="control-label" for="">{% trans "Point Stroke Width" %}</label>
+            <input type="text" data-bind="textInput: strokepointradius" class="form-control input-md widget-input">
+        </div>
+        <div class="node-config-item">
+            <label class="control-label" for="">{% trans "Point Stroke Opacity" %}</label>
+            <input type="text" data-bind="textInput: strokepointopacity" class="form-control input-md widget-input">
+        </div>
+    </div>
+
+</div>
+{% endblock config %}

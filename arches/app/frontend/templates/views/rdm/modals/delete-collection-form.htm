@@ -1,0 +1,48 @@
+{% load i18n %}
+<!-- Modal window for adding a new concept -->
+<form action="" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="labelmodal" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header arches-modal-header">
+                <button aria-hidden="true" data-dismiss="modal" class="close" type="button">×</button>
+                <h4 class="modal-title">{% trans "Delete Collection" %}</h4>
+            </div>
+            <div class="modal-body">
+                <div class="row">
+                    <div class="col-md-12">
+                        <h5 class="arches-modal-section">{% trans "Select collection to delete" %}</h5>
+                        <p> 
+                            <select style="width:100%" class="select2" name="scheme_dd" required>
+                                <option value=""></option>
+                                {% for collection in collections %}
+                                    {% if collection.conceptid not in CORE_CONCEPTS %}
+                                        <option value="{{collection.conceptid}}">{{collection.value}}</option>
+                                    {% endif %}
+                                {% endfor %}
+                            </select>
+                        </p>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-xs-1 text-right margin-top-10">
+                        <i class="color-red fa fa-3x fa-warning" style="margin-right: -25px; margin-top: 4px;"></i>
+                    </div>
+
+                    <div class="col-xs-11">
+                        <h6 class="warning">
+                            {% trans "You won't be able to undo this operation!&nbsp;  Are you sure you want to permanently delete this entire collection from Arches?" %} 
+                        </h6>
+                    </div>
+                </div>
+                <div name="additional-info" style="max-height: 300px; overflow-y: scroll;">
+                </div>
+                <!-- Spacer -->
+                <div class="margin-top-20"></div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn-u btn-u-default" data-dismiss="modal">{% trans "Close" %}</button>
+                <button type="submit" class="btn-u btn-u-red">{% trans "Delete" %}</button>
+            </div>
+        </div>
+    </div>
+</form>
