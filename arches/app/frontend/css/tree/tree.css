@@ -478,7 +478,7 @@ ul.jstree-container-ul > li.jstree-node.jstree-closed {
     background-position: 0 0;
 }
 
-.jstree-default>.jstree-container-ul .jstree-loading>.jstree-ocl {
+/* .jstree-default>.jstree-container-ul .jstree-loading>.jstree-ocl {
     background: url("throbber.gif") center center no-repeat;
 }
 
@@ -488,7 +488,7 @@ ul.jstree-container-ul > li.jstree-node.jstree-closed {
 
 .jstree-default .jstree-folder {
     background: url("32px.png") -260px -4px no-repeat;
-}
+} */
 
 .jstree-default>.jstree-container-ul>.jstree-node {
     margin-left: 0;
@@ -507,3 +507,4 @@ ul.jstree-container-ul > li.jstree-node.jstree-closed {
 
 .jstree-default .jstree-ellipsis.jstree-no-icons .jstree-anchor {
     width: calc(100% - 5px);
+}

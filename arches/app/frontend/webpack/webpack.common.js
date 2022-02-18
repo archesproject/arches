@@ -12,7 +12,7 @@ const fileNames = function(path, outer_acc) {
     
         if (lastThreeCharacters === '.js') {
             var foo = (path + '/' + v).slice(5)
-            return { ...acc, [foo]: `./js/${foo}` };
+            return { ...acc, [foo]: { 'import': `./js/${foo}`, 'filename': `./js/${foo}` } };
         }
         else {
             return fileNames(path + '/' + v, acc);
@@ -35,32 +35,42 @@ var baz = Object.keys(bar).reduce((acc, key) => {
 //     acc[foo] = Path.resolve(__dirname, '../js', key)
 //     return acc;
 // }, {});
-// console.log("HI", bar)
+console.log("HI", bar);
 // console.log("HI", baz)
 
 module.exports = {
-    entry: bar,
+    entry: {
+        ...bar,
+        'arches': { 'import': './css/arches.scss', 'filename': './css/arches.scss' },
+    },
     output: {
         path: Path.join(__dirname, '../build'),
-        filename: 'js/[name]',
+        filename: '[name]',
         publicPath: '/foo/',
     },
     optimization: {
-        splitChunks: {
-            chunks: 'all',
-            cacheGroups: {
-                vendor: {
-                    test: /[\\/]node_modules[\\/]/,
-                    name(module) {
-                        // Extracts node_modules to separate packages
-                        const packageName = module.context.match(
-                            /[\\/]node_modules[\\/](.*?)([\\/]|$)/
-                        )[1];
-                        return `npm.${packageName.replace("@", "")}`;
-                    }
-                },
-            }
-        },
+        // splitChunks: {
+        //     chunks: 'all',
+        //     cacheGroups: {
+        //         vendor: {
+        //             test: /[\\/]node_modules[\\/]/,
+        //             name(module) {
+        //                 // Extracts node_modules to separate packages
+        //                 const packagePath = module.context.match(
+        //                     /[\\/]node_modules[\\/](.*?)([\\/]|$)/
+        //                 );
+
+        //                 let packageName = null;
+
+        //                 if (packagePath) { 
+        //                     packageName = packagePath[1]; 
+        //                     return `js/npm.${packageName.replace("@", "")}.js`;
+        //                 }
+
+        //             }
+        //         },
+        //     }
+        // },
     },
     plugins: [
         new CleanWebpackPlugin(),
