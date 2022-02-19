@@ -279,7 +279,7 @@ STATICFILES_DIRS = (
     # Put strings here, like "/home/html/static" or "C:/www/django/static".
     # Always use forward slashes, even on Windows.
     # Don't forget to use absolute paths, not relative paths.
-    os.path.join(ROOT_DIR, 'app', "frontend", "build"),
+    # os.path.join(ROOT_DIR, 'app', "frontend", "build"),
     os.path.join(ROOT_DIR, "app", "media"),
 )
 
@@ -319,7 +319,8 @@ TEMPLATES = [
         "DIRS": [
             # insert your TEMPLATE_DIRS here
             os.path.join(ROOT_DIR, "app", "templates"),
-            os.path.join(ROOT_DIR, "app", "frontend", "build"),
+            os.path.join(ROOT_DIR, "app", "media", "build"),
+            # os.path.join(ROOT_DIR, "app", "frontend", "build"),
         ],
         "APP_DIRS": True,
         "OPTIONS": {

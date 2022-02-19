@@ -8,20 +8,18 @@ const fs = require('fs');
 
 const fileNames = function(path, outer_acc) {
     return fs.readdirSync(path).reduce((acc, v) => {
-        const lastThreeCharacters = v.slice(v.length - 3);
-    
-        if (lastThreeCharacters === '.js') {
-            var foo = (path + '/' + v).slice(5)
-            return { ...acc, [foo]: { 'import': `./js/${foo}`, 'filename': `./js/${foo}` } };
+        if (fs.lstatSync(path + '/' + v).isDirectory() ) {
+            return fileNames(path + '/' + v, acc);
         }
         else {
-            return fileNames(path + '/' + v, acc);
+            var foo = (path + '/' + v).slice(12)
+            return { ...acc, [foo]: { 'import': `${path}/${v}`, 'filename': `./js/${foo}` } };
         }
     }, outer_acc);
 };
 
 
-var bar = fileNames('./js', {});
+var bar = fileNames('../media/js', {});
 
 var baz = Object.keys(bar).reduce((acc, key) => {
     var foo = (key).slice(0, key.length - 3)
@@ -37,21 +35,22 @@ const fooFileNames = function(path, outer_acc) {
             return fooFileNames(path + '/' + v, acc);
         }
         else {
-            var foo = (path + '/' + v).slice(6)
-            return { ...acc, [foo]: { 'import': `../media/img/${foo}`, 'filename': `./img/${foo}` } };
+            var foo = (path + '/' + v).slice(13)
+            console.log("()", foo)
+            return { ...acc, [foo]: { 'import': `${path}/${v}`, 'filename': `./img/${foo}` } };
         }
 
     }, outer_acc);
 };
 
 
-var bar_img = fooFileNames('./img', {});
+var bar_img = fooFileNames('../media/img', {});
 
-var baz_img = Object.keys(bar).reduce((acc, key) => {
-    var foo = (key).slice(0, key.length - 4)
-    acc[foo] = Path.resolve(__dirname, '../img', key)
-    return acc;
-}, {});
+// var baz_img = Object.keys(bar).reduce((acc, key) => {
+//     var foo = (key).slice(0, key.length - 4)
+//     acc[foo] = Path.resolve(__dirname, '../img', key)
+//     return acc;
+// }, {});
 
 
 // css files
@@ -70,11 +69,11 @@ const quxFileNames = function(path, outer_acc) {
 
 qux_css = quxFileNames('../media/css', {})
 
-qux = Object.keys(qux_css).reduce((acc, key) => {
-    var foo = (key).slice(0, key.length - 4)
-    acc[foo] = Path.resolve(__dirname, '../css', key)
-    return acc;
-}, {});
+// qux = Object.keys(qux_css).reduce((acc, key) => {
+//     var foo = (key).slice(0, key.length - 4)
+//     acc[foo] = Path.resolve(__dirname, '../css', key)
+//     return acc;
+// }, {});
 
 // const foo_plugins = fileNames('./plugins', {})
 // var bar_plugins = Object.keys(foo_plugins).reduce((acc, key) => {
@@ -82,17 +81,17 @@ qux = Object.keys(qux_css).reduce((acc, key) => {
 //     acc[foo] = Path.resolve(__dirname, '../js', key)
 //     return acc;
 // }, {});
-console.log("HI", qux_css);
-// console.log("HI", baz)
+// console.log("HI", qux_css);
+console.log("HI", baz)
 
 module.exports = {
     entry: {
         ...bar,
         ...bar_img,
-        ...qux_css,
+        // ...qux_css,
     },
     output: {
-        path: Path.join(__dirname, '../build'),
+        path: Path.join(__dirname, '../../media/build'),
         filename: '[name]',
         publicPath: '/foo/',
     },
@@ -150,6 +149,7 @@ module.exports = {
             'jquery-validate': Path.resolve(__dirname, '../node_modules/jquery-validation/dist', 'jquery.validate.min'),
             'jquery-ui/draggable': Path.resolve(__dirname, '../node_modules/jqueryui', 'jquery-ui.min.js'),
             'jquery-ui/sortable': Path.resolve(__dirname, '../node_modules/jqueryui', 'jquery-ui.min.js'),
+            'underscore': Path.resolve(__dirname, '../node_modules/underscore', 'underscore-min.js'),
             // 'require': Path.resolve(__dirname, '../node_modules/requirejs', 'require.js'),
         },
     },

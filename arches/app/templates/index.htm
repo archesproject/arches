@@ -18,6 +18,8 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 {% load staticfiles %}
 {% load template_tags %}
 {% load i18n %}
+{% load webpack_static from webpack_loader %}
+
 <!DOCTYPE html>
 <!--[if IE 8]> <html lang="en" class="ie8"> <![endif]-->
 <!--[if IE 9]> <html lang="en" class="ie9"> <![endif]-->
@@ -440,10 +442,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
     </footer>
     <!-- End Footer -->
 
-{% load webpack_static from webpack_loader %}
 <script src="{% webpack_static 'packages/requirejs/require.js' %}"></script>
-<script src="{% static 'packages/requirejs/require.js' %}"></script>
-<script data-main="scripts/main" src="{{ STATIC_URL }}packages/requirejs"></script>
 
 <script>
 
