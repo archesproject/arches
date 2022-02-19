@@ -61,14 +61,14 @@ const quxFileNames = function(path, outer_acc) {
             return quxFileNames(path + '/' + v, acc);
         }
         else {
-            var foo = (path + '/' + v).slice(6)
+            var foo = (path + '/' + v).slice(13)
             return { ...acc, [foo]: { 'import': `../media/css/${foo}`, 'filename': `./css/${foo}` } };
         }
 
     }, outer_acc);
 };
 
-qux_css = quxFileNames('./css', {})
+qux_css = quxFileNames('../media/css', {})
 
 qux = Object.keys(qux_css).reduce((acc, key) => {
     var foo = (key).slice(0, key.length - 4)
@@ -163,6 +163,10 @@ module.exports = {
             {
                 test: /\.htm$/i,
                 loader: "html-loader",
+            },
+            {
+                test: /\.txt$/i,
+                use: 'raw-loader',
             },
             {
                 test: /\.(ico|jpg|jpeg|png|gif|eot|otf|webp|svg|ttf|woff|woff2)(\?.*)?$/,

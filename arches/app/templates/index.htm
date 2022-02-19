@@ -441,7 +441,9 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
     <!-- End Footer -->
 
 {% load webpack_static from webpack_loader %}
-<script src="{% webpack_static 'node_modules/requirejs/require.js' %}"></script>
+<script src="{% webpack_static 'packages/requirejs/require.js' %}"></script>
+<script src="{% static 'packages/requirejs/require.js' %}"></script>
+<script data-main="scripts/main" src="{{ STATIC_URL }}packages/requirejs"></script>
 
 <script>
 
