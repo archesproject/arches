@@ -18,8 +18,8 @@
     <div class="left-panel-overflow designer-tree">
         <ul class="jstree-container-ul jstree-children" aria-expanded="true">
             <li role="treeitem" class="jstree-node" data-bind="css: {'jstree-open': rootExpanded, 'jstree-closed' : !rootExpanded()}">
-                <i class="jstree-icon jstree-ocl" role="presentation" data-bind="click: function(){rootExpanded(!rootExpanded())}"></i>
-                <a class="jstree-anchor" href="#" tabindex="-1">
+                <i tabindex="0" class="jstree-icon jstree-ocl" role="presentation" data-bind="click: function(){rootExpanded(!rootExpanded())}" onkeyup="if(event.which == 13 || event.keyCode == 13){ $(this).trigger('click'); }"></i>
+                <a class="jstree-anchor" href="#">
                     <strong>
                         <i data-bind="css: graphiconclass" role="presentation"></i>
                         <span data-bind="text: graphname"></span>

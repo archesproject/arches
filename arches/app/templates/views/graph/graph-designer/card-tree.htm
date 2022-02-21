@@ -22,8 +22,8 @@
     <div class="left-panel-overflow designer-tree designer-card-tree">
         <ul class="jstree-container-ul jstree-children" aria-expanded="true">
             <li role="treeitem" class="jstree-node" data-bind="css: {'jstree-open': rootExpanded, 'jstree-closed' : !rootExpanded()}">
-                <i class="jstree-icon jstree-ocl" role="presentation" data-bind="click: function(){rootExpanded(!rootExpanded())}"></i>
-                <a class="jstree-anchor" href="#" tabindex="-1" data-bind="click: function () { selection('root'); }, css: {'jstree-clicked': selection() === 'root', 'func-node': isFuncNode()}">
+                <i tabindex="0" class="jstree-icon jstree-ocl" role="presentation" data-bind="click: function(){rootExpanded(!rootExpanded())}" onkeyup="if(event.which == 13 || event.keyCode == 13){ $(this).trigger('click'); }"></i>
+                <a class="jstree-anchor" href="#" data-bind="click: function () { selection('root'); }, css: {'jstree-clicked': selection() === 'root', 'func-node': isFuncNode()}">
                     <strong>
                         <!-- ko if: !isFuncNode -->
                         <i data-bind="css: graphiconclass != (null || '') ? graphiconclass : 'fa fa-question'" role="presentation"></i>

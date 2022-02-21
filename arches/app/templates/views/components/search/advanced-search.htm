@@ -20,7 +20,7 @@
                 <div class="search-facet-item disabled">
                     <h4 class="search-facet-item-heading">
                         <strong data-bind="text: name"></strong>
-                        <span><i class="fa report-expander print-hide" data-bind="css: {'fa-angle-down': !collapsed(), 'fa-angle-right': collapsed()}, click: function () { collapsed(!collapsed()) }"></i></span>
+                        <span><i tabindex="0" class="fa report-expander print-hide" data-bind="css: {'fa-angle-down': !collapsed(), 'fa-angle-right': collapsed()}, click: function () { collapsed(!collapsed()) }" onkeyup="if(event.which == 13 || event.keyCode == 13){ $(this).trigger('click'); }"></i></span>
                     </h4>
                 </div>
                 <div data-bind="visible: !collapsed()">

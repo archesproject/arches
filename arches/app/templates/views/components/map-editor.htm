@@ -2,7 +2,7 @@
 {% load i18n %}
 
 {% block tabs %}
-<div class="workbench-card-sidebar-tab" data-bind="click: function() {
+<div tabindex="0" class="workbench-card-sidebar-tab" data-bind="click: function() {
     toggleTab('editor');
 }, css: {
     'active': activeTab() === 'editor'

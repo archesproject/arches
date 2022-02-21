@@ -3,19 +3,19 @@
 {% load i18n %}
 
 {% block tabs %}
-<div class="workbench-card-sidebar-tab" data-bind="click: function() {
+<div tabindex="0" class="workbench-card-sidebar-tab" data-bind="click: function() {
     toggleTab('manifest');
 }, css: {
     'active': activeTab() === 'manifest',
     'disabled': mainMenu() || remoteManifest()
-}">
+}" onkeyup="if(event.which == 13 || event.keyCode == 13){ $(this).trigger('click'); }">
     <i class="fa fa-tags"></i>
     <span class="map-sidebar-text">{% trans "Service" %}</span>
 </div>
-<div class="workbench-card-sidebar-tab" data-bind="click: function() {
+<div tabindex="0" class="workbench-card-sidebar-tab" data-bind="click: function() {
     toggleTab('canvas');
 }, css: {'active': activeTab() === 'canvas', 'disabled': !canvas() || remoteManifest()
-}">
+}" onkeyup="if(event.which == 13 || event.keyCode == 13){ $(this).trigger('click'); }">
     <i class="fa fa-cloud-upload"></i>
     <span class="map-sidebar-text">{% trans "Canvas" %}</span>
 </div>
@@ -27,7 +27,7 @@
 <!--ko if: activeTab() === 'manifest'-->
 <div class="workbench-header-buffer">
     <div class="workbench-card-sidepanel-header-container">
-        <h4 class="workbench-card-sidepanel-header" data-bind="click: hideSidePanel">{% trans 'Manage Image Service' %}</h4>
+        <h4 tabindex="0" class="workbench-card-sidepanel-header" data-bind="click: hideSidePanel" onkeyup="if(event.which == 13 || event.keyCode == 13){ $(this).trigger('click'); }">{% trans 'Manage Image Service' %}</h4>
     </div>
 </div>
 
@@ -115,7 +115,7 @@
 <!--ko if: activeTab() === 'canvas'-->
 <div class="workbench-header-buffer">
     <div class="workbench-card-sidepanel-header-container">
-        <h4 class="workbench-card-sidepanel-header" data-bind="click: hideSidePanel">{% trans 'Manage Image Canvases' %}</h4>
+        <h4 tabindex="0" class="workbench-card-sidepanel-header" data-bind="click: hideSidePanel" onkeyup="if(event.which == 13 || event.keyCode == 13){ $(this).trigger('click'); }">{% trans 'Manage Image Canvases' %}</h4>
     </div>
 </div>
 
