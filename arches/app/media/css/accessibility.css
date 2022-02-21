@@ -223,16 +223,6 @@ button.search-type-btn:focus {
     outline: none !important;
 }
 
-.btn-mint:focus,
-.btn-primary:focus,
-.btn.viewstate-btn.active:focus,
-.btn-display-toggle:focus,
-.mpm-manager button:focus,
-#rr-splash button:focus {
-    outline: cyan solid 3px !important;
-    text-decoration: underline;
-}
-
 .mainnav-sm #mainnav-menu *:focus,
 .mainnav-sm #mainnav-menu a:hover {
     text-decoration: none;
