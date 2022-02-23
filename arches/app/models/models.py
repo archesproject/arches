@@ -722,6 +722,7 @@ class ResourceXResource(models.Model):
         if index:
             from arches.app.search.search_engine_factory import SearchEngineInstance as se
             from arches.app.search.mappings import RESOURCE_RELATIONS_INDEX
+
             se.delete(index=RESOURCE_RELATIONS_INDEX, id=self.resourcexid)
 
         # update the resource-instance tile by removing any references to a deleted resource
@@ -1031,8 +1032,6 @@ class MapSource(models.Model):
     class Meta:
         managed = True
         db_table = "map_sources"
-        default_permissions = ()
-        permissions = (("no_access_to_mapsource", "No access to map source"),)
 
 
 class MapLayer(models.Model):

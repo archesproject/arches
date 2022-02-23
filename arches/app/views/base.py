@@ -119,36 +119,15 @@ class MapBaseManagerView(BaseManagerView):
         all_map_sources = models.MapSource.objects.all()
 
         map_layers = []
-        map_sources = []
-        allowed_sourcenames = []
 
         if self.request.user.is_superuser is True:
             map_layers = all_map_layers
-            map_sources = all_map_sources
         else:
             for m in all_map_layers:
-                if m.addtomap is True:
+                if (m.addtomap is True) or (not self.request.user.has_perm("no_access_to_maplayer", m)):
                     map_layers.append(m)
-                    source_names = list(dict.fromkeys([x["source"] for x in m.layerdefinitions if "source" in x]))
-                    allowed_sourcenames.extend(source_names)
-                else:
-                    if not self.request.user.has_perm("no_access_to_maplayer", m):
-                        source_names = list(dict.fromkeys([x["source"] for x in m.layerdefinitions if "source" in x]))
-                        valid = True
-                        for s in source_names:
-                            map_source = list(all_map_sources.filter(name=s))
-                            if map_source:
-                                if self.request.user.has_perm("no_access_to_mapsource", map_source[0]):
-                                    valid = False
-                                    break
-                        if valid:
-                            map_layers.append(m)
-                            allowed_sourcenames.extend(source_names)
-            for s in all_map_sources:
-                if s.name in allowed_sourcenames:
-                    map_sources.append(s)
 
         context["map_layers"] = map_layers
-        context["map_sources"] = map_sources
+        context["map_sources"] = all_map_sources
 
         return context
