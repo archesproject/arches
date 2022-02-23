@@ -26,7 +26,7 @@ from django.core.exceptions import ObjectDoesNotExist
 from django.db import transaction
 from django.db.utils import IntegrityError
 from arches.app.models import models
-from arches.app.models.resource import Resource
+from arches.app.models.resource import Resource, UnpublishedModelError
 from arches.app.models.system_settings import settings
 from arches.app.datatypes.datatypes import DataTypeFactory
 from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializer
@@ -1600,7 +1600,7 @@ class Graph(models.GraphModel):
             self.publication = publication
             self.save()
         except Exception:
-            print(Exception)
+            raise UnpublishedModelError("Could not save graph publication ")
 
     def unpublish(self):
         """
