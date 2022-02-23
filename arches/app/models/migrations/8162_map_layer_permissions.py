@@ -6,7 +6,7 @@ from django.db import migrations
 class Migration(migrations.Migration):
 
     dependencies = [
-        ("models", "7128_resource_instance_filter"),
+        ("models", "8085_relational_data_model_handle_dates"),
     ]
 
     operations = [
