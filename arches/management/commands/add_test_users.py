@@ -39,7 +39,7 @@ class Command(BaseCommand):
             {"name": "tester1", "email": "tester1@test.com", "password": "Test12345!", "groups": ["Graph Editor", "Resource Editor"]},
             {"name": "tester2", "email": "tester2@test.com", "password": "Test12345!", "groups": ["Graph Editor", "Resource Editor"]},
             {"name": "tester3", "email": "tester3@test.com", "password": "Test12345!", "groups": ["Graph Editor", "Resource Editor"]},
-            {"name": "dev", "email": "dev@test.com", "password": "Test12345!", "groups": [
+            {"name": "dev", "email": "dev@test.com", "password": "dev", "groups": [
                 "Graph Editor",
                 "Resource Editor",
                 "Resource Reviewer",
