@@ -28,6 +28,7 @@ class GuardedAdmin(GuardedModelAdmin):
 admin.site.register(
     [
         models.DLanguage,
+        models.MapSource,
         models.Geocoder,
         models.MapMarker,
         models.DDataType,
@@ -40,4 +41,4 @@ admin.site.register(
     ]
 )
 
-admin.site.register([models.Plugin, models.NodeGroup, models.MapLayer, models.MapSource], GuardedAdmin)
+admin.site.register([models.Plugin, models.NodeGroup, models.MapLayer], GuardedAdmin)
