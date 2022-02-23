@@ -16,14 +16,11 @@ You should have received a copy of the GNU Affero General Public License
 along with this program. If not, see <http://www.gnu.org/licenses/>.
 """
 
-import os
-import uuid
-from arches.management.commands import utils
-from arches.app.models import models
-from django.core.management.base import BaseCommand, CommandError
+from django.core.management.base import BaseCommand
 from django.contrib.auth.models import User
 from django.contrib.auth.models import Group
-
+from guardian.shortcuts import assign_perm
+from arches.app.models import models
 
 class Command(BaseCommand):
     """
@@ -42,11 +39,33 @@ class Command(BaseCommand):
             {"name": "tester1", "email": "tester1@test.com", "password": "Test12345!", "groups": ["Graph Editor", "Resource Editor"]},
             {"name": "tester2", "email": "tester2@test.com", "password": "Test12345!", "groups": ["Graph Editor", "Resource Editor"]},
             {"name": "tester3", "email": "tester3@test.com", "password": "Test12345!", "groups": ["Graph Editor", "Resource Editor"]},
+            {"name": "dev", "email": "dev@test.com", "password": "Test12345!", "groups": [
+                "Graph Editor",
+                "Resource Editor",
+                "Resource Reviewer",
+                "Application Administrator",
+                "Crowdsource Editor",
+                "Guest",
+                "Mobile Project Administrator",
+                "RDM Administrator",
+                "Resource Reviewer",
+                "System Administrator",
+            ]},
         )
 
         for profile in profiles:
             try:
                 user = User.objects.create_user(username=profile["name"], email=profile["email"], password=profile["password"])
+                if user.username == 'dev':
+                    user.is_staff = True
+                    user.first_name = "Dev"
+                    user.last_name = "User"
+                    plugins = models.Plugin.objects.all()
+                    for plugin in plugins:
+                        assign_perm("change_plugin", user, plugin)
+                        assign_perm("add_plugin", user, plugin)
+                        assign_perm("delete_plugin", user, plugin)
+                        assign_perm("view_plugin", user, plugin)
                 user.save()
                 print(f"Added test user: {user.username}, password: {profile['password']}")
 
