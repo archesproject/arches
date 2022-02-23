@@ -9,51 +9,63 @@
 <!--/ko-->
 
 <!-- ko if: !loading() -->
-<!-- ko if: displayname -->
-<div class="hover-feature-title-bar">
-    {% block title %}
-    <div class="hover-feature-title">
-        <!-- Add nav to support accessing content for multiple features with overlapping geometry -->
-        <span class="hover-feature-nav-left disabled"><i class="fa fa-angle-left"></i></span>
-        <span class="" data-bind="text: displayname"></span>
-        <span class="hover-feature-nav-right disabled"><i class="fa fa-angle-right"></i></span>
+<!-- ko foreach: popupFeatures -->
+    <!-- ko if: active -->
+    <!-- ko if: displayname -->
+    <div class="hover-feature-title-bar">
+        {% block title %}
+        <div style="display: flex; justify-content: space-between;">
+            <div data-bind="visible: $parent.popupFeatures.length > 1, click: function(){$parent.advanceFeature('left')}" class="hover-feature-nav-left"><i class="fa fa-angle-left"></i></div>
+            <div class="hover-feature-title" data-bind="text: displayname"></div>
+            <div data-bind="visible: $parent.popupFeatures.length > 1, click: function(){$parent.advanceFeature('right')}" class="hover-feature-nav-right"><i class="fa fa-angle-right"></i></div>
+        </div>
+        {% endblock title %}
     </div>
-    {% endblock title %}
-</div>
-<!--/ko-->
-<!-- ko if: resourceinstanceid -->
-<div class="hover-feature-body">
-    {% block body %}
-    <div class="hover-feature" data-bind="html: map_popup"></div>
-    <div class="hover-feature-metadata">
-        {% trans "Resource Model:" %}
-        <span data-bind="text: graph_name"></span>
-    </div>
-    <div class="hover-feature-metadata">
-        {% trans "ID:" %}
-        <span data-bind="text: resourceinstanceid"></span>
-    </div>
-    {% endblock body %}
-</div>
-<!--/ko-->
-<div class="hover-feature-footer">
-    {% block footer %}
+    <!--/ko-->
     <!-- ko if: resourceinstanceid -->
-    <a data-bind="click: function () {
-        window.open(reportURL + resourceinstanceid());
-    }" href="javascript:void(0)">
-        <i class="ion-document-text"></i>
-        {% trans "Report" %}
-    </a>
+    <div class="hover-feature-body">
+        {% block body %}
+        <div class="hover-feature" data-bind="html: map_popup"></div>
+        <div class="hover-feature-metadata">
+            {% trans "Resource Model:" %}
+            <span data-bind="text: graph_name"></span>
+        </div>
+        <div class="hover-feature-metadata">
+            {% trans "ID:" %}
+            <span data-bind="text: resourceinstanceid"></span>
+        </div>
+        {% endblock body %}
+    </div>
     <!--/ko-->
-    <!-- ko if: showEditButton -->
-    <a data-bind="click: function () {
-        window.open(editURL + resourceinstanceid());
-    }" href="javascript:void(0)">
-        <i class="ion-ios-refresh-empty"></i>
-        {% trans "Edit" %}
-    </a>
+    <div class="hover-feature-footer">
+        <div>
+        {% block footer %}
+        <!-- ko if: resourceinstanceid -->
+        <a data-bind="click: function () {
+            window.open(reportURL + ko.unwrap(resourceinstanceid));
+        }" href="javascript:void(0)">
+            <i class="ion-document-text"></i>
+            {% trans "Report" %}
+        </a>
+        <!--/ko-->
+        <!-- ko if: showEditButton -->
+        <a data-bind="click: function () {
+            window.open(editURL + ko.unwrap(resourceinstanceid));
+        }" href="javascript:void(0)">
+            <i class="ion-ios-refresh-empty"></i>
+            {% trans "Edit" %}
+        </a>
+        <!--/ko-->
+        </div>
+        <!-- ko if: $parent.popupFeatures.length > 1 -->
+        <div style="display: flex; flex-direction: row; width: 50px; justify-content: space-evenly;">
+            <div data-bind="text: 1 + $parent.popupFeatures.findIndex(feature => feature.active());"></div>
+            {% trans "of" %}
+            <div data-bind="text: $parent.popupFeatures.length"></div>
+        </div>
+        <!--/ko-->
+        {% endblock footer %}
+    </div>
     <!--/ko-->
-    {% endblock footer %}
-</div>
+    <!--/ko-->
 <!--/ko-->

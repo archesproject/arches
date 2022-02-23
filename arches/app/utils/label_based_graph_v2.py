@@ -29,26 +29,36 @@ class LabelBasedNode(object):
 
         return is_empty
 
-    def as_json(self, compact=False, include_empty_nodes=True):
+    def as_json(self, compact=False, include_empty_nodes=True, include_hidden_nodes=True):
         display_data = {}
 
+        if not include_hidden_nodes:
+            card = models.CardModel.objects.filter(nodegroup_id=self.node_id).first()
+            try:
+                if not card.visible:
+                    return None
+            except AttributeError:
+                pass
+
         for child_node in self.child_nodes:
-            formatted_node = child_node.as_json(compact=compact, include_empty_nodes=include_empty_nodes)
+            formatted_node = child_node.as_json(
+                compact=compact, include_empty_nodes=include_empty_nodes, include_hidden_nodes=include_hidden_nodes
+            )
+            if formatted_node is not None:
+                formatted_node_name, formatted_node_value = formatted_node.popitem()
 
-            formatted_node_name, formatted_node_value = formatted_node.popitem()
+                if include_empty_nodes or not child_node.is_empty():
+                    previous_val = display_data.get(formatted_node_name)
+                    cardinality = child_node.cardinality
 
-            if include_empty_nodes or not child_node.is_empty():
-                previous_val = display_data.get(formatted_node_name)
-                cardinality = child_node.cardinality
-
-                # let's handle multiple identical node names
-                if not previous_val:
-                    should_create_new_array = cardinality == "n" and self.tile_id != child_node.tile_id
-                    display_data[formatted_node_name] = [formatted_node_value] if should_create_new_array else formatted_node_value
-                elif isinstance(previous_val, list):
-                    display_data[formatted_node_name].append(formatted_node_value)
-                else:
-                    display_data[formatted_node_name] = [previous_val, formatted_node_value]
+                    # let's handle multiple identical node names
+                    if not previous_val:
+                        should_create_new_array = cardinality == "n" and self.tile_id != child_node.tile_id
+                        display_data[formatted_node_name] = [formatted_node_value] if should_create_new_array else formatted_node_value
+                    elif isinstance(previous_val, list):
+                        display_data[formatted_node_name].append(formatted_node_value)
+                    else:
+                        display_data[formatted_node_name] = [previous_val, formatted_node_value]
 
         val = self.value
         if compact and display_data:
@@ -135,7 +145,16 @@ class LabelBasedGraph(object):
 
     @classmethod
     def from_resource(
-        cls, resource, datatype_factory=None, node_cache=None, compact=False, hide_empty_nodes=False, as_json=True, user=None, perm=None
+        cls,
+        resource,
+        datatype_factory=None,
+        node_cache=None,
+        compact=False,
+        hide_empty_nodes=False,
+        as_json=True,
+        user=None,
+        perm=None,
+        hide_hidden_nodes=False,
     ):
         """
         Generates a label-based graph from a given resource
@@ -172,7 +191,9 @@ class LabelBasedGraph(object):
                 root_label_based_node.child_nodes.append(label_based_graph)
 
         if as_json:
-            root_label_based_node_json = root_label_based_node.as_json(compact=compact, include_empty_nodes=bool(not hide_empty_nodes))
+            root_label_based_node_json = root_label_based_node.as_json(
+                compact=compact, include_empty_nodes=bool(not hide_empty_nodes), include_hidden_nodes=bool(not hide_hidden_nodes)
+            )
 
             _dummy_resource_name, resource_graph = root_label_based_node_json.popitem()
 
@@ -246,32 +267,35 @@ class LabelBasedGraph(object):
             parent_tile = associated_tile.parenttile
 
             if associated_tile == input_tile or parent_tile == input_tile:
-                label_based_node = LabelBasedNode(
-                    name=input_node.name,
-                    node_id=str(input_node.pk),
-                    tile_id=str(associated_tile.pk),
-                    value=cls._get_display_value(tile=associated_tile, node=input_node, datatype_factory=datatype_factory),
-                    cardinality=nodegroup_cardinality_reference[str(associated_tile.nodegroup_id)],
-                )
-
-                if not parent_tree:  # if top node and
-                    if not parent_tile:  # if not top node in separate card
-                        parent_tree = label_based_node
-                else:
-                    parent_tree.child_nodes.append(label_based_node)
-
-                for child_node in input_node.get_direct_child_nodes():
-                    if not node_cache.get(child_node.pk):
-                        node_cache[child_node.pk] = child_node
-
-                    cls._build_graph(
-                        input_node=child_node,
-                        input_tile=associated_tile,
-                        parent_tree=label_based_node,
-                        node_ids_to_tiles_reference=node_ids_to_tiles_reference,
-                        nodegroup_cardinality_reference=nodegroup_cardinality_reference,
-                        node_cache=node_cache,
-                        datatype_factory=datatype_factory,
+                if (  # don't instantiate `LabelBasedNode`s of cardinality `n` unless they are semantic or have value
+                    input_node.datatype == "semantic" or str(input_node.pk) in associated_tile.data
+                ):
+                    label_based_node = LabelBasedNode(
+                        name=input_node.name,
+                        node_id=str(input_node.pk),
+                        tile_id=str(associated_tile.pk),
+                        value=cls._get_display_value(tile=associated_tile, node=input_node, datatype_factory=datatype_factory),
+                        cardinality=nodegroup_cardinality_reference.get(str(associated_tile.nodegroup_id)),
                     )
+
+                    if not parent_tree:  # if top node and
+                        if not parent_tile:  # if not top node in separate card
+                            parent_tree = label_based_node
+                    else:
+                        parent_tree.child_nodes.append(label_based_node)
+
+                    for child_node in input_node.get_direct_child_nodes():
+                        if not node_cache.get(child_node.pk):
+                            node_cache[child_node.pk] = child_node
+
+                        cls._build_graph(
+                            input_node=child_node,
+                            input_tile=associated_tile,
+                            parent_tree=label_based_node,
+                            node_ids_to_tiles_reference=node_ids_to_tiles_reference,
+                            nodegroup_cardinality_reference=nodegroup_cardinality_reference,
+                            node_cache=node_cache,
+                            datatype_factory=datatype_factory,
+                        )
 
         return parent_tree

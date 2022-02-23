@@ -17,7 +17,7 @@ function($, ko, arches) {
             this.precision = ko.observable(6);
             this.result = ko.observable();
             this.emailInput = ko.observable(arches.userEmail);
-            this.exportName = ko.observable("Arches Export");
+            this.exportName = ko.observable();
             this.celeryRunning = ko.observable(arches.celeryRunning);
             this.hasExportHtmlTemplates = ko.observable(arches.exportHtmlTemplates.length > 0);
             this.downloadPending = ko.observable(false);
@@ -66,7 +66,7 @@ function($, ko, arches) {
                 payload.precision = this.precision();
                 payload.total = this.total();
                 payload.email = this.emailInput();
-                payload.exportName = this.exportName();
+                payload.exportName = this.exportName() || "Arches Export";
                 $.ajax({
                     type: "GET",
                     url: arches.urls.export_results,

@@ -668,7 +668,7 @@ define([
 
         this.save = function(){};  /* overwritten by inherited components */
 
-        this._saveComponent = function(componentBasedStepResolve) {
+        this._saveComponent = function(componentBasedStepResolve, componentBasedStepReject) {
             self.complete(false);
             var completeSubscription = self.complete.subscribe(function(complete) {
                 if (complete) {
@@ -686,9 +686,9 @@ define([
             var errorSubscription = self.error.subscribe(function(error) {
                 if (error) {
 
-                    if (componentBasedStepResolve) {
-                        componentBasedStepResolve();
-                        self.error(false);
+                    if (componentBasedStepReject) {
+                        componentBasedStepReject(error);
+                        self.error(null);
                     }
                     completeSubscription.dispose();  /* disposes after save */
                     errorSubscription.dispose();  /* disposes after save */
