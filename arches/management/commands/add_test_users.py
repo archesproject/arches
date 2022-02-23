@@ -39,24 +39,29 @@ class Command(BaseCommand):
             {"name": "tester1", "email": "tester1@test.com", "password": "Test12345!", "groups": ["Graph Editor", "Resource Editor"]},
             {"name": "tester2", "email": "tester2@test.com", "password": "Test12345!", "groups": ["Graph Editor", "Resource Editor"]},
             {"name": "tester3", "email": "tester3@test.com", "password": "Test12345!", "groups": ["Graph Editor", "Resource Editor"]},
-            {"name": "dev", "email": "dev@test.com", "password": "dev", "groups": [
-                "Graph Editor",
-                "Resource Editor",
-                "Resource Reviewer",
-                "Application Administrator",
-                "Crowdsource Editor",
-                "Guest",
-                "Mobile Project Administrator",
-                "RDM Administrator",
-                "Resource Reviewer",
-                "System Administrator",
-            ]},
+            {
+                "name": "dev",
+                "email": "dev@test.com",
+                "password": "dev",
+                "groups": [
+                    "Graph Editor",
+                    "Resource Editor",
+                    "Resource Reviewer",
+                    "Application Administrator",
+                    "Crowdsource Editor",
+                    "Guest",
+                    "Mobile Project Administrator",
+                    "RDM Administrator",
+                    "Resource Reviewer",
+                    "System Administrator",
+                ],
+            },
         )
 
         for profile in profiles:
             try:
                 user = User.objects.create_user(username=profile["name"], email=profile["email"], password=profile["password"])
-                if user.username == 'dev':
+                if user.username == "dev":
                     user.is_staff = True
                     user.first_name = "Dev"
                     user.last_name = "User"
