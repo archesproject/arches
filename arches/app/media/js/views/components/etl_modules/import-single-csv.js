@@ -251,6 +251,6 @@ define([
 
             this.init();
         },
-        template: { require: 'text!templates/views/components/etlmodules/import-single-csv.htm' }
+        template: { require: 'text!templates/views/components/etl_modules/import-single-csv.htm' }
     });
 });

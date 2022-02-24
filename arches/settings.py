@@ -573,7 +573,7 @@ SEARCH_COMPONENT_LOCATIONS = [
 ]
 
 ETL_MODULE_LOCATIONS = [
-    "arches.app.etlmodules",
+    "arches.app.etl_modules",
 ]
 
 MAPBOX_API_KEY = ""  # Put your Mapbox key here!

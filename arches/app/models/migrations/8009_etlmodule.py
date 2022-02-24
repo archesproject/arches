@@ -46,7 +46,7 @@ add_csv_importer = """
         '0a0cea7e-b59a-431a-93d8-e9f8c41bdd6b',
         'Import Single CSV',
         'Import a Single CSV file to Arches',
-        'views/components/etlmodules/import-single-csv',
+        'views/components/etl_modules/import-single-csv',
         'import-single-csv',
         'import_single_csv.py',
         'ImportSingleCsv',
