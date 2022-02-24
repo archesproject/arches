@@ -1381,91 +1381,6 @@
       "path": "/Users/cbyrd/Projects/arches/arches/app/media/build/img/dropzone/spritemap@2x.png",
       "publicPath": "/foo/img/dropzone/spritemap@2x.png"
     },
-    "img/landing/Arches_logo_white.png": {
-      "name": "img/landing/Arches_logo_white.png",
-      "path": "/Users/cbyrd/Projects/arches/arches/app/media/build/img/landing/Arches_logo_white.png",
-      "publicPath": "/foo/img/landing/Arches_logo_white.png"
-    },
-    "img/landing/IPhone_8_map.png": {
-      "name": "img/landing/IPhone_8_map.png",
-      "path": "/Users/cbyrd/Projects/arches/arches/app/media/build/img/landing/IPhone_8_map.png",
-      "publicPath": "/foo/img/landing/IPhone_8_map.png"
-    },
-    "img/landing/arches_designer.png": {
-      "name": "img/landing/arches_designer.png",
-      "path": "/Users/cbyrd/Projects/arches/arches/app/media/build/img/landing/arches_designer.png",
-      "publicPath": "/foo/img/landing/arches_designer.png"
-    },
-    "img/landing/arches_logo_dark.png": {
-      "name": "img/landing/arches_logo_dark.png",
-      "path": "/Users/cbyrd/Projects/arches/arches/app/media/build/img/landing/arches_logo_dark.png",
-      "publicPath": "/foo/img/landing/arches_logo_dark.png"
-    },
-    "img/landing/arches_logo_light.png": {
-      "name": "img/landing/arches_logo_light.png",
-      "path": "/Users/cbyrd/Projects/arches/arches/app/media/build/img/landing/arches_logo_light.png",
-      "publicPath": "/foo/img/landing/arches_logo_light.png"
-    },
-    "img/landing/arches_search.png": {
-      "name": "img/landing/arches_search.png",
-      "path": "/Users/cbyrd/Projects/arches/arches/app/media/build/img/landing/arches_search.png",
-      "publicPath": "/foo/img/landing/arches_search.png"
-    },
-    "img/landing/bhutan_tigersnest_lr.jpg": {
-      "name": "img/landing/bhutan_tigersnest_lr.jpg",
-      "path": "/Users/cbyrd/Projects/arches/arches/app/media/build/img/landing/bhutan_tigersnest_lr.jpg",
-      "publicPath": "/foo/img/landing/bhutan_tigersnest_lr.jpg"
-    },
-    "img/landing/card_manager.png": {
-      "name": "img/landing/card_manager.png",
-      "path": "/Users/cbyrd/Projects/arches/arches/app/media/build/img/landing/card_manager.png",
-      "publicPath": "/foo/img/landing/card_manager.png"
-    },
-    "img/landing/consultation_workflow.jpg": {
-      "name": "img/landing/consultation_workflow.jpg",
-      "path": "/Users/cbyrd/Projects/arches/arches/app/media/build/img/landing/consultation_workflow.jpg",
-      "publicPath": "/foo/img/landing/consultation_workflow.jpg"
-    },
-    "img/landing/disco.jpg": {
-      "name": "img/landing/disco.jpg",
-      "path": "/Users/cbyrd/Projects/arches/arches/app/media/build/img/landing/disco.jpg",
-      "publicPath": "/foo/img/landing/disco.jpg"
-    },
-    "img/landing/imac_designer.png": {
-      "name": "img/landing/imac_designer.png",
-      "path": "/Users/cbyrd/Projects/arches/arches/app/media/build/img/landing/imac_designer.png",
-      "publicPath": "/foo/img/landing/imac_designer.png"
-    },
-    "img/landing/landing-primary.jpg": {
-      "name": "img/landing/landing-primary.jpg",
-      "path": "/Users/cbyrd/Projects/arches/arches/app/media/build/img/landing/landing-primary.jpg",
-      "publicPath": "/foo/img/landing/landing-primary.jpg"
-    },
-    "img/landing/landing1.png": {
-      "name": "img/landing/landing1.png",
-      "path": "/Users/cbyrd/Projects/arches/arches/app/media/build/img/landing/landing1.png",
-      "publicPath": "/foo/img/landing/landing1.png"
-    },
-    "img/landing/landing2.jpg": {
-      "name": "img/landing/landing2.jpg",
-      "path": "/Users/cbyrd/Projects/arches/arches/app/media/build/img/landing/landing2.jpg",
-      "publicPath": "/foo/img/landing/landing2.jpg"
-    },
-    "img/landing/landing3.jpg": {
-      "name": "img/landing/landing3.jpg",
-      "path": "/Users/cbyrd/Projects/arches/arches/app/media/build/img/landing/landing3.jpg",
-      "publicPath": "/foo/img/landing/landing3.jpg"
-    },
-    "img/landing/permissions_manager.png": {
-      "name": "img/landing/permissions_manager.png",
-      "path": "/Users/cbyrd/Projects/arches/arches/app/media/build/img/landing/permissions_manager.png",
-      "publicPath": "/foo/img/landing/permissions_manager.png"
-    },
-    "img/landing/potala_palace.jpg": {
-      "name": "img/landing/potala_palace.jpg",
-      "path": "/Users/cbyrd/Projects/arches/arches/app/media/build/img/landing/potala_palace.jpg",
-      "publicPath": "/foo/img/landing/potala_palace.jpg"
-    },
     "img/help/activate-mobile-project.gif": {
       "name": "img/help/activate-mobile-project.gif",
       "path": "/Users/cbyrd/Projects/arches/arches/app/media/build/img/help/activate-mobile-project.gif",
@@ -1556,6 +1471,91 @@
       "path": "/Users/cbyrd/Projects/arches/arches/app/media/build/img/help/time-wheel-example.gif",
       "publicPath": "/foo/img/help/time-wheel-example.gif"
     },
+    "img/landing/Arches_logo_white.png": {
+      "name": "img/landing/Arches_logo_white.png",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/media/build/img/landing/Arches_logo_white.png",
+      "publicPath": "/foo/img/landing/Arches_logo_white.png"
+    },
+    "img/landing/IPhone_8_map.png": {
+      "name": "img/landing/IPhone_8_map.png",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/media/build/img/landing/IPhone_8_map.png",
+      "publicPath": "/foo/img/landing/IPhone_8_map.png"
+    },
+    "img/landing/arches_designer.png": {
+      "name": "img/landing/arches_designer.png",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/media/build/img/landing/arches_designer.png",
+      "publicPath": "/foo/img/landing/arches_designer.png"
+    },
+    "img/landing/arches_logo_dark.png": {
+      "name": "img/landing/arches_logo_dark.png",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/media/build/img/landing/arches_logo_dark.png",
+      "publicPath": "/foo/img/landing/arches_logo_dark.png"
+    },
+    "img/landing/arches_logo_light.png": {
+      "name": "img/landing/arches_logo_light.png",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/media/build/img/landing/arches_logo_light.png",
+      "publicPath": "/foo/img/landing/arches_logo_light.png"
+    },
+    "img/landing/arches_search.png": {
+      "name": "img/landing/arches_search.png",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/media/build/img/landing/arches_search.png",
+      "publicPath": "/foo/img/landing/arches_search.png"
+    },
+    "img/landing/bhutan_tigersnest_lr.jpg": {
+      "name": "img/landing/bhutan_tigersnest_lr.jpg",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/media/build/img/landing/bhutan_tigersnest_lr.jpg",
+      "publicPath": "/foo/img/landing/bhutan_tigersnest_lr.jpg"
+    },
+    "img/landing/card_manager.png": {
+      "name": "img/landing/card_manager.png",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/media/build/img/landing/card_manager.png",
+      "publicPath": "/foo/img/landing/card_manager.png"
+    },
+    "img/landing/consultation_workflow.jpg": {
+      "name": "img/landing/consultation_workflow.jpg",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/media/build/img/landing/consultation_workflow.jpg",
+      "publicPath": "/foo/img/landing/consultation_workflow.jpg"
+    },
+    "img/landing/disco.jpg": {
+      "name": "img/landing/disco.jpg",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/media/build/img/landing/disco.jpg",
+      "publicPath": "/foo/img/landing/disco.jpg"
+    },
+    "img/landing/imac_designer.png": {
+      "name": "img/landing/imac_designer.png",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/media/build/img/landing/imac_designer.png",
+      "publicPath": "/foo/img/landing/imac_designer.png"
+    },
+    "img/landing/landing-primary.jpg": {
+      "name": "img/landing/landing-primary.jpg",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/media/build/img/landing/landing-primary.jpg",
+      "publicPath": "/foo/img/landing/landing-primary.jpg"
+    },
+    "img/landing/landing1.png": {
+      "name": "img/landing/landing1.png",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/media/build/img/landing/landing1.png",
+      "publicPath": "/foo/img/landing/landing1.png"
+    },
+    "img/landing/landing2.jpg": {
+      "name": "img/landing/landing2.jpg",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/media/build/img/landing/landing2.jpg",
+      "publicPath": "/foo/img/landing/landing2.jpg"
+    },
+    "img/landing/landing3.jpg": {
+      "name": "img/landing/landing3.jpg",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/media/build/img/landing/landing3.jpg",
+      "publicPath": "/foo/img/landing/landing3.jpg"
+    },
+    "img/landing/permissions_manager.png": {
+      "name": "img/landing/permissions_manager.png",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/media/build/img/landing/permissions_manager.png",
+      "publicPath": "/foo/img/landing/permissions_manager.png"
+    },
+    "img/landing/potala_palace.jpg": {
+      "name": "img/landing/potala_palace.jpg",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/media/build/img/landing/potala_palace.jpg",
+      "publicPath": "/foo/img/landing/potala_palace.jpg"
+    },
     "img/user/apple.png": {
       "name": "img/user/apple.png",
       "path": "/Users/cbyrd/Projects/arches/arches/app/media/build/img/user/apple.png",
@@ -1625,11 +1625,6 @@
       "name": "img/icons/people/av6.png",
       "path": "/Users/cbyrd/Projects/arches/arches/app/media/build/img/icons/people/av6.png",
       "publicPath": "/foo/img/icons/people/av6.png"
-    },
-    "img/sliders/revolution/bg-text.png": {
-      "name": "img/sliders/revolution/bg-text.png",
-      "path": "/Users/cbyrd/Projects/arches/arches/app/media/build/img/sliders/revolution/bg-text.png",
-      "publicPath": "/foo/img/sliders/revolution/bg-text.png"
     },
     "img/icons/social/amazon.png": {
       "name": "img/icons/social/amazon.png",
@@ -1800,6 +1795,11 @@
       "name": "img/landing/patterns/gridtile.png",
       "path": "/Users/cbyrd/Projects/arches/arches/app/media/build/img/landing/patterns/gridtile.png",
       "publicPath": "/foo/img/landing/patterns/gridtile.png"
+    },
+    "img/sliders/revolution/bg-text.png": {
+      "name": "img/sliders/revolution/bg-text.png",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/media/build/img/sliders/revolution/bg-text.png",
+      "publicPath": "/foo/img/sliders/revolution/bg-text.png"
     },
     "templates/admin/change_form.html": {
       "name": "templates/admin/change_form.html",
@@ -3412,7 +3412,5 @@
       "js/views/user-profile-manager.js"
     ]
   },
-  "publicPath": "/foo/",
-  "error": "UnsupportedFeatureWarning",
-  "message": "Cannot statically analyse 'require(…, …)' in line 1"
+  "publicPath": "/foo/"
 }

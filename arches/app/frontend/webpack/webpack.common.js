@@ -295,7 +295,10 @@ module.exports = {
             'webcola': Path.resolve(__dirname, '../node_modules/webcola/WebCola/cola.min'),
 
 
-            'requirejs': Path.resolve(__dirname, '../node_modules/requirejs', 'require.js'),
+            'themepunch-tools': Path.resolve(__dirname, '../plugins', 'revolution-slider/rs-plugin/js/jquery.themepunch.tools.min'),
+            'revolution-slider': Path.resolve(__dirname, '../plugins', 'revolution-slider'),
+
+            // 'requirejs': Path.resolve(__dirname, '../node_modules/requirejs', 'require.js'),
         },
     },
     module: {

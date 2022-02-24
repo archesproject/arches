@@ -446,50 +446,52 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 
 <script>
 
-    // require.config({
-    //     // baseUrl: '{{ STATIC_URL }}js',
-    //     // paths: {
-    //     //     // 'templates': '{% url "templates" ""%}'.replace(/\/$/, ""),
-    //     //     // 'text': '{{ STATIC_URL }}packages/requirejs-text/text',
-    //     //     // 'jquery-lib': '{{ STATIC_URL }}packages/jquery/dist/jquery.min',
-    //     //     // 'jquery': '{{ STATIC_URL }}packages/jquery-migrate/dist/jquery-migrate.min',
-    //     //     // 'jquery-ui': '{{ STATIC_URL }}packages/jqueryui/jquery-ui.min',
-    //     //     // 'underscore': '{{ STATIC_URL }}packages/underscore/underscore-min',
-    //     //     // 'chosen': '{{ STATIC_URL }}packages/chosen-js/chosen.jquery.min',
-    //     //     // 'knockout': '{{ STATIC_URL }}packages/knockout/build/output/knockout-latest',
-    //     //     // 'bootstrap': '{{ STATIC_URL }}packages/bootstrap/dist/js/bootstrap.min',
-    //     //     // 'themepunch-tools': '{{ STATIC_URL }}plugins/revolution-slider/rs-plugin/js/jquery.themepunch.tools.min',
-    //     //     // 'themepunch-revolution': '{{ STATIC_URL }}plugins/revolution-slider/rs-plugin/js/jquery.themepunch.revolution',
-    //     //     // 'revolution-slider': '{{ STATIC_URL }}plugins/revolution-slider',
-    //     //     // 'one-app': '{{ STATIC_URL }}plugins/one.app',
-    //     // },
-    //     // shim: {
-    //     //     'jquery': {
-    //     //         deps: ['jquery-lib'],
-    //     //         exports: '$'
-    //     //     },
-    //     //     'bootstrap': {
-    //     //         deps: ['jquery', 'jquery-ui']
-    //     //     },
-    //     //     'chosen': {
-    //     //         deps: ['jquery'],
-    //     //     },
-    //     //     'themepunch-tools': {
-    //     //         deps: ['jquery'],
-    //     //     },
-    //     //     'themepunch-revolution': {
-    //     //         deps: ['jquery'],
-    //     //     },
-    //     //     'revolution-slider': {
-    //     //         deps: ['jquery'],
-    //     //     },
-    //     //     'one-app': {
-    //     //         deps: ['jquery'],
-    //     //     }
-    //     // }
-    // });
+    require.config({
+        // baseUrl: '{{ STATIC_URL }}js',
+        paths: {
+            // 'templates': '{% url "templates" ""%}'.replace(/\/$/, ""),
+            'text': "{% webpack_static 'node_modules/requirejs-text/text' %}",
+            'jquery-lib': "{% webpack_static 'node_modules/jquery/dist/jquery.min' %}",
+            'jquery': "{% webpack_static 'node_modules/jquery-migrate/dist/jquery-migrate.min' %}",
+            'jquery-ui': "{% webpack_static 'node_modules/jqueryui/jquery-ui.min' %}",
+            'jquery-validate': "{% webpack_static 'node_modules/jquery-validation/dist/jquery.validate.min' %}",
+            'underscore': "{% webpack_static 'node_modules/underscore/underscore-min' %}",
+            'chosen': "{% webpack_static 'node_modules/chosen-js/chosen.jquery.min' %}",
+            'knockout': "{% webpack_static 'node_modules/knockout/build/output/knockout-latest' %}",
+            'bootstrap': "{% webpack_static 'node_modules/bootstrap/dist/js/bootstrap.min' %}",
+            'themepunch-tools': "{% webpack_static 'plugins/revolution-slider/rs-plugin/js/jquery.themepunch.tools.min' %}",
+            'themepunch-revolution': "{% webpack_static 'plugins/revolution-slider/rs-plugin/js/jquery.themepunch.revolution' %}",
+            'revolution-slider': "{% webpack_static 'plugins/revolution-slider' %}",
+            'one-app': "{% webpack_static 'plugins/one.app' %}",
+        },
+        shim: {
+            'jquery': {
+                deps: ['jquery-lib'],
+                exports: '$'
+            },
+            'bootstrap': {
+                deps: ['jquery', 'jquery-ui']
+            },
+            'chosen': {
+                deps: ['jquery'],
+            },
+            'themepunch-tools': {
+                deps: ['jquery'],
+            },
+            'themepunch-revolution': {
+                deps: ['jquery'],
+            },
+            'revolution-slider': {
+                deps: ['jquery'],
+            },
+            'one-app': {
+                deps: ['jquery'],
+            }
+        }
+    });
     require(
-        ['jquery',
+        [
+            'jquery',
             'knockout',
             'bootstrap',
             'themepunch-tools',
