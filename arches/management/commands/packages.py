@@ -487,8 +487,7 @@ class Command(BaseCommand):
                 "extensions/datatypes",
                 "extensions/functions",
                 "extensions/widgets",
-                "extensions/etl_modules"
-                "extensions/css",
+                "extensions/etl_modules" "extensions/css",
                 "extensions/bindings",
                 "extensions/card_components",
                 "extensions/plugins",

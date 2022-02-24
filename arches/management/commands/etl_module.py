@@ -21,6 +21,7 @@ from arches.app.models import models
 from django.core.management.base import BaseCommand
 from arches.app.utils import module_importer
 
+
 class Command(BaseCommand):
     """
     Commands for managing Arches etl modules
@@ -55,7 +56,7 @@ class Command(BaseCommand):
         Inserts a etlmodule into the arches db
 
         """
-        
+
         module = module_importer.get_module(source)
         details = module.details
 
