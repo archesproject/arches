@@ -1409,7 +1409,6 @@ class ETLModule(models.Model):
     classname = models.TextField(blank=True, null=True)
     config = JSONField(blank=True, null=True, db_column="config")
     slug = models.TextField(validators=[validate_slug], unique=True, null=True)
-
     description = models.TextField(blank=True, null=True)
 
     def __str__(self):
