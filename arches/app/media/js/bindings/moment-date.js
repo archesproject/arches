@@ -16,7 +16,7 @@
         factory(require("knockout"), require("moment"));
     } else if (typeof define === "function" && define["amd"]) {
         // AMD anonymous module with hard-coded dependency on "knockout"
-        define(["knockout", "moment"], factory);
+        define('moment-date', ["knockout", "moment"], factory);
     } else {
         // <script> tag: use the global `ko` object, attaching a `mapping` property
         factory(ko, moment);

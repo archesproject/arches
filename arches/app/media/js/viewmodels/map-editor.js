@@ -12,7 +12,7 @@ define([
     'proj4',
     'views/components/map',
     'views/components/cards/select-feature-layers',
-    'text!templates/views/components/cards/map-popup.htm'
+    'templates/views/components/cards/map-popup.htm'
 ], function(arches, $, _, ko, koMapping, uuid, MapboxDraw, geojsonExtent, geojsonhint, toGeoJSON, proj4, MapComponentViewModel, selectFeatureLayersFactory, popupTemplate) {
     var viewModel = function(params) {
         var self = this;

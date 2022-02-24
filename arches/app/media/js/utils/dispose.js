@@ -1,4 +1,4 @@
-define(['knockout'], function(ko) {
+define('dispose', ['knockout'], function(ko) {
     /**
     * from http://www.knockmeout.net/2014/10/knockout-cleaning-up.html
     * little helper that handles being given a value or prop + value

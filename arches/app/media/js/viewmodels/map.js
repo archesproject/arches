@@ -6,7 +6,7 @@ define([
     'knockout-mapping',
     'mapbox-gl',
     'mapbox-gl-geocoder',
-    'text!templates/views/components/map-popup.htm'
+    'templates/views/components/map-popup.htm'
 ], function($, _, arches, ko, koMapping, mapboxgl, MapboxGeocoder, popupTemplate) {
     var viewModel = function(params) {
         var self = this;

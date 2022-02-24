@@ -1,4 +1,4 @@
-define([
+define('card', [
     'underscore',
     'arches',
     'models/abstract',

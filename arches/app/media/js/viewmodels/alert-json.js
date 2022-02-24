@@ -1,4 +1,4 @@
-define(['knockout', 'arches'], function(ko, arches) {
+define('alert-json', ['knockout', 'arches'], function(ko, arches) {
     /**
     * A viewmodel used for alert messages from JSON responses
     *

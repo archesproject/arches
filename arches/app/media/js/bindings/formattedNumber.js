@@ -1,4 +1,4 @@
-define([
+define('formattedNumber', [
     'jquery',
     'knockout',
     'numeral'

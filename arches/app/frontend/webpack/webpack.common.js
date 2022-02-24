@@ -36,15 +36,17 @@ const fooFileNames = function(path, outer_acc) {
         }
         else {
             var foo = (path + '/' + v).slice(13)
-            console.log("()", foo)
-            return { ...acc, [foo]: { 'import': `${path}/${v}`, 'filename': `./img/${foo}` } };
+            // console.log("()", foo)
+            acc[foo] = { 'import': Path.relative(__dirname, `${path}/${v}`).slice(3), 'filename': `img/[name]` };
+
+            return acc;
         }
 
     }, outer_acc);
 };
 
 
-var bar_img = fooFileNames('../media/img', {});
+var bar_img = fooFileNames(Path.relative(__dirname, 'media/img'), {});
 
 // var baz_img = Object.keys(bar).reduce((acc, key) => {
 //     var foo = (key).slice(0, key.length - 4)
@@ -82,57 +84,63 @@ qux_css = quxFileNames('../media/css', {})
 //     return acc;
 // }, {});
 // console.log("HI", qux_css);
-console.log("HI", baz)
+// console.log("HI", bar_img)
+
+
+var aaa = {
+    ...bar,
+    // ...bar_img,
+}
+
+console.log(aaa)
 
 module.exports = {
-    entry: {
-        ...bar,
-        ...bar_img,
-        // ...qux_css,
-    },
+    entry: aaa,
     output: {
-        path: Path.join(__dirname, '../../media/build'),
-        filename: '[name]',
+        path: Path.resolve(__dirname, '../../media/build'),
         publicPath: '/foo/',
     },
     optimization: {
-        // splitChunks: {
-        //     chunks: 'all',
-        //     cacheGroups: {
-        //         vendor: {
-        //             test: /[\\/]node_modules[\\/]/,
-        //             name(module) {
-        //                 // Extracts node_modules to separate packages
-        //                 const packagePath = module.context.match(
-        //                     /[\\/]node_modules[\\/](.*?)([\\/]|$)/
-        //                 );
+        splitChunks: {
+            chunks: 'all',
+            cacheGroups: {
+                vendor: {
+                    test: /[\\/]node_modules[\\/]/,
+                    name(module) {
+                        // Extracts node_modules to separate packages
+                        const packagePath = module.context.match(
+                            /[\\/]node_modules[\\/](.*?)([\\/]|$)/
+                        );
 
-        //                 let packageName = null;
+                        let packageName = null;
 
-        //                 if (packagePath) { 
-        //                     packageName = packagePath[1]; 
-        //                     return `js/npm.${packageName.replace("@", "")}.js`;
-        //                 }
+                        if (packagePath) { 
+                            packageName = packagePath[1]; 
+                            return `js/npm.${packageName.replace("@", "")}`;
+                        }
 
-        //             }
-        //         },
-        //     }
-        // },
+                    }
+                },
+            }
+        },
     },
     plugins: [
         new CleanWebpackPlugin(),
-        new CopyWebpackPlugin({ patterns: [{ from: Path.resolve(__dirname, '../public'), to: 'public' }] }),
+        new CopyWebpackPlugin({ patterns: [{ from: Path.resolve(__dirname, '../public'), to: 'public' }, {from: Path.resolve(__dirname, '../../media/img'), to: 'img'} ] }),
         new HtmlWebpackPlugin({
             template: Path.resolve(__dirname, '../../templates/index.htm'),
         }),
         new BundleTracker({ filename: './webpack-stats.json' }),
     ],
     resolve: {
-        // moduleDirectories: [__dirname, "node_modules"],
+        // modules: [__dirname, "node_modules"],
         alias: {
             ...baz,
             // ...qux,
             'arches': Path.resolve(__dirname, '../templates', 'javascript.htm'),
+            'report-templates': Path.resolve(__dirname, '../templates', 'javascript.htm'),
+            'card-components': Path.resolve(__dirname, '../templates', 'javascript.htm'),
+            'file-renderers': Path.resolve(__dirname, '../templates', 'javascript.htm'),
             'resource-edit-history-data': Path.resolve(__dirname, '../templates/views/resource', 'edit-log.htm'),
             'plugin-data': Path.resolve(__dirname, '../templates/views', 'plugin.htm'),
             'mobile-survey-manager-data': Path.resolve(__dirname, '../templates/views', 'mobile-survey-designer.htm'),
@@ -141,15 +149,66 @@ module.exports = {
             'graph-base-data': Path.resolve(__dirname, '../templates/views/graph', 'graph-base.htm'),
             'function-templates': Path.resolve(__dirname, '../templates', 'javascript.htm'),
             'component-templates': Path.resolve(__dirname, '../templates', 'javascript.htm'),
+            'geocoder-templates': Path.resolve(__dirname, '../templates', 'javascript.htm'),
+            'search-components': Path.resolve(__dirname, '../templates', 'javascript.htm'),
+            'datatype-config-components': Path.resolve(__dirname, '../templates', 'javascript.htm'),
             'widgets': Path.resolve(__dirname, '../templates', 'javascript.htm'),
             'view-data': Path.resolve(__dirname, '../templates', 'base-manager.htm'),
+            'profile-manager-data': Path.resolve(__dirname, '../templates/views', 'user-profile-manager.htm'),
             'graph-manager-data': Path.resolve(__dirname, '../templates/views', 'graph.htm'),
+            'graph-designer-data': Path.resolve(__dirname, '../templates/views', 'graph-designer.htm'),
+            'map-layer-manager-data': Path.resolve(__dirname, '../templates/views', 'map-layer-manager.htm'),
+            'resource-editor-data': Path.resolve(__dirname, '../templates/views/resource', 'editor.htm'),
             'turf': Path.resolve(__dirname, '../node_modules/@turf/turf', 'turf.min'),
             'plugins/knockout-select2': Path.resolve(__dirname, '../plugins', 'knockout-select2.js'),
             'jquery-validate': Path.resolve(__dirname, '../node_modules/jquery-validation/dist', 'jquery.validate.min'),
             'jquery-ui/draggable': Path.resolve(__dirname, '../node_modules/jqueryui', 'jquery-ui.min.js'),
             'jquery-ui/sortable': Path.resolve(__dirname, '../node_modules/jqueryui', 'jquery-ui.min.js'),
             'underscore': Path.resolve(__dirname, '../node_modules/underscore', 'underscore-min.js'),
+            'knockout': Path.resolve(__dirname, '../node_modules/knockout/build/output/knockout-latest'),
+            'knockout-mapping': Path.resolve(__dirname, '../node_modules/knockout-mapping/dist/', 'knockout.mapping.min'),
+            'jquery': Path.resolve(__dirname, '../node_modules/jquery-migrate/dist/', 'jquery-migrate.min'),
+            'jquery-ui': Path.resolve(__dirname, '../node_modules/jqueryui/jquery-ui.min'),
+            'select2': Path.resolve(__dirname, '../node_modules/select2/select2'),
+            'moment': Path.resolve(__dirname, '../node_modules/moment/min/', 'moment.min'),
+            'backbone': Path.resolve(__dirname, '../node_modules/backbone/backbone-min'),
+            'bootstrap': Path.resolve(__dirname, '../node_modules/bootstrap/dist/js/', 'bootstrap.min'),
+            'uuid': Path.resolve(__dirname, '../node_modules/uuidjs/dist/', 'uuid.core'),
+            'js-cookie': Path.resolve(__dirname, '../node_modules/js-cookie/src/', 'js.cookie'),
+            'dropzone': Path.resolve(__dirname, '../node_modules/dropzone/dist/min/', 'dropzone-amd-module.min'),
+            'jqtree': Path.resolve(__dirname, '../node_modules/jqtree/', 'tree.jquery'),
+            'cytoscape': Path.resolve(__dirname, '../node_modules/cytoscape/dist/', 'cytoscape.min'),
+            'cytoscape-cola': Path.resolve(__dirname, '../node_modules/cytoscape-cola/cytoscape-cola'),
+            'webcola': Path.resolve(__dirname, '../node_modules/webcola/WebCola/', 'cola.min'),
+            'geohash': Path.resolve(__dirname, '../node_modules/latlon-geohash/latlon-geohash'),
+            'chosen': Path.resolve(__dirname, '../node_modules/chosen-js/', 'chosen.jquery.min'),
+            'leaflet': Path.resolve(__dirname, '../node_modules/leaflet/dist/leaflet'),
+            'leaflet-iiif': Path.resolve(__dirname, '../node_modules/leaflet-iiif/leaflet-iiif'),
+            'leaflet-draw': Path.resolve(__dirname, '../node_modules/leaflet-draw/dist/', 'leaflet.draw'),
+            'leaflet-fullscreen': Path.resolve(__dirname, '../node_modules/leaflet.fullscreen/', 'Control.FullScreen'),
+            'leaflet-side-by-side': Path.resolve(__dirname, '../plugins/leaflet-side-by-side/index'),
+            'geojson-extent': Path.resolve(__dirname, '../node_modules/@mapbox/geojson-extent/geojson-extent'),
+            'geojsonhint': Path.resolve(__dirname, '../node_modules/@mapbox/geojsonhint/geojsonhint'),
+            'bootstrap-datetimepicker': Path.resolve(__dirname, '../node_modules/eonasdan-bootstrap-datetimepicker/build/js/bootstrap-datetimepicker.min'),
+            'mapbox-gl': Path.resolve(__dirname, '../node_modules/mapbox-gl/dist/mapbox-gl'),
+            'mapbox-gl-draw': Path.resolve(__dirname, '../node_modules/@mapbox/mapbox-gl-draw/dist/mapbox-gl-draw'),
+            'mapbox-gl-geocoder': Path.resolve(__dirname, '../node_modules/@mapbox/mapbox-gl-geocoder/dist/mapbox-gl-geocoder.min'),
+            'text': Path.resolve(__dirname, '../node_modules/requirejs-text/text'),
+            'dom-4': Path.resolve(__dirname, '../node_modules/dom4/build/dom4'),
+            'togeojson': Path.resolve(__dirname, '../node_modules/@tmcw/togeojson/dist/togeojson.umd'),
+            'ckeditor-jquery': Path.resolve(__dirname, '../node_modules/ckeditor/adapters/jquery'),
+            'datatables.net': Path.resolve(__dirname, '../node_modules/datatables.net/js/jquery.dataTables.min'),
+            'datatables.net-bs': Path.resolve(__dirname, '../node_modules/datatables.net-bs/js/dataTables.bootstrap.min'),
+            'datatables.net-buttons': Path.resolve(__dirname, '../node_modules/datatables.net-buttons/js/dataTables.buttons.min'),
+            'datatables.net-buttons-print': Path.resolve(__dirname, '../node_modules/datatables.net-buttons/js/buttons.print.min'),
+            'datatables.net-buttons-html5': Path.resolve(__dirname, '../node_modules/datatables.net-buttons/js/buttons.html5.min'),
+            'datatables.net-buttons-bs': Path.resolve(__dirname, '../node_modules/datatables.net-buttons-bs/js/buttons.bootstrap.min'),
+            'datatables.net-responsive': Path.resolve(__dirname, '../node_modules/datatables.net-responsive/js/dataTables.responsive'),
+            'datatables.net-responsive-bs': Path.resolve(__dirname, '../node_modules/datatables.net-responsive-bs/js/responsive.bootstrap'),
+            'templates/views/components/iiif-popup.htm': Path.resolve(__dirname, '../../templates/views/components/iiif-popup.htm'),
+            'templates/views/components/cards/related-resources-map-popup.htm': Path.resolve(__dirname, '../../templates/views/components/cards/related-resources-map-popup.htm'),
+            'templates/views/components/map-popup.htm': Path.resolve(__dirname, '../../templates/views/components/map-popup.htm'),
+            'templates/views/components/cards/map-popup.htm': Path.resolve(__dirname, '../../templates/views/components/cards/map-popup.htm'),
             // 'require': Path.resolve(__dirname, '../node_modules/requirejs', 'require.js'),
         },
     },
@@ -168,15 +227,39 @@ module.exports = {
                 test: /\.txt$/i,
                 use: 'raw-loader',
             },
-            {
-                test: /\.(ico|jpg|jpeg|png|gif|eot|otf|webp|svg|ttf|woff|woff2)(\?.*)?$/,
-                use: {
-                    loader: 'file-loader',
-                    options: {
-                        name: '[path][name].[ext]',
-                    },
-                },
-            },
+            // {
+            //     test: /\.(png|svg|jpg|jpeg|gif)$/i,
+            //     type: 'asset/resource',
+            //   },
+            // {
+            //     test: /\.(ico|jpg|jpeg|png|gif|eot|otf|webp|svg|ttf|woff|woff2)(\?.*)?$/,
+            //     use: {
+            //         loader: 'file-loader',
+            //         options: {
+            //             name: 'img/[name].[ext]',
+            //             // outputPath: 'img'
+            //             outputPath: (url, resourcePath, context) => {
+            //                 // `resourcePath` is original absolute path to asset
+            //                 // `context` is directory where stored asset (`rootContext`) or `context` option
+                
+            //                 // To get relative path you can use
+            //                 const relativePath = Path.relative(context, resourcePath);
+                
+            //                 // if (/my-custom-image\.png/.test(resourcePath)) {
+            //                 //   return `other_output_path/${url}`;
+            //                 // }
+                
+            //                 // if (/images/.test(context)) {
+            //                 //   return `image_output_path/${url}`;
+            //                 // }
+                
+            //                 // return `output_path/${url}`;
+
+            //                 return relativePath
+            //               },
+            //         },
+            //     },
+            // },
         ],
     },
 };

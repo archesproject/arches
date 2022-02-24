@@ -1,4 +1,4 @@
-define([
+define('datepicker', [
     'jquery',
     'underscore',
     'knockout',

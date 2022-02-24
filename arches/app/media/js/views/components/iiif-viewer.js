@@ -5,7 +5,7 @@ define([
     'knockout-mapping',
     'leaflet',
     'views/components/workbench',
-    'text!templates/views/components/iiif-popup.htm',
+    'templates/views/components/iiif-popup.htm',
     'leaflet-iiif',
     'leaflet-fullscreen',
     'leaflet-side-by-side',

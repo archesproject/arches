@@ -1,4 +1,4 @@
-define([
+define('mobile-survey', [
     'underscore',
     'knockout',
     'knockout-mapping',

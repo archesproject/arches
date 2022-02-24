@@ -1,4 +1,4 @@
-define(['arches',
+define('graph', ['arches',
     'models/abstract',
     'models/node',
     'knockout',

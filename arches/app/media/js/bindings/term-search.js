@@ -1,4 +1,4 @@
-define([
+define('term-search', [
     'jquery',
     'underscore',
     'knockout',

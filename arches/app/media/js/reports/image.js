@@ -1,4 +1,4 @@
-define([
+define('image-report', [
     'underscore',
     'knockout',
     'knockout-mapping',

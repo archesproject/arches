@@ -1,4 +1,4 @@
-define([
+define('datatable', [
     'jquery',
     'knockout',
     'underscore',

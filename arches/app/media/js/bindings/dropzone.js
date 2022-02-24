@@ -1,4 +1,4 @@
-define([
+define('dropzone', [
     'jquery',
     'underscore',
     'knockout',

@@ -1,4 +1,4 @@
-define([
+define('time-wheel', [
     'jquery',
     'underscore',
     'knockout',

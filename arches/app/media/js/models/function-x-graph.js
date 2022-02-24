@@ -1,11 +1,10 @@
-define([
+define('functionxgraph', [
     'underscore',
     'arches',
     'models/abstract',
     'knockout',
     'knockout-mapping',
-    'underscore'
-], function (_, arches, AbstractModel, ko, koMapping, _) {
+], function (_, arches, AbstractModel, ko, koMapping) {
 
     var FunctionXGraphModel = AbstractModel.extend({
         /**

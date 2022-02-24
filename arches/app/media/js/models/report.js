@@ -1,4 +1,4 @@
-define(['jquery',
+define('report', ['jquery',
     'arches',
     'models/abstract',
     'knockout',

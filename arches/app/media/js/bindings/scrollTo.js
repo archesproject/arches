@@ -1,4 +1,4 @@
-define([
+define('scrollTo', [
     'jquery',
     'knockout'
 ], function ($, ko) {

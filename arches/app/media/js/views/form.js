@@ -23,10 +23,10 @@ define([
         initialize: function(options) {
             var self = this;
             self.modelReady = ko.observable(false);
-            require(['models/'+(options.modelName?options.modelName:'tile')], function (TileModel) {
-                self.TileModel = TileModel;
-                self.modelReady(true);
-            })
+            // require(['models/'+(options.modelName?options.modelName:'tile')], function (TileModel) {
+            //     self.TileModel = TileModel;
+            //     self.modelReady(true);
+            // })
             this.form = this.$el;
 
             // parse then restringify JSON data to ensure whitespace is identical

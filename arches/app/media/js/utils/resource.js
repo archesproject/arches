@@ -1,4 +1,4 @@
-define(['arches'], function(arches) {
+define('resource', ['arches'], function(arches) {
     var resourceLookup = {};
     var resourceUtils = {
         /**

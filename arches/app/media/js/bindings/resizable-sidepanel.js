@@ -1,4 +1,4 @@
-define([
+define('resizeable-sidepanel', [
     'jquery',
     'knockout'
 ], function($, ko) {

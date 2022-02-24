@@ -1,4 +1,4 @@
-define([
+define('cytoscape', [
     'knockout',
     'underscore',
     'cytoscape',

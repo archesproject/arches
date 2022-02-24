@@ -1,4 +1,4 @@
-define([
+define('hover', [
     'knockout',
 ], function (ko) {
     ko.bindingHandlers.hover = {

@@ -1,4 +1,4 @@
-define([
+define('tabbed-report', [
     'knockout',
     'viewmodels/tabbed-report'
 ], function(ko, TabbedReportViewModel) {

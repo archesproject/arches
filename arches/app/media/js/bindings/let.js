@@ -1,4 +1,4 @@
-define([
+define('let', [
     'knockout',
 ], function (ko) {
     /**

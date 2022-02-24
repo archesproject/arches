@@ -42,9 +42,9 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
     <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.2/css/bootstrap.min.css">
 
     <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/font-awesome/4.2.0/css/font-awesome.min.css">
-    <link href="{% static 'css/index.css' %}" rel="stylesheet">
+    <link href="{% webpack_static 'css/index.css' %}" rel="stylesheet">
     {% if app_settings.ACCESSIBILITY_MODE %}
-    <link href="{% static 'css/accessibility.css' %}" rel="stylesheet">
+    <link href="{% webpack_static 'css/accessibility.css' %}" rel="stylesheet">
     {% endif %}
 </head>
 
@@ -64,7 +64,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 
                     <div class="relative nav-brand-container">
                         <div class="navbar-brand-v5-icon-container">
-                            <img class="navbar-brand-v5-icon" src="{% static 'img/landing/Arches_logo_white.png' %}" alt="Arches Logo">
+                            <img class="navbar-brand-v5-icon" src="{% webpack_static 'build/img/landing/Arches_logo_white.png' %}" alt="Arches Logo">
                         </div>
                         <div class="application-name">
                             <h1>{% blocktrans %}Arches | {{version}}{% endblocktrans %}</h1>
@@ -442,52 +442,52 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
     </footer>
     <!-- End Footer -->
 
-<script src="{% webpack_static 'packages/requirejs/require.js' %}"></script>
+<script src="{% webpack_static 'node_modules/requirejs/require.js' %}"></script>
 
 <script>
 
-    require.config({
-        baseUrl: '{{ STATIC_URL }}js',
-        paths: {
-            'templates': '{% url "templates" ""%}'.replace(/\/$/, ""),
-            'text': '{{ STATIC_URL }}packages/requirejs-text/text',
-            'jquery-lib': '{{ STATIC_URL }}packages/jquery/dist/jquery.min',
-            'jquery': '{{ STATIC_URL }}packages/jquery-migrate/dist/jquery-migrate.min',
-            'jquery-ui': '{{ STATIC_URL }}packages/jqueryui/jquery-ui.min',
-            'underscore': '{{ STATIC_URL }}packages/underscore/underscore-min',
-            'chosen': '{{ STATIC_URL }}packages/chosen-js/chosen.jquery.min',
-            'knockout': '{{ STATIC_URL }}packages/knockout/build/output/knockout-latest',
-            'bootstrap': '{{ STATIC_URL }}packages/bootstrap/dist/js/bootstrap.min',
-            'themepunch-tools': '{{ STATIC_URL }}plugins/revolution-slider/rs-plugin/js/jquery.themepunch.tools.min',
-            'themepunch-revolution': '{{ STATIC_URL }}plugins/revolution-slider/rs-plugin/js/jquery.themepunch.revolution',
-            'revolution-slider': '{{ STATIC_URL }}plugins/revolution-slider',
-            'one-app': '{{ STATIC_URL }}plugins/one.app',
-        },
-        shim: {
-            'jquery': {
-                deps: ['jquery-lib'],
-                exports: '$'
-            },
-            'bootstrap': {
-                deps: ['jquery', 'jquery-ui']
-            },
-            'chosen': {
-                deps: ['jquery'],
-            },
-            'themepunch-tools': {
-                deps: ['jquery'],
-            },
-            'themepunch-revolution': {
-                deps: ['jquery'],
-            },
-            'revolution-slider': {
-                deps: ['jquery'],
-            },
-            'one-app': {
-                deps: ['jquery'],
-            }
-        }
-    });
+    // require.config({
+    //     // baseUrl: '{{ STATIC_URL }}js',
+    //     // paths: {
+    //     //     // 'templates': '{% url "templates" ""%}'.replace(/\/$/, ""),
+    //     //     // 'text': '{{ STATIC_URL }}packages/requirejs-text/text',
+    //     //     // 'jquery-lib': '{{ STATIC_URL }}packages/jquery/dist/jquery.min',
+    //     //     // 'jquery': '{{ STATIC_URL }}packages/jquery-migrate/dist/jquery-migrate.min',
+    //     //     // 'jquery-ui': '{{ STATIC_URL }}packages/jqueryui/jquery-ui.min',
+    //     //     // 'underscore': '{{ STATIC_URL }}packages/underscore/underscore-min',
+    //     //     // 'chosen': '{{ STATIC_URL }}packages/chosen-js/chosen.jquery.min',
+    //     //     // 'knockout': '{{ STATIC_URL }}packages/knockout/build/output/knockout-latest',
+    //     //     // 'bootstrap': '{{ STATIC_URL }}packages/bootstrap/dist/js/bootstrap.min',
+    //     //     // 'themepunch-tools': '{{ STATIC_URL }}plugins/revolution-slider/rs-plugin/js/jquery.themepunch.tools.min',
+    //     //     // 'themepunch-revolution': '{{ STATIC_URL }}plugins/revolution-slider/rs-plugin/js/jquery.themepunch.revolution',
+    //     //     // 'revolution-slider': '{{ STATIC_URL }}plugins/revolution-slider',
+    //     //     // 'one-app': '{{ STATIC_URL }}plugins/one.app',
+    //     // },
+    //     // shim: {
+    //     //     'jquery': {
+    //     //         deps: ['jquery-lib'],
+    //     //         exports: '$'
+    //     //     },
+    //     //     'bootstrap': {
+    //     //         deps: ['jquery', 'jquery-ui']
+    //     //     },
+    //     //     'chosen': {
+    //     //         deps: ['jquery'],
+    //     //     },
+    //     //     'themepunch-tools': {
+    //     //         deps: ['jquery'],
+    //     //     },
+    //     //     'themepunch-revolution': {
+    //     //         deps: ['jquery'],
+    //     //     },
+    //     //     'revolution-slider': {
+    //     //         deps: ['jquery'],
+    //     //     },
+    //     //     'one-app': {
+    //     //         deps: ['jquery'],
+    //     //     }
+    //     // }
+    // });
     require(
         ['jquery',
             'knockout',

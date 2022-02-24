@@ -1,8 +1,3774 @@
 {
-  "status": "error",
-  "assets": {},
-  "chunks": {},
-  "publicPath": "/foo/",
-  "error": "ModuleNotFoundError",
-  "message": "Module not found: Error: Can't resolve 'chosen' in '/Users/cbyrd/Projects/arches/arches/app/media/js/bindings'\nDid you mean './chosen'?\nRequests that should resolve in the current directory need to start with './'.\nRequests that start with a name are treated as module requests and resolve within module directories (node_modules).\nIf changing the source code is not an option there is also a resolve options called 'preferRelative' which tries to resolve these kind of requests in the current directory too."
+  "status": "done",
+  "assets": {
+    "./js/bindings/chosen.js": {
+      "name": "./js/bindings/chosen.js",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/media/build/js/bindings/chosen.js",
+      "publicPath": "/foo/./js/bindings/chosen.js"
+    },
+    "./js/bindings/ckeditor.js": {
+      "name": "./js/bindings/ckeditor.js",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/media/build/js/bindings/ckeditor.js",
+      "publicPath": "/foo/./js/bindings/ckeditor.js"
+    },
+    "./js/bindings/clipboard.js": {
+      "name": "./js/bindings/clipboard.js",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/media/build/js/bindings/clipboard.js",
+      "publicPath": "/foo/./js/bindings/clipboard.js"
+    },
+    "./js/bindings/codemirror.js": {
+      "name": "./js/bindings/codemirror.js",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/media/build/js/bindings/codemirror.js",
+      "publicPath": "/foo/./js/bindings/codemirror.js"
+    },
+    "./js/bindings/color-picker.js": {
+      "name": "./js/bindings/color-picker.js",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/media/build/js/bindings/color-picker.js",
+      "publicPath": "/foo/./js/bindings/color-picker.js"
+    },
+    "./js/bindings/cytoscape.js": {
+      "name": "./js/bindings/cytoscape.js",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/media/build/js/bindings/cytoscape.js",
+      "publicPath": "/foo/./js/bindings/cytoscape.js"
+    },
+    "./js/bindings/datatable.js": {
+      "name": "./js/bindings/datatable.js",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/media/build/js/bindings/datatable.js",
+      "publicPath": "/foo/./js/bindings/datatable.js"
+    },
+    "./js/bindings/datepicker.js": {
+      "name": "./js/bindings/datepicker.js",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/media/build/js/bindings/datepicker.js",
+      "publicPath": "/foo/./js/bindings/datepicker.js"
+    },
+    "./js/bindings/dragDrop.js": {
+      "name": "./js/bindings/dragDrop.js",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/media/build/js/bindings/dragDrop.js",
+      "publicPath": "/foo/./js/bindings/dragDrop.js"
+    },
+    "./js/bindings/dropzone.js": {
+      "name": "./js/bindings/dropzone.js",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/media/build/js/bindings/dropzone.js",
+      "publicPath": "/foo/./js/bindings/dropzone.js"
+    },
+    "./js/bindings/fadeVisible.js": {
+      "name": "./js/bindings/fadeVisible.js",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/media/build/js/bindings/fadeVisible.js",
+      "publicPath": "/foo/./js/bindings/fadeVisible.js"
+    },
+    "./js/bindings/formattedNumber.js": {
+      "name": "./js/bindings/formattedNumber.js",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/media/build/js/bindings/formattedNumber.js",
+      "publicPath": "/foo/./js/bindings/formattedNumber.js"
+    },
+    "./js/bindings/gallery.js": {
+      "name": "./js/bindings/gallery.js",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/media/build/js/bindings/gallery.js",
+      "publicPath": "/foo/./js/bindings/gallery.js"
+    },
+    "./js/bindings/hover.js": {
+      "name": "./js/bindings/hover.js",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/media/build/js/bindings/hover.js",
+      "publicPath": "/foo/./js/bindings/hover.js"
+    },
+    "./js/bindings/leaflet.js": {
+      "name": "./js/bindings/leaflet.js",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/media/build/js/bindings/leaflet.js",
+      "publicPath": "/foo/./js/bindings/leaflet.js"
+    },
+    "./js/bindings/let.js": {
+      "name": "./js/bindings/let.js",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/media/build/js/bindings/let.js",
+      "publicPath": "/foo/./js/bindings/let.js"
+    },
+    "./js/bindings/map-controls.js": {
+      "name": "./js/bindings/map-controls.js",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/media/build/js/bindings/map-controls.js",
+      "publicPath": "/foo/./js/bindings/map-controls.js"
+    },
+    "./js/bindings/mapbox-gl.js": {
+      "name": "./js/bindings/mapbox-gl.js",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/media/build/js/bindings/mapbox-gl.js",
+      "publicPath": "/foo/./js/bindings/mapbox-gl.js"
+    },
+    "./js/bindings/moment-date.js": {
+      "name": "./js/bindings/moment-date.js",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/media/build/js/bindings/moment-date.js",
+      "publicPath": "/foo/./js/bindings/moment-date.js"
+    },
+    "./js/bindings/nouislider.js": {
+      "name": "./js/bindings/nouislider.js",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/media/build/js/bindings/nouislider.js",
+      "publicPath": "/foo/./js/bindings/nouislider.js"
+    },
+    "./js/bindings/related-resources-graph.js": {
+      "name": "./js/bindings/related-resources-graph.js",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/media/build/js/bindings/related-resources-graph.js",
+      "publicPath": "/foo/./js/bindings/related-resources-graph.js"
+    },
+    "./js/bindings/resizable-sidepanel.js": {
+      "name": "./js/bindings/resizable-sidepanel.js",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/media/build/js/bindings/resizable-sidepanel.js",
+      "publicPath": "/foo/./js/bindings/resizable-sidepanel.js"
+    },
+    "./js/bindings/scroll-to-file.js": {
+      "name": "./js/bindings/scroll-to-file.js",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/media/build/js/bindings/scroll-to-file.js",
+      "publicPath": "/foo/./js/bindings/scroll-to-file.js"
+    },
+    "./js/bindings/scrollTo.js": {
+      "name": "./js/bindings/scrollTo.js",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/media/build/js/bindings/scrollTo.js",
+      "publicPath": "/foo/./js/bindings/scrollTo.js"
+    },
+    "./js/bindings/select2-query.js": {
+      "name": "./js/bindings/select2-query.js",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/media/build/js/bindings/select2-query.js",
+      "publicPath": "/foo/./js/bindings/select2-query.js"
+    },
+    "./js/bindings/select2v4.js": {
+      "name": "./js/bindings/select2v4.js",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/media/build/js/bindings/select2v4.js",
+      "publicPath": "/foo/./js/bindings/select2v4.js"
+    },
+    "./js/bindings/slide.js": {
+      "name": "./js/bindings/slide.js",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/media/build/js/bindings/slide.js",
+      "publicPath": "/foo/./js/bindings/slide.js"
+    },
+    "./js/bindings/smartresize.js": {
+      "name": "./js/bindings/smartresize.js",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/media/build/js/bindings/smartresize.js",
+      "publicPath": "/foo/./js/bindings/smartresize.js"
+    },
+    "./js/bindings/sortable.js": {
+      "name": "./js/bindings/sortable.js",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/media/build/js/bindings/sortable.js",
+      "publicPath": "/foo/./js/bindings/sortable.js"
+    },
+    "./js/bindings/term-search.js": {
+      "name": "./js/bindings/term-search.js",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/media/build/js/bindings/term-search.js",
+      "publicPath": "/foo/./js/bindings/term-search.js"
+    },
+    "./js/bindings/time-wheel.js": {
+      "name": "./js/bindings/time-wheel.js",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/media/build/js/bindings/time-wheel.js",
+      "publicPath": "/foo/./js/bindings/time-wheel.js"
+    },
+    "./js/config-manager.js": {
+      "name": "./js/config-manager.js",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/media/build/js/config-manager.js",
+      "publicPath": "/foo/./js/config-manager.js"
+    },
+    "./js/models/abstract.js": {
+      "name": "./js/models/abstract.js",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/media/build/js/models/abstract.js",
+      "publicPath": "/foo/./js/models/abstract.js"
+    },
+    "./js/models/card-widget.js": {
+      "name": "./js/models/card-widget.js",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/media/build/js/models/card-widget.js",
+      "publicPath": "/foo/./js/models/card-widget.js"
+    },
+    "./js/models/card.js": {
+      "name": "./js/models/card.js",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/media/build/js/models/card.js",
+      "publicPath": "/foo/./js/models/card.js"
+    },
+    "./js/models/concept-parents.js": {
+      "name": "./js/models/concept-parents.js",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/media/build/js/models/concept-parents.js",
+      "publicPath": "/foo/./js/models/concept-parents.js"
+    },
+    "./js/models/concept.js": {
+      "name": "./js/models/concept.js",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/media/build/js/models/concept.js",
+      "publicPath": "/foo/./js/models/concept.js"
+    },
+    "./js/models/config.js": {
+      "name": "./js/models/config.js",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/media/build/js/models/config.js",
+      "publicPath": "/foo/./js/models/config.js"
+    },
+    "./js/models/function-x-graph.js": {
+      "name": "./js/models/function-x-graph.js",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/media/build/js/models/function-x-graph.js",
+      "publicPath": "/foo/./js/models/function-x-graph.js"
+    },
+    "./js/models/function.js": {
+      "name": "./js/models/function.js",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/media/build/js/models/function.js",
+      "publicPath": "/foo/./js/models/function.js"
+    },
+    "./js/models/graph.js": {
+      "name": "./js/models/graph.js",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/media/build/js/models/graph.js",
+      "publicPath": "/foo/./js/models/graph.js"
+    },
+    "./js/models/mobile-survey.js": {
+      "name": "./js/models/mobile-survey.js",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/media/build/js/models/mobile-survey.js",
+      "publicPath": "/foo/./js/models/mobile-survey.js"
+    },
+    "./js/models/node.js": {
+      "name": "./js/models/node.js",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/media/build/js/models/node.js",
+      "publicPath": "/foo/./js/models/node.js"
+    },
+    "./js/models/report.js": {
+      "name": "./js/models/report.js",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/media/build/js/models/report.js",
+      "publicPath": "/foo/./js/models/report.js"
+    },
+    "./js/models/tile.js": {
+      "name": "./js/models/tile.js",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/media/build/js/models/tile.js",
+      "publicPath": "/foo/./js/models/tile.js"
+    },
+    "./js/models/value.js": {
+      "name": "./js/models/value.js",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/media/build/js/models/value.js",
+      "publicPath": "/foo/./js/models/value.js"
+    },
+    "./js/rdm.js": {
+      "name": "./js/rdm.js",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/media/build/js/rdm.js",
+      "publicPath": "/foo/./js/rdm.js"
+    },
+    "./js/reports/default.js": {
+      "name": "./js/reports/default.js",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/media/build/js/reports/default.js",
+      "publicPath": "/foo/./js/reports/default.js"
+    },
+    "./js/reports/image.js": {
+      "name": "./js/reports/image.js",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/media/build/js/reports/image.js",
+      "publicPath": "/foo/./js/reports/image.js"
+    },
+    "./js/reports/map-header.js": {
+      "name": "./js/reports/map-header.js",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/media/build/js/reports/map-header.js",
+      "publicPath": "/foo/./js/reports/map-header.js"
+    },
+    "./js/reports/map.js": {
+      "name": "./js/reports/map.js",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/media/build/js/reports/map.js",
+      "publicPath": "/foo/./js/reports/map.js"
+    },
+    "./js/reports/tabbed.js": {
+      "name": "./js/reports/tabbed.js",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/media/build/js/reports/tabbed.js",
+      "publicPath": "/foo/./js/reports/tabbed.js"
+    },
+    "./js/utils/dispose.js": {
+      "name": "./js/utils/dispose.js",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/media/build/js/utils/dispose.js",
+      "publicPath": "/foo/./js/utils/dispose.js"
+    },
+    "./js/utils/ontology.js": {
+      "name": "./js/utils/ontology.js",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/media/build/js/utils/ontology.js",
+      "publicPath": "/foo/./js/utils/ontology.js"
+    },
+    "./js/utils/resource.js": {
+      "name": "./js/utils/resource.js",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/media/build/js/utils/resource.js",
+      "publicPath": "/foo/./js/utils/resource.js"
+    },
+    "./js/utils/set-csrf-token.js": {
+      "name": "./js/utils/set-csrf-token.js",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/media/build/js/utils/set-csrf-token.js",
+      "publicPath": "/foo/./js/utils/set-csrf-token.js"
+    },
+    "./js/utils.js": {
+      "name": "./js/utils.js",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/media/build/js/utils.js",
+      "publicPath": "/foo/./js/utils.js"
+    },
+    "./js/viewmodels/alert-json.js": {
+      "name": "./js/viewmodels/alert-json.js",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/media/build/js/viewmodels/alert-json.js",
+      "publicPath": "/foo/./js/viewmodels/alert-json.js"
+    },
+    "./js/viewmodels/alert.js": {
+      "name": "./js/viewmodels/alert.js",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/media/build/js/viewmodels/alert.js",
+      "publicPath": "/foo/./js/viewmodels/alert.js"
+    },
+    "./js/viewmodels/card-component.js": {
+      "name": "./js/viewmodels/card-component.js",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/media/build/js/viewmodels/card-component.js",
+      "publicPath": "/foo/./js/viewmodels/card-component.js"
+    },
+    "./js/viewmodels/card-constraints.js": {
+      "name": "./js/viewmodels/card-constraints.js",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/media/build/js/viewmodels/card-constraints.js",
+      "publicPath": "/foo/./js/viewmodels/card-constraints.js"
+    },
+    "./js/viewmodels/card-multi-select.js": {
+      "name": "./js/viewmodels/card-multi-select.js",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/media/build/js/viewmodels/card-multi-select.js",
+      "publicPath": "/foo/./js/viewmodels/card-multi-select.js"
+    },
+    "./js/viewmodels/card.js": {
+      "name": "./js/viewmodels/card.js",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/media/build/js/viewmodels/card.js",
+      "publicPath": "/foo/./js/viewmodels/card.js"
+    },
+    "./js/viewmodels/concept-select.js": {
+      "name": "./js/viewmodels/concept-select.js",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/media/build/js/viewmodels/concept-select.js",
+      "publicPath": "/foo/./js/viewmodels/concept-select.js"
+    },
+    "./js/viewmodels/concept-widget.js": {
+      "name": "./js/viewmodels/concept-widget.js",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/media/build/js/viewmodels/concept-widget.js",
+      "publicPath": "/foo/./js/viewmodels/concept-widget.js"
+    },
+    "./js/viewmodels/domain-widget.js": {
+      "name": "./js/viewmodels/domain-widget.js",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/media/build/js/viewmodels/domain-widget.js",
+      "publicPath": "/foo/./js/viewmodels/domain-widget.js"
+    },
+    "./js/viewmodels/file-widget.js": {
+      "name": "./js/viewmodels/file-widget.js",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/media/build/js/viewmodels/file-widget.js",
+      "publicPath": "/foo/./js/viewmodels/file-widget.js"
+    },
+    "./js/viewmodels/function.js": {
+      "name": "./js/viewmodels/function.js",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/media/build/js/viewmodels/function.js",
+      "publicPath": "/foo/./js/viewmodels/function.js"
+    },
+    "./js/viewmodels/graph-settings.js": {
+      "name": "./js/viewmodels/graph-settings.js",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/media/build/js/viewmodels/graph-settings.js",
+      "publicPath": "/foo/./js/viewmodels/graph-settings.js"
+    },
+    "./js/viewmodels/map-controls.js": {
+      "name": "./js/viewmodels/map-controls.js",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/media/build/js/viewmodels/map-controls.js",
+      "publicPath": "/foo/./js/viewmodels/map-controls.js"
+    },
+    "./js/viewmodels/map-editor.js": {
+      "name": "./js/viewmodels/map-editor.js",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/media/build/js/viewmodels/map-editor.js",
+      "publicPath": "/foo/./js/viewmodels/map-editor.js"
+    },
+    "./js/viewmodels/map-filter.js": {
+      "name": "./js/viewmodels/map-filter.js",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/media/build/js/viewmodels/map-filter.js",
+      "publicPath": "/foo/./js/viewmodels/map-filter.js"
+    },
+    "./js/viewmodels/map-report.js": {
+      "name": "./js/viewmodels/map-report.js",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/media/build/js/viewmodels/map-report.js",
+      "publicPath": "/foo/./js/viewmodels/map-report.js"
+    },
+    "./js/viewmodels/map.js": {
+      "name": "./js/viewmodels/map.js",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/media/build/js/viewmodels/map.js",
+      "publicPath": "/foo/./js/viewmodels/map.js"
+    },
+    "./js/viewmodels/mobile-survey.js": {
+      "name": "./js/viewmodels/mobile-survey.js",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/media/build/js/viewmodels/mobile-survey.js",
+      "publicPath": "/foo/./js/viewmodels/mobile-survey.js"
+    },
+    "./js/viewmodels/node-value-select.js": {
+      "name": "./js/viewmodels/node-value-select.js",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/media/build/js/viewmodels/node-value-select.js",
+      "publicPath": "/foo/./js/viewmodels/node-value-select.js"
+    },
+    "./js/viewmodels/photo-gallery.js": {
+      "name": "./js/viewmodels/photo-gallery.js",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/media/build/js/viewmodels/photo-gallery.js",
+      "publicPath": "/foo/./js/viewmodels/photo-gallery.js"
+    },
+    "./js/viewmodels/provisional-tile.js": {
+      "name": "./js/viewmodels/provisional-tile.js",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/media/build/js/viewmodels/provisional-tile.js",
+      "publicPath": "/foo/./js/viewmodels/provisional-tile.js"
+    },
+    "./js/viewmodels/remote-domain-widget.js": {
+      "name": "./js/viewmodels/remote-domain-widget.js",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/media/build/js/viewmodels/remote-domain-widget.js",
+      "publicPath": "/foo/./js/viewmodels/remote-domain-widget.js"
+    },
+    "./js/viewmodels/report.js": {
+      "name": "./js/viewmodels/report.js",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/media/build/js/viewmodels/report.js",
+      "publicPath": "/foo/./js/viewmodels/report.js"
+    },
+    "./js/viewmodels/resource-instance-select.js": {
+      "name": "./js/viewmodels/resource-instance-select.js",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/media/build/js/viewmodels/resource-instance-select.js",
+      "publicPath": "/foo/./js/viewmodels/resource-instance-select.js"
+    },
+    "./js/viewmodels/tabbed-report.js": {
+      "name": "./js/viewmodels/tabbed-report.js",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/media/build/js/viewmodels/tabbed-report.js",
+      "publicPath": "/foo/./js/viewmodels/tabbed-report.js"
+    },
+    "./js/viewmodels/tile.js": {
+      "name": "./js/viewmodels/tile.js",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/media/build/js/viewmodels/tile.js",
+      "publicPath": "/foo/./js/viewmodels/tile.js"
+    },
+    "./js/viewmodels/widget.js": {
+      "name": "./js/viewmodels/widget.js",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/media/build/js/viewmodels/widget.js",
+      "publicPath": "/foo/./js/viewmodels/widget.js"
+    },
+    "./js/viewmodels/workflow-step.js": {
+      "name": "./js/viewmodels/workflow-step.js",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/media/build/js/viewmodels/workflow-step.js",
+      "publicPath": "/foo/./js/viewmodels/workflow-step.js"
+    },
+    "./js/viewmodels/workflow.js": {
+      "name": "./js/viewmodels/workflow.js",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/media/build/js/viewmodels/workflow.js",
+      "publicPath": "/foo/./js/viewmodels/workflow.js"
+    },
+    "./js/viewmodels/xy-input.js": {
+      "name": "./js/viewmodels/xy-input.js",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/media/build/js/viewmodels/xy-input.js",
+      "publicPath": "/foo/./js/viewmodels/xy-input.js"
+    },
+    "./js/views/base-manager.js": {
+      "name": "./js/views/base-manager.js",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/media/build/js/views/base-manager.js",
+      "publicPath": "/foo/./js/views/base-manager.js"
+    },
+    "./js/views/components/cards/default.js": {
+      "name": "./js/views/components/cards/default.js",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/media/build/js/views/components/cards/default.js",
+      "publicPath": "/foo/./js/views/components/cards/default.js"
+    },
+    "./js/views/components/cards/file-renderers/imagereader.js": {
+      "name": "./js/views/components/cards/file-renderers/imagereader.js",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/media/build/js/views/components/cards/file-renderers/imagereader.js",
+      "publicPath": "/foo/./js/views/components/cards/file-renderers/imagereader.js"
+    },
+    "./js/views/components/cards/file-renderers/pdfreader.js": {
+      "name": "./js/views/components/cards/file-renderers/pdfreader.js",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/media/build/js/views/components/cards/file-renderers/pdfreader.js",
+      "publicPath": "/foo/./js/views/components/cards/file-renderers/pdfreader.js"
+    },
+    "./js/views/components/cards/file-viewer.js": {
+      "name": "./js/views/components/cards/file-viewer.js",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/media/build/js/views/components/cards/file-viewer.js",
+      "publicPath": "/foo/./js/views/components/cards/file-viewer.js"
+    },
+    "./js/views/components/cards/grouping.js": {
+      "name": "./js/views/components/cards/grouping.js",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/media/build/js/views/components/cards/grouping.js",
+      "publicPath": "/foo/./js/views/components/cards/grouping.js"
+    },
+    "./js/views/components/cards/iiif-card.js": {
+      "name": "./js/views/components/cards/iiif-card.js",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/media/build/js/views/components/cards/iiif-card.js",
+      "publicPath": "/foo/./js/views/components/cards/iiif-card.js"
+    },
+    "./js/views/components/cards/map.js": {
+      "name": "./js/views/components/cards/map.js",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/media/build/js/views/components/cards/map.js",
+      "publicPath": "/foo/./js/views/components/cards/map.js"
+    },
+    "./js/views/components/cards/photo-gallery-card.js": {
+      "name": "./js/views/components/cards/photo-gallery-card.js",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/media/build/js/views/components/cards/photo-gallery-card.js",
+      "publicPath": "/foo/./js/views/components/cards/photo-gallery-card.js"
+    },
+    "./js/views/components/cards/related-resources-map.js": {
+      "name": "./js/views/components/cards/related-resources-map.js",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/media/build/js/views/components/cards/related-resources-map.js",
+      "publicPath": "/foo/./js/views/components/cards/related-resources-map.js"
+    },
+    "./js/views/components/cards/select-feature-layers.js": {
+      "name": "./js/views/components/cards/select-feature-layers.js",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/media/build/js/views/components/cards/select-feature-layers.js",
+      "publicPath": "/foo/./js/views/components/cards/select-feature-layers.js"
+    },
+    "./js/views/components/cards/select-related-feature-layers.js": {
+      "name": "./js/views/components/cards/select-related-feature-layers.js",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/media/build/js/views/components/cards/select-related-feature-layers.js",
+      "publicPath": "/foo/./js/views/components/cards/select-related-feature-layers.js"
+    },
+    "./js/views/components/datatypes/boolean.js": {
+      "name": "./js/views/components/datatypes/boolean.js",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/media/build/js/views/components/datatypes/boolean.js",
+      "publicPath": "/foo/./js/views/components/datatypes/boolean.js"
+    },
+    "./js/views/components/datatypes/concept.js": {
+      "name": "./js/views/components/datatypes/concept.js",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/media/build/js/views/components/datatypes/concept.js",
+      "publicPath": "/foo/./js/views/components/datatypes/concept.js"
+    },
+    "./js/views/components/datatypes/date.js": {
+      "name": "./js/views/components/datatypes/date.js",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/media/build/js/views/components/datatypes/date.js",
+      "publicPath": "/foo/./js/views/components/datatypes/date.js"
+    },
+    "./js/views/components/datatypes/domain-value.js": {
+      "name": "./js/views/components/datatypes/domain-value.js",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/media/build/js/views/components/datatypes/domain-value.js",
+      "publicPath": "/foo/./js/views/components/datatypes/domain-value.js"
+    },
+    "./js/views/components/datatypes/edtf.js": {
+      "name": "./js/views/components/datatypes/edtf.js",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/media/build/js/views/components/datatypes/edtf.js",
+      "publicPath": "/foo/./js/views/components/datatypes/edtf.js"
+    },
+    "./js/views/components/datatypes/file-list.js": {
+      "name": "./js/views/components/datatypes/file-list.js",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/media/build/js/views/components/datatypes/file-list.js",
+      "publicPath": "/foo/./js/views/components/datatypes/file-list.js"
+    },
+    "./js/views/components/datatypes/geojson-feature-collection.js": {
+      "name": "./js/views/components/datatypes/geojson-feature-collection.js",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/media/build/js/views/components/datatypes/geojson-feature-collection.js",
+      "publicPath": "/foo/./js/views/components/datatypes/geojson-feature-collection.js"
+    },
+    "./js/views/components/datatypes/node-value.js": {
+      "name": "./js/views/components/datatypes/node-value.js",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/media/build/js/views/components/datatypes/node-value.js",
+      "publicPath": "/foo/./js/views/components/datatypes/node-value.js"
+    },
+    "./js/views/components/datatypes/number.js": {
+      "name": "./js/views/components/datatypes/number.js",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/media/build/js/views/components/datatypes/number.js",
+      "publicPath": "/foo/./js/views/components/datatypes/number.js"
+    },
+    "./js/views/components/datatypes/resource-instance.js": {
+      "name": "./js/views/components/datatypes/resource-instance.js",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/media/build/js/views/components/datatypes/resource-instance.js",
+      "publicPath": "/foo/./js/views/components/datatypes/resource-instance.js"
+    },
+    "./js/views/components/datatypes/string.js": {
+      "name": "./js/views/components/datatypes/string.js",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/media/build/js/views/components/datatypes/string.js",
+      "publicPath": "/foo/./js/views/components/datatypes/string.js"
+    },
+    "./js/views/components/datatypes/url.js": {
+      "name": "./js/views/components/datatypes/url.js",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/media/build/js/views/components/datatypes/url.js",
+      "publicPath": "/foo/./js/views/components/datatypes/url.js"
+    },
+    "./js/views/components/functions/local-file-storage.js": {
+      "name": "./js/views/components/functions/local-file-storage.js",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/media/build/js/views/components/functions/local-file-storage.js",
+      "publicPath": "/foo/./js/views/components/functions/local-file-storage.js"
+    },
+    "./js/views/components/functions/primary-descriptors.js": {
+      "name": "./js/views/components/functions/primary-descriptors.js",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/media/build/js/views/components/functions/primary-descriptors.js",
+      "publicPath": "/foo/./js/views/components/functions/primary-descriptors.js"
+    },
+    "./js/views/components/geocoders/base-geocoder.js": {
+      "name": "./js/views/components/geocoders/base-geocoder.js",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/media/build/js/views/components/geocoders/base-geocoder.js",
+      "publicPath": "/foo/./js/views/components/geocoders/base-geocoder.js"
+    },
+    "./js/views/components/geocoders/mapbox.js": {
+      "name": "./js/views/components/geocoders/mapbox.js",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/media/build/js/views/components/geocoders/mapbox.js",
+      "publicPath": "/foo/./js/views/components/geocoders/mapbox.js"
+    },
+    "./js/views/components/iiif-annotation.js": {
+      "name": "./js/views/components/iiif-annotation.js",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/media/build/js/views/components/iiif-annotation.js",
+      "publicPath": "/foo/./js/views/components/iiif-annotation.js"
+    },
+    "./js/views/components/iiif-viewer.js": {
+      "name": "./js/views/components/iiif-viewer.js",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/media/build/js/views/components/iiif-viewer.js",
+      "publicPath": "/foo/./js/views/components/iiif-viewer.js"
+    },
+    "./js/views/components/language-switcher.js": {
+      "name": "./js/views/components/language-switcher.js",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/media/build/js/views/components/language-switcher.js",
+      "publicPath": "/foo/./js/views/components/language-switcher.js"
+    },
+    "./js/views/components/map.js": {
+      "name": "./js/views/components/map.js",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/media/build/js/views/components/map.js",
+      "publicPath": "/foo/./js/views/components/map.js"
+    },
+    "./js/views/components/nodegroup-selector.js": {
+      "name": "./js/views/components/nodegroup-selector.js",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/media/build/js/views/components/nodegroup-selector.js",
+      "publicPath": "/foo/./js/views/components/nodegroup-selector.js"
+    },
+    "./js/views/components/notification.js": {
+      "name": "./js/views/components/notification.js",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/media/build/js/views/components/notification.js",
+      "publicPath": "/foo/./js/views/components/notification.js"
+    },
+    "./js/views/components/plugins/manifest-manager.js": {
+      "name": "./js/views/components/plugins/manifest-manager.js",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/media/build/js/views/components/plugins/manifest-manager.js",
+      "publicPath": "/foo/./js/views/components/plugins/manifest-manager.js"
+    },
+    "./js/views/components/plugins/map.js": {
+      "name": "./js/views/components/plugins/map.js",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/media/build/js/views/components/plugins/map.js",
+      "publicPath": "/foo/./js/views/components/plugins/map.js"
+    },
+    "./js/views/components/related-instance-creator.js": {
+      "name": "./js/views/components/related-instance-creator.js",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/media/build/js/views/components/related-instance-creator.js",
+      "publicPath": "/foo/./js/views/components/related-instance-creator.js"
+    },
+    "./js/views/components/related-resources-graph.js": {
+      "name": "./js/views/components/related-resources-graph.js",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/media/build/js/views/components/related-resources-graph.js",
+      "publicPath": "/foo/./js/views/components/related-resources-graph.js"
+    },
+    "./js/views/components/resource-report-abstract.js": {
+      "name": "./js/views/components/resource-report-abstract.js",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/media/build/js/views/components/resource-report-abstract.js",
+      "publicPath": "/foo/./js/views/components/resource-report-abstract.js"
+    },
+    "./js/views/components/search/advanced-search.js": {
+      "name": "./js/views/components/search/advanced-search.js",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/media/build/js/views/components/search/advanced-search.js",
+      "publicPath": "/foo/./js/views/components/search/advanced-search.js"
+    },
+    "./js/views/components/search/base-filter.js": {
+      "name": "./js/views/components/search/base-filter.js",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/media/build/js/views/components/search/base-filter.js",
+      "publicPath": "/foo/./js/views/components/search/base-filter.js"
+    },
+    "./js/views/components/search/map-filter.js": {
+      "name": "./js/views/components/search/map-filter.js",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/media/build/js/views/components/search/map-filter.js",
+      "publicPath": "/foo/./js/views/components/search/map-filter.js"
+    },
+    "./js/views/components/search/paging-filter.js": {
+      "name": "./js/views/components/search/paging-filter.js",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/media/build/js/views/components/search/paging-filter.js",
+      "publicPath": "/foo/./js/views/components/search/paging-filter.js"
+    },
+    "./js/views/components/search/provisional-filter.js": {
+      "name": "./js/views/components/search/provisional-filter.js",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/media/build/js/views/components/search/provisional-filter.js",
+      "publicPath": "/foo/./js/views/components/search/provisional-filter.js"
+    },
+    "./js/views/components/search/related-resources-filter.js": {
+      "name": "./js/views/components/search/related-resources-filter.js",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/media/build/js/views/components/search/related-resources-filter.js",
+      "publicPath": "/foo/./js/views/components/search/related-resources-filter.js"
+    },
+    "./js/views/components/search/resource-type-filter.js": {
+      "name": "./js/views/components/search/resource-type-filter.js",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/media/build/js/views/components/search/resource-type-filter.js",
+      "publicPath": "/foo/./js/views/components/search/resource-type-filter.js"
+    },
+    "./js/views/components/search/saved-searches.js": {
+      "name": "./js/views/components/search/saved-searches.js",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/media/build/js/views/components/search/saved-searches.js",
+      "publicPath": "/foo/./js/views/components/search/saved-searches.js"
+    },
+    "./js/views/components/search/search-export.js": {
+      "name": "./js/views/components/search/search-export.js",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/media/build/js/views/components/search/search-export.js",
+      "publicPath": "/foo/./js/views/components/search/search-export.js"
+    },
+    "./js/views/components/search/search-result-details.js": {
+      "name": "./js/views/components/search/search-result-details.js",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/media/build/js/views/components/search/search-result-details.js",
+      "publicPath": "/foo/./js/views/components/search/search-result-details.js"
+    },
+    "./js/views/components/search/search-results.js": {
+      "name": "./js/views/components/search/search-results.js",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/media/build/js/views/components/search/search-results.js",
+      "publicPath": "/foo/./js/views/components/search/search-results.js"
+    },
+    "./js/views/components/search/sort-results.js": {
+      "name": "./js/views/components/search/sort-results.js",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/media/build/js/views/components/search/sort-results.js",
+      "publicPath": "/foo/./js/views/components/search/sort-results.js"
+    },
+    "./js/views/components/search/term-filter.js": {
+      "name": "./js/views/components/search/term-filter.js",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/media/build/js/views/components/search/term-filter.js",
+      "publicPath": "/foo/./js/views/components/search/term-filter.js"
+    },
+    "./js/views/components/search/time-filter.js": {
+      "name": "./js/views/components/search/time-filter.js",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/media/build/js/views/components/search/time-filter.js",
+      "publicPath": "/foo/./js/views/components/search/time-filter.js"
+    },
+    "./js/views/components/simple-switch.js": {
+      "name": "./js/views/components/simple-switch.js",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/media/build/js/views/components/simple-switch.js",
+      "publicPath": "/foo/./js/views/components/simple-switch.js"
+    },
+    "./js/views/components/widgets/concept-checkbox.js": {
+      "name": "./js/views/components/widgets/concept-checkbox.js",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/media/build/js/views/components/widgets/concept-checkbox.js",
+      "publicPath": "/foo/./js/views/components/widgets/concept-checkbox.js"
+    },
+    "./js/views/components/widgets/concept-multiselect.js": {
+      "name": "./js/views/components/widgets/concept-multiselect.js",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/media/build/js/views/components/widgets/concept-multiselect.js",
+      "publicPath": "/foo/./js/views/components/widgets/concept-multiselect.js"
+    },
+    "./js/views/components/widgets/concept-radio.js": {
+      "name": "./js/views/components/widgets/concept-radio.js",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/media/build/js/views/components/widgets/concept-radio.js",
+      "publicPath": "/foo/./js/views/components/widgets/concept-radio.js"
+    },
+    "./js/views/components/widgets/concept-select.js": {
+      "name": "./js/views/components/widgets/concept-select.js",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/media/build/js/views/components/widgets/concept-select.js",
+      "publicPath": "/foo/./js/views/components/widgets/concept-select.js"
+    },
+    "./js/views/components/widgets/datepicker.js": {
+      "name": "./js/views/components/widgets/datepicker.js",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/media/build/js/views/components/widgets/datepicker.js",
+      "publicPath": "/foo/./js/views/components/widgets/datepicker.js"
+    },
+    "./js/views/components/widgets/domain-checkbox.js": {
+      "name": "./js/views/components/widgets/domain-checkbox.js",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/media/build/js/views/components/widgets/domain-checkbox.js",
+      "publicPath": "/foo/./js/views/components/widgets/domain-checkbox.js"
+    },
+    "./js/views/components/widgets/domain-multiselect.js": {
+      "name": "./js/views/components/widgets/domain-multiselect.js",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/media/build/js/views/components/widgets/domain-multiselect.js",
+      "publicPath": "/foo/./js/views/components/widgets/domain-multiselect.js"
+    },
+    "./js/views/components/widgets/domain-radio.js": {
+      "name": "./js/views/components/widgets/domain-radio.js",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/media/build/js/views/components/widgets/domain-radio.js",
+      "publicPath": "/foo/./js/views/components/widgets/domain-radio.js"
+    },
+    "./js/views/components/widgets/domain-select.js": {
+      "name": "./js/views/components/widgets/domain-select.js",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/media/build/js/views/components/widgets/domain-select.js",
+      "publicPath": "/foo/./js/views/components/widgets/domain-select.js"
+    },
+    "./js/views/components/widgets/edtf.js": {
+      "name": "./js/views/components/widgets/edtf.js",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/media/build/js/views/components/widgets/edtf.js",
+      "publicPath": "/foo/./js/views/components/widgets/edtf.js"
+    },
+    "./js/views/components/widgets/file.js": {
+      "name": "./js/views/components/widgets/file.js",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/media/build/js/views/components/widgets/file.js",
+      "publicPath": "/foo/./js/views/components/widgets/file.js"
+    },
+    "./js/views/components/widgets/iiif.js": {
+      "name": "./js/views/components/widgets/iiif.js",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/media/build/js/views/components/widgets/iiif.js",
+      "publicPath": "/foo/./js/views/components/widgets/iiif.js"
+    },
+    "./js/views/components/widgets/map/bin-feature-collection.js": {
+      "name": "./js/views/components/widgets/map/bin-feature-collection.js",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/media/build/js/views/components/widgets/map/bin-feature-collection.js",
+      "publicPath": "/foo/./js/views/components/widgets/map/bin-feature-collection.js"
+    },
+    "./js/views/components/widgets/map/map-styles.js": {
+      "name": "./js/views/components/widgets/map/map-styles.js",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/media/build/js/views/components/widgets/map/map-styles.js",
+      "publicPath": "/foo/./js/views/components/widgets/map/map-styles.js"
+    },
+    "./js/views/components/widgets/map.js": {
+      "name": "./js/views/components/widgets/map.js",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/media/build/js/views/components/widgets/map.js",
+      "publicPath": "/foo/./js/views/components/widgets/map.js"
+    },
+    "./js/views/components/widgets/node-value-select.js": {
+      "name": "./js/views/components/widgets/node-value-select.js",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/media/build/js/views/components/widgets/node-value-select.js",
+      "publicPath": "/foo/./js/views/components/widgets/node-value-select.js"
+    },
+    "./js/views/components/widgets/number.js": {
+      "name": "./js/views/components/widgets/number.js",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/media/build/js/views/components/widgets/number.js",
+      "publicPath": "/foo/./js/views/components/widgets/number.js"
+    },
+    "./js/views/components/widgets/radio-boolean.js": {
+      "name": "./js/views/components/widgets/radio-boolean.js",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/media/build/js/views/components/widgets/radio-boolean.js",
+      "publicPath": "/foo/./js/views/components/widgets/radio-boolean.js"
+    },
+    "./js/views/components/widgets/resource-instance-multiselect.js": {
+      "name": "./js/views/components/widgets/resource-instance-multiselect.js",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/media/build/js/views/components/widgets/resource-instance-multiselect.js",
+      "publicPath": "/foo/./js/views/components/widgets/resource-instance-multiselect.js"
+    },
+    "./js/views/components/widgets/resource-instance-select.js": {
+      "name": "./js/views/components/widgets/resource-instance-select.js",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/media/build/js/views/components/widgets/resource-instance-select.js",
+      "publicPath": "/foo/./js/views/components/widgets/resource-instance-select.js"
+    },
+    "./js/views/components/widgets/rich-text.js": {
+      "name": "./js/views/components/widgets/rich-text.js",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/media/build/js/views/components/widgets/rich-text.js",
+      "publicPath": "/foo/./js/views/components/widgets/rich-text.js"
+    },
+    "./js/views/components/widgets/switch.js": {
+      "name": "./js/views/components/widgets/switch.js",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/media/build/js/views/components/widgets/switch.js",
+      "publicPath": "/foo/./js/views/components/widgets/switch.js"
+    },
+    "./js/views/components/widgets/text.js": {
+      "name": "./js/views/components/widgets/text.js",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/media/build/js/views/components/widgets/text.js",
+      "publicPath": "/foo/./js/views/components/widgets/text.js"
+    },
+    "./js/views/components/widgets/urldatatype.js": {
+      "name": "./js/views/components/widgets/urldatatype.js",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/media/build/js/views/components/widgets/urldatatype.js",
+      "publicPath": "/foo/./js/views/components/widgets/urldatatype.js"
+    },
+    "./js/views/components/workbench.js": {
+      "name": "./js/views/components/workbench.js",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/media/build/js/views/components/workbench.js",
+      "publicPath": "/foo/./js/views/components/workbench.js"
+    },
+    "./js/views/components/workflows/final-step.js": {
+      "name": "./js/views/components/workflows/final-step.js",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/media/build/js/views/components/workflows/final-step.js",
+      "publicPath": "/foo/./js/views/components/workflows/final-step.js"
+    },
+    "./js/views/components/workflows/new-multi-tile-step.js": {
+      "name": "./js/views/components/workflows/new-multi-tile-step.js",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/media/build/js/views/components/workflows/new-multi-tile-step.js",
+      "publicPath": "/foo/./js/views/components/workflows/new-multi-tile-step.js"
+    },
+    "./js/views/components/workflows/new-tile-step.js": {
+      "name": "./js/views/components/workflows/new-tile-step.js",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/media/build/js/views/components/workflows/new-tile-step.js",
+      "publicPath": "/foo/./js/views/components/workflows/new-tile-step.js"
+    },
+    "./js/views/components/workflows/workflow-component-abstract.js": {
+      "name": "./js/views/components/workflows/workflow-component-abstract.js",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/media/build/js/views/components/workflows/workflow-component-abstract.js",
+      "publicPath": "/foo/./js/views/components/workflows/workflow-component-abstract.js"
+    },
+    "./js/views/concept-search.js": {
+      "name": "./js/views/concept-search.js",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/media/build/js/views/concept-search.js",
+      "publicPath": "/foo/./js/views/concept-search.js"
+    },
+    "./js/views/edit-history.js": {
+      "name": "./js/views/edit-history.js",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/media/build/js/views/edit-history.js",
+      "publicPath": "/foo/./js/views/edit-history.js"
+    },
+    "./js/views/form.js": {
+      "name": "./js/views/form.js",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/media/build/js/views/form.js",
+      "publicPath": "/foo/./js/views/form.js"
+    },
+    "./js/views/graph/card-configuration/card-components-tree.js": {
+      "name": "./js/views/graph/card-configuration/card-components-tree.js",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/media/build/js/views/graph/card-configuration/card-components-tree.js",
+      "publicPath": "/foo/./js/views/graph/card-configuration/card-components-tree.js"
+    },
+    "./js/views/graph/card-configuration/card-form-preview.js": {
+      "name": "./js/views/graph/card-configuration/card-form-preview.js",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/media/build/js/views/graph/card-configuration/card-form-preview.js",
+      "publicPath": "/foo/./js/views/graph/card-configuration/card-form-preview.js"
+    },
+    "./js/views/graph/function-manager/applied-function-list.js": {
+      "name": "./js/views/graph/function-manager/applied-function-list.js",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/media/build/js/views/graph/function-manager/applied-function-list.js",
+      "publicPath": "/foo/./js/views/graph/function-manager/applied-function-list.js"
+    },
+    "./js/views/graph/function-manager/function-list.js": {
+      "name": "./js/views/graph/function-manager/function-list.js",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/media/build/js/views/graph/function-manager/function-list.js",
+      "publicPath": "/foo/./js/views/graph/function-manager/function-list.js"
+    },
+    "./js/views/graph/function-manager.js": {
+      "name": "./js/views/graph/function-manager.js",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/media/build/js/views/graph/function-manager.js",
+      "publicPath": "/foo/./js/views/graph/function-manager.js"
+    },
+    "./js/views/graph/graph-designer/card-tree.js": {
+      "name": "./js/views/graph/graph-designer/card-tree.js",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/media/build/js/views/graph/graph-designer/card-tree.js",
+      "publicPath": "/foo/./js/views/graph/graph-designer/card-tree.js"
+    },
+    "./js/views/graph/graph-designer/graph-tree.js": {
+      "name": "./js/views/graph/graph-designer/graph-tree.js",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/media/build/js/views/graph/graph-designer/graph-tree.js",
+      "publicPath": "/foo/./js/views/graph/graph-designer/graph-tree.js"
+    },
+    "./js/views/graph/graph-designer/node-form.js": {
+      "name": "./js/views/graph/graph-designer/node-form.js",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/media/build/js/views/graph/graph-designer/node-form.js",
+      "publicPath": "/foo/./js/views/graph/graph-designer/node-form.js"
+    },
+    "./js/views/graph/graph-manager/branch-list.js": {
+      "name": "./js/views/graph/graph-manager/branch-list.js",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/media/build/js/views/graph/graph-manager/branch-list.js",
+      "publicPath": "/foo/./js/views/graph/graph-manager/branch-list.js"
+    },
+    "./js/views/graph/graph-manager/graph-base.js": {
+      "name": "./js/views/graph/graph-manager/graph-base.js",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/media/build/js/views/graph/graph-manager/graph-base.js",
+      "publicPath": "/foo/./js/views/graph/graph-manager/graph-base.js"
+    },
+    "./js/views/graph/graph-page-view.js": {
+      "name": "./js/views/graph/graph-page-view.js",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/media/build/js/views/graph/graph-page-view.js",
+      "publicPath": "/foo/./js/views/graph/graph-page-view.js"
+    },
+    "./js/views/graph/graph-settings.js": {
+      "name": "./js/views/graph/graph-settings.js",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/media/build/js/views/graph/graph-settings.js",
+      "publicPath": "/foo/./js/views/graph/graph-settings.js"
+    },
+    "./js/views/graph/permission-designer.js": {
+      "name": "./js/views/graph/permission-designer.js",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/media/build/js/views/graph/permission-designer.js",
+      "publicPath": "/foo/./js/views/graph/permission-designer.js"
+    },
+    "./js/views/graph/permission-manager/identity-list.js": {
+      "name": "./js/views/graph/permission-manager/identity-list.js",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/media/build/js/views/graph/permission-manager/identity-list.js",
+      "publicPath": "/foo/./js/views/graph/permission-manager/identity-list.js"
+    },
+    "./js/views/graph/permission-manager/permission-settings-form.js": {
+      "name": "./js/views/graph/permission-manager/permission-settings-form.js",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/media/build/js/views/graph/permission-manager/permission-settings-form.js",
+      "publicPath": "/foo/./js/views/graph/permission-manager/permission-settings-form.js"
+    },
+    "./js/views/graph-designer.js": {
+      "name": "./js/views/graph-designer.js",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/media/build/js/views/graph-designer.js",
+      "publicPath": "/foo/./js/views/graph-designer.js"
+    },
+    "./js/views/graph.js": {
+      "name": "./js/views/graph.js",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/media/build/js/views/graph.js",
+      "publicPath": "/foo/./js/views/graph.js"
+    },
+    "./js/views/list.js": {
+      "name": "./js/views/list.js",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/media/build/js/views/list.js",
+      "publicPath": "/foo/./js/views/list.js"
+    },
+    "./js/views/map-layer-manager.js": {
+      "name": "./js/views/map-layer-manager.js",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/media/build/js/views/map-layer-manager.js",
+      "publicPath": "/foo/./js/views/map-layer-manager.js"
+    },
+    "./js/views/mobile-survey-designer.js": {
+      "name": "./js/views/mobile-survey-designer.js",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/media/build/js/views/mobile-survey-designer.js",
+      "publicPath": "/foo/./js/views/mobile-survey-designer.js"
+    },
+    "./js/views/mobile-survey-manager/identity-list.js": {
+      "name": "./js/views/mobile-survey-manager/identity-list.js",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/media/build/js/views/mobile-survey-manager/identity-list.js",
+      "publicPath": "/foo/./js/views/mobile-survey-manager/identity-list.js"
+    },
+    "./js/views/mobile-survey-manager/mobile-survey-tree.js": {
+      "name": "./js/views/mobile-survey-manager/mobile-survey-tree.js",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/media/build/js/views/mobile-survey-manager/mobile-survey-tree.js",
+      "publicPath": "/foo/./js/views/mobile-survey-manager/mobile-survey-tree.js"
+    },
+    "./js/views/mobile-survey-manager.js": {
+      "name": "./js/views/mobile-survey-manager.js",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/media/build/js/views/mobile-survey-manager.js",
+      "publicPath": "/foo/./js/views/mobile-survey-manager.js"
+    },
+    "./js/views/notifications-list.js": {
+      "name": "./js/views/notifications-list.js",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/media/build/js/views/notifications-list.js",
+      "publicPath": "/foo/./js/views/notifications-list.js"
+    },
+    "./js/views/page-view.js": {
+      "name": "./js/views/page-view.js",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/media/build/js/views/page-view.js",
+      "publicPath": "/foo/./js/views/page-view.js"
+    },
+    "./js/views/plugin.js": {
+      "name": "./js/views/plugin.js",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/media/build/js/views/plugin.js",
+      "publicPath": "/foo/./js/views/plugin.js"
+    },
+    "./js/views/provisional-history-list.js": {
+      "name": "./js/views/provisional-history-list.js",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/media/build/js/views/provisional-history-list.js",
+      "publicPath": "/foo/./js/views/provisional-history-list.js"
+    },
+    "./js/views/rdm/concept-report.js": {
+      "name": "./js/views/rdm/concept-report.js",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/media/build/js/views/rdm/concept-report.js",
+      "publicPath": "/foo/./js/views/rdm/concept-report.js"
+    },
+    "./js/views/rdm/concept-tree.js": {
+      "name": "./js/views/rdm/concept-tree.js",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/media/build/js/views/rdm/concept-tree.js",
+      "publicPath": "/foo/./js/views/rdm/concept-tree.js"
+    },
+    "./js/views/rdm/modals/add-child-form.js": {
+      "name": "./js/views/rdm/modals/add-child-form.js",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/media/build/js/views/rdm/modals/add-child-form.js",
+      "publicPath": "/foo/./js/views/rdm/modals/add-child-form.js"
+    },
+    "./js/views/rdm/modals/add-collection-form.js": {
+      "name": "./js/views/rdm/modals/add-collection-form.js",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/media/build/js/views/rdm/modals/add-collection-form.js",
+      "publicPath": "/foo/./js/views/rdm/modals/add-collection-form.js"
+    },
+    "./js/views/rdm/modals/add-image-form.js": {
+      "name": "./js/views/rdm/modals/add-image-form.js",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/media/build/js/views/rdm/modals/add-image-form.js",
+      "publicPath": "/foo/./js/views/rdm/modals/add-image-form.js"
+    },
+    "./js/views/rdm/modals/add-scheme-form.js": {
+      "name": "./js/views/rdm/modals/add-scheme-form.js",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/media/build/js/views/rdm/modals/add-scheme-form.js",
+      "publicPath": "/foo/./js/views/rdm/modals/add-scheme-form.js"
+    },
+    "./js/views/rdm/modals/delete-collection-form.js": {
+      "name": "./js/views/rdm/modals/delete-collection-form.js",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/media/build/js/views/rdm/modals/delete-collection-form.js",
+      "publicPath": "/foo/./js/views/rdm/modals/delete-collection-form.js"
+    },
+    "./js/views/rdm/modals/delete-scheme-form.js": {
+      "name": "./js/views/rdm/modals/delete-scheme-form.js",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/media/build/js/views/rdm/modals/delete-scheme-form.js",
+      "publicPath": "/foo/./js/views/rdm/modals/delete-scheme-form.js"
+    },
+    "./js/views/rdm/modals/export-scheme-form.js": {
+      "name": "./js/views/rdm/modals/export-scheme-form.js",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/media/build/js/views/rdm/modals/export-scheme-form.js",
+      "publicPath": "/foo/./js/views/rdm/modals/export-scheme-form.js"
+    },
+    "./js/views/rdm/modals/import-concept-form.js": {
+      "name": "./js/views/rdm/modals/import-concept-form.js",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/media/build/js/views/rdm/modals/import-concept-form.js",
+      "publicPath": "/foo/./js/views/rdm/modals/import-concept-form.js"
+    },
+    "./js/views/rdm/modals/import-scheme-form.js": {
+      "name": "./js/views/rdm/modals/import-scheme-form.js",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/media/build/js/views/rdm/modals/import-scheme-form.js",
+      "publicPath": "/foo/./js/views/rdm/modals/import-scheme-form.js"
+    },
+    "./js/views/rdm/modals/manage-parent-form.js": {
+      "name": "./js/views/rdm/modals/manage-parent-form.js",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/media/build/js/views/rdm/modals/manage-parent-form.js",
+      "publicPath": "/foo/./js/views/rdm/modals/manage-parent-form.js"
+    },
+    "./js/views/rdm/modals/related-concept-form.js": {
+      "name": "./js/views/rdm/modals/related-concept-form.js",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/media/build/js/views/rdm/modals/related-concept-form.js",
+      "publicPath": "/foo/./js/views/rdm/modals/related-concept-form.js"
+    },
+    "./js/views/rdm/modals/related-member-form.js": {
+      "name": "./js/views/rdm/modals/related-member-form.js",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/media/build/js/views/rdm/modals/related-member-form.js",
+      "publicPath": "/foo/./js/views/rdm/modals/related-member-form.js"
+    },
+    "./js/views/rdm/modals/value-form.js": {
+      "name": "./js/views/rdm/modals/value-form.js",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/media/build/js/views/rdm/modals/value-form.js",
+      "publicPath": "/foo/./js/views/rdm/modals/value-form.js"
+    },
+    "./js/views/resource/edit-log.js": {
+      "name": "./js/views/resource/edit-log.js",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/media/build/js/views/resource/edit-log.js",
+      "publicPath": "/foo/./js/views/resource/edit-log.js"
+    },
+    "./js/views/resource/editor.js": {
+      "name": "./js/views/resource/editor.js",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/media/build/js/views/resource/editor.js",
+      "publicPath": "/foo/./js/views/resource/editor.js"
+    },
+    "./js/views/resource/permissions-manager.js": {
+      "name": "./js/views/resource/permissions-manager.js",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/media/build/js/views/resource/permissions-manager.js",
+      "publicPath": "/foo/./js/views/resource/permissions-manager.js"
+    },
+    "./js/views/resource/related-resources-manager.js": {
+      "name": "./js/views/resource/related-resources-manager.js",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/media/build/js/views/resource/related-resources-manager.js",
+      "publicPath": "/foo/./js/views/resource/related-resources-manager.js"
+    },
+    "./js/views/resource/related-resources-node-list.js": {
+      "name": "./js/views/resource/related-resources-node-list.js",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/media/build/js/views/resource/related-resources-node-list.js",
+      "publicPath": "/foo/./js/views/resource/related-resources-node-list.js"
+    },
+    "./js/views/resource/report.js": {
+      "name": "./js/views/resource/report.js",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/media/build/js/views/resource/report.js",
+      "publicPath": "/foo/./js/views/resource/report.js"
+    },
+    "./js/views/resource.js": {
+      "name": "./js/views/resource.js",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/media/build/js/views/resource.js",
+      "publicPath": "/foo/./js/views/resource.js"
+    },
+    "./js/views/search.js": {
+      "name": "./js/views/search.js",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/media/build/js/views/search.js",
+      "publicPath": "/foo/./js/views/search.js"
+    },
+    "./js/views/simple-search.js": {
+      "name": "./js/views/simple-search.js",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/media/build/js/views/simple-search.js",
+      "publicPath": "/foo/./js/views/simple-search.js"
+    },
+    "./js/views/tree-view.js": {
+      "name": "./js/views/tree-view.js",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/media/build/js/views/tree-view.js",
+      "publicPath": "/foo/./js/views/tree-view.js"
+    },
+    "./js/views/user-profile-manager.js": {
+      "name": "./js/views/user-profile-manager.js",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/media/build/js/views/user-profile-manager.js",
+      "publicPath": "/foo/./js/views/user-profile-manager.js"
+    },
+    "js/js_views_form_js.chunk.js": {
+      "name": "js/js_views_form_js.chunk.js",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/media/build/js/js_views_form_js.chunk.js",
+      "publicPath": "/foo/js/js_views_form_js.chunk.js"
+    },
+    "js/js_models_concept_js-js_viewmodels_alert-json_js-js_views_base-manager_js-js_views_concept-se-aead84.chunk.js": {
+      "name": "js/js_models_concept_js-js_viewmodels_alert-json_js-js_views_base-manager_js-js_views_concept-se-aead84.chunk.js",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/media/build/js/js_models_concept_js-js_viewmodels_alert-json_js-js_views_base-manager_js-js_views_concept-se-aead84.chunk.js",
+      "publicPath": "/foo/js/js_models_concept_js-js_viewmodels_alert-json_js-js_views_base-manager_js-js_views_concept-se-aead84.chunk.js"
+    },
+    "js/js_views_components_related-instance-creator_js.chunk.js": {
+      "name": "js/js_views_components_related-instance-creator_js.chunk.js",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/media/build/js/js_views_components_related-instance-creator_js.chunk.js",
+      "publicPath": "/foo/js/js_views_components_related-instance-creator_js.chunk.js"
+    },
+    "js/js_bindings_datatable_js-js_views_base-manager_js.chunk.js": {
+      "name": "js/js_bindings_datatable_js-js_views_base-manager_js.chunk.js",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/media/build/js/js_bindings_datatable_js-js_views_base-manager_js.chunk.js",
+      "publicPath": "/foo/js/js_bindings_datatable_js-js_views_base-manager_js.chunk.js"
+    },
+    "js/js_models_function-x-graph_js-js_models_function_js-js_viewmodels_alert-json_js-js_views_grap-1c2fb6.chunk.js": {
+      "name": "js/js_models_function-x-graph_js-js_models_function_js-js_viewmodels_alert-json_js-js_views_grap-1c2fb6.chunk.js",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/media/build/js/js_models_function-x-graph_js-js_models_function_js-js_viewmodels_alert-json_js-js_views_grap-1c2fb6.chunk.js",
+      "publicPath": "/foo/js/js_models_function-x-graph_js-js_models_function_js-js_viewmodels_alert-json_js-js_views_grap-1c2fb6.chunk.js"
+    },
+    "js/js_views_graph_graph-page-view_js-templates_views_graph_graph-settings_htm.chunk.js": {
+      "name": "js/js_views_graph_graph-page-view_js-templates_views_graph_graph-settings_htm.chunk.js",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/media/build/js/js_views_graph_graph-page-view_js-templates_views_graph_graph-settings_htm.chunk.js",
+      "publicPath": "/foo/js/js_views_graph_graph-page-view_js-templates_views_graph_graph-settings_htm.chunk.js"
+    },
+    "js/js_bindings_chosen_js-js_bindings_hover_js-js_viewmodels_alert-json_js-js_viewmodels_alert_js-864057.chunk.js": {
+      "name": "js/js_bindings_chosen_js-js_bindings_hover_js-js_viewmodels_alert-json_js-js_viewmodels_alert_js-864057.chunk.js",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/media/build/js/js_bindings_chosen_js-js_bindings_hover_js-js_viewmodels_alert-json_js-js_viewmodels_alert_js-864057.chunk.js",
+      "publicPath": "/foo/js/js_bindings_chosen_js-js_bindings_hover_js-js_viewmodels_alert-json_js-js_viewmodels_alert_js-864057.chunk.js"
+    },
+    "js/js_bindings_chosen_js-js_views_base-manager_js-node_modules_jquery-migrate_dist_jquery-migrat-7acbbd.chunk.js": {
+      "name": "js/js_bindings_chosen_js-js_views_base-manager_js-node_modules_jquery-migrate_dist_jquery-migrat-7acbbd.chunk.js",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/media/build/js/js_bindings_chosen_js-js_views_base-manager_js-node_modules_jquery-migrate_dist_jquery-migrat-7acbbd.chunk.js",
+      "publicPath": "/foo/js/js_bindings_chosen_js-js_views_base-manager_js-node_modules_jquery-migrate_dist_jquery-migrat-7acbbd.chunk.js"
+    },
+    "js/js_views_base-manager_js-js_views_components_resource-report-abstract_js-node_modules_jquery--d0350a.chunk.js": {
+      "name": "js/js_views_base-manager_js-js_views_components_resource-report-abstract_js-node_modules_jquery--d0350a.chunk.js",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/media/build/js/js_views_base-manager_js-js_views_components_resource-report-abstract_js-node_modules_jquery--d0350a.chunk.js",
+      "publicPath": "/foo/js/js_views_base-manager_js-js_views_components_resource-report-abstract_js-node_modules_jquery--d0350a.chunk.js"
+    },
+    "js/js_bindings_chosen_js-js_views_base-manager_js-node_modules_jquery-migrate_dist_jquery-migrat-1c10aa.chunk.js": {
+      "name": "js/js_bindings_chosen_js-js_views_base-manager_js-node_modules_jquery-migrate_dist_jquery-migrat-1c10aa.chunk.js",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/media/build/js/js_bindings_chosen_js-js_views_base-manager_js-node_modules_jquery-migrate_dist_jquery-migrat-1c10aa.chunk.js",
+      "publicPath": "/foo/js/js_bindings_chosen_js-js_views_base-manager_js-node_modules_jquery-migrate_dist_jquery-migrat-1c10aa.chunk.js"
+    },
+    "js/npm.knockout.js": {
+      "name": "js/npm.knockout.js",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/media/build/js/npm.knockout.js",
+      "publicPath": "/foo/js/npm.knockout.js"
+    },
+    "js/npm.core-js.js": {
+      "name": "js/npm.core-js.js",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/media/build/js/npm.core-js.js",
+      "publicPath": "/foo/js/npm.core-js.js"
+    },
+    "js/npm.underscore.js": {
+      "name": "js/npm.underscore.js",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/media/build/js/npm.underscore.js",
+      "publicPath": "/foo/js/npm.underscore.js"
+    },
+    "js/npm.knockout-mapping.js": {
+      "name": "js/npm.knockout-mapping.js",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/media/build/js/npm.knockout-mapping.js",
+      "publicPath": "/foo/js/npm.knockout-mapping.js"
+    },
+    "js/npm.backbone.js": {
+      "name": "js/npm.backbone.js",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/media/build/js/npm.backbone.js",
+      "publicPath": "/foo/js/npm.backbone.js"
+    },
+    "js/npm.jqueryui.js": {
+      "name": "js/npm.jqueryui.js",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/media/build/js/npm.jqueryui.js",
+      "publicPath": "/foo/js/npm.jqueryui.js"
+    },
+    "js/npm.regenerator-runtime.js": {
+      "name": "js/npm.regenerator-runtime.js",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/media/build/js/npm.regenerator-runtime.js",
+      "publicPath": "/foo/js/npm.regenerator-runtime.js"
+    },
+    "js/npm.moment.js": {
+      "name": "js/npm.moment.js",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/media/build/js/npm.moment.js",
+      "publicPath": "/foo/js/npm.moment.js"
+    },
+    "js/npm.mapbox.js": {
+      "name": "js/npm.mapbox.js",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/media/build/js/npm.mapbox.js",
+      "publicPath": "/foo/js/npm.mapbox.js"
+    },
+    "js/npm.select2.js": {
+      "name": "js/npm.select2.js",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/media/build/js/npm.select2.js",
+      "publicPath": "/foo/js/npm.select2.js"
+    },
+    "js/npm.dropzone.js": {
+      "name": "js/npm.dropzone.js",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/media/build/js/npm.dropzone.js",
+      "publicPath": "/foo/js/npm.dropzone.js"
+    },
+    "js/npm.codemirror.js": {
+      "name": "js/npm.codemirror.js",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/media/build/js/npm.codemirror.js",
+      "publicPath": "/foo/js/npm.codemirror.js"
+    },
+    "js/npm.bootstrap.js": {
+      "name": "js/npm.bootstrap.js",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/media/build/js/npm.bootstrap.js",
+      "publicPath": "/foo/js/npm.bootstrap.js"
+    },
+    "js/npm.mapbox-gl.js": {
+      "name": "js/npm.mapbox-gl.js",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/media/build/js/npm.mapbox-gl.js",
+      "publicPath": "/foo/js/npm.mapbox-gl.js"
+    },
+    "js/npm.turf.js": {
+      "name": "js/npm.turf.js",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/media/build/js/npm.turf.js",
+      "publicPath": "/foo/js/npm.turf.js"
+    },
+    "js/npm.leaflet.js": {
+      "name": "js/npm.leaflet.js",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/media/build/js/npm.leaflet.js",
+      "publicPath": "/foo/js/npm.leaflet.js"
+    },
+    "js/npm.d3-geo.js": {
+      "name": "js/npm.d3-geo.js",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/media/build/js/npm.d3-geo.js",
+      "publicPath": "/foo/js/npm.d3-geo.js"
+    },
+    "js/npm.d3-shape.js": {
+      "name": "js/npm.d3-shape.js",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/media/build/js/npm.d3-shape.js",
+      "publicPath": "/foo/js/npm.d3-shape.js"
+    },
+    "js/npm.d3-hierarchy.js": {
+      "name": "js/npm.d3-hierarchy.js",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/media/build/js/npm.d3-hierarchy.js",
+      "publicPath": "/foo/js/npm.d3-hierarchy.js"
+    },
+    "js/npm.chosen-js.js": {
+      "name": "js/npm.chosen-js.js",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/media/build/js/npm.chosen-js.js",
+      "publicPath": "/foo/js/npm.chosen-js.js"
+    },
+    "js/npm.d3-scale.js": {
+      "name": "js/npm.d3-scale.js",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/media/build/js/npm.d3-scale.js",
+      "publicPath": "/foo/js/npm.d3-scale.js"
+    },
+    "js/npm.d3-array.js": {
+      "name": "js/npm.d3-array.js",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/media/build/js/npm.d3-array.js",
+      "publicPath": "/foo/js/npm.d3-array.js"
+    },
+    "js/npm.d3-selection.js": {
+      "name": "js/npm.d3-selection.js",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/media/build/js/npm.d3-selection.js",
+      "publicPath": "/foo/js/npm.d3-selection.js"
+    },
+    "js/npm.d3-transition.js": {
+      "name": "js/npm.d3-transition.js",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/media/build/js/npm.d3-transition.js",
+      "publicPath": "/foo/js/npm.d3-transition.js"
+    },
+    "js/npm.d3-scale-chromatic.js": {
+      "name": "js/npm.d3-scale-chromatic.js",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/media/build/js/npm.d3-scale-chromatic.js",
+      "publicPath": "/foo/js/npm.d3-scale-chromatic.js"
+    },
+    "js/npm.d3-delaunay.js": {
+      "name": "js/npm.d3-delaunay.js",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/media/build/js/npm.d3-delaunay.js",
+      "publicPath": "/foo/js/npm.d3-delaunay.js"
+    },
+    "js/npm.d3-time-format.js": {
+      "name": "js/npm.d3-time-format.js",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/media/build/js/npm.d3-time-format.js",
+      "publicPath": "/foo/js/npm.d3-time-format.js"
+    },
+    "js/npm.d3-brush.js": {
+      "name": "js/npm.d3-brush.js",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/media/build/js/npm.d3-brush.js",
+      "publicPath": "/foo/js/npm.d3-brush.js"
+    },
+    "js/npm.d3-force.js": {
+      "name": "js/npm.d3-force.js",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/media/build/js/npm.d3-force.js",
+      "publicPath": "/foo/js/npm.d3-force.js"
+    },
+    "js/npm.d3-zoom.js": {
+      "name": "js/npm.d3-zoom.js",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/media/build/js/npm.d3-zoom.js",
+      "publicPath": "/foo/js/npm.d3-zoom.js"
+    },
+    "js/npm.d3-interpolate.js": {
+      "name": "js/npm.d3-interpolate.js",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/media/build/js/npm.d3-interpolate.js",
+      "publicPath": "/foo/js/npm.d3-interpolate.js"
+    },
+    "js/npm.d3-color.js": {
+      "name": "js/npm.d3-color.js",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/media/build/js/npm.d3-color.js",
+      "publicPath": "/foo/js/npm.d3-color.js"
+    },
+    "js/npm.d3-time.js": {
+      "name": "js/npm.d3-time.js",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/media/build/js/npm.d3-time.js",
+      "publicPath": "/foo/js/npm.d3-time.js"
+    },
+    "js/npm.delaunator.js": {
+      "name": "js/npm.delaunator.js",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/media/build/js/npm.delaunator.js",
+      "publicPath": "/foo/js/npm.delaunator.js"
+    },
+    "js/npm.d3-contour.js": {
+      "name": "js/npm.d3-contour.js",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/media/build/js/npm.d3-contour.js",
+      "publicPath": "/foo/js/npm.d3-contour.js"
+    },
+    "js/npm.d3-format.js": {
+      "name": "js/npm.d3-format.js",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/media/build/js/npm.d3-format.js",
+      "publicPath": "/foo/js/npm.d3-format.js"
+    },
+    "js/npm.d3-quadtree.js": {
+      "name": "js/npm.d3-quadtree.js",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/media/build/js/npm.d3-quadtree.js",
+      "publicPath": "/foo/js/npm.d3-quadtree.js"
+    },
+    "js/npm.d3-random.js": {
+      "name": "js/npm.d3-random.js",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/media/build/js/npm.d3-random.js",
+      "publicPath": "/foo/js/npm.d3-random.js"
+    },
+    "js/npm.cytoscape.js": {
+      "name": "js/npm.cytoscape.js",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/media/build/js/npm.cytoscape.js",
+      "publicPath": "/foo/js/npm.cytoscape.js"
+    },
+    "js/npm.proj4.js": {
+      "name": "js/npm.proj4.js",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/media/build/js/npm.proj4.js",
+      "publicPath": "/foo/js/npm.proj4.js"
+    },
+    "js/npm.webcola.js": {
+      "name": "js/npm.webcola.js",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/media/build/js/npm.webcola.js",
+      "publicPath": "/foo/js/npm.webcola.js"
+    },
+    "js/npm.numeral.js": {
+      "name": "js/npm.numeral.js",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/media/build/js/npm.numeral.js",
+      "publicPath": "/foo/js/npm.numeral.js"
+    },
+    "js/npm.eonasdan-bootstrap-datetimepicker.js": {
+      "name": "js/npm.eonasdan-bootstrap-datetimepicker.js",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/media/build/js/npm.eonasdan-bootstrap-datetimepicker.js",
+      "publicPath": "/foo/js/npm.eonasdan-bootstrap-datetimepicker.js"
+    },
+    "js/npm.cytoscape-cola.js": {
+      "name": "js/npm.cytoscape-cola.js",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/media/build/js/npm.cytoscape-cola.js",
+      "publicPath": "/foo/js/npm.cytoscape-cola.js"
+    },
+    "js/npm.mgrs.js": {
+      "name": "js/npm.mgrs.js",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/media/build/js/npm.mgrs.js",
+      "publicPath": "/foo/js/npm.mgrs.js"
+    },
+    "js/npm.wkt-parser.js": {
+      "name": "js/npm.wkt-parser.js",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/media/build/js/npm.wkt-parser.js",
+      "publicPath": "/foo/js/npm.wkt-parser.js"
+    },
+    "js/npm.datatables.net-buttons.js": {
+      "name": "js/npm.datatables.net-buttons.js",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/media/build/js/npm.datatables.net-buttons.js",
+      "publicPath": "/foo/js/npm.datatables.net-buttons.js"
+    },
+    "js/npm.ckeditor.js": {
+      "name": "js/npm.ckeditor.js",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/media/build/js/npm.ckeditor.js",
+      "publicPath": "/foo/js/npm.ckeditor.js"
+    },
+    "js/npm.noUiSlider.js": {
+      "name": "js/npm.noUiSlider.js",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/media/build/js/npm.noUiSlider.js",
+      "publicPath": "/foo/js/npm.noUiSlider.js"
+    },
+    "js/npm.knockstrap.js": {
+      "name": "js/npm.knockstrap.js",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/media/build/js/npm.knockstrap.js",
+      "publicPath": "/foo/js/npm.knockstrap.js"
+    },
+    "js/npm.bootstrap-colorpicker.js": {
+      "name": "js/npm.bootstrap-colorpicker.js",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/media/build/js/npm.bootstrap-colorpicker.js",
+      "publicPath": "/foo/js/npm.bootstrap-colorpicker.js"
+    },
+    "js/npm.leaflet-draw.js": {
+      "name": "js/npm.leaflet-draw.js",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/media/build/js/npm.leaflet-draw.js",
+      "publicPath": "/foo/js/npm.leaflet-draw.js"
+    },
+    "js/js/npm.jquery-validation.chunk.js": {
+      "name": "js/js/npm.jquery-validation.chunk.js",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/media/build/js/js/npm.jquery-validation.chunk.js",
+      "publicPath": "/foo/js/js/npm.jquery-validation.chunk.js"
+    },
+    "js/npm.jqtree.js": {
+      "name": "js/npm.jqtree.js",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/media/build/js/npm.jqtree.js",
+      "publicPath": "/foo/js/npm.jqtree.js"
+    },
+    "js/npm.dom4.js": {
+      "name": "js/npm.dom4.js",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/media/build/js/npm.dom4.js",
+      "publicPath": "/foo/js/npm.dom4.js"
+    },
+    "js/npm.datatables.net.js": {
+      "name": "js/npm.datatables.net.js",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/media/build/js/npm.datatables.net.js",
+      "publicPath": "/foo/js/npm.datatables.net.js"
+    },
+    "js/npm.datatables.net-responsive.js": {
+      "name": "js/npm.datatables.net-responsive.js",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/media/build/js/npm.datatables.net-responsive.js",
+      "publicPath": "/foo/js/npm.datatables.net-responsive.js"
+    },
+    "js/npm.tmcw.js": {
+      "name": "js/npm.tmcw.js",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/media/build/js/npm.tmcw.js",
+      "publicPath": "/foo/js/npm.tmcw.js"
+    },
+    "vendors-node_modules_jquery-migrate_dist_jquery-migrate_min_js-media_node_modules_d3_index_js-10b384.js": {
+      "name": "vendors-node_modules_jquery-migrate_dist_jquery-migrate_min_js-media_node_modules_d3_index_js-10b384.js",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/media/build/vendors-node_modules_jquery-migrate_dist_jquery-migrate_min_js-media_node_modules_d3_index_js-10b384.js",
+      "publicPath": "/foo/vendors-node_modules_jquery-migrate_dist_jquery-migrate_min_js-media_node_modules_d3_index_js-10b384.js"
+    },
+    "vendors-node_modules_jquery-migrate_dist_jquery-migrate_min_js-node_modules_latlon-geohash_la-60d824.js": {
+      "name": "vendors-node_modules_jquery-migrate_dist_jquery-migrate_min_js-node_modules_latlon-geohash_la-60d824.js",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/media/build/vendors-node_modules_jquery-migrate_dist_jquery-migrate_min_js-node_modules_latlon-geohash_la-60d824.js",
+      "publicPath": "/foo/vendors-node_modules_jquery-migrate_dist_jquery-migrate_min_js-node_modules_latlon-geohash_la-60d824.js"
+    },
+    "vendors-node_modules_jquery-migrate_dist_jquery-migrate_min_js-node_modules_js-cookie_src_js_-5cfb18.js": {
+      "name": "vendors-node_modules_jquery-migrate_dist_jquery-migrate_min_js-node_modules_js-cookie_src_js_-5cfb18.js",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/media/build/vendors-node_modules_jquery-migrate_dist_jquery-migrate_min_js-node_modules_js-cookie_src_js_-5cfb18.js",
+      "publicPath": "/foo/vendors-node_modules_jquery-migrate_dist_jquery-migrate_min_js-node_modules_js-cookie_src_js_-5cfb18.js"
+    },
+    "vendors-node_modules_datatables_net-buttons-bs_js_buttons_bootstrap_min_js-node_modules_datat-b68273.js": {
+      "name": "vendors-node_modules_datatables_net-buttons-bs_js_buttons_bootstrap_min_js-node_modules_datat-b68273.js",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/media/build/vendors-node_modules_datatables_net-buttons-bs_js_buttons_bootstrap_min_js-node_modules_datat-b68273.js",
+      "publicPath": "/foo/vendors-node_modules_datatables_net-buttons-bs_js_buttons_bootstrap_min_js-node_modules_datat-b68273.js"
+    },
+    "vendors-node_modules_jquery-migrate_dist_jquery-migrate_min_js-node_modules_leaflet-iiif_leaf-0dd98c.js": {
+      "name": "vendors-node_modules_jquery-migrate_dist_jquery-migrate_min_js-node_modules_leaflet-iiif_leaf-0dd98c.js",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/media/build/vendors-node_modules_jquery-migrate_dist_jquery-migrate_min_js-node_modules_leaflet-iiif_leaf-0dd98c.js",
+      "publicPath": "/foo/vendors-node_modules_jquery-migrate_dist_jquery-migrate_min_js-node_modules_leaflet-iiif_leaf-0dd98c.js"
+    },
+    "templates_javascript_htm.js": {
+      "name": "templates_javascript_htm.js",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/media/build/templates_javascript_htm.js",
+      "publicPath": "/foo/templates_javascript_htm.js"
+    },
+    "js_bindings_sortable_js.js": {
+      "name": "js_bindings_sortable_js.js",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/media/build/js_bindings_sortable_js.js",
+      "publicPath": "/foo/js_bindings_sortable_js.js"
+    },
+    "js_models_graph_js.js": {
+      "name": "js_models_graph_js.js",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/media/build/js_models_graph_js.js",
+      "publicPath": "/foo/js_models_graph_js.js"
+    },
+    "js_viewmodels_card_js-node_modules_jquery-migrate_dist_jquery-migrate_min_js.js": {
+      "name": "js_viewmodels_card_js-node_modules_jquery-migrate_dist_jquery-migrate_min_js.js",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/media/build/js_viewmodels_card_js-node_modules_jquery-migrate_dist_jquery-migrate_min_js.js",
+      "publicPath": "/foo/js_viewmodels_card_js-node_modules_jquery-migrate_dist_jquery-migrate_min_js.js"
+    },
+    "templates_base-manager_htm.js": {
+      "name": "templates_base-manager_htm.js",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/media/build/templates_base-manager_htm.js",
+      "publicPath": "/foo/templates_base-manager_htm.js"
+    },
+    "js_models_value_js-node_modules_jquery-migrate_dist_jquery-migrate_min_js.js": {
+      "name": "js_models_value_js-node_modules_jquery-migrate_dist_jquery-migrate_min_js.js",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/media/build/js_models_value_js-node_modules_jquery-migrate_dist_jquery-migrate_min_js.js",
+      "publicPath": "/foo/js_models_value_js-node_modules_jquery-migrate_dist_jquery-migrate_min_js.js"
+    },
+    "js_bindings_dropzone_js-node_modules_jquery-migrate_dist_jquery-migrate_min_js-node_modules_u-d5a2f5.js": {
+      "name": "js_bindings_dropzone_js-node_modules_jquery-migrate_dist_jquery-migrate_min_js-node_modules_u-d5a2f5.js",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/media/build/js_bindings_dropzone_js-node_modules_jquery-migrate_dist_jquery-migrate_min_js-node_modules_u-d5a2f5.js",
+      "publicPath": "/foo/js_bindings_dropzone_js-node_modules_jquery-migrate_dist_jquery-migrate_min_js-node_modules_u-d5a2f5.js"
+    },
+    "js_bindings_select2-query_js-js_viewmodels_resource-instance-select_js.js": {
+      "name": "js_bindings_select2-query_js-js_viewmodels_resource-instance-select_js.js",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/media/build/js_bindings_select2-query_js-js_viewmodels_resource-instance-select_js.js",
+      "publicPath": "/foo/js_bindings_select2-query_js-js_viewmodels_resource-instance-select_js.js"
+    },
+    "js_bindings_mapbox-gl_js-js_viewmodels_map_js.js": {
+      "name": "js_bindings_mapbox-gl_js-js_viewmodels_map_js.js",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/media/build/js_bindings_mapbox-gl_js-js_viewmodels_map_js.js",
+      "publicPath": "/foo/js_bindings_mapbox-gl_js-js_viewmodels_map_js.js"
+    },
+    "js_models_report_js.js": {
+      "name": "js_models_report_js.js",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/media/build/js_models_report_js.js",
+      "publicPath": "/foo/js_models_report_js.js"
+    },
+    "js_models_node_js.js": {
+      "name": "js_models_node_js.js",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/media/build/js_models_node_js.js",
+      "publicPath": "/foo/js_models_node_js.js"
+    },
+    "js_bindings_color-picker_js-node_modules_jquery-migrate_dist_jquery-migrate_min_js.js": {
+      "name": "js_bindings_color-picker_js-node_modules_jquery-migrate_dist_jquery-migrate_min_js.js",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/media/build/js_bindings_color-picker_js-node_modules_jquery-migrate_dist_jquery-migrate_min_js.js",
+      "publicPath": "/foo/js_bindings_color-picker_js-node_modules_jquery-migrate_dist_jquery-migrate_min_js.js"
+    },
+    "js_viewmodels_map-editor_js.js": {
+      "name": "js_viewmodels_map-editor_js.js",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/media/build/js_viewmodels_map-editor_js.js",
+      "publicPath": "/foo/js_viewmodels_map-editor_js.js"
+    },
+    "js_models_mobile-survey_js-node_modules_jquery-migrate_dist_jquery-migrate_min_js.js": {
+      "name": "js_models_mobile-survey_js-node_modules_jquery-migrate_dist_jquery-migrate_min_js.js",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/media/build/js_models_mobile-survey_js-node_modules_jquery-migrate_dist_jquery-migrate_min_js.js",
+      "publicPath": "/foo/js_models_mobile-survey_js-node_modules_jquery-migrate_dist_jquery-migrate_min_js.js"
+    },
+    "js_bindings_datepicker_js-js_viewmodels_alert_js-js_views_base-manager_js-templates_views_mob-f6d378.js": {
+      "name": "js_bindings_datepicker_js-js_viewmodels_alert_js-js_views_base-manager_js-templates_views_mob-f6d378.js",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/media/build/js_bindings_datepicker_js-js_viewmodels_alert_js-js_views_base-manager_js-templates_views_mob-f6d378.js",
+      "publicPath": "/foo/js_bindings_datepicker_js-js_viewmodels_alert_js-js_views_base-manager_js-templates_views_mob-f6d378.js"
+    },
+    "js_views_components_iiif-viewer_js.js": {
+      "name": "js_views_components_iiif-viewer_js.js",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/media/build/js_views_components_iiif-viewer_js.js",
+      "publicPath": "/foo/js_views_components_iiif-viewer_js.js"
+    },
+    "js_views_resource_related-resources-manager_js.js": {
+      "name": "js_views_resource_related-resources-manager_js.js",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/media/build/js_views_resource_related-resources-manager_js.js",
+      "publicPath": "/foo/js_views_resource_related-resources-manager_js.js"
+    },
+    "templates_views_graph-designer_htm.js": {
+      "name": "templates_views_graph-designer_htm.js",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/media/build/templates_views_graph-designer_htm.js",
+      "publicPath": "/foo/templates_views_graph-designer_htm.js"
+    },
+    "js_views_components_related-resources-graph_js.js": {
+      "name": "js_views_components_related-resources-graph_js.js",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/media/build/js_views_components_related-resources-graph_js.js",
+      "publicPath": "/foo/js_views_components_related-resources-graph_js.js"
+    },
+    "js_viewmodels_mobile-survey_js.js": {
+      "name": "js_viewmodels_mobile-survey_js.js",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/media/build/js_viewmodels_mobile-survey_js.js",
+      "publicPath": "/foo/js_viewmodels_mobile-survey_js.js"
+    },
+    "js_views_page-view_js-node_modules_jquery-migrate_dist_jquery-migrate_min_js.js": {
+      "name": "js_views_page-view_js-node_modules_jquery-migrate_dist_jquery-migrate_min_js.js",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/media/build/js_views_page-view_js-node_modules_jquery-migrate_dist_jquery-migrate_min_js.js",
+      "publicPath": "/foo/js_views_page-view_js-node_modules_jquery-migrate_dist_jquery-migrate_min_js.js"
+    },
+    "js_views_components_iiif-annotation_js.js": {
+      "name": "js_views_components_iiif-annotation_js.js",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/media/build/js_views_components_iiif-annotation_js.js",
+      "publicPath": "/foo/js_views_components_iiif-annotation_js.js"
+    },
+    "js_views_components_cards_select-feature-layers_js-js_views_components_map_js.js": {
+      "name": "js_views_components_cards_select-feature-layers_js-js_views_components_map_js.js",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/media/build/js_views_components_cards_select-feature-layers_js-js_views_components_map_js.js",
+      "publicPath": "/foo/js_views_components_cards_select-feature-layers_js-js_views_components_map_js.js"
+    },
+    "js_views_tree-view_js-node_modules_jquery-migrate_dist_jquery-migrate_min_js.js": {
+      "name": "js_views_tree-view_js-node_modules_jquery-migrate_dist_jquery-migrate_min_js.js",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/media/build/js_views_tree-view_js-node_modules_jquery-migrate_dist_jquery-migrate_min_js.js",
+      "publicPath": "/foo/js_views_tree-view_js-node_modules_jquery-migrate_dist_jquery-migrate_min_js.js"
+    },
+    "public/.gitkeep": {
+      "name": "public/.gitkeep",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/media/build/public/.gitkeep",
+      "publicPath": "/foo/public/.gitkeep"
+    },
+    "img/.DS_Store": {
+      "name": "img/.DS_Store",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/media/build/img/.DS_Store",
+      "publicPath": "/foo/img/.DS_Store"
+    },
+    "img/Answers.png": {
+      "name": "img/Answers.png",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/media/build/img/Answers.png",
+      "publicPath": "/foo/img/Answers.png"
+    },
+    "img/Comments.png": {
+      "name": "img/Comments.png",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/media/build/img/Comments.png",
+      "publicPath": "/foo/img/Comments.png"
+    },
+    "img/PoweredByArches.png": {
+      "name": "img/PoweredByArches.png",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/media/build/img/PoweredByArches.png",
+      "publicPath": "/foo/img/PoweredByArches.png"
+    },
+    "img/Workflow.png": {
+      "name": "img/Workflow.png",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/media/build/img/Workflow.png",
+      "publicPath": "/foo/img/Workflow.png"
+    },
+    "img/approval.png": {
+      "name": "img/approval.png",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/media/build/img/approval.png",
+      "publicPath": "/foo/img/approval.png"
+    },
+    "img/arches_logo.png": {
+      "name": "img/arches_logo.png",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/media/build/img/arches_logo.png",
+      "publicPath": "/foo/img/arches_logo.png"
+    },
+    "img/arches_logo_light.png": {
+      "name": "img/arches_logo_light.png",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/media/build/img/arches_logo_light.png",
+      "publicPath": "/foo/img/arches_logo_light.png"
+    },
+    "img/breadcrumbs.png": {
+      "name": "img/breadcrumbs.png",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/media/build/img/breadcrumbs.png",
+      "publicPath": "/foo/img/breadcrumbs.png"
+    },
+    "img/favicon.png": {
+      "name": "img/favicon.png",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/media/build/img/favicon.png",
+      "publicPath": "/foo/img/favicon.png"
+    },
+    "img/grab-handle.png": {
+      "name": "img/grab-handle.png",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/media/build/img/grab-handle.png",
+      "publicPath": "/foo/img/grab-handle.png"
+    },
+    "img/inspection.png": {
+      "name": "img/inspection.png",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/media/build/img/inspection.png",
+      "publicPath": "/foo/img/inspection.png"
+    },
+    "img/multiple_inputs.png": {
+      "name": "img/multiple_inputs.png",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/media/build/img/multiple_inputs.png",
+      "publicPath": "/foo/img/multiple_inputs.png"
+    },
+    "img/mybg.png": {
+      "name": "img/mybg.png",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/media/build/img/mybg.png",
+      "publicPath": "/foo/img/mybg.png"
+    },
+    "img/overlay-icon.png": {
+      "name": "img/overlay-icon.png",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/media/build/img/overlay-icon.png",
+      "publicPath": "/foo/img/overlay-icon.png"
+    },
+    "img/photo_missing.png": {
+      "name": "img/photo_missing.png",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/media/build/img/photo_missing.png",
+      "publicPath": "/foo/img/photo_missing.png"
+    },
+    "img/select2-spinner.gif": {
+      "name": "img/select2-spinner.gif",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/media/build/img/select2-spinner.gif",
+      "publicPath": "/foo/img/select2-spinner.gif"
+    },
+    "img/sort_both.png": {
+      "name": "img/sort_both.png",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/media/build/img/sort_both.png",
+      "publicPath": "/foo/img/sort_both.png"
+    },
+    "img/sort_desc.png": {
+      "name": "img/sort_desc.png",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/media/build/img/sort_desc.png",
+      "publicPath": "/foo/img/sort_desc.png"
+    },
+    "img/spinner.gif": {
+      "name": "img/spinner.gif",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/media/build/img/spinner.gif",
+      "publicPath": "/foo/img/spinner.gif"
+    },
+    "img/up.png": {
+      "name": "img/up.png",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/media/build/img/up.png",
+      "publicPath": "/foo/img/up.png"
+    },
+    "img/backgrounds/Photo Credits.txt": {
+      "name": "img/backgrounds/Photo Credits.txt",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/media/build/img/backgrounds/Photo Credits.txt",
+      "publicPath": "/foo/img/backgrounds/Photo Credits.txt"
+    },
+    "img/backgrounds/easter_island_night.jpg": {
+      "name": "img/backgrounds/easter_island_night.jpg",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/media/build/img/backgrounds/easter_island_night.jpg",
+      "publicPath": "/foo/img/backgrounds/easter_island_night.jpg"
+    },
+    "img/dropzone/spritemap.png": {
+      "name": "img/dropzone/spritemap.png",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/media/build/img/dropzone/spritemap.png",
+      "publicPath": "/foo/img/dropzone/spritemap.png"
+    },
+    "img/dropzone/spritemap@2x.png": {
+      "name": "img/dropzone/spritemap@2x.png",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/media/build/img/dropzone/spritemap@2x.png",
+      "publicPath": "/foo/img/dropzone/spritemap@2x.png"
+    },
+    "img/help/activate-mobile-project.gif": {
+      "name": "img/help/activate-mobile-project.gif",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/media/build/img/help/activate-mobile-project.gif",
+      "publicPath": "/foo/img/help/activate-mobile-project.gif"
+    },
+    "img/help/add-concept-alt-label.gif": {
+      "name": "img/help/add-concept-alt-label.gif",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/media/build/img/help/add-concept-alt-label.gif",
+      "publicPath": "/foo/img/help/add-concept-alt-label.gif"
+    },
+    "img/help/add-concepts.gif": {
+      "name": "img/help/add-concepts.gif",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/media/build/img/help/add-concepts.gif",
+      "publicPath": "/foo/img/help/add-concepts.gif"
+    },
+    "img/help/add-remove-function.gif": {
+      "name": "img/help/add-remove-function.gif",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/media/build/img/help/add-remove-function.gif",
+      "publicPath": "/foo/img/help/add-remove-function.gif"
+    },
+    "img/help/advanced-search-example.gif": {
+      "name": "img/help/advanced-search-example.gif",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/media/build/img/help/advanced-search-example.gif",
+      "publicPath": "/foo/img/help/advanced-search-example.gif"
+    },
+    "img/help/create-collection.gif": {
+      "name": "img/help/create-collection.gif",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/media/build/img/help/create-collection.gif",
+      "publicPath": "/foo/img/help/create-collection.gif"
+    },
+    "img/help/create-resource-relation.gif": {
+      "name": "img/help/create-resource-relation.gif",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/media/build/img/help/create-resource-relation.gif",
+      "publicPath": "/foo/img/help/create-resource-relation.gif"
+    },
+    "img/help/create-thesaurus.gif": {
+      "name": "img/help/create-thesaurus.gif",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/media/build/img/help/create-thesaurus.gif",
+      "publicPath": "/foo/img/help/create-thesaurus.gif"
+    },
+    "img/help/create-top-concept.gif": {
+      "name": "img/help/create-top-concept.gif",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/media/build/img/help/create-top-concept.gif",
+      "publicPath": "/foo/img/help/create-top-concept.gif"
+    },
+    "img/help/edit-resource-nested-card.gif": {
+      "name": "img/help/edit-resource-nested-card.gif",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/media/build/img/help/edit-resource-nested-card.gif",
+      "publicPath": "/foo/img/help/edit-resource-nested-card.gif"
+    },
+    "img/help/edit-resource-simple-card.gif": {
+      "name": "img/help/edit-resource-simple-card.gif",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/media/build/img/help/edit-resource-simple-card.gif",
+      "publicPath": "/foo/img/help/edit-resource-simple-card.gif"
+    },
+    "img/help/map-buffer-search.gif": {
+      "name": "img/help/map-buffer-search.gif",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/media/build/img/help/map-buffer-search.gif",
+      "publicPath": "/foo/img/help/map-buffer-search.gif"
+    },
+    "img/help/map-switch-basemap.gif": {
+      "name": "img/help/map-switch-basemap.gif",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/media/build/img/help/map-switch-basemap.gif",
+      "publicPath": "/foo/img/help/map-switch-basemap.gif"
+    },
+    "img/help/map-toggle-search-results-layer.gif": {
+      "name": "img/help/map-toggle-search-results-layer.gif",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/media/build/img/help/map-toggle-search-results-layer.gif",
+      "publicPath": "/foo/img/help/map-toggle-search-results-layer.gif"
+    },
+    "img/help/project-pick-cards.png": {
+      "name": "img/help/project-pick-cards.png",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/media/build/img/help/project-pick-cards.png",
+      "publicPath": "/foo/img/help/project-pick-cards.png"
+    },
+    "img/help/search-page-labeled.jpg": {
+      "name": "img/help/search-page-labeled.jpg",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/media/build/img/help/search-page-labeled.jpg",
+      "publicPath": "/foo/img/help/search-page-labeled.jpg"
+    },
+    "img/help/start-new-project.jpg": {
+      "name": "img/help/start-new-project.jpg",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/media/build/img/help/start-new-project.jpg",
+      "publicPath": "/foo/img/help/start-new-project.jpg"
+    },
+    "img/help/time-wheel-example.gif": {
+      "name": "img/help/time-wheel-example.gif",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/media/build/img/help/time-wheel-example.gif",
+      "publicPath": "/foo/img/help/time-wheel-example.gif"
+    },
+    "img/landing/Arches_logo_white.png": {
+      "name": "img/landing/Arches_logo_white.png",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/media/build/img/landing/Arches_logo_white.png",
+      "publicPath": "/foo/img/landing/Arches_logo_white.png"
+    },
+    "img/landing/IPhone_8_map.png": {
+      "name": "img/landing/IPhone_8_map.png",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/media/build/img/landing/IPhone_8_map.png",
+      "publicPath": "/foo/img/landing/IPhone_8_map.png"
+    },
+    "img/landing/arches_designer.png": {
+      "name": "img/landing/arches_designer.png",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/media/build/img/landing/arches_designer.png",
+      "publicPath": "/foo/img/landing/arches_designer.png"
+    },
+    "img/landing/arches_logo_dark.png": {
+      "name": "img/landing/arches_logo_dark.png",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/media/build/img/landing/arches_logo_dark.png",
+      "publicPath": "/foo/img/landing/arches_logo_dark.png"
+    },
+    "img/landing/arches_logo_light.png": {
+      "name": "img/landing/arches_logo_light.png",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/media/build/img/landing/arches_logo_light.png",
+      "publicPath": "/foo/img/landing/arches_logo_light.png"
+    },
+    "img/landing/arches_search.png": {
+      "name": "img/landing/arches_search.png",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/media/build/img/landing/arches_search.png",
+      "publicPath": "/foo/img/landing/arches_search.png"
+    },
+    "img/landing/bhutan_tigersnest_lr.jpg": {
+      "name": "img/landing/bhutan_tigersnest_lr.jpg",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/media/build/img/landing/bhutan_tigersnest_lr.jpg",
+      "publicPath": "/foo/img/landing/bhutan_tigersnest_lr.jpg"
+    },
+    "img/landing/card_manager.png": {
+      "name": "img/landing/card_manager.png",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/media/build/img/landing/card_manager.png",
+      "publicPath": "/foo/img/landing/card_manager.png"
+    },
+    "img/landing/consultation_workflow.jpg": {
+      "name": "img/landing/consultation_workflow.jpg",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/media/build/img/landing/consultation_workflow.jpg",
+      "publicPath": "/foo/img/landing/consultation_workflow.jpg"
+    },
+    "img/landing/disco.jpg": {
+      "name": "img/landing/disco.jpg",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/media/build/img/landing/disco.jpg",
+      "publicPath": "/foo/img/landing/disco.jpg"
+    },
+    "img/landing/imac_designer.png": {
+      "name": "img/landing/imac_designer.png",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/media/build/img/landing/imac_designer.png",
+      "publicPath": "/foo/img/landing/imac_designer.png"
+    },
+    "img/landing/landing-primary.jpg": {
+      "name": "img/landing/landing-primary.jpg",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/media/build/img/landing/landing-primary.jpg",
+      "publicPath": "/foo/img/landing/landing-primary.jpg"
+    },
+    "img/landing/landing1.png": {
+      "name": "img/landing/landing1.png",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/media/build/img/landing/landing1.png",
+      "publicPath": "/foo/img/landing/landing1.png"
+    },
+    "img/landing/landing2.jpg": {
+      "name": "img/landing/landing2.jpg",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/media/build/img/landing/landing2.jpg",
+      "publicPath": "/foo/img/landing/landing2.jpg"
+    },
+    "img/landing/landing3.jpg": {
+      "name": "img/landing/landing3.jpg",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/media/build/img/landing/landing3.jpg",
+      "publicPath": "/foo/img/landing/landing3.jpg"
+    },
+    "img/landing/permissions_manager.png": {
+      "name": "img/landing/permissions_manager.png",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/media/build/img/landing/permissions_manager.png",
+      "publicPath": "/foo/img/landing/permissions_manager.png"
+    },
+    "img/landing/potala_palace.jpg": {
+      "name": "img/landing/potala_palace.jpg",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/media/build/img/landing/potala_palace.jpg",
+      "publicPath": "/foo/img/landing/potala_palace.jpg"
+    },
+    "img/user/apple.png": {
+      "name": "img/user/apple.png",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/media/build/img/user/apple.png",
+      "publicPath": "/foo/img/user/apple.png"
+    },
+    "img/user/google.png": {
+      "name": "img/user/google.png",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/media/build/img/user/google.png",
+      "publicPath": "/foo/img/user/google.png"
+    },
+    "img/user/profile_background.png": {
+      "name": "img/user/profile_background.png",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/media/build/img/user/profile_background.png",
+      "publicPath": "/foo/img/user/profile_background.png"
+    },
+    "img/icons/flags/france.png": {
+      "name": "img/icons/flags/france.png",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/media/build/img/icons/flags/france.png",
+      "publicPath": "/foo/img/icons/flags/france.png"
+    },
+    "img/icons/flags/germany.png": {
+      "name": "img/icons/flags/germany.png",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/media/build/img/icons/flags/germany.png",
+      "publicPath": "/foo/img/icons/flags/germany.png"
+    },
+    "img/icons/flags/italy.png": {
+      "name": "img/icons/flags/italy.png",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/media/build/img/icons/flags/italy.png",
+      "publicPath": "/foo/img/icons/flags/italy.png"
+    },
+    "img/icons/flags/spain.png": {
+      "name": "img/icons/flags/spain.png",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/media/build/img/icons/flags/spain.png",
+      "publicPath": "/foo/img/icons/flags/spain.png"
+    },
+    "img/icons/flags/united-kingdom.png": {
+      "name": "img/icons/flags/united-kingdom.png",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/media/build/img/icons/flags/united-kingdom.png",
+      "publicPath": "/foo/img/icons/flags/united-kingdom.png"
+    },
+    "img/icons/people/av1.png": {
+      "name": "img/icons/people/av1.png",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/media/build/img/icons/people/av1.png",
+      "publicPath": "/foo/img/icons/people/av1.png"
+    },
+    "img/icons/people/av2.png": {
+      "name": "img/icons/people/av2.png",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/media/build/img/icons/people/av2.png",
+      "publicPath": "/foo/img/icons/people/av2.png"
+    },
+    "img/icons/people/av3.png": {
+      "name": "img/icons/people/av3.png",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/media/build/img/icons/people/av3.png",
+      "publicPath": "/foo/img/icons/people/av3.png"
+    },
+    "img/icons/people/av4.png": {
+      "name": "img/icons/people/av4.png",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/media/build/img/icons/people/av4.png",
+      "publicPath": "/foo/img/icons/people/av4.png"
+    },
+    "img/icons/people/av5.png": {
+      "name": "img/icons/people/av5.png",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/media/build/img/icons/people/av5.png",
+      "publicPath": "/foo/img/icons/people/av5.png"
+    },
+    "img/icons/people/av6.png": {
+      "name": "img/icons/people/av6.png",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/media/build/img/icons/people/av6.png",
+      "publicPath": "/foo/img/icons/people/av6.png"
+    },
+    "img/icons/social/amazon.png": {
+      "name": "img/icons/social/amazon.png",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/media/build/img/icons/social/amazon.png",
+      "publicPath": "/foo/img/icons/social/amazon.png"
+    },
+    "img/icons/social/behance.png": {
+      "name": "img/icons/social/behance.png",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/media/build/img/icons/social/behance.png",
+      "publicPath": "/foo/img/icons/social/behance.png"
+    },
+    "img/icons/social/blogger.png": {
+      "name": "img/icons/social/blogger.png",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/media/build/img/icons/social/blogger.png",
+      "publicPath": "/foo/img/icons/social/blogger.png"
+    },
+    "img/icons/social/deviantart.png": {
+      "name": "img/icons/social/deviantart.png",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/media/build/img/icons/social/deviantart.png",
+      "publicPath": "/foo/img/icons/social/deviantart.png"
+    },
+    "img/icons/social/dribbble.png": {
+      "name": "img/icons/social/dribbble.png",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/media/build/img/icons/social/dribbble.png",
+      "publicPath": "/foo/img/icons/social/dribbble.png"
+    },
+    "img/icons/social/dropbox.png": {
+      "name": "img/icons/social/dropbox.png",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/media/build/img/icons/social/dropbox.png",
+      "publicPath": "/foo/img/icons/social/dropbox.png"
+    },
+    "img/icons/social/evernote.png": {
+      "name": "img/icons/social/evernote.png",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/media/build/img/icons/social/evernote.png",
+      "publicPath": "/foo/img/icons/social/evernote.png"
+    },
+    "img/icons/social/facebook.png": {
+      "name": "img/icons/social/facebook.png",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/media/build/img/icons/social/facebook.png",
+      "publicPath": "/foo/img/icons/social/facebook.png"
+    },
+    "img/icons/social/forrst.png": {
+      "name": "img/icons/social/forrst.png",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/media/build/img/icons/social/forrst.png",
+      "publicPath": "/foo/img/icons/social/forrst.png"
+    },
+    "img/icons/social/github.png": {
+      "name": "img/icons/social/github.png",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/media/build/img/icons/social/github.png",
+      "publicPath": "/foo/img/icons/social/github.png"
+    },
+    "img/icons/social/googleplus.png": {
+      "name": "img/icons/social/googleplus.png",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/media/build/img/icons/social/googleplus.png",
+      "publicPath": "/foo/img/icons/social/googleplus.png"
+    },
+    "img/icons/social/jolicloud.png": {
+      "name": "img/icons/social/jolicloud.png",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/media/build/img/icons/social/jolicloud.png",
+      "publicPath": "/foo/img/icons/social/jolicloud.png"
+    },
+    "img/icons/social/last-fm.png": {
+      "name": "img/icons/social/last-fm.png",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/media/build/img/icons/social/last-fm.png",
+      "publicPath": "/foo/img/icons/social/last-fm.png"
+    },
+    "img/icons/social/linkedin.png": {
+      "name": "img/icons/social/linkedin.png",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/media/build/img/icons/social/linkedin.png",
+      "publicPath": "/foo/img/icons/social/linkedin.png"
+    },
+    "img/icons/social/picasa.png": {
+      "name": "img/icons/social/picasa.png",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/media/build/img/icons/social/picasa.png",
+      "publicPath": "/foo/img/icons/social/picasa.png"
+    },
+    "img/icons/social/pintrest.png": {
+      "name": "img/icons/social/pintrest.png",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/media/build/img/icons/social/pintrest.png",
+      "publicPath": "/foo/img/icons/social/pintrest.png"
+    },
+    "img/icons/social/rss.png": {
+      "name": "img/icons/social/rss.png",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/media/build/img/icons/social/rss.png",
+      "publicPath": "/foo/img/icons/social/rss.png"
+    },
+    "img/icons/social/skype.png": {
+      "name": "img/icons/social/skype.png",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/media/build/img/icons/social/skype.png",
+      "publicPath": "/foo/img/icons/social/skype.png"
+    },
+    "img/icons/social/spotify.png": {
+      "name": "img/icons/social/spotify.png",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/media/build/img/icons/social/spotify.png",
+      "publicPath": "/foo/img/icons/social/spotify.png"
+    },
+    "img/icons/social/stumbleupon.png": {
+      "name": "img/icons/social/stumbleupon.png",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/media/build/img/icons/social/stumbleupon.png",
+      "publicPath": "/foo/img/icons/social/stumbleupon.png"
+    },
+    "img/icons/social/tumblr.png": {
+      "name": "img/icons/social/tumblr.png",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/media/build/img/icons/social/tumblr.png",
+      "publicPath": "/foo/img/icons/social/tumblr.png"
+    },
+    "img/icons/social/twitter.png": {
+      "name": "img/icons/social/twitter.png",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/media/build/img/icons/social/twitter.png",
+      "publicPath": "/foo/img/icons/social/twitter.png"
+    },
+    "img/icons/social/vimeo.png": {
+      "name": "img/icons/social/vimeo.png",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/media/build/img/icons/social/vimeo.png",
+      "publicPath": "/foo/img/icons/social/vimeo.png"
+    },
+    "img/icons/social/vk.png": {
+      "name": "img/icons/social/vk.png",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/media/build/img/icons/social/vk.png",
+      "publicPath": "/foo/img/icons/social/vk.png"
+    },
+    "img/icons/social/wordpress.png": {
+      "name": "img/icons/social/wordpress.png",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/media/build/img/icons/social/wordpress.png",
+      "publicPath": "/foo/img/icons/social/wordpress.png"
+    },
+    "img/icons/social/xing.png": {
+      "name": "img/icons/social/xing.png",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/media/build/img/icons/social/xing.png",
+      "publicPath": "/foo/img/icons/social/xing.png"
+    },
+    "img/icons/social/yahoo.png": {
+      "name": "img/icons/social/yahoo.png",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/media/build/img/icons/social/yahoo.png",
+      "publicPath": "/foo/img/icons/social/yahoo.png"
+    },
+    "img/icons/social/youtube.png": {
+      "name": "img/icons/social/youtube.png",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/media/build/img/icons/social/youtube.png",
+      "publicPath": "/foo/img/icons/social/youtube.png"
+    },
+    "img/landing/bg/19.jpg": {
+      "name": "img/landing/bg/19.jpg",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/media/build/img/landing/bg/19.jpg",
+      "publicPath": "/foo/img/landing/bg/19.jpg"
+    },
+    "img/landing/bg/3.jpg": {
+      "name": "img/landing/bg/3.jpg",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/media/build/img/landing/bg/3.jpg",
+      "publicPath": "/foo/img/landing/bg/3.jpg"
+    },
+    "img/landing/bg/7.jpg": {
+      "name": "img/landing/bg/7.jpg",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/media/build/img/landing/bg/7.jpg",
+      "publicPath": "/foo/img/landing/bg/7.jpg"
+    },
+    "img/landing/bg/img1.jpg": {
+      "name": "img/landing/bg/img1.jpg",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/media/build/img/landing/bg/img1.jpg",
+      "publicPath": "/foo/img/landing/bg/img1.jpg"
+    },
+    "img/landing/patterns/5.png": {
+      "name": "img/landing/patterns/5.png",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/media/build/img/landing/patterns/5.png",
+      "publicPath": "/foo/img/landing/patterns/5.png"
+    },
+    "img/landing/patterns/gridtile.png": {
+      "name": "img/landing/patterns/gridtile.png",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/media/build/img/landing/patterns/gridtile.png",
+      "publicPath": "/foo/img/landing/patterns/gridtile.png"
+    },
+    "img/sliders/revolution/bg-text.png": {
+      "name": "img/sliders/revolution/bg-text.png",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/media/build/img/sliders/revolution/bg-text.png",
+      "publicPath": "/foo/img/sliders/revolution/bg-text.png"
+    },
+    "index.html": {
+      "name": "index.html",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/media/build/index.html",
+      "publicPath": "/foo/index.html"
+    }
+  },
+  "chunks": {
+    "bindings/chosen.js": [
+      "js/npm.knockout.js",
+      "js/npm.underscore.js",
+      "js/npm.chosen-js.js",
+      "./js/bindings/chosen.js"
+    ],
+    "bindings/ckeditor.js": [
+      "js/npm.knockout.js",
+      "js/npm.underscore.js",
+      "js/npm.ckeditor.js",
+      "./js/bindings/ckeditor.js"
+    ],
+    "bindings/clipboard.js": [
+      "js/npm.knockout.js",
+      "./js/bindings/clipboard.js"
+    ],
+    "bindings/codemirror.js": [
+      "js/npm.knockout.js",
+      "js/npm.codemirror.js",
+      "./js/bindings/codemirror.js"
+    ],
+    "bindings/color-picker.js": [
+      "js/npm.knockout.js",
+      "js/npm.bootstrap-colorpicker.js",
+      "./js/bindings/color-picker.js"
+    ],
+    "bindings/cytoscape.js": [
+      "js/npm.knockout.js",
+      "js/npm.underscore.js",
+      "js/npm.cytoscape.js",
+      "js/npm.webcola.js",
+      "js/npm.cytoscape-cola.js",
+      "./js/bindings/cytoscape.js"
+    ],
+    "bindings/datatable.js": [
+      "js/npm.knockout.js",
+      "js/npm.underscore.js",
+      "js/npm.datatables.net-buttons.js",
+      "js/npm.datatables.net.js",
+      "js/npm.datatables.net-responsive.js",
+      "vendors-node_modules_datatables_net-buttons-bs_js_buttons_bootstrap_min_js-node_modules_datat-b68273.js",
+      "./js/bindings/datatable.js"
+    ],
+    "bindings/datepicker.js": [
+      "js/npm.knockout.js",
+      "js/npm.underscore.js",
+      "js/npm.moment.js",
+      "js/npm.eonasdan-bootstrap-datetimepicker.js",
+      "./js/bindings/datepicker.js"
+    ],
+    "bindings/dragDrop.js": [
+      "js/npm.knockout.js",
+      "js/npm.jqueryui.js",
+      "./js/bindings/dragDrop.js"
+    ],
+    "bindings/dropzone.js": [
+      "js/npm.knockout.js",
+      "js/npm.underscore.js",
+      "js/npm.dropzone.js",
+      "./js/bindings/dropzone.js"
+    ],
+    "bindings/fadeVisible.js": [
+      "js/npm.knockout.js",
+      "./js/bindings/fadeVisible.js"
+    ],
+    "bindings/formattedNumber.js": [
+      "js/npm.knockout.js",
+      "js/npm.numeral.js",
+      "./js/bindings/formattedNumber.js"
+    ],
+    "bindings/gallery.js": [
+      "js/npm.knockout.js",
+      "./js/bindings/gallery.js"
+    ],
+    "bindings/hover.js": [
+      "js/npm.knockout.js",
+      "./js/bindings/hover.js"
+    ],
+    "bindings/leaflet.js": [
+      "js/npm.knockout.js",
+      "js/npm.underscore.js",
+      "js/npm.leaflet.js",
+      "./js/bindings/leaflet.js"
+    ],
+    "bindings/let.js": [
+      "js/npm.knockout.js",
+      "./js/bindings/let.js"
+    ],
+    "bindings/map-controls.js": [
+      "js/npm.knockout.js",
+      "./js/bindings/map-controls.js"
+    ],
+    "bindings/mapbox-gl.js": [
+      "js/npm.knockout.js",
+      "js/npm.core-js.js",
+      "js/npm.underscore.js",
+      "js/npm.jqueryui.js",
+      "js/npm.mapbox-gl.js",
+      "templates_javascript_htm.js",
+      "js_bindings_sortable_js.js",
+      "./js/bindings/mapbox-gl.js"
+    ],
+    "bindings/moment-date.js": [
+      "js/npm.knockout.js",
+      "js/npm.moment.js",
+      "./js/bindings/moment-date.js"
+    ],
+    "bindings/nouislider.js": [
+      "js/npm.knockout.js",
+      "js/npm.noUiSlider.js",
+      "./js/bindings/nouislider.js"
+    ],
+    "bindings/related-resources-graph.js": [
+      "js/npm.knockout.js",
+      "js/npm.underscore.js",
+      "js/npm.d3-geo.js",
+      "js/npm.d3-shape.js",
+      "js/npm.d3-hierarchy.js",
+      "js/npm.d3-scale.js",
+      "js/npm.d3-array.js",
+      "js/npm.d3-selection.js",
+      "js/npm.d3-transition.js",
+      "js/npm.d3-scale-chromatic.js",
+      "js/npm.d3-delaunay.js",
+      "js/npm.d3-time-format.js",
+      "js/npm.d3-brush.js",
+      "js/npm.d3-force.js",
+      "js/npm.d3-zoom.js",
+      "js/npm.d3-interpolate.js",
+      "js/npm.d3-color.js",
+      "js/npm.d3-time.js",
+      "js/npm.delaunator.js",
+      "js/npm.d3-contour.js",
+      "js/npm.d3-format.js",
+      "js/npm.d3-quadtree.js",
+      "js/npm.d3-random.js",
+      "vendors-node_modules_jquery-migrate_dist_jquery-migrate_min_js-media_node_modules_d3_index_js-10b384.js",
+      "templates_javascript_htm.js",
+      "./js/bindings/related-resources-graph.js"
+    ],
+    "bindings/resizable-sidepanel.js": [
+      "js/npm.knockout.js",
+      "./js/bindings/resizable-sidepanel.js"
+    ],
+    "bindings/scroll-to-file.js": [
+      "js/npm.knockout.js",
+      "./js/bindings/scroll-to-file.js"
+    ],
+    "bindings/scrollTo.js": [
+      "js/npm.knockout.js",
+      "./js/bindings/scrollTo.js"
+    ],
+    "bindings/select2-query.js": [
+      "js/npm.knockout.js",
+      "js/npm.underscore.js",
+      "js/npm.select2.js",
+      "./js/bindings/select2-query.js"
+    ],
+    "bindings/select2v4.js": [
+      "js/npm.knockout.js",
+      "./js/bindings/select2v4.js"
+    ],
+    "bindings/slide.js": [
+      "js/npm.knockout.js",
+      "./js/bindings/slide.js"
+    ],
+    "bindings/smartresize.js": [
+      "js/npm.knockout.js",
+      "./js/bindings/smartresize.js"
+    ],
+    "bindings/sortable.js": [
+      "js/npm.knockout.js",
+      "js/npm.jqueryui.js",
+      "./js/bindings/sortable.js"
+    ],
+    "bindings/term-search.js": [
+      "js/npm.knockout.js",
+      "js/npm.underscore.js",
+      "js/npm.select2.js",
+      "templates_javascript_htm.js",
+      "./js/bindings/term-search.js"
+    ],
+    "bindings/time-wheel.js": [
+      "js/npm.knockout.js",
+      "js/npm.underscore.js",
+      "js/npm.d3-geo.js",
+      "js/npm.d3-shape.js",
+      "js/npm.d3-hierarchy.js",
+      "js/npm.d3-scale.js",
+      "js/npm.d3-array.js",
+      "js/npm.d3-selection.js",
+      "js/npm.d3-transition.js",
+      "js/npm.d3-scale-chromatic.js",
+      "js/npm.d3-delaunay.js",
+      "js/npm.d3-time-format.js",
+      "js/npm.d3-brush.js",
+      "js/npm.d3-force.js",
+      "js/npm.d3-zoom.js",
+      "js/npm.d3-interpolate.js",
+      "js/npm.d3-color.js",
+      "js/npm.d3-time.js",
+      "js/npm.delaunator.js",
+      "js/npm.d3-contour.js",
+      "js/npm.d3-format.js",
+      "js/npm.d3-quadtree.js",
+      "js/npm.d3-random.js",
+      "vendors-node_modules_jquery-migrate_dist_jquery-migrate_min_js-media_node_modules_d3_index_js-10b384.js",
+      "templates_javascript_htm.js",
+      "./js/bindings/time-wheel.js"
+    ],
+    "config-manager.js": [
+      "./js/config-manager.js"
+    ],
+    "models/abstract.js": [
+      "js/npm.underscore.js",
+      "js/npm.backbone.js",
+      "./js/models/abstract.js"
+    ],
+    "models/card-widget.js": [
+      "js/npm.knockout.js",
+      "js/npm.core-js.js",
+      "js/npm.underscore.js",
+      "js/npm.knockout-mapping.js",
+      "templates_javascript_htm.js",
+      "./js/models/card-widget.js"
+    ],
+    "models/card.js": [
+      "js/npm.knockout.js",
+      "js/npm.core-js.js",
+      "js/npm.underscore.js",
+      "js/npm.knockout-mapping.js",
+      "templates_javascript_htm.js",
+      "js_models_node_js.js",
+      "./js/models/card.js"
+    ],
+    "models/concept-parents.js": [
+      "js/npm.core-js.js",
+      "templates_javascript_htm.js",
+      "./js/models/concept-parents.js"
+    ],
+    "models/concept.js": [
+      "js/npm.core-js.js",
+      "templates_javascript_htm.js",
+      "./js/models/concept.js"
+    ],
+    "models/config.js": [
+      "js/npm.core-js.js",
+      "templates_javascript_htm.js",
+      "./js/models/config.js"
+    ],
+    "models/function-x-graph.js": [
+      "js/npm.knockout.js",
+      "js/npm.core-js.js",
+      "js/npm.underscore.js",
+      "js/npm.knockout-mapping.js",
+      "templates_javascript_htm.js",
+      "./js/models/function-x-graph.js"
+    ],
+    "models/function.js": [
+      "js/npm.knockout.js",
+      "js/npm.core-js.js",
+      "js/npm.underscore.js",
+      "js/npm.knockout-mapping.js",
+      "templates_javascript_htm.js",
+      "./js/models/function.js"
+    ],
+    "models/graph.js": [
+      "js/npm.knockout.js",
+      "js/npm.core-js.js",
+      "js/npm.underscore.js",
+      "templates_javascript_htm.js",
+      "js_models_node_js.js",
+      "./js/models/graph.js"
+    ],
+    "models/mobile-survey.js": [
+      "js/npm.knockout.js",
+      "js/npm.core-js.js",
+      "js/npm.underscore.js",
+      "js/npm.knockout-mapping.js",
+      "templates_javascript_htm.js",
+      "./js/models/mobile-survey.js"
+    ],
+    "models/node.js": [
+      "js/npm.knockout.js",
+      "js/npm.core-js.js",
+      "js/npm.underscore.js",
+      "templates_javascript_htm.js",
+      "./js/models/node.js"
+    ],
+    "models/report.js": [
+      "js/npm.knockout.js",
+      "js/npm.core-js.js",
+      "js/npm.underscore.js",
+      "js/npm.knockout-mapping.js",
+      "templates_javascript_htm.js",
+      "./js/models/report.js"
+    ],
+    "models/tile.js": [
+      "js/npm.core-js.js",
+      "templates_javascript_htm.js",
+      "./js/models/tile.js"
+    ],
+    "models/value.js": [
+      "js/npm.core-js.js",
+      "templates_javascript_htm.js",
+      "./js/models/value.js"
+    ],
+    "rdm.js": [
+      "./js/rdm.js"
+    ],
+    "reports/default.js": [
+      "js/npm.knockout.js",
+      "js/npm.core-js.js",
+      "./js/reports/default.js"
+    ],
+    "reports/image.js": [
+      "js/npm.knockout.js",
+      "js/npm.core-js.js",
+      "js/npm.underscore.js",
+      "js/npm.knockout-mapping.js",
+      "js/npm.knockstrap.js",
+      "templates_javascript_htm.js",
+      "./js/reports/image.js"
+    ],
+    "reports/map-header.js": [
+      "js/npm.knockout.js",
+      "js/npm.core-js.js",
+      "js/npm.underscore.js",
+      "js/npm.knockout-mapping.js",
+      "js/npm.jqueryui.js",
+      "js/npm.mapbox.js",
+      "templates_javascript_htm.js",
+      "js_bindings_sortable_js.js",
+      "js_bindings_mapbox-gl_js-js_viewmodels_map_js.js",
+      "js_views_components_cards_select-feature-layers_js-js_views_components_map_js.js",
+      "./js/reports/map-header.js"
+    ],
+    "reports/map.js": [
+      "js/npm.knockout.js",
+      "js/npm.core-js.js",
+      "js/npm.underscore.js",
+      "js/npm.knockout-mapping.js",
+      "./js/reports/map.js"
+    ],
+    "reports/tabbed.js": [
+      "js/npm.knockout.js",
+      "js/npm.core-js.js",
+      "./js/reports/tabbed.js"
+    ],
+    "utils/dispose.js": [
+      "js/npm.knockout.js",
+      "./js/utils/dispose.js"
+    ],
+    "utils/ontology.js": [
+      "js/npm.knockout.js",
+      "templates_javascript_htm.js",
+      "./js/utils/ontology.js"
+    ],
+    "utils/resource.js": [
+      "templates_javascript_htm.js",
+      "./js/utils/resource.js"
+    ],
+    "utils/set-csrf-token.js": [
+      "vendors-node_modules_jquery-migrate_dist_jquery-migrate_min_js-node_modules_js-cookie_src_js_-5cfb18.js",
+      "./js/utils/set-csrf-token.js"
+    ],
+    "utils.js": [
+      "./js/utils.js"
+    ],
+    "viewmodels/alert-json.js": [
+      "js/npm.knockout.js",
+      "templates_javascript_htm.js",
+      "./js/viewmodels/alert-json.js"
+    ],
+    "viewmodels/alert.js": [
+      "js/npm.knockout.js",
+      "./js/viewmodels/alert.js"
+    ],
+    "viewmodels/card-component.js": [
+      "js/npm.knockout.js",
+      "js/npm.underscore.js",
+      "./js/viewmodels/card-component.js"
+    ],
+    "viewmodels/card-constraints.js": [
+      "js/npm.knockout.js",
+      "js/npm.knockout-mapping.js",
+      "templates_javascript_htm.js",
+      "./js/viewmodels/card-constraints.js"
+    ],
+    "viewmodels/card-multi-select.js": [
+      "js/npm.knockout.js",
+      "./js/viewmodels/card-multi-select.js"
+    ],
+    "viewmodels/card.js": [
+      "js/npm.knockout.js",
+      "js/npm.core-js.js",
+      "js/npm.underscore.js",
+      "js/npm.knockout-mapping.js",
+      "templates_javascript_htm.js",
+      "./js/viewmodels/card.js"
+    ],
+    "viewmodels/concept-select.js": [
+      "js/npm.knockout.js",
+      "js/npm.core-js.js",
+      "templates_javascript_htm.js",
+      "./js/viewmodels/concept-select.js"
+    ],
+    "viewmodels/concept-widget.js": [
+      "js/npm.core-js.js",
+      "js/npm.underscore.js",
+      "templates_javascript_htm.js",
+      "./js/viewmodels/concept-widget.js"
+    ],
+    "viewmodels/domain-widget.js": [
+      "js/npm.knockout.js",
+      "js/npm.core-js.js",
+      "js/npm.underscore.js",
+      "./js/viewmodels/domain-widget.js"
+    ],
+    "viewmodels/file-widget.js": [
+      "js/npm.knockout.js",
+      "js/npm.core-js.js",
+      "js/npm.underscore.js",
+      "js/npm.dropzone.js",
+      "templates_javascript_htm.js",
+      "js_bindings_dropzone_js-node_modules_jquery-migrate_dist_jquery-migrate_min_js-node_modules_u-d5a2f5.js",
+      "./js/viewmodels/file-widget.js"
+    ],
+    "viewmodels/function.js": [
+      "./js/viewmodels/function.js"
+    ],
+    "viewmodels/graph-settings.js": [
+      "js/npm.knockout.js",
+      "js/npm.core-js.js",
+      "js/npm.underscore.js",
+      "js/npm.knockout-mapping.js",
+      "templates_javascript_htm.js",
+      "js_bindings_color-picker_js-node_modules_jquery-migrate_dist_jquery-migrate_min_js.js",
+      "./js/viewmodels/graph-settings.js"
+    ],
+    "viewmodels/map-controls.js": [
+      "js/npm.knockout.js",
+      "js/npm.underscore.js",
+      "./js/viewmodels/map-controls.js"
+    ],
+    "viewmodels/map-editor.js": [
+      "js/npm.knockout.js",
+      "js/npm.core-js.js",
+      "js/npm.underscore.js",
+      "js/npm.knockout-mapping.js",
+      "js/npm.jqueryui.js",
+      "js/npm.mapbox.js",
+      "js/npm.proj4.js",
+      "js/npm.mgrs.js",
+      "js/npm.wkt-parser.js",
+      "js/npm.tmcw.js",
+      "templates_javascript_htm.js",
+      "js_bindings_sortable_js.js",
+      "js_bindings_mapbox-gl_js-js_viewmodels_map_js.js",
+      "js_views_components_cards_select-feature-layers_js-js_views_components_map_js.js",
+      "./js/viewmodels/map-editor.js"
+    ],
+    "viewmodels/map-filter.js": [
+      "js/npm.knockout.js",
+      "js/npm.underscore.js",
+      "js/npm.mapbox.js",
+      "./js/viewmodels/map-filter.js"
+    ],
+    "viewmodels/map-report.js": [
+      "js/npm.knockout.js",
+      "js/npm.core-js.js",
+      "js/npm.underscore.js",
+      "js/npm.knockout-mapping.js",
+      "./js/viewmodels/map-report.js"
+    ],
+    "viewmodels/map.js": [
+      "js/npm.knockout.js",
+      "js/npm.underscore.js",
+      "js/npm.knockout-mapping.js",
+      "js/npm.mapbox.js",
+      "js/npm.mapbox-gl.js",
+      "templates_javascript_htm.js",
+      "./js/viewmodels/map.js"
+    ],
+    "viewmodels/mobile-survey.js": [
+      "js/npm.knockout.js",
+      "js/npm.core-js.js",
+      "js/npm.underscore.js",
+      "js/npm.jqueryui.js",
+      "js/npm.moment.js",
+      "templates_javascript_htm.js",
+      "js_bindings_sortable_js.js",
+      "js_models_mobile-survey_js-node_modules_jquery-migrate_dist_jquery-migrate_min_js.js",
+      "./js/viewmodels/mobile-survey.js"
+    ],
+    "viewmodels/node-value-select.js": [
+      "js/npm.knockout.js",
+      "js/npm.core-js.js",
+      "js/npm.underscore.js",
+      "templates_javascript_htm.js",
+      "./js/viewmodels/node-value-select.js"
+    ],
+    "viewmodels/photo-gallery.js": [
+      "js/npm.knockout.js",
+      "./js/viewmodels/photo-gallery.js"
+    ],
+    "viewmodels/provisional-tile.js": [
+      "js/npm.knockout.js",
+      "js/npm.core-js.js",
+      "js/npm.underscore.js",
+      "js/npm.knockout-mapping.js",
+      "js/npm.moment.js",
+      "templates_javascript_htm.js",
+      "./js/viewmodels/provisional-tile.js"
+    ],
+    "viewmodels/remote-domain-widget.js": [
+      "js/npm.core-js.js",
+      "js/npm.underscore.js",
+      "./js/viewmodels/remote-domain-widget.js"
+    ],
+    "viewmodels/report.js": [
+      "js/npm.knockout.js",
+      "js/npm.core-js.js",
+      "js/npm.underscore.js",
+      "js/npm.knockout-mapping.js",
+      "js/npm.moment.js",
+      "./js/viewmodels/report.js"
+    ],
+    "viewmodels/resource-instance-select.js": [
+      "js/npm.knockout.js",
+      "js/npm.core-js.js",
+      "js/npm.underscore.js",
+      "templates_javascript_htm.js",
+      "./js/viewmodels/resource-instance-select.js"
+    ],
+    "viewmodels/tabbed-report.js": [
+      "js/npm.knockout.js",
+      "js/npm.core-js.js",
+      "js/npm.underscore.js",
+      "js/npm.knockout-mapping.js",
+      "templates_javascript_htm.js",
+      "./js/viewmodels/tabbed-report.js"
+    ],
+    "viewmodels/tile.js": [
+      "js/npm.knockout.js",
+      "js/npm.core-js.js",
+      "js/npm.underscore.js",
+      "js/npm.knockout-mapping.js",
+      "js/npm.regenerator-runtime.js",
+      "templates_javascript_htm.js",
+      "js_viewmodels_card_js-node_modules_jquery-migrate_dist_jquery-migrate_min_js.js",
+      "./js/viewmodels/tile.js"
+    ],
+    "viewmodels/widget.js": [
+      "js/npm.knockout.js",
+      "js/npm.underscore.js",
+      "./js/viewmodels/widget.js"
+    ],
+    "viewmodels/workflow-step.js": [
+      "js/npm.knockout.js",
+      "js/npm.core-js.js",
+      "js/npm.underscore.js",
+      "js/npm.knockout-mapping.js",
+      "./js/viewmodels/workflow-step.js"
+    ],
+    "viewmodels/workflow.js": [
+      "js/npm.knockout.js",
+      "js/npm.core-js.js",
+      "js/npm.underscore.js",
+      "js/npm.knockout-mapping.js",
+      "templates_javascript_htm.js",
+      "./js/viewmodels/workflow.js"
+    ],
+    "viewmodels/xy-input.js": [
+      "js/npm.knockout.js",
+      "js/npm.turf.js",
+      "js/npm.proj4.js",
+      "js/npm.mgrs.js",
+      "js/npm.wkt-parser.js",
+      "templates_javascript_htm.js",
+      "./js/viewmodels/xy-input.js"
+    ],
+    "views/base-manager.js": [
+      "js/npm.knockout.js",
+      "js/npm.core-js.js",
+      "js/npm.underscore.js",
+      "js/npm.backbone.js",
+      "js/npm.dom4.js",
+      "templates_base-manager_htm.js",
+      "js_views_page-view_js-node_modules_jquery-migrate_dist_jquery-migrate_min_js.js",
+      "./js/views/base-manager.js"
+    ],
+    "views/components/cards/default.js": [
+      "js/npm.knockout.js",
+      "js/npm.core-js.js",
+      "js/npm.regenerator-runtime.js",
+      "./js/views/components/cards/default.js"
+    ],
+    "views/components/cards/file-renderers/imagereader.js": [
+      "js/npm.knockout.js",
+      "./js/views/components/cards/file-renderers/imagereader.js"
+    ],
+    "views/components/cards/file-renderers/pdfreader.js": [
+      "js/npm.knockout.js",
+      "./js/views/components/cards/file-renderers/pdfreader.js"
+    ],
+    "views/components/cards/file-viewer.js": [
+      "js/npm.knockout.js",
+      "js/npm.core-js.js",
+      "js/npm.underscore.js",
+      "js/npm.jqueryui.js",
+      "js/npm.regenerator-runtime.js",
+      "js/npm.dropzone.js",
+      "templates_javascript_htm.js",
+      "js_bindings_sortable_js.js",
+      "js_bindings_dropzone_js-node_modules_jquery-migrate_dist_jquery-migrate_min_js-node_modules_u-d5a2f5.js",
+      "./js/views/components/cards/file-viewer.js"
+    ],
+    "views/components/cards/grouping.js": [
+      "js/npm.knockout.js",
+      "js/npm.core-js.js",
+      "js/npm.underscore.js",
+      "js/npm.regenerator-runtime.js",
+      "js/npm.chosen-js.js",
+      "templates_javascript_htm.js",
+      "./js/views/components/cards/grouping.js"
+    ],
+    "views/components/cards/iiif-card.js": [
+      "js/npm.knockout.js",
+      "js/npm.core-js.js",
+      "js/npm.knockout-mapping.js",
+      "js/npm.regenerator-runtime.js",
+      "js_views_components_iiif-annotation_js.js",
+      "./js/views/components/cards/iiif-card.js"
+    ],
+    "views/components/cards/map.js": [
+      "js/npm.knockout.js",
+      "js/npm.core-js.js",
+      "js/npm.regenerator-runtime.js",
+      "js/npm.codemirror.js",
+      "templates_javascript_htm.js",
+      "js_viewmodels_map-editor_js.js",
+      "./js/views/components/cards/map.js"
+    ],
+    "views/components/cards/photo-gallery-card.js": [
+      "js/npm.knockout.js",
+      "js/npm.core-js.js",
+      "js/npm.underscore.js",
+      "js/npm.knockout-mapping.js",
+      "js/npm.jqueryui.js",
+      "js/npm.regenerator-runtime.js",
+      "js/npm.dropzone.js",
+      "templates_javascript_htm.js",
+      "js_bindings_sortable_js.js",
+      "js_bindings_dropzone_js-node_modules_jquery-migrate_dist_jquery-migrate_min_js-node_modules_u-d5a2f5.js",
+      "./js/views/components/cards/photo-gallery-card.js"
+    ],
+    "views/components/cards/related-resources-map.js": [
+      "js/npm.knockout.js",
+      "js/npm.core-js.js",
+      "js/npm.knockout-mapping.js",
+      "js/npm.regenerator-runtime.js",
+      "js/npm.mapbox.js",
+      "templates_javascript_htm.js",
+      "js_viewmodels_map-editor_js.js",
+      "./js/views/components/cards/related-resources-map.js"
+    ],
+    "views/components/cards/select-feature-layers.js": [
+      "./js/views/components/cards/select-feature-layers.js"
+    ],
+    "views/components/cards/select-related-feature-layers.js": [
+      "./js/views/components/cards/select-related-feature-layers.js"
+    ],
+    "views/components/datatypes/boolean.js": [
+      "js/npm.knockout.js",
+      "./js/views/components/datatypes/boolean.js"
+    ],
+    "views/components/datatypes/concept.js": [
+      "js/npm.knockout.js",
+      "js/npm.core-js.js",
+      "templates_javascript_htm.js",
+      "./js/views/components/datatypes/concept.js"
+    ],
+    "views/components/datatypes/date.js": [
+      "js/npm.knockout.js",
+      "./js/views/components/datatypes/date.js"
+    ],
+    "views/components/datatypes/domain-value.js": [
+      "js/npm.knockout.js",
+      "templates_javascript_htm.js",
+      "./js/views/components/datatypes/domain-value.js"
+    ],
+    "views/components/datatypes/edtf.js": [
+      "js/npm.knockout.js",
+      "./js/views/components/datatypes/edtf.js"
+    ],
+    "views/components/datatypes/file-list.js": [
+      "js/npm.knockout.js",
+      "js/npm.underscore.js",
+      "templates_base-manager_htm.js",
+      "./js/views/components/datatypes/file-list.js"
+    ],
+    "views/components/datatypes/geojson-feature-collection.js": [
+      "js/npm.knockout.js",
+      "js/npm.core-js.js",
+      "js/npm.underscore.js",
+      "js/npm.codemirror.js",
+      "templates_javascript_htm.js",
+      "js_bindings_color-picker_js-node_modules_jquery-migrate_dist_jquery-migrate_min_js.js",
+      "./js/views/components/datatypes/geojson-feature-collection.js"
+    ],
+    "views/components/datatypes/node-value.js": [
+      "js/npm.knockout.js",
+      "js/npm.underscore.js",
+      "templates_javascript_htm.js",
+      "./js/views/components/datatypes/node-value.js"
+    ],
+    "views/components/datatypes/number.js": [
+      "js/npm.knockout.js",
+      "./js/views/components/datatypes/number.js"
+    ],
+    "views/components/datatypes/resource-instance.js": [
+      "js/npm.knockout.js",
+      "js/npm.core-js.js",
+      "js/npm.underscore.js",
+      "templates_javascript_htm.js",
+      "templates_base-manager_htm.js",
+      "js_bindings_select2-query_js-js_viewmodels_resource-instance-select_js.js",
+      "./js/views/components/datatypes/resource-instance.js"
+    ],
+    "views/components/datatypes/string.js": [
+      "js/npm.knockout.js",
+      "./js/views/components/datatypes/string.js"
+    ],
+    "views/components/datatypes/url.js": [
+      "js/npm.knockout.js",
+      "./js/views/components/datatypes/url.js"
+    ],
+    "views/components/functions/local-file-storage.js": [
+      "js/npm.knockout.js",
+      "js/npm.core-js.js",
+      "js/npm.knockout-mapping.js",
+      "./js/views/components/functions/local-file-storage.js"
+    ],
+    "views/components/functions/primary-descriptors.js": [
+      "js/npm.knockout.js",
+      "js/npm.core-js.js",
+      "js/npm.underscore.js",
+      "js/npm.knockout-mapping.js",
+      "templates_javascript_htm.js",
+      "./js/views/components/functions/primary-descriptors.js"
+    ],
+    "views/components/geocoders/base-geocoder.js": [
+      "js/npm.knockout.js",
+      "js/npm.mapbox-gl.js",
+      "templates_javascript_htm.js",
+      "./js/views/components/geocoders/base-geocoder.js"
+    ],
+    "views/components/geocoders/mapbox.js": [
+      "js/npm.knockout.js",
+      "js/npm.core-js.js",
+      "js/npm.mapbox-gl.js",
+      "templates_javascript_htm.js",
+      "./js/views/components/geocoders/mapbox.js"
+    ],
+    "views/components/iiif-annotation.js": [
+      "js/npm.knockout.js",
+      "js/npm.core-js.js",
+      "js/npm.underscore.js",
+      "js/npm.knockout-mapping.js",
+      "js/npm.mapbox.js",
+      "js/npm.leaflet.js",
+      "js/npm.leaflet-draw.js",
+      "js_views_components_iiif-viewer_js.js",
+      "./js/views/components/iiif-annotation.js"
+    ],
+    "views/components/iiif-viewer.js": [
+      "js/npm.knockout.js",
+      "js/npm.core-js.js",
+      "js/npm.underscore.js",
+      "js/npm.knockout-mapping.js",
+      "js/npm.jqueryui.js",
+      "js/npm.leaflet.js",
+      "vendors-node_modules_jquery-migrate_dist_jquery-migrate_min_js-node_modules_leaflet-iiif_leaf-0dd98c.js",
+      "templates_javascript_htm.js",
+      "js_bindings_sortable_js.js",
+      "./js/views/components/iiif-viewer.js"
+    ],
+    "views/components/language-switcher.js": [
+      "js/npm.knockout.js",
+      "./js/views/components/language-switcher.js"
+    ],
+    "views/components/map.js": [
+      "js/npm.knockout.js",
+      "js/npm.core-js.js",
+      "js/npm.underscore.js",
+      "js/npm.jqueryui.js",
+      "templates_javascript_htm.js",
+      "js_bindings_sortable_js.js",
+      "js_bindings_mapbox-gl_js-js_viewmodels_map_js.js",
+      "./js/views/components/map.js"
+    ],
+    "views/components/nodegroup-selector.js": [
+      "js/npm.knockout.js",
+      "js/npm.core-js.js",
+      "js/npm.knockout-mapping.js",
+      "js_models_graph_js.js",
+      "./js/views/components/nodegroup-selector.js"
+    ],
+    "views/components/notification.js": [
+      "js/npm.knockout.js",
+      "js/npm.moment.js",
+      "templates_javascript_htm.js",
+      "./js/views/components/notification.js"
+    ],
+    "views/components/plugins/manifest-manager.js": [
+      "js/npm.knockout.js",
+      "js/npm.core-js.js",
+      "js/npm.knockout-mapping.js",
+      "js/npm.dropzone.js",
+      "templates_javascript_htm.js",
+      "js_bindings_dropzone_js-node_modules_jquery-migrate_dist_jquery-migrate_min_js-node_modules_u-d5a2f5.js",
+      "js_views_components_iiif-viewer_js.js",
+      "./js/views/components/plugins/manifest-manager.js"
+    ],
+    "views/components/plugins/map.js": [
+      "js/npm.knockout.js",
+      "js/npm.core-js.js",
+      "./js/views/components/plugins/map.js"
+    ],
+    "views/components/related-instance-creator.js": [
+      "js/npm.knockout.js",
+      "js/npm.core-js.js",
+      "js/npm.underscore.js",
+      "js/npm.knockout-mapping.js",
+      "js/npm.regenerator-runtime.js",
+      "templates_javascript_htm.js",
+      "js_models_graph_js.js",
+      "js_viewmodels_card_js-node_modules_jquery-migrate_dist_jquery-migrate_min_js.js",
+      "./js/views/components/related-instance-creator.js"
+    ],
+    "views/components/related-resources-graph.js": [
+      "js/npm.knockout.js",
+      "js/npm.core-js.js",
+      "js/npm.underscore.js",
+      "js/npm.jqueryui.js",
+      "js/npm.cytoscape.js",
+      "js/npm.webcola.js",
+      "js/npm.cytoscape-cola.js",
+      "templates_javascript_htm.js",
+      "js_bindings_sortable_js.js",
+      "./js/views/components/related-resources-graph.js"
+    ],
+    "views/components/resource-report-abstract.js": [
+      "js/npm.knockout.js",
+      "js/npm.core-js.js",
+      "js/npm.underscore.js",
+      "js/npm.regenerator-runtime.js",
+      "templates_javascript_htm.js",
+      "js_models_graph_js.js",
+      "js_viewmodels_card_js-node_modules_jquery-migrate_dist_jquery-migrate_min_js.js",
+      "js_models_report_js.js",
+      "./js/views/components/resource-report-abstract.js"
+    ],
+    "views/components/search/advanced-search.js": [
+      "js/npm.knockout.js",
+      "js/npm.core-js.js",
+      "js/npm.underscore.js",
+      "js/npm.knockout-mapping.js",
+      "templates_javascript_htm.js",
+      "./js/views/components/search/advanced-search.js"
+    ],
+    "views/components/search/base-filter.js": [
+      "js/npm.knockout.js",
+      "js/npm.underscore.js",
+      "js/npm.backbone.js",
+      "./js/views/components/search/base-filter.js"
+    ],
+    "views/components/search/map-filter.js": [
+      "js/npm.knockout.js",
+      "js/npm.core-js.js",
+      "js/npm.underscore.js",
+      "js/npm.jqueryui.js",
+      "js/npm.mapbox.js",
+      "js/npm.codemirror.js",
+      "js/npm.mapbox-gl.js",
+      "js/npm.turf.js",
+      "vendors-node_modules_jquery-migrate_dist_jquery-migrate_min_js-node_modules_latlon-geohash_la-60d824.js",
+      "templates_javascript_htm.js",
+      "js_bindings_sortable_js.js",
+      "js_bindings_mapbox-gl_js-js_viewmodels_map_js.js",
+      "./js/views/components/search/map-filter.js"
+    ],
+    "views/components/search/paging-filter.js": [
+      "js/npm.knockout.js",
+      "js/npm.core-js.js",
+      "js/npm.knockout-mapping.js",
+      "./js/views/components/search/paging-filter.js"
+    ],
+    "views/components/search/provisional-filter.js": [
+      "js/npm.knockout.js",
+      "js/npm.core-js.js",
+      "./js/views/components/search/provisional-filter.js"
+    ],
+    "views/components/search/related-resources-filter.js": [
+      "js/npm.knockout.js",
+      "js/npm.core-js.js",
+      "templates_javascript_htm.js",
+      "js_views_resource_related-resources-manager_js.js",
+      "js_views_components_related-resources-graph_js.js",
+      "./js/views/components/search/related-resources-filter.js"
+    ],
+    "views/components/search/resource-type-filter.js": [
+      "js/npm.knockout.js",
+      "js/npm.core-js.js",
+      "./js/views/components/search/resource-type-filter.js"
+    ],
+    "views/components/search/saved-searches.js": [
+      "js/npm.knockout.js",
+      "js/npm.core-js.js",
+      "templates_javascript_htm.js",
+      "./js/views/components/search/saved-searches.js"
+    ],
+    "views/components/search/search-export.js": [
+      "js/npm.knockout.js",
+      "js/npm.core-js.js",
+      "templates_javascript_htm.js",
+      "./js/views/components/search/search-export.js"
+    ],
+    "views/components/search/search-result-details.js": [
+      "js/npm.knockout.js",
+      "js/npm.core-js.js",
+      "js/npm.underscore.js",
+      "js/npm.regenerator-runtime.js",
+      "templates_javascript_htm.js",
+      "js_viewmodels_card_js-node_modules_jquery-migrate_dist_jquery-migrate_min_js.js",
+      "js_models_report_js.js",
+      "./js/views/components/search/search-result-details.js"
+    ],
+    "views/components/search/search-results.js": [
+      "js/npm.knockout.js",
+      "js/npm.core-js.js",
+      "js/npm.underscore.js",
+      "js/npm.knockout-mapping.js",
+      "js/npm.moment.js",
+      "js/npm.select2.js",
+      "js/npm.bootstrap.js",
+      "js/npm.eonasdan-bootstrap-datetimepicker.js",
+      "templates_javascript_htm.js",
+      "js_models_graph_js.js",
+      "templates_base-manager_htm.js",
+      "./js/views/components/search/search-results.js"
+    ],
+    "views/components/search/sort-results.js": [
+      "js/npm.knockout.js",
+      "js/npm.core-js.js",
+      "js/npm.underscore.js",
+      "js/npm.chosen-js.js",
+      "./js/views/components/search/sort-results.js"
+    ],
+    "views/components/search/term-filter.js": [
+      "js/npm.knockout.js",
+      "js/npm.core-js.js",
+      "js/npm.underscore.js",
+      "js/npm.knockout-mapping.js",
+      "./js/views/components/search/term-filter.js"
+    ],
+    "views/components/search/time-filter.js": [
+      "js/npm.knockout.js",
+      "js/npm.core-js.js",
+      "js/npm.underscore.js",
+      "js/npm.moment.js",
+      "templates_javascript_htm.js",
+      "./js/views/components/search/time-filter.js"
+    ],
+    "views/components/simple-switch.js": [
+      "js/npm.knockout.js",
+      "js/npm.core-js.js",
+      "./js/views/components/simple-switch.js"
+    ],
+    "views/components/widgets/concept-checkbox.js": [
+      "js/npm.knockout.js",
+      "js/npm.core-js.js",
+      "./js/views/components/widgets/concept-checkbox.js"
+    ],
+    "views/components/widgets/concept-multiselect.js": [
+      "js/npm.knockout.js",
+      "js/npm.core-js.js",
+      "./js/views/components/widgets/concept-multiselect.js"
+    ],
+    "views/components/widgets/concept-radio.js": [
+      "js/npm.knockout.js",
+      "js/npm.core-js.js",
+      "./js/views/components/widgets/concept-radio.js"
+    ],
+    "views/components/widgets/concept-select.js": [
+      "js/npm.knockout.js",
+      "js/npm.core-js.js",
+      "./js/views/components/widgets/concept-select.js"
+    ],
+    "views/components/widgets/datepicker.js": [
+      "js/npm.knockout.js",
+      "js/npm.core-js.js",
+      "js/npm.underscore.js",
+      "js/npm.moment.js",
+      "templates_javascript_htm.js",
+      "./js/views/components/widgets/datepicker.js"
+    ],
+    "views/components/widgets/domain-checkbox.js": [
+      "js/npm.knockout.js",
+      "js/npm.core-js.js",
+      "./js/views/components/widgets/domain-checkbox.js"
+    ],
+    "views/components/widgets/domain-multiselect.js": [
+      "js/npm.knockout.js",
+      "js/npm.core-js.js",
+      "./js/views/components/widgets/domain-multiselect.js"
+    ],
+    "views/components/widgets/domain-radio.js": [
+      "js/npm.knockout.js",
+      "js/npm.core-js.js",
+      "./js/views/components/widgets/domain-radio.js"
+    ],
+    "views/components/widgets/domain-select.js": [
+      "js/npm.knockout.js",
+      "js/npm.core-js.js",
+      "./js/views/components/widgets/domain-select.js"
+    ],
+    "views/components/widgets/edtf.js": [
+      "js/npm.knockout.js",
+      "js/npm.core-js.js",
+      "js/npm.underscore.js",
+      "./js/views/components/widgets/edtf.js"
+    ],
+    "views/components/widgets/file.js": [
+      "js/npm.knockout.js",
+      "js/npm.core-js.js",
+      "js/npm.underscore.js",
+      "js/npm.dropzone.js",
+      "js_bindings_dropzone_js-node_modules_jquery-migrate_dist_jquery-migrate_min_js-node_modules_u-d5a2f5.js",
+      "./js/views/components/widgets/file.js"
+    ],
+    "views/components/widgets/iiif.js": [
+      "js/npm.knockout.js",
+      "js/npm.core-js.js",
+      "js/npm.underscore.js",
+      "js/npm.knockout-mapping.js",
+      "js/npm.mapbox.js",
+      "js/npm.leaflet.js",
+      "js_views_components_iiif-annotation_js.js",
+      "./js/views/components/widgets/iiif.js"
+    ],
+    "views/components/widgets/map/bin-feature-collection.js": [
+      "js/npm.knockout.js",
+      "js/npm.turf.js",
+      "templates_javascript_htm.js",
+      "./js/views/components/widgets/map/bin-feature-collection.js"
+    ],
+    "views/components/widgets/map/map-styles.js": [
+      "./js/views/components/widgets/map/map-styles.js"
+    ],
+    "views/components/widgets/map.js": [
+      "js/npm.knockout.js",
+      "js/npm.core-js.js",
+      "js/npm.underscore.js",
+      "js/npm.knockout-mapping.js",
+      "js/npm.select2.js",
+      "js/npm.codemirror.js",
+      "templates_javascript_htm.js",
+      "js_bindings_color-picker_js-node_modules_jquery-migrate_dist_jquery-migrate_min_js.js",
+      "js_viewmodels_map-editor_js.js",
+      "./js/views/components/widgets/map.js"
+    ],
+    "views/components/widgets/node-value-select.js": [
+      "js/npm.knockout.js",
+      "js/npm.core-js.js",
+      "./js/views/components/widgets/node-value-select.js"
+    ],
+    "views/components/widgets/number.js": [
+      "js/npm.knockout.js",
+      "js/npm.core-js.js",
+      "js/npm.underscore.js",
+      "js/npm.numeral.js",
+      "./js/views/components/widgets/number.js"
+    ],
+    "views/components/widgets/radio-boolean.js": [
+      "js/npm.knockout.js",
+      "js/npm.core-js.js",
+      "js/npm.underscore.js",
+      "./js/views/components/widgets/radio-boolean.js"
+    ],
+    "views/components/widgets/resource-instance-multiselect.js": [
+      "js/npm.knockout.js",
+      "js/npm.core-js.js",
+      "js_bindings_select2-query_js-js_viewmodels_resource-instance-select_js.js",
+      "./js/views/components/widgets/resource-instance-multiselect.js"
+    ],
+    "views/components/widgets/resource-instance-select.js": [
+      "js/npm.knockout.js",
+      "js/npm.core-js.js",
+      "js_bindings_select2-query_js-js_viewmodels_resource-instance-select_js.js",
+      "./js/views/components/widgets/resource-instance-select.js"
+    ],
+    "views/components/widgets/rich-text.js": [
+      "js/npm.knockout.js",
+      "js/npm.core-js.js",
+      "js/npm.underscore.js",
+      "./js/views/components/widgets/rich-text.js"
+    ],
+    "views/components/widgets/switch.js": [
+      "js/npm.knockout.js",
+      "js/npm.core-js.js",
+      "js/npm.underscore.js",
+      "./js/views/components/widgets/switch.js"
+    ],
+    "views/components/widgets/text.js": [
+      "js/npm.knockout.js",
+      "js/npm.core-js.js",
+      "js/npm.underscore.js",
+      "./js/views/components/widgets/text.js"
+    ],
+    "views/components/widgets/urldatatype.js": [
+      "js/npm.knockout.js",
+      "js/npm.core-js.js",
+      "./js/views/components/widgets/urldatatype.js"
+    ],
+    "views/components/workbench.js": [
+      "js/npm.knockout.js",
+      "js/npm.core-js.js",
+      "js/npm.underscore.js",
+      "js/npm.jqueryui.js",
+      "templates_javascript_htm.js",
+      "js_bindings_sortable_js.js",
+      "./js/views/components/workbench.js"
+    ],
+    "views/components/workflows/final-step.js": [
+      "js/npm.knockout.js",
+      "templates_javascript_htm.js",
+      "./js/views/components/workflows/final-step.js"
+    ],
+    "views/components/workflows/new-multi-tile-step.js": [
+      "js/npm.knockout.js",
+      "js/npm.core-js.js",
+      "./js/views/components/workflows/new-multi-tile-step.js"
+    ],
+    "views/components/workflows/new-tile-step.js": [
+      "js/npm.knockout.js",
+      "js/npm.core-js.js",
+      "js/npm.underscore.js",
+      "js/npm.knockout-mapping.js",
+      "js/npm.regenerator-runtime.js",
+      "templates_javascript_htm.js",
+      "js_models_graph_js.js",
+      "js_viewmodels_card_js-node_modules_jquery-migrate_dist_jquery-migrate_min_js.js",
+      "./js/views/components/workflows/new-tile-step.js"
+    ],
+    "views/components/workflows/workflow-component-abstract.js": [
+      "js/npm.knockout.js",
+      "js/npm.core-js.js",
+      "js/npm.underscore.js",
+      "js/npm.knockout-mapping.js",
+      "js/npm.regenerator-runtime.js",
+      "templates_javascript_htm.js",
+      "js_models_graph_js.js",
+      "js_viewmodels_card_js-node_modules_jquery-migrate_dist_jquery-migrate_min_js.js",
+      "./js/views/components/workflows/workflow-component-abstract.js"
+    ],
+    "views/concept-search.js": [
+      "js/npm.underscore.js",
+      "js/npm.backbone.js",
+      "js/npm.select2.js",
+      "templates_javascript_htm.js",
+      "./js/views/concept-search.js"
+    ],
+    "views/edit-history.js": [
+      "./js/views/edit-history.js"
+    ],
+    "views/form.js": [
+      "js/npm.knockout.js",
+      "js/npm.underscore.js",
+      "js/npm.knockout-mapping.js",
+      "js/npm.backbone.js",
+      "./js/views/form.js"
+    ],
+    "views/graph/card-configuration/card-components-tree.js": [
+      "js/npm.knockout.js",
+      "js/npm.core-js.js",
+      "js/npm.underscore.js",
+      "js/npm.backbone.js",
+      "js/npm.jqueryui.js",
+      "js_bindings_sortable_js.js",
+      "./js/views/graph/card-configuration/card-components-tree.js"
+    ],
+    "views/graph/card-configuration/card-form-preview.js": [
+      "js/npm.knockout.js",
+      "js/npm.core-js.js",
+      "js/npm.underscore.js",
+      "js/npm.backbone.js",
+      "js/npm.jqueryui.js",
+      "templates_javascript_htm.js",
+      "js_bindings_sortable_js.js",
+      "./js/views/graph/card-configuration/card-form-preview.js"
+    ],
+    "views/graph/function-manager/applied-function-list.js": [
+      "js/npm.core-js.js",
+      "./js/views/graph/function-manager/applied-function-list.js"
+    ],
+    "views/graph/function-manager/function-list.js": [
+      "js/npm.core-js.js",
+      "./js/views/graph/function-manager/function-list.js"
+    ],
+    "views/graph/function-manager.js": [
+      "./js/views/graph/function-manager.js"
+    ],
+    "views/graph/graph-designer/card-tree.js": [
+      "js/npm.knockout.js",
+      "js/npm.core-js.js",
+      "js/npm.underscore.js",
+      "js/npm.jqueryui.js",
+      "js/npm.regenerator-runtime.js",
+      "templates_javascript_htm.js",
+      "js_bindings_sortable_js.js",
+      "js_viewmodels_card_js-node_modules_jquery-migrate_dist_jquery-migrate_min_js.js",
+      "templates_views_graph-designer_htm.js",
+      "./js/views/graph/graph-designer/card-tree.js"
+    ],
+    "views/graph/graph-designer/graph-tree.js": [
+      "js/npm.knockout.js",
+      "js/npm.core-js.js",
+      "js/npm.underscore.js",
+      "templates_javascript_htm.js",
+      "js_views_tree-view_js-node_modules_jquery-migrate_dist_jquery-migrate_min_js.js",
+      "./js/views/graph/graph-designer/graph-tree.js"
+    ],
+    "views/graph/graph-designer/node-form.js": [
+      "js/npm.knockout.js",
+      "js/npm.core-js.js",
+      "js/npm.underscore.js",
+      "js/npm.backbone.js",
+      "templates_javascript_htm.js",
+      "./js/views/graph/graph-designer/node-form.js"
+    ],
+    "views/graph/graph-manager/branch-list.js": [
+      "js/npm.knockout.js",
+      "js/npm.core-js.js",
+      "templates_javascript_htm.js",
+      "js_models_graph_js.js",
+      "./js/views/graph/graph-manager/branch-list.js"
+    ],
+    "views/graph/graph-manager/graph-base.js": [
+      "js/npm.knockout.js",
+      "js/npm.underscore.js",
+      "js/npm.backbone.js",
+      "js/npm.d3-geo.js",
+      "js/npm.d3-shape.js",
+      "js/npm.d3-hierarchy.js",
+      "js/npm.d3-scale.js",
+      "js/npm.d3-array.js",
+      "js/npm.d3-selection.js",
+      "js/npm.d3-transition.js",
+      "js/npm.d3-scale-chromatic.js",
+      "js/npm.d3-delaunay.js",
+      "js/npm.d3-time-format.js",
+      "js/npm.d3-brush.js",
+      "js/npm.d3-force.js",
+      "js/npm.d3-zoom.js",
+      "js/npm.d3-interpolate.js",
+      "js/npm.d3-color.js",
+      "js/npm.d3-time.js",
+      "js/npm.delaunator.js",
+      "js/npm.d3-contour.js",
+      "js/npm.d3-format.js",
+      "js/npm.d3-quadtree.js",
+      "js/npm.d3-random.js",
+      "vendors-node_modules_jquery-migrate_dist_jquery-migrate_min_js-media_node_modules_d3_index_js-10b384.js",
+      "./js/views/graph/graph-manager/graph-base.js"
+    ],
+    "views/graph/graph-page-view.js": [
+      "js/npm.knockout.js",
+      "js/npm.core-js.js",
+      "js/npm.underscore.js",
+      "templates_javascript_htm.js",
+      "./js/views/graph/graph-page-view.js"
+    ],
+    "views/graph/graph-settings.js": [
+      "./js/views/graph/graph-settings.js"
+    ],
+    "views/graph/permission-designer.js": [
+      "js/npm.knockout.js",
+      "js/npm.core-js.js",
+      "js/npm.underscore.js",
+      "js/npm.knockout-mapping.js",
+      "templates_javascript_htm.js",
+      "./js/views/graph/permission-designer.js"
+    ],
+    "views/graph/permission-manager/identity-list.js": [
+      "js/npm.knockout.js",
+      "js/npm.core-js.js",
+      "./js/views/graph/permission-manager/identity-list.js"
+    ],
+    "views/graph/permission-manager/permission-settings-form.js": [
+      "js/npm.knockout.js",
+      "js/npm.underscore.js",
+      "js/npm.backbone.js",
+      "templates_javascript_htm.js",
+      "./js/views/graph/permission-manager/permission-settings-form.js"
+    ],
+    "views/graph-designer.js": [
+      "js/npm.knockout.js",
+      "js/npm.core-js.js",
+      "js/npm.underscore.js",
+      "js/npm.knockout-mapping.js",
+      "js/npm.regenerator-runtime.js",
+      "templates_javascript_htm.js",
+      "js_models_graph_js.js",
+      "js_viewmodels_card_js-node_modules_jquery-migrate_dist_jquery-migrate_min_js.js",
+      "templates_base-manager_htm.js",
+      "js_models_report_js.js",
+      "templates_views_graph-designer_htm.js",
+      "./js/views/graph-designer.js"
+    ],
+    "views/graph.js": [
+      "./js/views/graph.js"
+    ],
+    "views/list.js": [
+      "js/npm.knockout.js",
+      "js/npm.underscore.js",
+      "js/npm.backbone.js",
+      "./js/views/list.js"
+    ],
+    "views/map-layer-manager.js": [
+      "js/npm.knockout.js",
+      "js/npm.core-js.js",
+      "js/npm.underscore.js",
+      "js/npm.codemirror.js",
+      "js/npm.turf.js",
+      "vendors-node_modules_jquery-migrate_dist_jquery-migrate_min_js-node_modules_latlon-geohash_la-60d824.js",
+      "templates_javascript_htm.js",
+      "js_models_node_js.js",
+      "./js/views/map-layer-manager.js"
+    ],
+    "views/mobile-survey-designer.js": [
+      "js/npm.knockout.js",
+      "js/npm.core-js.js",
+      "js/npm.underscore.js",
+      "templates_javascript_htm.js",
+      "js_models_mobile-survey_js-node_modules_jquery-migrate_dist_jquery-migrate_min_js.js",
+      "js_bindings_datepicker_js-js_viewmodels_alert_js-js_views_base-manager_js-templates_views_mob-f6d378.js",
+      "js_viewmodels_mobile-survey_js.js",
+      "./js/views/mobile-survey-designer.js"
+    ],
+    "views/mobile-survey-manager/identity-list.js": [
+      "js/npm.knockout.js",
+      "js/npm.core-js.js",
+      "templates_javascript_htm.js",
+      "./js/views/mobile-survey-manager/identity-list.js"
+    ],
+    "views/mobile-survey-manager/mobile-survey-tree.js": [
+      "js/npm.knockout.js",
+      "js/npm.core-js.js",
+      "js/npm.underscore.js",
+      "js_views_tree-view_js-node_modules_jquery-migrate_dist_jquery-migrate_min_js.js",
+      "./js/views/mobile-survey-manager/mobile-survey-tree.js"
+    ],
+    "views/mobile-survey-manager.js": [
+      "js/npm.knockout.js",
+      "js/npm.core-js.js",
+      "js/npm.underscore.js",
+      "js/npm.moment.js",
+      "templates_javascript_htm.js",
+      "js_bindings_datepicker_js-js_viewmodels_alert_js-js_views_base-manager_js-templates_views_mob-f6d378.js",
+      "./js/views/mobile-survey-manager.js"
+    ],
+    "views/notifications-list.js": [
+      "js/npm.knockout.js",
+      "js/npm.core-js.js",
+      "templates_javascript_htm.js",
+      "./js/views/notifications-list.js"
+    ],
+    "views/page-view.js": [
+      "js/npm.knockout.js",
+      "js/npm.core-js.js",
+      "js/npm.underscore.js",
+      "js/npm.backbone.js",
+      "js/npm.moment.js",
+      "js/npm.bootstrap.js",
+      "templates_javascript_htm.js",
+      "templates_base-manager_htm.js",
+      "./js/views/page-view.js"
+    ],
+    "views/plugin.js": [
+      "js/npm.knockout.js",
+      "js/npm.core-js.js",
+      "./js/views/plugin.js"
+    ],
+    "views/provisional-history-list.js": [
+      "js/npm.knockout.js",
+      "js/npm.core-js.js",
+      "js/npm.underscore.js",
+      "js/npm.moment.js",
+      "templates_javascript_htm.js",
+      "./js/views/provisional-history-list.js"
+    ],
+    "views/rdm/concept-report.js": [
+      "js/npm.knockout.js",
+      "js/npm.core-js.js",
+      "js/npm.underscore.js",
+      "js/npm.backbone.js",
+      "templates_javascript_htm.js",
+      "js_models_value_js-node_modules_jquery-migrate_dist_jquery-migrate_min_js.js",
+      "./js/views/rdm/concept-report.js"
+    ],
+    "views/rdm/concept-tree.js": [
+      "js/npm.underscore.js",
+      "js/npm.backbone.js",
+      "js/npm.jqtree.js",
+      "templates_javascript_htm.js",
+      "./js/views/rdm/concept-tree.js"
+    ],
+    "views/rdm/modals/add-child-form.js": [
+      "js/npm.core-js.js",
+      "js/npm.underscore.js",
+      "js/npm.backbone.js",
+      "templates_javascript_htm.js",
+      "js_models_value_js-node_modules_jquery-migrate_dist_jquery-migrate_min_js.js",
+      "./js/views/rdm/modals/add-child-form.js"
+    ],
+    "views/rdm/modals/add-collection-form.js": [
+      "js/npm.core-js.js",
+      "js/npm.underscore.js",
+      "js/npm.backbone.js",
+      "templates_javascript_htm.js",
+      "js_models_value_js-node_modules_jquery-migrate_dist_jquery-migrate_min_js.js",
+      "./js/views/rdm/modals/add-collection-form.js"
+    ],
+    "views/rdm/modals/add-image-form.js": [
+      "js/npm.underscore.js",
+      "js/npm.backbone.js",
+      "js/npm.dropzone.js",
+      "js/npm.bootstrap.js",
+      "vendors-node_modules_jquery-migrate_dist_jquery-migrate_min_js-node_modules_js-cookie_src_js_-5cfb18.js",
+      "templates_javascript_htm.js",
+      "./js/views/rdm/modals/add-image-form.js"
+    ],
+    "views/rdm/modals/add-scheme-form.js": [
+      "js/npm.core-js.js",
+      "js/npm.underscore.js",
+      "js/npm.backbone.js",
+      "templates_javascript_htm.js",
+      "js_models_value_js-node_modules_jquery-migrate_dist_jquery-migrate_min_js.js",
+      "./js/views/rdm/modals/add-scheme-form.js"
+    ],
+    "views/rdm/modals/delete-collection-form.js": [
+      "js/npm.core-js.js",
+      "js/npm.underscore.js",
+      "js/npm.backbone.js",
+      "templates_javascript_htm.js",
+      "js_models_value_js-node_modules_jquery-migrate_dist_jquery-migrate_min_js.js",
+      "./js/views/rdm/modals/delete-collection-form.js"
+    ],
+    "views/rdm/modals/delete-scheme-form.js": [
+      "js/npm.core-js.js",
+      "js/npm.underscore.js",
+      "js/npm.backbone.js",
+      "templates_javascript_htm.js",
+      "js_models_value_js-node_modules_jquery-migrate_dist_jquery-migrate_min_js.js",
+      "./js/views/rdm/modals/delete-scheme-form.js"
+    ],
+    "views/rdm/modals/export-scheme-form.js": [
+      "js/npm.core-js.js",
+      "js/npm.underscore.js",
+      "js/npm.backbone.js",
+      "templates_javascript_htm.js",
+      "js_models_value_js-node_modules_jquery-migrate_dist_jquery-migrate_min_js.js",
+      "./js/views/rdm/modals/export-scheme-form.js"
+    ],
+    "views/rdm/modals/import-concept-form.js": [
+      "js/npm.core-js.js",
+      "js/npm.underscore.js",
+      "js/npm.backbone.js",
+      "templates_javascript_htm.js",
+      "./js/views/rdm/modals/import-concept-form.js"
+    ],
+    "views/rdm/modals/import-scheme-form.js": [
+      "js/npm.underscore.js",
+      "js/npm.backbone.js",
+      "templates_javascript_htm.js",
+      "./js/views/rdm/modals/import-scheme-form.js"
+    ],
+    "views/rdm/modals/manage-parent-form.js": [
+      "js/npm.core-js.js",
+      "js/npm.underscore.js",
+      "js/npm.backbone.js",
+      "templates_javascript_htm.js",
+      "./js/views/rdm/modals/manage-parent-form.js"
+    ],
+    "views/rdm/modals/related-concept-form.js": [
+      "js/npm.core-js.js",
+      "js/npm.underscore.js",
+      "js/npm.backbone.js",
+      "templates_javascript_htm.js",
+      "./js/views/rdm/modals/related-concept-form.js"
+    ],
+    "views/rdm/modals/related-member-form.js": [
+      "js/npm.core-js.js",
+      "js/npm.underscore.js",
+      "js/npm.backbone.js",
+      "templates_javascript_htm.js",
+      "./js/views/rdm/modals/related-member-form.js"
+    ],
+    "views/rdm/modals/value-form.js": [
+      "js/npm.underscore.js",
+      "js/npm.backbone.js",
+      "js/npm.select2.js",
+      "js/npm.bootstrap.js",
+      "./js/views/rdm/modals/value-form.js"
+    ],
+    "views/resource/edit-log.js": [
+      "./js/views/resource/edit-log.js"
+    ],
+    "views/resource/editor.js": [
+      "js/npm.knockout.js",
+      "js/npm.core-js.js",
+      "js/npm.underscore.js",
+      "js/npm.jqueryui.js",
+      "js/npm.regenerator-runtime.js",
+      "js/npm.moment.js",
+      "templates_javascript_htm.js",
+      "js_bindings_sortable_js.js",
+      "js_models_graph_js.js",
+      "js_viewmodels_card_js-node_modules_jquery-migrate_dist_jquery-migrate_min_js.js",
+      "js_models_report_js.js",
+      "js_views_resource_related-resources-manager_js.js",
+      "./js/views/resource/editor.js"
+    ],
+    "views/resource/permissions-manager.js": [
+      "js/npm.knockout.js",
+      "js/npm.core-js.js",
+      "js/npm.knockout-mapping.js",
+      "templates_javascript_htm.js",
+      "./js/views/resource/permissions-manager.js"
+    ],
+    "views/resource/related-resources-manager.js": [
+      "js/npm.knockout.js",
+      "js/npm.core-js.js",
+      "js/npm.underscore.js",
+      "js/npm.knockout-mapping.js",
+      "js/npm.backbone.js",
+      "templates_javascript_htm.js",
+      "js_bindings_select2-query_js-js_viewmodels_resource-instance-select_js.js",
+      "js_views_components_related-resources-graph_js.js",
+      "./js/views/resource/related-resources-manager.js"
+    ],
+    "views/resource/related-resources-node-list.js": [
+      "js/npm.knockout.js",
+      "js/npm.core-js.js",
+      "templates_javascript_htm.js",
+      "./js/views/resource/related-resources-node-list.js"
+    ],
+    "views/resource/report.js": [
+      "./js/views/resource/report.js"
+    ],
+    "views/resource.js": [
+      "./js/views/resource.js"
+    ],
+    "views/search.js": [
+      "js/npm.knockout.js",
+      "js/npm.core-js.js",
+      "js/npm.underscore.js",
+      "js/npm.knockout-mapping.js",
+      "templates_javascript_htm.js",
+      "./js/views/search.js"
+    ],
+    "views/simple-search.js": [
+      "js/npm.underscore.js",
+      "js/npm.backbone.js",
+      "js/npm.select2.js",
+      "./js/views/simple-search.js"
+    ],
+    "views/tree-view.js": [
+      "js/npm.knockout.js",
+      "js/npm.core-js.js",
+      "js/npm.underscore.js",
+      "js/npm.backbone.js",
+      "./js/views/tree-view.js"
+    ],
+    "views/user-profile-manager.js": [
+      "js/npm.knockout.js",
+      "js/npm.core-js.js",
+      "js/npm.underscore.js",
+      "js/npm.knockout-mapping.js",
+      "templates_javascript_htm.js",
+      "js_models_mobile-survey_js-node_modules_jquery-migrate_dist_jquery-migrate_min_js.js",
+      "js_viewmodels_mobile-survey_js.js",
+      "./js/views/user-profile-manager.js"
+    ]
+  },
+  "publicPath": "/foo/"
 }

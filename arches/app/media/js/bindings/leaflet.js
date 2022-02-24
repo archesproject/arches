@@ -1,4 +1,4 @@
-define([
+define('leaflet', [
     'jquery',
     'underscore',
     'knockout',
