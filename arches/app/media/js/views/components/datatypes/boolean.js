@@ -1,4 +1,4 @@
-define(['knockout'], function(ko) {
+define('boolean', ['knockout'], function(ko) {
     var name = 'boolean-datatype-config';
     ko.components.register(name, {
         viewModel: function(params) {

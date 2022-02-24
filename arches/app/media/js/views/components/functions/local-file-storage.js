@@ -1,4 +1,4 @@
-define(['knockout', 
+define('local-file-storage', ['knockout', 
         'knockout-mapping',
         'viewmodels/function', 
         'bindings/chosen'], 

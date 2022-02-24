@@ -1,4 +1,4 @@
-define([
+define('photo-gallery-card', [
     'knockout',
     'knockout-mapping',
     'underscore',

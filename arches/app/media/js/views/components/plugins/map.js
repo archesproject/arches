@@ -1,4 +1,4 @@
-define([
+define('map', [
     'knockout',
     'views/components/widgets/map'
 ], function(ko) {

@@ -1,4 +1,4 @@
-define([], function() {
+define('select-feature-layers', [], function() {
     return function(resourceId, source, sourceLayer, selectedResourceIds, visible, color) {
         color = color || "#F0C200";
         var strokecolor = "#fff";

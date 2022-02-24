@@ -1,4 +1,4 @@
-define(['jquery', 'backbone', 'arches', 'models/value'], function ($, Backbone, arches) {
+define('export-scheme-form', ['jquery', 'backbone', 'arches', 'models/value'], function ($, Backbone, arches) {
     return Backbone.View.extend({
 
         initialize: function(e){

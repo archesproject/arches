@@ -1,4 +1,4 @@
-define([
+define('map', [
     'jquery',
     'underscore',
     'arches',

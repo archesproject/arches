@@ -1,4 +1,4 @@
-define([
+define('plugin', [
     'knockout',
     'views/base-manager',
     'plugin-data'

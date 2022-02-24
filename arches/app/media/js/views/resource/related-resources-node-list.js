@@ -1,4 +1,4 @@
-define([
+define('related-resources-node-list', [
     'knockout',
     'views/list',
     'arches'

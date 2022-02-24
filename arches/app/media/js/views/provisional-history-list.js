@@ -1,4 +1,4 @@
-define([
+define('provisional-history', [
     'jquery',
     'underscore',
     'moment',

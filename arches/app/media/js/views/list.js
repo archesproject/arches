@@ -1,4 +1,4 @@
-define([
+define('list', [
     'jquery',
     'backbone',
     'knockout'

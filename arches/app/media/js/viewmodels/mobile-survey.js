@@ -1,4 +1,4 @@
-define([
+define('mobile-survey', [
     'jquery',
     'arches',
     'underscore',

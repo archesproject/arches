@@ -1,4 +1,4 @@
-define(['knockout'], function(ko) {
+define('card-multi-select', ['knockout'], function(ko) {
     /**
     * A base viewmodel for functions
     *

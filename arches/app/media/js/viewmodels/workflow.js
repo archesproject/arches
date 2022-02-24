@@ -1,4 +1,4 @@
-define([
+define('workflow', [
     'arches',
     'jquery',
     'underscore',

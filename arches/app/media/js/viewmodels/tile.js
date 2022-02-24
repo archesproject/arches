@@ -1,4 +1,4 @@
-define([
+define('tile', [
     'jquery',
     'underscore',
     'knockout',

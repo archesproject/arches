@@ -1,4 +1,4 @@
-define([
+define('default', [
     'knockout',
     'viewmodels/card-component'
 ], function(ko, CardComponentViewModel) {

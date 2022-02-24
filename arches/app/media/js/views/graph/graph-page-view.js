@@ -1,4 +1,4 @@
-define([
+define('graph-page-view', [
     'knockout',
     'underscore',
     'views/base-manager',

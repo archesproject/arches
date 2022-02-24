@@ -13,7 +13,7 @@ const fileNames = function(path, outer_acc) {
         }
         else {
             var foo = (path + '/' + v).slice(12)
-            return { ...acc, [foo]: { 'import': `${path}/${v}`, 'filename': `./js/${foo}` } };
+            return { ...acc, [foo]: { 'import': `${path}/${v}`, 'filename': `js/[name]` } };
         }
     }, outer_acc);
 };
@@ -71,6 +71,31 @@ const quxFileNames = function(path, outer_acc) {
 
 qux_css = quxFileNames('../media/css', {})
 
+
+//
+
+const quuxFileNames = function(path, outer_acc) {
+    return fs.readdirSync(path).reduce((acc, v) => {
+        if (fs.lstatSync(path + '/' + v).isDirectory() ) {
+            return quuxFileNames(path + '/' + v, acc);
+        }
+        else {
+            var foo = (path + '/' + v).slice(13)
+            
+            acc.push(new HtmlWebpackPlugin({
+                template: `../templates/${foo}`, // relative path to the HTML files
+                filename: `templates/${foo}`, // output HTML files
+                // chunks: [`${foo}`] // respective JS files
+            }));
+            return acc;
+            // return { ...acc, [foo]: { 'import': `../templates/${foo}` } };
+        }
+
+    }, outer_acc);
+};
+
+var quux = quuxFileNames('../templates', [])
+
 // qux = Object.keys(qux_css).reduce((acc, key) => {
 //     var foo = (key).slice(0, key.length - 4)
 //     acc[foo] = Path.resolve(__dirname, '../css', key)
@@ -92,7 +117,7 @@ var aaa = {
     // ...bar_img,
 }
 
-console.log(aaa)
+console.log(quux)
 
 module.exports = {
     entry: aaa,
@@ -100,40 +125,40 @@ module.exports = {
         path: Path.resolve(__dirname, '../../media/build'),
         publicPath: '/foo/',
     },
-    optimization: {
-        splitChunks: {
-            chunks: 'all',
-            cacheGroups: {
-                vendor: {
-                    test: /[\\/]node_modules[\\/]/,
-                    name(module) {
-                        // Extracts node_modules to separate packages
-                        const packagePath = module.context.match(
-                            /[\\/]node_modules[\\/](.*?)([\\/]|$)/
-                        );
+    // optimization: {
+    //     splitChunks: {
+    //         chunks: 'all',
+    //         cacheGroups: {
+    //             vendor: {
+    //                 test: /[\\/]node_modules[\\/]/,
+    //                 name(module) {
+    //                     // Extracts node_modules to separate packages
+    //                     const packagePath = module.context.match(
+    //                         /[\\/]node_modules[\\/](.*?)([\\/]|$)/
+    //                     );
 
-                        let packageName = null;
+    //                     let packageName = null;
 
-                        if (packagePath) { 
-                            packageName = packagePath[1]; 
-                            return `js/npm.${packageName.replace("@", "")}`;
-                        }
+    //                     if (packagePath) { 
+    //                         packageName = packagePath[1]; 
+    //                         return `js/npm.${packageName.replace("@", "")}`;
+    //                     }
 
-                    }
-                },
-            }
-        },
-    },
+    //                 }
+    //             },
+    //         }
+    //     },
+    // },
     plugins: [
         new CleanWebpackPlugin(),
         new CopyWebpackPlugin({ patterns: [{ from: Path.resolve(__dirname, '../public'), to: 'public' }, {from: Path.resolve(__dirname, '../../media/img'), to: 'img'} ] }),
-        new HtmlWebpackPlugin({
-            template: Path.resolve(__dirname, '../../templates/index.htm'),
-        }),
+        // new HtmlWebpackPlugin({
+        //     template: Path.resolve(__dirname, '../../templates/index.htm'),
+        // }),
         new BundleTracker({ filename: './webpack-stats.json' }),
-    ],
+    ].concat(quux),
     resolve: {
-        // modules: [__dirname, "node_modules"],
+        modules: [__dirname, "node_modules"],
         alias: {
             ...baz,
             // ...qux,
@@ -159,44 +184,80 @@ module.exports = {
             'graph-designer-data': Path.resolve(__dirname, '../templates/views', 'graph-designer.htm'),
             'map-layer-manager-data': Path.resolve(__dirname, '../templates/views', 'map-layer-manager.htm'),
             'resource-editor-data': Path.resolve(__dirname, '../templates/views/resource', 'editor.htm'),
-            'turf': Path.resolve(__dirname, '../node_modules/@turf/turf', 'turf.min'),
+            // 'turf': Path.resolve(__dirname, '../node_modules/@turf/turf', 'turf.min'),
             'plugins/knockout-select2': Path.resolve(__dirname, '../plugins', 'knockout-select2.js'),
-            'jquery-validate': Path.resolve(__dirname, '../node_modules/jquery-validation/dist', 'jquery.validate.min'),
+            // 'jquery-validate': Path.resolve(__dirname, '../node_modules/jquery-validation/dist', 'jquery.validate.min'),
             'jquery-ui/draggable': Path.resolve(__dirname, '../node_modules/jqueryui', 'jquery-ui.min.js'),
             'jquery-ui/sortable': Path.resolve(__dirname, '../node_modules/jqueryui', 'jquery-ui.min.js'),
-            'underscore': Path.resolve(__dirname, '../node_modules/underscore', 'underscore-min.js'),
-            'knockout': Path.resolve(__dirname, '../node_modules/knockout/build/output/knockout-latest'),
-            'knockout-mapping': Path.resolve(__dirname, '../node_modules/knockout-mapping/dist/', 'knockout.mapping.min'),
-            'jquery': Path.resolve(__dirname, '../node_modules/jquery-migrate/dist/', 'jquery-migrate.min'),
-            'jquery-ui': Path.resolve(__dirname, '../node_modules/jqueryui/jquery-ui.min'),
-            'select2': Path.resolve(__dirname, '../node_modules/select2/select2'),
-            'moment': Path.resolve(__dirname, '../node_modules/moment/min/', 'moment.min'),
-            'backbone': Path.resolve(__dirname, '../node_modules/backbone/backbone-min'),
-            'bootstrap': Path.resolve(__dirname, '../node_modules/bootstrap/dist/js/', 'bootstrap.min'),
-            'uuid': Path.resolve(__dirname, '../node_modules/uuidjs/dist/', 'uuid.core'),
-            'js-cookie': Path.resolve(__dirname, '../node_modules/js-cookie/src/', 'js.cookie'),
-            'dropzone': Path.resolve(__dirname, '../node_modules/dropzone/dist/min/', 'dropzone-amd-module.min'),
-            'jqtree': Path.resolve(__dirname, '../node_modules/jqtree/', 'tree.jquery'),
-            'cytoscape': Path.resolve(__dirname, '../node_modules/cytoscape/dist/', 'cytoscape.min'),
-            'cytoscape-cola': Path.resolve(__dirname, '../node_modules/cytoscape-cola/cytoscape-cola'),
-            'webcola': Path.resolve(__dirname, '../node_modules/webcola/WebCola/', 'cola.min'),
-            'geohash': Path.resolve(__dirname, '../node_modules/latlon-geohash/latlon-geohash'),
-            'chosen': Path.resolve(__dirname, '../node_modules/chosen-js/', 'chosen.jquery.min'),
-            'leaflet': Path.resolve(__dirname, '../node_modules/leaflet/dist/leaflet'),
-            'leaflet-iiif': Path.resolve(__dirname, '../node_modules/leaflet-iiif/leaflet-iiif'),
-            'leaflet-draw': Path.resolve(__dirname, '../node_modules/leaflet-draw/dist/', 'leaflet.draw'),
-            'leaflet-fullscreen': Path.resolve(__dirname, '../node_modules/leaflet.fullscreen/', 'Control.FullScreen'),
-            'leaflet-side-by-side': Path.resolve(__dirname, '../plugins/leaflet-side-by-side/index'),
-            'geojson-extent': Path.resolve(__dirname, '../node_modules/@mapbox/geojson-extent/geojson-extent'),
-            'geojsonhint': Path.resolve(__dirname, '../node_modules/@mapbox/geojsonhint/geojsonhint'),
-            'bootstrap-datetimepicker': Path.resolve(__dirname, '../node_modules/eonasdan-bootstrap-datetimepicker/build/js/bootstrap-datetimepicker.min'),
-            'mapbox-gl': Path.resolve(__dirname, '../node_modules/mapbox-gl/dist/mapbox-gl'),
-            'mapbox-gl-draw': Path.resolve(__dirname, '../node_modules/@mapbox/mapbox-gl-draw/dist/mapbox-gl-draw'),
-            'mapbox-gl-geocoder': Path.resolve(__dirname, '../node_modules/@mapbox/mapbox-gl-geocoder/dist/mapbox-gl-geocoder.min'),
+            // 'underscore': Path.resolve(__dirname, '../node_modules/underscore', 'underscore-min.js'),
+            // 'knockout': Path.resolve(__dirname, '../node_modules/knockout/build/output/knockout-latest'),
+            // 'knockout-mapping': Path.resolve(__dirname, '../node_modules/knockout-mapping/dist/', 'knockout.mapping.min'),
+            // 'jquery': Path.resolve(__dirname, '../node_modules/jquery-migrate/dist/', 'jquery-migrate.min'),
+            // 'jquery-ui': Path.resolve(__dirname, '../node_modules/jqueryui/jquery-ui.min'),
+            // 'select2': Path.resolve(__dirname, '../node_modules/select2/select2'),
+            // 'moment': Path.resolve(__dirname, '../node_modules/moment/min/', 'moment.min'),
+            // 'backbone': Path.resolve(__dirname, '../node_modules/backbone/backbone-min'),
+            // 'bootstrap': Path.resolve(__dirname, '../node_modules/bootstrap/dist/js/', 'bootstrap.min'),
+            // 'uuid': Path.resolve(__dirname, '../node_modules/uuidjs/dist/', 'uuid.core'),
+            // 'js-cookie': Path.resolve(__dirname, '../node_modules/js-cookie/src/', 'js.cookie'),
+            // 'dropzone': Path.resolve(__dirname, '../node_modules/dropzone/dist/min/', 'dropzone-amd-module.min'),
+            // 'jqtree': Path.resolve(__dirname, '../node_modules/jqtree/', 'tree.jquery'),
+            // 'cytoscape': Path.resolve(__dirname, '../node_modules/cytoscape/dist/', 'cytoscape.min'),
+            // 'cytoscape-cola': Path.resolve(__dirname, '../node_modules/cytoscape-cola/cytoscape-cola'),
+            // 'webcola': Path.resolve(__dirname, '../node_modules/webcola/WebCola/', 'cola.min'),
+            // 'geohash': Path.resolve(__dirname, '../node_modules/latlon-geohash/latlon-geohash'),
+            // 'chosen': Path.resolve(__dirname, '../node_modules/chosen-js/', 'chosen.jquery.min'),
+            // 'leaflet': Path.resolve(__dirname, '../node_modules/leaflet/dist/leaflet'),
+            // 'leaflet-iiif': Path.resolve(__dirname, '../node_modules/leaflet-iiif/leaflet-iiif'),
+            // 'leaflet-draw': Path.resolve(__dirname, '../node_modules/leaflet-draw/dist/', 'leaflet.draw'),
+            // 'leaflet-fullscreen': Path.resolve(__dirname, '../node_modules/leaflet.fullscreen/', 'Control.FullScreen'),
+            // 'leaflet-side-by-side': Path.resolve(__dirname, '../plugins/leaflet-side-by-side/index'),
+            // 'geojson-extent': Path.resolve(__dirname, '../node_modules/@mapbox/geojson-extent/geojson-extent'),
+            // 'geojsonhint': Path.resolve(__dirname, '../node_modules/@mapbox/geojsonhint/geojsonhint'),
+            // 'bootstrap-datetimepicker': Path.resolve(__dirname, '../node_modules/eonasdan-bootstrap-datetimepicker/build/js/bootstrap-datetimepicker.min'),
+            // 'mapbox-gl': Path.resolve(__dirname, '../node_modules/mapbox-gl/dist/mapbox-gl'),
+            // 'mapbox-gl-draw': Path.resolve(__dirname, '../node_modules/@mapbox/mapbox-gl-draw/dist/mapbox-gl-draw'),
+            // 'mapbox-gl-geocoder': Path.resolve(__dirname, '../node_modules/@mapbox/mapbox-gl-geocoder/dist/mapbox-gl-geocoder.min'),
+            // 'text': Path.resolve(__dirname, '../node_modules/requirejs-text/text'),
+            // 'dom-4': Path.resolve(__dirname, '../node_modules/dom4/build/dom4'),
+            // 'togeojson': Path.resolve(__dirname, '../node_modules/@tmcw/togeojson/dist/togeojson.umd'),
+            // 'ckeditor-jquery': Path.resolve(__dirname, '../node_modules/ckeditor/adapters/jquery'),
+            // 'datatables.net': Path.resolve(__dirname, '../node_modules/datatables.net/js/jquery.dataTables.min'),
+            // 'datatables.net-bs': Path.resolve(__dirname, '../node_modules/datatables.net-bs/js/dataTables.bootstrap.min'),
+            // 'datatables.net-buttons': Path.resolve(__dirname, '../node_modules/datatables.net-buttons/js/dataTables.buttons.min'),
+            // 'datatables.net-buttons-print': Path.resolve(__dirname, '../node_modules/datatables.net-buttons/js/buttons.print.min'),
+            // 'datatables.net-buttons-html5': Path.resolve(__dirname, '../node_modules/datatables.net-buttons/js/buttons.html5.min'),
+            // 'datatables.net-buttons-bs': Path.resolve(__dirname, '../node_modules/datatables.net-buttons-bs/js/buttons.bootstrap.min'),
+            // 'datatables.net-responsive': Path.resolve(__dirname, '../node_modules/datatables.net-responsive/js/dataTables.responsive'),
+            // 'datatables.net-responsive-bs': Path.resolve(__dirname, '../node_modules/datatables.net-responsive-bs/js/responsive.bootstrap'),
+            'templates/views/components/iiif-popup.htm': Path.resolve(__dirname, '../../templates/views/components/iiif-popup.htm'),
+            'templates/views/components/cards/related-resources-map-popup.htm': Path.resolve(__dirname, '../../templates/views/components/cards/related-resources-map-popup.htm'),
+            'templates/views/components/map-popup.htm': Path.resolve(__dirname, '../../templates/views/components/map-popup.htm'),
+            'templates/views/components/cards/map-popup.htm': Path.resolve(__dirname, '../../templates/views/components/cards/map-popup.htm'),
+
+            'nifty': Path.resolve(__dirname, '../plugins', 'nifty'),
+            'async': Path.resolve(__dirname, '../node_modules/requirejs-plugins/src/async'),
             'text': Path.resolve(__dirname, '../node_modules/requirejs-text/text'),
-            'dom-4': Path.resolve(__dirname, '../node_modules/dom4/build/dom4'),
-            'togeojson': Path.resolve(__dirname, '../node_modules/@tmcw/togeojson/dist/togeojson.umd'),
+            'jquery-lib': Path.resolve(__dirname, '../node_modules/jquery/dist/jquery.min'),
+            'jquery': Path.resolve(__dirname, '../node_modules/jquery-migrate/dist/jquery-migrate.min'),
+            'js-cookie': Path.resolve(__dirname, '../node_modules/js-cookie/src/js.cookie'),
+            'select2': Path.resolve(__dirname, '../node_modules/select2/select2'),
+            'bootstrap': Path.resolve(__dirname, '../node_modules/bootstrap/dist/js/bootstrap.min'),
+            'jquery-ui': Path.resolve(__dirname, '../node_modules/jqueryui/jquery-ui.min'),
+            'backbone': Path.resolve(__dirname, '../node_modules/backbone/backbone-min'),
+            'underscore': Path.resolve(__dirname, '../node_modules/underscore/underscore-min'),
+            'jquery-validate': Path.resolve(__dirname, '../node_modules/jquery-validation/dist/jquery.validate.min'),
+            'd3': Path.resolve(__dirname, '../node_modules/d3/dist/d3.min'),
+            'dropzone': Path.resolve(__dirname, '../node_modules/dropzone/dist/min/dropzone-amd-module.min'),
+            'ckeditor': Path.resolve(__dirname, '../node_modules/ckeditor/ckeditor'),
             'ckeditor-jquery': Path.resolve(__dirname, '../node_modules/ckeditor/adapters/jquery'),
+            'knockout': Path.resolve(__dirname, '../node_modules/knockout/build/output/knockout-latest'),
+            'knockout-mapping': Path.resolve(__dirname, '../node_modules/knockout-mapping/dist/knockout.mapping.min'),
+            'moment': Path.resolve(__dirname, '../node_modules/moment/min/moment.min'),
+            'bootstrap-datetimepicker': Path.resolve(__dirname, '../node_modules/eonasdan-bootstrap-datetimepicker/build/js/bootstrap-datetimepicker.min'),
+            'blueimp-gallery': Path.resolve(__dirname, '../node_modules/blueimp-gallery/js/blueimp-gallery.min'),
+            'blueimp-jquery': Path.resolve(__dirname, '../node_modules/blueimp-gallery/js/jquery.blueimp-gallery.min'),
+            'blueimp-helper': Path.resolve(__dirname, '../node_modules/blueimp-gallery/js/blueimp-helper.min'),
             'datatables.net': Path.resolve(__dirname, '../node_modules/datatables.net/js/jquery.dataTables.min'),
             'datatables.net-bs': Path.resolve(__dirname, '../node_modules/datatables.net-bs/js/dataTables.bootstrap.min'),
             'datatables.net-buttons': Path.resolve(__dirname, '../node_modules/datatables.net-buttons/js/dataTables.buttons.min'),
@@ -205,11 +266,36 @@ module.exports = {
             'datatables.net-buttons-bs': Path.resolve(__dirname, '../node_modules/datatables.net-buttons-bs/js/buttons.bootstrap.min'),
             'datatables.net-responsive': Path.resolve(__dirname, '../node_modules/datatables.net-responsive/js/dataTables.responsive'),
             'datatables.net-responsive-bs': Path.resolve(__dirname, '../node_modules/datatables.net-responsive-bs/js/responsive.bootstrap'),
-            'templates/views/components/iiif-popup.htm': Path.resolve(__dirname, '../../templates/views/components/iiif-popup.htm'),
-            'templates/views/components/cards/related-resources-map-popup.htm': Path.resolve(__dirname, '../../templates/views/components/cards/related-resources-map-popup.htm'),
-            'templates/views/components/map-popup.htm': Path.resolve(__dirname, '../../templates/views/components/map-popup.htm'),
-            'templates/views/components/cards/map-popup.htm': Path.resolve(__dirname, '../../templates/views/components/cards/map-popup.htm'),
-            // 'require': Path.resolve(__dirname, '../node_modules/requirejs', 'require.js'),
+            'chosen': Path.resolve(__dirname, '../node_modules/chosen-js/chosen.jquery.min'),
+            'mapbox-gl': Path.resolve(__dirname, '../node_modules/mapbox-gl/dist/mapbox-gl'),
+            'mapbox-gl-draw': Path.resolve(__dirname, '../node_modules/@mapbox/mapbox-gl-draw/dist/mapbox-gl-draw'),
+            'mapbox-gl-geocoder': Path.resolve(__dirname, '../node_modules/@mapbox/mapbox-gl-geocoder/dist/mapbox-gl-geocoder.min'),
+            'proj4': Path.resolve(__dirname, '../node_modules/proj4/dist/proj4'),
+            'noUiSlider': Path.resolve(__dirname, '../node_modules/nouislider/distribute/nouislider.min'),
+            'geojson-extent': Path.resolve(__dirname, '../node_modules/@mapbox/geojson-extent/geojson-extent'),
+            'geojsonhint': Path.resolve(__dirname, '../node_modules/@mapbox/geojsonhint/geojsonhint'),
+            'bootstrap-colorpicker': Path.resolve(__dirname, '../node_modules/bootstrap-colorpicker/dist/js/bootstrap-colorpicker.min'),
+            'uuid': Path.resolve(__dirname, '../node_modules/uuidjs/dist/uuid.core'),
+            'turf': Path.resolve(__dirname, '../node_modules/@turf/turf/turf.min'),
+            'geohash': Path.resolve(__dirname, '../node_modules/latlon-geohash/latlon-geohash'),
+            'leaflet': Path.resolve(__dirname, '../node_modules/leaflet/dist/leaflet'),
+            'leaflet-iiif': Path.resolve(__dirname, '../node_modules/leaflet-iiif/leaflet-iiif'),
+            'leaflet-draw': Path.resolve(__dirname, '../node_modules/leaflet-draw/dist/leaflet.draw'),
+            'leaflet-fullscreen': Path.resolve(__dirname, '../node_modules/leaflet.fullscreen/Control.FullScreen'),
+            'leaflet-side-by-side': Path.resolve(__dirname, '../plugins', 'leaflet-side-by-side/index'),
+            'metismenu': Path.resolve(__dirname, '../node_modules/metismenu/dist/metisMenu.min'),
+            'knockstrap': Path.resolve(__dirname, '../node_modules/knockstrap/build/knockstrap.min'),
+            'jqtree': Path.resolve(__dirname, '../node_modules/jqtree/tree.jquery'),
+            // 'core-js':Path.resolve(__dirname, '../node_modules/core-js/client/shim.min'),
+            'dom-4': Path.resolve(__dirname, '../node_modules/dom4/build/dom4'),
+            'numeral': Path.resolve(__dirname, '../node_modules/numeral/numeral'),
+            'togeojson': Path.resolve(__dirname, '../node_modules/@tmcw/togeojson/dist/togeojson.umd'),
+            'cytoscape': Path.resolve(__dirname, '../node_modules/cytoscape/dist/cytoscape.min'),
+            'cytoscape-cola': Path.resolve(__dirname, '../node_modules/cytoscape-cola/cytoscape-cola'),
+            'webcola': Path.resolve(__dirname, '../node_modules/webcola/WebCola/cola.min'),
+
+
+            'requirejs': Path.resolve(__dirname, '../node_modules/requirejs', 'require.js'),
         },
     },
     module: {
@@ -227,10 +313,10 @@ module.exports = {
                 test: /\.txt$/i,
                 use: 'raw-loader',
             },
-            // {
-            //     test: /\.(png|svg|jpg|jpeg|gif)$/i,
-            //     type: 'asset/resource',
-            //   },
+            {
+                test: /\.(png|svg|jpg|jpeg|gif)$/i,
+                type: 'asset/resource',
+            },
             // {
             //     test: /\.(ico|jpg|jpeg|png|gif|eot|otf|webp|svg|ttf|woff|woff2)(\?.*)?$/,
             //     use: {

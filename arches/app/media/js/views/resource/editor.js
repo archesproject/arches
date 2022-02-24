@@ -1,4 +1,4 @@
-define([
+define('editor', [
     'jquery',
     'underscore',
     'knockout',

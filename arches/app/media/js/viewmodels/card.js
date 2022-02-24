@@ -1,4 +1,4 @@
-define([
+define('card', [
     'jquery',
     'underscore',
     'knockout',

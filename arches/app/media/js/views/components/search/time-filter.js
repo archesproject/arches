@@ -1,4 +1,4 @@
-define([
+define('time-filter', [
     'jquery',
     'underscore',
     'knockout',

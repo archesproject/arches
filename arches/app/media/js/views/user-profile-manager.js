@@ -1,4 +1,4 @@
-define([
+define('user-profile-manager', [
     'jquery',
     'underscore',
     'knockout',

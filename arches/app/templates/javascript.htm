@@ -80,81 +80,81 @@
             location: '{{ STATIC_URL }}packages/codemirror',
             main: "lib/codemirror"
         }],
-        shim: {
-            'nifty': {
-                exports: 'nifty',
-                deps: ['bootstrap', 'jquery', 'jquery-ui', 'metismenu']
-            },
-            'metismenu': {
-                deps: ['jquery', 'jquery-ui']
-            },
-            'chosen': {
-                deps: ['jquery']
-            },
-            'bootstrap': {
-                deps: ['jquery', 'jquery-ui']
-            },
-            'knockout-mapping': {
-                deps: ['knockout']
-            },
-            'jquery-validate': {
-                deps: ['jquery']
-            },
-            'jquery-ui': {
-                deps: ['jquery']
-            },
-            'jqtree': {
-                deps: ['jquery']
-            },
-            'datatables': {
-                deps: ['jquery']
-            },
-            'datatables.net': {
-                deps: ['jquery']
-            },
-            'datatables.net-buttons-bs': {
-                deps: ['datatables.net-buttons']
-            },
-            'noUiSlider': {
-                deps: ['jquery'],
-                exports : '$'
-            },
-            'jquery': {
-                deps: ['jquery-lib'],
-                exports : '$'
-            },
-            'mapbox-gl-draw': {
-                deps: ['mapbox-gl']
-            },
-            'select2': {
-                deps: ['jquery'],
-            },
-            'moment': {
-                deps: ['jquery']
-            },
-            'uuid': {
-                exports: 'UUID'
-            },
-            'geohash': {
-                exports: 'Geohash'
-            },
-            'leaflet-iiif': {
-                deps: ['leaflet']
-            },
-            'leaflet-draw': {
-                deps: ['leaflet']
-            },
-            'leaflet-fullscreen': {
-                deps: ['leaflet']
-            },
-            'ckeditor': {
-                deps: ['jquery']
-            },
-            'ckeditor-jquery': {
-                deps: ['ckeditor']
-            },
-            {% block shim %}{% endblock shim %}
-        }
+        // shim: {
+        //     'nifty': {
+        //         exports: 'nifty',
+        //         deps: ['bootstrap', 'jquery', 'jquery-ui', 'metismenu']
+        //     },
+        //     'metismenu': {
+        //         deps: ['jquery', 'jquery-ui']
+        //     },
+        //     'chosen': {
+        //         deps: ['jquery']
+        //     },
+        //     'bootstrap': {
+        //         deps: ['jquery', 'jquery-ui']
+        //     },
+        //     'knockout-mapping': {
+        //         deps: ['knockout']
+        //     },
+        //     'jquery-validate': {
+        //         deps: ['jquery']
+        //     },
+        //     'jquery-ui': {
+        //         deps: ['jquery']
+        //     },
+        //     'jqtree': {
+        //         deps: ['jquery']
+        //     },
+        //     'datatables': {
+        //         deps: ['jquery']
+        //     },
+        //     'datatables.net': {
+        //         deps: ['jquery']
+        //     },
+        //     'datatables.net-buttons-bs': {
+        //         deps: ['datatables.net-buttons']
+        //     },
+        //     'noUiSlider': {
+        //         deps: ['jquery'],
+        //         exports : '$'
+        //     },
+        //     'jquery': {
+        //         deps: ['jquery-lib'],
+        //         exports : '$'
+        //     },
+        //     'mapbox-gl-draw': {
+        //         deps: ['mapbox-gl']
+        //     },
+        //     'select2': {
+        //         deps: ['jquery'],
+        //     },
+        //     'moment': {
+        //         deps: ['jquery']
+        //     },
+        //     'uuid': {
+        //         exports: 'UUID'
+        //     },
+        //     'geohash': {
+        //         exports: 'Geohash'
+        //     },
+        //     'leaflet-iiif': {
+        //         deps: ['leaflet']
+        //     },
+        //     'leaflet-draw': {
+        //         deps: ['leaflet']
+        //     },
+        //     'leaflet-fullscreen': {
+        //         deps: ['leaflet']
+        //     },
+        //     'ckeditor': {
+        //         deps: ['jquery']
+        //     },
+        //     'ckeditor-jquery': {
+        //         deps: ['ckeditor']
+        //     },
+        //     {% block shim %}{% endblock shim %}
+        // }
     });
 </script>
 {% endblock require_config %}

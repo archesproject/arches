@@ -1,4 +1,4 @@
-define([
+define('form', [
     'jquery',
     'backbone',
     'knockout',

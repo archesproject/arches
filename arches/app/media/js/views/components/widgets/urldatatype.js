@@ -1,4 +1,4 @@
-define(['knockout', 'viewmodels/widget'], function(ko, WidgetViewModel) {
+define('urldatatype', ['knockout', 'viewmodels/widget'], function(ko, WidgetViewModel) {
     var name = 'urldatatype';
     ko.components.register(name, {
         viewModel: function(params) {

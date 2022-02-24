@@ -1,4 +1,4 @@
-define([
+define('graph-designer', [
     'jquery',
     'underscore',
     'knockout',

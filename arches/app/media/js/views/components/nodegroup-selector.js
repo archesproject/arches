@@ -1,4 +1,4 @@
-define(['knockout', 
+define('nodegroup-selector', ['knockout', 
         'knockout-mapping',
         'viewmodels/function', 
         'models/graph',

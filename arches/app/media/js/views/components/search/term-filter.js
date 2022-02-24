@@ -1,4 +1,4 @@
-define([
+define('term-filter', [
     'knockout',
     'knockout-mapping',
     'underscore',

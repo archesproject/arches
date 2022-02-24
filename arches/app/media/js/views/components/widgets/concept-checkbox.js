@@ -1,4 +1,4 @@
-define([
+define('concept-checkbox', [
     'knockout',
     'viewmodels/concept-widget',
     'plugins/knockout-select2'

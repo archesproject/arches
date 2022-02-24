@@ -1,4 +1,4 @@
-define(['knockout', 'mapbox-gl', 'arches', 'geocoder-templates'],
+define('base-geocoder', ['knockout', 'mapbox-gl', 'arches', 'geocoder-templates'],
 function (ko, mapboxgl, arches) {
     /**
      * A viewmodel used for geocoders

@@ -1,4 +1,4 @@
-define([
+define('graph-settings', [
     'jquery',
     'underscore',
     'knockout',

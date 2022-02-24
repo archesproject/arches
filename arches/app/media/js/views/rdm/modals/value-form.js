@@ -1,4 +1,4 @@
-define(['jquery', 'backbone', 'bootstrap', 'select2'], function ($, Backbone) {
+define('value-form', ['jquery', 'backbone', 'bootstrap', 'select2'], function ($, Backbone) {
     return Backbone.View.extend({
         initialize: function(options) {
             var self = this,

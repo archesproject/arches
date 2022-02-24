@@ -1,4 +1,4 @@
-define(['knockout'], function(ko) {
+define('imagereader', ['knockout'], function(ko) {
     return ko.components.register('imagereader', {
         viewModel: function(params) {
             this.params = params;

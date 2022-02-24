@@ -1,4 +1,4 @@
-define([
+define('node-value-select', [
     'knockout',
     'viewmodels/node-value-select',
     'bindings/select2-query'

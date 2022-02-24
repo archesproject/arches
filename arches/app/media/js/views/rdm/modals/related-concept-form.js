@@ -1,4 +1,4 @@
-define(['jquery', 'backbone', 'arches', 'views/concept-search', 'models/concept'], function ($, Backbone, arches, ConceptSearch, ConceptModel) {
+define('related-concept-form', ['jquery', 'backbone', 'arches', 'views/concept-search', 'models/concept'], function ($, Backbone, arches, ConceptSearch, ConceptModel) {
     return ConceptSearch.extend({
 
         initialize: function(){

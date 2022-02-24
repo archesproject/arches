@@ -1,4 +1,4 @@
-define(['knockout', 'underscore', 'viewmodels/widget'], function(ko, _, WidgetViewModel) {
+define('edtf', ['knockout', 'underscore', 'viewmodels/widget'], function(ko, _, WidgetViewModel) {
     /**
     * registers a edtf-widget component for use in forms
     * @function external:"ko.components".edtf-widget

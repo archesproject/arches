@@ -1,4 +1,4 @@
-define(['knockout', 'underscore', 'viewmodels/widget', 'bindings/ckeditor'], function (ko, _, WidgetViewModel) {
+define('rich-text', ['knockout', 'underscore', 'viewmodels/widget', 'bindings/ckeditor'], function (ko, _, WidgetViewModel) {
     /**
     * registers a rich-text-widget component for use in forms
     * @function external:"ko.components".rich-text-widget

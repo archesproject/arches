@@ -1,4 +1,4 @@
-define([
+define('permission-settings-form', [
     'jquery',
     'underscore',
     'arches',

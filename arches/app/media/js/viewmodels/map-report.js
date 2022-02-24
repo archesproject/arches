@@ -1,4 +1,4 @@
-define(['underscore', 'knockout', 'knockout-mapping', 'viewmodels/report', 'reports/map-header'], function(_, ko, koMapping, ReportViewModel) {
+define('map-report', ['underscore', 'knockout', 'knockout-mapping', 'viewmodels/report', 'reports/map-header'], function(_, ko, koMapping, ReportViewModel) {
     return function(params) {
         var self = this;
         params.configKeys = ['zoom', 'centerX', 'centerY', 'geocoder', 'basemap', 'geometryTypes', 'pitch', 'bearing', 'geocodePlaceholder'];

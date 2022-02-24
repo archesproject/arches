@@ -1,4 +1,4 @@
-define(['knockout'], function (ko) {
+define('string', ['knockout'], function (ko) {
     var name = 'string-datatype-config';
     ko.components.register(name, {
         viewModel: function(params) {

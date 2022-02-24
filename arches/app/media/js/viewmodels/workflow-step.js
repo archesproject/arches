@@ -1,4 +1,4 @@
-define([
+define('workflow-step', [
     'knockout',
     'underscore',
     'knockout-mapping',

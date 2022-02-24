@@ -1,4 +1,4 @@
-define([
+define('branch-list', [
     'views/list',
     'views/graph/graph-manager/graph-base',
     'models/graph',

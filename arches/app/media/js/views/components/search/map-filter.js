@@ -1,4 +1,4 @@
-define([
+define('map-filter', [
     'jquery',
     'underscore',
     'arches',

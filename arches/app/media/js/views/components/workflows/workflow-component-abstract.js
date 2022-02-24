@@ -1,4 +1,4 @@
-define([
+define('workflow-component-abstract', [
     'underscore',
     'jquery',
     'arches',

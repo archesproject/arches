@@ -1,4 +1,4 @@
-define([
+define('card-components-tree', [
     'backbone',
     'knockout',
     'bindings/sortable'

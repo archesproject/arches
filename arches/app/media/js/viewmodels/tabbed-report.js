@@ -1,4 +1,4 @@
-define([
+define('tabbed-report', [
     'jquery',
     'underscore',
     'knockout',

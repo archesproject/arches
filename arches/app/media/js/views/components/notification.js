@@ -1,4 +1,4 @@
-define([
+define('notification', [
     'jquery',
     'arches',
     'knockout',

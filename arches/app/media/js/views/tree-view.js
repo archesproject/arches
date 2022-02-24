@@ -1,4 +1,4 @@
-define([
+define('tree-view', [
     'jquery',
     'backbone',
     'knockout',

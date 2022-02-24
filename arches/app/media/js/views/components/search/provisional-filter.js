@@ -1,4 +1,4 @@
-define([
+define('provisional-filter', [
     'knockout',
     'views/components/search/base-filter'
 ], function(ko, BaseFilter) {

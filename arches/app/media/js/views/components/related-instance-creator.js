@@ -1,4 +1,4 @@
-define([
+define('related-instance-creator', [
     'underscore',
     'jquery',
     'arches',

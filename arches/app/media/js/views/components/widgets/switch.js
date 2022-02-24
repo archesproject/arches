@@ -1,4 +1,4 @@
-define(['knockout', 'underscore', 'viewmodels/widget'], function(ko, _, WidgetViewModel) {
+define('switch', ['knockout', 'underscore', 'viewmodels/widget'], function(ko, _, WidgetViewModel) {
     /**
     * knockout components namespace used in arches
     * @external "ko.components"

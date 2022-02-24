@@ -1,4 +1,4 @@
-define([
+define('related-resources-graph', [
     'arches',
     'knockout',
     'views/components/workbench',

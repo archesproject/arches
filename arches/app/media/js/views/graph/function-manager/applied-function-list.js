@@ -1,4 +1,4 @@
-define([
+define('applied-function-list', [
     'views/list'
 ], function(ListView) {
     var AppliedFunctionList = ListView.extend({

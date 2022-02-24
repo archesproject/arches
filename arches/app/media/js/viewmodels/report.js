@@ -1,4 +1,4 @@
-define(['knockout', 'knockout-mapping', 'underscore', 'moment', 'bindings/let', 'views/components/simple-switch'], function(ko, koMapping, _, moment) {
+define('report', ['knockout', 'knockout-mapping', 'underscore', 'moment', 'bindings/let', 'views/components/simple-switch'], function(ko, koMapping, _, moment) {
     var ReportViewModel = function(params) {
         var self = this;
 

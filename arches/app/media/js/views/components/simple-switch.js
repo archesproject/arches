@@ -1,4 +1,4 @@
-define(['knockout', 'viewmodels/widget'], function (ko, WidgetViewModel) {
+define('simple-switch', ['knockout', 'viewmodels/widget'], function (ko, WidgetViewModel) {
     /**
     * knockout components namespace used in arches
     * @external "ko.components"

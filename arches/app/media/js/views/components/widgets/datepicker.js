@@ -1,4 +1,4 @@
-define([
+define('datepicker', [
     'knockout',
     'underscore',
     'viewmodels/widget',

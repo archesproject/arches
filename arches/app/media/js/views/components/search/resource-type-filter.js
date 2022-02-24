@@ -1,4 +1,4 @@
-define([
+define('resource-type-filter', [
     'knockout',
     'views/components/search/base-filter'
 ], function(ko, BaseFilter) {

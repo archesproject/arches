@@ -1,4 +1,4 @@
-define(['jquery', 'underscore', 'backbone', 'arches', 'select2'], function ($, _, Backbone, arches, Select2) {
+define('concept-search', ['jquery', 'underscore', 'backbone', 'arches', 'select2'], function ($, _, Backbone, arches, Select2) {
     return Backbone.View.extend({
 
         initialize: function(options) {

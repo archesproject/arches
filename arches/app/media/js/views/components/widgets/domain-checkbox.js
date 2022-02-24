@@ -1,4 +1,4 @@
-define([
+define('domain-checkbox', [
     'knockout',
     'viewmodels/domain-widget',
     'plugins/knockout-select2'

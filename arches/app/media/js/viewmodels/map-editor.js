@@ -1,4 +1,4 @@
-define([
+define('map-editor', [
     'arches',
     'jquery',
     'underscore',

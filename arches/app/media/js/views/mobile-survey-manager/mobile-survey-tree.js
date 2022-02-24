@@ -1,4 +1,4 @@
-define([
+define('mobile-survey-tree', [
     'jquery',
     'knockout',
     'underscore',

@@ -1,4 +1,4 @@
-define([
+define('concept-widget', [
     'viewmodels/remote-domain-widget',
     'arches'
 ], function (RemoteDomainWidgetViewModel, arches) {

@@ -1,4 +1,4 @@
-define([
+define('notifications-list', [
     'jquery',
     'arches',
     'views/list',

@@ -1,4 +1,4 @@
-define([
+define('search-results-details', [
     'jquery',
     'underscore',
     'knockout',

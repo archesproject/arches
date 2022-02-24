@@ -1,4 +1,4 @@
-define([
+define('card-tree', [
     'jquery',
     'underscore',
     'knockout',

@@ -1,4 +1,4 @@
-define(['knockout', 'proj4', 'arches', 'turf'], function (ko, proj4, arches, turf) {
+define('xy-input', ['knockout', 'proj4', 'arches', 'turf'], function (ko, proj4, arches, turf) {
     /**
     * A base viewmodel for maptools
     *

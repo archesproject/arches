@@ -1,4 +1,4 @@
-define([
+define('workbench', [
     'jquery',
     'underscore',
     'arches',

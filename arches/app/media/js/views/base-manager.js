@@ -1,4 +1,4 @@
-define([
+define('base-manager', [
     'jquery',
     'underscore',
     'knockout',

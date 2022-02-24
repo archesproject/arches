@@ -1,4 +1,4 @@
-define(['knockout'], function(ko) {
+define('url', ['knockout'], function(ko) {
     var name = 'url-datatype-config';
     ko.components.register(name, {
         viewModel: function(params) {

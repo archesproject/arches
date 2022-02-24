@@ -1,4 +1,4 @@
-define(['knockout'], function(ko) {
+define('pdfreader', ['knockout'], function(ko) {
     return ko.components.register('pdfreader', {
         viewModel: function(params) {
             this.params = params;
