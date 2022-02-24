@@ -235,6 +235,8 @@ module.exports = {
             'templates/views/components/map-popup.htm': Path.resolve(__dirname, '../../templates/views/components/map-popup.htm'),
             'templates/views/components/cards/map-popup.htm': Path.resolve(__dirname, '../../templates/views/components/cards/map-popup.htm'),
 
+            // 'views/page-view': Path.resolve(__dirname, '../build/js/views/page-view.js'),
+
             'nifty': Path.resolve(__dirname, '../plugins', 'nifty'),
             'async': Path.resolve(__dirname, '../node_modules/requirejs-plugins/src/async'),
             'text': Path.resolve(__dirname, '../node_modules/requirejs-text/text'),
