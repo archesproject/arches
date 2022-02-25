@@ -391,6 +391,8 @@ define([
                 return ko.unwrap(group.nodegroupid) === card.nodegroup_id;
             });
             return !nodegroup || !ko.unwrap(nodegroup.parentnodegroup_id);
+        }).sort((firstEl, secondEl) => {
+            return firstEl.sortorder >= secondEl.sortorder ? firstEl.sortorder === secondEl.sortorder ? 0 : 1 : -1; 
         });
         this.topCards(tc.map(function(card) {
             var constraints =  data.constraints.filter(function(ct){return ct.card_id === card.cardid;});
