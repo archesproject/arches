@@ -1200,40 +1200,31 @@ class JsonLDImportTests(ArchesTestCase):
         # which is why we call reader.read_resource directly with expand_data=False
         # see https://github.com/archesproject/arches/issues/8181
         data = {
-            "http://www.cidoc-crm.org/cidoc-crm/P3_has_note": [{
-                "@value": "ALLAN, DAVID"
-            }],
+            "http://www.cidoc-crm.org/cidoc-crm/P3_has_note": [{"@value": "ALLAN, DAVID"}],
             "@id": "urn:uuid:0b0e214d-4601-3f73-bdc9-f27c8ad9e0de",
-            "@type": [
-                "http://www.cidoc-crm.org/cidoc-crm/E21_Person"
+            "@type": ["http://www.cidoc-crm.org/cidoc-crm/E21_Person"],
+            "http://www.cidoc-crm.org/cidoc-crm/P14i_performed": [
+                {
+                    "http://www.cidoc-crm.org/cidoc-crm/P2_has_type": [
+                        {
+                            "http://www.w3.org/2000/01/rdf-schema#label": [{"@value": "collecting"}],
+                            "@id": "http://vocab.getty.edu/aat/300077121",
+                            "@type": ["http://www.cidoc-crm.org/cidoc-crm/E55_Type"],
+                        }
+                    ],
+                    "@type": ["http://www.cidoc-crm.org/cidoc-crm/E7_Activity"],
+                },
+                {
+                    "http://www.cidoc-crm.org/cidoc-crm/P2_has_type": [
+                        {
+                            "http://www.w3.org/2000/01/rdf-schema#label": [{"@value": "creating (artistic activity)"}],
+                            "@id": "http://vocab.getty.edu/aat/300404387",
+                            "@type": ["http://www.cidoc-crm.org/cidoc-crm/E55_Type"],
+                        }
+                    ],
+                    "@type": ["http://www.cidoc-crm.org/cidoc-crm/E7_Activity"],
+                },
             ],
-            "http://www.cidoc-crm.org/cidoc-crm/P14i_performed": [{
-                "http://www.cidoc-crm.org/cidoc-crm/P2_has_type": [{
-                    "http://www.w3.org/2000/01/rdf-schema#label": [{
-                        "@value": "collecting"
-                    }],
-                    "@id": "http://vocab.getty.edu/aat/300077121",
-                    "@type": [
-                        "http://www.cidoc-crm.org/cidoc-crm/E55_Type"
-                    ]
-                }],
-                "@type": [
-                    "http://www.cidoc-crm.org/cidoc-crm/E7_Activity"
-                ]
-            },{
-                "http://www.cidoc-crm.org/cidoc-crm/P2_has_type": [{
-                    "http://www.w3.org/2000/01/rdf-schema#label": [{
-                        "@value": "creating (artistic activity)"
-                    }],
-                    "@id": "http://vocab.getty.edu/aat/300404387",
-                    "@type": [
-                        "http://www.cidoc-crm.org/cidoc-crm/E55_Type"
-                    ]
-                }],
-                "@type": [
-                    "http://www.cidoc-crm.org/cidoc-crm/E7_Activity"
-                ]
-            }]
         }
 
         graph_id = "f13f8a92-3e76-11ec-9a49-faffc210b420"
@@ -1245,7 +1236,7 @@ class JsonLDImportTests(ArchesTestCase):
         reader.resources[0].save()
         tiles = TileModel.objects.filter(resourceinstance_id=resource_id)
         self.assertEqual(len(tiles), 3)
-        
+
         actual_tiledata = []
         for tile in tiles:
             actual_tiledata.append(tile.data)
@@ -1255,63 +1246,49 @@ class JsonLDImportTests(ArchesTestCase):
             {
                 "f1420740-3e76-11ec-9a49-faffc210b420": None,
                 "f1420f92-3e76-11ec-9a49-faffc210b420": None,
-                "f1417e1a-3e76-11ec-9a49-faffc210b420": [
-                    "b83cab06-1cfe-4aeb-9653-cb9f0cc45595"
-                ]
+                "f1417e1a-3e76-11ec-9a49-faffc210b420": ["b83cab06-1cfe-4aeb-9653-cb9f0cc45595"],
             },
             {
                 "f1420740-3e76-11ec-9a49-faffc210b420": None,
                 "f1420f92-3e76-11ec-9a49-faffc210b420": None,
-                "f1417e1a-3e76-11ec-9a49-faffc210b420": [
-                    "fc3559c4-03c4-428c-a48e-0f480c8a3751"
-                ]
-            }
-
+                "f1417e1a-3e76-11ec-9a49-faffc210b420": ["fc3559c4-03c4-428c-a48e-0f480c8a3751"],
+            },
         ]
         self.assertCountEqual(actual_tiledata, expected_tiledata)
 
     def test_8181_import_bug_2(self):
-        # this test is ostensibly the same as test_8181_import_bug with the only 
+        # this test is ostensibly the same as test_8181_import_bug with the only
         # difference being the order of the data in the json-ld document being submitted
         # without fix #8181 will fail in a different way which is a bit of a concern
         # this test and test_8181_import_bug need to submit data in an exact order
         # which is why we call reader.read_resource directly with expand_data=False
         # see https://github.com/archesproject/arches/issues/8181
         data = {
-            "http://www.cidoc-crm.org/cidoc-crm/P14i_performed": [{
-                "http://www.cidoc-crm.org/cidoc-crm/P2_has_type": [{
-                    "http://www.w3.org/2000/01/rdf-schema#label": [{
-                        "@value": "collecting"
-                    }],
-                    "@id": "http://vocab.getty.edu/aat/300077121",
-                    "@type": [
-                        "http://www.cidoc-crm.org/cidoc-crm/E55_Type"
-                    ]
-                }],
-                "@type": [
-                    "http://www.cidoc-crm.org/cidoc-crm/E7_Activity"
-                ]
-            },{
-                "http://www.cidoc-crm.org/cidoc-crm/P2_has_type": [{
-                    "http://www.w3.org/2000/01/rdf-schema#label": [{
-                        "@value": "creating (artistic activity)"
-                    }],
-                    "@id": "http://vocab.getty.edu/aat/300404387",
-                    "@type": [
-                        "http://www.cidoc-crm.org/cidoc-crm/E55_Type"
-                    ]
-                }],
-                "@type": [
-                    "http://www.cidoc-crm.org/cidoc-crm/E7_Activity"
-                ]
-            }],
-            "http://www.cidoc-crm.org/cidoc-crm/P3_has_note": [{
-                "@value": "ALLAN, DAVID"
-            }],
+            "http://www.cidoc-crm.org/cidoc-crm/P14i_performed": [
+                {
+                    "http://www.cidoc-crm.org/cidoc-crm/P2_has_type": [
+                        {
+                            "http://www.w3.org/2000/01/rdf-schema#label": [{"@value": "collecting"}],
+                            "@id": "http://vocab.getty.edu/aat/300077121",
+                            "@type": ["http://www.cidoc-crm.org/cidoc-crm/E55_Type"],
+                        }
+                    ],
+                    "@type": ["http://www.cidoc-crm.org/cidoc-crm/E7_Activity"],
+                },
+                {
+                    "http://www.cidoc-crm.org/cidoc-crm/P2_has_type": [
+                        {
+                            "http://www.w3.org/2000/01/rdf-schema#label": [{"@value": "creating (artistic activity)"}],
+                            "@id": "http://vocab.getty.edu/aat/300404387",
+                            "@type": ["http://www.cidoc-crm.org/cidoc-crm/E55_Type"],
+                        }
+                    ],
+                    "@type": ["http://www.cidoc-crm.org/cidoc-crm/E7_Activity"],
+                },
+            ],
+            "http://www.cidoc-crm.org/cidoc-crm/P3_has_note": [{"@value": "ALLAN, DAVID"}],
             "@id": "urn:uuid:0b0e214d-4601-3f73-bdc9-f27c8ad9e0de",
-            "@type": [
-                "http://www.cidoc-crm.org/cidoc-crm/E21_Person"
-            ]
+            "@type": ["http://www.cidoc-crm.org/cidoc-crm/E21_Person"],
         }
 
         graph_id = "f13f8a92-3e76-11ec-9a49-faffc210b420"
@@ -1323,7 +1300,7 @@ class JsonLDImportTests(ArchesTestCase):
         reader.resources[0].save()
         tiles = TileModel.objects.filter(resourceinstance_id=resource_id)
         self.assertEqual(len(tiles), 3)
-        
+
         actual_tiledata = []
         for tile in tiles:
             actual_tiledata.append(tile.data)
@@ -1333,17 +1310,12 @@ class JsonLDImportTests(ArchesTestCase):
             {
                 "f1420740-3e76-11ec-9a49-faffc210b420": None,
                 "f1420f92-3e76-11ec-9a49-faffc210b420": None,
-                "f1417e1a-3e76-11ec-9a49-faffc210b420": [
-                    "b83cab06-1cfe-4aeb-9653-cb9f0cc45595"
-                ]
+                "f1417e1a-3e76-11ec-9a49-faffc210b420": ["b83cab06-1cfe-4aeb-9653-cb9f0cc45595"],
             },
             {
                 "f1420740-3e76-11ec-9a49-faffc210b420": None,
                 "f1420f92-3e76-11ec-9a49-faffc210b420": None,
-                "f1417e1a-3e76-11ec-9a49-faffc210b420": [
-                    "fc3559c4-03c4-428c-a48e-0f480c8a3751"
-                ]
-            }
-
+                "f1417e1a-3e76-11ec-9a49-faffc210b420": ["fc3559c4-03c4-428c-a48e-0f480c8a3751"],
+            },
         ]
         self.assertCountEqual(actual_tiledata, expected_tiledata)
