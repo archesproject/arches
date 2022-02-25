@@ -69,6 +69,7 @@ define('base-manager', [
         }
 
     });
+    return 'hi'
     return BaseManager;
 
 

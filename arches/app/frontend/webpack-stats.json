@@ -2700,11 +2700,6 @@
       "name": "templates/views/user-profile-manager.htm",
       "path": "/Users/cbyrd/Projects/arches/arches/app/media/build/templates/views/user-profile-manager.htm",
       "publicPath": "/foo/templates/views/user-profile-manager.htm"
-    },
-    "index.html": {
-      "name": "index.html",
-      "path": "/Users/cbyrd/Projects/arches/arches/app/media/build/index.html",
-      "publicPath": "/foo/index.html"
     }
   },
   "chunks": {
@@ -3387,7 +3382,5 @@
       "js/views/user-profile-manager.js"
     ]
   },
-  "publicPath": "/foo/",
-  "error": "ModuleNotFoundError",
-  "message": "Module not found: Error: Can't resolve 'js/views/page-view' in '/Users/cbyrd/Projects/arches/arches/app/media/js'"
+  "publicPath": "/foo/"
 }

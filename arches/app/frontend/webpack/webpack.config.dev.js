@@ -23,9 +23,9 @@ module.exports = merge(common, {
         // new ESLintPlugin({
         //     extensions: [`js`, `jsx`],
         // }),
-        new HtmlWebpackPlugin({
-            template: Path.resolve(__dirname, '../../templates/index.htm')
-        }),
+        // new HtmlWebpackPlugin({
+        //     template: Path.resolve(__dirname, '../../templates/index.htm')
+        // }),
         new Webpack.DefinePlugin({
             'process.env.NODE_ENV': JSON.stringify('development'),
         }),

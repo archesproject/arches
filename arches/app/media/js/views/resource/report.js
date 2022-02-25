@@ -6,6 +6,7 @@ require([
     'views/base-manager',
     'views/components/resource-report-abstract'
 ], function($, _, ko, arches, BaseManagerView) {
+    console.log(BaseManagerView, arches)
     var View = BaseManagerView.extend({
         initialize: function(options){
             BaseManagerView.prototype.initialize.call(this, options);
