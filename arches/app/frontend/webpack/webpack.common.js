@@ -13,7 +13,9 @@ const fileNames = function(path, outer_acc) {
         }
         else {
             var foo = (path + '/' + v).slice(12)
-            return { ...acc, [foo]: { 'import': `${path}/${v}`, 'filename': `js/[name]` } };
+            var bar = foo.slice(0, foo.length - 3)
+            // console.log(bar)
+            return { ...acc, [bar]: { 'import': `${path}/${v}`, 'filename': `js/[name].js` } };
         }
     }, outer_acc);
 };
@@ -22,9 +24,9 @@ const fileNames = function(path, outer_acc) {
 var bar = fileNames('../media/js', {});
 
 var baz = Object.keys(bar).reduce((acc, key) => {
-    var foo = (key).slice(0, key.length - 3)
-    // console.log(foo, key)
-    acc[foo] = Path.resolve(__dirname, '../../media/js', key)
+    // var foo = (key).slice(0, key.length - 3)
+    // console.log(key)
+    acc[key] = Path.resolve(__dirname, '../../media/js', key)
     return acc;
 }, {});
 
