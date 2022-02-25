@@ -26,7 +26,7 @@ from django.core.exceptions import ObjectDoesNotExist
 from django.db import transaction
 from django.db.utils import IntegrityError
 from arches.app.models import models
-from arches.app.models.resource import Resource
+from arches.app.models.resource import Resource, UnpublishedModelError
 from arches.app.models.system_settings import settings
 from arches.app.datatypes.datatypes import DataTypeFactory
 from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializer
@@ -1307,7 +1307,7 @@ class Graph(models.GraphModel):
         exclude = [] if exclude is None else exclude
 
         if self.publication and not force_recalculation:
-            deserialized_graph = JSONDeserializer().deserialize(self.publication.serialized_graph)
+            deserialized_graph = self.publication.serialized_graph
 
             for key in exclude:
                 if deserialized_graph.get(key) is not None:  # explicit None comparison so falsey values will still return
@@ -1377,14 +1377,17 @@ class Graph(models.GraphModel):
                 unpermitted_edits = []
                 db_nodes = models.Node.objects.filter(graph=self)
                 for db_node in db_nodes:
-                    unpermitted_node_edits = find_unpermitted_edits(
-                        db_node,
-                        self.nodes[db_node.nodeid],
-                        ["name", "issearchable", "ontologyclass", "description", "isrequired", "fieldname", "exportable"],
-                        "node",
-                    )
-                    if unpermitted_node_edits is not None:
-                        unpermitted_edits.append(unpermitted_node_edits)
+                    try:
+                        unpermitted_node_edits = find_unpermitted_edits(
+                            db_node,
+                            self.nodes[db_node.nodeid],
+                            ["name", "issearchable", "ontologyclass", "description", "isrequired", "fieldname", "exportable"],
+                            "node",
+                        )
+                        if unpermitted_node_edits is not None:
+                            unpermitted_edits.append(unpermitted_node_edits)
+                    except KeyError:
+                        pass
                 db_graph = Graph.objects.get(pk=self.graphid)
                 unpermitted_graph_edits = find_unpermitted_edits(
                     db_graph,
@@ -1586,15 +1589,18 @@ class Graph(models.GraphModel):
         Adds a row to the GraphPublication table
         Assigns GraphPublication id to Graph
         """
-        publication = models.GraphPublication.objects.create(
-            graph=self,
-            serialized_graph=JSONSerializer().serialize(self, force_recalculation=True),
-            notes=notes,
-        )
-        publication.save()
+        try:
+            publication = models.GraphPublication.objects.create(
+                graph=self,
+                serialized_graph=JSONDeserializer().deserialize(JSONSerializer().serialize(self, force_recalculation=True)),
+                notes=notes,
+            )
+            publication.save()
 
-        self.publication = publication
-        self.save()
+            self.publication = publication
+            self.save()
+        except Exception:
+            raise UnpublishedModelError("Could not save graph publication ")
 
     def unpublish(self):
         """
