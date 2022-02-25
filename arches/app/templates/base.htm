@@ -69,7 +69,10 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 </body>
 
 {% block javascript %}
-    <script src="{{ STATIC_URL }}packages/requirejs/require.js"></script>
+    {% load webpack_static from webpack_loader %}
+
+    <script src="{% webpack_static 'node_modules/requirejs/require.js' %}"></script>
+    
 
     {% block pre_require_js %}
     {% endblock pre_require_js %}

@@ -49,7 +49,9 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 </head>
 
 <body>
+    <!-- <script src="{% webpack_static 'javascript.htm' %}"></script> -->
 
+    
     <!--=== Header ===-->
     <header>
         <nav class="v5-splash-navbar navbar" role="navigation">
@@ -444,10 +446,12 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 
 <script src="{% webpack_static 'node_modules/requirejs/require.js' %}"></script>
 
+{% include 'javascript.htm' %}
+
 <script>
 
     require.config({
-        // baseUrl: '{{ STATIC_URL }}js',
+        baseUrl: '{{ STATIC_URL }}js',
         paths: {
             // 'templates': '{% url "templates" ""%}'.replace(/\/$/, ""),
             'text': "{% webpack_static 'node_modules/requirejs-text/text' %}",
