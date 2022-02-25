@@ -34,7 +34,7 @@ define(['arches', 'knockout', 'uuid'], function (arches, ko, uuid) {
 
                 this.options = params.config.options;
                 params.config.options().map(option => { 
-                    option.text = ko.observable(option.text)
+                    option.text = ko.observable(option.text);
                     option.text.subscribe(value => {
                         if(value != option.text) {
                             self.options.valueHasMutated();
