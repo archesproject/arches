@@ -33,6 +33,15 @@ define(['arches', 'knockout', 'uuid'], function (arches, ko, uuid) {
                 }
 
                 this.options = params.config.options;
+                params.config.options().map(option => { 
+                    option.text = ko.observable(option.text)
+                    option.text.subscribe(value => {
+                        if(value != option.text) {
+                            self.options.valueHasMutated();
+                        }
+                    });
+                    return option;
+                });
                 var setupOption = function(option) {
                     option.remove = function () {
                         self.options.remove(option);
