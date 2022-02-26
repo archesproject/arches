@@ -1,6 +1,7 @@
 from arches.app.datatypes.base import BaseDataType
 from arches.app.models import models
 from arches.app.models.system_settings import settings
+from arches.app.search.search_term import SearchTerm
 
 sample_widget = models.Widget.objects.get(name="sample-widget")
 
@@ -45,7 +46,8 @@ class SampleDataType(BaseDataType):
         terms = []
         if nodevalue is not None:
             if settings.WORDS_PER_SEARCH_TERM is None or (len(nodevalue.split(" ")) < settings.WORDS_PER_SEARCH_TERM):
-                terms.append(nodevalue)
+                terms.append(SearchTerm(value=nodevalue))
+
         return terms
 
     def append_search_filters(self, value, node, query, request):
