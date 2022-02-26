@@ -39,6 +39,15 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 				<p class="arches-signin-subtext">
 					{% trans "Sign in to Arches to access your data modeling, editing, and discovery tools." %}
 				</p>
+
+				{% if registration_success %}
+					<hr style="border-color: #eee;">
+					<p style="color: green">
+						{% trans "Your account has been created. Please sign in." %}
+					</p>
+					<hr style="border-color: #eee;">
+				{% endif %}
+
 				<form id="login-form" action="?next={{ next }}" method='POST' {% if auth_failed %} autocomplete="off" {% endif %}>
 					{% csrf_token %}
 					<input type="hidden" name="next" value="{{ next }}" />
@@ -70,7 +79,10 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 				<div class="row account-management">
 					<!-- <a href="arches_password_reminder.html" class="col-xs-5 btn btn-link mar-rgt" style="color:#515152;">{% trans "Forgot password ?" %}</a> -->
 					<a href="{% url 'password_reset' %}" class="btn btn-link account-link">{% trans "Forgot password?" %}</a>
-					<a href="{% url 'signup' %}" class="btn btn-link account-link" target="_blank">{% trans "Create a new account" %}</a>
+
+					{% if user_signup_enabled %}
+						<a href="{% url 'signup' %}" class="btn btn-link account-link" target="_blank">{% trans "Create a new account" %}</a>
+					{% endif %}
 				</div>
 			</div>
 
