@@ -12,7 +12,8 @@ define([
     return ko.components.register('import-single-csv', {
         viewModel: function(params) {
             var self = this;
-            this.loading = params.loading;
+            this.loading = params.config.loading;
+            this.moduleId = params.etlmoduleid;
             this.loading(true);
             this.graphs = ko.observable();
             this.selectedGraph = ko.observable();
@@ -189,10 +190,10 @@ define([
                     for (columnName in errorByColumn) {
                         const error = Object.keys(errorByColumn[columnName][0])[0];
                         const example = errorByColumn[columnName].reduce(
-                                (acc, error) => {
-                                    Object.values(error)[0]
-                                    acc = [acc, Object.values(error)[0]].filter(Boolean).join(", ")
-                                    return acc;
+                            (acc, error) => {
+                                Object.values(error)[0]
+                                acc = [acc, Object.values(error)[0]].filter(Boolean).join(", ")
+                                return acc;
                             }, '');
                         const header = findField(columnName)
                         this.validationError.push(
@@ -209,7 +210,7 @@ define([
             this.submit = function(action) {
                 self.formData.append('action', action);
                 self.formData.append('transaction_id', self.transaction_id);
-                self.formData.append('module','import-single-csv');
+                self.formData.append('module', self.moduleId);
                 return $.ajax({
                     type: "POST",
                     url: arches.urls.etl_manager,

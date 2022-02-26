@@ -23,7 +23,7 @@ class ETLManagerView(View):
         """
         action = request.POST.get("action")
         module = request.POST.get("module")
-        import_module = ETLModule.objects.get(slug=module).get_class_module()()
+        import_module = ETLModule.objects.get(pk=module).get_class_module()()
         import_function = getattr(import_module, action)
         response = import_function(request=request)
         print(response)
