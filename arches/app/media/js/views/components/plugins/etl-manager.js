@@ -1,7 +1,6 @@
 define([
     'knockout',
     'arches',
-    'views/components/etl_modules/import-single-csv'
 ], function(ko, arches) {
     return ko.components.register('etl-manager', {
         viewModel: function(params) {
@@ -20,6 +19,7 @@ define([
                     .then(function(data){
                         self.etlModules = data.map(function(etl){
                             etl.config.loading = self.loading;
+                            require([etl.component]);
                             return etl;
                         });
                         self.loading(false);
