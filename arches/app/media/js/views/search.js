@@ -18,6 +18,8 @@ define('search', [
     //     this.OldValue1(oldValue);
     // }, this);
 
+    console.log("DIDS)(DS)(")
+
     ko.subscribable.fn.subscribeChanged = function(callback, context) {
         var savedValue = this.peek();
         return this.subscribe(function(latestValue) {

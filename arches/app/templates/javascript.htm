@@ -2,13 +2,14 @@
 {% load l10n %}
 {% load i18n %}
 {% load webpack_static from webpack_loader %}
+{% load render_bundle from webpack_loader %}
 
 
 {% block require_config %}
 <script>
     var CKEDITOR_BASEPATH = "{% webpack_static 'node_modules/ckeditor/' %}";
     require.config({
-        baseUrl: 'foo/js',
+        baseUrl: 'foo/build/js',
         urlArgs: '_dc={{ app_settings.VERSION }}',
         paths: {
             // 'plugins': '{{ STATIC_URL }}plugins',
@@ -141,13 +142,18 @@
             'cytoscape': "{% webpack_static 'node_modules/cytoscape/dist/cytoscape.min' %}",
             'cytoscape-cola': "{% webpack_static 'node_modules/cytoscape-cola/cytoscape-cola' %}",
             'webcola': "{% webpack_static 'node_modules/webcola/WebCola/cola.min' %}",
-            // {% block paths %}{% endblock paths %}
+
+            
+            'views/form': "{% webpack_static 'build/js/views/form' %}",
+            'views/page-view': "{% webpack_static 'js/views/page-view' %}",
+            'graph-base-data': "{% webpack_static 'templates/views/graph/graph-base.htm' %}",
+            {% block paths %}{% endblock paths %}
         },
-        // packages: [{
-        //     name: "codemirror",
-        //     location: '{{ STATIC_URL }}packages/codemirror',
-        //     main: "lib/codemirror"
-        // }],
+        packages: [{
+            name: "codemirror",
+            location: "{% webpack_static 'packages/codemirror' %}",
+            main: "lib/codemirror"
+        }],
         shim: {
             'nifty': {
                 exports: 'nifty',

@@ -3,6 +3,7 @@ const { CleanWebpackPlugin } = require('clean-webpack-plugin');
 const CopyWebpackPlugin = require('copy-webpack-plugin');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const BundleTracker = require('webpack-bundle-tracker');
+const webpack = require('webpack');
 
 const fs = require('fs');
 
@@ -26,7 +27,7 @@ var bar = fileNames('../media/js', {});
 var baz = Object.keys(bar).reduce((acc, key) => {
     // var foo = (key).slice(0, key.length - 3)
     // console.log(key)
-    acc[key] = Path.resolve(__dirname, '../../media/js', key)
+    acc[key + '$'] = Path.resolve(__dirname, `../../media/js/${key}.js`)
     return acc;
 }, {});
 
@@ -85,10 +86,14 @@ const quuxFileNames = function(path, outer_acc) {
         else {
             var foo = (path + '/' + v).slice(13)
             
+            var bar = foo.slice(0, foo.length - 4)
+
+            console.log(bar, Path.resolve(__dirname, `../../media/build/js/${bar}.js`) )
+
             acc.push(new HtmlWebpackPlugin({
                 template: `../templates/${foo}`, // relative path to the HTML files
                 filename: `templates/${foo}`, // output HTML files
-                // chunks: [`${foo}`] // respective JS files
+                chunks:  [ Path.resolve(__dirname, `${bar}.js`) ] // respective JS files
             }));
             return acc;
             // return { ...acc, [foo]: { 'import': `../templates/${foo}` } };
@@ -120,13 +125,17 @@ var aaa = {
     // ...bar_img,
 }
 
-console.log(bar)
+console.log(baz)
 
 module.exports = {
     entry: aaa,
     output: {
         path: Path.resolve(__dirname, '../../media/build'),
         publicPath: '/foo/',
+        libraryTarget: 'amd-require'
+    },
+    externals: {
+        // jquery: 'jQuery',
     },
     // optimization: {
     //     splitChunks: {
@@ -154,10 +163,13 @@ module.exports = {
     // },
     plugins: [
         new CleanWebpackPlugin(),
-        new CopyWebpackPlugin({ patterns: [{ from: Path.resolve(__dirname, '../public'), to: 'public' }, {from: Path.resolve(__dirname, '../../media/img'), to: 'img'} ] }),
+        new CopyWebpackPlugin({ patterns: [{from: Path.resolve(__dirname, '../../media/img'), to: 'img'} ] }),
         // new HtmlWebpackPlugin({
         //     template: Path.resolve(__dirname, '../../templates/index.htm'),
         // }),
+        new webpack.ProvidePlugin({
+            jQuery:  Path.resolve(__dirname, '../../media/node_modules/jquery/dist/jquery.min')
+        }),
         new BundleTracker({ filename: './webpack-stats.json' }),
     ].concat(quux),
     resolve: {
@@ -165,6 +177,7 @@ module.exports = {
         alias: {
             ...baz,
             // ...qux,
+            // 'jQuery': Path.resolve(__dirname, '../../media/node_modules/jquery-migrate/dist/jquery-migrate.min'),
             'arches': Path.resolve(__dirname, '../../templates', 'javascript.htm'),
             'report-templates': Path.resolve(__dirname, '../../templates', 'javascript.htm'),
             'card-components': Path.resolve(__dirname, '../../templates', 'javascript.htm'),
@@ -188,7 +201,7 @@ module.exports = {
             'map-layer-manager-data': Path.resolve(__dirname, '../../templates/views', 'map-layer-manager.htm'),
             'resource-editor-data': Path.resolve(__dirname, '../../templates/views/resource', 'editor.htm'),
             // 'turf': Path.resolve(__dirname, '../node_modules/@turf/turf', 'turf.min'),
-            'plugins/knockout-select2': Path.resolve(__dirname, '../plugins', 'knockout-select2.js'),
+            'plugins/knockout-select2': Path.resolve(__dirname, '../../media/plugins', 'knockout-select2.js'),
             // 'jquery-validate': Path.resolve(__dirname, '../node_modules/jquery-validation/dist', 'jquery.validate.min'),
             'jquery-ui/draggable': Path.resolve(__dirname, '../node_modules/jqueryui', 'jquery-ui.min.js'),
             'jquery-ui/sortable': Path.resolve(__dirname, '../node_modules/jqueryui', 'jquery-ui.min.js'),

@@ -5,6 +5,8 @@ define('mobile-survey', [
     'models/abstract',
     'arches'
 ], function(_, ko, koMapping, AbstractModel, arches) {
+
+    console.log("()()", AbstractModel, arches)
     return AbstractModel.extend({
         url: arches.urls.collector_designer,
 
