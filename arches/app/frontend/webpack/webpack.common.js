@@ -27,7 +27,7 @@ var bar = fileNames('../media/js', {});
 var baz = Object.keys(bar).reduce((acc, key) => {
     // var foo = (key).slice(0, key.length - 3)
     // console.log(key)
-    acc[key + '$'] = Path.resolve(__dirname, `../../media/js/${key}.js`)
+    acc[key + '$'] = Path.resolve(__dirname, `../../media/js/${key}`)
     return acc;
 }, {});
 
@@ -132,11 +132,13 @@ module.exports = {
     output: {
         path: Path.resolve(__dirname, '../../media/build'),
         publicPath: '/foo/',
-        libraryTarget: 'amd-require'
+        library: '[name]',
+        libraryTarget: 'amd',
     },
-    externals: {
-        // jquery: 'jQuery',
-    },
+    // externals: {
+    //     // jquery: 'jQuery',
+    //     $: 'jquery'
+    // },
     // optimization: {
     //     splitChunks: {
     //         chunks: 'all',
@@ -168,12 +170,17 @@ module.exports = {
         //     template: Path.resolve(__dirname, '../../templates/index.htm'),
         // }),
         new webpack.ProvidePlugin({
-            jQuery:  Path.resolve(__dirname, '../../media/node_modules/jquery/dist/jquery.min')
+            jQuery:  Path.resolve(__dirname, '../../media/node_modules/jquery/dist/jquery.min'),
+            $:  Path.resolve(__dirname, '../../media/node_modules/jquery/dist/jquery.min'),
+            // jquery:  Path.resolve(__dirname, '../../media/node_modules/jquery/dist/jquery.min'),
+            // $:  Path.resolve(__dirname, '../../media/node_modules/jquery/dist/jquery.min')
+            // $:  'jquery',
         }),
         new BundleTracker({ filename: './webpack-stats.json' }),
     ].concat(quux),
     resolve: {
         modules: [Path.resolve(__dirname, '../../media/node_modules')],
+        extensions: ['.js',],
         alias: {
             ...baz,
             // ...qux,

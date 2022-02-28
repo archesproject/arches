@@ -8,7 +8,7 @@ define('mobile-survey', [
 
     console.log("()()", AbstractModel, arches)
     return AbstractModel.extend({
-        url: arches.urls.collector_designer,
+        url: 'foo',
 
         initialize: function(options) {
             var self = this;
@@ -242,7 +242,7 @@ define('mobile-survey', [
                 };
                 //TODO: make the true project boundry available in the arches object rather than just the hexBinBounds
                 //and use the true bounds here instead of the hexBinBounds.
-                var extent = arches.hexBinBounds;
+                var extent = 0;
                 var coords = [[
                     [extent[0], extent[1]],
                     [extent[2], extent[1]],

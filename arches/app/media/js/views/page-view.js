@@ -1,5 +1,5 @@
 define('page-view', [
-    'jquery',
+    'jquery-lib',
     'underscore',
     'backbone',
     'knockout',
@@ -13,6 +13,8 @@ define('page-view', [
     'bootstrap',
     'bindings/slide'
 ], function($, _, Backbone, ko, moment, arches,  AlertViewModel, ProvisionalHistoryList, NotificationsList, viewData) {
+
+    console.log("!!!!", $, _, viewData, AlertViewModel)
     /**
     * A backbone view representing a basic page in arches.  It sets up the
     * viewModel defaults, optionally accepts additional view model data and

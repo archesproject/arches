@@ -1186,10 +1186,10 @@
       "path": "/Users/cbyrd/Projects/arches/arches/app/media/build/js/vendors-media_node_modules_moment_min_moment_min_js.chunk.js",
       "publicPath": "/foo/js/vendors-media_node_modules_moment_min_moment_min_js.chunk.js"
     },
-    "js/vendors-media_node_modules_backbone_backbone-min_js-media_node_modules_bootstrap_dist_js_boot-7c5f9a.chunk.js": {
-      "name": "js/vendors-media_node_modules_backbone_backbone-min_js-media_node_modules_bootstrap_dist_js_boot-7c5f9a.chunk.js",
-      "path": "/Users/cbyrd/Projects/arches/arches/app/media/build/js/vendors-media_node_modules_backbone_backbone-min_js-media_node_modules_bootstrap_dist_js_boot-7c5f9a.chunk.js",
-      "publicPath": "/foo/js/vendors-media_node_modules_backbone_backbone-min_js-media_node_modules_bootstrap_dist_js_boot-7c5f9a.chunk.js"
+    "js/vendors-media_node_modules_backbone_backbone-min_js-media_node_modules_bootstrap_dist_js_boot-5b604f.chunk.js": {
+      "name": "js/vendors-media_node_modules_backbone_backbone-min_js-media_node_modules_bootstrap_dist_js_boot-5b604f.chunk.js",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/media/build/js/vendors-media_node_modules_backbone_backbone-min_js-media_node_modules_bootstrap_dist_js_boot-5b604f.chunk.js",
+      "publicPath": "/foo/js/vendors-media_node_modules_backbone_backbone-min_js-media_node_modules_bootstrap_dist_js_boot-5b604f.chunk.js"
     },
     "js/vendors-media_node_modules_core-js_index_js-media_node_modules_dom4_build_dom4_js.chunk.js": {
       "name": "js/vendors-media_node_modules_core-js_index_js-media_node_modules_dom4_build_dom4_js.chunk.js",

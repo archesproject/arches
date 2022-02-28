@@ -18,7 +18,7 @@ define('search', [
     //     this.OldValue1(oldValue);
     // }, this);
 
-    console.log("DIDS)(DS)(")
+    console.log("DIDS)(DS)(", BaseManagerView, AlertViewModel)
 
     ko.subscribable.fn.subscribeChanged = function(callback, context) {
         var savedValue = this.peek();
