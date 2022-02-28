@@ -18,8 +18,6 @@ define([
     //     this.OldValue1(oldValue);
     // }, this);
 
-    console.log("DIDS)(DS)(", BaseManagerView, AlertViewModel)
-
     ko.subscribable.fn.subscribeChanged = function(callback, context) {
         var savedValue = this.peek();
         return this.subscribe(function(latestValue) {
@@ -115,7 +113,6 @@ define([
 
     var SearchView = BaseManagerView.extend({
         initialize: function(options) {
-            console.log('search view init')
             this.viewModel.sharedStateObject = new CommonSearchViewModel();
             this.viewModel.total = ko.observable();
             _.extend(this, this.viewModel.sharedStateObject);
@@ -178,6 +175,5 @@ define([
         }
     });
 
-    console.log("BUH")
     return new SearchView();
 });

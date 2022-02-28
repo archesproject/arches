@@ -319,7 +319,6 @@ TEMPLATES = [
             # insert your TEMPLATE_DIRS here
             # os.path.join(ROOT_DIR, "app", "templates"),
             os.path.join(ROOT_DIR, "app", "media", "build", "templates"),
-            # os.path.join(ROOT_DIR, "app", "frontend", "build"),
         ],
         "APP_DIRS": True,
         "OPTIONS": {

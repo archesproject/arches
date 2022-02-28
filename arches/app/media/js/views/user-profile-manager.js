@@ -10,9 +10,9 @@ define([
     'views/mobile-survey-manager/identity-list',
     'profile-manager-data'
 ], function($, _, ko, koMapping, arches, MobileSurveyViewModel, MobileSurveyModel, BaseManagerView, IdentityList, data) {
+    
     var UserProfileManager = BaseManagerView.extend({
         initialize: function(options) {
-            console.log("heloo")
             var self = this;
             self.viewModel.showChangePasswordForm = ko.observable(false);
             self.viewModel.showEditUserForm = ko.observable(!!data.error_count);

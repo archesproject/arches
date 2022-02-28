@@ -13,7 +13,7 @@ define([
     'bindings/fadeVisible',
     'bindings/mapbox-gl',
     'bindings/chosen',
-    // 'bindings/color-picker',
+    'bindings/color-picker',
     'geocoder-templates'
 ], function(arches, _, ko, koMapping, WidgetViewModel, MapEditorViewModel) {
     var viewModel = function(params) {

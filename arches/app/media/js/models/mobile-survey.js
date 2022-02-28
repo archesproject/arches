@@ -5,10 +5,8 @@ define([
     'models/abstract',
     'arches'
 ], function(_, ko, koMapping, AbstractModel, arches) {
-
-    console.log("()()", AbstractModel, arches)
     return AbstractModel.extend({
-        url: 'foo',
+        url: arches.urls.collector_designer,
 
         initialize: function(options) {
             var self = this;
@@ -242,7 +240,7 @@ define([
                 };
                 //TODO: make the true project boundry available in the arches object rather than just the hexBinBounds
                 //and use the true bounds here instead of the hexBinBounds.
-                var extent = 0;
+                var extent = arches.hexBinBounds;
                 var coords = [[
                     [extent[0], extent[1]],
                     [extent[2], extent[1]],

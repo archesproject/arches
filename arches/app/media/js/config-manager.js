@@ -6,8 +6,6 @@ require([
     'knockout',
     'widgets'
 ], function($, PageView, Form) {
-
-    console.log(")()(()", PageView, Form, $)
     /**
      * a view to manage configuration settings for the app
      * @augments PageView

@@ -3,7 +3,7 @@ define([
     'underscore',
     'knockout',
     'moment',
-    // 'bootstrap-datetimepicker',
+    'bootstrap-datetimepicker',
 ], function ($, _, ko, moment) {
     /**
     * A knockout.js binding for the jQuery UI datepicker

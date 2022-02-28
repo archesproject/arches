@@ -5,7 +5,6 @@ define([
     'knockout-mapping',
     'underscore'
 ], function ($, Backbone, ko, koMapping, _) {
-    console.log("DISO", $, Backbone, ko, koMapping, _)
     return Backbone.View.extend({
         /**
          * a view to manage the operations around saving tile data

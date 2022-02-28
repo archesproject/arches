@@ -2,13 +2,14 @@ define([
     'jquery',
     'underscore',
     'knockout',
+    'backbone',
     'views/page-view',
     'view-data',
     'uuid',
     'core-js',
     'dom-4',
     'views/components/language-switcher'
-], function($, _, ko, PageView, data) {
+], function($, _, ko, Backbone, PageView, data) {
     var BaseManager = PageView.extend({
         /**
         * Creates an instance of PageView, optionally using a passed in view model
