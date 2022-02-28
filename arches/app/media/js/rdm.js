@@ -15,7 +15,7 @@ require([
     'views/base-manager',
     'viewmodels/alert-json',
     'jquery-validate',
-], function($, Backbone,arches, ConceptModel, ConceptTree, ConceptReport, ConceptSearch,
+], function($, Backbone, arches, ConceptModel, ConceptTree, ConceptReport, ConceptSearch,
     AddSchemeForm, ExportSchemeForm, DeleteSchemeForm, ImportSchemeForm, AddCollectionForm,
     DeleteCollectionForm, BaseManagerView, JsonErrorAlertViewModel) {
 
