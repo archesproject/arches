@@ -264,7 +264,7 @@ STATIC_ROOT = ""
 STATIC_URL = "/foo/"
 
 STATIC_ROOT = os.path.join(ROOT_DIR, "staticfiles")
-STATICFILES_STORAGE = 'django.contrib.staticfiles.storage.ManifestStaticFilesStorage'
+STATICFILES_STORAGE = "django.contrib.staticfiles.storage.ManifestStaticFilesStorage"
 
 # when hosting Arches under a sub path set this value to the sub path eg : "/{sub_path}/"
 FORCE_SCRIPT_NAME = None
@@ -351,7 +351,7 @@ AUTHENTICATION_BACKENDS = (
 )
 
 INSTALLED_APPS = (
-    'webpack_loader',
+    "webpack_loader",
     "django.contrib.admin",
     "django.contrib.auth",
     "django.contrib.contenttypes",
@@ -390,8 +390,8 @@ MIDDLEWARE = [
 ]
 
 WEBPACK_LOADER = {
-    'DEFAULT': {
-        'STATS_FILE': os.path.join(ROOT_DIR, "app", "frontend", "webpack-stats.json"),
+    "DEFAULT": {
+        "STATS_FILE": os.path.join(ROOT_DIR, "app", "frontend", "webpack-stats.json"),
     },
 }
 
