@@ -1,4 +1,4 @@
-define('scroll-to-file', [
+define([
     'jquery',
     'knockout'
 ], function($, ko) {

@@ -1,4 +1,4 @@
-define('dragDrop', [
+define([
     'jquery',
     'knockout',
     'jquery-ui'

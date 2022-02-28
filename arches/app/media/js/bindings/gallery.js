@@ -1,4 +1,4 @@
-define('gallery', [
+define([
     'jquery',
     'knockout',
 ], function($, ko) {

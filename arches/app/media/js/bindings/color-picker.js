@@ -1,4 +1,4 @@
-define('colorPicker', [
+define([
     'jquery',
     'knockout',
     'bootstrap-colorpicker'

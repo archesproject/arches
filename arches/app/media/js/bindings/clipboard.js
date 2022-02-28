@@ -1,4 +1,4 @@
-define('clipboard', [
+define([
     'jquery',
     'knockout',
 ], function($, ko) {

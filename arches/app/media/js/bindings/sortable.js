@@ -2,7 +2,7 @@
 ;(function(factory) {
     if (typeof define === "function" && define.amd) {
         // AMD anonymous module
-        define('sortable', ["knockout", "jquery"], factory);
+        define(["knockout", "jquery"], factory);
     } else if (typeof require === "function" && typeof exports === "object" && typeof module === "object") {
         // CommonJS module
         var ko = require("knockout"),

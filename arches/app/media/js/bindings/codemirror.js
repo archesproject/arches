@@ -1,4 +1,4 @@
-define('codemirror', [
+define([
     'knockout',
     'codemirror'
 ], function(ko, CodeMirror) {

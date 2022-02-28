@@ -1,4 +1,4 @@
-define('mapboxgl', [
+define([
     'jquery',
     'underscore',
     'knockout',

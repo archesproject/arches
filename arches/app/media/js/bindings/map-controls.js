@@ -1,4 +1,4 @@
-define('map-controls', [
+define([
   'jquery',
   'knockout',
 ], function ($, ko) {

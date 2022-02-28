@@ -1,4 +1,4 @@
-define('select2Query', [
+define([
     'jquery',
     'knockout',
     'underscore',

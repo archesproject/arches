@@ -1,4 +1,4 @@
-define('smartresize', [
+define([
     'jquery',
     'knockout'
 ], function($, ko) {

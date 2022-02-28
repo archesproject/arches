@@ -1,4 +1,4 @@
-define('nouislider', [
+define([
     'jquery',
     'knockout',
     'noUiSlider'

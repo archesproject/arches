@@ -1,4 +1,4 @@
-define('related-resources-graph', [
+define([
     'knockout',
     'jquery',
     'underscore',

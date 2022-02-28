@@ -1,7 +1,7 @@
 /* jshint boss:true*/
 (function(factory) {
     if (typeof define === 'function' && define.amd) {
-        define('select2v4', ['jquery', 'knockout', 'module'], factory);
+        define(['jquery', 'knockout', 'module'], factory);
     } else {
         factory(jQuery, ko);
     }

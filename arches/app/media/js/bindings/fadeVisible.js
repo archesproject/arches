@@ -1,6 +1,6 @@
 // Here's a custom Knockout binding that makes elements shown/hidden via jQuery's fadeIn()/fadeOut() methods
 // Could be stored in a separate utility library
-define('fadeVisible', [
+define([
   'jquery',
   'knockout',
 ], function ($, ko) {

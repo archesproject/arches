@@ -1,13 +1,10 @@
-define(
+define([
+    'jquery',
+    'underscore',
+    'knockout',
+    'ckeditor-jquery',
     'ckeditor',
-    [
-        'jquery',
-        'underscore',
-        'knockout',
-        'ckeditor-jquery',
-        'ckeditor',
-    ]
-, function ($, _, ko) {
+], function ($, _, ko) {
     /**
     * A knockout.js binding for the "ckeditor" rich text editor widget
     * - pass options to ckeditor using the following syntax in the knockout

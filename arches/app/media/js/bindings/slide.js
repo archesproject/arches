@@ -1,4 +1,4 @@
-define('slide', [
+define([
     'jquery',
     'knockout',
 ], function($, ko) {
