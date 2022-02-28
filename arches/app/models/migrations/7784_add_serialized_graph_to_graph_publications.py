@@ -37,7 +37,12 @@ class Migration(migrations.Migration):
                 inactive_graphs = inactive_graphs + [resource.graph.name]
         
         if(len(inactive_graphs) > 0):
-            raise Exception("All resource instances must have their associated graph set to active before migration.  The following inactive graphs have resource instances: {} ".format(", ".join(inactive_graphs)))
+            raise Exception(
+                """
+                    All resource instances must have their associated
+                    graph set to active before migration.  The following inactive graphs
+                    have resource instances: {}
+                """.format(", ".join(inactive_graphs)))
 
     def reverse_add_resource_publications(apps, schema):
         pass
