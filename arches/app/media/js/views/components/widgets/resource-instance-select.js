@@ -1,4 +1,4 @@
-define('resource-instance-select', [
+define([
     'knockout',
     'bindings/select2-query'
 ], function(ko) {

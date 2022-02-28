@@ -1,4 +1,4 @@
-define('graph-tree', [
+define([
     'jquery',
     'knockout',
     'underscore',

@@ -1,4 +1,4 @@
-define('related-resources-map', [
+define([
     'jquery',
     'arches',
     'knockout',

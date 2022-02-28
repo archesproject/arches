@@ -1,4 +1,4 @@
-define('file', [
+define([
     'jquery',
     'knockout',
     'underscore',

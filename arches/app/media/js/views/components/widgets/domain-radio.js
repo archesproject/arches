@@ -1,4 +1,4 @@
-define('domain-radio', [
+define([
     'knockout',
     'viewmodels/domain-widget'
 ], function(ko, DomainWidgetViewModel) {

@@ -1,4 +1,4 @@
-define('edtf', ['knockout'], function (ko) {
+define(['knockout'], function (ko) {
     var name = 'edtf-datatype-config';
     ko.components.register(name, {
         viewModel: function(params) {

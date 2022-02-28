@@ -1,4 +1,4 @@
-define('grouping', [
+define([
     'underscore',
     'jquery',
     'knockout',

@@ -1,4 +1,4 @@
-define('permissions-manager', [
+define([
     'jquery',
     'knockout',
     'knockout-mapping',

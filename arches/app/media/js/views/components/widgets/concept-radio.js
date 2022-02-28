@@ -1,4 +1,4 @@
-define('concept-radio', [
+define([
     'knockout',
     'viewmodels/concept-widget',
     'plugins/knockout-select2'

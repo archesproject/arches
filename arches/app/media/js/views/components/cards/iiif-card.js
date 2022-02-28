@@ -1,4 +1,4 @@
-define('iiif-card', [
+define([
     'knockout',
     'knockout-mapping',
     'viewmodels/card-component',

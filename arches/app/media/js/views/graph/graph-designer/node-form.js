@@ -1,4 +1,4 @@
-define('node-form', [
+define([
     'jquery',
     'underscore',
     'backbone',

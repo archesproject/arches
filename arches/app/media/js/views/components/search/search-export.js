@@ -1,4 +1,4 @@
-define('search-export', ['jquery',
+define(['jquery',
     'knockout',
     'arches',
     'bindings/fadeVisible',

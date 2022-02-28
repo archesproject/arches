@@ -1,4 +1,4 @@
-define('file-list', [
+define([
     'knockout',
     'underscore',
     'view-data'

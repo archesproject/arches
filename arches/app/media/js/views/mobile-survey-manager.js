@@ -1,4 +1,4 @@
-define('mobile-survey-manager', [
+define([
     'jquery',
     'underscore',
     'knockout',

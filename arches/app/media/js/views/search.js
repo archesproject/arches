@@ -1,5 +1,4 @@
-console.log("MEH")
-define('search', [
+define([
     'jquery',
     'underscore',
     'knockout',

@@ -1,4 +1,4 @@
-define('iiif', [
+define([
     'underscore',
     'leaflet',
     'knockout',

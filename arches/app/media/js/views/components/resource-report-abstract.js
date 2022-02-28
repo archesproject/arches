@@ -1,4 +1,4 @@
-define('resource-report-abstract', [
+define([
     'arches',
     'jquery',
     'underscore',

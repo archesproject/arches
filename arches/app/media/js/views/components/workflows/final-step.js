@@ -1,4 +1,4 @@
-define('final-step', [
+define([
     'arches',
     'knockout',
 ], function(arches, ko) {

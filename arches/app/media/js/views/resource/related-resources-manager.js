@@ -1,4 +1,4 @@
-define('related-resources-manager', [
+define([
     'jquery',
     'underscore',
     'backbone',

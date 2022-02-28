@@ -1,4 +1,4 @@
-define('concept-report', [
+define([
     'jquery',
     'backbone',
     'arches',

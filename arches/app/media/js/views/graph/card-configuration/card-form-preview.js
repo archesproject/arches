@@ -1,4 +1,4 @@
-define('card-form-preview', [
+define([
     'backbone',
     'underscore',
     'knockout',

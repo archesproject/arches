@@ -1,4 +1,4 @@
-define('map-styles', function() {
+define(function() {
     var getDrawStyles = function(resource) {
         return [{
             "id": "gl-draw-point",

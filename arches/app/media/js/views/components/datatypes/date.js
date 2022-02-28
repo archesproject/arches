@@ -1,4 +1,4 @@
-define('date', ['knockout'], function(ko) {
+define(['knockout'], function(ko) {
     var name = 'date-datatype-config';
     ko.components.register(name, {
         viewModel: function(params) {

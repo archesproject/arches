@@ -1,4 +1,4 @@
-define('bin-feature-collection', ['knockout', 'turf', 'arches'], function(ko, turf, arches) {
+define(['knockout', 'turf', 'arches'], function(ko, turf, arches) {
     return function (searchAggregations) {
         var cellWidth = arches.hexBinSize;
         var units = 'kilometers';

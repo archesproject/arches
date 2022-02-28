@@ -1,4 +1,4 @@
-define('number', ['knockout'], function (ko) {
+define(['knockout'], function (ko) {
     var name = 'number-datatype-config';
     ko.components.register(name, {
         viewModel: function(params) {

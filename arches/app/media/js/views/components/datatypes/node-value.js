@@ -1,4 +1,4 @@
-define('node-value', [
+define([
     'jquery',
     'knockout',
     'underscore',

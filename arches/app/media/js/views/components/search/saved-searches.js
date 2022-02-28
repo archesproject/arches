@@ -1,4 +1,4 @@
-define('saved-searches', ['jquery',
+define(['jquery',
     'knockout',
     'arches',
     'bindings/smartresize'],

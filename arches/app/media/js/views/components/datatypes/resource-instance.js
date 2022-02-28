@@ -1,4 +1,4 @@
-define('resource-instance', [
+define([
     'knockout',
     'underscore',
     'view-data',

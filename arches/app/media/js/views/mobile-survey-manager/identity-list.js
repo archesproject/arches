@@ -1,4 +1,4 @@
-define('identity-list', [
+define([
     'knockout',
     'arches',
     'views/list'

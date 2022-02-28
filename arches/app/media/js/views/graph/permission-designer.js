@@ -1,4 +1,4 @@
-define('permission-designer', [
+define([
     'jquery',
     'underscore',
     'knockout',

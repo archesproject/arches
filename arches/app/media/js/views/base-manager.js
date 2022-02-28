@@ -1,5 +1,4 @@
-console.log("in base maanager view file")
-define('base-manager', [
+define([
     'jquery',
     'underscore',
     'knockout',
@@ -10,9 +9,6 @@ define('base-manager', [
     'dom-4',
     'views/components/language-switcher'
 ], function($, _, ko, PageView, data) {
-    console.log('hiyo', data)
-
-    data = {'graphs': []}
     var BaseManager = PageView.extend({
         /**
         * Creates an instance of PageView, optionally using a passed in view model

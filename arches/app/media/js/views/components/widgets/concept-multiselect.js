@@ -1,4 +1,4 @@
-define('concept-multiselect', [
+define([
     'knockout',
     'viewmodels/concept-select',
     'bindings/select2-query'

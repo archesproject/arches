@@ -1,4 +1,4 @@
-define('map', [
+define([
     'arches',
     'knockout',
     'viewmodels/card-component',

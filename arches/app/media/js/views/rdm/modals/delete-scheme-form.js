@@ -1,4 +1,4 @@
-define('delete-scheme-form', ['jquery', 'backbone', 'arches', 'models/concept', 'models/value'], function ($, Backbone, arches, ConceptModel, ValueModel) {
+define(['jquery', 'backbone', 'arches', 'models/concept', 'models/value'], function ($, Backbone, arches, ConceptModel, ValueModel) {
     return Backbone.View.extend({
 
         initialize: function(options){

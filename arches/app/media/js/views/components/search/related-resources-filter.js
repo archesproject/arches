@@ -1,4 +1,4 @@
-define('related-resources-filter', ['knockout', 'arches',
+define(['knockout', 'arches',
     'views/resource/related-resources-manager',
     'views/components/search/base-filter',
     'views/components/related-resources-graph'

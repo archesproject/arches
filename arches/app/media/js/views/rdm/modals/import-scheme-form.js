@@ -1,4 +1,4 @@
-define('import-scheme-form', ['jquery', 'backbone', 'arches'], function ($, Backbone, arches) {
+define(['jquery', 'backbone', 'arches'], function ($, Backbone, arches) {
     return Backbone.View.extend({
 
         initialize: function(options){

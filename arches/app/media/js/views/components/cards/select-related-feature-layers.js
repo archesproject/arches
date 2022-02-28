@@ -1,4 +1,4 @@
-define('select-related-feature-layers', [], function() {
+define([], function() {
     return function(source, sourceLayer, selectedResourceIds, visible, color, nodeids, filteredNodeids, hoverId, selectedLayerConfig) {
 
         var layerConfig = selectedLayerConfig;

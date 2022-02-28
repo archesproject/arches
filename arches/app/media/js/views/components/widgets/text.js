@@ -1,4 +1,4 @@
-define('text', ['knockout', 'underscore', 'viewmodels/widget'], function (ko, _, WidgetViewModel) {
+define(['knockout', 'underscore', 'viewmodels/widget'], function (ko, _, WidgetViewModel) {
     /**
     * registers a text-widget component for use in forms
     * @function external:"ko.components".text-widget

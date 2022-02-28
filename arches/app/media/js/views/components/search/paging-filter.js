@@ -1,4 +1,4 @@
-define('paging-filter', [
+define([
     'views/components/search/base-filter',
     'knockout',
     'knockout-mapping'],

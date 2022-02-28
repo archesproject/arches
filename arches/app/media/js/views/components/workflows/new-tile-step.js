@@ -1,4 +1,4 @@
-define('new-tile-step', [
+define([
     'underscore',
     'jquery',
     'arches',

@@ -1,4 +1,4 @@
-define('page-view', [
+define([
     'jquery-lib',
     'underscore',
     'backbone',

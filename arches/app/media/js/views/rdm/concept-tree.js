@@ -1,4 +1,4 @@
-define('concept-tree', [
+define([
     'jquery',
     'backbone',
     'arches',

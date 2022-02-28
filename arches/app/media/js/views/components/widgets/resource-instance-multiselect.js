@@ -1,4 +1,4 @@
-define('resource-instance-multiselect', [
+define([
     'knockout',
     'viewmodels/resource-instance-select',
     'bindings/select2-query'

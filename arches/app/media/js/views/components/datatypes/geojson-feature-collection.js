@@ -1,4 +1,4 @@
-define('geojson-feature-collection', [
+define([
     'jquery',
     'arches',
     'knockout',

@@ -1,4 +1,4 @@
-define('domain-multiselect', [
+define([
     'knockout',
     'viewmodels/domain-widget',
     'plugins/knockout-select2'

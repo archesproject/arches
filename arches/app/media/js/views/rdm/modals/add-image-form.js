@@ -1,4 +1,4 @@
-define('add-image-form', ['jquery', 'backbone', 'dropzone', 'arches', 'js-cookie', 'bootstrap'], function ($, Backbone, dropzone, arches, Cookies) {
+define(['jquery', 'backbone', 'dropzone', 'arches', 'js-cookie', 'bootstrap'], function ($, Backbone, dropzone, arches, Cookies) {
     return Backbone.View.extend({
         events: {
             'click button': 'close'

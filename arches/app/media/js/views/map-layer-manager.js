@@ -1,4 +1,4 @@
-define('map-layer-manager', [
+define([
     'jquery',
     'knockout',
     'underscore',

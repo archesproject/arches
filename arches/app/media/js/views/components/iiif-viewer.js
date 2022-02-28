@@ -1,4 +1,4 @@
-define('iiif-viewer', [
+define([
     'arches',
     'jquery',
     'knockout',

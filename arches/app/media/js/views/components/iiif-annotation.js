@@ -1,4 +1,4 @@
-define('iiif-annotation', [
+define([
     'underscore',
     'knockout',
     'knockout-mapping',

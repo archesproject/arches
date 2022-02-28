@@ -1,4 +1,4 @@
-define('mobile-survey-designer', [
+define([
     'underscore',
     'knockout',
     'views/base-manager',

@@ -1,4 +1,4 @@
-define('new-multi-tile-step', [
+define([
     'knockout',
     'views/components/workflows/new-tile-step',
     'viewmodels/alert'

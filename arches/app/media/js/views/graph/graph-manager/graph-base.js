@@ -1,4 +1,4 @@
-define('graph-base', [
+define([
     'backbone',
     'knockout',
     'd3'

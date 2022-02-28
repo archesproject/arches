@@ -1,4 +1,4 @@
-define('manifest-manager', [
+define([
     'knockout',
     'knockout-mapping',
     'jquery',

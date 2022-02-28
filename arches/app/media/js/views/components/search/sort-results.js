@@ -1,4 +1,4 @@
-define('sort-results', ['jquery',
+define(['jquery',
     'underscore',
     'views/components/search/base-filter',
     'knockout',

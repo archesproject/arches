@@ -1,4 +1,4 @@
-define('language-switcher', ['knockout'], function(ko) {
+define(['knockout'], function(ko) {
     /**
     * knockout components namespace used in arches
     * @external "ko.components"

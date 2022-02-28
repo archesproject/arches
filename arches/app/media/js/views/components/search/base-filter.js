@@ -1,4 +1,4 @@
-define('base-filter', [
+define([
     'jquery',
     'backbone',
     'knockout'

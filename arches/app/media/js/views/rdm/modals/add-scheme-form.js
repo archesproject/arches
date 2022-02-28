@@ -1,4 +1,4 @@
-define('add-scheme-form', ['jquery', 'backbone', 'models/concept', 'models/value'], function ($, Backbone, ConceptModel, ValueModel) {
+define(['jquery', 'backbone', 'models/concept', 'models/value'], function ($, Backbone, ConceptModel, ValueModel) {
     return Backbone.View.extend({
 
         initialize: function(e){

@@ -1,4 +1,4 @@
-define('primary-descriptors', ['jquery',
+define(['jquery',
     'underscore',
     'arches',
     'knockout',

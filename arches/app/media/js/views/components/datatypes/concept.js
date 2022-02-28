@@ -1,4 +1,4 @@
-define('concept', ['arches', 'knockout', 'viewmodels/concept-select'], function (arches, ko, ConceptSelectViewModel) {
+define(['arches', 'knockout', 'viewmodels/concept-select'], function (arches, ko, ConceptSelectViewModel) {
     var name = 'concept-datatype-config';
     ko.components.register(name, {
         viewModel: function(params) {

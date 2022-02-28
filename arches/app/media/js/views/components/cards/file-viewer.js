@@ -1,4 +1,4 @@
-define('file-viewer', [
+define([
     'jquery',
     'knockout',
     'arches',

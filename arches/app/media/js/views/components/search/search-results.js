@@ -1,4 +1,4 @@
-define('search-results', ['jquery',
+define(['jquery',
     'underscore',
     'views/components/search/base-filter',
     'bootstrap',

@@ -1,4 +1,4 @@
-define('import-concept-form', ['jquery', 'backbone', 'arches', 'models/concept'], function ($, Backbone, arches, ConceptModel) {
+define(['jquery', 'backbone', 'arches', 'models/concept'], function ($, Backbone, arches, ConceptModel) {
     return Backbone.View.extend({
 
         initialize: function(){
