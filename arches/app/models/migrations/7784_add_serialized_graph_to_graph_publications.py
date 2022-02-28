@@ -30,14 +30,18 @@ class Migration(migrations.Migration):
     def forwards_add_resource_publications(apps, schema_editor):
         inactive_graphs = []
         for resource in ResourceInstance.objects.all():
-            if(resource.graph.publication_id is not None):
+            if resource.graph.publication_id is not None:
                 resource.graph_publication = resource.graph.publication
                 resource.save()
             else:
                 inactive_graphs = inactive_graphs + [resource.graph.name]
-        
-        if(len(inactive_graphs) > 0):
-            raise Exception("All resource instances must have their associated graph set to active before migration.  The following inactive graphs have resource instances: {} ".format(", ".join(inactive_graphs)))
+
+        if len(inactive_graphs) > 0:
+            raise Exception(
+                "All resource instances must have their associated graph set to active before migration.  The following inactive graphs have resource instances: {} ".format(
+                    ", ".join(inactive_graphs)
+                )
+            )
 
     def reverse_add_resource_publications(apps, schema):
         pass
@@ -59,14 +63,14 @@ class Migration(migrations.Migration):
             name="isactive",
         ),
         migrations.AddField(
-            model_name='resourceinstance',
-            name='graph_publication',
-            field=models.ForeignKey(db_column='graphpublicationid', null=True, on_delete=models.PROTECT, to='models.GraphPublication'),
+            model_name="resourceinstance",
+            name="graph_publication",
+            field=models.ForeignKey(db_column="graphpublicationid", null=True, on_delete=models.PROTECT, to="models.GraphPublication"),
         ),
         migrations.RunPython(forwards_add_resource_publications, reverse_add_resource_publications),
         migrations.AlterField(
-            model_name='resourceinstance',
-            name='graph_publication',
-            field=models.ForeignKey(db_column='graphpublicationid', null=False, on_delete=models.PROTECT, to='models.GraphPublication'),
+            model_name="resourceinstance",
+            name="graph_publication",
+            field=models.ForeignKey(db_column="graphpublicationid", null=False, on_delete=models.PROTECT, to="models.GraphPublication"),
         ),
     ]

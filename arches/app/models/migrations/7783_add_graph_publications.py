@@ -47,7 +47,7 @@ class Migration(migrations.Migration):
 
             graph.publication = None
             graph.save()
-    
+
     operations = [
         migrations.CreateModel(
             name="GraphPublication",
@@ -74,5 +74,5 @@ class Migration(migrations.Migration):
             name="publication",
             field=models.ForeignKey(to="models.GraphPublication", db_column="publicationid", null=True, on_delete=models.SET_NULL),
         ),
-        migrations.RunPython(forwards_add_graph_column_data, reverse_add_graph_column_data)
+        migrations.RunPython(forwards_add_graph_column_data, reverse_add_graph_column_data),
     ]
