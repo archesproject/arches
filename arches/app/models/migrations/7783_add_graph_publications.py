@@ -5,6 +5,8 @@ from django.conf import settings
 from django.db import migrations, models
 import django.db.models.deletion
 
+from arches.app.models.models import ResourceInstance
+
 
 class Migration(migrations.Migration):
 
@@ -49,6 +51,17 @@ class Migration(migrations.Migration):
             graph.publication = None
             graph.save()
 
+    def forwards_add_resource_publications(apps, schema_editor):
+        for resource in ResourceInstance.objects.all():
+            if(resource.graph.publication_id is not None):
+                resource.graph_publication = resource.graph.publication_id
+                resource.save()
+            else:
+                raise Exception("All resource instances must have their associated graph set to active before migration.")
+
+    def reverse_add_resource_publications(apps, schema):
+        pass
+    
     operations = [
         migrations.CreateModel(
             name="GraphPublication",
@@ -76,4 +89,5 @@ class Migration(migrations.Migration):
             field=models.ForeignKey(to="models.GraphPublication", db_column="publicationid", null=True, on_delete=models.SET_NULL),
         ),
         migrations.RunPython(forwards_add_graph_column_data, reverse_add_graph_column_data),
+        migrations.RunPython(forwards_add_resource_publications, reverse_add_resource_publications),
     ]
