@@ -797,6 +797,10 @@ class ResourceInstance(models.Model):
     legacyid = models.TextField(blank=True, unique=True, null=True)
     createdtime = models.DateTimeField(auto_now_add=True)
 
+    def save(self, *args, **kwargs):
+        self.graph_publication = self.graph.publication
+        super(ResourceInstance, self).save()
+
     class Meta:
         managed = True
         db_table = "resource_instances"
@@ -920,6 +924,9 @@ class TileModel(models.Model):  # Tile
         db_table = "tiles"
 
     def save(self, *args, **kwargs):
+        # if a tile on a resource gets updated, it's possible it was created with a different publication
+        # so update the publication ID by saving the resource instance id
+        self.resourceinstance.save()
         if self.sortorder is None or (self.provisionaledits is not None and self.data == {}):
             sortorder_max = TileModel.objects.filter(
                 nodegroup_id=self.nodegroup_id, resourceinstance_id=self.resourceinstance_id
