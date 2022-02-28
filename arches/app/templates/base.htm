@@ -18,6 +18,8 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 {% load staticfiles %}
 {% load i18n %}
 {% load compress %}
+{% load webpack_static from webpack_loader %}
+{% load render_bundle from webpack_loader %}
 
 <!DOCTYPE html>
 <!--[if IE 8]> <html lang="en" class="ie8"> <![endif]-->
@@ -69,19 +71,13 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 </body>
 
 {% block javascript %}
-    {% load webpack_static from webpack_loader %}
-
     <script src="{% webpack_static 'node_modules/requirejs/require.js' %}"></script>
-    
+    <script src="{% webpack_static '' %}/build/js/{{main_script}}.js"></script>
 
     {% block pre_require_js %}
     {% endblock pre_require_js %}
 
     {% include 'javascript.htm' %}
-
-    <script>
-        require(["nifty"{% if main_script %},"{{ main_script }}"{% endif %}]);
-    </script>
 
     {% if app_settings.GOOGLE_ANALYTICS_TRACKING_ID != None %}
 

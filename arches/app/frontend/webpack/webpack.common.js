@@ -93,7 +93,8 @@ const quuxFileNames = function(path, outer_acc) {
             acc.push(new HtmlWebpackPlugin({
                 template: `../templates/${foo}`, // relative path to the HTML files
                 filename: `templates/${foo}`, // output HTML files
-                chunks:  [ Path.resolve(__dirname, `${bar}.js`) ] // respective JS files
+                // inject: 'body',
+                chunks:  [ 'vendors', Path.resolve(__dirname, `../../media/build/js/${bar}.js`) ] // respective JS files
             }));
             return acc;
             // return { ...acc, [foo]: { 'import': `../templates/${foo}` } };
@@ -132,8 +133,8 @@ module.exports = {
     output: {
         path: Path.resolve(__dirname, '../../media/build'),
         publicPath: '/foo/',
-        library: '[name]',
-        libraryTarget: 'amd',
+        libraryTarget: 'amd-require',
+        clean: true,
     },
     // externals: {
     //     // jquery: 'jQuery',

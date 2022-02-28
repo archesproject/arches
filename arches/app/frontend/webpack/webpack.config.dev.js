@@ -38,6 +38,7 @@ module.exports = merge(common, {
         rules: [
             {
                 test: /\.js$/,
+                exclude: '/node_modules/',
                 // include: Path.resolve(__dirname, '../../media/js'),
                 loader: 'babel-loader',
                 // options: {

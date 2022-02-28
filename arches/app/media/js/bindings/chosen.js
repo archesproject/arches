@@ -1,6 +1,4 @@
-define(
-    'chosen',
-    [
+define([
         'jquery',
         'underscore',
         'knockout',

@@ -451,7 +451,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 <script>
 
     require.config({
-        baseUrl: '{{ STATIC_URL }}js',
+        // baseUrl: 'foo/build/js',
         paths: {
             // 'templates': '{% url "templates" ""%}'.replace(/\/$/, ""),
             'text': "{% webpack_static 'node_modules/requirejs-text/text' %}",

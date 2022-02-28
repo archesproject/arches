@@ -1,4 +1,4 @@
-define('utils', [], function () {
+define([], function () {
     return {
         colorLuminance: function(hex, lum) {
             hex = String(hex).replace(/[^0-9a-f]/gi, '');

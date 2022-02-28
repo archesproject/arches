@@ -143,9 +143,9 @@
             'cytoscape-cola': "{% webpack_static 'node_modules/cytoscape-cola/cytoscape-cola' %}",
             'webcola': "{% webpack_static 'node_modules/webcola/WebCola/cola.min' %}",
 
-            
+            'view_data': "{% webpack_static 'templates/base-manager.htm' %}",
             // 'views/user-profile-manager': "{% webpack_static 'build/js/views/user-profile-manager' %}",
-            // 'views/graph': "{% webpack_static 'js/views/graph' %}",
+            // 'views/graph': "{% webpack_static 'build/js/views/graph' %}",
             // 'views/form': "{% webpack_static 'build/js/views/form' %}",
             // 'views/search': "{% webpack_static 'js/views/search' %}",
             // 'views/page-view': "{% webpack_static 'build/js/views/page-view' %}",
@@ -158,6 +158,10 @@
             main: "lib/codemirror"
         }],
         shim: {
+            'backbone': {
+                deps: ['jquery', 'jquery-lib', 'underscore'],
+                exports: 'Backbone'
+            },
             'nifty': {
                 exports: 'nifty',
                 deps: ['bootstrap', 'jquery', 'jquery-ui', 'metismenu']

@@ -1,3 +1,4 @@
+console.log("MEH")
 define('search', [
     'jquery',
     'underscore',
@@ -115,6 +116,7 @@ define('search', [
 
     var SearchView = BaseManagerView.extend({
         initialize: function(options) {
+            console.log('search view init')
             this.viewModel.sharedStateObject = new CommonSearchViewModel();
             this.viewModel.total = ko.observable();
             _.extend(this, this.viewModel.sharedStateObject);
@@ -177,6 +179,6 @@ define('search', [
         }
     });
 
-
+    console.log("BUH")
     return new SearchView();
 });

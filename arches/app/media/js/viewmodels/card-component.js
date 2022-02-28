@@ -1,4 +1,4 @@
-define('card-component', [
+define([
     'knockout',
     'underscore',
     'viewmodels/alert',
