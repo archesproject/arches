@@ -1,4 +1,4 @@
-define('domain-widget', [
+define([
     'knockout',
     'underscore',
     'viewmodels/widget'

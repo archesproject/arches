@@ -1,4 +1,4 @@
-define('provisional-tile', [
+define([
     'jquery',
     'underscore',
     'knockout',

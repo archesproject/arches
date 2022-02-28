@@ -1,4 +1,4 @@
-define('card-widget', [
+define([
     'underscore',
     'knockout',
     'arches',

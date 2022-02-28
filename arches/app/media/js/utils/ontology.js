@@ -1,4 +1,4 @@
-define('ontology', ['arches', 'knockout'], function(arches, ko) {
+define(['arches', 'knockout'], function(arches, ko) {
     var ontologyUtils = {
         /**
          * makeFriendly - makes a shortened name from an fully qalified name

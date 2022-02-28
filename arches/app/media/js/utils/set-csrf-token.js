@@ -1,4 +1,4 @@
-define('set-csrf-token', ['jquery', 'js-cookie'], function ($, Cookies) {
+define(['jquery', 'js-cookie'], function ($, Cookies) {
     /**
     * csrfSafeMethod - checks if the request method is CSRF safe (using regex)
     * this function is called before every request made using jQuery, and

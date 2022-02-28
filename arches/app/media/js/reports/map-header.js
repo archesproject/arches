@@ -1,4 +1,4 @@
-define('report-header-map', [
+define([
     'knockout',
     'knockout-mapping',
     'underscore',

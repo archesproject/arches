@@ -1,4 +1,4 @@
-define('widget', [
+define([
     'knockout',
     'underscore',
     'uuid',

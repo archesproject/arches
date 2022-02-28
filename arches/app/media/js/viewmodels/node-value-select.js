@@ -1,4 +1,4 @@
-define('node-value-select', [
+define([
     'underscore',
     'knockout',
     'jquery',

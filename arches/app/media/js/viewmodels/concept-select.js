@@ -1,4 +1,4 @@
-define('concept-select', [
+define([
     'knockout',
     'jquery',
     'viewmodels/widget',

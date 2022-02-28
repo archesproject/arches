@@ -1,4 +1,4 @@
-define('function', [
+define([
     'arches',
     'models/abstract',
     'knockout',

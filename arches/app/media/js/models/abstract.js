@@ -1,4 +1,4 @@
-define('abstract', ['backbone', 'jquery'], function (Backbone, $) {
+define(['backbone', 'jquery'], function (Backbone, $) {
     return Backbone.Model.extend({
         /**
          * A backbone model to manage RESTful requests on a per model basis

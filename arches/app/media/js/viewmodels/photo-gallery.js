@@ -1,4 +1,4 @@
-define('photo-gallery', [
+define([
     'knockout',
 ], function(ko) {
 

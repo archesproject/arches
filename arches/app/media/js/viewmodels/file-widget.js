@@ -1,4 +1,4 @@
-define('file-widget', [
+define([
     'jquery',
     'arches',
     'knockout',

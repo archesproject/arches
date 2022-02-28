@@ -1,4 +1,4 @@
-define('card-constraints', [
+define([
     'knockout',
     'knockout-mapping',
     'arches'

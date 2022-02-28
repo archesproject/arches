@@ -1,4 +1,4 @@
-define('node', [
+define([
     'underscore',
     'knockout',
     'models/abstract',

@@ -1,4 +1,4 @@
-define('remote-domain-widget', [
+define([
     'jquery',
     'underscore',
     'viewmodels/domain-widget'

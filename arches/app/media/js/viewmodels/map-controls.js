@@ -1,4 +1,4 @@
-define('map-controls', ['underscore', 'knockout'], function(_, ko) {
+define(['underscore', 'knockout'], function(_, ko) {
     /**
      * A viewmodel used for a generic geocoder
      *

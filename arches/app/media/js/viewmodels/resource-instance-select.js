@@ -1,4 +1,4 @@
-define('resource-instance-select', [
+define([
     'knockout',
     'underscore',
     'viewmodels/widget',

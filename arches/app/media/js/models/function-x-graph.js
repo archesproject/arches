@@ -1,4 +1,4 @@
-define('functionxgraph', [
+define([
     'underscore',
     'arches',
     'models/abstract',

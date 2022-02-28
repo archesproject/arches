@@ -1,4 +1,4 @@
-define('alert', ['knockout'], function(ko) {
+define(['knockout'], function(ko) {
     /**
     * A viewmodel used for generic alert messages
     *
