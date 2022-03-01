@@ -285,17 +285,18 @@
     >
         {% trans "Switch Image Service" %}
     </div>
-    <div data-bind="dropzone: dropzoneOptions4create" >
-        <div>
-        <div class="iiif-gallery-sequence-label fileinput-create-button dz-clickable" style="padding:0 5px" data-bind="css: uniqueidClass; dropzone: dropzoneOptions4create" role="button">
-            {% trans "Create Image Service" %}
-        </div>
-        </div>
-        <div style="min-height: 100%;">
-            <div id="hidden-dz-create-previews" style="display:none"></div>
+    <div data-bind="if: renderContext() != 'manifest-workflow'">
+        <div data-bind="dropzone: dropzoneOptions4create" >
+            <div>
+            <div class="iiif-gallery-sequence-label fileinput-create-button dz-clickable" style="padding:0 5px" data-bind="css: uniqueidClass; dropzone: dropzoneOptions4create" role="button">
+                {% trans "Create Image Service" %}
+            </div>
+            </div>
+            <div style="min-height: 100%;">
+                <div id="hidden-dz-create-previews" style="display:none"></div>
+            </div>
         </div>
     </div>
-
     <div>
         <span>{% trans "Filter" %}</span>
         <div class="list-filter" data-bind="">

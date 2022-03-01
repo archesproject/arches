@@ -29,7 +29,7 @@
     <h4 tabindex="0" class="workbench-card-sidepanel-header" data-bind="click: hideSidePanel" onkeyup="if(event.which == 13 || event.keyCode == 13){ $(this).trigger('click'); }">{% trans "Image Tools" %}</h4>
 </div>
 <div class="iiif-image-tools">
-    <div class="layout">
+    <div data-bind="if: showModeSelector" class="layout">
         <div>Panel Layout</div>
         <div class="mode-selector">
             <div data-bind="click: function(){ compareMode(false) }, css: { selected: !compareMode() }">
@@ -58,7 +58,7 @@
         </div>
     </div>
 
-    <div style="width: 96%; margin: 20px 0px;">
+    <div data-bind="if: showModeSelector" style="width: 96%; margin: 20px 0px;">
         <input class="form-control input-lg widget-input"
             data-bind="value: imageToolSelector,
             select2Query: {
@@ -254,7 +254,7 @@
             <div class="hide-gallery-control" data-bind="click: toggleGallery">
                 <span>{% trans "Hide Gallery" %}</span>
             </div>
-            <div class="mode-selector">
+            <div data-bind="if: showModeSelector"  class="mode-selector">
                 <div>Panels</div>
                 <div class="mode-selector-buttons" >
                     <div class="single-panel" data-bind="click: function(){compareMode(false)}, css: {selected: !compareMode()}">
