@@ -239,6 +239,9 @@ RESTRICT_MEDIA_ACCESS = False
 # value and is not signed in with a user account then the request will not be allowed.
 RESTRICT_CELERY_EXPORT_FOR_ANONYMOUS_USER = False
 
+# Set to True to hide the Copy Resource button
+HIDE_RESOURCE_COPY_BUTTON = False
+
 # Absolute filesystem path to the directory that will hold user-uploaded files.
 MEDIA_ROOT = os.path.join(ROOT_DIR)
 

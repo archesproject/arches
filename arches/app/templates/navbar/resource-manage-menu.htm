@@ -9,6 +9,7 @@
         <div class="panel-body">
             <ul class="list-group ep-menu-list editor-tools">
 
+                <!-- ko ifnot: ("{{app_settings.HIDE_RESOURCE_COPY_BUTTON}}" === "True") -->
                 <!-- Menu Item -->
                 <li id="settings-manager" class="edit-menu-item" data-bind="css: {'disabled': !resourceId()}">
                     <a href="" target="" class="" data-bind="click: copyResource">
@@ -18,6 +19,7 @@
                         </div>
                     </a>
                 </li>
+                <!-- /ko -->
 
                 <!-- Menu Item -->
                 {% if user_can_delete_resource %}
