@@ -317,3 +317,7 @@ a.tree-display-tool, a.tree-display-tool:hover {
 .resource-grid-main.mpm-manager .mpm-title {
     width: calc(100% - 55px);
 }
+div.search-facet-item:focus {
+    box-shadow: inset 0 0 0 3px #000;
+    outline: none;
+}

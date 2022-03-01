@@ -16,8 +16,10 @@ define([
     return ko.components.register('file-viewer', {
         viewModel: function(params) {
             params.configKeys = ['acceptedFiles', 'maxFilesize'];
+    
             var self = this;
             this.fileFormatRenderers = fileRenderers;
+            this.rendererComponentName = ko.observable();
 
             this.fileFormatRenderers.forEach(function(r){
                 r.state = {};
@@ -42,6 +44,15 @@ define([
             }
 
             this.fileRenderer = this.card.renderer;
+
+            //dynamically require the renderer - since these can be quite large/cumbersome
+            const renderer = fileRenderers.find(renderer => renderer.id === this.fileRenderer());
+            if(renderer) {
+                require([renderer.component], function(component){
+                    self.rendererComponentName(renderer.name);
+                });
+            }
+
             this.managerRenderer = ko.observable();
 
             this.filter = this.card.filter;

@@ -60,6 +60,7 @@
             <!-- /ko -->
             
         </a>
+        <!-- ko if: node.expanded() -->
         <ul class="jstree-children" aria-expanded="true" data-bind="if: node.childNodes().length > 0">
             <div data-bind="sortable: {
                 template: 'graph-tree',
@@ -70,5 +71,6 @@
             }">
             </div>
         </ul>
+        <!-- /ko -->
     </li>
 </template>

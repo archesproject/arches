@@ -17,10 +17,10 @@
             </div>
             <!-- ko foreach: searchableGraphs -->
                 <!-- ko if: cards().length > 0  -->
-                <div class="search-facet-item disabled">
+                <div tabindex="0" class="search-facet-item disabled" data-bind="click: function () { collapsed(!collapsed()) }">
                     <h4 class="search-facet-item-heading">
                         <strong data-bind="text: name"></strong>
-                        <span><i tabindex="0" class="fa report-expander print-hide" data-bind="css: {'fa-angle-down': !collapsed(), 'fa-angle-right': collapsed()}, click: function () { collapsed(!collapsed()) }" onkeyup="if(event.which == 13 || event.keyCode == 13){ $(this).trigger('click'); }"></i></span>
+                        <span><i class="fa report-expander print-hide" data-bind="css: {'fa-angle-down': !collapsed(), 'fa-angle-right': collapsed()}"></i></span>
                     </h4>
                 </div>
                 <div data-bind="visible: !collapsed()">
