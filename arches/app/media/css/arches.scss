@@ -11346,7 +11346,6 @@ div.search-facet-item.disabled {
 .search-facet-item-heading {
     font-weight: 400;
     font-size: 13px;
-    cursor: pointer;
 }
 
 .search-facet-item.header input {
@@ -11364,7 +11363,7 @@ a.search-facet-item {
 .search-facet-item.disabled {
     background: #f6f6f6;
     color: #666;
-    cursor: default;
+    cursor: pointer;
 }
 
 a.search-facet-item.disabled {
