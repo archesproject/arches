@@ -1805,30 +1805,6 @@ class DomainDataType(BaseDomainDataType):
                 option["text"] = {i81n_json_field.lang: option["text"]}
         return ret
 
-    def i18n_as_sql(self, i81n_json_field, compiler, connection):
-        sql = i81n_json_field.attname
-        for prop, value in i81n_json_field.raw_value.items():
-            escaped_value = json.dumps(value).replace("%", "%%")
-            if prop == "options":
-                sql = f"""
-                    __arches_i18n_update_jsonb_array('options.text', '{{"options": {escaped_value}}}', {sql}, '{i81n_json_field.lang}')
-                """
-            else:
-                sql = f"jsonb_set({sql}, array['{prop}'], '{escaped_value}')"
-        return sql
-
-    def i18n_serialize(self, i81n_json_field: I18n_JSONField):
-        ret = copy.deepcopy(i81n_json_field.raw_value)
-        for option in ret["options"]:
-            option["text"] = str(I18n_String(option["text"]))
-        return ret  
-
-    def i18n_localize(self, i81n_json_field: I18n_JSONField):
-        ret = copy.deepcopy(i81n_json_field.raw_value)
-        for option in ret["options"]:
-            option["text"] = {i81n_json_field.lang: option["text"]}
-        return ret  
-
 
 class DomainListDataType(BaseDomainDataType):
     def transform_value_for_tile(self, value, **kwargs):
