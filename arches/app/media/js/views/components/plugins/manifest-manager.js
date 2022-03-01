@@ -36,11 +36,15 @@ define([
                 self.canvas(canvas.images[0].resource.service['@id']);
             };
 
-            IIIFViewerViewmodel.apply(this, [params]);
+            IIIFViewerViewmodel.apply(this, [{...params, renderContext: params?.renderContext ? params.renderContext: 'manifestManager'}]);
             this.showTabs(false);
             this.mainMenu.subscribe(function(val){
                 val || self.showTabs(true);
             });
+
+            if(this.renderContext() == "manifest-workflow"){
+                this.showModeSelector(false)
+            }
             this.isManifestDirty = ko.computed(function() {
                 return ((ko.unwrap(self.manifestName) !== self.origManifestName) ||
                         (ko.unwrap(self.manifestDescription) !== self.origManifestDescription) ||
