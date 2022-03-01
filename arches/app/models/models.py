@@ -927,7 +927,7 @@ class TileModel(models.Model):  # Tile
         # if a tile on a resource gets updated, it's possible it was created with a different publication
         # so update the publication ID by saving the resource instance id
         refresh_resource = kwargs.pop("refresh_resource", True)
-        if(refresh_resource):
+        if refresh_resource:
             self.resourceinstance.save()
         if self.sortorder is None or (self.provisionaledits is not None and self.data == {}):
             sortorder_max = TileModel.objects.filter(

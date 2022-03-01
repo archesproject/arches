@@ -41,7 +41,7 @@ class TileTests(ArchesTestCase):
     def setUpClass(cls):
         for path in test_settings.RESOURCE_GRAPH_LOCATIONS:
             management.call_command("packages", operation="import_graphs", source=path)
-        
+
         sql = "select a.publicationid from graphs a inner join graph_publications b on (a.publicationid = b.publicationid) where a.graphid = '2f7f8e40-adbc-11e6-ac7f-14109fd34195'"
         with connection.cursor() as cursor:
             cursor.execute(sql)
@@ -62,7 +62,9 @@ class TileTests(ArchesTestCase):
 
         INSERT INTO node_groups(nodegroupid, legacygroupid, cardinality)
             VALUES ('21111111-0000-0000-0000-000000000000', '', 'n');
-        """.format(publication_id)
+        """.format(
+            publication_id
+        )
 
         cursor = connection.cursor()
         cursor.execute(sql)
