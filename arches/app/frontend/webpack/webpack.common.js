@@ -42,7 +42,7 @@ const buildHtmlWebpackPluginList = function(path, outerAcc) {
             acc.push(new HtmlWebpackPlugin({
                 template: `../templates/${subPath}`, // relative path to the HTML files
                 filename: `templates/${subPath}`, // output HTML files
-                chunks:  [ Path.resolve(__dirname, `../../media/build/js/${subPathWithoutFileExtension}.js`) ] // respective JS files
+                chunks:  [ Path.resolve(__dirname, `../../media/js/${subPathWithoutFileExtension}.js`) ] // respective JS files
             }));
             return acc;
         }
