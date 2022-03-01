@@ -62,7 +62,7 @@ remove_csv_importer = """
 class Migration(migrations.Migration):
 
     dependencies = [
-        ("models", "8085_relational_data_model_handle_dates"),
+        ("models", "7874_node_alias"),
     ]
 
     operations = [
