@@ -1,5 +1,5 @@
 {
-  "status": "compile",
+  "status": "done",
   "assets": {
     "js/bindings/chosen.js": {
       "name": "js/bindings/chosen.js",
@@ -1146,25 +1146,25 @@
       "path": "/Users/cbyrd/Projects/arches/arches/app/media/build/js/vendors-media_node_modules_mapbox-gl_dist_mapbox-gl_js.chunk.js",
       "publicPath": "/foo/js/vendors-media_node_modules_mapbox-gl_dist_mapbox-gl_js.chunk.js"
     },
-    "js/media_build_js_views_form_js-media_build_js_views_page-view_js.chunk.js": {
-      "name": "js/media_build_js_views_form_js-media_build_js_views_page-view_js.chunk.js",
-      "path": "/Users/cbyrd/Projects/arches/arches/app/media/build/js/media_build_js_views_form_js-media_build_js_views_page-view_js.chunk.js",
-      "publicPath": "/foo/js/media_build_js_views_form_js-media_build_js_views_page-view_js.chunk.js"
+    "js/media_js_views_form_js.chunk.js": {
+      "name": "js/media_js_views_form_js.chunk.js",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/media/build/js/media_js_views_form_js.chunk.js",
+      "publicPath": "/foo/js/media_js_views_form_js.chunk.js"
     },
-    "js/media_build_js_models_concept_js-media_build_js_views_concept-search_js-media_build_js_views_-9ba5dd.chunk.js": {
-      "name": "js/media_build_js_models_concept_js-media_build_js_views_concept-search_js-media_build_js_views_-9ba5dd.chunk.js",
-      "path": "/Users/cbyrd/Projects/arches/arches/app/media/build/js/media_build_js_models_concept_js-media_build_js_views_concept-search_js-media_build_js_views_-9ba5dd.chunk.js",
-      "publicPath": "/foo/js/media_build_js_models_concept_js-media_build_js_views_concept-search_js-media_build_js_views_-9ba5dd.chunk.js"
+    "js/media_js_views_base-manager_js-media_js_views_rdm_concept-report_js-media_js_views_rdm_concep-c29a1b.chunk.js": {
+      "name": "js/media_js_views_base-manager_js-media_js_views_rdm_concept-report_js-media_js_views_rdm_concep-c29a1b.chunk.js",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/media/build/js/media_js_views_base-manager_js-media_js_views_rdm_concept-report_js-media_js_views_rdm_concep-c29a1b.chunk.js",
+      "publicPath": "/foo/js/media_js_views_base-manager_js-media_js_views_rdm_concept-report_js-media_js_views_rdm_concep-c29a1b.chunk.js"
     },
     "js/vendors-media_node_modules_mapbox_mapbox-gl-geocoder_dist_mapbox-gl-geocoder_min_js.chunk.js": {
       "name": "js/vendors-media_node_modules_mapbox_mapbox-gl-geocoder_dist_mapbox-gl-geocoder_min_js.chunk.js",
       "path": "/Users/cbyrd/Projects/arches/arches/app/media/build/js/vendors-media_node_modules_mapbox_mapbox-gl-geocoder_dist_mapbox-gl-geocoder_min_js.chunk.js",
       "publicPath": "/foo/js/vendors-media_node_modules_mapbox_mapbox-gl-geocoder_dist_mapbox-gl-geocoder_min_js.chunk.js"
     },
-    "js/media_build_js_views_components_related-instance-creator_js.chunk.js": {
-      "name": "js/media_build_js_views_components_related-instance-creator_js.chunk.js",
-      "path": "/Users/cbyrd/Projects/arches/arches/app/media/build/js/media_build_js_views_components_related-instance-creator_js.chunk.js",
-      "publicPath": "/foo/js/media_build_js_views_components_related-instance-creator_js.chunk.js"
+    "js/media_js_views_components_related-instance-creator_js.chunk.js": {
+      "name": "js/media_js_views_components_related-instance-creator_js.chunk.js",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/media/build/js/media_js_views_components_related-instance-creator_js.chunk.js",
+      "publicPath": "/foo/js/media_js_views_components_related-instance-creator_js.chunk.js"
     },
     "js/media_js_views_components_cards_sync_recursive.chunk.js": {
       "name": "js/media_js_views_components_cards_sync_recursive.chunk.js",
@@ -1176,105 +1176,105 @@
       "path": "/Users/cbyrd/Projects/arches/arches/app/media/build/js/vendors-media_node_modules_mapbox_mapbox-gl-draw_dist_mapbox-gl-draw_js.chunk.js",
       "publicPath": "/foo/js/vendors-media_node_modules_mapbox_mapbox-gl-draw_dist_mapbox-gl-draw_js.chunk.js"
     },
-    "js/media_build_js_bindings_datatable_js.chunk.js": {
-      "name": "js/media_build_js_bindings_datatable_js.chunk.js",
-      "path": "/Users/cbyrd/Projects/arches/arches/app/media/build/js/media_build_js_bindings_datatable_js.chunk.js",
-      "publicPath": "/foo/js/media_build_js_bindings_datatable_js.chunk.js"
+    "js/media_js_bindings_datatable_js-media_js_views_base-manager_js.chunk.js": {
+      "name": "js/media_js_bindings_datatable_js-media_js_views_base-manager_js.chunk.js",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/media/build/js/media_js_bindings_datatable_js-media_js_views_base-manager_js.chunk.js",
+      "publicPath": "/foo/js/media_js_bindings_datatable_js-media_js_views_base-manager_js.chunk.js"
     },
-    "js/media_build_js_models_function-x-graph_js-media_build_js_models_function_js-media_build_js_vi-96ee86.chunk.js": {
-      "name": "js/media_build_js_models_function-x-graph_js-media_build_js_models_function_js-media_build_js_vi-96ee86.chunk.js",
-      "path": "/Users/cbyrd/Projects/arches/arches/app/media/build/js/media_build_js_models_function-x-graph_js-media_build_js_models_function_js-media_build_js_vi-96ee86.chunk.js",
-      "publicPath": "/foo/js/media_build_js_models_function-x-graph_js-media_build_js_models_function_js-media_build_js_vi-96ee86.chunk.js"
+    "js/media_js_models_function-x-graph_js-media_js_models_function_js-media_js_viewmodels_alert-jso-d8d574.chunk.js": {
+      "name": "js/media_js_models_function-x-graph_js-media_js_models_function_js-media_js_viewmodels_alert-jso-d8d574.chunk.js",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/media/build/js/media_js_models_function-x-graph_js-media_js_models_function_js-media_js_viewmodels_alert-jso-d8d574.chunk.js",
+      "publicPath": "/foo/js/media_js_models_function-x-graph_js-media_js_models_function_js-media_js_viewmodels_alert-jso-d8d574.chunk.js"
     },
-    "js/media_build_js_bindings_color-picker_js-media_build_js_models_node_js-templates_views_graph_g-e91858.chunk.js": {
-      "name": "js/media_build_js_bindings_color-picker_js-media_build_js_models_node_js-templates_views_graph_g-e91858.chunk.js",
-      "path": "/Users/cbyrd/Projects/arches/arches/app/media/build/js/media_build_js_bindings_color-picker_js-media_build_js_models_node_js-templates_views_graph_g-e91858.chunk.js",
-      "publicPath": "/foo/js/media_build_js_bindings_color-picker_js-media_build_js_models_node_js-templates_views_graph_g-e91858.chunk.js"
+    "js/media_js_bindings_color-picker_js-media_js_views_graph_graph-page-view_js-templates_views_gra-970e3c.chunk.js": {
+      "name": "js/media_js_bindings_color-picker_js-media_js_views_graph_graph-page-view_js-templates_views_gra-970e3c.chunk.js",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/media/build/js/media_js_bindings_color-picker_js-media_js_views_graph_graph-page-view_js-templates_views_gra-970e3c.chunk.js",
+      "publicPath": "/foo/js/media_js_bindings_color-picker_js-media_js_views_graph_graph-page-view_js-templates_views_gra-970e3c.chunk.js"
     },
-    "js/media_build_js_bindings_hover_js-media_build_js_viewmodels_alert_js-templates_base-manager_ht-e38dd3.chunk.js": {
-      "name": "js/media_build_js_bindings_hover_js-media_build_js_viewmodels_alert_js-templates_base-manager_ht-e38dd3.chunk.js",
-      "path": "/Users/cbyrd/Projects/arches/arches/app/media/build/js/media_build_js_bindings_hover_js-media_build_js_viewmodels_alert_js-templates_base-manager_ht-e38dd3.chunk.js",
-      "publicPath": "/foo/js/media_build_js_bindings_hover_js-media_build_js_viewmodels_alert_js-templates_base-manager_ht-e38dd3.chunk.js"
+    "js/media_js_bindings_hover_js-media_js_viewmodels_alert-json_js-media_js_views_base-manager_js-t-51a25a.chunk.js": {
+      "name": "js/media_js_bindings_hover_js-media_js_viewmodels_alert-json_js-media_js_views_base-manager_js-t-51a25a.chunk.js",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/media/build/js/media_js_bindings_hover_js-media_js_viewmodels_alert-json_js-media_js_views_base-manager_js-t-51a25a.chunk.js",
+      "publicPath": "/foo/js/media_js_bindings_hover_js-media_js_viewmodels_alert-json_js-media_js_views_base-manager_js-t-51a25a.chunk.js"
     },
-    "js/templates_views_resource_edit-log_htm.chunk.js": {
-      "name": "js/templates_views_resource_edit-log_htm.chunk.js",
-      "path": "/Users/cbyrd/Projects/arches/arches/app/media/build/js/templates_views_resource_edit-log_htm.chunk.js",
-      "publicPath": "/foo/js/templates_views_resource_edit-log_htm.chunk.js"
+    "js/media_js_views_base-manager_js-templates_views_resource_edit-log_htm.chunk.js": {
+      "name": "js/media_js_views_base-manager_js-templates_views_resource_edit-log_htm.chunk.js",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/media/build/js/media_js_views_base-manager_js-templates_views_resource_edit-log_htm.chunk.js",
+      "publicPath": "/foo/js/media_js_views_base-manager_js-templates_views_resource_edit-log_htm.chunk.js"
     },
-    "js/media_build_js_views_resource_related-resources-manager_js.chunk.js": {
-      "name": "js/media_build_js_views_resource_related-resources-manager_js.chunk.js",
-      "path": "/Users/cbyrd/Projects/arches/arches/app/media/build/js/media_build_js_views_resource_related-resources-manager_js.chunk.js",
-      "publicPath": "/foo/js/media_build_js_views_resource_related-resources-manager_js.chunk.js"
+    "js/media_js_views_resource_related-resources-manager_js.chunk.js": {
+      "name": "js/media_js_views_resource_related-resources-manager_js.chunk.js",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/media/build/js/media_js_views_resource_related-resources-manager_js.chunk.js",
+      "publicPath": "/foo/js/media_js_views_resource_related-resources-manager_js.chunk.js"
     },
-    "js/media_build_js_views_resource_permissions-manager_js.chunk.js": {
-      "name": "js/media_build_js_views_resource_permissions-manager_js.chunk.js",
-      "path": "/Users/cbyrd/Projects/arches/arches/app/media/build/js/media_build_js_views_resource_permissions-manager_js.chunk.js",
-      "publicPath": "/foo/js/media_build_js_views_resource_permissions-manager_js.chunk.js"
+    "js/media_js_views_resource_permissions-manager_js.chunk.js": {
+      "name": "js/media_js_views_resource_permissions-manager_js.chunk.js",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/media/build/js/media_js_views_resource_permissions-manager_js.chunk.js",
+      "publicPath": "/foo/js/media_js_views_resource_permissions-manager_js.chunk.js"
     },
-    "js/media_build_js_views_components_resource-report-abstract_js.chunk.js": {
-      "name": "js/media_build_js_views_components_resource-report-abstract_js.chunk.js",
-      "path": "/Users/cbyrd/Projects/arches/arches/app/media/build/js/media_build_js_views_components_resource-report-abstract_js.chunk.js",
-      "publicPath": "/foo/js/media_build_js_views_components_resource-report-abstract_js.chunk.js"
+    "js/media_js_views_base-manager_js-media_js_views_components_resource-report-abstract_js.chunk.js": {
+      "name": "js/media_js_views_base-manager_js-media_js_views_components_resource-report-abstract_js.chunk.js",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/media/build/js/media_js_views_base-manager_js-media_js_views_components_resource-report-abstract_js.chunk.js",
+      "publicPath": "/foo/js/media_js_views_base-manager_js-media_js_views_components_resource-report-abstract_js.chunk.js"
     },
-    "js/media_build_js_bindings_chosen_js.chunk.js": {
-      "name": "js/media_build_js_bindings_chosen_js.chunk.js",
-      "path": "/Users/cbyrd/Projects/arches/arches/app/media/build/js/media_build_js_bindings_chosen_js.chunk.js",
-      "publicPath": "/foo/js/media_build_js_bindings_chosen_js.chunk.js"
-    },
-    "js/vendors-media_node_modules_jquery-migrate_dist_jquery-migrate_min_js.chunk.js": {
-      "name": "js/vendors-media_node_modules_jquery-migrate_dist_jquery-migrate_min_js.chunk.js",
-      "path": "/Users/cbyrd/Projects/arches/arches/app/media/build/js/vendors-media_node_modules_jquery-migrate_dist_jquery-migrate_min_js.chunk.js",
-      "publicPath": "/foo/js/vendors-media_node_modules_jquery-migrate_dist_jquery-migrate_min_js.chunk.js"
-    },
-    "js/vendors-media_node_modules_knockout_build_output_knockout-latest_js.chunk.js": {
-      "name": "js/vendors-media_node_modules_knockout_build_output_knockout-latest_js.chunk.js",
-      "path": "/Users/cbyrd/Projects/arches/arches/app/media/build/js/vendors-media_node_modules_knockout_build_output_knockout-latest_js.chunk.js",
-      "publicPath": "/foo/js/vendors-media_node_modules_knockout_build_output_knockout-latest_js.chunk.js"
-    },
-    "js/vendors-media_node_modules_underscore_underscore-min_js.chunk.js": {
-      "name": "js/vendors-media_node_modules_underscore_underscore-min_js.chunk.js",
-      "path": "/Users/cbyrd/Projects/arches/arches/app/media/build/js/vendors-media_node_modules_underscore_underscore-min_js.chunk.js",
-      "publicPath": "/foo/js/vendors-media_node_modules_underscore_underscore-min_js.chunk.js"
-    },
-    "js/vendors-media_node_modules_bootstrap_dist_js_bootstrap_min_js.chunk.js": {
-      "name": "js/vendors-media_node_modules_bootstrap_dist_js_bootstrap_min_js.chunk.js",
-      "path": "/Users/cbyrd/Projects/arches/arches/app/media/build/js/vendors-media_node_modules_bootstrap_dist_js_bootstrap_min_js.chunk.js",
-      "publicPath": "/foo/js/vendors-media_node_modules_bootstrap_dist_js_bootstrap_min_js.chunk.js"
-    },
-    "js/vendors-media_node_modules_backbone_backbone-min_js-media_node_modules_jquery-validation_dist-5b3fec.chunk.js": {
-      "name": "js/vendors-media_node_modules_backbone_backbone-min_js-media_node_modules_jquery-validation_dist-5b3fec.chunk.js",
-      "path": "/Users/cbyrd/Projects/arches/arches/app/media/build/js/vendors-media_node_modules_backbone_backbone-min_js-media_node_modules_jquery-validation_dist-5b3fec.chunk.js",
-      "publicPath": "/foo/js/vendors-media_node_modules_backbone_backbone-min_js-media_node_modules_jquery-validation_dist-5b3fec.chunk.js"
+    "js/media_js_views_base-manager_js.chunk.js": {
+      "name": "js/media_js_views_base-manager_js.chunk.js",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/media/build/js/media_js_views_base-manager_js.chunk.js",
+      "publicPath": "/foo/js/media_js_views_base-manager_js.chunk.js"
     },
     "js/vendors-media_node_modules_moment_min_moment_min_js.chunk.js": {
       "name": "js/vendors-media_node_modules_moment_min_moment_min_js.chunk.js",
       "path": "/Users/cbyrd/Projects/arches/arches/app/media/build/js/vendors-media_node_modules_moment_min_moment_min_js.chunk.js",
       "publicPath": "/foo/js/vendors-media_node_modules_moment_min_moment_min_js.chunk.js"
     },
+    "js/vendors-media_node_modules_backbone_backbone-min_js-media_node_modules_bootstrap_dist_js_boot-7c5f9a.chunk.js": {
+      "name": "js/vendors-media_node_modules_backbone_backbone-min_js-media_node_modules_bootstrap_dist_js_boot-7c5f9a.chunk.js",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/media/build/js/vendors-media_node_modules_backbone_backbone-min_js-media_node_modules_bootstrap_dist_js_boot-7c5f9a.chunk.js",
+      "publicPath": "/foo/js/vendors-media_node_modules_backbone_backbone-min_js-media_node_modules_bootstrap_dist_js_boot-7c5f9a.chunk.js"
+    },
+    "js/vendors-media_node_modules_core-js_index_js-media_node_modules_dom4_build_dom4_js.chunk.js": {
+      "name": "js/vendors-media_node_modules_core-js_index_js-media_node_modules_dom4_build_dom4_js.chunk.js",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/media/build/js/vendors-media_node_modules_core-js_index_js-media_node_modules_dom4_build_dom4_js.chunk.js",
+      "publicPath": "/foo/js/vendors-media_node_modules_core-js_index_js-media_node_modules_dom4_build_dom4_js.chunk.js"
+    },
     "js/vendors-media_node_modules_knockout-mapping_dist_knockout_mapping_min_js.chunk.js": {
       "name": "js/vendors-media_node_modules_knockout-mapping_dist_knockout_mapping_min_js.chunk.js",
       "path": "/Users/cbyrd/Projects/arches/arches/app/media/build/js/vendors-media_node_modules_knockout-mapping_dist_knockout_mapping_min_js.chunk.js",
       "publicPath": "/foo/js/vendors-media_node_modules_knockout-mapping_dist_knockout_mapping_min_js.chunk.js"
     },
-    "js/templates_javascript_htm.chunk.js": {
-      "name": "js/templates_javascript_htm.chunk.js",
-      "path": "/Users/cbyrd/Projects/arches/arches/app/media/build/js/templates_javascript_htm.chunk.js",
-      "publicPath": "/foo/js/templates_javascript_htm.chunk.js"
+    "js/vendors-media_node_modules_select2_select2_js.chunk.js": {
+      "name": "js/vendors-media_node_modules_select2_select2_js.chunk.js",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/media/build/js/vendors-media_node_modules_select2_select2_js.chunk.js",
+      "publicPath": "/foo/js/vendors-media_node_modules_select2_select2_js.chunk.js"
     },
-    "js/media_build_js_views_base-manager_js.chunk.js": {
-      "name": "js/media_build_js_views_base-manager_js.chunk.js",
-      "path": "/Users/cbyrd/Projects/arches/arches/app/media/build/js/media_build_js_views_base-manager_js.chunk.js",
-      "publicPath": "/foo/js/media_build_js_views_base-manager_js.chunk.js"
+    "js/vendors-media_node_modules_datatables_net-buttons-bs_js_buttons_bootstrap_min_js-media_node_m-d7d553.chunk.js": {
+      "name": "js/vendors-media_node_modules_datatables_net-buttons-bs_js_buttons_bootstrap_min_js-media_node_m-d7d553.chunk.js",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/media/build/js/vendors-media_node_modules_datatables_net-buttons-bs_js_buttons_bootstrap_min_js-media_node_m-d7d553.chunk.js",
+      "publicPath": "/foo/js/vendors-media_node_modules_datatables_net-buttons-bs_js_buttons_bootstrap_min_js-media_node_m-d7d553.chunk.js"
     },
-    "js/media_build_js_viewmodels_alert-json_js.chunk.js": {
-      "name": "js/media_build_js_viewmodels_alert-json_js.chunk.js",
-      "path": "/Users/cbyrd/Projects/arches/arches/app/media/build/js/media_build_js_viewmodels_alert-json_js.chunk.js",
-      "publicPath": "/foo/js/media_build_js_viewmodels_alert-json_js.chunk.js"
+    "js/vendors-media_node_modules_dropzone_dist_min_dropzone-amd-module_min_js-media_node_modules_jq-748635.chunk.js": {
+      "name": "js/vendors-media_node_modules_dropzone_dist_min_dropzone-amd-module_min_js-media_node_modules_jq-748635.chunk.js",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/media/build/js/vendors-media_node_modules_dropzone_dist_min_dropzone-amd-module_min_js-media_node_modules_jq-748635.chunk.js",
+      "publicPath": "/foo/js/vendors-media_node_modules_dropzone_dist_min_dropzone-amd-module_min_js-media_node_modules_jq-748635.chunk.js"
     },
-    "js/media_build_js_views_graph_graph-page-view_js.chunk.js": {
-      "name": "js/media_build_js_views_graph_graph-page-view_js.chunk.js",
-      "path": "/Users/cbyrd/Projects/arches/arches/app/media/build/js/media_build_js_views_graph_graph-page-view_js.chunk.js",
-      "publicPath": "/foo/js/media_build_js_views_graph_graph-page-view_js.chunk.js"
+    "js/vendors-media_node_modules_cytoscape-cola_cytoscape-cola_js-media_node_modules_cytoscape_dist-a8d2cb.chunk.js": {
+      "name": "js/vendors-media_node_modules_cytoscape-cola_cytoscape-cola_js-media_node_modules_cytoscape_dist-a8d2cb.chunk.js",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/media/build/js/vendors-media_node_modules_cytoscape-cola_cytoscape-cola_js-media_node_modules_cytoscape_dist-a8d2cb.chunk.js",
+      "publicPath": "/foo/js/vendors-media_node_modules_cytoscape-cola_cytoscape-cola_js-media_node_modules_cytoscape_dist-a8d2cb.chunk.js"
+    },
+    "js/vendors-media_node_modules_bootstrap-colorpicker_dist_js_bootstrap-colorpicker_min_js.chunk.js": {
+      "name": "js/vendors-media_node_modules_bootstrap-colorpicker_dist_js_bootstrap-colorpicker_min_js.chunk.js",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/media/build/js/vendors-media_node_modules_bootstrap-colorpicker_dist_js_bootstrap-colorpicker_min_js.chunk.js",
+      "publicPath": "/foo/js/vendors-media_node_modules_bootstrap-colorpicker_dist_js_bootstrap-colorpicker_min_js.chunk.js"
+    },
+    "js/media_js_views_page-view_js.chunk.js": {
+      "name": "js/media_js_views_page-view_js.chunk.js",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/media/build/js/media_js_views_page-view_js.chunk.js",
+      "publicPath": "/foo/js/media_js_views_page-view_js.chunk.js"
+    },
+    "js/media_js_models_node_js.chunk.js": {
+      "name": "js/media_js_models_node_js.chunk.js",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/media/build/js/media_js_models_node_js.chunk.js",
+      "publicPath": "/foo/js/media_js_models_node_js.chunk.js"
     },
     "img/.DS_Store": {
       "name": "img/.DS_Store",
@@ -1591,41 +1591,6 @@
       "path": "/Users/cbyrd/Projects/arches/arches/app/media/build/img/user/profile_background.png",
       "publicPath": "/foo/img/user/profile_background.png"
     },
-    "img/landing/bg/19.jpg": {
-      "name": "img/landing/bg/19.jpg",
-      "path": "/Users/cbyrd/Projects/arches/arches/app/media/build/img/landing/bg/19.jpg",
-      "publicPath": "/foo/img/landing/bg/19.jpg"
-    },
-    "img/landing/bg/3.jpg": {
-      "name": "img/landing/bg/3.jpg",
-      "path": "/Users/cbyrd/Projects/arches/arches/app/media/build/img/landing/bg/3.jpg",
-      "publicPath": "/foo/img/landing/bg/3.jpg"
-    },
-    "img/landing/bg/7.jpg": {
-      "name": "img/landing/bg/7.jpg",
-      "path": "/Users/cbyrd/Projects/arches/arches/app/media/build/img/landing/bg/7.jpg",
-      "publicPath": "/foo/img/landing/bg/7.jpg"
-    },
-    "img/landing/bg/img1.jpg": {
-      "name": "img/landing/bg/img1.jpg",
-      "path": "/Users/cbyrd/Projects/arches/arches/app/media/build/img/landing/bg/img1.jpg",
-      "publicPath": "/foo/img/landing/bg/img1.jpg"
-    },
-    "img/landing/patterns/5.png": {
-      "name": "img/landing/patterns/5.png",
-      "path": "/Users/cbyrd/Projects/arches/arches/app/media/build/img/landing/patterns/5.png",
-      "publicPath": "/foo/img/landing/patterns/5.png"
-    },
-    "img/landing/patterns/gridtile.png": {
-      "name": "img/landing/patterns/gridtile.png",
-      "path": "/Users/cbyrd/Projects/arches/arches/app/media/build/img/landing/patterns/gridtile.png",
-      "publicPath": "/foo/img/landing/patterns/gridtile.png"
-    },
-    "img/sliders/revolution/bg-text.png": {
-      "name": "img/sliders/revolution/bg-text.png",
-      "path": "/Users/cbyrd/Projects/arches/arches/app/media/build/img/sliders/revolution/bg-text.png",
-      "publicPath": "/foo/img/sliders/revolution/bg-text.png"
-    },
     "img/icons/flags/france.png": {
       "name": "img/icons/flags/france.png",
       "path": "/Users/cbyrd/Projects/arches/arches/app/media/build/img/icons/flags/france.png",
@@ -1820,6 +1785,41 @@
       "name": "img/icons/social/youtube.png",
       "path": "/Users/cbyrd/Projects/arches/arches/app/media/build/img/icons/social/youtube.png",
       "publicPath": "/foo/img/icons/social/youtube.png"
+    },
+    "img/landing/bg/19.jpg": {
+      "name": "img/landing/bg/19.jpg",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/media/build/img/landing/bg/19.jpg",
+      "publicPath": "/foo/img/landing/bg/19.jpg"
+    },
+    "img/landing/bg/3.jpg": {
+      "name": "img/landing/bg/3.jpg",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/media/build/img/landing/bg/3.jpg",
+      "publicPath": "/foo/img/landing/bg/3.jpg"
+    },
+    "img/landing/bg/7.jpg": {
+      "name": "img/landing/bg/7.jpg",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/media/build/img/landing/bg/7.jpg",
+      "publicPath": "/foo/img/landing/bg/7.jpg"
+    },
+    "img/landing/bg/img1.jpg": {
+      "name": "img/landing/bg/img1.jpg",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/media/build/img/landing/bg/img1.jpg",
+      "publicPath": "/foo/img/landing/bg/img1.jpg"
+    },
+    "img/landing/patterns/5.png": {
+      "name": "img/landing/patterns/5.png",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/media/build/img/landing/patterns/5.png",
+      "publicPath": "/foo/img/landing/patterns/5.png"
+    },
+    "img/landing/patterns/gridtile.png": {
+      "name": "img/landing/patterns/gridtile.png",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/media/build/img/landing/patterns/gridtile.png",
+      "publicPath": "/foo/img/landing/patterns/gridtile.png"
+    },
+    "img/sliders/revolution/bg-text.png": {
+      "name": "img/sliders/revolution/bg-text.png",
+      "path": "/Users/cbyrd/Projects/arches/arches/app/media/build/img/sliders/revolution/bg-text.png",
+      "publicPath": "/foo/img/sliders/revolution/bg-text.png"
     },
     "templates/admin/change_form.html": {
       "name": "templates/admin/change_form.html",
