@@ -1,4 +1,4 @@
-@import url(../packages/chosen-js/chosen.css);
+@import url(../node_modules/chosen-js/chosen.css);
 
 html, body {
     overflow-x: hidden;
