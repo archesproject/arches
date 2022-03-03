@@ -45,7 +45,7 @@
                                         <h5 id="" class="arches-modal-section">{% trans "Language" %}</h5>
                                         <select style="width:100%;" class="select2 language language-input" id="label-language" name="label-language" placeholder='{% trans "Language" %}' required>
                                             {% for language in languages %}
-                                              <option value="{{language.languageid}}" {% if language.isdefault %} selected="selected" {% endif %}>{{language.languageid}} ({{language.languagename}})</option>
+                                            <option value="{{language.code}}" {% if language.isdefault %} selected="selected" {% endif %}>{{language.code}} ({{language.name}})</option>
                                             {% endfor %}
                                         </select>
                                     </div>
@@ -124,7 +124,7 @@
                                         <h5 id="" class="arches-modal-section">{% trans "Language" %}</h5>
                                         <select style="width:100%;" class="select2 language language-input" name="note_language_dd" id="note_language_dd" required placeholder="Language">
                                         {% for language in languages %}
-                                          <option value="{{language.languageid}}" {% if language.isdefault %} selected="selected" {% endif %}>{{language.languageid}} ({{language.languagename}})</option>
+                                        <option value="{{language.code}}" {% if language.isdefault %} selected="selected" {% endif %}>{{language.code}} ({{language.name}})</option>
                                         {% endfor %}
                                         </select>
                                     </div>
@@ -202,7 +202,7 @@
                                         <h5 id="" class="arches-modal-section">{% trans "Language" %}</h5>
                                         <select style="width:100%;" class="select2 language language-input" name="related_value_language_dd" id="related_value_language_dd" required placeholder='{% trans "Language" %}'>
                                         {% for language in languages %}
-                                          <option value="{{language.languageid}}" {% if language.isdefault %} selected="selected" {% endif %}>{{language.languageid}} ({{language.languagename}})</option>
+                                        <option value="{{language.code}}" {% if language.isdefault %} selected="selected" {% endif %}>{{language.code}} ({{language.name}})</option>
                                         {% endfor %}
                                         </select>
                                     </div>
