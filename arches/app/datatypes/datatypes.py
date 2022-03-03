@@ -1789,29 +1789,57 @@ class DomainDataType(BaseDomainDataType):
         value = get_value_from_jsonld(json_ld_node)
         return self.get_option_id_from_text(value[0])
 
-    def i18n_as_sql(self, i81n_json_field, compiler, connection):
-        sql = i81n_json_field.attname
-        for prop, value in i81n_json_field.raw_value.items():
+    def i18n_as_sql(self, i18n_json_field, compiler, connection):
+        """
+        Creates a sql snippet that can be used to update the
+        config object associated with this datatype.
+        This snippet will be used in a SQL UPDATE statement.
+        """
+
+        sql = i18n_json_field.attname
+        for prop, value in i18n_json_field.raw_value.items():
             escaped_value = json.dumps(value).replace("%", "%%")
             if prop == "options":
                 sql = f"""
-                    __arches_i18n_update_jsonb_array('options.text', '{{"options": {escaped_value}}}', {sql}, '{i81n_json_field.lang}')
+                    __arches_i18n_update_jsonb_array('options.text', '{{"options": {escaped_value}}}', {sql}, '{i18n_json_field.lang}')
                 """
             else:
                 sql = f"jsonb_set({sql}, array['{prop}'], '{escaped_value}')"
         return sql
 
-    def i18n_serialize(self, i81n_json_field: I18n_JSONField):
-        ret = copy.deepcopy(i81n_json_field.raw_value)
+    def i18n_serialize(self, i18n_json_field: I18n_JSONField):
+        """
+        Takes a localized list of options eg: 
+        {"options": [{"text":{"en": "blue", "es": "azul"}}, {"text":{"en": "red", "es": "rojo"}}]}
+        and returns the value as a string based on the active language
+        Eg: if the active language is Spanish then the above returned 
+        object would be {"options": [{"text":"azul"},{"text":"rojo"}]}
+
+        Arguments:
+        i18n_json_field -- the I18n_JSONField being serialized
+        """
+
+        ret = copy.deepcopy(i18n_json_field.raw_value)
         for option in ret["options"]:
             option["text"] = str(I18n_String(option["text"]))
         return ret
 
-    def i18n_localize(self, i81n_json_field: I18n_JSONField):
-        ret = copy.deepcopy(i81n_json_field.raw_value)
+    def i18n_to_localized_object(self, i18n_json_field: I18n_JSONField):
+        """
+        Takes a list of optione that is assumed to hold a localized value
+        eg: {"options": [{"text":"azul"},{"text":"rojo"}]}
+        and returns the value as an object keyed to the active language
+        Eg: if the active language is Spanish then the above returned 
+        object would be {"options": [{"text":{"es":"azul"}},{"text":{"es":"rojo"}}]}
+
+        Arguments:
+        i18n_json_field -- the I18n_JSONField being localized
+        """
+
+        ret = copy.deepcopy(i18n_json_field.raw_value)
         for option in ret["options"]:
             if not isinstance(option["text"], dict):
-                option["text"] = {i81n_json_field.lang: option["text"]}
+                option["text"] = {i18n_json_field.lang: option["text"]}
         return ret
 
 
