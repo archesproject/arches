@@ -9,6 +9,7 @@ define(['jquery', 'knockout', 'uuid', 'arches', 'js-cookie'], function($, ko, uu
     */
     const ImportModuleViewModel = function() {
         const self = this;
+        this.transactionId = uuid.generate();
         this.fileAdded = ko.observable(false);
         this.fileInfo = ko.observable({name:"", size:""});
         this.formData = new window.FormData();
@@ -20,8 +21,7 @@ define(['jquery', 'knockout', 'uuid', 'arches', 'js-cookie'], function($, ko, uu
             self.loading(true);
             self.fileInfo({name: file.name, size: file.size});
             self.formData.append('file', file, file.name);
-            self.submit('read').then(function(data){
-                console.log('success ', data);
+            self.submit('read').then(function(){
                 self.fileAdded(true);
                 self.loading(false);
             }).catch(function(err) {    
@@ -33,7 +33,7 @@ define(['jquery', 'knockout', 'uuid', 'arches', 'js-cookie'], function($, ko, uu
 
         this.submit = function(action) {
             self.formData.append('action', action);
-            self.formData.append('transaction_id', self.transaction_id);
+            self.formData.append('transaction_id', self.transactionId);
             self.formData.append('module', this.moduleId);
             return fetch(arches.urls.etl_manager, {
                 method: 'POST',
