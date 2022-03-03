@@ -6242,6 +6242,197 @@ th.notif-type {
     padding-right: 20px;
 }
 
+@media only screen and (min-width : 768px) {
+    .tabbed-workflow-title-bar {
+        .workflow-name-container {
+            display: flex;
+            flex-direction: row;
+        }
+
+        .workflow-top-control {
+            display: inline-flex;
+            max-width: 335px;
+            justify-content: flex-end;
+        }
+    }
+
+    .step-metadata {
+        display: flex;
+    }
+
+    .workflow-step-title,
+    .workflow-plugin .btn .succinct,
+    .ep-tools .fa-sign-out {
+        display: none
+    }
+}
+
+@media only screen and (max-width : 768px) {
+
+    #content-container {
+        .ep-tools .fa-sign-out {
+            font-size: 17px;
+        }
+        .ep-toolbar {
+            position: fixed;
+            z-index: 10;
+        }
+        .content-panel {
+            overflow-y: scroll;
+            padding: 17px 0px;
+        }
+    }
+
+    #container.mainnav-lg #mainnav-container{
+        left: 0;
+        width: 100%;
+
+        i {
+            font-size: 1.95em;
+        }
+
+        span.menu-title {
+            font-size: 17px;
+        }
+
+        .expanded-nav{
+            display: none;
+        }
+
+        .list-header{
+            font-size: 19px;
+        }
+    }
+
+    #card-alert-panel {
+        display: flex;
+        flex-direction: column;
+        height: auto;
+
+        .ep-form-alert-text {
+            display: none;
+        }
+
+        .ep-form-alert-default-dismiss {
+            display: none;
+        }
+
+        h4 {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 10px;
+            font-size: 17px;
+        }
+
+        .ep-form-alert-buttons {
+            display: flex;
+            flex-direction: row;
+            position: relative;
+            bottom: auto;
+            right: auto;
+
+            button {
+                display: flex;
+                flex: 1;
+                margin: 5px;
+                align-items: center;
+                justify-content: center;
+                font-size: 17px;
+                padding: 3px;
+            }
+            button.btn-labeled:before {
+                background-color: transparent;
+            }
+        }
+    }
+
+    .tabbed-workflow-step-body {
+        .card-component{
+            padding: 0px;
+            margin: 0px;
+        }
+        label {
+            font-size: 15px;
+        }
+    }
+
+    .tabbed-workflow-footer{
+        position: fixed;
+        bottom: 0px;
+        width: 100%;
+        z-index: 11;
+        display: flex;
+        flex-direction: column-reverse;
+
+        .btn > i, .btn > span {
+            padding: 0px 5px;
+        }
+
+        .btn {
+            padding: 12px;
+            font-size: 17px;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        i {
+            font-size: 17px;
+        }
+    }
+
+    .tabbed-workflow-footer-button-container {
+        display: flex;
+        flex-direction: row;
+    }
+
+    .tabbed-workflow-title-bar .workflow-top-control {
+        display: flex;
+        flex: 1;
+        flex-direction: row;
+        margin-top: 33px;
+
+        button {
+            display: flex;
+            flex: 1;
+            font-size: 17px;
+            padding: 12px;
+            justify-content: center;
+            align-items: center;
+        }
+    }
+
+    .tabbed-workflow-footer-button-container button {
+        margin: 10px 5px;
+        flex: 1;
+        display: flex;
+    }
+
+    .workflow-step-title {
+        padding: 0px 5px;
+        border-bottom: 1px solid #ddd;
+
+        h2 {
+            margin-top: 10px;
+            font-weight: initial; 
+            font-size:17px
+        }
+    }
+
+    .ep-notifs-toggle, 
+    .ep-tools-search, 
+    .tabbed-workflow-step-information-box-container.seen,
+    .workflow-nav-tab-container,
+    .workflow-plugin .btn .verbose,
+    .tabbed-workflow-footer .step-metadata,
+    .tabbed-workflow-title-bar .workflow-name-container,
+    .workflow-select-desc,
+    .ep-form-alert-title .verbose
+    {
+        display: none;
+    }
+}
+
 .ep-tools:hover {
     background: #fafafa;
     border-bottom: 1px solid #ddd;
