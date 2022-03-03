@@ -370,7 +370,12 @@ class SearchResultsExporter(object):
 
     def to_geojson(self, instances, headers, name):  # a part of the code exists in datatypes.py, l.567
         if len(instances) > 0:
-            geometry_fields = self.get_geometry_fieldnames(instances[0])
+            geometry_fields = []
+            for instance in instances:
+                geometry_fields_in_instance = self.get_geometry_fieldnames(instance)
+                for geometry_field_value in geometry_fields_in_instance:
+                    if geometry_field_value not in geometry_fields:
+                        geometry_fields.append(geometry_field_value)
 
         features = []
         for geometry_field in geometry_fields:
