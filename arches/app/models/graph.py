@@ -1307,7 +1307,7 @@ class Graph(models.GraphModel):
         exclude = [] if exclude is None else exclude
 
         if self.publication and not force_recalculation:
-            deserialized_graph = JSONDeserializer().deserialize(self.publication.serialized_graph)
+            deserialized_graph = self.publication.serialized_graph
 
             for key in exclude:
                 if deserialized_graph.get(key) is not None:  # explicit None comparison so falsey values will still return
