@@ -21,6 +21,7 @@ import re
 import logging
 from django.db import transaction, IntegrityError
 from django.db.models import Q
+from django.utils import translation
 from django.utils.http import urlencode
 from rdflib import Literal, Namespace, RDF, URIRef
 from rdflib.namespace import SKOS, DCTERMS
@@ -30,7 +31,6 @@ from arches.app.models import models
 from arches.app.models.concept import Concept
 from arches.app.models.system_settings import settings
 from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializer
-from django.utils import translation
 
 # define the ARCHES namespace
 ARCHES = Namespace(settings.ARCHES_NAMESPACE_FOR_DATA_EXPORT)
