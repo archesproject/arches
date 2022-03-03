@@ -1582,7 +1582,7 @@ class Graph(models.GraphModel):
         if self.slug is not None:
             graphs_with_matching_slug = models.GraphModel.objects.exclude(slug__isnull=True).filter(slug=self.slug)
             if graphs_with_matching_slug.exists() and graphs_with_matching_slug[0].graphid != self.graphid:
-                raise GraphValidationError(_("Another resource modal already uses the slug '{self.slug}'").format(**locals()), 1007)
+                raise GraphValidationError(_("Another resource model already uses the slug '{self.slug}'").format(**locals()), 1007)
 
     def publish(self, notes=None):
         """
@@ -1599,8 +1599,8 @@ class Graph(models.GraphModel):
 
             self.publication = publication
             self.save()
-        except Exception:
-            raise UnpublishedModelError("Could not save graph publication ")
+        except Exception as e:
+            raise UnpublishedModelError(e)
 
     def unpublish(self):
         """

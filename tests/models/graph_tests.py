@@ -156,10 +156,6 @@ class GraphTests(ArchesTestCase):
         }
         models.Edge.objects.create(**edges_dict).save()
 
-    @classmethod
-    def tearDownClass(cls):
-        cls.deleteGraph("2f7f8e40-adbc-11e6-ac7f-14109fd34195")
-
     def setUp(self):
         graph = Graph.new()
         graph.name = "TEST GRAPH"
