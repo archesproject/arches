@@ -487,7 +487,7 @@ class Command(BaseCommand):
                 "extensions/datatypes",
                 "extensions/functions",
                 "extensions/widgets",
-                "extensions/css",
+                "extensions/etl_modules" "extensions/css",
                 "extensions/bindings",
                 "extensions/card_components",
                 "extensions/plugins",
@@ -828,6 +828,9 @@ class Command(BaseCommand):
         def load_card_components(package_dir):
             load_extensions(package_dir, "card_components", "card_component")
 
+        def load_card_components(package_dir):
+            load_extensions(package_dir, "cards", "card_component")
+
         def load_search_components(package_dir):
             load_extensions(package_dir, "search", "search")
 
@@ -839,6 +842,9 @@ class Command(BaseCommand):
 
         def load_functions(package_dir):
             load_extensions(package_dir, "functions", "fn")
+
+        def load_etl_modules(package_dir):
+            load_extensions(package_dir, "etl_modules", "etl_module")
 
         def cache_graphs():
             management.call_command("cache", operation="graphs")
@@ -919,6 +925,8 @@ class Command(BaseCommand):
         load_functions(package_location)
         print("loading datatypes")
         load_datatypes(package_location)
+        print("loading etl modules")
+        load_etl_modules(package_location)
         print("loading concepts")
         load_concepts(package_location, overwrite_concepts, stage_concepts, defer_indexing)
         print("loading resource models and branches")

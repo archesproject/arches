@@ -1419,7 +1419,6 @@ class ETLModule(models.Model):
     classname = models.TextField(blank=True, null=True)
     config = JSONField(blank=True, null=True, db_column="config")
     slug = models.TextField(validators=[validate_slug], unique=True, null=True)
-
     description = models.TextField(blank=True, null=True)
 
     def __str__(self):
@@ -1431,3 +1430,36 @@ class ETLModule(models.Model):
 
     def get_class_module(self):
         return get_class_from_modulename(self.modulename, self.classname, settings.ETL_MODULE_LOCATIONS)
+
+
+class LoadEvent(models.Model):
+    transactionid = models.UUIDField(primary_key=True, serialize=False, default=uuid.uuid1)
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    complete = models.BooleanField(default=False)
+    succssful = models.BooleanField(blank=True, null=True)
+    load_description = models.TextField(blank=True, null=True)
+    message = models.TextField(blank=True, null=True)
+    load_start_time = models.DateTimeField(blank=True, null=True)
+    load_end_time = models.DateTimeField(blank=True, null=True)
+
+    class Meta:
+        managed = True
+        db_table = "load_event"
+
+
+class LoadStaging(models.Model):
+    nodegroup = models.ForeignKey(NodeGroup, db_column="nodegroupid", on_delete=models.CASCADE)
+    load_event = models.ForeignKey(LoadEvent, db_column="transactionid", on_delete=models.CASCADE)
+    value = JSONField(blank=True, null=True, db_column="value")
+    legacyid = models.TextField(blank=True, null=True)
+    resourceid = models.UUIDField(serialize=False, blank=True, null=True)
+    tileid = models.UUIDField(serialize=False, blank=True, null=True)
+    parenttileid = models.UUIDField(serialize=False, blank=True, null=True)
+    passes_validation = models.BooleanField(blank=True, null=True)
+    nodegroup_depth = models.IntegerField(default=1)
+    source_description = models.TextField(blank=True, null=True)
+    message = models.TextField(blank=True, null=True)
+
+    class Meta:
+        managed = True
+        db_table = "load_staging"

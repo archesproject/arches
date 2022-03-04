@@ -1,7 +1,7 @@
 <!-- ko ifnot: loading() || !!selectedModule() -->
 <div class="workflow-select-plugin">
     <div class="workflow-select-card-container">
-        <!-- ko foreach: {data: etlmodules, as: 'etlmodule'} -->
+        <!-- ko foreach: {data: etlModules, as: 'etlmodule'} -->
         <a href="#" data-bind="click: function () { $parent.selectedModule(etlmodule) }"><div data-bind="style: {'background-color': etlmodule.config.bgColor}" class="workflow-select-card">
             <h4 class="workflow-select-title" data-bind="text: etlmodule.name"></h4>
             <div data-bind="style: {'background-color': etlmodule.config.circleColor}" class="workflow-select-wf-circle">
@@ -19,7 +19,7 @@
     <div class="flex plugin-main" data-bind="component: {
         name: selectedModule().componentname,
         loading: selectedModule().loading,
-        params: selectedModule().config,
+        params: selectedModule(),
     }"></div>
 </div>
 <!-- /ko -->

@@ -13,8 +13,8 @@ class ETLManagerView(View):
     """
 
     def get(self, request):
-        etlmodules = ETLModule.objects.all()
-        return JSONResponse(etlmodules)
+        etl_modules = ETLModule.objects.all()
+        return JSONResponse(etl_modules)
 
     def post(self, request):
         """
@@ -23,7 +23,7 @@ class ETLManagerView(View):
         """
         action = request.POST.get("action")
         module = request.POST.get("module")
-        import_module = ETLModule.objects.get(slug=module).get_class_module()()
+        import_module = ETLModule.objects.get(pk=module).get_class_module()(request)
         import_function = getattr(import_module, action)
         response = import_function(request=request)
         print(response)
