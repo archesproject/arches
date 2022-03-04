@@ -33,7 +33,7 @@
 <!-- /ko -->
 
 <!-- ko if: fileAdded() -->
-<div class="etl-module-writer-container" style="display: inline-flex; flex-direction: column;">
+<div class="etl-module-writer-container" style="display: flex; flex-direction: column;">
     <div class="etl-module-preview-container" style="display: inline-flex; flex-direction: row;">
         <div class="etl-module-mapping" style="height: calc(100vh - 50px); width: 400px; padding: 25px; overflow: scroll;" data-bind="resizableSidepanel:true">
             <h3>{% trans "Format: Single .csv File Import" %}</h3>
@@ -86,7 +86,7 @@
                 </table>
             </div>
         </div>
-        <div class="etl-module-preview" style="height: calc(100vh - 50px); width: calc(100vw - 400px); padding: 25px; overflow: scroll;">
+        <div class="etl-module-preview" style="height: calc(100vh - 100px); width: calc(100vw - 400px); padding: 25px; overflow: scroll;">
             <h3>{% trans "Data Preview" %}</h3>
             <div class="etl-module-info" style="font-size: 10pt; margin: 50px 0px;">
                 <h4>{% trans "File Info" %}</h4>
@@ -156,14 +156,14 @@
                 <button data-bind="click: function () { fileAdded(false); }" class="btn btn-primary" style="margin-right: 10px;">
                     <span>{% trans "Remove File" %}</span>
                 </button>
-                <button data-bind="click: changeFormat()" class="btn btn-primary" style="display: none; margin-right: 10px;">
+                <button data-bind="click: changeFormat" class="btn btn-primary" style="display: none; margin-right: 10px;">
                     <span>{% trans "Select a different format" %}</span>
                 </button>
-                <button data-bind="click: validate()" class="btn btn-success" style="margin-right: 10px;">
+                <button data-bind="click: validate" class="btn btn-success" style="margin-right: 10px;">
                     <span>{% trans "Validate data before import" %}</span>
                 </button>
                 <!-- ko if: validated() && validationError().length === 0 -->
-                <button data-bind="click: write()" class="btn btn-success" style="margin-right: 10px;">
+                <button data-bind="click: write" class="btn btn-success" style="margin-right: 10px;">
                     <span>{% trans "Import data" %}</span>
                 </button>
                 <!-- /ko-->
