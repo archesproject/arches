@@ -1596,14 +1596,14 @@ class Graph(models.GraphModel):
                     notes=notes,
                 )
                 publication.save()
-            except Exception:
-                raise UnpublishedModelError("Could not save graph publication")
+            except Exception as e:
+                raise UnpublishedModelError(e)
 
             try:
                 self.publication = publication
                 self.save(validate=False)
-            except Exception:
-                raise UnpublishedModelError("Could not save graph with new publication")
+            except Exception as e:
+                raise UnpublishedModelError(e)
 
     def unpublish(self):
         """
