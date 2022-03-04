@@ -211,7 +211,7 @@ class ResourceEditorView(MapBaseManagerView):
 
         serialized_graph = None
         if graph.publication and graph.publication.serialized_graph:
-            serialized_graph = graph.publication.serialized_graph
+            serialized_graph = JSONDeserializer().deserialize(graph.publication.serialized_graph)
 
         if serialized_graph:
             serialized_cards = serialized_graph["cards"]
