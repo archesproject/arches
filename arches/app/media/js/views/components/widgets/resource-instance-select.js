@@ -1,10 +1,10 @@
 define([
     'knockout',
-    'viewmodels/resource-instance-select',
     'bindings/select2-query'
-], function(ko, ResourceInstanceSelectViewModel) {
+], function(ko) {
     return ko.components.register('resource-instance-select-widget', {
         viewModel: function(params) {
+            const ResourceInstanceSelectViewModel = require('viewmodels/resource-instance-select');
             params.multiple = false;
             params.datatype = 'resource-instance';
             ResourceInstanceSelectViewModel.apply(this, [params]);

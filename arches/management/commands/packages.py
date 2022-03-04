@@ -211,7 +211,7 @@ class Command(BaseCommand):
             "--prevent_indexing",
             action="store_true",
             dest="prevent_indexing",
-            help="Prevents indexing the resources or concepts into Elasticsearch",
+            help="Prevents indexing the resources or concepts into Elasticsearch.  If set to True will override any 'defer_indexing' setting.",
         )
 
         parser.add_argument(
@@ -243,6 +243,7 @@ class Command(BaseCommand):
     def handle(self, *args, **options):
         print("operation: " + options["operation"])
         package_name = settings.PACKAGE_NAME
+        celery_worker_running = task_management.check_if_celery_available()
 
         if options["operation"] == "setup":
             self.setup(package_name, es_install_location=options["dest_dir"])
@@ -274,6 +275,19 @@ class Command(BaseCommand):
             self.export_graphs(options["dest_dir"], options["graphs"], options["type"])
 
         if options["operation"] == "import_business_data":
+            defer_indexing = True
+            if "defer_indexing" in options:
+                if isinstance(options["defer_indexing"], bool):
+                    defer_indexing = options["defer_indexing"]
+                elif str(options["defer_indexing"])[0].lower() == "f":
+                    defer_indexing = False
+
+            defer_indexing = defer_indexing and not options["bulk_load"] and not celery_worker_running
+            prevent_indexing = True if options["prevent_indexing"] else defer_indexing
+
+            if defer_indexing:
+                concept_count = models.Value.objects.count()
+                relation_count = models.ResourceXResource.objects.count()
 
             self.import_business_data(
                 options["source"],
@@ -283,8 +297,21 @@ class Command(BaseCommand):
                 options["create_concepts"],
                 use_multiprocessing=options["use_multiprocessing"],
                 force=options["yes"],
-                prevent_indexing=options["prevent_indexing"],
+                prevent_indexing=prevent_indexing,
             )
+
+            if defer_indexing and not prevent_indexing:
+                # index concepts if new concepts created
+                if concept_count != models.Value.objects.count():
+                    management.call_command("es", "index_concepts")
+                # index relations if new relations created via new r-i tiles created
+                if relation_count != models.ResourceXResource.objects.count():
+                    management.call_command("es", "index_resource_relations")
+                # index resources of this model only
+                path = utils.get_valid_path(options["config_file"])
+                mapping = json.load(open(path, "r"))
+                graphid = mapping["resource_model_id"]
+                management.call_command("es", "index_resources_by_type", resource_types=[graphid])
 
         if options["operation"] == "import_node_value_data":
             self.import_node_value_data(options["source"], options["overwrite"])
@@ -507,6 +534,11 @@ class Command(BaseCommand):
 
         celery_worker_running = task_management.check_if_celery_available()
 
+        # only defer indexing if the celery worker ISN'T running because celery processes
+        # are async and we currently don't have a celery process to index data.  Once
+        # we do, then we can think about deferring indexing in the celery task as well.
+        defer_indexing = False if celery_worker_running else defer_indexing
+
         def load_ontologies(package_dir):
             ontologies = glob.glob(os.path.join(package_dir, "ontologies/*"))
             if len(ontologies) > 0:
@@ -706,7 +738,7 @@ class Command(BaseCommand):
                 # assumes resources in csv do not depend on data being loaded prior from json in same dir
                 chord(
                     [
-                        import_business_data.s(data_source=path, overwrite=True, bulk_load=bulk_load, prevent_indexing=prevent_indexing)
+                        import_business_data.s(data_source=path, overwrite=True, bulk_load=bulk_load, prevent_indexing=False)
                         for path in valid_resource_paths
                     ]
                 )(package_load_complete.signature(kwargs={"valid_resource_paths": valid_resource_paths}).on_error(on_chord_error.s()))
@@ -1033,17 +1065,17 @@ class Command(BaseCommand):
         if data_source.endswith(".jsonl"):
             print(
                 """
-WARNING: Support for loading JSONL files is still experimental. Be aware that
-the format of logging and console messages has not been updated."""
+                WARNING: Support for loading JSONL files is still experimental. Be aware that
+                the format of logging and console messages has not been updated."""
             )
             if use_multiprocessing is True:
                 print(
                     """
-WARNING: Support for multiprocessing files is still experimental. While using
-multiprocessing to import resources, you will not be able to use ctrl+c (etc.)
-to cancel the operation. You will need to manually kill all of the processes
-with or just close the terminal. Also, be aware that print statements
-will be very jumbled."""
+                    WARNING: Support for multiprocessing files is still experimental. While using
+                    multiprocessing to import resources, you will not be able to use ctrl+c (etc.)
+                    to cancel the operation. You will need to manually kill all of the processes
+                    with or just close the terminal. Also, be aware that print statements
+                    will be very jumbled."""
                 )
                 if not force:
                     confirm = input("continue? Y/n ")
