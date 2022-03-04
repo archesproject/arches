@@ -38,7 +38,7 @@ from arches.app.models.graph import Graph, GraphValidationError
 from arches.app.models.card import Card
 from arches.app.models.concept import Concept
 from arches.app.models.system_settings import settings
-from arches.app.models.resource import PublishedModelError
+from arches.app.models.resource import PublishedModelError, UnpublishedModelError
 from arches.app.utils.data_management.resource_graphs.exporter import get_graphs_for_export, create_mapping_configuration_file
 from arches.app.utils.data_management.resource_graphs import importer as GraphImporter
 from arches.app.utils.system_metadata import system_metadata
@@ -464,7 +464,10 @@ class GraphPublicationView(View):
                 notes = data.get("notes")
 
             if self.action == "publish":
-                graph.publish(notes)
+                try:
+                    graph.publish(notes)
+                except UnpublishedModelError as e:
+                    return JSONErrorResponse(e.title, e.message)
             elif self.action == "unpublish":
                 graph.unpublish()
         except Exception as e:
