@@ -191,7 +191,7 @@ class Customi18nTextFieldTests(ArchesTestCase):
         translation.activate("de")
         self.assertEqual(value, "genau")
         translation.activate("en")
-        self.assertEqual(value, "precisely")
+        self.assertEqual(str(value), "precisely")
 
 
 class Customi18nJSONFieldTests(ArchesTestCase):
