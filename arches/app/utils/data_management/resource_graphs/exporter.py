@@ -154,15 +154,15 @@ def get_graphs_for_export(graphids=None):
         )
         resource_graph["resource_2_resource_constraints"] = JSONSerializer().serializeToPython(r2r_constraints_for_export(resource_graph))
 
-        publication_id = resource_graph.get('publication_id')
+        publication_id = resource_graph.get("publication_id")
         publication = None
 
         if publication_id:
             publication = JSONDeserializer().deserialize(JSONSerializer().serialize(GraphPublication.objects.get(pk=publication_id)))
-            del publication['serialized_graph']
+            del publication["serialized_graph"]
 
-        resource_graph['publication'] = publication
-        del resource_graph['publication_id']
+        resource_graph["publication"] = publication
+        del resource_graph["publication_id"]
 
         graphs["graph"].append(resource_graph)
     return sort(graphs)
