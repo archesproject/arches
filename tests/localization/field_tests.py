@@ -188,10 +188,10 @@ class Customi18nTextFieldTests(ArchesTestCase):
         self.assertEqual(value, "toast")
 
         value = I18n_String('{"de": "genau", "en": "precisely"}')
-        translation.activate("de")
-        self.assertEqual(value, "genau")
         translation.activate("en")
         self.assertEqual(str(value), "precisely")
+        translation.activate("de")
+        self.assertEqual(value, "genau")
 
 
 class Customi18nJSONFieldTests(ArchesTestCase):
