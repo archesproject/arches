@@ -488,7 +488,7 @@
          return;
     });
 
-    define('file-renderers', [{% for renderer in app_settings.RENDERERS %}'{{ renderer.component }}',{% endfor %}], function () {
+    define('file-renderers', function () {
         return [{% autoescape off %}{% for renderer in app_settings.RENDERERS %}
                 {'name': '{{ renderer.name }}',
                 'title': '{{ renderer.title }}',
