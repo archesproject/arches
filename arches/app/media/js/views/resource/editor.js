@@ -86,7 +86,15 @@ define([
         });
         return !nodegroup || !nodegroup.parentnodegroup_id;
     }).sort((firstEl, secondEl) => {
-        return firstEl.sortorder >= secondEl.sortorder ? firstEl.sortorder === secondEl.sortorder ? 0 : 1 : -1; 
+        if(firstEl.sortorder >= secondEl.sortorder) {
+            if(firstEl.sortorder === secondEl.sortorder) {
+                return 0;
+            } else {
+                return 1;
+            }
+        } else {
+            return -1;
+        } 
     }).map(function(card) {
         return new CardViewModel({
             card: card,
