@@ -151,7 +151,7 @@
     data-bind="style: {transform: !!reportResourceId() ? 'translate(0,0)' : 'translate(100%,0)'}">
     <div class="create-instance-header" style="display: flex; justify-content: space-between;">{% trans "Related Resource Summary" %}
         <div data-bind="click: function(){reportResourceId(null)}, clickBubble: false" class="close-new-step" tabindex="0" onkeyup="if(event.which == 13 || event.keyCode == 13){ $(this).trigger('click'); }">
-            <i class="fa fa-times-circle"></i>
+            <button class="btn btn-labeled btn-lg fa fa-arrow-right btn-primary">{% trans "Return" %}</button>
         </div>
     </div>
     <div class="create-instance-panel" data-bind="component: {
@@ -197,7 +197,7 @@
             <div class="row" style="margin: 0px;">
                 <div class="col-xs-12 resource-instance-wrapper">
                     <input style="width:30%; display:inline-block;" data-bind="
-                  
+
                             select2Query: {
                                 select2Config: select2Config
                             }
@@ -205,7 +205,7 @@
                 </div>
             </div>
         </div>
-    
+
         <div class="rr-widget">
             <!-- ko if: !!value() && value().length > 5-->
             <div class="rr-widget-filter-panel">
@@ -218,7 +218,7 @@
                 </div>
             </div>
             <!-- /ko -->
-    
+
             <!-- ko if: relationshipsInFilter().length > 0-->
             <div class="rr-table">
                 <div data-bind='foreach: relationshipsInFilter' style="display: flex; flex-direction: column;">
@@ -250,19 +250,19 @@
                         </div>
                         <div class="rr-table-row-panel"
                             data-bind="visible: self.selectedResourceRelationship() === $data, if: self.selectedResourceRelationship() === $data, css: { 'rr-table-border': self.selectedResourceRelationship() === $data} ">
-    
+
                             <div class="row">
                                 <!-- Relationship from instance to rr -->
                                 <div class="row" style="margin-bottom: 10px;">
                                     <label class="col-xs-12" style="font-weight: bold; text-align: left;">{% trans "Resource's relationship to" %} <span
                                             data-bind="text: $data.resourceName"></span></label>
-    
+
                                     <div class="row" style="padding: 0px 12px; margin-bottom: 10px;">
                                         <!-- Instance name -->
                                         <span class="col-xs-12" style="text-align: left;"
                                             data-bind="text: self.resourceInstanceDisplayName + ' (' + self.makeFriendly(self.rootOntologyClass) + ')'">
                                         </span>
-    
+
                                         <!-- Property -->
                                         <span class="col-xs-12">
                                             <input style="max-width:100%; display:inline-block; margin: 3px 0px;"
@@ -270,24 +270,24 @@
                                             select2Query: {
                                                 select2Config: self.getSelect2ConfigForOntologyProperties($data.ontologyProperty, self.rootOntologyClass, $data.ontologyClass(), '{% trans 'Select an Ontology Property' %}')}">
                                         </span>
-    
+
                                         <!-- rr name -->
                                         <span class="col-xs-12"
                                             data-bind="text: $data.resourceName() + ' (' + self.makeFriendly($data.ontologyClass()) + ')'"></span>
                                     </div>
                                 </div>
-    
+
                                 <!-- Relationship from rr to instance -->
                                 <div class="row">
                                     <label class="col-xs-12" style="font-weight: bold;"><span
                                             data-bind="text: $data.resourceName"></span>{% trans "'s relationship to Resource" %} </label>
-    
+
                                     <div class="row" style="padding: 0px 12px; margin-bottom: 10px;">
                                         <!-- rr name -->
                                         <span class="col-xs-12" style="text-align: left;"
                                             data-bind="text: $data.resourceName() + ' (' + self.makeFriendly($data.ontologyClass()) + ')'">
                                         </span>
-    
+
                                         <!-- Property -->
                                         <span class="col-xs-12">
                                             <input style="width:100%; display:inline-block; margin: 3px 0px;"
@@ -295,7 +295,7 @@
                                             select2Query: {
                                                 select2Config: self.getSelect2ConfigForOntologyProperties($data.inverseOntologyProperty, $data.ontologyClass(), self.rootOntologyClass, '{% trans 'Select an Ontology Property' %}')}">
                                         </span>
-    
+
                                         <!-- Instance name -->
                                         <span class="col-xs-12"
                                             data-bind="text: self.resourceInstanceDisplayName + ' (' + self.makeFriendly(self.rootOntologyClass) + ')'">
@@ -309,11 +309,11 @@
             </div>
             <!-- /ko -->
         </div>
-    
+
         <div data-bind="if: !!value() && value().hasOwnProperty('length') && value().length > 1">
             <div class='file-workbench-filecount' data-bind='text: value().length + "{% trans ' relationship(s)' %}"'></div>
         </div>
-    
+
     </div>
     <!-- /ko -->
     <!-- /ko -->

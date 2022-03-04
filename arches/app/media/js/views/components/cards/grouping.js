@@ -22,7 +22,7 @@ define([
     function viewModel(params) {
         // params.form is the CardTreeViewModel
         var self = this;
-        this.saving = false;
+        this.saving = params.form?.saving || ko.observable(false);
         this.tiles = [];
         this.widgetInstanceDataLookup = {};
 
@@ -131,7 +131,7 @@ define([
         }
 
         this.groupedTiles = ko.computed(function() {
-            if (this.saving) {
+            if (this.saving()) {
                 return this.tiles;
             } else {
                 var tiles = [];
@@ -215,27 +215,28 @@ define([
             var tiles = self.groupedTiles();
             var tile = self.groupedTiles()[0];
             tile.resourceinstance_id = ko.unwrap(self.form.resourceId);
-            self.saving = true;
+            tile.transactionId = params.form?.workflowId;
+            self.saving(true);
 
             tile.save(function(response) {
                 errors.push(response);
-                self.saving = false;
                 self.groupedCardIds.valueHasMutated();
                 self.selectGroupCard();
             }, function(){
                 var requests = _.map(_.rest(tiles), function(tile) {
                     tile.resourceinstance_id = ko.unwrap(self.form.resourceId);
+                    tile.transactionId = params.form?.workflowId;
                     return tile.save(function(response) {
                         errors.push(response);
                     });
                 }, self);
                 Promise.all(requests).finally(function(){
-                    self.saving = false;
                     self.groupedCardIds.valueHasMutated();
                     self.selectGroupCard();
                     if (params.form.onSaveSuccess) {
                         params.form.onSaveSuccess(self.tiles);
                     }
+                    self.saving(false);
                     self.loading(false);
                 });
             });
