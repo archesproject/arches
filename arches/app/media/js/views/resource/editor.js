@@ -16,8 +16,6 @@ define([
     'bindings/sortable',
     'widgets',
     'card-components',
-    'views/resource/related-resources-manager',
-    'views/resource/permissions-manager',
     'moment',
 ], function($, _, ko, BaseManagerView, AlertViewModel, JsonErrorAlertViewModel, GraphModel, ReportModel, CardViewModel, ProvisionalTileViewModel, arches, data, reportLookup) {
     var handlers = {
@@ -258,38 +256,42 @@ define([
     });
 
     vm.showRelatedResourcesManager = function(){
-        if (vm.graph.domain_connections == undefined) {
-            $.ajax({
-                url: arches.urls.relatable_resources,
-                data: {graphid: vm.graphid}
-            }).done(function(relatable){
-                vm.graph.relatable_resources = relatable;
+        require(['views/resource/related-resources-manager'], () => {
+            if (vm.graph.domain_connections == undefined) {
                 $.ajax({
-                    url: arches.urls.get_domain_connections(vm.graphid),
-                    data: {"ontology_class": vm.graph.ontologyclass}
-                }).done(function(data){
-                    vm.graph.domain_connections = data;
-                    vm.relatedResourcesManagerObj = {
-                        searchResultsVm: undefined,
-                        resourceEditorContext: true,
-                        editing_instance_id: vm.resourceId(),
-                        relationship_types: vm.relationship_types,
-                        graph: vm.graph,
-                        loading: vm.loading
-                    };
-                    vm.selection('related-resources');
+                    url: arches.urls.relatable_resources,
+                    data: {graphid: vm.graphid}
+                }).done(function(relatable){
+                    vm.graph.relatable_resources = relatable;
+                    $.ajax({
+                        url: arches.urls.get_domain_connections(vm.graphid),
+                        data: {"ontology_class": vm.graph.ontologyclass}
+                    }).done(function(data){
+                        vm.graph.domain_connections = data;
+                        vm.relatedResourcesManagerObj = {
+                            searchResultsVm: undefined,
+                            resourceEditorContext: true,
+                            editing_instance_id: vm.resourceId(),
+                            relationship_types: vm.relationship_types,
+                            graph: vm.graph,
+                            loading: vm.loading
+                        };
+                        vm.selection('related-resources');
+                    });
                 });
-            });
 
-        } else {
-            vm.selection('related-resources');
-        }
+            } else {
+                vm.selection('related-resources');
+            }
+        });
     };
 
     vm.showInstancePermissionsManager = function(){
-        if (vm.userIsCreator === true || vm.userIsCreator === null) {
-            vm.selection('permissions-manager');
-        }
+        require(['views/resource/permissions-manager'], () => {
+            if (vm.userIsCreator === true || vm.userIsCreator === null) {
+                vm.selection('permissions-manager');
+            }
+        });
     };
 
     vm.selectionBreadcrumbs = ko.computed(function() {
