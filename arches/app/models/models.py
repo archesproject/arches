@@ -11,7 +11,6 @@
 
 import os
 import json
-from tkinter import N
 import uuid
 import datetime
 import logging
