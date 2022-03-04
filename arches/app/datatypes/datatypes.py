@@ -251,6 +251,15 @@ class StringDataType(BaseDataType):
         text_mapping = {"properties": {}}
         return text_mapping
 
+    def has_multicolumn_data(self):
+        return True
+
+    def get_column_header(self, node, **kwargs):
+        """
+        Returns a CSV column header or headers for a given node ID of this type
+        """
+        language_codes = kwargs.pop("language_codes")
+        return ["{column} ({code})".format(column=node["file_field_name"], code=code) for code in language_codes]
 
 
 class NumberDataType(BaseDataType):
