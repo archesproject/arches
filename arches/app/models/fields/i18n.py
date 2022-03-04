@@ -58,10 +58,29 @@ class I18n_String(object):
     def __call__(self):
         return self
 
+    # adding this so that we can treat it like a dict object
+    def __getitem__(self, *args):
+        return self.raw_value.__getitem__(*args)
+
+    def __contains__(self, *args):
+        return self.raw_value.__contains__(*args)
+
+    # adding this so that we can update it like a dict object
+    def __setitem__(self, key, item):
+        self.raw_value[key] = item
+
+    # added to remove items like a dict with del keyword
+    def __delitem__(self, key):
+        del self.raw_value[key]
+
+    # added to pop items like a dict
+    def pop(self, *args):
+        return self.raw_value.pop(*args)
+
     def __str__(self):
         ret = None
         try:
-            ret = self.raw_value[get_language()]
+            ret = self.raw_value[self.lang]
         except KeyError as e:
             try:
                 # if you can't return the requested language because the value doesn't exist then
@@ -221,7 +240,7 @@ class I18n_JSON(object):
         """
 
         if (len(self.i18n_properties) == 0 and self.function is None) or isinstance(compiler, SQLInsertCompiler):
-            params = [json.dumps(self.localize())]
+            params = [json.dumps(self.to_localized_object())]
             sql = "%s"
         else:
             params = []
@@ -251,7 +270,7 @@ class I18n_JSON(object):
                 ELSE %s
                 END
             """
-            params.append(json.dumps(self.localize()).replace("%", "%%"))
+            params.append(json.dumps(self.to_localized_object()).replace("%", "%%"))
 
         return sql, tuple(params)
 
@@ -283,6 +302,17 @@ class I18n_JSON(object):
         raise AttributeError
 
     def serialize(self, use_raw_i18n_json=False, **kwargs):
+        """
+        Takes a localized object 
+        eg: {"Color": {"en": "blue", "es": "azul"}}
+        and returns the value as a string based on the active language
+        eg: if the active language is Spanish then the above returned 
+        object would be {"Color": "asul"}
+
+        Keyword Arguaments:
+        use_raw_i18n_json -- defaults to False, set to True to return the raw object saved in the db
+        """
+
         if use_raw_i18n_json or ("i18n_properties" not in self.raw_value and "i18n_config" not in self.raw_value):
             return self.raw_value
         else:
@@ -299,10 +329,18 @@ class I18n_JSON(object):
                             pass
             return ret
 
-    def localize(self):
+    def to_localized_object(self):
+        """
+        Takes an object that is assumed to hold a localized value
+        eg: {"Color": "azul"}
+        and returns the value as an object keyed to the active language
+        Eg: if the active language is Spanish then the above returned 
+        object would be {"Color": {"es": "asul"}}
+        """
+
         if self.function is not None:
             clss = import_class_from_string(self.function)()
-            ret = clss.i18n_localize(self)
+            ret = clss.i18n_to_localized_object(self)
         else:
             ret = copy.deepcopy(self.raw_value)
             if "i18n_properties" in ret:

@@ -155,19 +155,6 @@ class DDataType(models.Model):
         db_table = "d_data_types"
 
 
-class DLanguage(models.Model):
-    languageid = models.TextField(primary_key=True)
-    languagename = models.TextField()
-    isdefault = models.BooleanField()
-
-    class Meta:
-        managed = True
-        db_table = "d_languages"
-
-    def __str__(self):
-        return f"{self.languageid} ({self.languagename})"
-
-
 class DNodeType(models.Model):
     nodetype = models.TextField(primary_key=True)
     namespace = models.TextField()
@@ -440,10 +427,11 @@ class Language(models.Model):
     DATA_SCOPE = "data"
     SCOPE_CHOICES = [(SYSTEM_SCOPE, "System Scope"), (DATA_SCOPE, "Data Scope")]
     id = models.AutoField(primary_key=True)
-    code = models.TextField()  # ISO639 code
+    code = models.TextField(unique=True)  # ISO639 code
     name = models.TextField()
     default_direction = models.TextField(choices=LANGUAGE_DIRECTION_CHOICES, default=LEFT_TO_RIGHT)
     scope = models.TextField(choices=SCOPE_CHOICES, default=SYSTEM_SCOPE)
+    isdefault = models.BooleanField(default=False, blank=True)
 
     def __str__(self):
         return self.name
@@ -934,7 +922,7 @@ class Value(models.Model):
     concept = models.ForeignKey("Concept", db_column="conceptid", on_delete=models.CASCADE)
     valuetype = models.ForeignKey(DValueType, db_column="valuetype", on_delete=models.CASCADE)
     value = models.TextField()
-    language = models.ForeignKey(DLanguage, db_column="languageid", blank=True, null=True, on_delete=models.CASCADE)
+    language = models.ForeignKey(Language, db_column="languageid", to_field="code", blank=True, null=True, on_delete=models.CASCADE)
 
     class Meta:
         managed = True
@@ -946,7 +934,7 @@ class FileValue(models.Model):
     concept = models.ForeignKey("Concept", db_column="conceptid", on_delete=models.CASCADE)
     valuetype = models.ForeignKey("DValueType", db_column="valuetype", on_delete=models.CASCADE)
     value = models.FileField(upload_to="concepts")
-    language = models.ForeignKey("DLanguage", db_column="languageid", blank=True, null=True, on_delete=models.CASCADE)
+    language = models.ForeignKey(Language, db_column="languageid", to_field="code", blank=True, null=True, on_delete=models.CASCADE)
 
     class Meta:
         managed = False

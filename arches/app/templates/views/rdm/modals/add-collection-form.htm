@@ -20,7 +20,7 @@
                         <p> 
                             <select style="width:100%" class="select2" name="language_dd" required>
                                 {% for language in languages %}
-                                  <option value="{{language.languageid}}" {% if language.isdefault %} selected="selected" {% endif %}>{{language.languageid}} ({{language.languagename}})</option>
+                                <option value="{{language.code}}" {% if language.isdefault %} selected="selected" {% endif %}>{{language.code}} ({{language.name}})</option>
                                 {% endfor %}
                             </select>
                         </p>
