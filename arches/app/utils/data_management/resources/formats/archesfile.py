@@ -63,7 +63,7 @@ class ArchesFileWriter(Writer):
             resource["resourceinstance"] = ResourceInstance.objects.get(resourceinstanceid=resourceinstanceid)
             graph = resource["resourceinstance"].graph
 
-            if not graph_id_to_publication_id.get(graph.pk):
+            if graph.publication_id and not graph_id_to_publication_id.get(graph.pk):
                 graph_id_to_publication_id[str(graph.pk)] = str(graph.publication_id)
 
             resources.append(resource)
@@ -82,7 +82,7 @@ class ArchesFileWriter(Writer):
             resource_instance_data = resource_data.get('resourceinstance')
 
             if resource_instance_data:
-                resource_data['resourceinstance']['publication_id'] = graph_id_to_publication_id[resource_instance_data['graph_id']]
+                resource_data['resourceinstance']['publication_id'] = graph_id_to_publication_id.get(resource_instance_data['graph_id'])
 
         json.dump(export, dest, indent=kwargs.get("indent", None))
         json_for_export.append({"name": json_name, "outputfile": dest})
