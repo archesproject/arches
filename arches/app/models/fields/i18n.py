@@ -80,7 +80,7 @@ class I18n_String(object):
     def __str__(self):
         ret = None
         try:
-            ret = self.raw_value[self.lang]
+            ret = self.raw_value[get_language()]
         except KeyError as e:
             try:
                 # if you can't return the requested language because the value doesn't exist then
