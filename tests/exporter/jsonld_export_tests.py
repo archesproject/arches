@@ -156,7 +156,8 @@ class JsonLDExportTests(ArchesTestCase):
         self.assertTrue(dt["@type"] == "http://www.w3.org/2001/XMLSchema#dateTime")
         # Test domain data type
         self.assertTrue("http://www.cidoc-crm.org/cidoc-crm/P79_beginning_is_qualified_by" in ts)
-        self.assertTrue(ts["http://www.cidoc-crm.org/cidoc-crm/P79_beginning_is_qualified_by"] == "example")
+        self.assertTrue(ts["http://www.cidoc-crm.org/cidoc-crm/P79_beginning_is_qualified_by"]["@value"] == "example")
+        self.assertTrue(ts["http://www.cidoc-crm.org/cidoc-crm/P79_beginning_is_qualified_by"]["@language"] == "en")
 
     def test_2b_complex_export_concepts(self):
         # 24d0d25a-fa75-11e9-b369-3af9d3b32b71  -- also concepts

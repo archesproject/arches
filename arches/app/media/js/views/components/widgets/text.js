@@ -16,13 +16,24 @@ define(['knockout', 'underscore', 'viewmodels/widget', 'arches', 'bindings/chose
     
             WidgetViewModel.apply(this, [params]);
             const self = this;
+
+            self.card = params.card;
             self.currentLanguage = ko.observable({code: arches.defaultLanguage});
             self.languages = ko.observableArray();
             self.currentText = ko.observable();
             self.currentDirection = ko.observable();
+            self.showi18nOptions = ko.observable(false);
+
+            self.currentDefaultText = ko.observable();
+            self.currentDefaultDirection = ko.observable();
+            self.currentDefaultLanguage = ko.observable({code: arches.defaultLanguage})
+
             const initialCurrent = {};
+            const initialDefault = {};
+            initialDefault[arches.defaultLanguage] = {value: '', direction: 'ltr'};
             initialCurrent[arches.defaultLanguage] = {value: '', direction: 'ltr'};
             let currentValue = ko.unwrap(self.value) || initialCurrent;
+            let currentDefaultValue = ko.unwrap(self.defaultValue) || initialDefault;
 
             const originalValue = JSON.stringify(self.value());
 
@@ -38,17 +49,30 @@ define(['knockout', 'underscore', 'viewmodels/widget', 'arches', 'bindings/chose
                 const currentLanguage = languages?.find(element => element.code == arches.defaultLanguage);
                 self.languages(languages);
                 self.currentLanguage(currentLanguage);
+                self.currentDefaultLanguage(currentLanguage);
     
-                if (currentLanguage?.code && currentValue?.[currentLanguage?.code]){
+                if (currentLanguage?.code && currentValue?.[currentLanguage.code]){
                     self.currentText(currentValue?.[currentLanguage.code]?.value);
                     self.currentDirection(currentValue?.[currentLanguage.code]?.direction);
-                } else if (!currentLanguage?.code){
+                } else if (!currentLanguage?.code) {
                     self.currentText('');
                     self.currentDirection('ltr');
                 } else {
                     self.currentText('');
                     self.currentDirection('ltr');
                     currentValue[currentLanguage.code] = {value: '', direction: 'ltr'}
+                }
+
+                if(currentLanguage?.code && currentDefaultValue?.[currentLanguage.code]){
+                    self.currentDefaultText(currentDefaultValue?.[currentLanguage.code]?.value);
+                    self.currentDefaultDirection(currentDefaultValue?.[currentLanguage.code]?.direction);
+                } else if (!currentLanguage?.code) {
+                    self.currentDefaultText('');
+                    self.currentDefaultDirection('ltr');
+                } else {
+                    self.currentDefaultText('');
+                    self.currentDefaultDirection('ltr');
+                    currentDefaultValue[currentLanguage.code] = {value: '', direction: 'ltr'}
                 }
             }
 
@@ -58,16 +82,53 @@ define(['knockout', 'underscore', 'viewmodels/widget', 'arches', 'bindings/chose
                 return ko.unwrap(self.disabled) || ko.unwrap(self.uneditable); 
             }, self);
 
+            self.currentDefaultText.subscribe(newValue => {
+                const currentLanguage = self.currentDefaultLanguage();
+                if(!currentLanguage) { return; }
+                currentDefaultValue[currentLanguage.code].value = newValue;
+                self.defaultValue(currentDefaultValue)
+                self.card._card.valueHasMutated();
+            });
+
+            self.currentDefaultDirection.subscribe(newValue => {
+                const currentLanguage = self.currentDefaultLanguage();
+                if(!currentLanguage) { return; }
+                if(!currentDefaultValue?.[currentLanguage.code]){
+                    currentDefaultValue[currentLanguage.code] = {}
+                }
+                currentDefaultValue[currentLanguage.code].direction = newValue;
+                self.defaultValue(currentDefaultValue);
+                self.card._card.valueHasMutated();
+            });
+
+            self.currentDefaultLanguage.subscribe(newValue => {
+                if(!self.currentDefaultLanguage()){ return; }
+                const currentLanguage = self.currentDefaultLanguage();
+                if(!currentDefaultValue?.[currentLanguage.code]) {
+                    currentDefaultValue[currentLanguage.code] = {
+                        value: '',
+                        direction: currentLanguage?.default_direction
+                    }
+                    self.defaultValue(currentDefaultValue);
+                    self.card._card.valueHasMutated();
+                }
+
+                self.currentDefaultText(self.defaultValue()?.[currentLanguage.code]?.value);
+                self.currentDefaultDirection(self.defaultValue()?.[currentLanguage.code]?.direction);
+                
+            });
+
             self.currentText.subscribe(newValue => {
                 const currentLanguage = self.currentLanguage();
                 if(!currentLanguage) { return; }
-                currentValue[currentLanguage.code].value = newValue;
+                currentValue[currentLanguage.code].value = newValue;       
                 self.value(currentValue);
             });
 
             self.currentDirection.subscribe(newValue => {
                 const currentLanguage = self.currentLanguage();
                 if(!currentLanguage) { return; }
+
                 if(!currentValue?.[currentLanguage.code]){
                     currentValue[currentLanguage.code] = {}
                 }

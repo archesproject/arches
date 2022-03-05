@@ -16,7 +16,7 @@ import datetime
 import logging
 from datetime import timedelta
 from arches.app.utils.module_importer import get_class_from_modulename
-from arches.app.models.fields.i18n import I18n_TextField
+from arches.app.models.fields.i18n import I18n_TextField, I18n_JSONField
 from django.forms.models import model_to_dict
 from django.contrib.gis.db import models
 from django.contrib.postgres.fields import JSONField
@@ -114,8 +114,8 @@ class CardXNodeXWidget(models.Model):
     node = models.ForeignKey("Node", db_column="nodeid", on_delete=models.CASCADE)
     card = models.ForeignKey("CardModel", db_column="cardid", on_delete=models.CASCADE)
     widget = models.ForeignKey("Widget", db_column="widgetid", on_delete=models.CASCADE)
-    config = JSONField(blank=True, null=True, db_column="config")
-    label = models.TextField(blank=True, null=True)
+    config = I18n_JSONField(blank=True, null=True, db_column="config")
+    label = I18n_TextField(blank=True, null=True)
     visible = models.BooleanField(default=True)
     sortorder = models.IntegerField(blank=True, null=True, default=None)
 
@@ -141,7 +141,7 @@ class DDataType(models.Model):
     modulename = models.TextField(blank=True, null=True)
     classname = models.TextField(blank=True, null=True)
     defaultwidget = models.ForeignKey(db_column="defaultwidget", to="models.Widget", null=True, on_delete=models.SET_NULL)
-    defaultconfig = JSONField(blank=True, null=True, db_column="defaultconfig")
+    defaultconfig = I18n_JSONField(blank=True, null=True, db_column="defaultconfig")
     configcomponent = models.TextField(blank=True, null=True)
     configname = models.TextField(blank=True, null=True)
     issearchable = models.NullBooleanField(default=False)
@@ -153,19 +153,6 @@ class DDataType(models.Model):
     class Meta:
         managed = True
         db_table = "d_data_types"
-
-
-class DLanguage(models.Model):
-    languageid = models.TextField(primary_key=True)
-    languagename = models.TextField()
-    isdefault = models.BooleanField()
-
-    class Meta:
-        managed = True
-        db_table = "d_languages"
-
-    def __str__(self):
-        return f"{self.languageid} ({self.languagename})"
 
 
 class DNodeType(models.Model):
@@ -375,8 +362,8 @@ class FunctionXGraph(models.Model):
 
 class GraphModel(models.Model):
     graphid = models.UUIDField(primary_key=True, default=uuid.uuid1)  # This field type is a guess.
-    name = models.TextField(blank=True, null=True)
-    description = models.TextField(blank=True, null=True)
+    name = I18n_TextField(blank=True, null=True)
+    description = I18n_TextField(blank=True, null=True)
     deploymentfile = models.TextField(blank=True, null=True)
     author = models.TextField(blank=True, null=True)
     deploymentdate = models.DateTimeField(blank=True, null=True)
@@ -385,7 +372,7 @@ class GraphModel(models.Model):
     isactive = models.BooleanField()
     iconclass = models.TextField(blank=True, null=True)
     color = models.TextField(blank=True, null=True)
-    subtitle = models.TextField(blank=True, null=True)
+    subtitle = I18n_TextField(blank=True, null=True)
     ontology = models.ForeignKey(
         "Ontology", db_column="ontologyid", related_name="graphs", null=True, blank=True, on_delete=models.SET_NULL
     )
@@ -414,7 +401,7 @@ class GraphModel(models.Model):
             return True
 
     def __str__(self):
-        return self.name
+        return str(self.name)
 
     class Meta:
         managed = True
@@ -440,10 +427,11 @@ class Language(models.Model):
     DATA_SCOPE = "data"
     SCOPE_CHOICES = [(SYSTEM_SCOPE, "System Scope"), (DATA_SCOPE, "Data Scope")]
     id = models.AutoField(primary_key=True)
-    code = models.TextField()  # ISO639 code
+    code = models.TextField(unique=True)  # ISO639 code
     name = models.TextField()
     default_direction = models.TextField(choices=LANGUAGE_DIRECTION_CHOICES, default=LEFT_TO_RIGHT)
     scope = models.TextField(choices=SCOPE_CHOICES, default=SYSTEM_SCOPE)
+    isdefault = models.BooleanField(default=False, blank=True)
 
     def __str__(self):
         return self.name
@@ -488,7 +476,7 @@ class Node(models.Model):
     datatype = models.TextField()
     nodegroup = models.ForeignKey(NodeGroup, db_column="nodegroupid", blank=True, null=True, on_delete=models.CASCADE)
     graph = models.ForeignKey(GraphModel, db_column="graphid", blank=True, null=True, on_delete=models.CASCADE)
-    config = JSONField(blank=True, null=True, db_column="config")
+    config = I18n_JSONField(blank=True, null=True, db_column="config")
     issearchable = models.BooleanField(default=True)
     isrequired = models.BooleanField(default=False)
     sortorder = models.IntegerField(blank=True, null=True, default=0)
@@ -934,7 +922,7 @@ class Value(models.Model):
     concept = models.ForeignKey("Concept", db_column="conceptid", on_delete=models.CASCADE)
     valuetype = models.ForeignKey(DValueType, db_column="valuetype", on_delete=models.CASCADE)
     value = models.TextField()
-    language = models.ForeignKey(DLanguage, db_column="languageid", blank=True, null=True, on_delete=models.CASCADE)
+    language = models.ForeignKey(Language, db_column="languageid", to_field="code", blank=True, null=True, on_delete=models.CASCADE)
 
     class Meta:
         managed = True
@@ -946,7 +934,7 @@ class FileValue(models.Model):
     concept = models.ForeignKey("Concept", db_column="conceptid", on_delete=models.CASCADE)
     valuetype = models.ForeignKey("DValueType", db_column="valuetype", on_delete=models.CASCADE)
     value = models.FileField(upload_to="concepts")
-    language = models.ForeignKey("DLanguage", db_column="languageid", blank=True, null=True, on_delete=models.CASCADE)
+    language = models.ForeignKey(Language, db_column="languageid", to_field="code", blank=True, null=True, on_delete=models.CASCADE)
 
     class Meta:
         managed = False

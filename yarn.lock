@@ -1256,10 +1256,10 @@ chalk@~0.4.0:
     has-color "~0.1.0"
     strip-ansi "~0.1.0"
 
-chosen-js@1.8.2:
-  version "1.8.2"
-  resolved "https://registry.yarnpkg.com/chosen-js/-/chosen-js-1.8.2.tgz#bfd8ed1266ef667fbbc453c7e5b88d4c470e897e"
-  integrity sha512-eC5+gRZLU20osMWuChokjL2WPeVlCWzd2YbF5ucaGkmuyD6eThxotJ9+t203sYvKx06bDUVeZ9MhGkm57Oei9g==
+chosen-js@1.8.7:
+  version "1.8.7"
+  resolved "https://registry.yarnpkg.com/chosen-js/-/chosen-js-1.8.7.tgz#9bfa5597f5081d602ff4ae904af9aef33265bb1d"
+  integrity sha512-eVdrZJ2U5ISdObkgsi0od5vIJdLwq1P1Xa/Vj/mgxkMZf14DlgobfB6nrlFi3kW4kkvKLsKk4NDqZj1MU1DCpw==
 
 ckeditor@^4.6.2:
   version "4.12.1"

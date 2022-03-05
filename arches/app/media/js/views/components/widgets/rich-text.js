@@ -12,6 +12,7 @@ define(['knockout', 'underscore', 'viewmodels/widget', 'arches', 'bindings/ckedi
             const self = this;
             WidgetViewModel.apply(self, [params]);
             const initialCurrent = {};
+            self.showi18nOptions = ko.observable(false);
             initialCurrent[arches.defaultLanguage] = {value: '', direction: 'ltr'};
             let currentValue = ko.unwrap(self.value) || initialCurrent;
             const currentLanguage = {"code": arches.defaultLanguage};
@@ -34,7 +35,7 @@ define(['knockout', 'underscore', 'viewmodels/widget', 'arches', 'bindings/ckedi
                 currentValue[currentLanguage.code] = {value: '', direction: 'ltr'}
             } else {
                 self.currentText = ko.observable(currentValue?.[currentLanguage.code]?.value);
-                self.currentDirection = ko.observable(currentValue?.[currentLanguage.code]?.direction);
+                self.currentDirection = ko.observable(ko.unwrap(currentValue?.[currentLanguage.code]?.direction));
             }
 
             self.strippedValue = ko.pureComputed(() => {
@@ -68,7 +69,7 @@ define(['knockout', 'underscore', 'viewmodels/widget', 'arches', 'bindings/ckedi
                 }
 
                 self.currentText(self.value()?.[currentLanguage.code]?.value);
-                self.currentDirection(self.value()?.[currentLanguage.code]?.direction);
+                self.currentDirection(ko.unwrap(self.value()?.[currentLanguage.code]?.direction));
                 
             });
 
