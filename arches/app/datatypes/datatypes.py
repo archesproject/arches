@@ -235,10 +235,16 @@ class StringDataType(BaseDataType):
 
     def get_display_value(self, tile, node):
         data = self.get_tile_data(tile)
+        current_language = get_language()
+        if not current_language:
+            current_language = settings.LANGUAGE_CODE
         if data:
             raw_value = data.get(str(node.nodeid))
             if raw_value is not None:
-                return raw_value
+                try:
+                    return raw_value[current_language]["value"]
+                except KeyError:
+                    pass
 
     def default_es_mapping(self):
         """
@@ -251,6 +257,14 @@ class StringDataType(BaseDataType):
         text_mapping = {"properties": {}}
         return text_mapping
 
+    def get_first_language_value_from_node(self, tile, nodeid):
+        return tile.data[str(nodeid)][list(tile.data[str(nodeid)].keys())[0]]["value"]
+
+    def is_multilingual_rdf(self, rdf):
+        if len(rdf) > 1 and len(set(val["language"] for val in rdf)) > 1:
+            return True
+        else:
+            return False
     def has_multicolumn_data(self):
         return True
 
@@ -261,6 +275,10 @@ class StringDataType(BaseDataType):
         language_codes = kwargs.pop("language_codes")
         return ["{column} ({code})".format(column=node["file_field_name"], code=code) for code in language_codes]
 
+    def to_json(self, tile, node):
+        data = self.get_tile_data(tile)
+        if data:
+            return self.compile_json(tile, node, **data.get(str(node.nodeid)))
 
 class NumberDataType(BaseDataType):
     def validate(self, value, row_number=None, source="", node=None, nodeid=None, strict=False):

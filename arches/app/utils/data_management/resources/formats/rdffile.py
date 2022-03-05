@@ -454,20 +454,6 @@ class JsonLdReader(Reader):
             except:
                 raise ("Local reference not found")
 
-    def is_multilingual_string_node(self, literal_node_values: list, graph_node: dict) -> bool:
-        """Test a graph node and literal node values to determine if the literals constitute a multilingual string."""
-        # multilingual string nodes are imported as a chunk of values rather than discrete values.
-        # determined by graph node type (string), cardinality (1), number of jsonld literal values (> 1),
-        # and number of languages present in jsonld (> 1)
-        if (
-            graph_node["datatype_type"] == "string"
-            and len(literal_node_values) > 1
-            and len(set(val["language"] for val in literal_node_values)) > 1
-        ):
-            return True
-        else:
-            return False
-
     def data_walk(self, data_node, tree_node, result, tile=None):
         my_tiles = []
         # print(data_node)
@@ -546,7 +532,7 @@ class JsonLdReader(Reader):
                     # print(f"Considering:\n  {vi}\n  {o['name']}")
                     if is_literal and o["datatype"].is_a_literal_in_rdf():
                         # import each value separately if there are no languages in the values and this is card n string
-                        if self.is_multilingual_string_node(values, o):
+                        if o["datatype"].is_multilingual_rdf(values):
                             if len(o["datatype"].validate_from_rdf(values)) == 0:
                                 possible.append([o, values])
                             else:
@@ -608,7 +594,7 @@ class JsonLdReader(Reader):
 
                 if not self.is_semantic_node(branch[0]):
                     graph_node = branch[0]
-                    if self.is_multilingual_string_node(values, graph_node):
+                    if graph_node["datatype"].is_multilingual_rdf(values):
                         node_value = graph_node["datatype"].from_rdf(values)
                     else:
                         node_value = graph_node["datatype"].from_rdf(vi)
@@ -650,7 +636,7 @@ class JsonLdReader(Reader):
                     # iterating through a root node *-list type
                     pass
                 elif bnodeid == branch[0]["nodegroup_id"] and not (
-                    self.is_multilingual_string_node(values, branch[0]) and bnodeid in result
+                    branch[0]["datatype"].is_multilingual_rdf(values) and bnodeid in result
                 ):
                     # Used to pick the previous tile in loop which MIGHT be the parent (but might not)
                     parenttile_id = result["tile"].tileid if "tile" in result else None
