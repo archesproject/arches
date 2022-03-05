@@ -303,10 +303,10 @@ class I18n_JSON(object):
 
     def serialize(self, use_raw_i18n_json=False, **kwargs):
         """
-        Takes a localized object 
+        Takes a localized object
         eg: {"Color": {"en": "blue", "es": "azul"}}
         and returns the value as a string based on the active language
-        eg: if the active language is Spanish then the above returned 
+        eg: if the active language is Spanish then the above returned
         object would be {"Color": "asul"}
 
         Keyword Arguaments:
@@ -334,7 +334,7 @@ class I18n_JSON(object):
         Takes an object that is assumed to hold a localized value
         eg: {"Color": "azul"}
         and returns the value as an object keyed to the active language
-        Eg: if the active language is Spanish then the above returned 
+        Eg: if the active language is Spanish then the above returned
         object would be {"Color": {"es": "asul"}}
         """
 

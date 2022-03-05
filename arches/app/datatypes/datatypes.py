@@ -266,6 +266,7 @@ class StringDataType(BaseDataType):
             return True
         else:
             return False
+
     def has_multicolumn_data(self):
         return True
 
@@ -1828,10 +1829,10 @@ class DomainDataType(BaseDomainDataType):
 
     def i18n_serialize(self, i18n_json_field: I18n_JSONField):
         """
-        Takes a localized list of options eg: 
+        Takes a localized list of options eg:
         {"options": [{"text":{"en": "blue", "es": "azul"}}, {"text":{"en": "red", "es": "rojo"}}]}
         and returns the value as a string based on the active language
-        Eg: if the active language is Spanish then the above returned 
+        Eg: if the active language is Spanish then the above returned
         object would be {"options": [{"text":"azul"},{"text":"rojo"}]}
 
         Arguments:
@@ -1848,7 +1849,7 @@ class DomainDataType(BaseDomainDataType):
         Takes a list of optione that is assumed to hold a localized value
         eg: {"options": [{"text":"azul"},{"text":"rojo"}]}
         and returns the value as an object keyed to the active language
-        Eg: if the active language is Spanish then the above returned 
+        Eg: if the active language is Spanish then the above returned
         object would be {"options": [{"text":{"es":"azul"}},{"text":{"es":"rojo"}}]}
 
         Arguments:
