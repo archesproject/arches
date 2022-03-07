@@ -1,3 +1,7 @@
+body, .title-v1 p, .ep-tools-login, .ep-tools-right, .search-label, .counters h3 {
+    font-size: 1.3em;
+}
+
 .btn-file-select {
     background: #4824FF;
 }
@@ -135,8 +139,10 @@ a:focus,
 
 .jstree-default .func-node,
 .map-data-drop-area,
-.workbench-card-sidebar-tab {
-    color: #000;
+.workbench-card-sidebar-tab,
+::placeholder,
+.rr-splash-description {
+    color: #000 !important;
 }
 
 .arches-toggle-subtitle {
@@ -330,9 +336,68 @@ div.search-facet-item:focus {
 }
 
 .search-results-panel {
-    height: calc(100vh - 100px);
+    max-width: 40%;
 }
 
 .card-form-preview-container {
     overflow-y: auto;
+}
+
+.ep-tools-login {
+    padding-right: 16px;
+}
+
+.ep-tools-right {
+    padding-right: 16px;
+    min-width: 50px;
+    max-width: inherit;
+}
+
+.top-right-nav {
+    margin-right: 0;
+}
+
+.top-btn-txt {
+    font-size: 0.7em;
+}
+
+.resource-filter .resource-selector-button div .btn,
+.qa-filter .resource-selector-button div .btn {
+    padding: 2px 10px;
+}
+
+.search-footer {
+    position: relative;
+    background: inherit;
+}
+
+.search-results-container {
+    overflow-y: auto;
+}
+
+.search-results-container,
+.search-tools-container,
+.search-listing,
+.search-footer {
+    width: 100%;
+}
+
+.search-map-container {
+    flex-direction: column;
+}
+
+.search-inline-filters div {
+    padding-left: 2px;
+    margin-bottom: 2px;
+    display: inline-block;
+}
+
+@media screen and (max-width: 1024px) {
+    .search-results-panel {
+        max-width: inherit;
+    }
+    .search-map-container {
+        flex: 1;
+        flex-direction: column-reverse;
+    }
 }
