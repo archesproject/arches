@@ -1,20 +1,3 @@
-<!--
-ARCHES - a program developed to inventory and manage immovable cultural heritage.
-Copyright (C) 2013 J. Paul Getty Trust and World Monuments Fund
-
-This program is free software: you can redistribute it and/or modify
-it under the terms of the GNU Affero General Public License as
-published by the Free Software Foundation, either version 3 of the
-License, or (at your option) any later version.
-
-This program is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-GNU Affero General Public License for more details.
-
-You should have received a copy of the GNU Affero General Public License
-along with this program. If not, see <http://www.gnu.org/licenses/>.
--->
 {% extends "base-manager.htm" %}
 {% load i18n %}
 {% load template_tags %}
@@ -24,9 +7,9 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 
 
 {% block main_content %}
-    <div class="content-panel flexrow" data-bind="click:function() { menuActive(false); }, visible: true", style="display:none;">
+    <article class="content-panel flexrow" data-bind="click:function() { menuActive(false); }, visible: true", style="display:none;">
 
-        <div class="flex search-results-panel">
+        <section class="flex search-results-panel">
             <div class="search-attribute-widget">
                 <div class="search-dropdown" data-bind="component: {
                     name: 'term-filter',
@@ -75,18 +58,16 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                         name: 'search-results',
                         params: sharedStateObject
                     }"></div>
-                </div>
-
-                <div class="search-footer" data-bind="component: {
+                    <div class="search-footer" data-bind="component: {
                         name: 'paging-filter',
                         params: sharedStateObject
                     }"></div>
-
+                </div>
             </div>
-        </div>
+        </section>
 
 
-        <div class="flex" style="flex-direction: column">
+        <section class="flex search-map-container">
             <!-- Title Block -->
             <div class="search-toolbar">
                 <div class="search-type-btn-panel" data-bind="foreach: {data: sharedStateObject.filtersList, as: 'filter'}">
@@ -115,8 +96,6 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
             </div>
 
             <div class="flex">
-
-
                 <!-- Card Container -->
                 <div class="card-form-preview-container relative">
                     <div class="tab-content relative" data-bind="foreach: {data: sharedStateObject.filtersList, as: 'filter'}">
@@ -142,8 +121,8 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                     </div>
                 </div>
             </div>
-        </div>
-    </div>
+        </section>
+    </article>
 {% endblock main_content %}
 
 {% block tabs %}{% endblock tabs %}
