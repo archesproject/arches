@@ -142,7 +142,8 @@ a:focus,
 .workbench-card-sidebar-tab,
 ::placeholder,
 .rr-splash-description,
-.search-export .instruction h4 {
+.search-export .instruction h4,
+.report-print-date {
     color: #000 !important;
 }
 
