@@ -29,10 +29,10 @@
             <i class="fa fa-unsorted map-coordinate-editor-drag-handler"></i>
             <!-- /ko-->
             <span class="coordinate-entry-label">X:</span>
-            <input type="number" step="any" class="coordinate-input form-control input-lg widget-input" data-bind="valueUpdate: 'keyup', value: $data[0]"></input>
+            <input type="number" step="any" class="coordinate-input form-control input-lg widget-input" data-bind="valueUpdate: 'keyup', value: $data[0]" aria-label="X coordinate"></input>
             <span class="coordinate-entry-label">Y:</span>
             <!-- ko if: $parent.coordinates().length-1 === $index() -->
-            <input type="number" step="any" class="coordinate-input form-control input-lg widget-input" data-bind="hasFocus: $parent.focusLatestY, valueUpdate: 'keyup', value: $data[1]"></input>
+            <input type="number" step="any" class="coordinate-input form-control input-lg widget-input" data-bind="hasFocus: $parent.focusLatestY, valueUpdate: 'keyup', value: $data[1]" aria-label="Y coordinate"></input>
             <!-- /ko-->
             <!-- ko if: $parent.coordinates().length-1 !== $index() -->
             <input type="number" step="any" class="coordinate-input form-control input-lg widget-input" data-bind="valueUpdate: 'keyup', value: $data[1]"></input>
@@ -40,7 +40,7 @@
             <!-- ko if: $parent.allowDeleteCoordinates() -->
             <a href="javascript:void(0);" class="map-coordinate-editor-delete-button" data-bind="click: function() {
                 $parent.coordinates.remove($data);
-            }"><i class="fa fa-trash"></i></a>
+            }" aria-label="Delete current coordinates"><i class="fa fa-trash"></i></a>
             <!-- /ko-->
             <hr/>
         </div>
@@ -49,9 +49,9 @@
     <div class="map-coordinate-editor-pair map-coordinate-editor-new-coordinates">
         <i class="fa fa-plus"></i>
         <span class="coordinate-entry-label">X:</span>
-        <input type="number" step="any" class="coordinate-input form-control input-lg widget-input" data-bind="hasFocus: true, valueUpdate: 'keyup', value: newX"></input>
+        <input type="number" step="any" class="coordinate-input form-control input-lg widget-input" data-bind="hasFocus: true, valueUpdate: 'keyup', value: newX" aria-label="X coordinate"></input>
         <span class="coordinate-entry-label">Y:</span>
-        <input type="number" step="any" class="coordinate-input form-control input-lg widget-input" data-bind="valueUpdate: 'keyup', value: newY"></input>
+        <input type="number" step="any" class="coordinate-input form-control input-lg widget-input" data-bind="valueUpdate: 'keyup', value: newY" aria-label="Y coordinate"></input>
     </div>
     <!-- /ko-->
     <div class="map-coordinate-editor-button-container">

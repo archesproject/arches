@@ -2,11 +2,11 @@
 {% load i18n %}
 
 {% block tabs %}
-<div class="workbench-card-sidebar-tab" data-bind="click: function() {
+<div tabindex="0" class="workbench-card-sidebar-tab" data-bind="click: function() {
     toggleTab('editor');
 }, css: {
     'active': activeTab() === 'editor'
-}">
+}" onkeyup="if(event.which == 13 || event.keyCode == 13){ $(this).trigger('click'); }">
     <i class="fa fa-pencil"></i>
     <span class="map-sidebar-text">{% trans "Edit" %}</span>
 </div>
@@ -16,7 +16,7 @@
 {% block sidepanel %}
 <!--ko if: activeTab() === 'editor' -->
     <div class="workbench-card-sidepanel-header-container">
-        <h4 class="workbench-card-sidepanel-header" data-bind="click: hideSidePanel, text: card.model.name"></h4>
+        <h4 tabindex="0" class="workbench-card-sidepanel-header" data-bind="click: hideSidePanel, text: card.model.name" onkeyup="if(event.which == 13 || event.keyCode == 13){ $(this).trigger('click'); }"></h4>
     </div>
 
 
@@ -24,7 +24,7 @@
         <div class='control-label widget-input-label'>{% trans "Participating Layers" %}</div>
         <!-- ko foreach: {data: self.nodeDetails, as: 'nodeInfo'} -->
         <div data-bind="css: {'active-overlay': self.filterNodeIds.indexOf(nodeInfo.nodeid) > -1}">
-        <div class="overlay-listing rr-map-card" style="padding: 5px; min-height: 0px" data-bind="click: function(){self.filterNodeIds.indexOf(nodeInfo.nodeid) > -1 ? self.filterNodeIds.remove(nodeInfo.nodeid) : self.filterNodeIds.push(nodeInfo.nodeid)}">
+        <div tabindex="0" class="overlay-listing rr-map-card" style="padding: 5px; min-height: 0px" data-bind="click: function(){self.filterNodeIds.indexOf(nodeInfo.nodeid) > -1 ? self.filterNodeIds.remove(nodeInfo.nodeid) : self.filterNodeIds.push(nodeInfo.nodeid)}" onkeyup="if(event.which == 13 || event.keyCode == 13){ $(this).trigger('click'); }">
             <div class="overlay-name" data-bind="text: nodeInfo.resourcemodelname"></div>
         </div>
         <div class="rr-map-card related-instances">

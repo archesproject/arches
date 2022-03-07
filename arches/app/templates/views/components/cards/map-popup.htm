@@ -4,7 +4,7 @@
 {% block footer %}
 <a data-bind="if: mapCard.isSelectable(feature), click: function () {
     mapCard.selectFeature(feature);
-}" href="javascript:void(0)">
+}" href="javascript:void(0)" aria-label="Select feature" onkeyup="if(event.which == 13 || event.keyCode == 13){ $(this).trigger('click'); }">
     <i class="ion-ios-refresh-empty"></i>
     <span data-bind="text: mapCard.selectText"></span>
 </a>

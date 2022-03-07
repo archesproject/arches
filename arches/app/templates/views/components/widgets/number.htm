@@ -14,10 +14,10 @@
             <span class="input-group-addon" data-bind="text: prefix"></span>
             <!-- /ko -->
             <!-- ko if: format -->
-            <input type="text" data-bind="formattedNumber: value, format: format, attr: {placeholder: placeholder, max: max, min: min, step: step, disabled: disable}, style: {width: width}, valueUpdate: 'keyup'" class="form-control input-lg widget-input">
+            <input type="text" data-bind="formattedNumber: value, format: format, attr: {placeholder: placeholder, max: max, min: min, step: step, disabled: uneditable, 'aria-label': label}, style: {width: width}, valueUpdate: 'keyup'" class="form-control input-lg widget-input">
             <!-- /ko -->
             <!-- ko ifnot: format -->
-            <input type="number" data-bind="value: value, attr: {placeholder: placeholder, max: max, min: min, step: step, disabled: disable}, style: {width: width}, valueUpdate: 'keyup'" class="form-control input-lg widget-input">
+            <input type="number" data-bind="value: value, attr: {placeholder: placeholder, max: max, min: min, step: step, disabled: uneditable, 'aria-label': label}, style: {width: width}, valueUpdate: 'keyup'" class="form-control input-lg widget-input">
             <!-- /ko -->
             <!-- ko if: suffix -->
             <span class="input-group-addon" data-bind="text: suffix"></span>
@@ -54,55 +54,55 @@
     {% trans "Placeholder" %}
 </div>
 <div class="col-xs-12 pad-no crud-widget-container">
-    <input type="" placeholder="{% trans "Placeholder" %}" id="" class="form-control input-md widget-input" data-bind="value: placeholder, valueUpdate: 'keyup'">
+    <input type="" placeholder="{% trans "Placeholder" %}" aria-label="{% trans "Placeholder" %}" class="form-control input-md widget-input" data-bind="value: placeholder, valueUpdate: 'keyup'">
 </div>
 <div class="control-label">
     {% trans "Min" %}
 </div>
 <div class="col-xs-12 pad-no crud-widget-container">
-    <input type="number" placeholder="{% trans "Min" %}" id="" class="form-control input-md widget-input" data-bind="value: min, valueUpdate: 'keyup'">
+    <input type="number" placeholder="{% trans "Min" %}" aria-label="{% trans "Min" %}" class="form-control input-md widget-input" data-bind="value: min, valueUpdate: 'keyup'">
 </div>
 <div class="control-label">
     {% trans "Max" %}
 </div>
 <div class="col-xs-12 pad-no crud-widget-container">
-    <input type="number" placeholder="{% trans "Max" %}" id="" class="form-control input-md widget-input" data-bind="value: max, valueUpdate: 'keyup'">
+    <input type="number" placeholder="{% trans "Max" %}" aria-label="{% trans "Max" %}" class="form-control input-md widget-input" data-bind="value: max, valueUpdate: 'keyup'">
 </div>
 <div class="control-label">
     {% trans "Increment" %}
 </div>
 <div class="col-xs-12 pad-no crud-widget-container" >
-    <input type="number" placeholder="{% trans "Increment size" %}" id="" class="form-control input-md widget-input" data-bind="value: step, valueUpdate: 'keyup', disable: format">
+    <input type="number" placeholder="{% trans "Increment size" %}" aria-label="{% trans "Increment size" %}" class="form-control input-md widget-input" data-bind="value: step, valueUpdate: 'keyup', disable: format">
 </div>
 <div class="control-label">
     {% trans "Decimal Places" %}
 </div>
 <div class="col-xs-12 pad-no crud-widget-container">
-    <input type="number" placeholder="{% trans "Number of decimal places" %}" id="" class="form-control input-md widget-input" data-bind="value: precision, valueUpdate: 'keyup'">
+    <input type="number" placeholder="{% trans "Number of decimal places" %}" aria-label="{% trans "Number of decimal places" %}" class="form-control input-md widget-input" data-bind="value: precision, valueUpdate: 'keyup'">
 </div>
 <div class="control-label">
     {% trans "Prefix" %}
 </div>
 <div class="col-xs-12 pad-no crud-widget-container">
-    <input type="" placeholder="{% trans "Field prefix" %}" id="" class="form-control input-md widget-input" data-bind="value: prefix, valueUpdate: 'keyup'">
+    <input type="" placeholder="{% trans "Field prefix" %}" aria-label="{% trans "Field prefix" %}" class="form-control input-md widget-input" data-bind="value: prefix, valueUpdate: 'keyup'">
 </div>
 <div class="control-label">
     {% trans "Suffix" %}
 </div>
 <div class="col-xs-12 pad-no crud-widget-container">
-    <input type="" placeholder="{% trans "Field suffix" %}" id="" class="form-control input-md widget-input" data-bind="value: suffix, valueUpdate: 'keyup'">
+    <input type="" placeholder="{% trans "Field suffix" %}" aria-label="{% trans "Field suffix" %}" class="form-control input-md widget-input" data-bind="value: suffix, valueUpdate: 'keyup'">
 </div>
 <div class="control-label">
     {% trans "Default Value" %}
 </div>
 <div class="col-xs-12 pad-no crud-widget-container">
-    <input type="number" placeholder="{% trans "Default Value" %}" id="" class="form-control input-md widget-input" data-bind="value: defaultValue, valueUpdate: 'keyup'">
+    <input type="number" placeholder="{% trans "Default Value" %}" aria-label="{% trans "Default Value" %}" class="form-control input-md widget-input" data-bind="value: defaultValue, valueUpdate: 'keyup'">
 </div>
 <div class="control-label">
   {% trans "Format" %} <a href="http://numeraljs.com/#format" target="_blank">{% trans "(view valid formats)" %}</a>
 </div>
 <div class="col-xs-12 pad-no crud-widget-container">
-  <input type="" placeholder="{% trans "Format" %}" id="" class="form-control input-md widget-input" data-bind="value: format, valueUpdate: 'keyup'">
+  <input type="" placeholder="{% trans "Format" %}" aria-label="{% trans "Format" %}" class="form-control input-md widget-input" data-bind="value: format, valueUpdate: 'keyup'">
 </div>
 <div class="node-config-item">
     <div class="control-label">

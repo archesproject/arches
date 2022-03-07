@@ -44,7 +44,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                 <div class="report-image-grid relative">
                     <div class="grid">
                         <!-- ko foreach: { data: listItems(), as: "item" } -->
-                        <div class="library-card selected-card" data-bind="click: function () { $parent.selection(item) }, css: {'selected': $parent.selection() === item}">
+                        <div tabindex="0" class="library-card selected-card" data-bind="click: function () { $parent.selection(item) }, css: {'selected': $parent.selection() === item}" onkeyup="if(event.which == 13 || event.keyCode == 13){ $(this).trigger('click'); }">
 
                             <div class="library-icon">
                                 <span class="icon-wrap icon-wrap-sm icon-circle branch-icon bg-primary">
@@ -80,12 +80,12 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
             <div class="card-form-preview-container">
 
                 <!-- Header -->
-                <div class="category-header" style="">
+                <div class="category-header">
                     <!-- Resource/Graph Toggle -->
                     <div style="display: block;">
-                        <a id="" class="category-title" href="" data-bind="css: { 'active': selectedList() && selectedList() === geomNodes  }, click: function() { selectedList(geomNodes); }">{% trans "Resource Layers" %}</a>
-                        <a id="" class="category-title" href="" data-bind="css: { 'active': selectedList() && selectedList() === basemaps  }, click: function() { selectedList(basemaps); }">{% trans "Basemaps" %}</a>
-                        <a id="" class="category-title" href="" data-bind="css: { 'active': selectedList() && selectedList() === overlays  }, click: function() { selectedList(overlays); }">{% trans "Overlays" %}</a>
+                        <a class="category-title" href="#" data-bind="css: { 'active': selectedList() && selectedList() === geomNodes  }, click: function() { selectedList(geomNodes); }">{% trans "Resource Layers" %}</a>
+                        <a class="category-title" href="#" data-bind="css: { 'active': selectedList() && selectedList() === basemaps  }, click: function() { selectedList(basemaps); }">{% trans "Basemaps" %}</a>
+                        <a class="category-title" href="#" data-bind="css: { 'active': selectedList() && selectedList() === overlays  }, click: function() { selectedList(overlays); }">{% trans "Overlays" %}</a>
                     </div>
                 </div>
                 <div class="ep-card-crud-container">
@@ -131,11 +131,11 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                                 <div class="map-service-manage-buttons">
                                     <div class="form-group">
                                         <label class="control-label">{% trans "Activated:" %}</label>
-                                        <span class="switch switch-small" data-bind="css: {
+                                        <span tabindex="0" class="switch switch-small" data-bind="css: {
                                                 'on': selection().activated()
                                             }, click: function () {
                                                 selection().activated(!selection().activated());
-                                            }">
+                                            }" onkeyup="if(event.which == 13 || event.keyCode == 13){ $(this).trigger('click'); }">
                                             <small></small>
                                         </span>
                                     </div>
@@ -200,11 +200,11 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                                                                 <div>
                                                                     <label class="control-label" data-bind="text: selection().isoverlay ? '{% trans "Add to map by default:" %}' : '{% trans "Default basemap:" %}'"></label>
                                                                     
-                                                                    <span class="switch switch-small service-switch-shim" style="margin-top: 0px;"data-bind="css: {
+                                                                    <span tabindex="0" class="switch switch-small service-switch-shim" style="margin-top: 0px;"data-bind="css: {
                                                                                 'on': selection().addtomap()
                                                                             }, click: function () {
                                                                                 selection().addtomap(!selection().addtomap());
-                                                                            }">
+                                                                            }" onkeyup="if(event.which == 13 || event.keyCode == 13){ $(this).trigger('click'); }">
                                                                             <small></small>
                                                                     </span>
                                                                 </div>
@@ -213,11 +213,11 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                                                             <div class="form-group" data-bind="if: selection().isoverlay">
                                                                 <label class="col-sm-3 control-label">{% trans "Only show on search map:" %}</label>
                                                                 <div class="col-sm-9">
-                                                                    <span class="switch switch-small service-switch-shim" data-bind="css: {
+                                                                    <span tabindex="0" class="switch switch-small service-switch-shim" data-bind="css: {
                                                                             'on': selection().searchonly()
                                                                         }, click: function () {
                                                                             selection().searchonly(!selection().searchonly());
-                                                                        }">
+                                                                        }" onkeyup="if(event.which == 13 || event.keyCode == 13){ $(this).trigger('click'); }">
                                                                         <small></small>
                                                                     </span>
                                                                 </div>
@@ -237,7 +237,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                                                                             <input type="text" class="form-control" style="width: 366px; height: 36px;" placeholder="{% trans "Find an icon" %}" data-bind="value:iconFilter, valueUpdate: 'keyup'">
 
                                                                             <!-- ko if: iconFilter() !== '' -->
-                                                                            <span class="clear-search" style="position: absolute; left: 345px; top: 5px; color: #123; font-size: 17px;" data-bind="click: function () { iconFilter(''); }"><i class="fa fa-times-circle"></i></span>
+                                                                            <span tabindex="0" class="clear-search" style="position: absolute; left: 345px; top: 5px; color: #123; font-size: 17px;" data-bind="click: function () { iconFilter(''); }" onkeyup="if(event.which == 13 || event.keyCode == 13){ $(this).trigger('click'); }"><i class="fa fa-times-circle"></i></span>
                                                                             <!-- /ko -->
                                                                         </div>
                                                                     </div>
@@ -248,7 +248,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                                                                     <div class="row">
 
                                                                         <!-- ko foreach: icons -->
-                                                                        <div class="col-xs-6 col-md-3 col-sm-4 demo-icon-font" data-bind="css: {'selected': (cssclass === $root.selection().icon())}, click: function() { $root.selection().icon(cssclass) }">
+                                                                        <div tabindex="0" class="col-xs-6 col-md-3 col-sm-4 demo-icon-font" data-bind="css: {'selected': (cssclass === $root.selection().icon())}, click: function() { $root.selection().icon(cssclass) }" onkeyup="if(event.which == 13 || event.keyCode == 13){ $(this).trigger('click'); }">
                                                                             <i data-bind="css: cssclass"></i> <span data-bind="text: name"></span>
                                                                         </div>
                                                                         <!-- /ko -->

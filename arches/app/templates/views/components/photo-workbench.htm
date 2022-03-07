@@ -2,19 +2,19 @@
 {% load i18n %}
 
 {% block tabs %}
-<div class="workbench-card-sidebar-tab" data-bind="click: function() {
+<div tabindex="0" class="workbench-card-sidebar-tab" data-bind="click: function() {
     toggleTab('edit');
 }, css: {
     'active': activeTab() === 'edit'
-}">
+}" onkeyup="if(event.which == 13 || event.keyCode == 13){ $(this).trigger('click'); }">
     <i class="fa fa-pencil"></i>
     <span class="map-sidebar-text">{% trans "Edit" %}</span>
 </div>
-<div class="workbench-card-sidebar-tab" data-bind="click: function() {
+<div tabindex="0" class="workbench-card-sidebar-tab" data-bind="click: function() {
     toggleTab('add');
 }, css: {
     'active': activeTab() === 'add'
-}">
+}" onkeyup="if(event.which == 13 || event.keyCode == 13){ $(this).trigger('click'); }">
     <i class="fa fa-plus"></i>
     <span class="map-sidebar-text">{% trans "Add" %}</span>
 </div>
@@ -143,7 +143,7 @@
 
 <!--ko if: activeTab() === 'edit' -->
 <div class="workbench-card-sidepanel-header-container">
-    <h4 class="workbench-card-sidepanel-header" data-bind="click: hideSidePanel, text: card.model.name"></h4>
+    <h4 tabindex="0" class="workbench-card-sidepanel-header" data-bind="click: hideSidePanel, text: card.model.name" onkeyup="if(event.which == 13 || event.keyCode == 13){ $(this).trigger('click'); }"></h4>
 </div>
 <h5 class="workbench-tile-picker-label">{% trans 'Image List' %}</h5>
 <div class='photo-workbench-photos'>

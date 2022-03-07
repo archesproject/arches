@@ -1,25 +1,8 @@
-<!--
-ARCHES - a program developed to inventory and manage immovable cultural heritage.
-Copyright (C) 2013 J. Paul Getty Trust and World Monuments Fund
-
-This program is free software: you can redistribute it and/or modify
-it under the terms of the GNU Affero General Public License as
-published by the Free Software Foundation, either version 3 of the
-License, or (at your option) any later version.
-
-This program is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-GNU Affero General Public License for more details.
-
-You should have received a copy of the GNU Affero General Public License
-along with this program. If not, see <http://www.gnu.org/licenses/>.
--->
 {% extends "base-manager.htm" %} {% load staticfiles %} {% load i18n %} {% block title %} {{ block.super }} {% trans "Account Settings" %} {% endblock title %} {% block main_content %}
-<div class="scroll-y">
+<div>
 
     <!-- Main Editor -->
-    <div id="">
+    <div>
 
         <!-- Profile Summary -->
         <div class="profile-summary-page">
@@ -30,7 +13,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                 <img class="widget-bg img-responsive" src='{{ STATIC_URL }}img/user/profile_background.png'>
                 -->
 
-                <div class="">
+                <div>
                     <div class="profile-full-name">
                         {{user.first_name}} {{user.last_name}}
                     </div>
@@ -44,59 +27,63 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
             <div class="profile-sections">
 
                 <!-- My Account Info -->
-                <section id="" class="profile-list">
+                <section class="profile-list">
                     <div class="account-wrapper">
                         <div class="row relative">
 
                             <!-- Section Title -->
                             <div class="col-sm-3">
-                                <div class="profile-header">
+                                <h3 class="profile-header">
                                     {% trans 'Account' %}
-                                </div>
+                                </h3>
                             </div>
 
                             <div class="col-sm-9">
+                                
                                 <!-- ko if: showEditUserForm() === false -->
                                 <div class="row">
                                     <div class="col-sm-5">
                                         <div class="relative">
-                                            <h4 class="text-main" style="font-weight: 500;">{{ user.username }}</h4>
-                                            <p class="profile-label-shim">{% trans 'User name' %}</p>
+                                            <h4 class="text-main">{% trans 'User name' %}</h4>
+                                            <p class="profile-label-shim">{{ user.username }}</p>
                                         </div>
                                     </div>
 
-                                    <div class="col-sm-5">
-                                        <h4 class="text-main">********</h4>
-                                        <button class="btn btn-default btn-active-success btn-profile-password add-popover" data-bind='click: toggleChangePasswordForm'>
+                                    <div class="col-sm-7">
+                                        <h4 class="text-main">{% trans 'Password' %}</h4>
+                                        <p class="profile-label-shim">********</p>
+                                        <button class="btn btn-default btn-active-success btn-profile-password add-popover" data-bind="click: function() { toggleChangePasswordForm(); document.getElementById('old_password').focus(); }" aria-label="Change password">
                                         {% trans 'Change password' %}</button>
                                         <div class="password-success" data-bind="text:changePasswordSuccess"></div>
                                         <div class="change-password-form bottom fade in popover" data-bind='visible: showChangePasswordForm()'>
-                                            <div class="arrow" style="left: 50%;"></div>
+                                            <div class="arrow"></div>
                                             {% include 'change_password.htm' %}
                                         </div>
                                     </div>
+                                </div>
 
-                                    <div class="col-sm-2">
+                                <div class="row">
+                                    <div class="col-sm-5">
+                                        <div class="relative">
+                                            <h4 class="text-main">{% trans 'Contact email' %}</h4>
+                                            <p class="profile-label-shim">{{ user.email }}</p>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="row">
+                                    <div class="col-sm-5">
+                                        <div class="relative">
+                                            <h4 class="text-main">{% trans 'Phone' %}</h4>
+                                            <p class="profile-label-shim">{{ user.userprofile.phone }}</p>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="row">
+                                    <div class="col-sm-5">
                                         <div>
-                                            <button class="btn btn-primary btn-active-purple btn-profile" data-bind='click: toggleEditUserForm'>{% trans 'Edit' %}</button>
-                                        </div>
-                                    </div>
-                                </div>
-
-                                <div class="row">
-                                    <div class="col-sm-5">
-                                        <div class="relative">
-                                            <h4 class="text-main" style="font-weight: 500;">{{ user.email }}</h4>
-                                            <p class="profile-label-shim">{% trans 'Contact email' %}</p>
-                                        </div>
-                                    </div>
-                                </div>
-
-                                <div class="row">
-                                    <div class="col-sm-5">
-                                        <div class="relative">
-                                            <h4 class="text-main" style="font-weight: 500;">{{ user.userprofile.phone }}</h4>
-                                            <p class="profile-label-shim">{% trans 'Phone' %}</p>
+                                            <button class="btn btn-primary btn-active-purple btn-profile" data-bind='click: toggleEditUserForm' onkeyup="if(event.which == 13 || event.keyCode == 13){ $(this).trigger('click'); }">{% trans 'Edit' %}</button>
                                         </div>
                                     </div>
                                 </div>
@@ -106,35 +93,28 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                                 <form method="post">
                                     {% csrf_token %}
                                     <div class="row">
-
-                                        <div class="col-sm-5">
+                                        <div class="col-sm-5 need-padding">
                                             <div class="form-group">
-                                                <label class="control-label account-label">{% trans 'Arches user name' %}</label>
-                                                <input disabled type="text" class="form-control input-lg account-input" placeholder="Fist name" name="username" value="{{ user.username }}">
+                                                <label class="control-label account-label" for="username">{% trans 'Arches user name' %}</label>
+                                                <input id="username" disabled type="text" class="form-control input-lg account-input" placeholder="Username" aria-label="Username" name="username" value="{{ user.username }}">
                                             </div>
                                         </div>
-
                                         <!-- Password -->
-                                        <div class="col-sm-5">
+                                        <div class="col-sm-7 need-padding">
                                             <p class="account-tips">
                                                 {% trans 'This is the unique email or name that you use to log on to Arches.' %}
                                             </p>
                                         </div>
-
-                                        <div class="col-sm-2">
-                                            <div>
-                                                <button class="btn btn-primary btn-active-purple btn-profile mar-btm" type="submit" formaction="{% url 'user_profile_manager' %}">{% trans 'Save' %}</button>
-                                                <button class="btn btn-danger btn-active-dark btn-profile mar-btm" data-bind='click: toggleEditUserForm'>{% trans 'Cancel' %}</button>
-                                            </div>
-                                        </div>
                                     </div>
 
-                                    <hr style="border-color: #eee;">
+                                    <hr>
+
+                                    <!-- Account First Name -->
                                     <div class="row">
-                                        <div class="col-sm-5">
+                                        <div class="col-sm-5 need-padding">
                                             <div class="form-group">
-                                                <label class="control-label account-label">{% trans 'First name' %}</label>
-                                                <input type="text" class="form-control input-lg account-input" placeholder="{% trans 'First name' %}" name="first_name" value="{{ user.first_name }}">
+                                                <label for="first_name" class="control-label account-label">{% trans 'First name' %}</label>
+                                                <input id="first_name" type="text" class="form-control input-lg account-input" placeholder="{% trans 'First name' %}" aria-label="{% trans 'First name' %}" name="first_name" value="{{ user.first_name }}">
                                                 {% if form.first_name.errors %}
                                                 {% for error in form.first_name.errors %}
                                                     <div style="color:darkred">{{ error|escape }}</div>
@@ -142,7 +122,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                                                 {% endif %}
                                             </div>
                                         </div>
-                                        <div class="col-sm-5">
+                                        <div class="col-sm-7 need-padding">
                                             <p class="account-tips">
                                                 {% trans 'Arches uses your name and phone number to make it easier for other users to find and work with you.' %}
                                             </p>
@@ -152,10 +132,10 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                                     <!-- Account Last Name -->
                                     <div class="row">
                                         <!-- Names -->
-                                        <div class="col-sm-5">
+                                        <div class="col-sm-5 need-padding">
                                             <div class="form-group">
-                                                <label class="control-label account-label">{% trans 'Last name' %}</label>
-                                                <input type="text" class="form-control input-lg account-input" placeholder="{% trans 'Last name' %}" name="last_name" value="{{ user.last_name }}">
+                                                <label for="last_name" class="control-label account-label">{% trans 'Last name' %}</label>
+                                                <input id="last_name" type="text" class="form-control input-lg account-input" placeholder="{% trans 'Last name' %}" aria-label="{% trans 'Last name' %}" name="last_name" value="{{ user.last_name }}">
                                                 {% if form.last_name.errors %}
                                                 {% for error in form.last_name.errors %}
                                                     <div style="color:darkred">{{ error|escape }}</div>
@@ -168,23 +148,23 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                                     <!-- Phone -->
                                     <div class="row">
                                         <!-- Names -->
-                                        <div class="col-sm-5">
+                                        <div class="col-sm-5 need-padding">
                                             <div class="form-group">
-                                                <label class="control-label account-label">{% trans 'Phone Number (optional)' %}</label>
-                                                <input type="text" class="form-control input-lg account-input" placeholder="e.g. +1 415 555-1234" name="phone" value="{{ user.userprofile.phone }}">
+                                                <label for="phone" class="control-label account-label">{% trans 'Phone Number (optional)' %}</label>
+                                                <input id="phone" type="text" class="form-control input-lg account-input" placeholder="e.g. +1 415 555-1234" name="phone" value="{{ user.userprofile.phone }}" aria-label="Contact phone number">
                                             </div>
                                         </div>
                                     </div>
 
-                                    <hr style="border-color: #eee;">
+                                    <hr>
 
                                     <!-- Contact Email -->
                                     <div class="row">
                                         <!-- Names -->
-                                        <div class="col-sm-5">
+                                        <div class="col-sm-5 need-padding">
                                             <div class="form-group">
-                                                <label class="control-label account-label">{% trans 'Contact Email' %}</label>
-                                                <input type="email" class="form-control input-lg account-input" placeholder="jsmith@company.com" name="email" value="{{ user.email }}">
+                                                <label for="email" class="control-label account-label">{% trans 'Contact Email' %}</label>
+                                                <input id="email" type="email" class="form-control input-lg account-input" placeholder="jsmith@company.com" name="email" value="{{ user.email }}" aria-label="Contact email address">
                                                 {% if form.email.errors %}
                                                 {% for error in form.email.errors %}
                                                     <div style="color:darkred">{{ error|escape }}</div>
@@ -192,14 +172,25 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                                                 {% endif %}
                                             </div>
                                         </div>
-                                        <div class="col-sm-5">
+                                        <div class="col-sm-7 need-padding">
                                             <p class="account-tips">
                                                 {% trans 'Arches uses your e-maill to alert you to projects and tasks assigned to you.' %}
                                             </p>
                                         </div>
                                     </div>
+
+                                    <!--Form action buttons-->
+                                    <div class="row">
+                                        <div class="col-sm-5 need-padding">
+                                            <div>
+                                                <button class="btn btn-primary btn-active-purple btn-profile mar-btm" type="submit" formaction="{% url 'user_profile_manager' %}" aria-label="{% trans 'Save' %}">{% trans 'Save' %}</button>
+                                                <button class="btn btn-danger btn-active-dark btn-profile mar-btm" data-bind='click: toggleEditUserForm' aria-label="{% trans 'Cancel' %}">{% trans 'Cancel' %}</button>
+                                            </div>
+                                        </div>
+                                    </div>
                                 </form>
                                 <!-- /ko -->
+                                
                             </div>
                         </div>
 
@@ -279,179 +270,177 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 -->
 
                 <!-- Notification Settings -->
-                <section>
-                    <div class="profile-list">
-                        <div class="profile-header">
+                <section class="profile-list">
+                    <div class="col-sm-3">
+                        <h3 class="profile-header">
                             {% trans 'Notification Settings' %}
-                        </div>
+                        </h3>
+                    </div>
 
+                    <div class="col-sm-9 profile-notif-settings">
                         <div class="row">
-                            <div class="col-sm-9 col-sm-offset-3 profile-notif-settings">
-                                <table class="notif-table table-striped">
-                                    <thead>
-                                        <tr>
-                                            <th>{% trans 'Trigger' %}</th>
-                                            <th class="notif-type">{% trans 'Email Notification' %}</th>
-                                            <th class="notif-type">{% trans 'Web Notification' %}</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        <!-- ko foreach: notifTypeObservables -->
-                                        <tr>
-                                            <td data-bind="text:name"></td>
-                                            <td>
-                                                <label class="control-label widget-input-label-notif">
-                                                    <span class="switch switch-small arches-switch" data-bind="css: {'on': emailnotify()}, click: function(){emailnotify(!emailnotify())}"><small></small></span>{% trans 'Enable' %}
-                                                </label>
-                                            </td>
-                                            <td>
-                                                <label class="control-label widget-input-label-notif">
-                                                    <span class="switch switch-small arches-switch" data-bind="css: {'on': webnotify()}, click: function(){webnotify(!webnotify())}"><small></small></span>{% trans 'Enable' %}
-                                                </label>
-                                            </td>
-                                        </tr>
-                                        <!-- <tr>
-                                            <td>{% trans 'Exporting Search Results' %}</td>
-                                            <td>
-                                                <label class="control-label widget-input-label">
-                                                    <span class="switch switch-small arches-switch" data-bind="css: {'on': toggleSearchExportEmailNotifs()}, click: function(){toggleSearchExportEmailNotifs(!toggleSearchExportEmailNotifs())}"><small></small></span>
-                                                </label>
-                                            </td>
-                                            <td>
-                                                <label class="control-label widget-input-label">
-                                                    <span class="switch switch-small arches-switch" data-bind="css: {'on': toggleSearchExportWebNotifs()}, click: function(){toggleSearchExportWebNotifs(!toggleSearchExportWebNotifs())}"><small></small></span>
-                                                </label>
-                                            </td>
-                                        </tr> -->
-                                        <!-- /ko -->
-                                    </tbody>
-                                </table>
-                            </div>
+                            <table class="notif-table table-striped">
+                                <thead>
+                                    <tr>
+                                        <th>{% trans 'Trigger' %}</th>
+                                        <th class="notif-type">{% trans 'Email Notification' %}</th>
+                                        <th class="notif-type">{% trans 'Web Notification' %}</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <!-- ko foreach: notifTypeObservables -->
+                                    <tr>
+                                        <td data-bind="text:name"></td>
+                                        <td>
+                                            <label class="control-label widget-input-label-notif">
+                                                <span class="switch switch-small arches-switch" data-bind="css: {'on': emailnotify()}, click: function(){emailnotify(!emailnotify())}" tabindex="0" onkeyup="if(event.which == 13 || event.keyCode == 13){ $(this).trigger('click'); }" aria-label="Notify by email"><small></small></span>{% trans 'Enable' %}
+                                            </label>
+                                        </td>
+                                        <td>
+                                            <label class="control-label widget-input-label-notif">
+                                                <span class="switch switch-small arches-switch" data-bind="css: {'on': webnotify()}, click: function(){webnotify(!webnotify())}" tabindex="0" onkeyup="if(event.which == 13 || event.keyCode == 13){ $(this).trigger('click'); }" aria-label="Notify by web"><small></small></span>{% trans 'Enable' %}
+                                            </label>
+                                        </td>
+                                    </tr>
+                                    <!-- <tr>
+                                        <td>{% trans 'Exporting Search Results' %}</td>
+                                        <td>
+                                            <label class="control-label widget-input-label">
+                                                <span class="switch switch-small arches-switch" data-bind="css: {'on': toggleSearchExportEmailNotifs()}, click: function(){toggleSearchExportEmailNotifs(!toggleSearchExportEmailNotifs())}"><small></small></span>
+                                            </label>
+                                        </td>
+                                        <td>
+                                            <label class="control-label widget-input-label">
+                                                <span class="switch switch-small arches-switch" data-bind="css: {'on': toggleSearchExportWebNotifs()}, click: function(){toggleSearchExportWebNotifs(!toggleSearchExportWebNotifs())}"><small></small></span>
+                                            </label>
+                                        </td>
+                                    </tr> -->
+                                    <!-- /ko -->
+                                </tbody>
+                            </table>
                         </div>
                     </div>
                 </section>
 
-                <section>
-                    <div class="profile-list">
-                        <div class="profile-header">
-                            {% trans 'Arches Collector Projects' %}
-                        </div>
-                        <!--ko if: mobilesurveys.length === 0 -->
-                        <div id="default-mobile-projects" class="profile-default-message-panel">
-                            {% trans "Sorry, but you haven't been invited to a project yet..." %}
-                        </div>
-                        <!--/ko-->
+                <section class="profile-list">
+                    <h3 class="profile-header">
+                        {% trans 'Arches Collector Projects' %}
+                    </h3>
+                    <!--ko if: mobilesurveys.length === 0 -->
+                    <div id="default-mobile-projects" class="profile-default-message-panel">
+                        {% trans "Sorry, but you haven't been invited to a project yet..." %}
+                    </div>
+                    <!--/ko-->
 
-                        <!--ko if: mobilesurveys.length > 0 -->
-                        <!-- Survey Invitations List -->
-                        <div id="mobile-projects-list" class="profile-default-message-panel">
-                            <div class="row">
+                    <!--ko if: mobilesurveys.length > 0 -->
+                    <!-- Survey Invitations List -->
+                    <div id="mobile-projects-list" class="profile-default-message-panel">
+                        <div class="row">
 
-                                <!-- Find a survey -->
-                                <div class="col-sm-9 col-sm-offset-3 relative">
-                                    <div class="project-search-widget">
-                                        <input type="text" class="form-control" placeholder="{% trans 'Find a project...' %}" data-bind="value: mobileSurveyFilter, valueUpdate: 'keyup'">
-                                        <span class="clear-node-search" data-bind="visible: mobileSurveyFilter().length > 0, click: function() { mobileSurveyFilter(''); }"><i class="fa fa-times-circle"></i></span>
-                                    </div>
+                            <!-- Find a survey -->
+                            <div class="col-sm-9 col-sm-offset-3 relative">
+                                <div class="project-search-widget">
+                                    <input type="text" class="form-control" placeholder="{% trans 'Find a project...' %}" aria-label="{% trans 'Find a project...' %}" data-bind="value: mobileSurveyFilter, valueUpdate: 'keyup'">
+                                    <span class="clear-node-search" data-bind="visible: mobileSurveyFilter().length > 0, click: function() { mobileSurveyFilter(''); }" tabindex="0" onkeyup="if(event.which == 13 || event.keyCode == 13){ $(this).trigger('click'); }" aria-label="Mobile survey filter"><i class="fa fa-times-circle"></i></span>
                                 </div>
                             </div>
+                        </div>
 
-                            <!-- Survey List -->
-                            <div id="" class="row">
-                                <div class="col-sm-9 col-sm-offset-3 mar-top">
-                                    <div class="">
-                                        <!--ko foreach: {data: filteredMobileSurveys(), as: 'vm'} -->
-                                        <div class="project-panel">
+                        <!-- Survey List -->
+                        <div class="row">
+                            <div class="col-sm-9 col-sm-offset-3 mar-top">
+                                <div>
+                                    <!--ko foreach: {data: filteredMobileSurveys(), as: 'vm'} -->
+                                    <div class="project-panel">
 
-                                            <div class="project-panel-header">
-                                                <div class="user-survey">
-                                                    <div class="project-status" data-bind="text:vm.mobilesurvey.active() ? '{% trans "Active" %}' : '{% trans "Inactive" %}', css: {active: vm.mobilesurvey.active()}"></div>
-                                                    <ul class="project-metadata">
-                                                        <li class="project-metadata-item">
-                                                            <span data-bind="text: vm.mobilesurvey.startdate() || '?'"></span>
-                                                            {% trans 'to' %}
-                                                            <span data-bind="text: vm.mobilesurvey.enddate() || '?'"></span>
-                                                        </li>
-                                                    </ul>
-                                                </div>
-                                                <h3 class="project-panel-title" data-bind="text: vm.mobilesurvey.name() === '' ? '{% trans "Unnamed Survey" %}' : vm.mobilesurvey.name()"></h3>
-
-                                                <div class="">
-                                                    <div class="project-details">
-                                                        <a id="view-project-details-btn" class="text-primary text-semibold" data-bind="click: function(val){val.mobilesurvey.toggleShowDetails();}">{% trans 'View Details' %}</a>
-                                                    </div>
-                                                </div>
+                                        <div class="project-panel-header">
+                                            <div class="user-survey">
+                                                <div class="project-status" data-bind="text:vm.mobilesurvey.active() ? '{% trans "Active" %}' : '{% trans "Inactive" %}', css: {active: vm.mobilesurvey.active()}"></div>
+                                                <ul class="project-metadata">
+                                                    <li class="project-metadata-item">
+                                                        <span data-bind="text: vm.mobilesurvey.startdate() || '?'"></span>
+                                                        {% trans 'to' %}
+                                                        <span data-bind="text: vm.mobilesurvey.enddate() || '?'"></span>
+                                                    </li>
+                                                </ul>
                                             </div>
+                                            <h3 class="project-panel-title" data-bind="text: vm.mobilesurvey.name() === '' ? '{% trans "Unnamed Survey" %}' : vm.mobilesurvey.name()"></h3>
 
-                                            <div class='profile-mpm-panel' data-bind="css: {'show-details': vm.mobilesurvey.showDetails}">
-                                                <div class="">
-                                                    <p class="mpm-item-listing-header" style="margin-bottom: 0px;">
-                                                        {% trans 'Project Summary' %}
-                                                    </p>
-                                                    <ul class="mpm-node-detail-metadata">
-                                                        <li class="">
-                                                            {% trans "Number of edits:" %} 0
-                                                        </li>
-                                                        <li class="">
-                                                            {% trans "Contributors:" %} 0
-                                                        </li>
-                                                        <li class="">
-                                                            {% trans "Offline Basemap:" %} {% trans "Streets-Grey" %}
-                                                        </li>
-                                                    </ul>
+                                            <div>
+                                                <div class="project-details">
+                                                    <a href="#" id="view-project-details-btn" class="text-primary text-semibold" data-bind="click: function(val){val.mobilesurvey.toggleShowDetails();}" tabindex="0" onkeyup="if(event.which == 13 || event.keyCode == 13){ $(this).trigger('click'); }">{% trans 'View Details' %}</a>
                                                 </div>
-
-                                                <div class="">
-                                                    <p class="mpm-item-listing-header" style="margin-bottom: 0px;">
-                                                        {% trans 'Groups/Users' %}
-                                                    </p>
-                                                    <ul class="mpm-node-detail-metadata">
-                                                        <li class="">
-
-                                                            {% trans 'Groups' %} (<span data-bind="text: vm.mobilesurvey.groups().length"></span>)
-                                                            <ul class="mpm-node-detail-metadata" data-bind="foreach: _.filter(vm.mobilesurvey.identities, function(id){return (id.type === 'group' && _.contains(mobilesurvey.groups(), id.id))})">
-                                                                <li class="" data-bind="text: $data.name"></li>
-                                                            </ul>
-                                                        </li>
-                                                    </ul>
-                                                    <ul class="mpm-node-detail-metadata">
-                                                        <li class="">
-                                                            {% trans 'Users' %} (<span data-bind="text: vm.mobilesurvey.users().length"></span>)
-                                                            <ul class="mpm-node-detail-metadata" data-bind="foreach: _.filter(vm.mobilesurvey.identities, function(id){return (id.type === 'user' && _.contains(vm.mobilesurvey.users(), id.id))})">
-                                                                <li class="" data-bind="text: $data.name"></li>
-                                                            </ul>
-                                                        </li>
-                                                    </ul>
-                                                </div>
-
-                                                <div class="">
-                                                    <p class="mpm-item-listing-header" style="margin-bottom: 0px;">
-                                                        {% trans 'Models and Data Entry Cards' %}
-                                                    </p>
-
-                                                    <ul class="mpm-node-detail-metadata">
-                                                        <!--ko foreach: {data: vm.resources, as: 'resource'} -->
-                                                        <li class="">
-                                                            <div data-bind="text: resource.name + ' (' + resource.cards.length + ' data entry cards)'"></div>
-                                                            <!--ko foreach: {data: resource.cards, as: 'card'} -->
-                                                            <ul class="mpm-node-detail-metadata">
-                                                                <li data-bind="text: card.name"></li>
-                                                            </ul>
-                                                            <!--/ko-->
-                                                        </li>
-                                                        <!--/ko-->
-                                                    </ul>
-                                                </div>
-
                                             </div>
                                         </div>
-                                        <!-- /ko -->
+
+                                        <div class='profile-mpm-panel' data-bind="css: {'show-details': vm.mobilesurvey.showDetails}">
+                                            <div>
+                                                <p class="mpm-item-listing-header" style="margin-bottom: 0px;">
+                                                    {% trans 'Project Summary' %}
+                                                </p>
+                                                <ul class="mpm-node-detail-metadata">
+                                                    <li>
+                                                        {% trans "Number of edits:" %} 0
+                                                    </li>
+                                                    <li>
+                                                        {% trans "Contributors:" %} 0
+                                                    </li>
+                                                    <li>
+                                                        {% trans "Offline Basemap:" %} {% trans "Streets-Grey" %}
+                                                    </li>
+                                                </ul>
+                                            </div>
+
+                                            <div>
+                                                <p class="mpm-item-listing-header" style="margin-bottom: 0px;">
+                                                    {% trans 'Groups/Users' %}
+                                                </p>
+                                                <ul class="mpm-node-detail-metadata">
+                                                    <li>
+
+                                                        {% trans 'Groups' %} (<span data-bind="text: vm.mobilesurvey.groups().length"></span>)
+                                                        <ul class="mpm-node-detail-metadata" data-bind="foreach: _.filter(vm.mobilesurvey.identities, function(id){return (id.type === 'group' && _.contains(mobilesurvey.groups(), id.id))})">
+                                                            <li data-bind="text: $data.name"></li>
+                                                        </ul>
+                                                    </li>
+                                                </ul>
+                                                <ul class="mpm-node-detail-metadata">
+                                                    <li>
+                                                        {% trans 'Users' %} (<span data-bind="text: vm.mobilesurvey.users().length"></span>)
+                                                        <ul class="mpm-node-detail-metadata" data-bind="foreach: _.filter(vm.mobilesurvey.identities, function(id){return (id.type === 'user' && _.contains(vm.mobilesurvey.users(), id.id))})">
+                                                            <li data-bind="text: $data.name"></li>
+                                                        </ul>
+                                                    </li>
+                                                </ul>
+                                            </div>
+
+                                            <div>
+                                                <p class="mpm-item-listing-header" style="margin-bottom: 0px;">
+                                                    {% trans 'Models and Data Entry Cards' %}
+                                                </p>
+
+                                                <ul class="mpm-node-detail-metadata">
+                                                    <!--ko foreach: {data: vm.resources, as: 'resource'} -->
+                                                    <li>
+                                                        <div data-bind="text: resource.name + ' (' + resource.cards.length + ' data entry cards)'"></div>
+                                                        <!--ko foreach: {data: resource.cards, as: 'card'} -->
+                                                        <ul class="mpm-node-detail-metadata">
+                                                            <li data-bind="text: card.name"></li>
+                                                        </ul>
+                                                        <!--/ko-->
+                                                    </li>
+                                                    <!--/ko-->
+                                                </ul>
+                                            </div>
+
+                                        </div>
                                     </div>
+                                    <!-- /ko -->
                                 </div>
                             </div>
                         </div>
-                        <!--/ko-->
                     </div>
+                    <!--/ko-->
                 </section>
             </div>
 
