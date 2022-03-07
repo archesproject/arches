@@ -198,8 +198,5 @@ class Migration(migrations.Migration):
                 "managed": True,
             },
         ),
-        migrations.RunSQL(
-            add_validation_reporting_functions,
-            remove_validation_reporting_functions
-        ),
+        migrations.RunSQL(add_validation_reporting_functions, remove_validation_reporting_functions),
     ]
