@@ -63,12 +63,14 @@ add_validation_reporting_functions = """
     CREATE OR REPLACE FUNCTION public.__arches_get_error_messages(json_obj jsonb)
     RETURNS text
     LANGUAGE plpgsql AS
+
     $func$
     DECLARE
         _key   text;
         _value jsonb;
         _result text;
         _note text;
+
     BEGIN
         FOR _key, _value IN 
             SELECT * FROM jsonb_each_text($1)
@@ -89,15 +91,20 @@ add_validation_reporting_functions = """
     END;
     $func$;
 
-    CREATE OR REPLACE FUNCTION public.__arches_collect_node_validation(verbose boolean, transaction_id uuid)
+    CREATE OR REPLACE FUNCTION public.__arches_collect_node_validation(transaction_id uuid)
     RETURNS TABLE(source text, message text, transactionid uuid)
     AS $$
-    SELECT source_description, __archces_identify_invalid_staged_tiles(value) AS message, transactionid
+    SELECT source_description, __arches_get_error_messages(value) AS message, transactionid
     FROM load_staging 
     WHERE passes_validation IS NOT true
     AND transactionid = transaction_id;  
     $$
     LANGUAGE SQL;
+    """
+
+remove_validation_reporting_functions = """
+    DROP FUNCTION public.__arches_get_error_messages(json_obj jsonb);
+    DROP FUNCTION public.__arches_collect_node_validation(transaction_id uuid);
     """
 
 class Migration(migrations.Migration):
@@ -190,5 +197,9 @@ class Migration(migrations.Migration):
                 "db_table": "load_staging",
                 "managed": True,
             },
+        ),
+        migrations.RunSQL(
+            add_validation_reporting_functions,
+            remove_validation_reporting_functions
         ),
     ]
