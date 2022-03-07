@@ -60,7 +60,7 @@ remove_csv_importer = """
     """
 
 add_validation_reporting_functions = """
-    CREATE OR REPLACE FUNCTION public.__arches_get_error_messages(json_obj jsonb)
+    CREATE OR REPLACE FUNCTION public.__arches_load_staging_get_tile_errors(json_obj jsonb)
     RETURNS text
     LANGUAGE plpgsql AS
 
@@ -91,20 +91,20 @@ add_validation_reporting_functions = """
     END;
     $func$;
 
-    CREATE OR REPLACE FUNCTION public.__arches_collect_node_validation(transaction_id uuid)
-    RETURNS TABLE(source text, message text, transactionid uuid)
+    CREATE OR REPLACE FUNCTION public.__arches_load_staging_report_errors(load_id uuid)
+    RETURNS TABLE(source text, message text, loadid uuid)
     AS $$
-    SELECT source_description, __arches_get_error_messages(value) AS message, transactionid
+    SELECT source_description, public.__arches_load_staging_get_tile_errors(value) AS message, loadid
     FROM load_staging 
     WHERE passes_validation IS NOT true
-    AND transactionid = transaction_id;  
+    AND loadid = load_id;  
     $$
     LANGUAGE SQL;
     """
 
 remove_validation_reporting_functions = """
-    DROP FUNCTION public.__arches_get_error_messages(json_obj jsonb);
-    DROP FUNCTION public.__arches_collect_node_validation(transaction_id uuid);
+    DROP FUNCTION public.__arches_load_staging_get_tile_errors(json_obj jsonb);
+    DROP FUNCTION public.__arches_load_staging_report_errors(load_id uuid);
     """
 
 class Migration(migrations.Migration):
@@ -157,9 +157,9 @@ class Migration(migrations.Migration):
         migrations.CreateModel(
             name="LoadEvent",
             fields=[
-                ("transactionid", models.UUIDField(default=uuid.uuid1, primary_key=True, serialize=False)),
+                ("loadid", models.UUIDField(default=uuid.uuid1, primary_key=True, serialize=False)),
                 ("complete", models.BooleanField(default=False)),
-                ("succssful", models.BooleanField(blank=True, null=True)),
+                ("successful", models.BooleanField(blank=True, null=True)),
                 ("load_description", models.TextField(blank=True, null=True)),
                 ("message", models.TextField(blank=True, null=True)),
                 ("load_start_time", models.DateTimeField(blank=True, null=True)),
@@ -183,10 +183,10 @@ class Migration(migrations.Migration):
                 ("passes_validation", models.BooleanField(blank=True, null=True)),
                 ("nodegroup_depth", models.IntegerField(default=1)),
                 ("source_description", models.TextField(blank=True, null=True)),
-                ("message", models.TextField(blank=True, null=True)),
+                ("error_message", models.TextField(blank=True, null=True)),
                 (
                     "load_event",
-                    models.ForeignKey(db_column="transactionid", on_delete=django.db.models.deletion.CASCADE, to="models.LoadEvent"),
+                    models.ForeignKey(db_column="loadid", on_delete=django.db.models.deletion.CASCADE, to="models.LoadEvent"),
                 ),
                 (
                     "nodegroup",
