@@ -59,6 +59,46 @@ remove_csv_importer = """
     delete from etl_modules where etlmoduleid = '0a0cea7e-b59a-431a-93d8-e9f8c41bdd6b';
     """
 
+add_validation_reporting_functions = """
+    CREATE OR REPLACE FUNCTION public.__arches_get_error_messages(json_obj jsonb)
+    RETURNS text
+    LANGUAGE plpgsql AS
+    $func$
+    DECLARE
+        _key   text;
+        _value jsonb;
+        _result text;
+        _note text;
+    BEGIN
+        FOR _key, _value IN 
+            SELECT * FROM jsonb_each_text($1)
+        LOOP
+            IF _value ->> 'valid' = 'false' THEN
+                IF _value ->> 'notes' IS NULL THEN
+                    _note = 'unspecified error';
+                END IF; 
+                -- we could add the nodeid (_key), but let's not be verbose just yet
+                IF _result IS NULL THEN
+                _result := _note;
+                ELSE
+                _result := '|' || _node;
+                END IF;
+            END IF;
+        END LOOP;
+        RETURN _result;
+    END;
+    $func$;
+
+    CREATE OR REPLACE FUNCTION public.__arches_collect_node_validation(verbose boolean, transaction_id uuid)
+    RETURNS TABLE(source text, message text, transactionid uuid)
+    AS $$
+    SELECT source_description, __archces_identify_invalid_staged_tiles(value) AS message, transactionid
+    FROM load_staging 
+    WHERE passes_validation IS NOT true
+    AND transactionid = transaction_id;  
+    $$
+    LANGUAGE SQL;
+    """
 
 class Migration(migrations.Migration):
 
