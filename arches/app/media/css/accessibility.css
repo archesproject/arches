@@ -141,7 +141,8 @@ a:focus,
 .map-data-drop-area,
 .workbench-card-sidebar-tab,
 ::placeholder,
-.rr-splash-description {
+.rr-splash-description,
+.search-export .instruction h4 {
     color: #000 !important;
 }
 
