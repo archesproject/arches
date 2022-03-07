@@ -10,7 +10,7 @@
             <div class="search-facet-item header">
                 <h4 class="search-facet-item-heading">{% trans "Search Facets" %}</h4>
                 <div class="list-filter relative">
-                    <input type="text" class="form-control" style="" placeholder="{% trans "Find ..." %}" data-bind="value: facetFilterText, valueUpdate: 'keyup'">
+                    <input type="text" class="form-control" placeholder="{% trans "Find ..." %}" aria-label="{% trans "Find search facets" %}" data-bind="value: facetFilterText, valueUpdate: 'keyup'">
                     <!-- Clear Filter -->
                     <span class="clear-node-search" data-bind="click: function () { facetFilterText(''); }"><i class="fa fa-times-circle"></i></span>
                 </div>
