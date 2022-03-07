@@ -33,9 +33,9 @@ define(['jquery', 'knockout', 'uuid', 'arches', 'js-cookie'], function($, ko, uu
         this.submit = function(action) {
             self.formData.append('action', action);
             if (action === 'read') {
-                self.transactionId = uuid.generate();
+                self.loadId = uuid.generate();
             }
-            self.formData.append('transaction_id', self.transactionId);
+            self.formData.append('load_id', self.loadId);
             self.formData.append('module', this.moduleId);
             return fetch(arches.urls.etl_manager, {
                 method: 'POST',
