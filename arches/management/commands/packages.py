@@ -1120,15 +1120,16 @@ class Command(BaseCommand):
                     new_languages = importer.scan_for_new_languages()
 
                     if new_languages is not None and len(new_languages) > 0:
-                        print("Found possible new languages while attempting import.")
+                        print("\nFound possible new languages while attempting import.")
                         for language in new_languages:
-                            print('Do you wish to add "{language}" as a new language? (y or n)'.format(language=language))
+                            print('Do you wish to add the language with code "{language}" to Arches? (y or n):'.format(language=language))
                             create_new_language = input()
-                            if create_new_language == "Y" or create_new_language == "y":
-                                print("Enter the human-readable language name: ")
+                            if create_new_language.lower() == "y":
+                                print("\nEnter the human-readable language name:")
                                 language_name = input()
-                                print("Is this language primary read right to left or left to right (enter ltr or rtl):")
-                                default_direction = input()
+                                print("\nIs this language primarily read Left-To-Right (y or n):")
+                                lang_is_ltr = input()
+                                default_direction = "ltr" if lang_is_ltr.lower() == "y" else "rtl"
                                 scope = "data"
                                 new_language = models.Language(
                                     code=language, name=language_name, default_direction=default_direction, scope=scope
