@@ -12,7 +12,7 @@
 
     <div id="widget-crud-settings" class="tab-pane fade in active">
 
-        <div class="node-config-item" style="">
+        <div class="node-config-item">
             <div class="control-label">
                 {% trans "Widget Label" %}
             </div>
@@ -21,7 +21,7 @@
             </div>
         </div>
 
-        <div class="node-config-item" style="">
+        <div class="node-config-item">
             <div class="control-label">
                 {% trans "Template" %}
             </div>
@@ -30,7 +30,7 @@
             </div>
         </div>
 
-        <div class="node-config-item" style="">
+        <div class="node-config-item">
             <div class="control-label">
                 {% trans "Visibility" %}
             </div>
@@ -54,7 +54,7 @@
         <!-- ko if: ko.isObservable(card) -->
         <div class="node-config-item switch-panel" data-bind="css: {'disabled': checkIfImmutable() }">
 
-            <span class="switch switch-small arches-switch" data-bind="css: {'on': node.isrequired(), 'disabled': checkIfImmutable() }, click: toggleRequired"><small></small></span>
+            <span tabindex="0" class="switch switch-small arches-switch" data-bind="css: {'on': node.isrequired(), 'disabled': checkIfImmutable() }, click: toggleRequired" onkeyup="if(event.which == 13 || event.keyCode == 13){ $(this).trigger('click'); }"><small></small></span>
 
             <p class="control-label" style="margin-left: 40px; margin-top: -17px; margin-bottom: 0px;">
                 {% trans "Required" %}

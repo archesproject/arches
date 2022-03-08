@@ -4,8 +4,8 @@
 
 {% block editor_tree %}
 <li role="treeitem card-treeitem" class="jstree-node" data-bind="css: {'jstree-open': (card.tiles().length > 0 && card.expanded()), 'jstree-closed' : (card.tiles().length > 0 && !card.expanded()), 'jstree-leaf': card.tiles().length === 0}, scrollTo: card.scrollTo, container: '.resource-editor-tree'">
-    <i class="jstree-icon jstree-ocl" role="presentation" data-bind="click: function(){card.expanded(!card.expanded())}"></i>
-    <a class="jstree-anchor" href="#" tabindex="-1" data-bind="css:{'filtered': card.highlight(), 'jstree-clicked': card.selected, 'child-selected': card.isChildSelected(), 'func-node': card.isFuncNode()}, event: {
+    <i tabindex="0" class="jstree-icon jstree-ocl" role="presentation" data-bind="click: function(){card.expanded(!card.expanded())}" onkeypress="$(this).trigger('click');"></i>
+    <a class="jstree-anchor" href="#" data-bind="css:{'filtered': card.highlight(), 'jstree-clicked': card.selected, 'child-selected': card.isChildSelected(), 'func-node': card.isFuncNode()}, event: {
         mousedown: function(d, e) {
             e.stopPropagation();
             selectGroupCard();
@@ -19,17 +19,16 @@
         <!-- /ko -->
         <span style="padding-right: 5px;" data-bind="text: card.model.name"></span>
         <!-- ko if: card.canAdd() -->
-        <i class="fa fa-plus-circle add-new-tile" role="presentation" data-bind="css:{'jstree-clicked': card.selected}" data-toggle="tooltip" data-original-title="{% trans "Add New" %}"></i>
+        <i tabindex="0" class="fa fa-plus-circle add-new-tile" role="presentation" data-bind="css:{'jstree-clicked': card.selected}" data-toggle="tooltip" data-original-title="{% trans "Add New" %}" onkeyup="if(event.which == 13 || event.keyCode == 13){ $(this).trigger('click'); }"></i>
         <!-- /ko -->
     </a>
     <ul class="jstree-children" aria-expanded="true">
         <!-- ko foreach: {data: sortedWidgetIds, as: 'nodeId'} -->
         <!-- ko let: $parent.getDataForDisplay(nodeId) --> 
-        <!-- ko if: widget.visible -->
         <!-- the let statement above returns an object of the form {widget: null, tile: null: tileData: null, card: null} -->
             <li role="treeitem" class="jstree-node" data-bind="css: {'jstree-open': (card.cards.length > 0 && expanded), 'jstree-closed' : (card.cards.length > 0 && !expanded()), 'jstree-leaf': card.cards.length === 0}">
-                <i class="jstree-icon jstree-ocl" role="presentation" data-bind="click: function(){expanded(!expanded())}"></i>
-                <a class="jstree-anchor" href="#" tabindex="-1" data-bind="click: function () { $parent.selectGroupCard()}, css:{'jstree-clicked': card.selected, 'child-selected': card.selected(), 'filtered-leaf': card.highlight()}">
+                <i tabindex="0" class="jstree-icon jstree-ocl" role="presentation" data-bind="click: function(){expanded(!expanded())}" onkeypress="$(this).trigger('click');"></i>
+                <a class="jstree-anchor" href="#" data-bind="click: function () { $parent.selectGroupCard()}, css:{'jstree-clicked': card.selected, 'child-selected': card.selected(), 'filtered-leaf': card.highlight()}">
                     <i class="fa fa-file" role="presentation" data-bind="css:{'has-provisional-edits': tile.hasprovisionaledits()}"></i>
                     <strong style="margin-right: 10px;">
                         {% block editor_tree_node_content %}
@@ -40,7 +39,7 @@
                             params: {
                                 tile: tile,
                                 node: self.form.nodeLookup[widget.node_id()],
-                                config: widget.configJSON,
+                                config: widget.config,
                                 label: widget.label(),
                                 value: tile.data[widget.node_id()],
                                 type: 'resource-editor',
@@ -76,7 +75,6 @@
             </li>
         <!-- /ko -->
         <!-- /ko -->
-        <!-- /ko -->
     </ul>
 </li>
 {% endblock editor_tree %}
@@ -84,7 +82,7 @@
 
 {% block designer_tree %}
 <li role="treeitem card-treeitem" class="jstree-node" data-bind="css: {'jstree-open': ((card.cards().length > 0 || card.widgets().length > 0) && card.expanded()), 'jstree-closed' : ((card.cards().length > 0 || card.widgets().length > 0) && !card.expanded()), 'jstree-leaf': card.cards().length === 0 && card.widgets().length === 0}, scrollTo: card.scrollTo, container: '.designer-card-tree'">
-    <i class="jstree-icon jstree-ocl" role="presentation" data-bind="click: function(){card.expanded(!card.expanded())}"></i>
+    <i tabindex="0" class="jstree-icon jstree-ocl" role="presentation" data-bind="click: function(){card.expanded(!card.expanded())}" onkeypress="$(this).trigger('click');"></i>
     <a class="jstree-anchor" href="#" tabindex="-1" data-bind="css:{'filtered': card.highlight(), 'jstree-clicked': card.selected, 'child-selected': card.isChildSelected(), 'func-node': card.isFuncNode()}, click: function () { card.selected(true) },">
         <i class="fa fa-file-o" role="presentation"></i>
         <span style="padding-right: 5px;" data-bind="text: card.model.name"></span>
@@ -103,7 +101,7 @@
                     'jstree-last': $index() === (card.widgets().length - 1) && card.cards().length === 0
                 }">
                 <i class="jstree-icon jstree-ocl" role="presentation"></i>
-                <a class="jstree-anchor" href="#" tabindex="-1" data-bind="click: function(d, e) {widget.selected(true); e.stopPropagation(); }, css:{'jstree-clicked': widget.selected, 'hover': widget.hovered}, event: { mouseover: function(){ widget.hovered(true) }, mouseout: function(){ widget.hovered(null) } }">
+                <a class="jstree-anchor" href="#" data-bind="click: function(d, e) {widget.selected(true); e.stopPropagation(); }, css:{'jstree-clicked': widget.selected, 'hover': widget.hovered}, event: { mouseover: function(){ widget.hovered(true) }, mouseout: function(){ widget.hovered(null) } }">
                     <i data-bind="css: widget.datatype.iconclass" role="presentation"></i>
                     <strong style="margin-right: 10px;" >
                         <span data-bind="text: !!(widget.label()) ? widget.label() : widget.node.name"></span>
@@ -157,7 +155,7 @@
                     <div class='field'>
                         <span data-bind="text : pe.username"></span>
                     </div>
-                    <a href='' class='field fa fa-times-circle new-delete-provisional-edit' data-bind="click : function(){$parent.provisionalTileViewModel.rejectProvisionalEdit(pe)}"></a>
+                    <a href='#' class='field fa fa-times-circle new-delete-provisional-edit' data-bind="click : function(){$parent.provisionalTileViewModel.rejectProvisionalEdit(pe)}"></a>
                 </div>
                 <div class="field timestamp">
                     <span data-bind="text : pe.displaydate">@</span>
@@ -178,7 +176,7 @@
             <!-- /ko -->
             <!-- ko if: card.model.helpenabled -->
             <span>
-                <a class="pull-right card-help help editable-help" data-bind="click: function () {card.model.get('helpactive')(true) }" style="cursor:pointer;"> {% trans "Help" %} <i class="fa fa-question-circle"></i></a>
+                <a href="#" class="pull-right card-help help editable-help" data-bind="click: function () {card.model.get('helpactive')(true) }" style="cursor:pointer;"> {% trans "Help" %} <i class="fa fa-question-circle"></i></a>
             </span>
             <!-- /ko -->
             <h5 data-bind="text: card.model.instructions"></h5>
@@ -308,12 +306,12 @@
     <div class="rp-card-section" data-bind="css: card.model.cssclass, visible: card.fullyProvisional() !== 'fullyprovisional'">
             <span class="rp-tile-title" data-bind="text: card.model.get('name')"></span>
             <!-- ko if: hasTiles -->
-            <i class="fa report-expander print-hide" data-bind="css: {'fa-angle-down': reportExpanded(), 'fa-angle-right': !reportExpanded()}, click: function () { reportExpanded(!reportExpanded()) }"></i>
+            <i tabindex="0" class="fa report-expander print-hide" data-bind="css: {'fa-angle-down': reportExpanded(), 'fa-angle-right': !reportExpanded()}, click: function () { reportExpanded(!reportExpanded()) }" onkeyup="if(event.which == 13 || event.keyCode == 13){ $(this).trigger('click'); }"></i>
             <!-- ko if: reportExpanded() -->
             <!-- ko foreach: { data: sortedWidgetIds, as: 'nodeId' } -->
             <!-- ko let: $parent.getDataForDisplay(nodeId) --> 
             <!-- the let statement above returns an object of the form {widget: null, tile: null: tileData: null, card: null} -->
-                <div class="rp-card-section" data-bind="css: {'provisional': ko.unwrap(tile.provisionaledits) !== null && tile.userisreviewer === false, 'fullyprovisional': tile.isfullyprovisional()}">
+                <div class="rp-card-section" data-bind="css: {'provisional': tile.provisionaledits() !== null && tile.userisreviewer === false, 'fullyprovisional': tile.isfullyprovisional()}">
 
                     {% block report_widgets %}
                         <div class="rp-report-tile" data-bind="attr: { id: tile.tileid }">

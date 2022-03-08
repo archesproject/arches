@@ -1,7 +1,7 @@
 {% load i18n %}
 <!-- ko if: $data.search -->
 <div class="col-md-4 col-lg-3">
-    <select class="resources" data-bind="value: op, chosen: {width: '100%', disable_search_threshold: 15}">
+    <select class="resources" data-bind="value: op, chosen: {width: '100%', disable_search_threshold: 15}, attr:{'aria-label': 'Search criteria'}">
         <option value="~">{% trans "Like" %}</option>
         <option value="!~">{% trans "Not like" %}</option>
         <option value="">{% trans "Equals" %}</option>
@@ -12,6 +12,6 @@
 </div>
 
 <div class="col-md-8 col-lg-9" data-bind="visible: op() !== 'null' && op() !== 'not_null'">
-    <input type="text" placeholder='{% trans "Name" %}' class="form-control input-lg" style="height: 36px;" data-bind="value: searchValue, valueUpdate: 'keyup'">
+    <input type="text" placeholder='{% trans "Name" %}' aria-label='{% trans "Name" %}' class="form-control input-lg" style="height: 36px;" data-bind="value: searchValue, valueUpdate: 'keyup'">
 </div>
 <!-- /ko -->

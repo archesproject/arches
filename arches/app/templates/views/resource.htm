@@ -30,7 +30,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
     <div class="graph-list-header" data-bind="css: {'alert-active': (alert() && alert().active())}">
 
         <!-- Toolbar -->
-        <div class="relative resource-toolbar" style="">
+        <div class="relative resource-toolbar">
 
             <!-- Search -->
             <div class="edit-panel-search-bar">
@@ -65,7 +65,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
             <!-- ko foreach: createableResources -->
             <div class="r-grid-item relative" data-bind="css: { 'disabled': disable_instance_creation}">
                 <div data-bind="attr: {href: '#', title: name, target: '_blank'}" href="#">
-                    <div class="r-select-card">
+                    <div class="r-select-card" tabindex="0">
                         <h4 class="r-select-title" data-bind="text: name"></h4>
                         <div class="r-select-circle" data-bind="attr:{style: ('background: ' + color)}">
                             <span>
@@ -73,7 +73,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                             </span>
                         </div>
                         <div class="r-desc-container">
-                            <p data-bind="text: subtitle" class="r-select-desc"></p> 
+                            <p data-bind="text: subtitle" class="r-select-desc"></p>
                         </div>  
                     </div>
                 </div>
@@ -82,11 +82,11 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                 <div class="r-select-card-footer">
                     <!-- ko if: disable_instance_creation -->
                     <div class="r-warning">
-                      <i class="fa fa-warning"></i> <span class="form-warning" style="" data-bind="text: disable_instance_creation"></span>
+                      <i class="fa fa-warning"></i> <span class="form-warning" data-bind="text: disable_instance_creation"></span>
                     </div>
                     <!-- /ko -->
                     <!-- ko if: !disable_instance_creation-->
-                    <div class="">
+                    <div>
                         <a href="#" class="btn btn-primary btn-resource-select" role="button" data-bind="
                         attr: { href: $parent.arches.urls.add_resource(graphid), 'data-arches-graphid': graphid},
                         css: { 'disabled': disable_instance_creation }">

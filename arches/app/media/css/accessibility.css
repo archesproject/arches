@@ -1,9 +1,34 @@
+.btn-file-select {
+    background: #4824FF;
+}
+
+.btn-file-upload-reset, .btn-file-upload-limit {
+    color: #10599E;
+}
+
+.btn-file-upload-reset:hover, .btn-file-upload-reset:focus {
+    text-decoration: underline;
+}
+
+.btn-file-select:focus,
+.btn-file-upload-reset:focus,
+.file-upload-filter:focus,
+.btn-file-upload-limit:focus,
+.file-download:focus {
+    outline: #006600 solid 3px !important;
+}
+
+a:hover, a:focus {
+    text-decoration: underline;
+}
+
 .navbar-toggle {
     margin-top: 11px;
     background: #000;
 }
 
-.nav>li>a:focus, .navbar-toggle:focus {
+.nav>li>a:focus:not(.graph-designer-tab):not(.config-title-tab),
+.navbar-toggle:focus:not(.graph-designer-tab):not(.config-title-tab) {
     box-shadow: inset 0 0 0 3px #13ce67;
     color: #000;
     text-decoration: underline;
@@ -71,4 +96,228 @@
 .link-spacing:hover {
     color: #7AD02F;
     text-decoration: underline;
+}
+
+.arches-signin .panel-footer {
+    color: #494949;
+}
+
+.arches-signin .panel-footer a {
+    color: #2c5271;
+}
+
+.password-rule {
+    color: #494949;
+}
+
+.profile-label-shim,
+.profile-default-message-panel {
+    color: #595959;
+}
+
+.btn-profile-password {
+    color: #1b4f7d;
+}
+
+.btn-profile-password:focus {
+    outline: #006600 solid 3px !important;
+}
+
+.password-rule {
+    color: #555;
+}
+
+.account-tips {
+    color: #595959;
+}
+
+.workbench-card-sidebar-tab {
+    color: #4f4f4f;
+}
+
+.hover-feature-metadata {
+    color: #595959;
+}
+
+.hover-feature-metadata span {
+    color: #315B7D;
+}
+
+.hover-feature-footer a {
+    color: #2F5879;
+}
+
+.jstree-default .func-node {
+    color: #000000;
+}
+
+.map-data-drop-area,
+.workbench-card-sidebar-tab {
+    color: #000;
+}
+
+.arches-toggle-subtitle {
+    color: #465B72;
+}
+
+.btn-file-select {
+    background: #4824FF;
+}
+
+.btn-file-upload-reset, .btn-file-upload-limit {
+    color: #10599E;
+}
+
+.btn-file-upload-reset:hover, .btn-file-upload-reset:focus {
+    text-decoration: underline;
+}
+
+.btn-file-select:focus,
+.btn-file-upload-reset:focus,
+.file-upload-filter:focus,
+.btn-file-upload-limit:focus,
+.file-download:focus {
+    outline: #006600 solid 3px !important;
+}
+
+.btn-primary, .library-icon .bg-primary {
+    background-color: #2B4E6D;
+}
+
+.btn-mint {
+    background-color: #15503f !important;
+}
+
+.btn-danger,
+.btn-warning {
+    background-color: #943725 !important;
+}
+
+.crud-card-main a {
+    color: #17568c;
+}
+
+a:focus,
+button:focus,
+input:focus,
+textarea:focus,
+.form-control:focus,
+i.report-expander:focus,
+.select-icon:focus,
+.chosen-container-active,
+.select2-container-active,
+.workbench-card-sidepanel-header:focus,
+.sp-header-alerts:focus,
+.timeline-entry:focus,
+.rr-splash-help-link:focus,
+.tabbed-report-tab-list li:focus,
+.jstree-icon:focus {
+    outline: #000000 solid 3px !important;
+}
+
+.workbench-card-sidebar-tab:focus,
+.search-facet-item:focus,
+button.saved-search-container:focus,
+button.search-type-btn:focus {
+    box-shadow: inset 0 0 0 2px #000000;
+    outline: none !important;
+}
+
+.mainnav-sm #mainnav-menu *:focus,
+.mainnav-sm #mainnav-menu a:hover {
+    text-decoration: none;
+}
+
+#mainnav-menu a {
+    transition: none;
+}
+
+#mainnav-menu *:focus,
+#mainnav-menu a:hover,
+.base-page .navbar-brand:focus,
+.collapsed-menu-trigger:focus {
+    -webkit-box-shadow: inset 5px 0 0 0 rgba(255,255,255,1) !important;
+    -moz-box-shadow: inset 5px 0 0 0 255,255,255,1 !important;
+    box-shadow: inset 5px 0 0 0 255,255,255,1 !important;
+    outline: none !important;
+    color: #fff;
+    text-decoration: underline;
+}
+
+#container.mainnav-sm #mainnav-menu>.active-link>a,
+#container.mainnav-sm #mainnav-menu>.active-sub>a,
+#container.mainnav-sm #mainnav-menu>.active-link a:hover,
+#container.mainnav-sm #mainnav-menu>.active-sub a:hover {
+	background-color: #184e6c;
+}
+
+#container.mainnav-sm #mainnav-menu>.active-sub>a:after {
+    width: 0;
+    height: 0;
+    border-style: solid;
+    border-width: 5px 10px 5px 0;
+    border-color: transparent #fff transparent transparent;
+    content: " ";
+    position: absolute;
+    top: calc(50% - 6px);
+    left: 40px;
+}
+
+#mainnav .list-header {
+    color: #fff;
+}
+
+.pagination>.active>a,
+.pagination>.active>span,
+.pagination>.active>a:hover,
+.pagination>.active>span:hover,
+.pagination>.active>a:focus,
+.pagination>.active>span:focus {
+    background-color: #2B4E6D;
+    border-color: #2B4E6D;
+}
+
+.select2-container-multi .select2-choices .select2-search-choice {
+    background-color: #2B4E6D;
+}
+
+.btn-u {
+    background: #3D588A;
+}
+
+.btn-u.btn-u-default {
+    background: #4D5B5B;
+}
+
+.search-listing-footer a:focus {
+    background: none;
+}
+
+.r-select-card-footer a:focus,
+.install-buttons button:focus,
+.tree-display-tool:focus,
+.tree-display-tool:hover,
+.graph-designer-tab:focus,
+.graph-designer-tab:hover {
+    text-decoration: underline !important;
+}
+
+a.tree-display-tool, a.tree-display-tool:hover {
+    color: #000;
+}
+
+.resource-grid-item:focus-within .graph-btn {
+    display: block;
+}
+
+.resource-grid-main-container {
+    height: auto;
+}
+
+.resource-grid-main.mpm-manager .mpm-title {
+    width: calc(100% - 55px);
+}
+div.search-facet-item:focus {
+    box-shadow: inset 0 0 0 3px #000;
+    outline: none;
 }

@@ -47,15 +47,15 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                             <span class="clear-node-search" data-bind="visible: filter().length > 0, click: function() { filter(''); }"><i class="fa fa-times-circle"></i></span>
                         </div>
                         <div>
-                            <a class="tree-display-tool" data-bind="click: expandAll"><i class="ion-plus"></i>{% trans ' Expand' %}</a>
-                            <a class="tree-display-tool" data-bind="click: collapseAll"><i class="ion-minus"></i>{% trans ' Collapse' %}</a>
+                            <a href="#" class="tree-display-tool" data-bind="click: expandAll"><i class="ion-plus"></i>{% trans ' Expand' %}</a>
+                            <a href="#" class="tree-display-tool" data-bind="click: collapseAll"><i class="ion-minus"></i>{% trans ' Collapse' %}</a>
                         </div>
                     </div>
                     <div class="resource-editor-tree">
                         <ul class="jstree-container-ul jstree-children" aria-expanded="true">
                         <li role="treeitem" class="jstree-node" data-bind="css: {'jstree-open': rootExpanded, 'jstree-closed' : !rootExpanded()}">
-                            <i class="jstree-icon jstree-ocl" role="presentation" data-bind="click: function(){rootExpanded(!rootExpanded())}"></i>
-                            <a class="jstree-anchor" href="#" tabindex="-1" data-bind="click: function () { selection('root'); }, css: {'jstree-clicked': selection() === 'root'}">
+                            <i tabindex="0" class="jstree-icon jstree-ocl" role="presentation" data-bind="click: function(){rootExpanded(!rootExpanded())}" onkeyup="if(event.which == 13 || event.keyCode == 13){ $(this).trigger('click'); }"></i>
+                            <a class="jstree-anchor" href="#" data-bind="click: function () { selection('root'); }, css: {'jstree-clicked': selection() === 'root'}">
                                 <strong>
                                     <i data-bind="css: graphiconclass != (null || '') ? graphiconclass : 'fa fa-question'" role="presentation"></i>
                                     <span data-bind="text: displayname"></span> (<span data-bind="text: graphname"></span>)
@@ -83,7 +83,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                         <!--ko ifnot: issystemsettings -->
                         <li role="treeitem" class="jstree-node jstree-open" data-bind="css: {'disabled': resourceId()}">
                             <i class="jstree-icon jstree-ocl" role="presentation"></i>
-                            <a class="jstree-anchor" href="#" tabindex="-1" data-bind="click: function(){if (resourceId()){showRelatedResourcesManager()}}, css: {'jstree-clicked': selection() === 'related-resources', 'disabled': resourceId() === ''}">
+                            <a class="jstree-anchor" href="#" data-bind="click: function(){if (resourceId()){showRelatedResourcesManager()}}, css: {'jstree-clicked': selection() === 'related-resources', 'disabled': resourceId() === ''}">
                                 <strong>
                                     <i class="fa fa-link" role="presentation"></i>
                                     <span>{% trans 'Related Resources' %}</span>
@@ -93,7 +93,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                         <!--/ko-->
                         <li role="treeitem" class="jstree-node jstree-open" data-bind="css: {'disabled': resourceId()}">
                             <i class="jstree-icon jstree-ocl" role="presentation"></i>
-                            <a class="jstree-anchor" href="#" tabindex="-1" data-bind="click: function(){if (resourceId()){showInstancePermissionsManager(self)}}, css: {'jstree-clicked': selection() === 'resource-permissions', 'disabled': resourceId() === '' || userIsCreator === false }">
+                            <a class="jstree-anchor" href="#" data-bind="click: function(){if (resourceId()){showInstancePermissionsManager(self)}}, css: {'jstree-clicked': selection() === 'resource-permissions', 'disabled': resourceId() === '' || userIsCreator === false }">
                                 <strong>
                                     <i class="fa fa-lock" role="presentation"></i>
                                     <span>{% trans 'Manage Permissions' %}</span>
@@ -143,11 +143,10 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
             <!--ko if: selection() === 'root' -->
                 <!--ko if: resourceId() -->
                 <div class='resource-report editor-report' data-bind='component: {
-                    name: "resource-report-abstract",
+                    name: reportLookup[report.get("template_id")()].componentname,
                     params: {
                         report: report,
-                        editorContext: true,
-                        cache: false
+                        editorContext: true
                     }
                 }'></div>
                 <!--/ko -->
@@ -181,7 +180,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 
                     <div class="card-breadcrumbs">
 
-                        <a href="" class="toggle-tree"><i class="ion-arrow-left-b"></i></a>
+                        <a href="#" class="toggle-tree"><i class="ion-arrow-left-b"></i></a>
 
                         <!-- ko foreach: { data: selectionBreadcrumbs(), as: 'crumb' } -->
                             <!-- ko if: crumb.tileid -->
@@ -252,9 +251,9 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                         <!-- /ko -->
 
                         <!-- ko if: selectedCard().cardinality === 'n' && selectedTile().tileid  -->
-                        <span class="add-new-crumb current-crumb" data-bind="click: function() {
+                        <span tabindex="0" class="add-new-crumb current-crumb" data-bind="click: function() {
                             selectedCard().selected(true); setTimeout(function(){selectedCard().showForm(true)}, 50);
-                        }">
+                        }" onkeyup="if(event.which == 13 || event.keyCode == 13){ $(this).trigger('click'); }">
                             <i class="fa fa-plus"></i>
                             {% trans 'Add New' %}
                         </span>

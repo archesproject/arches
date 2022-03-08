@@ -11,7 +11,7 @@
         {id: 'f', name: falseLabel},
         {id: 'null', name: '{% trans "Has no value" %}'},
         {id: 'not_null', name: '{% trans "Has any value" %}'}
-    ], optionsText: 'name', optionsValue: 'id'"></select>
+    ], optionsText: 'name', optionsValue: 'id', attr:{'aria-label': 'Select an Option'}"></select>
 </div>
 {% endblock search %}
 <!-- /ko -->
@@ -21,12 +21,12 @@
     {% trans "Label 'True'" %}
 </div>
 <div class="col-xs-12 pad-no crud-widget-container">
-    <input class="form-control input-md widget-input" data-bind="textInput: trueLabel">
+    <input class="form-control input-md widget-input" data-bind="textInput: trueLabel, attr: {'aria-label': 'True value'}">
 </div>
 <div class="control-label">
     {% trans "Label 'False'" %}
 </div>
 <div class="col-xs-12 pad-no crud-widget-container">
-    <input class="form-control input-md widget-input" data-bind="textInput: falseLabel">
+    <input class="form-control input-md widget-input" data-bind="textInput: falseLabel, attr: {'aria-label': 'False value'}">
 </div>
 <!-- /ko -->

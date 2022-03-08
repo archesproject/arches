@@ -16,9 +16,9 @@
                 value: value,
                 select2Query: {
                     select2Config: select2Config
-                }
+                },
+                attr: {'aria-label': label}
             ">
-
         </div>
     </div>
 </div>
@@ -33,6 +33,7 @@
     <div class="col-xs-12 pad-no crud-widget-container">
         <div class='node-config-item'>
         <input placeholder="{% trans "Placeholder" %}"
+            aria-label="{% trans "Placeholder" %}"
             class="form-control input-md widget-input"
             data-bind="value: placeholder, valueUpdate: 'keyup'">
         </div>
@@ -40,7 +41,7 @@
         <div class='control-label'>{% trans "Dropdown Format" %}
         </div>
         <div class="toggle-container">
-            <span class="switch switch-small" data-bind="css: {'on': displayOnlySelectedNode()}, click: toggleDisplayOnlySelected"><small></small></span>
+            <span class="switch switch-small" data-bind="css: {'on': displayOnlySelectedNode()}, click: toggleDisplayOnlySelected" tabindex="0" onkeyup="if(event.which == 13 || event.keyCode == 13){ $(this).trigger('click'); }"><small></small></span>
                     <div style="display:flex; flex-direction:row;">
                     <div class="arches-toggle-sm" data-bind="text:'Show only the value of the selected node in the dropdown options'"></div>
                     </div>

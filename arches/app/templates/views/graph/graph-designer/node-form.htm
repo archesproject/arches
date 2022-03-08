@@ -158,7 +158,7 @@
                         <div class="form-group">
                             <div class="relative">
                                 <label class="col-xs-12 control-label widget-input-label">
-                                    <span class="switch switch-small arches-switch" data-bind="css: {'on': node().issearchable()}, click: function () { node().issearchable(!node().issearchable()); }"><small></small></span>
+                                    <span tabindex="0" class="switch switch-small arches-switch" data-bind="css: {'on': node().issearchable()}, click: function () { node().issearchable(!node().issearchable()); }" onkeyup="if(event.which == 13 || event.keyCode == 13){ $(this).trigger('click'); }"><small></small></span>
                                 </label>
                             </div>
 
@@ -178,7 +178,7 @@
                         <div class="form-group">
                             <div class="relative">
                                 <label class="col-xs-12 control-label widget-input-label">
-                                    <span class="switch switch-small arches-switch" data-bind="css: {'on': node().isrequired(), 'disabled': checkIfImmutable()}, click: toggleRequired"><small></small></span>
+                                    <span tabindex="0" class="switch switch-small arches-switch" data-bind="css: {'on': node().isrequired(), 'disabled': checkIfImmutable()}, click: toggleRequired" onkeyup="if(event.which == 13 || event.keyCode == 13){ $(this).trigger('click'); }"><small></small></span>
                                 </label>
                             </div>
 
@@ -199,7 +199,7 @@
                         <div class="form-group">
                             <div class="relative">
                                 <label class="col-xs-12 control-label widget-input-label">
-                                    <span class="switch switch-small arches-switch" data-bind="css: {'on': node().exportable()}, click: function(){node().exportable(!node().exportable())}"><small></small></span>
+                                    <span tabindex="0" class="switch switch-small arches-switch" data-bind="css: {'on': node().exportable()}, click: function(){node().exportable(!node().exportable())}" onkeyup="if(event.which == 13 || event.keyCode == 13){ $(this).trigger('click'); }"><small></small></span>
                                 </label>
                             </div>
 
@@ -223,7 +223,7 @@
                         <div class="form-group">
                             <div class="relative">
                                 <label class="col-xs-12 control-label widget-input-label">
-                                    <span class="switch switch-small arches-switch" data-bind="css: {'on': node().isCollector(), 'disabled': checkIfImmutable()}, click: toggleIsCollector"><small></small></span>
+                                    <span tabindex="0" class="switch switch-small arches-switch" data-bind="css: {'on': node().isCollector(), 'disabled': checkIfImmutable()}, click: toggleIsCollector" onkeyup="if(event.which == 13 || event.keyCode == 13){ $(this).trigger('click'); }"><small></small></span>
                                 </label>
                             </div>
 

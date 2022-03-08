@@ -69,7 +69,6 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                             <h1>{% blocktrans %}Arches | {{version}}{% endblocktrans %}</h1>
                         </div>
                     </div>
-                </div>
 
                 <div id="myNavbar" class="navbar-collapse collapse">
                     <ul class="nav navbar-nav navbar-right">
@@ -344,6 +343,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
     </main>
 
 
+    
 
     <!-- Footer -->
     <footer>
@@ -444,7 +444,6 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 <script src="{% static 'packages/requirejs/require.js' %}"></script>
 
 <script>
-
     require.config({
         baseUrl: '{{ STATIC_URL }}js',
         paths: {
@@ -486,7 +485,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                 deps: ['jquery'],
             }
         }
-    });
+    }); 
     require(
         ['jquery',
             'knockout',

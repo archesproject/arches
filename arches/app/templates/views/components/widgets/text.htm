@@ -9,7 +9,7 @@
         <i data-bind="css: {'ion-asterisk widget-label-required': node.isrequired}"></i>
         <!-- /ko -->
         <div class="col-xs-12">
-            <input type="text" data-bind="textInput: value, attr: {placeholder: placeholder, maxlength: maxLength, disabled: disable}" class="form-control input-lg widget-input">
+            <input type="text" data-bind="textInput: value, attr: {placeholder: placeholder, maxlength: maxLength, disabled: uneditable, 'aria-label': label}" class="form-control input-lg widget-input">
         </div>
     </div>
 </div>
@@ -20,20 +20,20 @@
     {% trans "Placeholder" %}
 </div>
 <div class="col-xs-12 pad-no crud-widget-container">
-    <input type="" placeholder="{% trans "Placeholder" %}" id="" class="form-control input-md widget-input" data-bind="textInput: placeholder">
+    <input type="" placeholder="{% trans "Placeholder" %}" aria-label="{% trans "Placeholder" %}" class="form-control input-md widget-input" data-bind="textInput: placeholder">
 </div>
 <div class="control-label">
     {% trans "Max Length" %}
 </div>
 <div class="col-xs-12 pad-no crud-widget-container">
-    <input type="" placeholder="{% trans "Max Length" %}" id="" class="form-control input-md widget-input" data-bind="textInput: maxLength">
+    <input type="" placeholder="{% trans "Max Length" %}" aria-label="{% trans "Max Length" %}" class="form-control input-md widget-input" data-bind="textInput: maxLength">
 </div>
 
 <div class="control-label">
     {% trans "Default Value" %}
 </div>
 <div class="col-xs-12 pad-no crud-widget-container">
-    <input type="" placeholder="{% trans "Default Value" %}" id="" class="form-control input-md widget-input" data-bind="textInput: defaultValue">
+    <input type="" placeholder="{% trans "Default Value" %}" aria-label="{% trans "Default Value" %}" class="form-control input-md widget-input" data-bind="textInput: defaultValue">
 </div>
 <div class="node-config-item">
     <div class="control-label">

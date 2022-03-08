@@ -22,11 +22,38 @@
 @import url(../packages/@mapbox/mapbox-gl-geocoder/dist/mapbox-gl-geocoder.css);
 @import url(../packages/leaflet.fullscreen/Control.FullScreen.css);
 
+#topskip {
+	position: absolute;
+	top: 0;
+	clip: rect(1px,1px,1px,1px);
+	width: 1px;
+	height: 1px;
+	margin: -1px;
+	overflow: hidden;
+	padding: 0;
+	background-color: #fae619;
+	color: #101010;
+	font-weight: bold;
+	opacity: .95;
+	text-align: center;
+}
+
+#topskip:active, #topskip:focus {
+	clip: auto;
+	overflow: visible;
+	width: 100%;
+	height: auto;
+	padding: 10px;
+	z-index: 9999;
+	outline: none !important;
+	text-decoration: underline !important;
+}
+
 img {
     image-orientation: from-image;
 }
 
-[class^="col-"]:not(.pad-no) {
+[class^="col-"]:not(.pad-no):not(.need-padding) {
     padding-left: 0px;
     padding-right: 0px;
 }
@@ -128,8 +155,18 @@ dl.inline-flex dd {
     padding: 0;
 }
 
+.top-right-nav {
+    display: flex;
+    float: right;
+    margin-right: -8px;
+}
+
 .one-page-header .navbar-nav>li>a:before {
     content: "";
+}
+
+.page-header {
+    padding: 5px;
 }
 
 
@@ -146,20 +183,52 @@ dl.inline-flex dd {
 .brand-icon {
     height: 20px !important;
     width: 20px !important;
-    margin-top: 14px !important;
-    margin-left: 15px !important;
-    margin-right: 15px !important;
+    margin: 0 !important;
+    float: left;
+    line-height: inherit;
+    display: inline !important;
 }
 
 .brand-title {
-    display: block;
-    line-height: 48px;
-    font-size: 20px;
+    position: relative;
+    top: -10px;
+    left: 15px;
+    min-height: 47px;
+}
+
+.brand-title .brand-text {
+    font-size: 0.85em;
 }
 
 #mainnav-container {
-    padding-top: 50px;
+    padding-top: 0;
     background-color: #2d3c4b;
+}
+
+.toggle-leftnav-container {
+    position: fixed;
+    left: 0;
+    top: 0;
+    z-index: 4000;
+    height: 50px;
+    width: 50px;
+    background-color: #2d3c4b;
+    padding: 14px 0 12px 15px;
+}
+
+.toggle-leftnav-container .navbar-brand {
+    float: none;
+}
+
+#container.mainnav-sm .toggle-leftnav-container .brand-title {
+    display: none;
+    top: -30px;
+    left: 35px;
+}
+
+#mainnav-menu {
+    position: relative;
+    top: 50px;
 }
 
 #mainnav-menu .arches {
@@ -2181,7 +2250,7 @@ div.final-cons-step-separator>h4 {
     background: white;
     border-left: 1px solid rgb(216, 216, 216);
     padding: 16px;
-    overflow-y: scroll;
+    overflow-y: auto;
 }
 
 .workbench-sidepanel-card-container {
@@ -2197,9 +2266,14 @@ div.final-cons-step-separator>h4 {
     border-color: #E53211;
 }
 
-.install-buttons .btn-warning:hover {
+.install-buttons .btn-warning:hover,
+.install-buttons .btn-warning:focus {
     background: #E53211;
     border-color: #B02107;
+}
+
+.install-buttons .btn-warning:focus {
+    text-decoration: underline;
 }
 
 .install-buttons .btn-danger {
@@ -2258,16 +2332,12 @@ div.final-cons-step-separator>h4 {
 
 .workbench-card-sidepanel-header-container {
     border-bottom: 1px solid #ddd;
-    padding: 17px 30px 10px 0px;
+    padding: 10px 20px 10px 5px;
     margin-left: 0px;
     margin-top: -16px;
-    position: fixed;
     background: #fff;
     z-index: 20;
-    width: 370px;
 }
-
-
 
 .expanded .workbench-card-sidepanel-header-container {
     width: 599px;
@@ -4841,6 +4911,11 @@ ul .collapse li:last-of-type {
     text-overflow: ellipsis;
 }
 
+.menu-expanded {
+    left: 0 !important;
+    z-index: 3500 !important;
+}
+
 .edit-menu-item.selected {
     background: #f4f4f4;
     border-left: 3px solid #579ddb;
@@ -5144,12 +5219,16 @@ ul .collapse li:last-of-type {
 }
 
 .arches-signin-subtext {
-    padding: 0px 5px 10px 5px;
-    color: #888;
+    padding: 0 5px 10px 5px;
+    color: #595959;
+    font-size: 1em;
+    font-weight: normal;
 }
 
 .arches-signin .login-panel {
     border: 1px solid #ddd;
+    width: auto;
+    max-width: 350px;
 }
 
 .arches-signin .panel-footer {
@@ -5201,12 +5280,35 @@ ul .collapse li:last-of-type {
     font-weight: 300;
 }
 
+.reqlabel {
+    width: 100%;
+    text-align: left;
+}
+
+#login-form .alert h2 {
+    margin-top: 0;
+    margin-bottom: 10px;
+    color: inherit;
+    font-weight: 600;
+    font-size: 1.2em;
+}
+
 .change-password-form.popover {
     display: block;
-    margin-top: 65px;
+    margin-top: 80px;
     font-size: 14px;
-    width: 250px;
+    width: auto;
+    max-width: 330px;
     border: 1px solid rgba(0, 0, 0, .2);
+}
+
+.change-password-form.popover legend {
+    font-size: 0.9em;
+    padding: 0 0 10px 0;
+}
+
+.popover.bottom>.arrow {
+    left: 20%;
 }
 
 .change-password-form .panel {
@@ -5277,7 +5379,7 @@ ul.jqtree-tree div.jqtree_common {
     border: 1px solid #ccc;
     text-decoration: none;
     font-weight: 700;
-    background: linear-gradient(top, #fafafa0, #eee100);
+    background: linear-gradient(top, #fafafa, #eee100);
     -webkit-border-radius: 3px !important;
     border-radius: 3px !important;
     box-sizing: border-box;
@@ -5663,6 +5765,7 @@ span.editable-card i.fa.fa-align-justify:hover {
 
 .widgets {
     border-bottom-width: 1px;
+    margin-bottom: 20px;
 }
 
 .report li {
@@ -5807,6 +5910,29 @@ span.editable-card i.fa.fa-align-justify:hover {
     color: #5E29BA;
 }
 
+#resource-list .r-select-card {
+    overflow-y: auto;
+}
+
+#resource-list .r-select-circle {
+    position: relative;
+    top: auto;
+    left: auto;
+    margin: 10px 0;
+}
+
+#resource-list .r-desc-container {
+    position: relative;
+    left: auto;
+    right: auto;
+    bottom: auto;
+}
+
+#resource-list .r-select-desc {
+    overflow: inherit;
+    display: block;
+}
+
 .btn-resource-select {
     height: 50px;
     width: 100%;
@@ -5917,7 +6043,7 @@ ul.jqtree_common li.jqtree-folder {
 }
 
 .profile-report {
-    height: 150px;
+    min-height: 150px;
     background: #102F4F;
     width: 100%;
     padding: 40px 150px 0px 150px;
@@ -5942,7 +6068,7 @@ div.profile-notif-settings {
 
 .notif-table {
     width: 100%;
-    margin-top: -40px;
+    margin-top: -7px;
 }
 
 .notif-table th {
@@ -6005,6 +6131,7 @@ th.notif-type {
 
 .profile-header {
     font-size: 21px;
+    margin-top: 5px;
 }
 
 .account-summary {
@@ -6111,7 +6238,6 @@ th.notif-type {
 }
 
 .profile-default-message-panel {
-    text-align: center;
     padding-top: 10px;
     padding-bottom: 20px;
     font-size: 17px;
@@ -6157,12 +6283,24 @@ th.notif-type {
     display: inline-block;
     margin-right: 20px;
     padding: 7px 12px;
+    cursor: pointer;
 }
 
-.ep-toolbar {
+/*.ep-toolbar {
     display: -ms-flexbox;
     display: -webkit-flex;
     display: flex;
+    -ms-flex-align: center;
+    -webkit-align-items: center;
+    align-items: center;
+    width: 100%;
+    height: 50px;
+    background: #fff;
+    border-bottom: 1px solid #ddd;
+    z-index: 3000;
+}*/
+
+.ep-toolbar {
     -ms-flex-align: center;
     -webkit-align-items: center;
     align-items: center;
@@ -6301,14 +6439,12 @@ th.notif-type {
 
 .ep-tools-title {
     height: 50px;
-    margin-right: auto;
+    margin-right: 0;
     overflow: hidden;
 }
 
 .ep-graph-title {
-    font-size: 1.6em;
-    padding-left: 5px;
-    padding-top: 5px;
+    font-size: 1.3em;
 }
 
 .ep-graph-title-icon {
@@ -6681,7 +6817,7 @@ ul div .card-tree-list span .card-tree-list-item .card-tree-list-icon {
     border-bottom: 1px solid #FFB700;
     height: 50px;
     margin-top: -15px;
-    margin-left: -25px;
+    margin-left: -16px;
     margin-right: -25px;
     padding: 15px 25px;
 }
@@ -6721,7 +6857,7 @@ ul div .card-tree-list span .card-tree-list-item .card-tree-list-icon {
     display: flex;
     flex-direction: column;
     position: relative;
-    margin-right: -25px;
+    margin-right: -20px;
     width: 250px;
     padding: 5px 5px 0px 5px;
     border-left: 1px solid #ddd;
@@ -6861,7 +6997,7 @@ ul div .card-tree-list span .card-tree-list-item .card-tree-list-icon {
 
 .new-provisional-edits-header .new-provisional-edits-delete-all {
     width: 100%;
-    padding: 3px 0px;
+    padding: 3px;
     margin: 3px;
 }
 
@@ -7166,6 +7302,7 @@ ul div .card-tree-list span .card-tree-list-item .card-tree-list-icon {
     background: #ebeef0;
     overflow-y: scroll;
     overflow-x: hidden;
+    height: calc(100vh - 50px);
 }
 
 .title-block-title {
@@ -7773,7 +7910,6 @@ span.file-upload-clear-filter {
 .btn-file-upload-reset {
     color: #489EED;
     font-size: 12px;
-    float: right;
 }
 
 .file-upload-card-detail-right {
@@ -9160,7 +9296,7 @@ div.row.widget-wrapper.report-header:hover {
 }
 
 #mainnav-container {
-    z-index: 15;
+    z-index: 3000;
 }
 
 #navbar {
@@ -11364,7 +11500,7 @@ a.search-facet-item {
 .search-facet-item.disabled {
     background: #f6f6f6;
     color: #666;
-    cursor: default;
+    cursor: pointer;
 }
 
 a.search-facet-item.disabled {
@@ -11761,6 +11897,10 @@ a.filter-tools:hover {
 
 .account-wrapper {
     padding-top: 0px;
+}
+
+.account-wrapper hr {
+    border-color: #eee;
 }
 
 .msm-data-selection .form-text.form-checkbox:not(.btn),
@@ -14335,6 +14475,15 @@ a.jstree-anchor.permissions-widget {
     background: #bbb;
 }
 
+.reqlabel {
+    width: 100%;
+    text-align: left;
+}
+
+#add-basemap-wizard-help-content .panel-body {
+    padding: 10px 10px 15px 10px;
+}
+
 @keyframes loader {
     0% {
         background: #ddd;
@@ -14459,10 +14608,6 @@ a.jstree-anchor.permissions-widget {
 @media screen and (max-width: 650px) {}
 
 @media screen and (max-width: 768px) {
-    #content-container {
-        padding-top: 50px !important;
-    }
-
     #navbar {
         width: 100%;
     }
@@ -14478,6 +14623,45 @@ a.jstree-anchor.permissions-widget {
 
     .rp-report-tile dd {
         padding-left: 8px;
+    }
+
+    .ep-tools-title h1,
+    h1.page-header.text-overflow.ep-graph-title {
+        font-size: 1.1em;
+        padding-left: 59px !important;
+        position: absolute;
+        top: 50%;
+        transform: translateY(-50%);
+    }
+
+    #container.mainnav-lg .menu-expanded .brand-title {
+        top: -30px;
+        left: 35px;
+    }
+
+    #container.mainnav-sm .brand-title {
+        display: none;
+    }
+    
+    .profile-list,
+    .profile-report {
+        padding: 40px;
+    }
+
+    .profile-full-name,
+    .profile-e-mail {
+        position: relative;
+        left: auto;
+        top: auto;
+        font-size: 1.5em;
+    }
+
+    .profile-summary-page .notif-table {
+        margin-top: 0;
+    }
+
+    .profile-summary-page .account-wrapper .row {
+        margin: 0;
     }
 
 }
