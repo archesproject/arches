@@ -160,7 +160,7 @@ class BusinessDataImporter(object):
         if data is None:
             data = self.business_data
         if file_reader is not None and data is not None:
-            return file_reader.scan_for_new_languages(business_data=data)
+            return list(set(file_reader.scan_for_new_languages(business_data=data)))
         else:
             return []
 
