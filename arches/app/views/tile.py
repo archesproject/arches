@@ -125,7 +125,7 @@ class TileData(View):
                         return JSONResponse({"status": "false", "message": [_(e.title), _(str(message))]}, status=500)
                 tile_id = data["tileid"]
                 resource_instance = models.ResourceInstance.objects.get(pk=data["resourceinstance_id"])
-                is_active = resource_instance.graph.publication
+                is_active = bool(resource_instance.graph.publication)
                 if tile_id is not None and tile_id != "":
                     try:
                         old_tile = Tile.objects.get(pk=tile_id)
