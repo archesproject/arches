@@ -427,7 +427,7 @@ class GraphPublication(models.Model):
     graph = models.ForeignKey(GraphModel, db_column="graphid", on_delete=models.CASCADE)
     serialized_graph = JSONField(blank=True, null=True, db_column="serialized_graph")
     user = models.ForeignKey(User, db_column="userid", null=True, on_delete=models.CASCADE)
-    published_time = models.DateTimeField(auto_now_add=True, null=False)
+    published_time = models.DateTimeField(default=datetime.datetime.now, null=False)
 
     class Meta:
         managed = True

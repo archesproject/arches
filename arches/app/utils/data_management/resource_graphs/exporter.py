@@ -138,7 +138,7 @@ def get_graphs_for_export(graphids=None):
             print("*" * 80)
             sys.exit()
 
-    resource_graph_query = JSONSerializer().serializeToPython(resource_graphs, exclude=["widgets"])
+    resource_graph_query = JSONSerializer().serializeToPython(resource_graphs, exclude=["widgets"], force_recalculation=True)
 
     for resource_graph in resource_graph_query:
         function_ids = []
@@ -158,6 +158,8 @@ def get_graphs_for_export(graphids=None):
         publication = None
 
         if publication_id:
+            foo = GraphPublication.objects.get(pk=publication_id)
+            import pdb; pdb.set_trace()
             publication = JSONDeserializer().deserialize(JSONSerializer().serialize(GraphPublication.objects.get(pk=publication_id)))
             del publication['serialized_graph']
 

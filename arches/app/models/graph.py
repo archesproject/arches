@@ -429,8 +429,9 @@ class Graph(models.GraphModel):
                 node_constraint.constraint = constraint_x_node["constraint"]
                 node_constraint.save()
 
-            for widget in self.widgets.values():
-                widget.save()
+            if self.widgets:
+                for widget in self.widgets.values():
+                    widget.save()
 
             for functionxgraph in self._functions:
                 # Right now this only saves a functionxgraph record if the function is present in the database. Otherwise it silently fails.
@@ -1292,9 +1293,10 @@ class Graph(models.GraphModel):
         else:
             widgets = []
 
-            for widget in self.widgets.values():
-                widget_dict = JSONSerializer().serializeToPython(widget)
-                widgets.append(widget_dict)
+            if self.widgets:
+                for widget in self.widgets.values():
+                    widget_dict = JSONSerializer().serializeToPython(widget)
+                    widgets.append(widget_dict)
 
             return widgets
 
