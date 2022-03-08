@@ -20,12 +20,23 @@ import logging
 import sys
 import uuid
 from arches.app.models.graph import Graph
-from arches.app.models.models import CardXNodeXWidget, NodeGroup, DDataType, Widget, ReportTemplate, Function, Ontology, OntologyClass, GraphPublication
+from arches.app.models.models import (
+    CardXNodeXWidget,
+    NodeGroup,
+    DDataType,
+    Widget,
+    ReportTemplate,
+    Function,
+    Ontology,
+    OntologyClass,
+    GraphPublication,
+)
 from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializer
 from arches.app.models.models import GraphXMapping
 from django.db import transaction
 
 logger = logging.getLogger(__name__)
+
 
 class GraphImportReporter:
     def __init__(self, graphs):
@@ -83,26 +94,26 @@ def import_graph(graphs, overwrite_graphs=True):
             reporter.resource_model = resource["isresource"]
             reporter.graph_id = resource["graphid"]
 
-            publication_data = resource.get('publication')
+            publication_data = resource.get("publication")
             if publication_data:
                 GraphPublication.objects.update_or_create(
-                    publicationid=publication_data['publicationid'],
+                    publicationid=publication_data["publicationid"],
                     defaults={
-                        'notes': publication_data.get('notes'),
-                        'graph_id': publication_data.get('graph_id'),
-                        'user_id': publication_data.get('user_id'),
-                        'published_time': publication_data.get('published_time'),
-                        'serialized_graph': publication_data.get('serialized_graph'),
-                    }
+                        "notes": publication_data.get("notes"),
+                        "graph_id": publication_data.get("graph_id"),
+                        "user_id": publication_data.get("user_id"),
+                        "published_time": publication_data.get("published_time"),
+                        "serialized_graph": publication_data.get("serialized_graph"),
+                    },
                 )  # graph needs valid GraphPublication object
-                del resource['publication']
+                del resource["publication"]
 
             try:
                 graph = Graph(resource)
                 ontology_classes = [str(f["source"]) for f in OntologyClass.objects.all().values("source")]
 
                 if publication_data:
-                    graph.publication_id = publication_data['publicationid']
+                    graph.publication_id = publication_data["publicationid"]
 
                 for node in list(graph.nodes.values()):
                     if resource["ontology_id"] is not None:
@@ -140,20 +151,20 @@ def import_graph(graphs, overwrite_graphs=True):
                         default_config = Widget.objects.get(widgetid=card_x_node_x_widget["widget_id"]).defaultconfig
                         card_x_node_x_widget["config"] = check_default_configs(default_config, card_x_node_x_widget_config)
                         cardxnodexwidget = CardXNodeXWidget.objects.update_or_create(**card_x_node_x_widget)
-                
+
                 # saves graph publication with serialized graph
                 if publication_data:
-                    publication_data['serialized_graph'] = JSONSerializer().serialize(graph, force_recalculation=True)
+                    publication_data["serialized_graph"] = JSONSerializer().serialize(graph, force_recalculation=True)
 
                     GraphPublication.objects.update_or_create(
-                        publicationid=publication_data['publicationid'],
+                        publicationid=publication_data["publicationid"],
                         defaults={
-                            'notes': publication_data.get('notes'),
-                            'graph_id': publication_data.get('graph_id'),
-                            'user_id': publication_data.get('user_id'),
-                            'published_time': publication_data.get('published_time'),
-                            'serialized_graph': publication_data.get('serialized_graph'),
-                        }
+                            "notes": publication_data.get("notes"),
+                            "graph_id": publication_data.get("graph_id"),
+                            "user_id": publication_data.get("user_id"),
+                            "published_time": publication_data.get("published_time"),
+                            "serialized_graph": publication_data.get("serialized_graph"),
+                        },
                     )
 
             except GraphImportException as ge:
