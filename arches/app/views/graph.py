@@ -240,7 +240,6 @@ class GraphDesignerView(GraphBaseView):
         if serialized_graph.get("_functions"):
             serialized_graph["_functions"] = None
 
-        # import pdb; pdb.set_trace()
         context["graph"] = JSONSerializer().serialize(serialized_graph)
 
         context["nav"]["title"] = self.graph.name
