@@ -246,6 +246,8 @@ class Graph(models.GraphModel):
             node.ontologyclass = None
         if node.pk is None:
             node.pk = uuid.uuid1()
+        if isinstance(node.pk, str):
+            node.pk = uuid.UUID(node.pk)
         if node.istopnode:
             self.root = node
         self.nodes[node.pk] = node
@@ -1594,14 +1596,14 @@ class Graph(models.GraphModel):
         publication.save()
 
         self.publication = publication
-        self.save()
+        self.save(validate=False)
 
     def unpublish(self):
         """
         Unassigns GraphPublication id from Graph
         """
         self.publication = None
-        self.save()
+        self.save(validate=False)
 
 
 class GraphValidationError(Exception):
