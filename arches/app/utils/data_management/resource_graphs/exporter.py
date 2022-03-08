@@ -221,7 +221,7 @@ def create_mapping_configuration_file(graphid, include_concepts=True, data_dir=N
                             for concept in node.config["options"]:
                                 concepts[concept["id"]] = concept["text"]
 
-                        values[node.name] = OrderedDict(sorted(list(concepts.items()), key=itemgetter(1)))
+                        values[node.name] = concepts.items() 
 
         if include_concepts == True:
             try:
