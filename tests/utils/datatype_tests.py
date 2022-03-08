@@ -39,6 +39,5 @@ class StringDataTypeTests(ArchesTestCase):
         new_language.save()
         tile_value = string.transform_value_for_tile("hello", language="fa")
         self.assertEqual(type(tile_value), dict)
-        print(tile_value.keys())
         self.assertTrue("fa" in tile_value.keys())
         new_language.delete()
