@@ -78,11 +78,11 @@ class ArchesFileWriter(Writer):
         dest = StringIO()
         export = JSONDeserializer().deserialize(JSONSerializer().serialize(JSONSerializer().serializeToPython(export)))
 
-        for resource_data in export['business_data']['resources']:
-            resource_instance_data = resource_data.get('resourceinstance')
+        for resource_data in export["business_data"]["resources"]:
+            resource_instance_data = resource_data.get("resourceinstance")
 
             if resource_instance_data:
-                resource_data['resourceinstance']['publication_id'] = graph_id_to_publication_id.get(resource_instance_data['graph_id'])
+                resource_data["resourceinstance"]["publication_id"] = graph_id_to_publication_id.get(resource_instance_data["graph_id"])
 
         json.dump(export, dest, indent=kwargs.get("indent", None))
         json_for_export.append({"name": json_name, "outputfile": dest})
