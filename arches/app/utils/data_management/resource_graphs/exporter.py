@@ -159,7 +159,9 @@ def get_graphs_for_export(graphids=None):
 
         if publication_id:
             foo = GraphPublication.objects.get(pk=publication_id)
-            import pdb; pdb.set_trace()
+            import pdb
+
+            pdb.set_trace()
             publication = JSONDeserializer().deserialize(JSONSerializer().serialize(GraphPublication.objects.get(pk=publication_id)))
             del publication["serialized_graph"]
 
