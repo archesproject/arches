@@ -4,7 +4,7 @@ define([
     'arches',
     'knockout',
     'knockout-mapping',
-    'templates/views/components/map-popup.htm'
+    'text!templates/views/components/map-popup.htm'
 ], function($, _, arches, ko, koMapping, popupTemplate) {
     const viewModel = function(params) {
 
