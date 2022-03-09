@@ -1027,12 +1027,14 @@ class CsvReader(Reader):
                                         group_no in group_no_to_tileids and str(prototype_child_tile.nodegroup_id) in group_no_to_tileids[group_no]
                                     )
                                     if preexisting_childtile_for_resource_group_nodegroup:
-                                        target_tile = get_preexisting_tile(
+                                        test_tile = get_preexisting_tile(
                                             target_tile,
                                             populated_tiles,
                                             row["ResourceID"],
                                             tileid=str(group_no_to_tileids[group_no][str(prototype_child_tile.nodegroup_id)]["tileid"]),
                                         )
+                                        if test_tile:
+                                            target_tile = test_tile
                                     else:
                                         target_tile = prototype_child_tile
                                         target_tile.tileid = uuid.uuid4()
@@ -1056,7 +1058,7 @@ class CsvReader(Reader):
                                     if "-" in business_data[row_number - 1]["COMP_SORTORDER"]:
                                         last_prefix = business_data[row_number - 1]["COMP_SORTORDER"][0:2]
 
-                                    prefix_same = prefix == last_prefix
+                                    prefix_same = prefix == last_prefix and business_data[row_number - 1]["ResourceID"] == row["ResourceID"]
 
                                     # we want to look for an original tile with the same group if the group is the same
                                     # if the group is different, defintely just make a new tile, i.e. prevent an existing tile from being looked up
@@ -1065,14 +1067,15 @@ class CsvReader(Reader):
                                         and str(target_tile.nodegroup_id) in group_no_to_tileids[group_no]
                                     )
 
-                                    if prefix_same and preexisting_parenttile_for_resource_group_nodegroup:
-                                        preexisting_parenttile = get_preexisting_tile(
+                                    if prefix_same and preexisting_tile_for_resource_group_nodegroup:
+                                        preexisting_tile_for_nodegroup = get_preexisting_tile(
                                             target_tile,
                                             populated_tiles,
                                             row["ResourceID"],
                                             tileid=group_no_to_tileids[group_no][str(target_tile.nodegroup_id)]["tileid"],
                                         )
-                                        target_tile = preexisting_parenttile
+                                        if preexisting_tile_for_nodegroup:
+                                            target_tile = preexisting_tile_for_nodegroup
 
                         if "TileID" in row and row["TileID"] is not None:
                             target_tile.tileid = row["TileID"]
