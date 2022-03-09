@@ -913,7 +913,7 @@ class CsvReader(Reader):
                 missing_display_values = {}
 
                 for row_number, row in enumerate(business_data):
-                    # row_number = "on line " + str(row_number + 2)  # to represent the row in a csv accounting for the header and 0 index
+                    row_number = "on line " + str(row_number + 2)  # to represent the row in a csv accounting for the header and 0 index
                     resource_changed = row["ResourceID"] != previous_row_resourceid and previous_row_resourceid is not None
                     if resource_changed:
                         group_no_to_tileids.clear() # garbage collection of past resource groups
