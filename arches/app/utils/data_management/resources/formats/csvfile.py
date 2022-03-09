@@ -376,7 +376,6 @@ class CsvReader(Reader):
             newresourceinstance.tiles = populated_tiles
             # if bulk saving then append the resources to a list otherwise just save the resource
             if bulk:
-                newresourceinstance.tiles = self.verify_flattened_tiles(populated_tiles)
                 resources.append(newresourceinstance)
                 if len(resources) >= settings.BULK_IMPORT_BATCH_SIZE:
                     Resource.bulk_save(resources=resources, flat=True)
@@ -557,8 +556,8 @@ class CsvReader(Reader):
                         sys.exit()
                 graphid = mapping["resource_model_id"]
                 blanktilecache = {}
-                populated_nodegroups = {}
-                populated_nodegroups[resourceinstanceid] = []
+                populated_cardinality_1_nodegroups = {}
+                populated_cardinality_1_nodegroups[resourceinstanceid] = []
                 previous_row_resourceid = None
                 group_no_to_tileids = {}
                 populated_tiles = []
@@ -947,9 +946,9 @@ class CsvReader(Reader):
                         )
 
                         # reset values for next resource instance
-                        populated_tiles = []
                         resourceinstanceid = process_resourceid(row["ResourceID"], overwrite)
-                        populated_nodegroups[resourceinstanceid] = []
+                        populated_cardinality_1_nodegroups.clear()
+                        populated_cardinality_1_nodegroups[resourceinstanceid] = []
 
                     source_data = column_names_to_targetids(row, mapping, row_number)
 
@@ -1122,7 +1121,7 @@ class CsvReader(Reader):
                             else:
                                 target_tile_cardinality = "n"
 
-                            if str(tile_to_populate.nodegroup_id) not in populated_nodegroups[resourceinstanceid] or appending_to_parent:
+                            if str(tile_to_populate.nodegroup_id) not in populated_cardinality_1_nodegroups[resourceinstanceid] or appending_to_parent:
                                 tile_to_populate.nodegroup_id = str(tile_to_populate.nodegroup_id)
                                 # Check if we are populating a parent tile by inspecting the tile_to_populate.data array.
                                 source_data_has_target_tile_nodes = (
@@ -1349,7 +1348,7 @@ class CsvReader(Reader):
                                     need_new_tile = True
 
                                 if target_tile_cardinality == "1" and "NodeGroupID" not in row:
-                                    populated_nodegroups[resourceinstanceid].append(str(tile_to_populate.nodegroup_id))
+                                    populated_cardinality_1_nodegroups[resourceinstanceid].append(str(tile_to_populate.nodegroup_id))
 
                                 if need_new_tile:
                                     new_tile = get_blank_tile(source_data)
