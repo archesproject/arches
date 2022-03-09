@@ -35,9 +35,7 @@ class Command(BaseCommand):
         parser.add_argument(
             "-t", "--template", action="store", dest="template", default="branchcsv", help="Type of template you would like to create."
         )
-        parser.add_argument(
-            "-d", "--dest", action="store", dest="dest", default="", help="Directory where template should be saved"
-        )
+        parser.add_argument("-d", "--dest", action="store", dest="dest", default="", help="Directory where template should be saved")
         parser.add_argument(
             "-g", "--graph", action="store", dest="graph", default="", help="Graph for which you would like an import template"
         )
@@ -54,9 +52,9 @@ class Command(BaseCommand):
             first_sheet = True
             for row in rows:
                 details = dict(zip(columns, row))
-                tab = '    ' * details["depth"]
-                nodes = Node.objects.filter(nodegroup_id=details['nodegroupid']).values('datatype', 'alias')
-                data_collecting_nodes = [node['alias'] for node in nodes if node['datatype'] != 'semantic']
+                tab = "    " * details["depth"]
+                nodes = Node.objects.filter(nodegroup_id=details["nodegroupid"]).values("datatype", "alias")
+                data_collecting_nodes = [node["alias"] for node in nodes if node["datatype"] != "semantic"]
                 if details["depth"] == 0:
                     if first_sheet == True:
                         sheet = wb.active
@@ -72,8 +70,8 @@ class Command(BaseCommand):
                         sheet.cell(column=i + 3, row=row_number, value=f"{node_alias}")
                 else:
                     row_number += 1
-                    sheet[f"B{row_number}"]	= f'{tab}{details["alias"]}  ({details["cardinality"]})'
+                    sheet[f"B{row_number}"] = f'{tab}{details["alias"]}  ({details["cardinality"]})'
                     for i, node_alias in enumerate(data_collecting_nodes):
                         sheet.cell(column=i + 3, row=row_number, value=f"{node_alias}")
                 dest_filename = dest
-                wb.save(filename = dest_filename)
+                wb.save(filename=dest_filename)
