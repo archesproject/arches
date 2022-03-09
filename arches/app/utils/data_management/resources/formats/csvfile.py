@@ -373,7 +373,9 @@ class CsvReader(Reader):
                 createdtime=datetime.datetime.now(),
             )
             # add the tiles to the resource instance
-            newresourceinstance.tiles = populated_tiles
+            newresourceinstance.tiles = [t for t in populated_tiles]
+            populated_tiles.clear()
+                        
             # if bulk saving then append the resources to a list otherwise just save the resource
             if bulk:
                 resources.append(newresourceinstance)
