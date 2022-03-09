@@ -1097,6 +1097,7 @@ class CsvReader(Reader):
                             if "TileID" in row and row["TileID"] is not None:
                                 tile_to_populate.tileid = row["TileID"]
                             tile_to_populate.resourceinstance_id = resourceinstanceid
+                            # if first time seeing this nodegroup for this group
                             if (
                                 group_valid and group_no and group_no in group_no_to_tileids
                                 and str(tile_to_populate.nodegroup_id) not in group_no_to_tileids[group_no]
@@ -1348,10 +1349,21 @@ class CsvReader(Reader):
                                 if bulk or (not tile_to_populate.is_blank() and not appending_to_parent):
                                     if bulk:
                                         tile_to_populate.tiles = []
-                                    populated_tiles.append(tile_to_populate)
+                                    dupe = False
+                                    for i,t in enumerate(populated_tiles):
+                                        if str(t.tileid) == str(tile_to_populate.tileid):
+                                            # if t.data == tile_to_populate.data: # we mutated a pre-existing tile, don't re-add
+                                            dupe = True
+                                            break
 
-                                if len(source_data) > 0:
+                                    if not dupe:
+                                        populated_tiles.append(tile_to_populate)
+
+                                if len(source_data) > 0 and component_type_nodeid not in source_data[0]:
                                     need_new_tile = True
+                                elif len(source_data) > 0 and component_type_nodeid in source_data[0]:
+                                    if len(source_data) == 1 and component_type_nodeid in source_data[0] and len(list(source_data[0].keys())) == 1:
+                                        source_data.pop(0) #TODO TEMPORARY: remove Details components that have a component type
 
                                 if target_tile_cardinality == "1" and "NodeGroupID" not in row:
                                     populated_cardinality_1_nodegroups[resourceinstanceid].append(str(tile_to_populate.nodegroup_id))
@@ -1393,13 +1405,17 @@ class CsvReader(Reader):
                         # parent cardinality is N or because none exists yet on resource
                         elif target_tile is not None and len(source_data) > 0:
                             populate_tile(source_data, target_tile)
+                            if len(source_data) == 1 and component_type_nodeid in source_data[0] and len(list(source_data[0].keys())) == 1:
+                                source_data.pop(0) #TODO TEMPORARY: remove Details components that have a component type
                             while len(source_data) > 0:
                                 target_tile = get_blank_tile(source_data)
                                 preexisting_tile_for_nodegroup = get_preexisting_tile(target_tile, populated_tiles, row["ResourceID"])
-                                if preexisting_tile_for_nodegroup:
+                                if preexisting_tile_for_nodegroup and str(target_tile.nodegroup_id) != component_nodegroupid:
                                     target_tile = get_blank_tile(source_data, child_only=True)
                                     target_tile.parenttile = preexisting_tile_for_nodegroup
                                     populate_tile(source_data, target_tile, appending_to_parent=True)
+                                elif preexisting_tile_for_nodegroup and str(target_tile.nodegroup_id) == component_nodegroupid:
+                                    populate_tile(source_data, target_tile)
                                 else:
                                     target_tile = get_blank_tile(source_data)
                                     populate_tile(source_data, target_tile)
@@ -1441,8 +1457,6 @@ class CsvReader(Reader):
                     )
 
                 if bulk:
-                    for r in resources:
-                        r.tiles = self.verify_flattened_tiles(r.tiles)
                     Resource.bulk_save(resources=resources, flat=True)
                     del resources[:]  # clear out the array
                     print("Time to create resource and tile objects: %s" % datetime.timedelta(seconds=time() - self.start))
