@@ -913,6 +913,7 @@ class CsvReader(Reader):
                 missing_display_values = {}
 
                 for row_number, row in enumerate(business_data):
+                    i = int(row_number)
                     row_number = "on line " + str(row_number + 2)  # to represent the row in a csv accounting for the header and 0 index
                     resource_changed = row["ResourceID"] != previous_row_resourceid and previous_row_resourceid is not None
                     if resource_changed:
@@ -1065,10 +1066,10 @@ class CsvReader(Reader):
                                     group_no = row["GROUP_NO"] + "-" + str(prefix)
                                     if group_no not in group_no_to_tileids:
                                         group_no_to_tileids[group_no] = {}
-                                    if "-" in business_data[row_number - 1]["COMP_SORTORDER"]:
-                                        last_prefix = business_data[row_number - 1]["COMP_SORTORDER"][0:2]
+                                    if "-" in business_data[i - 1]["COMP_SORTORDER"]:
+                                        last_prefix = business_data[i - 1]["COMP_SORTORDER"][0:2]
 
-                                    prefix_same = prefix == last_prefix and business_data[row_number - 1]["ResourceID"] == row["ResourceID"]
+                                    prefix_same = prefix == last_prefix and business_data[i - 1]["ResourceID"] == row["ResourceID"]
 
                                     # we want to look for an original tile with the same group if the group is the same
                                     # if the group is different, defintely just make a new tile, i.e. prevent an existing tile from being looked up
