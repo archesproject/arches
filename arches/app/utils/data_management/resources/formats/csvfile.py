@@ -968,16 +968,25 @@ class CsvReader(Reader):
 
                         # IF GROUP_NO IS SAME AND PREFIX IS SAME, PARENT_TILE REMAINS SAME, i.e. AGGREGATE ON PARENT_TILE:
                         preexisting_tile_for_nodegroup = False
-                        target_tile = get_blank_tile(source_data)
+                        target_tile = get_blank_tile(source_data) # Heres our parent tile, i.e. a semantic Evaluation or a Semantic
                         target_tile.tileid = uuid.uuid4()
-                        # # { resourceid: {group_no: {nodegroupid: tileid} } }
-                        if (
-                            str(target_tile.nodegroup_id) in [evaluation_nodegroupid, component_nodegroupid]
-                            and row["ResourceID"] not in group_no_to_tileids
-                        ):
-                            group_no_to_tileids[row["ResourceID"]] = {}
-                        if row["GROUP_NO"] and row["GROUP_NO"] != "" and row["GROUP_NO"] not in group_no_to_tileids[row["ResourceID"]]:
-                            group_no_to_tileids[row["ResourceID"]][row["GROUP_NO"]] = {}
+
+                        group_no = False
+                        group_valid = row["GROUP_NO"] and row["GROUP_NO"] != ""
+                        if group_valid and not isinstance(row["GROUP_NO"], str):
+                            row["GROUP_NO"] = str(row["GROUP_NO"])
+
+                        if group_valid and str(target_tile.nodegroup_id) == evaluation_nodegroupid:
+                            group_no = row["GROUP_NO"]
+
+                        # {
+                        #   group_no: {
+                        #       nodegroupid: {
+                        #           tileid: tileid,
+                        #           parenttileid: parenttileid
+                        #       }
+                        #   }
+                        # }
 
                         # all the tiles should be flat except for the first appearance of a NG on a resource???
 
@@ -996,11 +1005,10 @@ class CsvReader(Reader):
                         if "COMP_SORTORDER" in row and row["COMP_SORTORDER"] and row["COMP_SORTORDER"] != "":
                             sort_str = row["COMP_SORTORDER"]
 
-                        if (
-                            str(target_tile.nodegroup_id) in [evaluation_nodegroupid, component_nodegroupid]
-                            and row["GROUP_NO"]
-                            and row["GROUP_NO"] != ""
-                        ):
+                        if sort_str and "DETAILS" in sort_str: #TODO NOT ADVISABLE TO JUST SKIP, TESTING PURPOSES ONLY
+                            continue
+                        
+                        if str(target_tile.nodegroup_id) in [evaluation_nodegroupid, component_nodegroupid] and group_valid:
 
                             if str(target_tile.nodegroup_id) == evaluation_nodegroupid:
                                 if group_no not in group_no_to_tileids:
