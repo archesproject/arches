@@ -438,10 +438,14 @@ class CsvReader(Reader):
         headers = [k.upper() for k in business_data[0].keys() if k.upper() != "RESOURCEID"]
         non_unique_col_headers = False
         unique_nodeids = set(list(mapping_filefieldname_to_nodeid_dict.values()))
-        evaluation_nodegroupid = "a271c31e-1037-11ec-b65f-31043b30bbcd"
-        component_nodegroupid = "a271c312-1037-11ec-b65f-31043b30bbcd"
+        evaluation_nodegroupid = "a271c31e-1037-11ec-b65f-31043b30bbcd" #parent tiledata IS semantic, parenttile=null
+        component_nodegroupid = "a271c312-1037-11ec-b65f-31043b30bbcd" #tiledata is not semantic, parenttile=null
+        component_type_nodeid = "a271c374-1037-11ec-b65f-31043b30bbcd"
+        place_nodegroupid = "a271c336-1037-11ec-b65f-31043b30bbcd"
+        address_nodegroupid = "a271c321-1037-11ec-b65f-31043b30bbcd"
         if len(unique_nodeids) != len(list(mapping_filefieldname_to_nodeid_dict.keys())):
             non_unique_col_headers = True
+        non_unique_col_headers = False
         try:
             col_header_to_nodeid_dict = {header: mapping_filefieldname_to_nodeid_dict[header.upper()] for header in headers}
         except KeyError as e:
@@ -460,25 +464,6 @@ class CsvReader(Reader):
             }
 
         print("Starting import of business data")
-        col_header_to_nodeid_dict["CONSTRUCTION TECHNIQUE1"] = "a271c38f-1037-11ec-b65f-31043b30bbcd"
-        col_header_to_nodeid_dict["CONSTRUCTION TECHNIQUE2"] = "a271c38f-1037-11ec-b65f-31043b30bbcd"
-        col_header_to_nodeid_dict["CONSTRUCTION TECHNIQUE3"] = "a271c38f-1037-11ec-b65f-31043b30bbcd"
-        col_header_to_nodeid_dict["CONSTRUCTION TECHNIQUE4"] = "a271c38f-1037-11ec-b65f-31043b30bbcd"
-        col_header_to_nodeid_dict["CONSTRUCTION TECHNIQUE5"] = "a271c38f-1037-11ec-b65f-31043b30bbcd"
-        col_header_to_nodeid_dict["CONSTRUCTION TECHNIQUE6"] = "a271c38f-1037-11ec-b65f-31043b30bbcd"
-        col_header_to_nodeid_dict["CONSTRUCTION TECHNIQUE7"] = "a271c38f-1037-11ec-b65f-31043b30bbcd"
-        col_header_to_nodeid_dict["CONSTRUCTION TECHNIQUE8"] = "a271c38f-1037-11ec-b65f-31043b30bbcd"
-        col_header_to_nodeid_dict["CONSTRUCTION TECHNIQUE9"] = "a271c38f-1037-11ec-b65f-31043b30bbcd"
-        col_header_to_nodeid_dict["CONSTRUCTION TECHNIQUE10"] = "a271c38f-1037-11ec-b65f-31043b30bbcd"
-        col_header_to_nodeid_dict["CONSTRUCTION TECHNIQUE11"] = "a271c38f-1037-11ec-b65f-31043b30bbcd"
-        col_header_to_nodeid_dict["CONSTRUCTION TECHNIQUE12"] = "a271c38f-1037-11ec-b65f-31043b30bbcd"
-        col_header_to_nodeid_dict["CONSTRUCTION TECHNIQUE13"] = "a271c38f-1037-11ec-b65f-31043b30bbcd"
-        col_header_to_nodeid_dict["MATERIAL1"] = "a271c376-1037-11ec-b65f-31043b30bbcd"
-        col_header_to_nodeid_dict["MATERIAL2"] = "a271c376-1037-11ec-b65f-31043b30bbcd"
-        col_header_to_nodeid_dict["MATERIAL3"] = "a271c376-1037-11ec-b65f-31043b30bbcd"
-        col_header_to_nodeid_dict["MATERIAL4"] = "a271c376-1037-11ec-b65f-31043b30bbcd"
-        col_header_to_nodeid_dict["MATERIAL5"] = "a271c376-1037-11ec-b65f-31043b30bbcd"
-        col_header_to_nodeid_dict["MATERIAL6"] = "a271c376-1037-11ec-b65f-31043b30bbcd"
         self.start = time()
 
         def get_display_nodes(graphid):
