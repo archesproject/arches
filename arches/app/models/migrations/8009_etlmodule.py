@@ -107,6 +107,67 @@ remove_validation_reporting_functions = """
     DROP FUNCTION public.__arches_load_staging_report_errors(load_id uuid);
     """
 
+add_functions_to_get_nodegroup_tree = """
+    CREATE OR REPLACE FUNCTION public.__get_nodegroup_tree(nodegroup_id uuid)
+    RETURNS TABLE(nodegroupid uuid, parentnodegroupid uuid, alias text, name text, depth integer, path text, cardinality text)
+    AS $$
+    WITH RECURSIVE nodegroup_tree AS (
+        SELECT
+            nodegroupid,
+            parentnodegroupid,
+            alias,
+            name,
+            0 as depth,
+            (select alias from nodes where nodeid = nodegroup_id) as path,
+            cardinality
+        FROM 
+        (SELECT ng.nodegroupid, ng.parentnodegroupid, alias, name, cardinality, graphid FROM node_groups ng 
+        INNER JOIN nodes n ON ng.nodegroupid = n.nodeid 
+        ORDER by ng.nodegroupid) AS root
+        WHERE nodegroupid = nodegroup_id
+        UNION
+            SELECT
+                parent.nodegroupid,
+                parent.parentnodegroupid,
+                parent.alias,
+                parent.name,
+                depth + 1,
+                path || ' - ' || parent.alias,
+                parent.cardinality
+            FROM
+            (SELECT ng.nodegroupid, ng.parentnodegroupid, alias, name, cardinality, graphid FROM node_groups ng 
+            INNER JOIN nodes n ON ng.nodegroupid = n.nodeid 
+            ORDER by ng.nodegroupid) AS parent
+            INNER JOIN nodegroup_tree nt ON nt.nodegroupid = parent.parentnodegroupid
+    ) SELECT
+        *
+    FROM
+        nodegroup_tree order by path;
+    $$
+    LANGUAGE SQL;
+
+    CREATE OR REPLACE FUNCTION public.__get_nodegroup_tree_by_graph(graph_id uuid)
+    RETURNS TABLE(root_nodegroup uuid, nodegroupid uuid, parentnodegroupid uuid, alias text, name text, depth integer, path text, cardinality text)
+    LANGUAGE PLPGSQL AS 
+    $func$
+    DECLARE
+    _nodegroupid uuid;
+    BEGIN
+    FOR _nodegroupid IN select ng.nodegroupid from node_groups ng join nodes n on ng.nodegroupid = nodeid where graphid = '34cfe98e-c2c0-11ea-9026-02e7594ce0a0' and ng.parentnodegroupid is null
+    LOOP
+        RETURN QUERY SELECT _nodegroupid, * FROM __get_nodegroup_tree(_nodegroupid);
+    END LOOP;
+    END;
+    $func$;
+    """
+
+remove_functions_to_get_nodegroup_tree = [
+    """ 
+    DROP FUNCTION public.__get_nodegroup_tree(nodegroup_id uuid);
+    DROP FUNCTION public.__get_nodegroup_tree_by_graph(graph_id uuid);
+    """
+]
+
 class Migration(migrations.Migration):
 
     dependencies = [
@@ -199,4 +260,5 @@ class Migration(migrations.Migration):
             },
         ),
         migrations.RunSQL(add_validation_reporting_functions, remove_validation_reporting_functions),
+        migrations.RunSQL(add_functions_to_get_nodegroup_tree, remove_functions_to_get_nodegroup_tree),
     ]
