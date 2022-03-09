@@ -92,6 +92,11 @@ module.exports = {
         }),
         new BundleTracker({ filename: './webpack-stats.json' }),
     ].concat(buildHtmlWebpackPluginList('../templates', [])),
+    resolveLoader: {
+        alias: {
+            text: 'text-loader'
+        }
+    },
     resolve: {
         modules: [Path.resolve(__dirname, '../../media/node_modules')],
         // extensions: ['.js',],

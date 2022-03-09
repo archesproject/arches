@@ -8,7 +8,7 @@ define([
     'viewmodels/map-editor',
     'viewmodels/map-filter',
     'views/components/cards/select-related-feature-layers',
-    'templates/views/components/cards/related-resources-map-popup.htm'
+    'text!templates/views/components/cards/related-resources-map-popup.htm'
 ], function($, arches, ko, koMapping, geojsonExtent, CardComponentViewModel, MapEditorViewModel, MapFilterViewModel, selectFeatureLayersFactory, popupTemplate) {
     var viewModel = function(params) {
         var self = this;
