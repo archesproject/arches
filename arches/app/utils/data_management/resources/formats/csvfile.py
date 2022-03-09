@@ -916,8 +916,7 @@ class CsvReader(Reader):
                     # row_number = "on line " + str(row_number + 2)  # to represent the row in a csv accounting for the header and 0 index
                     resource_changed = row["ResourceID"] != previous_row_resourceid and previous_row_resourceid is not None
                     if resource_changed:
-                        if business_data[row_number - 1]["ResourceID"] in group_no_to_tileids:
-                            del group_no_to_tileids[business_data[row_number - 1]["ResourceID"]]  # garbage collection of past resources
+                        group_no_to_tileids.clear() # garbage collection of past resource groups
 
                         save_count = save_count + 1
                         self.save_resource(
@@ -1004,47 +1003,46 @@ class CsvReader(Reader):
                         ):
 
                             if str(target_tile.nodegroup_id) == evaluation_nodegroupid:
+                                if group_no not in group_no_to_tileids:
+                                    group_no_to_tileids[group_no] = {}
                                 # checks for whether a parent tile exists since get_blank_tile starts out getting parent
                                 preexisting_parenttile_for_resource_group_nodegroup = (
-                                    row["ResourceID"] in group_no_to_tileids
-                                    and row["GROUP_NO"] in group_no_to_tileids[row["ResourceID"]]
-                                    and str(target_tile.nodegroup_id) in group_no_to_tileids[row["ResourceID"]][row["GROUP_NO"]]
+                                    group_no in group_no_to_tileids
+                                    and str(target_tile.nodegroup_id) in group_no_to_tileids[group_no]
                                 )
                                 if preexisting_parenttile_for_resource_group_nodegroup:
                                     preexisting_parenttile = get_preexisting_tile(
                                         target_tile,
                                         populated_tiles,
                                         row["ResourceID"],
-                                        tileid=group_no_to_tileids[row["ResourceID"]][row["GROUP_NO"]][str(target_tile.nodegroup_id)],
+                                        tileid=group_no_to_tileids[group_no][str(target_tile.nodegroup_id)]["tileid"],
                                     )
                                     # we know theres a parenttile for this group already
                                 if preexisting_parenttile:  # lets see if theres a child for our source_data's nodegroup
                                     prototype_child_tile = get_blank_tile(source_data, child_only=True)
 
                                     # we could also ask if a tile exists for this group in the group dict
-                                    # { resourceid: {group_no: {nodegroupid: tileid} } }
+                                    # {group_no: {nodegroupid: {tileid: tileid, parenttileid: parenttileid } } }
                                     preexisting_childtile_for_resource_group_nodegroup = (
-                                        row["ResourceID"] in group_no_to_tileids
-                                        and row["GROUP_NO"] in group_no_to_tileids[row["ResourceID"]]
-                                        and str(prototype_child_tile.nodegroup_id)
-                                        in group_no_to_tileids[row["ResourceID"]][row["GROUP_NO"]]
+                                        group_no in group_no_to_tileids and str(prototype_child_tile.nodegroup_id) in group_no_to_tileids[group_no]
                                     )
                                     if preexisting_childtile_for_resource_group_nodegroup:
                                         target_tile = get_preexisting_tile(
                                             target_tile,
                                             populated_tiles,
                                             row["ResourceID"],
-                                            tileid=group_no_to_tileids[row["ResourceID"]][row["GROUP_NO"]][
-                                                str(prototype_child_tile.nodegroup_id)
-                                            ],
+                                            tileid=str(group_no_to_tileids[group_no][str(prototype_child_tile.nodegroup_id)]["tileid"]),
                                         )
                                     else:
                                         target_tile = prototype_child_tile
                                         target_tile.tileid = uuid.uuid4()
                                         target_tile.parenttile = preexisting_parenttile
-                                        group_no_to_tileids[row["ResourceID"]][row["GROUP_NO"]][str(target_tile.nodegroup_id)] = str(
-                                            target_tile.tileid
-                                        )
+                                        group_no_to_tileids[group_no][str(target_tile.nodegroup_id)] = {}
+                                        group_no_to_tileids[group_no][str(target_tile.nodegroup_id)]["tileid"] = str(target_tile.tileid)
+                                        try:
+                                            group_no_to_tileids[group_no][str(target_tile.nodegroup_id)]["parenttileid"] = str(target_tile.parenttile.tileid)
+                                        except:
+                                            group_no_to_tileids[group_no][str(target_tile.nodegroup_id)]["parenttileid"] = None
 
                             elif str(target_tile.nodegroup_id) == component_nodegroupid:
                                 # TODO: Comp_sortorder must be used for Components so that all component tiles for a resource/group don't get merged into a single one
@@ -1052,15 +1050,19 @@ class CsvReader(Reader):
 
                                 if sort_str and "-" in sort_str:  # component or eval
                                     prefix = sort_str[0:2]
+                                    group_no = row["GROUP_NO"] + '-' + str(prefix)
+                                    if group_no not in group_no_to_tileids:
+                                        group_no_to_tileids[group_no] = {}
                                     if "-" in business_data[row_number - 1]["COMP_SORTORDER"]:
                                         last_prefix = business_data[row_number - 1]["COMP_SORTORDER"][0:2]
 
                                     prefix_same = prefix == last_prefix
 
-                                    preexisting_parenttile_for_resource_group_nodegroup = (
-                                        row["ResourceID"] in group_no_to_tileids
-                                        and row["GROUP_NO"] in group_no_to_tileids[row["ResourceID"]]
-                                        and str(target_tile.nodegroup_id) in group_no_to_tileids[row["ResourceID"]][row["GROUP_NO"]]
+                                    # we want to look for an original tile with the same group if the group is the same
+                                    # if the group is different, defintely just make a new tile, i.e. prevent an existing tile from being looked up
+                                    preexisting_tile_for_resource_group_nodegroup = (
+                                        group_no in group_no_to_tileids
+                                        and str(target_tile.nodegroup_id) in group_no_to_tileids[group_no]
                                     )
 
                                     if prefix_same and preexisting_parenttile_for_resource_group_nodegroup:
@@ -1068,7 +1070,7 @@ class CsvReader(Reader):
                                             target_tile,
                                             populated_tiles,
                                             row["ResourceID"],
-                                            tileid=group_no_to_tileids[row["ResourceID"]][row["GROUP_NO"]][str(target_tile.nodegroup_id)],
+                                            tileid=group_no_to_tileids[group_no][str(target_tile.nodegroup_id)]["tileid"],
                                         )
                                         target_tile = preexisting_parenttile
 
@@ -1085,6 +1087,10 @@ class CsvReader(Reader):
                             Grouping is enforced by having all grouped attributes in the same row.
                             """
                             need_new_tile = False
+                            if str(tile_to_populate.nodegroup_id) == component_nodegroupid:
+                                group_no = row["GROUP_NO"] + '-' + str(prefix)
+                            elif str(tile_to_populate.nodegroup_id) == evaluation_nodegroupid:
+                                group_no = row["GROUP_NO"]
                             # Set target tileid to None because this will be a new tile, a new tileid will be created on save.
                             if tile_to_populate.tileid is None:
                                 tile_to_populate.tileid = uuid.uuid4()
@@ -1092,14 +1098,15 @@ class CsvReader(Reader):
                                 tile_to_populate.tileid = row["TileID"]
                             tile_to_populate.resourceinstance_id = resourceinstanceid
                             if (
-                                row["GROUP_NO"]
-                                and row["GROUP_NO"] != ""
-                                and row["GROUP_NO"] in group_no_to_tileids[row["ResourceID"]]
-                                and str(tile_to_populate.nodegroup_id) not in group_no_to_tileids[row["ResourceID"]][row["GROUP_NO"]]
+                                group_valid and group_no and group_no in group_no_to_tileids
+                                and str(tile_to_populate.nodegroup_id) not in group_no_to_tileids[group_no]
                             ):
-                                group_no_to_tileids[row["ResourceID"]][row["GROUP_NO"]][str(tile_to_populate.nodegroup_id)] = str(
-                                    tile_to_populate.tileid
-                                )
+                                group_no_to_tileids[group_no][str(tile_to_populate.nodegroup_id)] = {}
+                                group_no_to_tileids[group_no][str(tile_to_populate.nodegroup_id)]["tileid"] = str(tile_to_populate.tileid)
+                                try:
+                                    group_no_to_tileids[group_no][str(target_tile.nodegroup_id)]["parenttileid"] = str(target_tile.parenttile.tileid)
+                                except:
+                                    group_no_to_tileids[group_no][str(target_tile.nodegroup_id)]["parenttileid"] = None
 
                             # Check the cardinality of the tile and check if it has been populated.
                             # If cardinality is one and the tile is populated the tile should not be populated again.
@@ -1213,16 +1220,16 @@ class CsvReader(Reader):
                                             if parenttileid is not None:
                                                 prototype_tile_copy.parenttile.tileid = parenttileid
                                             prototype_tile_copy.resourceinstance_id = resourceinstanceid
-                                            if (
-                                                row["GROUP_NO"]
-                                                and row["GROUP_NO"] != ""
-                                                and row["GROUP_NO"] in group_no_to_tileids[row["ResourceID"]]
-                                                and str(prototype_tile_copy.nodegroup_id)
-                                                not in group_no_to_tileids[row["ResourceID"]][row["GROUP_NO"]]
-                                            ):
-                                                group_no_to_tileids[row["ResourceID"]][row["GROUP_NO"]][
-                                                    str(prototype_tile_copy.nodegroup_id)
-                                                ] = str(prototype_tile_copy.tileid)
+                                            # if (
+                                            #     row["GROUP_NO"]
+                                            #     and row["GROUP_NO"] != ""
+                                            #     and row["GROUP_NO"] in group_no_to_tileids[row["ResourceID"]]
+                                            #     and str(prototype_tile_copy.nodegroup_id)
+                                            #     not in group_no_to_tileids[row["ResourceID"]][row["GROUP_NO"]]
+                                            # ):
+                                            #     group_no_to_tileids[row["ResourceID"]][row["GROUP_NO"]][
+                                            #         str(prototype_tile_copy.nodegroup_id)
+                                            #     ] = str(prototype_tile_copy.tileid)
                                             if str(prototype_tile_copy.nodegroup_id) not in populated_child_nodegroups:
                                                 prototype_tile_copy.nodegroup_id = str(prototype_tile_copy.nodegroup_id)
                                                 for target_key in list(prototype_tile_copy.data.keys()):
@@ -1306,6 +1313,18 @@ class CsvReader(Reader):
                                                             populate_child_tiles(source_data)
 
                                             if prototype_tile_copy.data != {}:
+                                                if (
+                                                    group_valid and group_no
+                                                    and group_no in group_no_to_tileids
+                                                    and str(prototype_tile_copy.nodegroup_id)
+                                                    not in group_no_to_tileids[group_no]
+                                                ):
+                                                    group_no_to_tileids[group_no][str(prototype_tile_copy.nodegroup_id)] = {}
+                                                    group_no_to_tileids[group_no][str(prototype_tile_copy.nodegroup_id)]["tileid"] = str(prototype_tile_copy.tileid)
+                                                    try:
+                                                        group_no_to_tileids[group_no][str(prototype_tile_copy.nodegroup_id)]["parenttileid"] = str(prototype_tile_copy.parenttile.tileid)
+                                                    except:
+                                                        group_no_to_tileids[group_no][str(prototype_tile_copy.nodegroup_id)]["parenttileid"] = None
                                                 if len([item for item in list(prototype_tile_copy.data.values()) if item is not None]) > 0:
                                                     if str(prototype_tile_copy.nodegroup_id) not in populated_child_nodegroups:
                                                         if bulk:
