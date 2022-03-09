@@ -212,7 +212,7 @@ class Resource(models.ResourceInstance):
                 pass
 
         # refetch new AND updated resources and index
-        for resource in Resource.objects.filter(resourceinstanceid__in=[resource.resourceinstanceid for resource in resources]):
+        for resource in resources:
             fetchTiles = resource.resourceinstanceid in existing_resources_ids
             document, terms = resource.get_documents_to_index(
                 fetchTiles=fetchTiles, datatype_factory=datatype_factory, node_datatypes=node_datatypes
