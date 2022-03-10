@@ -9,11 +9,11 @@ require([
     'views/graph/function-manager/applied-function-list',
     'models/function',
     'models/function-x-graph',
-    'graph-base-data',
-    'graph-functions-data',
     'function-templates',
     'component-templates'
-], function($, _, ko, arches, GraphPageView, JsonErrorAlertViewModel, FunctionList, AppliedFunctionList, FunctionModel, FunctionXGraphModel, baseData, data) {
+], function($, _, ko, arches, GraphPageView, JsonErrorAlertViewModel, FunctionList, AppliedFunctionList, FunctionModel, FunctionXGraphModel) {
+    const baseData = window['graph-base-data'];
+    const data = window['graph-functions-data'];
     /**
     * set up the page view model with the graph model and related sub views
     */

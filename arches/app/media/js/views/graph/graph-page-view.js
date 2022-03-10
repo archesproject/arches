@@ -3,9 +3,9 @@ define([
     'underscore',
     'views/base-manager',
     'arches',
-    'graph-base-data',
     'bindings/chosen'
-], function(ko, _, BaseManager, arches, data) {
+], function(ko, _, BaseManager, arches) {
+    const data = window['graph-base-data'];
     /**
     * A backbone view representing a page in the graph manager workflow.  It
     * adds some graph manager specfic values to the view model.

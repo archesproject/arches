@@ -291,31 +291,55 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 {% block pre_require_js %}
 {{block.super}}
     <script>
-        {% autoescape off %}define('resource-editor-data', [], function() {
-            return {
-                resourceid: '{{resourceid}}',
-                graphid: '{{graphid}}',
-                graphiconclass: '{{graphiconclass}}',
-                graphname: '{{graphname | escapejs}}',
-                displayname: '{{displayname | escapejs}}',
-                tiles: {{tiles}},
-                cards: {{cards}},
-                nodes: {{nodes}},
-                cardwidgets: {{cardwidgets}},
-                widgets: {{widgets_json}},
-                ontologyclass: '{{ontologyclass}}',
-                relationship_types: {{ relationship_types }},
-                datatypes: {{datatypes_json}},
-                appliedFunctions: {{applied_functions}},
-                cardComponents: {{card_components_json}},
-                nodegroups: {{nodegroups}},
-                userisreviewer:  JSON.parse('{{ user_is_reviewer }}'.toLowerCase()),
-                creator:  JSON.parse('{{ creator }}'.toLowerCase()),
-                useriscreator:  JSON.parse('{{ user_created_instance }}'.toLowerCase()),
-                templates: {{templates_json}},
-                graph: {{graph_json}},
-                issystemsettings: {{is_system_settings|yesno:"true,false"}}
-            };ƒ
-        });{% endautoescape %}
+        window['resource-editor-data'] = {
+            resourceid: '{{resourceid}}',
+            graphid: '{{graphid}}',
+            graphiconclass: '{{graphiconclass}}',
+            graphname: '{{graphname | escapejs}}',
+            displayname: '{{displayname | escapejs}}',
+            tiles: {{tiles}},
+            cards: {{cards}},
+            nodes: {{nodes}},
+            cardwidgets: {{cardwidgets}},
+            widgets: {{widgets_json}},
+            ontologyclass: '{{ontologyclass}}',
+            relationship_types: {{ relationship_types }},
+            datatypes: {{datatypes_json}},
+            appliedFunctions: {{applied_functions}},
+            cardComponents: {{card_components_json}},
+            nodegroups: {{nodegroups}},
+            userisreviewer:  JSON.parse('{{ user_is_reviewer }}'.toLowerCase()),
+            creator:  JSON.parse('{{ creator }}'.toLowerCase()),
+            useriscreator:  JSON.parse('{{ user_created_instance }}'.toLowerCase()),
+            templates: {{templates_json}},
+            graph: {{graph_json}},
+            issystemsettings: {{is_system_settings|yesno:"true,false"}}
+        };
+        // {% autoescape off %}define('resource-editor-data', [], function() {
+        //     return {
+        //         resourceid: '{{resourceid}}',
+        //         graphid: '{{graphid}}',
+        //         graphiconclass: '{{graphiconclass}}',
+        //         graphname: '{{graphname | escapejs}}',
+        //         displayname: '{{displayname | escapejs}}',
+        //         tiles: {{tiles}},
+        //         cards: {{cards}},
+        //         nodes: {{nodes}},
+        //         cardwidgets: {{cardwidgets}},
+        //         widgets: {{widgets_json}},
+        //         ontologyclass: '{{ontologyclass}}',
+        //         relationship_types: {{ relationship_types }},
+        //         datatypes: {{datatypes_json}},
+        //         appliedFunctions: {{applied_functions}},
+        //         cardComponents: {{card_components_json}},
+        //         nodegroups: {{nodegroups}},
+        //         userisreviewer:  JSON.parse('{{ user_is_reviewer }}'.toLowerCase()),
+        //         creator:  JSON.parse('{{ creator }}'.toLowerCase()),
+        //         useriscreator:  JSON.parse('{{ user_created_instance }}'.toLowerCase()),
+        //         templates: {{templates_json}},
+        //         graph: {{graph_json}},
+        //         issystemsettings: {{is_system_settings|yesno:"true,false"}}
+        //     };ƒ
+        // });{% endautoescape %}
     </script>
 {% endblock pre_require_js %}

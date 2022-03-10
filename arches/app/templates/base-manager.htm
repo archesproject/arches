@@ -472,15 +472,22 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 {% block pre_require_js %}
     <script>
         {% autoescape off %}
-        define('view-data', [], function () {
-            return {
-                graphs: {{graphs}},
-                createableResources: {{createable_resources}},
-                help: "{{nav.help.template}}",
-                userCanEditResources: JSON.parse('{{ user_can_edit }}'.toLowerCase()),
-                userCanReadResources: JSON.parse('{{ user_can_read }}'.toLowerCase())
-            };
-        });
+        window['view-data'] = {
+            graphs: {{graphs}},
+            createableResources: {{createable_resources}},
+            help: "{{nav.help.template}}",
+            userCanEditResources: JSON.parse('{{ user_can_edit }}'.toLowerCase()),
+            userCanReadResources: JSON.parse('{{ user_can_read }}'.toLowerCase())
+        };
+        // define('view-data', [], function () {
+        //     return {
+        //         graphs: {{graphs}},
+        //         createableResources: {{createable_resources}},
+        //         help: "{{nav.help.template}}",
+        //         userCanEditResources: JSON.parse('{{ user_can_edit }}'.toLowerCase()),
+        //         userCanReadResources: JSON.parse('{{ user_can_read }}'.toLowerCase())
+        //     };
+        // });
         {% endautoescape %}
     </script>
 {% endblock pre_require_js %}

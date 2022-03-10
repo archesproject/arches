@@ -8,12 +8,12 @@ define([
     'models/node',
     'viewmodels/alert',
     'views/components/widgets/map/bin-feature-collection',
-    'map-layer-manager-data',
     'arches',
     'bindings/mapbox-gl',
     'bindings/codemirror',
     'datatype-config-components'
-], function($, ko, _, turf, geohash, BaseManagerView, NodeModel, AlertViewModel, binFeatureCollection, data, arches) {
+], function($, ko, _, turf, geohash, BaseManagerView, NodeModel, AlertViewModel, binFeatureCollection, arches) {
+    const data = window['map-layer-manager-data'];
     var vm = {
         map: null,
         geomNodes: [],

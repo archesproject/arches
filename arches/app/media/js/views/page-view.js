@@ -8,11 +8,12 @@ define([
     'viewmodels/alert',
     'views/provisional-history-list',
     'views/notifications-list',
-    'view-data',
     'bindings/scrollTo',
     'bootstrap',
     'bindings/slide'
-], function($, _, Backbone, ko, moment, arches,  AlertViewModel, ProvisionalHistoryList, NotificationsList, viewData) {
+], function($, _, Backbone, ko, moment, arches,  AlertViewModel, ProvisionalHistoryList, NotificationsList) {
+    const viewData = window['view-data'];
+
     /**
     * A backbone view representing a basic page in arches.  It sets up the
     * viewModel defaults, optionally accepts additional view model data and

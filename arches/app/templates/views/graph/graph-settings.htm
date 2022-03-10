@@ -395,16 +395,25 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 {% block pre_require_js %}
 {{ block.super }}
 <script>{% autoescape off %}
-define('graph-settings-data', [], function () {
-    return {
-        icons: {{icons}},
-        graph: {{graph_json}},
-        node: {{node_json}},
-        ontologies: {{ontologies}},
-        ontologyClasses: {{ontology_classes}},
-        resources: {{resource_data}},
-        ontology_namespaces: {{ontology_namespaces}}
-    };
-});
+window['graph-settings-data'] = {
+    icons: {{icons}},
+    graph: {{graph_json}},
+    node: {{node_json}},
+    ontologies: {{ontologies}},
+    ontologyClasses: {{ontology_classes}},
+    resources: {{resource_data}},
+    ontology_namespaces: {{ontology_namespaces}}
+};
+// define('graph-settings-data', [], function () {
+//     return {
+//         icons: {{icons}},
+//         graph: {{graph_json}},
+//         node: {{node_json}},
+//         ontologies: {{ontologies}},
+//         ontologyClasses: {{ontology_classes}},
+//         resources: {{resource_data}},
+//         ontology_namespaces: {{ontology_namespaces}}
+//     };
+// });
 {% endautoescape %}</script>
 {% endblock pre_require_js %}

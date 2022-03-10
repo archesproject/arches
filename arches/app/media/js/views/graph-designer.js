@@ -13,16 +13,16 @@ define([
     'views/graph/graph-manager/branch-list',
     'views/graph/graph-designer/card-tree',
     'views/graph/permission-designer',
-    'graph-designer-data',
     'arches',
     'viewmodels/graph-settings',
     'viewmodels/card',
-    'view-data',
     'report-templates',
     'bindings/resizable-sidepanel',
     'datatype-config-components',
     'views/components/simple-switch'
-], function($, _, ko, koMapping, BaseManagerView, AlertViewModel, JsonErrorAlertViewModel, GraphModel, ReportModel, GraphTree, NodeFormView, BranchListView, CardTreeViewModel, PermissionDesigner, data, arches, GraphSettingsViewModel, CardViewModel, viewData, reportLookup) {
+], function($, _, ko, koMapping, BaseManagerView, AlertViewModel, JsonErrorAlertViewModel, GraphModel, ReportModel, GraphTree, NodeFormView, BranchListView, CardTreeViewModel, PermissionDesigner, arches, GraphSettingsViewModel, CardViewModel, reportLookup) {
+    const viewData = window['view-data'];
+    const data = window['graph-designer-data'];
     var GraphDesignerView = BaseManagerView.extend({
         initialize: function(options) {
             var viewModel = options.viewModel;

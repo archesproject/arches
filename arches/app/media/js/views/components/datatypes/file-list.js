@@ -1,8 +1,7 @@
 define([
     'knockout',
     'underscore',
-    'view-data'
-], function (ko, _, data) {
+], function(ko, _) {
     var name = 'file-list-datatype-config';
     ko.components.register(name, {
         viewModel: function(params) {

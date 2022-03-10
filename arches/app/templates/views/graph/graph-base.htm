@@ -72,13 +72,17 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 {% block pre_require_js %}
     {{block.super}}
     <script>
-        {% autoescape off %}
-        define('graph-base-data', [], function () {
-            return {
-                graphid: '{{graphid}}',
-                graph: {{graph_json}}
-            };
-        });
-        {% endautoescape %}
+        window['graph-base-data'] = {
+            graphid: '{{graphid}}',
+            graph: {{graph_json}}
+        };
+        // {% autoescape off %}
+        // define('graph-base-data', [], function () {
+        //     return {
+        //         graphid: '{{graphid}}',
+        //         graph: {{graph_json}}
+        //     };
+        // });
+        // {% endautoescape %}
     </script>
 {% endblock pre_require_js %}

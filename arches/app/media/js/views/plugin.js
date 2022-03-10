@@ -1,8 +1,9 @@
 define([
     'knockout',
     'views/base-manager',
-    'plugin-data'
-], function(ko, BaseManagerView, data) {
+], function(ko, BaseManagerView) {
+    const data = window['plugin-data'];
+
     if (!data.config) data.config = {};
     data.config.loading = ko.observable(false);
     data.config.alert = ko.observable(null);

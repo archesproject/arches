@@ -123,10 +123,13 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 {% block pre_require_js %}
 {{block.super}}
     <script>
-        {% autoescape off %}define('mobile-survey-manager-data', [], function() {
-            return {
-                mobilesurveys: {{mobile_surveys}}
-            };
-        });{% endautoescape %}
+        window['mobile-survey-manager-data'] = {
+            mobilesurveys: {{mobile_surveys}}
+        };
+        // {% autoescape off %}define('mobile-survey-manager-data', [], function() {
+        //     return {
+        //         mobilesurveys: {{mobile_surveys}}
+        //     };
+        // });{% endautoescape %}
     </script>
 {% endblock pre_require_js %}

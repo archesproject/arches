@@ -738,27 +738,47 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 {% block pre_require_js %}
 {{block.super}}
     <script>
-        {% autoescape off %}define('mobile-survey-manager-data', [], function() {
-            return {
-                mobilesurvey: {{mobile_survey}},
-                resources: {{resources}},
-                identities: {{identities}},
-                history: {{history}},
-                transstrings: {
-                    identity: {name: {% trans "'Name'" %}, namelong: {% trans "'Name'" %}, description: {% trans "'Manage users that participate in this project'" %}},
-                    resourcemodel: {name: {% trans "'Model Details'" %}, namelong: {% trans "'Model Details'" %}, description: {% trans "'Summary of how this model participates in the project'" %}},
-                    root: {name: {% trans "'Summary'" %}, namelong: {% trans "'Summary'" %}, description: {% trans "'Project summary and status'" %}},
-                    settings: {name: {% trans "'Settings'" %}, namelong: {% trans "'Project Settings'" %}, description: {% trans "'Define data collection parameters for your project'" %}},
-                    mapextent: {name: {% trans "'Map Extent'" %}, namelong: {% trans "'Map Extent'" %}, description: {% trans "'Draw a polygon to define the area over which you want to collect data in this survery'" %}},
-                    mapsources: {name: {% trans "'Map Sources'" %}, namelong: {% trans "'Basemap Source'" %}, description: {% trans "'Provide a basemap source url. Use an offline source for users without access to cell/wi-fi service'" %}},
-                    models: {name: {% trans "'Models'" %}, namelong: {% trans "'Models'" %}, description: {% trans "'Summary of models in this project'" %}},
-                    data: {name: {% trans "'Data'" %}, namelong: {% trans "'Data Download'" %}, description: {% trans "'Define the data you will allow users to download'" %}},
-                    people: {name: {% trans "'People'" %}, namelong: {% trans "'People'" %}, description: {% trans "'Summary of people invited to participate in this project'" %}},
-                    groupplaceholder: {% trans "'Select one or more groups...'" %},
-                    modelplaceholder: {% trans "'Select one or more resource models...'" %},
-                    loadingmessage: {% trans "'Preparing project - this may take a few minutes'" %}
-                }
-            };
-        });{% endautoescape %}
+        window['mobile-survey-manager-data'] = {
+            mobilesurvey: {{mobile_survey}},
+            resources: {{resources}},
+            identities: {{identities}},
+            history: {{history}},
+            transstrings: {
+                identity: {name: {% trans "'Name'" %}, namelong: {% trans "'Name'" %}, description: {% trans "'Manage users that participate in this project'" %}},
+                resourcemodel: {name: {% trans "'Model Details'" %}, namelong: {% trans "'Model Details'" %}, description: {% trans "'Summary of how this model participates in the project'" %}},
+                root: {name: {% trans "'Summary'" %}, namelong: {% trans "'Summary'" %}, description: {% trans "'Project summary and status'" %}},
+                settings: {name: {% trans "'Settings'" %}, namelong: {% trans "'Project Settings'" %}, description: {% trans "'Define data collection parameters for your project'" %}},
+                mapextent: {name: {% trans "'Map Extent'" %}, namelong: {% trans "'Map Extent'" %}, description: {% trans "'Draw a polygon to define the area over which you want to collect data in this survery'" %}},
+                mapsources: {name: {% trans "'Map Sources'" %}, namelong: {% trans "'Basemap Source'" %}, description: {% trans "'Provide a basemap source url. Use an offline source for users without access to cell/wi-fi service'" %}},
+                models: {name: {% trans "'Models'" %}, namelong: {% trans "'Models'" %}, description: {% trans "'Summary of models in this project'" %}},
+                data: {name: {% trans "'Data'" %}, namelong: {% trans "'Data Download'" %}, description: {% trans "'Define the data you will allow users to download'" %}},
+                people: {name: {% trans "'People'" %}, namelong: {% trans "'People'" %}, description: {% trans "'Summary of people invited to participate in this project'" %}},
+                groupplaceholder: {% trans "'Select one or more groups...'" %},
+                modelplaceholder: {% trans "'Select one or more resource models...'" %},
+                loadingmessage: {% trans "'Preparing project - this may take a few minutes'" %}
+            }
+        };
+        // {% autoescape off %}define('mobile-survey-manager-data', [], function() {
+        //     return {
+        //         mobilesurvey: {{mobile_survey}},
+        //         resources: {{resources}},
+        //         identities: {{identities}},
+        //         history: {{history}},
+        //         transstrings: {
+        //             identity: {name: {% trans "'Name'" %}, namelong: {% trans "'Name'" %}, description: {% trans "'Manage users that participate in this project'" %}},
+        //             resourcemodel: {name: {% trans "'Model Details'" %}, namelong: {% trans "'Model Details'" %}, description: {% trans "'Summary of how this model participates in the project'" %}},
+        //             root: {name: {% trans "'Summary'" %}, namelong: {% trans "'Summary'" %}, description: {% trans "'Project summary and status'" %}},
+        //             settings: {name: {% trans "'Settings'" %}, namelong: {% trans "'Project Settings'" %}, description: {% trans "'Define data collection parameters for your project'" %}},
+        //             mapextent: {name: {% trans "'Map Extent'" %}, namelong: {% trans "'Map Extent'" %}, description: {% trans "'Draw a polygon to define the area over which you want to collect data in this survery'" %}},
+        //             mapsources: {name: {% trans "'Map Sources'" %}, namelong: {% trans "'Basemap Source'" %}, description: {% trans "'Provide a basemap source url. Use an offline source for users without access to cell/wi-fi service'" %}},
+        //             models: {name: {% trans "'Models'" %}, namelong: {% trans "'Models'" %}, description: {% trans "'Summary of models in this project'" %}},
+        //             data: {name: {% trans "'Data'" %}, namelong: {% trans "'Data Download'" %}, description: {% trans "'Define the data you will allow users to download'" %}},
+        //             people: {name: {% trans "'People'" %}, namelong: {% trans "'People'" %}, description: {% trans "'Summary of people invited to participate in this project'" %}},
+        //             groupplaceholder: {% trans "'Select one or more groups...'" %},
+        //             modelplaceholder: {% trans "'Select one or more resource models...'" %},
+        //             loadingmessage: {% trans "'Preparing project - this may take a few minutes'" %}
+        //         }
+        //     };
+        // });{% endautoescape %}
     </script>
 {% endblock pre_require_js %}

@@ -6,13 +6,11 @@ require([
     'viewmodels/alert',
     'viewmodels/alert-json',
     'arches',
-    'view-data',
-    'graph-manager-data',
     'bootstrap',
     'bindings/hover',
     'bindings/chosen'
-], function($, _, ko, BaseManager, AlertViewModel, JsonErrorAlertViewModel, arches, data, graphManagerData) {
-
+], function($, _, ko, BaseManager, AlertViewModel, JsonErrorAlertViewModel, arches) {    
+    const graphManagerData = window['graph-manager-data'];
     var GraphView = BaseManager.extend({
         /**
         * Initializes an instance of BaseManager, optionally using a passed in view

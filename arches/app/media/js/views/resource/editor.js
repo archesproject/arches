@@ -10,14 +10,14 @@ define([
     'viewmodels/card',
     'viewmodels/provisional-tile',
     'arches',
-    'resource-editor-data',
     'report-templates',
     'bindings/resizable-sidepanel',
     'bindings/sortable',
     'widgets',
     'card-components',
     'moment',
-], function($, _, ko, BaseManagerView, AlertViewModel, JsonErrorAlertViewModel, GraphModel, ReportModel, CardViewModel, ProvisionalTileViewModel, arches, data, reportLookup) {
+], function($, _, ko, BaseManagerView, AlertViewModel, JsonErrorAlertViewModel, GraphModel, ReportModel, CardViewModel, ProvisionalTileViewModel, arches, reportLookup) {
+    const data = window['resource-editor-data'];
     var handlers = {
         'after-update': [],
         'tile-reset': []

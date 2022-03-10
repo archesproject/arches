@@ -7,10 +7,11 @@ define(['jquery',
     'knockout',
     'knockout-mapping',
     'models/graph',
-    'view-data',
     'bootstrap-datetimepicker',
     'plugins/knockout-select2'],
-function($, _, BaseFilter, bootstrap, arches, select2, ko, koMapping, GraphModel, viewdata) {
+function($, _, BaseFilter, bootstrap, arches, select2, ko, koMapping, GraphModel) {
+    const viewdata = window['view-data'];
+
     var componentName = 'search-results';
     return ko.components.register(componentName, {
         viewModel: BaseFilter.extend({

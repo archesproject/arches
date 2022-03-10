@@ -1,4 +1,5 @@
-define(['graph-base-data'], function (data) {
+define([], function () {
+    const data = window['graph-base-data'];
     /**
     * A base viewmodel for functions
     *

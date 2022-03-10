@@ -389,23 +389,39 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 {% block pre_require_js %}
 {{block.super}}
     <script>
-        {% autoescape off %}define('graph-designer-data', [], function() {
-            return {
-                graphid: '{{graphid}}',
-                ontologyClasses: {{ontology_classes}},
-                ontologies: {{ontologies}},
-                datatypes: {{datatypes_json}},
-                graph: {{graph}},
-                ontology_namespaces: {{ontology_namespaces}},
-                branches: {{branches}},
-                cards: {{cards}},
-                constraints: {{constraints}},
-                cardwidgets: {{cardwidgets}},
-                widgets: {{widgets_json}},
-                cardComponents: {{card_components_json}},
-                appliedFunctions: {{applied_functions}},
-                restrictedNodegroups: {{restricted_nodegroups}}
-            };
-        });{% endautoescape %}
+        window['graph-desigern-data'] = {
+            graphid: '{{graphid}}',
+            ontologyClasses: {{ontology_classes}},
+            ontologies: {{ontologies}},
+            datatypes: {{datatypes_json}},
+            graph: {{graph}},
+            ontology_namespaces: {{ontology_namespaces}},
+            branches: {{branches}},
+            cards: {{cards}},
+            constraints: {{constraints}},
+            cardwidgets: {{cardwidgets}},
+            widgets: {{widgets_json}},
+            cardComponents: {{card_components_json}},
+            appliedFunctions: {{applied_functions}},
+            restrictedNodegroups: {{restricted_nodegroups}}
+        };
+        // {% autoescape off %}define('graph-designer-data', [], function() {
+        //     return {
+        //         graphid: '{{graphid}}',
+        //         ontologyClasses: {{ontology_classes}},
+        //         ontologies: {{ontologies}},
+        //         datatypes: {{datatypes_json}},
+        //         graph: {{graph}},
+        //         ontology_namespaces: {{ontology_namespaces}},
+        //         branches: {{branches}},
+        //         cards: {{cards}},
+        //         constraints: {{constraints}},
+        //         cardwidgets: {{cardwidgets}},
+        //         widgets: {{widgets_json}},
+        //         cardComponents: {{card_components_json}},
+        //         appliedFunctions: {{applied_functions}},
+        //         restrictedNodegroups: {{restricted_nodegroups}}
+        //     };
+        // });{% endautoescape %}
     </script>
 {% endblock pre_require_js %}

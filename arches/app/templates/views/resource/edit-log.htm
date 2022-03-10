@@ -195,16 +195,25 @@
 {% block pre_require_js %}
 {{ block.super }}
 <script>{% autoescape off %}
-define('resource-edit-history-data', [], function () {
-    return {
-        edits: {{edits}},
-        cards: {{cards}},
-        resource_type: '{{resource_type | escapejs}}',
-        iconclass: '{{iconclass | escapejs}}',
-        resourceid: '{{resourceid | escapejs}}',
-        displayname: '{{displayname | escapejs}}',
-        description: '{{resource_description | escapejs}}'
-    };
-});
+window['resource-edit-history-data'] = {
+    edits: {{edits}},
+    cards: {{cards}},
+    resource_type: '{{resource_type | escapejs}}',
+    iconclass: '{{iconclass | escapejs}}',
+    resourceid: '{{resourceid | escapejs}}',
+    displayname: '{{displayname | escapejs}}',
+    description: '{{resource_description | escapejs}}'
+};
+// define('resource-edit-history-data', [], function () {
+//     return {
+//         edits: {{edits}},
+//         cards: {{cards}},
+//         resource_type: '{{resource_type | escapejs}}',
+//         iconclass: '{{iconclass | escapejs}}',
+//         resourceid: '{{resourceid | escapejs}}',
+//         displayname: '{{displayname | escapejs}}',
+//         description: '{{resource_description | escapejs}}'
+//     };
+// });
 {% endautoescape %}</script>
 {% endblock pre_require_js %}

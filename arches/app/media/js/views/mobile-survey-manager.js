@@ -6,12 +6,11 @@ define([
     'views/base-manager',
     'viewmodels/alert',
     'viewmodels/alert-json',
-    'mobile-survey-manager-data',
     'arches',
     'moment',
     'bindings/datepicker',
-], function($, _, ko, uuid, BaseManagerView, AlertViewModel, JsonErrorAlertViewModel, data, arches, moment) {
-
+], function($, _, ko, uuid, BaseManagerView, AlertViewModel, JsonErrorAlertViewModel, arches, moment) {
+    const data = window['mobile-survey-manager-data'];
     var MobileSurveysViewModel = function(params) {
         var self = this;
         this.dateFormat = 'YYYY-MM-DD';

@@ -469,14 +469,20 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 {% block pre_require_js %}
 {{ block.super }}
 <script>{% autoescape off %}
-    define('profile-manager-data', [], function() {
-        return {
-            'error_count': {{form.errors|length}},
-            'mobilesurveys': {{user_surveys}},
-            'identities': {{identities}},
-            'resources': {{resources}}
-        }
-    });
+    window['profile-manager-data'] = {
+        'error_count': {{form.errors|length}},
+        'mobilesurveys': {{user_surveys}},
+        'identities': {{identities}},
+        'resources': {{resources}}
+    }
+    // define('profile-manager-data', [], function() {
+    //     return {
+    //         'error_count': {{form.errors|length}},
+    //         'mobilesurveys': {{user_surveys}},
+    //         'identities': {{identities}},
+    //         'resources': {{resources}}
+    //     }
+    // });
 {% endautoescape %}</script>
 
 {% endblock pre_require_js %}
