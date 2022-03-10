@@ -9,11 +9,7 @@ define([
     'views/base-manager',
     'views/components/simple-switch'
 ], function($, _, ko, koMapping, arches, AlertViewModel, BaseManagerView) {
-    const foo = require('search-components')
-    console.log("@@@", foo)
     const SearchComponents = window['search-components'];
-    SearchComponents[10]['componentname'] = 'views/components/search/search-export'
-    console.log('sc', SearchComponents)
     // a method to track the old and new values of a subscribable
     // from https://github.com/knockout/knockout/issues/914
     //
