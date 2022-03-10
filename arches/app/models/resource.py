@@ -183,6 +183,8 @@ class Resource(models.ResourceInstance):
         else:
             tiles = [tile for resource in resources for tile in resource.tiles]
 
+        tiles = sorted(tiles, key=lambda t: t.parenttile is not None, reverse=True)
+
         # need to save the models first before getting the documents for index
         # need to handle if the bulk load is appending tiles to existing resources/
         existing_resources_ids = Resource.objects.filter(
