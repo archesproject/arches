@@ -11,7 +11,6 @@ define([
     'bindings/select2v4',
     'bindings/fadeVisible',
     'bindings/mapbox-gl',
-    'bindings/chosen',
     'bindings/color-picker',
     'geocoder-templates'
 ], function(arches, _, ko, koMapping, WidgetViewModel, MapEditorViewModel) {

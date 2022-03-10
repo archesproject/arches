@@ -169,10 +169,7 @@
 {% block arches_modules %}
 <script>
     require(['utils/set-csrf-token']);
-
-    // put values here that should be accessible application wide
-    define('arches', [], function () {
-        return {
+    window.arches = {
             urls: {
                 root: "{% url 'root' %}",
                 home: "{% url 'home' %}",
@@ -424,7 +421,8 @@
             },
             version: '{{ app_settings.VERSION }}'
         };
-    });
+
+
 
     define('resource-types', [], function () {
         var resourceTypes = {

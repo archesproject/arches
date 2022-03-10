@@ -3,13 +3,13 @@ define([
     'underscore',
     'knockout',
     'knockout-mapping',
-    'arches',
     'viewmodels/mobile-survey',
     'models/mobile-survey',
     'views/base-manager',
     'views/mobile-survey-manager/identity-list',
-], function($, _, ko, koMapping, arches, MobileSurveyViewModel, MobileSurveyModel, BaseManagerView, IdentityList) {
+], function($, _, ko, koMapping, MobileSurveyViewModel, MobileSurveyModel, BaseManagerView, IdentityList) {
     const data = window['profile-manager-data'];
+    const arches = window['arches'];
     var UserProfileManager = BaseManagerView.extend({
         initialize: function(options) {
             var self = this;
