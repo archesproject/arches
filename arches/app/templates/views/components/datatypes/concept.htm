@@ -28,6 +28,6 @@
                 select2Config: select2Config
             }
         ">
-    <span style="z-index: 100; position:absolute; right: 24px; top: 8px;" data-bind="visible: select2Config.isEmpty() === false, click: function(){select2Config.clear();}" tabindex="0" onkeyup="if(event.which == 13 || event.keyCode == 13){ $(this).trigger('click'); }"><i class="fa fa-times-circle fa-lg"></i></span>
+    <span style="z-index: 100; position:absolute; right: 24px; top: 8px;" data-bind="visible: select2Config.isEmpty() === false, event: { keyup: clearSelectionEventHandler, click:  clearSelectionEventHandler}" tabindex="0"><i class="fa fa-times-circle fa-lg"></i></span>
 </div>
 <!-- /ko -->

@@ -12,6 +12,11 @@ define(['arches', 'knockout', 'viewmodels/concept-select'], function (arches, ko
                 this.multiple = ko.observable(false);
                 this.searchValue = ko.observable(filter.val || '');
                 this.node = params.node;
+                this.clearSelectionEventHandler = function(data,event){
+                    if(event.type=="click" || (event.type=="keyup" && (event.which==13 || event.keyCode==13))){
+                        data.select2Config.clear()
+                    }
+                }
                 if (!ko.isObservable(this.node.config.rdmCollection)) {
                     this.node.config.rdmCollection = ko.observable(this.node.config.rdmCollection);
                 }
