@@ -137,7 +137,7 @@ module.exports = {
             'nifty': Path.resolve(__dirname, '../../media/plugins', 'nifty'),
             'async': Path.resolve(__dirname, '../../media/node_modules/requirejs-plugins/src/async'),
             'text': Path.resolve(__dirname, '../../media/node_modules/requirejs-text/text'),
-            // 'jquery-lib': Path.resolve(__dirname, '../../media/node_modules/jquery/dist/jquery.min'),
+            'jquery': Path.resolve(__dirname, '../../media/node_modules/jquery/dist/jquery.min'),
             // 'jquery': Path.resolve(__dirname, '../../media/node_modules/jquery-migrate/dist/jquery-migrate.min'),
             'js-cookie': Path.resolve(__dirname, '../../media/node_modules/js-cookie/src/js.cookie'),
             'select2': Path.resolve(__dirname, '../../media/node_modules/select2/select2'),
