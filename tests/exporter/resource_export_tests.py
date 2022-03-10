@@ -20,6 +20,7 @@ import os
 import json
 import csv
 from io import BytesIO
+from arches.app.utils.data_management.resources.formats.csvfile import CsvWriter, MissingConfigException
 from tests import test_settings
 from operator import itemgetter
 from django.core import management
@@ -57,6 +58,10 @@ class BusinessDataExportTests(ArchesTestCase):
     @classmethod
     def tearDownClass(cls):
         pass
+
+    def test_invalid_writer_config(self):
+        with self.assertRaises(MissingConfigException):
+            CsvWriter()
 
     def test_csv_export(self):
         BusinessDataImporter("tests/fixtures/data/csv/resource_export_test.csv").import_business_data()
