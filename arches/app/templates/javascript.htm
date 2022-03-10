@@ -522,6 +522,12 @@
         {% autoescape off %}return {{geoms}};{% endautoescape %}
     });
 
+    window['search-components'] = (function() {
+        return {% autoescape off %}[{% for component in search_components %}
+                {{component.toJSON}},
+        {% endfor %}]{% endautoescape %};
+    })()  // IIFE
+
     define('search-components', [{% for component in search_components %}'{{ component.componentpath }}',{% endfor %}], function () {
             return {% autoescape off %}[{% for component in search_components %}
                 {{component.toJSON}},
