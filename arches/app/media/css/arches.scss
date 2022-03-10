@@ -9989,6 +9989,11 @@ a.clear-geojson-button:hover {
     padding: 10px;
 }
 
+.hover-feature-nav-right+.hover-feature-title {
+    width: 250px;
+    margin-left: -4px;
+}
+
 .hover-feature-nav-left {
     height: 28px;
     width: 28px;
@@ -10021,7 +10026,6 @@ a.clear-geojson-button:hover {
     width: 28px;
     background: #fbfbfb;
     margin-top: 5px;
-    margin-right: -2px;
     padding-left: 12px;
     padding-top: 3px;
     border: 1px solid #ddd;
