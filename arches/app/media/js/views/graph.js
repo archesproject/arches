@@ -8,7 +8,7 @@ require([
     'arches',
     'bootstrap',
     'bindings/hover',
-    'bindings/chosen'
+    'bindings/chosen',
 ], function($, _, ko, BaseManager, AlertViewModel, JsonErrorAlertViewModel, arches) {    
     const graphManagerData = window['graph-manager-data'];
     var GraphView = BaseManager.extend({
@@ -46,7 +46,7 @@ require([
             };
 
             this.viewModel.leaveDropdown = function(){
-                $('.dropdown').dropdown('toggle');
+                // $('.dropdown').dropdown('toggle');
             };
 
             this.viewModel.allGraphs().forEach(function(graph) {

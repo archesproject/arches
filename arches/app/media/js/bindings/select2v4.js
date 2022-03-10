@@ -9,7 +9,7 @@
     'use strict';
 
     var bindingName = 'select2v4';
-    if (module && module.config() && module.config().name) {
+    if (module && module.loaded && module.config() && module.config().name) {
         bindingName = module.config().name;
     }
 

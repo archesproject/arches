@@ -10,7 +10,8 @@ define([
     'views/notifications-list',
     'bindings/scrollTo',
     'bootstrap',
-    'bindings/slide'
+    'bindings/slide',
+    'jquery-ui',
 ], function($, _, Backbone, ko, moment, arches,  AlertViewModel, ProvisionalHistoryList, NotificationsList) {
     const viewData = window['view-data'];
 
