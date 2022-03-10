@@ -26,13 +26,15 @@
     <div class="hover-feature-body">
         {% block body %}
         <div class="hover-feature" data-bind="html: map_popup"></div>
-        <div class="hover-feature-metadata">
-            {% trans "Resource Model:" %}
-            <span data-bind="text: graph_name"></span>
-        </div>
-        <div class="hover-feature-metadata">
-            {% trans "ID:" %}
-            <span data-bind="text: resourceinstanceid"></span>
+        <div class="hover-feature-metadata-block">
+            <div class="hover-feature-metadata">
+                {% trans "Resource Model:" %}
+                <span data-bind="text: graph_name"></span>
+            </div>
+            <div class="hover-feature-metadata">
+                {% trans "ID:" %}
+                <span data-bind="text: resourceinstanceid"></span>
+            </div>
         </div>
         {% endblock body %}
     </div>
