@@ -291,6 +291,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 {% block pre_require_js %}
 {{block.super}}
     <script>
+        {% autoescape off %}
         window['resource-editor-data'] = {
             resourceid: '{{resourceid}}',
             graphid: '{{graphid}}',
@@ -315,6 +316,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
             graph: {{graph_json}},
             issystemsettings: {{is_system_settings|yesno:"true,false"}}
         };
+        {% endautoescape %}
         // {% autoescape off %}define('resource-editor-data', [], function() {
         //     return {
         //         resourceid: '{{resourceid}}',
