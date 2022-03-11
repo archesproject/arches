@@ -52,8 +52,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 
 </head>
 
-{% get_current_language_bidi as LANGUAGE_DIR %}
-<body {% if LANGUAGE_DIR == True %}dir="rtl" {% endif %}  {% block body_attributes %}class="scroll-y-auto"{% endblock %}>
+<body dir="{{ app_settings.DEFAULT_LANGUAGE_DIR }}" {% block body_attributes %}class="scroll-y-auto"{% endblock %}>
     {% block loading_mask %}
 
     <div class="loading-mask" data-bind="visible: typeof(loading()) === 'boolean' && loading()"></div>
