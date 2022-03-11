@@ -1,6 +1,5 @@
 define([
     'underscore',
-    'arches',
     'models/abstract',
     'models/node',
     'models/card-widget',
@@ -9,7 +8,8 @@ define([
     'card-components',
     'viewmodels/card-constraints',
     'utils/dispose'
-], function(_, arches, AbstractModel, NodeModel, CardWidgetModel, ko, koMapping, cardComponentLookup, CardConstraintsViewModel, dispose) {
+], function(_, AbstractModel, NodeModel, CardWidgetModel, ko, koMapping, cardComponentLookup, CardConstraintsViewModel, dispose) {
+    const arches = window.arches;
     var CardModel = AbstractModel.extend({
         /**
         * A backbone model to manage card data
