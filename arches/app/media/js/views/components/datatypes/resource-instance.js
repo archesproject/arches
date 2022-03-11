@@ -11,6 +11,13 @@ define([
         viewModel: function(params) {
             var self = this;
             this.search = params.search;
+            this.showSelectedResourceInfo = function(current_item,parent_context,data,event){
+                if(event.type=="click" || (event.type=="keyup" && (event.which==13 || event.keyCode==13))){
+                    { if(current_item.graphIsSemantic && parent_context.isEditable !== false){
+                            current_item.toggleSelectedResource(data)
+                    }; }
+                }
+            };
             this.resourceModels = [{
                 graphid: null,
                 name: ''
@@ -35,7 +42,7 @@ define([
                 } else if (params.widget) {
                     this.isEditable = params.widget.card.get('is_editable');
                 }
-                
+
                 this.node = params;
                 this.config = params.config;
                 this.openSearch = function(){
@@ -49,7 +56,7 @@ define([
                         self.selectedResourceModel([]);
                     }
                 });
-                
+
                 this.selectedResourceType = ko.observable(null);
                 this.toggleSelectedResource = function(resourceRelationship) {
                     if (self.selectedResourceType() === resourceRelationship) {
@@ -58,7 +65,7 @@ define([
                         self.selectedResourceType(resourceRelationship);
                     }
                 };
-                
+
                 var preventSetup = false;
                 var setupConfig = function(graph) {
                     var model = _.find(self.resourceModels, function(model){
@@ -87,7 +94,7 @@ define([
                             });
                         });
 
-                    // need to listen to these properties change so we can 
+                    // need to listen to these properties change so we can
                     // trigger a "dirty" state in the config
                     var triggerDirtyState = function() {
                         preventSetup = true;

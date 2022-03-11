@@ -28,7 +28,7 @@
                         </button>
                     </div>
                     <div class="rr-table-column" tabindex="0" style="flex-grow: 1; padding-left: 10px;"
-                       data-bind="click: function() { if(self.graphIsSemantic && $parent.isEditable !== false){self.toggleSelectedResource($data)}; }, clickBubble: false, style:{cursor: self.graphIsSemantic ? 'pointer': 'inherit'}" style="cursor: pointer;" onkeyup="if(event.which == 13 || event.keyCode == 13){ $(this).trigger('click'); }">
+                       data-bind="event: { keyup: $parent.showSelectedResourceInfo.bind($data,self,$parent), click:  $parent.showSelectedResourceInfo.bind($data,self,$parent)}, clickBubble: false, style:{cursor: self.graphIsSemantic ? 'pointer': 'inherit'}" style="cursor: pointer;">
                         <div class="rr-table-instance-label" data-bind="text: $data.name"></div>
                     </div>
                 </div>
@@ -91,7 +91,7 @@
                 title="{% trans " View search string..." %}"></i>
         </label>
     </div>
-    
+
     <div class="col-xs-12" style="padding-bottom: 10px;">
         <input type="text" placeholder="{% trans " Enter Search String here..." %}" class="form-control" style=""
             data-bind="textInput: config.searchString">
