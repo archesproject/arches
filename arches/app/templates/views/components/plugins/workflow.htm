@@ -127,34 +127,6 @@
         </div>
 
         <div class="tabbed-workflow-footer">
-            <div style="display: flex;">
-                <div class="step-counter">
-                    <span 
-                        style="padding-right: 2px;"
-                        data-bind="text:activeStep()['_index'] + 1"
-                    ></span>
-                    <span data-bind="text:`/ ${steps().length}`"></span>
-                    
-                </div>
-    
-                <!--ko if: ko.unwrap(activeStep().informationBoxData) -->
-                <div
-                    data-bind="{
-                        component: { 
-                            name: 'views/components/simple-switch', 
-                            params: {
-                                value: activeStep().informationBoxData()['displayed'], 
-                                config:{
-                                    label: '{% trans "Detailed Step Information" %}',
-                                    setvalue: activeStep().toggleInformationBox,
-                                    getvalue: activeStep().informationBoxData()['displayed'],
-                                }
-                            }
-                        }
-                    }"
-                ></div>
-                <!-- /ko -->
-            </div>
 
             <div class="tabbed-workflow-footer-button-container">
                 <!-- ko if: activeStep()._index > 0 -->
@@ -189,11 +161,7 @@
                     <button
                         class="btn btn-success"
                         data-bind="
-                            click: function() {
-                                $data.saveActiveStep().then(function() {
-                                    $data.next();
-                                });
-                            },
+                            click: $data.saveActiveStep
                         "
                     >
                         <i class="ion-android-cloud-done"></i>
@@ -241,6 +209,38 @@
                     <!-- /ko -->
                 <!-- /ko -->
             </div>
+
+
+            <div style="display: flex;">
+                <div class="step-counter">
+                    <span 
+                        style="padding-right: 2px;"
+                        data-bind="text:activeStep()['_index'] + 1"
+                    ></span>
+                    <span data-bind="text:`/ ${steps().length}`"></span>
+                    
+                </div>
+    
+                <!--ko if: ko.unwrap(activeStep().informationBoxData) -->
+                <div
+                    data-bind="{
+                        component: { 
+                            name: 'views/components/simple-switch', 
+                            params: {
+                                value: activeStep().informationBoxData()['displayed'], 
+                                config:{
+                                    label: '{% trans "Show Step Information" %}',
+                                    setvalue: activeStep().toggleInformationBox,
+                                    getvalue: activeStep().informationBoxData()['displayed'],
+                                }
+                            }
+                        }
+                    }"
+                ></div>
+                <!-- /ko -->
+            </div>
+
+
 
         </div>
     </div>

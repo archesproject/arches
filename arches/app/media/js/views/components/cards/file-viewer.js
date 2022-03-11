@@ -16,8 +16,10 @@ define([
     return ko.components.register('file-viewer', {
         viewModel: function(params) {
             params.configKeys = ['acceptedFiles', 'maxFilesize'];
+    
             var self = this;
             this.fileFormatRenderers = fileRenderers;
+            this.rendererComponentName = ko.observable();
 
             this.fileFormatRenderers.forEach(function(r){
                 r.state = {};
@@ -42,6 +44,15 @@ define([
             }
 
             this.fileRenderer = this.card.renderer;
+
+            //dynamically require the renderer - since these can be quite large/cumbersome
+            const renderer = fileRenderers.find(renderer => renderer.id === this.fileRenderer());
+            if(renderer) {
+                require([renderer.component], function(component){
+                    self.rendererComponentName(renderer.name);
+                });
+            }
+
             this.managerRenderer = ko.observable();
 
             this.filter = this.card.filter;
@@ -136,7 +147,11 @@ define([
                 this.fileFormatRenderers.forEach(function(renderer){
                     var excludeExtensions = renderer.exclude ? renderer.exclude.split(",") : [];
                     var rawFileType = type;
-                    var rawExtension = file.name ? ko.unwrap(file.name).split('.').pop() : ko.unwrap(file).split('.').pop();
+                    try {
+                        rawExtension = ko.unwrap(file).split('.').pop();
+                    } catch (error) {
+                        var rawExtension = file.name ? ko.unwrap(file.name).split('.').pop() : undefined;
+                    }
                     if (renderer.type === rawFileType && renderer.ext === rawExtension)  {
                         defaultRenderers.push(renderer);
                     }

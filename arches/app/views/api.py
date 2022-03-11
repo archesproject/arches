@@ -359,8 +359,10 @@ class GeoJSON(APIBase):
                                 feature["properties"]["primary_name"] = self.get_name(tile.resourceinstance)
                             feature["properties"]["resourceinstanceid"] = tile.resourceinstance_id
                             feature["properties"]["tileid"] = tile.pk
-                            if feature["properties"]["nodeId"]:
+                            try:
                                 feature["properties"].pop("nodeId")
+                            except KeyError:
+                                pass
                             feature["properties"]["nodeid"] = node.pk
                             if include_geojson_link:
                                 feature["properties"]["geojson"] = "%s?tileid=%s&nodeid=%s" % (reverse("geojson"), tile.pk, node.pk)
@@ -564,6 +566,7 @@ class Resources(APIBase):
 
         allowed_formats = ["json", "json-ld", "arches-json"]
         format = request.GET.get("format", "json-ld")
+        hide_hidden_nodes = bool(request.GET.get("hidden", "true").lower() == "false")
         user = request.user
         perm = "read_nodegroup"
 
@@ -585,11 +588,23 @@ class Resources(APIBase):
                 hide_empty_nodes = bool(request.GET.get("hide_empty_nodes", "false").lower() == "true")  # default False
 
                 if version == "beta":
-                    out = resource.to_json(compact=compact, hide_empty_nodes=hide_empty_nodes, user=user, perm=perm, version=version)
+                    out = resource.to_json(
+                        compact=compact,
+                        hide_empty_nodes=hide_empty_nodes,
+                        user=user,
+                        perm=perm,
+                        version=version,
+                        hide_hidden_nodes=hide_hidden_nodes,
+                    )
                 else:
                     out = {
                         "resource": resource.to_json(
-                            compact=compact, hide_empty_nodes=hide_empty_nodes, user=user, perm=perm, version=version
+                            compact=compact,
+                            hide_empty_nodes=hide_empty_nodes,
+                            user=user,
+                            perm=perm,
+                            version=version,
+                            hide_hidden_nodes=hide_hidden_nodes,
                         ),
                         "displaydescription": resource.displaydescription,
                         "displayname": resource.displayname,
@@ -1051,7 +1066,10 @@ class SearchExport(View):
         exporter = SearchResultsExporter(search_request=request)
         export_files, export_info = exporter.export(format, report_link)
         if format == "geojson" and total <= download_limit:
-            response = JSONResponse(export_files)
+            if settings.EXPORT_DATA_FIELDS_IN_CARD_ORDER:
+                response = JSONResponse(export_files, sort_keys=False)
+            else:
+                response = JSONResponse(export_files)
             return response
         return JSONResponse(status=404)
 
@@ -1417,13 +1435,15 @@ class BulkResourceReport(APIBase):
 class BulkDisambiguatedResourceInstance(APIBase):
     def get(self, request):
         resource_ids = request.GET.get("resource_ids").split(",")
-        uncompacted_value = request.GET.get("uncompacted")
         version = request.GET.get("v")
-        compact = True
-        if uncompacted_value == "true":
-            compact = False
+        hide_hidden_nodes = bool(request.GET.get("hidden", "true").lower() == "false")
+        compact = bool(request.GET.get("uncompacted", "false").lower() == "false")
+
         return JSONResponse(
-            {resource.pk: resource.to_json(compact=compact, version=version) for resource in Resource.objects.filter(pk__in=resource_ids)}
+            {
+                resource.pk: resource.to_json(compact=compact, version=version, hide_hidden_nodes=hide_hidden_nodes)
+                for resource in Resource.objects.filter(pk__in=resource_ids)
+            }
         )
 
 

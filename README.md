@@ -12,7 +12,7 @@ Issue reports are encouraged! [Please read this article](http://polite.technolog
 *   [Report a Bug](https://github.com/archesproject/arches/issues/new?template=bug.md)
 *   [File a Feature Ticket](https://github.com/archesproject/arches/issues/new?template=feature.md)
 
-[Version 5.1.1 release notes](https://github.com/archesproject/arches/blob/stable/5.1.x/releases/5.1.1.md)
+[Version 6.0.1 release notes](https://github.com/archesproject/arches/blob/dev/6.0.x/releases/6.0.1.md)
 
 #### Quick Install
 
