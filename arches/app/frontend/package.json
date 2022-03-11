@@ -17,6 +17,7 @@
         "@babel/eslint-parser": "^7.16.5",
         "@babel/plugin-proposal-class-properties": "^7.16.7",
         "@babel/plugin-syntax-dynamic-import": "^7.8.3",
+        "@babel/plugin-transform-runtime": "^7.17.0",
         "@babel/preset-env": "^7.16.8",
         "babel-loader": "^8.2.3",
         "clean-webpack-plugin": "^4.0.0",
@@ -46,6 +47,7 @@
     },
     "dependencies": {
         "@babel/polyfill": "^7.12.1",
+        "@babel/runtime": "^7.17.2",
         "@mapbox/geojson-extent": "0.3.2",
         "@mapbox/geojsonhint": "^3.0.0",
         "@mapbox/mapbox-gl-draw": "1.1.2",
@@ -95,6 +97,7 @@
         "nouislider": "11.0.3",
         "numeral": "^2.0.6",
         "proj4": "^2.3.15",
+        "regenerator-runtime": "^0.13.9",
         "requirejs": "~2.3.2",
         "requirejs-plugins": "1.0.2",
         "requirejs-text": "2.0.16",
