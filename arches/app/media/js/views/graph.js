@@ -8,6 +8,7 @@ require([
     'bootstrap',
     'bindings/hover',
     'bindings/chosen',
+    'utils/set-csrf-token',
 ], function($, _, ko, BaseManager, AlertViewModel, JsonErrorAlertViewModel) {    
     const arches = window.arches;
     const graphManagerData = window['graph-manager-data'];
