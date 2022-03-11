@@ -1,11 +1,12 @@
 define(['jquery',
-    'arches',
     'models/abstract',
     'knockout',
     'knockout-mapping',
     'underscore',
     'report-templates'
-], function($, arches, AbstractModel, ko, koMapping, _, reportLookup) {
+], function($, AbstractModel, ko, koMapping, _, reportLookup) {
+    const arches = window.arches;
+
     var ReportModel = AbstractModel.extend({
         /**
          * A backbone model to manage report data

@@ -389,6 +389,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 {% block pre_require_js %}
 {{block.super}}
     <script>
+        {% autoescape off %}
         window['graph-desigern-data'] = {
             graphid: '{{graphid}}',
             ontologyClasses: {{ontology_classes}},
@@ -405,6 +406,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
             appliedFunctions: {{applied_functions}},
             restrictedNodegroups: {{restricted_nodegroups}}
         };
+        {% endautoescape %}
         // {% autoescape off %}define('graph-designer-data', [], function() {
         //     return {
         //         graphid: '{{graphid}}',

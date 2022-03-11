@@ -1,9 +1,11 @@
-define(['arches',
+define([
     'models/abstract',
     'models/node',
     'knockout',
     'underscore'
-], function(arches, AbstractModel, NodeModel, ko, _) {
+], function(AbstractModel, NodeModel, ko, _) {
+    const arches = window.arches;
+
     return AbstractModel.extend({
         /**
         * A backbone model to manage graph data
