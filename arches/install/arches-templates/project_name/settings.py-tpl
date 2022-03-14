@@ -91,7 +91,7 @@ INSTALLED_APPS = (
     "oauth2_provider",
     "django_celery_results",
     "compressor",
-    # "silk.apps.SilkAppConfig",
+    # "silk",
     "{{ project_name }}",
 )
 
