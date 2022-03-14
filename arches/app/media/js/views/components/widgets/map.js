@@ -7,7 +7,6 @@ define([
     'viewmodels/map-editor',
     'bindings/chosen',
     'bindings/codemirror',
-    'codemirror/mode/javascript/javascript',
     'select2',
     'bindings/select2v4',
     'bindings/fadeVisible',

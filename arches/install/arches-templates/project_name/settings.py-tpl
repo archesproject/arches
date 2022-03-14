@@ -181,7 +181,11 @@ SESSION_COOKIE_NAME = '{{ project_name }}'
 CACHES = {
     'default': {
         'BACKEND': 'django.core.cache.backends.dummy.DummyCache',
-    }
+    },
+    'user_permission': {
+        'BACKEND': 'django.core.cache.backends.db.DatabaseCache',
+        'LOCATION': 'user_permission_cache',
+    },
 }
 
 # Hide nodes and cards in a report that have no data
