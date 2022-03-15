@@ -267,7 +267,8 @@ class GeoJSON(APIBase):
         if len(functionConfig) == 1:
             module = importlib.import_module(functionConfig[0].config["module"])
             PrimaryDescriptorsFunction = getattr(module, functionConfig[0].config["class_name"])()
-            return PrimaryDescriptorsFunction.get_primary_descriptor_from_nodes(resource, functionConfig[0].config["descriptor_types"]["name"])
+            return PrimaryDescriptorsFunction.get_primary_descriptor_from_nodes(resource, functionConfig[0].config[
+                "descriptor_types"]["name"])
         else:
             return _("Unnamed Resource")
 

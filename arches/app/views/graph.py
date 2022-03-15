@@ -177,6 +177,7 @@ class GraphDesignerView(GraphBaseView):
         #
         # Hack to get the function.functiontype available to views
         #
+
         class TmpFunc:
             def __init__(self, func_x_graph):
                 self.config = func_x_graph.config

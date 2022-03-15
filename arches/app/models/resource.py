@@ -75,7 +75,8 @@ class Resource(models.ResourceInstance):
         if len(functionConfig) == 1:
             module = importlib.import_module(functionConfig[0].config['module'])
             PrimaryDescriptorsFunction = getattr(module, functionConfig[0].config['class_name'])()
-            return PrimaryDescriptorsFunction.get_primary_descriptor_from_nodes(self, functionConfig[0].config['descriptor_types'][descriptor])
+            return PrimaryDescriptorsFunction.get_primary_descriptor_from_nodes(self, functionConfig[0].config[
+                'descriptor_types'][descriptor])
         else:
             return "undefined"
 
