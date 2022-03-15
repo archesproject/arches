@@ -21,10 +21,10 @@ function($, _, arches, ko, koMapping, FunctionViewModel, chosen) {
                 nodegroups[card.nodegroup_id] = true;
             }, this);
 
-            this.name = params.config.name;
+            this.name = params.config.descriptor_types.name;
 
-            this.description = params.config.description;
-            this.map_popup = params.config.map_popup;
+            this.description = params.config.descriptor_types.description;
+            this.map_popup = params.config.descriptor_types.map_popup;
 
             _.each([this.name, this.description, this.map_popup], function(property){
                 if (property.nodegroup_id) {

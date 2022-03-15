@@ -93,19 +93,19 @@ define([
 
         /**
          * Returns a boolean to indicate whether this node participates in descriptor function
-         * @param {object} node - a node in the tree 
+         * @param {object} node - a node in the tree
          */
         isFuncNode: function(node) {
             var appFuncs = null, appFuncDesc = false, appFuncName = false;
             if(this.appliedFunctions()) {
                 appFuncs = this.appliedFunctions();
                 for(var i = 0; i < appFuncs.length; i++) {
-                    if(appFuncs[i]['function_id'] == "60000000-0000-0000-0000-000000000001") {
-                        if(appFuncs[i]['config']['description']['nodegroup_id']) {
-                            appFuncDesc = appFuncs[i]['config']['description']['nodegroup_id'];
+                    if(appFuncs[i]['function']['functiontype'] == "primarydescriptors") {
+                        if(appFuncs[i]['config']['descriptor_types']['description']['nodegroup_id']) {
+                            appFuncDesc = appFuncs[i]['config']['descriptor_types']['description']['nodegroup_id'];
                         }
-                        if(appFuncs[i]['config']['name']['nodegroup_id']) {
-                            appFuncName = appFuncs[i]['config']['name']['nodegroup_id'];
+                        if(appFuncs[i]['config']['descriptor_types']['name']['nodegroup_id']) {
+                            appFuncName = appFuncs[i]['config']['descriptor_types']['name']['nodegroup_id'];
                         }
                         if(node['id'] === appFuncDesc || node['id'] === appFuncName) {
                             return true;
@@ -115,7 +115,7 @@ define([
                                     if(child['id'] === appFuncDesc || child['id'] === appFuncName) {
                                         return true;
                                     }
-                                }); 
+                                });
                             }
                         }
                     }

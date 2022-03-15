@@ -45,12 +45,12 @@ define([
                 if(this.appliedFunctions()) {
                     appFuncs = this.appliedFunctions();
                     for(var i = 0; i < appFuncs.length; i++) {
-                        if(appFuncs[i]['function_id'] == "60000000-0000-0000-0000-000000000001") {
-                            if(appFuncs[i]['config']['description']['nodegroup_id']) {
-                                appFuncDesc = appFuncs[i]['config']['description']['nodegroup_id'];
+                        if(appFuncs[i]['function']['functiontype'] === "primarydescriptors") {
+                            if(appFuncs[i]['config']['descriptor_types']['description']['nodegroup_id']) {
+                                appFuncDesc = appFuncs[i]['config']['descriptor_types']['description']['nodegroup_id'];
                             }
-                            if(appFuncs[i]['config']['name']['nodegroup_id']) {
-                                appFuncName = appFuncs[i]['config']['name']['nodegroup_id'];
+                            if(appFuncs[i]['config']['descriptor_types']['name']['nodegroup_id']) {
+                                appFuncName = appFuncs[i]['config']['descriptor_types']['name']['nodegroup_id'];
                             }
                             if(node['id'] === appFuncDesc) {
                                 return "This node participates in the descriptor function";

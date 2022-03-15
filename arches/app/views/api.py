@@ -263,11 +263,11 @@ class GeoJSON(APIBase):
     se = SearchEngineFactory().create()
 
     def get_name(self, resource):
-        module = importlib.import_module("arches.app.functions.primary_descriptors")
-        PrimaryDescriptorsFunction = getattr(module, "PrimaryDescriptorsFunction")()
         functionConfig = models.FunctionXGraph.objects.filter(graph_id=resource.graph_id, function__functiontype="primarydescriptors")
         if len(functionConfig) == 1:
-            return PrimaryDescriptorsFunction.get_primary_descriptor_from_nodes(resource, functionConfig[0].config["name"])
+            module = importlib.import_module(functionConfig[0].config["module"])
+            PrimaryDescriptorsFunction = getattr(module, functionConfig[0].config["class_name"])()
+            return PrimaryDescriptorsFunction.get_primary_descriptor_from_nodes(resource, functionConfig[0].config["descriptor_types"]["name"])
         else:
             return _("Unnamed Resource")
 

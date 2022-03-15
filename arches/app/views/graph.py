@@ -174,7 +174,24 @@ class GraphDesignerView(GraphBaseView):
         datatypes = models.DDataType.objects.all()
         datatypes_json = JSONSerializer().serialize(datatypes, exclude=["modulename", "isgeometric"])
         branch_graphs = Graph.objects.exclude(pk=graphid).exclude(isresource=True)
-        applied_functions = JSONSerializer().serialize(models.FunctionXGraph.objects.filter(graph=self.graph))
+        #
+        # Hack to get the function.functiontype available to views
+        #
+        class TmpFunc:
+            def __init__(self, func_x_graph):
+                self.config = func_x_graph.config
+                self.graph_id = func_x_graph.graph.graphid
+                self.id = func_x_graph.id
+                self.function_id = func_x_graph.function_id
+                self.function = func_x_graph.function
+
+        functions = []
+        for function in models.FunctionXGraph.objects.filter(graph=self.graph).prefetch_related("function"):
+            functions.append(TmpFunc(function))
+        #
+        # end hack
+        #
+        applied_functions = JSONSerializer().serialize(functions)
         cards = self.graph.cardmodel_set.order_by("sortorder").prefetch_related("cardxnodexwidget_set")
         constraints = []
         for card in cards:
@@ -400,7 +417,7 @@ class GraphDataView(View):
             return JSONErrorResponse(
                 _("Elasticsearch indexing error"),
                 _(
-                    """If you want to change the datatype of an existing node.  
+                    """If you want to change the datatype of an existing node.
                     Delete and then re-create the node, or export the branch then edit the datatype and re-import the branch."""
                 ),
             )

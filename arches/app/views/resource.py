@@ -176,7 +176,26 @@ class ResourceEditorView(MapBaseManagerView):
         ]
         widgets = models.Widget.objects.all()
         card_components = models.CardComponent.objects.all()
-        applied_functions = JSONSerializer().serialize(models.FunctionXGraph.objects.filter(graph=graph))
+
+        #
+        # Hack to get the function.functiontype available to views
+        #
+        class TmpFunc:
+            def __init__(self, func_x_graph):
+                self.config = func_x_graph.config
+                self.graph_id = func_x_graph.graph.graphid
+                self.id = func_x_graph.id
+                self.function_id = func_x_graph.function_id
+                self.function = func_x_graph.function
+
+        functions = []
+        for function in models.FunctionXGraph.objects.filter(graph=self.graph).prefetch_related("function"):
+            functions.append(TmpFunc(function))
+        #
+        # end hack
+        #
+        applied_functions = JSONSerializer().serialize(functions)
+
         datatypes = models.DDataType.objects.all()
         user_is_reviewer = user_is_resource_reviewer(request.user)
         is_system_settings = False

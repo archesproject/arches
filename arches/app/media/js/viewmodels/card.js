@@ -380,12 +380,12 @@ define([
                 var appFuncDesc = false, appFuncName = false, nodegroupId = null;
                 if(params.appliedFunctions && params.card) {
                     for(var i=0; i < self.appliedFunctions.length; i++) {
-                        if(self.appliedFunctions[i]['function_id'] == "60000000-0000-0000-0000-000000000001") {
-                            if(self.appliedFunctions[i]['config']['description']['nodegroup_id']) {
-                                appFuncDesc = self.appliedFunctions[i]['config']['description']['nodegroup_id'];
+                        if(self.appliedFunctions[i]['function']['functiontype'] === "primarydescriptors") {
+                            if(self.appliedFunctions[i]['config']['descriptor_types']['description']['nodegroup_id']) {
+                                appFuncDesc = self.appliedFunctions[i]['config']['descriptor_types']['description']['nodegroup_id'];
                             }
-                            if(self.appliedFunctions[i]['config']['name']['nodegroup_id']) {
-                                appFuncName = self.appliedFunctions[i]['config']['name']['nodegroup_id'];
+                            if(self.appliedFunctions[i]['config']['descriptor_types']['name']['nodegroup_id']) {
+                                appFuncName = self.appliedFunctions[i]['config']['descriptor_types']['name']['nodegroup_id'];
                             }
                             nodegroupId = params.card.nodegroup_id;
                             if(nodegroupId === appFuncDesc) {

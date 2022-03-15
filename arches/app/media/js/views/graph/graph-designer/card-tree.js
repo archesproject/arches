@@ -230,7 +230,7 @@ define([
             },
             updateCards: function(selectedNodegroupId, data) {
                 self.updateNode(self.topCards(), data.updated_values.node);
-                
+
                 if (data.updated_values.card) {
                     var card = data.updated_values.card;
                     var defaultCardName = data.default_card_name;
@@ -367,12 +367,12 @@ define([
                     appFuncs = this.appliedFunctions();
                     nodegroupId = params.card.nodegroup_id;
                     for(var i = 0; i < appFuncs.length; i++) {
-                        if(appFuncs[i]['function_id'] == "60000000-0000-0000-0000-000000000001") {
-                            if(appFuncs[i]['config']['description']['nodegroup_id']) {
-                                appFuncDesc = appFuncs[i]['config']['description']['nodegroup_id'];
+                        if(appFuncs[i]['function']['functiontype'] === "primarydescriptors") {
+                            if(appFuncs[i]['config']['descriptor_types']['description']['nodegroup_id']) {
+                                appFuncDesc = appFuncs[i]['config']['descriptor_types']['description']['nodegroup_id'];
                             }
-                            if(appFuncs[i]['config']['name']['nodegroup_id']) {
-                                appFuncName = appFuncs[i]['config']['name']['nodegroup_id'];
+                            if(appFuncs[i]['config']['descriptor_types']['name']['nodegroup_id']) {
+                                appFuncName = appFuncs[i]['config']['descriptor_types']['name']['nodegroup_id'];
                             }
                             if(nodegroupId === appFuncDesc || nodegroupId === appFuncName) {
                                 return true;
