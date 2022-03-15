@@ -3,27 +3,21 @@
 <div class="workbench-card-wrapper">
     <div class="workbench-card-sidebar">
         {% block tabs %}
-        <div tabindex="0" class="workbench-card-sidebar-tab" data-bind="click: function() {
-            toggleTab('basemap');
-        }, css: {
+        <div tabindex="0" class="workbench-card-sidebar-tab" data-bind="event: { keyup: mapEventHandler.bind($data,'toggle tab','basemap'), click:  mapEventHandler.bind($data,'toggle tab','basemap')}, css: {
             'active': activeTab() === 'basemap'
-        }" onkeyup="if(event.which == 13 || event.keyCode == 13){ $(this).trigger('click'); }">
+        }">
             <i class="fa fa-globe"></i>
             <span class="map-sidebar-text">{% trans "Basemap" %}</span>
         </div>
-        <div tabindex="0" class="workbench-card-sidebar-tab" data-bind="click: function() {
-            toggleTab('overlays');
-        }, css: {
+        <div tabindex="0" class="workbench-card-sidebar-tab" data-bind="event: { keyup: mapEventHandler.bind($data,'toggle tab','overlays'), click:  mapEventHandler.bind($data,'toggle tab','overlays')}, css: {
             'active': activeTab() === 'overlays'
-        }" onkeyup="if(event.which == 13 || event.keyCode == 13){ $(this).trigger('click'); }">
+        }" >
             <i class="fa fa-list"></i>
             <span class="map-sidebar-text">{% trans "Overlays" %}</span>
         </div>
-        <div tabindex="0" class="workbench-card-sidebar-tab" data-bind="click: function() {
-            toggleTab('legend');
-        }, css: {
+        <div tabindex="0" class="workbench-card-sidebar-tab" data-bind="event: { keyup: mapEventHandler.bind($data,'toggle tab','legend'), click:  mapEventHandler.bind($data,'toggle tab','legend')}, css: {
             'active': activeTab() === 'legend'
-        }" onkeyup="if(event.which == 13 || event.keyCode == 13){ $(this).trigger('click'); }">
+        }">
             <i class="fa fa-list-alt"></i>
             <span class="map-sidebar-text">{% trans "Legend" %}</span>
         </div>
@@ -34,17 +28,16 @@
             {% block sidepanel %}
             <!--ko if: activeTab() === 'basemap' -->
                 <div class="workbench-card-sidepanel-header-container">
-                    <h4 tabindex="0" class="workbench-card-sidepanel-header" data-bind="click: hideSidePanel" onkeyup="if(event.which == 13 || event.keyCode == 13){ $(this).trigger('click'); }">
+                    <h4 tabindex="0" class="workbench-card-sidepanel-header" data-bind="event: { keyup: mapEventHandler.bind($data,'hide side panel',null), click:  mapEventHandler.bind($data,'hide side panel',null)}">
                         {% trans "Basemaps" %}
                     </h4>
                 </div>
 
                 <div class="basemap-listing-container">
                 <!--ko foreach: basemaps -->
-                    <div tabindex="0" class="basemap-listing" data-bind="
-                        click: $parent.activeBasemap,
-                        css: {'active-basemap': $data === $parent.activeBasemap()}
-                        " onkeyup="if(event.which == 13 || event.keyCode == 13){ $(this).trigger('click'); }">
+                <div tabindex="0" class="basemap-listing" data-bind="
+                        event: {click: $parent.mapEventHandler.bind($data,'active basemap',$parent), keyup: $parent.mapEventHandler.bind($data,'active basemap',$parent)},
+                        css: {'active-basemap': $data === $parent.activeBasemap()}">
                         <i data-bind="css: icon" class="layer-listing-icon"></i>
                         <span data-bind="text: name"></span>
                     </div>
@@ -55,7 +48,7 @@
 
             <!--ko if: activeTab() === 'overlays' -->
                 <div class="workbench-card-sidepanel-header-container">
-                    <h4 tabindex="0" class="workbench-card-sidepanel-header" data-bind="click: hideSidePanel" onkeyup="if(event.which == 13 || event.keyCode == 13){ $(this).trigger('click'); }">
+                    <h4 tabindex="0" class="workbench-card-sidepanel-header" data-bind="event: { keyup: mapEventHandler.bind($data,'hide side panel',null), click:  mapEventHandler.bind($data,'hide side panel',null)}">
                         {% trans "Overlays" %}
                     </h4>
                 </div>
@@ -63,12 +56,7 @@
                     data: overlays
                 }">
                     <div class="overlay-listing" data-bind="css: {'active-overlay': onMap}">
-                        <div tabindex="0" class="overlay-name" data-bind="
-                            click: function() {
-                                onMap(!onMap());
-                                updateParent($parent);
-                            }
-                        " onkeyup="if(event.which == 13 || event.keyCode == 13){ $(this).trigger('click'); }">
+                        <div tabindex="0" class="overlay-name" data-bind="event: {keyup: $parent.mapEventHandler.bind($data,'overlay',$parent), click: $parent.mapEventHandler.bind($data,'overlay',$parent)}">
                             <i data-bind="css: icon" class="layer-listing-icon"></i>
                             <span data-bind="text: name"></span>
                         </div>
@@ -84,7 +72,7 @@
 
             <!--ko if: activeTab() === 'legend' -->
                 <div class="workbench-card-sidepanel-header-container">
-                    <h4 tabindex="0" class="workbench-card-sidepanel-header" data-bind="click: hideSidePanel" onkeyup="if(event.which == 13 || event.keyCode == 13){ $(this).trigger('click'); }">
+                    <h4 tabindex="0" class="workbench-card-sidepanel-header" data-bind="event: { keyup: mapEventHandler.bind($data,'hide side panel',null), click:  mapEventHandler.bind($data,'hide side panel',null)}">
                         {% trans "Legend" %}
                     </h4>
                 </div>

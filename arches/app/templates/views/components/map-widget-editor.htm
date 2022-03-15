@@ -2,11 +2,9 @@
 {% load i18n %}
 
 {% block tabs %}
-<div tabindex="0" class="workbench-card-sidebar-tab" data-bind="click: function() {
-    toggleTab('editor');
-}, css: {
+<div tabindex="0" class="workbench-card-sidebar-tab" data-bind="event: { keyup: mapEventHandler.bind($data,'toggle tab','editor'), click:  mapEventHandler.bind($data,'toggle tab','editor')}, css: {
     'active': activeTab() === 'editor'
-}" onkeyup="if(event.which == 13 || event.keyCode == 13){ $(this).trigger('click'); }">
+}">
     <i class="fa fa-pencil"></i>
     <span class="map-sidebar-text">{% trans "Edit" %}</span>
 </div>
@@ -18,7 +16,7 @@
 <!--ko if: activeTab() === 'editor' -->
     <div class="workbench-header-buffer">
         <div class="workbench-card-sidepanel-header-container">
-            <h4 tabindex="0" class="workbench-card-sidepanel-header" data-bind="click: hideSidePanel, text: label" onkeyup="if(event.which == 13 || event.keyCode == 13){ $(this).trigger('click'); }"></h4>
+            <h4 tabindex="0" class="workbench-card-sidepanel-header" data-bind="event: { keyup: mapEventHandler.bind($data,'hide side panel',null), click:  mapEventHandler.bind($data,'hide side panel',null)}, text: label"></h4>
         </div>
     </div>
 

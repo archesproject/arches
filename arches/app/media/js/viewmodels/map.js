@@ -25,6 +25,27 @@ define([
         this.canEdit = params.userCanEditResources;
         this.canRead = params.userCanReadResources;
 
+
+        this.mapEventHandler = function(event_name,additional_param,data,event){
+            if(event.type=="click" || (event.type=="keyup" && (event.which==13 || event.keyCode==13))){
+                switch (event_name){
+                    case "toggle tab":
+                        data.toggleTab(additional_param);
+                        break;
+                    case "hide side panel":
+                        data.hideSidePanel();
+                        break;
+                    case "active basemap":
+                        additional_param.activeBasemap(data)
+                        break;
+                    case "overlay":
+                        data.onMap(!data.onMap());
+                        data.updateParent(additional_param);
+                        break;
+                }
+            }
+        }
+
         var boundingOptions = {
             padding: {
                 top: 40,
@@ -41,13 +62,13 @@ define([
 
             if (ko.unwrap(params.x) && ko.unwrap(params.y)) {
                 var center = map.getCenter();
-            
+
                 lng = parseFloat(params.x());
                 lat = parseFloat(params.y());
-                
+
                 if (lng) { center.lng = lng; }
                 if (lat) { center.lat = lat; }
-    
+
                 map.setCenter(center);
             }
 
@@ -77,7 +98,7 @@ define([
             if (lng && self.map()) {
                 var center = self.map().getCenter();
                 center.lng = lng;
-            
+
                 self.map().setCenter(center);
             }
             if (ko.isObservable(params.x) && params.x() !== lng) {
@@ -90,14 +111,14 @@ define([
             if (lat && self.map()) {
                 var center = self.map().getCenter();
                 center.lat = lat;
-            
+
                 self.map().setCenter(center);
             }
             if (ko.isObservable(params.y) && params.y() !== lat) {
                 params.y(lat);
             }
         });
-        
+
         this.zoom = ko.observable(ko.unwrap(params.zoom) || arches.mapDefaultZoom);
         this.zoom.subscribe(function(level) {
             if (level && self.map()) { self.map().setZoom(level) };
@@ -113,7 +134,7 @@ define([
                 params.overlayConfigs(overlayConfigs)
             }
         })
-        
+
         this.activeBasemap = ko.observable();  // params.basemap is a string, activeBasemap is a map. Cannot initialize from params.
         this.activeBasemap.subscribe(function(basemap) {
             if (ko.isObservable(params.basemap) && params.basemap() !== basemap.name) {
@@ -127,10 +148,10 @@ define([
             "search-results-hashes": geojsonSourceFactory(),
             "search-results-points": geojsonSourceFactory()
         }, arches.mapSources, params.sources);
-        
+
         this.basemaps = params.basemaps || [];
         this.overlays = params.overlaysObservable || ko.observableArray();
-        
+
         var mapLayers = params.mapLayers || arches.mapLayers;
         mapLayers.forEach(function(layer) {
             if (!layer.isoverlay) {
@@ -145,7 +166,7 @@ define([
                         layer.opacity(value ? 100 : 0);
                     }
                 });
-                
+
                 layer.updateParent = function(parent) {
                     if (self.overlayConfigs.indexOf(layer.maplayerid) === -1) {
                         self.overlayConfigs.push(layer.maplayerid)
@@ -154,7 +175,7 @@ define([
                         self.overlayConfigs.remove(layer.maplayerid);
                         layer.opacity(0)
                     }
-                    
+
                     if (parent !== self) {
                         parent.overlayConfigs(self.overlayConfigs())
 
@@ -171,7 +192,7 @@ define([
                 self.overlays.push(layer);
             }
         });
-        
+
         if (!self.activeBasemap()) {
             var basemap = ko.unwrap(self.basemaps).find(function(basemap) {
                 return ko.unwrap(params.basemap) === basemap.name;
@@ -516,7 +537,7 @@ define([
 
                     map.on('dragend', function() {
                         var center = map.getCenter();
-                        
+
                         self.centerX(parseFloat(center.lng));
                         self.centerY(parseFloat(center.lat));
                     });
