@@ -2,14 +2,14 @@ define(['jquery',
     'underscore',
     'views/components/search/base-filter',
     'bootstrap',
-    'arches',
     'select2',
     'knockout',
     'knockout-mapping',
     'models/graph',
     'bootstrap-datetimepicker',
     'plugins/knockout-select2'],
-function($, _, BaseFilter, bootstrap, arches, select2, ko, koMapping, GraphModel) {
+function($, _, BaseFilter, bootstrap, select2, ko, koMapping, GraphModel) {
+    const arches = window.arches;
     const viewdata = window['view-data'];
 
     var componentName = 'search-results';
@@ -230,6 +230,6 @@ function($, _, BaseFilter, bootstrap, arches, select2, ko, koMapping, GraphModel
                 this.trigger('find_on_map', data.resourceid, data);
             }
         }),
-        template: { require: 'text!templates/views/components/search/search-results.htm' }
+        template: window['search-results-template']
     });
 });

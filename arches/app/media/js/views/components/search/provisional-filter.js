@@ -74,6 +74,6 @@ define([
                 this.filter.removeAll();
             }
         }),
-        template: { require: 'text!templates/views/components/search/provisional-filter.htm' }
+        template: window['provisional-filter-template']
     });
 });

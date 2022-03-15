@@ -44,6 +44,6 @@ function($, _, BaseFilter, ko) {
             }
             
         }),
-        template: { require: 'text!templates/views/components/search/sort-results.htm' }
+        template: window['sort-results-template']
     });
 });

@@ -1,8 +1,9 @@
 define(['jquery',
     'knockout',
-    'arches',
-    'bindings/smartresize'],
-function($, ko, arches) {
+    'bindings/smartresize'
+],
+function($, ko) {
+    const arches = window.arches
     var componentName = 'saved-searches';
     return ko.components.register(componentName, {
         viewModel: function(params) {
@@ -33,6 +34,6 @@ function($, ko, arches) {
                 }
             };
         },
-        template: { require: 'text!templates/views/components/search/saved-searches.htm'}
+        template: window['saved-search-template']
     });
 });
