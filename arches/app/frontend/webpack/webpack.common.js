@@ -90,6 +90,7 @@ module.exports = {
             jquery:  Path.resolve(__dirname, '../../media/node_modules/jquery/dist/jquery.min'),
             jQuery:  Path.resolve(__dirname, '../../media/node_modules/jquery/dist/jquery.min'),
             $:  Path.resolve(__dirname, '../../media/node_modules/jquery/dist/jquery.min'),
+            // require: Path.resolve(__dirname, '../../media/node_modules/requirejs/require.js'),
         }),
         new BundleTracker({ filename: './webpack-stats.json' }),
     ].concat(buildHtmlWebpackPluginList('../templates', [])),
@@ -133,6 +134,7 @@ module.exports = {
             'templates/views/components/cards/related-resources-map-popup.htm': Path.resolve(__dirname, '../../templates/views/components/cards/related-resources-map-popup.htm'),
             'templates/views/components/map-popup.htm': Path.resolve(__dirname, '../../templates/views/components/map-popup.htm'),
             'templates/views/components/cards/map-popup.htm': Path.resolve(__dirname, '../../templates/views/components/cards/map-popup.htm'),
+            'templates/views/components/simple-switch.htm': Path.resolve(__dirname, '../../templates/views/components/simple-switch.htm' ),
 
             'nifty': Path.resolve(__dirname, '../../media/plugins', 'nifty'),
             'async': Path.resolve(__dirname, '../../media/node_modules/requirejs-plugins/src/async'),
@@ -197,6 +199,10 @@ module.exports = {
     },
     module: {
         rules: [
+            // {
+            //     test: /\.json$/,
+            //     loader: "json-loader"
+            // },
             {
                 test: /\.mjs$/,
                 include: /node_modules/,

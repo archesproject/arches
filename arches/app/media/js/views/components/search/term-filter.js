@@ -3,7 +3,7 @@ define([
     'knockout-mapping',
     'underscore',
     'views/components/search/base-filter',
-    'bindings/term-search'
+    'bindings/term-search',
 ], function(ko, koMapping, _, BaseFilter, termSearchComponent) {
     var componentName = 'term-filter';
     return ko.components.register(componentName, {
@@ -103,6 +103,6 @@ define([
                 this.filter.tags.removeAll();
             }
         }),
-        template: { require: 'text!templates/views/components/search/term-filter.htm' }
+        template: window['term-filter-template']
     });
 });

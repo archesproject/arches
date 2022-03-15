@@ -7,7 +7,9 @@ define([
     'viewmodels/alert',
     // 'search-components',
     'views/base-manager',
-    'views/components/simple-switch'
+    'views/components/simple-switch',
+    'views/components/search/term-filter',
+    // 'templates/views/components/search/term-filter.htm'
 ], function($, _, ko, koMapping, arches, AlertViewModel, BaseManagerView) {
     const SearchComponents = window['search-components'];
     // a method to track the old and new values of a subscribable
