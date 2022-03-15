@@ -8,8 +8,12 @@ define([
     // 'search-components',
     'views/base-manager',
     'views/components/simple-switch',
+    'views/components/search/map-filter',
+    'views/components/search/paging-filter',
+    'views/components/search/related-resources-filter',
+    'views/components/search/resource-type-filter',
     'views/components/search/term-filter',
-    // 'templates/views/components/search/term-filter.htm'
+    'views/components/search/time-filter',
 ], function($, _, ko, koMapping, arches, AlertViewModel, BaseManagerView) {
     const SearchComponents = window['search-components'];
     // a method to track the old and new values of a subscribable

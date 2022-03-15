@@ -603,6 +603,6 @@ define([
                 }
             }
         }),
-        template: { require: 'text!templates/views/components/search/map-filter.htm' }
+        template: window['map-filter-template']
     });
 });

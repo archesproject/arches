@@ -33,6 +33,6 @@ define(['knockout', 'arches',
                 }
             }
         }),
-        template: { require: 'text!templates/views/components/search/related-resources-filter.htm'}
+        template: window['related-resources-template']
     });
 });

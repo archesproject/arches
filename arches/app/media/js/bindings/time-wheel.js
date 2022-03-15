@@ -2,9 +2,10 @@ define([
     'jquery',
     'underscore',
     'knockout',
+    'regenerator-runtime',
     'd3',
     'arches'
-], function($, _, ko, d3, arches) {
+], function($, _, ko, regeneratorRuntime, d3, arches) {
     var width = 300;
     var height = 300;
     var radius = Math.min(width, height) / 8;

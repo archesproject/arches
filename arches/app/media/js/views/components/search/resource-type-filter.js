@@ -71,6 +71,6 @@ define([
                 }
             }
         }),
-        template: { require: 'text!templates/views/components/search/resource-type-filter.htm' }
+        template: window['resource-type-filter-template']
     });
 });

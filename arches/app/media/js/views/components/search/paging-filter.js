@@ -76,6 +76,6 @@ function(BaseFilter, ko, koMapping) {
                 }
             }
         }),
-        template: { require: 'text!templates/views/components/search/paging-filter.htm' }
+        template: window['paging-filter-template']
     });
 });

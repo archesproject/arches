@@ -186,6 +186,6 @@ function($, _, ko, moment, BaseFilter, arches) {
                 return;
             }
         }),
-        template: { require: 'text!templates/views/components/search/time-filter.htm' }
+        template: window['time-filter-template']
     });
 });
