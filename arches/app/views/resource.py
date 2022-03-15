@@ -189,7 +189,7 @@ class ResourceEditorView(MapBaseManagerView):
                 self.function = func_x_graph.function
 
         functions = []
-        for function in models.FunctionXGraph.objects.filter(graph=self.graph).prefetch_related("function"):
+        for function in models.FunctionXGraph.objects.filter(graph=graph).prefetch_related("function"):
             functions.append(TmpFunc(function))
         #
         # end hack
