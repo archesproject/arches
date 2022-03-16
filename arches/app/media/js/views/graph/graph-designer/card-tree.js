@@ -143,6 +143,7 @@ define([
             graph: params.graph,
             graphModel: params.graphModel,
             appliedFunctions: params.appliedFunctions(),
+            primaryDescriptorFunction: params.primaryDescriptorFunction(),
             toggleIds: function() {
                 self.showIds(!self.showIds());
             },
@@ -360,27 +361,23 @@ define([
             },
             selection: selection,
             filter: filter,
-            isFuncNode: function() {
-                var appFuncs = null, appFuncDesc = false, appFuncName = false, nodegroupId = null;
-                if(params.card && this.appliedFunctions()) {
+            isFuncNode: function () {
+                var nodegroupId = null, pdFunction = this.primaryDescriptorFunction;
+
+                // params.card always seems to be undefined...
+                if (params.card && pdFunction) {
                     // console.log(ko.unwrap(params));
-                    appFuncs = this.appliedFunctions();
                     nodegroupId = params.card.nodegroup_id;
-                    for(var i = 0; i < appFuncs.length; i++) {
-                        if(appFuncs[i]['function']['functiontype'] === "primarydescriptors") {
-                            if(appFuncs[i]['config']['descriptor_types']['description']['nodegroup_id']) {
-                                appFuncDesc = appFuncs[i]['config']['descriptor_types']['description']['nodegroup_id'];
-                            }
-                            if(appFuncs[i]['config']['descriptor_types']['name']['nodegroup_id']) {
-                                appFuncName = appFuncs[i]['config']['descriptor_types']['name']['nodegroup_id'];
-                            }
-                            if(nodegroupId === appFuncDesc || nodegroupId === appFuncName) {
+
+                    for (var descriptor in ['name', 'description'])
+                    {
+                        try {
+                            if (nodegroupId === pdFunction['config']['descriptor_types'][descriptor]['nodegroup_id'])
                                 return true;
-                            }
-                        }
+                        } catch (e) { } // Descriptor doesn't exist so ignore the exception
                     }
+                    return false;
                 }
-                return false;
             }
         });
 
@@ -400,6 +397,7 @@ define([
             return new CardViewModel({
                 card: card,
                 appliedFunctions: params.appliedFunctions(),
+                primaryDescriptorFunction: params.primaryDescriptorFunction(),
                 graphModel: params.graphModel,
                 tile: null,
                 resourceId: ko.observable(),

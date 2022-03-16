@@ -177,24 +177,17 @@ class ResourceEditorView(MapBaseManagerView):
         widgets = models.Widget.objects.all()
         card_components = models.CardComponent.objects.all()
 
-        #
-        # Hack to get the function.functiontype available to views
-        #
-        class TmpFunc:
-            def __init__(self, func_x_graph):
-                self.config = func_x_graph.config
-                self.graph_id = func_x_graph.graph.graphid
-                self.id = func_x_graph.id
-                self.function_id = func_x_graph.function_id
-                self.function = func_x_graph.function
+        primary_descriptor_functions = models.FunctionXGraph.objects.filter(graph=graph).filter(
+            function__functiontype="primarydescriptors"
+        )
 
-        functions = []
-        for function in models.FunctionXGraph.objects.filter(graph=graph).prefetch_related("function"):
-            functions.append(TmpFunc(function))
-        #
-        # end hack
-        #
-        applied_functions = JSONSerializer().serialize(functions)
+        primary_descriptor_function = JSONSerializer().serialize(
+            primary_descriptor_functions[0] if len(primary_descriptor_functions) > 0 else None
+        )
+
+        applied_functions = JSONSerializer().serialize(
+            models.FunctionXGraph.objects.filter(graph=graph)
+        )
 
         datatypes = models.DDataType.objects.all()
         user_is_reviewer = user_is_resource_reviewer(request.user)
@@ -265,6 +258,7 @@ class ResourceEditorView(MapBaseManagerView):
             card_components_json=JSONSerializer().serialize(card_components),
             tiles=JSONSerializer().serialize(tiles),
             cards=JSONSerializer().serialize(cards),
+            primary_descriptor_function=primary_descriptor_function,
             applied_functions=applied_functions,
             nodegroups=JSONSerializer().serialize(nodegroups),
             nodes=JSONSerializer().serialize(nodes),

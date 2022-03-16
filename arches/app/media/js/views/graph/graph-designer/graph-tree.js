@@ -63,6 +63,7 @@ define([
             this.graphSettings = options.graphSettings;
             this.cardTree = options.cardTree;
             this.appliedFunctions = options.appliedFunctions;
+            this.primaryDescriptorFunction = options.primaryDescriptorFunction;
             this.permissionTree = options.permissionTree;
             this.items = this.graphModel.get('nodes');
             this.branchListVisible = ko.observable(false);
@@ -96,32 +97,21 @@ define([
          * @param {object} node - a node in the tree
          */
         isFuncNode: function(node) {
-            var appFuncs = null, appFuncDesc = false, appFuncName = false;
-            if(this.appliedFunctions()) {
-                appFuncs = this.appliedFunctions();
-                for(var i = 0; i < appFuncs.length; i++) {
-                    if(appFuncs[i]['function']['functiontype'] == "primarydescriptors") {
-                        if(appFuncs[i]['config']['descriptor_types']['description']['nodegroup_id']) {
-                            appFuncDesc = appFuncs[i]['config']['descriptor_types']['description']['nodegroup_id'];
-                        }
-                        if(appFuncs[i]['config']['descriptor_types']['name']['nodegroup_id']) {
-                            appFuncName = appFuncs[i]['config']['descriptor_types']['name']['nodegroup_id'];
-                        }
-                        if(node['id'] === appFuncDesc || node['id'] === appFuncName) {
-                            return true;
-                        } else {
-                            if(node['children']) {
-                                node['children'].forEach( function(child) {
-                                    if(child['id'] === appFuncDesc || child['id'] === appFuncName) {
-                                        return true;
-                                    }
-                                });
-                            }
-                        }
-                    }
-                }
-            }
-            return false;
+            var primaryDescriptorNodes = {}, descriptorNode = null, pdFunction = this.primaryDescriptorFunction;
+
+            if(!this.primaryDescriptorFunction())
+                return null;
+
+            ['name', 'description'].forEach(function (descriptor) {
+                try {
+                    primaryDescriptorNodes[pdFunction()['config']['descriptor_types'][descriptor]['nodegroup_id']] = descriptor;
+                } catch (e) { } // Descriptor doesn't exist so ignore the exception
+            });
+
+            [node].concat(!!node['childNodes']() ? node['childNodes']() : [])
+                .find(nodeToCheck => !!(descriptorType = primaryDescriptorNodes[nodeToCheck['id']]));
+
+            return !!descriptorType
         },
 
         /**

@@ -81,6 +81,7 @@ define([
         }];
 
         var appliedFunctions = params.appliedFunctions;
+        var primaryDescriptorFunction = params.primaryDescriptorFunction;
 
         if (params.multiselect) {
             selection = params.selection || ko.observableArray([]);
@@ -141,6 +142,7 @@ define([
             isWritable: isWritable,
             model: cardModel,
             appliedFunctions: appliedFunctions,
+            primaryDescriptorFunction: primaryDescriptorFunction,
             allowProvisionalEditRerender: allowProvisionalEditRerender,
             multiselect: params.multiselect,
             widgets: cardModel.widgets,
@@ -377,26 +379,22 @@ define([
                 return this.newTile;
             },
             isFuncNode: function() {
-                var appFuncDesc = false, appFuncName = false, nodegroupId = null;
-                if(params.appliedFunctions && params.card) {
-                    for(var i=0; i < self.appliedFunctions.length; i++) {
-                        if(self.appliedFunctions[i]['function']['functiontype'] === "primarydescriptors") {
-                            if(self.appliedFunctions[i]['config']['descriptor_types']['description']['nodegroup_id']) {
-                                appFuncDesc = self.appliedFunctions[i]['config']['descriptor_types']['description']['nodegroup_id'];
-                            }
-                            if(self.appliedFunctions[i]['config']['descriptor_types']['name']['nodegroup_id']) {
-                                appFuncName = self.appliedFunctions[i]['config']['descriptor_types']['name']['nodegroup_id'];
-                            }
-                            nodegroupId = params.card.nodegroup_id;
-                            if(nodegroupId === appFuncDesc) {
-                                return arches.translations.cardFunctionNodeDesc;
-                            } else if(nodegroupId === appFuncName) {
-                                return arches.translations.cardFunctionNodeName;
-                            }
-                        }
-                    }
-                }
-                return false;
+                var primaryDescriptorNodes = {}, pdFunction = params.primaryDescriptorFunction;
+
+                if(!pdFunction || !params.card)
+                    return false;
+
+                ['name', 'description'].forEach(function (descriptor) {
+                    try {
+                        primaryDescriptorNodes[pdFunction['config']['descriptor_types'][descriptor]['nodegroup_id']] = descriptor;
+                    } catch (e) { } // Descriptor doesn't exist so ignore the exception
+                });
+
+                return !primaryDescriptorNodes[params.card.nodegroup_id] ? false :
+                    (primaryDescriptorNodes[params.card.nodegroup_id] === "name" ?
+                        arches.translations.cardFunctionNodeName :
+                        arches.translations.cardFunctionNodeDesc
+                    );
             }
         });
 
