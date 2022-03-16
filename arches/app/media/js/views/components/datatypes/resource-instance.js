@@ -14,9 +14,9 @@ define([
             this.showSelectedResourceInfo = function(currentItem,parentContext,data,event){
                 if(event.type=="click" || (event.type=="keyup" && (event.which==13 || event.keyCode==13))){
                     if(currentItem.graphIsSemantic && parentContext.isEditable !== false){
-                        currentItem.toggleSelectedResource(data)
-                    };
-                };
+                        currentItem.toggleSelectedResource(data);
+                    }
+                }
             };
             this.resourceModels = [{
                 graphid: null,
