@@ -73,40 +73,46 @@ define([
                     });
                     graph.ontologyProperty = ko.observable(ko.unwrap(graph.ontologyProperty));
                     graph.inverseOntologyProperty = ko.observable(ko.unwrap(graph.inverseOntologyProperty));
-                    // use this so that graph.name won't get saved back to the node config
-                    Object.defineProperty(graph, 'name', {
-                        value: model.name
-                    });
-                    window.fetch(arches.urls.graph_nodes(graph.graphid))
-                        .then(function(response){
-                            if(response.ok) {
-                                return response.json();
-                            }
-                            throw("error");
-                        })
-                        .then(function(json) {
-                            var node = _.find(json, function(node) {
-                                return node.istopnode;
-                            });
-                            // use this so that graph.ontologyclass won't get saved back to the node config
-                            Object.defineProperty(graph, 'ontologyClass', {
-                                value: node.ontologyclass
-                            });
-                        });
-
-                    // need to listen to these properties change so we can
-                    // trigger a "dirty" state in the config
-                    var triggerDirtyState = function() {
-                        preventSetup = true;
-                        self.config.graphs(self.config.graphs());
-                        preventSetup = false;
-                    };
-                    graph.ontologyProperty.subscribe(triggerDirtyState);
-                    graph.inverseOntologyProperty.subscribe(triggerDirtyState);
 
                     graph.removeRelationship = function(graph){
                         self.config.graphs.remove(graph);
                     };
+                    if(!!model){
+                        // use this so that graph.name won't get saved back to the node config
+                        Object.defineProperty(graph, 'name', {
+                            value: model.name
+                        });
+                        window.fetch(arches.urls.graph_nodes(graph.graphid))
+                            .then(function(response){
+                                if(response.ok) {
+                                    return response.json();
+                                }
+                                throw("error");
+                            })
+                            .then(function(json) {
+                                var node = _.find(json, function(node) {
+                                    return node.istopnode;
+                                });
+                                // use this so that graph.ontologyclass won't get saved back to the node config
+                                Object.defineProperty(graph, 'ontologyClass', {
+                                    value: node.ontologyclass
+                                });
+                            });
+
+                        // need to listen to these properties change so we can
+                        // trigger a "dirty" state in the config
+                        var triggerDirtyState = function() {
+                            preventSetup = true;
+                            self.config.graphs(self.config.graphs());
+                            preventSetup = false;
+                        };
+                        graph.ontologyProperty.subscribe(triggerDirtyState);
+                        graph.inverseOntologyProperty.subscribe(triggerDirtyState);
+                    }else{
+                        Object.defineProperty(graph, 'name', {
+                            value: arches.translations.modelDoesNotExist
+                        });
+                    }
                 };
 
                 this.config.graphs().forEach(function(graph) {

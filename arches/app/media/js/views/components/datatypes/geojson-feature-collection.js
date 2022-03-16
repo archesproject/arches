@@ -6,7 +6,6 @@ define([
     'bindings/color-picker',
     'bindings/mapbox-gl',
     'bindings/codemirror',
-    'codemirror/mode/javascript/javascript',
     'bindings/ckeditor'
 ], function($, arches, ko, _) {
     var name = 'geojson-feature-collection-datatype-config';
