@@ -410,12 +410,6 @@ input[type="checkbox"] {
     color: #777;
 }
 
-.graph-settings-crud {
-    margin-right: 0px;
-    position: absolute;
-    right: 10px;
-}
-
 .workflow-step-container {
     height: calc(100% + 41px);
 }
@@ -6352,6 +6346,7 @@ th.notif-type {
     min-height: 55px;
     background: #f6f6f6;
     border-bottom: 1px solid #ddd;
+    padding: 0px 14px;
 }
 
 .ep-form-toolbar div:nth-last-child(2) {
@@ -6362,11 +6357,10 @@ th.notif-type {
     font-size: 16px;
     font-weight: 400;
     color: #666;
-    padding-left: 15px;
+    flex-grow: 1;
 }
 
 .ep-form-toolbar-tools {
-    margin-right: 10px;
     -ms-justify-content: flex-end;
     -webkit-justify-content: flex-end;
     justify-content: flex-end;
@@ -11878,7 +11872,6 @@ a.filter-tools:hover {
 
 .graph-selector {
     width: 350px;
-    margin-right: 10px;
 }
 
 .graph-designer-tab-container {
