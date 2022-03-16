@@ -151,7 +151,6 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                     <div class="tab-content search-popup-panel" data-bind="foreach: {data: sharedStateObject.filtersList, as: 'filter'}, visible: sharedStateObject.selectedPopup() !== ''">
                         <!-- ko if: filter.type === 'popup' && filter.enabled -->
                         <div class="tab-pane" data-bind="css: {'active': $parent.sharedStateObject.selectedPopup() === filter.componentname}">
-                            <span data-bind="text: console.log(filter.componentname)"></span>
                             <div data-bind="component: {
                                 name: filter.componentname,
                                 params: $parent.sharedStateObject
