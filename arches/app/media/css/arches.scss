@@ -6268,7 +6268,10 @@ th.notif-type {
 }
 
 @media only screen and (max-width : 768px) {
-
+    .tabbed-workflow-step-container{
+        margin-bottom: 108px;
+    }
+    
     #content-container {
         .ep-tools .fa-sign-out {
             font-size: 17px;
@@ -6278,7 +6281,6 @@ th.notif-type {
             z-index: 10;
         }
         .content-panel {
-            overflow-y: scroll;
             padding: 17px 0px;
         }
     }
