@@ -17,30 +17,30 @@ define([
             this.config = params.config;
             this.graph = params.graph;
             this.layer = params.layer;
-            this.GeojsonDataTypeEventHandler = function(event_label,parent_config,data,event){
+            this.GeojsonDataTypeEventHandler = function(eventLabel,parentConfig,data,event){
 
-                // While the parameter pattern in the template is data, event_label, parent_config and
+                // While the parameter pattern in the template is data, eventLabel, parentConfig and
                 // (automatically) event, when injected into the above function it comes through
-                // event_label, parent_config, data, event.  Please be aware of this when modifying
+                // eventLabel, parentConfig, data, event.  Please be aware of this when modifying
                 // the function.
 
                 if(event.type=="click" || (event.type=="keyup" && (event.which==13 || event.keyCode==13))){
-                    switch(event_label){
-                        case 'Toggle Activate Layer':
-                            data.config.layerActivated(!data.config.layerActivated());
-                            break;
-                        case 'Toggle Add To Map':
-                            data.config.addToMap(!data.config.addToMap());
-                            break;
-                        case 'Icon Filter Remove':
-                            data.iconFilter('');
-                            break;
-                        case 'Layer Icon Selection':
-                            parent_config.layerIcon(data.cssclass);
-                            break;
-                        case 'Toggle Advanced Styling':
-                            data.config.advancedStyling(!data.config.advancedStyling());
-                            break;
+                    switch(eventLabel){
+                    case 'Toggle Activate Layer':
+                        data.config.layerActivated(!data.config.layerActivated());
+                        break;
+                    case 'Toggle Add To Map':
+                        data.config.addToMap(!data.config.addToMap());
+                        break;
+                    case 'Icon Filter Remove':
+                        data.iconFilter('');
+                        break;
+                    case 'Layer Icon Selection':
+                        parentConfig.layerIcon(data.cssclass);
+                        break;
+                    case 'Toggle Advanced Styling':
+                        data.config.advancedStyling(!data.config.advancedStyling());
+                        break;
                     }
                 }
             };

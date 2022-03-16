@@ -11,12 +11,12 @@ define([
         viewModel: function(params) {
             var self = this;
             this.search = params.search;
-            this.showSelectedResourceInfo = function(current_item,parent_context,data,event){
+            this.showSelectedResourceInfo = function(currentItem,parentContext,data,event){
                 if(event.type=="click" || (event.type=="keyup" && (event.which==13 || event.keyCode==13))){
-                    { if(current_item.graphIsSemantic && parent_context.isEditable !== false){
-                            current_item.toggleSelectedResource(data)
-                    }; }
-                }
+                    if(currentItem.graphIsSemantic && parentContext.isEditable !== false){
+                        currentItem.toggleSelectedResource(data)
+                    };
+                };
             };
             this.resourceModels = [{
                 graphid: null,
