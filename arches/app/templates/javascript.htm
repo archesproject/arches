@@ -169,6 +169,16 @@
 {% block arches_modules %}
 <script>
     require(['utils/set-csrf-token']);
+
+
+    window['card-components'] = {{% autoescape off %}{% for component in card_components %}
+            '{{ component.pk }}': {
+                'componentname': '{{ component.componentname }}',
+                'component': '{{ component.component }}',
+                'defaultconfig': '{{ component.defaultconfig_json }}'
+            },
+        {% endfor %}{% endautoescape %}};
+
     window.arches = {
             urls: {
                 root: "{% url 'root' %}",
@@ -471,15 +481,6 @@
         {% endfor %}{% endautoescape %}};
     });
 
-    define('card-components', [{% for component in card_components %}'{{ component.component }}',{% endfor %}], function () {
-        return {{% autoescape off %}{% for component in card_components %}
-            '{{ component.pk }}': {
-                'componentname': '{{ component.componentname }}',
-                'component': '{{ component.component }}',
-                'defaultconfig': '{{ component.defaultconfig_json }}'
-            },
-        {% endfor %}{% endautoescape %}};
-    });
 
     define('function-templates', [{% for template in function_templates %}'{{ template.component }}',{% endfor %}], function () {
          return;
