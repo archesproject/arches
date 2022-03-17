@@ -384,10 +384,13 @@ define([
                 if(!pdFunction || !params.card)
                     return false;
 
-                ['name', 'description'].forEach(function (descriptor) {
+                ['name', 'description'].forEach(function(descriptor) {
                     try {
                         primaryDescriptorNodes[pdFunction['config']['descriptor_types'][descriptor]['nodegroup_id']] = descriptor;
-                    } catch (e) { } // Descriptor doesn't exist so ignore the exception
+                    } catch (e) {
+                        // Descriptor doesn't exist so ignore the exception
+                        console.log("No descriptor configuration for "+descriptor);
+                    }
                 });
 
                 return !primaryDescriptorNodes[params.card.nodegroup_id] ? false :

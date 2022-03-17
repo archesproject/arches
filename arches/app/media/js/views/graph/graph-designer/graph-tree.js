@@ -97,21 +97,24 @@ define([
          * @param {object} node - a node in the tree
          */
         isFuncNode: function(node) {
-            var primaryDescriptorNodes = {}, descriptorNode = null, pdFunction = this.primaryDescriptorFunction;
+            var primaryDescriptorNodes = {}, descriptorType, pdFunction = this.primaryDescriptorFunction;
 
             if(!this.primaryDescriptorFunction())
                 return null;
 
-            ['name', 'description'].forEach(function (descriptor) {
+            ['name', 'description'].forEach(function(descriptor) {
                 try {
                     primaryDescriptorNodes[pdFunction()['config']['descriptor_types'][descriptor]['nodegroup_id']] = descriptor;
-                } catch (e) { } // Descriptor doesn't exist so ignore the exception
+                } catch (e) {
+                    // Descriptor doesn't exist so ignore the exception
+                    console.log("No descriptor configuration for "+descriptor);
+                }
             });
 
             [node].concat(!!node['childNodes']() ? node['childNodes']() : [])
                 .find(nodeToCheck => !!(descriptorType = primaryDescriptorNodes[nodeToCheck['id']]));
 
-            return !!descriptorType
+            return !!descriptorType;
         },
 
         /**

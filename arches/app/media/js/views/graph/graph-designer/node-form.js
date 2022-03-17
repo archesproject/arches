@@ -40,17 +40,21 @@ define([
             this.appliedFunctions = options.appliedFunctions;
             this.primaryDescriptorFunction = options.primaryDescriptorFunction;
 
-            this.isFuncNode = function () {
+            this.isFuncNode = function() {
                 var node = self.node();
                 var primaryDescriptorNodes = {}, descriptorType = null, pdFunction = this.primaryDescriptorFunction;
 
                 if (!pdFunction || !pdFunction())
                     return false;
 
-                ['name', 'description'].forEach(function (descriptor) {
+                ['name', 'description'].forEach(function (descriptor){
                     try {
                         primaryDescriptorNodes[pdFunction()['config']['descriptor_types'][descriptor]['nodegroup_id']] = descriptor;
-                    } catch (e) { } // Descriptor doesn't exist so ignore the exception
+                    } catch (e)
+                    {
+                        // Descriptor doesn't exist so ignore the exception
+                        console.log("No descriptor configuration for "+descriptor);
+                    }
                 });
 
                 [node].concat(!!node['childNodes']() ? node['childNodes']() : [])
@@ -60,7 +64,7 @@ define([
                     (descriptorType === "name" ?
                         "This node participates in the name function" :
                         "This node participates in the descriptor function"
-                    )
+                    );
             };
 
             /**
