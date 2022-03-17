@@ -218,11 +218,11 @@ class Migration(migrations.Migration):
         migrations.CreateModel(
             name="LoadEvent",
             fields=[
-                ("loadid", models.UUIDField(default=uuid.uuid1, primary_key=True, serialize=False)),
+                ("loadid", models.UUIDField(default=uuid.uuid4, primary_key=True, serialize=False)),
                 ("complete", models.BooleanField(default=False)),
                 ("successful", models.BooleanField(blank=True, null=True)),
                 ("load_description", models.TextField(blank=True, null=True)),
-                ("message", models.TextField(blank=True, null=True)),
+                ("error_message", models.TextField(blank=True, null=True)),
                 ("load_start_time", models.DateTimeField(blank=True, null=True)),
                 ("load_end_time", models.DateTimeField(blank=True, null=True)),
                 ("user", models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to=settings.AUTH_USER_MODEL)),
