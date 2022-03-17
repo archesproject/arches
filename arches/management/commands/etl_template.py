@@ -75,7 +75,7 @@ class Command(BaseCommand):
                 metadata += nodes
                 if details["depth"] == 0:
                     column_length = 0
-                    if first_sheet == True:
+                    if first_sheet is True:
                         sheet = wb.active
                         sheet.title = details["alias"]
                         first_sheet = False
