@@ -168,6 +168,7 @@ remove_functions_to_get_nodegroup_tree = [
     """
 ]
 
+
 class Migration(migrations.Migration):
 
     dependencies = [
