@@ -83,7 +83,7 @@ add_validation_reporting_functions = """
                 IF _result IS NULL THEN
                 _result := _note;
                 ELSE
-                _result := '|' || _node;
+                _result := '|' || _note;
                 END IF;
             END IF;
         END LOOP;

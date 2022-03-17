@@ -1,4 +1,3 @@
-from turtle import pd
 from arches.app.utils.betterJSONSerializer import JSONSerializer
 import uuid
 import csv
