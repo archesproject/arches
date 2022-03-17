@@ -34,9 +34,9 @@ class PluginView(MapBaseManagerView):
         else:
             plugin = models.Plugin.objects.get(pk=pluginid)
         if not request.user.has_perm("view_plugin", plugin):
-            if(slug is not None):
+            if slug is not None:
                 return redirect("/auth?next=/plugins/{}".format(slug))
-            if(slug is not None):
+            if slug is not None:
                 return redirect("/auth?next=/plugins/{}".format(pluginid))
         if request.GET.get("json", False):
             return JSONResponse(plugin)
