@@ -289,10 +289,6 @@ a.tree-display-tool:hover,
     display: block;
 }
 
-.resource-grid-main-container {
-    height: auto;
-}
-
 .resource-grid-main.mpm-manager .mpm-title {
     width: calc(100% - 55px);
 }
@@ -334,7 +330,6 @@ div.search-facet-item:focus {
 .popup-panel-row {
     padding: 4px;
     height: 50px;
-    text-align: right;
 }
 
 .search-results-panel {
@@ -384,22 +379,221 @@ div.search-facet-item:focus {
     width: 100%;
 }
 
-.search-map-container {
-    flex-direction: column;
-}
-
 .search-inline-filters div {
     padding-left: 2px;
     margin-bottom: 2px;
     display: inline-block;
 }
 
+.search-toolbar {
+    position: absolute;
+}
+
+.search-map-container div.flex {
+    margin-top: 50px;
+}
+
+.search-type-btn-popup-panel {
+    position: relative;
+}
+
+.search-toolbar {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: nowrap;
+    justify-content: normal;
+    align-items: normal;
+    align-content: normal;
+    width: 60%;
+}
+
+.search-type-btn-panel,
+.search-type-btn-popup-panel {
+    display: block;
+    flex-grow: 1;
+    flex-basis: auto;
+    align-self: auto;
+    order: 0;
+}
+
+.popup-panel-row {
+    float: right;
+    display: block;
+}
+
+.grid-list.provisional-edit-history {
+    height: calc(100vh - 50px);
+    overflow-y: auto;
+}
+
+.search-popup-panel {
+    overflow-y: auto;
+    overflow-x: hidden;
+}
+
+.saved-search-grid {
+    overflow-y: auto;
+}
+
+.workbench-card-container {
+    width: calc(100% - 75px);
+}
+
+.workbench-card-container .mapboxgl-ctrl-geocoder {
+    margin-right: 10px;
+}
+
+.ep-notifs,
+.search-popup-panel {
+    width: 50vw;
+}
+
+/******************************************************************/
+/* Media queries                                                  */
+/******************************************************************/
+
+@media only screen and (min-width: 1025px) and (max-width: 1140px) {
+    .search-toolbar .fa {
+        display: none;
+    }
+
+    .search-type-btn, .search-type-btn-popup {
+        min-width: auto;
+    }
+}
+
 @media screen and (max-width: 1024px) {
+    article.flexrow {
+        flex-direction: column-reverse;
+    }
+
+    article .flex.search-map-container {
+        min-height: 0;
+    }
+
     .search-results-panel {
         max-width: inherit;
+        min-height: 0;
     }
-    .search-map-container {
+
+    .search-control-container {
+        margin-top: 0;
         flex: 1;
-        flex-direction: column-reverse;
+    }
+
+    .tab-pane .tab-pane-content {
+        height: calc(50vh - 75px);
+        overflow-y: auto;
+    }
+
+    .card-form-preview-container {
+        height: inherit;
+        overflow-y: hidden;
+    }
+
+    .workbench-card-sidebar-tab {
+        height: 3em;
+        padding: 4px;
+    }
+
+    .top-right-nav div {
+        white-space: nowrap;
+    }
+
+    .search-toolbar {
+        width: 100%;
+    }
+
+    .facets-container,
+    .facets-search-container {
+        width: 50%;
+    }
+
+    .facets-search-container,
+    .list-group.search-facets,
+    .search-popup-panel {
+        height: calc(50vh - 75px);
+    }
+
+    .facets-search-container .rr-splash {
+        margin: 0;
+        padding: 5px;
+    }
+
+    .faceted-search-card-container {
+        padding: 2px;
+    }
+
+    .facet-body {
+        margin: 0 5px;
+        padding: 0;
+    }
+
+    .related-resources-content .rr-splash,
+    .search-result-details-splash .rr-splash {
+        padding: 20px;
+        margin: 20px;
+    }
+
+    .search-result-details-splash {
+        padding: 5px 0 0 0;
+    }
+
+    .rr-splash-description:last-child {
+        margin-bottom: 0;
+    }
+
+    .search-result-details {
+        height: 50vh;
+    }
+}
+
+@media screen and (max-width: 768px) {
+    article.flexrow {
+        height: calc(100vh - 100px);
+    }
+
+    .search-toolbar {
+        flex-direction: column;
+        width: 100%;
+    }
+
+    .search-type-btn-panel {
+        padding-bottom: 0;
+    }
+
+    .search-type-btn,
+    .search-type-btn-popup,
+    .search-type-btn.relative.active,
+    .search-type-btn-popup.relative.active {
+        height: 20px;
+        padding: 0;
+    }
+
+    .popup-panel-row {
+        padding-left: 4px;
+    }
+
+    .search-type-btn .fa,
+    .search-type-btn-popup .fa {
+        display: none;
+    }
+
+    .popup-panel-row {
+        float: none;
+    }
+
+    .ep-notifs,
+    .ep-help {
+        width: 100%;
+    }
+
+    .workbench-card-wrapper {
+        height: 38vh;
+    }
+    
+    .workbench-card-sidepanel {
+        width: calc(100% - 74px);
+        height: 38vh;
     }
 }
