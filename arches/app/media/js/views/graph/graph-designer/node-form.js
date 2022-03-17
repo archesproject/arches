@@ -47,7 +47,7 @@ define([
                 if (!pdFunction || !pdFunction())
                     return false;
 
-                ['name', 'description'].forEach(function (descriptor){
+                ['name', 'description'].forEach(function(descriptor){
                     try {
                         primaryDescriptorNodes[pdFunction()['config']['descriptor_types'][descriptor]['nodegroup_id']] = descriptor;
                     } catch (e)
