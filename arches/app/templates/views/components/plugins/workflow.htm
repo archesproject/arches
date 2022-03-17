@@ -171,7 +171,7 @@
                             {% trans  "Save and Continue" %}
                         </span>
                         <span class="succinct">
-                            {% trans  "Continue" %}
+                            {% trans  "Next" %}
                         </span>
                         <i class="fa fa-caret-right"></i>
                     </button>
@@ -233,7 +233,7 @@
                 </div>
     
                 <!--ko if: ko.unwrap(activeStep().informationBoxData) -->
-                <div class="step-info"
+                <div
                     data-bind="{
                         component: { 
                             name: 'views/components/simple-switch', 
