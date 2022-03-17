@@ -3,7 +3,7 @@
 
 {% block form %}
 <div class="toggle-container">
-    <span class="switch switch-small switch-widget" data-bind="css: {'on': getvalue() === true, 'null': getvalue() === null, 'disabled': disabled }, click: setvalue" tabindex="0" onkeyup="if(event.which == 13 || event.keyCode == 13){ $(this).trigger('click'); }"><small></small></span>
+    <span class="switch switch-small switch-widget" data-bind="css: {'on': getvalue() === true, 'null': getvalue() === null, 'disabled': disabled }, event: { keyup: switchEventHandler.bind($data,'set value'), click:  switchEventHandler.bind($data,'set value')}" tabindex="0"><small></small></span>
             <div style="display:flex; flex-direction:row;">
             <div class="arches-toggle-sm" data-bind="text:label, css: {'disabled': disabled}"></div>
                 <div style="margin-top: -17px;">
@@ -27,7 +27,7 @@
   {% trans "Default Value" %}
 </div>
 <div class="toggle-container">
-    <span class="switch switch-small switch-widget" data-bind="css: {'on': getdefault() === true, 'null': getdefault() === null}, click: setdefault" tabindex="0" onkeyup="if(event.which == 13 || event.keyCode == 13){ $(this).trigger('click'); }"><small></small></span>
+    <span class="switch switch-small switch-widget" data-bind="css: {'on': getdefault() === true, 'null': getdefault() === null}, event: { keyup: switchEventHandler.bind($data,'set default'), click:  switchEventHandler.bind($data,'set default')}" tabindex="0"><small></small></span>
             <div style="display:flex; flex-direction:row;">
             <div class="arches-toggle-sm" data-bind="text:label"></div>
             </div>

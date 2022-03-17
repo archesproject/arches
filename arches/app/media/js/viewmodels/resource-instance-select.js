@@ -9,7 +9,7 @@ define([
     var resourceLookup = {};
     var graphCache = {};
     require(['views/components/related-instance-creator']);
-    
+
     /**
     * A viewmodel used for generic alert messages
     *
@@ -17,7 +17,7 @@ define([
     * @name ResourceInstanceSelectViewModel
     *
     * @param  {object} params
-    * @param  {object} params.node (optional) - if supplied will assume that a node in an editor is being managed and will show 
+    * @param  {object} params.node (optional) - if supplied will assume that a node in an editor is being managed and will show
     * the table of ontologyProperties below the dropdown otherwise the table will be hidden and you will have to populate params.graphids
     * @param  {boolean} params.graphids (optional) - if params.node is not supplied then you need to supply a list of graphids that can be used to get resource instances for the dropdown
     * @param  {boolean} params.multiple - whether to display multiple values in the dropdown/table
@@ -45,10 +45,10 @@ define([
         }
         this.renderContext = params.renderContext;
 
-        /* 
-            shoehorn logic to piggyback off of search context functionality. 
+        /*
+            shoehorn logic to piggyback off of search context functionality.
             Should be refactored when we get the chance for better component clarity.
-        */ 
+        */
         if (params.renderContext === 'workflow') {
             self.renderContext = 'search';
         }
@@ -60,6 +60,22 @@ define([
         this.graphIsSemantic = false;
         this.resourceTypesToDisplayInDropDown = ko.observableArray(!!params.graphids ? ko.toJS(params.graphids) : []);
         this.displayOntologyTable = this.renderContext !== 'search' && !!params.node;
+
+        this.resourceInstanceSelectEventHandler = function (eventType,data,event){
+            if(event.type=="click" || (event.type=="keyup" && (event.which==13 || event.keyCode==13))){
+                switch (eventType){
+                    case 'filter':
+                        data.filter('')
+                        break;
+                    case 'toggle relationships':
+                        self.toggleSelectedResourceRelationship(data)
+                        break;
+                    case 'report resourceid':
+                        self.reportResourceId(null)
+
+                }
+            }
+        };
 
         this.waitingForGraphToDownload = ko.computed(function(){
             if (!!params.node && this.resourceTypesToDisplayInDropDown().length > 0){
@@ -90,7 +106,7 @@ define([
             }
         };
 
-        // depending on where the widget is being rendered there are several ways to get the ontologyclass 
+        // depending on where the widget is being rendered there are several ways to get the ontologyclass
         if(!!params.node && params.state !== 'display_value'){
             if(!!params.node.graph && !!params.node.graph.get('root')){
                 this.rootOntologyClass = params.node.graph.get('root').ontologyclass();
@@ -114,7 +130,7 @@ define([
                 self.downloadGraph(graphid);
             });
         }
-    
+
         this.resourceInstanceDisplayName = params.form && params.form.displayname ? params.form.displayname() : '';
         this.makeFriendly = ontologyUtils.makeFriendly;
         this.getSelect2ConfigForOntologyProperties = ontologyUtils.getSelect2ConfigForOntologyProperties;
@@ -135,7 +151,7 @@ define([
                 }
             }
         };
-        
+
         WidgetViewModel.apply(this, [params]);
 
         // if a default resource instance is defined, then show them in the ui
@@ -158,7 +174,7 @@ define([
                 ri.inverseOntologyProperty.subscribe(function(){
                     self.defaultResourceInstance(self.value());
                 });
-                ret.push(ri); 
+                ret.push(ri);
             });
             // only set the default values if the tile has never been saved before OR if this is the config form
             if ((this.tile && !this.tile.noDefaults && ko.unwrap(this.tile.tileid) == "" && ret.length > 0) || !!params.configForm) {
@@ -167,16 +183,16 @@ define([
         }
 
         this.displayValue = ko.observable('');
-        
+
         //
-        // this.close is only called if newResourceInstance is True and the user 
+        // this.close is only called if newResourceInstance is True and the user
         // decides not to add the new resource instance, and closes the window without adding it
         //
         this.close = function(){
             this.newResourceInstance(null);
         };
-        
-        
+
+
         this.setValue = function(valueObject) {
             if (self.multiple) {
                 valueObject = [valueObject];
@@ -191,7 +207,7 @@ define([
                 self.defaultResourceInstance(self.value());
             }
         };
-        
+
         this.lookupResourceInstanceData = function(resourceid) {
             if (resourceLookup[resourceid]) {
                 return Promise.resolve(resourceLookup[resourceid]);
@@ -208,7 +224,7 @@ define([
                     });
             }
         };
-        
+
         if(self.renderContext !== 'search'){
             var updateNameAndOntologyClass = function(values) {
                 var names = [];
@@ -236,7 +252,7 @@ define([
                     });
                 }
             };
-    
+
             self.value.subscribe(updateNameAndOntologyClass);
             // Resolve Resource Instance Names from the incoming values
             self.value.valueHasMutated();
@@ -278,7 +294,7 @@ define([
                 "ontologyProperty": ko.observable(ontologyProperty || ""),
                 "inverseOntologyProperty": ko.observable(inverseOntologyProperty || ""),
                 "resourceXresourceId": ""
-            };            
+            };
             Object.defineProperty(ret, 'resourceName', {value: ko.observable(esSource.displayname)});
             Object.defineProperty(ret, 'ontologyClass', {value: ko.observable(esSource.root_ontology_class)});
             if (!!params.configForm) {
@@ -289,7 +305,7 @@ define([
                     self.defaultResourceInstance(self.value());
                 });
             }
-            
+
             return ret;
         };
 
@@ -300,7 +316,7 @@ define([
         this.disabled = ko.computed(function() {
             return ko.unwrap(self.waitingForGraphToDownload) || ko.unwrap(params.disabled) || !!ko.unwrap(params.form?.locked);
         });
-        
+
         this.select2Config = {
             value: self.renderContext === 'search' ? self.value : self.resourceToAdd,
             clickBubble: true,
@@ -383,7 +399,7 @@ define([
                             var searchUrl = new URL(ko.unwrap(params.node.config.searchString));
                             queryString = new URLSearchParams(searchUrl.search);
                             self.allowInstanceCreation = false;
-                        } 
+                        }
                         queryString.set('paging-filter', page);
 
                         // merge resource type filters
@@ -478,7 +494,7 @@ define([
                         var resourceInstance = self.lookupResourceInstanceData(resourceId).then(
                             function(resourceInstance) { return resourceInstance; }
                         );
-           
+
                         if (resourceInstance) { lookups.push(resourceInstance); }
                     });
 

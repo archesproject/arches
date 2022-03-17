@@ -47,6 +47,12 @@ define([
             self.setOptionSelection(opt, selected);
         };
 
+        this.radioEventHandler = function(selected,data,event){
+            if(event.type=="click" || (event.type=="keyup" && (event.which==13 || event.keyCode==13))){
+                self.setOptionSelection(data,selected);
+            }
+        }
+
         this.setOptionSelection = function(opt, selected) {
             if (ko.unwrap(self.disabled) === false) {
                 var optid = ko.unwrap(opt.id);

@@ -11,10 +11,10 @@
       </div></div>
       <div class="col-xs-12">
         <div class="pad-hor">
-        <label data-bind="css: { 'active': value() === true, 'disabled': disabled }, click: function(e){setValue(true)}" class="form-radio form-normal form-text" tabindex="0" onkeyup="if(event.which == 13 || event.keyCode == 13){ $(this).trigger('click'); }">
+        <label data-bind="css: { 'active': value() === true, 'disabled': disabled }, event: { keyup: radioBooleanEventHandler.bind($data,'set value',true), click:  radioBooleanEventHandler.bind($data,'set value',true)}" class="form-radio form-normal form-text" tabindex="0">
             <input type="radio" name="stat-w-label" data-bind="checked: value() === true"><span data-bind="text:node.config.trueLabel"></span>
         </label>
-        <label data-bind="css: { 'active': value() === false, 'disabled': disabled }, click: function(e){setValue(false)}" class="form-radio form-normal form-text" tabindex="0" onkeyup="if(event.which == 13 || event.keyCode == 13){ $(this).trigger('click'); }">
+        <label data-bind="css: { 'active': value() === false, 'disabled': disabled }, event: { keyup: radioBooleanEventHandler.bind($data,'set value',false), click:  radioBooleanEventHandler.bind($data,'set value',false)}" class="form-radio form-normal form-text" tabindex="0">
             <input type="radio" name="stat-w-label" data-bind="checked: value() === false"><span data-bind="text:node.config.falseLabel"></span>
         </label>
      </div>
@@ -29,10 +29,10 @@
 </div>
 <div class="col-xs-12" style="display:flex; flex-direction: column; height: 50px">
   <div class="pad-hor">
-      <label data-bind="css: { 'active': defaultValue() === true }, click: function(e){setDefaultValue(true)}" class="form-radio form-normal form-text" tabindex="0" onkeyup="if(event.which == 13 || event.keyCode == 13){ $(this).trigger('click'); }">
+      <label data-bind="css: { 'active': defaultValue() === true }, event: { keyup: radioBooleanEventHandler.bind($data,'set default value',true), click:  radioBooleanEventHandler.bind($data,'set default value',true)}" class="form-radio form-normal form-text" tabindex="0" onkeyup="if(event.which == 13 || event.keyCode == 13){ $(this).trigger('click'); }">
           <input type="radio" name="stat-w-label" data-bind="checked: defaultValue() === true"><span data-bind="text: node.config.trueLabel"></span>
       </label>
-      <label data-bind="css: { 'active': defaultValue() === false }, click: function(e){setDefaultValue(false)}" class="form-radio form-normal form-text" tabindex="0" onkeyup="if(event.which == 13 || event.keyCode == 13){ $(this).trigger('click'); }">
+      <label data-bind="css: { 'active': defaultValue() === false }, event: { keyup: radioBooleanEventHandler.bind($data,'set default value',false), click:  radioBooleanEventHandler.bind($data,'set default value',false)}" class="form-radio form-normal form-text" tabindex="0" onkeyup="if(event.which == 13 || event.keyCode == 13){ $(this).trigger('click'); }">
           <input type="radio" name="stat-w-label" data-bind="checked: defaultValue() === false"><span data-bind="text: node.config.falseLabel"></span>
       </label>
   </div>

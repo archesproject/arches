@@ -41,9 +41,9 @@
     <div class="rr-widget">
         <!-- ko if: !!value() && value().length > 5-->
         <div class="rr-widget-filter-panel">
-            <div class="list-filter">
+            <div>
                 <input type="text" class="form-control" style="width: 225px; height:28px;" placeholder="{% trans 'filter...' %}" aria-label="{% trans 'filter...' %}" data-bind="textInput: filter"></input>
-                <span class="clear-node-search" data-bind="visible: filter().length > 0, click: function() { filter('');}" tabindex="0" onkeyup="if(event.which == 13 || event.keyCode == 13){ $(this).trigger('click'); }"><i class="fa fa-times-circle"></i></span>
+                <span class="clear-node-search" data-bind="visible: filter().length > 0, event: {keyup: resourceInstanceSelectEventHandler.bind($data,'filter'), click: resourceInstanceSelectEventHandler.bind($data,'filter')}" tabindex="0"><i class="fa fa-times-circle"></i></span>
             </div>
         </div>
         <!-- /ko -->
@@ -68,7 +68,7 @@
                                 <i class="fa fa-info-circle"></i>
                             </button>
                         </div>
-                        <div class="rr-table-column" style="flex-grow: 1; cursor: pointer;" data-bind="click: function() { self.toggleSelectedResourceRelationship($data); }, clickBubble: false" tabindex="0" onkeyup="if(event.which == 13 || event.keyCode == 13){ $(this).trigger('click'); }">
+                        <div class="rr-table-column" style="flex-grow: 1; cursor: pointer;" data-bind="event: {keyup: $parent.resourceInstanceSelectEventHandler.bind($data,'toggle relationships'), click: $parent.resourceInstanceSelectEventHandler.bind($data,'toggle relationships')}, clickBubble: false" tabindex="0">
                             <div class="rr-table-instance-label" style="padding-left: 10px;" data-bind="text: $data.resourceName()">
                             </div>
                         </div>
@@ -150,7 +150,7 @@
 <div class="create-resource-instance-card-component rr-table-pop"
     data-bind="style: {transform: !!reportResourceId() ? 'translate(0,0)' : 'translate(100%,0)'}">
     <div class="create-instance-header" style="display: flex; justify-content: space-between;">{% trans "Related Resource Summary" %}
-        <div data-bind="click: function(){reportResourceId(null)}, clickBubble: false" class="close-new-step" tabindex="0" onkeyup="if(event.which == 13 || event.keyCode == 13){ $(this).trigger('click'); }">
+        <div data-bind="event: {keyup: resourceInstanceSelectEventHandler.bind($data,'report resourceid'), click: resourceInstanceSelectEventHandler.bind($data,'report resourceid')}, clickBubble: false" class="close-new-step" tabindex="0">
             <button class="btn btn-labeled btn-lg fa fa-arrow-right btn-primary">{% trans "Return" %}</button>
         </div>
     </div>

@@ -16,9 +16,7 @@
                         'active': $parent.isOptionSelected($data),
                         'disabled': $parent.disabled
                     },
-                    click: function () {
-                        $parent.setOptionSelection($data, true);
-                    }" tabindex="0" onkeyup="if(event.which == 13 || event.keyCode == 13){ $(this).trigger('click'); }">
+                    event: {keyup: $parent.radioEventHandler.bind($data, true), click: $parent.radioEventHandler.bind($data, true)}" tabindex="0" >
                     <input type="radio" data-bind="checked: $parent.value,
                         attr: {
                             value: id,
@@ -43,9 +41,7 @@
                 data-bind="css: {
                     'active': $parent.isOptionSelected($data)
                 },
-                click: function () {
-                    $parent.setOptionSelection($data, true);
-                }" tabindex="0" onkeyup="if(event.which == 13 || event.keyCode == 13){ $(this).trigger('click'); }">
+                event: {keyup: $parent.radioEventHandler.bind($data, true), click: $parent.radioEventHandler.bind($data, true)}" tabindex="0">
                 <input type="radio" data-bind="checked: $parent.defaultValue,
                     attr: {
                         value: id,
