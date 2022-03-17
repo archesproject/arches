@@ -101,7 +101,7 @@
                     <div class="tab-content relative" data-bind="foreach: {data: sharedStateObject.filtersList, as: 'filter'}">
                         <!-- ko if: filter.type === 'filter' && filter.enabled -->
                         <div class="tab-pane" data-bind="css: {'active': $parent.sharedStateObject.selectedTab() === filter.componentname}">
-                            <div style="height: calc(100vh - 100px)" data-bind="component: {
+                            <div class="tab-pane-content" data-bind="component: {
                                 name: filter.componentname,
                                 params: $parent.sharedStateObject
                             }"></div>
