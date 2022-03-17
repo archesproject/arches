@@ -59,6 +59,114 @@ remove_csv_importer = """
     delete from etl_modules where etlmoduleid = '0a0cea7e-b59a-431a-93d8-e9f8c41bdd6b';
     """
 
+add_validation_reporting_functions = """
+    CREATE OR REPLACE FUNCTION public.__arches_load_staging_get_tile_errors(json_obj jsonb)
+    RETURNS text
+    LANGUAGE plpgsql AS
+
+    $func$
+    DECLARE
+        _key   text;
+        _value jsonb;
+        _result text;
+        _note text;
+
+    BEGIN
+        FOR _key, _value IN 
+            SELECT * FROM jsonb_each_text($1)
+        LOOP
+            IF _value ->> 'valid' = 'false' THEN
+                IF _value ->> 'notes' IS NULL THEN
+                    _note = 'unspecified error';
+                END IF; 
+                -- we could add the nodeid (_key), but let's not be verbose just yet
+                IF _result IS NULL THEN
+                _result := _note;
+                ELSE
+                _result := '|' || _note;
+                END IF;
+            END IF;
+        END LOOP;
+        RETURN _result;
+    END;
+    $func$;
+
+    CREATE OR REPLACE FUNCTION public.__arches_load_staging_report_errors(load_id uuid)
+    RETURNS TABLE(source text, message text, loadid uuid)
+    AS $$
+    SELECT source_description, public.__arches_load_staging_get_tile_errors(value) AS message, loadid
+    FROM load_staging 
+    WHERE passes_validation IS NOT true
+    AND loadid = load_id;  
+    $$
+    LANGUAGE SQL;
+    """
+
+remove_validation_reporting_functions = """
+    DROP FUNCTION public.__arches_load_staging_get_tile_errors(json_obj jsonb);
+    DROP FUNCTION public.__arches_load_staging_report_errors(load_id uuid);
+    """
+
+add_functions_to_get_nodegroup_tree = """
+    CREATE OR REPLACE FUNCTION public.__get_nodegroup_tree(nodegroup_id uuid)
+    RETURNS TABLE(nodegroupid uuid, parentnodegroupid uuid, alias text, name text, depth integer, path text, cardinality text)
+    AS $$
+    WITH RECURSIVE nodegroup_tree AS (
+        SELECT
+            nodegroupid,
+            parentnodegroupid,
+            alias,
+            name,
+            0 as depth,
+            (select alias from nodes where nodeid = nodegroup_id) as path,
+            cardinality
+        FROM 
+        (SELECT ng.nodegroupid, ng.parentnodegroupid, alias, name, cardinality, graphid FROM node_groups ng 
+        INNER JOIN nodes n ON ng.nodegroupid = n.nodeid 
+        ORDER by ng.nodegroupid) AS root
+        WHERE nodegroupid = nodegroup_id
+        UNION
+            SELECT
+                parent.nodegroupid,
+                parent.parentnodegroupid,
+                parent.alias,
+                parent.name,
+                depth + 1,
+                path || ' - ' || parent.alias,
+                parent.cardinality
+            FROM
+            (SELECT ng.nodegroupid, ng.parentnodegroupid, alias, name, cardinality, graphid FROM node_groups ng 
+            INNER JOIN nodes n ON ng.nodegroupid = n.nodeid 
+            ORDER by ng.nodegroupid) AS parent
+            INNER JOIN nodegroup_tree nt ON nt.nodegroupid = parent.parentnodegroupid
+    ) SELECT
+        *
+    FROM
+        nodegroup_tree order by path;
+    $$
+    LANGUAGE SQL;
+
+    CREATE OR REPLACE FUNCTION public.__get_nodegroup_tree_by_graph(graph_id uuid)
+    RETURNS TABLE(root_nodegroup uuid, nodegroupid uuid, parentnodegroupid uuid, alias text, name text, depth integer, path text, cardinality text)
+    LANGUAGE PLPGSQL AS 
+    $func$
+    DECLARE
+    _nodegroupid uuid;
+    BEGIN
+    FOR _nodegroupid IN select ng.nodegroupid from node_groups ng join nodes n on ng.nodegroupid = nodeid where graphid = '34cfe98e-c2c0-11ea-9026-02e7594ce0a0' and ng.parentnodegroupid is null
+    LOOP
+        RETURN QUERY SELECT _nodegroupid, * FROM __get_nodegroup_tree(_nodegroupid);
+    END LOOP;
+    END;
+    $func$;
+    """
+
+remove_functions_to_get_nodegroup_tree = [
+    """ 
+    DROP FUNCTION public.__get_nodegroup_tree(nodegroup_id uuid);
+    DROP FUNCTION public.__get_nodegroup_tree_by_graph(graph_id uuid);
+    """
+]
 
 class Migration(migrations.Migration):
 
@@ -110,11 +218,11 @@ class Migration(migrations.Migration):
         migrations.CreateModel(
             name="LoadEvent",
             fields=[
-                ("transactionid", models.UUIDField(default=uuid.uuid1, primary_key=True, serialize=False)),
+                ("loadid", models.UUIDField(default=uuid.uuid4, primary_key=True, serialize=False)),
                 ("complete", models.BooleanField(default=False)),
-                ("succssful", models.BooleanField(blank=True, null=True)),
+                ("successful", models.BooleanField(blank=True, null=True)),
                 ("load_description", models.TextField(blank=True, null=True)),
-                ("message", models.TextField(blank=True, null=True)),
+                ("error_message", models.TextField(blank=True, null=True)),
                 ("load_start_time", models.DateTimeField(blank=True, null=True)),
                 ("load_end_time", models.DateTimeField(blank=True, null=True)),
                 ("user", models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to=settings.AUTH_USER_MODEL)),
@@ -136,10 +244,10 @@ class Migration(migrations.Migration):
                 ("passes_validation", models.BooleanField(blank=True, null=True)),
                 ("nodegroup_depth", models.IntegerField(default=1)),
                 ("source_description", models.TextField(blank=True, null=True)),
-                ("message", models.TextField(blank=True, null=True)),
+                ("error_message", models.TextField(blank=True, null=True)),
                 (
                     "load_event",
-                    models.ForeignKey(db_column="transactionid", on_delete=django.db.models.deletion.CASCADE, to="models.LoadEvent"),
+                    models.ForeignKey(db_column="loadid", on_delete=django.db.models.deletion.CASCADE, to="models.LoadEvent"),
                 ),
                 (
                     "nodegroup",
@@ -151,4 +259,6 @@ class Migration(migrations.Migration):
                 "managed": True,
             },
         ),
+        migrations.RunSQL(add_validation_reporting_functions, remove_validation_reporting_functions),
+        migrations.RunSQL(add_functions_to_get_nodegroup_tree, remove_functions_to_get_nodegroup_tree),
     ]

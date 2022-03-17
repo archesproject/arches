@@ -34,7 +34,7 @@ define([
             this.validated = ko.observable();
             this.validationError = ko.observableArray();
             this.formData = new window.FormData();
-            this.transaction_id = uuid.generate();
+            this.loadId = uuid.generate();
             this.uniqueId = uuid.generate();
             this.uniqueidClass = ko.computed(function() {
                 return "unique_id_" + self.uniqueId;
@@ -209,7 +209,7 @@ define([
 
             this.submit = function(action) {
                 self.formData.append('action', action);
-                self.formData.append('transaction_id', self.transaction_id);
+                self.formData.append('load_id', self.loadId);
                 self.formData.append('module', self.moduleId);
                 return $.ajax({
                     type: "POST",
