@@ -1433,7 +1433,7 @@ class ETLModule(models.Model):
 
 
 class LoadEvent(models.Model):
-    transactionid = models.UUIDField(primary_key=True, serialize=False, default=uuid.uuid1)
+    loadid = models.UUIDField(primary_key=True, serialize=False, default=uuid.uuid1)
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     complete = models.BooleanField(default=False)
     succssful = models.BooleanField(blank=True, null=True)
@@ -1449,7 +1449,7 @@ class LoadEvent(models.Model):
 
 class LoadStaging(models.Model):
     nodegroup = models.ForeignKey(NodeGroup, db_column="nodegroupid", on_delete=models.CASCADE)
-    load_event = models.ForeignKey(LoadEvent, db_column="transactionid", on_delete=models.CASCADE)
+    load_event = models.ForeignKey(LoadEvent, db_column="loadid", on_delete=models.CASCADE)
     value = JSONField(blank=True, null=True, db_column="value")
     legacyid = models.TextField(blank=True, null=True)
     resourceid = models.UUIDField(serialize=False, blank=True, null=True)
