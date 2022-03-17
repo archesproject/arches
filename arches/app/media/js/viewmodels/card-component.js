@@ -145,6 +145,9 @@ define([
             self.tile.resourceinstance_id = self.tile.resourceinstance_id || ko.unwrap(params.form?.resourceId);
             self.tile.save(function(response) {
                 self.loading(false);
+                if(params?.form?.error){
+                    params.form.error(response.responseJSON.message);
+                }
                 params.pageVm.alert(
                     new AlertViewModel(
                         'ep-alert-red',
