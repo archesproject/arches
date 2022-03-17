@@ -40,16 +40,16 @@ class Command(BaseCommand):
         )
 
     def handle(self, *args, **options):
-        self.create_template(template=options['template'], dest=options["dest"], graphid=options["graph"])
+        self.create_template(template=options["template"], dest=options["dest"], graphid=options["graph"])
 
     def write_metadata(self, workbook, metadata):
-        metadata_sheet = workbook.create_sheet(title='Metadata')
+        metadata_sheet = workbook.create_sheet(title="Metadata")
         metadata_sheet[f"A1"] = "node"
         metadata_sheet[f"B1"] = "datatype"
         for i, node in enumerate(metadata):
-            metadata_sheet.cell(column=1, row=i + 2, value=node['alias'])
-            metadata_sheet.cell(column=2, row=i + 2, value=node['datatype'])
-    
+            metadata_sheet.cell(column=1, row=i + 2, value=node["alias"])
+            metadata_sheet.cell(column=2, row=i + 2, value=node["datatype"])
+
     def style_header(self, length, width, sheet):
         thin = styles.Side(border_style="thin", color="000000")
         fill = styles.PatternFill("solid", fgColor="eeeeee")
@@ -70,8 +70,8 @@ class Command(BaseCommand):
             column_length = 0
             for row in rows:
                 details = dict(zip(columns, row))
-                tab = '    ' * details["depth"]
-                nodes = Node.objects.filter(nodegroup_id=details['nodegroupid']).exclude(datatype='semantic').values('datatype', 'alias')
+                tab = "    " * details["depth"]
+                nodes = Node.objects.filter(nodegroup_id=details["nodegroupid"]).exclude(datatype="semantic").values("datatype", "alias")
                 metadata += nodes
                 if details["depth"] == 0:
                     column_length = 0
@@ -91,14 +91,14 @@ class Command(BaseCommand):
                 else:
                     row_number += 1
                     sheet[f"A{row_number}"] = "--"
-                    sheet[f"B{row_number}"]	= f'{tab}{details["alias"]}  ({details["cardinality"]})'
+                    sheet[f"B{row_number}"] = f'{tab}{details["alias"]}  ({details["cardinality"]})'
                     for i, node in enumerate(nodes):
                         sheet.cell(column=i + 3, row=row_number, value=f"{node['alias']}")
                 column_length = len(nodes) if len(nodes) > column_length else column_length
                 self.style_header(row_number, column_length + 2, sheet)
             self.write_metadata(wb, metadata)
-            wb.save(filename = dest)
+            wb.save(filename=dest)
 
     def create_template(self, template, dest, graphid):
-        if template == 'branchcsv':
+        if template == "branchcsv":
             self.create_branchcsv_template(dest, graphid)
