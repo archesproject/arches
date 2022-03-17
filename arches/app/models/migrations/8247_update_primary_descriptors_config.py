@@ -3,7 +3,7 @@ from django.db import migrations, models
 
 class Migration(migrations.Migration):
 
-    dependencies = [("models", "8085_relational_data_model_handle_dates"),]
+    dependencies = [("models", "8085_relational_data_model_handle_dates"), ]
     operations = [
         migrations.RunSQL(
             """
@@ -12,7 +12,8 @@ class Migration(migrations.Migration):
                                                  json_build_object('name', defaultconfig -> 'name',
                                                                    'description', defaultconfig -> 'description',
                                                                    'map_popup', defaultconfig -> 'map_popup'))::jsonb,
-                                                 '{"module": "arches.app.functions.primary_descriptors", "class_name": "PrimaryDescriptorsFunction" }'::jsonb)
+                                                 ('{"module": "arches.app.functions.primary_descriptors", '||
+                                                 '"class_name": "PrimaryDescriptorsFunction" }')::jsonb)
                 where functionid = '60000000-0000-0000-0000-000000000001';
 
 
@@ -21,7 +22,9 @@ class Migration(migrations.Migration):
                                              json_build_object('name', config -> 'name',
                                                                'description', config -> 'description',
                                                                'map_popup', config -> 'map_popup'))::jsonb,
-                                             '{"module": "arches.app.functions.primary_descriptors", "class_name": "PrimaryDescriptorsFunction" }'::jsonb)
+                                             ('{"module": "arches.app.functions.primary_descriptors", '||
+                                             '"class_name": "PrimaryDescriptorsFunction" }')::jsonb)
                     where functionid = '60000000-0000-0000-0000-000000000001';
-            """)
-        ]
+            """
+        )
+    ]
