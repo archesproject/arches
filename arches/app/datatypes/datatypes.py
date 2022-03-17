@@ -1539,6 +1539,10 @@ class FileListDataType(BaseDataType):
 
 
 class BaseDomainDataType(BaseDataType):
+    def __init__(self, model=None):
+        super(BaseDomainDataType, self).__init__(model=model)
+        self.value_lookup = {}
+
     def get_option_text(self, node, option_id):
         for option in node.config["options"]:
             if option["id"] == option_id:
@@ -1555,7 +1559,15 @@ class BaseDomainDataType(BaseDataType):
     def is_a_literal_in_rdf(self):
         return True
 
+    def lookup_domainid_by_value(self, value, nodeid, config):
+        if nodeid not in self.value_lookup:          
+            options = {}
+            for val in config["options"]:
+                options[val["text"]] = val["id"]
+            self.value_lookup[nodeid] = options
+        return self.value_lookup[nodeid][value]
 
+        
 class DomainDataType(BaseDomainDataType):
     def validate(self, value, row_number=None, source="", node=None, nodeid=None, strict=False):
         errors = []
@@ -1575,6 +1587,16 @@ class DomainDataType(BaseDomainDataType):
                     error_message = self.create_error_message(value, source, row_number, message)
                     errors.append(error_message)
         return errors
+
+    def transform_value_for_tile(self, value, **kwargs):
+        if value is not None:
+            value = value.strip()
+            try:
+                uuid.UUID(value)
+            except ValueError:
+                if "nodeid" in kwargs and "config" in kwargs:
+                    self.lookup_domainid_by_value(self, value, kwargs["nodeid"], kwargs["config"])
+        return value
 
     def get_search_terms(self, nodevalue, nodeid=None):
         terms = []
@@ -1658,9 +1680,19 @@ class DomainDataType(BaseDomainDataType):
 
 class DomainListDataType(BaseDomainDataType):
     def transform_value_for_tile(self, value, **kwargs):
+        result = []
         if value is not None:
             if not isinstance(value, list):
                 value = value.split(",")
+            for v in value:
+                try:
+                    stripped = v.strip()
+                    uuid.UUID(stripped)
+                    v = stripped
+                except ValueError:
+                    if "nodeid" in kwargs and "config" in kwargs:
+                        v = self.lookup_domainid_by_value(self, v, kwargs["nodeid"], kwargs["config"])
+                result.append(v)
         return value
 
     def validate(self, values, row_number=None, source="", node=None, nodeid=None, strict=False):

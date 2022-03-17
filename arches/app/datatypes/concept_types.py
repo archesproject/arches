@@ -1,3 +1,4 @@
+from turtle import pd
 from arches.app.utils.betterJSONSerializer import JSONSerializer
 import uuid
 import csv
@@ -16,6 +17,8 @@ from rdflib import Namespace, URIRef, Literal, BNode
 from rdflib import ConjunctiveGraph as Graph
 from rdflib.namespace import RDF, RDFS, XSD, DC, DCTERMS, SKOS
 from arches.app.models.concept import ConceptValue
+from arches.app.models.concept import Concept
+from io import StringIO
 
 archesproject = Namespace(settings.ARCHES_NAMESPACE_FOR_DATA_EXPORT)
 cidoc_nm = Namespace("http://www.cidoc-crm.org/cidoc-crm/")
@@ -25,6 +28,23 @@ class BaseConceptDataType(BaseDataType):
     def __init__(self, model=None):
         super(BaseConceptDataType, self).__init__(model=model)
         self.value_lookup = {}
+        self.collection_lookup = {}
+
+    def lookup_label(self, label, collectionid):
+        ret = label
+        collection_values = self.collection_lookup[collectionid]
+        for concept in collection_values:
+            if label == concept[1]:
+                ret = concept[2]
+        return ret
+
+    def lookup_labelid_from_label(self, value, collectionid):
+        try:
+            result = self.lookup_label(value, collectionid)
+        except KeyError:
+            self.collection_lookup[collectionid] = Concept().get_child_collections(collectionid)
+            result = self.lookup_label(value, collectionid)
+        return result
 
     def get_value(self, valueid):
         try:
@@ -131,7 +151,14 @@ class ConceptDataType(BaseConceptDataType):
         return errors
 
     def transform_value_for_tile(self, value, **kwargs):
-        return value.strip()
+        try:
+            stripped = value.strip()
+            uuid.UUID(stripped)
+            value = stripped
+        except ValueError:
+            if "rdmCollection" in kwargs:
+                value = self.lookup_labelid_from_label(value, kwargs["rdmCollection"])
+        return value
 
     def transform_export_values(self, value, *args, **kwargs):
         concept_export_value_type = kwargs.get("concept_export_value_type", None)
@@ -262,7 +289,13 @@ class ConceptListDataType(BaseConceptDataType):
         ret = []
         for val in csv.reader([value], delimiter=",", quotechar='"'):
             for v in val:
-                ret.append(v.strip())
+                try:
+                    stripped = v.strip()
+                    uuid.UUID(stripped)
+                    ret.append(stripped)
+                except ValueError:
+                    if "rdmCollection" in kwargs:
+                        ret.append(self.lookup_labelid_from_label(v, kwargs["rdmCollection"]))
         return ret
 
     def transform_export_values(self, value, *args, **kwargs):
