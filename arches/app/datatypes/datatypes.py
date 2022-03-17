@@ -1560,14 +1560,14 @@ class BaseDomainDataType(BaseDataType):
         return True
 
     def lookup_domainid_by_value(self, value, nodeid, config):
-        if nodeid not in self.value_lookup:          
+        if nodeid not in self.value_lookup:
             options = {}
             for val in config["options"]:
                 options[val["text"]] = val["id"]
             self.value_lookup[nodeid] = options
         return self.value_lookup[nodeid][value]
 
-        
+
 class DomainDataType(BaseDomainDataType):
     def validate(self, value, row_number=None, source="", node=None, nodeid=None, strict=False):
         errors = []
