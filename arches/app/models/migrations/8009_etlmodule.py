@@ -169,7 +169,8 @@ remove_functions_to_get_nodegroup_tree = [
 ]
 
 add_staging_to_tile_function = """
-    CREATE OR REPLACE PROCEDURE public.__arches_staging_to_tile(load_id text, graph_id text) AS $$
+    CREATE OR REPLACE FUNCTION public.__arches_staging_to_tile(load_id text, graph_id text)
+    RETURNS TABLE(complete TEXT, successful TEXT) AS $$
         DECLARE
             staged_value jsonb;
             tile_data jsonb;
@@ -222,13 +223,14 @@ add_staging_to_tile_function = """
                     END IF;
                 END LOOP;
             UPDATE load_event SET (load_end_time, complete, successful) = (now(), true, true) WHERE loadid = load_id::uuid;
+            SELECT l.complete, l.successful FROM load_event l WHERE l.loadid = load_id::uuid;  
         END
     $$
     LANGUAGE plpgsql
     """
 
 remove_staging_to_tile_function = """
-    DROP PROCEDURE public.__arches_staging_to_tile(load_id text, graph_id text);
+    DROP FUNCTION public.__arches_staging_to_tile(load_id text, graph_id text);
     """
 
 

@@ -15,7 +15,8 @@ from arches.app.models.tile import Tile
 from arches.app.models.system_settings import settings
 from arches.app.utils.response import JSONResponse
 from arches.app.utils.betterJSONSerializer import JSONSerializer
-from arches.app.utils.index_database import index_resources_by_transaction
+from arches.app.utils.index_database import index_resources_by_type
+#from arches.app.utils.index_database import index_resources_by_transaction
 
 logger = logging.getLogger(__name__)
 
@@ -102,21 +103,15 @@ class ImportSingleCsv:
     def write(self, request):
         graphid = request.POST.get("graphid")
         with connection.cursor() as cursor:
-            cursor.execute("""CALL __arches_staging_to_tile(%s, %s)""", [self.loadid, graphid])
-            cursor.execute("""SELECT complete, successful FROM load_event WHERE loadid = %s""", [self.loadid])
+            cursor.execute("""SELECT * FROM __arches_staging_to_tile(%s, %s)""", [self.loadid, graphid])
             row = cursor.fetchall()
 
+        index_resources_by_type(graphid, quiet=True, use_multiprocessing=True)
         # index_resources_by_transaction(self.loadid, quiet=True, use_multiprocessing=True)
-        result = {"complete": row[0][0], "successful": row[0][1]}
-        if result["complete"] and result["successful"]:
-            return {"success": True, "data": result}
+        if row[0][0]:
+            return {"success": True, "data": "success"}
         else:
-            return {"success": False, "data": result}
-
-    def clear_staging_table(self, loadid):
-        with connection.cursor() as cursor:
-            cursor.execute("""DELETE FROM load_staging WHERE loadid = %s""", [self.loadid])
-            cursor.execute("""DELETE FROM load_event WHERE loadid = %s""", [self.loadid])
+            return {"success": False, "data": "failed"}
 
     def populate_staging_table(self, request):
         """
