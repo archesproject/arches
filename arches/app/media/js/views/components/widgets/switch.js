@@ -46,7 +46,8 @@ define(['knockout', 'underscore', 'viewmodels/widget'], function(ko, _, WidgetVi
                     break;
                 }
             }
-        }
+        };
+
         this.getvalue = this.config().getvalue || ko.computed(function(){
             var result = null;
             if (this.value() === this.on) {

@@ -35,10 +35,10 @@ define(['knockout', 'underscore', 'viewmodels/widget'], function (ko, _, WidgetV
                 if(event.type=="click" || (event.type=="keyup" && (event.which==13 || event.keyCode==13))){
                     switch (eventType){
                     case "set value":
-                        data.setValue(additionalParam)
+                        data.setValue(additionalParam);
                         break;
                     case "set default value":
-                        data.setDefaultValue(additionalParam)
+                        data.setDefaultValue(additionalParam);
                         break;
                     }
 
