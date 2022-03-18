@@ -432,6 +432,7 @@ def index_concepts(clear_index=True, batch_size=settings.BULK_IMPORT_BATCH_SIZE)
         )
     )
 
+
 def index_resources_by_transaction(
     transaction_id, batch_size=settings.BULK_IMPORT_BATCH_SIZE, quiet=False, use_multiprocessing=False, max_subprocesses=0
 ):
