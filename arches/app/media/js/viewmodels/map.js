@@ -26,25 +26,25 @@ define([
         this.canRead = params.userCanReadResources;
 
 
-        this.mapEventHandler = function(event_name,additional_param,data,event){
+        this.mapEventHandler = function(eventName,additionalParam,data,event){
             if(event.type=="click" || (event.type=="keyup" && (event.which==13 || event.keyCode==13))){
-                switch (event_name){
-                    case "toggle tab":
-                        data.toggleTab(additional_param);
-                        break;
-                    case "hide side panel":
-                        data.hideSidePanel();
-                        break;
-                    case "active basemap":
-                        additional_param.activeBasemap(data)
-                        break;
-                    case "overlay":
-                        data.onMap(!data.onMap());
-                        data.updateParent(additional_param);
-                        break;
+                switch (eventName){
+                case "toggle tab":
+                    data.toggleTab(additionalParam);
+                    break;
+                case "hide side panel":
+                    data.hideSidePanel();
+                    break;
+                case "active basemap":
+                    additionalParam.activeBasemap(data)
+                    break;
+                case "overlay":
+                    data.onMap(!data.onMap());
+                    data.updateParent(additionalParam);
+                    break;
                 }
             }
-        }
+        };
 
         var boundingOptions = {
             padding: {
