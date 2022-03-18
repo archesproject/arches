@@ -170,8 +170,9 @@ remove_functions_to_get_nodegroup_tree = [
 
 add_staging_to_tile_function = """
     CREATE OR REPLACE FUNCTION public.__arches_staging_to_tile(load_id text, graph_id text)
-    RETURNS TABLE(complete TEXT, successful TEXT) AS $$
+    RETURNS BOOLEAN AS $$
         DECLARE
+            status boolean;
             staged_value jsonb;
             tile_data jsonb;
             old_data jsonb;
@@ -223,8 +224,9 @@ add_staging_to_tile_function = """
                     END IF;
                 END LOOP;
             UPDATE load_event SET (load_end_time, complete, successful) = (now(), true, true) WHERE loadid = load_id::uuid;
-            SELECT l.complete, l.successful FROM load_event l WHERE l.loadid = load_id::uuid;  
-        END
+            SELECT successful INTO status FROM load_event WHERE loadid = load_id::uuid;
+            RETURN status;
+        END;
     $$
     LANGUAGE plpgsql
     """
