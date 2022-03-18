@@ -73,6 +73,13 @@
     text-decoration: underline;
 }
 
+
 .jstree-default .func-node {
     color: #000000;
+}
+
+div.search-facet-item:focus {
+    box-shadow: inset 0 0 0 3px #000;
+    outline: none;
+
 }
