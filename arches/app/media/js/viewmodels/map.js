@@ -36,7 +36,7 @@ define([
                     data.hideSidePanel();
                     break;
                 case "active basemap":
-                    additionalParam.activeBasemap(data)
+                    additionalParam.activeBasemap(data);
                     break;
                 case "overlay":
                     data.onMap(!data.onMap());
