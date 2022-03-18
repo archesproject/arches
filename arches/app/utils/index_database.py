@@ -146,6 +146,7 @@ def index_resources_using_multiprocessing(resourceids, batch_size=settings.BULK_
         pool.close()
         pool.join()
 
+
 def index_resources_using_singleprocessing(resources, batch_size=settings.BULK_IMPORT_BATCH_SIZE, quiet=False, title=None):
     datatype_factory = DataTypeFactory()
     node_datatypes = {str(nodeid): datatype for nodeid, datatype in models.Node.objects.values_list("nodeid", "datatype")}
@@ -214,20 +215,12 @@ def index_resources_by_type(
                 str(rid) for rid in Resource.objects.filter(graph_id=str(resource_type)).values_list("resourceinstanceid", flat=True)
             ]
             index_resources_using_multiprocessing(
-                resourceids=resources,
-                batch_size=batch_size,
-                quiet=quiet,
-                max_subprocesses=max_subprocesses
+                resourceids=resources, batch_size=batch_size, quiet=quiet, max_subprocesses=max_subprocesses
             )
 
         else:
             resources = Resource.objects.filter(graph_id=str(resource_type))
-            index_resources_using_singleprocessing(
-                resources=resources,
-                batch_size=batch_size,
-                quiet=quiet,
-                title=graph_name
-            )
+            index_resources_using_singleprocessing(resources=resources, batch_size=batch_size, quiet=quiet, title=graph_name)
 
         q = Query(se=se)
         term = Term(field="graph_id", term=str(resource_type))
@@ -466,19 +459,16 @@ def index_resources_by_transaction(
 
     if use_multiprocessing:
         index_resources_using_multiprocessing(
-            resourceids=resourceids,
-            batch_size=batch_size,
-            quiet=quiet,
-            max_subprocesses=max_subprocesses
+            resourceids=resourceids, batch_size=batch_size, quiet=quiet, max_subprocesses=max_subprocesses
         )
     else:
         index_resources_using_singleprocessing(
             resources=Resource.objects.filter(pk__in=resourceids),
             batch_size=batch_size,
             quiet=quiet,
-            title="transaction {}".format(transaction_id)
+            title="transaction {}".format(transaction_id),
         )
 
-    logger.info("Transaction: {0}, In Database: {1}, Took: {2} seconds".format(
-        transaction_id, len(resourceids), (datetime.now() - start).seconds
-    ))
+    logger.info(
+        "Transaction: {0}, In Database: {1}, Took: {2} seconds".format(transaction_id, len(resourceids), (datetime.now() - start).seconds)
+    )
