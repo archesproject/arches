@@ -4,28 +4,22 @@
     <div class="tabbed-workflow">
 
         <div class="tabbed-workflow-title-bar">
-            <div
-                style="
-                    display: flex;
-                    flex-direction: row;
-                "
-            >
+            <div class="workflow-name-container">
                 <div class="workflow-name" data-bind="text: workflowName() + ' Workflow'">{% trans "Insert Workflow Name" %}</div>
             </div>
 
-            <div style="
-                display: inline-flex;
-                width: 335px;
-                justify-content: flex-end;"
-                >
+            <div class="workflow-top-control">
                 <!-- ko if: (activeStep()._index === steps().length - 1) || isWorkflowFinished() -->
                 <button 
                     data-bind="click: finishWorkflow"
                     class="btn btn-success"
                 >
                 <i class="fa fa-check"></i>
-                <span>
+                <span class="verbose">
                     {% trans "Save and Complete Workflow" %}
+                </span>
+                <span class="succinct">
+                    {% trans "Complete" %}
                 </span>
                 </button>
                 <!-- /ko -->
@@ -35,7 +29,7 @@
                 >
                     <i class=" ion-android-cancel"></i>
                     <span>
-                        {% trans "Delete Workflow" %}
+                        {% trans "Delete" %}
                     </span>
                 </button>
             </div>
@@ -121,7 +115,12 @@
                 </div>
             <div class="workflow-tab-controls left" data-bind="click: function(){ updatePan('right') }"><i class="fa fa-angle-right"></i></div>
         </div>
-        
+        <div class="workflow-step-title">
+            <h2>
+                <i class="fa fa-list-ol text-center icon-wrap bg-gray ep-graph-title-icon"></i>
+                <span data-bind="text: activeStep().title"></span>
+            </h2>
+        </div>
         <div class="tabbed-workflow-step-container">
             <workflow-step params='step: activeStep()'></workflow-step>
         </div>
@@ -135,8 +134,11 @@
                     data-bind="click: back"
                 >
                     <i class="fa fa-caret-left"></i>
-                    <span>
+                    <span class="verbose">
                         {% trans  "Previous Step" %}
+                    </span>
+                    <span class="succinct">
+                        {% trans  "Previous" %}
                     </span>
                 </button>
                 <!-- /ko -->
@@ -165,8 +167,11 @@
                         "
                     >
                         <i class="ion-android-cloud-done"></i>
-                        <span>
+                        <span class="verbose">
                             {% trans  "Save and Continue" %}
+                        </span>
+                        <span class="succinct">
+                            {% trans  "Next" %}
                         </span>
                         <i class="fa fa-caret-right"></i>
                     </button>
@@ -182,8 +187,11 @@
                                 }
                             "
                         >
-                            <span>
+                            <span class="verbose">
                                 {% trans  "Next Step" %}
+                            </span>
+                            <span class="succinct">
+                                {% trans  "Next" %}
                             </span>
                             <i class="fa fa-caret-right"></i>
                         </button>
@@ -201,8 +209,11 @@
                             }
                         "
                     >
-                        <span>
+                        <span class="verbose">
                             {% trans  "Next Step" %}
+                        </span>
+                        <span class="succinct">
+                            {% trans  "Next" %}
                         </span>
                         <i class="fa fa-caret-right"></i>
                     </button>
@@ -211,7 +222,7 @@
             </div>
 
 
-            <div style="display: flex;">
+            <div class="step-metadata">
                 <div class="step-counter">
                     <span 
                         style="padding-right: 2px;"
