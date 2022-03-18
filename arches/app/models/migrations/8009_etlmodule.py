@@ -228,7 +228,7 @@ add_staging_to_tile_function = """
     """
 
 remove_staging_to_tile_function = """
-    DROP FUNCTION public.__arches_staging_to_tile(load_id text, graph_id text);
+    DROP PROCEDURE public.__arches_staging_to_tile(load_id text, graph_id text);
     """
 
 
