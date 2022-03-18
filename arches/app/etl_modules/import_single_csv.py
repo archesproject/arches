@@ -16,7 +16,8 @@ from arches.app.models.system_settings import settings
 from arches.app.utils.response import JSONResponse
 from arches.app.utils.betterJSONSerializer import JSONSerializer
 from arches.app.utils.index_database import index_resources_by_type
-#from arches.app.utils.index_database import index_resources_by_transaction
+
+# from arches.app.utils.index_database import index_resources_by_transaction
 
 logger = logging.getLogger(__name__)
 
