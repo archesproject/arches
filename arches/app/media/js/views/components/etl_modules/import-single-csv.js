@@ -150,7 +150,9 @@ define([
                 self.formData.append('fieldnames', fieldnames);
                 self.formData.append('header', self.headers());
                 self.formData.append('graphid', self.selectedGraph());
-                self.submit('write');
+                self.submit('write').then(data => {
+                    console.log(data.result);
+                }).fail(error => console.log(error));
             };
 
             this.changeFormat =function(){
@@ -170,40 +172,8 @@ define([
                 self.formData.append('header', self.headers());
                 self.formData.append('graphid', self.selectedGraph());
                 self.submit('validate').then(data => {
-                    const response = data.result;
                     self.validated(true);
-
-                    let errorByColumn = {};
-                    for (const rowNumber in response) {
-                        for (const columnName in response[rowNumber]) {
-                            if (columnName in errorByColumn) {
-                                errorByColumn[columnName].push(
-                                    response[rowNumber][columnName]
-                                );
-                            } else {
-                                errorByColumn[columnName] = [
-                                    response[rowNumber][columnName]
-                                ];
-                            }
-                        };
-                    };
-                    for (columnName in errorByColumn) {
-                        const error = Object.keys(errorByColumn[columnName][0])[0];
-                        const example = errorByColumn[columnName].reduce(
-                            (acc, error) => {
-                                Object.values(error)[0]
-                                acc = [acc, Object.values(error)[0]].filter(Boolean).join(", ")
-                                return acc;
-                            }, '');
-                        const header = findField(columnName)
-                        this.validationError.push(
-                            {
-                                column: header,
-                                error: error,
-                                example: example
-                            }
-                        );
-                    }    
+                    self.validationError(data.result);
                 }).fail(error => console.log(error));
             };
 

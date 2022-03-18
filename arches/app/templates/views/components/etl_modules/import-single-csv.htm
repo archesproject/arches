@@ -72,9 +72,9 @@
                                 <select data-bind="
                                     value: mapping.node,
                                     options: nodes,
-                                    optionsText: 'name',
+                                    optionsText: 'alias',
                                     optionsCaption: '{% trans "Select a Node..." %}',
-                                    optionsValue: 'name',
+                                    optionsValue: 'alias',
                                     valueAllowUnset: true,
                                     chosen: {width: '100%'}"
                                 ></select>
@@ -126,18 +126,16 @@
                 <table class="table table-striped" style="margin-top: 25px; border: 1px solid rgba(0,0,0,0.14)" width="100%">
                     <thead>
                         <tr>
-                            <th data-bind="text: 'Column Name'"></th>
-                            <th data-bind="text: 'Error Message'"></th>
-                            <th data-bind="text: 'Examples'"></th>
+                            <th data-bind="text: 'Error'"></th>
+                            <th data-bind="text: 'Source'"></th>
                         </tr>
                     </thead>
                     <!-- ko if: validationError().length -->
                     <tbody>
                         <!-- ko foreach: validationError -->
                         <tr>
-                            <td data-bind="text: column"></td>
-                            <td data-bind="text: error"></td>
-                            <td data-bind="text: example"></td>
+                            <td data-bind="text: $data[1]"></td>
+                            <td data-bind="text: $data[0]"></td>
                         </tr>
                         <!-- /ko -->
                     </tbody>
@@ -153,20 +151,25 @@
                 <!-- /ko -->
             </div>
             <div class="etl-module-buttons" style="display: inline-flex; flex-direction:row; justify-content: flex-end; margin-top: 25px;">
-                <button data-bind="click: function () { fileAdded(false); }" class="btn btn-primary" style="margin-right: 10px;">
-                    <span>{% trans "Remove File" %}</span>
-                </button>
                 <button data-bind="click: changeFormat" class="btn btn-primary" style="display: none; margin-right: 10px;">
                     <span>{% trans "Select a different format" %}</span>
                 </button>
+                <!-- ko ifnot: validated -->
                 <button data-bind="click: validate" class="btn btn-success" style="margin-right: 10px;">
                     <span>{% trans "Validate data before import" %}</span>
                 </button>
+                <!-- /ko -->
                 <!-- ko if: validated() && validationError().length === 0 -->
                 <button data-bind="click: write" class="btn btn-success" style="margin-right: 10px;">
                     <span>{% trans "Import data" %}</span>
                 </button>
-                <!-- /ko-->
+                <!-- /ko -->
+                <!-- ko if: validated() && validationError().length !== 0 -->
+                <!-- button data-bind="click: function () { fileAdded(false); }" class="btn btn-danger" style="margin-right: 10px;" -->
+                <button data-bind="click: function () { $parent.selectedModule(null); }" class="btn btn-danger" style="margin-right: 10px;">
+                    <span>{% trans "Reload File" %}</span>
+                </button>
+                <!-- /ko -->
                 <button data-bind="click: function () { $parent.selectedModule(null); }" class="btn btn-danger" style="margin-right: 10px;">
                     <span>{% trans "Cancel File Import" %}</span>
                 </button>
