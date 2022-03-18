@@ -231,6 +231,7 @@ remove_staging_to_tile_function = """
     DROP FUNCTION public.__arches_staging_to_tile(load_id text, graph_id text);
     """
 
+
 class Migration(migrations.Migration):
 
     dependencies = [

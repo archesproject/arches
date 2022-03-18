@@ -24,7 +24,7 @@ class ImportSingleCsv:
     def __init__(self, request=None):
         self.request = request
         self.userid = request.user.id
-        self.loadid = request.POST.get('load_id')
+        self.loadid = request.POST.get("load_id")
         self.datatype_factory = DataTypeFactory()
         self.node_lookup = {}
         self.blank_tile_lookup = {}
@@ -106,7 +106,7 @@ class ImportSingleCsv:
             cursor.execute("""SELECT complete, successful FROM load_event WHERE loadid = %s""", [self.loadid])
             row = cursor.fetchall()
 
-        #index_resources_by_transaction(self.loadid, quiet=True, use_multiprocessing=True)
+        # index_resources_by_transaction(self.loadid, quiet=True, use_multiprocessing=True)
         result = {"complete": row[0][0], "successful": row[0][1]}
         if result["complete"] and result["successful"]:
             return {"success": True, "data": result}
@@ -137,11 +137,7 @@ class ImportSingleCsv:
             next(reader)
 
         with connection.cursor() as cursor:
-            cursor.execute("""INSERT INTO load_event (loadid, complete, user_id) VALUES (%s, %s, %s)""", (
-                self.loadid,
-                False,
-                self.userid)
-            )
+            cursor.execute("""INSERT INTO load_event (loadid, complete, user_id) VALUES (%s, %s, %s)""", (self.loadid, False, self.userid))
 
         for row in reader:
             resourceid = uuid.uuid4()
@@ -156,13 +152,17 @@ class ImportSingleCsv:
                 source_value = row[key]
                 error = datatype_instance.validate(source_value)
                 valid = True if len(error) == 0 else False
-                notes = None if valid else error[0]['message']
+                notes = None if valid else error[0]["message"]
                 value = datatype_instance.transform_value_for_tile(source_value) if source_value is not None and valid else None
-                
+
                 if nodegroupid in dict_by_nodegroup:
-                    dict_by_nodegroup[nodegroupid].append({node: {"value": value, "valid": valid, "source": source_value, "notes": notes, "datatype": datatype}})
+                    dict_by_nodegroup[nodegroupid].append(
+                        {node: {"value": value, "valid": valid, "source": source_value, "notes": notes, "datatype": datatype}}
+                    )
                 else:
-                    dict_by_nodegroup[nodegroupid] = [{node: {"value": value, "valid": valid, "source": source_value, "notes": notes, "datatype": datatype}}]
+                    dict_by_nodegroup[nodegroupid] = [
+                        {node: {"value": value, "valid": valid, "source": source_value, "notes": notes, "datatype": datatype}}
+                    ]
 
             for nodegroup in dict_by_nodegroup:
                 tile_data = self.get_blank_tile_lookup(nodegroup)
@@ -170,24 +170,19 @@ class ImportSingleCsv:
                 for node in dict_by_nodegroup[nodegroup]:
                     for key in node:
                         tile_data[key] = node[key]
-                        if node[key]['valid'] is False:
+                        if node[key]["valid"] is False:
                             passes_validation = False
 
                 tile_value_json = JSONSerializer().serialize(tile_data)
                 node_depth = 0
 
                 with connection.cursor() as cursor:
-                    cursor.execute("""
+                    cursor.execute(
+                        """
                         INSERT INTO load_staging (
                             nodegroupid, resourceid, value, loadid, nodegroup_depth, source_description, passes_validation
-                        ) VALUES (%s,%s,%s,%s,%s,%s,%s)""", (
-                        nodegroup,
-                        resourceid,
-                        tile_value_json,
-                        self.loadid,
-                        node_depth,
-                        file.name,
-                        passes_validation)
+                        ) VALUES (%s,%s,%s,%s,%s,%s,%s)""",
+                        (nodegroup, resourceid, tile_value_json, self.loadid, node_depth, file.name, passes_validation),
                     )
 
         message = "staging table populated"
@@ -199,7 +194,6 @@ class ImportSingleCsv:
             with connection.cursor() as cursor:
                 cursor.execute("""SELECT nodeid FROM nodes WHERE datatype <> 'semantic' AND nodegroupid = %s;""", [nodegroupid])
                 for row in cursor.fetchall():
-                    nodeid, = row
+                    (nodeid,) = row
                     self.blank_tile_lookup[nodegroupid][str(nodeid)] = None
         return self.blank_tile_lookup[nodegroupid]
-
