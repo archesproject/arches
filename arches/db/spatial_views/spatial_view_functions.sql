@@ -17,7 +17,7 @@ drop function if exists __arches_get_concept_label;
 drop function if exists __arches_get_domain_label;
 drop function if exists __arches_get_resourceinstance_label;
 drop function if exists __arches_get_nodevalue_label;
-drop role if exists arches_featureservices;
+drop role if exists arches_spatial_views;
 */
 
 -- ROLE
@@ -26,26 +26,25 @@ do
 $do$
 declare
     database_name     text;
-    fs_user_sql     text;
+    sv_user_sql     text;
 begin
     if not exists (
         select from pg_catalog.pg_roles
-        where  rolname = 'arches_featureservices') then
+        where  rolname = 'arches_spatial_views') then
 
         select current_database() into database_name;
 
-        create role arches_featureservices with
+        create role arches_spatial_views with
         login
         nosuperuser
         inherit
         nocreatedb
         nocreaterole
         noreplication
-        --encrypted password 'md5967438f66634c78452443a93cc7293a4';
-        password 'arches_featureservices';
+        password 'arches_spatial_views';
 
-        fs_user_sql := format('grant connect on database %s to arches_featureservices;', database_name);
-        execute fs_user_sql;
+        sv_user_sql := format('grant connect on database %s to arches_spatial_views;', database_name);
+        execute sv_user_sql;
 
     end if;
 end
@@ -796,7 +795,7 @@ begin
             where geo.nodeid = ''%s''
                 and ST_GeometryType(geo.geom) = ''%s'';
 
-            GRANT SELECT ON TABLE %s TO arches_featureservices;
+            GRANT SELECT ON TABLE %s TO arches_spatial_views;
 
             ',
             sv_name_slug_with_geom,
