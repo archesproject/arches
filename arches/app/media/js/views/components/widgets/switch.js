@@ -38,12 +38,12 @@ define(['knockout', 'underscore', 'viewmodels/widget'], function(ko, _, WidgetVi
         this.switchEventHandler = function(eventType,data,event){
             if(event.type=="click" || (event.type=="keyup" && (event.which==13 || event.keyCode==13))){
                 switch (eventType){
-                    case 'set value':
-                        data.setvalue(data);
-                        break;
-                    case 'set default':
-                        data.setdefault(data);
-                        break;
+                case 'set value':
+                    data.setvalue(data);
+                    break;
+                case 'set default':
+                    data.setdefault(data);
+                    break;
                 }
             }
         }

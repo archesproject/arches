@@ -34,16 +34,16 @@ define(['knockout', 'underscore', 'viewmodels/widget'], function (ko, _, WidgetV
             this.radioBooleanEventHandler = function(eventType,additionalParam,data,event){
                 if(event.type=="click" || (event.type=="keyup" && (event.which==13 || event.keyCode==13))){
                     switch (eventType){
-                        case "set value":
-                            data.setValue(additionalParam)
-                            break;
-                        case "set default value":
-                            data.setDefaultValue(additionalParam)
-                            break;
+                    case "set value":
+                        data.setValue(additionalParam)
+                        break;
+                    case "set default value":
+                        data.setDefaultValue(additionalParam)
+                        break;
                     }
 
                 }
-            }
+            };
 
             this.displayValue = ko.computed(function () {
                 if (this.value()===true) {

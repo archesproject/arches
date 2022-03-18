@@ -51,7 +51,7 @@ define([
             if(event.type=="click" || (event.type=="keyup" && (event.which==13 || event.keyCode==13))){
                 self.setOptionSelection(data,selected);
             }
-        }
+        };
 
         this.setOptionSelection = function(opt, selected) {
             if (ko.unwrap(self.disabled) === false) {
