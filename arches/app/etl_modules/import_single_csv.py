@@ -104,7 +104,7 @@ class ImportSingleCsv:
     def write(self, request):
         graphid = request.POST.get("graphid")
         with connection.cursor() as cursor:
-            cursor.execute("""SELECT * FROM __arches_staging_to_tile(%s, %s)""", [self.loadid, graphid])
+            cursor.execute("""SELECT * FROM __arches_staging_to_tile(%s)""", [self.loadid])
             row = cursor.fetchall()
 
         index_resources_by_type(graphid, quiet=True, use_multiprocessing=True)
