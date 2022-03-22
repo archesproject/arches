@@ -9,7 +9,7 @@ from arches.app.datatypes.datatypes import DataTypeFactory
 from arches.app.models.models import Node
 from arches.app.models.system_settings import settings
 from arches.app.utils.betterJSONSerializer import JSONSerializer
-from arches.app.utils.index_database import index_resources_by_type
+from arches.app.utils.index_database import index_resources_by_transaction
 
 logger = logging.getLogger(__name__)
 
@@ -222,8 +222,7 @@ class BranchCsvImporter:
             cursor.execute("""SELECT * FROM __arches_staging_to_tile(%s, %s)""", [self.loadid, graphid])
             row = cursor.fetchall()
 
-        index_resources_by_type(graphid, quiet=True, use_multiprocessing=True)
-        # index_resources_by_transaction(self.loadid, quiet=True, use_multiprocessing=True)
+        index_resources_by_transaction(self.loadid, quiet=True, use_multiprocessing=True)
         if row[0][0]:
             return {"success": True, "data": "success"}
         else:
