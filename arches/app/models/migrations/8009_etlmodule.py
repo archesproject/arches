@@ -72,13 +72,13 @@ add_validation_reporting_functions = """
         _note text;
 
     BEGIN
-        FOR _key, _value IN 
+        FOR _key, _value IN
             SELECT * FROM jsonb_each_text($1)
         LOOP
             IF _value ->> 'valid' = 'false' THEN
                 IF _value ->> 'notes' IS NULL THEN
                     _note = 'unspecified error';
-                END IF; 
+                END IF;
                 -- we could add the nodeid (_key), but let's not be verbose just yet
                 IF _result IS NULL THEN
                 _result := _note;
@@ -95,9 +95,9 @@ add_validation_reporting_functions = """
     RETURNS TABLE(source text, message text, loadid uuid)
     AS $$
     SELECT source_description, public.__arches_load_staging_get_tile_errors(value) AS message, loadid
-    FROM load_staging 
+    FROM load_staging
     WHERE passes_validation IS NOT true
-    AND loadid = load_id;  
+    AND loadid = load_id;
     $$
     LANGUAGE SQL;
     """
@@ -120,9 +120,9 @@ add_functions_to_get_nodegroup_tree = """
             0 as depth,
             (select alias from nodes where nodeid = nodegroup_id) as path,
             cardinality
-        FROM 
-        (SELECT ng.nodegroupid, ng.parentnodegroupid, alias, name, cardinality, graphid FROM node_groups ng 
-        INNER JOIN nodes n ON ng.nodegroupid = n.nodeid 
+        FROM
+        (SELECT ng.nodegroupid, ng.parentnodegroupid, alias, name, cardinality, graphid FROM node_groups ng
+        INNER JOIN nodes n ON ng.nodegroupid = n.nodeid
         ORDER by ng.nodegroupid) AS root
         WHERE nodegroupid = nodegroup_id
         UNION
@@ -135,8 +135,8 @@ add_functions_to_get_nodegroup_tree = """
                 path || ' - ' || parent.alias,
                 parent.cardinality
             FROM
-            (SELECT ng.nodegroupid, ng.parentnodegroupid, alias, name, cardinality, graphid FROM node_groups ng 
-            INNER JOIN nodes n ON ng.nodegroupid = n.nodeid 
+            (SELECT ng.nodegroupid, ng.parentnodegroupid, alias, name, cardinality, graphid FROM node_groups ng
+            INNER JOIN nodes n ON ng.nodegroupid = n.nodeid
             ORDER by ng.nodegroupid) AS parent
             INNER JOIN nodegroup_tree nt ON nt.nodegroupid = parent.parentnodegroupid
     ) SELECT
@@ -148,7 +148,7 @@ add_functions_to_get_nodegroup_tree = """
 
     CREATE OR REPLACE FUNCTION public.__get_nodegroup_tree_by_graph(graph_id uuid)
     RETURNS TABLE(root_nodegroup uuid, nodegroupid uuid, parentnodegroupid uuid, alias text, name text, depth integer, path text, cardinality text)
-    LANGUAGE PLPGSQL AS 
+    LANGUAGE PLPGSQL AS
     $func$
     DECLARE
     _nodegroupid uuid;
@@ -162,7 +162,7 @@ add_functions_to_get_nodegroup_tree = """
     """
 
 remove_functions_to_get_nodegroup_tree = [
-    """ 
+    """
     DROP FUNCTION public.__get_nodegroup_tree(nodegroup_id uuid);
     DROP FUNCTION public.__get_nodegroup_tree_by_graph(graph_id uuid);
     """
