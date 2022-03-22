@@ -209,14 +209,14 @@ class ResourceEditorView(MapBaseManagerView):
                     provisionaltiles.append(tile)
             tiles = provisionaltiles
 
-        deserialized_graph = None
+        serialized_graph = None
         if graph.publication and graph.publication.serialized_graph:
-            deserialized_graph = JSONDeserializer().deserialize(graph.publication.serialized_graph)
+            serialized_graph = graph.publication.serialized_graph
 
-        if deserialized_graph:
-            serialized_cards = deserialized_graph["cards"]
+        if serialized_graph:
+            serialized_cards = serialized_graph["cards"]
             cardwidgets = [
-                models.CardXNodeXWidget(**card_x_node_x_widget_dict) for card_x_node_x_widget_dict in deserialized_graph["widgets"]
+                models.CardXNodeXWidget(**card_x_node_x_widget_dict) for card_x_node_x_widget_dict in serialized_graph["widgets"]
             ]
         else:
             cards = graph.cardmodel_set.order_by("sortorder").filter(nodegroup__in=nodegroups).prefetch_related("cardxnodexwidget_set")

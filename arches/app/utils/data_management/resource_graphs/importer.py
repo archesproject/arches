@@ -135,11 +135,13 @@ def import_graph(graphs, overwrite_graphs=True):
                                     graph.config = check_default_configs(default_config, report_config)
                                     graph.template_id = report["template_id"]
                         graph.save()
+                        graph.publish()
                         reporter.update_graphs_saved()
                     else:
                         overwrite_input = input("Overwrite {0} (Y/N) ? ".format(graph.name))
                         if overwrite_input.lower() in ("t", "true", "y", "yes"):
                             graph.save()
+                            graph.publish()
                         else:
                             raise GraphImportException("{0} - already exists. Skipping import.".format(graph.name))
 
