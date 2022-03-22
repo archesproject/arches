@@ -53,6 +53,7 @@ class Command(BaseCommand):
                 "index_concepts",
                 "index_resources",
                 "index_resources_by_type",
+                "index_resources_by_transaction",
                 "index_resource_relations",
                 "add_index",
                 "delete_index",
@@ -65,6 +66,7 @@ class Command(BaseCommand):
             + "'index_concepts'=Indexes all concepts from the database"
             + "'index_resources'=Indexes all resources from the database"
             + "'index_resources_by_type'=Indexes only resources of a given resource_model/graph"
+            + "'index_resources_by_transaction'=Indexes only resources of a given transaction"
             + "'index_resource_relations'=Indexes all resource to resource relation records"
             + "'add_index'=Register a new index in Elasticsearch"
             + "'delete_index'=Deletes a named index from Elasticsearch",
@@ -85,6 +87,15 @@ class Command(BaseCommand):
             dest="resource_types",
             default="",
             help="UUID of resource_model to index resources of.",
+        )
+
+        parser.add_argument(
+            "-t",
+            "--transaction",
+            action="store",
+            dest="transaction",
+            default="",
+            help="The transaction id of the resources to index.",
         )
 
         parser.add_argument(
@@ -184,6 +195,15 @@ class Command(BaseCommand):
             index_database_util.index_resources_by_type(
                 resource_types=options["resource_types"],
                 clear_index=options["clear_index"],
+                batch_size=options["batch_size"],
+                quiet=options["quiet"],
+                use_multiprocessing=options["use_multiprocessing"],
+                max_subprocesses=options["max_subprocesses"],
+            )
+
+        if options["operation"] == "index_resources_by_transaction":
+            index_database_util.index_resources_by_transaction(
+                transaction_id=options["transaction"],
                 batch_size=options["batch_size"],
                 quiet=options["quiet"],
                 use_multiprocessing=options["use_multiprocessing"],
