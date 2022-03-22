@@ -433,7 +433,7 @@ define([
 
         this.popupTemplate = popupTemplate;
 
-        this.onFeatureClick = function(feature, lngLat, MapboxGl) {
+        this.onFeatureClick = function(features, lngLat, MapboxGl) {
             const map = self.map();
             const mapStyle = map.getStyle();
             self.popup = new MapboxGl.Popup()
