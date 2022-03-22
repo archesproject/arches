@@ -26,7 +26,7 @@ from django.core.exceptions import ObjectDoesNotExist
 from django.db import transaction
 from django.db.utils import IntegrityError
 from arches.app.models import models
-from arches.app.models.resource import Resource
+from arches.app.models.resource import Resource, UnpublishedModelError
 from arches.app.models.system_settings import settings
 from arches.app.datatypes.datatypes import DataTypeFactory
 from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializer
@@ -1311,13 +1311,13 @@ class Graph(models.GraphModel):
         exclude = [] if exclude is None else exclude
 
         if self.publication and not force_recalculation:
-            deserialized_graph = JSONDeserializer().deserialize(self.publication.serialized_graph)
+            serialized_graph = self.publication.serialized_graph
 
             for key in exclude:
-                if deserialized_graph.get(key) is not None:  # explicit None comparison so falsey values will still return
-                    deserialized_graph[key] = None
+                if serialized_graph.get(key) is not None:  # explicit None comparison so falsey values will still return
+                    serialized_graph[key] = None
 
-            return deserialized_graph
+            return serialized_graph
         else:
             ret = JSONSerializer().handle_model(self, fields, exclude)
             ret["root"] = self.root
@@ -1590,15 +1590,22 @@ class Graph(models.GraphModel):
         Adds a row to the GraphPublication table
         Assigns GraphPublication id to Graph
         """
-        publication = models.GraphPublication.objects.create(
-            graph=self,
-            serialized_graph=JSONSerializer().serialize(self, force_recalculation=True),
-            notes=notes,
-        )
-        publication.save()
+        with transaction.atomic():
+            try:
+                publication = models.GraphPublication.objects.create(
+                    graph=self,
+                    serialized_graph=JSONDeserializer().deserialize(JSONSerializer().serialize(self, force_recalculation=True)),
+                    notes=notes,
+                )
+                publication.save()
+            except Exception as e:
+                raise UnpublishedModelError(e)
 
-        self.publication = publication
-        self.save(validate=False)
+            try:
+                self.publication = publication
+                self.save(validate=False)
+            except Exception as e:
+                raise UnpublishedModelError(e)
 
     def unpublish(self):
         """
