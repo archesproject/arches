@@ -11486,6 +11486,7 @@ div.search-facet-item.disabled {
 .search-facet-item-heading {
     font-weight: 400;
     font-size: 13px;
+    cursor: pointer;
 }
 
 .search-facet-item.header input {
@@ -11811,6 +11812,18 @@ a.search-facet-item.disabled {
     background: #fcfcfc;
     flex: 1;
     border-left: solid 1px #ccc;
+}
+
+.sm-icon-wrap {
+    display: inline-block;
+    padding: 5px;
+    border-radius: 2px;
+}
+
+.select2-search-choice .sm-icon-wrap {
+    padding: 0px;
+    padding-left: 5px;
+    padding-right: 2px;
 }
 
 .msm-icon-wrap {

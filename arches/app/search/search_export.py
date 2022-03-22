@@ -109,7 +109,7 @@ class SearchResultsExporter(object):
                 for card_node_object in card_node_objects:
                     if card_node_object.node.datatype != "semantic":
                         nodes_in_card.append(card_node_object)
-                node_object_list_sorted = sorted(nodes_in_card, key=lambda x: x.sortorder)
+                node_object_list_sorted = sorted(nodes_in_card, key=lambda x: 0 if x.sortorder is None else x.sortorder)
                 for sorted_node_object in node_object_list_sorted:
                     ordered_list_all_nodes.append(sorted_node_object)
 
@@ -370,7 +370,12 @@ class SearchResultsExporter(object):
 
     def to_geojson(self, instances, headers, name):  # a part of the code exists in datatypes.py, l.567
         if len(instances) > 0:
-            geometry_fields = self.get_geometry_fieldnames(instances[0])
+            geometry_fields = []
+            for instance in instances:
+                geometry_fields_in_instance = self.get_geometry_fieldnames(instance)
+                for geometry_field_value in geometry_fields_in_instance:
+                    if geometry_field_value not in geometry_fields:
+                        geometry_fields.append(geometry_field_value)
 
         features = []
         for geometry_field in geometry_fields:
