@@ -138,7 +138,7 @@ class BranchCsvImporter:
                     legacyid, resourceid = self.set_legacy_id(resourceid, legacyid_lookup)
                     tile_value_json, passes_validation = self.create_tile_value(cell_values, data_node_lookup, node_lookup, row_details)
                     cursor.execute("""INSERT INTO load_staging (nodegroupid, legacyid, resourceid, tileid, parenttileid, value, loadid, nodegroup_depth, source_description, passes_validation) VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)""", (                                        
-                        nodegroupid,
+                        row_details['nodegroup_id'],
                         legacyid,
                         resourceid,
                         tileid,
