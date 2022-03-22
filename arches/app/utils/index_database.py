@@ -447,8 +447,8 @@ def index_resources_by_transaction(
 
     try:
         uuid.UUID(transaction_id)
-    except:
-        print("***** A valid transaction id should be passed with -t or --transaction , eg. -t 'xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx'")
+    except ValueError:
+        logger.error("A transaction id must be a valid uuid")
         return
 
     logger.info("Indexing transaction '{0}'".format(transaction_id))

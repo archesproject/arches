@@ -18,6 +18,8 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 
 """This module contains commands for building Arches."""
 
+import uuid
+import logging
 from django.core.management.base import BaseCommand
 from arches.app.models.system_settings import settings
 from arches.app.search.base_index import get_index
@@ -33,6 +35,7 @@ from arches.app.search.mappings import (
 )
 import arches.app.utils.index_database as index_database_util
 
+logger = logging.getLogger(__name__)
 
 class Command(BaseCommand):
     """
@@ -202,6 +205,10 @@ class Command(BaseCommand):
             )
 
         if options["operation"] == "index_resources_by_transaction":
+            try:
+                uuid.UUID(options["transaction"])
+            except ValueError:
+                logger.error("A valid transaction id is required. Use -t or --transaction , eg. -t 'xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx'")
             index_database_util.index_resources_by_transaction(
                 transaction_id=options["transaction"],
                 batch_size=options["batch_size"],
