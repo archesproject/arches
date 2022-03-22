@@ -102,7 +102,7 @@ class BranchCsvImporter:
                 valid = True if len(datatype_instance.validate(value)) == 0 else False
                 if not valid:
                     tile_valid = False
-                tile_value[key] = {"value": value, "valid": valid, "source": source_value, "notes": None, "datatype": datatype}
+                tile_value[nodeid] = {"value": value, "valid": valid, "source": source_value, "notes": None, "datatype": datatype}
             except KeyError as e:
                 pass
 
