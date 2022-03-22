@@ -246,6 +246,8 @@ class Graph(models.GraphModel):
             node.ontologyclass = None
         if node.pk is None:
             node.pk = uuid.uuid1()
+        if isinstance(node.pk, str):
+            node.pk = uuid.UUID(node.pk)
         if node.istopnode:
             self.root = node
         self.nodes[node.pk] = node
@@ -1307,13 +1309,13 @@ class Graph(models.GraphModel):
         exclude = [] if exclude is None else exclude
 
         if self.publication and not force_recalculation:
-            deserialized_graph = self.publication.serialized_graph
+            serialized_graph = self.publication.serialized_graph
 
             for key in exclude:
-                if deserialized_graph.get(key) is not None:  # explicit None comparison so falsey values will still return
-                    deserialized_graph[key] = None
+                if serialized_graph.get(key) is not None:  # explicit None comparison so falsey values will still return
+                    serialized_graph[key] = None
 
-            return deserialized_graph
+            return serialized_graph
         else:
             ret = JSONSerializer().handle_model(self, fields, exclude)
             ret["root"] = self.root
@@ -1377,17 +1379,14 @@ class Graph(models.GraphModel):
                 unpermitted_edits = []
                 db_nodes = models.Node.objects.filter(graph=self)
                 for db_node in db_nodes:
-                    try:
-                        unpermitted_node_edits = find_unpermitted_edits(
-                            db_node,
-                            self.nodes[db_node.nodeid],
-                            ["name", "issearchable", "ontologyclass", "description", "isrequired", "fieldname", "exportable"],
-                            "node",
-                        )
-                        if unpermitted_node_edits is not None:
-                            unpermitted_edits.append(unpermitted_node_edits)
-                    except KeyError:
-                        pass
+                    unpermitted_node_edits = find_unpermitted_edits(
+                        db_node,
+                        self.nodes[db_node.nodeid],
+                        ["name", "issearchable", "ontologyclass", "description", "isrequired", "fieldname", "exportable"],
+                        "node",
+                    )
+                    if unpermitted_node_edits is not None:
+                        unpermitted_edits.append(unpermitted_node_edits)
                 db_graph = Graph.objects.get(pk=self.graphid)
                 unpermitted_graph_edits = find_unpermitted_edits(
                     db_graph,
@@ -1589,25 +1588,29 @@ class Graph(models.GraphModel):
         Adds a row to the GraphPublication table
         Assigns GraphPublication id to Graph
         """
-        try:
-            publication = models.GraphPublication.objects.create(
-                graph=self,
-                serialized_graph=JSONDeserializer().deserialize(JSONSerializer().serialize(self, force_recalculation=True)),
-                notes=notes,
-            )
-            publication.save()
+        with transaction.atomic():
+            try:
+                publication = models.GraphPublication.objects.create(
+                    graph=self,
+                    serialized_graph=JSONDeserializer().deserialize(JSONSerializer().serialize(self, force_recalculation=True)),
+                    notes=notes,
+                )
+                publication.save()
+            except Exception as e:
+                raise UnpublishedModelError(e)
 
-            self.publication = publication
-            self.save()
-        except Exception as e:
-            raise UnpublishedModelError(e)
+            try:
+                self.publication = publication
+                self.save(validate=False)
+            except Exception as e:
+                raise UnpublishedModelError(e)
 
     def unpublish(self):
         """
         Unassigns GraphPublication id from Graph
         """
         self.publication = None
-        self.save()
+        self.save(validate=False)
 
 
 class GraphValidationError(Exception):
