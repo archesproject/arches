@@ -154,7 +154,9 @@ def import_graph(graphs, overwrite_graphs=True):
 
                 # saves graph publication with serialized graph
                 if publication_data:
-                    publication_data["serialized_graph"] = JSONSerializer().serialize(graph, force_recalculation=True)
+                    publication_data["serialized_graph"] = JSONDeserializer().deserialize(
+                        JSONSerializer().serialize(graph, force_recalculation=True)
+                    )
 
                     GraphPublication.objects.update_or_create(
                         publicationid=publication_data["publicationid"],

@@ -132,7 +132,7 @@
           }
         ],
         "resourceinstance": {
-          "publication_id": null,
+          "publication_id": "f546e4de-aa0d-11ec-99a5-8e0f431ffc6d",
           "graph_id": "ab74af76-fa0e-11e6-9e3e-026d961c88e6",
           "resourceinstanceid": "b546621a-9556-4955-8997-8be88dcabf2b",
           "legacyid": "b546621a-9556-4955-8997-8be88dcabf2b"
@@ -269,7 +269,7 @@
           }
         ],
         "resourceinstance": {
-          "publication_id": null,
+          "publication_id": "f546e4de-aa0d-11ec-99a5-8e0f431ffc6d",
           "graph_id": "ab74af76-fa0e-11e6-9e3e-026d961c88e6",
           "resourceinstanceid": "75226cdb-6ecb-4dab-8f83-3537fa298ca3",
           "legacyid": "75226cdb-6ecb-4dab-8f83-3537fa298ca3"
