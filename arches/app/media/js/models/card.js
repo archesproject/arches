@@ -6,9 +6,10 @@ define([
     'knockout',
     'knockout-mapping',
     'viewmodels/card-constraints',
+    'regenerator-runtime',
     'utils/dispose',
     'views/components/cards/default'
-], function(_, AbstractModel, NodeModel, CardWidgetModel, ko, koMapping, CardConstraintsViewModel, dispose) {
+], function(_, AbstractModel, NodeModel, CardWidgetModel, ko, koMapping, CardConstraintsViewModel, regeneratorRuntime, dispose) {
     const cardComponentLookup = window['card-components'];
     const arches = window.arches;
     var CardModel = AbstractModel.extend({

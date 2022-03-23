@@ -4,9 +4,10 @@ define([
     'knockout',
     'knockout-mapping',
     'moment',
-    'arches',
-    'views/components/simple-switch'
-], function($, _, ko, koMapping, moment, arches) {
+    'views/components/simple-switch',
+    'utils/set-csrf-token'
+], function($, _, ko, koMapping, moment) {
+    const arches = window['arches'];
     /**
     * A viewmodel for managing provisional edits
     *
