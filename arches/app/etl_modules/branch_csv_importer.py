@@ -19,6 +19,7 @@ class BranchCsvImporter:
         self.request = request
         self.userid = request.user.id
         self.datatype_factory = DataTypeFactory()
+        self.legacyid_lookup = {}
 
     def filesize_format(self, bytes):
         """Convert bytes to readable units"""
@@ -71,15 +72,15 @@ class BranchCsvImporter:
         previous_tile['depth'] = depth
         return parenttileid
 
-    def set_legacy_id(self, resourceid, legacyid_lookup):
+    def set_legacy_id(self, resourceid):
         try:
             uuid.UUID(resourceid)
             legacyid = None
         except AttributeError:
             legacyid = resourceid
-            if legacyid not in legacyid_lookup:
-                legacyid_lookup[legacyid] = uuid.uuid4()
-            resourceid = legacyid_lookup[legacyid]
+            if legacyid not in self.legacyid_lookup:
+                self.legacyid_lookup[legacyid] = uuid.uuid4()
+            resourceid = self.legacyid_lookup[legacyid]
         return legacyid, resourceid
 
     def create_tile_value(self, cell_values, data_node_lookup, node_lookup, row_details):
@@ -111,9 +112,7 @@ class BranchCsvImporter:
         return tile_value_json, tile_valid
 
     def process_worksheet(self, worksheet, cursor, node_lookup, nodegroup_lookup):
-        nodegroupid = node_lookup[worksheet.title]['nodeid']
         data_node_lookup = {}
-        legacyid_lookup = {}
         nodegroup_tile_lookup = {}
         previous_tile = {}
         row_count = 0
@@ -136,7 +135,7 @@ class BranchCsvImporter:
                     nodegroup_depth = nodegroup_lookup[row_details['nodegroup_id']]["depth"]
                     parenttileid = None if 'None' else row_details["parenttile_id"]
                     parenttileid = self.get_parent_tileid(nodegroup_depth, str(tileid), previous_tile, nodegroup_alias, nodegroup_tile_lookup)
-                    legacyid, resourceid = self.set_legacy_id(resourceid, legacyid_lookup)
+                    legacyid, resourceid = self.set_legacy_id(resourceid)
                     tile_value_json, passes_validation = self.create_tile_value(cell_values, data_node_lookup, node_lookup, row_details)
                     cursor.execute("""INSERT INTO load_staging (nodegroupid, legacyid, resourceid, tileid, parenttileid, value, loadid, nodegroup_depth, source_description, passes_validation) VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)""", (                                        
                         row_details['nodegroup_id'],
