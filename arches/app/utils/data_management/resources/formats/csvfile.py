@@ -914,8 +914,9 @@ class CsvReader(Reader):
 
                 for row_number, row in enumerate(business_data):
                     i = int(row_number)
+                    row_resourceid = row["ResourceID"] if row["ResourceID"] != "" and row["ResourceID"] else row["LegacyID"]
                     row_number = "on line " + str(row_number + 2)  # to represent the row in a csv accounting for the header and 0 index
-                    resource_changed = row["ResourceID"] != previous_row_resourceid and previous_row_resourceid is not None
+                    resource_changed = row_resourceid != previous_row_resourceid and previous_row_resourceid is not None
                     if resource_changed:
                         group_no_to_tileids.clear()  # garbage collection of past resource groups
 
@@ -1069,7 +1070,7 @@ class CsvReader(Reader):
                                     if "-" in business_data[i - 1]["COMP_SORTORDER"]:
                                         last_prefix = business_data[i - 1]["COMP_SORTORDER"][0:2]
 
-                                    prefix_same = prefix == last_prefix and business_data[i - 1]["ResourceID"] == row["ResourceID"]
+                                    prefix_same = prefix == last_prefix and previous_row_resourceid == row_resourceid
 
                                     # we want to look for an original tile with the same group if the group is the same
                                     # if the group is different, defintely just make a new tile, i.e. prevent an existing tile from being looked up
@@ -1454,8 +1455,8 @@ class CsvReader(Reader):
                             # Check that required nodes are populated. If not remove tile from populated_tiles array.
                             check_required_nodes(target_tile, target_tile, required_nodes)
 
-                    previous_row_resourceid = row["ResourceID"]
-                    legacyid = row["ResourceID"]
+                    previous_row_resourceid = row_resourceid
+                    legacyid = row["LegacyID"] if row["LegacyID"] else row["ResourceID"]
 
                 # check for missing display value nodes.
                 # errors = []
