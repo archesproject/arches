@@ -1482,7 +1482,6 @@ class NodeGroup(APIBase):
         return JSONResponse(nodegroup, status=200)
 
 
-
 @method_decorator(csrf_exempt, name="dispatch")
 class Node(APIBase):
     def get(self, request, nodeid=None):

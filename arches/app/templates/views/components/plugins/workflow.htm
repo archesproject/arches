@@ -143,9 +143,9 @@
                 </button>
                 <!-- /ko -->
                 <!-- ko if: activeStep().hasUnsavedData() -->
-                    <!-- ko if: !$data.hiddenWorkflowButtons().includes('undo') -->
+                    <!-- ko if: !$data.hiddenWorkflowButtons().includes('undo') && !activeStep().saveWithoutProgressing()  -->
                     <button
-                        class="btn btn-danger"
+                        class="btn btn-danger static-save-button"
                         data-bind="{
                             css: {
                                 disabled: !activeStep().hasUnsavedData(),
@@ -160,23 +160,41 @@
                     </button>
                     <!-- /ko -->
                     <!-- ko if: !$data.hiddenWorkflowButtons().includes('save') -->
-                    <button
-                        class="btn btn-success"
-                        data-bind="
-                            click: $data.saveActiveStep
-                        "
-                    >
-                        <i class="ion-android-cloud-done"></i>
-                        <span class="verbose">
-                            {% trans  "Save and Continue" %}
-                        </span>
-                        <span class="succinct">
-                            {% trans  "Next" %}
-                        </span>
-                        <i class="fa fa-caret-right"></i>
-                    </button>
+                        <!-- ko if: activeStep().saveWithoutProgressing() -->
+                            <button
+                                class="btn btn-success"
+                                data-bind="
+                                    click: $data.foobar
+                                "
+                            >
+                                <i class="ion-android-cloud-done"></i>
+                                <span class="verbose">
+                                        {% trans "Save and Return" %}
+                                </span>
+                                <span class="succinct">
+                                    {% trans  "Save" %}
+                                </span>
+                            </button>
+                        <!-- /ko -->
+                        <!-- ko ifnot: activeStep().saveWithoutProgressing() -->
+                            <button
+                                class="btn btn-success"
+                                data-bind="
+                                    click: $data.saveActiveStep
+                                "
+                            >
+                                <i class="ion-android-cloud-done"></i>
+                                <span class="verbose">
+                                    {% trans  "Save and Continue" %}
+                                </span>
+                                <span class="succinct">
+                                    {% trans  "Next" %}
+                                </span>
+                                <i class="fa fa-caret-right"></i>
+                            </button>
+                        <!-- /ko -->
                     <!-- /ko -->
-                    <!-- ko if: $data.hiddenWorkflowButtons().includes('save') -->
+                    <!-- ko if: $data.hiddenWorkflowButtons().includes('save') || activeStep().saveWithoutProgressing() -->
                         <!-- ko if: activeStep()._index < steps().length - 1 -->
                         <button
                             class="btn btn-primary"

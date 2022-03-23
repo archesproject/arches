@@ -165,6 +165,17 @@ define([
             });
         };
 
+
+        this.foobar = function() {
+            self.activeStep().save()
+            .then(function() {
+                console.log(self)
+            })
+            .catch(function(error) {
+                console.error(error);
+            });
+        };
+
         this.parseComponentPath = function(path) {
             var pathAsStringArray = path.slice(1, path.length - 1).split('][');
 
