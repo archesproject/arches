@@ -119,7 +119,6 @@ class Graph(models.GraphModel):
 
                     self.publication = models.GraphPublication(**publication_data)
 
-
             else:
                 if len(args) == 1 and (isinstance(args[0], str) or isinstance(args[0], uuid.UUID)):
                     for key, value in models.GraphModel.objects.get(pk=args[0]).__dict__.items():
