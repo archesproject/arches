@@ -6,8 +6,8 @@
 
     <div class="search-export">
         <div class="instruction">
-            <h2 class=""> {% trans "1. Format" %} </h2>
-            <h4 class=""> {% trans "Select the format you'd like for your export data. (tile excel and geojson formats require a resource type filter)" %} </h4>
+            <h2> {% trans "1. Format" %} </h2>
+            <h4> {% trans "Select the format you'd like for your export data. (tile excel and geojson formats require a resource type filter)" %} </h4>
         </div>
         <div class="parameter">
             <div>
@@ -41,16 +41,16 @@
         </div>
 
         <div class="instruction">
-                <h2 class=""> {% trans "2. Coordinate Precision" %} </h2>
-                <h4 class=""> {% trans "Tell us how many decimal places of precision you'd like for geo-data results" %} </h4>
+            <h2> {% trans "2. Coordinate Precision" %} </h2>
+            <h4> {% trans "Tell us how many decimal places of precision you'd like for geo-data results" %} </h4>
         </div>
         <div class="parameter">
-            <input type="number" class="form-control input-md widget-input precision" data-bind="textInput: precision"></input>
+            <input type="number" class="form-control input-md widget-input precision" data-bind="textInput: precision" aria-label="Precision decimal places"></input>
         </div>
         
         <div class="instruction">
-            <h2 class=""> {% trans "3. Report Link" %} </h2>
-            <h4 class=""> {% trans "Only applicable to CSV and shapefile exports" %} </h4>
+            <h2> {% trans "3. Report Link" %} </h2>
+            <h4> {% trans "Only applicable to CSV and shapefile exports" %} </h4>
         </div>
         <div class="parameter">
             <div data-bind="component: { name: 'views/components/simple-switch', params: {value: reportlink, config:{ label: '{% trans "Include the report link in the export?" %}', subtitle: ''}}}"></div>
@@ -61,16 +61,16 @@
                 <h2>{% trans "4. Name this export" %}</h2>
             </div>
             <div class="parameter">
-                <input type="" class="form-control input-md widget-input" data-bind="textInput: exportName" placeholder="Arches Export"></input>
+                <input type="" class="form-control input-md widget-input" data-bind="textInput: exportName" placeholder="Arches Export" aria-label="Name of arches export"></input>
             </div>
         </div>
-        <div class="">
+        <div>
             <div class="instruction">
-                    <h2 class=""> {% trans "5. Email Address" %} </h2>
-                    <h4 class=""> {% trans "This download may take some time.  Tell us where to email a download link to your results" %} </h4>
+                <h2> {% trans "5. Email Address" %} </h2>
+                <h4> {% trans "This download may take some time.  Tell us where to email a download link to your results" %} </h4>
             </div>
             <div class="parameter">
-                <input type="" class="form-control input-md widget-input" data-bind="textInput: emailInput" placeholder="No Email saved for User"></input>
+                <input type="" class="form-control input-md widget-input" data-bind="textInput: emailInput" placeholder="No Email saved for User" aria-label="Email address for receiving download link"></input>
             </div>
         </div>
         <!-- /ko -->

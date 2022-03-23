@@ -11399,6 +11399,10 @@ table.table.dataTable {
     margin-left: -8px;
 }
 
+.tab-pane .tab-pane-content {
+    height: calc(100vh - 100px);
+}
+
 .facets-container {
     position: absolute;
     width: 275px;
@@ -14162,6 +14166,18 @@ a.jstree-anchor.permissions-widget {
 
 .related-resources-filter {
     height: 100%;
+}
+
+.related-resources-content {
+    padding-top: 5px;
+    width:100%;
+    height: 100%;
+    background-color: white;
+    overflow-y: auto;
+}
+
+.related-resources-content .rr-splash {
+    padding-top: 75px;
 }
 
 .related-resources-graph-workbench {
