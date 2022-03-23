@@ -139,7 +139,7 @@ define([
             return values;
         };
 
-        this.foo = function(tile) {  // used for cardinality 'n' cards in workflows
+        this.selectWorkflowTile = function(tile) {  // used for cardinality 'n' cards in workflows
             tile.selected(true);
             self.tile = tile;
             params.dirty(true);

@@ -48,7 +48,7 @@
                         <i 
                             class="fa fa-pencil" 
                             data-bind="
-                                click: function(){if ($parent?.form?.workflowId) { $parent.foo(tile); } else { tile.selected(true); } }
+                                click: function(){if ($parent?.form?.workflowId) { $parent.selectWorkflowTile(tile); } else { tile.selected(true); } }
                             "
                         ></i>
                         <i class="fa fa-trash" data-bind="click: function(){console.log(tile); tile.deleteTile()}"></i>
