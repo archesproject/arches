@@ -96,24 +96,11 @@ def import_graph(graphs, overwrite_graphs=True):
 
             publication_data = resource.get("publication")
             if publication_data:
-                GraphPublication.objects.update_or_create(
-                    publicationid=publication_data["publicationid"],
-                    defaults={
-                        "notes": publication_data.get("notes"),
-                        "graph_id": publication_data.get("graph_id"),
-                        "user_id": publication_data.get("user_id"),
-                        "published_time": publication_data.get("published_time"),
-                        "serialized_graph": publication_data.get("serialized_graph"),
-                    },
-                )  # graph needs valid GraphPublication object
                 del resource["publication"]
 
             try:
                 graph = Graph(resource)
                 ontology_classes = [str(f["source"]) for f in OntologyClass.objects.all().values("source")]
-
-                if publication_data:
-                    graph.publication_id = publication_data["publicationid"]
 
                 for node in list(graph.nodes.values()):
                     if resource["ontology_id"] is not None:
@@ -168,6 +155,9 @@ def import_graph(graphs, overwrite_graphs=True):
                             "serialized_graph": publication_data.get("serialized_graph"),
                         },
                     )
+
+                    graph.publication_id = publication_data["publicationid"]
+                    graph.save()
 
             except GraphImportException as ge:
                 logger.exception(ge)

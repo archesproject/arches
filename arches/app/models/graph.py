@@ -79,7 +79,7 @@ class Graph(models.GraphModel):
             if isinstance(args[0], dict):
 
                 for key, value in args[0].items():
-                    if key not in ("root", "nodes", "edges", "cards", "functions", "is_editable"):
+                    if key not in ("root", "nodes", "edges", "cards", "functions", "is_editable", "publication"):
                         setattr(self, key, value)
 
                 nodegroups = dict((item["nodegroupid"], item) for item in args[0]["nodegroups"])
@@ -110,6 +110,15 @@ class Graph(models.GraphModel):
                         self.add_function(function)
 
                 self.populate_null_nodegroups()
+
+                if "publication" in args[0]:
+                    publication_data = args[0]["publication"]
+                    publication_data["serialized_graph"] = JSONDeserializer().deserialize(
+                        JSONSerializer().serialize(self, force_recalculation=True)
+                    )
+
+                    self.publication = models.GraphPublication(**publication_data)
+
 
             else:
                 if len(args) == 1 and (isinstance(args[0], str) or isinstance(args[0], uuid.UUID)):

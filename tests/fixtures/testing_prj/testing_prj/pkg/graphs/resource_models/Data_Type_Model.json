@@ -615,7 +615,7 @@
             "config": {},
             "deploymentdate": null,
             "deploymentfile": null,
-            "description": "Testing model created for 4.3 testing.  \\nIncludes data types: Strings, Concepts, Domains, Images, Dates, Number, Boolean, Resource instance type, Node data type.  Also all three flavors of reports and descriptor function.\\n", 
+            "description": "Testing model created for 4.3 testing.  \\nIncludes data types: Strings, Concepts, Domains, Images, Dates, Number, Boolean, Resource instance type, Node data type.  Also all three flavors of reports and descriptor function.\\n",
             "edges": [
                 {
                     "description": null,
@@ -902,6 +902,13 @@
                 }
             ],
             "graphid": "330802c5-95bd-11e8-b7ac-acde48001122",
+            "publication": {
+                "graph_id": "330802c5-95bd-11e8-b7ac-acde48001122",
+                "notes": "Initial migration.",
+                "publicationid": "d5419599-fece-4dd6-8fb7-89df264ba7bc",
+                "published_time": "2022-03-22T13:29:06.593",
+                "user_id": null
+            },
             "iconclass": "",
             "is_editable": false,
             "isresource": true,
