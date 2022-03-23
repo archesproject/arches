@@ -1471,7 +1471,7 @@ class NodeGroup(APIBase):
             del params["nodegroupid"]
 
         try:
-            nodegroup = models.NodeGroup.objects.get(pk=params['nodegroupid'])
+            nodegroup = models.NodeGroup.objects.get(pk=params["nodegroupid"])
             permitted_nodegroups = [nodegroup.pk for nodegroup in get_nodegroups_by_perm(user, perms)]
         except Exception as e:
             return JSONResponse(str(e), status=404)
