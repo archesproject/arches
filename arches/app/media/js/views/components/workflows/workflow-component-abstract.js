@@ -288,7 +288,6 @@ define([
 
             $.getJSON(( arches.urls.api_nodegroup(self.componentData.parameters['nodegroupid']) ), function(nodegroupData) {
                 self.cardinality(nodegroupData.cardinality);
-                console.log("90", self.cardinality())
 
                 $.getJSON(( arches.urls.resource + `/${self.componentData.parameters['resourceid']}/tiles?nodeid=${self.componentData.parameters['nodegroupid']}` ), function(data) {
                     if (self.cardinality() === '1') {
