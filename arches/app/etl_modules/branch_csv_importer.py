@@ -217,9 +217,8 @@ class BranchCsvImporter:
 
     def write(self, request):
         self.loadid = request.POST.get('load_id')
-        graphid = '34cfe98e-c2c0-11ea-9026-02e7594ce0a0'
         with connection.cursor() as cursor:
-            cursor.execute("""SELECT * FROM __arches_staging_to_tile(%s, %s)""", [self.loadid, graphid])
+            cursor.execute("""SELECT * FROM __arches_staging_to_tile(%s)""", [self.loadid])
             row = cursor.fetchall()
 
         index_resources_by_transaction(self.loadid, quiet=True, use_multiprocessing=True)
