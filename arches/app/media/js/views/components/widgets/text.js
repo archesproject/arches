@@ -22,6 +22,6 @@ define(['knockout', 'underscore', 'viewmodels/widget'], function (ko, _, WidgetV
                 return ko.unwrap(self.disabled) || ko.unwrap(self.uneditable); 
             }, self);
         },
-        template: { require: 'text!widget-templates/text' }
+        template: window['text-datatype-template']
     });
 });

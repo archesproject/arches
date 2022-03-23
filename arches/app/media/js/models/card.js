@@ -8,7 +8,8 @@ define([
     'viewmodels/card-constraints',
     'regenerator-runtime',
     'utils/dispose',
-    'views/components/cards/default'
+    'views/components/cards/default',
+    'views/components/widgets/text'
 ], function(_, AbstractModel, NodeModel, CardWidgetModel, ko, koMapping, CardConstraintsViewModel, regeneratorRuntime, dispose) {
     const cardComponentLookup = window['card-components'];
     const arches = window.arches;

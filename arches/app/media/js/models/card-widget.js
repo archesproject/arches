@@ -1,12 +1,13 @@
 define([
     'underscore',
     'knockout',
-    'arches',
     'knockout-mapping',
     'models/abstract',
-    'widgets',
-    'utils/dispose'
-], function(_, ko, arches, koMapping, AbstractModel, widgets, dispose) {
+    'utils/dispose',
+    'views/components/datatypes/string'
+], function(_, ko, koMapping, AbstractModel, dispose) {
+    const widgets = window['widgets'];
+    const arches = window['arches'];
     return AbstractModel.extend({
         /**
         * A backbone model to manage cards_x_nodes_x_widgets records
