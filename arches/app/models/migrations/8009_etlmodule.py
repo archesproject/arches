@@ -102,13 +102,13 @@ add_validation_reporting_functions = """
         _note text;
 
     BEGIN
-        FOR _key, _value IN 
+        FOR _key, _value IN
             SELECT * FROM jsonb_each_text($1)
         LOOP
             IF _value ->> 'valid' = 'false' THEN
                 IF _value ->> 'notes' IS NULL THEN
                     _note = 'unspecified error';
-                END IF; 
+                END IF;
                 -- we could add the nodeid (_key), but let's not be verbose just yet
                 IF _result IS NULL THEN
                 _result := _note;
@@ -125,9 +125,9 @@ add_validation_reporting_functions = """
     RETURNS TABLE(source text, message text, loadid uuid)
     AS $$
     SELECT source_description, public.__arches_load_staging_get_tile_errors(value) AS message, loadid
-    FROM load_staging 
+    FROM load_staging
     WHERE passes_validation IS NOT true
-    AND loadid = load_id;  
+    AND loadid = load_id;
     $$
     LANGUAGE SQL;
     """
@@ -150,9 +150,9 @@ add_functions_to_get_nodegroup_tree = """
             0 as depth,
             (select alias from nodes where nodeid = nodegroup_id) as path,
             cardinality
-        FROM 
-        (SELECT ng.nodegroupid, ng.parentnodegroupid, alias, name, cardinality, graphid FROM node_groups ng 
-        INNER JOIN nodes n ON ng.nodegroupid = n.nodeid 
+        FROM
+        (SELECT ng.nodegroupid, ng.parentnodegroupid, alias, name, cardinality, graphid FROM node_groups ng
+        INNER JOIN nodes n ON ng.nodegroupid = n.nodeid
         ORDER by ng.nodegroupid) AS root
         WHERE nodegroupid = nodegroup_id
         UNION
@@ -165,8 +165,8 @@ add_functions_to_get_nodegroup_tree = """
                 path || ' - ' || parent.alias,
                 parent.cardinality
             FROM
-            (SELECT ng.nodegroupid, ng.parentnodegroupid, alias, name, cardinality, graphid FROM node_groups ng 
-            INNER JOIN nodes n ON ng.nodegroupid = n.nodeid 
+            (SELECT ng.nodegroupid, ng.parentnodegroupid, alias, name, cardinality, graphid FROM node_groups ng
+            INNER JOIN nodes n ON ng.nodegroupid = n.nodeid
             ORDER by ng.nodegroupid) AS parent
             INNER JOIN nodegroup_tree nt ON nt.nodegroupid = parent.parentnodegroupid
     ) SELECT
@@ -178,7 +178,7 @@ add_functions_to_get_nodegroup_tree = """
 
     CREATE OR REPLACE FUNCTION public.__get_nodegroup_tree_by_graph(graph_id uuid)
     RETURNS TABLE(root_nodegroup uuid, nodegroupid uuid, parentnodegroupid uuid, alias text, name text, depth integer, path text, cardinality text)
-    LANGUAGE PLPGSQL AS 
+    LANGUAGE PLPGSQL AS
     $func$
     DECLARE
     _nodegroupid uuid;
@@ -192,14 +192,14 @@ add_functions_to_get_nodegroup_tree = """
     """
 
 remove_functions_to_get_nodegroup_tree = [
-    """ 
+    """
     DROP FUNCTION public.__get_nodegroup_tree(nodegroup_id uuid);
     DROP FUNCTION public.__get_nodegroup_tree_by_graph(graph_id uuid);
     """
 ]
 
 add_staging_to_tile_function = """
-    CREATE OR REPLACE FUNCTION public.__arches_staging_to_tile(load_id text, graph_id text)
+    CREATE OR REPLACE FUNCTION public.__arches_staging_to_tile(load_id uuid)
     RETURNS BOOLEAN AS $$
         DECLARE
             status boolean;
@@ -208,6 +208,7 @@ add_staging_to_tile_function = """
             old_data jsonb;
             passed boolean;
             selected_resource text;
+            graph_id uuid;
             instance_id text;
             tile_id text;
             parent_id text;
@@ -215,19 +216,25 @@ add_staging_to_tile_function = """
             _key text;
             _value text;
         BEGIN
-            UPDATE load_event SET load_start_time = now() WHERE loadid = load_id::uuid;
-            FOR staged_value, instance_id, tile_id, parent_id, group_id, passed IN
-                    (SELECT value, resourceid, tileid, parenttileid, nodegroupid, passes_validation FROM load_staging WHERE loadid = load_id::uuid ORDER BY nodegroup_depth ASC)
+            UPDATE load_event SET load_start_time = now() WHERE loadid = load_id;
+            FOR staged_value, instance_id, tile_id, parent_id, group_id, passed, graph_id IN
+                    (
+                        SELECT value, resourceid, tileid, parenttileid, ls.nodegroupid, passes_validation, n.graphid
+                        FROM load_staging ls INNER JOIN (SELECT DISTINCT nodegroupid, graphid FROM nodes) n
+                        ON ls.nodegroupid = n.nodegroupid
+                        WHERE loadid = load_id
+                        ORDER BY nodegroup_depth ASC
+                    )
                 LOOP
                     IF passed THEN
                         SELECT resourceinstanceid FROM resource_instances INTO selected_resource WHERE resourceinstanceid = instance_id::uuid;
                         -- create a resource first if the rsource is not yet created
                         IF NOT FOUND THEN
                             INSERT INTO resource_instances(resourceinstanceid, graphid, legacyid, createdtime)
-                                VALUES (instance_id::uuid, graph_id::uuid, instance_id::uuid, now());
+                                VALUES (instance_id::uuid, graph_id, instance_id::uuid, now());
                             -- create resource instance edit log
                             INSERT INTO edit_log (resourceclassid, resourceinstanceid, edittype, timestamp, note, transactionid)
-                                VALUES (graph_id, instance_id, 'create', now(), 'loaded from staging_table', load_id::uuid);
+                                VALUES (graph_id, instance_id, 'create', now(), 'loaded from staging_table', load_id);
                         END IF;
 
                         -- create a tile one by one
@@ -250,11 +257,11 @@ add_staging_to_tile_function = """
                         INSERT INTO tiles(tileid, tiledata, nodegroupid, parenttileid, resourceinstanceid)
                             VALUES (tile_id::uuid, tile_data, group_id::uuid, parent_id::uuid, instance_id::uuid);
                         INSERT INTO edit_log (resourceclassid, resourceinstanceid, nodegroupid, tileinstanceid, edittype, newvalue, oldvalue, timestamp, note, transactionid)
-                            VALUES (graph_id, instance_id, group_id, tile_id, 'tile create', tile_data::jsonb, old_data, now(), 'loaded from staging_table', load_id::uuid);
+                            VALUES (graph_id, instance_id, group_id, tile_id, 'tile create', tile_data::jsonb, old_data, now(), 'loaded from staging_table', load_id);
                     END IF;
                 END LOOP;
-            UPDATE load_event SET (load_end_time, complete, successful) = (now(), true, true) WHERE loadid = load_id::uuid;
-            SELECT successful INTO status FROM load_event WHERE loadid = load_id::uuid;
+            UPDATE load_event SET (load_end_time, complete, successful) = (now(), true, true) WHERE loadid = load_id;
+            SELECT successful INTO status FROM load_event WHERE loadid = load_id;
             RETURN status;
         END;
     $$
@@ -262,7 +269,7 @@ add_staging_to_tile_function = """
     """
 
 remove_staging_to_tile_function = """
-    DROP FUNCTION public.__arches_staging_to_tile(load_id text, graph_id text);
+    DROP FUNCTION public.__arches_staging_to_tile(load_id uuid);
     """
 
 
