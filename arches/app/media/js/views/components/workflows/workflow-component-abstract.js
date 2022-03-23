@@ -288,18 +288,21 @@ define([
 
             $.getJSON(( arches.urls.api_nodegroup(self.componentData.parameters['nodegroupid']) ), function(nodegroupData) {
                 self.cardinality(nodegroupData.cardinality);
+                console.log("90", self.cardinality())
 
                 $.getJSON(( arches.urls.resource + `/${self.componentData.parameters['resourceid']}/tiles?nodeid=${self.componentData.parameters['nodegroupid']}` ), function(data) {
                     if (self.cardinality() === '1') {
                         if (data['tiles'].length) {
                             self.componentData.parameters['tileid'] = data['tiles'][0]['tileid'];
-                            TileBasedComponent.apply(self);
-
                             self.complete(true);
                         }
+                        TileBasedComponent.apply(self);
                     }
                     else if (self.cardinality() === 'n') {
                         MultipleTileBasedComponent.apply(self);
+                        if (data['tiles'].length) {
+                            self.complete(true);
+                        }
                         
                         self.onSaveSuccess = function(_savedData) {  // LEGACY -- DO NOT USE
                             self.componentData.parameters.dirty(false);
