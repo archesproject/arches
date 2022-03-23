@@ -20,12 +20,23 @@ import logging
 import sys
 import uuid
 from arches.app.models.graph import Graph
-from arches.app.models.models import CardXNodeXWidget, NodeGroup, DDataType, Widget, ReportTemplate, Function, Ontology, OntologyClass
+from arches.app.models.models import (
+    CardXNodeXWidget,
+    NodeGroup,
+    DDataType,
+    Widget,
+    ReportTemplate,
+    Function,
+    Ontology,
+    OntologyClass,
+    GraphPublication,
+)
 from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializer
 from arches.app.models.models import GraphXMapping
 from django.db import transaction
 
 logger = logging.getLogger(__name__)
+
 
 class GraphImportReporter:
     def __init__(self, graphs):
@@ -82,6 +93,11 @@ def import_graph(graphs, overwrite_graphs=True):
             reporter.name = resource["name"]
             reporter.resource_model = resource["isresource"]
             reporter.graph_id = resource["graphid"]
+
+            publication_data = resource.get("publication")
+            if publication_data:
+                del resource["publication"]
+
             try:
                 graph = Graph(resource)
                 ontology_classes = [str(f["source"]) for f in OntologyClass.objects.all().values("source")]
@@ -106,13 +122,11 @@ def import_graph(graphs, overwrite_graphs=True):
                                     graph.config = check_default_configs(default_config, report_config)
                                     graph.template_id = report["template_id"]
                         graph.save()
-                        graph.publish()
                         reporter.update_graphs_saved()
                     else:
                         overwrite_input = input("Overwrite {0} (Y/N) ? ".format(graph.name))
                         if overwrite_input.lower() in ("t", "true", "y", "yes"):
                             graph.save()
-                            graph.publish()
                         else:
                             raise GraphImportException("{0} - already exists. Skipping import.".format(graph.name))
 
@@ -124,6 +138,27 @@ def import_graph(graphs, overwrite_graphs=True):
                         default_config = Widget.objects.get(widgetid=card_x_node_x_widget["widget_id"]).defaultconfig
                         card_x_node_x_widget["config"] = check_default_configs(default_config, card_x_node_x_widget_config)
                         cardxnodexwidget = CardXNodeXWidget.objects.update_or_create(**card_x_node_x_widget)
+
+                # saves graph publication with serialized graph
+                if publication_data:
+                    publication_data["serialized_graph"] = JSONDeserializer().deserialize(
+                        JSONSerializer().serialize(graph, force_recalculation=True)
+                    )
+
+                    GraphPublication.objects.update_or_create(
+                        publicationid=publication_data["publicationid"],
+                        defaults={
+                            "notes": publication_data.get("notes"),
+                            "graph_id": publication_data.get("graph_id"),
+                            "user_id": publication_data.get("user_id"),
+                            "published_time": publication_data.get("published_time"),
+                            "serialized_graph": publication_data.get("serialized_graph"),
+                        },
+                    )
+
+                    graph.publication_id = publication_data["publicationid"]
+                    graph.save()
+
             except GraphImportException as ge:
                 logger.exception(ge)
                 errors.append(ge)

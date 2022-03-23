@@ -174,7 +174,7 @@ class GraphDesignerView(GraphBaseView):
 
     def get(self, request, graphid):
         self.graph = Graph.objects.get(graphid=graphid)
-        serialized_graph = self.graph.serialize()  # calling `serialize` directly returns a dict
+        serialized_graph = self.graph.serialize(force_recalculation=True)  # calling `serialize` directly returns a dict
 
         datatypes = models.DDataType.objects.all()
         widgets = models.Widget.objects.all()
@@ -239,6 +239,7 @@ class GraphDesignerView(GraphBaseView):
             serialized_graph["_nodegroups_to_delete"] = None
         if serialized_graph.get("_functions"):
             serialized_graph["_functions"] = None
+
         context["graph"] = JSONSerializer().serialize(serialized_graph)
 
         context["nav"]["title"] = self.graph.name

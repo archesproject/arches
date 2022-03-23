@@ -2688,6 +2688,13 @@
       "maplinewidth": 1,
       "mappointsize": 3,
       "graphid": "99417385-b8fa-11e6-84a5-026d961c88e6",
+      "publication": {
+            "graph_id": "99417385-b8fa-11e6-84a5-026d961c88e6",
+            "notes": "Initial migration.",
+            "publicationid": "95b4aa7e-cd3b-4c0b-8f58-79ebe4938c7a",
+            "published_time": "2022-03-22T13:29:06.593",
+            "user_id": null
+        },
       "name": "Heritage Resource Model",
       "cards_x_nodes_x_widgets": [
         {

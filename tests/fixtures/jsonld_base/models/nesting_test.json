@@ -593,6 +593,13 @@
             ],
             "functions_x_graphs": [],
             "graphid": "96867672-fbef-11e9-9ca4-3af9d3b32b71",
+            "publication": {
+                "graph_id": "96867672-fbef-11e9-9ca4-3af9d3b32b71",
+                "notes": "Initial migration.",
+                "publicationid": "f5bdf6aa-eab5-475c-b912-dbfd39e9c634",
+                "published_time": "2022-03-22T13:29:06.593",
+                "user_id": null
+            },
             "iconclass": "",
             "is_editable": false,
             "isresource": true,
