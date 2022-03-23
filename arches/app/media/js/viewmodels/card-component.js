@@ -191,8 +191,6 @@ define([
         if (params.renderContext === 'workflow') {
             self.card.selected(true);  // cardinality 'n' cards will display appropriately
             self.inResourceEditor = true;
-
-            console.log(self, params)
         }
 
         this.saveTileAddNew = function() {

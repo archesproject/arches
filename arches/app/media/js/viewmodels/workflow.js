@@ -165,12 +165,8 @@ define([
             });
         };
 
-
-        this.foobar = function() {
+        this.staticSaveActiveStep = function() {
             self.activeStep().save()
-            .then(function() {
-                console.log(self)
-            })
             .catch(function(error) {
                 console.error(error);
             });

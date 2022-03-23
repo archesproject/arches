@@ -96,7 +96,6 @@ define([
                 });
 
                 self.tiles.subscribe(function(tiles) {
-                    console.log(self, tiles)
                     if (tiles && !self.saving()) {
                         if (self.savedData()) {  /* if the refresh after tile save */
                             self.loadData(self.savedData());
