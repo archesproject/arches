@@ -180,7 +180,7 @@ add_staging_to_tile_function = """
             selected_resource text;
             graph_id uuid;
             instance_id text;
-			legacy_id text;
+            legacy_id text;
             tile_id text;
             parent_id text;
             group_id text;
