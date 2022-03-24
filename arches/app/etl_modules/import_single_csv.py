@@ -73,7 +73,7 @@ class ImportSingleCsv:
         csvfile = file.read().decode("utf-8")
         reader = csv.reader(io.StringIO(csvfile))
         data = {"csv": [line for line in reader]}
-        self.loadid = "cadfbe12-98dc-4410-906e-73146f062ede"
+
         with connection.cursor() as cursor:
             cursor.execute("""SELECT load_details FROM load_event WHERE loadid = %s""", [self.loadid])
             row = cursor.fetchall()
