@@ -1,13 +1,13 @@
 define([
-    'arches',
     'jquery',
     'underscore',
     'knockout',
-    'report-templates',
     'models/report',
     'models/graph',
     'viewmodels/card'
-], function(arches, $, _, ko, reportLookup, ReportModel, GraphModel) {
+], function($, _, ko, ReportModel, GraphModel) {
+    const arches = window.arches;
+    const reportLookup = window['report-templates'];
     var ResourceReportAbstract = function(params) {
         var self = this;
         var CardViewModel = require('viewmodels/card');
@@ -137,7 +137,7 @@ define([
     };
     ko.components.register('resource-report-abstract', {
         viewModel: ResourceReportAbstract,
-        template: { require: 'text!templates/views/components/resource-report-abstract.htm' }
+        template: window['resource-report-abstract-template']
     });
     return ResourceReportAbstract;
 });

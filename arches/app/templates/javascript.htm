@@ -444,6 +444,15 @@
         {% endfor %}
         {% endautoescape %}
     };
+    window['report-templates'] = {{% autoescape off %}{% for template in report_templates %}
+        '{{ template.pk }}': {
+            'componentname': '{{ template.componentname }}',
+            'component': '{{ template.component }}',
+            'defaultconfig': '{{ template.defaultconfig_json }}',
+            'name': '{{ template.name }}',
+            'preload_resource_data': '{{ template.preload_resource_data }}'
+        },
+    {% endfor %}{% endautoescape %}};
 
     define('resource-types', [], function () {
         var resourceTypes = {
@@ -480,7 +489,7 @@
         {% endfor %}{% endautoescape %}};
     }); {% endcomment %}
 
-    define('report-templates', [{% for template in report_templates %}'{{ template.component }}',{% endfor %}], function () {
+    {% comment %} define('report-templates', [{% for template in report_templates %}'{{ template.component }}',{% endfor %}], function () {
         return {{% autoescape off %}{% for template in report_templates %}
             '{{ template.pk }}': {
                 'componentname': '{{ template.componentname }}',
@@ -490,7 +499,7 @@
                 'preload_resource_data': '{{ template.preload_resource_data }}'
             },
         {% endfor %}{% endautoescape %}};
-    });
+    }); {% endcomment %}
 
 
     define('function-templates', [{% for template in function_templates %}'{{ template.component }}',{% endfor %}], function () {
