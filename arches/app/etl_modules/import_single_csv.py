@@ -73,7 +73,7 @@ class ImportSingleCsv:
         csvfile = file.read().decode("utf-8")
         reader = csv.reader(io.StringIO(csvfile))
         data = {"csv": [line for line in reader]}
-        self.loadid = 'cadfbe12-98dc-4410-906e-73146f062ede'
+        self.loadid = "cadfbe12-98dc-4410-906e-73146f062ede"
         with connection.cursor() as cursor:
             cursor.execute("""SELECT load_details FROM load_event WHERE loadid = %s""", [self.loadid])
             row = cursor.fetchall()
@@ -133,16 +133,16 @@ class ImportSingleCsv:
         fieldnames = request.POST.get("fieldnames").split(",")
         csvfile = file.read().decode("utf-8")
         csv_mapping = request.POST.get("fieldMapping")
-        mapping_details = {
-            "mapping": json.loads(csv_mapping),
-            "graph": graphid
-        }
+        mapping_details = {"mapping": json.loads(csv_mapping), "graph": graphid}
         reader = csv.DictReader(io.StringIO(csvfile), fieldnames=fieldnames)
         if hasHeaders:
             next(reader)
 
         with connection.cursor() as cursor:
-            cursor.execute("""INSERT INTO load_event (loadid, complete, load_details, user_id) VALUES (%s, %s, %s, %s)""", (self.loadid, False, json.dumps(mapping_details), self.userid))
+            cursor.execute(
+                """INSERT INTO load_event (loadid, complete, load_details, user_id) VALUES (%s, %s, %s, %s)""",
+                (self.loadid, False, json.dumps(mapping_details), self.userid),
+            )
 
         for row in reader:
             resourceid = uuid.uuid4()
