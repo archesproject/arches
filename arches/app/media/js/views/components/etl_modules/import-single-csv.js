@@ -136,8 +136,10 @@ define([
                 //     }
                 // }).then(function(response){
                     self.csvArray(response.result.csv);
-                    self.fieldMapping(response.result.config.mapping);
-                    self.selectedGraph(response.result.config.graph);
+                    if (response.result.config) {
+                        self.fieldMapping(response.result.config.mapping);
+                        self.selectedGraph(response.result.config.graph);
+                    }
                     self.fileAdded(true);
                     self.loading(false);
                 }).catch(function(err) {

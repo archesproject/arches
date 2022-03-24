@@ -73,11 +73,11 @@ class ImportSingleCsv:
         csvfile = file.read().decode("utf-8")
         reader = csv.reader(io.StringIO(csvfile))
         data = {"csv": [line for line in reader]}
-
         with connection.cursor() as cursor:
             cursor.execute("""SELECT load_details FROM load_event WHERE loadid = %s""", [self.loadid])
             row = cursor.fetchall()
-        data["config"] = row[0][0]
+        if len(row) > 0:
+            data["config"] = row[0][0]
         return {"success": True, "data": data}
 
     def delete_staging_db(self):
