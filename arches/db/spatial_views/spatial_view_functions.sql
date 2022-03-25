@@ -1,14 +1,25 @@
 /* --------------- DROP ALL ---------------
+
+drop trigger __arches_trg_update_spatial_attributes on tiles;
+drop function if exists __arches_trg_fnc_update_spatial_attributes;
+
+drop trigger __arches_trg_update_spatial_views on spatial_views;
+drop function if exists __arches_trg_fnc_update_spatial_views;
+
+drop function if exists __arches_refresh_spatial_views;
 drop function if exists __arches_create_spatial_view;
 drop function if exists __arches_update_spatial_view;
 drop function if exists __arches_delete_spatial_view;
 drop function if exists __arches_create_spatial_view_attribute_table;
 drop function if exists __arches_delete_spatial_view_attribute_table;
-drop function if exists __arches_create_spatial_attribute_trigger_function;
-drop function if exists __arches_delete_spatial_attribute_trigger_function;
-drop function if exists __arches_create_spatial_attribute_trigger;
-drop function if exists __arches_delete_spatial_attribute_trigger;
-drop aggregate if exists __arches_agg_get_node_display_value(in_tiledata jsonb, in_nodeid text);
+
+-- drop function if exists __arches_create_spatial_attribute_trigger_function;
+-- drop function if exists __arches_delete_spatial_attribute_trigger_function;
+-- drop function if exists __arches_create_spatial_attribute_trigger;
+-- drop function if exists __arches_delete_spatial_attribute_trigger;
+
+
+drop aggregate if exists __arches_agg_get_node_display_value(in_tiledata jsonb, in_nodeid uuid);
 drop function if exists __arches_accum_get_node_display_value;
 drop function if exists __arches_get_node_display_value;
 drop function if exists __arches_get_resourceinstance_list_label;
@@ -17,6 +28,27 @@ drop function if exists __arches_get_concept_label;
 drop function if exists __arches_get_domain_label;
 drop function if exists __arches_get_resourceinstance_label;
 drop function if exists __arches_get_nodevalue_label;
+
+
+do
+$do$
+declare
+    database_name     text;
+    sv_user_sql     text;
+begin
+    if exists (
+        select from pg_catalog.pg_roles
+        where  rolname = 'arches_spatial_views') then
+
+        select current_database() into database_name;
+		
+        sv_user_sql := format('revoke connect on database %s from arches_spatial_views;', database_name);
+        execute sv_user_sql;
+
+    end if;
+end
+$do$;
+
 drop role if exists arches_spatial_views;
 */
 
@@ -636,7 +668,7 @@ create or replace function __arches_create_spatial_view_attribute_table(
         spatial_view_name_slug text,
         geometry_node_id uuid,
         attribute_node_list jsonb,
-        schema_name text default 'public',
+        schema_name text default 'public'
     ) returns text
     language plpgsql 
     strict
@@ -653,12 +685,13 @@ create or replace function __arches_create_spatial_view_attribute_table(
 
         declare
             tmp_nodegroupid_slug     text;
+			node_name_slug			text;
             n                         record;
         begin
-            with attribute_nodes as (
-                    select * from json_to_recordset(attribute_node_list) as x(nodeid uuid, description text)
-            )
             for n in 
+			        with attribute_nodes as (
+                        select * from json_to_recordset(attribute_node_list) as x(nodeid uuid, description text)
+                    )
                     select 
                         n1.name, 
                         n1.nodeid, 
@@ -675,7 +708,8 @@ create or replace function __arches_create_spatial_view_attribute_table(
                         ',
                             tmp_nodegroupid_slug,
                             n.nodeid::text,
-                            node_name_slug;
+                            node_name_slug
+						   );
                 
                 if tile_create not like (format('%%tile_%s%%',tmp_nodegroupid_slug)) then
                     tile_create = tile_create || 
@@ -941,7 +975,8 @@ create or replace function __arches_delete_spatial_view(
 create or replace function __arches_refresh_spatial_views()
     returns integer
     language plpgsql
-    as $func$
+    as 
+    $$
     begin
 
         select __arches_update_spatial_view(sv.slug,sv.geometrynodeid, sv.attributenodes, sv.schema, sv.description, sv.ismixedgeometrytypes)
@@ -950,16 +985,11 @@ create or replace function __arches_refresh_spatial_views()
         
         return 1;
     end;
-    $func$
+    $$;
 
 -- 
 --TRIGGERS - tiles
-create constraint trigger __arches_trg_update_spatial_attributes
-    after insert or update or delete
-    on tiles
-    deferrable initially deferred
-    for each row
-        execute procedure __arches_trg_fnc_update_spatial_attributes()
+
 
 --
 create or replace function __arches_trg_fnc_update_spatial_attributes()
@@ -979,18 +1009,6 @@ create or replace function __arches_trg_fnc_update_spatial_attributes()
         -- need to fetch spatial view table info
         for spv in
                 select * from spatial_views where isactive = true
-                /*
-                class SpatialView(models.Model):
-                    spatialviewid = models.UUIDField(primary_key=True, default=uuid.uuid1)
-                    schema = models.TextField(default='public')
-                    name = models.TextField(unique=True) # this will be slugged and needs to be unique
-                    slug = models.TextField(validators=[validate_slug], unique=True)
-                    description = models.TextField() # provide a description of the spatial view
-                    geometrynodeid = models.ForeignKey(Node, on_delete=models.CASCADE, db_column="geometrynodeid")
-                    ismixedgeometrytypes = models.BooleanField(default=False)
-                    attributenodes = JSONField(blank=True, null=True, db_column="attributenodes")
-                    isactive = models.BooleanField(default=True) # the view is not created in the DB until set to active.
-                */
         loop
             declare
                 resource_geom_count     integer := 0;
@@ -1033,13 +1051,16 @@ create or replace function __arches_trg_fnc_update_spatial_attributes()
                     execute delete_existing;
 
                     for n in 
+					        with attribute_nodes1 as (
+								select * from json_to_recordset(spv.attributenodes) as x(nodeid uuid, description text)
+							)
                             select 
                                 n1.name, 
                                 n1.nodeid, 
                                 n1.nodegroupid,
                                 att_nodes.description
                             from nodes n1
-                                join (select * attribute_nodes) att_nodes ON n1.nodeid = att_nodes.nodeid
+                                join (select * from attribute_nodes1) att_nodes ON n1.nodeid = att_nodes.nodeid
                     loop
                         tmp_nodegroupid_slug := __arches_slugify(n.nodegroupid::text);
                         node_create = node_create || 
@@ -1096,16 +1117,16 @@ create or replace function __arches_trg_fnc_update_spatial_attributes()
 
         return trigger_tile;
     end;
-    $func$
+    $func$;
 --
--- TRIGGERS - spatial_views model
-create constraint trigger __arches_trg_update_spatial_views
+create constraint trigger __arches_trg_update_spatial_attributes
     after insert or update or delete
-    on spatial_views
+    on tiles
     deferrable initially deferred
     for each row
-        execute procedure __arches_trg_fnc_update_spatial_views()
+        execute procedure __arches_trg_fnc_update_spatial_attributes();
 
+-- TRIGGERS - spatial_views model
 --
 create or replace function __arches_trg_fnc_update_spatial_views()
     returns trigger 
@@ -1118,42 +1139,37 @@ create or replace function __arches_trg_fnc_update_spatial_views()
 
         if tg_op = 'DELETE' then 
             
-            if old.slug is null or old.slug = '' then
-                old.slug := __arches_slugify(old.name);
-            end if;
-
-            __arches_delete_spatial_view(old.slug)
+            select __arches_delete_spatial_view(old.slug);
             return old;
 
         elsif tg_op = 'INSERT' then
 
-            if new.slug is null or new.slug = '' then
-                new.slug := __arches_slugify(new.name);
-            end if;
-
             if new.isactive = true then
-                __arches_create_spatial_view(new.slug, new.geometrynodeid, new.attributenodes, new.schema, new.description, new.ismixedgeometrytypes);
+                select __arches_create_spatial_view(new.slug, new.geometrynodeid, new.attributenodes, new.schema, new.description, new.ismixedgeometrytypes);
             end if;
 
             return new;
 
         elsif tg_op = 'UPDATE' then
-            if new.slug is null or new.slug = '' then
-                new.slug := __arches_slugify(new.name);
-            end if;
 
             if new.isactive = true then
-                __arches_update_spatial_view(new.slug, new.geometrynodeid, new.attributenodes, new.schema, new.description, new.ismixedgeometrytypes);
+                select __arches_update_spatial_view(new.slug, new.geometrynodeid, new.attributenodes, new.schema, new.description, new.ismixedgeometrytypes);
             else
-                __arches_delete_spatial_view(new.slug)
+                select __arches_delete_spatial_view(new.slug);
             end if;
 
             return new;
         end if;
         
     end;
-    $func$
+    $func$;
 
 
 --
+create constraint trigger __arches_trg_update_spatial_views
+    after insert or update or delete
+    on spatial_views
+    deferrable initially deferred
+    for each row
+        execute procedure __arches_trg_fnc_update_spatial_views();
 
