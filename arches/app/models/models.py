@@ -1412,8 +1412,7 @@ class GeoJSONGeometry(models.Model):
 class SpatialView(models.Model):
     spatialviewid = models.UUIDField(primary_key=True, default=uuid.uuid1)
     schema = models.TextField(default='public')
-    name = models.TextField(unique=True) # this will be slugged and needs to be unique
-    slug = models.TextField(validators=[validate_slug], unique=True)
+    slug = models.TextField(validators=[RegexValidator(regex=r"^[a-zA-Z_]([a-zA-Z0-9_]+)$", message="Slug must contain only letters, numbers and hyphens, but not begin with a number.", code="nomatch")], unique=True)
     description = models.TextField(default='arches spatial view') # provide a description of the spatial view
     geometrynodeid = models.ForeignKey(Node, on_delete=models.CASCADE, db_column="geometrynodeid")
     ismixedgeometrytypes = models.BooleanField(default=False)
@@ -1421,7 +1420,7 @@ class SpatialView(models.Model):
     isactive = models.BooleanField(default=True) # the view is not created in the DB until set to active.
 
     def __str__(self):
-        return f"() {self.name}"
+        return f"{self.schema}.{self.slug}"
 
     class Meta:
         managed = True

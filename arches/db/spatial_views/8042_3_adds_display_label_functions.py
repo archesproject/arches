@@ -3,7 +3,7 @@ from django.db import migrations
 class Migration(migrations.Migration):
 
     dependencies = [
-        ("models", "8042_1_geometry_table_expand_geoms"),
+        ("models", "8042_2_spatialview_model"),
     ]
 
     sql_string = """

@@ -11,7 +11,7 @@ import uuid
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('models', '8042_2_adds_display_label_functions'),
+        ('models', '8042_1_geometry_table_expand_geoms'),
     ]
 
     operations = [
@@ -20,9 +20,8 @@ class Migration(migrations.Migration):
             fields=[
                 ('spatialviewid', models.UUIDField(default=uuid.uuid1, primary_key=True, serialize=False)),
                 ('schema', models.TextField(default='public')),
-                ('name', models.TextField(unique=True)),
-                ('slug', models.TextField(unique=True, validators=[django.core.validators.RegexValidator(re.compile('^[-a-zA-Z0-9_]+\\Z'), "Enter a valid 'slug' consisting of letters, numbers, underscores or hyphens.", 'invalid')])),
-                ('description', models.TextField()),
+                ('slug', models.TextField(unique=True, validators=[django.core.validators.RegexValidator(code='nomatch', message='Slug must contain only letters, numbers and hyphens, but not begin with a number.', regex='^[a-zA-Z_]([a-zA-Z0-9_]+)$')])),
+                ('description', models.TextField(default='arches spatial view')),
                 ('ismixedgeometrytypes', models.BooleanField(default=False)),
                 ('attributenodes', django.contrib.postgres.fields.jsonb.JSONField(blank=True, db_column='attributenodes', null=True)),
                 ('isactive', models.BooleanField(default=True)),
