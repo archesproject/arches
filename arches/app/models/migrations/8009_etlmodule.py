@@ -247,7 +247,7 @@ remove_staging_to_tile_function = """
 class Migration(migrations.Migration):
 
     dependencies = [
-        ("models", "7874_node_alias"),
+        ("models", "8247_update_primary_descriptors_config"),
     ]
 
     operations = [
