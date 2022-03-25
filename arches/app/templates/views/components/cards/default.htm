@@ -4,19 +4,8 @@
 <!-- ko if: state === 'editor-tree' && card.model.visible() -->
 {% block editor_tree %}
 <li role="treeitem card-treeitem" class="jstree-node" data-bind="css: {'jstree-open': (card.tiles().length > 0 && card.expanded()), 'jstree-closed' : (card.tiles().length > 0 && !card.expanded()), 'jstree-leaf': card.tiles().length === 0}, scrollTo: card.scrollTo, container: '.resource-editor-tree'">
-    <i tabindex="0" class="jstree-icon jstree-ocl" role="presentation" data-bind="click: function(){card.expanded(!card.expanded())}" aria-label="Expand/collapse" onkeyup="if(event.which == 13 || event.keyCode == 13){ $(this).trigger('click'); }"></i>
-    <a class="jstree-anchor" href="#" data-bind="css:{'filtered': card.highlight(), 'jstree-clicked': card.selected, 'child-selected': card.isChildSelected(), 'func-node': card.isFuncNode(),'unsaved-edit': card.isDirty() === true}, event: {
-        mousedown: function(d, e) {
-            e.stopPropagation();
-            card.canAdd() ? card.selected(true) : card.tiles()[0].selected(true);
-        },
-        keyup: function(d, e){
-            if (event.which == 13 || event.keyCode == 13) {
-                e.stopPropagation();
-                card.canAdd() ? card.selected(true) : card.tiles()[0].selected(true);
-            }
-        }
-    }">
+    <i tabindex="0" class="jstree-icon jstree-ocl" role="presentation" data-bind="event : {keyup: $parent.cardComponentEventHandler.bind($data,'expand card',null), click: $parent.cardComponentEventHandler.bind($data,'expand card',null)}" aria-label="Expand/collapse"></i>
+    <a class="jstree-anchor" href="#" data-bind="css:{'filtered': card.highlight(), 'jstree-clicked': card.selected, 'child-selected': card.isChildSelected(), 'func-node': card.isFuncNode(),'unsaved-edit': card.isDirty() === true}, event: { keyup: $parent.cardComponentEventHandler.bind($data,'stop propagation card select or add',null), mousedown: $parent.cardComponentEventHandler.bind($data,'stop propagation card select or add',null)}">
         <!-- ko if: !card.isFuncNode() -->
         <i class="fa fa-file-o" role="presentation" data-bind="css:{'filtered': card.highlight(), 'has-provisional-edits fa-file': card.doesChildHaveProvisionalEdits()}"></i>
         <!-- /ko -->
@@ -25,7 +14,7 @@
         <!-- /ko -->
         <span style="padding-right: 5px;" data-bind="text: card.model.name"></span>
         <!-- ko if: card.canAdd() -->
-        <i tabindex="0" class="fa fa-plus-circle add-new-tile" role="presentation" data-bind="css:{'jstree-clicked': card.selected}, click: function(){card.showForm(true);}, clickBubble: false" data-toggle="tooltip" data-original-title="{% trans 'Add Gnu' %}" onkeyup="if(event.which == 13 || event.keyCode == 13){ $(this).trigger('click'); }"></i>
+        <i tabindex="0" class="fa fa-plus-circle add-new-tile" role="presentation" data-bind="css:{'jstree-clicked': card.selected}, event : {keyup: cardComponentEventHandler.bind($data,'show form',null), click: cardComponentEventHandler.bind($data,'show form',null)}, clickBubble: false" data-toggle="tooltip" data-original-title="{% trans 'Add Gnu' %}"></i>
         <!-- /ko -->
     </a>
     <ul class="jstree-children" aria-expanded="true">
@@ -38,7 +27,7 @@
             afterMove: card.reorderTiles
         }">
             <li role="treeitem" class="jstree-node" data-bind="css: {'jstree-open': (cards.length > 0 && expanded), 'jstree-closed' : (cards.length > 0 && !expanded()), 'jstree-leaf': cards.length === 0}, event: {'dragstart': function () { console.log('dragging...') }}">
-                <i tabindex="0" class="jstree-icon jstree-ocl" role="presentation" data-bind="click: function(){expanded(!expanded())}" onkeyup="if(event.which == 13 || event.keyCode == 13){ $(this).trigger('click'); }"></i>
+                <i tabindex="0" class="jstree-icon jstree-ocl" role="presentation" data-bind="event : {keyup: $parent.cardComponentEventHandler.bind($data,'expanded',null), click: $parent.cardComponentEventHandler.bind($data,'expanded',null)}"></i>
                 <a class="jstree-anchor" href="#" data-bind="click: function () { self.form.selection($data);}, css:{'jstree-clicked': selected, 'child-selected': isChildSelected(), 'filtered-leaf': card.highlight(), 'unsaved-edit': !!$data.dirty()}">
                     <i class="fa " role="presentation" data-bind="css:{'has-provisional-edits': doesChildHaveProvisionalEdits() || $data.hasprovisionaledits(),'fa-pencil':$data.dirty()===true,'fa-file':!$data.dirty()}"></i>
                     <strong style="margin-right: 10px;">
@@ -93,7 +82,7 @@
 <!-- ko if: state === 'designer-tree' -->
 {% block designer_tree %}
 <li role="treeitem card-treeitem" class="jstree-node" data-bind="css: {'jstree-open': ((card.cards().length > 0 || card.widgets().length > 0) && card.expanded()), 'jstree-closed' : ((card.cards().length > 0 || card.widgets().length > 0) && !card.expanded()), 'jstree-leaf': card.cards().length === 0 && card.widgets().length === 0}, scrollTo: card.scrollTo, container: '.designer-card-tree'">
-    <i tabindex="0" class="jstree-icon jstree-ocl" role="presentation" data-bind="click: function(){card.expanded(!card.expanded())}" onkeyup="if(event.which == 13 || event.keyCode == 13){ $(this).trigger('click'); }"></i>
+    <i tabindex="0" class="jstree-icon jstree-ocl" role="presentation" data-bind="event : {keyup: $parent.cardComponentEventHandler.bind($data,'expand card',null), click: $parent.cardComponentEventHandler.bind($data,'expand card',null)}"></i>
     <a class="jstree-anchor" href="#" data-bind="css:{'filtered': card.highlight(), 'jstree-clicked': card.selected, 'child-selected': card.isChildSelected(), 'func-node': card.isFuncNode()}, click: function () { card.selected(true) },">
         <i class="fa fa-file-o" role="presentation"></i>
         <span data-bind="text: card.model.name"></span>
@@ -113,7 +102,7 @@
                     'jstree-last': $index() === (card.widgets().length - 1) && $parent.card.cards().length === 0
                 }">
                 <i class="jstree-icon jstree-ocl" role="presentation"></i>
-                <a class="jstree-anchor" href="#" data-bind="click: function() { widget.selected(true) }, css:{'jstree-clicked': widget.selected, 'hover': widget.hovered}, event: { mouseover: function(){ widget.hovered(true) }, mouseout: function(){ widget.hovered(null) }, keyup: function(d, e) { if (event.which == 13 || event.keyCode == 13) { e.stopPropagation(); widget.selected(true); } } }">
+                <a class="jstree-anchor" href="#" data-bind="css:{'jstree-clicked': widget.selected, 'hover': widget.hovered}, event : {keyup: $parent.cardComponentWidgetEventHandler.bind($data,null,'designer'), click: $parent.cardComponentWidgetEventHandler.bind($data,null,'designer'), mouseover: $parent.cardComponentWidgetEventHandler.bind($data,null,'designer'), mouseout: $parent.cardComponentWidgetEventHandler.bind($data,null,'designer')}">
                     <i data-bind="css: widget.datatype.iconclass" role="presentation"></i>
                     <strong style="margin-right: 10px;" >
                         <span data-bind="text: !!(widget.label()) ? widget.label() : widget.node.name"></span>
@@ -159,8 +148,8 @@
 <!-- ko if: state === 'permissions-tree' -->
 {% block permissions_tree %}
 <li role="treeitem card-treeitem" class="jstree-node" data-bind="css: {'jstree-open': ((card.cards().length > 0 || card.widgets().length > 0) && card.expanded()), 'jstree-closed' : ((card.cards().length > 0 || card.widgets().length > 0) && !card.expanded()), 'jstree-leaf': card.cards().length === 0 && card.widgets().length === 0}">
-    <i tabindex="0" class="jstree-icon jstree-ocl" role="presentation" data-bind="click: function(){card.expanded(!card.expanded())}" onkeyup="if(event.which == 13 || event.keyCode == 13){ $(this).trigger('click'); }"></i>
-    <a class="jstree-anchor permissions-card" href="#" data-bind="css:{'jstree-clicked': card.selected, 'child-selected': card.isChildSelected(), 'filtered': card.highlight()}, click: function () { card.selectChildCards() }, event: { keyup: function(d, e) { if (event.which == 13 || event.keyCode == 13) { e.stopPropagation(); card.selectChildCards(); } } }">
+    <i tabindex="0" class="jstree-icon jstree-ocl" role="presentation" data-bind="event : {keyup: $parent.cardComponentEventHandler.bind($data,'expand card',null), click: $parent.cardComponentEventHandler.bind($data,'expand card',null)}"></i>
+    <a class="jstree-anchor permissions-card" href="#" data-bind="css:{'jstree-clicked': card.selected, 'child-selected': card.isChildSelected(), 'filtered': card.highlight()}, event : {keyup: $parent.cardComponentEventHandler.bind($data,'stop propagation select child cards',null), click: $parent.cardComponentEventHandler.bind($data,'stop propagation select child cards',null)}">
         <i class="fa fa-file-o" role="presentation"></i>
         <span style="padding-right: 5px;" data-bind="text: card.model.name">
         </span>
@@ -227,13 +216,13 @@
 <!-- ko if: state === 'form' -->
 {% block form %}
 <div class="card-component" data-bind="css: card.model.cssclass">
-
     <!-- ko if: reviewer && provisionalTileViewModel.selectedProvisionalEdit() -->
     <div class="edit-message-container provisional-editor">
         <span>{% trans 'Showing edits by' %}</span>
         <span class="edit-message-container-user" data-bind="text: provisionalTileViewModel.selectedProvisionalEdit().username() + '.'"></span>
         <!-- ko if: !provisionalTileViewModel.tileIsFullyProvisional() -->
-        <a class="reset-authoritative" href='#' data-bind="click: function(){provisionalTileViewModel.resetAuthoritative();}, event: { keyup: function(d, e) { if (event.which == 13 || event.keyCode == 13) { e.stopPropagation(); provisionalTileViewModel.resetAuthoritative(); } } }">{% trans 'Return to approved edits' %}</a>
+        Tile isn't provisional
+        <a class="reset-authoritative" href='#' data-bind="event: { keyup: $parent.cardComponentEventHandler.bind($data,'stop propagation reset authoritative',null), click: $parent.cardComponentEventHandler.bind($data,'stop propagation reset authoritative',null)}">{% trans 'Return to approved edits' %}</a>
         <!-- /ko-->
         <!-- ko if: provisionalTileViewModel.selectedProvisionalEdit().isfullyprovisional -->
         <span>{% trans ' This is a new contribution by a provisional editor.' %}</span>
@@ -255,15 +244,15 @@
         <div class='new-provisional-edits-list'>
             <div class='new-provisional-edits-header'>
                 <div class='new-provisional-edits-title'>{% trans 'Provisional Edits' %}</div>
-                <div tabindex="0" class="btn btn-shim btn-danger btn-labeled btn-xs fa fa-trash new-provisional-edits-delete-all" style="padding: 3px;" data-bind="click: function(){provisionalTileViewModel.deleteAllProvisionalEdits()}" onkeyup="if(event.which == 13 || event.keyCode == 13){ $(this).trigger('click'); }">{% trans 'Delete all edits' %}</div>
+                <div tabindex="0" class="btn btn-shim btn-danger btn-labeled btn-xs fa fa-trash new-provisional-edits-delete-all" style="padding: 3px;" data-bind="event : {keyup: $parent.cardComponentEventHandler.bind($data,'delete provisional edits',null), click: $parent.cardComponentEventHandler.bind($data,'delete provisional edits',null)}">{% trans 'Delete all edits' %}</div>
             </div>
             <!-- ko foreach: { data: provisionalTileViewModel.provisionaledits(), as: 'pe' } -->
-            <div tabindex="0" class='new-provisional-edit-entry' data-bind="css: {'selected': pe === $parent.provisionalTileViewModel.selectedProvisionalEdit()}, click: function(){$parent.provisionalTileViewModel.selectProvisionalEdit(pe)}" onkeyup="if(event.which == 13 || event.keyCode == 13){ $(this).trigger('click'); }">
+            <div tabindex="0" class='select provisional edit' data-bind="css: {'selected': pe === $parent.provisionalTileViewModel.selectedProvisionalEdit()}, event : {keyup: $parent.cardComponentEventHandler.bind($data,'select provisional edit',[$parent,pe]), click: $parent.cardComponentEventHandler.bind($data,'select provisional edit',[$parent,pe])}">
                 <div class='title'>
                     <div class='field'>
                         <span data-bind="text : pe.username"></span>
                     </div>
-                    <a href='#' class='field fa fa-times-circle new-delete-provisional-edit' data-bind="click : function(){$parent.provisionalTileViewModel.rejectProvisionalEdit(pe)}, event: { keyup: function(d, e) { if (event.which == 13 || event.keyCode == 13) { e.stopPropagation(); $parent.provisionalTileViewModel.rejectProvisionalEdit(pe); } } }"></a>
+                    <a href='#' class='field fa fa-times-circle new-delete-provisional-edit' data-bind="event : {keyup: $parent.cardComponentEventHandler.bind($data,'stop propagation reject provisional edit',[$parent,pe]), click: $parent.cardComponentEventHandler.bind($data,'stop propagation reject provisional edit',[$parent,pe])}"></a>
                 </div>
                 <div class="field timestamp">
                     <span data-bind="text : pe.displaydate">@</span>
@@ -282,7 +271,7 @@
 
             <!-- ko if: card.model.helpenabled -->
             <span>
-                <a href="#" class="pull-right card-help help editable-help" data-bind="click: function () {card.model.get('helpactive')(true) }, event: { keyup: function(d, e) { if (event.which == 13 || event.keyCode == 13) { e.stopPropagation(); card.model.get('helpactive')(true); } } }" style="cursor:pointer;"> {% trans "Help" %} <i class="fa fa-question-circle"></i></a>
+                <a href="#" class="pull-right card-help help editable-help" data-bind="event : {keyup: $parent.cardComponentEventHandler.bind($data,'open help',null), click: $parent.cardComponentEventHandler.bind($data,'open help',null)}" style="cursor:pointer;"> {% trans "Help" %} <i class="fa fa-question-circle"></i></a>
             </span>
             <!-- /ko -->
             <h5 class="card-instructions" data-bind="text: card.model.instructions"></h5>
@@ -316,8 +305,7 @@
                             disabled: !self.card.isWritable && !self.preview
                         }
                     }, css:{ "active": widget.selected, "hover": widget.hovered, "widget-preview": self.preview
-                }, click: function(data, e) { if (!widget.selected() && self.preview) {widget.selected(true);}
-            }, event: { keyup: function(d, e) { if (event.which == 13 || event.keyCode == 13) { e.stopPropagation(); if (!widget.selected() && self.preview) {widget.selected(true);} } }, mouseover: function(){ if (self.preview){widget.hovered(true) } }, mouseout: function(){ if (self.preview){widget.hovered(null)} } }, visible: widget.visible'></div>
+                }, event: { keyup: $parent.cardComponentWidgetEventHandler.bind($data,$parent,"form"), click: $parent.cardComponentWidgetEventHandler.bind($data,$parent,"form"), mouseover: $parent.cardComponentWidgetEventHandler.bind($data,$parent,"form"), mouseout: $parent.cardComponentWidgetEventHandler.bind($data,$parent,"form") }, visible: widget.visible'></div>
                 </div>
             </form>
             {% endblock form_widgets %}
@@ -327,14 +315,10 @@
             <ul class="card-summary-section" data-bind="css: {disabled: !tile.tileid}">
                 <!-- ko foreach: { data: tile.cards, as: 'card' } -->
                 <li style="border:1px solid red;" class="card-summary" data-bind="visible: card.model.visible()">
-                    <a href="#" data-bind="click: function () {
-                        if (card.parent.tileid) {
-                            card.canAdd() ? card.selected(true) : card.tiles()[0].selected(true);
-                        }
-                    }" onkeyup="if(event.which == 13 || event.keyCode == 13){ $(this).trigger('click'); }">
+                    <a href="#" data-bind="event : {keyup: $parent.cardComponentEventHandler.bind($data,'select or add card',null), click: $parent.cardComponentEventHandler.bind($data,'select or add card',null)}">
                         <h4 class="card-summary-name" style='color: #2f527a'>
                             <span data-bind="text: card.model.name"></span>
-                            <i tabindex="0" class="fa fa-plus-circle card-summary-add" data-bind="click: function(){$parent.createParentAndChild($parent.tile, card)}" onkeyup="if(event.which == 13 || event.keyCode == 13){ $(this).trigger('click'); }"></i>
+                            <i tabindex="0" class="fa fa-plus-circle card-summary-add" data-bind="event : {keyup: $parent.cardComponentEventHandler.bind($data,'create parent and child',$parent), click: $parent.cardComponentEventHandler.bind($data,'create parent and child',$parent)}"></i>
                         </h4>
                     </a>
                     <ul class="tile-summary-item" data-bind="foreach: {
@@ -342,7 +326,7 @@
                             as: 'tile'
                         }">
                         <li class="tile-summary">
-                            <a href="#" data-bind="click: function () { tile.selected(true) }" onkeyup="if(event.which == 13 || event.keyCode == 13){ $(this).trigger('click'); }">
+                            <a href="#" data-bind="event: { keyup: $parents[1].cardComponentEventHandler.bind($data,'select',tile), click: $parents[1].cardComponentEventHandler.bind($data,'select',tile)}">
                                 <!-- ko if: card.widgets().length > 0 -->
                                 <span data-bind="text: card.widgets()[0].label || card.model.name" class="tile-summary-label"></span>:
                                 <div style="display: inline;" data-bind="component: {
@@ -372,21 +356,21 @@
             {% block form_buttons %}
             <div class="install-buttons">
                 <!-- ko if: tile.tileid && self.deleteTile -->
-                <button class="btn btn-shim btn-labeled btn-lg fa fa-trash" data-bind="click: self.deleteTile, css: {disabled: (!card.isWritable && !self.preview), 'btn-warning': card.isWritable }" onkeyup="if(event.which == 13 || event.keyCode == 13){ $(this).trigger('click'); }">{% trans 'Delete this record' %}</button>
+                <button class="btn btn-shim btn-labeled btn-lg fa fa-trash" data-bind="event: { keyup: $parent.cardComponentEventHandler.bind($data,'delete tile',null), click: $parent.cardComponentEventHandler.bind($data,'delete tile',null)}, css: {disabled: (!card.isWritable && !self.preview), 'btn-warning': card.isWritable }">{% trans 'Delete this record' %}</button>
                 <!-- /ko -->
 
                 <!-- ko if: tile.dirty() -->
                     <!-- ko if: provisionalTileViewModel && !provisionalTileViewModel.tileIsFullyProvisional() && card.isWritable -->
-                    <button class="btn btn-shim btn-danger btn-labeled btn-lg fa fa-times" data-bind="click: tile.reset" onkeyup="if(event.which == 13 || event.keyCode == 13){ $(this).trigger('click'); }">{% trans 'Cancel edit' %}</button>
+                    <button class="btn btn-shim btn-danger btn-labeled btn-lg fa fa-times" data-bind="event: { keyup: $parent.cardComponentEventHandler.bind($data,'reset parameter',tile), click: $parent.cardComponentEventHandler.bind($data,'reset parameter',tile)}">{% trans 'Cancel edit' %}</button>
                     <!-- /ko -->
 
                     <!-- ko if: tile.tileid -->
-                    <button class="btn btn-shim btn-labeled btn-lg fa fa-plus" data-bind="click: self.saveTile, css: {disabled: (!card.isWritable && !self.preview), 'btn-mint': card.isWritable }" onkeyup="if(event.which == 13 || event.keyCode == 13){ $(this).trigger('click'); }">{% trans 'Save edit' %}</button>
+                    <button class="btn btn-shim btn-labeled btn-lg fa fa-plus" data-bind="event: { keyup: $parent.cardComponentEventHandler.bind($data,'save tile',null), click: $parent.cardComponentEventHandler.bind($data,'save tile',null)}, css: {disabled: (!card.isWritable && !self.preview), 'btn-mint': card.isWritable }">{% trans 'Save edit' %}</button>
                     <!-- /ko -->
                 <!-- /ko -->
-                
+
                 <!-- ko if: !tile.tileid && !showChildCards() -->
-                <button class="btn btn-shim btn-labeled btn-lg fa fa-plus" data-bind="click: self.saveTile, css: {disabled: (!card.isWritable && !self.preview), 'btn-mint': card.isWritable }" onkeyup="if(event.which == 13 || event.keyCode == 13){ $(this).trigger('click'); }">{% trans 'Add'  %}</button>
+                <button class="btn btn-shim btn-labeled btn-lg fa fa-plus" data-bind="event: { keyup: $parent.cardComponentEventHandler.bind($data,'save tile',null), click: $parent.cardComponentEventHandler.bind($data,'save tile',null)}, css: {disabled: (!card.isWritable && !self.preview), 'btn-mint': card.isWritable }">{% trans 'Add'  %}</button>
                 <!-- /ko -->
             </div>
             {% endblock form_buttons %}
@@ -394,13 +378,13 @@
             <!-- ko if: card.showSummary() === true -->
             {% block card_summary %}
             {% include 'views/components/cards/default-card-report.htm' %}
-            <button class="btn btn-shim btn-labeled btn-lg fa fa-plus btn-primary" data-bind="text: '{% trans "New" %}', click: function(){card.showForm(true)}" onkeyup="if(event.which == 13 || event.keyCode == 13){ $(this).trigger('click'); }"></button>
+            <button class="btn btn-shim btn-labeled btn-lg fa fa-plus btn-primary" data-bind="text: '{% trans "New" %}', event : {keyup: cardComponentEventHandler.bind($data,'show form',null), click: cardComponentEventHandler.bind($data,'show form',null)}"></button>
             {% endblock card_summary %}
             <!-- /ko -->
 
             <aside id="card-help-panel" class="card-help-panel" style="display: none;" data-bind="visible: card.model.get('helpactive')">
                 <div class="relative">
-                    <a id="add-basemap-wizard-help-close" href="#" class="help-close fa fa-times fa-lg" data-bind="click: function () { card.model.get('helpactive')(false) }" onkeyup="if(event.which == 13 || event.keyCode == 13){ $(this).trigger('click'); }"></a>
+                    <a id="add-basemap-wizard-help-close" href="#" class="help-close fa fa-times fa-lg" data-bind="event : {keyup: cardComponentEventHandler.bind($data,'close help',null), click: cardComponentEventHandler.bind($data,'close help',null)}"></a>
                 </div>
                 <div id="add-basemap-wizard-help-content">
                     <div>
