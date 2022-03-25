@@ -1446,7 +1446,22 @@ class CsvReader(Reader):
                         if target_tile.nodegroup.cardinality == "1" and preexisting_tile_for_nodegroup and len(source_data) > 0:
                             target_tile = get_blank_tile(source_data, child_only=True)
                             target_tile.parenttile = preexisting_tile_for_nodegroup
-                            populate_tile(source_data, target_tile, appending_to_parent=True)
+                            populate_tile(
+                                source_data,
+                                target_tile,
+                                row,
+                                row_number,
+                                resourceinstanceid,
+                                populated_tiles,
+                                group_no,
+                                group_valid,
+                                group_no_to_tileids,
+                                non_unique_col_headers,
+                                populated_cardinality_1_nodegroups,
+                                node_datatypes,
+                                appending_to_parent=True,
+                                prefix=prefix
+                            )
                             if not bulk:
                                 preexisting_tile_for_nodegroup.tiles.append(target_tile)
                             while len(source_data) > 0:
@@ -1455,10 +1470,39 @@ class CsvReader(Reader):
                                 if preexisting_tile_for_nodegroup:
                                     target_tile = get_blank_tile(source_data, child_only=True)
                                     target_tile.parenttile = preexisting_tile_for_nodegroup
-                                    populate_tile(source_data, target_tile, appending_to_parent=True)
+                                    populate_tile(
+                                        source_data,
+                                        target_tile,
+                                        row,
+                                        row_number,
+                                        resourceinstanceid,
+                                        populated_tiles,
+                                        group_no,
+                                        group_valid,
+                                        group_no_to_tileids,
+                                        non_unique_col_headers,
+                                        populated_cardinality_1_nodegroups,
+                                        node_datatypes,
+                                        appending_to_parent=True,
+                                        prefix=prefix
+                                    )
                                 else:
                                     target_tile = get_blank_tile(source_data)
-                                    populate_tile(source_data, target_tile)
+                                    populate_tile(
+                                        source_data,
+                                        target_tile,
+                                        row,
+                                        row_number,
+                                        resourceinstanceid,
+                                        populated_tiles,
+                                        group_no,
+                                        group_valid,
+                                        group_no_to_tileids,
+                                        non_unique_col_headers,
+                                        populated_cardinality_1_nodegroups,
+                                        node_datatypes,
+                                        prefix=prefix
+                                    )
 
                                 if not bulk and preexisting_tile_for_nodegroup:
                                     preexisting_tile_for_nodegroup.tiles.append(target_tile)
@@ -1466,7 +1510,21 @@ class CsvReader(Reader):
                         # populates a tile from parent-level nodegroup because
                         # parent cardinality is N or because none exists yet on resource
                         elif target_tile is not None and len(source_data) > 0:
-                            populate_tile(source_data, target_tile)
+                            populate_tile(
+                                source_data,
+                                target_tile,
+                                row,
+                                row_number,
+                                resourceinstanceid,
+                                populated_tiles,
+                                group_no,
+                                group_valid,
+                                group_no_to_tileids,
+                                non_unique_col_headers,
+                                populated_cardinality_1_nodegroups,
+                                node_datatypes,
+                                prefix=prefix
+                            )
                             if len(source_data) == 1 and component_type_nodeid in source_data[0] and len(list(source_data[0].keys())) == 1:
                                 source_data.pop(0)  # TODO TEMPORARY: remove Details components that have a component type
                             while len(source_data) > 0:
@@ -1475,12 +1533,54 @@ class CsvReader(Reader):
                                 if preexisting_tile_for_nodegroup and str(target_tile.nodegroup_id) != component_nodegroupid:
                                     target_tile = get_blank_tile(source_data, child_only=True)
                                     target_tile.parenttile = preexisting_tile_for_nodegroup
-                                    populate_tile(source_data, target_tile, appending_to_parent=True)
+                                    populate_tile(
+                                        source_data,
+                                        target_tile,
+                                        row,
+                                        row_number,
+                                        resourceinstanceid,
+                                        populated_tiles,
+                                        group_no,
+                                        group_valid,
+                                        group_no_to_tileids,
+                                        non_unique_col_headers,
+                                        populated_cardinality_1_nodegroups,
+                                        node_datatypes,
+                                        appending_to_parent=True,
+                                        prefix=prefix
+                                    )
                                 elif preexisting_tile_for_nodegroup and str(target_tile.nodegroup_id) == component_nodegroupid:
-                                    populate_tile(source_data, target_tile)
+                                    populate_tile(
+                                        source_data,
+                                        target_tile,
+                                        row,
+                                        row_number,
+                                        resourceinstanceid,
+                                        populated_tiles,
+                                        group_no, group_valid,
+                                        group_no_to_tileids,
+                                        non_unique_col_headers,
+                                        populated_cardinality_1_nodegroups,
+                                        node_datatypes,
+                                        prefix=prefix
+                                    )
                                 else:
                                     target_tile = get_blank_tile(source_data)
-                                    populate_tile(source_data, target_tile)
+                                    populate_tile(
+                                        source_data,
+                                        target_tile,
+                                        row,
+                                        row_number,
+                                        resourceinstanceid,
+                                        populated_tiles,
+                                        group_no,
+                                        group_valid,
+                                        group_no_to_tileids,
+                                        non_unique_col_headers,
+                                        populated_cardinality_1_nodegroups,
+                                        node_datatypes,
+                                        prefix=prefix
+                                    )
                                 if not bulk and preexisting_tile_for_nodegroup:
                                     preexisting_tile_for_nodegroup.tiles.append(target_tile)
                             # Check that required nodes are populated. If not remove tile from populated_tiles array.
