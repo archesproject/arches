@@ -210,6 +210,7 @@ add_staging_to_tile_function = """
             selected_resource text;
             graph_id uuid;
             instance_id text;
+            legacy_id text;
             tile_id text;
             parent_id text;
             group_id text;
@@ -217,9 +218,9 @@ add_staging_to_tile_function = """
             _value text;
         BEGIN
             UPDATE load_event SET load_start_time = now() WHERE loadid = load_id;
-            FOR staged_value, instance_id, tile_id, parent_id, group_id, passed, graph_id IN
+            FOR staged_value, instance_id, legacy_id, tile_id, parent_id, group_id, passed, graph_id IN
                     (
-                        SELECT value, resourceid, tileid, parenttileid, ls.nodegroupid, passes_validation, n.graphid
+                        SELECT value, resourceid, legacyid, tileid, parenttileid, ls.nodegroupid, passes_validation, n.graphid
                         FROM load_staging ls INNER JOIN (SELECT DISTINCT nodegroupid, graphid FROM nodes) n
                         ON ls.nodegroupid = n.nodegroupid
                         WHERE loadid = load_id
@@ -231,7 +232,7 @@ add_staging_to_tile_function = """
                         -- create a resource first if the rsource is not yet created
                         IF NOT FOUND THEN
                             INSERT INTO resource_instances(resourceinstanceid, graphid, legacyid, createdtime)
-                                VALUES (instance_id::uuid, graph_id, instance_id::uuid, now());
+                                VALUES (instance_id::uuid, graph_id, legacy_id, now());
                             -- create resource instance edit log
                             INSERT INTO edit_log (resourceclassid, resourceinstanceid, edittype, timestamp, note, transactionid)
                                 VALUES (graph_id, instance_id, 'create', now(), 'loaded from staging_table', load_id);
