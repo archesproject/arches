@@ -706,9 +706,13 @@ input[type="checkbox"] {
     display: none;
 }
 
+.display-in-workflow-step {
+    padding: 10px;
+    background-color: #ececec;
+    border-top: solid 1px #ddd;
+}
+
 .tabbed-workflow-step-body .display-in-workflow-step.install-buttons {
-    bottom: 53px;
-    display: unset;
 }
 
 .tabbed-workflow-step-body>div {
@@ -1230,7 +1234,6 @@ ul.tabbed-report-tab-list {
     font-weight: 600;
     color: #666;
     margin-left: 10px;
-    margin-top: 60px;
 }
 
 .workbench-card-sidepanel-header-container.file-workbench {
@@ -2177,11 +2180,12 @@ div.final-cons-step-separator>h4 {
     z-index: 250;
     right: 75px;
     height: 100%;
-    width: 400px;
     background: white;
     border-left: 1px solid rgb(216, 216, 216);
-    padding: 16px;
-    overflow-y: scroll;
+    overflow-y: hidden;
+    display: flex;
+    flex-direction: column;
+    align-items: normal;
 }
 
 .workbench-sidepanel-card-container {
@@ -2257,17 +2261,21 @@ div.final-cons-step-separator>h4 {
 }
 
 .workbench-card-sidepanel-header-container {
-    border-bottom: 1px solid #ddd;
-    padding: 17px 30px 10px 0px;
+    padding: 14px;
     margin-left: 0px;
-    margin-top: -16px;
-    position: fixed;
     background: #fff;
     z-index: 20;
-    width: 370px;
+    width: 400px;
 }
 
-
+.workflow-card-sidepanel-body {
+    overflow-y: scroll;
+    width: inherit;
+    height: -moz-available;
+    height: -webkit-fill-available;
+    height: fill-available;
+    padding: 16px;
+}
 
 .expanded .workbench-card-sidepanel-header-container {
     width: 599px;
