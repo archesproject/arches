@@ -9987,19 +9987,32 @@ a.clear-geojson-button:hover {
     padding: 10px;
 }
 
+.hover-feature-nav-right+.hover-feature-title {
+    width: 250px;
+    margin-left: -4px;
+}
+
 .hover-feature-nav-left {
-    height: 38px;
-    background: #fafafa;
-    padding: 10px;
-    border-right: 1px solid #ddd;
+    height: 28px;
+    width: 28px;
+    background: #fbfbfb;
+    margin-top: 5px;
+    margin-right: 2px;
+    margin-left: 5px;
+    padding-left: 10px;
+    padding-top: 3px;
+    border: 1px solid #ddd;
+    border-radius: 50%;
 }
 
 .hover-feature-nav-left:hover {
-    background-color: #f4f4f4;;
+    background-color: #f2f2f2;
+    cursor: pointer;
 }
 
 .hover-feature-nav-right:hover {
-    background-color: #f4f4f4;;
+    background-color: #f2f2f2;
+    cursor: pointer;
 }
 
 .hover-feature-nav-left.disabled {
@@ -10007,18 +10020,50 @@ a.clear-geojson-button:hover {
 }
 
 .hover-feature-nav-right {
-    height: 38px;
-    background: #fafafa;
-    padding: 10px;
-    border-left: 1px solid #ddd;
+    height: 28px;
+    width: 28px;
+    background: #fbfbfb;
+    margin-top: 5px;
+    padding-left: 12px;
+    padding-top: 3px;
+    border: 1px solid #ddd;
+    border-radius: 50%;
 }
+
+.hover-feature-nav-right i {
+    font-size: 14px;
+    font-weight: 600;
+}
+
+.hover-feature-nav-left i {
+    font-size: 14px;
+    font-weight: 600;
+}
+
 
 .hover-feature-nav-right.disabled {
     display: none;
 }
 
+.hover-feature-instance-counter {
+    background: #9DC4E4;
+    border: 1px solid #4783B4;
+    color: #fff;
+    padding-top: 1px;
+    padding-left: 1px;
+    margin-top: -2px;
+    border-radius: 50%;
+    margin-right: 2px;
+    height: 24px;
+    width: 24px;
+    text-align: center;
+}
+
 .hover-feature-body {
     padding: 10px 15px 15px 15px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
     width: 350px;
     border-left: 1px solid #ddd;
     border-right: 1px solid #ddd;
@@ -10027,7 +10072,7 @@ a.clear-geojson-button:hover {
 .hover-feature {
     font-size: 13px;
     color: #555;
-    margin-bottom: 20px;
+    margin-bottom: 10px;
     overflow: hidden;
     text-overflow: ellipsis;
     display: -webkit-box;
@@ -11361,7 +11406,7 @@ a.search-facet-item {
 .search-facet-item.disabled {
     background: #f6f6f6;
     color: #666;
-    cursor: default;
+    cursor: pointer;
 }
 
 a.search-facet-item.disabled {
