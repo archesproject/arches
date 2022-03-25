@@ -937,7 +937,23 @@ create or replace function __arches_delete_spatial_view(
     end;
     $$;
 
---
+
+create or replace function __arches_refresh_spatial_views()
+    returns integer
+    language plpgsql
+    as $func$
+    begin
+
+        select __arches_update_spatial_view(sv.slug,sv.geometrynodeid, sv.attributenodes, sv.schema, sv.description, sv.ismixedgeometrytypes)
+        from spatial_views sv
+        where sv.isactive = true;
+        
+        return 1;
+    end;
+    $func$
+
+-- 
+--TRIGGERS - tiles
 create constraint trigger __arches_trg_update_spatial_attributes
     after insert or update or delete
     on tiles
@@ -1082,7 +1098,7 @@ create or replace function __arches_trg_fnc_update_spatial_attributes()
     end;
     $func$
 --
-
+-- TRIGGERS - spatial_views model
 create constraint trigger __arches_trg_update_spatial_views
     after insert or update or delete
     on spatial_views
@@ -1109,7 +1125,7 @@ create or replace function __arches_trg_fnc_update_spatial_views()
             __arches_delete_spatial_view(old.slug)
             return old;
 
-        elsif tg_op = 'INSERT' or tg_op = 'UPDATE' then
+        elsif tg_op = 'INSERT' then
 
             if new.slug is null or new.slug = '' then
                 new.slug := __arches_slugify(new.name);
@@ -1117,48 +1133,27 @@ create or replace function __arches_trg_fnc_update_spatial_views()
 
             if new.isactive = true then
                 __arches_create_spatial_view(new.slug, new.geometrynodeid, new.attributenodes, new.schema, new.description, new.ismixedgeometrytypes);
+            end if;
+
+            return new;
+
+        elsif tg_op = 'UPDATE' then
+            if new.slug is null or new.slug = '' then
+                new.slug := __arches_slugify(new.name);
+            end if;
+
+            if new.isactive = true then
+                __arches_update_spatial_view(new.slug, new.geometrynodeid, new.attributenodes, new.schema, new.description, new.ismixedgeometrytypes);
             else
                 __arches_delete_spatial_view(new.slug)
             end if;
 
             return new;
-
         end if;
-
-        /*
-                create_spv
-                    spatial_view_name_slug      text,
-                    geometry_node_id            uuid,
-                    attribute_node_list         jsonb,
-                    schema_name                 text default 'public',
-                    spv_description             text default 'arches spatial view',
-                    is_mixed_geometry_type      boolean default false
-
-
-                class SpatialView(models.Model):
-                    spatialviewid = models.UUIDField(primary_key=True, default=uuid.uuid1)
-                    schema = models.TextField(default='public')
-                    name = models.TextField(unique=True) # this will be slugged and needs to be unique
-                    slug = models.TextField(validators=[validate_slug], unique=True)
-                    description = models.TextField(default='arches spatial view') # provide a description of the spatial view
-                    geometrynodeid = models.ForeignKey(Node, on_delete=models.CASCADE, db_column="geometrynodeid")
-                    precision = models.IntegerField(default=6) # 1.1cm
-                    attributenodes = JSONField(blank=True, null=True, db_column="attributenodes")
-                    isactive = models.BooleanField(default=True) # the view is not created in the DB until set to active.
-                    status = models.TextField() # if there is any issues with the creation of view in the DB, let the applicaiton know.
-
-
-                    attributenodes structure = [{"nodeid": "21342134-12432134-2431234-123-423", "description": "a column description"},]
-                        
-
-
-                    spatial_view_name_slug      text,
-                    geometry_node_id            uuid,
-                    attribute_node_list         jsonb,
-                    schema_name                 text default 'public',
-                    spv_description             text default 'arches spatial view',
-                    is_mixed_geometry_type      boolean default false
-        */
         
     end;
     $func$
+
+
+--
+
