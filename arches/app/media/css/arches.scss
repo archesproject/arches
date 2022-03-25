@@ -1132,6 +1132,7 @@ div.wf-multi-tile-card-info div {
     display: flex;
     flex-direction: column;
     justify-content: space-between;
+    height: calc(100vh - 50px);
 }
 
 .resource-component-abstract {
