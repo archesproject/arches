@@ -98,7 +98,8 @@ a:focus,
 }
 
 .arches-signin .panel-footer,
-.password-rule {
+.password-rule,
+.rp-no-data {
     color: #494949;
 }
 
@@ -446,6 +447,10 @@ div.search-facet-item:focus {
 .ep-notifs,
 .search-popup-panel {
     width: 50vw;
+}
+
+.rp-report-section-title {
+    padding-left: 0;
 }
 
 /******************************************************************/
