@@ -1476,7 +1476,7 @@ class NodeGroup(APIBase):
         except Exception as e:
             return JSONResponse(str(e), status=404)
 
-        if not nodegroup or not nodegroup.pk in permitted_nodegroups:
+        if not nodegroup or nodegroup.pk not in permitted_nodegroups:
             return JSONResponse(_("No nodegroup matching query parameters found."), status=404)
 
         return JSONResponse(nodegroup, status=200)
