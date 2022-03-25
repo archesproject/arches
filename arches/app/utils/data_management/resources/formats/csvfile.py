@@ -1587,7 +1587,6 @@ class CsvReader(Reader):
                             check_required_nodes(target_tile, target_tile, required_nodes)
 
                     previous_row_resourceid = row_resourceid
-                    legacyid = row["LegacyID"] if row["LegacyID"] else row["ResourceID"]
 
                 # check for missing display value nodes.
                 # errors = []
