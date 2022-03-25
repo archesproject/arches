@@ -256,6 +256,9 @@
                 api_tiles: function (tileid) {
                     return "{% url 'api_tiles' 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa' %}".replace('aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa', tileid)
                 },
+                api_nodegroup: function (nodegroupid) {
+                    return "{% url 'api_nodegroup' 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa' %}".replace('aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa', nodegroupid)
+                },
                 api_nodes: function (nodeid) {
                     return "{% url 'api_nodes' 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa' %}".replace('aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa', nodeid)
                 },
