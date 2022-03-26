@@ -2186,6 +2186,7 @@ div.final-cons-step-separator>h4 {
     display: flex;
     flex-direction: column;
     align-items: normal;
+    width: 400px;
 }
 
 .workbench-sidepanel-card-container {
@@ -2288,6 +2289,7 @@ div.final-cons-step-separator>h4 {
 }
 
 .workbench-card-sidepanel-header {
+    position: relative;
     cursor: pointer;
     color: rgb(33, 62, 95);
     font-size: 15px;
@@ -14202,8 +14204,8 @@ a.jstree-anchor.permissions-widget {
         color: darken(#213e5f, 100%);
     }
     .related-resource-graph-information-content {
-        padding-top: 60px;
         height: 100%;
+        padding: 16px;
         .edge-relationship-information {
             $edge-label-height: 150px;
             position: relative;
@@ -14281,7 +14283,7 @@ a.jstree-anchor.permissions-widget {
         line-height: 0.9;
     }
     .relationships-list {
-        height: calc(100% - 134px);
+        height: calc(100% - 185px);
         border: 1px solid rgb(221, 221, 221);
         overflow-y: auto;
         .relationships-list-item {
