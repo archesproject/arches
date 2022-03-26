@@ -178,6 +178,11 @@
 <div class="workbench-card-sidepanel-header-container">
     <h4 class="workbench-card-sidepanel-header" data-bind="click: hideSidePanel">{% trans "Search Network" %}</h4>
 </div>
+<div style="
+    border-bottom: 1px solid #ddd;
+    margin: 0px 12px;">
+</div>
+<div class="related-reasources-search-body">
 <div class="related-reasources-search-container">
     <input type="text" class="form-control" placeholder="{% trans "Filter..." %}" data-bind="value: nodeSearchFilter, valueUpdate: 'afterkeydown'">
     <span class="clear-node-search" data-bind="click: function() { nodeSearchFilter(''); }, visible: nodeSearchFilter() !== ''"><i class="fa fa-times-circle"></i></span>
@@ -209,6 +214,7 @@
         </div>
     </div>
 </div>
+</div>
 <!--/ko -->
 <!--ko if: activeTab() === 'analyze' -->
 <div class="workbench-card-sidepanel-header-container">
@@ -223,6 +229,10 @@
 <!--ko if: activeTab() === 'legend' -->
 <div class="workbench-card-sidepanel-header-container">
     <h4 class="workbench-card-sidepanel-header" data-bind="click: hideSidePanel">{% trans "Legend" %}</h4>
+</div>
+<div style="
+    border-bottom: 1px solid #ddd;
+    margin: 0px 12px;">
 </div>
 <div class="legend-listing-container" data-bind="foreach: legendEntries">
     <div class="legend-listing related-resource-legend">

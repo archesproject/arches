@@ -2341,7 +2341,7 @@ div.final-cons-step-separator>h4 {
 }
 
 .legend-listing-container {
-    margin-top: 50px;
+    padding: 0 16px 16px;
 }
 
 .basemap-listing:before,
@@ -14339,10 +14339,12 @@ a.jstree-anchor.permissions-widget {
             margin-top: -2px;
         }
     }
-    .related-reasources-search-container {
-        margin-top: 60px;
-        position: relative;
+    .related-reasources-search-body {
+        padding: 16px;
     }
+    .related-reasources-search-container {
+        position: relative;
+    }   
     .related-reasources-search-list {
         height: calc(100% - 110px);
         margin-top: 5px;
