@@ -54,6 +54,11 @@
 <div class="workbench-card-sidepanel-header-container">
     <h4 class="workbench-card-sidepanel-header" data-bind="click: hideSidePanel">{% trans "Resource Information" %}</h4>
 </div>
+<div style="
+    border-bottom: 1px solid #ddd;
+    margin: 0px 12px;">
+</div>
+
 <div class="related-resource-graph-information-content" data-bind="using: informationElement">
     <!--ko if: $data -->
     <!--ko if: $parent.edgeInformation() -->
@@ -167,6 +172,8 @@
     <!--/ko -->
 </div>
 <!--/ko -->
+
+
 <!--ko if: activeTab() === 'search' -->
 <div class="workbench-card-sidepanel-header-container">
     <h4 class="workbench-card-sidepanel-header" data-bind="click: hideSidePanel">{% trans "Search Network" %}</h4>
