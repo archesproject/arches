@@ -1135,6 +1135,10 @@ div.wf-multi-tile-card-info div {
     height: calc(100vh - 50px);
 }
 
+.resource-component-abstract-container .has-summary {
+    height: inherit;
+}
+
 .resource-component-abstract {
     overflow-y: scroll;
     height: 100%;
