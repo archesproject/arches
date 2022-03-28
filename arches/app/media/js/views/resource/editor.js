@@ -16,7 +16,9 @@ define([
     'card-components',
     'moment',
     'views/components/resource-report-abstract',
-    'reports/default'
+    'reports/default',
+    'views/components/widgets/number',
+    'views/components/plugins/map'
 ], function($, _, ko, BaseManagerView, AlertViewModel, JsonErrorAlertViewModel, GraphModel, ReportModel, CardViewModel, ProvisionalTileViewModel, reportLookup) {
     const data = window['resource-editor-data'];
     const arches = window.arches;

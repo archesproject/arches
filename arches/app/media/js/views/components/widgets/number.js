@@ -62,6 +62,6 @@ define(['knockout', 'underscore', 'viewmodels/widget', 'bindings/formattedNumber
 
     return ko.components.register('number-widget', {
         viewModel: NumberWidget,
-        template: { require: 'text!widget-templates/number' }
+        template: window['number-datatype-template']
     });
 });

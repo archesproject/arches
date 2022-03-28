@@ -102,7 +102,7 @@ define([
     ko.components.register('map-widget', {
         viewModel: viewModel,
         template: {
-            require: 'text!templates/views/components/widgets/map.htm'
+            require: window['map-widget-template']
         }
     });
     return viewModel;
