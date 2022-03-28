@@ -450,7 +450,7 @@ define([
             },
             formatResult: function(item) {
                 if (item._source) {
-                    iconClass = self.graphLookup[item._source.graph_id].iconclass
+                    iconClass = self.graphLookup[item._source.graph_id]?.iconclass
                     return `<i class="fa ${iconClass} sm-icon-wrap"></i> ${item._source.displayname}`;
                 } else {
                     if (self.allowInstanceCreation) {
