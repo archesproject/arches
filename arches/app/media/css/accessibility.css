@@ -457,6 +457,15 @@ div.search-facet-item:focus {
     padding-left: 0;
 }
 
+.resource-component-abstract {
+    overflow-y: auto;
+    height: calc(100vh - 100px);
+}
+
+.resource-component-abstract-container.is-summary {
+    height: calc(100vh - 100px);
+}
+
 /******************************************************************/
 /* Media queries                                                  */
 /******************************************************************/
@@ -612,11 +621,19 @@ div.search-facet-item:focus {
         height: calc(100vh - 100px);
     }
 
+    .resource-component-abstract-container.is-summary {
+        height: calc(50vh - 100px);
+    }
+
     .report-print-date {
         white-space: nowrap;
     }
 
     .rp-no-data {
         top: 0;
+    }
+
+    .search-result-details {
+        height: calc(50vh - 100px);
     }
 }
