@@ -7,6 +7,7 @@ define([
     'models/mobile-survey',
     'views/base-manager',
     'views/mobile-survey-manager/identity-list',
+    'utils/set-csrf-token'
 ], function($, _, ko, koMapping, MobileSurveyViewModel, MobileSurveyModel, BaseManagerView, IdentityList) {
     const data = window['profile-manager-data'];
     const arches = window['arches'];
