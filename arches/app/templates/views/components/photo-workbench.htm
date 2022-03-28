@@ -145,11 +145,9 @@
 <div class="workbench-card-sidepanel-header-container">
     <h4 class="workbench-card-sidepanel-header" data-bind="click: hideSidePanel, text: card.model.name"></h4>
 </div>
-<div style="
-    border-bottom: 1px solid #ddd;
-    margin: 0px 12px;">
-</div>
-<div class="workflow-card-sidepanel-body">
+<div class="workbench-card-sidepanel-border"></div>
+
+<div class="workbench-card-sidepanel-body">
 <h5 class="workbench-tile-picker-label">{% trans 'Image List' %}</h5>
 <div class='photo-workbench-photos'>
 <!-- ko foreach: { data: card.tiles(), as: 'tile'} -->
