@@ -98,7 +98,8 @@ a:focus,
 }
 
 .arches-signin .panel-footer,
-.password-rule {
+.password-rule,
+.rp-no-data {
     color: #494949;
 }
 
@@ -340,6 +341,10 @@ div.search-facet-item:focus {
     overflow-y: auto;
 }
 
+.ep-tools {
+    white-space: nowrap;
+}
+
 .ep-tools-login {
     padding-right: 16px;
 }
@@ -446,6 +451,10 @@ div.search-facet-item:focus {
 .ep-notifs,
 .search-popup-panel {
     width: 50vw;
+}
+
+.rp-report-section-title {
+    padding-left: 0;
 }
 
 /******************************************************************/
@@ -595,5 +604,19 @@ div.search-facet-item:focus {
     .workbench-card-sidepanel {
         width: calc(100% - 74px);
         height: 38vh;
+    }
+
+    .resource-component-abstract-container {
+        display: inline-flex;
+        width: 100vw;
+        height: calc(100vh - 100px);
+    }
+
+    .report-print-date {
+        white-space: nowrap;
+    }
+
+    .rp-no-data {
+        top: 0;
     }
 }

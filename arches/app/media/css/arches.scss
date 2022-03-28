@@ -1128,9 +1128,29 @@ div.wf-multi-tile-card-info div {
     color: #ccc;
 }
 
+.resource-component-abstract-container {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    height: calc(100vh - 50px);
+}
+
+.resource-component-abstract-container .has-summary {
+    height: inherit;
+}
+
 .resource-component-abstract {
     overflow-y: scroll;
     height: 100%;
+}
+
+.resource-component-abstract-container footer {
+    background: #f8f8f8; 
+    display: flex;
+    height: 50px;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0 20px;
 }
 
 .workflow-plugin {
