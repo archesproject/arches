@@ -5,7 +5,7 @@
 <div class='loading-mask'></div>
 <!--/ko-->
 <!-- ko ifnot: loading() -->
-<div class="resource-component-abstract-container" data-bind="css: { height: $data.summary ? 'has-summary' : '' }">
+<div class="resource-component-abstract-container" data-bind="css: { 'is-summary': $data.summary}">
     <div class="resource-component-abstract"
         data-bind='
             component: { 
