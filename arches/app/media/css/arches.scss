@@ -5366,24 +5366,6 @@ ul.jqtree-tree li.jqtree-ghost span.jqtree-line {
     padding-left: 10px;
 }
 
-.layer-list .fdg-node-filter {
-    margin-right: 18px;
-    margin-left: 10px;
-    margin-top: -2px;
-    position: relative;
-}
-
-.layer-list.search {
-    background: #e4e4e4;
-    margin-left: -1px;
-    border: 1px solid #bbb;
-    border-top: transparent;
-    padding-top: 10px;
-    position: sticky;
-    top: 0px;
-    z-index: 10;
-}
-
 .node-current {
     stroke: #454545;
     stroke-width: 2px;
@@ -7032,7 +7014,6 @@ ul div .card-tree-list span .card-tree-list-item .card-tree-list-icon {
 
 .layer-list {
     height: 50px;
-    margin-right: -10px;
     margin-bottom: 0px;
     padding-top: 10px;
     padding-bottom: 0px;
@@ -11533,12 +11514,6 @@ a.search-facet-item.disabled {
 
 .mobile-project-manager-editor .card-nav-container {
     margin-bottom: 0;
-}
-
-.mobile-project-manager-editor .layer-list {
-    background: transparent;
-    border-top: 0px;
-    padding-top: 5px;
 }
 
 .mpm-project-card {
