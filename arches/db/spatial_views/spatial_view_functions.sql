@@ -690,7 +690,7 @@ create or replace function __arches_create_spatial_view_attribute_table(
         begin
             for n in 
 			        with attribute_nodes as (
-                        select * from json_to_recordset(attribute_node_list) as x(nodeid uuid, description text)
+                        select * from jsonb_to_recordset(attribute_node_list) as x(nodeid uuid, description text)
                     )
                     select 
                         n1.name, 
@@ -901,12 +901,14 @@ create or replace function __arches_create_spatial_view(
     $$;
 
 create or replace function __arches_update_spatial_view(
-        spatial_view_name_slug       text,
-        geometry_node_id        uuid,
-        attribute_node_list     jsonb,
-        schema_name             text default 'public',
-        spv_description         text default 'arches spatial view',
-        is_mixed_geometry_type  boolean default false
+        current_spatial_view_name_slug  text,
+		current_schema_name				text,
+		new_spatial_view_name_slug      text,
+        geometry_node_id        		uuid,
+        attribute_node_list     		jsonb,
+        new_schema_name             	text default 'public',
+        spv_description         		text default 'arches spatial view',
+        is_mixed_geometry_type  		boolean default false
     ) returns boolean
     language plpgsql 
     strict 
@@ -915,10 +917,10 @@ create or replace function __arches_update_spatial_view(
     declare
         success     boolean := false;
     begin
-        success := __arches_delete_spatial_view(spatial_view_name_slug, schema_name);
+        success := __arches_delete_spatial_view(current_spatial_view_name_slug, current_schema_name);
 
         if success = true then
-            success := __arches_create_spatial_view(spatial_view_name_slug, geometry_node_id, attribute_node_list, schema_name, spv_description, is_mixed_geometry_type);
+            success := __arches_create_spatial_view(new_spatial_view_name_slug, geometry_node_id, attribute_node_list, new_schema_name, spv_description, is_mixed_geometry_type);
         end if;
 
         return success;
@@ -954,7 +956,7 @@ create or replace function __arches_delete_spatial_view(
                 );
         end loop;
         
-        att_table_name := format('sp_attr_%s', spatial_view_name_slug);
+        att_table_name := format('%s.sp_attr_%s', schema_name, spatial_view_name_slug);
         sv_delete := sv_delete || 
                 format('
                 drop table if exists %s;
@@ -973,17 +975,19 @@ create or replace function __arches_delete_spatial_view(
 
 
 create or replace function __arches_refresh_spatial_views()
-    returns integer
+    returns boolean
     language plpgsql
     as 
     $$
+    declare
+        success boolean := false;
     begin
 
-        select __arches_update_spatial_view(sv.slug,sv.geometrynodeid, sv.attributenodes, sv.schema, sv.description, sv.ismixedgeometrytypes)
+        success := __arches_update_spatial_view(sv.slug,sv.geometrynodeid, sv.attributenodes, sv.schema, sv.description, sv.ismixedgeometrytypes)
         from spatial_views sv
         where sv.isactive = true;
         
-        return 1;
+        return success;
     end;
     $$;
 
@@ -1017,14 +1021,12 @@ create or replace function __arches_trg_fnc_update_spatial_attributes()
                 delete_existing         text    := '';
             begin
                 with attribute_nodes as (
-                    select * from json_to_recordset(spv.attributenodes) as x(nodeid uuid, description text)
+                    select * from jsonb_to_recordset(spv.attributenodes) as x(nodeid uuid, description text)
                 )
-
-                -- nodeid key check - are we working with a tile valid for this sp view?
                 select count(*) into found_attr_key_count 
                 from (select jsonb_object_keys(trigger_tile.tiledata) as node_id) keys
-                where keys.node_id::text in (select nodeid from attribute_nodes)
-                    or keys.node_id::text = spv.geometrynodeid;
+                where keys.node_id::text in (select nodeid::text from attribute_nodes)
+                    or keys.node_id::text = spv.geometrynodeid::text;
 
                 -- skip if tile has nothing to do with this spv
                 if found_attr_key_count < 1 then
@@ -1052,7 +1054,7 @@ create or replace function __arches_trg_fnc_update_spatial_attributes()
 
                     for n in 
 					        with attribute_nodes1 as (
-								select * from json_to_recordset(spv.attributenodes) as x(nodeid uuid, description text)
+								select * from jsonb_to_recordset(spv.attributenodes) as x(nodeid uuid, description text)
 							)
                             select 
                                 n1.name, 
@@ -1109,7 +1111,7 @@ create or replace function __arches_trg_fnc_update_spatial_attributes()
                         trigger_tile.resourceinstanceid::text);
 
                 end;
-                
+                raise notice '%', insert_attr;
                 execute insert_attr;
 
             end;
@@ -1133,19 +1135,60 @@ create or replace function __arches_trg_fnc_update_spatial_views()
     language plpgsql
     as $func$
     declare
-        
+        sv_perform text := '';
+        valid_geom_nodeid boolean := false;
+        has_att_nodes integer := 0;
+        valid_att_nodeids boolean := false;
     begin
+        if tg_op = 'INSERT' or tg_op = 'UPDATE' then
+            -- validation
+            valid_geom_nodeid := (select count(*) from nodes where nodeid = new.geometrynodeid and datatype = 'geojson-feature-collection') > 0;
+            if valid_geom_nodeid is false then
+                raise exception 'geometrynodeid is not a valid nodeid';
+            end if;
+            
 
+
+            if jsonb_typeof(new.attributenodes::jsonb) = 'array' then
+                has_att_nodes := jsonb_array_length(new.attributenodes);
+                if has_att_nodes = 0 then
+                    raise exception 'attributenodes needs at least one attribute dict';
+                else
+                    valid_att_nodeids := (
+                        with attribute_nodes as (
+                            select * from jsonb_to_recordset(new.attributenodes) as x(nodeid uuid, description text)
+                        )
+                        select count(*) from attribute_nodes att join nodes n1 on att.nodeid = n1.nodeid
+                        ) > 0;
+                    
+                    if valid_att_nodeids is false then
+                        raise exception 'attributenodes contains an invalid nodeid';
+                    end if;
+                end if;
+            else
+                raise exception 'attributenodes needs to be an array';
+            end if;
+            
+        end if;
+        
 
         if tg_op = 'DELETE' then 
-            
-            select __arches_delete_spatial_view(old.slug);
+            sv_perform := sv_perform || format(
+                'select __arches_delete_spatial_view(%L,%L);'
+                , old.slug
+				, old.schema);
             return old;
 
         elsif tg_op = 'INSERT' then
-
             if new.isactive = true then
-                select __arches_create_spatial_view(new.slug, new.geometrynodeid, new.attributenodes, new.schema, new.description, new.ismixedgeometrytypes);
+                sv_perform := sv_perform || format(
+                    'select __arches_create_spatial_view(%L, %L::uuid, %L::jsonb, %L, %L, %L);'
+                    , new.slug
+                    , new.geometrynodeid
+                    , new.attributenodes
+                    , new.schema
+                    , new.description
+                    , new.ismixedgeometrytypes);
             end if;
 
             return new;
@@ -1153,12 +1196,29 @@ create or replace function __arches_trg_fnc_update_spatial_views()
         elsif tg_op = 'UPDATE' then
 
             if new.isactive = true then
-                select __arches_update_spatial_view(new.slug, new.geometrynodeid, new.attributenodes, new.schema, new.description, new.ismixedgeometrytypes);
+                sv_perform := sv_perform || format(
+                    'select __arches_update_spatial_view(%L, %L, %L, %L::uuid, %L::jsonb, %L, %L, %L);'
+                    , old.slug
+					, old.schema
+					, new.slug
+                    , new.geometrynodeid
+                    , new.attributenodes
+                    , new.schema
+                    , new.description
+                    , new.ismixedgeometrytypes);
             else
-                select __arches_delete_spatial_view(new.slug);
+                sv_perform := sv_perform || format(
+                    'select __arches_delete_spatial_view(%L,%L);'
+                    , old.slug
+					, old.schema);
             end if;
 
             return new;
+        end if;
+
+        if sv_perform <> '' then
+            raise notice '%', sv_perform;
+            execute sv_perform;
         end if;
         
     end;
