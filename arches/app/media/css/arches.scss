@@ -9373,11 +9373,6 @@ a#close-map-tools.map-widget-icon:hover {
     text-overflow: ellipsis;
 }
 
-.spatial-filter-body {
-    padding: 16px;
-    overflow: auto;
-}
-
 .spatial-filter-container {
     padding: 10px 5px 15px 5px;
     border-bottom: 1px solid #ddd;
@@ -14344,7 +14339,7 @@ a.jstree-anchor.permissions-widget {
     }
     .related-reasources-search-container {
         position: relative;
-    }   
+    }
     .related-reasources-search-list {
         height: calc(100% - 110px);
         margin-top: 5px;
