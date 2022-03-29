@@ -22,6 +22,7 @@
 @import url(../packages/@mapbox/mapbox-gl-geocoder/dist/mapbox-gl-geocoder.css);
 @import url(../packages/leaflet.fullscreen/Control.FullScreen.css);
 @import url(../css/base-manager.css);
+@import url(../css/arches-nav.css);
 
 
 img {
@@ -151,22 +152,6 @@ dl.inline-flex dd {
     margin-top: 14px !important;
     margin-left: 15px !important;
     margin-right: 15px !important;
-}
-
-.brand-title {
-    display: block;
-    line-height: 48px;
-    font-size: 20px;
-}
-
-#mainnav-container {
-    padding-top: 50px;
-    background-color: #2d3c4b;
-    z-index: 15;
-}
-
-#mainnav-menu .arches {
-    margin-left: -25px;
 }
 
 .list-group.bg-trans .list-group-item:not(.active):not(.disabled) {
@@ -4451,11 +4436,6 @@ div.dropdown-menu.open {
 
 .list-divider-dark {
     border-bottom: 1px solid rgba(0, 0, 0, 0.4);
-}
-
-.nano-content {
-    font-size: 11px;
-    overflow-y: auto;
 }
 
 ul .collapse li {
