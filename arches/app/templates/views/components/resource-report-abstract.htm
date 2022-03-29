@@ -5,16 +5,7 @@
 <div class='loading-mask'></div>
 <!--/ko-->
 <!-- ko ifnot: loading() -->
-<div 
-    style="
-        display: flex;
-        flex-direction: column;
-        justify-content: space-between;
-    "
-    data-bind="
-        style: { height: $data.summary ? 'inherit' : 'calc(100vh - 50px)' }
-    "
->
+<div class="resource-component-abstract-container" data-bind="css: { 'is-summary': $data.summary}">
     <div class="resource-component-abstract"
         data-bind='
             component: { 
@@ -30,16 +21,7 @@
     ></div>
 
     <!-- ko ifnot: $data.summary -->
-    <footer 
-        style="
-            background: #f8f8f8; 
-            display: flex;
-            height: 50px;
-            justify-content: space-between;
-            align-items: center;
-            padding: 0 20px;
-        "
-    >
+    <footer>
         <div data-bind="text: '{% trans 'Arches' %}' + ' ' + $data.version"></div>
         <div>
             <a href="http://archesproject.org" target="_blank">http://archesproject.org</a>
