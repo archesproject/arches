@@ -7013,6 +7013,12 @@ ul div .card-tree-list span .card-tree-list-item .card-tree-list-icon {
 }
 
 .layer-list {
+    display: flex;
+    flex-direction: column;
+    height: calc( 100vh - 100px);
+}
+
+.layer-filter {
     height: 50px;
     margin-bottom: 0px;
     padding-top: 10px;

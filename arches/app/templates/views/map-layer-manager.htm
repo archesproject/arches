@@ -30,8 +30,8 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 <div class="content-panel" data-bind="click:function() { menuActive(false); }">
     <div class="flex">
         <div class="flex">
-            <div class="left-column-crud-container form-list">
-                <div class="layer-list">
+            <div class="left-column-crud-container form-list" style="overflow-y: hidden;">
+                <div class="layer-filter">
                     <!-- Layer Filter -->
                     <div class="list-filter" data-bind="">
                         <input type="text" class="form-control" placeholder="Find a layer..." data-bind="value: listFilter, valueUpdate: 'keyup'">
@@ -40,7 +40,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                         <span class="clear-node-search" data-bind="click: function () { listFilter(''); }"><i class="fa fa-times-circle"></i></span>
                     </div>
                 </div>
-                <div class="report-image-grid relative">
+                <div class="layer-list">
                     <div class="grid">
                         <!-- ko foreach: { data: listItems(), as: "item" } -->
                         <div class="library-card selected-card" data-bind="click: function () { $parent.selection(item) }, css: {'selected': $parent.selection() === item}">
@@ -76,7 +76,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
             </div>
 
             <!-- Basemap/Overlays Config -->
-            <div class="card-form-preview-container">
+            <div class="card-form-preview-container" style="height: calc(100vh + 100px);">
 
                 <!-- Header -->
                 <div class="category-header">
