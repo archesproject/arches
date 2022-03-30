@@ -16,8 +16,7 @@ from arches.app.models.system_settings import settings
 from arches.app.utils.response import JSONResponse
 from arches.app.utils.betterJSONSerializer import JSONSerializer
 from arches.app.utils.index_database import index_resources_by_type
-
-# from arches.app.utils.index_database import index_resources_by_transaction
+from arches.app.utils.index_database import index_resources_by_transaction
 
 logger = logging.getLogger(__name__)
 
@@ -64,29 +63,25 @@ class ImportSingleCsv:
 
     def read(self, request):
         """
-        Reads added csv file and turn csv.reader or csv.DictReader object
-        Reuiqres csv file and a flag indicating there is a header (can be handled in the front-end)
-        Returns the reader object to display in a mapper && in a preview display
+        Reads added csv file and returns all the rows
+        If the loadid already exsists also returns the load_details
         """
 
         file = request.FILES.get("file")
         csvfile = file.read().decode("utf-8")
-        reader = csv.reader(io.StringIO(csvfile))  # returns iterator
-        data = [line for line in reader]
-        return {"success": True, "data": data}
-
-    def delete_staging_db(self):
-        """
-        when import is done the database should be deleted
-        """
+        reader = csv.reader(io.StringIO(csvfile))
+        data = {"csv": [line for line in reader]}
         with connection.cursor() as cursor:
-            cursor.execute("DROP TABLE etl_staging;")
+            cursor.execute("""SELECT load_details FROM load_event WHERE loadid = %s""", [self.loadid])
+            row = cursor.fetchall()
+        if len(row) > 0:
+            data["config"] = row[0][0]
+        return {"success": True, "data": data}
 
     def validate(self, request):
         """
-        Validate the csv file and return true / false
-        User mapping is required
-        Instantiate datatypes and validate the datatype?
+        Creates records in the load_staging table (validated before poulating the load_staging table with error message)
+        Collects error messages if any and returns table of error messages
         """
 
         fieldnames = request.POST.get("fieldnames").split(",")
@@ -102,38 +97,38 @@ class ImportSingleCsv:
         return {"success": True, "data": rows}
 
     def write(self, request):
-        graphid = request.POST.get("graphid")
+        """
+        Move the records from load_staging to tiles table using db function
+        """
+
         with connection.cursor() as cursor:
             cursor.execute("""SELECT * FROM __arches_staging_to_tile(%s)""", [self.loadid])
             row = cursor.fetchall()
 
-        index_resources_by_type(graphid, quiet=True, use_multiprocessing=True)
-        # index_resources_by_transaction(self.loadid, quiet=True, use_multiprocessing=True)
+        index_resources_by_transaction(self.loadid, quiet=True, use_multiprocessing=True)
         if row[0][0]:
             return {"success": True, "data": "success"}
         else:
             return {"success": False, "data": "failed"}
 
     def populate_staging_table(self, request):
-        """
-        Runs the actual import
-        Returns done
-        Must be a transaction
-        Will sys.exit() work for stop in the middle of importing?
-        """
 
         file = request.FILES.get("file")
-        header = request.POST.get("header")
         graphid = request.POST.get("graphid")
+        has_headers = request.POST.get("hasHeaders")
         fieldnames = request.POST.get("fieldnames").split(",")
         csvfile = file.read().decode("utf-8")
-
+        csv_mapping = request.POST.get("fieldMapping")
+        mapping_details = {"mapping": json.loads(csv_mapping), "graph": graphid}
         reader = csv.DictReader(io.StringIO(csvfile), fieldnames=fieldnames)
-        if header:
+        if has_headers:
             next(reader)
 
         with connection.cursor() as cursor:
-            cursor.execute("""INSERT INTO load_event (loadid, complete, user_id) VALUES (%s, %s, %s)""", (self.loadid, False, self.userid))
+            cursor.execute(
+                """INSERT INTO load_event (loadid, complete, load_details, user_id) VALUES (%s, %s, %s, %s)""",
+                (self.loadid, False, json.dumps(mapping_details), self.userid),
+            )
 
         for row in reader:
             resourceid = uuid.uuid4()

@@ -332,6 +332,7 @@ class Migration(migrations.Migration):
                 ("complete", models.BooleanField(default=False)),
                 ("successful", models.BooleanField(blank=True, null=True)),
                 ("load_description", models.TextField(blank=True, null=True)),
+                ("load_details", django.contrib.postgres.fields.jsonb.JSONField(blank=True, null=True)),
                 ("error_message", models.TextField(blank=True, null=True)),
                 ("load_start_time", models.DateTimeField(blank=True, null=True)),
                 ("load_end_time", models.DateTimeField(blank=True, null=True)),
