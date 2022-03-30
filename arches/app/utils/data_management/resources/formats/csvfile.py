@@ -836,6 +836,7 @@ class CsvReader(Reader):
                                 cache(blank_tile)
                             else:
                                 blank_tile = blanktilecache[key]
+                                blank_tile.tileid = uuid.uuid4()
                         else:
                             blank_tile = None
                     else:
