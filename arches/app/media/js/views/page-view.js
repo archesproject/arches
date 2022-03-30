@@ -4,7 +4,6 @@ define([
     'backbone',
     'knockout',
     'moment',
-    'arches',
     'viewmodels/alert',
     'views/provisional-history-list',
     'views/notifications-list',
@@ -12,7 +11,8 @@ define([
     'bootstrap',
     'bindings/slide',
     'jquery-ui',
-], function($, _, Backbone, ko, moment, arches,  AlertViewModel, ProvisionalHistoryList, NotificationsList) {
+], function($, _, Backbone, ko, moment, AlertViewModel, ProvisionalHistoryList, NotificationsList) {
+    const arches = window.arches;
     const viewData = window['view-data'];
 
     /**

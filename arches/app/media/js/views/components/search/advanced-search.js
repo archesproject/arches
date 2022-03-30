@@ -4,10 +4,10 @@ define([
     'knockout',
     'knockout-mapping',
     'views/components/search/base-filter',
-    'arches',
     'datatype-config-components',
-    'bindings/let'
-], function($, _, ko, koMapping, BaseFilter, arches) {
+    'bindings/let',
+], function($, _, ko, koMapping, BaseFilter) {
+    const arches = window.arches;
     var componentName = 'advanced-search';
     return ko.components.register(componentName, {
         viewModel: BaseFilter.extend({
@@ -182,6 +182,6 @@ define([
                 this.filter.facets.removeAll();
             }
         }),
-        template: { require: 'text!templates/views/components/search/advanced-search.htm' }
+        template: window['advanced-search-template'] 
     });
 });

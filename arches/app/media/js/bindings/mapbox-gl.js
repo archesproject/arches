@@ -2,11 +2,10 @@ define([
     'jquery',
     'underscore',
     'knockout',
-    'arches',
     'bindings/nouislider',
     'bindings/sortable'
-], function($, _, ko, arches) {
-
+], function($, _, ko) {
+    const arches = window.arches;
     const initialize = function(element, valueAccessor, mapboxgl) {
         var defaults = {
             container: element

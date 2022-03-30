@@ -521,7 +521,7 @@ define([
             restoreState: function() {
                 var query = this.query();
                 var buffer = 10;
-                var bufferUnit = 'm';
+                var bufferUnit = 'm'
                 var inverted = false;
                 var hasSpatialFilter = false;
                 if (componentName in query) {

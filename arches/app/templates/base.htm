@@ -41,6 +41,10 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 
     <link rel="shortcut icon" href="{% static 'img/favicon.png' %}" />
 
+    <script style="display: none;">
+        window['simple-switch-template'] = `{% include 'views/components/simple-switch.htm' %}`
+        window['default-card-template'] = `{% include 'views/components/cards/default.htm' %}`
+    </script>
     {% block css %}
         {% compress css %}
         <link type="text/x-scss" href="{% static 'css/arches.scss' %}" rel="stylesheet" media="screen">

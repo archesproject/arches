@@ -1,13 +1,12 @@
 define([
     'jquery',
     'underscore',
-    'arches',
     'knockout',
     'knockout-mapping',
     'text!templates/views/components/map-popup.htm'
-], function($, _, arches, ko, koMapping, popupTemplate) {
+], function($, _, ko, koMapping, popupTemplate) {
+    const arches = window.arches;
     const viewModel = function(params) {
-
         var self = this;
 
         var geojsonSourceFactory = function() {

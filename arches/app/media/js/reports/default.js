@@ -5,6 +5,6 @@ define(['knockout', 'viewmodels/report'], function(ko, ReportViewModel) {
 
             ReportViewModel.apply(this, [params]);
         },
-        template: { require: 'text!report-templates/default' }
+        template: window['default-report-template']
     });
 });

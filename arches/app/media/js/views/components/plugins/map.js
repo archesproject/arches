@@ -26,6 +26,6 @@ define([
                 "geocodePlaceholder": "Search"
             };
         },
-        template: { require: 'text!templates/views/components/plugins/map.htm' }
+        template: window['map-plugin-template']
     });
 });

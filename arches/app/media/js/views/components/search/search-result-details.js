@@ -112,6 +112,6 @@ define([
                 };
             }
         }),
-        template: { require: 'text!templates/views/components/search/search-result-details.htm'}
+        template: window['search-result-details-template']
     });
 });

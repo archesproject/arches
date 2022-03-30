@@ -1,4 +1,4 @@
-define(['knockout', 'arches'], function(ko, arches) {
+define(['knockout'], function(ko) {
     /**
     * A viewmodel used for alert messages from JSON responses
     *
@@ -10,7 +10,7 @@ define(['knockout', 'arches'], function(ko, arches) {
     * @param  {function} cancel (optional) - a function to call on cancel
     * @param  {function} ok (optional) - a function to call on confirmation
     */
-
+    const arches = window.arches;
     var getPropertyOrDefaultMessage = function(property, defaultMessage) {
         if (typeof property === 'undefined') {
             return defaultMessage;

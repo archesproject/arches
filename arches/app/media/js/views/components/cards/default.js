@@ -4,8 +4,6 @@ define([
 ], function(ko, CardComponentViewModel) {
     return ko.components.register('default-card', {
         viewModel: CardComponentViewModel,
-        template: {
-            require: 'text!templates/views/components/cards/default.htm'
-        }
+        template: window['default-card-template']
     });
 });

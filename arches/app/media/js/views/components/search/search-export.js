@@ -1,10 +1,11 @@
 define(['jquery',
     'knockout',
-    'arches',
     'bindings/fadeVisible',
     'bindings/clipboard',
-    'views/components/simple-switch'],
-function($, ko, arches) {
+    'views/components/simple-switch'
+],
+function($, ko) {
+    const arches = window.arches;
     var componentName = 'search-export';
     return ko.components.register(componentName, {
         viewModel: function(params) {
@@ -92,6 +93,6 @@ function($, ko, arches) {
             };
 
         },
-        template: { require: 'text!templates/views/components/search/search-export.htm'}
+        template: window['search-export-template']
     });
 });

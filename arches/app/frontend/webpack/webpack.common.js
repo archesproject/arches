@@ -23,15 +23,31 @@ const buildJavascriptFilepathLookup = function(path, outerAcc) {
     }, outerAcc);
 };
 
-const entryPointConfiguration = buildJavascriptFilepathLookup('../media/js', {});
+const buildTemplateFilePathLookup = function(path, outerAcc) {
+    return fs.readdirSync(path).reduce((acc, name) => {
+        if (fs.lstatSync(path + '/' + name).isDirectory() ) {
+            return buildTemplateFilePathLookup(path + '/' + name, acc);
+        }
+        else {
+            const subPath = `templates${(path + '/' + name).slice(12)}`;
 
+            return { 
+                ...acc, 
+                [subPath]: Path.resolve(__dirname, `../../${subPath}`)
+            };
+        }
+    }, outerAcc);
+};
+
+const entryPointConfiguration = buildJavascriptFilepathLookup('../media/js', {});
+const templatePathConfiguration = buildTemplateFilePathLookup('../templates', {});
 var javascriptRelativeFilepathToAbsoluteFilepathLookup = Object.keys(entryPointConfiguration).reduce((acc, path) => {
     acc[path + '$'] = Path.resolve(__dirname, `../../media/js/${path}`);
     return acc;
 }, {});
 
 const buildHtmlWebpackPluginList = function(path, outerAcc) {
-    return fs.readdirSync(path).reduce((acc, name) => {
+    const list = fs.readdirSync(path).reduce((acc, name) => {
         if (fs.lstatSync(path + '/' + name).isDirectory() ) {
             return buildHtmlWebpackPluginList(path + '/' + name, acc);
         }
@@ -47,6 +63,7 @@ const buildHtmlWebpackPluginList = function(path, outerAcc) {
             return acc;
         }
     }, outerAcc);
+    return list;
 };
 
 module.exports = {
@@ -104,6 +121,7 @@ module.exports = {
         // extensions: ['.js',],
         alias: {
             ...javascriptRelativeFilepathToAbsoluteFilepathLookup,
+            ...templatePathConfiguration,
             'arches': Path.resolve(__dirname, '../../templates', 'javascript.htm'),
             'report-templates': Path.resolve(__dirname, '../../templates', 'javascript.htm'),
             'card-components': Path.resolve(__dirname, '../../templates', 'javascript.htm'),
@@ -129,12 +147,6 @@ module.exports = {
             'plugins/knockout-select2': Path.resolve(__dirname, '../../media/plugins', 'knockout-select2.js'),
             'jquery-ui/draggable': Path.resolve(__dirname, '../node_modules/jqueryui', 'jquery-ui.min.js'),
             'jquery-ui/sortable': Path.resolve(__dirname, '../node_modules/jqueryui', 'jquery-ui.min.js'),
-
-            'templates/views/components/iiif-popup.htm': Path.resolve(__dirname, '../../templates/views/components/iiif-popup.htm'),
-            'templates/views/components/cards/related-resources-map-popup.htm': Path.resolve(__dirname, '../../templates/views/components/cards/related-resources-map-popup.htm'),
-            'templates/views/components/map-popup.htm': Path.resolve(__dirname, '../../templates/views/components/map-popup.htm'),
-            'templates/views/components/cards/map-popup.htm': Path.resolve(__dirname, '../../templates/views/components/cards/map-popup.htm'),
-            'templates/views/components/simple-switch.htm': Path.resolve(__dirname, '../../templates/views/components/simple-switch.htm' ),
 
             'nifty': Path.resolve(__dirname, '../../media/plugins', 'nifty'),
             'async': Path.resolve(__dirname, '../../media/node_modules/requirejs-plugins/src/async'),
@@ -209,8 +221,8 @@ module.exports = {
                 type: 'javascript/auto',
             },
             {
-                test: /\.htm$/i,
-                loader: "html-loader",
+                test: /\.html?$/i,
+                use: ["html-loader"],
             },
             {
                 test: /\.txt$/i,
@@ -223,3 +235,4 @@ module.exports = {
         ],
     },
 };
+

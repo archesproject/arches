@@ -169,6 +169,16 @@
 {% block arches_modules %}
 <script>
     require(['utils/set-csrf-token']);
+
+
+    window['card-components'] = {{% autoescape off %}{% for component in card_components %}
+            '{{ component.pk }}': {
+                'componentname': '{{ component.componentname }}',
+                'component': '{{ component.component }}',
+                'defaultconfig': '{{ component.defaultconfig_json }}'
+            },
+        {% endfor %}{% endautoescape %}};
+
     window.arches = {
             urls: {
                 root: "{% url 'root' %}",
@@ -426,7 +436,27 @@
             version: '{{ app_settings.VERSION }}'
         };
 
-
+    window.widgets = { 
+        {% autoescape off %}
+        {% for widget in widgets %}
+            '{{ widget.pk }}': {
+                'name': '{{ widget.name }}',
+                'component': '{{ widget.component }}',
+                'datatype': '{{ widget.datatype }}',
+                'defaultconfig': '{{ widget.defaultconfig_json }}'
+            },
+        {% endfor %}
+        {% endautoescape %}
+    };
+    window['report-templates'] = {{% autoescape off %}{% for template in report_templates %}
+        '{{ template.pk }}': {
+            'componentname': '{{ template.componentname }}',
+            'component': '{{ template.component }}',
+            'defaultconfig': '{{ template.defaultconfig_json }}',
+            'name': '{{ template.name }}',
+            'preload_resource_data': '{{ template.preload_resource_data }}'
+        },
+    {% endfor %}{% endautoescape %}};
 
     define('resource-types', [], function () {
         var resourceTypes = {
@@ -452,7 +482,7 @@
         return resourceTypes;
     });
 
-    define('widgets', [{% for widget in widgets %}'{{ widget.component }}',{% endfor %}], function () {
+    {% comment %} define('widgets', [{% for widget in widgets %}'{{ widget.component }}',{% endfor %}], function () {
         return {{% autoescape off %}{% for widget in widgets %}
             '{{ widget.pk }}': {
                 'name': '{{ widget.name }}',
@@ -461,9 +491,9 @@
                 'defaultconfig': '{{ widget.defaultconfig_json }}'
             },
         {% endfor %}{% endautoescape %}};
-    });
+    }); {% endcomment %}
 
-    define('report-templates', [{% for template in report_templates %}'{{ template.component }}',{% endfor %}], function () {
+    {% comment %} define('report-templates', [{% for template in report_templates %}'{{ template.component }}',{% endfor %}], function () {
         return {{% autoescape off %}{% for template in report_templates %}
             '{{ template.pk }}': {
                 'componentname': '{{ template.componentname }}',
@@ -473,17 +503,8 @@
                 'preload_resource_data': '{{ template.preload_resource_data }}'
             },
         {% endfor %}{% endautoescape %}};
-    });
+    }); {% endcomment %}
 
-    define('card-components', [{% for component in card_components %}'{{ component.component }}',{% endfor %}], function () {
-        return {{% autoescape off %}{% for component in card_components %}
-            '{{ component.pk }}': {
-                'componentname': '{{ component.componentname }}',
-                'component': '{{ component.component }}',
-                'defaultconfig': '{{ component.defaultconfig_json }}'
-            },
-        {% endfor %}{% endautoescape %}};
-    });
 
     define('function-templates', [{% for template in function_templates %}'{{ template.component }}',{% endfor %}], function () {
          return;

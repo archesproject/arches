@@ -1,4 +1,4 @@
-define(['knockout', 'viewmodels/widget', 'text!templates/views/components/simple-switch.htm'], function (ko, WidgetViewModel, simpleSwitchTemplate) {
+define(['knockout', 'viewmodels/widget'], function (ko, WidgetViewModel) {
     /**
     * knockout components namespace used in arches
     * @external "ko.components"
@@ -33,6 +33,6 @@ define(['knockout', 'viewmodels/widget', 'text!templates/views/components/simple
                 return this.value() === this.on;
             }, this);
         },
-        template: simpleSwitchTemplate
+        template: window['simple-switch-template']
     });
 });

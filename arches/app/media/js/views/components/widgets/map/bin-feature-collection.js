@@ -1,4 +1,5 @@
-define(['knockout', 'turf', 'arches'], function(ko, turf, arches) {
+define(['underscore', 'knockout', 'turf'], function(_, ko, turf) {
+    const arches = window.arches;
     return function (searchAggregations) {
         var cellWidth = arches.hexBinSize;
         var units = 'kilometers';

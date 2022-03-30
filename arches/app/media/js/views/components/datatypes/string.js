@@ -20,7 +20,7 @@ define(['knockout'], function (ko) {
                 });
             }
         },
-        template: { require: 'text!datatype-config-templates/string' }
+        template: window['string-datatype-template']
     });
     return name;
 });
