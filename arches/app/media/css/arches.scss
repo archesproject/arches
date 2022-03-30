@@ -2216,6 +2216,7 @@ div.final-cons-step-separator>h4 {
     padding: 10px 35px;
     right: 0;
     width: 399px;
+    display: flex;
 }
 
 .workbench-card-sidepanel .resource-instance-card-component-content .install-buttons {
@@ -4579,14 +4580,10 @@ ul .collapse li:last-of-type {
     text-overflow: ellipsis;
 }
 
-.resource-grid-tools-container {
-    position: absolute;
-    right: 20px;
-    top: 48px;
-}
-
-.resource-grid-item:hover .resource-grid-tools-container {
-    top: 20px;
+.resource-grid-item .resource-grid-tools-container {
+    flex-direction: column;
+    padding: 15px;
+    display: flex;
 }
 
 .report-image-grid .resource-grid-item:last-of-type .resource-grid-tools-container .btn-group .manage-menu {

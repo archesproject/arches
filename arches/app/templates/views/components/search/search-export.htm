@@ -33,7 +33,7 @@
                 <!-- ko if: format() === 'geojson' && hasResourceTypeFilter -->
                 <div data-bind="clipboard: geojsonUrl">
                     <div style="padding: 5px 0px"><textarea style="width: 300px;" data-bind="value: geojsonUrl"></textarea></div>
-                    <button class="btn btn-shim btn-labeled btn-sm fa fa-clipboard btn-primary">{% trans "Copy to clipboard" %}</button>
+                    <button class="btn btn-shim btn-labeled btn-sm fa fa-clipboard btn-primary"><span>{% trans "Copy to clipboard" %}</span></button>
                 </div>
                 <!-- /ko -->
                 <!-- /ko -->
@@ -81,7 +81,8 @@
         <button class="btn btn-lg btn-primary btn-active-primary"
             type="button"
             aria-expanded="true"
-            data-bind="css: {disabled: (total() === 0) || (total() > {{app_settings.SEARCH_EXPORT_IMMEDIATE_DOWNLOAD_THRESHOLD}} && celeryRunning() !== 'True') || (format() === 'html' && total() > {{app_settings.SEARCH_EXPORT_IMMEDIATE_DOWNLOAD_THRESHOLD_HTML_FORMAT}} && celeryRunning() !== 'True') },click: function(){if (format() === 'html') { executeExport( {{app_settings.SEARCH_EXPORT_IMMEDIATE_DOWNLOAD_THRESHOLD_HTML_FORMAT}} ) } else { executeExport( {{app_settings.SEARCH_EXPORT_IMMEDIATE_DOWNLOAD_THRESHOLD}} ) }}"> {% trans "Download" %}
+            data-bind="css: {disabled: (total() === 0) || (total() > {{app_settings.SEARCH_EXPORT_IMMEDIATE_DOWNLOAD_THRESHOLD}} && celeryRunning() !== 'True') || (format() === 'html' && total() > {{app_settings.SEARCH_EXPORT_IMMEDIATE_DOWNLOAD_THRESHOLD_HTML_FORMAT}} && celeryRunning() !== 'True') },click: function(){if (format() === 'html') { executeExport( {{app_settings.SEARCH_EXPORT_IMMEDIATE_DOWNLOAD_THRESHOLD_HTML_FORMAT}} ) } else { executeExport( {{app_settings.SEARCH_EXPORT_IMMEDIATE_DOWNLOAD_THRESHOLD}} ) }}"> 
+            <span>{% trans "Download" %}</span>
             <i class="fa fa-spin fa-spinner" data-bind="visible: downloadPending() === true"></i>
         </button>
     </div>
