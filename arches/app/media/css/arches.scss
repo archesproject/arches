@@ -4773,16 +4773,6 @@ ul .collapse li:last-of-type {
     transition: all .25s ease;
 }
 
-.edit-panel-search-bar {
-    position: absolute;
-    left: 40px;
-    padding-top: 10px;
-}
-
-.edit-panel-search-bar+.edit-panel-menu-bar {
-    left: 170px;
-}
-
 .edit-menu {
     position: absolute;
     top: 36px;
@@ -6452,6 +6442,18 @@ th.notif-type {
     min-height: 60px;
     background: #f6f6f6;
     border-bottom: 1px solid #e4e4e4;
+    display: flex;
+    padding: 0 40px;
+    align-items: center;
+    &>div:first-child{
+        flex: 1;
+        display: flex;
+        align-items: center;
+    }
+
+    .resource-tools .resource-grid-title {
+        margin: 0 5px;
+    } 
 }
 
 .resource-selector {
@@ -7966,12 +7968,6 @@ span.file-upload-clear-filter {
 
 div.hide-file-list>div>div>div>div>form>div>div:nth-child(3) {
     visibility: hidden;
-}
-
-.resource-tools {
-    margin-left: 120px;
-    margin-top: 0px;
-    margin-bottom: 0px;
 }
 
 .resource-grid-title {
