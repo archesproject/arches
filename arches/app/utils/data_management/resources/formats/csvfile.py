@@ -924,7 +924,7 @@ class CsvReader(Reader):
                     populated_cardinality_1_nodegroups,
                     node_datatypes,
                     appending_to_parent=False,
-                    prefix=""
+                    prefix="",
                 ):
                     """
                     source_data = [{nodeid:value},{nodeid:value},{nodeid:value} . . .]
@@ -972,9 +972,7 @@ class CsvReader(Reader):
                         tileid = row["TileID"] if "TileID" in row else uuid.uuid4()
                         prototype_tile_copy.tileid = tileid
                         prototype_tile_copy.parenttile = tile_to_populate
-                        parenttileid = (
-                            row["ParentTileID"] if "ParentTileID" in row and row["ParentTileID"] is not None else None
-                        )
+                        parenttileid = row["ParentTileID"] if "ParentTileID" in row and row["ParentTileID"] is not None else None
                         if parenttileid is not None:
                             prototype_tile_copy.parenttile.tileid = parenttileid
                         prototype_tile_copy.resourceinstance_id = resourceinstanceid
@@ -1013,15 +1011,9 @@ class CsvReader(Reader):
                                     s_tile_value = source_dict.get(target_key, None)
                                     if s_tile_value is not None and prototype_tile_copy.data[target_key] is None:
                                         try:
-                                            value = transform_value(
-                                                node_datatypes[target_key], s_tile_value, row_number, target_key
-                                            )
+                                            value = transform_value(node_datatypes[target_key], s_tile_value, row_number, target_key)
                                             prototype_tile_copy.data[target_key] = value["value"]
-                                            found = list(
-                                                filter(
-                                                    lambda x: x.get(target_key, "not found") != "not found", source_data
-                                                )
-                                            )
+                                            found = list(filter(lambda x: x.get(target_key, "not found") != "not found", source_data))
                                             if len(found) > 0:
                                                 found = found[0]
                                                 i = source_data.index(found)
@@ -1035,21 +1027,15 @@ class CsvReader(Reader):
                                         and isinstance(prototype_tile_copy.data[target_key], list)
                                     ):  # weve found a pre-existing value for this node on tile
                                         try:
-                                            value = transform_value(
-                                                node_datatypes[target_key], s_tile_value, row_number, target_key
-                                            )
+                                            value = transform_value(node_datatypes[target_key], s_tile_value, row_number, target_key)
                                             value = value["value"]
-                                            if (
-                                                isinstance(value, str) is False or isinstance(value, uuid) is False
-                                            ) and isinstance(value, list):
+                                            if (isinstance(value, str) is False or isinstance(value, uuid) is False) and isinstance(
+                                                value, list
+                                            ):
                                                 value = value[0]
 
                                             prototype_tile_copy.data[target_key].append(value)
-                                            found = list(
-                                                filter(
-                                                    lambda x: x.get(target_key, "not found") != "not found", source_data
-                                                )
-                                            )
+                                            found = list(filter(lambda x: x.get(target_key, "not found") != "not found", source_data))
                                             if len(found) > 0:
                                                 found = found[0]
                                                 i = source_data.index(found)
@@ -1059,9 +1045,7 @@ class CsvReader(Reader):
                                             pass
 
                                     elif s_tile_value is None:
-                                        found = list(
-                                            filter(lambda x: x.get(target_key, "not found") != "not found", source_data)
-                                        )
+                                        found = list(filter(lambda x: x.get(target_key, "not found") != "not found", source_data))
                                         if len(found) > 0:
                                             found = found[0]
                                             i = source_data.index(found)
@@ -1082,13 +1066,11 @@ class CsvReader(Reader):
                                     prototype_tile_copy.tileid
                                 )
                                 try:
-                                    group_no_to_tileids[group_no][str(prototype_tile_copy.nodegroup_id)][
-                                        "parenttileid"
-                                    ] = str(prototype_tile_copy.parenttile.tileid)
+                                    group_no_to_tileids[group_no][str(prototype_tile_copy.nodegroup_id)]["parenttileid"] = str(
+                                        prototype_tile_copy.parenttile.tileid
+                                    )
                                 except:
-                                    group_no_to_tileids[group_no][str(prototype_tile_copy.nodegroup_id)][
-                                        "parenttileid"
-                                    ] = None
+                                    group_no_to_tileids[group_no][str(prototype_tile_copy.nodegroup_id)]["parenttileid"] = None
                             if len([item for item in list(prototype_tile_copy.data.values()) if item is not None]) > 0:
                                 if str(prototype_tile_copy.nodegroup_id) not in populated_child_nodegroups:
                                     if bulk:
@@ -1139,14 +1121,10 @@ class CsvReader(Reader):
                                     if s_tile_value is not None and tile_to_populate.data[target_key] is None:
                                         # If match populate tile_to_populate node with transformed value.
                                         try:
-                                            value = transform_value(
-                                                node_datatypes[target_key], s_tile_value, row_number, target_key
-                                            )
+                                            value = transform_value(node_datatypes[target_key], s_tile_value, row_number, target_key)
 
                                             tile_to_populate.data[target_key] = value["value"]
-                                            found = list(
-                                                filter(lambda x: x.get(target_key, "not found") != "not found", source_data)
-                                            )
+                                            found = list(filter(lambda x: x.get(target_key, "not found") != "not found", source_data))
                                             if len(found) > 0:
                                                 found = found[0]
                                                 i = source_data.index(found)
@@ -1160,9 +1138,7 @@ class CsvReader(Reader):
                                         and isinstance(tile_to_populate.data[target_key], list)
                                     ):  # weve found a pre-existing value for this node on tile
                                         try:
-                                            value = transform_value(
-                                                node_datatypes[target_key], s_tile_value, row_number, target_key
-                                            )
+                                            value = transform_value(node_datatypes[target_key], s_tile_value, row_number, target_key)
                                             value = value["value"]
                                             if (isinstance(value, str) is False or isinstance(value, uuid) is False) and isinstance(
                                                 value, list
@@ -1170,9 +1146,7 @@ class CsvReader(Reader):
                                                 value = value[0]
 
                                             tile_to_populate.data[target_key].append(value)
-                                            found = list(
-                                                filter(lambda x: x.get(target_key, "not found") != "not found", source_data)
-                                            )
+                                            found = list(filter(lambda x: x.get(target_key, "not found") != "not found", source_data))
                                             if len(found) > 0:
                                                 found = found[0]
                                                 i = source_data.index(found)
@@ -1222,11 +1196,7 @@ class CsvReader(Reader):
                         if len(source_data) > 0 and component_type_nodeid not in source_data[0]:
                             need_new_tile = True
                         elif len(source_data) > 0 and component_type_nodeid in source_data[0]:
-                            if (
-                                len(source_data) == 1
-                                and component_type_nodeid in source_data[0]
-                                and len(list(source_data[0].keys())) == 1
-                            ):
+                            if len(source_data) == 1 and component_type_nodeid in source_data[0] and len(list(source_data[0].keys())) == 1:
                                 source_data.pop(0)  # TODO TEMPORARY: remove Details components that have a component type
 
                         if target_tile_cardinality == "1" and "NodeGroupID" not in row:
@@ -1235,8 +1205,23 @@ class CsvReader(Reader):
                         if need_new_tile:
                             new_tile = get_blank_tile(source_data)
                             if new_tile is not None:
-                                populate_tile(source_data, new_tile, row, row_number, resourceinstanceid, populated_tiles, group_no, group_valid, group_no_to_tileids, non_unique_col_headers, populated_cardinality_1_nodegroups, node_datatypes, appending_to_parent=False, prefix=prefix)
-                
+                                populate_tile(
+                                    source_data,
+                                    new_tile,
+                                    row,
+                                    row_number,
+                                    resourceinstanceid,
+                                    populated_tiles,
+                                    group_no,
+                                    group_valid,
+                                    group_no_to_tileids,
+                                    non_unique_col_headers,
+                                    populated_cardinality_1_nodegroups,
+                                    node_datatypes,
+                                    appending_to_parent=False,
+                                    prefix=prefix,
+                                )
+
                 resources = []
                 missing_display_values = {}
                 group_no = False
@@ -1251,8 +1236,8 @@ class CsvReader(Reader):
                     row_resourceid = row["ResourceID"] if row["ResourceID"] != "" and row["ResourceID"] else row["LegacyID"]
                     row_number = "on line " + str(row_number + 2)  # to represent the row in a csv accounting for the header and 0 index
                     legacyid_changed = False
-                    if i > 0 and "LegacyID" in business_data[i-1]:
-                        legacyid_changed = business_data[i-1]["LegacyID"] != row["LegacyID"]
+                    if i > 0 and "LegacyID" in business_data[i - 1]:
+                        legacyid_changed = business_data[i - 1]["LegacyID"] != row["LegacyID"]
                     if legacyids_only:
                         resource_changed = legacyid_changed
                     else:
@@ -1462,7 +1447,7 @@ class CsvReader(Reader):
                                 populated_cardinality_1_nodegroups,
                                 node_datatypes,
                                 appending_to_parent=True,
-                                prefix=prefix
+                                prefix=prefix,
                             )
                             if not bulk:
                                 preexisting_tile_for_nodegroup.tiles.append(target_tile)
@@ -1486,7 +1471,7 @@ class CsvReader(Reader):
                                         populated_cardinality_1_nodegroups,
                                         node_datatypes,
                                         appending_to_parent=True,
-                                        prefix=prefix
+                                        prefix=prefix,
                                     )
                                 else:
                                     target_tile = get_blank_tile(source_data)
@@ -1503,7 +1488,7 @@ class CsvReader(Reader):
                                         non_unique_col_headers,
                                         populated_cardinality_1_nodegroups,
                                         node_datatypes,
-                                        prefix=prefix
+                                        prefix=prefix,
                                     )
 
                                 if not bulk and preexisting_tile_for_nodegroup:
@@ -1525,7 +1510,7 @@ class CsvReader(Reader):
                                 non_unique_col_headers,
                                 populated_cardinality_1_nodegroups,
                                 node_datatypes,
-                                prefix=prefix
+                                prefix=prefix,
                             )
                             if len(source_data) == 1 and component_type_nodeid in source_data[0] and len(list(source_data[0].keys())) == 1:
                                 source_data.pop(0)  # TODO TEMPORARY: remove Details components that have a component type
@@ -1549,7 +1534,7 @@ class CsvReader(Reader):
                                         populated_cardinality_1_nodegroups,
                                         node_datatypes,
                                         appending_to_parent=True,
-                                        prefix=prefix
+                                        prefix=prefix,
                                     )
                                 elif preexisting_tile_for_nodegroup and str(target_tile.nodegroup_id) == component_nodegroupid:
                                     populate_tile(
@@ -1559,12 +1544,13 @@ class CsvReader(Reader):
                                         row_number,
                                         resourceinstanceid,
                                         populated_tiles,
-                                        group_no, group_valid,
+                                        group_no,
+                                        group_valid,
                                         group_no_to_tileids,
                                         non_unique_col_headers,
                                         populated_cardinality_1_nodegroups,
                                         node_datatypes,
-                                        prefix=prefix
+                                        prefix=prefix,
                                     )
                                 else:
                                     target_tile = get_blank_tile(source_data)
@@ -1581,7 +1567,7 @@ class CsvReader(Reader):
                                         non_unique_col_headers,
                                         populated_cardinality_1_nodegroups,
                                         node_datatypes,
-                                        prefix=prefix
+                                        prefix=prefix,
                                     )
                                 if not bulk and preexisting_tile_for_nodegroup:
                                     preexisting_tile_for_nodegroup.tiles.append(target_tile)
