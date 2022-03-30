@@ -932,10 +932,11 @@ class CsvReader(Reader):
                     Grouping is enforced by having all grouped attributes in the same row.
                     """
                     need_new_tile = False
-                    if str(tile_to_populate.nodegroup_id) == component_nodegroupid:
-                        group_no = row["GROUP_NO"] + "-" + str(prefix)
-                    elif str(tile_to_populate.nodegroup_id) == evaluation_nodegroupid:
-                        group_no = row["GROUP_NO"]
+                    if group_valid:
+                        if str(tile_to_populate.nodegroup_id) == component_nodegroupid:
+                            group_no = row["GROUP_NO"] + "-" + str(prefix)
+                        elif str(tile_to_populate.nodegroup_id) == evaluation_nodegroupid:
+                            group_no = row["GROUP_NO"]
                     # Set target tileid to None because this will be a new tile, a new tileid will be created on save.
                     if tile_to_populate.tileid is None:
                         tile_to_populate.tileid = uuid.uuid4()
