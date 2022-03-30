@@ -1281,7 +1281,7 @@ class CsvReader(Reader):
                     legacyid = row["LegacyID"] if row["LegacyID"] else row["ResourceID"]
                     source_data = column_names_to_targetids(row, mapping, row_number)
                     group_no = False
-                    group_valid = row["GROUP_NO"] and row["GROUP_NO"] != ""
+                    group_valid = "GROUP_NO" in row and row["GROUP_NO"] and row["GROUP_NO"] != ""
                     prefix = None
 
                     # row_keys = [list(b) for b in zip(*[list(a.keys()) for a in source_data])]
@@ -1406,7 +1406,7 @@ class CsvReader(Reader):
                                 # TODO: Comp_sortorder must be used for Components so that all component tiles for a resource/group don't get merged into a single one
                                 # only need to know if prefix_changed, prefix functions same way as group
 
-                                if sort_str and "-" in sort_str:  # component or eval
+                                if sort_str and "-" in sort_str and group_valid:  # component or eval
                                     prefix = sort_str[0:2]
                                     group_no = row["GROUP_NO"] + "-" + str(prefix)
                                     if group_no not in group_no_to_tileids:
