@@ -115,11 +115,11 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 
                             <!-- Service management buttons (for convenience) -->
                             <div class="service-buttons-heading">
-                                <button class="btn btn-danger btn-labeled btn-active-dark fa fa-trash pull-right mar-top" data-bind="click: function () { selection().delete() }">{% trans "Delete Layer" %}</button>
+                                <button class="btn btn-danger btn-labeled btn-active-dark fa fa-trash pull-right mar-top" data-bind="click: function () { selection().delete() }"><span>{% trans "Delete Layer" %}</span></button>
 
                                 <!-- ko if: selection().dirty() -->
-                                <button class="btn btn-primary btn-labeled btn-active-dark fa fa-check pull-right mar-top" data-bind="click: function () { selection().save() }">{% trans "Save Edits" %}</button>
-                                <button class="btn btn-mint btn-labeled btn-active-dark fa fa-undo pull-right mar-top" data-bind="click: function () { selection().reset() }">{% trans "Discard Edits" %}</button>
+                                <button class="btn btn-primary btn-labeled btn-active-dark fa fa-check pull-right mar-top" data-bind="click: function () { selection().save() }"><span>{% trans "Save Edits" %}</span></button>
+                                <button class="btn btn-mint btn-labeled btn-active-dark fa fa-undo pull-right mar-top" data-bind="click: function () { selection().reset() }"><span>{% trans "Discard Edits" %}</span></button>
                                 <!-- /ko -->
                             </div>
                         </div>
@@ -288,11 +288,11 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                             </div>
 
                             <div>
-                                <button class="btn btn-danger btn-labeled btn-active-dark fa fa-trash pull-right mar-top" data-bind="click: function () { selection().delete() }">{% trans "Delete Layer" %}</button>
+                                <button class="btn btn-danger btn-labeled btn-active-dark fa fa-trash pull-right mar-top" data-bind="click: function () { selection().delete() }"><span>{% trans "Delete Layer" %}</span></button>
 
                                 <!-- ko if: selection().dirty() -->
-                                <button class="btn btn-primary btn-labeled btn-active-dark fa fa-check pull-right mar-top" data-bind="click: function () { selection().save() }">{% trans "Save Edits" %}</button>
-                                <button class="btn btn-mint btn-labeled btn-active-dark fa fa-undo pull-right mar-top" data-bind="click: function () { selection().reset() }">{% trans "Discard Edits" %}</button>
+                                <button class="btn btn-primary btn-labeled btn-active-dark fa fa-check pull-right mar-top" data-bind="click: function () { selection().save() }"><span>{% trans "Save Edits" %}</span></button>
+                                <button class="btn btn-mint btn-labeled btn-active-dark fa fa-undo pull-right mar-top" data-bind="click: function () { selection().reset() }"><span>{% trans "Discard Edits" %}</span></button>
                                 <!-- /ko -->
                             </div>
 
