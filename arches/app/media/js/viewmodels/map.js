@@ -45,8 +45,8 @@ define([
                 case "select features":
                     if(data.mapCard.isSelectable([data.feature])){
                         data.selectFeature([data.feature]);
-                        break;
-                    }
+                    };
+                    break;
                 case "open editing":
                     window.open(data.editURL + data.resourceinstanceid);
                     break;
@@ -57,13 +57,13 @@ define([
                     data.provisionalTileViewModel.deleteAllProvisionalEdits();
                     break;
                 case "select provisional edit":
-                    parent = additionalParam[0]
-                    provisionalEdit = additionalParam[1]
+                    var parent = additionalParam[0];
+                    var provisionalEdit = additionalParam[1];
                     parent.provisionalTileViewModel.selectProvisionalEdit(provisionalEdit);
                     break;
                 case "reject provisional edit":
-                    parent = additionalParam[0]
-                    provisionalEdit = additionalParam[1]
+                    var parent = additionalParam[0];
+                    var provisionalEdit = additionalParam[1];
                     parent.provisionalTileViewModel.rejectProvisionalEdit(provisionalEdit);
                     break;
                 case "clear features":
