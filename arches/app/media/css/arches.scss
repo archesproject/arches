@@ -9798,10 +9798,39 @@ a.clear-geojson-button:hover {
     display: inline-block;
 }
 
-.msm-designer-panel {
-    width: 100%;
+.msm-designer-panel
+{
     background-color: #fff;
     overflow-y: auto;
+    display: flex;
+    flex: 1;
+    flex-direction: column;
+
+    .library-header>div{
+        display: flex;
+        flex:1;
+        align-items: center;
+
+        .mobile-project-category-header {
+            flex: 1;
+            padding: 0;
+
+            li {
+                font-size: 17px;
+            }
+        }
+
+        .msm-edit-buttons {
+            list-style: none;
+            font-size: 14px;
+            display: flex;
+            margin: 0 20px;
+
+            &.mobile-project-category-header {
+                flex: 1;
+            }
+        }
+    }
 }
 
 .msm-locked-warning {
@@ -10837,11 +10866,9 @@ table.table.dataTable {
 
 .root-node-label {
     stroke: #999;
-    /*#3275b1;*/
     font-size: 32px;
     font-weight: 900;
     fill: #fcfcfc;
-    /*#fdfdfd; */
     opacity: 1;
     text-anchor: middle;
     pointer-events: none;
@@ -10851,10 +10878,21 @@ table.table.dataTable {
     padding-top: 5px;
 }
 
-.service-buttons-heading {
-    position: absolute;
-    top: -3px;
-    right: 10px;
+.panel>.panel-heading {
+    display: flex;
+    align-items: center;
+
+    .panel-title {
+        flex: 1;
+    }
+    .service-buttons-heading {
+        margin: 0 20px;
+    }
+    &::after{
+        border: none;
+        position: inherit;
+
+    }
 }
 
 .basemap-preview-panel {
@@ -11471,7 +11509,9 @@ a.search-facet-item.disabled {
 }
 
 .facet-search-button {
-    padding: 10px;
+    margin: 10px;
+    display: flex;
+    justify-content: flex-end;
 }
 
 .facet-btn-group {
@@ -12293,8 +12333,6 @@ a.filter-tools:hover {
     margin-top: 10px;
 }
 
-.msm-stat-time {}
-
 .msm-stat-date {
     font-size: 17px;
     white-space: nowrap;
@@ -12379,14 +12417,6 @@ a.filter-tools:hover {
     position: absolute;
     top: 35px;
     right: 0px;
-    list-style: none;
-    font-size: 14px;
-}
-
-.msm-edit-buttons {
-    position: absolute;
-    top: 10px;
-    right: 10px;
     list-style: none;
     font-size: 14px;
 }

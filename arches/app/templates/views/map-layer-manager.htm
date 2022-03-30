@@ -110,7 +110,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                         <!-- /ko -->
 
                         <!-- ko if: selection()  && !selection().nodeid -->
-                        <div class="panel-heading relative">
+                        <div class="panel-heading">
                             <h3 class="panel-title"><i data-bind="css: selection().icon"></i> <span data-bind="text: selection().name"></span></h3>
 
                             <!-- Service management buttons (for convenience) -->
@@ -125,28 +125,30 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                         </div>
 
                         <div class="panel-body basemap-preview-panel">
-                            <div class="row map-service-container relative">
-                                <h3 class="config-title" style="margin-top: -10px; margin-bottom: 0px;"><i class="fa fa-binoculars"></i> {% trans "Layer Preview" %}</h3>
+                            <div class="row map-service-container">
+                                <div>
+                                    <h3 class="config-title"><i class="fa fa-binoculars"></i> {% trans "Layer Preview" %}</h3>
 
-                                <div class="map-service-manage-buttons">
-                                    <div class="form-group">
-                                        <label class="control-label">{% trans "Activated:" %}</label>
-                                        <span class="switch switch-small" data-bind="css: {
-                                                'on': selection().activated()
-                                            }, click: function () {
-                                                selection().activated(!selection().activated());
-                                            }">
-                                            <small></small>
-                                        </span>
+                                    <div class="map-service-manage-buttons">
+                                        <div class="form-group">
+                                            <label class="control-label">{% trans "Activated:" %}</label>
+                                            <span class="switch switch-small" data-bind="css: {
+                                                    'on': selection().activated()
+                                                }, click: function () {
+                                                    selection().activated(!selection().activated());
+                                                }">
+                                                <small></small>
+                                            </span>
+                                        </div>
                                     </div>
-                                </div>
-                                <div class="btn-group map-server-basemap-button" data-bind="if: selection().isoverlay">
-                                    <button class="dropdown-toggle btn" data-toggle="dropdown" aria-expanded="false"><i class="fa fa-globe"></i></button>
-                                    <ul class="dropdown-menu dropdown-menu-right">
-                                        <!-- ko foreach: basemaps -->
-                                        <li><a href="#" data-bind="text: name, click: function () { select(); }"></a></li>
-                                        <!-- /ko -->
-                                    </ul>
+                                    <div class="btn-group map-server-basemap-button" data-bind="if: selection().isoverlay">
+                                        <button class="dropdown-toggle btn" data-toggle="dropdown" aria-expanded="false"><i class="fa fa-globe"></i></button>
+                                        <ul class="dropdown-menu dropdown-menu-right">
+                                            <!-- ko foreach: basemaps -->
+                                            <li><a href="#" data-bind="text: name, click: function () { select(); }"></a></li>
+                                            <!-- /ko -->
+                                        </ul>
+                                    </div>
                                 </div>
 
                                 <div class="map-service-preview" style="padding:0;" data-bind="mapboxgl: {
@@ -287,13 +289,16 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                                 </div>
                             </div>
 
-                            <div>
-                                <button class="btn btn-danger btn-labeled btn-active-dark fa fa-trash pull-right mar-top" data-bind="click: function () { selection().delete() }"><span>{% trans "Delete Layer" %}</span></button>
+                            <div style="display: flex; margin: 0 12.5px;">
+                                <div style="flex: 1"></div>
+                                <div>
+                                    <button class="btn btn-danger btn-labeled btn-active-dark fa fa-trash pull-right mar-top" data-bind="click: function () { selection().delete() }"><span>{% trans "Delete Layer" %}</span></button>
 
-                                <!-- ko if: selection().dirty() -->
-                                <button class="btn btn-primary btn-labeled btn-active-dark fa fa-check pull-right mar-top" data-bind="click: function () { selection().save() }"><span>{% trans "Save Edits" %}</span></button>
-                                <button class="btn btn-mint btn-labeled btn-active-dark fa fa-undo pull-right mar-top" data-bind="click: function () { selection().reset() }"><span>{% trans "Discard Edits" %}</span></button>
-                                <!-- /ko -->
+                                    <!-- ko if: selection().dirty() -->
+                                    <button class="btn btn-primary btn-labeled btn-active-dark fa fa-check pull-right mar-top" data-bind="click: function () { selection().save() }"><span>{% trans "Save Edits" %}</span></button>
+                                    <button class="btn btn-mint btn-labeled btn-active-dark fa fa-undo pull-right mar-top" data-bind="click: function () { selection().reset() }"><span>{% trans "Discard Edits" %}</span></button>
+                                    <!-- /ko -->
+                                </div>
                             </div>
 
                         </div>
