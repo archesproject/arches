@@ -25,6 +25,99 @@ define([
         this.canEdit = params.userCanEditResources;
         this.canRead = params.userCanReadResources;
 
+
+        this.mapEventHandler = function(eventName,additionalParam,data,event){
+            if(event.type=="click" || (event.type=="keyup" && (event.which==13 || event.keyCode==13))){
+                switch (eventName){
+                case "toggle tab":
+                    data.toggleTab(additionalParam);
+                    break;
+                case "hide side panel":
+                    data.hideSidePanel();
+                    break;
+                case "active basemap":
+                    additionalParam.activeBasemap(data);
+                    break;
+                case "overlay":
+                    data.onMap(!data.onMap());
+                    data.updateParent(additionalParam);
+                    break;
+                case "select features":
+                    if(data.mapCard.isSelectable([data.feature])){
+                        data.selectFeature([data.feature]);
+                        break;
+                    }
+                case "open editing":
+                    window.open(data.editURL + data.resourceinstanceid);
+                    break;
+                case "reset provisional edits":
+                    data.provisionalTileViewModel.resetAuthoritative();
+                    break;
+                case "delete provisional edits":
+                    data.provisionalTileViewModel.deleteAllProvisionalEdits();
+                    break;
+                case "select provisional edit":
+                    parent = additionalParam[0]
+                    provisionalEdit = additionalParam[1]
+                    parent.provisionalTileViewModel.selectProvisionalEdit(provisionalEdit);
+                    break;
+                case "reject provisional edit":
+                    parent = additionalParam[0]
+                    provisionalEdit = additionalParam[1]
+                    parent.provisionalTileViewModel.rejectProvisionalEdit(provisionalEdit);
+                    break;
+                case "clear features":
+                    data.geoJSONString(undefined);
+                    break;
+                case "update features":
+                    data.updateGeoJSON();
+                    break;
+                case "toggle help":
+                    data.card.model.get('helpactive')(additionalParam);
+                    break;
+                case "show geojson errors":
+                    additionalParam[0].featureLookup[additionalParam[1]].dropErrors([]);
+                    break;
+                case "feature item":
+                    additionalParam.fitFeatures([data]);
+                    break;
+                case "edit feature":
+                    additionalParam.editFeature(data);
+                    break;
+                case "delete feature":
+                    additionalParam.deleteFeature(data);
+                    break;
+                case "edit geojson":
+                    additionalParam[0].editGeoJSON(additionalParam[0].featureLookup[additionalParam[1]].features(), additionalParam[1]);
+                    break;
+                case "edit coordinates":
+                    additionalParam.coordinateEditing(true);
+                    break;
+                case "add buffer":
+                    additionalParam[0].bufferNodeId(additionalParam[1]);
+                    break;
+                case "zoom to all":
+                    additionalParam[0].fitFeatures(self.featureLookup[additionalParam[1]].features());
+                    break;
+                case "delete tile":
+                    data.deleteTile();
+                    break;
+                case "reset tile":
+                    additionalParam.reset();
+                    break;
+                case "save tile":
+                    data.saveTile();
+                    break;
+                case "add card":
+                    if (additionalParam.isWritable && !data.preview) {
+                        data.updateTiles();
+                        data.saveTile();
+                    }
+
+                }
+            }
+        };
+
         var boundingOptions = {
             padding: {
                 top: 40,
@@ -41,13 +134,13 @@ define([
 
             if (ko.unwrap(params.x) && ko.unwrap(params.y)) {
                 var center = map.getCenter();
-            
+
                 lng = parseFloat(params.x());
                 lat = parseFloat(params.y());
-                
+
                 if (lng) { center.lng = lng; }
                 if (lat) { center.lat = lat; }
-    
+
                 map.setCenter(center);
             }
 
@@ -77,7 +170,7 @@ define([
             if (lng && self.map()) {
                 var center = self.map().getCenter();
                 center.lng = lng;
-            
+
                 self.map().setCenter(center);
             }
             if (ko.isObservable(params.x) && params.x() !== lng) {
@@ -90,14 +183,14 @@ define([
             if (lat && self.map()) {
                 var center = self.map().getCenter();
                 center.lat = lat;
-            
+
                 self.map().setCenter(center);
             }
             if (ko.isObservable(params.y) && params.y() !== lat) {
                 params.y(lat);
             }
         });
-        
+
         this.zoom = ko.observable(ko.unwrap(params.zoom) || arches.mapDefaultZoom);
         this.zoom.subscribe(function(level) {
             if (level && self.map()) { self.map().setZoom(level) };
@@ -113,7 +206,7 @@ define([
                 params.overlayConfigs(overlayConfigs)
             }
         })
-        
+
         this.activeBasemap = ko.observable();  // params.basemap is a string, activeBasemap is a map. Cannot initialize from params.
         this.activeBasemap.subscribe(function(basemap) {
             if (ko.isObservable(params.basemap) && params.basemap() !== basemap.name) {
@@ -121,16 +214,18 @@ define([
             }
         });
 
+
+
         var sources = Object.assign({
             "resource": geojsonSourceFactory(),
             "search-results-hex": geojsonSourceFactory(),
             "search-results-hashes": geojsonSourceFactory(),
             "search-results-points": geojsonSourceFactory()
         }, arches.mapSources, params.sources);
-        
+
         this.basemaps = params.basemaps || [];
         this.overlays = params.overlaysObservable || ko.observableArray();
-        
+
         var mapLayers = params.mapLayers || arches.mapLayers;
         mapLayers.forEach(function(layer) {
             if (!layer.isoverlay) {
@@ -145,7 +240,7 @@ define([
                         layer.opacity(value ? 100 : 0);
                     }
                 });
-                
+
                 layer.updateParent = function(parent) {
                     if (self.overlayConfigs.indexOf(layer.maplayerid) === -1) {
                         self.overlayConfigs.push(layer.maplayerid)
@@ -154,7 +249,7 @@ define([
                         self.overlayConfigs.remove(layer.maplayerid);
                         layer.opacity(0)
                     }
-                    
+
                     if (parent !== self) {
                         parent.overlayConfigs(self.overlayConfigs())
 
@@ -171,7 +266,7 @@ define([
                 self.overlays.push(layer);
             }
         });
-        
+
         if (!self.activeBasemap()) {
             var basemap = ko.unwrap(self.basemaps).find(function(basemap) {
                 return ko.unwrap(params.basemap) === basemap.name;
@@ -305,6 +400,8 @@ define([
             this.mapOptions.bounds = self.bounds;
             this.mapOptions.fitBoundsOptions = params.fitBoundsOptions;
         }
+
+
 
         this.hideSidePanel = function() {
             self.activeTab(undefined);
@@ -516,7 +613,7 @@ define([
 
                     map.on('dragend', function() {
                         var center = map.getCenter();
-                        
+
                         self.centerX(parseFloat(center.lng));
                         self.centerY(parseFloat(center.lat));
                     });

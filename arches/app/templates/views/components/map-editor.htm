@@ -2,11 +2,9 @@
 {% load i18n %}
 
 {% block tabs %}
-<div class="workbench-card-sidebar-tab" data-bind="click: function() {
-    toggleTab('editor');
-}, css: {
+<div class="workbench-card-sidebar-tab" data-bind="event: {keyup: mapEventHandler.bind($data,'toggle tab','editor'), click: mapEventHandler.bind($data,'toggle tab','editor')}, css: {
     'active': activeTab() === 'editor'
-}" tabindex="0" onkeyup="if(event.which == 13 || event.keyCode == 13){ $(this).trigger('click'); }" aria-label="Edit geometry information">
+}" tabindex="0" aria-label="Edit geometry information">
     <i class="fa fa-pencil"></i>
     <span class="map-sidebar-text">{% trans "Edit" %}</span>
 </div>
@@ -17,7 +15,7 @@
 <!--ko if: activeTab() === 'editor' -->
     <div class="workbench-header-buffer">
         <div class="workbench-card-sidepanel-header-container">
-            <h4 class="workbench-card-sidepanel-header" data-bind="click: hideSidePanel, text: card.model.name" tabindex="0" onkeyup="if(event.which == 13 || event.keyCode == 13){ $(this).trigger('click'); }"></h4>
+            <h4 class="workbench-card-sidepanel-header" data-bind="event: {keyup: mapEventHandler.bind($data,'hide side panel',null), click: mapEventHandler.bind($data,'hide side panel',null)}, text: card.model.name" tabindex="0" onkeyup="if(event.which == 13 || event.keyCode == 13){ $(this).trigger('click'); }"></h4>
         </div>
     </div>
     <div data-bind="css: card.model.cssclass">
@@ -27,7 +25,7 @@
             <span>{% trans 'Showing edits by' %}</span>
             <span class="edit-message-container-user" data-bind="text: provisionalTileViewModel.selectedProvisionalEdit().username() + '.'"></span>
             <!-- ko if: !provisionalTileViewModel.tileIsFullyProvisional() -->
-            <a class="reset-authoritative" href="#" data-bind="click: function(){provisionalTileViewModel.resetAuthoritative();}" onkeyup="if(event.which == 13 || event.keyCode == 13){ $(this).trigger('click'); }">{% trans 'Return to approved edits' %}</a>
+            <a class="reset-authoritative" href="#" data-bind="event: {keyup: mapEventHandler.bind($data,'reset provisional edits',null), click: mapEventHandler.bind($data,'reset provisional edits',null)}">{% trans 'Return to approved edits' %}</a>
             <!-- /ko-->
             <!-- ko if: provisionalTileViewModel.selectedProvisionalEdit().isfullyprovisional -->
             <span>{% trans ' This is a new contribution by a provisional editor.' %}</span>
@@ -49,23 +47,17 @@
             <div class='new-provisional-edits-list'>
                 <div class='new-provisional-edits-header'>
                     <div class='new-provisional-edits-title'>{% trans 'Provisional Edits' %}</div>
-                    <div class="btn btn-shim btn-danger btn-labeled btn-xs fa fa-trash new-provisional-edits-delete-all" data-bind="click: function(){
-                            provisionalTileViewModel.deleteAllProvisionalEdits();
-                        }" tabindex="0" onkeyup="if(event.which == 13 || event.keyCode == 13){ $(this).trigger('click'); }">{% trans 'Delete all edits' %}</div>
+                    <div class="btn btn-shim btn-danger btn-labeled btn-xs fa fa-trash new-provisional-edits-delete-all" data-bind="event: {keyup: mapEventHandler.bind($data,'delete provisional edits',null), click: mapEventHandler.bind($data,'delete provisional edits',null)}" tabindex="0">{% trans 'Delete all edits' %}</div>
                 </div>
                 <!-- ko foreach: { data: provisionalTileViewModel.provisionaledits(), as: 'pe' } -->
                 <div class='new-provisional-edit-entry' data-bind="css: {
                         'selected': pe === $parent.provisionalTileViewModel.selectedProvisionalEdit()
-                    }, click: function(){
-                        $parent.provisionalTileViewModel.selectProvisionalEdit(pe);
-                    }" tabindex="0" onkeyup="if(event.which == 13 || event.keyCode == 13){ $(this).trigger('click'); }">
+                    }, event: {keyup: $parent.mapEventHandler.bind($data,'select provisional edit',[$parent,pe]), click: $parent.mapEventHandler.bind($data,'select provisional edit',[$parent,pe])}" tabindex="0">
                     <div class='title'>
                         <div class='field'>
                             <span data-bind="text : pe.username"></span>
                         </div>
-                        <a href="#" class='field fa fa-times-circle new-delete-provisional-edit' data-bind="click : function(){
-                            $parent.provisionalTileViewModel.rejectProvisionalEdit(pe);
-                        }" tabindex="0" onkeyup="if(event.which == 13 || event.keyCode == 13){ $(this).trigger('click'); }" aria-label="Reject provisional edit"></a>
+                        <a href="#" class='field fa fa-times-circle new-delete-provisional-edit' data-bind="event: {keyup: $parent.mapEventHandler.bind($data,'reject provisional edit',[$parent,pe]), click: $parent.mapEventHandler.bind($data,'reject provisional edit',[$parent,pe])}" tabindex="0" aria-label="Reject provisional edit"></a>
                     </div>
                     <div class="field timestamp">
                         <span data-bind="text : pe.displaydate">@</span>
@@ -85,12 +77,10 @@
                     lineNumbers: true
                 }"></div>
                 <div class="display-in-workflow-step install-buttons">
-                    <button class="btn btn-shim btn-danger btn-labeled btn-lg fa fa-times" data-bind="click: function () {
-                        geoJSONString(undefined);
-                    }" onkeyup="if(event.which == 13 || event.keyCode == 13){ $(this).trigger('click'); }">{% trans 'Cancel' %}</button>
+                    <button class="btn btn-shim btn-danger btn-labeled btn-lg fa fa-times" data-bind="event: {keyup: $parent.mapEventHandler.bind($data,'clear features',null), click: $parent.mapEventHandler.bind($data,'clear features',null)}">{% trans 'Cancel' %}</button>
                     <button class="btn btn-shim btn-labeled btn-lg fa fa-plus btn-mint" data-bind="css: {
                         disabled: geoJSONErrors().length !== 0
-                    }, click: updateGeoJSON" onkeyup="if(event.which == 13 || event.keyCode == 13){ $(this).trigger('click'); }">{% trans 'Update Features' %}</button>
+                    }, event: {keyup: $parent.mapEventHandler.bind($data,'update features',null), click: $parent.mapEventHandler.bind($data,'update features',null)}">{% trans 'Update Features' %}</button>
                 </div>
                 <!-- ko if: geoJSONErrors().length !== 0 -->
                 <div class="geojson-error-list">
@@ -113,9 +103,7 @@
                 {% block form_header %}
                 <!-- ko if: card.model.helpenabled -->
                 <span>
-                    <a class="pull-right card-help help editable-help" href="#" data-bind="click: function () {
-                        card.model.get('helpactive')(true)
-                    }" onkeyup="if(event.which == 13 || event.keyCode == 13){ $(this).trigger('click'); }" aria-label="Editing help">
+                    <a class="pull-right card-help help editable-help" href="#" data-bind="event: {keyup: $parent.mapEventHandler.bind($data,'toggle help',true), click: $parent.mapEventHandler.bind($data,'toggle help',true)}" aria-label="Editing help">
                         {% trans "Help" %}
                         <i class="fa fa-question-circle"></i>
                     </a>
@@ -157,8 +145,9 @@
                                             click: self.dropZoneClickHandler,
                                             dragenter: self.dropZoneEnterHandler,
                                             dragleave: self.dropZoneLeaveHandler,
-                                            dragend: self.dropZoneLeaveHandler
-                                        }" tabindex="0" onkeyup="if(event.which == 13 || event.keyCode == 13){ $(this).trigger('click'); }">
+                                            dragend: self.dropZoneLeaveHandler,
+                                            keyup: self.dropZoneKeyupHandler
+                                        }" tabindex="0">
                                             {% trans "Drag GeoJSON or KML files here to add..." %}
                                         </div>
                                         <div class="hidden-file-input">
@@ -168,9 +157,7 @@
                                         </div>
                                         <!-- ko if: self.featureLookup[widget.node_id()].dropErrors().length !== 0 -->
                                         <div class="geojson-error-list">
-                                            <a href="javascript: void(0);" data-bind="click:function () {
-                                                self.featureLookup[widget.node_id()].dropErrors([]);
-                                            }" onkeyup="if(event.which == 13 || event.keyCode == 13){ $(this).trigger('click'); }">
+                                            <a href="javascript: void(0);" data-bind="event: {keyup: $parent.mapEventHandler.bind($data,'show geojson errors',[$parents[1],widget.node_id()]), click: $parent.mapEventHandler.bind($data,'show geojson errors',[$parents[1],widget.node_id()])}">
                                                 <i class="fa fa-close"></i>
                                             </a>
                                             {% trans "The following errors occurred:" %}
@@ -184,18 +171,18 @@
                                         <table class="table">
                                             <tbody>
                                                 <!-- ko foreach: {data: self.featureLookup[widget.node_id()].features, as: 'feature'} -->
-                                                <tr class="map-card-feature-item" data-bind="css: {'active': self.selectedFeatureIds().indexOf(feature.id) >= 0}, click: function() { self.fitFeatures([feature]) }" tabindex="0" onkeyup="if(event.which == 13 || event.keyCode == 13){ $(this).trigger('click'); }" aria-label="Feature item">
+                                                <tr class="map-card-feature-item" data-bind="css: {'active': self.selectedFeatureIds().indexOf(feature.id) >= 0},  event: {keyup: $parents[1].mapEventHandler.bind($data,'feature item',$parents[1]), click: $parents[1].mapEventHandler.bind($data,'feature item',$parents[1])}" tabindex="0" aria-label="Feature item">
                                                     <td>
                                                         <span class="map-card-feature-name" data-bind="text: feature.geometry.type"></span>
                                                     </td>
                                                     <td class="map-card-feature-tool">
-                                                        <a href="javascript:void(0);" data-bind="click: function() { self.editFeature(feature) }, clickBubble: false" onkeyup="if(event.which == 13 || event.keyCode == 13){ $(this).trigger('click'); }">
+                                                        <a href="javascript:void(0);" data-bind="event: {keyup: $parents[1].mapEventHandler.bind($data,'edit feature',$parents[1]), click: $parents[1].mapEventHandler.bind($data,'edit feature',$parents[1])}, clickBubble: false">
                                                             <i class="fa fa-pencil map-card-feature-edit"></i>
                                                             {% trans "Edit" %}
                                                         </a>
                                                     </td>
                                                     <td class="map-card-feature-tool">
-                                                        <a href="javascript:void(0);" data-bind="click: function() { self.deleteFeature(feature) }, clickBubble: false" onkeyup="if(event.which == 13 || event.keyCode == 13){ $(this).trigger('click'); }">
+                                                        <a href="javascript:void(0);" data-bind="event: {keyup: $parents[1].mapEventHandler.bind($data,'delete feature',$parents[1]), click: $parents[1].mapEventHandler.bind($data,'delete feature',$parents[1])}, clickBubble: false">
                                                             <i class="fa fa-trash map-card-feature-delete"></i>
                                                             {% trans "Delete" %}
                                                         </a>
@@ -205,17 +192,13 @@
                                             </tbody>
                                         </table>
                                         <div class="map-card-zoom-tool">
-                                            <a href="javascript:void(0);" data-bind="click: function() {
-                                                self.editGeoJSON(self.featureLookup[widget.node_id()].features(), widget.node_id());
-                                            }" onkeyup="if(event.which == 13 || event.keyCode == 13){ $(this).trigger('click'); }">
+                                            <a href="javascript:void(0);" data-bind="event: {keyup: $parent.mapEventHandler.bind($data,'edit geojson',[$parents[1],widget.node_id()]), click: $parent.mapEventHandler.bind($data,'edit geojson',[$parents[1],widget.node_id()])}">
                                                 <i class="fa fa-pencil map-card-feature-edit"></i>
                                                 {% trans "Edit GeoJSON" %}
                                             </a>
                                             |
                                             <!-- ko if: self.canEditCoordinates() -->
-                                            <a href="javascript:void(0);" data-bind="click: function() {
-                                                self.coordinateEditing(true);
-                                            }" onkeyup="if(event.which == 13 || event.keyCode == 13){ $(this).trigger('click'); }">
+                                            <a href="javascript:void(0);" data-bind="event: {keyup: $parent.mapEventHandler.bind($data,'edit coordinates',$parents[1]), click: $parent.mapEventHandler.bind($data,'edit coordinates',$parents[1])}">
                                                 <i class="fa fa-list map-card-feature-edit"></i>
                                                 {% trans "Edit Coordinates" %}
                                             </a>
@@ -228,9 +211,7 @@
                                             <!-- /ko -->
                                             |
                                             <!-- ko if: self.bufferFeature() -->
-                                            <a href="javascript:void(0);" data-bind="click: function() {
-                                                self.bufferNodeId(widget.node_id());
-                                            }" onkeyup="if(event.which == 13 || event.keyCode == 13){ $(this).trigger('click'); }">
+                                            <a href="javascript:void(0);" data-bind="event: {keyup: $parent.mapEventHandler.bind($data,'add buffer',[$parents[1],widget.node_id()]), click: $parent.mapEventHandler.bind($data,'add buffer',[$parents[1],widget.node_id()])}">
                                                 <i class="fa fa-list map-card-feature-edit"></i>
                                                 {% trans "Add Buffer" %}
                                             </a>
@@ -243,9 +224,7 @@
                                             <!-- /ko -->
                                             <!-- ko if: self.featureLookup[widget.node_id()].features().length > 0 -->
                                             |
-                                            <a href="javascript:void(0);" data-bind="click: function() {
-                                                self.fitFeatures(self.featureLookup[widget.node_id()].features());
-                                            }" onkeyup="if(event.which == 13 || event.keyCode == 13){ $(this).trigger('click'); }">
+                                            <a href="javascript:void(0);" data-bind="event: {keyup: $parent.mapEventHandler.bind($data,'zoom to all',[$parents[1],widget.node_id()]), click: $parent.mapEventHandler.bind($data,'zoom to all',[$parents[1],widget.node_id()])}">
                                                 <i class="fa fa-search map-card-feature-edit"></i>
                                                 {% trans "Zoom to all" %}
                                             </a>
@@ -297,40 +276,34 @@
                 {% block form_buttons %}
                 <div class="install-buttons">
                     <!-- ko if: tile.tileid && self.deleteTile -->
-                    <button class="btn btn-shim btn-labeled btn-lg fa fa-trash" data-bind="click: self.deleteTile, css: {
+                    <button class="btn btn-shim btn-labeled btn-lg fa fa-trash" data-bind="event: {keyup: $parent.mapEventHandler.bind($data,'delete tile',null), click: $parent.mapEventHandler.bind($data,'delete tile',null)}, css: {
                         disabled: (!card.isWritable && !self.preview),
                         'btn-warning': card.isWritable
-                    }" onkeyup="if(event.which == 13 || event.keyCode == 13){ $(this).trigger('click'); }">{% trans 'Delete' %}</button>
+                    }">{% trans 'Delete' %}</button>
                     <!-- /ko -->
                     <!-- ko if: tile.dirty() -->
                         <!-- ko if: provisionalTileViewModel && !provisionalTileViewModel.tileIsFullyProvisional() && card.isWritable -->
-                        <button class="btn btn-shim btn-danger btn-labeled btn-lg fa fa-times" data-bind="click: tile.reset" onkeyup="if(event.which == 13 || event.keyCode == 13){ $(this).trigger('click'); }">{% trans 'Cancel' %}</button>
+                        <button class="btn btn-shim btn-danger btn-labeled btn-lg fa fa-times" data-bind="event: {keyup: $parent.mapEventHandler.bind($data,'reset tile',tile), click: $parent.mapEventHandler.bind($data,'reset tile',tile)}">{% trans 'Cancel' %}</button>
                         <!-- /ko -->
                         <!-- ko if: tile.tileid -->
-                        <button class="btn btn-shim btn-labeled btn-lg fa fa-plus" data-bind="click: self.saveTile, css: {
+                        <button class="btn btn-shim btn-labeled btn-lg fa fa-plus" data-bind="event: {keyup: $parent.mapEventHandler.bind($data,'save tile',tile), click: $parent.mapEventHandler.bind($data,'save tile',tile)}, css: {
                             disabled: (!card.isWritable && !self.preview),
                             'btn-mint': card.isWritable
-                        }" onkeyup="if(event.which == 13 || event.keyCode == 13){ $(this).trigger('click'); }">{% trans 'Save' %}</button>
+                        }">{% trans 'Save' %}</button>
                         <!-- /ko -->
                     <!-- /ko -->
                     <!-- ko if: !tile.tileid -->
                     <button
                         class="btn btn-shim btn-labeled btn-lg fa fa-plus"
-                        data-bind="click: function() { if (card.isWritable && !self.preview) {
-                            self.updateTiles();
-                            self.saveTile();
-                        }},
-                        css: { disabled: (!card.isWritable || self.preview), 'btn-mint': card.isWritable }"
-                        onkeyup="if(event.which == 13 || event.keyCode == 13){ $(this).trigger('click'); }">{% trans 'Add'  %}</button>
+                        data-bind="event: {keyup: $parent.mapEventHandler.bind($data,'add card',card), click: $parent.mapEventHandler.bind($data,'add card',card)},
+                        css: { disabled: (!card.isWritable || self.preview), 'btn-mint': card.isWritable }">{% trans 'Add'  %}</button>
                     <!-- /ko -->
                 </div>
                 {% endblock form_buttons %}
 
                 <aside id="card-help-panel" class="card-help-panel" style="display: none;" data-bind="visible: card.model.get('helpactive')">
                     <div class="relative">
-                        <a id="add-basemap-wizard-help-close" href="#" class="help-close fa fa-times fa-lg" data-bind="click: function () {
-                            card.model.get('helpactive')(false);
-                        }"></a>
+                        <a id="add-basemap-wizard-help-close" href="#" class="help-close fa fa-times fa-lg" data-bind="{keyup: $parent.mapEventHandler.bind($data,'toggle help',false), click: $parent.mapEventHandler.bind($data,'toggle help',false)}"></a>
                     </div>
                     <div id="add-basemap-wizard-help-content">
                         <div>

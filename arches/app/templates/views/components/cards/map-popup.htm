@@ -2,11 +2,11 @@
 {% load i18n %}
 
 {% block footer %}
-<a data-bind="if: mapCard.isSelectable(feature), click: function () {
-    mapCard.selectFeature(feature);
-}" href="javascript:void(0)" aria-label="Select feature" onkeyup="if(event.which == 13 || event.keyCode == 13){ $(this).trigger('click'); }">
+<!-- ko if: mapCard.isSelectable(feature) -->
+<a data-bind="event: { keyup: mapCard.mapEventHandler.bind($data,'select features',feature), click:  mapCard.mapEventHandler.bind($data,'select features',feature)}" href="javascript:void(0)" aria-label="Select feature">
     <i class="ion-ios-refresh-empty"></i>
     <span data-bind="text: mapCard.selectText"></span>
 </a>
+<!--/ko-->
 {{ block.super }}
 {% endblock footer %}

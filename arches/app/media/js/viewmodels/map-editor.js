@@ -17,7 +17,7 @@ define([
         var self = this;
         var padding = 40;
         var drawFeatures;
-        
+
         var resourceId = params.tile ? params.tile.resourceinstance_id : '';
         if (this.widgets === undefined) { // could be [], so checking specifically for undefined
             this.widgets = params.widgets || [];
@@ -657,6 +657,12 @@ define([
                 );
                 self.featureLookup[nodeId].dropErrors(errors);
             });
+        };
+
+        self.dropZoneKeyupHandler = function(data, e) {
+            if(e.type=="click" || (e.type=="keyup" && (e.which==13 || e.keyCode==13))){
+                self.dropZoneClickHandler(data,e);
+            }
         };
 
         self.dropZoneHandler = function(data, e) {
