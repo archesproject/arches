@@ -188,7 +188,10 @@ define([
         resourceId: resourceId,
         reportLookup: reportLookup,
         copyResource: function() {
-            if (resourceId()) {
+            if (data.graph && !data.graph.publication_id) {
+                vm.alert(new AlertViewModel('ep-alert-red', arches.resourceHasUnpublishedGraph.title, arches.resourceHasUnpublishedGraph.text, null, function(){}));
+            }
+            else if (resourceId()) {
                 vm.menuActive(false);
                 loading(true);
                 $.ajax({
@@ -204,6 +207,9 @@ define([
                         loading(false);
                     },
                 });
+            }
+            else {
+                vm.alert(new AlertViewModel('ep-alert-red', arches.resourceCopyFailed.title, arches.resourceCopyFailed.text, null, function(){}));
             }
         },
         deleteResource: function() {

@@ -332,6 +332,10 @@
                 title: "{% trans 'Resource Copy Failed...'%}",
                 text: "{% trans 'Sorry! The copy request failed. Please try again.  Contact your system administrator if the problem persists.' %}"
             },
+            resourceHasUnpublishedGraph: {
+                title: "{% trans 'This resource is based on an unpublished graph.' %}",
+                text: "{% trans 'To continue, please ensure the graph is published.' %}"
+            },
             mapboxApiKey: '{{ map_info.mapbox_api_key }}',
             hexBinSize: {{ map_info.hex_bin_size | unlocalize }},
             mapboxSprites: '{{ map_info.mapbox_sprites }}',

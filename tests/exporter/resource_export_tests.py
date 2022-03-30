@@ -103,4 +103,9 @@ class BusinessDataExportTests(ArchesTestCase):
 
         json_truth = deep_sort(json.load(open("tests/fixtures/data/json/resource_export_business_data_truth.json")))
 
+        # removes generated graph_publication_id
+        for resource_data in json_export["business_data"]["resources"]:
+            if resource_data["resourceinstance"]["graph_publication_id"]:
+                del resource_data["resourceinstance"]["graph_publication_id"]
+
         self.assertDictEqual(json_export, json_truth)

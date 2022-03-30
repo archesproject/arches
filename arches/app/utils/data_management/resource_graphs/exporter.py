@@ -10,7 +10,7 @@ from io import StringIO
 from arches.app.models.graph import Graph
 from arches.app.models.concept import Concept
 from arches.app.models.system_settings import settings
-from arches.app.models.models import CardXNodeXWidget, Node, Resource2ResourceConstraint, FunctionXGraph, Value
+from arches.app.models.models import CardXNodeXWidget, Node, Resource2ResourceConstraint, FunctionXGraph, Value, GraphPublication
 from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializer
 from collections import OrderedDict
 from operator import itemgetter
@@ -138,7 +138,7 @@ def get_graphs_for_export(graphids=None):
             print("*" * 80)
             sys.exit()
 
-    resource_graph_query = JSONSerializer().serializeToPython(resource_graphs, exclude=["widgets"])
+    resource_graph_query = JSONSerializer().serializeToPython(resource_graphs, exclude=["widgets"], force_recalculation=True)
 
     for resource_graph in resource_graph_query:
         function_ids = []
@@ -153,6 +153,17 @@ def get_graphs_for_export(graphids=None):
             get_card_x_node_x_widget_data_for_export(resource_graph)
         )
         resource_graph["resource_2_resource_constraints"] = JSONSerializer().serializeToPython(r2r_constraints_for_export(resource_graph))
+
+        publication_id = resource_graph.get("publication_id")
+        publication = None
+
+        if publication_id:
+            publication = JSONDeserializer().deserialize(JSONSerializer().serialize(GraphPublication.objects.get(pk=publication_id)))
+            del publication["serialized_graph"]
+
+        resource_graph["publication"] = publication
+        del resource_graph["publication_id"]
+
         graphs["graph"].append(resource_graph)
     return sort(graphs)
 

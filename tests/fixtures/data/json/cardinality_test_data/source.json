@@ -651,6 +651,13 @@
       "maplinewidth": 1,
       "mappointsize": 3,
       "graphid": "316d5523-c6f2-11e6-8705-685b3597724b",
+        "publication": {
+            "graph_id": "316d5523-c6f2-11e6-8705-685b3597724b",
+            "notes": "Initial migration.",
+            "publicationid": "1ba8f154-d8e9-4a80-8382-a4676d4f263b",
+            "published_time": "2022-03-22T13:29:06.593",
+            "user_id": null
+        },
       "name": "Source",
       "cards_x_nodes_x_widgets": [],
       "cards": [

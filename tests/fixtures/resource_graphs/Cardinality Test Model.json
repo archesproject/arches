@@ -301,6 +301,13 @@
                 }
             ],
             "ontology_id": null,
+            "publication": {
+                "graph_id": "2f7f8e40-adbc-11e6-ac7f-14109fd34195",
+                "notes": "Initial migration.",
+                "publicationid": "c7b7e1cb-3aa6-465d-9a37-9bd087d3849b",
+                "published_time": "2022-03-22T13:29:06.593",
+                "user_id": null
+            },
             "description": "Model to test the 6 different combinations of card container and child card cardinality",
             "edges": [
                 {

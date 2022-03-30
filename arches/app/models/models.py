@@ -427,7 +427,7 @@ class GraphPublication(models.Model):
     graph = models.ForeignKey(GraphModel, db_column="graphid", on_delete=models.CASCADE)
     serialized_graph = JSONField(blank=True, null=True, db_column="serialized_graph")
     user = models.ForeignKey(User, db_column="userid", null=True, on_delete=models.CASCADE)
-    published_time = models.DateTimeField(auto_now_add=True, null=False)
+    published_time = models.DateTimeField(default=datetime.datetime.now, null=False)
 
     class Meta:
         managed = True
@@ -793,8 +793,13 @@ class ResourceXResource(models.Model):
 class ResourceInstance(models.Model):
     resourceinstanceid = models.UUIDField(primary_key=True, default=uuid.uuid1)  # This field type is a guess.
     graph = models.ForeignKey(GraphModel, db_column="graphid", on_delete=models.CASCADE)
+    graph_publication = models.ForeignKey(GraphPublication, db_column="graphpublicationid", on_delete=models.PROTECT)
     legacyid = models.TextField(blank=True, unique=True, null=True)
     createdtime = models.DateTimeField(auto_now_add=True)
+
+    def save(self, *args, **kwargs):
+        self.graph_publication = self.graph.publication
+        super(ResourceInstance, self).save()
 
     class Meta:
         managed = True

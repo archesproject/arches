@@ -1014,6 +1014,13 @@
             ],
             "functions_x_graphs": [],
             "graphid": "ff623370-fa12-11e6-b98b-6c4008b05c4c",
+            "publication": {
+                "graph_id": "ff623370-fa12-11e6-b98b-6c4008b05c4c",
+                "notes": "Initial migration.",
+                "publicationid": "ad8ff79d-1922-4f1f-95d7-0adc6b8f630a",
+                "published_time": "2022-03-22T13:29:06.593",
+                "user_id": null
+            },
             "iconclass": "fa fa-sliders",
             "is_editable": false,
             "isresource": true,

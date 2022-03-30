@@ -317,6 +317,13 @@
       "maplinewidth": 1,
       "mappointsize": 3,
       "graphid": "8e672ab0-c6e2-11e6-9725-685b3597724b",
+      "publication": {
+            "graph_id": "8e672ab0-c6e2-11e6-9725-685b3597724b",
+            "notes": "Initial migration.",
+            "publicationid": "e1eaf4ba-225d-4c69-a355-8f348083716d",
+            "published_time": "2022-03-22T13:29:06.593",
+            "user_id": null
+        },
       "name": "Target",
       "cards_x_nodes_x_widgets": [],
       "cards": [
