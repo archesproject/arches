@@ -262,30 +262,30 @@
 {% endblock main_menu %}
 
 {% block gallery_header %}
-<div class="iiif-gallery-header">
     <div>
         <span class="iiif-gallery-manifest-label" data-bind="text: manifestData() ? manifestName() : '{% trans "No manifest selected..." %}'"></span>
-        <span class="iiif-gallery-manifest-label">|</span>
-        <span>{% trans "Filter" %}</span>
-        <div class="list-filter" data-bind="">
-            <input type="text" class="form-control" style="width: 100%;" placeholder="{% trans 'Filter images...' %}" data-bind="textInput: filter">
-
-            <!-- Clear Search -->
-            <span class="clear-node-search" data-bind="visible: filter().length > 0, click: function() { filter(''); }"><i class="fa fa-times-circle"></i></span>
-        </div>
+    </div>                 
+    <div>
+        <span class="iiif-gallery-sequence-label" data-bind="click: function(){expandGallery(!expandGallery())}">
+            <!-- ko if: !expandGallery() -->
+            {% trans "Info" %}
+            <!-- /ko -->
+            <!-- ko if: expandGallery() -->
+            {% trans "Close" %}
+            <!-- /ko -->
+        </span>
     </div>
-    <div class="iiif-gallery-sequence-labels">
-        <div 
-            class="iiif-gallery-sequence-label" 
-            style="padding:0 5px" 
-            data-bind="
-                if: shouldShowEditService,
-                click: toggleManifestEditor,
-            "
-        >
-            {% trans "Switch Image Service" %}
-        </div>
-        |
+    <div 
+        class="iiif-gallery-sequence-label" 
+        style="padding:0 5px" 
+        data-bind="
+            if: shouldShowEditService,
+            click: toggleManifestEditor,
+        "
+    >
+        {% trans "Switch Image Service" %}
+    </div>
+    <div data-bind="if: renderContext() != 'manifest-workflow'">
         <div data-bind="dropzone: dropzoneOptions4create" >
             <div>
             <div class="iiif-gallery-sequence-label fileinput-create-button dz-clickable" style="padding:0 5px" data-bind="css: uniqueidClass; dropzone: dropzoneOptions4create" role="button">
@@ -297,5 +297,13 @@
             </div>
         </div>
     </div>
-</div>
+    <div>
+        <span>{% trans "Filter" %}</span>
+        <div class="list-filter" data-bind="">
+            <input type="text" class="form-control" style="width: 100%;" placeholder="{% trans 'Filter images...' %}" data-bind="textInput: filter">
+
+            <!-- Clear Search -->
+            <span class="clear-node-search" data-bind="visible: filter().length > 0, click: function() { filter(''); }"><i class="fa fa-times-circle"></i></span>
+        </div>
+    </div>
 {% endblock gallery_header %}

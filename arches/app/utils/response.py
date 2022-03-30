@@ -3,6 +3,7 @@ import logging
 from django.http import HttpResponse
 from django.utils.translation import ugettext as _
 from arches.app.utils.betterJSONSerializer import JSONSerializer
+from arches.app.models.system_settings import settings
 
 logger = logging.getLogger(__name__)
 
@@ -14,6 +15,7 @@ class JSONResponse(HttpResponse):
         stream = kwargs.pop("stream", None)
         indent = kwargs.pop("indent", None)
         selected_fields = kwargs.pop("fields", None)
+        sort_keys = kwargs.pop("sort_keys", None)
         use_natural_keys = kwargs.pop("use_natural_keys", None)
         geom_format = kwargs.pop("geom_format", None)
 
@@ -32,6 +34,8 @@ class JSONResponse(HttpResponse):
             options["indent"] = indent
         if selected_fields is not None:
             options["selected_fields"] = selected_fields
+        if sort_keys is not None:
+            options["sort_keys"] = sort_keys
         if use_natural_keys is not None:
             options["use_natural_keys"] = use_natural_keys
         if geom_format is not None:

@@ -12,7 +12,6 @@ define([
     'arches',
     'bindings/mapbox-gl',
     'bindings/codemirror',
-    'codemirror/mode/javascript/javascript',
     'datatype-config-components'
 ], function($, ko, _, turf, geohash, BaseManagerView, NodeModel, AlertViewModel, binFeatureCollection, data, arches) {
     var vm = {

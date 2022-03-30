@@ -167,6 +167,13 @@ class NumberDataType(BaseDataType):
             errors.append(error_message)
         return errors
 
+    def get_display_value(self, tile, node):
+        data = self.get_tile_data(tile)
+        if data:
+            display_value = data.get(str(node.nodeid))
+            if display_value is not None:
+                return str(display_value)
+
     def transform_value_for_tile(self, value, **kwargs):
         try:
             if value == "":
@@ -348,19 +355,23 @@ class DateDataType(BaseDataType):
         return valid_date_format, valid
 
     def transform_value_for_tile(self, value, **kwargs):
-        if type(value) == list:
-            value = value[0]
-        valid_date_format, valid = self.get_valid_date_format(value)
-        if valid:
-            v = datetime.strptime(value, valid_date_format)
-        else:
-            v = datetime.strptime(value, settings.DATE_IMPORT_EXPORT_FORMAT)
-        # The .astimezone() function throws an error on Windows for dates before 1970
-        try:
-            v = v.astimezone()
-        except:
-            v = self.backup_astimezone(v)
-        value = v.isoformat(timespec="milliseconds")
+        value = None if value == "" else value
+        if value is not None:
+            if type(value) == list:
+                value = value[0]
+            elif type(value) == str and len(value) < 4 and value.startswith("-") is False:  # a year before 1000 but not BCE
+                value = value.zfill(4)
+            valid_date_format, valid = self.get_valid_date_format(value)
+            if valid:
+                v = datetime.strptime(value, valid_date_format)
+            else:
+                v = datetime.strptime(value, settings.DATE_IMPORT_EXPORT_FORMAT)
+            # The .astimezone() function throws an error on Windows for dates before 1970
+            try:
+                v = v.astimezone()
+            except:
+                v = self.backup_astimezone(v)
+            value = v.isoformat(timespec="milliseconds")
         return value
 
     def backup_astimezone(self, dt):
@@ -2053,14 +2064,17 @@ class NodeValueDataType(BaseDataType):
 
     def get_display_value(self, tile, node):
         datatype_factory = DataTypeFactory()
-        value_node = models.Node.objects.get(nodeid=node.config["nodeid"])
-        data = self.get_tile_data(tile)
-        tileid = data[str(node.pk)]
-        if tileid:
-            value_tile = models.TileModel.objects.get(tileid=tileid)
-            datatype = datatype_factory.get_instance(value_node.datatype)
-            return datatype.get_display_value(value_tile, value_node)
-        return ""
+        try:
+            value_node = models.Node.objects.get(nodeid=node.config["nodeid"])
+            data = self.get_tile_data(tile)
+            tileid = data[str(node.pk)]
+            if tileid:
+                value_tile = models.TileModel.objects.get(tileid=tileid)
+                datatype = datatype_factory.get_instance(value_node.datatype)
+                return datatype.get_display_value(value_tile, value_node)
+            return ""
+        except:
+            raise Exception(f'Node with name "{node.name}" is not configured correctly.')
 
     def append_to_document(self, document, nodevalue, nodeid, tile, provisional=False):
         pass
@@ -2070,7 +2084,7 @@ class NodeValueDataType(BaseDataType):
 
 
 class AnnotationDataType(BaseDataType):
-    def validate(self, value, source=None, node=None, strict=False):
+    def validate(self, value, row_number=None, source=None, node=None, nodeid=None, strict=False):
         errors = []
         return errors
 
@@ -2080,8 +2094,18 @@ class AnnotationDataType(BaseDataType):
             return self.compile_json(tile, node, geojson=data.get(str(node.nodeid)))
 
     def append_to_document(self, document, nodevalue, nodeid, tile, provisional=False):
-        # document["strings"].append({"string": nodevalue["address"], "nodegroup_id": tile.nodegroup_id})
         return
+
+    def transform_value_for_tile(self, value, **kwargs):
+        try:
+            return json.loads(value)
+        except ValueError:
+            # do this if json (invalid) is formatted with single quotes, re #6390
+            return ast.literal_eval(value)
+        except TypeError:
+            # data should come in as json but python list is accepted as well
+            if isinstance(value, list):
+                return value
 
     def get_search_terms(self, nodevalue, nodeid=None):
         # return [nodevalue["address"]]
