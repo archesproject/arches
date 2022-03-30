@@ -475,6 +475,20 @@ div.search-facet-item:focus {
     background: #4138E0;
 }
 
+.card-component-panel .card-component .is-function-node {
+    color: #014C44;
+}
+
+.add-new-crumb {
+    background: #2B4E6D;
+    border-color: #fff;
+}
+
+.add-new-crumb:hover,
+.add-new-crumb:focus {
+    text-decoration: underline;
+}
+
 /******************************************************************/
 /* Media queries                                                  */
 /******************************************************************/
