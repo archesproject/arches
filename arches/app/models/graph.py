@@ -26,7 +26,7 @@ from django.core.exceptions import ObjectDoesNotExist
 from django.db import transaction
 from django.db.utils import IntegrityError
 from arches.app.models import models
-from arches.app.models.resource import Resource
+from arches.app.models.resource import Resource, UnpublishedModelError
 from arches.app.models.system_settings import settings
 from arches.app.datatypes.datatypes import DataTypeFactory
 from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializer
@@ -79,7 +79,7 @@ class Graph(models.GraphModel):
             if isinstance(args[0], dict):
 
                 for key, value in args[0].items():
-                    if key not in ("root", "nodes", "edges", "cards", "functions", "is_editable"):
+                    if key not in ("root", "nodes", "edges", "cards", "functions", "is_editable", "publication"):
                         setattr(self, key, value)
 
                 nodegroups = dict((item["nodegroupid"], item) for item in args[0]["nodegroups"])
@@ -110,6 +110,14 @@ class Graph(models.GraphModel):
                         self.add_function(function)
 
                 self.populate_null_nodegroups()
+
+                if "publication" in args[0]:
+                    publication_data = args[0]["publication"]
+                    publication_data["serialized_graph"] = JSONDeserializer().deserialize(
+                        JSONSerializer().serialize(self, force_recalculation=True)
+                    )
+
+                    self.publication = models.GraphPublication(**publication_data)
 
             else:
                 if len(args) == 1 and (isinstance(args[0], str) or isinstance(args[0], uuid.UUID)):
@@ -429,8 +437,9 @@ class Graph(models.GraphModel):
                 node_constraint.constraint = constraint_x_node["constraint"]
                 node_constraint.save()
 
-            for widget in self.widgets.values():
-                widget.save()
+            if self.widgets:
+                for widget in self.widgets.values():
+                    widget.save()
 
             for functionxgraph in self._functions:
                 # Right now this only saves a functionxgraph record if the function is present in the database. Otherwise it silently fails.
@@ -1292,9 +1301,10 @@ class Graph(models.GraphModel):
         else:
             widgets = []
 
-            for widget in self.widgets.values():
-                widget_dict = JSONSerializer().serializeToPython(widget)
-                widgets.append(widget_dict)
+            if self.widgets:
+                for widget in self.widgets.values():
+                    widget_dict = JSONSerializer().serializeToPython(widget)
+                    widgets.append(widget_dict)
 
             return widgets
 
@@ -1309,13 +1319,13 @@ class Graph(models.GraphModel):
         exclude = [] if exclude is None else exclude
 
         if self.publication and not force_recalculation:
-            deserialized_graph = JSONDeserializer().deserialize(self.publication.serialized_graph)
+            serialized_graph = self.publication.serialized_graph
 
             for key in exclude:
-                if deserialized_graph.get(key) is not None:  # explicit None comparison so falsey values will still return
-                    deserialized_graph[key] = None
+                if serialized_graph.get(key) is not None:  # explicit None comparison so falsey values will still return
+                    serialized_graph[key] = None
 
-            return deserialized_graph
+            return serialized_graph
         else:
             ret = JSONSerializer().handle_model(self, fields, exclude)
             ret["root"] = self.root
@@ -1581,22 +1591,29 @@ class Graph(models.GraphModel):
         if self.slug is not None:
             graphs_with_matching_slug = models.GraphModel.objects.exclude(slug__isnull=True).filter(slug=self.slug)
             if graphs_with_matching_slug.exists() and graphs_with_matching_slug[0].graphid != self.graphid:
-                raise GraphValidationError(_("Another resource modal already uses the slug '{self.slug}'").format(**locals()), 1007)
+                raise GraphValidationError(_("Another resource model already uses the slug '{self.slug}'").format(**locals()), 1007)
 
     def publish(self, notes=None):
         """
         Adds a row to the GraphPublication table
         Assigns GraphPublication id to Graph
         """
-        publication = models.GraphPublication.objects.create(
-            graph=self,
-            serialized_graph=JSONSerializer().serialize(self, force_recalculation=True),
-            notes=notes,
-        )
-        publication.save()
+        with transaction.atomic():
+            try:
+                publication = models.GraphPublication.objects.create(
+                    graph=self,
+                    serialized_graph=JSONDeserializer().deserialize(JSONSerializer().serialize(self, force_recalculation=True)),
+                    notes=notes,
+                )
+                publication.save()
+            except Exception as e:
+                raise UnpublishedModelError(e)
 
-        self.publication = publication
-        self.save(validate=False)
+            try:
+                self.publication = publication
+                self.save(validate=False)
+            except Exception as e:
+                raise UnpublishedModelError(e)
 
     def unpublish(self):
         """

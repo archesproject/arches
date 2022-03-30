@@ -5,11 +5,10 @@ from django.conf import settings
 from django.db import migrations, models
 import django.db.models.deletion
 
-
 class Migration(migrations.Migration):
 
     dependencies = [
-        ("models", "8085_relational_data_model_handle_dates"),
+        ("models", "7783_make_settings_active"),
     ]
 
     def forwards_add_graph_transactions_table_data(apps, schema_editor):

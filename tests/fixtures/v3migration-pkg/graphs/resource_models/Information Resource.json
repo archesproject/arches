@@ -10938,6 +10938,13 @@
                 }
             ],
             "graphid": "3caf329f-b8f7-11e6-84a5-026d961c88e6",
+            "publication": {
+                "graph_id": "3caf329f-b8f7-11e6-84a5-026d961c88e6",
+                "notes": "Initial migration.",
+                "publicationid": "41a35d2a-b051-4710-a7fd-4470b9d3109d",
+                "published_time": "2022-03-22T13:29:06.593",
+                "user_id": null
+            },
             "iconclass": "fa fa-file-text-o",
             "is_editable": false,
             "isresource": true,
@@ -11668,7 +11675,7 @@
                     "config": {
                         "addToMap": true,
                         "advancedStyle": "",
-                        "advancedStyling": false, 
+                        "advancedStyling": false,
                         "clusterDistance": 20,
                         "clusterMaxZoom": 5,
                         "clusterMinPoints": 3,

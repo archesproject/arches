@@ -127,6 +127,13 @@
             ],
             "functions_x_graphs": [],
             "graphid": "9f716aa2-bf96-11e9-bd39-0242ac160002",
+            "publication": {
+                "graph_id": "9f716aa2-bf96-11e9-bd39-0242ac160002",
+                "notes": "Initial migration.",
+                "publicationid": "10939396-6356-4b44-8dcf-6b9afa74c02a",
+                "published_time": "2022-03-22T13:29:06.593",
+                "user_id": null
+            },
             "iconclass": "",
             "is_editable": true,
             "isresource": true,
