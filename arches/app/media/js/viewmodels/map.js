@@ -28,6 +28,8 @@ define([
 
         this.mapEventHandler = function(eventName,additionalParam,data,event){
             if(event.type=="click" || (event.type=="keyup" && (event.which==13 || event.keyCode==13))){
+                var parent;
+                var provisionalEdit;
                 switch (eventName){
                 case "toggle tab":
                     data.toggleTab(additionalParam);
@@ -45,7 +47,7 @@ define([
                 case "select features":
                     if(data.mapCard.isSelectable([data.feature])){
                         data.selectFeature([data.feature]);
-                    };
+                    }
                     break;
                 case "open editing":
                     window.open(data.editURL + data.resourceinstanceid);
@@ -57,13 +59,13 @@ define([
                     data.provisionalTileViewModel.deleteAllProvisionalEdits();
                     break;
                 case "select provisional edit":
-                    var parent = additionalParam[0];
-                    var provisionalEdit = additionalParam[1];
+                    parent = additionalParam[0];
+                    provisionalEdit = additionalParam[1];
                     parent.provisionalTileViewModel.selectProvisionalEdit(provisionalEdit);
                     break;
                 case "reject provisional edit":
-                    var parent = additionalParam[0];
-                    var provisionalEdit = additionalParam[1];
+                    parent = additionalParam[0];
+                    provisionalEdit = additionalParam[1];
                     parent.provisionalTileViewModel.rejectProvisionalEdit(provisionalEdit);
                     break;
                 case "clear features":
