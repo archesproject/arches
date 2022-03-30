@@ -93,7 +93,7 @@
                 </div>
 
                 <div class="col-xs-12">
-                    <a class="btn btn-sm btn-primary btn-labeled fa fa-refresh" style="float: right;margin-top: 6px;margin-right: 6px;" data-bind="visible: !loading(), click: reindexdb;">{% trans "Re-Index Resources Now" %}</a>
+                    <a class="btn btn-sm btn-primary btn-labeled fa fa-refresh" style="float: right;margin-top: 6px;margin-right: 6px;" data-bind="visible: !loading(), click: reindexdb;"><span>{% trans "Re-Index Resources Now" %}</span></a>
                     <a class="btn btn-primary" href="#" style="float: right;margin-top: 6px;margin-right: 6px; padding:0px 5px 0px 0px;" data-bind="visible: loading">
                         <i class="fa fa-spin fa-refresh" style="padding: 8px;"></i> {% trans "Re-Indexing..." %}
                     </a>
