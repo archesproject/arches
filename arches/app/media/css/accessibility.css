@@ -1,3 +1,7 @@
+html, body {
+    overflow-y: hidden;
+}
+
 body, .title-v1 p, .ep-tools-login, .ep-tools-right, .search-label, .counters h3 {
     font-size: 1.3em;
 }
@@ -466,6 +470,11 @@ div.search-facet-item:focus {
     height: calc(100vh - 100px);
 }
 
+#menu-control {
+    color: #fff;
+    background: #4138E0;
+}
+
 /******************************************************************/
 /* Media queries                                                  */
 /******************************************************************/
@@ -635,5 +644,44 @@ div.search-facet-item:focus {
 
     .search-result-details {
         height: calc(50vh - 100px);
+    }
+
+    .sidepanel-draggable {
+        display: none;
+    }
+
+    #menu-control {
+        margin-left: 50px;
+    }
+
+    h1.page-header.text-overflow.ep-graph-title {
+        padding-left: 5px !important;
+    }
+
+    .resource-editor-container {
+        flex-direction: column;
+    }
+
+    .resource-editor-container .left-panel {
+        flex: 0 0 30vh !important;
+        overflow-y: auto;
+    }
+
+    .resource-editor-container .left-panel .resource-editor-tree{
+        height: auto;
+    }
+
+    .resource-editor-container .main-panel {
+        flex: 0 0 calc(70vh - 100px) !important;
+        overflow-y: auto;
+    }
+
+    .resource-editor-container .main-panel .card-component-wrapper-editor {
+        height: inherit;
+    }
+
+    .resource-editor-container .main-panel .rr-splash {
+        margin: 20px;
+        padding: 20px;
     }
 }
