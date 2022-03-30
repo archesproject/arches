@@ -46,6 +46,7 @@ from arches.app.utils.decorators import can_read_concept, group_required
 from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializer
 from arches.app.utils.data_management.resources.exporter import ResourceExporter
 from arches.app.utils.data_management.resources.formats.rdffile import JsonLdReader
+from arches.app.utils.data_management.resources.formats.archesfile import ArchesFileReader
 from arches.app.utils.permission_backend import (
     user_can_read_resource,
     user_can_edit_resource,
@@ -358,8 +359,10 @@ class GeoJSON(APIBase):
                                 feature["properties"]["primary_name"] = self.get_name(tile.resourceinstance)
                             feature["properties"]["resourceinstanceid"] = tile.resourceinstance_id
                             feature["properties"]["tileid"] = tile.pk
-                            if feature["properties"]["nodeId"]:
+                            try:
                                 feature["properties"].pop("nodeId")
+                            except KeyError:
+                                pass
                             feature["properties"]["nodeid"] = node.pk
                             if include_geojson_link:
                                 feature["properties"]["geojson"] = "%s?tileid=%s&nodeid=%s" % (reverse("geojson"), tile.pk, node.pk)
@@ -563,6 +566,7 @@ class Resources(APIBase):
 
         allowed_formats = ["json", "json-ld", "arches-json"]
         format = request.GET.get("format", "json-ld")
+        hide_hidden_nodes = bool(request.GET.get("hidden", "true").lower() == "false")
         user = request.user
         perm = "read_nodegroup"
 
@@ -584,11 +588,23 @@ class Resources(APIBase):
                 hide_empty_nodes = bool(request.GET.get("hide_empty_nodes", "false").lower() == "true")  # default False
 
                 if version == "beta":
-                    out = resource.to_json(compact=compact, hide_empty_nodes=hide_empty_nodes, user=user, perm=perm, version=version)
+                    out = resource.to_json(
+                        compact=compact,
+                        hide_empty_nodes=hide_empty_nodes,
+                        user=user,
+                        perm=perm,
+                        version=version,
+                        hide_hidden_nodes=hide_hidden_nodes,
+                    )
                 else:
                     out = {
                         "resource": resource.to_json(
-                            compact=compact, hide_empty_nodes=hide_empty_nodes, user=user, perm=perm, version=version
+                            compact=compact,
+                            hide_empty_nodes=hide_empty_nodes,
+                            user=user,
+                            perm=perm,
+                            version=version,
+                            hide_hidden_nodes=hide_hidden_nodes,
                         ),
                         "displaydescription": resource.displaydescription,
                         "displayname": resource.displayname,
@@ -722,24 +738,100 @@ class Resources(APIBase):
         except Exception:
             indent = None
 
+        allowed_formats = ["arches-json", "json-ld"]
+        format = request.GET.get("format", "json-ld")
+        if format not in allowed_formats:
+            return JSONResponse(status=406, reason="incorrect format specified, only %s formats allowed" % allowed_formats)
+
         if not user_can_edit_resource(user=request.user, resourceid=resourceid):
             return JSONResponse(status=403)
         else:
             with transaction.atomic():
                 try:
-                    # DELETE
-                    resource_instance = Resource.objects.get(pk=resourceid)
-                    resource_instance.delete()
-                except models.ResourceInstance.DoesNotExist:
-                    pass
+                    if format == "json-ld":
+                        try:
+                            # DELETE
+                            resource_instance = Resource.objects.get(pk=resourceid)
+                            resource_instance.delete()
+                        except models.ResourceInstance.DoesNotExist:
+                            pass
 
-                try:
-                    # POST
+                        # POST
+                        data = JSONDeserializer().deserialize(request.body)
+                        reader = JsonLdReader()
+                        if slug is not None:
+                            graphid = models.GraphModel.objects.get(slug=slug).pk
+                        reader.read_resource(data, resourceid=resourceid, graphid=graphid)
+                        if reader.errors:
+                            response = []
+                            for value in reader.errors.values():
+                                response.append(value.message)
+                            return JSONResponse({"error": response}, indent=indent, status=400)
+                        else:
+                            response = []
+                            for resource in reader.resources:
+                                with transaction.atomic():
+                                    resource.save(request=request)
+                                response.append(JSONDeserializer().deserialize(self.get(request, resource.resourceinstanceid).content))
+                            return JSONResponse(response, indent=indent, status=201)
+
+                    elif format == "arches-json":
+                        reader = ArchesFileReader()
+                        archesresource = JSONDeserializer().deserialize(request.body)
+
+                        # IF a resource id is supplied in the url it should match the resource ids in the body of the request.
+                        if resourceid != archesresource["resourceinstanceid"]:
+                            return JSONResponse(
+                                {"error": "Resource id in the URI does not match the resourceinstanceid supplied in the document"},
+                                indent=indent,
+                                status=400,
+                            )
+
+                        #  Resource id's in the request body take precedence over the id supplied in the url.
+                        resource = {
+                            "resourceinstance": {
+                                "graph_id": archesresource["graph_id"],
+                                "resourceinstanceid": archesresource["resourceinstanceid"],
+                                "legacyid": archesresource["legacyid"],
+                            },
+                            "tiles": archesresource["tiles"],
+                        }
+
+                        reader.import_business_data({"resources": [resource]})
+
+                        if reader.errors:
+                            response = []
+                            for value in reader.errors.values():
+                                response.append(value.message)
+                            return JSONResponse({"error": response}, indent=indent, status=400)
+                        else:
+                            response = []
+                            response.append(JSONDeserializer().deserialize(self.get(request, archesresource["resourceinstanceid"]).content))
+                            return JSONResponse(response, indent=indent, status=201)
+
+                except models.ResourceInstance.DoesNotExist:
+                    return JSONResponse(status=404)
+                except Exception as e:
+                    return JSONResponse({"error": "resource data could not be saved"}, status=500, reason=e)
+
+    def post(self, request, resourceid=None, slug=None, graphid=None):
+        try:
+            indent = int(request.POST.get("indent", None))
+        except Exception:
+            indent = None
+        allowed_formats = ["arches-json", "json-ld"]
+        format = request.GET.get("format", "json-ld")
+        if format not in allowed_formats:
+            return JSONResponse(status=406, reason="incorrect format specified, only %s formats allowed" % allowed_formats)
+
+        try:
+            if user_can_edit_resource(user=request.user, resourceid=resourceid):
+                if format == "json-ld":
                     data = JSONDeserializer().deserialize(request.body)
                     reader = JsonLdReader()
                     if slug is not None:
                         graphid = models.GraphModel.objects.get(slug=slug).pk
-                    reader.read_resource(data, resourceid=resourceid, graphid=graphid)
+                    reader.read_resource(data, graphid=graphid)
                     if reader.errors:
                         response = []
                         for value in reader.errors.values():
@@ -752,36 +844,34 @@ class Resources(APIBase):
                                 resource.save(request=request)
                             response.append(JSONDeserializer().deserialize(self.get(request, resource.resourceinstanceid).content))
                         return JSONResponse(response, indent=indent, status=201)
-                except models.ResourceInstance.DoesNotExist:
-                    return JSONResponse(status=404)
-                except Exception as e:
-                    return JSONResponse({"error": "resource data could not be saved"}, status=500, reason=e)
 
-    def post(self, request, resourceid=None, slug=None, graphid=None):
-        try:
-            indent = int(request.POST.get("indent", None))
-        except Exception:
-            indent = None
+                elif format == "arches-json":
+                    reader = ArchesFileReader()
+                    archesresource = JSONDeserializer().deserialize(request.body)
 
-        try:
-            if user_can_edit_resource(user=request.user, resourceid=resourceid):
-                data = JSONDeserializer().deserialize(request.body)
-                reader = JsonLdReader()
-                if slug is not None:
-                    graphid = models.GraphModel.objects.get(slug=slug).pk
-                reader.read_resource(data, graphid=graphid)
-                if reader.errors:
-                    response = []
-                    for value in reader.errors.values():
-                        response.append(value.message)
-                    return JSONResponse({"error": response}, indent=indent, status=400)
-                else:
-                    response = []
-                    for resource in reader.resources:
-                        with transaction.atomic():
-                            resource.save(request=request)
-                        response.append(JSONDeserializer().deserialize(self.get(request, resource.resourceinstanceid).content))
-                    return JSONResponse(response, indent=indent, status=201)
+                    nascent_resourceinstanceid = str(uuid.uuid4())
+
+                    resource = {
+                        "resourceinstance": {
+                            "graph_id": archesresource["graph_id"],
+                            "resourceinstanceid": nascent_resourceinstanceid,
+                            "legacyid": archesresource["legacyid"],
+                        },
+                        "tiles": archesresource["tiles"],
+                    }
+
+                    reader.import_business_data({"resources": [resource]})
+
+                    if reader.errors:
+                        response = []
+                        for value in reader.errors.values():
+                            response.append(value.message)
+                        return JSONResponse({"error": response}, indent=indent, status=400)
+                    else:
+                        response = []
+                        response.append(JSONDeserializer().deserialize(self.get(request, nascent_resourceinstanceid).content))
+                        return JSONResponse(response, indent=indent, status=201)
+
             else:
                 return JSONResponse(status=403)
         except Exception as e:
@@ -976,7 +1066,10 @@ class SearchExport(View):
         exporter = SearchResultsExporter(search_request=request)
         export_files, export_info = exporter.export(format, report_link)
         if format == "geojson" and total <= download_limit:
-            response = JSONResponse(export_files)
+            if settings.EXPORT_DATA_FIELDS_IN_CARD_ORDER:
+                response = JSONResponse(export_files, sort_keys=False)
+            else:
+                response = JSONResponse(export_files)
             return response
         return JSONResponse(status=404)
 
@@ -1342,13 +1435,15 @@ class BulkResourceReport(APIBase):
 class BulkDisambiguatedResourceInstance(APIBase):
     def get(self, request):
         resource_ids = request.GET.get("resource_ids").split(",")
-        uncompacted_value = request.GET.get("uncompacted")
         version = request.GET.get("v")
-        compact = True
-        if uncompacted_value == "true":
-            compact = False
+        hide_hidden_nodes = bool(request.GET.get("hidden", "true").lower() == "false")
+        compact = bool(request.GET.get("uncompacted", "false").lower() == "false")
+
         return JSONResponse(
-            {resource.pk: resource.to_json(compact=compact, version=version) for resource in Resource.objects.filter(pk__in=resource_ids)}
+            {
+                resource.pk: resource.to_json(compact=compact, version=version, hide_hidden_nodes=hide_hidden_nodes)
+                for resource in Resource.objects.filter(pk__in=resource_ids)
+            }
         )
 
 

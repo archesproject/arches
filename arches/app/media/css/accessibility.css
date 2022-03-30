@@ -73,6 +73,7 @@
     text-decoration: underline;
 }
 
+
 .arches-signin .panel-footer {
     color: #494949;
 }
@@ -83,4 +84,9 @@
 
 .password-rule {
     color: #494949;
+}
+
+div.search-facet-item:focus {
+    box-shadow: inset 0 0 0 3px #000;
+    outline: none;
 }

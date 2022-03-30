@@ -7,8 +7,8 @@ define(['arches'], function(arches) {
          * @param  {resourceid} the id of the Resouce Instance
          * @return {object}
          */
-        lookupResourceInstanceData: function(resourceid) {
-            if (resourceLookup[resourceid]) {
+        lookupResourceInstanceData: function(resourceid, usecache=true) {
+            if (resourceLookup[resourceid] && usecache) {
                 return Promise.resolve(resourceLookup[resourceid]);
             } else {
                 return window.fetch(arches.urls.search_results + "?id=" + resourceid)
