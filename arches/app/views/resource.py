@@ -169,6 +169,12 @@ class ResourceEditorView(MapBaseManagerView):
                 if not added and request.user.has_perm("read_nodegroup", node.nodegroup):
                     nodegroups.append(node.nodegroup)
 
+        primary_descriptor_functions = models.FunctionXGraph.objects.filter(graph=graph).filter(
+            function__functiontype="primarydescriptors"
+        )
+        primary_descriptor_function = JSONSerializer().serialize(
+            primary_descriptor_functions[0] if len(primary_descriptor_functions) > 0 else None
+        )
         user_is_reviewer = user_is_resource_reviewer(request.user)
         is_system_settings = False
 
@@ -253,6 +259,7 @@ class ResourceEditorView(MapBaseManagerView):
             card_components_json=JSONSerializer().serialize(card_components),
             tiles=JSONSerializer().serialize(tiles),
             cards=JSONSerializer().serialize(serialized_cards),
+            primary_descriptor_function=primary_descriptor_function,
             applied_functions=JSONSerializer().serialize(models.FunctionXGraph.objects.filter(graph=graph)),
             nodegroups=JSONSerializer().serialize(nodegroups),
             nodes=JSONSerializer().serialize(nodes.filter(nodegroup__in=nodegroups)),

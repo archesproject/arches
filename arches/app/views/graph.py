@@ -177,6 +177,12 @@ class GraphDesignerView(GraphBaseView):
         serialized_graph = self.graph.serialize(force_recalculation=True)  # calling `serialize` directly returns a dict
 
         datatypes = models.DDataType.objects.all()
+        primary_descriptor_functions = models.FunctionXGraph.objects.filter(
+            graph=self.graph
+        ).filter(function__functiontype="primarydescriptors")
+        primary_descriptor_function = JSONSerializer().serialize(
+            primary_descriptor_functions[0] if len(primary_descriptor_functions) > 0 else None
+        )
         widgets = models.Widget.objects.all()
         card_components = models.CardComponent.objects.all()
         graph_models = models.GraphModel.objects.all().exclude(graphid=settings.SYSTEM_SETTINGS_RESOURCE_MODEL_ID)
@@ -214,6 +220,7 @@ class GraphDesignerView(GraphBaseView):
             map_markers=models.MapMarker.objects.all(),
             map_sources=models.MapSource.objects.all(),
             applied_functions=JSONSerializer().serialize(serialized_graph["functions"]),
+            primary_descriptor_function=primary_descriptor_function,
             geocoding_providers=models.Geocoder.objects.all(),
             report_templates=models.ReportTemplate.objects.all(),
             restricted_nodegroups=[str(nodegroup) for nodegroup in restricted_nodegroups],
@@ -407,7 +414,7 @@ class GraphDataView(View):
             return JSONErrorResponse(
                 _("Elasticsearch indexing error"),
                 _(
-                    """If you want to change the datatype of an existing node.  
+                    """If you want to change the datatype of an existing node.
                     Delete and then re-create the node, or export the branch then edit the datatype and re-import the branch."""
                 ),
             )

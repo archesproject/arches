@@ -485,6 +485,7 @@ class Node(models.Model):
     sortorder = models.IntegerField(blank=True, null=True, default=0)
     fieldname = models.TextField(blank=True, null=True)
     exportable = models.BooleanField(default=False, null=True)
+    alias = models.TextField(blank=True, null=True)
 
     def get_child_nodes_and_edges(self):
         """
@@ -553,6 +554,7 @@ class Node(models.Model):
         db_table = "nodes"
         constraints = [
             models.UniqueConstraint(fields=["name", "nodegroup"], name="unique_nodename_nodegroup"),
+            models.UniqueConstraint(fields=["alias", "graph"], name="unique_alias_graph"),
         ]
 
 

@@ -16566,17 +16566,21 @@
             "functions_x_graphs": [
                 {
                     "config": {
-                        "description": {
-                            "nodegroup_id": "13e60e01-943d-11e8-b76c-94659cf754d0",
-                            "string_template": "<Description>"
-                        },
-                        "map_popup": {
-                            "nodegroup_id": "185b6981-943d-11e8-8310-94659cf754d0",
-                            "string_template": "<Name>"
-                        },
-                        "name": {
-                            "nodegroup_id": "185b6981-943d-11e8-8310-94659cf754d0",
-                            "string_template": "<Name>"
+                        "module": "arches.app.functions.primary_descriptors",
+                        "class_name": "PrimaryDescriptorsFunction",
+                        "descriptor_types": {
+                            "description": {
+                                "nodegroup_id": "13e60e01-943d-11e8-b76c-94659cf754d0",
+                                "string_template": "<Description>"
+                            },
+                            "map_popup": {
+                                "nodegroup_id": "185b6981-943d-11e8-8310-94659cf754d0",
+                                "string_template": "<Name>"
+                            },
+                            "name": {
+                                "nodegroup_id": "185b6981-943d-11e8-8310-94659cf754d0",
+                                "string_template": "<Name>"
+                            }
                         },
                         "triggering_nodegroups": []
                     },
