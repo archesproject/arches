@@ -489,6 +489,11 @@ div.search-facet-item:focus {
     text-decoration: underline;
 }
 
+.edtf-style-tools-collapser {
+    left: auto;
+    right: 0;
+}
+
 /******************************************************************/
 /* Media queries                                                  */
 /******************************************************************/
@@ -586,6 +591,21 @@ div.search-facet-item:focus {
 
     .search-result-details {
         height: 50vh;
+    }
+
+    .dl-horizontal dt {
+        float: none;
+        width: auto;
+        text-align: left;
+        padding-top: 10px;
+    }
+
+    .dl-horizontal dd {
+        margin-left: 0;
+    }
+
+    .rp-card-section-contents {
+        display: block;
     }
 }
 
