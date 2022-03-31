@@ -169,9 +169,7 @@ class ResourceEditorView(MapBaseManagerView):
                 if not added and request.user.has_perm("read_nodegroup", node.nodegroup):
                     nodegroups.append(node.nodegroup)
 
-        primary_descriptor_functions = models.FunctionXGraph.objects.filter(graph=graph).filter(
-            function__functiontype="primarydescriptors"
-        )
+        primary_descriptor_functions = models.FunctionXGraph.objects.filter(graph=graph).filter(function__functiontype="primarydescriptors")
         primary_descriptor_function = JSONSerializer().serialize(
             primary_descriptor_functions[0] if len(primary_descriptor_functions) > 0 else None
         )

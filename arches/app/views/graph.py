@@ -177,9 +177,9 @@ class GraphDesignerView(GraphBaseView):
         serialized_graph = self.graph.serialize(force_recalculation=True)  # calling `serialize` directly returns a dict
 
         datatypes = models.DDataType.objects.all()
-        primary_descriptor_functions = models.FunctionXGraph.objects.filter(
-            graph=self.graph
-        ).filter(function__functiontype="primarydescriptors")
+        primary_descriptor_functions = models.FunctionXGraph.objects.filter(graph=self.graph).filter(
+            function__functiontype="primarydescriptors"
+        )
         primary_descriptor_function = JSONSerializer().serialize(
             primary_descriptor_functions[0] if len(primary_descriptor_functions) > 0 else None
         )
