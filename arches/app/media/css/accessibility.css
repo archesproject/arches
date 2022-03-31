@@ -475,6 +475,25 @@ div.search-facet-item:focus {
     background: #4138E0;
 }
 
+.card-component-panel .card-component .is-function-node {
+    color: #014C44;
+}
+
+.add-new-crumb {
+    background: #2B4E6D;
+    border-color: #fff;
+}
+
+.add-new-crumb:hover,
+.add-new-crumb:focus {
+    text-decoration: underline;
+}
+
+.edtf-style-tools-collapser {
+    left: auto;
+    right: 0;
+}
+
 /******************************************************************/
 /* Media queries                                                  */
 /******************************************************************/
@@ -572,6 +591,21 @@ div.search-facet-item:focus {
 
     .search-result-details {
         height: 50vh;
+    }
+
+    .dl-horizontal dt {
+        float: none;
+        width: auto;
+        text-align: left;
+        padding-top: 10px;
+    }
+
+    .dl-horizontal dd {
+        margin-left: 0;
+    }
+
+    .rp-card-section-contents {
+        display: block;
     }
 }
 
@@ -683,5 +717,13 @@ div.search-facet-item:focus {
     .resource-editor-container .main-panel .rr-splash {
         margin: 20px;
         padding: 20px;
+    }
+
+    .create-resource-instance-card-component.rr-table-pop {
+        padding-left: 0;
+    }
+
+    .create-instance-header {
+        padding-left: 55px;
     }
 }
