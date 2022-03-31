@@ -706,9 +706,13 @@ input[type="checkbox"] {
     display: none;
 }
 
+.display-in-workflow-step {
+    padding: 10px;
+    background-color: #ececec;
+    border-top: solid 1px #ddd;
+}
+
 .tabbed-workflow-step-body .display-in-workflow-step.install-buttons {
-    bottom: 53px;
-    display: unset;
 }
 
 .tabbed-workflow-step-body>div {
@@ -1230,7 +1234,6 @@ ul.tabbed-report-tab-list {
     font-weight: 600;
     color: #666;
     margin-left: 10px;
-    margin-top: 60px;
 }
 
 .workbench-card-sidepanel-header-container.file-workbench {
@@ -2177,15 +2180,13 @@ div.final-cons-step-separator>h4 {
     z-index: 250;
     right: 75px;
     height: 100%;
-    width: 400px;
     background: white;
     border-left: 1px solid rgb(216, 216, 216);
-    padding: 16px;
-    overflow-y: scroll;
-}
-
-.workbench-sidepanel-card-container {
-    /* margin: -40px -10px 10px -10px; */
+    overflow-y: hidden;
+    display: flex;
+    flex-direction: column;
+    align-items: normal;
+    width: 400px;
 }
 
 .workbench-sidepanel-body {
@@ -2257,17 +2258,26 @@ div.final-cons-step-separator>h4 {
 }
 
 .workbench-card-sidepanel-header-container {
-    border-bottom: 1px solid #ddd;
-    padding: 17px 30px 10px 0px;
+    padding: 14px;
     margin-left: 0px;
-    margin-top: -16px;
-    position: fixed;
     background: #fff;
     z-index: 20;
-    width: 370px;
+    width: 400px;
 }
 
+.workbench-card-sidepanel-border {
+    border-bottom: 1px solid #ddd;
+    margin: 0px 12px;
+}
 
+.workbench-card-sidepanel-body {
+    overflow-y: scroll;
+    width: inherit;
+    height: -moz-available;
+    height: -webkit-fill-available;
+    height: fill-available;
+    padding: 10px;
+}
 
 .expanded .workbench-card-sidepanel-header-container {
     width: 599px;
@@ -2275,11 +2285,8 @@ div.final-cons-step-separator>h4 {
     padding-left: 15px;
 }
 
-.workbench-header-buffer {
-    height: 40px
-}
-
 .workbench-card-sidepanel-header {
+    position: relative;
     cursor: pointer;
     color: rgb(33, 62, 95);
     font-size: 15px;
@@ -2323,15 +2330,15 @@ div.final-cons-step-separator>h4 {
 }
 
 .basemap-listing-container {
-    margin-top: 50px;
+    padding: 0 16px 16px;
 }
 
 .overlays-listing-container {
-    margin-top: 50px;
+    padding: 0 16px 16px;
 }
 
 .legend-listing-container {
-    margin-top: 50px;
+    padding: 0 16px 16px;
 }
 
 .basemap-listing:before,
@@ -9355,7 +9362,6 @@ a#close-map-tools.map-widget-icon:hover {
 
 .spatial-filter-container {
     padding: 10px 5px 15px 5px;
-    margin-top: 45px;
     border-bottom: 1px solid #ddd;
 }
 
@@ -13763,12 +13769,10 @@ a.jstree-anchor.permissions-widget {
 }
 
 .iiif-image-tools {
-    margin-top: 55px;
     padding: 10px;
     color: rgb(30, 63, 94);
     font-size: 0.9em;
 }
-
 
 .iiif-image-tool-slider {
     padding-bottom: 10px;
@@ -14175,8 +14179,8 @@ a.jstree-anchor.permissions-widget {
         color: darken(#213e5f, 100%);
     }
     .related-resource-graph-information-content {
-        padding-top: 60px;
         height: 100%;
+        padding: 16px;
         .edge-relationship-information {
             $edge-label-height: 150px;
             position: relative;
@@ -14254,7 +14258,7 @@ a.jstree-anchor.permissions-widget {
         line-height: 0.9;
     }
     .relationships-list {
-        height: calc(100% - 134px);
+        height: calc(100% - 185px);
         border: 1px solid rgb(221, 221, 221);
         overflow-y: auto;
         .relationships-list-item {
@@ -14310,8 +14314,11 @@ a.jstree-anchor.permissions-widget {
             margin-top: -2px;
         }
     }
+    .related-resources-search-body {
+        padding: 16px;
+        height: 100%;
+    }
     .related-reasources-search-container {
-        margin-top: 60px;
         position: relative;
     }
     .related-reasources-search-list {
