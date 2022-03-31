@@ -718,4 +718,12 @@ div.search-facet-item:focus {
         margin: 20px;
         padding: 20px;
     }
+
+    .create-resource-instance-card-component.rr-table-pop {
+        padding-left: 0;
+    }
+
+    .create-instance-header {
+        padding-left: 55px;
+    }
 }
