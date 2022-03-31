@@ -325,18 +325,18 @@
 
                 <aside id="card-help-panel" class="card-help-panel" style="display: none;" data-bind="visible: card.model.get('helpactive')">
                     <div class="relative">
-                        <a id="add-basemap-wizard-help-close" href="#" class="help-close fa fa-times fa-lg" style="" data-bind="click: function () {
+                        <a id="add-basemap-wizard-help-close" href="#" class="help-close fa fa-times fa-lg" data-bind="click: function () {
                             card.model.get('helpactive')(false);
                         }"></a>
                     </div>
                     <div id="add-basemap-wizard-help-content">
                         <div>
                             <div class="panel-heading">
-                                <h3 class="panel-title help-panel-title" style="">
+                                <h3 class="panel-title help-panel-title">
                                     <span data-bind="html: card.model.get('helptitle')"></span>
                                 </h3>
                             </div>
-                            <div class="panel-body" style="padding: 10px 10px 15px 10px;" data-bind="html: card.model.get('helptext')">
+                            <div class="panel-body" data-bind="html: card.model.get('helptext')">
                             </div>
                         </div>
                     </div>
