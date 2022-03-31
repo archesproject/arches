@@ -479,6 +479,11 @@ div.search-facet-item:focus {
     color: #1F496E;
 }
 
+.recent-edits-container {
+    height: calc(100vh - 50px);
+    overflow-y: auto;
+}
+
 /******************************************************************/
 /* Media queries                                                  */
 /******************************************************************/
@@ -687,5 +692,9 @@ div.search-facet-item:focus {
     .resource-editor-container .main-panel .rr-splash {
         margin: 20px;
         padding: 20px;
+    }
+
+    .recent-edits-container {
+        height: calc(100vh - 100px);
     }
 }
