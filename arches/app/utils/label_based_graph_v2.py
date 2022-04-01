@@ -198,8 +198,9 @@ class LabelBasedGraph(object):
             _dummy_resource_name, resource_graph = root_label_based_node_json.popitem()
 
             # removes unneccesary ( None ) top-node values
-            for key in [NODE_ID_KEY, TILE_ID_KEY]:
-                resource_graph.pop(key, None)
+            if resource_graph:
+                for key in [NODE_ID_KEY, TILE_ID_KEY]:
+                    resource_graph.pop(key, None)
 
             # adds metadata that was previously only accessible via API
             return {
@@ -263,13 +264,29 @@ class LabelBasedGraph(object):
     def _build_graph(
         cls, input_node, input_tile, parent_tree, node_ids_to_tiles_reference, nodegroup_cardinality_reference, node_cache, datatype_factory
     ):
+        def is_valid_semantic_node(node, tile):
+            if node.datatype == "semantic":
+                child_nodes = node.get_direct_child_nodes()
+                semantic_child_nodes = [child_node for child_node in child_nodes if child_node.datatype == "semantic"]
+                non_semantic_child_nodes = [child_node for child_node in child_nodes if child_node.datatype != "semantic"]
+
+                for non_semantic_child_node in non_semantic_child_nodes:
+                    if str(non_semantic_child_node.pk) in tile.data or str(non_semantic_child_node.pk) in node_ids_to_tiles_reference:
+                        return True
+
+                has_valid_child_semantic_node = False
+
+                for semantic_child_node in semantic_child_nodes:
+                    if is_valid_semantic_node(semantic_child_node, tile):
+                        has_valid_child_semantic_node = True
+
+                return has_valid_child_semantic_node
+
         for associated_tile in node_ids_to_tiles_reference.get(str(input_node.pk), [input_tile]):
             parent_tile = associated_tile.parenttile
 
             if associated_tile == input_tile or parent_tile == input_tile:
-                if (  # don't instantiate `LabelBasedNode`s of cardinality `n` unless they are semantic or have value
-                    input_node.datatype == "semantic" or str(input_node.pk) in associated_tile.data
-                ):
+                if is_valid_semantic_node(input_node, associated_tile) or str(input_node.pk) in associated_tile.data:
                     label_based_node = LabelBasedNode(
                         name=input_node.name,
                         node_id=str(input_node.pk),
