@@ -42,6 +42,9 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
     {% block css %}
         {% compress css %}
         <link type="text/x-scss" href="{% static 'css/arches.scss' %}" rel="stylesheet" media="screen, print">
+            {% if app_settings.DEFAULT_LANGUAGE_DIR == "rtl" %}
+            <link type="text/x-scss" href="{% static 'css/rtl.scss' %}" rel="stylesheet" media="screen, print">
+            {% endif %}
     	{% endcompress %}
         {% if app_settings.ACCESSIBILITY_MODE %}
         <link href="{% static 'css/accessibility.css' %}" rel="stylesheet">
