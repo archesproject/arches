@@ -64,6 +64,7 @@ define([
                 
                 return shouldShowGraphPublishButtons;
             });
+            viewModel.primaryDescriptorFunction = ko.observable(data['primaryDescriptorFunction']);
 
             var resources = ko.utils.arrayFilter(viewData.graphs, function(graph) {
                 return graph.isresource;
@@ -286,6 +287,7 @@ define([
             viewModel.cardTree = new CardTreeViewModel({
                 graph: viewModel.graph,
                 appliedFunctions: viewModel.appliedFunctions,
+                primaryDescriptorFunction: viewModel.primaryDescriptorFunction,
                 graphModel: viewModel.graphModel
             });
 
@@ -293,6 +295,7 @@ define([
                 graph: viewModel.graph,
                 graphModel: viewModel.graphModel,
                 appliedFunctions: viewModel.appliedFunctions,
+                primaryDescriptorFunction: viewModel.primaryDescriptorFunction,
                 multiselect: true
             });
 
@@ -326,6 +329,7 @@ define([
                 loading: viewModel.loading,
                 node: viewModel.selectedNode,
                 appliedFunctions: viewModel.appliedFunctions,
+                primaryDescriptorFunction: viewModel.primaryDescriptorFunction,
                 restrictedNodegroups: data.restrictedNodegroups
             });
 
@@ -394,6 +398,7 @@ define([
                 cardTree: viewModel.cardTree,
                 permissionTree: viewModel.permissionTree,
                 appliedFunctions: viewModel.appliedFunctions,
+                primaryDescriptorFunction: viewModel.primaryDescriptorFunction,
                 restrictedNodegroups: data.restrictedNodegroups
             });
 
