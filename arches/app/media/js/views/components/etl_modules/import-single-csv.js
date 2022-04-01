@@ -18,7 +18,6 @@ define([
             this.graphs = ko.observable();
             this.selectedGraph = ko.observable();
             this.nodes = ko.observable();
-            // this.selectedNode = ko.observable();
             this.fileInfo = ko.observable({name:"", size:""});
             this.hasHeaders = ko.observable(true);
             this.csvArray = ko.observable();
@@ -34,7 +33,7 @@ define([
             this.validated = ko.observable();
             this.validationError = ko.observableArray();
             this.formData = new window.FormData();
-            this.loadId = uuid.generate();
+            this.loadId = params.loadId || uuid.generate();
             this.uniqueId = uuid.generate();
             this.uniqueidClass = ko.computed(function() {
                 return "unique_id_" + self.uniqueId;
@@ -136,7 +135,11 @@ define([
                 //         return response.json;
                 //     }
                 // }).then(function(response){
-                    self.csvArray(response.result);
+                    self.csvArray(response.result.csv);
+                    if (response.result.config) {
+                        self.fieldMapping(response.result.config.mapping);
+                        self.selectedGraph(response.result.config.graph);
+                    }
                     self.fileAdded(true);
                     self.loading(false);
                 }).catch(function(err) {
@@ -147,8 +150,10 @@ define([
 
             this.write = function(){
                 const fieldnames = koMapping.toJS(self.fieldMapping).map(fieldname => {return fieldname.node;});
+                const fieldMapping = koMapping.toJS(self.fieldMapping);
                 self.formData.append('fieldnames', fieldnames);
-                self.formData.append('header', self.headers());
+                self.formData.append('fieldMapping', JSON.stringify(fieldMapping));
+                self.formData.append('hasHeaders', self.hasHeaders());
                 self.formData.append('graphid', self.selectedGraph());
                 self.submit('write').then(data => {
                     console.log(data.result);
@@ -168,8 +173,10 @@ define([
             this.validate =function(){
                 self.validated(false);
                 const fieldnames = koMapping.toJS(self.fieldMapping).map(fieldname => fieldname.node);
+                const fieldMapping = koMapping.toJS(self.fieldMapping);
                 self.formData.append('fieldnames', fieldnames);
-                self.formData.append('header', self.headers());
+                self.formData.append('fieldMapping', JSON.stringify(fieldMapping));
+                self.formData.append('hasHeaders', self.hasHeaders());
                 self.formData.append('graphid', self.selectedGraph());
                 self.submit('validate').then(data => {
                     self.validated(true);
