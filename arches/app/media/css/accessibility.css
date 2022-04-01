@@ -494,6 +494,15 @@ div.search-facet-item:focus {
     right: 0;
 }
 
+.regular-link {
+    color: #1F496E;
+}
+
+.recent-edits-container {
+    height: calc(100vh - 50px);
+    overflow-y: auto;
+}
+
 /******************************************************************/
 /* Media queries                                                  */
 /******************************************************************/
@@ -725,5 +734,9 @@ div.search-facet-item:focus {
 
     .create-instance-header {
         padding-left: 55px;
+    }
+  
+    .recent-edits-container {
+        height: calc(100vh - 100px);
     }
 }
