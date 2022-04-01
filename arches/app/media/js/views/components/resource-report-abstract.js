@@ -92,7 +92,7 @@ define([
         this.preloadResourceData = function(responseJson) {
             const displayName = (() => {
                 try{
-                    return JSON.parse(responseJson.displayname)?.[arches.defaultLanguage]?.value;
+                    return JSON.parse(responseJson.displayname)?.[arches.activeLanguage]?.value;
                 } catch (e){
                     return responseJson.displayname
                 }
