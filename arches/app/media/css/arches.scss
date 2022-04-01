@@ -3807,10 +3807,6 @@ ul.nav.nav-tabs.nav-justified {
     overflow-y: scroll;
 }
 
-.rdm.flex.row > div {
-    margin: 0 5px;
-}
-
 .graph-crm-class {
     font-size: 15px;
     color: #ddd;
@@ -11951,6 +11947,10 @@ a.filter-tools:hover {
     padding-left: 0;
 }
 .rdm {
+    &.flex.row > div {
+        margin: 0 5px;
+    }
+
     &.tab-content {
         display: flex;
         flex-direction: column-reverse;
@@ -11961,6 +11961,7 @@ a.filter-tools:hover {
             padding: 2px 8px;
         }
     }
+
     &.tabs {
         display: flex;
         background: #f6f6f6;
@@ -11972,7 +11973,8 @@ a.filter-tools:hover {
             flex: 1;
             margin-bottom: 0;
             border-bottom: none;
-            &>li {
+
+            & > li {
                 margin-bottom: -1px;
             }
         }
