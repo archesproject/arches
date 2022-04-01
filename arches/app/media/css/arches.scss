@@ -3965,6 +3965,60 @@ ul.nav.nav-tabs.nav-justified {
     padding-top: 0px;
 }
 
+body[dir="rtl"] #concept_report .dropdown-menu {
+    left: 0;
+    right: auto;
+}
+
+#concept_report {
+    .concept-report-content>div{
+        padding: 0 10px;
+    }
+
+    .dropdown-menu{
+        right: 0;
+        left: auto;
+    }
+
+    dt {
+        display: flex;
+
+        h5 {
+            flex: 1;
+        }
+    }
+
+    .arches-RDM-label-highlighted{
+        margin: 0;
+        padding: 0 8px;
+    }
+
+    .arches-RDM-headline {
+        display: flex;
+        &>div:first-child {
+            flex: 1;
+        }
+    }
+
+    .arches-concept-heirarchy {
+        padding: 1px 0;
+        margin: 0;
+        display: flex;
+        align-items: center;
+
+        i {
+            width: 13px;
+            margin: 0 2px;
+        }
+        .arches-CRUD-delete{
+            margin: 5px;
+        }
+        .text-muted, .is_padded {
+            padding: 0 10px;
+        }
+    }
+}
+
 .tree-container {
     overflow-x: scroll;
     padding: 0 0 10px 10px;
