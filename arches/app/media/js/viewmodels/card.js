@@ -56,7 +56,7 @@ define([
                 if(typeof descriptors.displayname == "string"){
                     displayname(descriptors.displayname);
                 } else {
-                    displayname(descriptors.displayname.find(displayname => displayname.language == arches.defaultLanguage)?.value);
+                    displayname(descriptors.displayname.find(displayname => displayname.language == arches.activeLanguage)?.value);
                 }
             }
         );
