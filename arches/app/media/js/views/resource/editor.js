@@ -38,8 +38,8 @@ define([
 
     let displayNameValue = undefined;
     if(parsedDisplayName){
-        const defaultLanguageValue = parsedDisplayName?.[arches.defaultLanguage]?.value;
-        displayNameValue = defaultLanguageValue ? defaultLanguageValue : "(" + parsedDisplayName[Object.keys(parsedDisplayName).filter(languageKey => languageKey != arches.defaultLanguage)?.[0]]?.value + ")";
+        const defaultLanguageValue = parsedDisplayName?.[arches.activeLanguage]?.value;
+        displayNameValue = defaultLanguageValue ? defaultLanguageValue : "(" + parsedDisplayName[Object.keys(parsedDisplayName).filter(languageKey => languageKey != arches.activeLanguage)?.[0]]?.value + ")";
     } else {
         displayNameValue = data.displayname;
     }

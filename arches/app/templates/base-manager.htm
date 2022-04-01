@@ -49,12 +49,12 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
     <!-- /ko -->
 
 
-    <div id="container" class="base-manager-grid effect aside-left aside-bright navbar-fixed mainnav-sm"
-                    data-bind="css: {'mainnav-in': tabsActive() && showTabs(), 'mainnav-sm': !navExpanded(), 'mainnav-lg': navExpanded()}">
+    <div id="container" class="base-manager-grid effect aside-left aside-bright navbar-fixed sidenav-sm"
+                    data-bind="css: {'mainnav-in': tabsActive() && showTabs(), 'sidenav-sm': !navExpanded(), 'sidenav-lg': navExpanded()}">
 
         <div class="sidenav">
             {% block navheader %}
-            <a href="#" class="arches-navbar-brand" data-bind="click: function () { navExpanded(!navExpanded()) }">
+            <a href="#" class="sidenav-brand" data-bind="click: function () { navExpanded(!navExpanded()) }">
                 <img src="{{ STATIC_URL }}img/arches_logo_light.png" alt="Nifty Logo" class="brand-icon">
                 <div class="brand-title">
                     <span class="brand-text">{{ app_name }}</span>
@@ -62,9 +62,9 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
             </a>
             {% endblock navheader %}
             {% block mainnav %}
-            <div id="mainnav">
+            <div class="sidenav-menu">
                 {% block navbar %}
-                <ul id="mainnav-menu2" class="list-group">
+                <ul class="list-group">
 
                     <!-- Tools -->
                     <li class="list-header">{% trans "Tools" %}</li>
@@ -78,7 +78,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                                 <strong>{% trans "Manage System Settings" %}</strong>
                             </span>
                         </a>
-                        <ul class="collapse in pop-in arches" data-bind="css:{'expanded-nav': navExpanded()}">
+                        <ul class="collapse" data-bind="css:{'in': navExpanded()}">
                             <li class="link-submenu-item">
                                 <a class="link-submenu" href="{% url 'config' %}"
                                     data-bind="click: navigate.bind(this, '{% url 'config' %}')">{% trans "System Settings" %}</a>
@@ -103,7 +103,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 
                     <!--Menu list item-->
                     {% if user_can_edit %}
-                    <li{% if "views/resource" in main_script and is_system_settings is False %}
+                    <li{% if "views/resource" in main_script and is_system_settings is None %}
                         class="active-sub" {% endif %}
                         data-bind="click: navigate.bind(self, '{% url 'resource' %}')">
                         <a href="{% url 'resource' %}">
@@ -112,11 +112,10 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                                 <strong>{% trans "Add New Resource" %}</strong>
                             </span>
                         </a>
-                        <ul class="collapse in pop-in arches"
-                            data-bind="css:{'expanded-nav': navExpanded()}">
+                        <ul class="collapse" data-bind="css:{'in': navExpanded()}">
                             <!-- ko foreach: createableResources -->
                             <li class="link-submenu-item">
-                                <a class="link-submenu" href="#" data-bind="click: disable_instance_creation ? null: $parent.navigate.bind(this, '{% url 'add_resource' 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa' %}'.replace('aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa', graphid)),
+                                <a class="link-submenu" href="#" data-bind="
                                 css: { 'arches-menu-item-disabled': disable_instance_creation },
                                 attr: {
                                     href: disable_instance_creation ? '#' : ('{% url 'add_resource' 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa' %}'.replace('aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa', graphid))
@@ -141,8 +140,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                                 <strong>{% trans "Arches Designer" %}</strong>
                             </span>
                         </a>
-                        <ul class="collapse in pop-in arches"
-                            data-bind="css:{'expanded-nav': navExpanded()}">
+                        <ul class="collapse" data-bind="css:{'in': navExpanded()}">
                             <li class="link-submenu-item">
                                 <a class="link-submenu" href="{% url 'graph' '' %}"
                                     data-bind="click: navigate.bind(this, '{% url 'graph' '' %}')">{% trans "Resource Models" %}</a>
@@ -164,8 +162,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                                 <strong>{% trans "Map Layer Manager" %}</strong>
                             </span>
                         </a>
-                        <ul class="collapse in pop-in arches"
-                            data-bind="css:{'expanded-nav': navExpanded()}">
+                        <ul class="collapse"  data-bind="css:{'in': navExpanded()}">
                             <li class="link-submenu-item">
                                 <a class="link-submenu" href="{% url 'map_layer_manager' %}"
                                     data-bind="click: navigate.bind(this, '{% url 'map_layer_manager' %}')">{% trans "Resource Layers" %}</a>
@@ -233,7 +230,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                             data-bind="click: navigate.bind(this, '{% url 'rdm' '' %}') ">
                             <i class="fa fa-align-left"></i>
                             <span class="menu-title">
-                                {% trans "Reference Data Manager" %}
+                                <strong>{% trans "Reference Data Manager" %}</strong>
                             </span>
                         </a>
                     </li>
@@ -250,7 +247,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                                 {% endif %}
                                     <i class="{{p.icon}}"></i>
                                     <span class="menu-title">
-                                        {{p.name}}
+                                        <strong>{{p.name}}</strong>
                                     </span>
                                 </a>
                             </li>
@@ -264,7 +261,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                             {% endif %}
                                 <i class="{{p.icon}}"></i>
                                 <span class="menu-title">
-                                    {{p.name}}
+                                    <strong>{{p.name}}</strong>
                                 </span>
                             </a>
                         </li>

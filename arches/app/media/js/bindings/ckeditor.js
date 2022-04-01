@@ -19,7 +19,7 @@ define([
         init: function (element, valueAccessor, allBindings, viewModel, bindingContext) {
             var modelValue = valueAccessor();
             var value = ko.utils.unwrapObservable(valueAccessor());
-            const language = allBindings.get('language') || ko.observable(arches.defaultLanguage);
+            const language = allBindings.get('language') || ko.observable(arches.activeLanguage);
             const direction = allBindings.get('direction') || ko.observable('ltr');
             var $element = $(element);
             var options = {bodyId: 'ckeditor'};
