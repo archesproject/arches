@@ -18,6 +18,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 
 from django.views.generic import View
 from django.utils.decorators import method_decorator
+from arches.app.datatypes.datatypes import EDTFDataType
 from arches.app.utils.decorators import group_required
 from arches.app.utils.index_database import index_resources_by_type
 from arches.app.utils.response import JSONResponse
@@ -27,7 +28,6 @@ from arches.app.models import models
 from arches.app.models.system_settings import settings
 from django.core.exceptions import PermissionDenied
 from django.core.cache import caches
-
 
 
 @method_decorator(group_required("Graph Editor"), name="dispatch")
@@ -61,3 +61,15 @@ class ClearUserPermissionCache(View):
             return JSONResponse(str(e), status=500)
 
         return JSONResponse(status=200)
+
+
+class TransformEdtfForTile(View):
+    def get(self, request):
+        try:
+            value = request.GET.get("value")
+            transformed_value = EDTFDataType().transform_value_for_tile(value)
+
+        except Exception as e:
+            return JSONResponse(str(e), status=500)
+
+        return JSONResponse({"data": transformed_value})

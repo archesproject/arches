@@ -1,4 +1,8 @@
-define(['knockout', 'underscore', 'viewmodels/widget'], function(ko, _, WidgetViewModel) {
+define(['knockout',
+    'underscore',
+    'arches',
+    'viewmodels/widget'
+], function(ko, _, arches, WidgetViewModel) {
     /**
     * registers a edtf-widget component for use in forms
     * @function external:"ko.components".edtf-widget
@@ -10,8 +14,26 @@ define(['knockout', 'underscore', 'viewmodels/widget'], function(ko, _, WidgetVi
     */
     return ko.components.register('edtf-widget', {
         viewModel: function(params) {
+            const self = this;
             params.configKeys = ['placeholder', 'defaultValue'];
             this.showEDTFFormats = ko.observable(false);
+            this.transformedEdtf = ko.observable();
+            params.value.subscribe(val => {
+                window.fetch(arches.urls.transform_edtf_for_tile + "?value=" + val)
+                    .then(response => {
+                        if(response.ok) {
+                            return response.json();
+                        }
+                    })
+                    .then(json => {
+                        if (json?.data) {
+                            self.transformedEdtf(json.data);
+                        } else {
+                            self.transformedEdtf("not a valid edtf format");
+                        }
+                    })
+            });
+
             WidgetViewModel.apply(this, [params]);
         },
         template: { require: 'text!widget-templates/edtf' }
