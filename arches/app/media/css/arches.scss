@@ -22,8 +22,7 @@
 @import url(../packages/@mapbox/mapbox-gl-geocoder/dist/mapbox-gl-geocoder.css);
 @import url(../packages/leaflet.fullscreen/Control.FullScreen.css);
 @import url(../css/base-manager.css);
-@import url(../css/arches-nav.css);
-
+@import "sidenav.scss";
 
 img {
     image-orientation: from-image;
@@ -4438,18 +4437,6 @@ div.dropdown-menu.open {
     border-bottom: 1px solid rgba(0, 0, 0, 0.4);
 }
 
-ul .collapse li {
-    height: 25px;
-}
-
-ul .collapse li:first-of-type {
-    margin-top: -10px;
-}
-
-ul .collapse li:last-of-type {
-    height: 35px;
-}
-
 .arches-panel-header {
     font-size: 1.6em;
     padding-left: 25px;
@@ -7994,11 +7981,6 @@ div.row.widget-wrapper {
     transform: translate(0, -2px);
 }
 
-.arches-menu-item-disabled:hover {
-    cursor: default;
-    margin-left: -3px;
-}
-
 .related-resources-container {
     -ms-flex: 0 0 calc(100% - 400px);
     -webkit-flex: 0 0 calc(100% - 400px);
@@ -8381,7 +8363,7 @@ a.mega-dropdown-toggle.disabled {
     width: calc(100% - 50px);
 }
 
-.mainnav-lg .workbench-card-sidepanel .create-resource-instance-card-component.rr-table-pop {
+.sidenav-lg .workbench-card-sidepanel .create-resource-instance-card-component.rr-table-pop {
     left: 220px;
 }
 
@@ -8439,7 +8421,7 @@ a.mega-dropdown-toggle.disabled {
     position: unset;
 }
 
-.mainnav-lg .workbench-card-sidepanel .create-resource-instance-card-component.rr-table-pop .install-buttons {
+.sidenav-lg .workbench-card-sidepanel .create-resource-instance-card-component.rr-table-pop .install-buttons {
     left: 520px;
 }
 
@@ -10261,10 +10243,6 @@ a.search-query-link-captions:focus {
     left: 0px;
     border-top: 1px solid #ddd;
     height: 50px;
-}
-
-.mainnav-lg .search-footer {
-    left: 170px;
 }
 
 .search-footer .pagination {
@@ -12651,11 +12629,11 @@ a.jstree-anchor strong {
     font-weight: 500;
 }
 
-.expanded-nav {
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-}
+// .expanded-nav {
+//     white-space: nowrap;
+//     overflow: hidden;
+//     text-overflow: ellipsis;
+// }
 
 .add-new-tile {
     display: none;

@@ -317,7 +317,8 @@
                 text: "{% trans 'Sorry! The copy request failed. Please try again.  Contact your system administrator if the problem persists.' %}"
             },
             mapboxApiKey: '{{ map_info.mapbox_api_key }}',
-            defaultLanguage: '{{ app_settings.DEFAULT_LANGUAGE }}',
+            activeLanguage: '{{ app_settings.ACTIVE_LANGUAGE }}',
+            activeLanguageDir: '{{ app_settings.ACTIVE_LANGUAGE_DIR }}',
             languages: {% autoescape off %}{{ app_settings.LANGUAGES }}{% endautoescape %},
             hexBinSize: {{ map_info.hex_bin_size | unlocalize }},
             mapboxSprites: '{{ map_info.mapbox_sprites }}',

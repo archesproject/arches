@@ -13,9 +13,9 @@ define(['knockout', 'underscore', 'viewmodels/widget', 'arches', 'bindings/ckedi
             WidgetViewModel.apply(self, [params]);
             const initialCurrent = {};
             self.showi18nOptions = ko.observable(false);
-            initialCurrent[arches.defaultLanguage] = {value: '', direction: 'ltr'};
+            initialCurrent[arches.activeLanguage] = {value: '', direction: 'ltr'};
             let currentValue = ko.unwrap(self.value) || initialCurrent;
-            const currentLanguage = {"code": arches.defaultLanguage};
+            const currentLanguage = {"code": arches.activeLanguage};
             self.currentLanguage = ko.observable(currentLanguage);
 
             if(self.form){
@@ -27,7 +27,7 @@ define(['knockout', 'underscore', 'viewmodels/widget', 'arches', 'bindings/ckedi
 
             const languages = arches.languages;
             self.languages =  ko.observableArray(languages);
-            self.currentLanguage(languages.find(element => element.code == arches.defaultLanguage));
+            self.currentLanguage(languages.find(element => element.code == arches.activeLanguage));
 
             if(!currentValue?.[currentLanguage.code]){
                 self.currentText = ko.observable('');
