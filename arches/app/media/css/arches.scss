@@ -5914,13 +5914,6 @@ ul.jqtree_common li.jqtree-folder {
     border-bottom: 1px solid #520008;
 }
 
-.profile-list {
-    width: 100%;
-    padding: 40px 100px 50px 100px;
-    min-height: 170px;
-    border-bottom: 1px solid #ccc;
-}
-
 .profile-sections {
     padding: 0px 0px;
     min-height: 650px;
@@ -5930,32 +5923,8 @@ div.profile-notif-settings {
     padding-top: 12px;
 }
 
-.notif-table {
-    width: 100%;
-    margin-top: -40px;
-}
-
-.notif-table th {
-    font-size: 1.05em;
-    font-weight: 600;
-    border-bottom: 1px solid rgba(0, 0, 0, 0.07);
-    color: #4d627b;
-}
-
 th.notif-type {
     width: 150px;
-}
-
-.widget-input-label-notif {
-    padding-left: 20px;
-    font-size: 12px;
-    margin-top: 2px;
-    font-weight: 500;
-    color: #666;
-}
-
-.widget-input-label-notif .arches-switch {
-    margin-right: 5px;
 }
 
 .profile-notif-settings td {
@@ -14571,5 +14540,69 @@ a.jstree-anchor.permissions-widget {
 }
 
 #user-profile {
+    .account-wrapper
+    { 
+        flex: 1;
+        > .row {
+            display: flex;
+
+            .row-content {
+                flex: 1;
+
+                .row {
+                    display: flex;
+                }
+            }
+        }
+    }
+
+    .notif-table {
+        width: 100%;
+        
+    }
+    .widget-input-label-notif {
+        padding: 0 20px;
+        font-size: 12px;
+        margin-top: 2px;
+        font-weight: 500;
+        color: #666;
+    }
     
+    .widget-input-label-notif .arches-switch {
+        margin: 0 5px;
+    }
+
+    .notif-table th {
+        font-size: 1.05em;
+        font-weight: 600;
+        border-bottom: 1px solid rgba(0, 0, 0, 0.07);
+        color: #4d627b;
+    }
+
+    .profile-header {
+        padding: 0 10px;
+    }
+
+    #default-mobile-projects {
+        padding: 0;
+    }
+
+    .profile-list {
+        display: flex;
+        width: 100%;
+        padding: 40px 100px;
+        min-height: 170px;
+        border-bottom: 1px solid #ccc;
+        
+        .profile-notif-settings{
+            margin: 0 20px;
+            padding: 0;
+            width: 100%;
+            float: none;
+        }
+
+        th {
+            text-align: start;
+        }
+    }
 }
