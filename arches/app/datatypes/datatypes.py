@@ -403,17 +403,17 @@ class DateDataType(BaseDataType):
 
     def add_missing_colon_to_timezone(self, value):
         """
-        Python will parse a timezone with a colon (-07:00) but will not add a colon to a timezone using strftime. 
+        Python will parse a timezone with a colon (-07:00) but will not add a colon to a timezone using strftime.
         Elastic will not index a time with a timezone without a colon, so this method ensures the colon is added
         if it is missing.
         """
-        
+
         format = self.get_valid_date_format(value)[0]
-        if format.endswith('z') and value[-5] in ("-", "+"):
+        if format.endswith("z") and value[-5] in ("-", "+"):
             return "{0}:{1}".format(value[:-2], value[-2:])
         else:
             return value
-        
+
     def pre_tile_save(self, tile, nodeid):
         # pass
         print(tile.data[nodeid])
