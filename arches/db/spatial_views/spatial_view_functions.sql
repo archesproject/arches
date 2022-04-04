@@ -13,12 +13,6 @@ drop function if exists __arches_delete_spatial_view;
 drop function if exists __arches_create_spatial_view_attribute_table;
 drop function if exists __arches_delete_spatial_view_attribute_table;
 
--- drop function if exists __arches_create_spatial_attribute_trigger_function;
--- drop function if exists __arches_delete_spatial_attribute_trigger_function;
--- drop function if exists __arches_create_spatial_attribute_trigger;
--- drop function if exists __arches_delete_spatial_attribute_trigger;
-
-
 drop aggregate if exists __arches_agg_get_node_display_value(in_tiledata jsonb, in_nodeid uuid);
 drop function if exists __arches_accum_get_node_display_value;
 drop function if exists __arches_get_node_display_value;
@@ -50,9 +44,8 @@ end
 $do$;
 
 drop role if exists arches_spatial_views;
-*/
 
--- ROLE
+----------------------------------------------*/
 
 do
 $do$
@@ -81,8 +74,6 @@ begin
     end if;
 end
 $do$;
-
--- FUNCTIONS - DISPLAY VALUES
 
 create or replace function __arches_get_concept_label(concept_value uuid) returns text language plpgsql as $$
     declare
@@ -441,229 +432,6 @@ create or replace aggregate __arches_agg_get_node_display_value(in_tiledata json
         sfunc = __arches_accum_get_node_display_value
     );
 
--- FUNCTIONS - create spatial view trigger functions
-
-
-/*
-NOT NEEDED create or replace function __arches_create_spatial_attribute_trigger_function(
-        sp_view_name_slug text,
-        sp_geometry_node_id uuid,
-        sp_nodeids_list text
-    ) returns boolean
-    language plpgsql 
-    strict
-    as 
-    $$
-    declare
-        sp_attr_trigger_function text := '';
-        success boolean := false;
-    begin
-        sp_attr_trigger_function := format(
-            '
-            create or replace function __arches_trg_fnc_spatial_attributes_%1$s() -- sp_view_name_slug
-            returns trigger 
-            language plpgsql
-            as $func$
-            declare
-                resource_geom_count     integer := 0;
-                attr_nodeids            text    := replace(%2$L,'' '',''''); -- sp_nodeids_list;
-                geometry_node_id        text    := %3$L; -- sp_geometry_node_id;
-                found_attr_key_count    integer := 0;
-                insert_attr             text    := '''';
-                trigger_tile            record;
-            begin
-                -- set the working context depending on the operation
-                if tg_op = ''DELETE'' then 
-                    trigger_tile := old;
-                else
-                    trigger_tile := new;
-                end if;
-
-                -- checks to see if it needs regenerating--
-
-                -- nodeid key check - are we working with a tile valid for this sp view?
-
-                select count(*) into found_attr_key_count 
-                from (select jsonb_object_keys(trigger_tile.tiledata) as node_id) keys
-                where keys.node_id::text in (select unnest(string_to_array(attr_nodeids,'','')) as node_id)
-                    or keys.node_id::text = geometry_node_id;
-
-                -- stop if tile has nothing to do with this view
-                if found_attr_key_count < 1 then
-                    return trigger_tile; 
-                end if;
-
-                -- delete the existing rows for this resource
-                delete from sp_attr_%1$s where resourceinstanceid::uuid = trigger_tile.resourceinstanceid;
-
-                -- insert the new attrs
-                
-                declare
-                    att_table_name          text := ''sp_attr_%1$s'';
-                    attribute_node_list     text := attr_nodeids;
-                    tmp_nodegroupid_slug    text;
-                    n                       record;
-                    node_create             text := '''';
-                    tile_create             text := '''';
-                begin
-                
-                    for n in 
-                            select 
-                                name, 
-                                nodeid, 
-                                nodegroupid 
-                            from nodes 
-                            where nodeid::text in (select unnest(string_to_array(attribute_node_list,'','')) as nodeid)
-                    loop
-                        tmp_nodegroupid_slug := __arches_slugify(n.nodegroupid::text);
-                        node_create = node_create || 
-                            format(
-                                ''
-                                ,__arches_agg_get_node_display_value(distinct tile_%%s.tiledata, %%L) as %%s
-                                ''
-                                ,tmp_nodegroupid_slug
-                                ,n.nodeid::text
-                                ,__arches_slugify(n.name)
-                            );
-                        
-                        if tile_create not like (format(''%%%%tile_%%s%%%%'',tmp_nodegroupid_slug)) then
-                            tile_create = tile_create || 
-                                format('' 
-                                left outer join tiles tile_%%s on r.resourceinstanceid = tile_%%s.resourceinstanceid
-                                    and tile_%%s.nodegroupid = ''''%%s''''
-                                '',
-                                tmp_nodegroupid_slug,
-                                tmp_nodegroupid_slug,
-                                tmp_nodegroupid_slug,
-                                n.nodegroupid::text);
-                        end if;
-
-                    end loop;
-
-                    -- pull together 
-                    insert_attr := format(
-                        ''
-                        insert into %%s
-                            select 
-                                r.resourceinstanceid
-                                %%s
-                            from resource_instances r
-                                join geojson_geometries geo on geo.resourceinstanceid = r.resourceinstanceid
-                                    and geo.nodeid = %%L
-                                %%s
-                            group by
-                                r.resourceinstanceid
-                            having r.resourceinstanceid = %%L::uuid
-                        '',
-                        att_table_name,
-                        node_create, 
-                        geometry_node_id::text, 
-                        tile_create,
-                        trigger_tile.resourceinstanceid::text);
-
-                end;
-                
-                execute insert_attr;
-
-                -- end insert --
-
-                return trigger_tile;
-            end;
-            $func$
-            '
-            ,sp_view_name_slug
-            ,sp_nodeids_list
-            ,sp_geometry_node_id
-        );
-
-        execute sp_attr_trigger_function;
-        
-        success := true;
-
-        return success;
-    end;
-    $$;
-
-NOT NEEDED create or replace function __arches_delete_spatial_attribute_trigger_function(
-        sp_view_name_slug text
-    ) returns boolean
-    language plpgsql 
-    strict
-    as 
-    $$
-    declare
-        sp_attr_trigger_function text := '';
-        success boolean := false;
-    begin
-        sp_attr_trigger_function := format('drop function if exists __arches_trg_fnc_spatial_attributes_%1$s', sp_view_name_slug);
-        execute sp_attr_trigger_function;
-        success := true;
-        return success;
-    end;
-    $$;
-
--- FUNCTIONS - create spatial view triggers
-
-NOT NEEDED create or replace function __arches_create_spatial_attribute_trigger(
-        sp_view_name_slug text,
-        sp_geometry_node_id uuid,
-        sp_nodeids_list text
-    ) returns boolean
-    language plpgsql 
-    strict
-    as 
-    $$
-    declare
-        sp_attr_trigger text := '';
-        t_fnc_created boolean := false;
-        success boolean := false;
-    begin
-        -- create the trigger function
-        select __arches_create_spatial_attribute_trigger_function(sp_view_name_slug, sp_geometry_node_id, sp_nodeids_list) into t_fnc_created;
-
-        -- create the trigger
-        sp_attr_trigger := format('
-            create constraint trigger __arches_trg_spatial_attribute_%1$s
-            after insert or update or delete
-            on tiles
-            deferrable initially deferred
-            for each row
-                execute procedure __arches_trg_fnc_spatial_attributes_%1$s()', sp_view_name_slug);
-        
-        execute sp_attr_trigger;
-
-        success := true;
-
-        return success;
-    end;
-    $$;
-
-NOT NEEDED create or replace function __arches_delete_spatial_attribute_trigger(
-        sp_view_name_slug text
-    ) returns boolean
-    language plpgsql 
-    strict
-    as 
-    $$
-    declare
-        del_sp_attr_trigger text := '';
-        t_fnc_deleted boolean := false;
-        success boolean := false;
-    begin
-        del_sp_attr_trigger := format('drop trigger if exists __arches_trg_spatial_attribute_%1$s on tiles;', sp_view_name_slug);
-        execute del_sp_attr_trigger;
-        select __arches_delete_spatial_attribute_trigger_function(sp_view_name_slug) into t_fnc_deleted;
-        success := true;
-
-        return success;
-    end;
-    $$;
-
-
-
-*/
--- FUNCTIONS - create spatial views
-
 create or replace function __arches_create_spatial_view_attribute_table(
         spatial_view_name_slug text,
         geometry_node_id uuid,
@@ -683,7 +451,6 @@ create or replace function __arches_create_spatial_view_attribute_table(
     begin
         att_table_name := format('%s.sp_attr_%s', schema_name, spatial_view_name_slug);
 		
-		-- add resourceinstanceid comment
 		att_comments = att_comments || format(
                         'comment on column %s.%s is ''%s'';',
                         att_table_name,
@@ -743,7 +510,6 @@ create or replace function __arches_create_spatial_view_attribute_table(
             end loop;
         end;
 		
-        -- pull together 
         att_view_tbl := format(
             '
             create table %s 
@@ -880,9 +646,6 @@ create or replace function __arches_create_spatial_view(
 				sv_name_slug_with_geom,
 				spv_description);
 
-				-- add column comments to view
-				--standard columns
-				-- add resourceinstanceid comment
 				sv_create = sv_create || format(
 								'comment on column %s.%s is ''%s'';',
 								sv_name_slug_with_geom,
@@ -909,7 +672,7 @@ create or replace function __arches_create_spatial_view(
 								'tileid',
 								'Id of the tile record storing the geometry'
 								);
-				--dyanamic columns
+
 				for n in
 					with attribute_nodes as (
 						select * from jsonb_to_recordset(attribute_node_list) as x(nodeid uuid, description text)
@@ -1014,7 +777,6 @@ create or replace function __arches_delete_spatial_view(
     end;
     $$;
 
-
 create or replace function __arches_refresh_spatial_views()
     returns boolean
     language plpgsql
@@ -1032,11 +794,6 @@ create or replace function __arches_refresh_spatial_views()
     end;
     $$;
 
--- 
---TRIGGERS - tiles
-
-
---
 create or replace function __arches_trg_fnc_update_spatial_attributes()
     returns trigger 
     language plpgsql
@@ -1051,7 +808,6 @@ create or replace function __arches_trg_fnc_update_spatial_attributes()
             trigger_tile := new;
         end if;
 
-        -- need to fetch spatial view table info
         for spv in
                 select * from spatial_views where isactive = true
         loop
@@ -1069,12 +825,9 @@ create or replace function __arches_trg_fnc_update_spatial_attributes()
                 where keys.node_id::text in (select nodeid::text from attribute_nodes)
                     or keys.node_id::text = spv.geometrynodeid::text;
 
-                -- skip if tile has nothing to do with this spv
                 if found_attr_key_count < 1 then
                     continue; 
                 end if;
-
-                -- insert the new attrs
                 
                 declare
                     att_table_name          text := spv.schema || '.sp_attr_' || spv.slug;
@@ -1084,7 +837,6 @@ create or replace function __arches_trg_fnc_update_spatial_attributes()
                     tile_create             text := '';
                 begin
 
-                    -- delete the existing rows for this resource
                     delete_existing := format('
                         delete from %1$s where resourceinstanceid::uuid = %2$L::uuid;
                         ',
@@ -1125,7 +877,6 @@ create or replace function __arches_trg_fnc_update_spatial_attributes()
 
                     end loop;
 
-                    -- pull together 
                     insert_attr := format(
                         '
                         insert into %s
@@ -1155,7 +906,7 @@ create or replace function __arches_trg_fnc_update_spatial_attributes()
         return trigger_tile;
     end;
     $func$;
---
+
 create constraint trigger __arches_trg_update_spatial_attributes
     after insert or update or delete
     on tiles
@@ -1163,8 +914,6 @@ create constraint trigger __arches_trg_update_spatial_attributes
     for each row
         execute procedure __arches_trg_fnc_update_spatial_attributes();
 
--- TRIGGERS - spatial_views model
---
 create or replace function __arches_trg_fnc_update_spatial_views()
     returns trigger 
     language plpgsql
@@ -1176,7 +925,6 @@ create or replace function __arches_trg_fnc_update_spatial_views()
         valid_att_nodeids boolean := false;
     begin
         if tg_op = 'INSERT' or tg_op = 'UPDATE' then
-            -- validation
             valid_geom_nodeid := (select count(*) from nodes where nodeid = new.geometrynodeid and datatype = 'geojson-feature-collection') > 0;
             if valid_geom_nodeid is false then
                 raise exception 'geometrynodeid is not a valid nodeid';
@@ -1269,8 +1017,6 @@ create or replace function __arches_trg_fnc_update_spatial_views()
     end;
     $func$;
 
-
---
 create constraint trigger __arches_trg_update_spatial_views
     after insert or update or delete
     on spatial_views
