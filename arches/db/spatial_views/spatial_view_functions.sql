@@ -1,4 +1,6 @@
-/* --------------- DROP ALL ---------------
+/* --------------- DROP ALL (reverse SQL)---------------
+
+DELETE FROM public.spatial_views;
 
 drop trigger __arches_trg_update_spatial_attributes on tiles;
 drop function if exists __arches_trg_fnc_update_spatial_attributes;
