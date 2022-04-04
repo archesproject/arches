@@ -22,10 +22,10 @@
         {% endblock title %}
     </div>
     <!--/ko-->
-    <!-- ko if: resourceinstanceid -->
     <div class="hover-feature-body">
         {% block body %}
         <div class="hover-feature" data-bind="html: map_popup"></div>
+            <!-- ko if: resourceinstanceid -->
         <div class="hover-feature-metadata-block">
             <div class="hover-feature-metadata">
                 {% trans "Resource Model:" %}
@@ -36,9 +36,9 @@
                 <span data-bind="text: resourceinstanceid"></span>
             </div>
         </div>
+            <!--/ko-->
         {% endblock body %}
     </div>
-    <!--/ko-->
     <div class="hover-feature-footer">
         <div>
         {% block footer %}
