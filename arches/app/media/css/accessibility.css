@@ -498,9 +498,14 @@ div.search-facet-item:focus {
     color: #1F496E;
 }
 
-.recent-edits-container {
+.recent-edits-container,
+.profile-summary-page {
     height: calc(100vh - 50px);
     overflow-y: auto;
+}
+
+.profile-summary-page {
+    overflow-x: hidden;
 }
 
 /******************************************************************/
@@ -736,7 +741,17 @@ div.search-facet-item:focus {
         padding-left: 55px;
     }
   
-    .recent-edits-container {
+    .recent-edits-container,
+    .profile-summary-page {
         height: calc(100vh - 100px);
+    }
+
+    .profile-list,
+    .profile-report {
+        padding: 20px;
+    }
+
+    .profile-report {
+        min-height: 0;
     }
 }

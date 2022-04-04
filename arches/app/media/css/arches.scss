@@ -6056,6 +6056,7 @@ ul.jqtree_common li.jqtree-folder {
 .profile-summary-page {
     width: 100%;
     background: #fff;
+    padding-bottom: 100px;
 }
 
 .profile-summary-page .img-responsive {
@@ -6073,7 +6074,6 @@ ul.jqtree_common li.jqtree-folder {
 .profile-list {
     width: 100%;
     padding: 40px 100px 50px 100px;
-    min-height: 170px;
     border-bottom: 1px solid #ccc;
 }
 
@@ -6252,8 +6252,6 @@ th.notif-type {
 }
 
 .project-search-widget {
-    position: absolute;
-    top: -40px;
     width: 250px;
 }
 
