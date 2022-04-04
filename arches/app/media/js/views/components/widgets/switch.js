@@ -78,6 +78,6 @@ define(['knockout', 'underscore', 'viewmodels/widget'], function(ko, _, WidgetVi
 
     return ko.components.register('switch-widget', {
         viewModel: SwitchWidget,
-        template: { require: 'text!widget-templates/switch' }
+        template: window['switch-widget-template']
     });
 });

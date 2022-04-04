@@ -16,8 +16,6 @@ define([
                 self.select2Config.value = self.defaultValue
             };
         },
-        template: {
-            require: 'text!widget-templates/concept-select'
-        }
+        template: window['concept-select-widget-template']
     });
 });

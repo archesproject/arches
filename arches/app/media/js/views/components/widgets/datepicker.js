@@ -2,12 +2,11 @@ define([
     'knockout',
     'underscore',
     'viewmodels/widget',
-    'arches',
     'moment',
     'bindings/datepicker',
     'bindings/moment-date',
     'bindings/chosen'
-], function(ko, _, WidgetViewModel, arches, moment) {
+], function(ko, _, WidgetViewModel, moment) {
     /**
      * registers a datepicker-widget component for use in forms
      * @function external:"ko.components".datepicker-widget
@@ -96,8 +95,6 @@ define([
 
     return ko.components.register('datepicker-widget', {
         viewModel: DatePickerWidget,
-        template: {
-            require: 'text!widget-templates/datepicker'
-        }
+        template: window['datepicker-widget-template']
     });
 });

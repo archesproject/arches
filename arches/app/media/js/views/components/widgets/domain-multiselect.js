@@ -20,8 +20,6 @@ define([
 
             this.multiple = true;
         },
-        template: {
-            require: 'text!widget-templates/select'
-        }
+        template: window['select-widget-template']
     });
 });

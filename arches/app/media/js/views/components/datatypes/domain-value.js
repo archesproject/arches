@@ -1,4 +1,4 @@
-define(['arches', 'knockout', 'uuid'], function (arches, ko, uuid) {
+define(['knockout', 'uuid'], function (ko, uuid) {
     ko.components.register('domain-value-datatype-config', {
         viewModel: function(params) {
             var self = this;
@@ -61,7 +61,6 @@ define(['arches', 'knockout', 'uuid'], function (arches, ko, uuid) {
                 }
             }
         },
-        template: { require: 'text!datatype-config-templates/domain-value' }
+        template: window['domain-value-datatype-template']
     });
-    return name;
 });

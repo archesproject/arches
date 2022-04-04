@@ -56,6 +56,6 @@ define(['knockout', 'underscore', 'viewmodels/widget'], function (ko, _, WidgetV
                 this.value(defaultValue);
             }
         },
-        template: { require: 'text!widget-templates/radio-boolean' }
+        template: window['radio-boolean-widget-template']
     });
 });

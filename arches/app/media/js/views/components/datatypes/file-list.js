@@ -14,7 +14,7 @@ define([
             });
             this.activated = params.config.activateMax;
         },
-        template: { require: 'text!datatype-config-templates/file-list' }
+        template: window['file-list-datatype-template']
     });
     return name;
 });

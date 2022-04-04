@@ -19,8 +19,6 @@ define([
 
             ConceptWidgetViewModel.apply(this, [params]);
         },
-        template: {
-            require: 'text!widget-templates/radio'
-        }
+        template: window['radio-widget-template']
     });
 });

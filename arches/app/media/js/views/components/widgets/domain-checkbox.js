@@ -20,8 +20,6 @@ define([
 
             this.multiple = true;
         },
-        template: {
-            require: 'text!widget-templates/checkbox'
-        }
+        template: window['checkbox-widget-template']
     });
 });

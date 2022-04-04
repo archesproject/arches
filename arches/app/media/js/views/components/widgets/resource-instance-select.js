@@ -9,8 +9,6 @@ define([
             params.datatype = 'resource-instance';
             ResourceInstanceSelectViewModel.apply(this, [params]);
         },
-        template: {
-            require: 'text!widget-templates/resource-instance-select'
-        }
+        template: window['resource-instance-select-widget-template']
     });
 });

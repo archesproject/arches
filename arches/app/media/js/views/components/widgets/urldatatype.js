@@ -16,7 +16,7 @@ define(['knockout', 'viewmodels/widget'], function(ko, WidgetViewModel) {
                 }
             }, this);
         },
-        template: { require: 'text!templates/views/components/widgets/urldatatype.htm' }
+        template: window['urldatatype-widget-template']
     });
     return name;
 });

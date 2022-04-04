@@ -179,6 +179,15 @@
             },
         {% endfor %}{% endautoescape %}};
 
+    window['widgets'] = {{% autoescape off %}{% for widget in widgets %}
+            '{{ widget.pk }}': {
+                'name': '{{ widget.name }}',
+                'component': '{{ widget.component }}',
+                'datatype': '{{ widget.datatype }}',
+                'defaultconfig': '{{ widget.defaultconfig_json }}'
+            },
+        {% endfor %}{% endautoescape %}};
+
     window.arches = {
             urls: {
                 root: "{% url 'root' %}",

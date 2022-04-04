@@ -2,9 +2,10 @@ define([
     'jquery',
     'knockout',
     'underscore',
-    'arches'
-], function ($, ko, _, arches) {
+], function ($, ko, _,) {
     var name = 'node-value-datatype-config';
+    const arches = window.arches;
+
     ko.components.register(name, {
         viewModel: function(params) {
             var self = this;
@@ -104,7 +105,7 @@ define([
                 });
             }
         },
-        template: { require: 'text!datatype-config-templates/node-value' }
+        template: window['node-value-datatype-template']
     });
     return name;
 });

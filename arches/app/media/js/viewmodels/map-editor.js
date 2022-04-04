@@ -1,5 +1,4 @@
 define([
-    'arches',
     'jquery',
     'underscore',
     'knockout',
@@ -12,7 +11,9 @@ define([
     'views/components/map',
     'views/components/cards/select-feature-layers',
     'text!templates/views/components/cards/map-popup.htm'
-], function(arches, $, _, ko, koMapping, uuid, geojsonExtent, geojsonhint, toGeoJSON, proj4, MapComponentViewModel, selectFeatureLayersFactory, popupTemplate) {
+], function($, _, ko, koMapping, uuid, geojsonExtent, geojsonhint, toGeoJSON, proj4, MapComponentViewModel, selectFeatureLayersFactory, popupTemplate) {
+    const arches = window.arches;
+    
     var viewModel = function(params) {
         var self = this;
         var padding = 40;

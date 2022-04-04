@@ -168,7 +168,7 @@ define([
 
             }
         },
-        template: { require: 'text!datatype-config-templates/resource-instance' }
+        template: window['resource-instance-datatype-template']
     });
     return name;
 });

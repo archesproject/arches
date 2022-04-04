@@ -18,8 +18,6 @@ define([
             params.configKeys = ['placeholder', 'defaultValue'];
             DomainWidgetViewModel.apply(this, [params]);
         },
-        template: {
-            require: 'text!widget-templates/select'
-        }
+        template: window['select-widget-template']
     });
 });

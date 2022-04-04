@@ -1,14 +1,15 @@
 define([
     'jquery',
-    'arches',
     'knockout',
     'underscore',
     'bindings/color-picker',
     'bindings/mapbox-gl',
     'bindings/codemirror',
     'bindings/ckeditor'
-], function($, arches, ko, _) {
+], function($, ko, _) {
     var name = 'geojson-feature-collection-datatype-config';
+    const arches = window.arches;
+
     ko.components.register(name, {
         viewModel: function(params) {
             var self = this;
@@ -200,7 +201,7 @@ define([
                 };
             }
         },
-        template: { require: 'text!datatype-config-templates/geojson-feature-collection' }
+        template: window['geojson-feature-collection-datatype-template']
     });
     return name;
 });

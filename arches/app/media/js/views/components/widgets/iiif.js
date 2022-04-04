@@ -80,6 +80,6 @@ define([
                 return value.features.length;
             }, this);    
         },
-        template: { require: 'text!templates/views/components/widgets/iiif.htm' }
+        template: window['iiif-widget-template']
     });
 });

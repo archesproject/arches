@@ -21,7 +21,7 @@ define(['knockout'], function (ko) {
                 });
             }
         },
-        template: { require: 'text!datatype-config-templates/edtf' }
+        template: window['edtf-datatype-template']
     });
     return name;
 });

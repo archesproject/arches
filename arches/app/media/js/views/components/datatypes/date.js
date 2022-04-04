@@ -43,7 +43,7 @@ define(['knockout'], function(ko) {
                 });
             }
         },
-        template: { require: 'text!datatype-config-templates/date' }
+        template: window['date-datatype-template']
     });
     return name;
 });

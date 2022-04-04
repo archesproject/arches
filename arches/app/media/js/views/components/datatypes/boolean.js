@@ -24,7 +24,7 @@ define(['knockout'], function(ko) {
                 });
             }
         },
-        template: { require: 'text!datatype-config-templates/boolean' }
+        template: window['boolean-datatype-template']
     });
     return name;
 });

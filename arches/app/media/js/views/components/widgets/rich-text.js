@@ -12,6 +12,6 @@ define(['knockout', 'underscore', 'viewmodels/widget', 'bindings/ckeditor'], fun
             WidgetViewModel.apply(this, [params]);
             this.displayfullvalue(params.displayfullvalue);
         },
-        template: { require: 'text!widget-templates/rich-text' }
+        template: window['rich-text-widget-template']
     });
 });

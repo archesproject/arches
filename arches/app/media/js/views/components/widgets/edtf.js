@@ -14,6 +14,6 @@ define(['knockout', 'underscore', 'viewmodels/widget'], function(ko, _, WidgetVi
             this.showEDTFFormats = ko.observable(false);
             WidgetViewModel.apply(this, [params]);
         },
-        template: { require: 'text!widget-templates/edtf' }
+        template: window['edtf-widget-template']
     });
 });

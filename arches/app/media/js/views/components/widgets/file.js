@@ -22,9 +22,7 @@ define([
             params.configKeys = ['acceptedFiles', 'maxFilesize'];
             FileWidgetViewModel.apply(this, [params]);
         },
-        template: {
-            require: 'text!widget-templates/file'
-        }
+        template: window['file-widget-template']
     });
 
 });
