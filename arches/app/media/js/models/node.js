@@ -46,6 +46,7 @@ define([
             self.name = ko.observable('');
             self.description = ko.observable(null);
             self.slug = ko.observable(null);
+            self.alias = ko.observable(null);
             self.nodeGroupId = ko.observable('');
             var datatype = ko.observable('');
             self.datatype = ko.computed({
@@ -184,7 +185,8 @@ define([
                     issearchable: self.issearchable,
                     isrequired: self.isrequired,
                     fieldname: self.fieldname,
-                    exportable: self.exportable
+                    exportable: self.exportable,
+                    alias: self.alias,
                 });
                 return JSON.stringify(_.extend(JSON.parse(self._node()), jsObj));
             });
@@ -261,6 +263,7 @@ define([
             self.isrequired(source.isrequired);
             self.fieldname(source.fieldname);
             self.exportable(source.exportable);
+            self.alias(source.alias);
 
             if (source.config) {
                 self.setupConfig(source.config);
@@ -313,6 +316,7 @@ define([
                     userCallback.call(this, request, status, model);
                 }
                 if (status==='success') {
+                    this.alias(request.responseJSON.updated_values.node.alias);
                     this._node(this.json());
                 }
             };

@@ -481,17 +481,21 @@
             "functions_x_graphs": [
                 {
                     "config": {
-                        "description": {
-                            "nodegroup_id": "",
-                            "string_template": ""
-                        },
-                        "map_popup": {
-                            "nodegroup_id": "",
-                            "string_template": ""
-                        },
-                        "name": {
-                            "nodegroup_id": "0117d6e8-df31-11e8-b51b-a4d18cec433a",
-                            "string_template": "<String>"
+                        "module": "arches.app.functions.primary_descriptors",
+                        "class_name": "PrimaryDescriptorsFunction",
+                        "descriptor_types": {
+                            "description": {
+                                "nodegroup_id": "",
+                                "string_template": ""
+                            },
+                            "map_popup": {
+                                "nodegroup_id": "",
+                                "string_template": ""
+                            },
+                            "name": {
+                                "nodegroup_id": "0117d6e8-df31-11e8-b51b-a4d18cec433a",
+                                "string_template": "<String>"
+                            }
                         },
                         "triggering_nodegroups": []
                     },
@@ -503,6 +507,7 @@
             "graphid": "c35fe0a1-df30-11e8-b280-a4d18cec433a",
             "iconclass": "",
             "is_editable": false,
+            "isactive": true,
             "isresource": true,
             "jsonldcontext": "https://linked.art/ns/v1/linked-art.json",
             "name": "Import Test - Object",

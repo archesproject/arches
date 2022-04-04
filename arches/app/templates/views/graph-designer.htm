@@ -223,13 +223,13 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                             {% include 'views/graph/graph-designer/graph-tree.htm' %}
                         </div>
                     </div>
-    
+
                     <div style="width: 100%" class="tab-pane fade in" data-bind="css: { active: activeTab() === 'card' }">
                         <div style="height:100%;" class="jstree jstree-default" data-bind="visible: true, with: cardTree" style="display: none;">
                             {% include 'views/graph/graph-designer/card-tree.htm' %}
                         </div>
                     </div>
-    
+
                     <div style="width: 100%" class="tab-pane fade in" data-bind="css: { active: activeTab() === 'permissions' }">
                         <div style="height:100%;" class="jstree jstree-default" data-bind="visible: true, with: permissionTree" style="display: none;">
                             {% include 'views/graph/graph-designer/card-tree-permissions.htm' %}
@@ -283,9 +283,9 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                 </div>
             </div>
 
-            <div 
+            <div
                 style="flex-direction: row-reverse;"
-                class="settings-panel-body set-variable-pixel-height" 
+                class="settings-panel-body set-variable-pixel-height"
                 data-bind="visible: activeTab() === 'card'"
             >
                 <!--Middle Panel -->
@@ -328,15 +328,15 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                     </div>
                     <!-- /ko -->
                 </div>
-                
+
                 <!-- Card Manager -->
-                <div 
+                <div
                     style="
                         flex: 2;
                         width: 0;
                         overflow: hidden;
                     "
-                    class="flex tab-pane fade in graph-designer" 
+                    class="flex tab-pane fade in graph-designer"
                     data-bind="css: { active: activeTab() === 'card' }"
                 >
                     <!-- ko if: selectedCard() -->

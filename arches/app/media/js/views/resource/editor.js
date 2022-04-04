@@ -34,6 +34,7 @@ define([
     var displayname = ko.observable(data.displayname);
     var resourceId = ko.observable(data.resourceid);
     var appliedFunctions = ko.observable(data['appliedFunctions']);
+    var primaryDescriptorFunction = ko.observable(data['primaryDescriptorFunction']);
     var userIsCreator = data['useriscreator'];
     var creator = data['creator'];
     var selectedTile = ko.computed(function() {
@@ -98,6 +99,7 @@ define([
             cards: data.cards,
             tiles: tiles,
             appliedFunctions: appliedFunctions(),
+            primaryDescriptorFunction: primaryDescriptorFunction(),
             selection: selection,
             scrollTo: scrollTo,
             loading: loading,

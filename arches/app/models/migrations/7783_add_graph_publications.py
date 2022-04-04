@@ -4,28 +4,13 @@ import uuid
 from django.conf import settings
 from django.db import migrations, models
 import django.db.models.deletion
+from django.contrib.postgres.fields import JSONField
 
 class Migration(migrations.Migration):
 
     dependencies = [
         ("models", "7783_make_settings_active"),
     ]
-
-    def forwards_add_graph_transactions_table_data(apps, schema_editor):
-        GraphPublication = apps.get_model("models", "GraphPublication")
-        GraphModel = apps.get_model("models", "GraphModel")
-
-        for graph in GraphModel.objects.all():
-            if graph.isactive:
-                graph_publication = GraphPublication.objects.create(
-                    graph=graph,
-                    notes="Initial migration.",
-                )
-                graph_publication.save()
-
-    def reverse_add_graph_transactions_table_data(apps, schema_editor):
-        GraphPublication = apps.get_model("models", "GraphPublication")
-        GraphPublication.objects.all().delete()
 
     def forwards_add_graph_column_data(apps, schema_editor):
         GraphPublication = apps.get_model("models", "GraphPublication")
@@ -68,11 +53,29 @@ class Migration(migrations.Migration):
                 "managed": True,
             },
         ),
-        migrations.RunPython(forwards_add_graph_transactions_table_data, reverse_add_graph_transactions_table_data),
         migrations.AddField(
             model_name="graphmodel",
             name="publication",
             field=models.ForeignKey(to="models.GraphPublication", db_column="publicationid", null=True, on_delete=models.SET_NULL),
+        ),
+        migrations.AddField(
+            model_name="graphpublication",
+            name="serialized_graph",
+            field=JSONField(blank=True, db_column="serialized_graph", null=True),
+        ),
+        migrations.AlterField(
+            model_name="graphmodel",
+            name="isactive",
+            field=models.BooleanField(verbose_name="isactive", default=False),
+        ),
+        migrations.RemoveField(
+            model_name="graphmodel",
+            name="isactive",
+        ),
+        migrations.AddField(
+            model_name="resourceinstance",
+            name="graph_publication",
+            field=models.ForeignKey(db_column="graphpublicationid", null=True, on_delete=models.PROTECT, to="models.GraphPublication"),
         ),
         migrations.RunPython(forwards_add_graph_column_data, reverse_add_graph_column_data),
     ]
