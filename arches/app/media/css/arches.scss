@@ -3877,13 +3877,13 @@ ul.nav.nav-tabs.nav-justified {
 }
 
 .graph-settings-switch-label {
-    margin-left: 40px;
+    margin: 0 40px;
     margin-top: -20px;
     margin-bottom: 0px;
 }
 
 .graph-settings-switch-subtitle {
-    margin-left: 40px;
+    margin: 0 40px;
     margin-top: -5px;
     display: inline-block;
     color: #5F7D9A;
@@ -7383,20 +7383,20 @@ ul .card-tree-list a .node-subname {
 
 .toggle-container {
     padding-bottom: 15px;
-    padding-right: 15px;
+    padding-right: 5px;
     padding-top: 0px;
     padding-left: 5px;
 }
 
 .arches-toggle-sm {
-    margin-left: 40px;
+    margin: 0 40px;
     margin-top: -17px;
     margin-bottom: 0;
     font-size: 12px;
 }
 
 .arches-toggle-subtitle {
-    margin-left: 40px;
+    margin: 0 40px;
     display: inline-block;
     color: #5F7D9A;
     font-size: 12px;
