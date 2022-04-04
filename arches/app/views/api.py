@@ -1476,6 +1476,31 @@ class Tile(APIBase):
 
 
 @method_decorator(csrf_exempt, name="dispatch")
+class NodeGroup(APIBase):
+    def get(self, request, nodegroupid=None):
+        params = request.GET.dict()
+        user = request.user
+        perms = "models." + params.pop("perms", "read_nodegroup")
+        params["nodegroupid"] = params.get("nodegroupid", nodegroupid)
+
+        try:
+            uuid.UUID(params["nodegroupid"])
+        except ValueError as e:
+            del params["nodegroupid"]
+
+        try:
+            nodegroup = models.NodeGroup.objects.get(pk=params["nodegroupid"])
+            permitted_nodegroups = [nodegroup.pk for nodegroup in get_nodegroups_by_perm(user, perms)]
+        except Exception as e:
+            return JSONResponse(str(e), status=404)
+
+        if not nodegroup or nodegroup.pk not in permitted_nodegroups:
+            return JSONResponse(_("No nodegroup matching query parameters found."), status=404)
+
+        return JSONResponse(nodegroup, status=200)
+
+
+@method_decorator(csrf_exempt, name="dispatch")
 class Node(APIBase):
     def get(self, request, nodeid=None):
         graph_cache = {}

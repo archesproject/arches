@@ -6211,6 +6211,13 @@ th.notif-type {
     border-bottom: 1px solid #9490EE;
 }
 
+
+.file-select {
+    text-align: center;
+    padding: 70px 0;
+    background: #f6f6f6;
+}
+
 .ep-tools {
     cursor: pointer;
     border-right: 1px solid #514CCA;
@@ -6224,6 +6231,247 @@ th.notif-type {
     align-items: center;
     padding-left: 10px;
     padding-right: 20px;
+}
+
+.file-select-window {
+    min-width: 350px;
+    border: 1px solid #c4c4c4;
+    border-radius: 2px;
+}
+
+
+.tabbed-workflow-title-bar {
+    .workflow-name-container {
+        display: flex;
+        flex-direction: row;
+    }
+
+    .workflow-top-control {
+        display: inline-flex;
+        max-width: 335px;
+        justify-content: flex-end;
+    }
+}
+
+.step-metadata {
+    display: flex;
+}
+
+.workflow-step-title,
+.workflow-plugin .btn .succinct,
+.ep-tools .fa-sign-out {
+    display: none
+}
+
+
+@media only screen and (max-width : 768px) {
+    .tabbed-workflow-step-container{
+        margin-bottom: 108px;
+    }
+    
+    #content-container {
+        .ep-tools .fa-sign-out {
+            font-size: 17px;
+            display: inherit;
+        }
+        .ep-toolbar {
+            position: fixed;
+            z-index: 10;
+        }
+        .content-panel {
+            padding: 17px 0px;
+        }
+    }
+
+    .dropzone {
+        min-width: auto;
+        width: auto;
+    }
+    .file-select {
+        padding: 0px;
+
+        div {
+            display: none;
+        }
+        button {
+            margin: 0px;
+        }
+    }
+
+    .workflow-step-loading-mask {
+        bottom: 109px;
+    }
+
+    .file-select-window {
+        min-width: auto;
+        border: none;
+
+        .file-upload-footer{
+            display: none;
+        }
+    }
+
+    #container.mainnav-lg #mainnav-container{
+        left: 0;
+        width: 100%;
+
+        i {
+            font-size: 1.95em;
+        }
+
+        span.menu-title {
+            font-size: 17px;
+        }
+
+        .expanded-nav{
+            display: none;
+        }
+
+        .list-header{
+            font-size: 19px;
+        }
+    }
+
+    #card-alert-panel {
+        display: flex;
+        flex-direction: column;
+        height: auto;
+
+        .ep-form-alert-text {
+            display: none;
+        }
+
+        .ep-form-alert-default-dismiss {
+            display: none;
+        }
+
+        h4 {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 10px;
+            font-size: 15px;
+        }
+
+        .ep-form-alert-buttons {
+            display: flex;
+            flex-direction: row;
+            position: relative;
+            bottom: auto;
+            right: auto;
+
+            button {
+                display: flex;
+                flex: 1;
+                margin: 5px;
+                align-items: center;
+                justify-content: center;
+                font-size: 17px;
+                padding: 3px;
+            }
+            button.btn-labeled:before {
+                background-color: transparent;
+            }
+        }
+    }
+
+    .tabbed-workflow-step-body {
+        .card-component{
+            padding: 0px;
+            margin: 0px;
+        }
+        label {
+            font-size: 15px;
+        }
+    }
+
+    .tabbed-workflow-footer{
+        position: fixed;
+        bottom: 0px;
+        width: 100%;
+        z-index: 11;
+        display: flex;
+        flex-direction: column-reverse;
+        padding: 10px 5px;
+
+        .btn > i, .btn > span {
+            padding: 0px 5px;
+        }
+
+        .btn {
+            padding: 12px;
+            font-size: 17px;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        i {
+            font-size: 17px;
+        }
+    }
+
+    .tabbed-workflow-footer-button-container {
+        display: flex;
+        flex-direction: row;
+    }
+    
+    .tabbed-workflow-title-bar .workflow-top-control {
+        display: flex;
+        flex: 1;
+        flex-direction: row;
+        margin-top: 33px;
+        display: inherit;
+        max-width: none;
+
+        button {
+            display: flex;
+            flex: 1;
+            font-size: 17px;
+            padding: 12px;
+            justify-content: center;
+            align-items: center;
+        }
+    }        
+    
+    .workflow-name-container {
+        display: inherit;
+        flex-direction: initial;
+    }
+
+    .tabbed-workflow-footer-button-container button {
+        margin: 10px 5px;
+        flex: 1;
+        display: flex;
+    }
+
+    .workflow-step-title {
+        padding: 0px 5px;
+        border-bottom: 1px solid #ddd;
+        display: inherit;
+
+        h2 {
+            margin-top: 10px;
+            font-weight: initial; 
+            font-size:17px
+        }
+    }
+
+    .ep-notifs-toggle, 
+    .ep-tools-search, 
+    .tabbed-workflow-step-information-box-container.seen,
+    .workflow-nav-tab-container,
+    .workflow-plugin .btn .verbose,
+    .tabbed-workflow-footer .step-metadata,
+    .tabbed-workflow-title-bar .workflow-name-container,
+    .workflow-select-desc,
+    .ep-form-alert-title .verbose
+    {
+        display: none;
+    }
+
+    .workflow-plugin .btn .succinct {
+        display: inherit;
+    }
 }
 
 .ep-tools:hover {
@@ -7706,12 +7954,6 @@ div .switch label:hover,
     overflow: hidden;
 }
 
-.file-select {
-    text-align: center;
-    padding: 70px 0;
-    background: #f9f9f9;
-}
-
 .file-upload input.upload {
     position: absolute;
     top: 0;
@@ -7808,12 +8050,6 @@ span.file-upload-clear-filter {
     max-height: 25px;
 }
 
-.file-select {
-    text-align: center;
-    padding: 70px 0;
-    background: #f6f6f6;
-}
-
 .file-select h2 {
     font-weight: 400;
 }
@@ -7854,11 +8090,6 @@ span.file-upload-clear-filter {
     height: inherit;
 }
 
-.file-select-window {
-    min-width: 350px;
-    border: 1px solid #c4c4c4;
-    border-radius: 2px;
-}
 
 .file-select-window h2 {
     font-weight: 400;
