@@ -471,11 +471,11 @@ class EDTFDataType(BaseDataType):
     def transform_value_for_tile(self, value, **kwargs):
         transformed_value = ExtendedDateFormat(value)
         if transformed_value.edtf is None:
-            return None
-        return str(transformed_value.edtf)
+            return value, False
+        return str(transformed_value.edtf), True
 
     def pre_tile_save(self, tile, nodeid):
-        tile.data[nodeid] = self.transform_value_for_tile(tile.data[nodeid])
+        tile.data[nodeid], valid = self.transform_value_for_tile(tile.data[nodeid])
 
     def validate(self, value, row_number=None, source="", node=None, nodeid=None, strict=False):
         errors = []

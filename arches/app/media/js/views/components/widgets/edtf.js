@@ -26,8 +26,8 @@ define(['knockout',
                         }
                     })
                     .then(json => {
-                        if (json?.data) {
-                            self.transformedEdtf(json.data);
+                        if (json?.data?.[1]) {
+                            self.transformedEdtf(json.data[0]);
                         } else {
                             self.transformedEdtf("not a valid edtf format");
                         }
