@@ -682,7 +682,15 @@ create or replace function __arches_create_spatial_view_attribute_table(
         att_comments         text := '';
     begin
         att_table_name := format('%s.sp_attr_%s', schema_name, spatial_view_name_slug);
-
+		
+		-- add resourceinstanceid comment
+		att_comments = att_comments || format(
+                        'comment on column %s.%s is ''%s'';',
+                        att_table_name,
+                        'resourceinstanceid',
+                        'Globally unique Arches resource ID'
+                        );
+		
         declare
             tmp_nodegroupid_slug     text;
 			node_name_slug			text;
@@ -734,7 +742,7 @@ create or replace function __arches_create_spatial_view_attribute_table(
 
             end loop;
         end;
-        
+		
         -- pull together 
         att_view_tbl := format(
             '
@@ -819,78 +827,111 @@ create or replace function __arches_create_spatial_view(
         sv_create                 text := '';
         att_table_name            text;
         g                         record;
-        tmp_geom_type             text;
+		n						  record;
+		geom_list				  text := '';
+        geom_type_filter          text;
     begin
         att_table_name := __arches_create_spatial_view_attribute_table(spatial_view_name_slug, geometry_node_id, attribute_node_list, schema_name);
         if att_table_name = 'error' then
             return success;
         end if;
 
-        if is_mixed_geometry_type = false then
-            for g in 
-                select unnest(string_to_array('ST_Point,ST_LineString,ST_Polygon'::text,',')) as geometry_type
-            loop
-                        
-                tmp_geom_type := g.geometry_type;
-                sv_name_slug_with_geom := format('%s.%s_%s',schema_name, spatial_view_name_slug, lower(replace(tmp_geom_type,'ST_','')));
-                
-                sv_create := sv_create || 
-                    format('
-                    create or replace view %s AS
-                    select 
-                        geo.id AS gid,
-                        geo.tileid::text AS tileid, 
-                        geo.nodeid::text AS nodeid,
-                        geo.geom,
-                        att.*
-                        FROM public.geojson_geometries geo
-                            join %s att ON geo.resourceinstanceid::text = att.resourceinstanceid::text
-                    where geo.nodeid = ''%s''
-                        and ST_GeometryType(geo.geom) = ''%s'';
+		if is_mixed_geometry_type = false then
+			geom_list := 'ST_Point,ST_LineString,ST_Polygon';
+		else
+			geom_list := 'mixed_geom';
+		end if;
 
-                    grant select on table %s to arches_spatial_views;
+		for g in 
+			select unnest(string_to_array(geom_list,',')) as geometry_type
+		loop
+			if g.geometry_type = 'mixed_geom' then
+				geom_type_filter := '';
+			else
+				geom_type_filter := format('and ST_GeometryType(geo.geom) = ''%s''',g.geometry_type);
+			end if;
+			
+			sv_name_slug_with_geom := format('%s.%s_%s',schema_name, spatial_view_name_slug, lower(replace(g.geometry_type,'ST_','')));
 
-                    comment on view %s is ''%s'';
+			sv_create := sv_create || 
+				format('
+				create or replace view %s AS
+				select 
+					geo.id AS gid,
+					geo.tileid::text AS tileid, 
+					geo.nodeid::text AS nodeid,
+					geo.geom,
+					att.*
+					FROM public.geojson_geometries geo
+						join %s att ON geo.resourceinstanceid::text = att.resourceinstanceid::text
+				where geo.nodeid = ''%s''
+					%s;
 
-                    ',
-                    sv_name_slug_with_geom,
-                    att_table_name,
-                    geometry_node_id::text,
-                    tmp_geom_type,
-                    sv_name_slug_with_geom,
-                    sv_name_slug_with_geom,
-                    spv_description);
-                
-            end loop;
-        else
-            sv_name_slug_with_geom := format('%s.%s_%s',schema_name, spatial_view_name_slug, 'mixed_geom');
-            
-            sv_create := format(
-                '
-                create or replace view %s AS
-                select 
-                    geo.id AS gid,
-                    geo.tileid::text AS tileid, 
-                    geo.nodeid::text AS nodeid,
-                    geo.geom,
-                    att.*
-                    FROM public.geojson_geometries geo
-                        join %s att ON geo.resourceinstanceid::text = att.resourceinstanceid::text
-                where geo.nodeid = ''%s'';
+				grant select on table %s to arches_spatial_views;
 
-                grant select on table %s to arches_spatial_views;
+				comment on view %s is ''%s'';
 
-                comment on view %s is ''%s'';
+				',
+				sv_name_slug_with_geom,
+				att_table_name,
+				geometry_node_id::text,
+				geom_type_filter,
+				sv_name_slug_with_geom,
+				sv_name_slug_with_geom,
+				spv_description);
 
-                ',
-                sv_name_slug_with_geom,
-                att_table_name,
-                geometry_node_id::text,
-                tmp_geom_type,
-                sv_name_slug_with_geom,
-                sv_name_slug_with_geom,
-                spv_description);
-        end if;
+				-- add column comments to view
+				--standard columns
+				-- add resourceinstanceid comment
+				sv_create = sv_create || format(
+								'comment on column %s.%s is ''%s'';',
+								sv_name_slug_with_geom,
+								'gid',
+								'Unique geometry id. This is not guarenteed to be consistent across sessions.'
+								);
+								
+				sv_create = sv_create || format(
+								'comment on column %s.%s is ''%s'';',
+								sv_name_slug_with_geom,
+								'resourceinstanceid',
+								'Globally unique Arches resource ID'
+								);
+				sv_create = sv_create || format(
+								'comment on column %s.%s is ''%s'';',
+								sv_name_slug_with_geom,
+								'nodeid',
+								'Id for the Arches graph node containing the geometry'
+								);
+								
+				sv_create = sv_create || format(
+								'comment on column %s.%s is ''%s'';',
+								sv_name_slug_with_geom,
+								'tileid',
+								'Id of the tile record storing the geometry'
+								);
+				--dyanamic columns
+				for n in
+					with attribute_nodes as (
+						select * from jsonb_to_recordset(attribute_node_list) as x(nodeid uuid, description text)
+					)
+					select 
+						__arches_slugify(n1.name) as name, 
+						n1.nodeid, 
+						n1.nodegroupid,
+						att_nodes.description
+					from nodes n1
+						join (select * from attribute_nodes) att_nodes ON n1.nodeid = att_nodes.nodeid
+				loop
+					sv_create := sv_create || 
+						format('
+							comment on column %s.%s is ''%s'';
+						',
+						sv_name_slug_with_geom,
+						n.name,
+						n.description);
+				end loop;
+
+		end loop;
         
         execute sv_create;
         
@@ -1039,13 +1080,13 @@ create or replace function __arches_trg_fnc_update_spatial_attributes()
                     att_table_name          text := spv.schema || '.sp_attr_' || spv.slug;
                     tmp_nodegroupid_slug    text;
                     n                       record;
-                    node_create             text := '''';
-                    tile_create             text := '''';
+                    node_create             text := '';
+                    tile_create             text := '';
                 begin
 
                     -- delete the existing rows for this resource
                     delete_existing := format('
-                        delete from %1$s where where resourceinstanceid::uuid = %2$L;
+                        delete from %1$s where resourceinstanceid::uuid = %2$L::uuid;
                         ',
                         att_table_name,
                         trigger_tile.resourceinstanceid
@@ -1066,10 +1107,7 @@ create or replace function __arches_trg_fnc_update_spatial_attributes()
                     loop
                         tmp_nodegroupid_slug := __arches_slugify(n.nodegroupid::text);
                         node_create = node_create || 
-                            format(
-                                '
-                                ,__arches_agg_get_node_display_value(distinct tile_%s.tiledata, %L) as %s
-                                '
+                            format(',__arches_agg_get_node_display_value(distinct tile_%s.tiledata, %L::uuid) as %s'
                                 ,tmp_nodegroupid_slug
                                 ,n.nodeid::text
                                 ,__arches_slugify(n.name)
@@ -1077,10 +1115,8 @@ create or replace function __arches_trg_fnc_update_spatial_attributes()
                         
                         if tile_create not like (format('%%tile_%s%%',tmp_nodegroupid_slug)) then
                             tile_create = tile_create || 
-                                format(' 
-                                left outer join tiles tile_%s on r.resourceinstanceid = tile_%s.resourceinstanceid
-                                    and tile_%s.nodegroupid = ''%s''
-                                ',
+                                format('left outer join tiles tile_%s on r.resourceinstanceid = tile_%s.resourceinstanceid
+                                    and tile_%s.nodegroupid = ''%s''::uuid',
                                 tmp_nodegroupid_slug,
                                 tmp_nodegroupid_slug,
                                 tmp_nodegroupid_slug,
@@ -1111,7 +1147,6 @@ create or replace function __arches_trg_fnc_update_spatial_attributes()
                         trigger_tile.resourceinstanceid::text);
 
                 end;
-                raise notice '%', insert_attr;
                 execute insert_attr;
 
             end;
@@ -1177,6 +1212,11 @@ create or replace function __arches_trg_fnc_update_spatial_views()
                 'select __arches_delete_spatial_view(%L,%L);'
                 , old.slug
 				, old.schema);
+				
+			if sv_perform <> '' then
+				execute sv_perform;
+			end if;	
+			
             return old;
 
         elsif tg_op = 'INSERT' then
@@ -1190,8 +1230,12 @@ create or replace function __arches_trg_fnc_update_spatial_views()
                     , new.description
                     , new.ismixedgeometrytypes);
             end if;
-
-            return new;
+			
+			if sv_perform <> '' then
+				execute sv_perform;
+			end if;
+            
+			return new;
 
         elsif tg_op = 'UPDATE' then
 
@@ -1213,13 +1257,14 @@ create or replace function __arches_trg_fnc_update_spatial_views()
 					, old.schema);
             end if;
 
-            return new;
+			if sv_perform <> '' then
+				execute sv_perform;
+			end if;
+            
+			return new;
         end if;
 
-        if sv_perform <> '' then
-            raise notice '%', sv_perform;
-            execute sv_perform;
-        end if;
+        
         
     end;
     $func$;
