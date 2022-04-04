@@ -23,6 +23,7 @@
 @import url(../packages/leaflet.fullscreen/Control.FullScreen.css);
 @import url(../css/base-manager.css);
 @import "sidenav.scss";
+@import "edit-history.scss";
 
 img {
     image-orientation: from-image;
@@ -4543,14 +4544,6 @@ div.dropdown-menu.open {
     background: #f9f9f9;
 }
 
-.resource-grid-title {
-    font-weight: normal;
-    padding: 3px 20px 0 20px;
-    font-size: 1.416em;
-    line-height: 50px;
-    display: inline-block;
-}
-
 .resource-grid-subtitle {
     padding-left: 69px;
     margin-top: -20px;
@@ -5665,17 +5658,12 @@ span.editable-card i.fa.fa-align-justify:hover {
     margin-bottom: 20px;
 }
 
-.navbar-top-links .dropdown-menu .recent-additions-container {
-    margin-top: 10px;
-    padding: 0 30px;
-}
-
-.recent-additions-container {
-    padding-left: 20px;
-}
-
 .dataTables_scrollBody {
     max-height: 65vh !important;
+}
+
+.dataTables_scrollHead, .dataTables_scrollHeadInner {
+    width: 100%;
 }
 
 .card-grid {
