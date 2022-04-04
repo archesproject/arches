@@ -57,7 +57,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
             </div>
         </h4>
 
-        <div class="graph-settings-crud">
+        <div class="ep-form-toolbar-tools">
 
             <span data-bind="visible: graphSettingsVisible()" style="display: none;">
                 <!-- ko if: graphSettingsViewModel.dirty() -->
@@ -300,8 +300,6 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
     </div>
 </div>
 {% endblock main_content %}
-
-{% block tabs %}{% endblock tabs %}
 
 {% block pre_require_js %}
 {{block.super}}

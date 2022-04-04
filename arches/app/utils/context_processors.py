@@ -22,7 +22,7 @@ from arches.app.models.models import GroupMapSettings, Language
 from arches.app.models.system_settings import settings
 from arches.app.utils.geo_utils import GeoUtils
 from arches.app.utils.betterJSONSerializer import JSONSerializer
-from django.utils.translation import get_language, get_language_info
+from django.utils.translation import get_language, get_language_info, get_language_bidi
 
 
 def livereload(request):
@@ -95,7 +95,8 @@ def app_settings(request):
             "RENDERERS": settings.RENDERERS,
             "ACCESSIBILITY_MODE": settings.ACCESSIBILITY_MODE,
             "FORCE_SCRIPT_NAME": settings.FORCE_SCRIPT_NAME if settings.FORCE_SCRIPT_NAME is not None else "",
-            "DEFAULT_LANGUAGE": get_language(),
+            "ACTIVE_LANGUAGE": get_language(),
+            "ACTIVE_LANGUAGE_DIR": "rtl" if get_language_bidi() else "ltr",
             "LANGUAGES": JSONSerializer().serialize(languages) if len(languages) != 0 else JSONSerializer().serialize([]),
             "RESTRICT_CELERY_EXPORT_FOR_ANONYMOUS_USER": settings.RESTRICT_CELERY_EXPORT_FOR_ANONYMOUS_USER,
         }

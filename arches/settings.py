@@ -178,7 +178,7 @@ TIME_ZONE = "America/Chicago"
 USE_TZ = False
 
 
-# see https://docs.djangoproject.com/en/1.9/topics/i18n/translation/#how-django-discovers-language-preference
+# see https://docs.djangoproject.com/en/2.2/topics/i18n/translation/#how-django-discovers-language-preference
 # to see how LocaleMiddleware tries to determine the user's language preference
 # (make sure to check your accept headers as they will override the LANGUAGE_CODE setting!)
 # also see get_language_from_request in django.utils.translation.trans_real.py

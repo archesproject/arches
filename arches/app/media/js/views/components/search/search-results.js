@@ -30,7 +30,7 @@ function($, _, BaseFilter, bootstrap, arches, select2, ko, koMapping, GraphModel
                 this.showRelationships = ko.observable();
                 this.relationshipCandidates = ko.observableArray();
                 this.selectedResourceId = ko.observable(null);
-                this.language = arches.defaultLanguage;
+                this.language = arches.activeLanguage;
                 this.showRelationships.subscribe(function(res) {
                     this.selectedResourceId(res.resourceinstanceid);
                 }, this);
@@ -231,7 +231,7 @@ function($, _, BaseFilter, bootstrap, arches, select2, ko, koMapping, GraphModel
 
             getLocalizedText: function(data){
                 const d = data.find((element) => {
-                    return arches.defaultLanguage == element.language;
+                    return arches.activeLanguage == element.language;
                 });
                 if(!!d && d["value"] !== "") {
                     return { displayText: d["value"], alternative: false };

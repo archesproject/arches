@@ -1,0 +1,12 @@
+// This file is only imported if the direction of the page is Right-To-Left (RTL)
+// Use this only to override styles that are rtl specific
+
+.sidenav-menu{
+    > ul {
+        > li {
+            > a:hover {
+                box-shadow: inset -4px 0 0 0 #2986b8;
+            }
+        }
+    }
+}

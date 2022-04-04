@@ -1115,7 +1115,32 @@ class Command(BaseCommand):
                 path = utils.get_valid_path(source)
                 if path is not None:
                     print("Importing {0}. . .".format(path))
-                    BusinessDataImporter(path, config_file).import_business_data(
+                    importer = BusinessDataImporter(path, config_file)
+
+                    new_languages = importer.scan_for_new_languages()
+
+                    if new_languages is not None and len(new_languages) > 0:
+                        print("\nFound possible new languages while attempting import.")
+                        for language in new_languages:
+                            print('Do you wish to add the language with code "{language}" to Arches? (y or n):'.format(language=language))
+                            create_new_language = input()
+                            if create_new_language.lower() == "y":
+                                print("\nEnter the human-readable language name:")
+                                language_name = input()
+                                print("\nIs this language primarily read Left-To-Right (y or n):")
+                                lang_is_ltr = input()
+                                default_direction = "ltr" if lang_is_ltr.lower() == "y" else "rtl"
+                                scope = "data"
+                                new_language = models.Language(
+                                    code=language, name=language_name, default_direction=default_direction, scope=scope
+                                )
+                                try:
+                                    new_language.save()
+
+                                except Exception as e:
+                                    raise Exception("Couldn't save new entry for {language}.".format(language=language)) from e
+
+                    importer.import_business_data(
                         overwrite=overwrite,
                         bulk=bulk_load,
                         create_concepts=create_concepts,

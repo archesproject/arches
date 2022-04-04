@@ -21,6 +21,8 @@
 @import url(../css/tree/tree.css);
 @import url(../packages/@mapbox/mapbox-gl-geocoder/dist/mapbox-gl-geocoder.css);
 @import url(../packages/leaflet.fullscreen/Control.FullScreen.css);
+@import url(../css/base-manager.css);
+@import "sidenav.scss";
 
 img {
     image-orientation: from-image;
@@ -149,21 +151,6 @@ dl.inline-flex dd {
     margin-top: 14px !important;
     margin-left: 15px !important;
     margin-right: 15px !important;
-}
-
-.brand-title {
-    display: block;
-    line-height: 48px;
-    font-size: 20px;
-}
-
-#mainnav-container {
-    padding-top: 50px;
-    background-color: #2d3c4b;
-}
-
-#mainnav-menu .arches {
-    margin-left: -25px;
 }
 
 .list-group.bg-trans .list-group-item:not(.active):not(.disabled) {
@@ -405,12 +392,6 @@ input[type="checkbox"] {
 .gsheets-descr {
     font-size: 14px;
     color: #777;
-}
-
-.graph-settings-crud {
-    margin-right: 0px;
-    position: absolute;
-    right: 10px;
 }
 
 .workflow-step-container {
@@ -4456,23 +4437,6 @@ div.dropdown-menu.open {
     border-bottom: 1px solid rgba(0, 0, 0, 0.4);
 }
 
-.nano>.nano-content {
-    font-size: 11px;
-    overflow-y: auto;
-}
-
-ul .collapse li {
-    height: 25px;
-}
-
-ul .collapse li:first-of-type {
-    margin-top: -10px;
-}
-
-ul .collapse li:last-of-type {
-    height: 35px;
-}
-
 .arches-panel-header {
     font-size: 1.6em;
     padding-left: 25px;
@@ -6416,6 +6380,7 @@ th.notif-type {
     min-height: 55px;
     background: #f6f6f6;
     border-bottom: 1px solid #ddd;
+    padding: 0px 14px;
 }
 
 .ep-form-toolbar div:nth-last-child(2) {
@@ -6426,11 +6391,10 @@ th.notif-type {
     font-size: 16px;
     font-weight: 400;
     color: #666;
-    padding-left: 15px;
+    flex-grow: 1;
 }
 
 .ep-form-toolbar-tools {
-    margin-right: 10px;
     -ms-justify-content: flex-end;
     -webkit-justify-content: flex-end;
     justify-content: flex-end;
@@ -8115,11 +8079,6 @@ div.row.widget-wrapper {
     transform: translate(0, -2px);
 }
 
-.arches-menu-item-disabled:hover {
-    cursor: default;
-    margin-left: -3px;
-}
-
 .related-resources-container {
     -ms-flex: 0 0 calc(100% - 400px);
     -webkit-flex: 0 0 calc(100% - 400px);
@@ -8502,7 +8461,7 @@ a.mega-dropdown-toggle.disabled {
     width: calc(100% - 50px);
 }
 
-.mainnav-lg .workbench-card-sidepanel .create-resource-instance-card-component.rr-table-pop {
+.sidenav-lg .workbench-card-sidepanel .create-resource-instance-card-component.rr-table-pop {
     left: 220px;
 }
 
@@ -8560,7 +8519,7 @@ a.mega-dropdown-toggle.disabled {
     position: unset;
 }
 
-.mainnav-lg .workbench-card-sidepanel .create-resource-instance-card-component.rr-table-pop .install-buttons {
+.sidenav-lg .workbench-card-sidepanel .create-resource-instance-card-component.rr-table-pop .install-buttons {
     left: 520px;
 }
 
@@ -9242,10 +9201,6 @@ div.row.widget-wrapper.report-header:hover {
     display: table-cell;
     border-top: 1px solid #999;
     z-index: 10;
-}
-
-#mainnav-container {
-    z-index: 15;
 }
 
 #navbar {
@@ -10386,10 +10341,6 @@ a.search-query-link-captions:focus {
     left: 0px;
     border-top: 1px solid #ddd;
     height: 50px;
-}
-
-.mainnav-lg .search-footer {
-    left: 170px;
 }
 
 .search-footer .pagination {
@@ -11946,7 +11897,6 @@ a.filter-tools:hover {
 
 .graph-selector {
     width: 350px;
-    margin-right: 10px;
 }
 
 .graph-designer-tab-container {
@@ -12777,11 +12727,11 @@ a.jstree-anchor strong {
     font-weight: 500;
 }
 
-.expanded-nav {
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-}
+// .expanded-nav {
+//     white-space: nowrap;
+//     overflow: hidden;
+//     text-overflow: ellipsis;
+// }
 
 .add-new-tile {
     display: none;
