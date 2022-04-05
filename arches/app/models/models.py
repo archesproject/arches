@@ -67,7 +67,7 @@ class CardModel(models.Model):
     def __init__(self, *args, **kwargs):
         super(CardModel, self).__init__(*args, **kwargs)
         if not self.cardid:
-            self.cardid = uuid.uuid1()
+            self.cardid = uuid.uuid4()
 
     class Meta:
         managed = True
@@ -83,7 +83,7 @@ class ConstraintModel(models.Model):
     def __init__(self, *args, **kwargs):
         super(ConstraintModel, self).__init__(*args, **kwargs)
         if not self.constraintid:
-            self.constraintid = uuid.uuid1()
+            self.constraintid = uuid.uuid4()
 
     class Meta:
         managed = True
@@ -98,7 +98,7 @@ class ConstraintXNode(models.Model):
     def __init__(self, *args, **kwargs):
         super(ConstraintXNode, self).__init__(*args, **kwargs)
         if not self.id:
-            self.id = uuid.uuid1()
+            self.id = uuid.uuid4()
 
     class Meta:
         managed = True
@@ -121,7 +121,7 @@ class CardComponent(models.Model):
     def __init__(self, *args, **kwargs):
         super(CardComponent, self).__init__(*args, **kwargs)
         if not self.componentid:
-            self.componentid = uuid.uuid1()
+            self.componentid = uuid.uuid4()
 
     class Meta:
         managed = True
@@ -141,7 +141,7 @@ class CardXNodeXWidget(models.Model):
     def __init__(self, *args, **kwargs):
         super(CardXNodeXWidget, self).__init__(*args, **kwargs)
         if not self.id:
-            self.id = uuid.uuid1()
+            self.id = uuid.uuid4()
 
     class Meta:
         managed = True
@@ -157,7 +157,7 @@ class Concept(models.Model):
     def __init__(self, *args, **kwargs):
         super(Concept, self).__init__(*args, **kwargs)
         if not self.conceptid:
-            self.conceptid = uuid.uuid1()
+            self.conceptid = uuid.uuid4()
 
     class Meta:
         managed = True
@@ -240,7 +240,7 @@ class Edge(models.Model):
     def __init__(self, *args, **kwargs):
         super(Edge, self).__init__(*args, **kwargs)
         if not self.edgeid:
-            self.edgeid = uuid.uuid1()
+            self.edgeid = uuid.uuid4()
 
     class Meta:
         managed = True
@@ -275,7 +275,7 @@ class EditLog(models.Model):
     def __init__(self, *args, **kwargs):
         super(EditLog, self).__init__(*args, **kwargs)
         if not self.editlogid:
-            self.editlogid = uuid.uuid1()
+            self.editlogid = uuid.uuid4()
 
     class Meta:
         managed = True
@@ -294,7 +294,7 @@ class MobileSyncLog(models.Model):
     def __init__(self, *args, **kwargs):
         super(MobileSyncLog, self).__init__(*args, **kwargs)
         if not self.logid:
-            self.logid = uuid.uuid1()
+            self.logid = uuid.uuid4()
 
     class Meta:
         managed = True
@@ -313,7 +313,7 @@ class ResourceRevisionLog(models.Model):
     def __init__(self, *args, **kwargs):
         super(ResourceRevisionLog, self).__init__(*args, **kwargs)
         if not self.logid:
-            self.logid = uuid.uuid1()
+            self.logid = uuid.uuid4()
 
     class Meta:
         managed = True
@@ -333,7 +333,7 @@ class TileRevisionLog(models.Model):
     def __init__(self, *args, **kwargs):
         super(TileRevisionLog, self).__init__(*args, **kwargs)
         if not self.logid:
-            self.logid = uuid.uuid1()
+            self.logid = uuid.uuid4()
 
     class Meta:
         managed = True
@@ -348,7 +348,7 @@ class File(models.Model):
     def __init__(self, *args, **kwargs):
         super(File, self).__init__(*args, **kwargs)
         if not self.fileid:
-            self.fileid = uuid.uuid1()
+            self.fileid = uuid.uuid4()
 
     class Meta:
         managed = True
@@ -410,7 +410,7 @@ class Function(models.Model):
     def __init__(self, *args, **kwargs):
         super(Function, self).__init__(*args, **kwargs)
         if not self.functionid:
-            self.functionid = uuid.uuid1()
+            self.functionid = uuid.uuid4()
 
     class Meta:
         managed = True
@@ -434,7 +434,7 @@ class FunctionXGraph(models.Model):
     def __init__(self, *args, **kwargs):
         super(FunctionXGraph, self).__init__(*args, **kwargs)
         if not self.id:
-            self.id = uuid.uuid1()
+            self.id = uuid.uuid4()
 
     class Meta:
         managed = True
@@ -488,7 +488,7 @@ class GraphModel(models.Model):
     def __init__(self, *args, **kwargs):
         super(GraphModel, self).__init__(*args, **kwargs)
         if not self.graphid:
-            self.graphid = uuid.uuid1()
+            self.graphid = uuid.uuid4()
 
     class Meta:
         managed = True
@@ -516,7 +516,7 @@ class NodeGroup(models.Model):
     def __init__(self, *args, **kwargs):
         super(NodeGroup, self).__init__(*args, **kwargs)
         if not self.nodegroupid:
-            self.nodegroupid = uuid.uuid1()
+            self.nodegroupid = uuid.uuid4()
 
     class Meta:
         managed = True
@@ -617,7 +617,7 @@ class Node(models.Model):
     def __init__(self, *args, **kwargs):
         super(Node, self).__init__(*args, **kwargs)
         if not self.nodeid:
-            self.nodeid = uuid.uuid1()
+            self.nodeid = uuid.uuid4()
 
     class Meta:
         managed = True
@@ -640,7 +640,7 @@ class Ontology(models.Model):
     def __init__(self, *args, **kwargs):
         super(Ontology, self).__init__(*args, **kwargs)
         if not self.ontologyid:
-            self.ontologyid = uuid.uuid1()
+            self.ontologyid = uuid.uuid4()
 
     class Meta:
         managed = True
@@ -692,7 +692,7 @@ class OntologyClass(models.Model):
     def __init__(self, *args, **kwargs):
         super(OntologyClass, self).__init__(*args, **kwargs)
         if not self.ontologyclassid:
-            self.ontologyclassid = uuid.uuid1()
+            self.ontologyclassid = uuid.uuid4()
 
     class Meta:
         managed = True
@@ -709,7 +709,7 @@ class Relation(models.Model):
     def __init__(self, *args, **kwargs):
         super(Relation, self).__init__(*args, **kwargs)
         if not self.relationid:
-            self.relationid = uuid.uuid1()
+            self.relationid = uuid.uuid4()
 
     class Meta:
         managed = True
@@ -734,7 +734,7 @@ class ReportTemplate(models.Model):
     def __init__(self, *args, **kwargs):
         super(ReportTemplate, self).__init__(*args, **kwargs)
         if not self.templateid:
-            self.templateid = uuid.uuid1()
+            self.templateid = uuid.uuid4()
 
     class Meta:
         managed = True
@@ -758,7 +758,7 @@ class Resource2ResourceConstraint(models.Model):
     def __init__(self, *args, **kwargs):
         super(Resource2ResourceConstraint, self).__init__(*args, **kwargs)
         if not self.resource2resourceid:
-            self.resource2resourceid = uuid.uuid1()
+            self.resource2resourceid = uuid.uuid4()
 
     class Meta:
         managed = True
@@ -877,7 +877,7 @@ class ResourceXResource(models.Model):
     def __init__(self, *args, **kwargs):
         super(ResourceXResource, self).__init__(*args, **kwargs)
         if not self.resourcexid:
-            self.resourcexid = uuid.uuid1()
+            self.resourcexid = uuid.uuid4()
 
     class Meta:
         managed = True
@@ -893,7 +893,7 @@ class ResourceInstance(models.Model):
     def __init__(self, *args, **kwargs):
         super(ResourceInstance, self).__init__(*args, **kwargs)
         if not self.resourceinstanceid:
-            self.resourceinstanceid = uuid.uuid1()
+            self.resourceinstanceid = uuid.uuid4()
 
     class Meta:
         managed = True
@@ -919,7 +919,7 @@ class SearchComponent(models.Model):
     def __init__(self, *args, **kwargs):
         super(SearchComponent, self).__init__(*args, **kwargs)
         if not self.searchcomponentid:
-            self.searchcomponentid = uuid.uuid1()
+            self.searchcomponentid = uuid.uuid4()
 
     class Meta:
         managed = True
@@ -945,7 +945,7 @@ class SearchExportHistory(models.Model):
     def __init__(self, *args, **kwargs):
         super(SearchExportHistory, self).__init__(*args, **kwargs)
         if not self.searchexportid:
-            self.searchexportid = uuid.uuid1()
+            self.searchexportid = uuid.uuid4()
 
     class Meta:
         managed = True
@@ -1030,7 +1030,7 @@ class TileModel(models.Model):  # Tile
     def __init__(self, *args, **kwargs):
         super(TileModel, self).__init__(*args, **kwargs)
         if not self.tileid:
-            self.tileid = uuid.uuid1()
+            self.tileid = uuid.uuid4()
 
     def save(self, *args, **kwargs):
         if self.sortorder is None or (self.provisionaledits is not None and self.data == {}):
@@ -1051,7 +1051,7 @@ class Value(models.Model):
     def __init__(self, *args, **kwargs):
         super(Value, self).__init__(*args, **kwargs)
         if not self.valueid:
-            self.valueid = uuid.uuid1()
+            self.valueid = uuid.uuid4()
 
     class Meta:
         managed = True
@@ -1068,7 +1068,7 @@ class FileValue(models.Model):
     def __init__(self, *args, **kwargs):
         super(FileValue, self).__init__(*args, **kwargs)
         if not self.valueid:
-            self.valueid = uuid.uuid1()
+            self.valueid = uuid.uuid4()
 
     class Meta:
         managed = False
@@ -1145,7 +1145,7 @@ class Widget(models.Model):
     def __init__(self, *args, **kwargs):
         super(Widget, self).__init__(*args, **kwargs)
         if not self.widgetid:
-            self.widgetid = uuid.uuid1()
+            self.widgetid = uuid.uuid4()
 
     class Meta:
         managed = True
@@ -1164,7 +1164,7 @@ class Geocoder(models.Model):
     def __init__(self, *args, **kwargs):
         super(Geocoder, self).__init__(*args, **kwargs)
         if not self.geocoderid:
-            self.geocoderid = uuid.uuid1()
+            self.geocoderid = uuid.uuid4()
 
     class Meta:
         managed = True
@@ -1213,7 +1213,7 @@ class MapLayer(models.Model):
     def __init__(self, *args, **kwargs):
         super(MapLayer, self).__init__(*args, **kwargs)
         if not self.maplayerid:
-            self.maplayerid = uuid.uuid1()
+            self.maplayerid = uuid.uuid4()
 
     class Meta:
         managed = True
@@ -1228,7 +1228,7 @@ class GraphXMapping(models.Model):
     def __init__(self, *args, **kwargs):
         super(GraphXMapping, self).__init__(*args, **kwargs)
         if not self.id:
-            self.id = uuid.uuid1()
+            self.id = uuid.uuid4()
 
     class Meta:
         managed = True
@@ -1297,7 +1297,7 @@ class UserXTask(models.Model):
     def __init__(self, *args, **kwargs):
         super(UserXTask, self).__init__(*args, **kwargs)
         if not self.id:
-            self.id = uuid.uuid1()
+            self.id = uuid.uuid4()
 
     class Meta:
         managed = True
@@ -1319,7 +1319,7 @@ class NotificationType(models.Model):
     def __init__(self, *args, **kwargs):
         super(NotificationType, self).__init__(*args, **kwargs)
         if not self.typeid:
-            self.typeid = uuid.uuid1()
+            self.typeid = uuid.uuid4()
 
     class Meta:
         managed = True
@@ -1343,7 +1343,7 @@ class Notification(models.Model):
     def __init__(self, *args, **kwargs):
         super(Notification, self).__init__(*args, **kwargs)
         if not self.id:
-            self.id = uuid.uuid1()
+            self.id = uuid.uuid4()
 
     class Meta:
         managed = True
@@ -1367,7 +1367,7 @@ class UserXNotification(models.Model):
     def __init__(self, *args, **kwargs):
         super(UserXNotification, self).__init__(*args, **kwargs)
         if not self.id:
-            self.id = uuid.uuid1()
+            self.id = uuid.uuid4()
 
     class Meta:
         managed = True
@@ -1392,7 +1392,7 @@ class UserXNotificationType(models.Model):
     def __init__(self, *args, **kwargs):
         super(UserXNotificationType, self).__init__(*args, **kwargs)
         if not self.id:
-            self.id = uuid.uuid1()
+            self.id = uuid.uuid4()
 
     class Meta:
         managed = True
@@ -1457,7 +1457,7 @@ class MobileSurveyModel(models.Model):
     def __init__(self, *args, **kwargs):
         super(MobileSurveyModel, self).__init__(*args, **kwargs)
         if not self.id:
-            self.id = uuid.uuid1()
+            self.id = uuid.uuid4()
 
     class Meta:
         managed = True
@@ -1485,7 +1485,7 @@ class MobileSurveyXUser(models.Model):
     def __init__(self, *args, **kwargs):
         super(MobileSurveyXUser, self).__init__(*args, **kwargs)
         if not self.mobile_survey_x_user_id:
-            self.mobile_survey_x_user_id = uuid.uuid1()
+            self.mobile_survey_x_user_id = uuid.uuid4()
 
     class Meta:
         managed = True
@@ -1501,7 +1501,7 @@ class MobileSurveyXGroup(models.Model):
     def __init__(self, *args, **kwargs):
         super(MobileSurveyXGroup, self).__init__(*args, **kwargs)
         if not self.mobile_survey_x_group_id:
-            self.mobile_survey_x_group_id = uuid.uuid1()
+            self.mobile_survey_x_group_id = uuid.uuid4()
 
     class Meta:
         managed = True
@@ -1518,7 +1518,7 @@ class MobileSurveyXCard(models.Model):
     def __init__(self, *args, **kwargs):
         super(MobileSurveyXCard, self).__init__(*args, **kwargs)
         if not self.mobile_survey_x_card_id:
-            self.mobile_survey_x_card_id = uuid.uuid1()
+            self.mobile_survey_x_card_id = uuid.uuid4()
 
     class Meta:
         managed = True
@@ -1551,7 +1551,7 @@ class Plugin(models.Model):
     def __init__(self, *args, **kwargs):
         super(Plugin, self).__init__(*args, **kwargs)
         if not self.pluginid:
-            self.pluginid = uuid.uuid1()
+            self.pluginid = uuid.uuid4()
 
     def __str__(self):
         return self.name
@@ -1601,7 +1601,7 @@ class VwAnnotation(models.Model):
     def __init__(self, *args, **kwargs):
         super(VwAnnotation, self).__init__(*args, **kwargs)
         if not self.feature_id:
-            self.feature_id = uuid.uuid1()
+            self.feature_id = uuid.uuid4()
 
     class Meta:
         managed = False
