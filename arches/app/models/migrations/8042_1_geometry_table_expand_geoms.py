@@ -1,5 +1,6 @@
 from django.db import migrations
 
+
 class Migration(migrations.Migration):
 
     dependencies = [
@@ -88,7 +89,7 @@ class Migration(migrations.Migration):
 
             SELECT refresh_geojson_geometries();
         """
-    
+
     reverse_sql_string = """
             CREATE OR REPLACE FUNCTION refresh_geojson_geometries() RETURNS BOOLEAN AS $$
                     BEGIN
@@ -169,5 +170,3 @@ class Migration(migrations.Migration):
     operations = [
         migrations.RunSQL(sql_string, reverse_sql_string),
     ]
-
-    

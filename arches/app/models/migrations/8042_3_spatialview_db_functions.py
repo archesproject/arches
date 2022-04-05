@@ -1,5 +1,6 @@
 from django.db import migrations
 
+
 class Migration(migrations.Migration):
 
     dependencies = [
@@ -1003,7 +1004,7 @@ class Migration(migrations.Migration):
 
             select __arches_refresh_spatial_views();
         """
-    
+
     reverse_sql_string = """
             DELETE FROM public.spatial_views;
 
@@ -1055,5 +1056,3 @@ class Migration(migrations.Migration):
     operations = [
         migrations.RunSQL(sql_string, reverse_sql_string),
     ]
-
-    
