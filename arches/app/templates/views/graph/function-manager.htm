@@ -25,8 +25,8 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 
 {% block graph_header_buttons %}
 <span data-bind="if: dirty">
-    <button class="btn btn-sm btn-danger btn-labeled fa fa-trash" data-bind="click: cancel">{% trans "Discard Edits" %}</button>
-    <button class="btn btn-sm btn-primary btn-labeled fa fa-check" data-bind="click: save">{% trans "Save Edits" %}</button>
+    <button class="btn btn-sm btn-danger btn-labeled fa fa-trash" data-bind="click: cancel"><span>{% trans "Discard Edits" %}</span></button>
+    <button class="btn btn-sm btn-primary btn-labeled fa fa-check" data-bind="click: save"><span>{% trans "Save Edits" %}</span></button>
 </span>
 {{ block.super }}
 {% endblock graph_header_buttons %}

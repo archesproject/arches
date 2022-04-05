@@ -1022,6 +1022,9 @@ div.wf-multi-tile-card-info div {
     font-weight: 600;
 }
 
+.card .install-buttons {
+    display: flex;
+}
 
 /*.workflow-nav-controls.left {
     border-left: solid 1px #aaa;
@@ -2208,6 +2211,7 @@ div.final-cons-step-separator>h4 {
     padding: 10px 35px;
     right: 0;
     width: 399px;
+    display: flex;
 }
 
 .workbench-card-sidepanel .resource-instance-card-component-content .install-buttons {
@@ -3686,6 +3690,7 @@ a.select2-search-choice-close {
     grid-row-end: 5;
     height: 75px;
     align-items: baseline;
+    display: flex;
 }
 
 .permission-grid .remove-permissions-btn {
@@ -4678,14 +4683,10 @@ div.dropdown-menu.open {
     text-overflow: ellipsis;
 }
 
-.resource-grid-tools-container {
-    position: absolute;
-    right: 20px;
-    top: 48px;
-}
-
-.resource-grid-item:hover .resource-grid-tools-container {
-    top: 20px;
+.resource-grid-item .resource-grid-tools-container {
+    flex-direction: column;
+    padding: 15px;
+    display: flex;
 }
 
 .report-image-grid .resource-grid-item:last-of-type .resource-grid-tools-container .btn-group .manage-menu {
@@ -4873,16 +4874,6 @@ div.dropdown-menu.open {
     z-index: 900;
     opacity: 1.0;
     transition: all .25s ease;
-}
-
-.edit-panel-search-bar {
-    position: absolute;
-    left: 40px;
-    padding-top: 10px;
-}
-
-.edit-panel-search-bar+.edit-panel-menu-bar {
-    left: 170px;
 }
 
 .edit-menu {
@@ -5809,6 +5800,88 @@ span.editable-card i.fa.fa-align-justify:hover {
     border: 1px solid #333;
 }
 
+.ep-form-toolbar-tools {
+    flex-direction: row;
+    display: flex;
+}
+
+.btn.btn-labeled {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+    margin: 0 2px;
+    font-family: inherit;
+    font-size: 13px;
+    line-height: 1.42857;
+    color: #fff;
+    border-radius: 0;
+    cursor: pointer;
+    padding: 0;
+    vertical-align: middle;
+    transition: all .25s;
+
+    &:not(.btn-block):not(.form-icon) {
+        font-family: inherit;
+        font-size: 13px;
+        line-height: 1.42857;
+        padding-bottom: 0;
+        padding-top: 0;
+    }
+
+    &.btn-mint {
+        background-color: #3acaa1;
+        border-color: #42cca5;
+        color: #fff;
+    }
+
+    &a {
+        text-decoration: none;
+        outline: 0;
+    }
+    
+    &.btn-primary {
+        background-color: #579ddb;
+        border-color: #5fa2dd;
+        color: #fff;
+    }
+
+    &.btn-danger {
+        background-color: #f75d3f;
+        border-color: #f76549;
+        color: #fff;
+    }
+
+    &.btn-lg::before {
+        padding: 10px 16px;
+    }
+    &.btn-sm::before {
+        padding: 5px 10px;
+    }
+
+    &.fa::before{
+        font-family: fontAwesome;
+    }
+
+    &::before {
+        margin: 0;
+        display: flex;
+        background-color: rgba(0,0,0,0.05);
+        padding: 6px 12px;
+        box-sizing: border-box;
+    }
+    &.btn-lg span {
+        padding: 0 15px;
+    }
+    span {
+        padding: 0 7.5px;
+    }
+}
+
+.graph-settings {
+    display: flex;
+}
+
 .r-select-card {
     background: #8BC3EB;
     padding: 10px;
@@ -6467,6 +6540,18 @@ th.notif-type {
     min-height: 60px;
     background: #f6f6f6;
     border-bottom: 1px solid #e4e4e4;
+    display: flex;
+    padding: 0 40px;
+    align-items: center;
+    &>div:first-child{
+        flex: 1;
+        display: flex;
+        align-items: center;
+    }
+
+    .resource-tools .resource-grid-title {
+        margin: 0 5px;
+    } 
 }
 
 .resource-selector {
@@ -7736,6 +7821,14 @@ div .switch label:hover,
     color: #fff;
     transition: all .40s ease;
     overflow: hidden;
+    display: flex;
+    flex-direction: column;
+
+    .ep-form-alert-buttons {
+        display: flex;
+        justify-content: flex-end;
+        align-items: center;
+    }
 }
 
 .alert-active .ep-form-alert {
@@ -7778,21 +7871,12 @@ div .switch label:hover,
 }
 
 .ep-form-alert-default-dismiss {
-    position: absolute;
-    top: 10px;
-    right: 25px;
     font-size: 16px;
 }
 
 .ep-form-alert-default-dismiss:hover {
     cursor: pointer;
     color: #f9f9f9;
-}
-
-.ep-form-alert-buttons {
-    position: absolute;
-    bottom: 10px;
-    right: 25px;
 }
 
 .graph-list-header .ep-form-alert {
@@ -7982,12 +8066,6 @@ span.file-upload-clear-filter {
 
 div.hide-file-list>div>div>div>div>form>div>div:nth-child(3) {
     visibility: hidden;
-}
-
-.resource-tools {
-    margin-left: 120px;
-    margin-top: 0px;
-    margin-bottom: 0px;
 }
 
 .resource-grid-title {
@@ -9806,10 +9884,39 @@ a.clear-geojson-button:hover {
     display: inline-block;
 }
 
-.msm-designer-panel {
-    width: 100%;
+.msm-designer-panel
+{
     background-color: #fff;
     overflow-y: auto;
+    display: flex;
+    flex: 1;
+    flex-direction: column;
+
+    .library-header>div{
+        display: flex;
+        flex:1;
+        align-items: center;
+
+        .mobile-project-category-header {
+            flex: 1;
+            padding: 0;
+
+            li {
+                font-size: 17px;
+            }
+        }
+
+        .msm-edit-buttons {
+            list-style: none;
+            font-size: 14px;
+            display: flex;
+            margin: 0 20px;
+
+            &.mobile-project-category-header {
+                flex: 1;
+            }
+        }
+    }
 }
 
 .msm-locked-warning {
@@ -10841,11 +10948,9 @@ table.table.dataTable {
 
 .root-node-label {
     stroke: #999;
-    /*#3275b1;*/
     font-size: 32px;
     font-weight: 900;
     fill: #fcfcfc;
-    /*#fdfdfd; */
     opacity: 1;
     text-anchor: middle;
     pointer-events: none;
@@ -10855,10 +10960,21 @@ table.table.dataTable {
     padding-top: 5px;
 }
 
-.service-buttons-heading {
-    position: absolute;
-    top: -3px;
-    right: 10px;
+.panel>.panel-heading {
+    display: flex;
+    align-items: center;
+
+    .panel-title {
+        flex: 1;
+    }
+    .service-buttons-heading {
+        margin: 0 20px;
+    }
+    &::after{
+        border: none;
+        position: inherit;
+
+    }
 }
 
 .basemap-preview-panel {
@@ -10868,22 +10984,29 @@ table.table.dataTable {
 
 .map-service-container {
     padding: 10px;
+    .config-title {
+        margin: 0;
+        flex: 1;
+    }
+    & > div {
+        align-items: center;
+        margin-bottom: 10px;
+        display: flex;
+    }
 }
 
 .map-service-manage-buttons {
-    position: absolute;
-    top: 10px;
-    right: 60px;
-}
+    margin: 0 10px;
+    display: flex;
 
-.basemap-preview-panel .map-service-manage-buttons {
-    right: 60px;
-}
-
-.resource-service-buttons-heading {
-    position: absolute;
-    top: -60px;
-    right: 10px;
+    .form-group {
+        align-items: center;
+        display: flex;
+        margin-bottom: 0;
+        .control-label {
+            margin: 0 5px;
+        }
+    }
 }
 
 .map-service-preview {
@@ -10976,10 +11099,6 @@ table.table.dataTable {
 }
 
 .map-server-basemap-button {
-    position: absolute;
-    z-index: 10;
-    right: 10px;
-    top: 5px;
     background: rgba(255, 255, 255, 0.88);
 }
 
@@ -11472,7 +11591,9 @@ a.search-facet-item.disabled {
 }
 
 .facet-search-button {
-    padding: 10px;
+    margin: 10px;
+    display: flex;
+    justify-content: flex-end;
 }
 
 .facet-btn-group {
@@ -12294,8 +12415,6 @@ a.filter-tools:hover {
     margin-top: 10px;
 }
 
-.msm-stat-time {}
-
 .msm-stat-date {
     font-size: 17px;
     white-space: nowrap;
@@ -12380,14 +12499,6 @@ a.filter-tools:hover {
     position: absolute;
     top: 35px;
     right: 0px;
-    list-style: none;
-    font-size: 14px;
-}
-
-.msm-edit-buttons {
-    position: absolute;
-    top: 10px;
-    right: 10px;
     list-style: none;
     font-size: 14px;
 }
@@ -12877,6 +12988,9 @@ a.jstree-anchor.permissions-widget {
     padding: 40px 30px;
     background: #f6f6f6;
     border-radius: 4px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
 }
 
 .rr-splash-title {
