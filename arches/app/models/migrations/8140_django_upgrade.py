@@ -9,7 +9,7 @@ import re
 class Migration(migrations.Migration):
 
     dependencies = [
-        ("models", "8085_relational_data_model_handle_dates"),
+        ("models", "8247_update_primary_descriptors_config"),
     ]
 
     operations = [

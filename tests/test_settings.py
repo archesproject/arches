@@ -44,7 +44,15 @@ BUSISNESS_DATA_FILES = (
     # Don't forget to use absolute paths, not relative paths.
 )
 
-CACHES = {"default": {"BACKEND": "django.core.cache.backends.dummy.DummyCache",}}
+CACHES = {
+    "default": {
+        "BACKEND": "django.core.cache.backends.dummy.DummyCache",
+    },
+    "user_permission": {
+        "BACKEND": "django.core.cache.backends.dummy.DummyCache",
+        "LOCATION": "user_permission_cache",
+    },
+}
 
 ELASTICSEARCH_PREFIX = "test"
 
@@ -57,6 +65,9 @@ LOCAL_BROWSERS = []  # ['Firefox']
 # these are set in Travis CI
 SAUCE_USERNAME = os.environ.get("SAUCE_USERNAME")
 SAUCE_ACCESS_KEY = os.environ.get("SAUCE_ACCESS_KEY")
+
+ENABLE_USER_SIGNUP = True
+FORCE_USER_SIGNUP_EMAIL_AUTHENTICATION = True
 
 RUN_LOCAL = True
 if SAUCE_USERNAME and SAUCE_ACCESS_KEY:

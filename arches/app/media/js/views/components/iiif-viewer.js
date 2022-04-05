@@ -48,6 +48,8 @@ define([
         this.imageToolSelector = ko.observable(this.canvas());
         this.floatingLocation = ko.observable("left");
         this.showImageModifiers = ko.observable(false);
+        this.renderContext = ko.observable(params.renderContext);
+        this.showModeSelector = ko.observable(true);
         let primaryPanelFilters
         let secondaryPanelFilters;
 

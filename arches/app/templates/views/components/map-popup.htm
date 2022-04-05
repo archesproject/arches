@@ -14,10 +14,10 @@
     <!-- ko if: displayname -->
     <div class="hover-feature-title-bar">
         {% block title %}
-        <div style="display: flex; justify-content: space-between;">
+        <div style="display: flex;">
             <div data-bind="visible: $parent.popupFeatures.length > 1, click: function(){$parent.advanceFeature('left')}" class="hover-feature-nav-left"><i class="fa fa-angle-left"></i></div>
-            <div class="hover-feature-title" data-bind="text: displayname"></div>
             <div data-bind="visible: $parent.popupFeatures.length > 1, click: function(){$parent.advanceFeature('right')}" class="hover-feature-nav-right"><i class="fa fa-angle-right"></i></div>
+            <div class="hover-feature-title" data-bind="text: displayname"></div>
         </div>
         {% endblock title %}
     </div>
@@ -26,13 +26,15 @@
     <div class="hover-feature-body">
         {% block body %}
         <div class="hover-feature" data-bind="html: map_popup"></div>
-        <div class="hover-feature-metadata">
-            {% trans "Resource Model:" %}
-            <span data-bind="text: graph_name"></span>
-        </div>
-        <div class="hover-feature-metadata">
-            {% trans "ID:" %}
-            <span data-bind="text: resourceinstanceid"></span>
+        <div class="hover-feature-metadata-block">
+            <div class="hover-feature-metadata">
+                {% trans "Resource Model:" %}
+                <span data-bind="text: graph_name"></span>
+            </div>
+            <div class="hover-feature-metadata">
+                {% trans "ID:" %}
+                <span data-bind="text: resourceinstanceid"></span>
+            </div>
         </div>
         {% endblock body %}
     </div>
@@ -58,10 +60,10 @@
         <!--/ko-->
         </div>
         <!-- ko if: $parent.popupFeatures.length > 1 -->
-        <div style="display: flex; flex-direction: row; width: 50px; justify-content: space-evenly;">
-            <div data-bind="text: 1 + $parent.popupFeatures.findIndex(feature => feature.active());"></div>
+        <div style="display: flex; flex-direction: row; width: 60px; justify-content: space-evenly; font-weight: 500;">
+            <div class="hover-feature-instance-counter" data-bind="text: 1 + $parent.popupFeatures.findIndex(feature => feature.active());"></div>
             {% trans "of" %}
-            <div data-bind="text: $parent.popupFeatures.length"></div>
+            <div style="padding-left: 3px;" data-bind="text: $parent.popupFeatures.length"></div>
         </div>
         <!--/ko-->
         {% endblock footer %}

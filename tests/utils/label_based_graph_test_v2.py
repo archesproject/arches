@@ -257,34 +257,6 @@ class LabelBasedGraph_FromResourceTests(TestCase):
             },
         )
 
-    def test_handles_empty_semantic_node(self, mock_Node, mock_NodeGroup):
-        mock_Node.objects.get.return_value = self.grouping_node
-        mock_NodeGroup.objects.filter.return_value.values.return_value = [
-            {"nodegroupid": self.grouping_tile.nodegroup_id, "cardinality": "1"}
-        ]
-
-        self.test_resource.tiles.append(self.grouping_tile)
-
-        label_based_graph = LabelBasedGraph.from_resource(resource=self.test_resource, compact=False, hide_empty_nodes=False)
-
-        self.assertEqual(
-            label_based_graph,
-            {
-                self.RESOURCE_KEY: {
-                    self.grouping_node.name: {
-                        NODE_ID_KEY: str(self.grouping_node.pk),
-                        TILE_ID_KEY: str(self.grouping_tile.pk),
-                    },
-                },
-                self.DISPLAY_DESCRIPTION_KEY: mock.ANY,
-                self.DISPLAY_NAME_KEY: mock.ANY,
-                self.GRAPH_ID_KEY: mock.ANY,
-                self.LEGACY_ID_KEY: mock.ANY,
-                self.MAP_POPUP_KEY: mock.ANY,
-                self.RESOURCE_INSTANCE_ID_KEY: mock.ANY,
-            },
-        )
-
     def test_semantic_node_with_child(self, mock_Node, mock_NodeGroup):
         mock_Node.objects.get.return_value = self.grouping_node
         mock_NodeGroup.objects.filter.return_value.values.return_value = [
@@ -419,12 +391,7 @@ class LabelBasedGraph_FromResourceTests(TestCase):
         self.assertEqual(
             label_based_graph,
             {
-                self.RESOURCE_KEY: {
-                    self.grouping_node.name: {
-                        NODE_ID_KEY: str(self.grouping_node.pk),
-                        TILE_ID_KEY: str(self.grouping_tile.pk),
-                    },
-                },
+                self.RESOURCE_KEY: {},
                 self.DISPLAY_DESCRIPTION_KEY: mock.ANY,
                 self.DISPLAY_NAME_KEY: mock.ANY,
                 self.GRAPH_ID_KEY: mock.ANY,

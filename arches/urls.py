@@ -21,7 +21,7 @@ from django.contrib.auth import views as auth_views
 from django.conf.urls import include, url
 from django.contrib.staticfiles.urls import staticfiles_urlpatterns
 from arches.app.views import concept, main, map, search, graph, api
-from arches.app.views.admin import ReIndexResources, FileView
+from arches.app.views.admin import ReIndexResources, FileView, ClearUserPermissionCache
 from arches.app.views.graph import (
     GraphDesignerView,
     GraphSettingsView,
@@ -238,6 +238,7 @@ urlpatterns = [
     url(r"^resources/(?P<resourceid>%s|())$" % uuid_regex, api.Resources.as_view(), name="resources"),
     url(r"^api/tiles/(?P<tileid>%s|())$" % (uuid_regex), api.Tile.as_view(), name="api_tiles"),
     url(r"^api/nodes/(?P<nodeid>%s|())$" % (uuid_regex), api.Node.as_view(), name="api_nodes"),
+    url(r"^api/nodegroup/(?P<nodegroupid>%s|())$" % (uuid_regex), api.NodeGroup.as_view(), name="api_nodegroup"),
     url(r"^api/instance_permissions/$", api.InstancePermission.as_view(), name="api_instance_permissions"),
     url(r"^api/node_value/$", api.NodeValue.as_view(), name="api_node_value"),
     url(r"^api/resource_report/(?P<resourceid>%s|())$" % (uuid_regex), api.ResourceReport.as_view(), name="api_resource_report"),
@@ -291,12 +292,11 @@ urlpatterns = [
     url(r"^iiifannotationnodes$", api.IIIFAnnotationNodes.as_view(), name="iiifannotationnodes"),
     url(r"^manifest/(?P<id>[0-9]+)$", api.Manifest.as_view(), name="manifest"),
     url(r"^image-service-manager", ManifestManagerView.as_view(), name="manifest_manager"),
+    url(r"^clear-user-permission-cache", ClearUserPermissionCache.as_view(), name="clear_user_permission_cache"),
 ]
 
 if settings.DEBUG:
     try:
-        import debug_toolbar
-
-        urlpatterns = [url(r"^__debug__/", include(debug_toolbar.urls))] + urlpatterns
+        urlpatterns += [url("silk/", include("silk.urls", namespace="silk"))]
     except:
         pass
