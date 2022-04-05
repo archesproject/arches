@@ -265,7 +265,7 @@
             {% block form_buttons %}
             <div class="install-buttons">
                 <!-- ko if: previouslySaved() && self.deleteTiles -->
-                    <button class="btn btn-shim btn-labeled btn-lg fa fa-trash" data-bind="click: deleteTiles, css: {disabled: (!card.isWritable && !self.preview), 'btn-warning': card.isWritable }">{% trans 'Delete this record' %}</button>
+                    <button class="btn btn-shim btn-labeled btn-lg fa fa-trash" data-bind="click: deleteTiles, css: {disabled: (!card.isWritable && !self.preview), 'btn-warning': card.isWritable }"><span>{% trans 'Delete this record' %}</span></button>
                 <!-- /ko -->
                 <!-- ko if: dirty() -->
                     <!-- ko if: provisionalTileViewModel && !provisionalTileViewModel.tileIsFullyProvisional() && card.isWritable -->
