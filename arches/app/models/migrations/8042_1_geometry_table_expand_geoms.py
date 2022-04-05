@@ -3,7 +3,7 @@ from django.db import migrations
 class Migration(migrations.Migration):
 
     dependencies = [
-        ("models", "7874_node_alias"),
+        ("models", "8247_update_primary_descriptors_config"),
     ]
 
     sql_string = """

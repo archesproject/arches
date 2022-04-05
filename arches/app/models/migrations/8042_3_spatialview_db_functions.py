@@ -162,7 +162,7 @@ class Migration(migrations.Migration):
                     from resource_instances r
                     where resourceinstanceid = target_resourceinstanceid;
                     
-                    select fxg.config
+                    select fxg.config -> 'descriptor_types'
                     into target_graph_funct_config
                     from functions_x_graphs fxg
                     join functions f on fxg.functionid = f.functionid
