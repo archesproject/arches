@@ -8,6 +8,7 @@ define([
 ], function($, _, ko, ReportModel, GraphModel) {
     const arches = window.arches;
     const reportLookup = window['report-templates'];
+
     var ResourceReportAbstract = function(params) {
         var self = this;
         var CardViewModel = require('viewmodels/card');

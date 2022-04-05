@@ -8,7 +8,14 @@ define([
     'viewmodels/card-constraints',
     'regenerator-runtime',
     'utils/dispose',
+    
     'views/components/cards/default',
+    'views/components/cards/file-viewer',
+    'views/components/cards/grouping',
+    'views/components/cards/iiif-card',
+    'views/components/cards/map',
+    'views/components/cards/photo-gallery-card',
+    'views/components/cards/related-resources-map',
 
     'views/components/datatypes/boolean',
     'views/components/datatypes/concept',
@@ -35,7 +42,7 @@ define([
     'views/components/widgets/edtf',
     'views/components/widgets/file',
     'views/components/widgets/iiif',
-    // 'views/components/widgets/map',
+    'views/components/widgets/map',
     'views/components/widgets/node-value-select',
     'views/components/widgets/number',
     'views/components/widgets/radio-boolean',

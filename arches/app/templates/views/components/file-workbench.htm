@@ -1,5 +1,6 @@
 {% extends "views/components/workbench.htm" %}
 {% load i18n %}
+{% load webpack_static from webpack_loader %}
 
 {% block tabs %}
 <div class="workbench-card-sidebar-tab" data-bind="click: function(){ if (self.card.tiles().length) {
@@ -73,7 +74,7 @@
 
                                         <!-- Image -->
                                         <div class="img-lg img-circle rr-splash-img-container">
-                                            <img class="rr-splash-img" src="{% static '/media/img/Answers.png' %}" alt="Resource Editor">
+                                            <img class="rr-splash-img" src="{% webpack_static '/media/img/Answers.png' %}" alt="Resource Editor">
                                         </div>
 
                                         <!-- Splash Title -->

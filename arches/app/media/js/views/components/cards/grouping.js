@@ -309,9 +309,7 @@ define([
 
     ko.components.register('grouping-card-component', {
         viewModel: viewModel,
-        template: {
-            require: 'text!templates/views/components/cards/grouping.htm'
-        }
+        template: window['grouping-card-template']
     });
     return viewModel;
 });

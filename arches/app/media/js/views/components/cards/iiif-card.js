@@ -111,9 +111,7 @@ define([
     };
     ko.components.register('iiif-card', {
         viewModel: ViewModel,
-        template: {
-            require: 'text!templates/views/components/cards/iiif-card.htm'
-        }
+        template: window['iiif-card-template']
     });
     return ViewModel;
 });

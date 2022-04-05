@@ -43,7 +43,16 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 
     <script style="display: none;">
         window['simple-switch-template'] = `{% include 'views/components/simple-switch.htm' %}`
+        
         window['default-card-template'] = `{% include 'views/components/cards/default.htm' %}`
+        window['grouping-card-template'] = `{% include 'views/components/cards/grouping.htm' %}`
+        window['file-viewer-card-template'] = `{% include 'views/components/cards/file-viewer.htm' %}`
+        window['iiif-card-template'] = `{% include 'views/components/cards/iiif-card.htm' %}`
+        window['map-card-template'] = `{% include 'views/components/cards/map.htm' %}`
+        window['map-card-popup-template'] = `{% include 'views/components/cards/map-popup.htm' %}`
+        window['photo-gallery-card-template'] = `{% include 'views/components/cards/photo-gallery-card.htm' %}`
+        window['related-resources-map-card-template'] = `{% include 'views/components/cards/related-resources-map.htm' %}`
+        window['related-resources-map-card-popup-template'] = `{% include 'views/components/cards/related-resources-map-popup.htm' %}`
 
         window['boolean-datatype-template'] = `{% include 'views/components/datatypes/boolean.htm' %}`
         window['concept-datatype-template'] = `{% include 'views/components/datatypes/concept.htm' %}`
@@ -75,6 +84,9 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
         window['switch-widget-template'] = `{% include 'views/components/widgets/switch.htm' %}`
         window['text-widget-template'] = `{% include 'views/components/widgets/text.htm' %}`
         window['urldatatype-widget-template'] = `{% include 'views/components/widgets/urldatatype.htm' %}`
+
+        window['resource-report-abstract-template'] = `{% include 'views/components/resource-report-abstract.htm' %}`
+
 
     </script>
     {% block css %}

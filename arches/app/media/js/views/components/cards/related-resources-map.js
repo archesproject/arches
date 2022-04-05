@@ -1,6 +1,5 @@
 define([
     'jquery',
-    'arches',
     'knockout',
     'knockout-mapping',
     'geojson-extent',
@@ -9,7 +8,9 @@ define([
     'viewmodels/map-filter',
     'views/components/cards/select-related-feature-layers',
     'text!templates/views/components/cards/related-resources-map-popup.htm'
-], function($, arches, ko, koMapping, geojsonExtent, CardComponentViewModel, MapEditorViewModel, MapFilterViewModel, selectFeatureLayersFactory, popupTemplate) {
+], function($, ko, koMapping, geojsonExtent, CardComponentViewModel, MapEditorViewModel, MapFilterViewModel, selectFeatureLayersFactory, popupTemplate) {
+    const arches = window.arches;
+
     var viewModel = function(params) {
         var self = this;
 
@@ -421,9 +422,7 @@ define([
     };
     ko.components.register('related-resources-map-card', {
         viewModel: viewModel,
-        template: {
-            require: 'text!templates/views/components/cards/related-resources-map.htm'
-        }
+        template: window['related-resources-map-card-template']
     });
     return viewModel;
 });

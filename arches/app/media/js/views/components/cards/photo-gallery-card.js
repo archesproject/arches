@@ -176,8 +176,6 @@ define([
                 }
             };
         },
-        template: {
-            require: 'text!templates/views/components/cards/photo-gallery-card.htm'
-        }
+        template: window['photo-gallery-card-template']
     });
 });

@@ -1,5 +1,4 @@
 define([
-    'arches',
     'jquery',
     'knockout',
     'knockout-mapping',
@@ -11,7 +10,9 @@ define([
     'leaflet-side-by-side',
     'bindings/select2-query',
     'bindings/leaflet'
-], function(arches, $, ko, koMapping, L, WorkbenchViewmodel, iiifPopup) {
+], function($, ko, koMapping, L, WorkbenchViewmodel, iiifPopup) {
+    const arches = window.arches;
+
     var IIIFViewerViewmodel = function(params) {
         var self = this;
         var abortFetchManifest;

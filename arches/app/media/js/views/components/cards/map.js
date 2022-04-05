@@ -1,11 +1,12 @@
 define([
-    'arches',
     'knockout',
     'viewmodels/card-component',
     'viewmodels/map-editor',
     'bindings/chosen',
     'bindings/codemirror'
-], function(arches, ko, CardComponentViewModel, MapEditorViewModel) {
+], function(ko, CardComponentViewModel, MapEditorViewModel) {
+    const arches = window.arches;
+
     var viewModel = function(params) {
         var self = this;
 
@@ -132,9 +133,7 @@ define([
     };
     ko.components.register('map-card', {
         viewModel: viewModel,
-        template: {
-            require: 'text!templates/views/components/cards/map.htm'
-        }
+        template: window['map-card-template']
     });
     return viewModel;
 });
