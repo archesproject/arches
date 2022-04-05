@@ -18,22 +18,25 @@ define(['knockout',
             params.configKeys = ['placeholder', 'defaultValue'];
             this.showEDTFFormats = ko.observable(false);
             this.transformedEdtf = ko.observable();
+            this.getEdtf = val => {window.fetch(arches.urls.transform_edtf_for_tile + "?value=" + val)
+                .then(response => {
+                    if(response.ok) {
+                        return response.json();
+                    } else {
+                        self.transformedEdtf(null);
+                    }
+                })
+                .then(json => {
+                    if (json?.data?.[1]) {
+                        self.transformedEdtf(json.data[0]);
+                    } else {
+                        self.transformedEdtf(null);
+                    }
+                });
+            }
+            this.getEdtf(params.value())
             params.value.subscribe(val => {
-                window.fetch(arches.urls.transform_edtf_for_tile + "?value=" + val)
-                    .then(response => {
-                        if(response.ok) {
-                            return response.json();
-                        } else {
-                            self.transformedEdtf(null);
-                        }
-                    })
-                    .then(json => {
-                        if (json?.data?.[1]) {
-                            self.transformedEdtf(json.data[0]);
-                        } else {
-                            self.transformedEdtf(null);
-                        }
-                    })
+                self.getEdtf(val);
             });
 
             WidgetViewModel.apply(this, [params]);
