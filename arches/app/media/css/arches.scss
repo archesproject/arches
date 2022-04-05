@@ -2628,7 +2628,7 @@ label.form-checkbox.form-normal:before,
 }
 
 label.form-checkbox.form-normal{
-    margin: 2px 0px;
+    margin: 4px 0px;
     display: flex;
     align-items: center;
 
@@ -2708,6 +2708,18 @@ label.form-checkbox.form-normal{
         position: unset !important; // TODO: remove !important after nifty.css is purged
         margin: 5px;
     }
+}
+
+.columns .form-text.form-checkbox:not(.btn),
+.form-text.form-radio:not(.btn),
+.columns .form-text.form-checkbox:not(.btn),
+.form-text.form-radio:not(.btn),
+.columns .form-text.form-checkbox:not(.btn),
+.form-text.form-radio:not(.btn) {
+    width: 225px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 
 .option-input {
@@ -7737,18 +7749,6 @@ div .switch label:hover,
     cursor: pointer;
 }
 
-.columns .form-text.form-checkbox:not(.btn),
-.form-text.form-radio:not(.btn),
-.columns .form-text.form-checkbox:not(.btn),
-.form-text.form-radio:not(.btn),
-.columns .form-text.form-checkbox:not(.btn),
-.form-text.form-radio:not(.btn) {
-    width: 225px;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-}
-
 .select2-search,
 .dropdown-shim,
 .dropdown-shim,
@@ -11964,8 +11964,7 @@ a.filter-tools:hover {
     padding-top: 0px;
 }
 
-.msm-data-selection .form-text.form-checkbox:not(.btn),
-.form-text.form-radio:not(.btn) {
+.msm-data-selection {
     margin-top: 1px;
 }
 
