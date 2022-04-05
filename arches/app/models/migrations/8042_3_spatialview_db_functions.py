@@ -744,12 +744,12 @@ class Migration(migrations.Migration):
                 $$
                 declare
                     success boolean := false;
-                    refresh_script text;
-                    r record;
+                    refresh_script text := '';
+                    sv record;
                 begin
-                    for r in select * from spatial_views where isactive = true
+                    for sv in select * from spatial_views where isactive = true
                     loop
-                        refresh_script := refresh_script || format('__arches_update_spatial_view(''%s'',''%s'',''%s'', ''%s''::uuid, ''%s''::jsonb, ''%s'', ''%s'', %s);'
+                        refresh_script := refresh_script || format('select __arches_update_spatial_view(''%s'',''%s'',''%s'', ''%s''::uuid, ''%s''::jsonb, ''%s'', ''%s'', %L);'
                             , sv.slug
                             , sv.schema
                             , sv.slug
@@ -761,9 +761,11 @@ class Migration(migrations.Migration):
 
                     end loop;
 
-                    if refresh_script <> '' then
+                    if refresh_script <> '' then                     
                         execute refresh_script;
                     end if;
+
+                    success := true;
                     
                     return success;
                 end;
