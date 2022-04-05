@@ -32,7 +32,9 @@
                         {% trans "Basemaps" %}
                     </h4>
                 </div>
+                <div class="workbench-card-sidepanel-border"></div>
 
+                <div class="workbench-card-sidepanel-body">
                 <div class="basemap-listing-container">
                 <!--ko foreach: basemaps -->
                 <div tabindex="0" class="basemap-listing" data-bind="
@@ -43,6 +45,7 @@
                     </div>
                 <!--/ko -->
                 </div>
+                </div>
 
             <!--/ko -->
 
@@ -52,6 +55,8 @@
                         {% trans "Overlays" %}
                     </h4>
                 </div>
+                <div class="workbench-card-sidepanel-border"></div>
+                <div class="workbench-card-sidepanel-body">
                 <div class="overlays-listing-container" data-bind="sortable: {
                     data: overlays
                 }">
@@ -68,6 +73,7 @@
                         </div>
                     </div>
                 </div>
+                </div>
             <!--/ko -->
 
             <!--ko if: activeTab() === 'legend' -->
@@ -76,7 +82,8 @@
                         {% trans "Legend" %}
                     </h4>
                 </div>
-
+                <div class="workbench-card-sidepanel-border"></div>
+                <div class="workbench-card-sidepanel-body">
                 <div class="legend-listing-container" data-bind="sortable: {
                     data: overlays
                 }">
@@ -89,6 +96,7 @@
                         <div class="legend-content" data-bind="html: legend"></div>
                         <!--/ko -->
                     </div>
+                </div>
                 </div>
             <!--/ko -->
             {% endblock sidepanel %}

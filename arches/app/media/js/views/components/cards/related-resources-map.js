@@ -292,8 +292,8 @@ define([
             zoomToData = false;
             var graphconfig = widget.node.config.graphs().find(function(graph){return graph.graphid === ko.unwrap(resourceData.graphid);});
             var val = [{
-                ontologyProperty: ko.observable(graphconfig.ontologyProperty || ''),
-                inverseOntologyProperty: ko.observable(graphconfig.ontologyProperty || ''),
+                ontologyProperty: ko.observable(graphconfig?.ontologyProperty || ''),
+                inverseOntologyProperty: ko.observable(graphconfig?.ontologyProperty || ''),
                 resourceId: resourceinstanceid,
                 resourceXresourceId: "",
             }];
