@@ -143,7 +143,7 @@ define([
                     data.deleteTile();
                     break;
                 case "select tile":
-                    if(additionalParam[0]?.form?.workflowId){
+                    if (additionalParam[0]?.form?.workflowId) {
                         additionalParam[0].selectWorkflowTile(additionalParam[1]);
                     }
                     else{
