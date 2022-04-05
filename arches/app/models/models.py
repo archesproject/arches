@@ -64,11 +64,6 @@ class CardModel(models.Model):
         else:
             return not TileModel.objects.filter(nodegroup=self.nodegroup).exists()
 
-    def save(self, *args, **kwargs):
-        if not self.cardid:
-            self.cardid = uuid.uuid1()
-        super(CardModel, self).save(*args, **kwargs)
-
     def __init__(self, *args, **kwargs):
         super(CardModel, self).__init__(*args, **kwargs)
         if not self.cardid:
@@ -85,11 +80,6 @@ class ConstraintModel(models.Model):
     card = models.ForeignKey("CardModel", db_column="cardid", on_delete=models.CASCADE)
     nodes = models.ManyToManyField(to="Node", through="ConstraintXNode")
 
-    def save(self, *args, **kwargs):
-        if not self.constraintid:
-            self.constraintid = uuid.uuid1()
-        super(ConstraintModel, self).save(*args, **kwargs)
-
     def __init__(self, *args, **kwargs):
         super(ConstraintModel, self).__init__(*args, **kwargs)
         if not self.constraintid:
@@ -104,11 +94,6 @@ class ConstraintXNode(models.Model):
     id = models.UUIDField(primary_key=True, serialize=False)
     constraint = models.ForeignKey("ConstraintModel", on_delete=models.CASCADE, db_column="constraintid")
     node = models.ForeignKey("Node", on_delete=models.CASCADE, db_column="nodeid")
-
-    def save(self, *args, **kwargs):
-        if not self.id:
-            self.id = uuid.uuid1()
-        super(ConstraintXNode, self).save(*args, **kwargs)
 
     def __init__(self, *args, **kwargs):
         super(ConstraintXNode, self).__init__(*args, **kwargs)
@@ -133,11 +118,6 @@ class CardComponent(models.Model):
         json_string = json.dumps(self.defaultconfig)
         return json_string
 
-    def save(self, *args, **kwargs):
-        if not self.componentid:
-            self.componentid = uuid.uuid1()
-        super(CardComponent, self).save(*args, **kwargs)
-
     def __init__(self, *args, **kwargs):
         super(CardComponent, self).__init__(*args, **kwargs)
         if not self.componentid:
@@ -158,11 +138,6 @@ class CardXNodeXWidget(models.Model):
     visible = models.BooleanField(default=True)
     sortorder = models.IntegerField(blank=True, null=True, default=None)
 
-    def save(self, *args, **kwargs):
-        if not self.id:
-            self.id = uuid.uuid1()
-        super(CardXNodeXWidget, self).save(*args, **kwargs)
-
     def __init__(self, *args, **kwargs):
         super(CardXNodeXWidget, self).__init__(*args, **kwargs)
         if not self.id:
@@ -178,11 +153,6 @@ class Concept(models.Model):
     conceptid = models.UUIDField(primary_key=True)
     nodetype = models.ForeignKey("DNodeType", db_column="nodetype", on_delete=models.CASCADE)
     legacyoid = models.TextField(unique=True)
-
-    def save(self, *args, **kwargs):
-        if not self.conceptid:
-            self.conceptid = uuid.uuid1()
-        super(Concept, self).save(*args, **kwargs)
 
     def __init__(self, *args, **kwargs):
         super(Concept, self).__init__(*args, **kwargs)
@@ -267,11 +237,6 @@ class Edge(models.Model):
     rangenode = models.ForeignKey("Node", db_column="rangenodeid", related_name="edge_ranges", on_delete=models.CASCADE)
     graph = models.ForeignKey("GraphModel", db_column="graphid", blank=True, null=True, on_delete=models.CASCADE)
 
-    def save(self, *args, **kwargs):
-        if not self.edgeid:
-            self.edgeid = uuid.uuid1()
-        super(Edge, self).save(*args, **kwargs)
-
     def __init__(self, *args, **kwargs):
         super(Edge, self).__init__(*args, **kwargs)
         if not self.edgeid:
@@ -307,11 +272,6 @@ class EditLog(models.Model):
     provisional_edittype = models.TextField(blank=True, null=True)
     note = models.TextField(blank=True, null=True)
 
-    def save(self, *args, **kwargs):
-        if not self.editlogid:
-            self.editlogid = uuid.uuid1()
-        super(EditLog, self).save(*args, **kwargs)
-
     def __init__(self, *args, **kwargs):
         super(EditLog, self).__init__(*args, **kwargs)
         if not self.editlogid:
@@ -331,11 +291,6 @@ class MobileSyncLog(models.Model):
     message = models.TextField(blank=True, null=True)
     status = models.TextField(blank=True, null=True)
 
-    def save(self, *args, **kwargs):
-        if not self.logid:
-            self.logid = uuid.uuid1()
-        super(MobileSyncLog, self).save(*args, **kwargs)
-
     def __init__(self, *args, **kwargs):
         super(MobileSyncLog, self).__init__(*args, **kwargs)
         if not self.logid:
@@ -354,11 +309,6 @@ class ResourceRevisionLog(models.Model):
     synclog = models.ForeignKey("MobileSyncLog", on_delete=models.CASCADE, related_name="sync_log")
     synctimestamp = models.DateTimeField(auto_now_add=True, null=False)
     action = models.TextField(blank=True, null=True)
-
-    def save(self, *args, **kwargs):
-        if not self.logid:
-            self.logid = uuid.uuid1()
-        super(ResourceRevisionLog, self).save(*args, **kwargs)
 
     def __init__(self, *args, **kwargs):
         super(ResourceRevisionLog, self).__init__(*args, **kwargs)
@@ -380,11 +330,6 @@ class TileRevisionLog(models.Model):
     synctimestamp = models.DateTimeField(auto_now_add=True, null=False)
     action = models.TextField(blank=True, null=True)
 
-    def save(self, *args, **kwargs):
-        if not self.logid:
-            self.logid = uuid.uuid1()
-        super(TileRevisionLog, self).save(*args, **kwargs)
-
     def __init__(self, *args, **kwargs):
         super(TileRevisionLog, self).__init__(*args, **kwargs)
         if not self.logid:
@@ -399,11 +344,6 @@ class File(models.Model):
     fileid = models.UUIDField(primary_key=True)
     path = models.FileField(upload_to="uploadedfiles")
     tile = models.ForeignKey("TileModel", db_column="tileid", null=True, on_delete=models.CASCADE)
-
-    def save(self, *args, **kwargs):
-        if not self.fileid:
-            self.fileid = uuid.uuid1()
-        super(File, self).save(*args, **kwargs)
 
     def __init__(self, *args, **kwargs):
         super(File, self).__init__(*args, **kwargs)
@@ -467,11 +407,6 @@ class Function(models.Model):
     classname = models.TextField(blank=True, null=True)
     component = models.TextField(blank=True, null=True)
 
-    def save(self, *args, **kwargs):
-        if not self.functionid:
-            self.functionid = uuid.uuid1()
-        super(Function, self).save(*args, **kwargs)
-
     def __init__(self, *args, **kwargs):
         super(Function, self).__init__(*args, **kwargs)
         if not self.functionid:
@@ -495,11 +430,6 @@ class FunctionXGraph(models.Model):
     function = models.ForeignKey("Function", on_delete=models.CASCADE, db_column="functionid")
     graph = models.ForeignKey("GraphModel", on_delete=models.CASCADE, db_column="graphid")
     config = JSONField(blank=True, null=True)
-
-    def save(self, *args, **kwargs):
-        if not self.id:
-            self.id = uuid.uuid1()
-        super(FunctionXGraph, self).save(*args, **kwargs)
 
     def __init__(self, *args, **kwargs):
         super(FunctionXGraph, self).__init__(*args, **kwargs)
@@ -555,11 +485,6 @@ class GraphModel(models.Model):
     def __str__(self):
         return self.name
 
-    def save(self, *args, **kwargs):
-        if not self.graphid:
-            self.graphid = uuid.uuid1()
-        super(GraphModel, self).save(*args, **kwargs)
-
     def __init__(self, *args, **kwargs):
         super(GraphModel, self).__init__(*args, **kwargs)
         if not self.graphid:
@@ -592,11 +517,6 @@ class NodeGroup(models.Model):
         super(NodeGroup, self).__init__(*args, **kwargs)
         if not self.nodegroupid:
             self.nodegroupid = uuid.uuid1()
-
-    def save(self, *args, **kwargs):
-        if not self.nodegroupid:
-            self.nodegroupid = uuid.uuid1()
-        super(NodeGroup, self).save(*args, **kwargs)
 
     class Meta:
         managed = True
@@ -694,11 +614,6 @@ class Node(models.Model):
                 new_r2r = Resource2ResourceConstraint.objects.create(resourceclassfrom_id=self.nodeid, resourceclassto_id=new_id)
                 new_r2r.save()
 
-    def save(self, *args, **kwargs):
-        if not self.nodeid:
-            self.nodeid = uuid.uuid1()
-        super(Node, self).save(*args, **kwargs)
-
     def __init__(self, *args, **kwargs):
         super(Node, self).__init__(*args, **kwargs)
         if not self.nodeid:
@@ -721,11 +636,6 @@ class Ontology(models.Model):
     parentontology = models.ForeignKey(
         "Ontology", db_column="parentontologyid", related_name="extensions", null=True, blank=True, on_delete=models.CASCADE
     )
-
-    def save(self, *args, **kwargs):
-        if not self.ontologyid:
-            self.ontologyid = uuid.uuid1()
-        super(Ontology, self).save(*args, **kwargs)
 
     def __init__(self, *args, **kwargs):
         super(Ontology, self).__init__(*args, **kwargs)
@@ -779,11 +689,6 @@ class OntologyClass(models.Model):
     target = JSONField(null=True)
     ontology = models.ForeignKey("Ontology", db_column="ontologyid", related_name="ontologyclasses", on_delete=models.CASCADE)
 
-    def save(self, *args, **kwargs):
-        if not self.ontologyclassid:
-            self.ontologyclassid = uuid.uuid1()
-        super(OntologyClass, self).save(*args, **kwargs)
-
     def __init__(self, *args, **kwargs):
         super(OntologyClass, self).__init__(*args, **kwargs)
         if not self.ontologyclassid:
@@ -800,11 +705,6 @@ class Relation(models.Model):
     conceptto = models.ForeignKey(Concept, db_column="conceptidto", related_name="relation_concepts_to", on_delete=models.CASCADE)
     relationtype = models.ForeignKey(DRelationType, db_column="relationtype", on_delete=models.CASCADE)
     relationid = models.UUIDField(primary_key=True)
-
-    def save(self, *args, **kwargs):
-        if not self.relationid:
-            self.relationid = uuid.uuid1()
-        super(Relation, self).save(*args, **kwargs)
 
     def __init__(self, *args, **kwargs):
         super(Relation, self).__init__(*args, **kwargs)
@@ -831,11 +731,6 @@ class ReportTemplate(models.Model):
         json_string = json.dumps(self.defaultconfig)
         return json_string
 
-    def save(self, *args, **kwargs):
-        if not self.templateid:
-            self.templateid = uuid.uuid1()
-        super(ReportTemplate, self).save(*args, **kwargs)
-
     def __init__(self, *args, **kwargs):
         super(ReportTemplate, self).__init__(*args, **kwargs)
         if not self.templateid:
@@ -859,11 +754,6 @@ class Resource2ResourceConstraint(models.Model):
     resourceclassto = models.ForeignKey(
         Node, db_column="resourceclassto", blank=True, null=True, related_name="resxres_contstraint_classes_to", on_delete=models.SET_NULL
     )
-
-    def save(self, *args, **kwargs):
-        if not self.resource2resourceid:
-            self.resource2resourceid = uuid.uuid1()
-        super(Resource2ResourceConstraint, self).save(*args, **kwargs)
 
     def __init__(self, *args, **kwargs):
         super(Resource2ResourceConstraint, self).__init__(*args, **kwargs)
@@ -963,8 +853,6 @@ class ResourceXResource(models.Model):
         from arches.app.search.search_engine_factory import SearchEngineInstance as se
         from arches.app.search.mappings import RESOURCE_RELATIONS_INDEX
 
-        if not self.resourcexid:
-            self.resourcexid = uuid.uuid1()
         # during package/csv load the ResourceInstance models are not always available
         try:
             self.resourceinstancefrom_graphid = self.resourceinstanceidfrom.graph
@@ -1002,11 +890,6 @@ class ResourceInstance(models.Model):
     legacyid = models.TextField(blank=True, unique=True, null=True)
     createdtime = models.DateTimeField(auto_now_add=True)
 
-    def save(self, *args, **kwargs):
-        if not self.resourceinstanceid:
-            self.resourceinstanceid = uuid.uuid1()
-        super(ResourceInstance, self).save(*args, **kwargs)
-
     def __init__(self, *args, **kwargs):
         super(ResourceInstance, self).__init__(*args, **kwargs)
         if not self.resourceinstanceid:
@@ -1033,11 +916,6 @@ class SearchComponent(models.Model):
     def __str__(self):
         return self.name
 
-    def save(self, *args, **kwargs):
-        if not self.searchcomponentid:
-            self.searchcomponentid = uuid.uuid1()
-        super(SearchComponent, self).save(*args, **kwargs)
-
     def __init__(self, *args, **kwargs):
         super(SearchComponent, self).__init__(*args, **kwargs)
         if not self.searchcomponentid:
@@ -1063,11 +941,6 @@ class SearchExportHistory(models.Model):
     numberofinstances = models.IntegerField()
     url = models.TextField()
     downloadfile = models.FileField(upload_to="export_deliverables", blank=True, null=True)
-
-    def save(self, *args, **kwargs):
-        if not self.searchexportid:
-            self.searchexportid = uuid.uuid1()
-        super(SearchExportHistory, self).save(*args, **kwargs)
 
     def __init__(self, *args, **kwargs):
         super(SearchExportHistory, self).__init__(*args, **kwargs)
@@ -1160,8 +1033,6 @@ class TileModel(models.Model):  # Tile
             self.tileid = uuid.uuid1()
 
     def save(self, *args, **kwargs):
-        if not self.tileid:
-            self.tileid = uuid.uuid1()
         if self.sortorder is None or (self.provisionaledits is not None and self.data == {}):
             sortorder_max = TileModel.objects.filter(
                 nodegroup_id=self.nodegroup_id, resourceinstance_id=self.resourceinstance_id
@@ -1176,11 +1047,6 @@ class Value(models.Model):
     valuetype = models.ForeignKey(DValueType, db_column="valuetype", on_delete=models.CASCADE)
     value = models.TextField()
     language = models.ForeignKey(DLanguage, db_column="languageid", blank=True, null=True, on_delete=models.CASCADE)
-
-    def save(self, *args, **kwargs):
-        if not self.valueid:
-            self.valueid = uuid.uuid1()
-        super(Value, self).save(*args, **kwargs)
 
     def __init__(self, *args, **kwargs):
         super(Value, self).__init__(*args, **kwargs)
@@ -1198,11 +1064,6 @@ class FileValue(models.Model):
     valuetype = models.ForeignKey("DValueType", db_column="valuetype", on_delete=models.CASCADE)
     value = models.FileField(upload_to="concepts")
     language = models.ForeignKey("DLanguage", db_column="languageid", blank=True, null=True, on_delete=models.CASCADE)
-
-    def save(self, *args, **kwargs):
-        if not self.valueid:
-            self.valueid = uuid.uuid1()
-        super(FileValue, self).save(*args, **kwargs)
 
     def __init__(self, *args, **kwargs):
         super(FileValue, self).__init__(*args, **kwargs)
@@ -1281,11 +1142,6 @@ class Widget(models.Model):
     def __str__(self):
         return self.name
 
-    def save(self, *args, **kwargs):
-        if not self.widgetid:
-            self.widgetid = uuid.uuid1()
-        super(Widget, self).save(*args, **kwargs)
-
     def __init__(self, *args, **kwargs):
         super(Widget, self).__init__(*args, **kwargs)
         if not self.widgetid:
@@ -1304,11 +1160,6 @@ class Geocoder(models.Model):
 
     def __str__(self):
         return self.name
-
-    def save(self, *args, **kwargs):
-        if not self.geocoderid:
-            self.geocoderid = uuid.uuid1()
-        super(Geocoder, self).save(*args, **kwargs)
 
     def __init__(self, *args, **kwargs):
         super(Geocoder, self).__init__(*args, **kwargs)
@@ -1359,11 +1210,6 @@ class MapLayer(models.Model):
     def __str__(self):
         return self.name
 
-    def save(self, *args, **kwargs):
-        if not self.maplayerid:
-            self.maplayerid = uuid.uuid1()
-        super(MapLayer, self).save(*args, **kwargs)
-
     def __init__(self, *args, **kwargs):
         super(MapLayer, self).__init__(*args, **kwargs)
         if not self.maplayerid:
@@ -1378,11 +1224,6 @@ class GraphXMapping(models.Model):
     id = models.UUIDField(primary_key=True, serialize=False)
     graph = models.ForeignKey("GraphModel", db_column="graphid", on_delete=models.CASCADE)
     mapping = JSONField(blank=True, null=False)
-
-    def save(self, *args, **kwargs):
-        if not self.id:
-            self.id = uuid.uuid1()
-        super(GraphXMapping, self).save(*args, **kwargs)
 
     def __init__(self, *args, **kwargs):
         super(GraphXMapping, self).__init__(*args, **kwargs)
@@ -1453,11 +1294,6 @@ class UserXTask(models.Model):
     name = models.TextField(blank=True, null=True)
     user = models.ForeignKey(User, on_delete=models.CASCADE)
 
-    def save(self, *args, **kwargs):
-        if not self.id:
-            self.id = uuid.uuid1()
-        super(UserXTask, self).save(*args, **kwargs)
-
     def __init__(self, *args, **kwargs):
         super(UserXTask, self).__init__(*args, **kwargs)
         if not self.id:
@@ -1479,11 +1315,6 @@ class NotificationType(models.Model):
     emailtemplate = models.TextField(blank=True, null=True)
     emailnotify = models.BooleanField(default=False)
     webnotify = models.BooleanField(default=False)
-
-    def save(self, *args, **kwargs):
-        if not self.typeid:
-            self.typeid = uuid.uuid1()
-        super(NotificationType, self).save(*args, **kwargs)
 
     def __init__(self, *args, **kwargs):
         super(NotificationType, self).__init__(*args, **kwargs)
@@ -1509,11 +1340,6 @@ class Notification(models.Model):
     # TODO: Ideally validate context against a list of keys from NotificationType
     notiftype = models.ForeignKey(NotificationType, on_delete=models.CASCADE, null=True)
 
-    def save(self, *args, **kwargs):
-        if not self.id:
-            self.id = uuid.uuid1()
-        super(Notification, self).save(*args, **kwargs)
-
     def __init__(self, *args, **kwargs):
         super(Notification, self).__init__(*args, **kwargs)
         if not self.id:
@@ -1537,11 +1363,6 @@ class UserXNotification(models.Model):
     notif = models.ForeignKey(Notification, on_delete=models.CASCADE)
     isread = models.BooleanField(default=False)
     recipient = models.ForeignKey(User, on_delete=models.CASCADE)
-
-    def save(self, *args, **kwargs):
-        if not self.id:
-            self.id = uuid.uuid1()
-        super(UserXNotification, self).save(*args, **kwargs)
 
     def __init__(self, *args, **kwargs):
         super(UserXNotification, self).__init__(*args, **kwargs)
@@ -1567,11 +1388,6 @@ class UserXNotificationType(models.Model):
     notiftype = models.ForeignKey(NotificationType, on_delete=models.CASCADE)
     emailnotify = models.BooleanField(default=False)
     webnotify = models.BooleanField(default=False)
-
-    def save(self, *args, **kwargs):
-        if not self.id:
-            self.id = uuid.uuid1()
-        super(UserXNotificationType, self).save(*args, **kwargs)
 
     def __init__(self, *args, **kwargs):
         super(UserXNotificationType, self).__init__(*args, **kwargs)
@@ -1638,11 +1454,6 @@ class MobileSurveyModel(models.Model):
     def __str__(self):
         return self.name
 
-    def save(self, *args, **kwargs):
-        if not self.id:
-            self.id = uuid.uuid1()
-        super(MobileSurveyModel, self).save(*args, **kwargs)
-
     def __init__(self, *args, **kwargs):
         super(MobileSurveyModel, self).__init__(*args, **kwargs)
         if not self.id:
@@ -1671,11 +1482,6 @@ class MobileSurveyXUser(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     mobile_survey = models.ForeignKey(MobileSurveyModel, on_delete=models.CASCADE, null=True)
 
-    def save(self, *args, **kwargs):
-        if not self.mobile_survey_x_user_id:
-            self.mobile_survey_x_user_id = uuid.uuid1()
-        super(MobileSurveyXUser, self).save(*args, **kwargs)
-
     def __init__(self, *args, **kwargs):
         super(MobileSurveyXUser, self).__init__(*args, **kwargs)
         if not self.mobile_survey_x_user_id:
@@ -1691,11 +1497,6 @@ class MobileSurveyXGroup(models.Model):
     mobile_survey_x_group_id = models.UUIDField(primary_key=True, serialize=False)
     group = models.ForeignKey(Group, on_delete=models.CASCADE)
     mobile_survey = models.ForeignKey(MobileSurveyModel, on_delete=models.CASCADE, null=True)
-
-    def save(self, *args, **kwargs):
-        if not self.mobile_survey_x_group_id:
-            self.mobile_survey_x_group_id = uuid.uuid1()
-        super(Widget, self).save(*args, **kwargs)
 
     def __init__(self, *args, **kwargs):
         super(MobileSurveyXGroup, self).__init__(*args, **kwargs)
@@ -1713,11 +1514,6 @@ class MobileSurveyXCard(models.Model):
     card = models.ForeignKey(CardModel, on_delete=models.CASCADE)
     mobile_survey = models.ForeignKey(MobileSurveyModel, on_delete=models.CASCADE, null=True)
     sortorder = models.IntegerField(default=0)
-
-    def save(self, *args, **kwargs):
-        if not self.mobile_survey_x_card_id:
-            self.mobile_survey_x_card_id = uuid.uuid1()
-        super(MobileSurveyXCard, self).save(*args, **kwargs)
 
     def __init__(self, *args, **kwargs):
         super(MobileSurveyXCard, self).__init__(*args, **kwargs)
@@ -1751,11 +1547,6 @@ class Plugin(models.Model):
     config = JSONField(blank=True, null=True, db_column="config")
     slug = models.TextField(validators=[validate_slug], unique=True, null=True)
     sortorder = models.IntegerField(blank=True, null=True, default=None)
-
-    def save(self, *args, **kwargs):
-        if not self.pluginid:
-            self.pluginid = uuid.uuid1()
-        super(Plugin, self).save(*args, **kwargs)
 
     def __init__(self, *args, **kwargs):
         super(Plugin, self).__init__(*args, **kwargs)
@@ -1806,11 +1597,6 @@ class VwAnnotation(models.Model):
     node = models.ForeignKey(Node, on_delete=models.DO_NOTHING, db_column="nodeid")
     feature = JSONField()
     canvas = models.TextField()
-
-    def save(self, *args, **kwargs):
-        if not self.feature_id:
-            self.feature_id = uuid.uuid1()
-        super(VwAnnotation, self).save(*args, **kwargs)
 
     def __init__(self, *args, **kwargs):
         super(VwAnnotation, self).__init__(*args, **kwargs)
