@@ -34,10 +34,10 @@
                 <div>
                     <button class="btn btn-shim btn-danger btn-labeled btn-lg fa fa-times" data-bind="click: function () {
                         geoJSONString(undefined);
-                    }">{% trans 'Cancel' %}</button>
+                    }"><span>{% trans 'Cancel' %}</span></button>
                     <button class="btn btn-shim btn-labeled btn-lg fa fa-plus btn-mint" data-bind="css: {
                         disabled: geoJSONErrors().length !== 0
-                    }, click: updateGeoJSON">{% trans 'Update Features' %}</button>
+                    }, click: updateGeoJSON"><span>{% trans 'Update Features' %}</span></button>
                 </div>
                 <!-- ko if: geoJSONErrors().length !== 0 -->
                 <div class="geojson-error-list">
