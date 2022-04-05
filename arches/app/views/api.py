@@ -1695,6 +1695,9 @@ class TransformEdtfForTile(APIBase):
             value = request.GET.get("value")
             transformed_value = EDTFDataType().transform_value_for_tile(value)
 
+        except TypeError as e:
+            return JSONResponse(str(e))
+
         except Exception as e:
             return JSONResponse(str(e), status=500)
 
