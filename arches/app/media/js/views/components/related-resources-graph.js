@@ -1,9 +1,10 @@
 define([
-    'arches',
     'knockout',
     'views/components/workbench',
     'bindings/cytoscape'
-], function(arches, ko, WorkbenchViewmodel) {
+], function(ko, WorkbenchViewmodel) {
+    const arches = window.arches;
+
     return ko.components.register('related-resources-graph', {
         viewModel: function(params) {
             var self = this;
@@ -454,6 +455,6 @@ define([
 
             updateFocusResource();
         },
-        template: { require: 'text!templates/views/components/related-resources-graph.htm' }
+        template: window['related-resources-graph-template']
     });
 });

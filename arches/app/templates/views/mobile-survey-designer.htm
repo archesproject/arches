@@ -738,6 +738,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 {% block pre_require_js %}
 {{block.super}}
     <script>
+        {% autoescape off %}
         window['mobile-survey-manager-data'] = {
             mobilesurvey: {{mobile_survey}},
             resources: {{resources}},
@@ -758,6 +759,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                 loadingmessage: {% trans "'Preparing project - this may take a few minutes'" %}
             }
         };
+        {% endautoescape %}
         // {% autoescape off %}define('mobile-survey-manager-data', [], function() {
         //     return {
         //         mobilesurvey: {{mobile_survey}},

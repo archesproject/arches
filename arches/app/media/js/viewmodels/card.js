@@ -5,12 +5,11 @@ define([
     'knockout-mapping',
     'models/card',
     'models/card-widget',
-    'arches',
     'require',
     'uuid',
     'utils/dispose',
     'viewmodels/tile'
-], function($, _, ko, koMapping, CardModel, CardWidgetModel, arches, require, uuid, dispose) {
+], function($, _, ko, koMapping, CardModel, CardWidgetModel, require, uuid, dispose) {
     /**
     * A viewmodel used for generic cards
     *
@@ -19,6 +18,9 @@ define([
     *
     * @param  {string} params - a configuration object
     */
+
+    const arches = window.arches;
+
     var isChildSelected = function(parent) {
         var childSelected = false;
         var children = [];

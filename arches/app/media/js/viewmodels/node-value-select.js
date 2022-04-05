@@ -3,8 +3,8 @@ define([
     'knockout',
     'jquery',
     'viewmodels/widget',
-    'arches',
-], function(_, ko, $, WidgetViewModel, arches) {
+], function(_, ko, $, WidgetViewModel) {
+    const arches = window.arches;
 
     var NodeValueSelectViewModel = function(params) {
         var self = this;

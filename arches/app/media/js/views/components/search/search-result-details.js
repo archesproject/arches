@@ -26,6 +26,7 @@ define([
 
                 this.report = ko.observable();
                 this.loading = ko.observable(false);
+                this.reportExpanded = ko.observable();
 
                 var setSearchResults = function(){
                     options.searchResultsVm = self.getFilter('search-results');

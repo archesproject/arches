@@ -7,8 +7,8 @@ define(['jquery',
     'knockout-mapping',
     'models/graph',
     'bootstrap-datetimepicker',
-    'plugins/knockout-select2'],
-function($, _, BaseFilter, bootstrap, select2, ko, koMapping, GraphModel) {
+    'plugins/knockout-select2'
+], function($, _, BaseFilter, bootstrap, select2, ko, koMapping, GraphModel) {
     const arches = window.arches;
     const viewdata = window['view-data'];
 

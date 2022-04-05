@@ -14,6 +14,7 @@
 {% endblock tabs %}
 
 {% block sidepanel %}
+<div  data-bind="text: console.log($data)"></div>
 <!--ko if: activeTab() === 'filter' -->
     <div class="workbench-card-sidepanel-header-container">
         <h4 class="workbench-card-sidepanel-header" data-bind="click: hideSidePanel">{% trans "Map Search" %}</h4>

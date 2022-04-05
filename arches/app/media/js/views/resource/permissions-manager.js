@@ -2,10 +2,11 @@ define([
     'jquery',
     'knockout',
     'knockout-mapping',
-    'arches',
     'viewmodels/alert',
     'bindings/select2-query'
-], function($, ko, koMapping, arches, AlertViewModel) {
+], function($, ko, koMapping, AlertViewModel) {
+    const arches = window.arches;
+
     return ko.components.register('permissions-manager', {
         viewModel: function(params) {
             var self = this;

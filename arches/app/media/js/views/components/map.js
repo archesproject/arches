@@ -1,12 +1,11 @@
 define([
     'jquery',
     'underscore',
-    'arches',
     'knockout',
     'viewmodels/map',
     'bindings/mapbox-gl',
     'bindings/sortable'
-], function($, _, arches, ko, MapViewModel) {
+], function($, _, ko, MapViewModel) {
     ko.components.register('arches-map', {
         viewModel: MapViewModel,
         template: {

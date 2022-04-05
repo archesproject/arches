@@ -6,14 +6,14 @@ define([
     'viewmodels/alert',
     'models/mobile-survey',
     'views/mobile-survey-manager/mobile-survey-tree',
-    'arches',
     'bindings/datepicker',
     'bindings/resizable-sidepanel',
     'bindings/select2-query'
-], function(_, ko, BaseManagerView, MobileSurveyViewModel, AlertViewModel, MobileSurveyModel, Tree, arches) {
+], function(_, ko, BaseManagerView, MobileSurveyViewModel, AlertViewModel, MobileSurveyModel, Tree,) {
     const data = window['mobile-survey-manager-data'];
     var viewModel = new MobileSurveyViewModel(data);
-    viewModel.arches = arches;
+    const arches = window.arches;
+    // viewModel.arches = arches;
     viewModel.saveMobileSurvey = function() {
         var self = this;
         var title;

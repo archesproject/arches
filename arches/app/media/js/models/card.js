@@ -17,6 +17,8 @@ define([
     'views/components/cards/photo-gallery-card',
     'views/components/cards/related-resources-map',
 
+    'reports/default',
+
     'views/components/datatypes/boolean',
     'views/components/datatypes/concept',
     'views/components/datatypes/date',

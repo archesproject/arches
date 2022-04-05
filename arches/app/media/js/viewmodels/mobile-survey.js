@@ -1,6 +1,5 @@
 define([
     'jquery',
-    'arches',
     'underscore',
     'moment',
     'knockout',
@@ -8,7 +7,7 @@ define([
     'models/mobile-survey',
     'views/components/widgets/map',
     'bindings/sortable'
-], function($, arches, _, moment, ko, IdentityList, MobileSurveyModel) {
+], function($, _, moment, ko, IdentityList, MobileSurveyModel) {
     /**
     * A base viewmodel for mobile survey management
     *
@@ -17,6 +16,9 @@ define([
     *
     * @param  {string} params - a configuration object
     */
+
+    const arches = window.arches;
+    
     var MobileSurveyViewModel = function(params) {
         var self = this;
         this.dateFormat = 'YYYY-MM-DD';
@@ -26,6 +28,7 @@ define([
             items: ko.observableArray(params.identities)
         });
         this.transStrings = params.transstrings;
+        this._ = _;  // hack so webpacked template can recognize underscore
 
         this.basemap = _.filter(arches.mapLayers, function(layer) {
             return !layer.isoverlay;

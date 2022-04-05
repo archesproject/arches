@@ -3,7 +3,8 @@ define([
     'viewmodels/card-component',
     'viewmodels/map-editor',
     'bindings/chosen',
-    'bindings/codemirror'
+    'bindings/codemirror',
+    'views/components/datatypes/geojson-feature-collection',
 ], function(ko, CardComponentViewModel, MapEditorViewModel) {
     const arches = window.arches;
 
