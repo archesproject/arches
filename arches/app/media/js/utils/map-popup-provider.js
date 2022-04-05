@@ -1,7 +1,7 @@
 define(['arches',
     'knockout',
     'text!templates/views/components/map-popup.htm'
-], function (arches, ko, popupTemplate) {
+], function(arches, ko, popupTemplate) {
 
     var provider = {
 
@@ -10,14 +10,16 @@ define(['arches',
          * @param feature Map feature to check
          * @returns <code>true</code> if the feature can be clicked, otherwise <code>false</code>
          */
-        isFeatureClickable: function (feature) {
+        isFeatureClickable: function(feature)
+        {
             return feature.properties.resourceinstanceid;
         },
 
         /**
          * Return the template that should be used for the
-         * @param features
-         * @returns {*}
+         * @param features - Unused in this provider, but may be used in custom provider to determine which template
+         * to use
+         * @returns {*} HTML template for the Map Popup
          */
         getPopupTemplate: function(features)
         {
