@@ -59,7 +59,7 @@ from arches.app.utils.permission_backend import (
 )
 from arches.app.utils.geo_utils import GeoUtils
 from arches.app.search.components.base import SearchFilterFactory
-from arches.app.datatypes.datatypes import DataTypeFactory
+from arches.app.datatypes.datatypes import DataTypeFactory, EDTFDataType
 from arches.app.search.search_engine_factory import SearchEngineFactory
 from arches.app.search.search_export import SearchResultsExporter
 
@@ -1712,3 +1712,18 @@ class Validator(APIBase):
             return JSONResponse(self.validate_tile(tile, verbose, strict), indent=indent)
 
         return JSONResponse(status=400)
+
+
+class TransformEdtfForTile(APIBase):
+    def get(self, request):
+        try:
+            value = request.GET.get("value")
+            transformed_value = EDTFDataType().transform_value_for_tile(value)
+
+        except TypeError as e:
+            return JSONResponse({"data": (str(e), False)})
+
+        except Exception as e:
+            return JSONResponse(str(e), status=500)
+
+        return JSONResponse({"data": transformed_value})
