@@ -47,6 +47,7 @@ DATABASES = {
     }
 }
 
+DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 PG_SUPERUSER = ""
 PG_SUPERUSER_PW = ""
 
@@ -706,7 +707,6 @@ JSON_LD_SORT_FUNCTIONS = [lambda x: x.get("@id", "~")]
 
 def JSON_LD_FIX_DATA_FUNCTION(data, jsdata, model):
     return jsdata
-
 
 ##########################################
 ### END RUN TIME CONFIGURABLE SETTINGS ###
