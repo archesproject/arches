@@ -35,7 +35,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
             <div class="rr-splash-title">{% trans "Mobile Data Collection" %}</div>
 
             <!-- Splash Button -->
-            <button class="btn btn-shim btn-rr btn-labeled btn-lg fa fa-globe" data-bind="click: newMobileSurvey">{% trans 'Create a Project' %}</button>
+            <button class="btn btn-shim btn-rr btn-labeled btn-lg fa fa-globe" data-bind="click: newMobileSurvey"><span>{% trans 'Create a Project' %}</span></button>
 
             <!-- Splash Instructions -->
             <div class="rr-splash-description">{% trans "Arches allows you to create and edit data in the field using mobile devices such as" %}</div>
@@ -53,7 +53,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                 <div class="list-filter mpm" data-bind="">
                     <div class="msm-list-filter">
                     <div>
-                        <button id="" class="btn btn-lg btn-mint btn-active-dark btn-labeled ion-plus-round" data-bind="click: newMobileSurvey">{% trans "New Project" %}</button>
+                        <button id="" class="btn btn-lg btn-mint btn-active-dark btn-labeled ion-plus-round" data-bind="click: newMobileSurvey"><span>{% trans "New Project" %}</span></button>
                     </div>
                     <div class="msm-list-filter-input">
                     <input type="text" class="form-control" placeholder="{% trans 'Find a project...' %}" data-bind="value: mobileSurveyFilter, valueUpdate: 'keyup'">
@@ -96,7 +96,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                             </div>
                             <div class="resource-grid-tools-container mpm-manager">
 
-                                <button class="btn btn-shim btn-rr graph-btn btn-labeled btn-sm fa fa-trash" data-bind="click: function(val){$parent.deleteMobileSurvey(val)}, clickBubble: false, css: {'disabled': active()}" aria-expanded="true">{% trans 'delete' %}</button>
+                                <button class="btn btn-shim btn-rr graph-btn btn-labeled btn-sm fa fa-trash" data-bind="click: function(val){$parent.deleteMobileSurvey(val)}, clickBubble: false, css: {'disabled': active()}" aria-expanded="true"><span>{% trans 'delete' %}</span></button>
 
                                 <div>
                                     <p class="resource-status-label">

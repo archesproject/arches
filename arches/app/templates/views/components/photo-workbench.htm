@@ -183,7 +183,7 @@
                 <div class='new-provisional-edits-title'>{% trans 'Provisional Edits' %}</div>
                 <div class="btn btn-shim btn-danger btn-labeled btn-xs fa fa-trash new-provisional-edits-delete-all" style="padding: 3px;" data-bind="click: function(){
                         provisionalTileViewModel.deleteAllProvisionalEdits();
-                    }">{% trans 'Delete all edits' %}</div>
+                    }"><span>{% trans 'Delete all edits' %}</span></div>
             </div>
             <!-- ko foreach: { data: provisionalTileViewModel.provisionaledits(), as: 'pe' } -->
             <div class='new-provisional-edit-entry' data-bind="css: {
@@ -278,24 +278,24 @@
                 <button class="btn btn-shim btn-labeled btn-lg fa fa-trash" data-bind="click: $parent.removeTile, css: {
                     disabled: (!$parent.card.isWritable && !self.preview),
                     'btn-warning': $parent.card.isWritable
-                }">{% trans 'Delete' %}</button>
+                }"><span>{% trans 'Delete' %}</span></button>
                 <!-- /ko -->
                 <!-- ko if: tile.dirty() -->
                     <!-- ko if: $parent.provisionalTileViewModel && !$parent.provisionalTileViewModel.tileIsFullyProvisional() && $parent.card.isWritable -->
-                    <button class="btn btn-shim btn-danger btn-labeled btn-lg fa fa-times" data-bind="click: selected().reset">{% trans 'Cancel' %}</button>
+                    <button class="btn btn-shim btn-danger btn-labeled btn-lg fa fa-times" data-bind="click: selected().reset"><span>{% trans 'Cancel' %}</span></button>
                     <!-- /ko -->
                     <!-- ko if: tile.tileid -->
                     <button class="btn btn-shim btn-labeled btn-lg fa fa-plus" data-bind="click: tile.save, css: {
                         disabled: (!$parent.card.isWritable && !self.preview),
                         'btn-mint': $parent.card.isWritable
-                    }">{% trans 'Save' %}</button>
+                    }"><span>{% trans 'Save' %}</span></button>
                     <!-- /ko -->
                 <!-- /ko -->
                 <!-- ko if: !tile.tileid -->
                 <button class="btn btn-shim btn-labeled btn-lg fa fa-plus" data-bind="click: self.saveTile, css: {
                     disabled: (!$parent.card.isWritable && !self.preview),
                     'btn-mint': $parent.card.isWritable
-                }">{% trans 'Add'  %}</button>
+                }"><span>{% trans 'Add'  %}</span></button>
                 <!-- /ko -->
             </div>
                 <!--/ko-->
