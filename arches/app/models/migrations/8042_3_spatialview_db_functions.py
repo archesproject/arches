@@ -39,7 +39,7 @@ class Migration(migrations.Migration):
                 declare
                     concept_label     text := '';
                 begin
-                    if concept_array is null then
+                    if concept_value is null then
                         return concept_label;
                     end if;
 
@@ -233,7 +233,7 @@ class Migration(migrations.Migration):
                             where nodegroupid = target_nodegroupid
                         loop
                             if target_template like format('%%<%s>%%',n.name) then
-                                select replace(target_template, format('<%s>',n.name), __arches_get_node_display_value(target_data, n.nodeid::text)) into target_template;
+                                select replace(target_template, format('<%s>',n.name), __arches_get_node_display_value(target_data, n.nodeid)) into target_template;
                             end if;
                         end loop;    
                     end;
@@ -836,7 +836,7 @@ class Migration(migrations.Migration):
                                 loop
                                     tmp_nodegroupid_slug := __arches_slugify(n.nodegroupid::text);
                                     node_create = node_create || 
-                                        format(',__arches_agg_get_node_display_value(distinct tile_%s.tiledata, %L::uuid) as %s'
+                                        format(' ,__arches_agg_get_node_display_value(distinct tile_%s.tiledata, %L::uuid) as %s '
                                             ,tmp_nodegroupid_slug
                                             ,n.nodeid::text
                                             ,__arches_slugify(n.name)
@@ -844,8 +844,8 @@ class Migration(migrations.Migration):
                                     
                                     if tile_create not like (format('%%tile_%s%%',tmp_nodegroupid_slug)) then
                                         tile_create = tile_create || 
-                                            format('left outer join tiles tile_%s on r.resourceinstanceid = tile_%s.resourceinstanceid
-                                                and tile_%s.nodegroupid = ''%s''::uuid',
+                                            format(' left outer join tiles tile_%s on r.resourceinstanceid = tile_%s.resourceinstanceid
+                                                and tile_%s.nodegroupid = ''%s''::uuid ',
                                             tmp_nodegroupid_slug,
                                             tmp_nodegroupid_slug,
                                             tmp_nodegroupid_slug,
