@@ -238,6 +238,7 @@ urlpatterns = [
     url(r"^resources/(?P<resourceid>%s|())$" % uuid_regex, api.Resources.as_view(), name="resources"),
     url(r"^api/tiles/(?P<tileid>%s|())$" % (uuid_regex), api.Tile.as_view(), name="api_tiles"),
     url(r"^api/nodes/(?P<nodeid>%s|())$" % (uuid_regex), api.Node.as_view(), name="api_nodes"),
+    url(r"^api/nodegroup/(?P<nodegroupid>%s|())$" % (uuid_regex), api.NodeGroup.as_view(), name="api_nodegroup"),
     url(r"^api/instance_permissions/$", api.InstancePermission.as_view(), name="api_instance_permissions"),
     url(r"^api/node_value/$", api.NodeValue.as_view(), name="api_node_value"),
     url(r"^api/resource_report/(?P<resourceid>%s|())$" % (uuid_regex), api.ResourceReport.as_view(), name="api_resource_report"),
@@ -296,8 +297,6 @@ urlpatterns = [
 
 if settings.DEBUG:
     try:
-        import debug_toolbar
-
-        urlpatterns = [url(r"^__debug__/", include(debug_toolbar.urls))] + urlpatterns
+        urlpatterns += [url("silk/", include("silk.urls", namespace="silk"))]
     except:
         pass

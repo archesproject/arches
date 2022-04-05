@@ -176,7 +176,19 @@ class ResourceEditorView(MapBaseManagerView):
         ]
         widgets = models.Widget.objects.all()
         card_components = models.CardComponent.objects.all()
-        applied_functions = JSONSerializer().serialize(models.FunctionXGraph.objects.filter(graph=graph))
+
+        primary_descriptor_functions = models.FunctionXGraph.objects.filter(graph=graph).filter(
+            function__functiontype="primarydescriptors"
+        )
+
+        primary_descriptor_function = JSONSerializer().serialize(
+            primary_descriptor_functions[0] if len(primary_descriptor_functions) > 0 else None
+        )
+
+        applied_functions = JSONSerializer().serialize(
+            models.FunctionXGraph.objects.filter(graph=graph)
+        )
+
         datatypes = models.DDataType.objects.all()
         user_is_reviewer = user_is_resource_reviewer(request.user)
         is_system_settings = False
@@ -246,6 +258,7 @@ class ResourceEditorView(MapBaseManagerView):
             card_components_json=JSONSerializer().serialize(card_components),
             tiles=JSONSerializer().serialize(tiles),
             cards=JSONSerializer().serialize(cards),
+            primary_descriptor_function=primary_descriptor_function,
             applied_functions=applied_functions,
             nodegroups=JSONSerializer().serialize(nodegroups),
             nodes=JSONSerializer().serialize(nodes),

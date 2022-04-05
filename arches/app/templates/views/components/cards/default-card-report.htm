@@ -45,7 +45,7 @@
                         <!-- ko if: tile.parent.selected() && tile.parent.cardinality == 'n' -->
                         <i class="fa fa-copy" tabindex="0" data-bind="event: { keyup: $parent.cardComponentEventHandler.bind($data,'copy tile',tile), click: $parent.cardComponentEventHandler.bind($data,'copy tile',tile)}" aria-label="Copy"></i>
                         <!-- /ko -->
-                        <i class="fa fa-pencil" tabindex="0" data-bind="event: { keyup: $parent.cardComponentEventHandler.bind($data,'select',tile), click: $parent.cardComponentEventHandler.bind($data,'select',tile)}" aria-label="Edit"></i>
+                        <i class="fa fa-pencil" tabindex="0" data-bind="event: { keyup: $parent.cardComponentEventHandler.bind($data,'select tile',[$parent,tile]), click: $parent.cardComponentEventHandler.bind($data,'select tile',[$parent,tile])}" aria-label="Edit"></i>
                         <i class="fa fa-trash" tabindex="0" data-bind="event: { keyup: $parent.cardComponentEventHandler.bind($data,'delete tile',tile), click: $parent.cardComponentEventHandler.bind($data,'delete tile',tile)}" aria-label="Delete"></i>
                     </div>
                     <!-- /ko -->
