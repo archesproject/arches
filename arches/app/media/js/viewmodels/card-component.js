@@ -139,7 +139,16 @@ define([
                     parent.createParentAndChild(parent.tile, data.card)
                     break;
                 case "delete tile":
+                    console.log(data);
                     data.deleteTile();
+                    break;
+                case "select tile":
+                    if(additionalParam[0]?.form?.workflowId){
+                        additionalParam[0].selectWorkflowTile(additionalParam[1]);
+                    }
+                    else{
+                        additionalParam[1].selected(true);
+                    }
                     break;
                 case "reset parameter":
                     additionalParam.reset();
