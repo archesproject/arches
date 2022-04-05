@@ -23,13 +23,15 @@ define(['knockout',
                     .then(response => {
                         if(response.ok) {
                             return response.json();
+                        } else {
+                            self.transformedEdtf(null);
                         }
                     })
                     .then(json => {
                         if (json?.data?.[1]) {
                             self.transformedEdtf(json.data[0]);
                         } else {
-                            self.transformedEdtf("not a valid edtf format");
+                            self.transformedEdtf(null);
                         }
                     })
             });
