@@ -34,10 +34,13 @@ define(['knockout',
                     }
                 });
             }
+            
             this.getEdtf(params.value())
-            params.value.subscribe(val => {
-                self.getEdtf(val);
-            });
+            if (params.state !== 'report') {
+                params.value.subscribe(val => {
+                    self.getEdtf(val);
+                })
+            }
 
             WidgetViewModel.apply(this, [params]);
         },
