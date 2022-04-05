@@ -357,11 +357,6 @@ dl.inline-flex dd {
     border-left: 1px solid #ddd;
 }
 
-input[type="checkbox"] {
-    width: 30px;
-    height: 30px;
-}
-
 .wizard-data-card-alert {
     box-shadow: none;
     margin: 1px 0 0;
@@ -2566,11 +2561,149 @@ div.final-cons-step-separator>h4 {
     border-top-right-radius: 0;
 }
 
-.form-text.form-checkbox:not(.btn),
-.form-text.form-radio:not(.btn) {
-    padding-right: 25px;
-    padding-top: 5px;
-    padding-left: 22px;
+.columns{
+    display: flex;
+    flex-wrap: wrap;
+}
+
+.columns label {
+    .form-radio {
+        display: flex;
+        align-items: center;
+    }
+}
+
+label.form-radio.form-normal{
+    cursor: pointer;
+    margin: 2px 0px;
+
+    &::before{
+        top: 22px;
+        content: '';
+        position: relative;
+        width: 16px;
+        height: 16px;
+        border: 1px solid #c3cedb;
+        left: auto;
+        bottom: auto;
+        display: block;
+        border-radius: 50%;
+        background-color: transparent;
+        padding-bottom:4px;
+        &:hover{
+            padding-bottom: 0;
+        }
+    }
+
+    &:not(.disabled):not(.active):hover::after {
+        opacity: .3;
+    }
+    &::after{
+        content: '';
+        position: relative;
+        display: block;
+        width: 8px;
+        height: 8px;
+    }
+
+    &.active::after, &:not(.disabled):hover::after{
+        bottom: 13px;
+        position: relative;
+        border: none;
+        display: block;
+        left: auto;
+        border-radius: 50%;
+        background-color: #515151;
+        margin: 0 4px;
+    }
+}
+
+label.form-checkbox.form-normal:before,
+.form-radio.form-normal::before {
+    left: 1px;
+}
+
+label.form-checkbox.form-normal{
+    margin: 2px 0px;
+    display: flex;
+    align-items: center;
+
+    &:before {
+        content: '';
+        margin: 0 5px;
+        display: block;
+        position: absolute;
+        width: 16px;
+        height: 16px;
+        background-color: transparent;
+        border: 1px solid #c3cedb;
+        border-radius: 0;
+        left: auto;
+        top: auto;
+    }
+    &:not(.active):hover:after{
+        opacity: 3;
+    }
+    &.form-primary:not(.active):hover:after {
+        border-color: #489eed;
+    }
+
+    &:not(.disabled):hover:after {
+        content: '';
+        position: absolute;
+        height: 6px;
+        width: 11px;
+        left: 8px;
+        top: 50%;
+        margin-top: -5px;
+        -webkit-transform: rotate(-45deg);
+        -ms-transform: rotate(-45deg);
+        transform: rotate(-45deg);
+        border-bottom: 2.5px solid #515151;
+        border-left: 2.5px solid #515151;
+    }
+
+    &.active
+    {
+        &:after {
+            content: '';
+            position: absolute;
+            height: 6px;
+            width: 11px;    
+            left: 8px;
+            top: 50%;
+            margin-top: -5px;
+            border-bottom: 2.5px solid #515151;
+            border-color: #fff;
+            border-left: 2.5px solid #515151;
+            transform: rotate(-45deg);
+        }
+        &:before {
+            background-color: #5fa2dd;
+            border-color: #5fa2dd;
+        }
+    }
+    span {
+        width: 186px;
+        white-space: normal;
+        padding: 0 5px;
+    }
+
+    &.permission-option i{
+        padding: 0 5px;
+    }
+}
+
+.form-text.form-checkbox,.form-text.form-radio{
+    &:not(.btn){
+        padding: 0px;
+    }
+
+    &>input[type="checkbox"],
+    &>input[type="radio"] {
+        position: unset !important; // TODO: remove !important after nifty.css is purged
+        margin: 5px;
+    }
 }
 
 .option-input {
@@ -3207,11 +3340,6 @@ a.select2-search-choice-close {
 .permissions-options {
     display: flex;
     flex-direction: column;
-}
-
-.form-checkbox.form-normal.form-primary.permission-option {
-    padding-left: 22px;
-    padding-bottom: 5px;
 }
 
 .selected-group-user-permissions .library-icon-permissions {
@@ -3856,11 +3984,6 @@ ul.nav.nav-tabs.nav-justified {
     font-size: 16px;
     padding-bottom: 5px;
     border-bottom: solid 1px #ddd;
-}
-
-.columns label.form-checkbox.form-normal:before,
-.form-radio.form-normal::before {
-    left: 1px;
 }
 
 .pad-hor.columns {
