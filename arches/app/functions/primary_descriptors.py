@@ -1,7 +1,6 @@
 import uuid
 from arches.app.functions.base import BaseFunction
 from arches.app.models import models
-from arches.app.models.tile import Tile
 from arches.app.datatypes.datatypes import DataTypeFactory
 from django.utils.translation import ugettext as _
 
