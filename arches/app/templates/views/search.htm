@@ -57,7 +57,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                 </div>
                 <div class="search-controls-container">
                     <!--ko if: ko.unwrap(sharedStateObject.filterApplied) -->
-                    <button class="btn-sm btn btn-mint btn-labeled clear-filter" data-bind="click: function() {sharedStateObject.clearQuery();}">{% trans "Clear Filters" %}</button>
+                    <button class="btn-sm btn btn-mint btn-labeled clear-filter" data-bind="click: function() {sharedStateObject.clearQuery();}"><span>{% trans "Clear Filters" %}</span></button>
                     <!--/ko-->
                     <span style="width:125px">
                         <div data-bind="component: {
