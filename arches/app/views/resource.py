@@ -534,7 +534,7 @@ class ResourceEditLogView(BaseManagerView):
                 iconclass=resource_instance.graph.iconclass,
                 edits=JSONSerializer().serialize(permitted_edits),
                 resourceid=resourceid,
-                displayname= _("Unnamed Resource") if displayname == "undefined" else displayname
+                displayname=_("Unnamed Resource") if displayname == "undefined" else displayname,
             )
 
             context["nav"]["res_edit"] = True
