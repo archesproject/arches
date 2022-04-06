@@ -173,12 +173,6 @@
                         <!-- /ko -->
                     <!-- /ko -->
                 </div>
-
-                <div class="display-in-workflow-step install-buttons">
-                    <button class="btn btn-shim btn-danger btn-labeled btn-lg fa fa-times" data-bind="click: function () {
-                        showRelatedQuery(false);
-                    }">{% trans 'Close' %}</button>
-                </div>
             </div>
             <!-- /ko-->
 
@@ -362,7 +356,14 @@
             </div>
         </div>
     </div>
-    </div>
+</div>
+<!-- ko if: showRelatedQuery -->
+<div class="display-in-workflow-step">
+    <button class="btn btn-shim btn-danger btn-labeled btn-lg fa fa-times" data-bind="click: function () {
+        showRelatedQuery(false);
+    }">{% trans 'Close' %}</button>
+</div>
+<!--/ko -->
 <!--/ko -->
 {{ block.super }}
 {% endblock sidepanel %}
