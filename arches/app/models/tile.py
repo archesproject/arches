@@ -385,7 +385,7 @@ class Tile(models.TileModel):
         index = kwargs.pop("index", True)
         user = kwargs.pop("user", None)
         new_resource_created = kwargs.pop("new_resource_created", False)
-        log = kwargs.pop("log", True)
+        context = kwargs.pop("context", None)
         transaction_id = kwargs.pop("transaction_id", None)
         provisional_edit_log_details = kwargs.pop("provisional_edit_log_details", None)
         creating_new_tile = True
@@ -405,7 +405,7 @@ class Tile(models.TileModel):
                 node = models.Node.objects.get(nodeid=nodeid)
                 datatype = self.datatype_factory.get_instance(node.datatype)
                 datatype.pre_tile_save(self, nodeid)
-            self.__preSave(request)
+            self.__preSave(request, context=context)
             self.check_for_missing_nodes()
             self.check_for_constraint_violation()
             self.check_tile_cardinality_violation()
@@ -451,7 +451,7 @@ class Tile(models.TileModel):
             # resource's displayname changes are avaliable
             user = {} if user is None else user
             self.datatype_post_save_actions(request)
-            self.__postSave(request)
+            self.__postSave(request, context=context)
             if creating_new_tile is True:
                 self.save_edit(
                     user=user,
@@ -644,11 +644,11 @@ class Tile(models.TileModel):
         tile.after_update_all()
         return tile
 
-    def __preSave(self, request=None):
+    def __preSave(self, request=None, context=None):
         try:
             for function in self._getFunctionClassInstances():
                 try:
-                    function.save(self, request)
+                    function.save(self, request, context)
                 except NotImplementedError:
                     pass
         except TypeError:
@@ -664,11 +664,11 @@ class Tile(models.TileModel):
         except TypeError:
             logger.info(_("No associated functions or other TypeError raised by a function"))
 
-    def __postSave(self, request=None):
+    def __postSave(self, request=None, context=None):
         try:
             for function in self._getFunctionClassInstances():
                 try:
-                    function.post_save(self, request)
+                    function.post_save(self, request, context)
                 except NotImplementedError:
                     pass
         except TypeError as e:

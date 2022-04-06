@@ -124,11 +124,12 @@ class Resource(models.ResourceInstance):
         request = kwargs.pop("request", None)
         user = kwargs.pop("user", None)
         index = kwargs.pop("index", True)
+        context = kwargs.pop("context", None)
         transaction_id = kwargs.pop("transaction_id", None)
         super(Resource, self).save(*args, **kwargs)
         for tile in self.tiles:
             tile.resourceinstance_id = self.resourceinstanceid
-            saved_tile = tile.save(request=request, index=False, transaction_id=transaction_id)
+            tile.save(request=request, index=False, transaction_id=transaction_id, context=context)
         if request is None:
             if user is None:
                 user = {}
@@ -592,7 +593,7 @@ class Resource(models.ResourceInstance):
                 tile.parenttile = id_map[tile.parenttile_id]
 
         with transaction.atomic():
-            new_resource.save()
+            new_resource.save(context="copy")
 
         return new_resource
 
