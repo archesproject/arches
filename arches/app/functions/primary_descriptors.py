@@ -1,8 +1,11 @@
+import logging
 import uuid
 from arches.app.functions.base import BaseFunction
 from arches.app.models import models
 from arches.app.datatypes.datatypes import DataTypeFactory
 from django.utils.translation import ugettext as _
+
+logger = logging.getLogger(__name__)
 
 
 class AbstractPrimaryDescriptorsFunction(BaseFunction):
@@ -47,8 +50,8 @@ class PrimaryDescriptorsFunction(AbstractPrimaryDescriptorsFunction):
                             if value is None:
                                 value = ""
                             config["string_template"] = config["string_template"].replace("<%s>" % node.name, str(value))
-        except ValueError as e:
-            print(e, "invalid nodegroupid participating in descriptor function.")
+        except ValueError:
+            logger.error(_("Invalid nodegroupid, {0}, participating in descriptor function.").format(config["nodegroup_id"]))
         if config["string_template"].strip() == "":
             config["string_template"] = _("Undefined")
         return config["string_template"]
