@@ -259,6 +259,9 @@
                 api_tiles: function (tileid) {
                     return "{% url 'api_tiles' 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa' %}".replace('aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa', tileid)
                 },
+                api_nodegroup: function (nodegroupid) {
+                    return "{% url 'api_nodegroup' 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa' %}".replace('aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa', nodegroupid)
+                },
                 api_nodes: function (nodeid) {
                     return "{% url 'api_nodes' 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa' %}".replace('aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa', nodeid)
                 },
@@ -277,6 +280,7 @@
                 iiifannotationnodes: "{% url 'iiifannotationnodes' %}",
                 validatejson: "{% url 'validatejson' 'aaaa'%}".replace('aaaa', ''),
                 get_dsl: "{% url 'get_dsl' %}",
+                transform_edtf_for_tile: "{% url 'transform_edtf_for_tile' %}",
                 {% block urls %}{% endblock urls %}
             },
             geocoderPlaceHolder: "{% trans 'Find an address...' %}",
