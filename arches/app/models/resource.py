@@ -144,7 +144,7 @@ class Resource(models.ResourceInstance):
 
         self.save_edit(user=user, edit_type="create", transaction_id=transaction_id)
         if index is True:
-            self.index()
+            self.index(context)
 
     def get_root_ontology(self):
         """
@@ -226,7 +226,7 @@ class Resource(models.ResourceInstance):
         se.bulk_index(documents)
         se.bulk_index(term_list)
 
-    def index(self):
+    def index(self, context=None):
         """
         Indexes all the nessesary items values of a resource to support search
 
@@ -235,7 +235,7 @@ class Resource(models.ResourceInstance):
         if str(self.graph_id) != str(settings.SYSTEM_SETTINGS_RESOURCE_MODEL_ID):
             datatype_factory = DataTypeFactory()
             node_datatypes = {str(nodeid): datatype for nodeid, datatype in models.Node.objects.values_list("nodeid", "datatype")}
-            document, terms = self.get_documents_to_index(datatype_factory=datatype_factory, node_datatypes=node_datatypes)
+            document, terms = self.get_documents_to_index(datatype_factory=datatype_factory, node_datatypes=node_datatypes, context=context)
             document["root_ontology_class"] = self.get_root_ontology()
             doc = JSONSerializer().serializeToPython(document)
             se.index_data(index=RESOURCES_INDEX, body=doc, id=self.pk)
@@ -252,7 +252,7 @@ class Resource(models.ResourceInstance):
                     doc, doc_id = es_index.get_documents_to_index(self, document["tiles"])
                     es_index.index_document(document=doc, id=doc_id)
 
-    def get_documents_to_index(self, fetchTiles=True, datatype_factory=None, node_datatypes=None):
+    def get_documents_to_index(self, fetchTiles=True, datatype_factory=None, node_datatypes=None, context=None):
         """
         Gets all the documents nessesary to index a single resource
         returns a tuple of a document and list of terms
@@ -272,9 +272,9 @@ class Resource(models.ResourceInstance):
         document["displayname"] = None
         document["root_ontology_class"] = self.get_root_ontology()
         document["legacyid"] = self.legacyid
-        document["displayname"] = self.displayname()
-        document["displaydescription"] = self.displaydescription()
-        document["map_popup"] = self.map_popup()
+        document["displayname"] = self.displayname(context)
+        document["displaydescription"] = self.displaydescription(context)
+        document["map_popup"] = self.map_popup(context)
 
         tiles = list(models.TileModel.objects.filter(resourceinstance=self)) if fetchTiles else self.tiles
 
