@@ -263,11 +263,14 @@ class GeoJSON(APIBase):
     se = SearchEngineFactory().create()
 
     def get_name(self, resource):
-        module = importlib.import_module("arches.app.functions.primary_descriptors")
-        PrimaryDescriptorsFunction = getattr(module, "PrimaryDescriptorsFunction")()
-        functionConfig = models.FunctionXGraph.objects.filter(graph_id=resource.graph_id, function__functiontype="primarydescriptors")
-        if len(functionConfig) == 1:
-            return PrimaryDescriptorsFunction.get_primary_descriptor_from_nodes(resource, functionConfig[0].config["name"])
+        graph_function = models.FunctionXGraph.objects.filter(
+            graph_id=resource.graph_id, function__functiontype="primarydescriptors"
+        ).select_related("function")
+        if len(graph_function) == 1:
+            module = graph_function[0].function.get_class_module()()
+            return module.get_primary_descriptor_from_nodes(
+                self, graph_function[0].config["descriptor_types"]["name"]
+            )
         else:
             return _("Unnamed Resource")
 
@@ -1470,6 +1473,31 @@ class Tile(APIBase):
             request.POST = request.POST.copy()
             request.POST["data"] = request.body
         return tileview.post(request)
+
+
+@method_decorator(csrf_exempt, name="dispatch")
+class NodeGroup(APIBase):
+    def get(self, request, nodegroupid=None):
+        params = request.GET.dict()
+        user = request.user
+        perms = "models." + params.pop("perms", "read_nodegroup")
+        params["nodegroupid"] = params.get("nodegroupid", nodegroupid)
+
+        try:
+            uuid.UUID(params["nodegroupid"])
+        except ValueError as e:
+            del params["nodegroupid"]
+
+        try:
+            nodegroup = models.NodeGroup.objects.get(pk=params["nodegroupid"])
+            permitted_nodegroups = [nodegroup.pk for nodegroup in get_nodegroups_by_perm(user, perms)]
+        except Exception as e:
+            return JSONResponse(str(e), status=404)
+
+        if not nodegroup or nodegroup.pk not in permitted_nodegroups:
+            return JSONResponse(_("No nodegroup matching query parameters found."), status=404)
+
+        return JSONResponse(nodegroup, status=200)
 
 
 @method_decorator(csrf_exempt, name="dispatch")

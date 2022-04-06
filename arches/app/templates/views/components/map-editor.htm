@@ -13,11 +13,11 @@
 
 {% block sidepanel %}
 <!--ko if: activeTab() === 'editor' -->
-    <div class="workbench-header-buffer">
-        <div class="workbench-card-sidepanel-header-container">
-            <h4 class="workbench-card-sidepanel-header" data-bind="event: {keyup: mapEventHandler.bind($data,'hide side panel',null), click: mapEventHandler.bind($data,'hide side panel',null)}, text: card.model.name" tabindex="0" onkeyup="if(event.which == 13 || event.keyCode == 13){ $(this).trigger('click'); }"></h4>
-        </div>
+    <div class="workbench-card-sidepanel-header-container">
+        <h4 class="workbench-card-sidepanel-header" data-bind="event: {keyup: mapEventHandler.bind($data,'hide side panel',null), click: mapEventHandler.bind($data,'hide side panel',null)}, text: card.model.name" tabindex="0"></h4>
     </div>
+    <div class="workbench-card-sidepanel-border"></div>
+    <div class="workbench-card-sidepanel-body">
     <div data-bind="css: card.model.cssclass">
 
         <!-- ko if: reviewer && provisionalTileViewModel.selectedProvisionalEdit() -->
@@ -319,6 +319,7 @@
                 </aside>
             </div>
         </div>
+    </div>
     </div>
 <!--/ko -->
 {{ block.super }}
