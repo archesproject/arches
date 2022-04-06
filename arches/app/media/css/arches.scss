@@ -4531,7 +4531,7 @@ div.dropdown-menu.open {
     transform: translate(0px, 7px);
     background: #e2e2e2;
     border: 1px solid #ddd;
-    margin-bottom: 10px;
+    margin: 7px 5px;
     text-align: center;
 }
 
@@ -4550,8 +4550,8 @@ div.dropdown-menu.open {
 }
 
 .resource-grid-subtitle {
-    padding-left: 69px;
-    margin-top: -20px;
+    margin: 0 78px;
+    margin-top: -14px;
     color: #999;
     font-size: 12px;
     width: 500px;
@@ -4562,8 +4562,9 @@ div.dropdown-menu.open {
 
 .resource-grid-item .resource-grid-tools-container {
     flex-direction: column;
-    padding: 15px;
+    margin: 15px;
     display: flex;
+    width: 76px;
 }
 
 .report-image-grid .resource-grid-item:last-of-type .resource-grid-tools-container .btn-group .manage-menu {
