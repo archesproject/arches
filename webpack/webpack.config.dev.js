@@ -1,11 +1,9 @@
 const Path = require('path');
-const Webpack = require('webpack');
-const { merge } = require('webpack-merge');
-const StylelintPlugin = require('stylelint-webpack-plugin');
-const MiniCssExtractPlugin = require('mini-css-extract-plugin');
-
-const ESLintPlugin = require('eslint-webpack-plugin');
-const HtmlWebpackPlugin = require('html-webpack-plugin');
+const Webpack = require('../arches/app/media/node_modules/webpack');
+const { merge } = require('../arches/app/media/node_modules/webpack-merge');
+const StylelintPlugin = require('../arches/app/media/node_modules/stylelint-webpack-plugin');
+const MiniCssExtractPlugin = require('../arches/app/media/node_modules/mini-css-extract-plugin');
+const ESLintPlugin = require('../arches/app/media/node_modules/eslint-webpack-plugin');
 
 const common = require('./webpack.common.js');
 
@@ -22,9 +20,6 @@ module.exports = merge(common, {
     plugins: [
         // new ESLintPlugin({
         //     extensions: [`js`, `jsx`],
-        // }),
-        // new HtmlWebpackPlugin({
-        //     template: Path.resolve(__dirname, '../../templates/index.htm')
         // }),
         new Webpack.DefinePlugin({
             'process.env.NODE_ENV': JSON.stringify('development'),

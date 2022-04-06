@@ -48,7 +48,13 @@ language:
   - node_js
 
 python: 3.9
-node_js: 10.8
+
+node_js:
+  - 10.8
+  - "lts/*"
+  - "node"
+
+script: npm run build
 
 jobs:
   allow_failures:

@@ -390,7 +390,7 @@ MIDDLEWARE = [
 
 WEBPACK_LOADER = {
     "DEFAULT": {
-        "STATS_FILE": os.path.join(ROOT_DIR, "app", "frontend", "webpack-stats.json"),
+        "STATS_FILE": os.path.join(ROOT_DIR, "../webpack-stats.json"),
     },
 }
 
@@ -595,7 +595,7 @@ SEARCH_COMPONENT_LOCATIONS = [
     "arches.app.search.components",
 ]
 
-MAPBOX_API_KEY = ""  # Put your Mapbox key here!
+MAPBOX_API_KEY = "pk.eyJ1IjoiY2hpYXR0IiwiYSI6ImZRLTZDbVkifQ.2ZLLC1kInvxJ7isk_0_OMw"  # Put your Mapbox key here!
 
 # links to sprites and glyphs for use on map
 MAPBOX_SPRITES = "mapbox://sprites/mapbox/basic-v9"
