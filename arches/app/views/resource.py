@@ -197,7 +197,7 @@ class ResourceEditorView(MapBaseManagerView):
             tiles = []
             displayname = _("New Resource")
         else:
-            displayname = resource_instance.displayname
+            displayname = resource_instance.displayname()
             if displayname == "undefined":
                 displayname = _("Unnamed Resource")
             if str(resource_instance.graph_id) == settings.SYSTEM_SETTINGS_RESOURCE_MODEL_ID:
@@ -522,22 +522,19 @@ class ResourceEditLogView(BaseManagerView):
                     permitted_edits.append(edit)
 
             resource = Resource.objects.get(pk=resourceid)
-            displayname = resource.displayname
-            displaydescription = resource.displaydescription
+            displayname = resource.displayname()
             cards = Card.objects.filter(nodegroup__parentnodegroup=None, graph=resource_instance.graph)
             graph_name = resource_instance.graph.name
-            if displayname == "undefined":
-                displayname = _("Unnamed Resource")
 
             context = self.get_context_data(
                 main_script="views/resource/edit-log",
                 cards=JSONSerializer().serialize(cards),
                 resource_type=graph_name,
-                resource_description=displaydescription,
+                resource_description=resource.displaydescription(),
                 iconclass=resource_instance.graph.iconclass,
                 edits=JSONSerializer().serialize(permitted_edits),
                 resourceid=resourceid,
-                displayname=displayname,
+                displayname= _("Unnamed Resource") if displayname == "undefined" else displayname
             )
 
             context["nav"]["res_edit"] = True
@@ -545,8 +542,6 @@ class ResourceEditLogView(BaseManagerView):
             context["nav"]["title"] = graph_name
 
             return render(request, view_template, context)
-
-        return HttpResponseNotFound()
 
 
 @method_decorator(can_edit_resource_instance, name="dispatch")

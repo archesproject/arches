@@ -70,29 +70,26 @@ class Resource(models.ResourceInstance):
         # end from models.ResourceInstance
         self.tiles = []
 
-    def get_descriptor(self, descriptor):
+    def get_descriptor(self, descriptor, context):
         graph_function = models.FunctionXGraph.objects.filter(
             graph_id=self.graph_id, function__functiontype="primarydescriptors"
         ).select_related("function")
         if len(graph_function) == 1:
             module = graph_function[0].function.get_class_module()()
             return module.get_primary_descriptor_from_nodes(
-                self, graph_function[0].config["descriptor_types"][descriptor]
+                self, graph_function[0].config["descriptor_types"][descriptor], context
             )
         else:
             return "undefined"
 
-    @property
-    def displaydescription(self):
-        return self.get_descriptor("description")
+    def displaydescription(self, context=None):
+        return self.get_descriptor("description", context)
 
-    @property
-    def map_popup(self):
-        return self.get_descriptor("map_popup")
+    def map_popup(self, context=None):
+        return self.get_descriptor("map_popup", context)
 
-    @property
-    def displayname(self):
-        return self.get_descriptor("name")
+    def displayname(self, context=None):
+        return self.get_descriptor("name", context)
 
     def save_edit(self, user={}, note="", edit_type="", transaction_id=None):
         timestamp = datetime.datetime.now()
@@ -274,9 +271,9 @@ class Resource(models.ResourceInstance):
         document["displayname"] = None
         document["root_ontology_class"] = self.get_root_ontology()
         document["legacyid"] = self.legacyid
-        document["displayname"] = self.displayname
-        document["displaydescription"] = self.displaydescription
-        document["map_popup"] = self.map_popup
+        document["displayname"] = self.displayname()
+        document["displaydescription"] = self.displaydescription()
+        document["map_popup"] = self.map_popup()
 
         tiles = list(models.TileModel.objects.filter(resourceinstance=self)) if fetchTiles else self.tiles
 
@@ -387,7 +384,7 @@ class Resource(models.ResourceInstance):
                 self.delete_index()
 
             try:
-                self.save_edit(edit_type="delete", user=user, note=self.displayname, transaction_id=transaction_id)
+                self.save_edit(edit_type="delete", user=user, note=self.displayname(), transaction_id=transaction_id)
             except:
                 pass
             super(Resource, self).delete()
