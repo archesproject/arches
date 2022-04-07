@@ -14595,6 +14595,10 @@ a.jstree-anchor.permissions-widget {
     }
 }
 
+.etl-manager-tabs {
+    background: #F7F9FB;
+}
+
 .etl-manager-tab {
     min-width: 150px;
     padding: 12px 20px;
@@ -14614,4 +14618,37 @@ a.jstree-anchor.permissions-widget {
     background-color: #fff;
     border-bottom: 1px solid #fff;
     font-weight: 600;
+}
+
+.etl-manager-filter-container {
+    margin: 50px;
+}
+
+.etl-manager-filter-button {
+    min-width: 150px;
+    padding: 12px 20px;
+    border: 1px solid #BBD1EA;
+    background: #F7F9FB;
+    font-size: 14px;
+    height: 45px;
+    display: inline-block;
+    text-align: center;
+}
+
+.etl-manager-filter-button:hover {
+    cursor: pointer;
+}
+
+.etl-manager-filter-button.active {
+    background-color: #fff;
+    font-weight: 600;
+}
+
+.etl-manager-filter-input {
+    min-width: 300px;
+    border: 1px solid #BBD1EA;
+    font-size: 12px;
+    height: 30px;
+    margin-left: 20px;
+    padding-left: 20px;
 }

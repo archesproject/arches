@@ -2,16 +2,16 @@
 
 <div class="workflow-plugin" style="display: flex; flex-direction: column;">
     <div class="etl-manager-tab-container">
-        <ul class="etl-manager-tabs">
+        <div class="etl-manager-tabs">
             <!-- ko foreach: {data: tabs, as: 'tab'} -->
-            <li class="etl-manager-tab" data-bind="click: function(){$parent.activeTab(tab.id)}, css: {active: $parent.activeTab() === tab.id}, text: tab.title"></li>
+            <div class="etl-manager-tab" data-bind="click: function(){$parent.activeTab(tab.id)}, css: {active: $parent.activeTab() === tab.id}, text: tab.title"></div>
             <!-- /ko -->
     </div>
     <div data-bind="if: activeTab() === 'start'">
-        <div class="etl-manager-tab-container">
-            <div class="etl-manager-tab" data-bind="click: function() { isImport(true); }, css: {active: isImport() }">Import</div>
-            <div class="etl-manager-tab" data-bind="click: function() { isImport(false); }, css: {active: !isImport() }">Export</div>
-            <input class="etl-manager-tab" type="text" placeholder = "Filter Modules..." data-bind="textInput: moduleSearchString">
+        <div class="etl-manager-filter-container">
+            <div class="etl-manager-filter-button" data-bind="click: function() { isImport(true); }, css: {active: isImport() }">Import</div>
+            <div class="etl-manager-filter-button" data-bind="click: function() { isImport(false); }, css: {active: !isImport() }">Export</div>
+            <input class="etl-manager-filter-input" type="text" placeholder = "Filter Modules..." data-bind="textInput: moduleSearchString">
         </div>
         <!-- ko ifnot: loading() -->
         <div class="workflow-select-plugin">
