@@ -313,7 +313,8 @@ class ResourceEditorView(MapBaseManagerView):
 
     def copy(self, request, resourceid=None):
         resource_instance = Resource.objects.get(pk=resourceid)
-        return JSONResponse(resource_instance.copy())
+        resource = resource_instance.copy()
+        return JSONResponse({"resourceid": resource.resourceinstanceid})
 
 
 @method_decorator(group_required("Resource Editor"), name="dispatch")
