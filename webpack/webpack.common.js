@@ -191,7 +191,7 @@ module.exports = {
             },
             {
                 test: /\.html?$/i,
-                use: ["html-loader"],
+                use: ["./arches/app/media/node_modules/html-loader"],
             },
             {
                 test: /\.txt$/i,
