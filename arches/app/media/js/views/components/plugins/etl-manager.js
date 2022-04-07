@@ -8,7 +8,19 @@ define([
             this.loading = params.loading;
             this.loading(true);
             this.selectedModule = ko.observable();
-
+            this.activeTab = ko.observable();
+            this.isImport = ko.observable(true);
+            this.moduleSearchString = ko.observable('');
+            this.tabs = [
+                {id: 'start', title: 'Start'},
+                {id: 'details', title: 'Task Details'},
+                {id: 'import', title: 'Import Tasks'},
+                {id: 'export', title: 'Export Tasks'},
+            ];
+            this.selectModule = function(etlmodule) {
+                self.selectedModule(etlmodule);
+                self.activeTab("details");
+            };
             this.init = function(){
                 window.fetch(arches.urls.etl_manager)
                     .then(function(response){
@@ -24,6 +36,7 @@ define([
                         });
                         self.loading(false);
                     });
+                this.activeTab("start");
             };
 
             this.init();

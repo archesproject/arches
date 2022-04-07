@@ -1,25 +1,75 @@
-<!-- ko ifnot: loading() || !!selectedModule() -->
-<div class="workflow-select-plugin">
-    <div class="workflow-select-card-container">
-        <!-- ko foreach: {data: etlModules, as: 'etlmodule'} -->
-        <a href="#" data-bind="click: function () { $parent.selectedModule(etlmodule) }"><div data-bind="style: {'background-color': etlmodule.config.bgColor}" class="workflow-select-card">
-            <h4 class="workflow-select-title" data-bind="text: etlmodule.name"></h4>
-            <div data-bind="style: {'background-color': etlmodule.config.circleColor}" class="workflow-select-wf-circle">
-                <span><i data-bind="attr:{class: ('fa '+etlmodule.icon +' workflow-select-wf-icon')}"></i></span>
+{% load i18n %}
+
+<div class="workflow-plugin" style="display: flex; flex-direction: column;">
+    <div class="etl-manager-tab-container">
+        <ul class="etl-manager-tabs">
+            <!-- ko foreach: {data: tabs, as: 'tab'} -->
+            <li class="etl-manager-tab" data-bind="click: function(){$parent.activeTab(tab.id)}, css: {active: $parent.activeTab() === tab.id}, text: tab.title"></li>
+            <!-- /ko -->
+    </div>
+    <div data-bind="if: activeTab() === 'start'">
+        <div class="etl-manager-tab-container">
+            <div class="etl-manager-tab" data-bind="click: function() { isImport(true); }, css: {active: isImport() }">Import</div>
+            <div class="etl-manager-tab" data-bind="click: function() { isImport(false); }, css: {active: !isImport() }">Export</div>
+            <input class="etl-manager-tab" type="text" placeholder = "Filter Modules..." data-bind="textInput: moduleSearchString">
+        </div>
+        <!-- ko ifnot: loading() -->
+        <div class="workflow-select-plugin">
+            <div class="workflow-select-card-container">
+                <!-- ko foreach: {data: etlModules, as: 'etlmodule', noChildContext: true} -->
+                    <!-- ko if: isImport() && (!moduleSearchString() || !!moduleSearchString() && etlmodule.name.toLowerCase().includes(moduleSearchString().toLowerCase()) ) -->
+                    <a href="#" data-bind="if: etlmodule.config.type === 'import', click: function() { selectModule(etlmodule) }">
+                        <div data-bind="style: {'background-color': etlmodule.config.bgColor}" class="workflow-select-card">
+                            <h4 class="workflow-select-title" data-bind="text: etlmodule.name"></h4>
+                            <div data-bind="style: {'background-color': etlmodule.config.circleColor}" class="workflow-select-wf-circle">
+                                <span><i data-bind="attr:{class: ('fa '+etlmodule.icon +' workflow-select-wf-icon')}"></i></span>
+                            </div>
+                            <p data-bind="text: etlmodule.description" class="workflow-select-desc"></p>
+                        </div>
+                    </a>
+                    <!-- /ko -->
+                    <!-- ko if: !isImport() && (!moduleSearchString() || !!moduleSearchString() && etlmodule.name.toLowerCase().includes(moduleSearchString().toLowerCase()) )-->
+                    <a href="#" data-bind="if: etlmodule.config.type === 'export', click: function() { selectModule(etlmodule) }">
+                        <div data-bind="style: {'background-color': etlmodule.config.bgColor}" class="workflow-select-card">
+                            <h4 class="workflow-select-title" data-bind="text: etlmodule.name"></h4>
+                            <div data-bind="style: {'background-color': etlmodule.config.circleColor}" class="workflow-select-wf-circle">
+                                <span><i data-bind="attr:{class: ('fa '+etlmodule.icon +' workflow-select-wf-icon')}"></i></span>
+                            </div>
+                            <p data-bind="text: etlmodule.description" class="workflow-select-desc"></p>
+                        </div>
+                    </a>
+                    <!-- /ko -->
+                <!-- /ko -->
             </div>
-            <p data-bind="text: etlmodule.description" class="workflow-select-desc"></p>
-        </div></a>
+        </div>
         <!-- /ko -->
     </div>
+    <div data-bind="if: activeTab() === 'details'">
+        <h1>details</h1>
+        <!-- ko if: selectedModule() -->
+        <div style="flex: 1 1 auto;">
+            <div class="content-panel">
+                <div class="" data-bind="component: {
+                    name: selectedModule().componentname,
+                    loading: selectedModule().loading,
+                    params: selectedModule(),
+                }"></div>
+            </div>
+            <div class="etl-module-buttons-container" style="align-items: center; padding: 10px 20px; display: flex; flex-direction:row; justify-content: flex-end;">
+                <button class="btn btn-success" style="margin-right: 10px;">
+                    <span>{% trans "Import data" %}</span>
+                </button>
+                <button class="btn btn-danger" style="margin-right: 10px;">
+                    <span>{% trans "Cancel File Import" %}</span>
+                </button>
+            </div>
+        </div>
+        <!-- /ko -->
+    </div>
+    <div data-bind="if: activeTab() === 'import'">
+        <h1>import</h1>
+    </div>
+    <div data-bind="if: activeTab() === 'export'">
+         <h1>export</h1>
+    </div>
 </div>
-<!-- /ko -->
-
-<!-- ko if: selectedModule() -->
-<div class="content-panel">
-    <div class="flex plugin-main" data-bind="component: {
-        name: selectedModule().componentname,
-        loading: selectedModule().loading,
-        params: selectedModule(),
-    }"></div>
-</div>
-<!-- /ko -->

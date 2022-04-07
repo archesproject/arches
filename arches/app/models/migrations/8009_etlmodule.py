@@ -51,7 +51,7 @@ add_csv_importer = """
         'import-single-csv',
         'import_single_csv.py',
         'ImportSingleCsv',
-        '{"bgColor": "#9591ef", "circleColor": "#b0adf3"}',
+        '{"bgColor": "#9591ef", "circleColor": "#b0adf3", "type": "import"}',
         'fa fa-upload',
         'import-single-csv');
     """

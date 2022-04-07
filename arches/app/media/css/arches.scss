@@ -14594,3 +14594,24 @@ a.jstree-anchor.permissions-widget {
         height: 0;
     }
 }
+
+.etl-manager-tab {
+    min-width: 150px;
+    padding: 12px 20px;
+    border: 1px solid #BBD1EA;
+    background: #F7F9FB;
+    font-size: 14px;
+    height: 45px;
+    display: inline-block;
+    text-align: center;
+}
+
+.etl-manager-tab:hover {
+    cursor: pointer;
+}
+
+.etl-manager-tab.active {
+    background-color: #fff;
+    border-bottom: 1px solid #fff;
+    font-weight: 600;
+}
