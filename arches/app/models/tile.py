@@ -401,7 +401,7 @@ class Tile(models.TileModel):
             user = None
 
         with transaction.atomic():
-            for nodeid, value in self.data.items():
+            for nodeid in self.data.keys():
                 node = models.Node.objects.get(nodeid=nodeid)
                 datatype = self.datatype_factory.get_instance(node.datatype)
                 datatype.pre_tile_save(self, nodeid)
