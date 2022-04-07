@@ -4092,6 +4092,7 @@ div.dropdown-menu.open {
     border-radius: 13px;
     height: 13px;
     width: 25px;
+    margin: 0 4px;
 }
 
 .switch-small>small {
@@ -7141,7 +7142,7 @@ ul div .card-tree-list span .card-tree-list-item .card-tree-list-icon {
 
 .panel-config .widget-config-container .control-label {
     padding-top: 5px;
-    padding-left: 5px;
+    // padding-left: 5px;
 }
 
 
@@ -8840,6 +8841,17 @@ div.row.widget-wrapper.report-header:hover {
     display: none;
 }
 
+.map-service-manage-control-label {
+    display: flex;
+    justify-content: flex-end;
+    margin: 0 20px;
+}
+
+.permission-user-group-container {
+    display: flex;
+    flex-direction: column;
+}
+
 .map-widget-container-expanded {
     top: 6px;
     right: 10px;
@@ -9530,6 +9542,19 @@ a.clear-geojson-button:hover {
     white-space: nowrap;
     overflow: scroll;
     text-overflow: ellipsis;
+}
+
+.map-style-panel-body-form-group {
+    display: flex;
+}
+
+.map-style-panel-body-control-label {
+    display: flex;
+    flex-direction: row-reverse;   
+}
+
+.clustering-pane-form-group {
+    display: flex;
 }
 
 .mapboxgl-canvas:focus {
@@ -10873,6 +10898,8 @@ table.table.dataTable {
         align-items: center;
         margin-bottom: 10px;
         display: flex;
+        flex-wrap: wrap;
+        flex-direction: column;
     }
 }
 
@@ -10890,6 +10917,16 @@ table.table.dataTable {
     }
 }
 
+.map-service-manage-layer-name {
+    display: flex;
+    align-items: center;
+}
+
+.map-service-manage-icon-selector {
+    display: flex;
+    flex-wrap: wrap;
+}
+
 .map-service-preview {
     background: #f4f4f4;
     border: 1px solid #ddd;
@@ -10901,18 +10938,17 @@ table.table.dataTable {
 }
 
 .advanced-map-style-switch {
-    margin-top: -45px;
+    margin-top: -35px;
     margin-right: 10px;
     margin-bottom: 10px;
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
 }
 
 .service-url {
     font-size: 12px;
     color: #999;
-}
-
-.service-switch-shim {
-    margin-top: 8px;
 }
 
 .config-title {
@@ -10954,6 +10990,7 @@ table.table.dataTable {
 
 .map-service-nav-tabs {
     background: #f6f6f6;
+    display: flex;
 }
 
 .service-widget-container {
@@ -10975,7 +11012,7 @@ table.table.dataTable {
 }
 
 .map-server-instructions {
-    padding: 0px 10px 20px 10px;
+    padding: 20px 10px 20px 10px;
     color: #808080;
 }
 
@@ -10987,6 +11024,9 @@ table.table.dataTable {
     border: 1px solid #ddd;
     background: #f9f9f9;
     margin-bottom: 0px;
+    display: flex;
+    flex-direction: column;
+    flex-wrap: wrap;
 }
 
 .hover-feature-loading {
@@ -14453,7 +14493,7 @@ a.jstree-anchor.permissions-widget {
 
     .dl-horizontal dd {
         padding-right: 20px;
-        margin-left: 220px;
+        margin-left: 0220px;
         word-break: break-word;
     }
 
@@ -14483,11 +14523,12 @@ a.jstree-anchor.permissions-widget {
     .dl-horizontal dt {
         width: 300px;
         margin-bottom: 0px;
+        display: flex;
+        flex-direction: row-reverse;
     }
 
     .dl-horizontal dd {
-        padding-right: 20px;
-        margin-left: 320px;
+        margin:0 320px;
         word-break: break-word;
     }
 
