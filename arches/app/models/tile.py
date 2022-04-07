@@ -648,7 +648,7 @@ class Tile(models.TileModel):
         try:
             for function in self._getFunctionClassInstances():
                 try:
-                    function.save(self, request, context)
+                    function.save(self, request, context=context)
                 except NotImplementedError:
                     pass
         except TypeError:
@@ -668,7 +668,7 @@ class Tile(models.TileModel):
         try:
             for function in self._getFunctionClassInstances():
                 try:
-                    function.post_save(self, request, context)
+                    function.post_save(self, request, context=context)
                 except NotImplementedError:
                     pass
         except TypeError as e:
