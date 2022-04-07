@@ -95,7 +95,7 @@ module.exports = {
             jQuery:  Path.resolve(__dirname, '../arches/app/media/node_modules/jquery/dist/jquery.min'),
             $:  Path.resolve(__dirname, '../arches/app/media/node_modules/jquery/dist/jquery.min'),
         }),
-        new BundleTracker({ filename: './webpack-stats.json' }),
+        new BundleTracker({ filename: './webpack/webpack-stats.json' }),
     ].concat(htmlWebpackPluginList),
     resolveLoader: {
         alias: {
@@ -195,7 +195,7 @@ module.exports = {
             },
             {
                 test: /\.txt$/i,
-                use: 'raw-loader',
+                use: './arches/app/media/node_modules/raw-loader',
             },
             {
                 test: /\.(png|svg|jpg|jpeg|gif)$/i,
