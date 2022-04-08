@@ -116,7 +116,7 @@
     </div>
 
     <div class="install-buttons">
-        <button class="btn btn-shim btn-danger btn-labeled btn-lg fa fa-refresh" data-bind="click: resetImageSettings">{% trans 'Reset to defaults' %}</button>
+        <button class="btn btn-shim btn-danger btn-labeled btn-lg fa fa-refresh" data-bind="click: resetImageSettings"><span>{% trans 'Reset to defaults' %}</span></button>
     </div>
 </div>
 <!--/ko -->
@@ -309,9 +309,9 @@
                 <button class="btn btn-shim btn-mint btn-labeled btn-lg fa fa-pencil" data-bind="click: getManifestData,
                     disabled: manifestLoading(),
                     css: { 'disabled': manifestLoading() }
-                ">{% trans 'Load manifest' %}</button>
+                "><span>{% trans 'Load manifest' %}</span></button>
                 <!--ko if: manifestData() -->
-                <button class="btn btn-shim btn-danger btn-labeled btn-lg fa fa-refresh" data-bind="click: toggleManifestEditor">{% trans 'Cancel' %}</button>
+                <button class="btn btn-shim btn-danger btn-labeled btn-lg fa fa-refresh" data-bind="click: toggleManifestEditor"><span>{% trans 'Cancel' %}</span></button>
                 <!--/ko -->
                 <!--ko if: manifestLoading() -->
                 <span class="manifest-editor-loading">

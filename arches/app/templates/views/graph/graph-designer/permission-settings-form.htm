@@ -72,9 +72,9 @@
             <!-- Buttons -->
             <!-- ko with: permissionsDesigner.permissionSettingsForm -->
             <div class="permission-buttons mar-btm">
-                <button id="cc-delete-btn" class="btn btn-shim btn-danger btn-labeled btn-lg fa fa-times mar-rgt disabled" data-bind="click: revert, css: {'disabled': selectedCards().length === 0 || selectedIdentities().length === 0}">{% trans "Revert Permissions" %}
+                <button id="cc-delete-btn" class="btn btn-shim btn-danger btn-labeled btn-lg fa fa-times mar-rgt disabled" data-bind="click: revert, css: {'disabled': selectedCards().length === 0 || selectedIdentities().length === 0}"><span>{% trans "Revert Permissions" %}</span>
                 </button>
-                <button id="cc-save-btn" class="btn btn-shim btn-primary btn-labeled btn-lg fa fa-check disabled" data-bind="click: save, css: {'disabled': selectedCards().length === 0 || selectedIdentities().length === 0}">{% trans "Apply Permissions" %}</button>
+                <button id="cc-save-btn" class="btn btn-shim btn-primary btn-labeled btn-lg fa fa-check disabled" data-bind="click: save, css: {'disabled': selectedCards().length === 0 || selectedIdentities().length === 0}"><span>{% trans "Apply Permissions" %}</span></button>
             </div>
             <!--/ko-->
     

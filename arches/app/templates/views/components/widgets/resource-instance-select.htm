@@ -150,7 +150,7 @@
     data-bind="style: {transform: !!reportResourceId() ? 'translate(0,0)' : 'translate(100%,0)'}">
     <div class="create-instance-header" style="display: flex; justify-content: space-between;">{% trans "Related Resource Summary" %}
         <div data-bind="click: function(){reportResourceId(null)}, clickBubble: false" class="close-new-step">
-            <button class="btn btn-labeled btn-lg fa fa-arrow-right btn-primary">{% trans "Return" %}</button>
+            <button class="btn btn-labeled btn-lg fa fa-arrow-right btn-primary"><span>{% trans "Return" %}</span></button>
         </div>
     </div>
     <div class="create-instance-panel" data-bind="component: {

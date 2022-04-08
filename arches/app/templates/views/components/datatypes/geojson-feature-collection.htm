@@ -1,37 +1,41 @@
 {% load i18n %}
 <!-- ko if: $data.layer -->
-<div class="row map-service-container relative">
+<div class="row map-service-container">
 
-    <!-- Save/discard edits buttons (for convenience) -->
-    <!-- ko if: node.dirty() -->
-    <div class="resource-service-buttons-heading">
-        <button class="btn btn-primary btn-labeled btn-active-dark fa fa-check pull-right mar-top" data-bind="click: function () { saveNode() }">{% trans "Save Edits" %}</button>
-        <button class="btn btn-mint btn-labeled btn-active-dark fa fa-undo pull-right mar-top" data-bind="click: function () { node.reset() }">{% trans "Discard Edits" %}</button>
-    </div>
-    <!-- /ko -->
 
-    <h3 class="config-title" style="margin-top: -10px; margin-bottom: 0px;"><i class="fa fa-binoculars"></i> {% trans "Layer Preview" %} <span class="service-url text-semibold" data-bind="text: serviceURL"></span></h3>
+    <div>
+        <h3 class="config-title"><i class="fa fa-binoculars"></i> {% trans "Layer Preview" %} <span class="service-url text-semibold" data-bind="text: serviceURL"></span></h3>
+        
+        <!-- Save/discard edits buttons (for convenience) -->
+        <!-- ko if: node.dirty() -->
+        <div class="resource-service-buttons-heading">
+            <button class="btn btn-primary btn-labeled btn-active-dark fa fa-check pull-right mar-top" data-bind="click: function () { saveNode() }"><span>{% trans "Save Edits" %}</span></button>
+            <button class="btn btn-mint btn-labeled btn-active-dark fa fa-undo pull-right mar-top" data-bind="click: function () { node.reset() }"><span>{% trans "Discard Edits" %}</span></button>
+        </div>
+        <!-- /ko -->
 
-    <div class="map-service-manage-buttons">
-        <div class="form-group">
-            <label class="control-label text-semibold">{% trans "Activated:" %}</label>
-            <span class="switch switch-small" data-bind="css: {
-                    'on': config.layerActivated()
-                }, click: function () {
-                    config.layerActivated(!config.layerActivated());
-                }">
-                <small></small>
-            </span>
+        <div class="map-service-manage-buttons">
+            <div class="form-group">
+                <label class="control-label text-semibold">{% trans "Activated:" %}</label>
+                <span class="switch switch-small" data-bind="css: {
+                        'on': config.layerActivated()
+                    }, click: function () {
+                        config.layerActivated(!config.layerActivated());
+                    }">
+                    <small></small>
+                </span>
+            </div>
+        </div>
+        <div class="btn-group map-server-basemap-button">
+            <button class="dropdown-toggle btn" data-toggle="dropdown" aria-expanded="false"><i class="fa fa-globe"></i></button>
+            <ul class="dropdown-menu dropdown-menu-right">
+                <!-- ko foreach: basemaps -->
+                <li><a href="#" data-bind="text: name, click: function () { select(); }"></a></li>
+                <!-- /ko -->
+            </ul>
         </div>
     </div>
-    <div class="btn-group map-server-basemap-button">
-        <button class="dropdown-toggle btn" data-toggle="dropdown" aria-expanded="false"><i class="fa fa-globe"></i></button>
-        <ul class="dropdown-menu dropdown-menu-right">
-            <!-- ko foreach: basemaps -->
-            <li><a href="#" data-bind="text: name, click: function () { select(); }"></a></li>
-            <!-- /ko -->
-        </ul>
-    </div>
+    
     <!-- ko if: !loading() -->
     <div class="map-service-preview" style="padding:0;" data-bind="mapboxgl: {
             mapOptions: {
@@ -373,8 +377,8 @@
                     </div>
                 </div>
                 <!-- ko if: node.dirty() -->
-                <button class="btn btn-primary btn-labeled btn-active-dark fa fa-check pull-right mar-top" data-bind="click: function () { saveNode() }">{% trans "Save Edits" %}</button>
-                <button class="btn btn-mint btn-labeled btn-active-dark fa fa-undo pull-right mar-top" data-bind="click: function () { node.reset() }">{% trans "Discard Edits" %}</button>
+                <button class="btn btn-primary btn-labeled btn-active-dark fa fa-check pull-right mar-top" data-bind="click: function () { saveNode() }"><span>{% trans "Save Edits" %}</span></button>
+                <button class="btn btn-mint btn-labeled btn-active-dark fa fa-undo pull-right mar-top" data-bind="click: function () { node.reset() }"><span>{% trans "Discard Edits" %}</span></button>
                 <!-- /ko -->
             </div>
         </div>
