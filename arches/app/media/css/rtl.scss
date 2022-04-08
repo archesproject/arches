@@ -10,3 +10,26 @@
         }
     }
 }
+
+.jstree-default{
+    .jstree-anchor {
+        .jstree-leading-icon{
+            margin-left: 5px;
+            margin-right: 0px;
+        }
+    }
+    &.jstree-rtl{
+        .jstree-node {
+            margin: 0 20px;
+            &.jstree-open {
+                > .jstree-icon:not(.jstree-ocl) {
+                    background-position: -36px -36px;
+                }
+            }
+        }
+
+        .jstree-icon{
+            background-position: -4px -36px;
+        }
+    }
+}

@@ -156,6 +156,7 @@ define([
         graphiconclass: data.graphiconclass,
         relationship_types: data.relationship_types,
         userIsCreator: userIsCreator,
+        showGrid: ko.observable(false),
         creator: creator,
         // appliedFunctions: appliedFunctions(),
         graph: {
@@ -171,6 +172,10 @@ define([
         collapseAll: function() {
             toggleAll(false);
         },
+        toggleGrid: () => {
+            vm.showGrid(!vm.showGrid());
+        },
+        activeLanguageDir: ko.observable(arches.activeLanguageDir),
         rootExpanded: ko.observable(true),
         topCards: topCards,
         selection: selection,

@@ -38,7 +38,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
     <div style="height: inherit;" class="flex">
         <div class="left-panel graph-designer" data-bind="resizableSidepanel:true">
             <div class="left-panel-inner-container">
-                <div class="jstree jstree-default" data-bind="visible: true" style="display: none;">
+                <div class="jstree jstree-default" data-bind="visible: true, css: {'jstree-rtl': activeLanguageDir() == 'rtl' }" style="display: none;">
                     <div class="header">
                         <div class="list-filter" data-bind="">
                             <input type="text" class="form-control" style="width: 100%;" placeholder="{% trans 'Find a card...' %}" data-bind="textInput: filter, event: {keypress: filterEnterKeyHandler}">
@@ -46,15 +46,16 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                             <!-- Clear Search -->
                             <span class="clear-node-search" data-bind="visible: filter().length > 0, click: function() { filter(''); }"><i class="fa fa-times-circle"></i></span>
                         </div>
-                        <div>
+                        <div class="tools">
                             <a class="tree-display-tool" data-bind="click: expandAll"><i class="ion-plus"></i>{% trans ' Expand' %}</a>
                             <a class="tree-display-tool" data-bind="click: collapseAll"><i class="ion-minus"></i>{% trans ' Collapse' %}</a>
+                            <a class="tree-display-tool" data-bind="click: toggleGrid"><i class="fa fa-ellipsis-v"></i>{% trans ' Grid' %}</a>
                         </div>
                     </div>
                     <div class="resource-editor-tree">
-                        <ul class="jstree-container-ul jstree-children" aria-expanded="true">
-                        <li role="treeitem" class="jstree-node" data-bind="css: {'jstree-open': rootExpanded, 'jstree-closed' : !rootExpanded()}">
-                            <i class="jstree-icon jstree-ocl" role="presentation" data-bind="click: function(){rootExpanded(!rootExpanded())}"></i>
+                        <ul class="jstree-container-ul jstree-children jstree-striped" aria-expanded="true">
+                        <li role="treeitem" class="jstree-node" data-bind="css: {'jstree-open': rootExpanded, 'jstree-closed' : !rootExpanded(), 'hide-background': !showGrid()}">
+                            <i class="jstree-icon" role="presentation" data-bind="click: function(){rootExpanded(!rootExpanded())}, css: {'jstree-ocl': showGrid}"></i>
                             <a class="jstree-anchor" href="#" tabindex="-1" data-bind="click: function () { selection('root'); }, css: {'jstree-clicked': selection() === 'root'}">
                                 <strong>
                                     <i data-bind="css: graphiconclass != (null || '') ? graphiconclass : 'fa fa-question'" role="presentation"></i>
@@ -81,8 +82,8 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                             <!-- /ko -->
                         </li>
                         <!--ko ifnot: issystemsettings -->
-                        <li role="treeitem" class="jstree-node jstree-open" data-bind="css: {'disabled': resourceId()}">
-                            <i class="jstree-icon jstree-ocl" role="presentation"></i>
+                        <li role="treeitem" class="jstree-node jstree-open" data-bind="css: {'disabled': resourceId(), 'hide-background': !showGrid()}">
+                            <i class="jstree-icon" role="presentation" data-bind="css: {'jstree-ocl': showGrid}"></i>
                             <a class="jstree-anchor" href="#" tabindex="-1" data-bind="click: function(){if (resourceId()){showRelatedResourcesManager()}}, css: {'jstree-clicked': selection() === 'related-resources', 'disabled': resourceId() === ''}">
                                 <strong>
                                     <i class="fa fa-link" role="presentation"></i>
@@ -91,8 +92,8 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                             </a>
                         </li>
                         <!--/ko-->
-                        <li role="treeitem" class="jstree-node jstree-open" data-bind="css: {'disabled': resourceId()}">
-                            <i class="jstree-icon jstree-ocl" role="presentation"></i>
+                        <li role="treeitem" class="jstree-node jstree-open" data-bind="css: {'disabled': resourceId(), 'hide-background': !showGrid()}">
+                            <i class="jstree-icon" role="presentation" data-bind="css: {'jstree-ocl': showGrid}"></i>
                             <a class="jstree-anchor" href="#" tabindex="-1" data-bind="click: function(){if (resourceId()){showInstancePermissionsManager(self)}}, css: {'jstree-clicked': selection() === 'resource-permissions', 'disabled': resourceId() === '' || userIsCreator === false }">
                                 <strong>
                                     <i class="fa fa-lock" role="presentation"></i>

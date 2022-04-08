@@ -136,19 +136,19 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 
                 <div class="tab-content set-variable-pixel-height">
                     <div style="width: 100%" class="tab-pane fade in" data-bind="css: { active: activeTab() === 'graph' }">
-                        <div style="height:100%;" class="" data-bind="with: graphTree">
+                        <div style="height:100%;" class="jstree jstree-default" data-bind="with: graphTree, css: {'jstree-rtl': activeLanguageDir() == 'rtl' }">
                             {% include 'views/graph/graph-designer/graph-tree.htm' %}
                         </div>
                     </div>
     
                     <div style="width: 100%" class="tab-pane fade in" data-bind="css: { active: activeTab() === 'card' }">
-                        <div style="height:100%;" class="jstree jstree-default" data-bind="visible: true, with: cardTree" style="display: none;">
+                        <div style="height:100%;" class="jstree jstree-default" data-bind="visible: true, with: cardTree, css: {'jstree-rtl': activeLanguageDir() == 'rtl' }" style="display: none;">
                             {% include 'views/graph/graph-designer/card-tree.htm' %}
                         </div>
                     </div>
     
                     <div style="width: 100%" class="tab-pane fade in" data-bind="css: { active: activeTab() === 'permissions' }">
-                        <div style="height:100%;" class="jstree jstree-default" data-bind="visible: true, with: permissionTree" style="display: none;">
+                        <div style="height:100%;" class="jstree jstree-default" data-bind="visible: true, with: permissionTree, css: {'jstree-rtl': activeLanguageDir() == 'rtl' }" style="display: none;">
                             {% include 'views/graph/graph-designer/card-tree-permissions.htm' %}
                         </div>
                     </div>
