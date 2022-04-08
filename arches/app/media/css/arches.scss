@@ -24,6 +24,7 @@
 @import url(../css/base-manager.css);
 @import "sidenav.scss";
 @import "edit-history.scss";
+@import "jqtree.scss";
 
 img {
     image-orientation: from-image;
@@ -3883,17 +3884,14 @@ ul.nav.nav-tabs.nav-justified {
 }
 
 .graph-settings-switch-label {
-    margin-top: -20px;
-    margin-right: 40px;
-    margin-bottom: 0px;
     margin-left: 40px;
+    margin-top: -20px;
+    margin-bottom: 0px;
 }
 
 .graph-settings-switch-subtitle {
-    margin-top: -5px;
-    margin-right: 40px;
-    margin-bottom: 0px;
     margin-left: 40px;
+    margin-top: -5px;
     display: inline-block;
     color: #5F7D9A;
     position: relative;
@@ -5289,101 +5287,6 @@ div.dropdown-menu.open {
     padding: 13px;
 }
 
-ul.jqtree-tree 
-{
-    div.jqtree_common {
-        display: block;
-        color: #333;
-        border: 1px solid #ccc;
-        text-decoration: none;
-        font-weight: 700;
-        background: linear-gradient(top, #fafafa0, #eee100);
-        border-radius: 3px;
-        box-sizing: border-box;
-        margin: 5px 0;
-        padding: 5px 10px;
-    }
-
-    li.jqtree-selected>.jqtree-element,
-    li.jqtree-selected>.jqtree-element:hover {
-        background-color: #ddd;
-        text-shadow: 0 1px 0 rgba(255, 255, 255, 0.7);
-    }
-    
-    div.jqtree_common:hover {
-        color: #2ea8e5;
-        background: #fff;
-    }
-
-    li.jqtree-folder {
-        display: block;
-        font-size: 13px;
-        line-height: 20px;
-        margin: 0;
-        padding: 0;
-    }
-    
-    .jqtree-title {
-        color: #1C4257;
-        vertical-align: middle;
-        margin-left: 0;
-    }
-
-    .jqtree-loading>div a {
-        content: url(../img/select2-spinner.gif);
-    }
-    
-    li.jqtree-ghost {
-        margin: 0;
-    }
-
-    li.jqtree-ghost span.jqtree-line {
-        background-color: #fff;
-        opacity: 0.6;
-        border: dashed 1px #00f;
-        height: 35px;
-    }
-
-    .jqtree-toggler{
-        margin: 0 5px;
-    }
-
-    ul.jqtree_common {
-        list-style: none outside;
-        margin-left: 12px;
-        margin-right: 0;
-        margin-bottom: 2px;
-    }
-
-    div.jqtree-element.jqtree_common {
-
-        display: flex;
-        flex-direction: row-reverse;
-    }
-    
-    .jqtree-title.jqtree_common, .jqtree-title.jqtree_common.jqtree-title-folder  {
-        font-size: 13px;
-        flex: 1;
-        margin: 0 1.5em;
-    }
-    
-    li.jqtree-selected>.jqtree-element,
-    li.jqtree-selected>.jqtree-element:hover {
-        background: none;
-        background-color: #49596A;
-        text-shadow: none;
-    }
-}
-
-.jqtree-border {
-    border: dashed 1px #00f;
-    -webkit-border-radius: 3px !important;
-    border-radius: 3px !important;
-    box-sizing: border-box;
-    -moz-box-sizing: border-box;
-    padding: 0 5px;
-}
-
 .concept_result {
     font-weight: 700;
 }
@@ -5564,7 +5467,6 @@ ul.jqtree-tree
 }
 
 #nodeCrud.hidden,
-ul.jqtree-tree li.jqtree-ghost span.jqtree-circle,
 .node_info.hidden {
     display: none;
 }
@@ -5974,23 +5876,6 @@ div.card-grid-item.selected {
     height: 48px;
     min-width: 300px;
     max-width: 600px;
-}
-
-div.jqtree-element.jqtree_common:hover {
-    background-color: #49596A;
-}
-
-div.jqtree-element.jqtree_common {
-    text-overflow: ellipsis;
-    padding: 2px 0;
-}
-
-ul.jqtree-tree .jqtree-element {
-    color: #93a6b9;
-}
-
-ul.jqtree_common li.jqtree-folder {
-    margin-bottom: 4px;
 }
 
 #container #profile-table td {
@@ -7508,21 +7393,20 @@ ul .card-tree-list a .node-subname {
 
 .toggle-container {
     padding-bottom: 15px;
-    padding-right: 5px;
+    padding-right: 15px;
     padding-top: 0px;
     padding-left: 5px;
 }
 
 .arches-toggle-sm {
-    margin-top: -17px;
-    margin-right: 40px;
-    margin-bottom: 0px;
     margin-left: 40px;
+    margin-top: -17px;
+    margin-bottom: 0;
     font-size: 12px;
 }
 
 .arches-toggle-subtitle {
-    margin: 0 40px;
+    margin-left: 40px;
     display: inline-block;
     color: #5F7D9A;
     font-size: 12px;
@@ -7565,11 +7449,9 @@ li.search-field {
 .btn-flat:focus,
 .help-close:hover,
 #aside .nav-tabs a i:hover,
-.jqtree-title.jqtree_common:hover,
 .btn-flat:focus,
 .help-close:hover,
 #aside .nav-tabs a i:hover,
-.jqtree-title.jqtree_common:hover,
 .btn-flat:focus,
 .help-close:hover {
     color: #123;
