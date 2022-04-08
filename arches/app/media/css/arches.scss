@@ -2636,7 +2636,7 @@ label.form-checkbox.form-normal{
         content: '';
         margin: 0 5px;
         display: block;
-        position: absolute;
+        position: unset;
         width: 16px;
         height: 16px;
         background-color: transparent;
