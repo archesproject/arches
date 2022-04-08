@@ -2,15 +2,16 @@ define([
     'jquery',
     'underscore',
     'knockout',
-    'arches',
     'views/components/search/base-filter',
-    'report-templates',
-    'card-components',
     'models/report',
     'viewmodels/card',
     'views/components/resource-report-abstract',
     'bindings/chosen'
-], function($, _, ko, arches, BaseFilter, reportLookup, cardComponents, ReportModel, CardViewModel) {
+], function($, _, ko, BaseFilter, ReportModel, CardViewModel) {
+    const reportLookup = window['report-templates'];
+    const cardComponents = window['card-components'];
+
+    
     var componentName = 'search-result-details';
     return ko.components.register(componentName, {
         viewModel: BaseFilter.extend({

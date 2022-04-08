@@ -3,9 +3,8 @@ define([
     'underscore',
     'backbone',
     'knockout',
-    'arches',
     'bindings/chosen'
-], function($, _, Backbone, ko, arches) {
+], function($, _, Backbone, ko) {
     var NodeFormView = Backbone.View.extend({
         /**
         * A backbone view representing a node form

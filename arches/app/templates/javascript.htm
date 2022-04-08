@@ -218,6 +218,14 @@
         {% endfor %}
     {% endautoescape %}
 
+    window['datatype-config-components'] = {% autoescape off %} 
+        {% for datatype in datatypes %}
+            {% if datatype.configcomponent != None %}
+            "{{ datatype.configcomponent }}",
+            {% endif %}
+        {% endfor %}
+    {% endautoescape %}
+
     window.arches = {
             urls: {
                 root: "{% url 'root' %}",

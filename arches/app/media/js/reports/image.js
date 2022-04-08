@@ -3,10 +3,11 @@ define([
     'knockout',
     'knockout-mapping',
     'viewmodels/report',
-    'arches',
     'knockstrap',
     'bindings/chosen'
-], function(_, ko, koMapping, ReportViewModel, arches) {
+], function(_, ko, koMapping, ReportViewModel) {
+    const arches = window.arches;
+
     return ko.components.register('image-report', {
         viewModel: function(params) {
             var self = this;

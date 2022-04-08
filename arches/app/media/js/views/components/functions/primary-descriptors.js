@@ -1,11 +1,12 @@
 define(['jquery',
     'underscore',
-    'arches',
     'knockout',
     'knockout-mapping',
     'viewmodels/function',
     'bindings/chosen'],
-function($, _, arches, ko, koMapping, FunctionViewModel, chosen) {
+function($, _, ko, koMapping, FunctionViewModel, chosen) {
+    const arches = window.arches;
+
     return ko.components.register('views/components/functions/primary-descriptors', {
         viewModel: function(params) {
             FunctionViewModel.apply(this, arguments);

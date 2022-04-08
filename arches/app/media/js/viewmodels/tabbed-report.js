@@ -3,10 +3,11 @@ define([
     'underscore',
     'knockout',
     'knockout-mapping',
-    'arches',
     'viewmodels/report',
     'bindings/chosen',
-], function($, _, ko, koMapping, arches, ReportViewModel) {
+], function($, _, ko, koMapping, ReportViewModel) {
+    const arches = window.arches;
+
     return function(params) {
         var self = this;
 

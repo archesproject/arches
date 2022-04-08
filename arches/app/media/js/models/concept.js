@@ -1,4 +1,6 @@
-define(['arches', 'models/abstract'], function (arches, AbstractModel) {
+define(['models/abstract'], function (AbstractModel) {
+    const arches = window.arches;
+
     return AbstractModel.extend({
         url: arches.urls.concept,
 

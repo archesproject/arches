@@ -1,4 +1,4 @@
-define(['jquery', 'backbone', 'arches', 'views/concept-search', 'models/concept', 'models/value'], function ($, Backbone, arches, ConceptSearch, ConceptModel, ValueModel) {
+define(['jquery', 'backbone', 'views/concept-search', 'models/concept', 'models/value'], function ($, Backbone, ConceptSearch, ConceptModel, ValueModel) {
     return Backbone.View.extend({
 
         initialize: function(e){

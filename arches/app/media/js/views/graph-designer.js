@@ -15,14 +15,13 @@ define([
     'views/graph/permission-designer',
     'viewmodels/graph-settings',
     'viewmodels/card',
-    'report-templates',
     'bindings/resizable-sidepanel',
-    'datatype-config-components',
     'views/components/simple-switch',
     'utils/set-csrf-token'
-], function($, _, ko, koMapping, BaseManagerView, AlertViewModel, JsonErrorAlertViewModel, GraphModel, ReportModel, GraphTree, NodeFormView, BranchListView, CardTreeViewModel, PermissionDesigner, GraphSettingsViewModel, CardViewModel, reportLookup) {
+], function($, _, ko, koMapping, BaseManagerView, AlertViewModel, JsonErrorAlertViewModel, GraphModel, ReportModel, GraphTree, NodeFormView, BranchListView, CardTreeViewModel, PermissionDesigner, GraphSettingsViewModel, CardViewModel) {
     const viewData = window['view-data'];
     const data = window['graph-designer-data'];
+    const reportLookup = window['report-templates'];
     const arches = window.arches;
 
     var GraphDesignerView = BaseManagerView.extend({

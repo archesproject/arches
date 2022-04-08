@@ -2,18 +2,17 @@ require([
     'jquery',
     'underscore',
     'knockout',
-    'arches',
     'views/graph/graph-page-view',
     'viewmodels/alert-json',
     'views/graph/function-manager/function-list',
     'views/graph/function-manager/applied-function-list',
     'models/function',
     'models/function-x-graph',
-    'function-templates',
-    'component-templates'
-], function($, _, ko, arches, GraphPageView, JsonErrorAlertViewModel, FunctionList, AppliedFunctionList, FunctionModel, FunctionXGraphModel) {
+], function($, _, ko, GraphPageView, JsonErrorAlertViewModel, FunctionList, AppliedFunctionList, FunctionModel, FunctionXGraphModel) {
     const baseData = window['graph-base-data'];
     const data = window['graph-functions-data'];
+    const arches = window.arches;
+
     /**
     * set up the page view model with the graph model and related sub views
     */

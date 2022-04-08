@@ -2,11 +2,10 @@ require([
     'jquery',
     'underscore',
     'knockout',
-    'arches',
     'moment',
     'views/base-manager',
     'bindings/chosen'
-], function($, _, ko, arches, moment, BaseManagerView) {
+], function($, _, ko, moment, BaseManagerView) {
     const data = window['resource-edit-history-data'];
     var ResourceEditLogView = BaseManagerView.extend({
         initialize: function(options){

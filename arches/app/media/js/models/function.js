@@ -1,10 +1,10 @@
 define([
-    'arches',
     'models/abstract',
     'knockout',
     'knockout-mapping',
     'underscore'
-], function(arches, AbstractModel, ko, koMapping, _) {
+], function(AbstractModel, ko, koMapping, _) {
+    const arches = window.arches;
 
     var FunctionModel = AbstractModel.extend({
         /**

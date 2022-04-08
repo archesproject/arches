@@ -1,4 +1,4 @@
-define(['knockout', 'proj4', 'arches', 'turf'], function (ko, proj4, arches, turf) {
+define(['knockout', 'proj4', 'turf'], function (ko, proj4, turf) {
     /**
     * A base viewmodel for maptools
     *
@@ -7,6 +7,9 @@ define(['knockout', 'proj4', 'arches', 'turf'], function (ko, proj4, arches, tur
     *
     * @param  {string} params - a configuration object
     */
+
+    const arches = window.arches;
+
     var XYInputViewModel = function(params) {
         var self = this;
         var mapWidget = params.mapWidget;

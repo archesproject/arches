@@ -1,4 +1,6 @@
-define(['jquery', 'backbone', 'arches', 'models/concept', 'models/value'], function ($, Backbone, arches, ConceptModel, ValueModel) {
+define(['jquery', 'backbone', 'models/concept', 'models/value'], function ($, Backbone, ConceptModel, ValueModel) {
+    const arches = window.arches;
+
     return Backbone.View.extend({
 
         initialize: function(e){

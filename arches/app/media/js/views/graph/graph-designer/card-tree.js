@@ -4,14 +4,13 @@ define([
     'knockout',
     'viewmodels/card',
     'models/card-widget',
-    'arches',
     'uuid',
     'bindings/sortable',
     'bindings/scrollTo',
-    'widgets',
-    'card-components'
-], function($, _, ko, CardViewModel, CardWidgetModel, arches, uuid) {
+], function($, _, ko, CardViewModel, CardWidgetModel, uuid) {
     const data = window['graph-designer-data'];
+    const arches = window.arches;
+
     var CardTreeViewModel = function(params) {
         var self = this;
         var filter = ko.observable('');

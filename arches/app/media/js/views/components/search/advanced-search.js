@@ -4,7 +4,6 @@ define([
     'knockout',
     'knockout-mapping',
     'views/components/search/base-filter',
-    'datatype-config-components',
     'bindings/let',
 ], function($, _, ko, koMapping, BaseFilter) {
     const arches = window.arches;

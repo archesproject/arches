@@ -1,9 +1,10 @@
 define([
     'jquery',
     'backbone',
-    'arches',
     'jqtree'
-], function($, Backbone, arches) {
+], function($, Backbone) {
+    const arches = window.arches;
+
     return Backbone.View.extend({
 
         events: {

@@ -3,8 +3,7 @@ define([
     'views/graph/graph-manager/graph-base',
     'models/graph',
     'knockout',
-    'arches'
-], function(ListView, GraphBase, GraphModel, ko, arches) {
+], function(ListView, GraphBase, GraphModel, ko) {
     var BranchList = ListView.extend({
         /**
         * A backbone view to manage a list of branch graphs

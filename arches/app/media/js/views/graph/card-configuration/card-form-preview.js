@@ -2,9 +2,10 @@ define([
     'backbone',
     'underscore',
     'knockout',
-    'widgets',
     'bindings/sortable'
-], function(Backbone, _, ko, widgets) {
+], function(Backbone, _, ko) {
+    const widgets = window['widgets'];
+
     var CardFormPreview = Backbone.View.extend({
         /**
         * A backbone view representing a card form preview
