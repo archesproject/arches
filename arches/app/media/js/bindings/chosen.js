@@ -2,8 +2,9 @@ define([
     'jquery',
     'underscore',
     'knockout',
+    'arches',
     'chosen'
-], function ($, _, ko) {
+], function ($, _, ko, arches) {
     /**
     * A knockout.js binding for the "chosen.js" select box - https://harvesthq.github.io/chosen/
     * - pass options to chosen using the following syntax in the knockout data-bind attribute
@@ -17,7 +18,8 @@ define([
             var $element = $(element);
             var options = ko.unwrap(valueAccessor());
             var defaults = {
-                search_contains: true
+                search_contains: true,
+                rtl: arches.activeLanguageDir == "rtl"
             };
             
             if (options.disabled === true) {
