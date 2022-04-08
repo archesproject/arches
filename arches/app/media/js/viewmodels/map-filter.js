@@ -195,7 +195,6 @@ define(['underscore', 'knockout'], function(_, ko) {
         };
 
         this.setupDraw = function() {
-            console.log('setting draw back up')
             require(['mapbox-gl-draw'], (MapboxDraw) => {
                 var self = this;
                 if (!this.draw) {
