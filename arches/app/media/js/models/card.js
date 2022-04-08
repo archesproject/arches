@@ -18,6 +18,7 @@ define([
     'views/components/cards/related-resources-map',
 
     'reports/default',
+    'reports/map',
 
     'views/components/datatypes/boolean',
     'views/components/datatypes/concept',

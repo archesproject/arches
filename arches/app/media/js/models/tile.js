@@ -1,4 +1,4 @@
-define(['models/abstract'], function(AbstractModel) {
+define(['models/abstract', 'utils/set-csrf-token'], function(AbstractModel) {
     const arches = window.arches;
     return AbstractModel.extend({
         url: arches.urls.tile,

@@ -94,6 +94,7 @@ module.exports = {
             jquery:  Path.resolve(__dirname, '../arches/app/media/node_modules/jquery/dist/jquery.min'),
             jQuery:  Path.resolve(__dirname, '../arches/app/media/node_modules/jquery/dist/jquery.min'),
             $:  Path.resolve(__dirname, '../arches/app/media/node_modules/jquery/dist/jquery.min'),
+            // select2: Path.resolve(__dirname, '../arches/app/media/node_modules/select2/select2.js'),
         }),
         new BundleTracker({ filename: './webpack/webpack-stats.json' }),
     ].concat(htmlWebpackPluginList),

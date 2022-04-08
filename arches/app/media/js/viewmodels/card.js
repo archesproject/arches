@@ -8,7 +8,8 @@ define([
     'require',
     'uuid',
     'utils/dispose',
-    'viewmodels/tile'
+    'viewmodels/tile',
+    'utils/set-csrf-token'
 ], function($, _, ko, koMapping, CardModel, CardWidgetModel, require, uuid, dispose) {
     /**
     * A viewmodel used for generic cards

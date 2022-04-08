@@ -55,6 +55,6 @@ define([
                     .setData(featureCollection);
             });
         },
-        template: { require: 'text!templates/views/components/map.htm' }
+        template: window['map-component-template']
     });
 });
