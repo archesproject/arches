@@ -143,10 +143,11 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
             <!--ko if: selection() === 'root' -->
                 <!--ko if: resourceId() -->
                 <div class='resource-report editor-report' data-bind='component: {
-                    name: reportLookup[report.get("template_id")()].componentname,
+                    name: "resource-report-abstract",
                     params: {
                         report: report,
-                        editorContext: true
+                        editorContext: true,
+                        cache: false
                     }
                 }'></div>
                 <!--/ko -->
