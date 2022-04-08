@@ -5,14 +5,14 @@ define([
     'viewmodels/card-component',
     'viewmodels/card-multi-select',
     'views/components/workbench',
-    'file-renderers',
     'bindings/slide',
     'bindings/fadeVisible',
     'bindings/scroll-to-file',
     'dropzone',
     'bindings/dropzone'
-], function($, ko, uuid, CardComponentViewModel, CardMultiSelectViewModel, WorkbenchComponentViewModel, fileRenderers) {
+], function($, ko, uuid, CardComponentViewModel, CardMultiSelectViewModel, WorkbenchComponentViewModel) {
     const arches = window.arches;
+    const fileRenderers = window['file-renderers']
 
     return ko.components.register('file-viewer', {
         viewModel: function(params) {

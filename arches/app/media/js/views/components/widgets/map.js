@@ -11,7 +11,6 @@ define([
     'bindings/fadeVisible',
     'bindings/mapbox-gl',
     'bindings/color-picker',
-    'geocoder-templates'
 ], function(_, ko, koMapping, WidgetViewModel, MapEditorViewModel) {
     const arches = window.arches;
 

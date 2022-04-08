@@ -1,7 +1,8 @@
 define([
-    'arches',
     'knockout',
-], function(arches, ko) {
+], function(ko) {
+    const arches = window.arches;
+
     function viewModel(params) {
         this.urls = arches.urls;
         this.loading = ko.observable(true);

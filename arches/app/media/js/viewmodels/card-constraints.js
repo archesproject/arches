@@ -1,8 +1,9 @@
 define([
     'knockout',
     'knockout-mapping',
-    'arches'
-], function(ko, koMapping, arches) {
+], function(ko, koMapping) {
+    const arches = window.arches;
+
     var ConstraintViewModel = function(params) {
         this.widgets = params.widgets || [];
         this.constraint = params.constraint;

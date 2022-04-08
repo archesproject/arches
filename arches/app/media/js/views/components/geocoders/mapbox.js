@@ -1,5 +1,5 @@
 define(
-    ['knockout', 'arches','views/components/geocoders/base-geocoder','geocoder-templates'],
+    ['knockout', 'arches','views/components/geocoders/base-geocoder'],
     function (ko, arches, BaseGeocoderViewModel) {
         return ko.components.register('views/components/geocoders/mapbox', {
             viewModel: function(params) {

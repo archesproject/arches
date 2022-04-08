@@ -1,13 +1,14 @@
 define([
     'underscore',
     'jquery',
-    'arches',
     'knockout',
     'knockout-mapping',
     'models/graph',
     'viewmodels/card',
     'viewmodels/provisional-tile'
-], function(_, $, arches, ko, koMapping, GraphModel, CardViewModel, ProvisionalTileViewModel) {
+], function(_, $, ko, koMapping, GraphModel, CardViewModel, ProvisionalTileViewModel) {
+    const arches = window.arches;
+
     function viewModel(params) {
         var self = this;
 

@@ -1,13 +1,12 @@
 define([
     'jquery',
-    'arches',
     'knockout',
     'underscore',
     'dropzone',
     'uuid',
     'viewmodels/widget',
     'bindings/dropzone'
-], function($, arches, ko, _, Dropzone, uuid, WidgetViewModel) {
+], function($, ko, _, Dropzone, uuid, WidgetViewModel) {
     /**
      * A viewmodel used for domain widgets
      *

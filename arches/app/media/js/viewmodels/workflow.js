@@ -1,5 +1,4 @@
 define([
-    'arches',
     'jquery',
     'underscore',
     'knockout',
@@ -9,7 +8,7 @@ define([
     'viewmodels/workflow-step',
     'bindings/gallery',
     'bindings/scrollTo'
-], function(arches, $, _, ko, koMapping, uuid, AlertViewModel, WorkflowStep) {
+], function($, _, ko, koMapping, uuid, AlertViewModel, WorkflowStep) {
     WORKFLOW_LABEL = 'workflow';
     WORKFLOW_ID_LABEL = 'workflow-id';
     STEPS_LABEL = 'workflow-steps';
@@ -17,6 +16,7 @@ define([
     STEP_IDS_LABEL = 'workflow-step-ids';
     WORKFLOW_COMPONENT_ABSTRACTS_LABEL = 'workflow-component-abstracts';
 
+    const arches = window.arches;
 
     var Workflow = function(config) {
         var self = this;

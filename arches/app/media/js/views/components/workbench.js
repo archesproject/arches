@@ -1,10 +1,9 @@
 define([
     'jquery',
     'underscore',
-    'arches',
     'knockout',
     'bindings/sortable'
-], function($, _, arches, ko) {
+], function($, _, ko) {
     var viewModel = function(params) {
         var self = this;
 

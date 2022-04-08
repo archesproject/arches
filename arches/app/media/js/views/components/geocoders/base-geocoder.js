@@ -1,5 +1,5 @@
 define(
-    ['knockout', 'arches', 'geocoder-templates'],
+    ['knockout', 'arches'],
     function(ko, arches) {
         /**
          * A viewmodel used for geocoders

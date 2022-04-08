@@ -1,7 +1,6 @@
 define([
     'underscore',
     'jquery',
-    'arches',
     'knockout',
     'knockout-mapping',
     'models/graph',
@@ -9,8 +8,9 @@ define([
     'viewmodels/provisional-tile',
     'viewmodels/alert',
     'uuid',
-], function(_, $, arches, ko, koMapping, GraphModel, CardViewModel, ProvisionalTileViewModel, AlertViewModel, uuid) {
+], function(_, $, ko, koMapping, GraphModel, CardViewModel, ProvisionalTileViewModel, AlertViewModel, uuid) {
     WORKFLOW_COMPONENT_ABSTRACTS_LABEL = 'workflow-component-abstracts';
+    const arches = window.arches;
 
     function NonTileBasedComponent() {
         var self = this;
@@ -760,9 +760,7 @@ define([
     }
 
     ko.components.register('workflow-component-abstract', {
-        template: {
-            require: 'text!templates/views/components/workflows/workflow-component-abstract.htm'
-        }
+        template: window['workflow-component-abstract-template']
     });
 
     return WorkflowComponentAbstract;

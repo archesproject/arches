@@ -1,7 +1,6 @@
 define([
     'viewmodels/remote-domain-widget',
-    'arches'
-], function (RemoteDomainWidgetViewModel, arches) {
+], function (RemoteDomainWidgetViewModel) {
     /**
     * A viewmodel used for concept widgets
     *
@@ -10,6 +9,9 @@ define([
     *
     * @param  {string} params - a configuration object
     */
+
+    const arches = window.arches;
+    
     var ConceptWidgetViewModel = function(params) {
         var self = this;
 

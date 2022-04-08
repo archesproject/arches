@@ -3,12 +3,13 @@ define([
     'underscore',
     'moment',
     'knockout',
-    'arches',
     'views/list',
     'bindings/datepicker',
     'bindings/chosen',
     'views/components/simple-switch'
-], function($, _, moment, ko, arches, ListView, dp, ch,ss) {
+], function($, _, moment, ko, ListView, dp, ch,ss) {
+    const arches = window.arches;
+
     var ProvisionalHistoryList = ListView.extend({
         /**
         * A backbone view to manage a list of graph nodes
