@@ -1413,6 +1413,7 @@ class ETLModule(models.Model):
     etlmoduleid = models.UUIDField(primary_key=True, default=uuid.uuid1)
     name = models.TextField()
     icon = models.TextField()
+    type = models.TextField()
     component = models.TextField()
     componentname = models.TextField()
     modulename = models.TextField(blank=True, null=True)
