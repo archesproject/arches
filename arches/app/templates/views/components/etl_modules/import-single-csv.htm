@@ -33,7 +33,7 @@
 <!-- /ko -->
 
 <!-- ko if: fileAdded() -->
-<div class="etl-module-writer-container" style="height: calc(100vh - 100px); width: 100%; padding: 25px; overflow: scroll;">
+<div class="etl-module-writer-container">
     <h3>{% trans "Format: Single .csv File Import" %}</h3>
     <div class="etl-module-info">
         <h4>{% trans "File Summary" %}</h4>
@@ -41,7 +41,7 @@
         <div data-bind="html: '{% trans "File Size: " %}' + formatSize(fileInfo().size)"></div>
         <div data-bind="text: '{% trans "Number of Row: " %}' + numberOfRow()"></div>
     </div>
-    <div class="etl-module-mapping" style="width: 300px;">
+    <div class="etl-module-mapping">
         <h4>{% trans "Target Model" %}</h4>
         <select data-bind="
             value: selectedGraph,
@@ -58,7 +58,7 @@
         <label class="form-checkbox form-normal form-primary" style="padding-left: 25px; padding-top: 3px;">
             <input type="checkbox" data-bind="checked: hasHeaders">{% trans "Column names in the first row" %}
         </label>
-            <table class="table table-striped" style="margin-top: 25px; border: 1px solid rgba(0,0,0,0.14)" width="100%">
+        <table class="table table-striped" style="margin-top: 25px; border: 1px solid rgba(0,0,0,0.14)" width="100%">
             <thead>
                 <tr>
                 <!-- ko foreach: { data: fieldMapping, as: 'mapping', noChildContext: true } -->
@@ -131,27 +131,24 @@
         </table>
         <!-- /ko -->
     </div>
-    <div class="etl-module-buttons" style="display: inline-flex; flex-direction:row; justify-content: flex-end; margin-top: 25px;">
-        <button data-bind="click: changeFormat" class="btn btn-primary" style="display: none; margin-right: 10px;">
-            <span>{% trans "Select a different format" %}</span>
-        </button>
+    <div class="etl-module-buttons">
         <!-- ko ifnot: validated -->
-        <button data-bind="click: validate" class="btn btn-success" style="margin-right: 10px;">
+        <button data-bind="click: validate" class="btn btn-success">
             <span>{% trans "Validate data before import" %}</span>
         </button>
         <!-- /ko -->
         <!-- ko if: validated() && validationError().length === 0 -->
-        <button data-bind="click: write" class="btn btn-success" style="margin-right: 10px;">
+        <button data-bind="click: write" class="btn btn-success">
             <span>{% trans "Import data" %}</span>
         </button>
         <!-- /ko -->
         <!-- ko if: validated() && validationError().length !== 0 -->
-        <!-- button data-bind="click: function () { fileAdded(false); }" class="btn btn-danger" style="margin-right: 10px;" -->
-        <button data-bind="click: function () { $parent.selectedModule(null); }" class="btn btn-danger" style="margin-right: 10px;">
+        <!-- button data-bind="click: function () { fileAdded(false); }" class="btn btn-danger" -->
+        <button data-bind="click: function () { $parent.selectedModule(null); }" class="btn btn-danger">
             <span>{% trans "Reload File" %}</span>
         </button>
         <!-- /ko -->
-        <button data-bind="click: function () { $parent.selectedModule(null); }" class="btn btn-danger" style="margin-right: 10px;">
+        <button data-bind="click: function () { $parent.selectedModule(null); }" class="btn btn-danger">
             <span>{% trans "Cancel File Import" %}</span>
         </button>
     </div>
