@@ -14652,3 +14652,25 @@ a.jstree-anchor.permissions-widget {
     margin-left: 20px;
     padding-left: 20px;
 }
+
+.etl-module-writer-container {
+    height: calc(100vh - 100px);
+    width: 100%;
+    padding: 25px;
+    overflow: scroll;
+}
+
+.etl-module-mapping {
+    width: 300px;
+}
+
+.etl-module-buttons {
+    display: inline-flex;
+    flex-direction:row;
+    justify-content: flex-end;
+    margin-top: 25px;
+}
+
+.etl-module-buttons .btn {
+    margin-right: 10px;
+}
