@@ -21,14 +21,36 @@ define([
                 self.selectedModule(etlmodule);
                 self.activeTab("details");
             };
+
+            this.fetchLoadEvent = function(){
+                const url = arches.urls.etl_manager + "?action=loadEvent";
+                window.fetch(url).then(function(response){
+                    if(response.ok){
+                        return response.json();
+                    }
+                }).then(function(data){
+                    console.log(data)
+                });
+            };
+
+            this.fetchStagedData = function(loadid){
+                const url = arches.urls.etl_manager + "?action=stagedData&loadid="+loadid;
+                window.fetch(url).then(function(response){
+                    if(response.ok){
+                        return response.json();
+                    }
+                }).then(function(data){
+                    console.log(data)
+                });
+            };
+
             this.init = function(){
-                window.fetch(arches.urls.etl_manager)
-                    .then(function(response){
+                const url = arches.urls.etl_manager + "?action=modules";
+                window.fetch(url).then(function(response){
                         if(response.ok){
                             return response.json();
-                        }
-                    })
-                    .then(function(data){
+                    }
+                    }).then(function(data){
                         self.etlModules = data.map(function(etl){
                             etl.config.loading = self.loading;
                             require([etl.component]);
@@ -36,7 +58,7 @@ define([
                         });
                         self.loading(false);
                     });
-                this.activeTab("start");
+                    this.activeTab("start");
             };
 
             this.init();

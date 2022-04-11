@@ -14608,10 +14608,17 @@ a.jstree-anchor.permissions-widget {
     height: 45px;
     display: inline-block;
     text-align: center;
+    margin-right: -5px;
 }
 
 .etl-manager-tab:hover {
     cursor: pointer;
+}
+
+.etl-manager-tab.disabled {
+    background-color: #fff;
+    color: grey;
+    cursor: default;
 }
 
 .etl-manager-tab.active {
@@ -14633,6 +14640,7 @@ a.jstree-anchor.permissions-widget {
     height: 45px;
     display: inline-block;
     text-align: center;
+    margin-right: -5px;
 }
 
 .etl-manager-filter-button:hover {
@@ -14654,23 +14662,32 @@ a.jstree-anchor.permissions-widget {
 }
 
 .etl-module-writer-container {
-    height: calc(100vh - 100px);
+    height: calc(100vh - 160px);
     width: 100%;
     padding: 25px;
     overflow: scroll;
 }
 
-.etl-module-mapping {
+.etl-module-component.etl-module-mapping {
     width: 300px;
 }
 
-.etl-module-buttons {
-    display: inline-flex;
-    flex-direction:row;
-    justify-content: flex-end;
-    margin-top: 25px;
+.etl-module-component {
+    margin-top: 50px;
 }
 
-.etl-module-buttons .btn {
-    margin-right: 10px;
+.etl-module-button-container {
+    display: inline-flex;
+    position: fixed;
+    background-color: #445769;
+    border-top: 1px solid #0E2031;
+    padding: 15px 20px;
+    bottom: 0;
+    width: 100%;
+    height: 65px;
+}
+
+.etl-module-button-container .btn {
+    border-radius: 2px;
+    margin-right: 20px;
 }

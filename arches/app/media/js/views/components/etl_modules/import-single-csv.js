@@ -87,8 +87,7 @@ define([
                 return '<strong>' + parseFloat((bytes / Math.pow(k, i)).toFixed(dm)) + '</strong> ' + sizes[i];
             };
 
-            this.csvArray.subscribe(function(val){ //array of array
-                console.log(val)
+            this.csvArray.subscribe(function(val){
                 self.numberOfCol(val[0].length);
                 let i = 1;
                 if (self.hasHeaders()) {

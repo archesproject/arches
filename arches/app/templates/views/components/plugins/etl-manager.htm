@@ -4,8 +4,13 @@
     <div class="etl-manager-tab-container">
         <div class="etl-manager-tabs">
             <!-- ko foreach: {data: tabs, as: 'tab'} -->
-            <div class="etl-manager-tab" data-bind="click: function(){$parent.activeTab(tab.id)}, css: {active: $parent.activeTab() === tab.id}, text: tab.title"></div>
+            <!-- <div class="etl-manager-tab" data-bind="click: function(){$parent.activeTab(tab.id)}, css: {active: $parent.activeTab() === tab.id, 'disabled': true}, text: tab.title"></div> -->
             <!-- /ko -->
+            <div class="etl-manager-tab" data-bind="click: function(){activeTab('start')}, css: {active: activeTab() === 'start', 'disabled': true}, text: 'Start'"></div>
+            <div class="etl-manager-tab" data-bind="click: function(){activeTab('details')}, css: {active: activeTab() === 'details', 'disabled': true}, text: 'Task Details'"></div>
+            <div class="etl-manager-tab" data-bind="click: function(){activeTab('import'); fetchLoadEvent()}, css: {active: activeTab() === 'import', 'disabled': true}, text: 'Import Tasks'"></div>
+            <div class="etl-manager-tab" data-bind="click: function(){activeTab('export')}, css: {active: activeTab() === 'export', 'disabled': true}, text: 'Export Tasks'"></div>
+        </div>
     </div>
     <div data-bind="if: activeTab() === 'start'">
         <div class="etl-manager-filter-container">
@@ -45,7 +50,6 @@
         <!-- /ko -->
     </div>
     <div data-bind="if: activeTab() === 'details'">
-        <h1>details</h1>
         <!-- ko if: selectedModule() -->
         <div style="flex: 1 1 auto;">
             <div class="content-panel">
@@ -54,14 +58,6 @@
                     loading: selectedModule().loading,
                     params: selectedModule(),
                 }"></div>
-            </div>
-            <div class="etl-module-buttons-container" style="align-items: center; padding: 10px 20px; display: flex; flex-direction:row; justify-content: flex-end;">
-                <button class="btn btn-success" style="margin-right: 10px;">
-                    <span>{% trans "Import data" %}</span>
-                </button>
-                <button class="btn btn-danger" style="margin-right: 10px;">
-                    <span>{% trans "Cancel File Import" %}</span>
-                </button>
             </div>
         </div>
         <!-- /ko -->
