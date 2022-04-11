@@ -311,7 +311,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                 {% if nav.login %}
                 <a href="{% url 'auth' %}?next={{ request.get_full_path }}{% if user.username != 'anonymous' %}&logout=true{% endif %}"
                     class="ep-tools ep-tools-login">
-                    <div class="" data-placement="bottom" data-toggle="tooltip"
+                    <div class="" data-placement="bottom" data-toggle="tooltip" style="width:max-content;"
                         data-original-title="{% if user.username != 'anonymous' %}Logout{% else %}Login{% endif %}">
                         {% if user.username == 'anonymous' %}
                         <h5 class="hidden-xs">{% trans "Login" %}</h5>
