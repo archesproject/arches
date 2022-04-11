@@ -10297,13 +10297,20 @@ a.search-query-link-captions:focus {
 }
 
 .search-footer {
-    position: fixed;
-    bottom: 0px;
     background: #f4f4f4;
-    width: 449px;
-    left: 0px;
     border-top: 1px solid #ddd;
     height: 50px;
+}
+
+.search-footer {
+    #paginator {
+        display: flex;
+        justify-content: center;
+        .pagination {
+            padding: 0;
+            margin: 20px 0;
+        }
+    }
 }
 
 .search-footer .pagination {
@@ -11051,6 +11058,7 @@ table.table.dataTable {
     height: 50px;
     background: #f2f2f2;
     margin-left: 4px;
+    flex: 1;
 }
 
 .search-type-btn.relative:hover {
@@ -11166,12 +11174,11 @@ table.table.dataTable {
     margin-top: 0px;
     display: inline-block;
     flex-direction: row;
-    position: absolute;
-    right: 0px;
 }
 
 .popup-panel-row {
     display: inline-flex;
+    margin-left: 1px;
 }
 
 .search-type-btn-popup {
@@ -11181,12 +11188,11 @@ table.table.dataTable {
     font-size: 12px;
     font-weight: 600;
     color: #888;
-    border-color: #BBD1EA;
+    border: 1px solid #BBD1EA;
     border-top: none;
     border-bottom: none;
     border-right: none;
     background: #F7F9FB;
-    border-width: 1px;
     z-index: 1000;
 }
 
