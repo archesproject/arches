@@ -1,7 +1,7 @@
 import json
 import logging
 from django.views.generic import View
-from arches.app.models.models import ETLModule
+from arches.app.models.models import ETLModule, LoadEvent, LoadStaging
 from arches.app.utils.response import JSONResponse
 
 logger = logging.getLogger(__name__)
@@ -13,8 +13,17 @@ class ETLManagerView(View):
     """
 
     def get(self, request):
-        etl_modules = ETLModule.objects.all()
-        return JSONResponse(etl_modules)
+        action = request.GET.get("action", None)
+        loadid = request.GET.get("loadid", None)
+        if action == "modules" or action is None:
+            response = ETLModule.objects.all()
+        elif action == "loadEvent":
+            response = LoadEvent.objects.all()
+        elif action == "stagedData" and loadid:
+            response = LoadStaging.objects.get(loadid=loadid)
+        print(action)
+        print(response)
+        return JSONResponse(response)
 
     def post(self, request):
         """
