@@ -189,8 +189,13 @@ define([
         }
 
         if (params.renderContext === 'workflow') {
-            self.card.selected(true);  // cardinality 'n' cards will display appropriately
-            self.inResourceEditor = true;
+            if (
+                params.card && params.card.cardinality === 'n'
+                && params.cardinality_override !== '1'
+            ) {
+                self.card.selected(true);  // cardinality 'n' cards will display appropriately
+                self.inResourceEditor = true;
+            }
         }
 
         this.saveTileAddNew = function() {
