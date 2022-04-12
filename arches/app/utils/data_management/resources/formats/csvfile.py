@@ -1225,23 +1225,25 @@ class CsvReader(Reader):
                 resources = []
                 missing_display_values = {}
                 group_no = False
-                legacyids_only = business_data[0]["ResourceID"] is None or business_data[0]["ResourceID"] == ""
+                legacyids_only = (business_data[0]["ResourceID"] is None or business_data[0]["ResourceID"] == "") and "LegacyID" in business_data[0]
 
                 for row_number, row in enumerate(business_data):
                     i = int(row_number)
                     if "LegacyID" not in row:
-                        row["LegacyID"] = ""
-                    if not row["ResourceID"] or row["ResourceID"] == "":
-                        row["ResourceID"] = resourceinstanceid
-                    row_resourceid = row["ResourceID"] if row["ResourceID"] != "" and row["ResourceID"] else row["LegacyID"]
+                        row["LegacyID"] = None
+                    row_resourceid = row["ResourceID"] if row["ResourceID"] else None
                     row_number = "on line " + str(row_number + 2)  # to represent the row in a csv accounting for the header and 0 index
                     legacyid_changed = False
-                    if i > 0 and "LegacyID" in business_data[i - 1]:
-                        legacyid_changed = business_data[i - 1]["LegacyID"] != row["LegacyID"]
                     if legacyids_only:
+                        if i > 0:
+                            legacyid_changed = business_data[i - 1]["LegacyID"] != row["LegacyID"]
+                        if not row_resourceid:
+                            row_resourceid = row["LegacyID"]
                         resource_changed = legacyid_changed
                     else:
-                        resource_changed = row_resourceid != previous_row_resourceid and previous_row_resourceid is not None
+                        if not row_resourceid:
+                            row_resourceid = resourceinstanceid
+                        resource_changed = (row_resourceid != previous_row_resourceid or resourceinstanceid != row["ResourceID"]) and i > 0
                     if resource_changed:
                         group_no_to_tileids.clear()  # garbage collection of past resource groups
 
@@ -1263,7 +1265,7 @@ class CsvReader(Reader):
                         populated_cardinality_1_nodegroups.clear()
                         populated_cardinality_1_nodegroups[resourceinstanceid] = []
 
-                    legacyid = row["LegacyID"] if row["LegacyID"] else row["ResourceID"]
+                    legacyid = row["LegacyID"] if row["LegacyID"] else resourceinstanceid
                     source_data = column_names_to_targetids(row, mapping, row_number)
                     group_no = False
                     group_valid = "GROUP_NO" in row and row["GROUP_NO"] and row["GROUP_NO"] != ""
