@@ -37,7 +37,6 @@ from django.db import connection, transaction
 
 from elasticsearch import Elasticsearch
 from elasticsearch.exceptions import NotFoundError
-from edtf import parse_edtf
 
 
 # One benefit of shifting to python3.x would be to use
@@ -485,11 +484,20 @@ class DateDataType(BaseDataType):
 
 
 class EDTFDataType(BaseDataType):
+    def transform_value_for_tile(self, value, **kwargs):
+        transformed_value = ExtendedDateFormat(value)
+        if transformed_value.edtf is None:
+            return value, False
+        return str(transformed_value.edtf), True
+
+    def pre_tile_save(self, tile, nodeid):
+        tile.data[nodeid], valid = self.transform_value_for_tile(tile.data[nodeid])
+
     def validate(self, value, row_number=None, source="", node=None, nodeid=None, strict=False):
         errors = []
         if value is not None:
             if not ExtendedDateFormat(value).is_valid():
-                message = _("Incorrect Extended Date Time Format. See http://www.loc.gov/standards/datetime/ for supported formats.")
+                message = _("Incorrect Extended Date Time Format. See http://www.loc.gov/standards/datetime/ for supported formats")
                 error_message = self.create_error_message(value, source, row_number, message)
                 errors.append(error_message)
         return errors

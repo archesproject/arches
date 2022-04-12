@@ -157,12 +157,19 @@ define([
 
         this.saveActiveStep = function() {
             self.activeStep().save()
-            .then(function(_data) {        
-                self.next();
-            })
-            .catch(function(error) {
-                console.error(error);
-            });
+                .then(function(_data) {        
+                    self.next();
+                })
+                .catch(function(error) {
+                    console.error(error);
+                });
+        };
+
+        this.staticSaveActiveStep = function() {
+            self.activeStep().save()
+                .catch(function(error) {
+                    console.error(error);
+                });
         };
 
         this.parseComponentPath = function(path) {
