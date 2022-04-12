@@ -188,11 +188,13 @@ define([
             params.form.save = saveTileInWorkflow;
         }
 
+        /*
+            TODO: Reverse this logic to be in-line with card UX in resource_editor using this logic:
+                    params.card && params.card.cardinality === 'n'
+                    && params.form.componentData.cardinalityOverride !== '1'
+        */ 
         if (params.renderContext === 'workflow') {
-            if (
-                params.card && params.card.cardinality === 'n'
-                && params.cardinality_override !== '1'
-            ) {
+            if (params.form.componentData.cardinalityOverride === 'n') {
                 self.card.selected(true);  // cardinality 'n' cards will display appropriately
                 self.inResourceEditor = true;
             }
