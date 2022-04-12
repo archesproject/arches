@@ -5,7 +5,7 @@ define([
     'knockout',
     'knockout-mapping',
     'utils/map-popup-provider'
-], function($, _, arches, ko, koMapping, mapUtils) {
+], function($, _, arches, ko, koMapping, mapPopupProvider) {
     const viewModel = function(params) {
 
         var self = this;
@@ -428,7 +428,7 @@ define([
         };
 
         this.onFeatureClick = function(features, lngLat, MapboxGl) {
-            var popupTemplate = mapUtils.getPopupTemplate(features);
+            var popupTemplate = mapPopupProvider.getPopupTemplate(features);
             const map = self.map();
             const mapStyle = map.getStyle();
             self.popup = new MapboxGl.Popup()
@@ -436,7 +436,7 @@ define([
                 .setHTML(popupTemplate)
                 .addTo(map);
             ko.applyBindingsToDescendants(
-                mapUtils.processData(self.getPopupData(features)),
+                mapPopupProvider.processData(self.getPopupData(features)),
                 self.popup._content
             );
             features.forEach(feature=>{
@@ -474,7 +474,7 @@ define([
                         if (hoverFeature && hoverFeature.id && style) map.setFeatureState(hoverFeature, { hover: false });
                         hoverFeature = _.find(
                             map.queryRenderedFeatures(e.point),
-                            mapUtils.isFeatureClickable
+                            mapPopupProvider.isFeatureClickable
                         );
                         if (hoverFeature && hoverFeature.id && style) map.setFeatureState(hoverFeature, { hover: true });
 
@@ -495,7 +495,7 @@ define([
                     map.on('click', function(e) {
                         const popupFeatures = _.filter(
                             map.queryRenderedFeatures(e.point),
-                            mapUtils.isFeatureClickable
+                            mapPopupProvider.isFeatureClickable
                         );
                         if (popupFeatures.length) {
                             self.onFeatureClick(popupFeatures, e.lngLat, MapboxGl);
