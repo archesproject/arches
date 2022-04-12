@@ -1128,9 +1128,29 @@ div.wf-multi-tile-card-info div {
     color: #ccc;
 }
 
+.resource-component-abstract-container {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    height: calc(100vh - 50px);
+}
+
+.resource-component-abstract-container .has-summary {
+    height: inherit;
+}
+
 .resource-component-abstract {
     overflow-y: scroll;
     height: 100%;
+}
+
+.resource-component-abstract-container footer {
+    background: #f8f8f8; 
+    display: flex;
+    height: 50px;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0 20px;
 }
 
 .workflow-plugin {
@@ -6018,6 +6038,7 @@ ul.jqtree_common li.jqtree-folder {
 .profile-summary-page {
     width: 100%;
     background: #fff;
+    padding-bottom: 100px;
 }
 
 .profile-summary-page .img-responsive {
@@ -6035,7 +6056,6 @@ ul.jqtree_common li.jqtree-folder {
 .profile-list {
     width: 100%;
     padding: 40px 100px 50px 100px;
-    min-height: 170px;
     border-bottom: 1px solid #ccc;
 }
 
@@ -6214,8 +6234,6 @@ th.notif-type {
 }
 
 .project-search-widget {
-    position: absolute;
-    top: -40px;
     width: 250px;
 }
 
@@ -6334,6 +6352,7 @@ th.notif-type {
 #menu-control {
     background: #9490EE;
     color: #eee;
+    float: left;
 }
 
 #menu-control:hover {
@@ -8696,6 +8715,12 @@ a.mega-dropdown-toggle.disabled {
     padding-top: 0px;
     position: relative;
     padding-left: 15px;
+}
+
+.rp-card-section-contents {
+    display: inline-flex;
+    width: 100%;
+    justify-content: space-between;
 }
 
 .rp-edit-buttons {
@@ -12856,6 +12881,10 @@ ul.select2-choices:after {
     overflow-x: hidden;
     background: #ecf0f5;
     padding-bottom: 50px;
+}
+
+.resource-editor-container {
+    height: inherit;
 }
 
 a.jstree-anchor strong {

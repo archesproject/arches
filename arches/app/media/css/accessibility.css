@@ -1,3 +1,7 @@
+html, body {
+    overflow-y: hidden;
+}
+
 body, .title-v1 p, .ep-tools-login, .ep-tools-right, .search-label, .counters h3 {
     font-size: 1.3em;
 }
@@ -98,7 +102,8 @@ a:focus,
 }
 
 .arches-signin .panel-footer,
-.password-rule {
+.password-rule,
+.rp-no-data {
     color: #494949;
 }
 
@@ -340,6 +345,10 @@ div.search-facet-item:focus {
     overflow-y: auto;
 }
 
+.ep-tools {
+    white-space: nowrap;
+}
+
 .ep-tools-login {
     padding-right: 16px;
 }
@@ -448,6 +457,57 @@ div.search-facet-item:focus {
     width: 50vw;
 }
 
+.rp-report-section-title {
+    padding-left: 0;
+}
+
+.resource-component-abstract {
+    overflow-y: auto;
+    height: calc(100vh - 100px);
+}
+
+.resource-component-abstract-container.is-summary {
+    height: calc(100vh - 100px);
+}
+
+#menu-control {
+    color: #fff;
+    background: #4138E0;
+}
+
+.card-component-panel .card-component .is-function-node {
+    color: #014C44;
+}
+
+.add-new-crumb {
+    background: #2B4E6D;
+    border-color: #fff;
+}
+
+.add-new-crumb:hover,
+.add-new-crumb:focus {
+    text-decoration: underline;
+}
+
+.edtf-style-tools-collapser {
+    left: auto;
+    right: 0;
+}
+
+.regular-link {
+    color: #1F496E;
+}
+
+.recent-edits-container,
+.profile-summary-page {
+    height: calc(100vh - 50px);
+    overflow-y: auto;
+}
+
+.profile-summary-page {
+    overflow-x: hidden;
+}
+
 /******************************************************************/
 /* Media queries                                                  */
 /******************************************************************/
@@ -546,6 +606,21 @@ div.search-facet-item:focus {
     .search-result-details {
         height: 50vh;
     }
+
+    .dl-horizontal dt {
+        float: none;
+        width: auto;
+        text-align: left;
+        padding-top: 10px;
+    }
+
+    .dl-horizontal dd {
+        margin-left: 0;
+    }
+
+    .rp-card-section-contents {
+        display: block;
+    }
 }
 
 @media screen and (max-width: 768px) {
@@ -595,5 +670,88 @@ div.search-facet-item:focus {
     .workbench-card-sidepanel {
         width: calc(100% - 74px);
         height: 38vh;
+    }
+
+    .resource-component-abstract-container {
+        display: inline-flex;
+        width: 100vw;
+        height: calc(100vh - 100px);
+    }
+
+    .resource-component-abstract-container.is-summary {
+        height: calc(50vh - 100px);
+    }
+
+    .report-print-date {
+        white-space: nowrap;
+    }
+
+    .rp-no-data {
+        top: 0;
+    }
+
+    .search-result-details {
+        height: calc(50vh - 100px);
+    }
+
+    .sidepanel-draggable {
+        display: none;
+    }
+
+    #menu-control {
+        margin-left: 50px;
+    }
+
+    h1.page-header.text-overflow.ep-graph-title {
+        padding-left: 5px !important;
+    }
+
+    .resource-editor-container {
+        flex-direction: column;
+    }
+
+    .resource-editor-container .left-panel {
+        flex: 0 0 30vh !important;
+        overflow-y: auto;
+    }
+
+    .resource-editor-container .left-panel .resource-editor-tree{
+        height: auto;
+    }
+
+    .resource-editor-container .main-panel {
+        flex: 0 0 calc(70vh - 100px) !important;
+        overflow-y: auto;
+    }
+
+    .resource-editor-container .main-panel .card-component-wrapper-editor {
+        height: inherit;
+    }
+
+    .resource-editor-container .main-panel .rr-splash {
+        margin: 20px;
+        padding: 20px;
+    }
+
+    .create-resource-instance-card-component.rr-table-pop {
+        padding-left: 0;
+    }
+
+    .create-instance-header {
+        padding-left: 55px;
+    }
+  
+    .recent-edits-container,
+    .profile-summary-page {
+        height: calc(100vh - 100px);
+    }
+
+    .profile-list,
+    .profile-report {
+        padding: 20px;
+    }
+
+    .profile-report {
+        min-height: 0;
     }
 }
