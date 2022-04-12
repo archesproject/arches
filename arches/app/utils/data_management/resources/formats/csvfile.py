@@ -1225,7 +1225,9 @@ class CsvReader(Reader):
                 resources = []
                 missing_display_values = {}
                 group_no = False
-                legacyids_only = (business_data[0]["ResourceID"] is None or business_data[0]["ResourceID"] == "") and "LegacyID" in business_data[0]
+                legacyids_only = (
+                    business_data[0]["ResourceID"] is None or business_data[0]["ResourceID"] == ""
+                ) and "LegacyID" in business_data[0]
 
                 for row_number, row in enumerate(business_data):
                     i = int(row_number)
