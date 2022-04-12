@@ -10,3 +10,8 @@
         }
     }
 }
+
+.input-group-addon:first-child{
+    border-right: 1px solid #e1e5ea;
+    border-left: none;
+}
