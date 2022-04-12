@@ -258,9 +258,6 @@ def create_mapping_configuration_file(graphid, include_concepts=True, data_dir=N
     files_for_export.append({"name": file_name, "outputfile": dest})
 
     if data_dir is not None:
-        with open(os.path.join(data_dir, "temp.config"), "w") as config_file:
-            json.dump(export_json, config_file, indent=4)
-
         file_name = Graph.objects.get(graphid=graphid).name
         buffer = BytesIO()
         with zipfile.ZipFile(buffer, "w", zipfile.ZIP_DEFLATED) as zip:
