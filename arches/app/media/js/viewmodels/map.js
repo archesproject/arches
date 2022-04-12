@@ -443,8 +443,12 @@ define([
                 if (mapStyle && feature.id) map.setFeatureState(feature, { selected: true });
                 self.popup.on('close', function() {
                     if (mapStyle && feature.id) {
-                        map.setFeatureState(feature, { selected: false });
-                        map.setFeatureState(feature, { hover: false });
+                        try {
+                            map.setFeatureState(feature, { selected: false });
+                            map.setFeatureState(feature, { hover: false });
+                        } catch(e){
+                            // catch TypeError which occurs when map is destroyed while popup open.
+                        }
                     }
                     self.popup = undefined;
                 });
