@@ -1354,7 +1354,7 @@ class CsvReader(Reader):
                                     preexisting_parenttile = get_preexisting_tile(
                                         target_tile,
                                         populated_tiles,
-                                        row["ResourceID"],
+                                        row_resourceid,
                                         tileid=group_no_to_tileids[group_no][str(target_tile.nodegroup_id)]["tileid"],
                                     )
                                     # we know theres a parenttile for this group already
@@ -1371,7 +1371,7 @@ class CsvReader(Reader):
                                         test_tile = get_preexisting_tile(
                                             target_tile,
                                             populated_tiles,
-                                            row["ResourceID"],
+                                            row_resourceid,
                                             tileid=str(group_no_to_tileids[group_no][str(prototype_child_tile.nodegroup_id)]["tileid"]),
                                         )
                                         if test_tile:
@@ -1413,7 +1413,7 @@ class CsvReader(Reader):
                                         preexisting_tile_for_nodegroup = get_preexisting_tile(
                                             target_tile,
                                             populated_tiles,
-                                            row["ResourceID"],
+                                            row_resourceid,
                                             tileid=group_no_to_tileids[group_no][str(target_tile.nodegroup_id)]["tileid"],
                                         )
                                         if preexisting_tile_for_nodegroup:
@@ -1428,7 +1428,7 @@ class CsvReader(Reader):
 
                         # identify whether a tile for this nodegroup on this resource already exists
                         if not preexisting_tile_for_nodegroup and not preexisting_parenttile:
-                            preexisting_tile_for_nodegroup = get_preexisting_tile(target_tile, populated_tiles, row["ResourceID"])
+                            preexisting_tile_for_nodegroup = get_preexisting_tile(target_tile, populated_tiles, row_resourceid)
 
                         # aggregates a tile of the nodegroup associated with source_data (via get_blank_tile)
                         # onto the pre-existing tile who would be its parent
@@ -1455,7 +1455,7 @@ class CsvReader(Reader):
                                 preexisting_tile_for_nodegroup.tiles.append(target_tile)
                             while len(source_data) > 0:
                                 target_tile = get_blank_tile(source_data)
-                                preexisting_tile_for_nodegroup = get_preexisting_tile(target_tile, populated_tiles, row["ResourceID"])
+                                preexisting_tile_for_nodegroup = get_preexisting_tile(target_tile, populated_tiles, row_resourceid)
                                 if preexisting_tile_for_nodegroup:
                                     target_tile = get_blank_tile(source_data, child_only=True)
                                     target_tile.parenttile = preexisting_tile_for_nodegroup
@@ -1518,7 +1518,7 @@ class CsvReader(Reader):
                                 source_data.pop(0)  # TODO TEMPORARY: remove Details components that have a component type
                             while len(source_data) > 0:
                                 target_tile = get_blank_tile(source_data)
-                                preexisting_tile_for_nodegroup = get_preexisting_tile(target_tile, populated_tiles, row["ResourceID"])
+                                preexisting_tile_for_nodegroup = get_preexisting_tile(target_tile, populated_tiles, row_resourceid)
                                 if preexisting_tile_for_nodegroup and str(target_tile.nodegroup_id) != component_nodegroupid:
                                     target_tile = get_blank_tile(source_data, child_only=True)
                                     target_tile.parenttile = preexisting_tile_for_nodegroup
@@ -1576,7 +1576,7 @@ class CsvReader(Reader):
                             # Check that required nodes are populated. If not remove tile from populated_tiles array.
                             check_required_nodes(target_tile, target_tile, required_nodes)
 
-                    previous_row_resourceid = row_resourceid
+                    previous_row_resourceid = resourceinstanceid
 
                 # check for missing display value nodes.
                 # errors = []
