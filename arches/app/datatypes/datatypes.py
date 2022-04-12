@@ -415,7 +415,8 @@ class DateDataType(BaseDataType):
             return value
 
     def pre_tile_save(self, tile, nodeid):
-        tile.data[nodeid] = self.add_missing_colon_to_timezone(tile.data[nodeid])
+        if tile.data[nodeid]:
+            tile.data[nodeid] = self.add_missing_colon_to_timezone(tile.data[nodeid])
 
     def append_to_document(self, document, nodevalue, nodeid, tile, provisional=False):
         document["dates"].append(
