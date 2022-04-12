@@ -4839,7 +4839,6 @@ div.dropdown-menu.open {
 
 .find-widget {
     width: 450px;
-    top: 10px;
     z-index: 10;
 }
 
@@ -6430,6 +6429,9 @@ th.notif-type {
     padding: 0 55px;
     align-items: center;
     &>div:first-child{
+        flex: 1;
+        display: flex;
+        align-items: center;
     }
 
     .resource-tools .resource-grid-title {
@@ -7979,7 +7981,7 @@ div.hide-file-list>div>div>div>div>form>div>div:nth-child(3) {
 
 .resource-grid-title {
     font-weight: normal;
-    padding: 3px 20px 0 20px;
+    padding: 0 20px;
     font-size: 1.416em;
     line-height: 50px;
     display: inline-block;
