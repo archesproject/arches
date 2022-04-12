@@ -4753,6 +4753,11 @@ div.dropdown-menu.open {
     transition: all .25s ease;
 }
 
+.edit-panel-search-bar{
+    display: flex;
+    align-items: center;
+}
+
 .edit-menu {
     position: absolute;
     top: 36px;
@@ -4827,10 +4832,7 @@ div.dropdown-menu.open {
 }
 
 .find-widget {
-    position: absolute;
-    left: 100px;
     top: 10px;
-    width: 450px;
     z-index: 10;
 }
 
@@ -6418,12 +6420,9 @@ th.notif-type {
     background: #f6f6f6;
     border-bottom: 1px solid #e4e4e4;
     display: flex;
-    padding: 0 40px;
+    padding: 0 55px;
     align-items: center;
     &>div:first-child{
-        flex: 1;
-        display: flex;
-        align-items: center;
     }
 
     .resource-tools .resource-grid-title {
@@ -7984,11 +7983,20 @@ div.hide-file-list>div>div>div>div>form>div>div:nth-child(3) {
     margin-top: 0px;
     font-size: 19px;
     color: #999;
-    padding-top: 5px;
-    padding-bottom: 3px;
-    padding-left: 25px;
-    width: 80px;
-    border-right: 1px solid #ccc;
+    padding: 0;
+    margin: 0 20px;
+    cursor: pointer;
+}
+
+.dropdown-menu {
+    font-size: 13px;
+    border-radius: 0;
+    box-shadow: 0 4px 8px 0 RGB(0 0 0 / 15%);
+    margin: 0;
+    padding: 0;
+    border: 1px solid #e9e9e9;
+    left: auto;
+    right: 0;
 }
 
 .switch-panel {
