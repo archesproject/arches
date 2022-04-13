@@ -30,7 +30,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 <div class="content-panel" data-bind="click:function() { menuActive(false); }">
     <div class="flex">
         <div class="flex">
-            <div class="left-column-crud-container form-list">
+            <div class="side-column-crud-container form-list">
                 <div class="layer-list">
                     <!-- Layer Filter -->
                     <div class="list-filter" data-bind="">
@@ -56,20 +56,22 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                                     <!-- /ko -->
                                 </span>
                             </div>
-                            <div class="crud-card-main">
+                            <div class="library-card-content">
+                                <div class="crud-card-main">
+                                    <!-- ko if: item.nodeid -->
+                                    <a class="listitem_name" data-bind="text: (item.config.layerName ? item.config.layerName() : false) || item.layer.name"></a>
+                                    <!-- /ko -->
+                                    <!-- ko if: !item.nodeid -->
+                                    <a class="listitem_name" data-bind="text: item.name"></a>
+                                    <!-- /ko -->
+                                </div>
                                 <!-- ko if: item.nodeid -->
-                                <a class="listitem_name" data-bind="text: (item.config.layerName ? item.config.layerName() : false) || item.layer.name"></a>
+                                <div class="crud-card-subtitle" data-bind="text: item.name"></div>
                                 <!-- /ko -->
                                 <!-- ko if: !item.nodeid -->
-                                <a class="listitem_name" data-bind="text: item.name"></a>
+                                <div class="crud-card-subtitle" data-bind="text: item.isoverlay ? '{% trans "Overlay" %}' : '{% trans "Basemap" %}'"></div>
                                 <!-- /ko -->
                             </div>
-                            <!-- ko if: item.nodeid -->
-                            <div class="crud-card-subtitle" data-bind="text: item.name"></div>
-                            <!-- /ko -->
-                            <!-- ko if: !item.nodeid -->
-                            <div class="crud-card-subtitle" data-bind="text: item.isoverlay ? '{% trans "Overlay" %}' : '{% trans "Basemap" %}'"></div>
-                            <!-- /ko -->
                         </div>
                         <!-- /ko -->
                     </div>

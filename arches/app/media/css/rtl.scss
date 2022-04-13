@@ -10,3 +10,24 @@
         }
     }
 }
+
+.side-column-crud-container {
+    border-left: 1px solid #ddd;
+    border-right: none;
+    .clear-node-search {
+        left: 10px;
+        right: auto;
+    }
+    .grid { 
+        .library-card {
+            &.selected.selected-card {
+                border-right: 5px solid steelblue;
+                border-left: none;
+            }
+            &:hover {
+                border-right: 5px solid steelblue;
+                border-left: none;
+            }
+        }
+    }
+}
