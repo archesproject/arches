@@ -2271,16 +2271,12 @@ div.final-cons-step-separator>h4 {
     height: 100%;
     background: white;
     border-left: 1px solid rgb(216, 216, 216);
-    overflow-y: hidden;
+    overflow-y: auto;
+    overflow-x: hidden;
     display: flex;
     flex-direction: column;
     align-items: normal;
     width: 400px;
-}
-
-/* PAUL TO REVIEW IF NEEDED */
-.workbench-sidepanel-card-container {
-    /* margin: -40px -10px 10px -10px; */
 }
 
 .workbench-sidepanel-body {
@@ -2356,18 +2352,6 @@ div.final-cons-step-separator>h4 {
     padding-bottom: 40px;
 }
 
-/*
-PAUL TO REVIEW THIS AGAINST NEW FLEX CHANGES
-.workbench-card-sidepanel-header-container {
-    border-bottom: 1px solid #ddd;
-    padding: 10px 20px 10px 5px;
-    margin-left: 0px;
-    margin-top: -16px;
-    background: #fff;
-    z-index: 20;
-}
-*/
-
 .workbench-card-sidepanel-header-container {
     padding: 14px;
     margin-left: 0px;
@@ -2382,7 +2366,7 @@ PAUL TO REVIEW THIS AGAINST NEW FLEX CHANGES
 }
 
 .workbench-card-sidepanel-body {
-    overflow-y: scroll;
+    overflow-y: auto;
     width: inherit;
     height: -moz-available;
     height: -webkit-fill-available;
@@ -2418,7 +2402,7 @@ PAUL TO REVIEW THIS AGAINST NEW FLEX CHANGES
 .basemap-listing,
 .overlay-listing,
 .legend-listing {
-    padding: 16px 20px;
+    padding: 16px 0;
     min-height: 60px;
     border-bottom: 1px solid rgb(216, 216, 216);
 }
@@ -6436,31 +6420,16 @@ th.notif-type {
 }
 
 .workflow-step-title,
-.workflow-plugin .btn .succinct,
-.ep-tools .fa-sign-out {
-    display: none
+.workflow-plugin .btn .succinct {
+    display: none;
 }
 
 
 @media only screen and (max-width : 768px) {
-    .tabbed-workflow-step-container{
+    .tabbed-workflow-step-container {
         margin-bottom: 108px;
     }
     
-    #content-container {
-        .ep-tools .fa-sign-out {
-            font-size: 17px;
-            display: inherit;
-        }
-        .ep-toolbar {
-            position: fixed;
-            z-index: 10;
-        }
-        .content-panel {
-            padding: 17px 0px;
-        }
-    }
-
     .dropzone {
         min-width: auto;
         width: auto;
