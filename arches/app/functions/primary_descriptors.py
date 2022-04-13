@@ -14,7 +14,7 @@ class AbstractPrimaryDescriptorsFunction(BaseFunction):
         Arguments:
         resource -- the resource instance to which the primary decriptor will be assigned
         config -- the descriptor config which indicates how and what will define the descriptor
-        
+
         Keyword Arguments:
         context -- string such as "copy" to indicate conditions under which a resource participates in a function.
         """
