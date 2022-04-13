@@ -30,18 +30,17 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 <div class="content-panel" data-bind="click:function() { menuActive(false); }">
     <div class="flex">
         <div class="flex">
-            <div class="left-column-crud-container form-list">
-                <div class="layer-list">
+            <div class="left-column-crud-container form-list" style="overflow-y: hidden;">
+                <div class="layer-filter">
                     <!-- Layer Filter -->
                     <div class="list-filter" data-bind="">
-                        <input type="text" class="form-control" style="" placeholder="Find a layer..." data-bind="value: listFilter, valueUpdate: 'keyup'">
+                        <input type="text" class="form-control" placeholder="Find a layer..." data-bind="value: listFilter, valueUpdate: 'keyup'">
 
                         <!-- Clear Search -->
                         <span class="clear-node-search" data-bind="click: function () { listFilter(''); }"><i class="fa fa-times-circle"></i></span>
                     </div>
-
                 </div>
-                <div class="report-image-grid relative">
+                <div class="layer-list">
                     <div class="grid">
                         <!-- ko foreach: { data: listItems(), as: "item" } -->
                         <div tabindex="0" class="library-card selected-card" data-bind="click: function () { $parent.selection(item) }, css: {'selected': $parent.selection() === item}" onkeyup="if(event.which == 13 || event.keyCode == 13){ $(this).trigger('click'); }">
@@ -49,10 +48,10 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                             <div class="library-icon">
                                 <span class="icon-wrap icon-wrap-sm icon-circle branch-icon bg-primary">
                                     <!-- ko if: item.nodeid -->
-                                    <i class="" data-bind="css: item.config.layerIcon() || item.layer.icon"></i>
+                                    <i data-bind="css: item.config.layerIcon() || item.layer.icon"></i>
                                     <!-- /ko -->
                                     <!-- ko if: !item.nodeid -->
-                                    <i class="" data-bind="css: item.icon"></i>
+                                    <i data-bind="css: item.icon"></i>
                                     <!-- /ko -->
                                 </span>
                             </div>
@@ -77,7 +76,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
             </div>
 
             <!-- Basemap/Overlays Config -->
-            <div class="card-form-preview-container">
+            <div class="card-form-preview-container" style="height: calc(100vh + 100px);">
 
                 <!-- Header -->
                 <div class="category-header">
@@ -170,15 +169,15 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 
                             <!-- Service Styling -->
                             <div class="row map-service-container" style="padding-left: 10px; padding-right: 10px;">
-                                <div class="">
-                                    <div class="tab-base map-service-tabs" style="">
+                                <div>
+                                    <div class="tab-base map-service-tabs">
 
                                         <!-- Resource Styling Tabs -->
                                         <ul class="nav nav-tabs map-service-nav-tabs">
                                             <li class="active">
                                                 <a class="config-title-tab mar-no" data-toggle="tab" href="#settings-panel" aria-expanded="false"><i class="ion-ios-settings-strong"></i> {% trans "Settings" %}</a>
                                             </li>
-                                            <li class="">
+                                            <li>
                                                 <a class="config-title-tab mar-no" data-toggle="tab" href="#styling-panel" aria-expanded="false"><i class="ion-image"></i> {% trans "Service Styling" %}</a>
                                             </li>
                                         </ul>
@@ -191,7 +190,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                                                         <div class="panel-body" style="padding-top: 10px;">
                                                             <div class="form-group">
                                                                 <label class="control-label">{% trans "Layer Name:" %}</label>
-                                                                <div class="">
+                                                                <div>
                                                                     <input type="text" class="form-control" data-bind="valueUpdate: 'keyup', value: selection().name">
                                                                 </div>
                                                             </div>
@@ -244,7 +243,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                                                                 </div>
 
                                                                 <!-- Icon List -->
-                                                                <div style="height: 300px;overflow-y: scroll;padding: 15px;border: 1px solid #e9e9e9;">
+                                                                <div style="height: 300px; overflow-y: scroll; padding: 15px; border: 1px solid #e9e9e9;">
                                                                     <div class="row">
 
                                                                         <!-- ko foreach: icons -->
@@ -278,7 +277,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 
                                             <div id="styling-panel" class="tab-pane fade">
                                                 <div class="row" style="margin-top: -5px; margin-left: -5px; margin-right: -5px; margin-bottom: 10px;">
-                                                    <div class="" data-bind="codemirror: { value: selectedLayerJSON, mode: { name: 'javascript', json: true }, theme: 'monokai' }"></div>
+                                                    <div data-bind="codemirror: { value: selectedLayerJSON, mode: { name: 'javascript', json: true }, theme: 'monokai' }"></div>
                                                 </div>
                                             </div>
 

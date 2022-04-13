@@ -59,7 +59,7 @@ from arches.app.utils.permission_backend import (
 )
 from arches.app.utils.geo_utils import GeoUtils
 from arches.app.search.components.base import SearchFilterFactory
-from arches.app.datatypes.datatypes import DataTypeFactory
+from arches.app.datatypes.datatypes import DataTypeFactory, EDTFDataType
 from arches.app.search.search_engine_factory import SearchEngineFactory
 from arches.app.search.search_export import SearchResultsExporter
 
@@ -263,11 +263,14 @@ class GeoJSON(APIBase):
     se = SearchEngineFactory().create()
 
     def get_name(self, resource):
-        module = importlib.import_module("arches.app.functions.primary_descriptors")
-        PrimaryDescriptorsFunction = getattr(module, "PrimaryDescriptorsFunction")()
-        functionConfig = models.FunctionXGraph.objects.filter(graph_id=resource.graph_id, function__functiontype="primarydescriptors")
-        if len(functionConfig) == 1:
-            return PrimaryDescriptorsFunction.get_primary_descriptor_from_nodes(resource, functionConfig[0].config["name"])
+        graph_function = models.FunctionXGraph.objects.filter(
+            graph_id=resource.graph_id, function__functiontype="primarydescriptors"
+        ).select_related("function")
+        if len(graph_function) == 1:
+            module = graph_function[0].function.get_class_module()()
+            return module.get_primary_descriptor_from_nodes(
+                self, graph_function[0].config["descriptor_types"]["name"]
+            )
         else:
             return _("Unnamed Resource")
 
@@ -1473,6 +1476,31 @@ class Tile(APIBase):
 
 
 @method_decorator(csrf_exempt, name="dispatch")
+class NodeGroup(APIBase):
+    def get(self, request, nodegroupid=None):
+        params = request.GET.dict()
+        user = request.user
+        perms = "models." + params.pop("perms", "read_nodegroup")
+        params["nodegroupid"] = params.get("nodegroupid", nodegroupid)
+
+        try:
+            uuid.UUID(params["nodegroupid"])
+        except ValueError as e:
+            del params["nodegroupid"]
+
+        try:
+            nodegroup = models.NodeGroup.objects.get(pk=params["nodegroupid"])
+            permitted_nodegroups = [nodegroup.pk for nodegroup in get_nodegroups_by_perm(user, perms)]
+        except Exception as e:
+            return JSONResponse(str(e), status=404)
+
+        if not nodegroup or nodegroup.pk not in permitted_nodegroups:
+            return JSONResponse(_("No nodegroup matching query parameters found."), status=404)
+
+        return JSONResponse(nodegroup, status=200)
+
+
+@method_decorator(csrf_exempt, name="dispatch")
 class Node(APIBase):
     def get(self, request, nodeid=None):
         graph_cache = {}
@@ -1684,3 +1712,18 @@ class Validator(APIBase):
             return JSONResponse(self.validate_tile(tile, verbose, strict), indent=indent)
 
         return JSONResponse(status=400)
+
+
+class TransformEdtfForTile(APIBase):
+    def get(self, request):
+        try:
+            value = request.GET.get("value")
+            transformed_value = EDTFDataType().transform_value_for_tile(value)
+
+        except TypeError as e:
+            return JSONResponse({"data": (str(e), False)})
+
+        except Exception as e:
+            return JSONResponse(str(e), status=500)
+
+        return JSONResponse({"data": transformed_value})
