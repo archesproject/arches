@@ -1,4 +1,6 @@
+{% load template_tags %}
 {% load i18n %}
+
 <!-- ko foreach: { data: [$data], as: 'self' } -->
 <div>
     <!-- TOC Cards/Widgets -->
@@ -27,7 +29,7 @@
                 }"></i>
             </span>
             <span class="node-name" data-bind="text: card.get('name')"></span>
-            <span class="node-subname" data-bind="text: card.isContainer() ? '{% trans "Card Container" %}' : '{% trans "Card" %}'"></span>
+            <span class="node-subname" data-bind="text: card.isContainer() ? {% quoted_trans "Card Container" %} : {% quoted_trans "Card" %}"></span>
         </a>
 
         <ul class="card-tree-list-item" aria-expanded="true">

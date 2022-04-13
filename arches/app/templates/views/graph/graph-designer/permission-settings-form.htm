@@ -1,4 +1,6 @@
+{% load template_tags %}
 {% load i18n %}
+
 <div id="" class="graph-designer-graph-content permission-manager">
 <!--ko if: permissionsDesigner.showPermissionsForm() === true -->
     <div class="settings-panel">
@@ -40,7 +42,7 @@
                     <script type="text/html" id="selectAccountTemplate">
                         <option disabled selected value>{% trans "Select a Group/Account..." %}</option>
                         <!-- ko foreach: groups -->
-                            <optgroup data-bind="attr: { 'label': (name==='Groups')?'{% trans "Groups" %}':'{% trans "Accounts" %}' }, foreach: items">
+                            <optgroup data-bind="attr: { 'label': (name==='Groups')?{% quoted_trans "Groups" %}:{% quoted_trans "Accounts" %} }, foreach: items">
                                 <option data-bind="value: combinedId, text: name"></option>
                             </optgroup>
                         <!-- /ko -->

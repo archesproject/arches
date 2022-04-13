@@ -1,4 +1,5 @@
 {% load staticfiles %}
+{% load template_tags %}
 {% load i18n %}
 {% block header %}
 
@@ -22,7 +23,7 @@
             </select>
         </div>
 
-        <div data-bind="component: { name: 'views/components/simple-switch', params: {value: sortDescending, config:{ label: '{% trans "Youngest to oldest" %}', subtitle: ''}}}"></div>
+        <div data-bind="component: { name: 'views/components/simple-switch', params: {value: sortDescending, config:{ label: {% quoted_trans "Youngest to oldest" %}, subtitle: ''}}}"></div>
     </div>
     <!-- /ko -->
     {% endblock %}
@@ -46,11 +47,11 @@
             {% block listitem %}
             <div class='entry'>
                 <!--ko if: $data.resource_deleted == false -->
-                <a class="resource-edit-link" href='' data-bind="text: '{% trans "Edit" %}', click: function(){$parent.editResource($data.resourceinstanceid)}"></a>
+                <a class="resource-edit-link" href='' data-bind="text: {% quoted_trans "Edit" %}, click: function(){$parent.editResource($data.resourceinstanceid)}"></a>
                 <div class="entry-label-resource" data-bind="text: $data.resourcedisplayname"></div>
                 <!--/ko-->
                 <!--ko if: $data.resource_deleted == true -->
-                <div><span class="resource-edit-link" data-bind="text: '{% trans 'Resource has been deleted' %}'"></span></div>
+                <div><span class="resource-edit-link" data-bind="text: {% quoted_trans 'Resource has been deleted' %}"></span></div>
                 <!--/ko-->
             </div>
 

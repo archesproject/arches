@@ -2,6 +2,7 @@ from arches.app.utils.permission_backend import get_editable_resource_types
 from arches.app.utils.permission_backend import get_createable_resource_types
 from arches.app.utils.permission_backend import get_resource_types_by_perm
 from django import template
+from django.templatetags.i18n import do_translate, TranslateNode
 import json
 
 register = template.Library()
@@ -76,3 +77,19 @@ def return_json_as_obj(string):
     except:
         pass
     return value
+
+class QuotedTranslateNode(TranslateNode):
+    def render(self, context):
+        value = super().render(context)
+        return '&quot;{0}&quot;'.format(value)
+
+@register.tag("quoted_trans")
+def quoted_trans_tag(parser, token):
+    """
+    Returns a translated string wrapped in HTML &quot; characters 
+    primarily for use in JSON strings embedded in HTML templates
+    where using single quotes breaks when the string itself contains a single quote
+    which is often found in other languages
+    """
+    transnode = do_translate(parser, token)
+    return QuotedTranslateNode(transnode.filter_expression, transnode.noop, transnode.asvar, transnode.message_context)

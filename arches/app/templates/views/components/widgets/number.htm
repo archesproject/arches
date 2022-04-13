@@ -1,4 +1,5 @@
 {% extends "views/components/widgets/base.htm" %}
+{% load template_tags %}
 {% load i18n %}
 
 {% block form %}
@@ -35,7 +36,7 @@
     <!-- ko if: displayValue -->
     <span data-bind="text: prefix(), css: {'number-prefix': prefix()}"></span>
         <!-- ko if: format -->
-        <span data-bind="formattedNumber: displayValue(), format: format || '{% trans "None" %}'"></span>
+        <span data-bind="formattedNumber: displayValue(), format: format || {% quoted_trans "None" %}"></span>
         <!-- /ko -->
         <!-- ko ifnot: format -->
         <span data-bind="text: displayValue()"></span>
@@ -43,7 +44,7 @@
     <span data-bind="text: suffix(), css: {'number-suffix': suffix()}"></span>
     <!-- /ko -->
     <!-- ko ifnot: displayValue -->
-    <span data-bind="text: '{% trans "None" %}'"></span>
+    <span data-bind="text: {% quoted_trans "None" %}"></span>
     <!-- /ko -->
     </div>
 </dd>
@@ -109,7 +110,7 @@
         {% trans "Disabled" %}
     </div>
     <div class="pad-no">
-        <div data-bind="component: { name: 'views/components/simple-switch', params: {value: uneditable, config:{label: '{% trans "Disable Editing" %}', subtitle: '{% trans "Prevent users from editing value" %}'}}}"></div>
+        <div data-bind="component: { name: 'views/components/simple-switch', params: {value: uneditable, config:{label: {% quoted_trans "Disable Editing" %}, subtitle: {% quoted_trans "Prevent users from editing value" %}}}}"></div>
     </div>
 </div>
 {% endblock config_form %}

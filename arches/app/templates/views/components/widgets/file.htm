@@ -1,4 +1,5 @@
 {% extends "views/components/widgets/base.htm" %}
+{% load template_tags %}
 {% load i18n %}
 
 {% block form %}
@@ -53,7 +54,7 @@
                     <span data-bind="text: filteredList().length+' out of '+filesJSON().length+' files match filter'"></span>
                     <!-- /ko -->
                     <!-- ko if: (!filter() || filter() == "") -->
-                    <span data-bind="text: filesJSON().length + '{% trans " file(s) uploaded" %}'"></span>
+                    <span data-bind="text: filesJSON().length + {% quoted_trans " file(s) uploaded" %}"></span>
                     <!-- /ko -->
                     <button type="button" class="btn btn-file-upload-reset" data-bind="click: reset">
                         <span>{% trans "delete all files" %}</span>
@@ -76,9 +77,9 @@
                                 <div class="media-left">
                                     <span class="text-main mar-no text-overflow" data-bind="text: name"></span>
                                     <!-- ko if: $data.error -->
-                                    <span class="dz-error text-danger text-sm" data-bind="text: '{% trans "error" %}'"></span>
+                                    <span class="dz-error text-danger text-sm" data-bind="text: {% quoted_trans "error" %}"></span>
                                     <!-- /ko -->
-                                    <span class="text-sm"><a data-bind="attr: {href: ko.unwrap(url) ? $parent.getFileUrl(url) : content, download: name}, click: function(){return ko.unwrap(url) ? true : false}, clickBubble: false"><span data-bind="text: ko.unwrap(url) ? '{% trans "Download" %}' : '{% trans "Unsaved" %}'"></span></a></span>
+                                    <span class="text-sm"><a data-bind="attr: {href: ko.unwrap(url) ? $parent.getFileUrl(url) : content, download: name}, click: function(){return ko.unwrap(url) ? true : false}, clickBubble: false"><span data-bind="text: ko.unwrap(url) ? {% quoted_trans "Download" %} : {% quoted_trans "Unsaved" %}"></span></a></span>
                                 </div>
                                 <div class="file-upload-card-detail-right">
                                     <div class="media-right" data-bind="click: $parent.removeFile">
@@ -106,9 +107,9 @@
                                 <div class="media-left">
                                     <span class="text-main mar-no text-overflow" data-bind="text: name"></span>
                                     <!-- ko if: $data.error -->
-                                    <span class="dz-error text-danger text-sm" data-bind="text: '{% trans "error" %}'"></span>
+                                    <span class="dz-error text-danger text-sm" data-bind="text: {% quoted_trans "error" %}"></span>
                                     <!-- /ko -->
-                                    <span class="text-sm"><a data-bind="attr: {href: ko.unwrap(url) ? $parent.getFileUrl(url) : content, download: name}, click: function(){return ko.unwrap(url) ? true : false}, clickBubble: false"><span data-bind="text: ko.unwrap(url) ? '{% trans "Download" %}' : '{% trans "Unsaved" %}'"></span></a></span>
+                                    <span class="text-sm"><a data-bind="attr: {href: ko.unwrap(url) ? $parent.getFileUrl(url) : content, download: name}, click: function(){return ko.unwrap(url) ? true : false}, clickBubble: false"><span data-bind="text: ko.unwrap(url) ? {% quoted_trans "Download" %} : {% quoted_trans "Unsaved" %}"></span></a></span>
                                 </div>
                                 <div class="file-upload-card-detail-right">
                                     <div class="media-right" data-bind="click: $parent.removeFile">
