@@ -34,7 +34,7 @@ define([
         };
 
         this.initialize();
-    };
+    }
 
 
     function TileBasedComponent() {
@@ -236,7 +236,7 @@ define([
                     resourceInstanceId: savedDatum.resourceinstance_id,
                 };
             }));
-
+            
             self.saving(false);
             self.complete(true);
         };
@@ -276,7 +276,46 @@ define([
         };
 
         this.initialize();
-    };
+    }
+
+    function AbstractCardAdapter() {  // CURRENTLY IN DEVLEOPMENT, USE AT YOUR OWN RISK!
+        var self = this;
+
+        this.cardinality = ko.observable();
+
+        this.initialize = function() {
+            self.loading(true);
+
+            $.getJSON(( arches.urls.api_nodegroup(self.componentData.parameters['nodegroupid']) ), function(nodegroupData) {
+                self.cardinality(nodegroupData.cardinality);
+
+                $.getJSON(( arches.urls.resource + `/${self.componentData.parameters['resourceid']}/tiles?nodeid=${self.componentData.parameters['nodegroupid']}` ), function(data) {
+                    if (self.cardinality() === '1') {
+                        if (data['tiles'].length) {
+                            self.componentData.parameters['tileid'] = data['tiles'][0]['tileid'];
+                            self.complete(true);
+                        }
+                        TileBasedComponent.apply(self);
+                    }
+                    else if (self.cardinality() === 'n') {
+                        MultipleTileBasedComponent.apply(self);
+                        if (data['tiles'].length) {
+                            self.complete(true);
+                        }
+                        
+                        self.onSaveSuccess = function(_savedData) {  // LEGACY -- DO NOT USE
+                            self.componentData.parameters.dirty(false);
+                            self.dirty(false);
+                            self.saving(false);
+                            self.complete(true);
+                        };
+                    }
+                });
+            });
+        };
+
+        this.initialize();
+    }
 
 
     function MultipleTileBasedComponent(title) {
@@ -520,7 +559,7 @@ define([
         };
 
         this.initialize();
-    };
+    }
 
 
     function WorkflowComponentAbstract(params) {
@@ -628,7 +667,14 @@ define([
                 self.componentData['parameters']['renderContext'] = 'workflow';
             }
 
-            if (!self.componentData.tilesManaged || self.componentData.tilesManaged === "none") {
+
+
+            if (self.componentData.componentType === 'card') {
+                AbstractCardAdapter.apply(self);
+            }
+
+
+            else if (!self.componentData.tilesManaged || self.componentData.tilesManaged === "none") {
                 NonTileBasedComponent.apply(self);
             }
             else if (self.componentData.tilesManaged === "one") {

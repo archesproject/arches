@@ -1,0 +1,59 @@
+{% load i18n %}
+<!-- ko ifnot: loading() --><!-- ko ifnot: response() -->
+<div data-bind="dropzone: dropzoneOptions" class="file-select loader-select" style="height: 100%; width: 100%">
+    <div>
+        <div class="manifest-manager-main-menu-circle loader-button">
+            <span><i style="color: #000" class="fa fa-cloud-upload r-select-icon"></i></span>
+        </div> 
+        <h2>{% trans 'Upload Your .zip File' %}</h2>
+        <h4>{% trans 'Drag & Drop your file onto this area to upload' %}</h4>
+        <div style="display: flex; padding: 15px 25px; flex-direction: column; justify-content: center; align-items: center;">
+            <div style="display:flex; flex-direction: column;">
+                <div>
+                    <div class="dropzone-photo-upload">
+                        <div style="border-top: 1px solid #c4c4c4; margin-bottom: 15px;" class="btn btn-primary btn-labeled btn-lg fa fa-file fileinput-button dz-clickable" data-bind="css: uniqueidClass" role="button">
+                        {% trans 'Select File' %}
+                        </div>
+                        <div style="border-top: 1px solid #c4c4c4; margin-bottom: 15px;" class="btn btn-danger btn-labeled btn-lg fa fa-times-circle" data-bind="click: function() { $parent.selectedModule(null) }" role="button">
+                            {% trans 'Cancel File Import' %}
+                        </div>
+                        <div style="min-height: 100%;">
+                            <div id="hidden-dz-previews" style="display:none"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <h5 class="rr-splash-description">
+                {% trans 'Use this workflow to upload a file with data that you want to use to create new data instances of a model.' %}
+            </h5>
+        </div>
+    </div>
+</div>
+<!-- /ko --><!-- /ko -->
+<!-- ko if: response -->
+<div style="display: grid; row-gap: 2px; height:fit-content; padding:15px; color: steelblue;">
+<h4>{% trans "Format: Branch CSV" %}</h4>
+<h4>{% trans "File Summary" %}</h4>
+<div>
+    <div style="display: inline-grid; grid-template-columns: auto auto; column-gap: 10px;">
+        <div data-bind="text: response().result.summary.name"></div>
+        <div data-bind="text: response().result.summary.size"></div>
+        <!--ko foreach: {data: Object.keys(response().result.summary.files), as: 'file'}-->
+        <div data-bind="text: file"></div>
+            <!-- ko foreach: {data: $parent.response().result.summary.files[file], as: 'details'} -->
+            <div data-bind="text: details.size"></div>
+            <h5>{% trans "Worksheets" %}</h5>
+            <h5>{% trans "Rows" %}</h5>
+            <!-- <div style="display: inline-grid; grid-template-columns: auto auto; row-gap: 5px; column-gap: 10px;"> -->
+                <!--ko foreach: $data.worksheets-->
+                <div data-bind="text: $data.name"></div>
+                <div data-bind="text: $data.rows"></div>
+                <!-- /ko -->
+            <!-- </div> -->
+            <!-- /ko -->
+        <!-- /ko -->
+    </div>
+    <div style="padding:10px; margin: 10px; width: fit-content; color: #fff; background-color:steelblue;" data-bind="click: function(){submit('write')}">Load</div>
+</div>
+</div>
+<!--/ko-->

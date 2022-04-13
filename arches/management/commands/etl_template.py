@@ -44,11 +44,13 @@ class Command(BaseCommand):
 
     def write_metadata(self, workbook, metadata):
         metadata_sheet = workbook.create_sheet(title="Metadata")
-        metadata_sheet[f"A1"] = "node"
-        metadata_sheet[f"B1"] = "datatype"
-        for i, node in enumerate(metadata):
-            metadata_sheet.cell(column=1, row=i + 2, value=node["alias"])
-            metadata_sheet.cell(column=2, row=i + 2, value=node["datatype"])
+        metadata_sheet[f"A1"] = "graphid"
+        metadata_sheet[f"B1"] = metadata["graphid"]
+        metadata_sheet[f"A5"] = "node"
+        metadata_sheet[f"B5"] = "datatype"
+        for i, node in enumerate(metadata["nodes"]):
+            metadata_sheet.cell(column=1, row=i + 6, value=node["alias"])
+            metadata_sheet.cell(column=2, row=i + 6, value=node["datatype"])
 
     def style_header(self, length, width, sheet):
         thin = styles.Side(border_style="thin", color="000000")
@@ -66,13 +68,13 @@ class Command(BaseCommand):
             cursor.execute("""SELECT * FROM __get_nodegroup_tree_by_graph(%s)""", (graphid,))
             rows = cursor.fetchall()
             first_sheet = True
-            metadata = []
+            metadata = {"nodes": [], "graphid": graphid}
             column_length = 0
             for row in rows:
                 details = dict(zip(columns, row))
                 tab = "    " * details["depth"]
                 nodes = Node.objects.filter(nodegroup_id=details["nodegroupid"]).exclude(datatype="semantic").values("datatype", "alias")
-                metadata += nodes
+                metadata["nodes"] += nodes
                 if details["depth"] == 0:
                     column_length = 0
                     if first_sheet is True:

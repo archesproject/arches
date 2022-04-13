@@ -61,6 +61,36 @@ remove_csv_importer = """
     delete from etl_modules where etlmoduleid = '0a0cea7e-b59a-431a-93d8-e9f8c41bdd6b';
     """
 
+add_branch_csv_importer = """
+    insert into etl_modules (
+        etlmoduleid,
+        name,
+        description,
+        component,
+        componentname,
+        modulename,
+        classname,
+        config,
+        icon,
+        slug)
+    values (
+        '3b19a76a-0b09-450e-bee1-65accb096eaf',
+        'Import Branch CSV',
+        'Loads resource data in branch csv format',
+        'views/components/etl_modules/branch-csv-importer',
+        'branch-csv-importer',
+        'branch_csv_importer.py',
+        'BranchCsvImporter',
+        '{"circleColor": "#ff77cc", "bgColor": "#cc2266"}',
+        'fa fa-upload',
+        'branch-csv-importer'
+    );
+"""
+
+remove_branch_csv_importer = """
+    delete from etl_modules where etlmoduleid = '0a0cea7e-b59a-431a-93d8-e9f8c41bdd6b';
+"""
+
 add_validation_reporting_functions = """
     CREATE OR REPLACE FUNCTION public.__arches_load_staging_get_tile_errors(json_obj jsonb)
     RETURNS text
@@ -293,6 +323,10 @@ class Migration(migrations.Migration):
         migrations.RunSQL(
             add_csv_importer,
             remove_csv_importer,
+        ),
+        migrations.RunSQL(
+            add_branch_csv_importer,
+            remove_branch_csv_importer,
         ),
         migrations.CreateModel(
             name="LoadEvent",

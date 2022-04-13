@@ -15,14 +15,20 @@ define(['jquery', 'knockout', 'uuid', 'arches', 'js-cookie'], function($, ko, uu
         this.uniqueidClass = ko.computed(function() {
             return "unique_id_" + uuid.generate();
         });
+        this.response = ko.observable();
 
         this.addFile = function(file){
             self.loading(true);
             self.fileInfo({name: file.name, size: file.size});
             self.formData.append('file', file, file.name);
-            self.submit('read').then(function(){
+            self.submit('read').then(function(response){
                 self.fileAdded(true);
                 self.loading(false);
+                if (response.ok) {
+                    return response.json();
+                }
+            }).then(function(response) {
+                self.response(response);
             }).catch(function(err) {    
                 // eslint-disable-next-line no-console
                 console.log(err);
