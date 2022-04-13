@@ -7,7 +7,7 @@
     <div>
         <select data-bind="
             disable: isEditable === false,
-            placeholder: '{% trans "Select a node" %}',
+            placeholder: {% quoted_trans "Select a node" %},
             value: config.nodeid,
             options: nodes,
             optionsText: 'name',
@@ -25,7 +25,7 @@
     <div data-bind="if: properties().length > 0">
         <select data-bind="
             disable: isEditable === false,
-            placeholder: '{% trans "Select a property" %}',
+            placeholder: {% quoted_trans "Select a property" %},
             value: config.property,
             options: properties,
             optionsText: 'name',

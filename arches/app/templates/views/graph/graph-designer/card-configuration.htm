@@ -124,7 +124,7 @@
                         <div class="dropdown">
                             <input class="" style="display:inline-block;"
                             data-bind="select2Query: {
-                                select2Config: getSelect2ConstraintConfig('{% trans "Select Nodes" %}')
+                                select2Config: getSelect2ConstraintConfig({% quoted_trans "Select Nodes" %})
                             }">
                         </div>
                         <div data-bind="component: { name: 'views/components/simple-switch', params: {value: constraintvm.constraint.uniquetoallinstances, config:{label: 'Unique to all resource instances?'}}}"></div>

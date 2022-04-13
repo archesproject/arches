@@ -13,10 +13,10 @@
         <div>{% trans 'Units:' %}</div>
         <select data-bind="
             options: [{
-                text: '{% trans 'meters' %}',
+                text: {% quoted_trans 'meters' %},
                 value: 'm'
             }, {
-                text: '{% trans 'feet' %}',
+                text: {% quoted_trans 'feet' %},
                 value: 'ft'
             }],
             optionsText: 'text',

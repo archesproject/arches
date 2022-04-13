@@ -74,10 +74,10 @@
                 <span class="provisional-review-pending">{% trans 'pending review' %}</span>
                 <!--/ko-->
                 <!--ko if: $data.lastedittype === 'delete edit' -->
-                <div><span class="provisional-review-declined" data-bind="text: $data.reviewer + ' {% trans 'declined' %}'"></span></div>
+                <div><span class="provisional-review-declined" data-bind="text: $data.reviewer + {% quoted_trans 'declined' %}"></span></div>
                 <!--/ko-->
                 <!--ko if: $data.lastedittype === 'accept edit' -->
-                <div><span class="provisional-review-accepted" data-bind="text: $data.reviewer + ' {% trans 'accepted' %}'"></span></div>
+                <div><span class="provisional-review-accepted" data-bind="text: $data.reviewer + {% quoted_trans 'accepted' %}"></span></div>
                 <!--/ko-->
             </div>
 

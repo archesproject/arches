@@ -190,5 +190,5 @@
 {% endblock report %}
 
 {% block display_value %}
-<span data-bind="text: Number.isInteger(displayValue()) ? displayValue() + ' {% trans "files uploaded" %}' : displayValue()"></span>
+<span data-bind="text: Number.isInteger(displayValue()) ? displayValue() + {% quoted_trans "files uploaded" %} : displayValue()"></span>
 {% endblock display_value %}
