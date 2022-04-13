@@ -45,7 +45,7 @@ class Command(BaseCommand):
     def write_metadata(self, workbook, metadata):
         metadata_sheet = workbook.create_sheet(title="Metadata")
         metadata_sheet[f"A1"] = "graphid"
-        metadata_sheet[f"B1"] = metadata["graphid"]        
+        metadata_sheet[f"B1"] = metadata["graphid"]
         metadata_sheet[f"A5"] = "node"
         metadata_sheet[f"B5"] = "datatype"
         for i, node in enumerate(metadata["nodes"]):
@@ -68,10 +68,7 @@ class Command(BaseCommand):
             cursor.execute("""SELECT * FROM __get_nodegroup_tree_by_graph(%s)""", (graphid,))
             rows = cursor.fetchall()
             first_sheet = True
-            metadata = {
-                "nodes":[],
-                "graphid": graphid
-            }
+            metadata = {"nodes": [], "graphid": graphid}
             column_length = 0
             for row in rows:
                 details = dict(zip(columns, row))
