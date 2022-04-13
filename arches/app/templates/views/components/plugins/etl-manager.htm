@@ -6,10 +6,10 @@
             <!-- ko foreach: {data: tabs, as: 'tab'} -->
             <!-- <div class="etl-manager-tab" data-bind="click: function(){$parent.activeTab(tab.id)}, css: {active: $parent.activeTab() === tab.id, 'disabled': true}, text: tab.title"></div> -->
             <!-- /ko -->
-            <div class="etl-manager-tab" data-bind="click: function(){activeTab('start')}, css: {active: activeTab() === 'start', 'disabled': true}, text: 'Start'"></div>
-            <div class="etl-manager-tab" data-bind="click: function(){activeTab('details')}, css: {active: activeTab() === 'details', 'disabled': true}, text: 'Task Details'"></div>
-            <div class="etl-manager-tab" data-bind="click: function(){activeTab('import'); fetchLoadEvent()}, css: {active: activeTab() === 'import', 'disabled': true}, text: 'Import Tasks'"></div>
-            <div class="etl-manager-tab" data-bind="click: function(){activeTab('export')}, css: {active: activeTab() === 'export', 'disabled': true}, text: 'Export Tasks'"></div>
+            <div class="etl-manager-tab" data-bind="click: function(){activeTab('start')}, css: {active: activeTab() === 'start', 'disabled': false}, text: 'Start'"></div>
+            <div class="etl-manager-tab" data-bind="click: function(){activeTab('details')}, css: {active: activeTab() === 'details', 'disabled': false}, text: 'Task Details'"></div>
+            <div class="etl-manager-tab" data-bind="click: function(){activeTab('import'); fetchLoadEvent()}, css: {active: activeTab() === 'import', 'disabled': false}, text: 'Import Tasks'"></div>
+            <div class="etl-manager-tab" data-bind="click: function(){activeTab('export')}, css: {active: activeTab() === 'export', 'disabled': false}, text: 'Export Tasks'"></div>
         </div>
     </div>
     <div data-bind="if: activeTab() === 'start'">
@@ -63,7 +63,93 @@
         <!-- /ko -->
     </div>
     <div data-bind="if: activeTab() === 'import'">
-        <h1>import</h1>
+        <div class="etl-module-writer-container" style="display: flex; flex-direction: column;">
+            <div class="etl-module-preview-container" style="display: inline-flex; flex-direction: row;">
+                <div class="etl-module-mapping" style="height: calc(100vh - 50px); width: 400px; padding: 25px; overflow: scroll;" data-bind="resizableSidepanel:true">
+                    <h3>{% trans "ETL History" %}</h3>
+                    <div class="etl-table">
+                        <table class="table-striped" style="min-width: 50px; border: 1px solid rgba(0,0,0,0.14);">
+                            <tbody data-bind="foreach: {data: loadEvents, as: 'event'}">
+                                <tr>
+                                    <td data-bind="click: function(){$parent.selectedLoadEvent(event)}" style="display: flex; padding:5px; flex-direction: column; justify-content: space-between; cursor: pointer; height:75px; width: 300px;">
+                                        <div>
+                                            <div data-bind="text: event.load_description"></div>
+                                        </div>
+                                        <div style="display: flex; flex-direction: row; justify-content: space-between;">
+                                            <div>
+                                                <div data-bind="text: $parent.getUserName(event.user_id)"></div>
+                                                <div data-bind="text: event.load_start_time"></div>
+                                            </div>
+                                            <div>
+                                                <!-- ko if: event.complete && event.successful -->
+                                                <button class="btn btn-success">{% trans "Finished" %}</button>
+                                                <!-- /ko -->
+                                                <!-- ko if: (event.complete && !event.successful) || !event.load_start_time -->
+                                                <button class="btn btn-danger">{% trans "Failed" %}</button>
+                                                <!-- /ko -->
+                                                <!-- ko if: !event.complete && event.load_start_time -->
+                                                <button class="btn btn-warning">{% trans "Running" %}</button>
+                                                <!-- /ko -->
+                                            </div>
+                                        </div>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td style="height:30px; border-bottom: 1px solid rgba(0,0,0,0.14)">
+                                        <!-- ko if: event.complete && event.successful -->
+                                        <a style="color: steelblue; text-decoration: underline; padding-right: 10px;" data-bind="attr: {href: ''}">{% trans "clean up" %}</a>
+                                        <a style="color: steelblue; text-decoration: underline; padding-right: 10px;" data-bind="attr: {href: ''}">{% trans "undo import" %}</a>
+                                        <!-- /ko -->
+                                        <!-- ko if: (event.complete && !event.successful) || !event.load_start_time -->
+                                        <a style="color: steelblue; text-decoration: underline; padding-right: 10px;" data-bind="attr: {href: ''}">{% trans "clean up" %}</a>
+                                        <!-- /ko -->
+                                        <!-- ko if: !event.complete && event.load_start_time -->
+                                        <a style="color: steelblue; text-decoration: underline; padding-right: 10px;" data-bind="attr: {href: ''}">{% trans "stop task" %}</a>
+                                        <!-- /ko -->
+                                    </td>
+                                </tr>
+                            <tbody>
+                        </table>
+                    </div>
+                </div>
+                <div class="etl-module-preview" style="height: calc(100vh - 50px); width: calc(100vw - 400px); padding: 25px; overflow: scroll;">
+                    <div class="etl-module-info" data-bind="if: selectedLoadEvent()">
+                        <div>
+                            <h4 data-bind='text: selectedLoadEvent().load_description'></h4>
+                            <div>
+                                <span style="font-size: 15px; padding-right: 3px;">{% trans 'Target Resource:' %}</span>
+                                <span data-bind="text: selectedLoadEvent().load_details.graph"></span>    
+                            </div>
+                            <div>
+                                <span style="font-size: 15px; padding-right: 3px;">{% trans 'Target Fields:' %}</span>
+                                <!-- ko foreach: selectedLoadEvent().load_details.mapping -->
+                                <span data-bind="text: $data.node"></span><span>;</span>
+                                <!-- /ko -->
+                            </div>
+                        </div>
+                        <div data-bind="if: selectedLoadEvent()">
+                            <h4>{% trans "Loading data" %}</h4>
+                            <div>
+                                <span style="font-size: 15px; padding-right: 3px;">{% trans 'Loading status:' %}</span>
+                                <span data-bind="text: selectedLoadEvent().successful ? '{% trans "Finished" %}' : selectedLoadEvent().complete || !selectedLoadEvent().load_start_time ? '{% trans "Failed" %}' : '{% trans "Running" %}'"></span>  
+                            </div>
+                            <div>
+                                <span style="font-size: 15px; padding-right: 3px;">{% trans 'Loading start:' %}</span>
+                                <span data-bind="text: formatTime(selectedLoadEvent().load_start_time)"></span>    
+                            </div>
+                            <div>
+                                <span style="font-size: 15px; padding-right: 3px;">{% trans 'Loading end:' %}</span>
+                                <span data-bind="text: formatTime(selectedLoadEvent().load_end_time)"></span>    
+                            </div>
+                            <div data-bind="if: selectedLoadEvent().load_end_time">
+                                <span style="font-size: 15px; padding-right: 3px;">{% trans 'Load duration:' %}</span>
+                                <span data-bind="text: timeDifference(selectedLoadEvent().load_end_time, selectedLoadEvent().load_start_time)"></span>    
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
     <div data-bind="if: activeTab() === 'export'">
          <h1>export</h1>

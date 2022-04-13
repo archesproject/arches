@@ -1,7 +1,8 @@
 define([
     'knockout',
     'arches',
-], function(ko, arches) {
+    'js-cookie'
+], function(ko, arches, Cookies) {
     return ko.components.register('etl-manager', {
         viewModel: function(params) {
             var self = this;
@@ -10,6 +11,9 @@ define([
             this.selectedModule = ko.observable();
             this.activeTab = ko.observable();
             this.isImport = ko.observable(true);
+            this.loadEvents = ko.observable();
+            this.selectedLoadEvent = ko.observable();
+            this.selectedLoadEvent.subscribe(function(val){console.log(val)})
             this.moduleSearchString = ko.observable('');
             this.tabs = [
                 {id: 'start', title: 'Start'},
@@ -29,9 +33,29 @@ define([
                         return response.json();
                     }
                 }).then(function(data){
-                    console.log(data)
+                    self.loadEvents(data);
+                    self.selectedLoadEvent(data[0]);
                 });
             };
+
+            this.getUserName = function(user){
+                window.fetch(arches.urls.get_user_names,{
+                    method: 'POST',
+                    credentials: 'include',
+                    body: JSON.stringify({userids: [user]}),
+                    headers: {
+                        'Content-Type': 'application/json',
+                        "X-CSRFToken": Cookies.get('csrftoken')
+                    },
+                }).then(function(response){
+                    if(response.ok){
+                        return response.json();
+                    }
+                }).then(function(data){
+                    console.log(data[user]);
+                    return data[user]
+                });
+            }
 
             this.fetchStagedData = function(loadid){
                 const url = arches.urls.etl_manager + "?action=stagedData&loadid="+loadid;
@@ -43,6 +67,25 @@ define([
                     console.log(data)
                 });
             };
+
+            this.formatTime = function(timeString){
+                if (timeString){
+                    timeObject = new Date(timeString)
+                } else {
+                    return null;
+                }
+                return timeObject.toLocaleString();
+            };
+
+            this.timeDifference = function(endTime, startTime){
+                let timeDiff = new Date(endTime) - new Date(startTime);
+                const hours = Math.floor(timeDiff / 3600000);
+                timeDiff -= hours * 3600000;
+                const minutes = Math.floor(timeDiff / 60000);
+                timeDiff -= minutes * 60000;
+                const seconds = Math.floor(timeDiff / 1000);
+                return `${hours}:${('0' + minutes).slice(-2)}:${('0' + seconds).slice(-2)}`;
+            }
 
             this.init = function(){
                 const url = arches.urls.etl_manager + "?action=modules";
