@@ -145,6 +145,9 @@
 <div class="workbench-card-sidepanel-header-container">
     <h4 tabindex="0" class="workbench-card-sidepanel-header" data-bind="click: hideSidePanel, text: card.model.name" onkeyup="if(event.which == 13 || event.keyCode == 13){ $(this).trigger('click'); }"></h4>
 </div>
+<div class="workbench-card-sidepanel-border"></div>
+
+<div class="workbench-card-sidepanel-body">
 <h5 class="workbench-tile-picker-label">{% trans 'Image List' %}</h5>
 <div class='photo-workbench-photos'>
 <!-- ko foreach: { data: card.tiles(), as: 'tile'} -->
@@ -270,10 +273,33 @@
 
             {% endblock form_widgets %}
             <!-- /ko -->
+
+                    <aside id="card-help-panel" class="card-help-panel" style="display: none;" data-bind="visible: card.model.get('helpactive')">
+                        <div class="relative">
+                            <a id="add-basemap-wizard-help-close" href="#" class="help-close fa fa-times fa-lg" style="" data-bind="click: function () {
+                                card.model.get('helpactive')(false);
+                            }"></a>
+                        </div>
+                        <div id="add-basemap-wizard-help-content">
+                            <div>
+                                <div class="panel-heading">
+                                    <h3 class="panel-title help-panel-title" style="">
+                                        <span data-bind="html: card.model.get('helptitle')"></span>
+                                    </h3>
+                                </div>
+                                <div class="panel-body" style="padding: 10px 10px 15px 10px;" data-bind="html: card.model.get('helptext')">
+                                </div>
+                            </div>
+                        </div>
+                    </aside>
+                </div>
+            </div>
+        </div>
+    </div>
             {% block form_buttons %}
             <!-- ko foreach: { data: card.tiles(), as: 'tile'} -->
                 <!--ko if: $parent.getUrl(tile) && tile.selected()-->
-            <div class="display-in-workflow-step install-buttons">
+            <div class="display-in-workflow-step">
                 <!-- ko if: tile && self.deleteTile -->
                 <button class="btn btn-shim btn-labeled btn-lg fa fa-trash" data-bind="click: $parent.removeTile, css: {
                     disabled: (!$parent.card.isWritable && !self.preview),
@@ -300,30 +326,7 @@
             </div>
                 <!--/ko-->
             <!-- /ko -->
-
             {% endblock form_buttons %}
-
-            <aside id="card-help-panel" class="card-help-panel" style="display: none;" data-bind="visible: card.model.get('helpactive')">
-                <div class="relative">
-                    <a id="add-basemap-wizard-help-close" href="#" class="help-close fa fa-times fa-lg" style="" data-bind="click: function () {
-                        card.model.get('helpactive')(false);
-                    }"></a>
-                </div>
-                <div id="add-basemap-wizard-help-content">
-                    <div>
-                        <div class="panel-heading">
-                            <h3 class="panel-title help-panel-title" style="">
-                                <span data-bind="html: card.model.get('helptitle')"></span>
-                            </h3>
-                        </div>
-                        <div class="panel-body" style="padding: 10px 10px 15px 10px;" data-bind="html: card.model.get('helptext')">
-                        </div>
-                    </div>
-                </div>
-            </aside>
-        </div>
-    </div>
-</div>
 <!--/ko-->
 
 {{ block.super }}

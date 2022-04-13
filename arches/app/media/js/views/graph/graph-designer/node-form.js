@@ -38,39 +38,33 @@ define([
             });
             this.restrictedNodegroups = options.restrictedNodegroups;
             this.appliedFunctions = options.appliedFunctions;
+            this.primaryDescriptorFunction = options.primaryDescriptorFunction;
 
             this.isFuncNode = function() {
                 var node = self.node();
-                var appFuncs = null, appFuncDesc = false, appFuncName = false;
-                if(this.appliedFunctions()) {
-                    appFuncs = this.appliedFunctions();
-                    for(var i = 0; i < appFuncs.length; i++) {
-                        if(appFuncs[i]['function_id'] == "60000000-0000-0000-0000-000000000001") {
-                            if(appFuncs[i]['config']['description']['nodegroup_id']) {
-                                appFuncDesc = appFuncs[i]['config']['description']['nodegroup_id'];
-                            }
-                            if(appFuncs[i]['config']['name']['nodegroup_id']) {
-                                appFuncName = appFuncs[i]['config']['name']['nodegroup_id'];
-                            }
-                            if(node['id'] === appFuncDesc) {
-                                return "This node participates in the descriptor function";
-                            } else if(node['id'] === appFuncName) {
-                                return "This node participates in the name function";
-                            } else {
-                                if(node['children']) {
-                                    node['children'].forEach( function(child) {
-                                        if(child['id'] === appFuncDesc) {
-                                            return "This node participates in the descriptor function";
-                                        } else if(child['id'] === appFuncName) {
-                                            return "This node participates in the name function";
-                                        }
-                                    });
-                                }
-                            }
-                        }
+                var primaryDescriptorNodes = {}, descriptorType = null, pdFunction = this.primaryDescriptorFunction;
+
+                if (!pdFunction || !pdFunction())
+                    return false;
+
+                ['name', 'description'].forEach(function(descriptor){
+                    try {
+                        primaryDescriptorNodes[pdFunction()['config']['descriptor_types'][descriptor]['nodegroup_id']] = descriptor;
+                    } catch (e)
+                    {
+                        // Descriptor doesn't exist so ignore the exception
+                        console.log("No descriptor configuration for "+descriptor);
                     }
-                }
-                return false;
+                });
+
+                [node].concat(!!node['childNodes']() ? node['childNodes']() : [])
+                    .find(nodeToCheck => !!(descriptorType = primaryDescriptorNodes[nodeToCheck['id']]));
+
+                return !descriptorType ? false :
+                    (descriptorType === "name" ?
+                        "This node participates in the name function" :
+                        "This node participates in the descriptor function"
+                    );
             };
 
             /**

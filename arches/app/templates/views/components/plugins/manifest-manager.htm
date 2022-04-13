@@ -25,13 +25,12 @@
 {% block sidepanel %}
 <!--ko foreach: { data: [$data], as: 'self' }-->
 <!--ko if: activeTab() === 'manifest'-->
-<div class="workbench-header-buffer">
-    <div class="workbench-card-sidepanel-header-container">
-        <h4 tabindex="0" class="workbench-card-sidepanel-header" data-bind="click: hideSidePanel" onkeyup="if(event.which == 13 || event.keyCode == 13){ $(this).trigger('click'); }">{% trans 'Manage Image Service' %}</h4>
-    </div>
+<div class="workbench-card-sidepanel-header-container">
+    <h4 tabindex="0" class="workbench-card-sidepanel-header" data-bind="click: hideSidePanel" onkeyup="if(event.which == 13 || event.keyCode == 13){ $(this).trigger('click'); }">{% trans 'Manage Image Service' %}</h4>
 </div>
-
-<div class="iiif-image-tools" style="margin-top: 20px;">
+<div class="workbench-card-sidepanel-border"></div>
+<div class="workbench-card-sidepanel-body">
+<div class="iiif-image-tools">
     <div class="form-group">
         <div class="row widget-wrapper">
         <label class="control-label">{% trans "Title" %}</label>
@@ -110,16 +109,17 @@
         <!--/ko-->
     </div>
 </div>
+</div>
 <!--/ko-->
 
 <!--ko if: activeTab() === 'canvas'-->
-<div class="workbench-header-buffer">
-    <div class="workbench-card-sidepanel-header-container">
-        <h4 tabindex="0" class="workbench-card-sidepanel-header" data-bind="click: hideSidePanel" onkeyup="if(event.which == 13 || event.keyCode == 13){ $(this).trigger('click'); }">{% trans 'Manage Image Canvases' %}</h4>
-    </div>
+<div class="workbench-card-sidepanel-header-container">
+    <h4 tabindex="0" class="workbench-card-sidepanel-header" data-bind="click: hideSidePanel" onkeyup="if(event.which == 13 || event.keyCode == 13){ $(this).trigger('click'); }">{% trans 'Manage Image Canvases' %}</h4>
 </div>
 
-<div class="iiif-image-tools" style="margin-top: 20px;">
+<div class="workbench-card-sidepanel-border"></div>
+<div class="workbench-card-sidepanel-body">
+<div class="iiif-image-tools">
     <!--ko if: canvases().length > 0-->
     <label class="control-label">{% trans "Images" %}</label>
     <div>{% trans "Select image to delete from the image service" %}</div>
@@ -173,6 +173,7 @@
             <button class="btn btn-warning btn-md btn-labeled fa fa-refresh" data-bind="click: reset, clickBubble: false, disable: !isCanvasDirty()">{% trans "Cancel" %}</button>
         </div>
     </div>
+</div>
 </div>
 <!--/ko-->
 <!--/ko-->
