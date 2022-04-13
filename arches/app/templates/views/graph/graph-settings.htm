@@ -17,6 +17,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 -->
 {% extends "views/graph/graph-base.htm" %}
 {% load staticfiles %}
+{% load template_tags %}
 {% load i18n %}
 
 <!-- Title Bar -->
@@ -30,7 +31,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 {% endblock graph_title %}
 
 {% block graph_header_title %}
-<span data-bind="text: graph.isresource() ? '{% trans "Resource Model Settings" %}' : '{% trans "Branch Settings" %}'"></span>
+<span data-bind="text: graph.isresource() ? {% quoted_trans "Resource Model Settings" %} : {% quoted_trans "Branch Settings" %}"></span>
 {% endblock graph_header_title %}
 
 {% block graph_header_buttons %}
@@ -107,7 +108,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 
                                         <!-- Card Instruction -->
                                         <p id="install-instructions" class="content-instructions">
-                                            <span data-bind="text: graph.isresource() ? '{% trans "Set the defaults for your resource model" %}' : '{% trans "Set the defaults for your branch" %}'"></span>
+                                            <span data-bind="text: graph.isresource() ? {% quoted_trans "Set the defaults for your resource model" %} : {% quoted_trans "Set the defaults for your branch" %}"></span>
 
                                             <!-- Help link -->
                                             <span>
@@ -125,7 +126,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                                                             <label class="col-xs-12 control-label widget-input-label">
                                                                 {% trans "Name" %}
                                                                 <i class="ion-ios-checkmark-outline"></i>
-                                                                <i class="ion-ios-book add-tooltip pull-right" data-placement="top" data-toggle="tooltip" data-original-title='{% trans "Show Vocabulary" %}'></i>
+                                                                <i class="ion-ios-book add-tooltip pull-right" data-placement="top" data-toggle="tooltip" data-original-title="{% trans "Show Vocabulary" %}"></i>
                                                             </label>
                                                         </div>
 
@@ -187,7 +188,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 
                                         <!-- Card Instruction -->
                                         <p id="install-instructions" class="content-instructions">
-                                            <span data-bind="text: graph.isresource() ? '{% trans "Pick an icon for your resource model" %}' : '{% trans "Pick an icon for your branch" %}'"></span>
+                                            <span data-bind="text: graph.isresource() ? {% quoted_trans "Pick an icon for your resource model" %} : {% quoted_trans "Pick an icon for your branch" %}"></span>
 
                                             <!-- Help link -->
                                             <span>
@@ -357,7 +358,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 
                                         <!-- Card Instruction -->
                                         <p id="install-instructions" class="content-instructions">
-                                            <span data-bind="text: graph.isresource() ? '{% trans "Describe this resource model" %}' : '{% trans "Describe this branch" %}'"></span>
+                                            <span data-bind="text: graph.isresource() ? {% quoted_trans "Describe this resource model" %} : {% quoted_trans "Describe this branch" %}"></span>
                                         </p>
 
                                         <!-- Form -->

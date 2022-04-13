@@ -1,4 +1,6 @@
+{% load template_tags %}
 {% load i18n %}
+
 <!-- ko if: !configForm  && state === 'form' -->
 {% block form %}
 {% endblock form %}
@@ -8,14 +10,14 @@
 <!-- ko if: !ko.unwrap(hideEmptyNodes) || ko.unwrap(hideEmptyNodes) === true && displayValue() -->
 {% block report %}
 <dt data-bind="text: label"></dt>
-<dd data-bind="text: displayValue() || '{% trans "None" %}'"></dd>
+<dd data-bind="text: displayValue() || {% quoted_trans "None" %}"></dd>
 {% endblock report %}
 <!-- /ko -->
 <!-- /ko -->
 
 <!-- ko if: !configForm  && state === 'display_value' -->
 {% block display_value %}
-<span data-bind="text: displayValue() || '{% trans "None" %}'"></span>
+<span data-bind="text: displayValue() || {% quoted_trans "None" %}"></span>
 {% endblock display_value %}
 <!-- /ko -->
 

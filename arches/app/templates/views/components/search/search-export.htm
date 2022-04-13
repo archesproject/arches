@@ -1,4 +1,6 @@
+{% load template_tags %}
 {% load i18n %}
+
 <div class="search-container time-search-container relative" style="overflow-y: scroll;">
     <div class="filter-title">{% trans "Export Search Results" %}
     </div>
@@ -53,7 +55,7 @@
             <h4 class=""> {% trans "Only applicable to CSV and shapefile exports" %} </h4>
         </div>
         <div class="parameter">
-            <div data-bind="component: { name: 'views/components/simple-switch', params: {value: reportlink, config:{ label: '{% trans "Include the report link in the export?" %}', subtitle: ''}}}"></div>
+            <div data-bind="component: { name: 'views/components/simple-switch', params: {value: reportlink, config:{ label: {% quoted_trans "Include the report link in the export?" %}, subtitle: ''}}}"></div>
         </div>
         <!-- ko if: ((total() > {{app_settings.SEARCH_EXPORT_IMMEDIATE_DOWNLOAD_THRESHOLD}} && celeryRunning() === "True") || (format() === "html" && total() > {{app_settings.SEARCH_EXPORT_IMMEDIATE_DOWNLOAD_THRESHOLD_HTML_FORMAT}} && celeryRunning() === "True")) && ("{{app_settings.RESTRICT_CELERY_EXPORT_FOR_ANONYMOUS_USER}}" === "False" || "{{app_settings.RESTRICT_CELERY_EXPORT_FOR_ANONYMOUS_USER}}" === "True" && "{{user.username}}" !== "anonymous")-->
         <div>

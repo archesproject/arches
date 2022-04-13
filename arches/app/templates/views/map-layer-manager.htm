@@ -68,7 +68,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                             <div class="crud-card-subtitle" data-bind="text: item.name"></div>
                             <!-- /ko -->
                             <!-- ko if: !item.nodeid -->
-                            <div class="crud-card-subtitle" data-bind="text: item.isoverlay ? '{% trans "Overlay" %}' : '{% trans "Basemap" %}'"></div>
+                            <div class="crud-card-subtitle" data-bind="text: item.isoverlay ? {% quoted_trans "Overlay" %} : {% quoted_trans "Basemap" %}"></div>
                             <!-- /ko -->
                         </div>
                         <!-- /ko -->
@@ -200,7 +200,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 
                                                             <div class="form-group">
                                                                 <div>
-                                                                    <label class="control-label" data-bind="text: selection().isoverlay ? '{% trans "Add to map by default:" %}' : '{% trans "Default basemap:" %}'"></label>
+                                                                    <label class="control-label" data-bind="text: selection().isoverlay ? {% quoted_trans "Add to map by default:" %} : {% quoted_trans "Default basemap:" %}"></label>
                                                                     
                                                                     <span class="switch switch-small service-switch-shim" style="margin-top: 0px;"data-bind="css: {
                                                                                 'on': selection().addtomap()
