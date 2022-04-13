@@ -1225,25 +1225,18 @@ class CsvReader(Reader):
                 resources = []
                 missing_display_values = {}
                 group_no = False
+                # if some rows have a ResourceID and not a LegacyID while others a LegacyID and no ResourceID, this import breaks
                 legacyids_only = (business_data[0]["ResourceID"] is None or business_data[0]["ResourceID"] == "") and "LegacyID" in business_data[0]
 
                 for row_number, row in enumerate(business_data):
                     i = int(row_number)
                     if "LegacyID" not in row:
                         row["LegacyID"] = None
-                    row_resourceid = row["ResourceID"] if row["ResourceID"] else None
                     row_number = "on line " + str(row_number + 2)  # to represent the row in a csv accounting for the header and 0 index
-                    legacyid_changed = False
-                    if legacyids_only:
-                        if i > 0:
-                            legacyid_changed = business_data[i - 1]["LegacyID"] != row["LegacyID"]
-                        if not row_resourceid:
-                            row_resourceid = row["LegacyID"]
-                        resource_changed = legacyid_changed
+                    if legacyids_only and i > 0:
+                        resource_changed = business_data[i - 1]["LegacyID"] != row["LegacyID"]
                     else:
-                        if not row_resourceid:
-                            row_resourceid = resourceinstanceid
-                        resource_changed = (row_resourceid != previous_row_resourceid or resourceinstanceid != row["ResourceID"]) and i > 0
+                        resource_changed = resourceinstanceid != row["ResourceID"] and i > 0
                     if resource_changed:
                         group_no_to_tileids.clear()  # garbage collection of past resource groups
 
@@ -1354,7 +1347,7 @@ class CsvReader(Reader):
                                     preexisting_parenttile = get_preexisting_tile(
                                         target_tile,
                                         populated_tiles,
-                                        row_resourceid,
+                                        resourceinstanceid,
                                         tileid=group_no_to_tileids[group_no][str(target_tile.nodegroup_id)]["tileid"],
                                     )
                                     # we know theres a parenttile for this group already
@@ -1371,7 +1364,7 @@ class CsvReader(Reader):
                                         test_tile = get_preexisting_tile(
                                             target_tile,
                                             populated_tiles,
-                                            row_resourceid,
+                                            resourceinstanceid,
                                             tileid=str(group_no_to_tileids[group_no][str(prototype_child_tile.nodegroup_id)]["tileid"]),
                                         )
                                         if test_tile:
@@ -1401,7 +1394,7 @@ class CsvReader(Reader):
                                     if "-" in business_data[i - 1]["COMP_SORTORDER"]:
                                         last_prefix = business_data[i - 1]["COMP_SORTORDER"][0:2]
 
-                                    prefix_same = prefix == last_prefix and previous_row_resourceid == row_resourceid
+                                    prefix_same = prefix == last_prefix and previous_row_resourceid == resourceinstanceid
 
                                     # we want to look for an original tile with the same group if the group is the same
                                     # if the group is different, defintely just make a new tile, i.e. prevent an existing tile from being looked up
@@ -1413,7 +1406,7 @@ class CsvReader(Reader):
                                         preexisting_tile_for_nodegroup = get_preexisting_tile(
                                             target_tile,
                                             populated_tiles,
-                                            row_resourceid,
+                                            resourceinstanceid,
                                             tileid=group_no_to_tileids[group_no][str(target_tile.nodegroup_id)]["tileid"],
                                         )
                                         if preexisting_tile_for_nodegroup:
@@ -1428,7 +1421,7 @@ class CsvReader(Reader):
 
                         # identify whether a tile for this nodegroup on this resource already exists
                         if not preexisting_tile_for_nodegroup and not preexisting_parenttile:
-                            preexisting_tile_for_nodegroup = get_preexisting_tile(target_tile, populated_tiles, row_resourceid)
+                            preexisting_tile_for_nodegroup = get_preexisting_tile(target_tile, populated_tiles, resourceinstanceid)
 
                         # aggregates a tile of the nodegroup associated with source_data (via get_blank_tile)
                         # onto the pre-existing tile who would be its parent
@@ -1455,7 +1448,7 @@ class CsvReader(Reader):
                                 preexisting_tile_for_nodegroup.tiles.append(target_tile)
                             while len(source_data) > 0:
                                 target_tile = get_blank_tile(source_data)
-                                preexisting_tile_for_nodegroup = get_preexisting_tile(target_tile, populated_tiles, row_resourceid)
+                                preexisting_tile_for_nodegroup = get_preexisting_tile(target_tile, populated_tiles, resourceinstanceid)
                                 if preexisting_tile_for_nodegroup:
                                     target_tile = get_blank_tile(source_data, child_only=True)
                                     target_tile.parenttile = preexisting_tile_for_nodegroup
@@ -1518,7 +1511,7 @@ class CsvReader(Reader):
                                 source_data.pop(0)  # TODO TEMPORARY: remove Details components that have a component type
                             while len(source_data) > 0:
                                 target_tile = get_blank_tile(source_data)
-                                preexisting_tile_for_nodegroup = get_preexisting_tile(target_tile, populated_tiles, row_resourceid)
+                                preexisting_tile_for_nodegroup = get_preexisting_tile(target_tile, populated_tiles, resourceinstanceid)
                                 if preexisting_tile_for_nodegroup and str(target_tile.nodegroup_id) != component_nodegroupid:
                                     target_tile = get_blank_tile(source_data, child_only=True)
                                     target_tile.parenttile = preexisting_tile_for_nodegroup
