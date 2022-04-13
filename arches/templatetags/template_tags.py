@@ -78,15 +78,17 @@ def return_json_as_obj(string):
         pass
     return value
 
+
 class QuotedTranslateNode(TranslateNode):
     def render(self, context):
         value = super().render(context)
-        return '&quot;{0}&quot;'.format(value)
+        return "&quot;{0}&quot;".format(value)
+
 
 @register.tag("quoted_trans")
 def quoted_trans_tag(parser, token):
     """
-    Returns a translated string wrapped in HTML &quot; characters 
+    Returns a translated string wrapped in HTML &quot; characters
     primarily for use in JSON strings embedded in HTML templates
     where using single quotes breaks when the string itself contains a single quote
     which is often found in other languages
