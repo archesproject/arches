@@ -645,6 +645,12 @@ class Tile(models.TileModel):
         return tile
 
     def __preSave(self, request=None, context=None):
+        """
+        Keyword Arguments:
+        request -- request object passed from the view to the model.
+        context -- string e.g. "copy" indicating conditions under which a resource is saved and how functions should behave.
+        """
+
         try:
             for function in self._getFunctionClassInstances():
                 try:
@@ -665,6 +671,12 @@ class Tile(models.TileModel):
             logger.info(_("No associated functions or other TypeError raised by a function"))
 
     def __postSave(self, request=None, context=None):
+        """
+        Keyword Arguments:
+        request -- request object passed from the view to the model.
+        context -- string e.g. "copy" indicating conditions under which a resource is saved and how functions should behave.
+        """
+
         try:
             for function in self._getFunctionClassInstances():
                 try:

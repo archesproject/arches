@@ -183,6 +183,9 @@ class Resource(models.ResourceInstance):
         Arguments:
         resources -- a list of resource models
 
+        Keyword Arguments:
+        transaction_id -- a uuid identifing the save of these instances as belonging to a collective load or process
+
         """
 
         datatype_factory = DataTypeFactory()
@@ -230,6 +233,9 @@ class Resource(models.ResourceInstance):
         """
         Indexes all the nessesary items values of a resource to support search
 
+        Keyword Arguments:
+        context -- a string such as "copy" to indicate conditions under which a document is indexed
+
         """
 
         if str(self.graph_id) != str(settings.SYSTEM_SETTINGS_RESOURCE_MODEL_ID):
@@ -261,6 +267,7 @@ class Resource(models.ResourceInstance):
         fetchTiles -- instead of fetching the tiles from the database get them off the model itself
         datatype_factory -- refernce to the DataTypeFactory instance
         node_datatypes -- a dictionary of datatypes keyed to node ids
+        context -- a string such as "copy" to indicate conditions under which a document is indexed
 
         """
 
