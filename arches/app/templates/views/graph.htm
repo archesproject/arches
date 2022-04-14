@@ -26,11 +26,11 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 
 
 {% block main_content %}
-<div class="scroll-y">
+<div class="scroll-y graph-designer-container">
     <div class="graph-list-header" data-bind="css: {'alert-active': (alert() && alert().active())}">
 
         <!-- Toolbar -->
-        <div class="relative resource-toolbar" style="">
+        <div class="relative resource-toolbar">
 
             <!-- Search -->
             <div class="edit-panel-search-bar">
@@ -64,7 +64,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                 <a class="resource-grid-title" href="javascript:void(0);" data-bind="css: {'active': !showResources()}, click: function () { showResources(false) }">{% trans "Branches" %}</a>
             </div>
 
-            <div class="btn-group" style="position: absolute; right: 70px; top: 12px;">
+            <div class="btn-group">
                 <button class="btn btn-primary dropdown-toggle" data-toggle="dropdown" type="button" aria-expanded="false">
                     {% trans "Add" %} <i class="ion-more"></i>
                 </button>
@@ -86,7 +86,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 
 
     <!-- Default Page content-->
-    <div id="page-content" style="padding: 0 50px 240px; margin-top: -1px;">
+    <div id="page-content">
 
         <div id="report-image-grid" class="report-image-grid">
 
