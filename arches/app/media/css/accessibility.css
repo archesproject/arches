@@ -828,4 +828,12 @@ div.search-facet-item:focus {
     .graph-designer-graph-content .chosen-container {
         width: 100% !important;
     }
+
+    .resource-toolbar {
+        height: 105px;
+    }
+
+    .find-widget {
+        width: 42vw;
+    }
 }

@@ -15,52 +15,56 @@
         <!-- Toolbar -->
         <div class="relative resource-toolbar">
 
-            <!-- Search -->
-            <div class="edit-panel-search-bar">
+            <div class="col-xs-12 col-sm-10">
+                <!-- Search -->
+                <div class="edit-panel-search-bar">
 
-                <!-- Find Button -->
-                <div class="">
-                    <a class="page-header text-overflow graph-find" href="#" data-bind="click: function () { showFind(!showFind()) }"> {% trans "Find" %} </a>
-                </div>
-
-                <!-- Find widget -->
-                <div class="find-widget" style="display: none;" data-bind="visible: showFind()">
+                    <!-- Find Button -->
                     <div>
-                        <!-- ko if: groupedGraphs -->
-                        <select data-bind="template: { name: 'selectGraphTemplate', data: groupedGraphs }, chosen: {width: '100%'}, value: graphId"></select>
-                        <!-- /ko -->
-                        <script type="text/html" id="selectGraphTemplate">
-                            <option disabled selected value>{% trans "Find a Resource Model/Branch..." %}</option>
-                            <!-- ko foreach: groups -->
-                                <optgroup data-bind="attr: { 'label': (name==='Resource Models')?'{% trans "Resource Models" %}':'{% trans "Branches" %}' }, foreach: items">
-                                    <option data-bind="value: graphid, text: name"></option>
-                                </optgroup>
+                        <a class="page-header text-overflow graph-find" href="#" data-bind="click: function () { showFind(!showFind()) }"> {% trans "Find" %} </a>
+                    </div>
+
+                    <!-- Find widget -->
+                    <div class="find-widget" style="display: none;" data-bind="visible: showFind()">
+                        <div>
+                            <!-- ko if: groupedGraphs -->
+                            <select data-bind="template: { name: 'selectGraphTemplate', data: groupedGraphs }, chosen: {width: '100%'}, value: graphId"></select>
                             <!-- /ko -->
-                        </script>
+                            <script type="text/html" id="selectGraphTemplate">
+                                <option disabled selected value>{% trans "Find a Resource Model/Branch..." %}</option>
+                                <!-- ko foreach: groups -->
+                                    <optgroup data-bind="attr: { 'label': (name==='Resource Models')?'{% trans "Resource Models" %}':'{% trans "Branches" %}' }, foreach: items">
+                                        <option data-bind="value: graphid, text: name"></option>
+                                    </optgroup>
+                                <!-- /ko -->
+                            </script>
+                        </div>
                     </div>
                 </div>
+
+                <!-- Resource/Graph Toggle -->
+                <div class="resource-tools relative" data-bind="visible: !showFind()">
+                    <a class="resource-grid-title" href="javascript:void(0);" data-bind="css: {'active': showResources()}, click: function () { showResources(true) }">{% trans "Resource Models" %}</a>
+                    <a class="resource-grid-title" href="javascript:void(0);" data-bind="css: {'active': !showResources()}, click: function () { showResources(false) }">{% trans "Branches" %}</a>
+                </div>
             </div>
 
-            <!-- Resource/Graph Toggle -->
-            <div class="resource-tools relative" data-bind="visible: !showFind()">
-                <a class="resource-grid-title" href="javascript:void(0);" data-bind="css: {'active': showResources()}, click: function () { showResources(true) }">{% trans "Resource Models" %}</a>
-                <a class="resource-grid-title" href="javascript:void(0);" data-bind="css: {'active': !showResources()}, click: function () { showResources(false) }">{% trans "Branches" %}</a>
-            </div>
-
-            <div class="btn-group">
-                <button class="btn btn-primary dropdown-toggle" data-toggle="dropdown" type="button" aria-expanded="false">
-                    {% trans "Add" %} <i class="ion-more"></i>
-                </button>
-                <ul class="dropdown-menu dropdown-menu-right" data-bind="event: {mouseleave: leaveDropdown}">
-                    <li><a href="#" data-bind="click: newResource">{% trans "New Resource Model" %}</a></li>
-                    <li><a href="#" data-bind="click: newGraph">{% trans "New Branch" %}</a></li>
-                    <li class="file-upload upload">
-                            <form id="data">
-                                <input type="file" class="upload" id="fileupload" data-bind="event: {change: importGraph}" accept=".json"/>
-                            </form>
-                            <a href="#" class="arches-tool-item file-upload" data-bind="{click: importButtonClick}">{% trans "Import Branch/Resource Model" %}</a>
-                    </li>
-                </ul>
+            <div class="col-xs-12 col-sm-2">
+                <div class="btn-group">
+                    <button class="btn btn-primary dropdown-toggle" data-toggle="dropdown" type="button" aria-expanded="false">
+                        {% trans "Add" %} <i class="ion-more"></i>
+                    </button>
+                    <ul class="dropdown-menu dropdown-menu-right" data-bind="event: {mouseleave: leaveDropdown}">
+                        <li><a href="#" data-bind="click: newResource">{% trans "New Resource Model" %}</a></li>
+                        <li><a href="#" data-bind="click: newGraph">{% trans "New Branch" %}</a></li>
+                        <li class="file-upload upload">
+                                <form id="data">
+                                    <input type="file" class="upload" id="fileupload" data-bind="event: {change: importGraph}" accept=".json"/>
+                                </form>
+                                <a href="#" class="arches-tool-item file-upload" data-bind="{click: importButtonClick}">{% trans "Import Branch/Resource Model" %}</a>
+                        </li>
+                    </ul>
+                </div>
             </div>
         </div>
 
