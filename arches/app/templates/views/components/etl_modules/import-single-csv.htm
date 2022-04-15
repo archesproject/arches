@@ -133,22 +133,9 @@
     </div>
 </div>
 <div class="etl-module-button-container">
-    <!-- ko ifnot: validated -->
-    <button data-bind="click: validate" class="btn btn-success">
-        <span>{% trans "Validate data before import" %}</span>
-    </button>
-    <!-- /ko -->
-    <!-- ko if: validated() && validationError().length === 0 -->
     <button data-bind="click: write" class="btn btn-success">
         <span>{% trans "Import data" %}</span>
     </button>
-    <!-- /ko -->
-    <!-- ko if: validated() && validationError().length !== 0 -->
-    <!-- button data-bind="click: function () { fileAdded(false); }" class="btn btn-danger" -->
-    <button data-bind="click: function () { $parent.selectedModule(null); }" class="btn btn-danger">
-        <span>{% trans "Reload File" %}</span>
-    </button>
-    <!-- /ko -->
     <button data-bind="click: function () { $parent.selectedModule(null); }" class="btn btn-danger">
         <span>{% trans "Cancel File Import" %}</span>
     </button>
