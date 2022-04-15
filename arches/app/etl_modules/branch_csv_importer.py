@@ -103,7 +103,10 @@ class BranchCsvImporter:
                 except TypeError:
                     config = {}
                 value = datatype_instance.transform_value_for_tile(source_value, **config) if source_value is not None else None
-                valid = True if value is not None and len(datatype_instance.validate(value, nodeid=nodeid)) == 0 else False
+                if datatype == "file-list":
+                    valid = True if len(datatype_instance.validate(value, nodeid=nodeid, path='tmp')) == 0 else False
+                else:
+                    valid = True if len(datatype_instance.validate(value, nodeid=nodeid)) == 0 else False
                 if not valid:
                     tile_valid = False
                 tile_value[nodeid] = {"value": value, "valid": valid, "source": source_value, "notes": None, "datatype": datatype}

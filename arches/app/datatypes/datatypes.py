@@ -1209,7 +1209,7 @@ class FileListDataType(BaseDataType):
         super(FileListDataType, self).__init__(model=model)
         self.node_lookup = {}
 
-    def validate(self, value, row_number=None, source=None, node=None, nodeid=None, strict=False):
+    def validate(self, value, row_number=None, source=None, node=None, nodeid=None, strict=False, path=None):
         if node:
             self.node_lookup[str(node.pk)] = node
         elif nodeid:
@@ -1248,6 +1248,12 @@ class FileListDataType(BaseDataType):
                                 formatted_max_size
                             )
                         )
+                        errors.append({"type": "ERROR", "message": message})
+            if path:
+                for file in value:
+                    if not os.path.exists(os.path.join(settings.APP_ROOT, path, file['name'])):
+                        print(os.path.join(settings.APP_ROOT, path, file['name']))
+                        message = _('The file "{0}" does not exist in "{1}"'.format(file['name'], os.path.join(settings.APP_ROOT, path)))
                         errors.append({"type": "ERROR", "message": message})
         except Exception as e:
             dt = self.datatype_model.datatype
@@ -1388,17 +1394,15 @@ class FileListDataType(BaseDataType):
             tile_file["file_id"] = str(uuid.uuid4())
             if source_path:
                 source_file = os.path.join(settings.APP_ROOT, source_path, tile_file["name"])
-                current_file, created = models.File.objects.get_or_create(fileid=tile_file["file_id"])
                 fs = FileSystemStorage(location=os.path.join(settings.MEDIA_ROOT,'uploadedfiles'))
                 try:
                     with open(source_file, "rb") as f:
+                        current_file, created = models.File.objects.get_or_create(fileid=tile_file["file_id"])
                         filename = fs.save(os.path.basename(f.name), File(f))
                         current_file.path = os.path.join('uploadedfiles', filename)
                         current_file.save()
                 except FileNotFoundError:
-                    current_file.delete()
                     logger.exception(_("File does not exist"))
-                    return
 
             else:
                 models.File.objects.get_or_create(fileid=tile_file["file_id"], path=file_path)
