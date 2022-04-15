@@ -30,4 +30,4 @@ class ETLManagerView(View):
             ret = {"result": response["data"]}
             return JSONResponse(ret)
         else:
-            return JSONResponse(status=400, reason=response["error"])
+            return JSONResponse(status=400, reason=response["data"])
