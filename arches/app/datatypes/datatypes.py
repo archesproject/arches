@@ -1251,9 +1251,9 @@ class FileListDataType(BaseDataType):
                         errors.append({"type": "ERROR", "message": message})
             if path:
                 for file in value:
-                    if not os.path.exists(os.path.join(settings.APP_ROOT, path, file['name'])):
-                        print(os.path.join(settings.APP_ROOT, path, file['name']))
-                        message = _('The file "{0}" does not exist in "{1}"'.format(file['name'], os.path.join(settings.APP_ROOT, path)))
+                    if not os.path.exists(os.path.join(settings.APP_ROOT, path, file["name"])):
+                        print(os.path.join(settings.APP_ROOT, path, file["name"]))
+                        message = _('The file "{0}" does not exist in "{1}"'.format(file["name"], os.path.join(settings.APP_ROOT, path)))
                         errors.append({"type": "ERROR", "message": message})
         except Exception as e:
             dt = self.datatype_model.datatype

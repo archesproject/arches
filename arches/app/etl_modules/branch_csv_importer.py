@@ -104,7 +104,7 @@ class BranchCsvImporter:
                     config = {}
                 value = datatype_instance.transform_value_for_tile(source_value, **config) if source_value is not None else None
                 if datatype == "file-list":
-                    valid = True if len(datatype_instance.validate(value, nodeid=nodeid, path='tmp')) == 0 else False
+                    valid = True if len(datatype_instance.validate(value, nodeid=nodeid, path="tmp")) == 0 else False
                 else:
                     valid = True if len(datatype_instance.validate(value, nodeid=nodeid)) == 0 else False
                 if not valid:
