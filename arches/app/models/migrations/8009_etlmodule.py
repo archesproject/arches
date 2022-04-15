@@ -64,6 +64,7 @@ add_branch_csv_importer = """
         etlmoduleid,
         name,
         description,
+        type,
         component,
         componentname,
         modulename,
@@ -75,6 +76,7 @@ add_branch_csv_importer = """
         '3b19a76a-0b09-450e-bee1-65accb096eaf',
         'Import Branch CSV',
         'Loads resource data in branch csv format',
+        'import',
         'views/components/etl_modules/branch-csv-importer',
         'branch-csv-importer',
         'branch_csv_importer.py',
@@ -183,7 +185,7 @@ add_functions_to_get_nodegroup_tree = """
     DECLARE
     _nodegroupid uuid;
     BEGIN
-    FOR _nodegroupid IN select ng.nodegroupid from node_groups ng join nodes n on ng.nodegroupid = nodeid where graphid = '34cfe98e-c2c0-11ea-9026-02e7594ce0a0' and ng.parentnodegroupid is null
+    FOR _nodegroupid IN select ng.nodegroupid from node_groups ng join nodes n on ng.nodegroupid = nodeid where graphid = graph_id and ng.parentnodegroupid is null
     LOOP
         RETURN QUERY SELECT _nodegroupid, * FROM __get_nodegroup_tree(_nodegroupid);
     END LOOP;
@@ -211,9 +213,11 @@ add_staging_to_tile_function = """
             graph_id uuid;
             instance_id text;
             legacy_id text;
+            file_id text;
             tile_id text;
             parent_id text;
             group_id text;
+            _file jsonb;
             _key text;
             _value text;
         BEGIN
@@ -244,7 +248,6 @@ add_staging_to_tile_function = """
                             LOOP
                                 tile_data = tile_data || FORMAT('{"%s": %s}', _key, _value::jsonb -> 'value')::jsonb;
                             END LOOP;
-                        RAISE NOTICE '%', tile_data::text;
 
                         IF tile_id IS null THEN
                             tile_id = uuid_generate_v1mc();
@@ -260,6 +263,23 @@ add_staging_to_tile_function = """
                         INSERT INTO edit_log (resourceclassid, resourceinstanceid, nodegroupid, tileinstanceid, edittype, newvalue, oldvalue, timestamp, note, transactionid)
                             VALUES (graph_id, instance_id, group_id, tile_id, 'tile create', tile_data::jsonb, old_data, now(), 'loaded from staging_table', load_id);
                     END IF;
+                END LOOP;
+            FOR staged_value, tile_id IN
+                    (
+                        SELECT value, tileid
+                        FROM load_staging
+                        WHERE loadid = load_id
+                    )
+                LOOP
+                    FOR _key, _value IN SELECT * FROM jsonb_each_text(staged_value)
+                        LOOP
+                            IF (_value::jsonb ->> 'datatype') = 'file-list' THEN
+                                FOR _file IN SELECT * FROM jsonb_array_elements(_value::jsonb -> 'value') LOOP
+                                    file_id = _file ->> 'file_id';
+                                    UPDATE files SET tileid = tile_id::uuid WHERE fileid::text = file_id;
+                                END LOOP;
+                            END IF;
+                        END LOOP;
                 END LOOP;
             UPDATE load_event SET (load_end_time, complete, successful) = (now(), true, true) WHERE loadid = load_id;
             SELECT successful INTO status FROM load_event WHERE loadid = load_id;
