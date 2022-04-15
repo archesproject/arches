@@ -167,6 +167,48 @@
 {% endblock require_config %}
 
 {% block arches_modules %}
+<div 
+    id='arches-data'
+    style='display:none'
+    foo="bar"
+    urls='{
+        "root": "{% url "root" %}",
+        "home": "{% url "home" %}",
+        "media": "{{ STATIC_URL }}",
+        "rdm": "{% url "rdm" ""%}",
+        "uploadedfiles": "{{ MEDIA_URL }}",
+        "url_subpath": "{{app_settings.FORCE_SCRIPT_NAME}}",
+        "concept_tree": "{% url "concept_tree" "" %}",
+        "concept": "{% url "concept" "aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa" %}",
+        "concept_search": "{% url "concept_search" %}",
+        "concept_value": "{% url "concept_value" %}",
+        "concept_manage_parents": "{% url "concept_manage_parents" "aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa" %}",
+        "concept_make_collection": "{% url "make_collection" "aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa" %}",
+        "change_password": "{% url "change_password" %}",
+        "export_concept": "{% url "export_concept" "aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa" %}",
+        "export_concept_collections": "{% url "export_concept_collections" %}",
+        "get_concept_collections": "{% url "get_concept_collections" %}",
+        "dropdown": "{% url "dropdown" %}",
+        "paged_dropdown": "{% url "paged_dropdown" %}",
+        "get_pref_label": "{% url "get_pref_label" %}",
+        "from_sparql_endpoint": "{% url "from_sparql_endpoint" "aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa" %}",
+        "search_sparql_endpoint": "{% url "search_sparql_endpoint" %}",
+        "confirm_delete": "{% url "confirm_delete" "aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa" %}",
+        "search_home": "{% url "search_home" %}",
+        "search_terms": "{% url "search_terms" %}",
+        "search_results": "{% url "search_results" %}",
+        "export_results": "{% url "export_results" %}",
+        "get_export_file": "{% url "get_export_file" %}",
+        "buffer": "{% url "buffer"%}",
+        "config": "{% url "config" %}",
+        "node": "{% url "node" "aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa" %}"
+        
+    }'
+    userInputUrls='{
+        "graph_nodes": "{% url "graph_nodes" "aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa" %}"
+    }'
+></div>
+
 <script>
     require(['utils/set-csrf-token']);
 
@@ -225,6 +267,8 @@
             {% endif %}
         {% endfor %}
     {% endautoescape %}
+
+
 
     window.arches = {
             urls: {
