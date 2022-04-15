@@ -1389,11 +1389,11 @@ class FileListDataType(BaseDataType):
             if source_path:
                 source_file = os.path.join(settings.APP_ROOT, source_path, tile_file["name"])
                 current_file, created = models.File.objects.get_or_create(fileid=tile_file["file_id"])
-                fs = FileSystemStorage(location=os.path.join(settings.MEDIA_ROOT,'uploadedfiles'))
+                fs = FileSystemStorage(location=os.path.join(settings.MEDIA_ROOT, "uploadedfiles"))
                 try:
                     with open(source_file, "rb") as f:
                         filename = fs.save(os.path.basename(f.name), File(f))
-                        current_file.path = os.path.join('uploadedfiles', filename)
+                        current_file.path = os.path.join("uploadedfiles", filename)
                         current_file.save()
                 except FileNotFoundError:
                     current_file.delete()
