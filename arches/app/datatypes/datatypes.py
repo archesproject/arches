@@ -25,7 +25,9 @@ from arches.app.search.elasticsearch_dsl_builder import Query, Dsl, Bool, Match,
 from arches.app.search.search_engine_factory import SearchEngineInstance as se
 from arches.app.search.mappings import RESOURCES_INDEX, RESOURCE_RELATIONS_INDEX
 from django.core.cache import cache
+from django.core.files import File
 from django.core.files.base import ContentFile
+from django.core.files.storage import FileSystemStorage
 from django.utils.translation import ugettext as _
 from django.contrib.gis.geos import GEOSGeometry
 from django.contrib.gis.geos import GeometryCollection
@@ -1369,7 +1371,8 @@ class FileListDataType(BaseDataType):
 
         mime = MimeTypes()
         tile_data = []
-        for file_path in value.split(","):
+        source_path = kwargs.get("path")
+        for file_path in [filename.strip() for filename in value.split(",")]:
             tile_file = {}
             try:
                 file_stats = os.stat(file_path)
@@ -1383,7 +1386,23 @@ class FileListDataType(BaseDataType):
             tile_file["type"] = "" if tile_file["type"] is None else tile_file["type"]
             file_path = "uploadedfiles/" + str(tile_file["name"])
             tile_file["file_id"] = str(uuid.uuid4())
-            models.File.objects.get_or_create(fileid=tile_file["file_id"], path=file_path)
+            if source_path:
+                source_file = os.path.join(settings.APP_ROOT, source_path, tile_file["name"])
+                current_file, created = models.File.objects.get_or_create(fileid=tile_file["file_id"])
+                fs = FileSystemStorage(location=os.path.join(settings.MEDIA_ROOT,'uploadedfiles'))
+                try:
+                    with open(source_file, "rb") as f:
+                        filename = fs.save(os.path.basename(f.name), File(f))
+                        current_file.path = os.path.join('uploadedfiles', filename)
+                        current_file.save()
+                except FileNotFoundError:
+                    current_file.delete()
+                    logger.exception(_("File does not exist"))
+                    return
+
+            else:
+                models.File.objects.get_or_create(fileid=tile_file["file_id"], path=file_path)
+
             tile_file["url"] = "/files/" + tile_file["file_id"]
             tile_file["accepted"] = True
             compatible_renderers = self.get_compatible_renderers(tile_file)
