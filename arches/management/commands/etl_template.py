@@ -43,7 +43,7 @@ class Command(BaseCommand):
         self.create_template(template=options["template"], dest=options["dest"], graphid=options["graph"])
 
     def write_metadata(self, workbook, metadata):
-        metadata_sheet = workbook.create_sheet(title="Metadata")
+        metadata_sheet = workbook.create_sheet(title="metadata")
         metadata_sheet[f"A1"] = "graphid"
         metadata_sheet[f"B1"] = metadata["graphid"]
         metadata_sheet[f"A5"] = "node"
