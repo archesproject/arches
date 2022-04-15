@@ -88,7 +88,7 @@ class ImportSingleCsv:
         column_names = [fieldname for fieldname in fieldnames if fieldname != ""]
         if len(column_names) == 0:
             message = "No valid node is selected"
-            return {"success": False, "error": message}
+            return {"success": False, "data": message}
 
         self.populate_staging_table(request)
         with connection.cursor() as cursor:
