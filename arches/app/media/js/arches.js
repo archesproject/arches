@@ -1,4 +1,10 @@
 define([], function () {
+    function removeTrailingCommaFromArray(string) {
+        return string.replace(/,]*$/, "]");
+    }
+    function removeTrailingCommaFromObject(string) {
+        return string.replace(/,\s*}*$/, "}");
+    }
     function removeWhitespace(string){
         return string.replace(/(\r\n|\n|\r)/gm, "");
     }
@@ -55,17 +61,17 @@ define([], function () {
 
     return {
         celeryRunning: archesData.getAttribute('celeryRunning'),
-        conceptCollections: JSON.parse(archesData.getAttribute('conceptCollections')),
+        conceptCollections: JSON.parse(removeTrailingCommaFromArray(archesData.getAttribute('conceptCollections'))),
         confirmAllResourceDelete: JSON.parse(archesData.getAttribute('confirmAllResourceDelete')),
         confirmGraphDelete: JSON.parse(archesData.getAttribute('confirmGraphDelete')),
         confirmMaplayerDelete: JSON.parse(archesData.getAttribute('confirmMaplayerDelete')),
         confirmNav: JSON.parse(archesData.getAttribute('confirmNav')),
         confirmResourceDelete: JSON.parse(archesData.getAttribute('confirmResourceDelete')),
         confirmSurveyDelete: JSON.parse(archesData.getAttribute('confirmSurveyDelete')),
-        exportHtmlTemplates: JSON.parse(archesData.getAttribute('exportHtmlTemplates')),
+        exportHtmlTemplates: JSON.parse(removeTrailingCommaFromArray(archesData.getAttribute('exportHtmlTemplates'))),
         geocoderDefault: archesData.getAttribute('geocoderDefault'),
         geocoderPlaceholder: archesData.getAttribute('geocoderPlaceholder'),
-        geoCodingProviders: JSON.parse(archesData.getAttribute('geoCodingProviders')),
+        geoCodingProviders: JSON.parse(removeTrailingCommaFromArray(archesData.getAttribute('geoCodingProviders'))),
         graphImportFailed: JSON.parse(archesData.getAttribute('graphImportFailed')),
         graphs: JSON.parse(archesData.getAttribute('graphs')),
         hexBinBounds: JSON.parse(archesData.getAttribute('hexBinBounds')),
@@ -78,15 +84,15 @@ define([], function () {
         mapboxApiKey: archesData.getAttribute('mapboxApiKey'),
         mapboxGlyphs: archesData.getAttribute('mapboxGlyphs'),
         mapboxSprites: archesData.getAttribute('mapboxSprites'),
-        mapLayers: JSON.parse(archesData.getAttribute('mapLayers')),
-        mapMarkers: JSON.parse(archesData.getAttribute('mapMarkers')),
-        mapSources: JSON.parse(archesData.getAttribute('mapSources')),
+        mapLayers: JSON.parse(removeTrailingCommaFromArray(archesData.getAttribute('mapLayers'))),
+        mapMarkers: JSON.parse(removeTrailingCommaFromArray(archesData.getAttribute('mapMarkers'))),
+        mapSources: JSON.parse(removeTrailingCommaFromObject(archesData.getAttribute('mapSources'))),
         preferredCoordinateSystems: JSON.parse(archesData.getAttribute('preferredCoordinateSystems')),
         requestFailed: JSON.parse(archesData.getAttribute('requestFailed')),
         resourceCopyFailed: JSON.parse(archesData.getAttribute('resourceCopyFailed')),
         resourceCopySuccess: JSON.parse(archesData.getAttribute('resourceCopySuccess')),
         resourceHasUnpublishedGraph: JSON.parse(archesData.getAttribute('resourceHasUnpublishedGraph')),
-        resources: JSON.parse(archesData.getAttribute('resources')),
+        resources: JSON.parse(removeTrailingCommaFromArray(archesData.getAttribute('resources'))),
         translations: JSON.parse(removeWhitespace(archesData.getAttribute('translations'))),
         urls: buildUrls(),
         userEmail: archesData.getAttribute('userEmail'),

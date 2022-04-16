@@ -172,10 +172,10 @@
     id='arches-data'
     style='display:none'
     celeryRunning='{{celery_running}}'
-    conceptCollections="[{% for concept_collection in concept_collections %}{
-        'label': '{{ concept_collection.label | escapejs }}',
-        'id': '{{ concept_collection.id }}',
-    },{% endfor %}]"
+    conceptCollections='[{% for concept_collection in concept_collections %}{
+        "label": "{{ concept_collection.label | escapejs }}",
+        "id": "{{ concept_collection.id }}"
+    },{% endfor %}]'
     confirmAllResourceDelete='{
         "title": "{% trans "Delete All Resources Associated with this Graph?" %}",
         "text": "{% trans "Deleting All Resources removes all associated data with this graph entirely.  Are you sure you would like to proceed?" %}"
@@ -200,15 +200,15 @@
         "title": "{% trans "Delete survey?" %}",
         "text": "{% trans "Deleting this survey will remove it entirely.  You cannot undo this action.  Are you sure you would like to proceed?" %}"
     }'
-    exportHtmlTemplates="[{% for template in export_html_templates %} '{{ template }}', {% endfor %}]"
+    exportHtmlTemplates='[{% for template in export_html_templates %} "{{ template }}", {% endfor %}]'
     geocoderDefault="{{ map_info.geocoder_default }}"
     geocoderPlaceHolder="{% trans 'Find an address...' %}"
-    geocodingProviders="[{% for provider in geocoding_providers %}{
-        'name': '{{ provider.name }}',
-        'geocoderid': '{{ provider.geocoderid }}',
-        'api_key': {% if provider.api_key != None %} '{{ provider.api_key }}' {% elif provider.api_key == None %} null {% endif %},
-        'component': '{{ provider.component }}'
-    },{% endfor %}]"
+    geocodingProviders='[{% for provider in geocoding_providers %}{
+        "name": "{{ provider.name }}",
+        "geocoderid": "{{ provider.geocoderid }}",
+        "api_key": {% if provider.api_key != None %} "{{ provider.api_key }}" {% elif provider.api_key == None %} null {% endif %},
+        "component": "{{ provider.component }}"
+    },{% endfor %}]'
     graphImportFailed='{
         "title": "{% trans "Graph import failed."%}"
     }'
@@ -337,42 +337,44 @@
     mapDefaultZoom="{{ map_info.zoom | unlocalize }}"
     mapDefaultMinZoom="{{ map_info.map_min_zoom | unlocalize }}"
     mapDefaultMaxZoom="{{ map_info.map_max_zoom | unlocalize }}"
-    mapLayers="[{% for map_layer in map_layers %}{
-        'maplayerid': '{{ map_layer.maplayerid }}',
-        'name': '{{ map_layer.name }}',
-        'layer_definitions': {{ map_layer.layer_json }},
-        'isoverlay': {{ map_layer.isoverlay|lower }},
-        'icon': '{{ map_layer.icon }}',
-        'legend': '{{ map_layer.legend | default_if_none:'' | escapejs  }}',
-        'searchonly': {{ map_layer.searchonly|lower }},
-        'activated': {{ map_layer.activated|lower }},
-        'addtomap': {{ map_layer.addtomap|lower }},
-        'is_resource_layer': false,
-        'centerx': {{ map_layer.centerx|default_if_none:'null'|unlocalize }},
-        'centery': {{ map_layer.centery|default_if_none:'null'|unlocalize }},
-        'zoom': {{ map_layer.zoom|default_if_none:'null'|unlocalize }}
+    mapLayers='[{% for map_layer in map_layers %}{
+        "maplayerid": "{{ map_layer.maplayerid }}",
+        "name": "{{ map_layer.name }}",
+        "layer_definitions": {{ map_layer.layer_json }},
+        "isoverlay": {{ map_layer.isoverlay|lower }},
+        "icon": "{{ map_layer.icon }}",
+        "legend": "{{ map_layer.legend | default_if_none:"" | escapejs  }}",
+        "searchonly": {{ map_layer.searchonly|lower }},
+        "activated": {{ map_layer.activated|lower }},
+        "addtomap": {{ map_layer.addtomap|lower }},
+        "is_resource_layer": false,
+        "centerx": {{ map_layer.centerx|default_if_none:"null"|unlocalize }},
+        "centery": {{ map_layer.centery|default_if_none:"null"|unlocalize }},
+        "zoom": {{ map_layer.zoom|default_if_none:"null"|unlocalize }}
     },{% endfor %}{% for resource_map_layer in resource_map_layers %}{
-        'maplayerid': '{{ resource_map_layer.nodeid }}',
-        'name': '{{ resource_map_layer.name }}',
-        'layer_definitions': {{ resource_map_layer.layer_definitions }},
-        'searchonly': false,
-        'isoverlay': true,
-        'icon': '{{ resource_map_layer.icon }}',
-        'legend': '{{ resource_map_layer.legend | escapejs  }}',
-        'activated': true,
-        'addtomap': {{ resource_map_layer.addtomap|lower }},
-        'is_resource_layer': true
-    },{% endfor %}]"
-    mapMarkers="[{% for map_marker in map_markers %}{
-        'name': '{{ map_marker.name }}',
-        'url': '{{ map_marker.url }}',
-    },{% endfor %}]"
-    mapSources="{{% for map_source in map_sources %}
-            '{{ map_source.name }}': {{ map_source.source_json }},
+        "maplayerid": "{{ resource_map_layer.nodeid }}",
+        "name": "{{ resource_map_layer.name }}",
+        "layer_definitions": {{ resource_map_layer.layer_definitions }},
+        "searchonly": false,
+        "isoverlay": true,
+        "icon": "{{ resource_map_layer.icon }}",
+        "legend": "{{ resource_map_layer.legend | escapejs  }}",
+        "activated": true,
+        "addtomap": {{ resource_map_layer.addtomap|lower }},
+        "is_resource_layer": true
+    },{% endfor %}]'
+    mapMarkers='[{% for map_marker in map_markers %}{
+        "name": "{{ map_marker.name }}",
+        "url": "{{ map_marker.url }}"
+    },{% endfor %}]'
+    mapSources='{
+        {% for map_source in map_sources %}
+            "{{ map_source.name }}": {{ map_source.source_json }},
         {% endfor %}
         {% for resource_map_source in resource_map_sources %}
-            '{{ resource_map_source.name }}': {{ resource_map_source.source }},
-    {% endfor %}}"
+            "{{ resource_map_source.name }}": {{ resource_map_source.source }},
+        {% endfor %}
+    }'
     preferredCoordinateSystems="{{ map_info.preferred_coordinate_systems }}"
     requestFailed='{
         "title": "{% trans "Request Failed..." %}",
@@ -389,12 +391,12 @@
         "title": "{% trans "This resource is based on an unpublished graph." %}",
         "text": "{% trans "To continue, please ensure the graph is published." %}"
     }'
-    resources="[{% for resource in resource_graphs %}{
-        'maplayerid': '{{resource.graphid}}',
-        'graphid': '{{resource.graphid}}',
-        'name': '{{ resource.name | escapejs }}',
-        'icon': '{{ resource.iconclass }}',
-    },{% endfor %}]"
+    resources='[{% for resource in resource_graphs %}{
+        "maplayerid": "{{resource.graphid}}",
+        "graphid": "{{resource.graphid}}",
+        "name": "{{ resource.name | escapejs }}",
+        "icon": "{{ resource.iconclass }}"
+    },{% endfor %}]'
     translations='{
         "deactivateSurveyTitle": "{% trans "You are deactivating an active survey" %}",
         "deactivateSurveyMessage": "{% trans "Users will not be able to download this survey to their device" %}",
