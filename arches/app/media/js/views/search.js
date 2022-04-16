@@ -3,6 +3,7 @@ define([
     'underscore',
     'knockout',
     'knockout-mapping',
+    'arches',
     'viewmodels/alert',
     // 'search-components',
     'views/base-manager',
@@ -20,9 +21,9 @@ define([
     'views/components/search/search-export',
     'views/components/search/saved-searches',
     'views/components/search/provisional-filter'
-], function($, _, ko, koMapping, AlertViewModel, BaseManagerView) {
+], function($, _, ko, koMapping, arches, AlertViewModel, BaseManagerView) {
     const SearchComponents = window['search-components'];
-    const arches = window.arches;
+
     // a method to track the old and new values of a subscribable
     // from https://github.com/knockout/knockout/issues/914
     //

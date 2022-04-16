@@ -1,11 +1,10 @@
 define([
     'underscore',
+    'arches',
     'models/abstract',
     'knockout',
     'knockout-mapping',
-], function (_, AbstractModel, ko, koMapping) {
-    const arches = window.arches;
-
+], function (_, arches, AbstractModel, ko, koMapping) {
     var FunctionXGraphModel = AbstractModel.extend({
         /**
         * A backbone model to manage function data

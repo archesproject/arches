@@ -2,9 +2,9 @@ define([
     'underscore',
     'knockout',
     'knockout-mapping',
+    'arches',
     'models/abstract',
-], function(_, ko, koMapping, AbstractModel) {
-    const arches = window.arches;
+], function(_, ko, koMapping, arches, AbstractModel) {
     return AbstractModel.extend({
         url: arches.urls.collector_designer,
 

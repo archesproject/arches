@@ -1,5 +1,6 @@
 require([
     'jquery',
+    'arches',
     'backbone',
     'models/concept',
     'views/rdm/concept-tree',
@@ -14,12 +15,9 @@ require([
     'views/base-manager',
     'viewmodels/alert-json',
     'jquery-validate',
-], function($, Backbone, ConceptModel, ConceptTree, ConceptReport, ConceptSearch,
+], function($, arches, Backbone, ConceptModel, ConceptTree, ConceptReport, ConceptSearch,
     AddSchemeForm, ExportSchemeForm, DeleteSchemeForm, ImportSchemeForm, AddCollectionForm,
     DeleteCollectionForm, BaseManagerView, JsonErrorAlertViewModel) {
-
-    const arches = window.arches;
-
     var RDMView = BaseManagerView.extend({
         initialize: function(options){
             var mode = 'semantic';

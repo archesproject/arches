@@ -1,10 +1,10 @@
 define(['jquery',
+    'arches',
     'models/abstract',
     'knockout',
     'knockout-mapping',
     'underscore',
-], function($, AbstractModel, ko, koMapping, _,) {
-    const arches = window.arches;
+], function($, arches, AbstractModel, ko, koMapping, _,) {
     const reportLookup = window['report-templates'];
 
     var ReportModel = AbstractModel.extend({

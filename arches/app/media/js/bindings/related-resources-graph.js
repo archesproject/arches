@@ -2,10 +2,9 @@ define([
     'knockout',
     'jquery',
     'underscore',
-    'd3'
-], function(ko, $, _, d3) {
-    const arches = window.arches;
-
+    'd3',
+    'arches'
+], function(ko, $, _, d3, arches) {
     ko.bindingHandlers.relatedResourcesGraph = {
         init: function(element, valueAccessor) {
             var modelMap = arches.resources.reduce(function(a, v) {

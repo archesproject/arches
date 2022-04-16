@@ -2,10 +2,9 @@ define([
     'jquery',
     'underscore',
     'knockout',
+    'arches',
     'select2'
-], function($, _, ko) {
-    const arches = window.arches;
-
+], function($, _, ko, arches) {
     ko.bindingHandlers.termSearch = {
         init: function(el, valueAccessor, allBindingsAccessor, viewmodel, bindingContext) {
             var allBindings = allBindingsAccessor();

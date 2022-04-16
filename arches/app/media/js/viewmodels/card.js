@@ -3,6 +3,7 @@ define([
     'underscore',
     'knockout',
     'knockout-mapping',
+    'arches',
     'models/card',
     'models/card-widget',
     'require',
@@ -10,7 +11,7 @@ define([
     'utils/dispose',
     'viewmodels/tile',
     'utils/set-csrf-token'
-], function($, _, ko, koMapping, CardModel, CardWidgetModel, require, uuid, dispose) {
+], function($, _, ko, koMapping, arches,  CardModel, CardWidgetModel, require, uuid, dispose) {
     /**
     * A viewmodel used for generic cards
     *
@@ -19,9 +20,6 @@ define([
     *
     * @param  {string} params - a configuration object
     */
-
-    const arches = window.arches;
-
     var isChildSelected = function(parent) {
         var childSelected = false;
         var children = [];

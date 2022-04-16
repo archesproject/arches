@@ -1,6 +1,4 @@
-define([], function() {
-    const arches = window.arches;
-
+define(['arches'], function(arches) {
     var resourceLookup = {};
     var resourceUtils = {
         /**

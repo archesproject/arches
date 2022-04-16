@@ -1,10 +1,9 @@
 define([
     'underscore',
     'knockout',
+    'arches',
     'models/abstract',
-], function(_, ko, AbstractModel) {
-    const arches = window.arches;
-    
+], function(_, ko, arches, AbstractModel) {
     return AbstractModel.extend({
         /**
          * A backbone model representing a single node in a graph

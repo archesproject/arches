@@ -1,6 +1,4 @@
-define(['models/tile'], function (TileModel) {
-    const arches = window.arches;
-
+define(['arches', 'models/tile'], function (arches, TileModel) {
     return TileModel.extend({
         url: arches.urls.config
     });
