@@ -2,6 +2,7 @@ define([
     'jquery',
     'knockout',
     'underscore',
+    'arches',
     'turf',
     'geohash',
     'views/base-manager',
@@ -11,8 +12,7 @@ define([
     'bindings/mapbox-gl',
     'bindings/codemirror',
     'views/components/datatypes/geojson-feature-collection',
-], function($, ko, _, turf, geohash, BaseManagerView, NodeModel, AlertViewModel, binFeatureCollection) {
-    const arches = window.arches;
+], function($, ko, _, arches, turf, geohash, BaseManagerView, NodeModel, AlertViewModel, binFeatureCollection) {
     const data = window['map-layer-manager-data'];
     var vm = {
         map: null,

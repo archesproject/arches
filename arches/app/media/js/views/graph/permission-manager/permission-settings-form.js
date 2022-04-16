@@ -2,10 +2,9 @@ define([
     'jquery',
     'underscore',
     'backbone',
-    'knockout'
-], function($, _, Backbone, ko) {
-    const arches = window.arches;
-
+    'knockout',
+    'arches',
+], function($, _, Backbone, ko, arches) {
     var PermissionSettingsForm = Backbone.View.extend({
         /**
         * A backbone view representing a card component form

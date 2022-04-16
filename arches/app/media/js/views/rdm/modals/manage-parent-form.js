@@ -1,6 +1,4 @@
-define(['jquery', 'backbone', 'views/concept-search', 'models/concept'], function ($, Backbone, ConceptSearch, ConceptModel) {
-    const arches = window.arches;
-
+define(['jquery', 'backbone', 'arches', 'views/concept-search', 'models/concept'], function ($, Backbone, arches, ConceptSearch, ConceptModel) {
     return Backbone.View.extend({
 
         events: {

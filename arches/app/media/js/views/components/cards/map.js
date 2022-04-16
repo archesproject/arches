@@ -1,13 +1,12 @@
 define([
     'knockout',
+    'arches',
     'viewmodels/card-component',
     'viewmodels/map-editor',
     'bindings/chosen',
     'bindings/codemirror',
     'views/components/datatypes/geojson-feature-collection',
-], function(ko, CardComponentViewModel, MapEditorViewModel) {
-    const arches = window.arches;
-
+], function(ko, arches, CardComponentViewModel, MapEditorViewModel) {
     var viewModel = function(params) {
         var self = this;
 

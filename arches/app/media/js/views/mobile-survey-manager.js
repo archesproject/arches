@@ -3,16 +3,14 @@ define([
     'underscore',
     'knockout',
     'uuid',
+    'arches',
     'views/base-manager',
     'viewmodels/alert',
     'viewmodels/alert-json',
     'moment',
     'bindings/datepicker',
-], function($, _, ko, uuid, BaseManagerView, AlertViewModel, JsonErrorAlertViewModel, moment) {
+], function($, _, ko, uuid, arches, BaseManagerView, AlertViewModel, JsonErrorAlertViewModel, moment) {
     const data = window['mobile-survey-manager-data'];
-    const arches = window.arches;
-
-    console.log("!!!!", data)
 
     var MobileSurveysViewModel = function(params) {
         var self = this;

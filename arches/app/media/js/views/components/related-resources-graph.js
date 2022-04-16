@@ -1,10 +1,9 @@
 define([
     'knockout',
+    'arches',
     'views/components/workbench',
     'bindings/cytoscape'
-], function(ko, WorkbenchViewmodel) {
-    const arches = window.arches;
-
+], function(ko, arches, WorkbenchViewmodel) {
     return ko.components.register('related-resources-graph', {
         viewModel: function(params) {
             var self = this;

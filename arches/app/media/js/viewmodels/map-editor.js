@@ -3,6 +3,7 @@ define([
     'underscore',
     'knockout',
     'knockout-mapping',
+    'arches',
     'uuid',
     'geojson-extent',
     'geojsonhint',
@@ -12,9 +13,7 @@ define([
     'views/components/cards/select-feature-layers',
     'text!templates/views/components/cards/map-popup.htm',
     'views/components/datatypes/geojson-feature-collection',
-], function($, _, ko, koMapping, uuid, geojsonExtent, geojsonhint, toGeoJSON, proj4, MapComponentViewModel, selectFeatureLayersFactory, popupTemplate) {
-    const arches = window.arches;
-    
+], function($, _, ko, koMapping, arches, uuid, geojsonExtent, geojsonhint, toGeoJSON, proj4, MapComponentViewModel, selectFeatureLayersFactory, popupTemplate) {
     var viewModel = function(params) {
         var self = this;
         var padding = 40;

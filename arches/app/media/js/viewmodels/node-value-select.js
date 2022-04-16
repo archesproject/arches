@@ -2,10 +2,9 @@ define([
     'underscore',
     'knockout',
     'jquery',
+    'arches',
     'viewmodels/widget',
-], function(_, ko, $, WidgetViewModel) {
-    const arches = window.arches;
-
+], function(_, ko, $, arches, WidgetViewModel) {
     var NodeValueSelectViewModel = function(params) {
         var self = this;
         params.configKeys = ['placeholder','displayOnlySelectedNode'];

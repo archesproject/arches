@@ -2,12 +2,11 @@ define([
     'underscore',
     'jquery',
     'knockout',
+    'arches',
     'viewmodels/card-component',
     'viewmodels/alert',
     'chosen'
-], function(_, $, ko, CardComponentViewModel, AlertViewModel) {
-    const arches = window.arches;
-
+], function(_, $, ko, arches, CardComponentViewModel, AlertViewModel) {
     var flattenTree = function(parents, flatList) {
         _.each(ko.unwrap(parents), function(parent) {
             flatList.push(parent);

@@ -1,6 +1,7 @@
 define([
     'underscore',
     'knockout',
+    'arches',
     'views/base-manager',
     'viewmodels/mobile-survey',
     'viewmodels/alert',
@@ -9,11 +10,9 @@ define([
     'bindings/datepicker',
     'bindings/resizable-sidepanel',
     'bindings/select2-query'
-], function(_, ko, BaseManagerView, MobileSurveyViewModel, AlertViewModel, MobileSurveyModel, Tree,) {
+], function(_, ko, arches, BaseManagerView, MobileSurveyViewModel, AlertViewModel, MobileSurveyModel, Tree,) {
     const data = window['mobile-survey-manager-data'];
     var viewModel = new MobileSurveyViewModel(data);
-    const arches = window.arches;
-    // viewModel.arches = arches;
     viewModel.saveMobileSurvey = function() {
         var self = this;
         var title;

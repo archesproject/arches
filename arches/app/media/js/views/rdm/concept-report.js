@@ -1,6 +1,7 @@
 define([
     'jquery',
     'backbone',
+    'arches',
     'models/concept',
     'models/value',
     'models/concept-parents',
@@ -13,11 +14,9 @@ define([
     'views/rdm/modals/add-image-form',
     'viewmodels/alert',
     'viewmodels/alert-json',
-], function($, Backbone, ConceptModel, ValueModel, ConceptParentModel, ValueEditor,
+], function($, Backbone, arches, ConceptModel, ValueModel, ConceptParentModel, ValueEditor,
     RelatedConcept, RelatedMember, ManageParentForm, ImportConcept, AddChildForm,
     AddImageForm, AlertViewModel, JsonErrorAlertViewModel) {
-
-    const arches = window.arches;
 
     return Backbone.View.extend({
         events: {

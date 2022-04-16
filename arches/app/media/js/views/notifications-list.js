@@ -1,12 +1,12 @@
 define([
     'jquery',
+    'arches',
     'views/list',
     'bindings/datepicker',
     'bindings/chosen',
     'views/components/simple-switch',
     'views/components/notification',
-], function($, ListView) {
-    const arches = window.arches;
+], function($, arches,  ListView) {
     var NotificationsList = ListView.extend({
         /**
         * A backbone view to manage a list of notification records

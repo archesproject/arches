@@ -2,11 +2,11 @@ define([
     'jquery',
     'underscore',
     'knockout',
+    'arches',
     'models/report',
     'models/graph',
     'viewmodels/card'
-], function($, _, ko, ReportModel, GraphModel) {
-    const arches = window.arches;
+], function($, _, ko, arches, ReportModel, GraphModel) {
     const reportLookup = window['report-templates'];
 
     var ResourceReportAbstract = function(params) {

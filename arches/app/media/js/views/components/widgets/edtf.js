@@ -1,7 +1,8 @@
 define(['knockout',
     'underscore',
+    'arches',
     'viewmodels/widget'
-], function(ko, _, WidgetViewModel) {
+], function(ko, _, arches, WidgetViewModel) {
     /**
     * registers a edtf-widget component for use in forms
     * @function external:"ko.components".edtf-widget
@@ -11,9 +12,6 @@ define(['knockout',
     * @param {string} params.config().label - label to use alongside the text input
     * @param {string} params.config().placeholder - default text to show in the text input
     */
-
-    const arches = window.arches;
-
     return ko.components.register('edtf-widget', {
         viewModel: function(params) {
             const self = this;

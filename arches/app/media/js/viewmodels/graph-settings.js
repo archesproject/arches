@@ -3,12 +3,12 @@ define([
     'underscore',
     'knockout',
     'knockout-mapping',
+    'arches',
     'bindings/color-picker',
     'viewmodels/alert-json',
     'bindings/chosen',
     'utils/set-csrf-token'
-], function($, _, ko, koMapping, colorPicker, JsonErrorAlertViewModel) {
-    const arches = window.arches;
+], function($, _, ko, koMapping, arches, colorPicker, JsonErrorAlertViewModel) {
     var GraphSettingsViewModel = function(params) {
 
         var self = this;

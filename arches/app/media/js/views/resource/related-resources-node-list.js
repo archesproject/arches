@@ -1,9 +1,8 @@
 define([
     'knockout',
+    'arches',
     'views/list',
-], function(ko, ListView) {
-    const arches = window.arches;
-
+], function(ko, arches, ListView) {
     var RelatedResourcesNodeList = ListView.extend({
         /**
         * A backbone view to manage a list of graph nodes

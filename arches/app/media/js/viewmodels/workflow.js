@@ -3,20 +3,19 @@ define([
     'underscore',
     'knockout',
     'knockout-mapping',
+    'arches',
     'uuid',
     'viewmodels/alert',
     'viewmodels/workflow-step',
     'bindings/gallery',
     'bindings/scrollTo'
-], function($, _, ko, koMapping, uuid, AlertViewModel, WorkflowStep) {
+], function($, _, ko, koMapping, arches, uuid, AlertViewModel, WorkflowStep) {
     WORKFLOW_LABEL = 'workflow';
     WORKFLOW_ID_LABEL = 'workflow-id';
     STEPS_LABEL = 'workflow-steps';
     STEP_ID_LABEL = 'workflow-step-id';
     STEP_IDS_LABEL = 'workflow-step-ids';
     WORKFLOW_COMPONENT_ABSTRACTS_LABEL = 'workflow-component-abstracts';
-
-    const arches = window.arches;
 
     var Workflow = function(config) {
         var self = this;

@@ -3,9 +3,9 @@ define([
     'underscore',
     'knockout',
     'knockout-mapping',
+    'arches',
     'text!templates/views/components/map-popup.htm'
-], function($, _, ko, koMapping, popupTemplate) {
-    const arches = window.arches;
+], function($, _, ko, koMapping, arches, popupTemplate) {
     const viewModel = function(params) {
         var self = this;
 

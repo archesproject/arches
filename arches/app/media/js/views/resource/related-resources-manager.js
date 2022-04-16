@@ -4,6 +4,7 @@ define([
     'backbone',
     'knockout',
     'knockout-mapping',
+    'arches',
     'views/components/widgets/resource-instance-multiselect',
     'views/resource/related-resources-node-list',
     'utils/ontology',
@@ -11,9 +12,7 @@ define([
     'plugins/knockout-select2',
     'bindings/datepicker',
     'bindings/datatable'
-], function($, _, Backbone, ko, koMapping, ResourceInstanceSelect, RelatedResourcesNodeList, ontologyUtils) {
-    const arches = window.arches;
-
+], function($, _, Backbone, ko, koMapping, arches, ResourceInstanceSelect, RelatedResourcesNodeList, ontologyUtils) {
     return ko.components.register('related-resources-manager', {
         viewModel: Backbone.View.extend({
             initialize: function(options) {

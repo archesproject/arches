@@ -3,15 +3,14 @@ define([
     'knockout',
     'knockout-mapping',
     'geojson-extent',
+    'arches',
     'viewmodels/card-component',
     'viewmodels/map-editor',
     'viewmodels/map-filter',
     'views/components/cards/select-related-feature-layers',
     'text!templates/views/components/cards/related-resources-map-popup.htm',
     'views/components/datatypes/geojson-feature-collection',
-], function($, ko, koMapping, geojsonExtent, CardComponentViewModel, MapEditorViewModel, MapFilterViewModel, selectFeatureLayersFactory, popupTemplate) {
-    const arches = window.arches;
-
+], function($, ko, koMapping, geojsonExtent, arches, CardComponentViewModel, MapEditorViewModel, MapFilterViewModel, selectFeatureLayersFactory, popupTemplate) {
     var viewModel = function(params) {
         var self = this;
 

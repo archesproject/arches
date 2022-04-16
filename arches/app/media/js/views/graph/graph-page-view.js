@@ -5,7 +5,6 @@ define([
     'bindings/chosen'
 ], function(ko, _, BaseManager) {
     const data = window['graph-base-data'];
-    const arches = window.arches;
 
     /**
     * A backbone view representing a page in the graph manager workflow.  It

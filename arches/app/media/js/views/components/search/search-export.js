@@ -1,11 +1,11 @@
 define(['jquery',
     'knockout',
+    'arches',
     'bindings/fadeVisible',
     'bindings/clipboard',
     'views/components/simple-switch'
 ],
-function($, ko) {
-    const arches = window.arches;
+function($, ko, arches) {
     var componentName = 'search-export';
     return ko.components.register(componentName, {
         viewModel: function(params) {

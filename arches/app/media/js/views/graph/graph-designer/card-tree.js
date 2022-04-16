@@ -2,14 +2,14 @@ define([
     'jquery',
     'underscore',
     'knockout',
+    'arches',
     'viewmodels/card',
     'models/card-widget',
     'uuid',
     'bindings/sortable',
     'bindings/scrollTo',
-], function($, _, ko, CardViewModel, CardWidgetModel, uuid) {
+], function($, _, ko, arches, CardViewModel, CardWidgetModel, uuid) {
     const data = window['graph-designer-data'];
-    const arches = window.arches;
 
     var CardTreeViewModel = function(params) {
         var self = this;

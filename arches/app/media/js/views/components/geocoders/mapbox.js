@@ -1,8 +1,6 @@
 define(
-    ['knockout', 'views/components/geocoders/base-geocoder'],
-    function (ko, BaseGeocoderViewModel) {
-        const arches = window.arches;
-
+    ['knockout', 'arches', 'views/components/geocoders/base-geocoder'],
+    function (ko, arches, BaseGeocoderViewModel) {
         return ko.components.register('views/components/geocoders/mapbox', {
             viewModel: function(params) {
                 BaseGeocoderViewModel.apply(this, [params]);

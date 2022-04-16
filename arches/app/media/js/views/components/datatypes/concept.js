@@ -1,7 +1,5 @@
-define(['knockout', 'viewmodels/concept-select'], function (ko, ConceptSelectViewModel) {
+define(['knockout', 'arches', 'viewmodels/concept-select'], function (ko, arches, ConceptSelectViewModel) {
     var name = 'concept-datatype-config';
-    const arches = window.arches;
-    
     ko.components.register(name, {
         viewModel: function(params) {
             this.search = params.search;

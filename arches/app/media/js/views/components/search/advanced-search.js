@@ -3,10 +3,10 @@ define([
     'underscore',
     'knockout',
     'knockout-mapping',
+    'arches',
     'views/components/search/base-filter',
     'bindings/let',
-], function($, _, ko, koMapping, BaseFilter) {
-    const arches = window.arches;
+], function($, _, ko, koMapping, arches, BaseFilter) {
     var componentName = 'advanced-search';
     return ko.components.register(componentName, {
         viewModel: BaseFilter.extend({

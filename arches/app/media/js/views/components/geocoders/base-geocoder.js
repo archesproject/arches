@@ -1,6 +1,6 @@
 define(
-    ['knockout'],
-    function(ko) {
+    ['knockout', 'arches'],
+    function(ko, arches) {
         /**
          * A viewmodel used for geocoders
          *
@@ -9,8 +9,6 @@ define(
          *
          * @param  {string} params - a configuration object
          */
-
-        const arches = window.arches;
 
         var BaseGeocoderViewModel = function(params) {
             var self = this;

@@ -3,6 +3,7 @@ define([
     'knockout',
     'knockout-mapping',
     'leaflet',
+    'arches',
     'views/components/workbench',
     'text!templates/views/components/iiif-popup.htm',
     'leaflet-iiif',
@@ -10,9 +11,7 @@ define([
     'leaflet-side-by-side',
     'bindings/select2-query',
     'bindings/leaflet'
-], function($, ko, koMapping, L, WorkbenchViewmodel, iiifPopup) {
-    const arches = window.arches;
-
+], function($, ko, koMapping, L, arches, WorkbenchViewmodel, iiifPopup) {
     var IIIFViewerViewmodel = function(params) {
         var self = this;
         var abortFetchManifest;

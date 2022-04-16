@@ -3,11 +3,12 @@ define([
     'underscore',
     'moment',
     'knockout',
+    'arches',
     'views/mobile-survey-manager/identity-list',
     'models/mobile-survey',
     'views/components/widgets/map',
     'bindings/sortable'
-], function($, _, moment, ko, IdentityList, MobileSurveyModel) {
+], function($, _, moment, ko, arches, IdentityList, MobileSurveyModel) {
     /**
     * A base viewmodel for mobile survey management
     *
@@ -17,8 +18,6 @@ define([
     * @param  {string} params - a configuration object
     */
 
-    const arches = window.arches;
-    
     var MobileSurveyViewModel = function(params) {
         var self = this;
         this.dateFormat = 'YYYY-MM-DD';

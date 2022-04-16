@@ -2,6 +2,7 @@ define([
     'underscore',
     'knockout',
     'knockout-mapping',
+    'arches',
     'viewmodels/widget',
     'viewmodels/map-editor',
     'bindings/chosen',
@@ -11,9 +12,7 @@ define([
     'bindings/fadeVisible',
     'bindings/mapbox-gl',
     'bindings/color-picker',
-], function(_, ko, koMapping, WidgetViewModel, MapEditorViewModel) {
-    const arches = window.arches;
-
+], function(_, ko, koMapping, arches, WidgetViewModel, MapEditorViewModel) {
     var viewModel = function(params) {
         this.context = params.type;
 

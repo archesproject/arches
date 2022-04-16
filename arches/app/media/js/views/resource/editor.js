@@ -2,6 +2,7 @@ define([
     'jquery',
     'underscore',
     'knockout',
+    'arches',
     'views/base-manager',
     'viewmodels/alert',
     'viewmodels/alert-json',
@@ -16,9 +17,8 @@ define([
     'reports/default',
     'views/components/widgets/number',
     'views/components/plugins/map'
-], function($, _, ko, BaseManagerView, AlertViewModel, JsonErrorAlertViewModel, GraphModel, ReportModel, CardViewModel, ProvisionalTileViewModel) {
+], function($, _, ko, arches, BaseManagerView, AlertViewModel, JsonErrorAlertViewModel, GraphModel, ReportModel, CardViewModel, ProvisionalTileViewModel) {
     const data = window['resource-editor-data'];
-    const arches = window.arches;
     const reportLookup = window['report-templates'];
 
     var handlers = {

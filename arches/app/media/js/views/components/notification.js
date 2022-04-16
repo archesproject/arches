@@ -2,14 +2,13 @@ define([
     'jquery',
     'knockout',
     'moment',
-], function($, ko, moment) {
+    'arches',
+], function($, ko, moment, arches) {
 
     /** 
      * A generic component for displaying notifications
      * @name NotificationViewModel
      **/
-
-    const arches = window.arches;
 
     function NotificationViewModel(params) {
         var self = this;

@@ -1,6 +1,4 @@
-define(['jquery', 'backbone', 'dropzone', 'js-cookie', 'bootstrap'], function ($, Backbone, dropzone, Cookies) {
-    const arches = window.arches;
-
+define(['jquery', 'arches', 'backbone', 'dropzone', 'js-cookie', 'bootstrap'], function ($, arches, Backbone, dropzone, Cookies) {
     return Backbone.View.extend({
         events: {
             'click button': 'close'

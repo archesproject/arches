@@ -3,14 +3,14 @@ define([
     'jquery',
     'knockout',
     'knockout-mapping',
+    'arches',
     'models/graph',
     'viewmodels/card',
     'viewmodels/provisional-tile',
     'viewmodels/alert',
     'uuid',
-], function(_, $, ko, koMapping, GraphModel, CardViewModel, ProvisionalTileViewModel, AlertViewModel, uuid) {
+], function(_, $, ko, koMapping, arches, GraphModel, CardViewModel, ProvisionalTileViewModel, AlertViewModel, uuid) {
     WORKFLOW_COMPONENT_ABSTRACTS_LABEL = 'workflow-component-abstracts';
-    const arches = window.arches;
 
     function NonTileBasedComponent() {
         var self = this;

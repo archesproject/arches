@@ -1,6 +1,4 @@
-define(['jquery', 'underscore', 'backbone', 'select2'], function ($, _, Backbone, Select2) {
-    const arches = window.arches;
-
+define(['jquery', 'underscore', 'backbone', 'select2', 'arches'], function ($, _, Backbone, Select2, arches) {
     return Backbone.View.extend({
 
         initialize: function(options) {

@@ -1,13 +1,13 @@
 define([
     'knockout',
     'underscore',
+    'arches',
     'viewmodels/widget',
     'utils/ontology',
     'views/components/resource-report-abstract',
-], function(ko, _, WidgetViewModel, ontologyUtils) {
+], function(ko, _, arches, WidgetViewModel, ontologyUtils) {
     var resourceLookup = {};
     var graphCache = {};
-    const arches = window.arches;
 
     require(['views/components/related-instance-creator']);
     

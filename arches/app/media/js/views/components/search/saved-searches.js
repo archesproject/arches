@@ -1,9 +1,9 @@
 define(['jquery',
     'knockout',
+    'arches',
     'bindings/smartresize'
 ],
-function($, ko) {
-    const arches = window.arches
+function($, ko, arches) {
     var componentName = 'saved-searches';
     return ko.components.register(componentName, {
         viewModel: function(params) {

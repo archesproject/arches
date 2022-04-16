@@ -1,9 +1,9 @@
 define(['knockout', 
+    'arches',
     'views/resource/related-resources-manager',
     'views/components/search/base-filter',
     'views/components/related-resources-graph',
-], function(ko, RelatedResourcesManager, BaseFilter) {
-    const arches = window.arches;
+], function(ko, arches, RelatedResourcesManager, BaseFilter) {
     var componentName = 'related-resources-filter';
     return ko.components.register(componentName, {
         viewModel: BaseFilter.extend ({

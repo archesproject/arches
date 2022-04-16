@@ -3,13 +3,13 @@ define([
     'underscore',
     'knockout',
     'moment',
+    'arches',
     'views/components/search/base-filter',
     'bindings/datepicker',
     'bindings/chosen',
     'bindings/time-wheel'
 ],
-function($, _, ko, moment, BaseFilter) {
-    const arches = window.arches;
+function($, _, ko, moment, arches, BaseFilter) {
     var componentName = 'time-filter';
     return ko.components.register(componentName, {
         viewModel: BaseFilter.extend({

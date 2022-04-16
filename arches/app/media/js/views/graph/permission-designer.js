@@ -3,9 +3,10 @@ define([
     'underscore',
     'knockout',
     'knockout-mapping',
+    'arches',
     'views/graph/permission-manager/identity-list',
     'views/graph/permission-manager/permission-settings-form'
-], function($, _, ko, koMapping, IdentityList, PermissionSettingsForm, data) {
+], function($, _, ko, koMapping, arches, IdentityList, PermissionSettingsForm, data) {
     /**
     * A viewmodel for managing nodegroup permissions
     *
@@ -14,7 +15,6 @@ define([
     *
     * @param  {string} params - a configuration object
     */
-    const arches = window.arches;
 
     var PermissionDesignerViewModel = function(params) {
         var self = this;

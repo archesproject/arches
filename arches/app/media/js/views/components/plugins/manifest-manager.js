@@ -4,12 +4,11 @@ define([
     'jquery',
     'dropzone',
     'uuid',
+    'arches',
     'viewmodels/alert-json',
     'views/components/iiif-viewer',
     'bindings/dropzone'
-], function(ko, koMapping, $, Dropzone, uuid, JsonErrorAlertViewModel, IIIFViewerViewmodel) {
-    const arches = window.arches;
-
+], function(ko, koMapping, $, Dropzone, uuid, arches, JsonErrorAlertViewModel, IIIFViewerViewmodel) {
     return ko.components.register('manifest-manager', {
         viewModel: function(params) {
             var self = this;

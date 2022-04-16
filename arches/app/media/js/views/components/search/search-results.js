@@ -1,5 +1,6 @@
 define(['jquery',
     'underscore',
+    'arches',
     'views/components/search/base-filter',
     'bootstrap',
     'select2',
@@ -8,8 +9,7 @@ define(['jquery',
     'models/graph',
     'bootstrap-datetimepicker',
     'plugins/knockout-select2'
-], function($, _, BaseFilter, bootstrap, select2, ko, koMapping, GraphModel) {
-    const arches = window.arches;
+], function($, _, arches, BaseFilter, bootstrap, select2, ko, koMapping, GraphModel) {
     const viewdata = window['view-data'];
 
     var componentName = 'search-results';
