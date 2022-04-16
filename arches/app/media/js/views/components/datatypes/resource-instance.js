@@ -1,11 +1,11 @@
 define([
     'knockout',
     'underscore',
+    'arches',
     'utils/ontology',
     'views/components/widgets/resource-instance-select'
-], function(ko, _, ontologyUtils) {
+], function(ko, _, arches, ontologyUtils) {
     const data = window['view-data'];
-    const arches = window['arches'];
 
     var name = 'resource-instance-datatype-config';
     ko.components.register(name, {

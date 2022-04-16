@@ -4,11 +4,10 @@ define([
     'knockout',
     'knockout-mapping',
     'moment',
+    'arches',
     'utils/set-csrf-token',
-    // 'js-cookie',
     'views/components/simple-switch',
-], function($, _, ko, koMapping, moment, foo) {
-    const arches = window['arches'];
+], function($, _, ko, koMapping, moment, arches) {
     /**
     * A viewmodel for managing provisional edits
     *
@@ -39,7 +38,6 @@ define([
         //     }
         // });
         self.getUserNames = function(edits, users){
-            console.log("D(DS()DS()SD", foo)
             $.ajax({
                 url: arches.urls.get_user_names,
                 context: this,

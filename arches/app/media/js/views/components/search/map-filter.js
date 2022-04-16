@@ -2,6 +2,7 @@ define([
     'jquery',
     'underscore',
     'knockout',
+    'arches',
     'views/components/search/base-filter',
     'views/components/map',
     'views/components/widgets/map/bin-feature-collection',
@@ -11,9 +12,8 @@ define([
     'geojson-extent',
     'uuid',
     'geojsonhint',
-], function($, _, ko, BaseFilter, MapComponentViewModel, binFeatureCollection, mapStyles, turf, geohash,  geojsonExtent, uuid, geojsonhint) {
+], function($, _, ko, arches, BaseFilter, MapComponentViewModel, binFeatureCollection, mapStyles, turf, geohash,  geojsonExtent, uuid, geojsonhint) {
     var componentName = 'map-filter';
-    const arches = window['arches'];
 
     return ko.components.register(componentName, {
         viewModel: BaseFilter.extend({
