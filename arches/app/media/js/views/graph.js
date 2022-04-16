@@ -2,6 +2,7 @@ require([
     'jquery',
     'underscore',
     'knockout',
+    'arches',
     'views/base-manager',
     'viewmodels/alert',
     'viewmodels/alert-json',
@@ -9,8 +10,8 @@ require([
     'bindings/hover',
     'bindings/chosen',
     'utils/set-csrf-token',
-], function($, _, ko, BaseManager, AlertViewModel, JsonErrorAlertViewModel) {    
-    const arches = window.arches;
+], function($, _, ko, arches, BaseManager, AlertViewModel, JsonErrorAlertViewModel) {   
+    console.log("(#)()@#@#()", arches) 
     const graphManagerData = window['graph-manager-data'];
     var GraphView = BaseManager.extend({
         /**

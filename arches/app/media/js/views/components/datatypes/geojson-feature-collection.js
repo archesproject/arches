@@ -2,13 +2,13 @@ define([
     'jquery',
     'knockout',
     'underscore',
+    'arches',
     'bindings/color-picker',
     'bindings/mapbox-gl',
     'bindings/codemirror',
     'bindings/ckeditor'
-], function($, ko, _) {
+], function($, ko, _, arches) {
     var name = 'geojson-feature-collection-datatype-config';
-    const arches = window.arches;
 
     ko.components.register(name, {
         viewModel: function(params) {
