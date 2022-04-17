@@ -110,7 +110,6 @@ module.exports = {
             ...templatePathConfiguration,
             'arches': Path.resolve(__dirname, '../arches/app/templates', 'javascript.htm'),
             'report-templates': Path.resolve(__dirname, '../arches/app/templates', 'javascript.htm'),
-            'card-components': Path.resolve(__dirname, '../arches/app/templates', 'javascript.htm'),
             'file-renderers': Path.resolve(__dirname, '../arches/app/templates', 'javascript.htm'),
             'function-templates': Path.resolve(__dirname, '../arches/app/templates', 'javascript.htm'),
             'component-templates': Path.resolve(__dirname, '../arches/app/templates', 'javascript.htm'),

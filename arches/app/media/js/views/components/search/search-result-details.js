@@ -2,15 +2,14 @@ define([
     'jquery',
     'underscore',
     'knockout',
+    'card-components',
     'views/components/search/base-filter',
     'models/report',
     'viewmodels/card',
     'views/components/resource-report-abstract',
     'bindings/chosen'
-], function($, _, ko, BaseFilter, ReportModel, CardViewModel) {
+], function($, _, ko, cardComponents, BaseFilter, ReportModel, CardViewModel) {
     const reportLookup = window['report-templates'];
-    const cardComponents = window['card-components'];
-
     
     var componentName = 'search-result-details';
     return ko.components.register(componentName, {

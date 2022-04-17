@@ -167,6 +167,18 @@
 {% endblock require_config %}
 
 {% block arches_modules %}
+<div 
+    id="cardComponentData"
+    style="display: none;"
+    cardComponents='{{% for component in card_components %}
+        "{{ component.pk }}": {
+            "componentname": "{{ component.componentname }}",
+            "component": "{{ component.component }}",
+            "defaultconfig": {{ component.defaultconfig_json }}
+        },
+    {% endfor %}}'
+></div>
+
 <!-- consumed by media/js/arches.js -->
 <div 
     id='arches-data'
@@ -429,18 +441,8 @@
     version="{{ app_settings.VERSION }}"
 ></div>
 
+
 <script>
-    require(['utils/set-csrf-token']);
-
-
-    window['card-components'] = {{% autoescape off %}{% for component in card_components %}
-            '{{ component.pk }}': {
-                'componentname': '{{ component.componentname }}',
-                'component': '{{ component.component }}',
-                'defaultconfig': '{{ component.defaultconfig_json }}'
-            },
-        {% endfor %}{% endautoescape %}};
-
     window['widgets'] = {{% autoescape off %}{% for widget in widgets %}
             '{{ widget.pk }}': {
                 'name': '{{ widget.name }}',

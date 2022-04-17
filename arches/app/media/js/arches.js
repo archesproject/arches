@@ -1,4 +1,4 @@
-define([], function () {
+define(['utils/set-csrf-token'], function () {
     function removeTrailingCommaFromArray(string) {
         return string.replace(/,]*$/, "]");
     }

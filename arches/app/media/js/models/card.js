@@ -1,6 +1,7 @@
 define([
     'underscore',
     'arches',
+    'card-components',
     'models/abstract',
     'models/node',
     'models/card-widget',
@@ -10,13 +11,6 @@ define([
     'regenerator-runtime',
     'utils/dispose',
     
-    'views/components/cards/default',
-    'views/components/cards/file-viewer',
-    'views/components/cards/grouping',
-    'views/components/cards/iiif-card',
-    'views/components/cards/map',
-    'views/components/cards/photo-gallery-card',
-    'views/components/cards/related-resources-map',
 
     'reports/default',
     'reports/map',
@@ -56,8 +50,17 @@ define([
     'views/components/widgets/switch',
     'views/components/widgets/text',
     'views/components/widgets/urldatatype',
-], function(_, arches, AbstractModel, NodeModel, CardWidgetModel, ko, koMapping, CardConstraintsViewModel, regeneratorRuntime, dispose) {
-    const cardComponentLookup = window['card-components'];
+], function(_, arches, cardComponentLookup, AbstractModel, NodeModel, CardWidgetModel, ko, koMapping, CardConstraintsViewModel, regeneratorRuntime, dispose) {
+
+
+    // Object.keys(cardComponentLookup).forEach((key) => {
+    //     require([cardComponentLookup[key]['component']]);
+    // });
+
+    // require('views/components/cards/default')
+
+
+
     var CardModel = AbstractModel.extend({
         /**
         * A backbone model to manage card data
@@ -151,7 +154,7 @@ define([
 
             var componentIdSubscription = this.get('component_id').subscribe(function(value) {
                 var key;
-                var defaultConfig = JSON.parse(self.cardComponentLookup[value].defaultconfig);
+                var defaultConfig = self.cardComponentLookup[value].defaultconfig;
                 for (key in defaultConfig) {
                     defaultConfig[key] = ko.observable(defaultConfig[key]);
                 }
