@@ -7,14 +7,9 @@ define(['require'], function (require) {
     const cardComponentData = cardComponentDataHTML.getAttribute('cardComponents');
     const cardComponents = JSON.parse(removeTrailingCommaFromObject(cardComponentData));
 
-    const foo = Object.keys(cardComponents).reduce((acc, key) => {
-        acc.push(cardComponents[key]['component']);
-        return acc;
-    }, []);
-
-    console.log(foo)
-    console.log(foo[0] === 'views/components/cards/default')
-    require('views/components/cards/default');
+    Object.keys(cardComponents).forEach((key) => {
+        require(`./${cardComponents[key]['component']}.js`);
+    });
 
     return {...cardComponents};
 });

@@ -51,16 +51,6 @@ define([
     'views/components/widgets/text',
     'views/components/widgets/urldatatype',
 ], function(_, arches, cardComponentLookup, AbstractModel, NodeModel, CardWidgetModel, ko, koMapping, CardConstraintsViewModel, regeneratorRuntime, dispose) {
-
-
-    // Object.keys(cardComponentLookup).forEach((key) => {
-    //     require([cardComponentLookup[key]['component']]);
-    // });
-
-    // require('views/components/cards/default')
-
-
-
     var CardModel = AbstractModel.extend({
         /**
         * A backbone model to manage card data
