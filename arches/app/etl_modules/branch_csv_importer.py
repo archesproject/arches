@@ -211,10 +211,8 @@ class BranchCsvImporter:
         """Validation is actually done - we're just getting the report here"""
         success = True
         with connection.cursor() as cursor:
-            cursor.execute("""SELECT __arches_load_staging_report_errors(%s)""", (self.loadid,))
+            cursor.execute("""SELECT * FROM __arches_load_staging_report_errors(%s)""", (self.loadid,))
             row = cursor.fetchall()
-            if len(row):
-                success = False
         return {"success": success, "data": row}
 
     def write(self, request):
