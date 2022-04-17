@@ -54,11 +54,11 @@
         <!-- /ko -->
     </div>
     <!-- ko if: validationError() && validationError().length == 0 -->
-    <div style="cursor:pointer; padding:10px; margin: 10px; width: fit-content; color: #fff; background-color:steelblue;" data-bind="click: function(){submit('write')}">Load</div>
+    <div style="cursor:pointer; padding:10px; margin: 10px; width: fit-content; color: #fff; background-color:steelblue;" data-bind="click: function(){ write(); }">Load</div>
     <!-- /ko -->
     <div style="margin-top: 50px;">
-        <h4>{% trans "Validation Errors" %}</h4>
         <!-- ko if: validationError() && validationError().length > 0 -->
+        <h4>{% trans "Validation Errors" %}</h4>
         <table class="table table-striped"  style="border: 1px solid rgba(0,0,0,0.14)">
             <tr>
                 <th>Error</th>
