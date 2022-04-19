@@ -29,7 +29,6 @@ from django.core.exceptions import PermissionDenied
 from django.core.cache import caches
 
 
-
 @method_decorator(group_required("Graph Editor"), name="dispatch")
 class ReIndexResources(View):
     def post(self, request):

@@ -16,11 +16,10 @@
 {% block sidepanel %}
 <!-- ko foreach: { data: [$data], as: 'self' } -->
 <!--ko if: activeTab() === 'editor' -->
-    <div class="workbench-header-buffer">
-        <div class="workbench-card-sidepanel-header-container">
-            <h4 tabindex="0" class="workbench-card-sidepanel-header" data-bind="click: hideSidePanel, text: label" onkeyup="if(event.which == 13 || event.keyCode == 13){ $(this).trigger('click'); }"></h4>
-        </div>
+    <div class="workbench-card-sidepanel-header-container">
+        <h4 tabindex="0" class="workbench-card-sidepanel-header" data-bind="click: hideSidePanel, text: label" onkeyup="if(event.which == 13 || event.keyCode == 13){ $(this).trigger('click'); }"></h4>
     </div>
+    <div class="workbench-card-sidepanel-border"></div>
 
     <div>
         <div class="new-provisional-edit-card-container">

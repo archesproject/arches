@@ -702,10 +702,6 @@ div.search-facet-item:focus {
         margin-left: 50px;
     }
 
-    h1.page-header.text-overflow.ep-graph-title {
-        padding-left: 5px !important;
-    }
-
     .resource-editor-container {
         flex-direction: column;
     }

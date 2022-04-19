@@ -54,6 +54,8 @@
 <div class="workbench-card-sidepanel-header-container">
     <h4 tabindex="0" class="workbench-card-sidepanel-header" data-bind="click: hideSidePanel" onkeyup="if(event.which == 13 || event.keyCode == 13){ $(this).trigger('click'); }">{% trans "Resource Information" %}</h4>
 </div>
+<div class="workbench-card-sidepanel-border"></div>
+
 <div class="related-resource-graph-information-content" data-bind="using: informationElement">
     <!--ko if: $data -->
     <!--ko if: $parent.edgeInformation() -->
@@ -167,10 +169,13 @@
     <!--/ko -->
 </div>
 <!--/ko -->
+
 <!--ko if: activeTab() === 'search' -->
 <div class="workbench-card-sidepanel-header-container">
     <h4 tabindex="0" class="workbench-card-sidepanel-header" data-bind="click: hideSidePanel" onkeyup="if(event.which == 13 || event.keyCode == 13){ $(this).trigger('click'); }">{% trans "Search Network" %}</h4>
 </div>
+<div class="workbench-card-sidepanel-border"></div>
+<div class="related-resources-search-body">
 <div class="related-reasources-search-container">
     <input type="text" class="form-control" placeholder="{% trans "Filter..." %}" data-bind="value: nodeSearchFilter, valueUpdate: 'afterkeydown'">
     <span class="clear-node-search" data-bind="click: function() { nodeSearchFilter(''); }, visible: nodeSearchFilter() !== ''"><i class="fa fa-times-circle"></i></span>
@@ -202,6 +207,7 @@
         </div>
     </div>
 </div>
+</div>
 <!--/ko -->
 <!--ko if: activeTab() === 'analyze' -->
 <div class="workbench-card-sidepanel-header-container">
@@ -217,6 +223,7 @@
 <div class="workbench-card-sidepanel-header-container">
     <h4 tabindex="0" class="workbench-card-sidepanel-header" data-bind="click: hideSidePanel" onkeyup="if(event.which == 13 || event.keyCode == 13){ $(this).trigger('click'); }">{% trans "Legend" %}</h4>
 </div>
+<div class="workbench-card-sidepanel-border"></div>
 <div class="legend-listing-container" data-bind="foreach: legendEntries">
     <div class="legend-listing related-resource-legend">
         <div class="edge-node-information">
