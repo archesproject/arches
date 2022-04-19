@@ -1226,7 +1226,9 @@ class CsvReader(Reader):
                 missing_display_values = {}
                 group_no = False
                 # if some rows have a ResourceID and not a LegacyID while others a LegacyID and no ResourceID, this import breaks
-                legacyids_only = (business_data[0]["ResourceID"] is None or business_data[0]["ResourceID"] == "") and "LegacyID" in business_data[0]
+                legacyids_only = (
+                    business_data[0]["ResourceID"] is None or business_data[0]["ResourceID"] == ""
+                ) and "LegacyID" in business_data[0]
 
                 for row_number, row in enumerate(business_data):
                     i = int(row_number)
