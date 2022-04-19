@@ -1236,7 +1236,7 @@ class CsvReader(Reader):
                     if legacyids_only and i > 0:
                         resource_changed = business_data[i - 1]["LegacyID"] != row["LegacyID"]
                     else:
-                        resource_changed = resourceinstanceid != row["ResourceID"] and i > 0
+                        resource_changed = str(resourceinstanceid) != str(row["ResourceID"]) and i > 0
                     if resource_changed:
                         group_no_to_tileids.clear()  # garbage collection of past resource groups
 
