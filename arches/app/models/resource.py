@@ -187,9 +187,9 @@ class Resource(models.ResourceInstance):
 
         # need to save the models first before getting the documents for index
         # need to handle if the bulk load is appending tiles to existing resources/
-        existing_resources_ids = Resource.objects.filter(
+        existing_resources_ids = list(Resource.objects.filter(
             resourceinstanceid__in=[resource.resourceinstanceid for resource in resources]
-        ).values_list("resourceinstanceid", flat=True)
+        ).values_list("resourceinstanceid", flat=True))
 
         resources_to_update = [resource for resource in resources if resource.resourceinstanceid in existing_resources_ids]
         resources_to_create = [resource for resource in resources if resource.resourceinstanceid not in existing_resources_ids]
