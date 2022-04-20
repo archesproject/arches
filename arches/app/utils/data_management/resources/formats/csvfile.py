@@ -445,7 +445,7 @@ class CsvReader(Reader):
         component_type_nodeid = "a271c374-1037-11ec-b65f-31043b30bbcd"
         place_nodegroupid = "a271c336-1037-11ec-b65f-31043b30bbcd"
         address_nodegroupid = "a271c321-1037-11ec-b65f-31043b30bbcd"
-        hist_dist_eval_nodegroupid = 'bb6de9e8-98a2-11eb-b28f-5f1901ec6b3b'
+        hist_dist_eval_nodegroupid = "bb6de9e8-98a2-11eb-b28f-5f1901ec6b3b"
         if len(unique_nodeids) != len(list(mapping_filefieldname_to_nodeid_dict.keys())):
             non_unique_col_headers = True
         non_unique_col_headers = False
@@ -1338,7 +1338,10 @@ class CsvReader(Reader):
                         if sort_str and "DETAILS" in sort_str:  # TODO NOT ADVISABLE TO JUST SKIP, TESTING PURPOSES ONLY
                             continue
 
-                        if str(target_tile.nodegroup_id) in [evaluation_nodegroupid, hist_dist_eval_nodegroupid, component_nodegroupid] and group_valid:
+                        if (
+                            str(target_tile.nodegroup_id) in [evaluation_nodegroupid, hist_dist_eval_nodegroupid, component_nodegroupid]
+                            and group_valid
+                        ):
 
                             if str(target_tile.nodegroup_id) in [evaluation_nodegroupid, hist_dist_eval_nodegroupid]:
                                 if group_no not in group_no_to_tileids:
