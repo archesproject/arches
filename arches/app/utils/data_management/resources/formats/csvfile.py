@@ -445,6 +445,7 @@ class CsvReader(Reader):
         component_type_nodeid = "a271c374-1037-11ec-b65f-31043b30bbcd"
         place_nodegroupid = "a271c336-1037-11ec-b65f-31043b30bbcd"
         address_nodegroupid = "a271c321-1037-11ec-b65f-31043b30bbcd"
+        hist_dist_eval_nodegroupid = 'bb6de9e8-98a2-11eb-b28f-5f1901ec6b3b'
         if len(unique_nodeids) != len(list(mapping_filefieldname_to_nodeid_dict.keys())):
             non_unique_col_headers = True
         non_unique_col_headers = False
@@ -936,7 +937,7 @@ class CsvReader(Reader):
                     if group_valid:
                         if str(tile_to_populate.nodegroup_id) == component_nodegroupid:
                             group_no = row["GROUP_NO"] + "-" + str(prefix)
-                        elif str(tile_to_populate.nodegroup_id) == evaluation_nodegroupid:
+                        elif str(tile_to_populate.nodegroup_id) in [evaluation_nodegroupid, hist_dist_eval_nodegroupid]:
                             group_no = row["GROUP_NO"]
                     # Set target tileid to None because this will be a new tile, a new tileid will be created on save.
                     if tile_to_populate.tileid is None:
@@ -1240,6 +1241,7 @@ class CsvReader(Reader):
                     else:
                         resource_changed = str(resourceinstanceid) != str(row["ResourceID"]) and i > 0
                     if resource_changed:
+                        # print(legacyid)
                         group_no_to_tileids.clear()  # garbage collection of past resource groups
 
                         save_count = save_count + 1
@@ -1304,7 +1306,7 @@ class CsvReader(Reader):
                         if group_valid and not isinstance(row["GROUP_NO"], str):
                             row["GROUP_NO"] = str(row["GROUP_NO"])
 
-                        if group_valid and str(target_tile.nodegroup_id) == evaluation_nodegroupid:
+                        if group_valid and str(target_tile.nodegroup_id) in [evaluation_nodegroupid, hist_dist_eval_nodegroupid]:
                             group_no = row["GROUP_NO"]
 
                         # {
@@ -1336,9 +1338,9 @@ class CsvReader(Reader):
                         if sort_str and "DETAILS" in sort_str:  # TODO NOT ADVISABLE TO JUST SKIP, TESTING PURPOSES ONLY
                             continue
 
-                        if str(target_tile.nodegroup_id) in [evaluation_nodegroupid, component_nodegroupid] and group_valid:
+                        if str(target_tile.nodegroup_id) in [evaluation_nodegroupid, hist_dist_eval_nodegroupid, component_nodegroupid] and group_valid:
 
-                            if str(target_tile.nodegroup_id) == evaluation_nodegroupid:
+                            if str(target_tile.nodegroup_id) in [evaluation_nodegroupid, hist_dist_eval_nodegroupid]:
                                 if group_no not in group_no_to_tileids:
                                     group_no_to_tileids[group_no] = {}
                                 # checks for whether a parent tile exists since get_blank_tile starts out getting parent
