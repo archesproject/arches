@@ -5,7 +5,7 @@ define([
     'knockout-mapping',
     'arches',
     'viewmodels/alert',
-    // 'search-components',
+    'search-components',
     'views/base-manager',
     'views/components/simple-switch',
     'views/components/search/map-filter',
@@ -21,9 +21,7 @@ define([
     'views/components/search/search-export',
     'views/components/search/saved-searches',
     'views/components/search/provisional-filter'
-], function($, _, ko, koMapping, arches, AlertViewModel, BaseManagerView) {
-    const SearchComponents = window['search-components'];
-
+], function($, _, ko, koMapping, arches, AlertViewModel, SearchComponents, BaseManagerView) {
     // a method to track the old and new values of a subscribable
     // from https://github.com/knockout/knockout/issues/914
     //
@@ -60,10 +58,10 @@ define([
 
     var CommonSearchViewModel = function() {
         this.filters = {};
-        this.filtersList = _.sortBy(SearchComponents, function(filter) {
+        this.filtersList = _.sortBy(Object.values(SearchComponents), function(filter) {
             return filter.sortorder;
         }, this);
-        SearchComponents.forEach(function(component) {
+        Object.values(SearchComponents).forEach(function(component) {
             this.filters[component.componentname] = ko.observable(null);
         }, this);
         var firstEnabledFilter = _.find(this.filtersList, function(filter) {

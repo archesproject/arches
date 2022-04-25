@@ -478,6 +478,16 @@
 ></div>
 
 
+<!-- consumed by media/js/search-components.js -->
+<div 
+    id="searchComponentData"
+    style="display: none;"
+    searchComponents='{{% for component in search_components %}
+        "{{ component.pk }}": {{ component.toJSON }},
+    {% endfor %}}'
+></div>
+
+
 <!-- consumed by media/js/widgets.js -->
 <div 
     id="widgetData"
@@ -494,30 +504,6 @@
 
 
 <script>
-    {% comment %} define('widgets', [{% for widget in widgets %}'{{ widget.component }}',{% endfor %}], function () {
-        return {{% autoescape off %}{% for widget in widgets %}
-            '{{ widget.pk }}': {
-                'name': '{{ widget.name }}',
-                'component': '{{ widget.component }}',
-                'datatype': '{{ widget.datatype }}',
-                'defaultconfig': '{{ widget.defaultconfig_json }}'
-            },
-        {% endfor %}{% endautoescape %}};
-    }); {% endcomment %}
-
-    {% comment %} define('report-templates', [{% for template in report_templates %}'{{ template.component }}',{% endfor %}], function () {
-        return {{% autoescape off %}{% for template in report_templates %}
-            '{{ template.pk }}': {
-                'componentname': '{{ template.componentname }}',
-                'component': '{{ template.component }}',
-                'defaultconfig': '{{ template.defaultconfig_json }}',
-                'name': '{{ template.name }}',
-                'preload_resource_data': '{{ template.preload_resource_data }}'
-            },
-        {% endfor %}{% endautoescape %}};
-    }); {% endcomment %}
-
-
     define('function-templates', [{% for template in function_templates %}'{{ template.component }}',{% endfor %}], function () {
          return;
     });
@@ -526,41 +512,8 @@
          return;
     });
 
-    define('geocoder-templates', [{% for provider in geocoding_providers %}'{{ provider.component }}',{% endfor %}], function () {
-         return;
-    });
-
-    define('file-renderers', function () {
-        return [{% autoescape off %}{% for renderer in app_settings.RENDERERS %}
-                {'name': '{{ renderer.name }}',
-                'title': '{{ renderer.title }}',
-                'description': '{{ renderer.description }}',
-                'component': '{{ renderer.component }}',
-                'id': '{{ renderer.id }}',
-                'iconclass': '{{ renderer.iconclass }}',
-                'text': '{{ renderer.title }}',
-                'type': '{{ renderer.type }}',
-                'ext': '{{ renderer.ext }}',
-                'exclude': '{{ renderer.exclude }}',
-                 },
-                {% endfor %}{% endautoescape %}];
-    });
-
-
     define('geoms', function () {
         {% autoescape off %}return {{geoms}};{% endautoescape %}
-    });
-
-    window['search-components'] = (function() {
-        return {% autoescape off %}[{% for component in search_components %}
-                {{component.toJSON}},
-        {% endfor %}]{% endautoescape %};
-    })()  // IIFE
-
-    define('search-components', [{% for component in search_components %}'{{ component.componentpath }}',{% endfor %}], function () {
-            return {% autoescape off %}[{% for component in search_components %}
-                {{component.toJSON}},
-            {% endfor %}]{% endautoescape %};
     });
 
     define('leaflet-draw-local', [

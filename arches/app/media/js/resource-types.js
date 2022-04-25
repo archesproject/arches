@@ -7,8 +7,6 @@ define(['require'], function (require) {
     const resourceTypeData = resourceTypeDataHTML.getAttribute('resourceTypes');
     const resourceTypes = JSON.parse(removeTrailingCommaFromObject(resourceTypeData));
 
-    console.log(resourceTypes)
-
     Object.keys(resourceTypes).forEach((key) => {
         require(`./${resourceTypes[key]['component']}`);
     });
