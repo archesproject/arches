@@ -3,6 +3,7 @@ define([
     'knockout',
     'uuid',
     'arches',
+    'file-renderers',
     'viewmodels/card-component',
     'viewmodels/card-multi-select',
     'views/components/workbench',
@@ -11,9 +12,7 @@ define([
     'bindings/scroll-to-file',
     'dropzone',
     'bindings/dropzone'
-], function($, ko, uuid, arches, CardComponentViewModel, CardMultiSelectViewModel, WorkbenchComponentViewModel) {
-    const fileRenderers = window['file-renderers']
-
+], function($, ko, uuid, arches, fileRenderers, CardComponentViewModel, CardMultiSelectViewModel, WorkbenchComponentViewModel) {
     return ko.components.register('file-viewer', {
         viewModel: function(params) {
             params.configKeys = ['acceptedFiles', 'maxFilesize'];

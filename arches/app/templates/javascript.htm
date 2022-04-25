@@ -380,6 +380,27 @@
 ></div>
 
 
+<!-- consumed by media/js/file-renderers.js -->
+<div 
+    id="fileRendererData"
+    style="display: none;"
+    fileRenderers='{{% for renderer in app_settings.RENDERERS  %}
+        "{{ renderer.id }}": {
+            "name": "{{ renderer.name }}",
+            "title": "{{ renderer.title }}",
+            "description": "{{ renderer.description }}",
+            "component": "{{ renderer.component }}",
+            "id": "{{ renderer.id }}",
+            "iconclass": "{{ renderer.iconclass }}",
+            "text": "{{ renderer.title }}",
+            "type": "{{ renderer.type }}",
+            "ext": "{{ renderer.ext }}",
+            "exclude": "{{ renderer.exclude }}"
+        },
+    {% endfor %}}'
+></div>
+
+
 <!-- consumed by media/js/geocoder-templates.js -->
 <div 
     id="geocoderTemplateData"
@@ -422,26 +443,6 @@
 
 
 <script>
-    // window['geocoder-templates'] = {{% autoescape off %}{% for provider in geocoding_providers %}
-    //     '{{ provider.component }}',
-    // {% endfor %}{% endautoescape %}}
-
-    window['file-renderers'] = {% autoescape off %}
-        {% for renderer in app_settings.RENDERERS %}
-                {'name': '{{ renderer.name }}',
-                'title': '{{ renderer.title }}',
-                'description': '{{ renderer.description }}',
-                'component': '{{ renderer.component }}',
-                'id': '{{ renderer.id }}',
-                'iconclass': '{{ renderer.iconclass }}',
-                'text': '{{ renderer.title }}',
-                'type': '{{ renderer.type }}',
-                'ext': '{{ renderer.ext }}',
-                'exclude': '{{ renderer.exclude }}',
-                 },
-        {% endfor %}
-    {% endautoescape %}
-
     window['datatype-config-components'] = {% autoescape off %} 
         {% for datatype in datatypes %}
             {% if datatype.configcomponent != None %}
