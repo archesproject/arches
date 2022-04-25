@@ -8,24 +8,9 @@ define([
     'knockout',
     'knockout-mapping',
     'viewmodels/card-constraints',
-    'regenerator-runtime',
     'utils/dispose',
-
-
-    'views/components/datatypes/boolean',
-    'views/components/datatypes/concept',
-    'views/components/datatypes/date',
-    'views/components/datatypes/domain-value',
-    'views/components/datatypes/edtf',
-    'views/components/datatypes/file-list',
-    'views/components/datatypes/geojson-feature-collection',
-    'views/components/datatypes/node-value',
-    'views/components/datatypes/number',
-    'views/components/datatypes/resource-instance',
-    'views/components/datatypes/string',
-    'views/components/datatypes/url',
-
-], function(_, arches, cardComponentLookup, AbstractModel, NodeModel, CardWidgetModel, ko, koMapping, CardConstraintsViewModel, regeneratorRuntime, dispose) {
+    'regenerator-runtime',
+], function(_, arches, cardComponentLookup, AbstractModel, NodeModel, CardWidgetModel, ko, koMapping, CardConstraintsViewModel, dispose) {
     var CardModel = AbstractModel.extend({
         /**
         * A backbone model to manage card data

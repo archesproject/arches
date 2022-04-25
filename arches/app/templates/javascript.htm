@@ -380,6 +380,29 @@
 ></div>
 
 
+<!-- consumed by media/js/datatype-config-components.js -->
+<div 
+    id="datatypeConfigComponentData"
+    style="display: none;"
+    datatypeConfigComponents='{{% for datatype in datatypes %}
+        {% if datatype.configcomponent != None %}
+            "{{ datatype.pk }}" : {
+                "datatype": "{{ datatype.datatype }}",
+                "iconclass": "{{ datatype.iconclass }}",
+                "modulename": "{{ datatype.modulename }}",
+                "classname": "{{ datatype.classname }}",
+                "configcomponent": "{{ datatype.configcomponent }}",
+                "defaultconfig": "{{ datatype.defaultconfig }}",
+                "configname": "{{ datatype.configname }}",
+                "isgeometric": "{{ datatype.isgeometric }}",
+                "defaultwidget": "{{ datatype.defaultwidget }}",
+                "issearchable": "{{ datatype.issearchable }}"
+            },
+        {% endif %}
+    {% endfor %}}'
+></div>
+
+
 <!-- consumed by media/js/file-renderers.js -->
 <div 
     id="fileRendererData"
@@ -406,7 +429,11 @@
     id="geocoderTemplateData"
     style="display: none;"
     geocoderTemplates='{{% for provider in geocoding_providers %}
-        "{{ provider }}": "{{ provider.component }}",
+        "{{ provider.geocoderid }}": {
+            "component": "{{ provider.component }}",
+            "name": "{{ provider.name }}",
+            "api_key": "{{ provider.api_key }}"
+        },
     {% endfor %}}'
 ></div>
 
@@ -443,14 +470,6 @@
 
 
 <script>
-    window['datatype-config-components'] = {% autoescape off %} 
-        {% for datatype in datatypes %}
-            {% if datatype.configcomponent != None %}
-            "{{ datatype.configcomponent }}",
-            {% endif %}
-        {% endfor %}
-    {% endautoescape %}
-
     define('resource-types', [], function () {
         var resourceTypes = {
             {% for type, type_data in resource_types %}
@@ -527,14 +546,6 @@
                 {% endfor %}{% endautoescape %}];
     });
 
-    define('datatype-config-components',
-        [{% for datatype in datatypes %}
-            {% if datatype.configcomponent != None %}
-            "{{ datatype.configcomponent }}",
-            {% endif %}
-        {% endfor %}
-        ],
-        function () { return });
 
     define('geoms', function () {
         {% autoescape off %}return {{geoms}};{% endautoescape %}

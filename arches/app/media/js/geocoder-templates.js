@@ -8,7 +8,7 @@ define(['require'], function (require) {
     const geocoderTemplates = JSON.parse(removeTrailingCommaFromObject(geocoderTemplateData));
 
     Object.keys(geocoderTemplates).forEach((key) => {
-        require(`./${geocoderTemplates[key]}`);
+        require(`./${geocoderTemplates[key]['component']}`);
     });
 
     return geocoderTemplates;
