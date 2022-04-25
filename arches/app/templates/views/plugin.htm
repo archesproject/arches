@@ -35,12 +35,13 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 
 {% block pre_require_js %}
 {{block.super}}
+    <div
+        id="pluginData"
+        style="display: none;"
+        pluginData='{{plugin_json}}'
+    ></div>
     <script style="display: none;">
         window['workflow-component-abstract-template'] = `{% include 'views/components/workflows/workflow-component-abstract.htm' %}`
         window['workflow-step-template'] = `{% include 'views/components/plugins/workflow-step.htm' %}`
-        window['plugin-data'] = {% autoescape off %}{{plugin_json}}{% endautoescape %};
-        // define('plugin-data', ['{{ plugin.component }}'], function() {
-        //     return {% autoescape off %}{{plugin_json}}{% endautoescape %};
-        // });
     </script>
 {% endblock pre_require_js %}

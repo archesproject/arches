@@ -8,8 +8,8 @@ define(['require'], function (require) {
     const cardComponents = JSON.parse(removeTrailingCommaFromObject(cardComponentData));
 
     Object.keys(cardComponents).forEach((key) => {
-        require(`./${cardComponents[key]['component']}.js`);
+        require(`./${cardComponents[key]['component']}`);
     });
 
-    return {...cardComponents};
+    return cardComponents;
 });

@@ -2,7 +2,10 @@ define([
     'knockout',
     'views/base-manager',
 ], function(ko, BaseManagerView) {
-    const data = window['plugin-data'];
+    const pluginDataHTML = document.querySelector('#pluginData');
+    const data = JSON.parse(pluginDataHTML.getAttribute('pluginData'));
+
+    console.log(data)
 
     if (!data.config) data.config = {};
     data.config.loading = ko.observable(false);

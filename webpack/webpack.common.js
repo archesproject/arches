@@ -108,7 +108,7 @@ module.exports = {
         alias: {
             ...javascriptRelativeFilepathToAbsoluteFilepathLookup,
             ...templatePathConfiguration,
-            'arches': Path.resolve(__dirname, '../arches/app/templates', 'javascript.htm'),
+            // 'arches': Path.resolve(__dirname, '../arches/app/templates', 'javascript.htm'),
             'report-templates': Path.resolve(__dirname, '../arches/app/templates', 'javascript.htm'),
             'file-renderers': Path.resolve(__dirname, '../arches/app/templates', 'javascript.htm'),
             'function-templates': Path.resolve(__dirname, '../arches/app/templates', 'javascript.htm'),
@@ -116,7 +116,7 @@ module.exports = {
             'geocoder-templates': Path.resolve(__dirname, '../arches/app/templates', 'javascript.htm'),
             'search-components': Path.resolve(__dirname, '../arches/app/templates', 'javascript.htm'),
             'datatype-config-components': Path.resolve(__dirname, '../arches/app/templates', 'javascript.htm'),
-            'widgets': Path.resolve(__dirname, '../arches/app/templates', 'javascript.htm'),
+            // 'widgets': Path.resolve(__dirname, '../arches/app/templates', 'javascript.htm'),
             'plugins/knockout-select2': Path.resolve(__dirname, '../arches/app/media/plugins', 'knockout-select2.js'),
             'jquery-ui/draggable': Path.resolve(__dirname, '../node_modules/jqueryui', 'jquery-ui.min.js'),
             'jquery-ui/sortable': Path.resolve(__dirname, '../node_modules/jqueryui', 'jquery-ui.min.js'),

@@ -6,6 +6,7 @@ define([
     'arches',
     'text!templates/views/components/map-popup.htm'
 ], function($, _, ko, koMapping, arches, popupTemplate) {
+    console.log(popupTemplate)
     const viewModel = function(params) {
         var self = this;
 

@@ -12,71 +12,7 @@
         baseUrl: "{% webpack_static 'build/js' %}",
         urlArgs: '_dc={{ app_settings.VERSION }}',
         paths: {
-            'plugins': "{% webpack_static 'plugins' %}",
-            'widget-templates': '{% url "widgets" ""%}'.replace(/\/$/, ""),
-            'report-templates': '{% url "report-templates" ""%}'.replace(/\/$/, ""),
-            'function-templates': '{% url "function-templates" ""%}'.replace(/\/$/, ""),
-            'templates': '{% url "templates" ""%}'.replace(/\/$/, ""),
-            'datatype-config-templates': '{% url "datatype_template" ""%}'.replace(/\/$/, ""),
-            'nifty': "{% webpack_static 'plugins/nifty' %}",
-            'async': "{% webpack_static 'node_modules/requirejs-plugins/src/async' %}",
-            'text': "{% webpack_static 'node_modules/requirejs-text/text' %}",
-            // 'jquery-lib': "{% webpack_static 'node_modules/jquery/dist/jquery.min' %}",
-            // 'jquery': "{% webpack_static 'node_modules/jquery-migrate/dist/jquery-migrate.min' %}",
-            'js-cookie': "{% webpack_static 'node_modules/js-cookie/src/js.cookie' %}",
-            // 'select2': "{% webpack_static 'node_modules/select2/select2' %}",
-            'bootstrap': "{% webpack_static 'node_modules/bootstrap/dist/js/bootstrap.min' %}",
-            'jquery-ui': "{% webpack_static 'node_modules/jqueryui/jquery-ui.min' %}",
-            'backbone': "{% webpack_static 'node_modules/backbone/backbone-min' %}",
-            'underscore': "{% webpack_static 'node_modules/underscore/underscore-min' %}",
-            'jquery-validate': "{% webpack_static 'node_modules/jquery-validation/dist/jquery.validate.min' %}",
-            'd3': "{% webpack_static 'node_modules/d3/dist/d3.min' %}",
-            'dropzone': "{% webpack_static 'node_modules/dropzone/dist/min/dropzone-amd-module.min' %}",
-            'ckeditor': "{% webpack_static 'node_modules/ckeditor/ckeditor' %}",
-            'ckeditor-jquery': "{% webpack_static 'node_modules/ckeditor/adapters/jquery' %}",
-            'knockout': "{% webpack_static 'node_modules/knockout/build/output/knockout-latest' %}",
-            'knockout-mapping': "{% webpack_static 'node_modules/knockout-mapping/dist/knockout.mapping.min' %}",
-            'moment': "{% webpack_static 'node_modules/moment/min/moment.min' %}",
-            'bootstrap-datetimepicker': "{% webpack_static 'node_modules/eonasdan-bootstrap-datetimepicker/build/js/bootstrap-datetimepicker.min' %}",
-            'blueimp-gallery': "{% webpack_static 'node_modules/blueimp-gallery/js/blueimp-gallery.min' %}",
-            'blueimp-jquery': "{% webpack_static 'node_modules/blueimp-gallery/js/jquery.blueimp-gallery.min' %}",
-            'blueimp-helper': "{% webpack_static 'node_modules/blueimp-gallery/js/blueimp-helper.min' %}",
-            'datatables.net': "{% webpack_static 'node_modules/datatables.net/js/jquery.dataTables.min' %}",
-            'datatables.net-bs': "{% webpack_static 'node_modules/datatables.net-bs/js/dataTables.bootstrap.min' %}",
-            'datatables.net-buttons': "{% webpack_static 'node_modules/datatables.net-buttons/js/dataTables.buttons.min' %}",
-            'datatables.net-buttons-print': "{% webpack_static 'node_modules/datatables.net-buttons/js/buttons.print.min' %}",
-            'datatables.net-buttons-html5': "{% webpack_static 'node_modules/datatables.net-buttons/js/buttons.html5.min' %}",
-            'datatables.net-buttons-bs': "{% webpack_static 'node_modules/datatables.net-buttons-bs/js/buttons.bootstrap.min' %}",
-            'datatables.net-responsive': "{% webpack_static 'node_modules/datatables.net-responsive/js/dataTables.responsive' %}",
-            'datatables.net-responsive-bs': "{% webpack_static 'node_modules/datatables.net-responsive-bs/js/responsive.bootstrap' %}",
-            'chosen': "{% webpack_static 'node_modules/chosen-js/chosen.jquery.min' %}",
-            'mapbox-gl': "{% webpack_static 'node_modules/mapbox-gl/dist/mapbox-gl' %}",
-            'mapbox-gl-draw': "{% webpack_static 'node_modules/@mapbox/mapbox-gl-draw/dist/mapbox-gl-draw' %}",
-            'mapbox-gl-geocoder': "{% webpack_static 'node_modules/@mapbox/mapbox-gl-geocoder/dist/mapbox-gl-geocoder.min' %}",
-            'proj4': "{% webpack_static 'node_modules/proj4/dist/proj4' %}",
-            'noUiSlider': "{% webpack_static 'node_modules/nouislider/distribute/nouislider.min' %}",
-            'geojson-extent': "{% webpack_static 'node_modules/@mapbox/geojson-extent/geojson-extent' %}",
-            'geojsonhint': "{% webpack_static 'node_modules/@mapbox/geojsonhint/geojsonhint' %}",
-            'bootstrap-colorpicker': "{% webpack_static 'node_modules/bootstrap-colorpicker/dist/js/bootstrap-colorpicker.min' %}",
-            'uuid': "{% webpack_static 'node_modules/uuidjs/dist/uuid.core' %}",
-            'turf': "{% webpack_static 'node_modules/@turf/turf/turf.min' %}",
-            'geohash': "{% webpack_static 'node_modules/latlon-geohash/latlon-geohash' %}",
-            'leaflet': "{% webpack_static 'node_modules/leaflet/dist/leaflet' %}",
-            'leaflet-iiif': "{% webpack_static 'node_modules/leaflet-iiif/leaflet-iiif' %}",
-            'leaflet-draw': "{% webpack_static 'node_modules/leaflet-draw/dist/leaflet.draw' %}",
-            'leaflet-fullscreen': "{% webpack_static 'node_modules/leaflet.fullscreen/Control.FullScreen' %}",
-            'leaflet-side-by-side': "{% webpack_static 'plugins/leaflet-side-by-side/index' %}",
-            'metismenu': "{% webpack_static 'node_modules/metismenu/dist/metisMenu.min' %}",
-            'knockstrap': "{% webpack_static 'node_modules/knockstrap/build/knockstrap.min' %}",
-            'jqtree': "{% webpack_static 'node_modules/jqtree/tree.jquery' %}",
-            'core-js':"{% webpack_static 'node_modules/core-js/client/shim.min' %}",
-            'dom-4': "{% webpack_static 'node_modules/dom4/build/dom4' %}",
-            'numeral': "{% webpack_static 'node_modules/numeral/numeral' %}",
-            'togeojson': "{% webpack_static 'node_modules/@tmcw/togeojson/dist/togeojson.umd' %}",
-            'cytoscape': "{% webpack_static 'node_modules/cytoscape/dist/cytoscape.min' %}",
-            'cytoscape-cola': "{% webpack_static 'node_modules/cytoscape-cola/cytoscape-cola' %}",
-            'webcola': "{% webpack_static 'node_modules/webcola/WebCola/cola.min' %}",
-            {% block paths %}{% endblock paths %}
+
         },
         packages: [{
             name: "codemirror",
@@ -167,18 +103,6 @@
 {% endblock require_config %}
 
 {% block arches_modules %}
-<div 
-    id="cardComponentData"
-    style="display: none;"
-    cardComponents='{{% for component in card_components %}
-        "{{ component.pk }}": {
-            "componentname": "{{ component.componentname }}",
-            "component": "{{ component.component }}",
-            "defaultconfig": {{ component.defaultconfig_json }}
-        },
-    {% endfor %}}'
-></div>
-
 <!-- consumed by media/js/arches.js -->
 <div 
     id='arches-data'
@@ -442,16 +366,36 @@
 ></div>
 
 
-<script>
-    window['widgets'] = {{% autoescape off %}{% for widget in widgets %}
-            '{{ widget.pk }}': {
-                'name': '{{ widget.name }}',
-                'component': '{{ widget.component }}',
-                'datatype': '{{ widget.datatype }}',
-                'defaultconfig': '{{ widget.defaultconfig_json }}'
-            },
-        {% endfor %}{% endautoescape %}};
+<!-- consumed by media/js/card-components.js -->
+<div 
+    id="cardComponentData"
+    style="display: none;"
+    cardComponents='{{% for component in card_components %}
+        "{{ component.pk }}": {
+            "componentname": "{{ component.componentname }}",
+            "component": "{{ component.component }}",
+            "defaultconfig": {{ component.defaultconfig_json }}
+        },
+    {% endfor %}}'
+></div>
 
+
+<!-- consumed by media/js/widgets.js -->
+<div 
+    id="widgetData"
+    style="display: none;"
+    widgets='{{% for widget in widgets %}
+        "{{ widget.pk }}": {
+            "name": "{{ widget.name }}",
+            "component": "{{ widget.component }}",
+            "datatype": "{{ widget.datatype }}",
+            "defaultconfig": {{ widget.defaultconfig_json }}
+        },
+    {% endfor %}}'
+></div>
+
+
+<script>
     window['report-templates'] = {{% autoescape off %}{% for template in report_templates %}
         '{{ template.pk }}': {
             'componentname': '{{ template.componentname }}',
