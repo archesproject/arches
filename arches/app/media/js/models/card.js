@@ -25,28 +25,6 @@ define([
     'views/components/datatypes/string',
     'views/components/datatypes/url',
 
-    'views/components/widgets/concept-checkbox',
-    'views/components/widgets/concept-multiselect',
-    'views/components/widgets/concept-radio',
-    'views/components/widgets/concept-select',
-    'views/components/widgets/datepicker',
-    'views/components/widgets/domain-checkbox',
-    'views/components/widgets/domain-multiselect',
-    'views/components/widgets/domain-radio',
-    'views/components/widgets/domain-select',
-    'views/components/widgets/edtf',
-    'views/components/widgets/file',
-    'views/components/widgets/iiif',
-    'views/components/widgets/map',
-    'views/components/widgets/node-value-select',
-    'views/components/widgets/number',
-    'views/components/widgets/radio-boolean',
-    'views/components/widgets/resource-instance-multiselect',
-    'views/components/widgets/resource-instance-select',
-    'views/components/widgets/rich-text',
-    'views/components/widgets/switch',
-    'views/components/widgets/text',
-    'views/components/widgets/urldatatype',
 ], function(_, arches, cardComponentLookup, AbstractModel, NodeModel, CardWidgetModel, ko, koMapping, CardConstraintsViewModel, regeneratorRuntime, dispose) {
     var CardModel = AbstractModel.extend({
         /**

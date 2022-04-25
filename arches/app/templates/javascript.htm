@@ -380,6 +380,16 @@
 ></div>
 
 
+<!-- consumed by media/js/geocoder-templates.js -->
+<div 
+    id="geocoderTemplateData"
+    style="display: none;"
+    geocoderTemplates='{{% for provider in geocoding_providers %}
+        "{{ provider }}": "{{ provider.component }}",
+    {% endfor %}}'
+></div>
+
+
 <!-- consumed by media/js/report-templates.js -->
 <div 
     id="reportTemplateData"
