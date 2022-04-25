@@ -4,6 +4,7 @@ define([
     'knockout',
     'knockout-mapping',
     'arches',
+    'report-templates',
     'views/base-manager',
     'viewmodels/alert',
     'viewmodels/alert-json',
@@ -19,10 +20,9 @@ define([
     'bindings/resizable-sidepanel',
     'views/components/simple-switch',
     'utils/set-csrf-token'
-], function($, _, ko, koMapping, arches, BaseManagerView, AlertViewModel, JsonErrorAlertViewModel, GraphModel, ReportModel, GraphTree, NodeFormView, BranchListView, CardTreeViewModel, PermissionDesigner, GraphSettingsViewModel, CardViewModel) {
+], function($, _, ko, koMapping, arches, reportLookup, BaseManagerView, AlertViewModel, JsonErrorAlertViewModel, GraphModel, ReportModel, GraphTree, NodeFormView, BranchListView, CardTreeViewModel, PermissionDesigner, GraphSettingsViewModel, CardViewModel) {
     const viewData = window['view-data'];
     const data = window['graph-designer-data'];
-    const reportLookup = window['report-templates'];
 
     var GraphDesignerView = BaseManagerView.extend({
         initialize: function(options) {

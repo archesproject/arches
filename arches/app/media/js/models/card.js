@@ -10,10 +10,7 @@ define([
     'viewmodels/card-constraints',
     'regenerator-runtime',
     'utils/dispose',
-    
 
-    'reports/default',
-    'reports/map',
 
     'views/components/datatypes/boolean',
     'views/components/datatypes/concept',

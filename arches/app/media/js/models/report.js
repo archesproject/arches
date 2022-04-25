@@ -1,12 +1,11 @@
 define(['jquery',
     'arches',
+    'report-templates',
     'models/abstract',
     'knockout',
     'knockout-mapping',
     'underscore',
-], function($, arches, AbstractModel, ko, koMapping, _,) {
-    const reportLookup = window['report-templates'];
-
+], function($, arches, reportLookup, AbstractModel, ko, koMapping, _,) {
     var ReportModel = AbstractModel.extend({
         /**
          * A backbone model to manage report data
@@ -36,7 +35,7 @@ define(['jquery',
                 var config;
 
                 if (reportLookup[self.templateId()]) {
-                    self.defaultConfig = JSON.parse(reportLookup[self.templateId()].defaultconfig);
+                    self.defaultConfig = reportLookup[self.templateId()].defaultconfig;
                 }
                 else {
                     self.defaultConfig = {};

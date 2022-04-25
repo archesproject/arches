@@ -3,12 +3,11 @@ define([
     'underscore',
     'knockout',
     'arches',
+    'report-templates',
     'models/report',
     'models/graph',
     'viewmodels/card'
-], function($, _, ko, arches, ReportModel, GraphModel) {
-    const reportLookup = window['report-templates'];
-
+], function($, _, ko, arches, reportLookup, ReportModel, GraphModel) {
     var ResourceReportAbstract = function(params) {
         var self = this;
         var CardViewModel = require('viewmodels/card');
