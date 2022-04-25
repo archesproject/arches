@@ -100,13 +100,17 @@
                             </div>
 
                             <div class="col-xs-12">
-                                <span class="node-semantic-description">
-                                    <div class="node-form node-name" data-bind="text: graphModel.getParentNode(node()).name"></div>
-                                    <div class="node-form ontology" data-bind="text: '(' + graphModel.getParentNode(node()).ontologyclass_friendlyname() + '; parent)'"></div>
-                                    <div class="node-form ontology" data-bind="text: node().parentproperty_friendlyname"></div>
-                                    <div class="node-form node-name" data-bind="text: node().name"></div>
-                                    <div class="node-form ontology" data-bind="text: '(' + node().ontologyclass_friendlyname()  + ')'"></div>
-                                </span>
+                                <div class="node-semantic-description">
+                                    <div class="col-xs-12">
+                                        <div class="node-form node-name" data-bind="text: graphModel.getParentNode(node()).name"></div>
+                                    </div>
+                                    <div class="col-xs-12">
+                                        <div class="node-form ontology" data-bind="text: '(' + graphModel.getParentNode(node()).ontologyclass_friendlyname() + '; parent)'"></div>
+                                        <div class="node-form ontology" data-bind="text: node().parentproperty_friendlyname"></div>
+                                        <div class="node-form node-name" data-bind="text: node().name"></div>
+                                        <div class="node-form ontology" data-bind="text: '(' + node().ontologyclass_friendlyname()  + ')'"></div>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </div>
