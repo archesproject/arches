@@ -11,7 +11,6 @@ require([
     'bindings/chosen',
     'utils/set-csrf-token',
 ], function($, _, ko, arches, BaseManager, AlertViewModel, JsonErrorAlertViewModel) {   
-    console.log("(#)()@#@#()", arches) 
     const graphManagerData = window['graph-manager-data'];
     var GraphView = BaseManager.extend({
         /**

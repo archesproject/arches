@@ -12,7 +12,7 @@
         baseUrl: "{% webpack_static 'build/js' %}",
         urlArgs: '_dc={{ app_settings.VERSION }}',
         paths: {
-
+            'underscore': "{% webpack_static 'node_modules/underscore/underscore-min' %}" ,
         },
         packages: [{
             name: "codemirror",
@@ -438,6 +438,30 @@
 ></div>
 
 
+<!-- consumed by media/js/resource-types.js -->
+<div 
+    id="resourceTypeData"
+    style="display: none;"
+    resourceTypes='{{% for type, type_data in resource_types %}
+        "{{type}}": {
+            "id": "{{type_data.resourcetypeid}}",
+            "icon": "{{type_data.icon_class}}",
+            "name": "{{type_data.name}}",
+            "defaultDescription": "{{type_data.default_description}}",
+            "descriptionNode": "{{type_data.description_node}}",
+            "categories": [
+                {% for category in type_data.categories %}
+                    "{{category}}"
+                {% endfor %}
+            ],
+            "color": "{{type_data.marker_color}}",
+            "strokeColor": "{{type_data.stroke_color}}",
+            "fillColor": "{{type_data.fill_color}}"
+        },
+    {% endfor %}}'
+></div>
+
+
 <!-- consumed by media/js/report-templates.js -->
 <div 
     id="reportTemplateData"
@@ -470,30 +494,6 @@
 
 
 <script>
-    define('resource-types', [], function () {
-        var resourceTypes = {
-            {% for type, type_data in resource_types %}
-            "{{type}}": {
-                id: "{{type_data.resourcetypeid}}",
-                icon: "{{type_data.icon_class}}",
-                name: "{{type_data.name}}",
-                defaultDescription: "{{type_data.default_description}}",
-                descriptionNode: "{{type_data.description_node}}",
-                categories: [
-                    {% for category in type_data.categories %}
-                    "{{category}}"
-                    {% endfor %}
-                ],
-                color: "{{type_data.marker_color}}",
-                strokeColor: "{{type_data.stroke_color}}",
-                fillColor: "{{type_data.fill_color}}"
-            },
-            {% endfor %}
-        };
-
-        return resourceTypes;
-    });
-
     {% comment %} define('widgets', [{% for widget in widgets %}'{{ widget.component }}',{% endfor %}], function () {
         return {{% autoescape off %}{% for widget in widgets %}
             '{{ widget.pk }}': {
