@@ -522,14 +522,6 @@
 
 
 <script>
-    define('function-templates', [{% for template in function_templates %}'{{ template.component }}',{% endfor %}], function () {
-         return;
-    });
-
-    define('component-templates', ['views/components/nodegroup-selector','views/components/simple-switch'], function () {
-         return;
-    });
-
     define('geoms', function () {
         {% autoescape off %}return {{geoms}};{% endautoescape %}
     });

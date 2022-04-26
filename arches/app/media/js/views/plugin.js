@@ -3,9 +3,19 @@ define([
     'views/base-manager',
 ], function(ko, BaseManagerView) {
     const pluginDataHTML = document.querySelector('#pluginData');
-    const data = JSON.parse(pluginDataHTML.getAttribute('pluginData'));
+    const pluginData = JSON.parse(pluginDataHTML.getAttribute('pluginData'));
 
-    console.log(data)
+    const data = pluginData['plugin_json'];
+    const plugins = pluginData['plugins_json'];
+
+    plugins.forEach((plugin) => {
+        try {  // first try to load project path
+            require(`../../../../../../sfplanning/sfplanning/media/js/${plugin['component']}`);
+        }
+        catch(e) {  // if project path fails, load arches-core path
+            require(`../${plugin['component']}`);
+        }
+    });
 
     if (!data.config) data.config = {};
     data.config.loading = ko.observable(false);

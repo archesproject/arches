@@ -38,7 +38,10 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
     <div
         id="pluginData"
         style="display: none;"
-        pluginData='{{plugin_json}}'
+        pluginData='{
+            "plugin_json": {{ plugin_json }},
+            "plugins_json": {{ plugins_json }}
+        }'
     ></div>
     <script style="display: none;">
         window['workflow-component-abstract-template'] = `{% include 'views/components/workflows/workflow-component-abstract.htm' %}`

@@ -222,7 +222,3 @@ define([
     });
     return GraphBase;
 });
-
-define('graph-base-data', [], function() {
-    console.log("YOHO")
-});
