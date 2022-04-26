@@ -7,8 +7,6 @@ define(['require'], function (require) {
     const searchComponentData = searchComponentDataHTML.getAttribute('searchComponents');
     const searchComponents = JSON.parse(removeTrailingCommaFromObject(searchComponentData));
 
-    console.log(searchComponents)
-
     Object.keys(searchComponents).forEach((key) => {
         require(`./${searchComponents[key]['componentpath']}`);
     });

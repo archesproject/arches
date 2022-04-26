@@ -8,7 +8,7 @@ define(['require'], function (require) {
 
     const widgets = JSON.parse(removeTrailingCommaFromObject(widgetData));
 
-    // NEED TO HANDLE SAMPLE WIDGET
+    // SAMPLE WIDGET HAS BAD TEMPLATE REQUIRE
     delete widgets['6cf125cc-a253-43ce-8d3c-7f791124bca9']
 
 
