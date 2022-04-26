@@ -424,6 +424,24 @@
 ></div>
 
 
+<!-- consumed by media/js/function-templates.js -->
+<div 
+    id="functionTemplateData"
+    style="display: none;"
+    functionTemplates='{{% for template in function_templates  %}
+        "{{ template.pk }}": {
+            "component": "{{ template.component }}",
+            "classname": "{{ template.classname }}",
+            "name": "{{ template.name }}",
+            "functiontype": "{{ template.functiontype }}",
+            "modulename": "{{ template.modulename }}",
+            "description": "{{ template.description }}",
+            "defaultconfig": "{{ template.defaultconfig }}"
+        },
+    {% endfor %}}'
+></div>
+
+
 <!-- consumed by media/js/geocoder-templates.js -->
 <div 
     id="geocoderTemplateData"

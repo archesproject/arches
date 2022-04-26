@@ -2,10 +2,9 @@ define([
     'knockout',
     'underscore',
     'views/base-manager',
-    'bindings/chosen'
-], function(ko, _, BaseManager) {
-    const data = window['graph-base-data'];
-
+    'graph-base-data',
+    'bindings/chosen',
+], function(ko, _, BaseManager, data) {
     /**
     * A backbone view representing a page in the graph manager workflow.  It
     * adds some graph manager specfic values to the view model.

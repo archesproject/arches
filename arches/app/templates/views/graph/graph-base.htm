@@ -71,11 +71,23 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 
 {% block pre_require_js %}
     {{block.super}}
+
+<!-- consumed by media/js/function-templates.js -->
+    <div 
+        id="graphBaseData"
+        style="display: none;"
+        graphBaseData='{
+            "graphid": "{{graphid}}",
+            "graph": {{graph_json}}
+        }'
+    ></div>
+
+
     <script>
-        window['graph-base-data'] = {
-            graphid: '{{graphid}}',
-            graph: {{graph_json}}
-        };
+        // window['graph-base-data'] = {
+        //     graphid: '{{graphid}}',
+        //     graph: {{graph_json}}
+        // };
         // {% autoescape off %}
         // define('graph-base-data', [], function () {
         //     return {

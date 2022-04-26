@@ -12,10 +12,10 @@ define(['require'], function (require) {
         require('views/components/widgets/sample-widget');
         require('views/components/widgets/resource-instance-select');
         
-        try {  // first try to load directory path
+        try {  // first try to load project path
             require(`../../../../../sfplanning/sfplanning/media/js/${widgets[key]['component']}`);
         }
-        catch(e) {  // if directory path fails, load arches-core path
+        catch(e) {  // if project path fails, load arches-core path
             require(`./${widgets[key]['component']}`);
         }
     });
