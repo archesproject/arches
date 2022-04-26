@@ -39,6 +39,8 @@ define([
         this.annotationNodes = ko.observableArray();
         this.compareMode = ko.observable(false);
         this.primaryCanvas = ko.observable();
+        this.canvasObject = ko.observable();
+        this.secondaryCanvasObject = ko.observable();
         this.secondaryCanvas = ko.observable();
         this.compareInstruction = ko.observable();
         this.primaryTilesLoaded = ko.observable(false);
@@ -105,6 +107,11 @@ define([
                 self.secondaryCanvas(undefined);
                 self.secondaryLabel(undefined);
                 self.showImageModifiers(false);
+                self.selectPrimaryPanel(true);
+            } else {
+                self.selectPrimaryPanel(false);
+                self.canvasClick(self.canvasObject());
+                self.selectPrimaryPanel(true);
             }
         });
 
@@ -351,8 +358,8 @@ define([
                 return self.canvases() === '' || !self.canvases();
             }, this),
             initSelection: function(element, callback) {
-                const canvasObject = self.canvases().find(canvas => self.getCanvasService(canvas) == element.val())
-                callback(canvasObject);
+                const canvasObj = self.canvases().find(canvas => self.getCanvasService(canvas) == element.val())
+                callback(canvasObj);
             }
         }
 
@@ -584,10 +591,12 @@ define([
 
             if (service && self.selectPrimaryPanel()) {
                 self.canvas(service);
+                self.canvasObject(canvas);
                 self.origCanvasLabel = self.getManifestDataValue(canvas, 'label', true);
                 self.canvasLabel(self.getManifestDataValue(canvas, 'label', true));
             } else {
                 self.secondaryCanvas(service);
+                self.secondaryCanvasObject(canvas);
                 self.secondaryLabel(self.getManifestDataValue(canvas, 'label', true));
             }
         };

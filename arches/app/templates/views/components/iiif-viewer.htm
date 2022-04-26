@@ -34,11 +34,11 @@
     <div data-bind="if: showModeSelector" class="layout">
         <div>Panel Layout</div>
         <div class="mode-selector">
-            <div data-bind="click: function(){ compareMode(false) }, css: { selected: !compareMode() }">
+            <div data-bind="click: function(){ compareMode(false); return true; }, css: { selected: !compareMode() }">
                 <div class="selector-button"></div>
                 <input name="panelGroup" value="single" type="radio" data-bind="checked: panelRadio"> Single Panel
             </div>
-            <div data-bind="click: function(){ compareMode(true) }, css: { selected: compareMode() }">
+            <div data-bind="click: function(){ compareMode(true); return true; }, css: { selected: compareMode() }">
                 <div>
                     <div class="selector-button"></div>
                     <div class="selector-button"></div>
