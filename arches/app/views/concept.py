@@ -17,13 +17,14 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 """
 
 import uuid
-from django.db import transaction
+from django.db import transaction, connection
 from django.db.models import Q
 from django.http import HttpResponse, HttpResponseNotFound, HttpResponseNotAllowed, HttpResponseServerError
 from django.shortcuts import render
 from django.utils.decorators import method_decorator
 from django.utils.module_loading import import_string
 from django.utils.translation import ugettext as _
+from django.utils.translation import get_language
 from arches.app.models import models
 from arches.app.models.system_settings import settings
 from arches.app.models.concept import Concept, ConceptValue, CORE_CONCEPTS, get_preflabel_from_valueid
@@ -418,8 +419,6 @@ def paged_dropdown(request):
                     AND valuetype in ('prefLabel')
                     ORDER BY score desc limit 1
                 """
-                from django.utils.translation import get_language
-                from django.db import connection
                 languageid = get_language().lower()
                 sql = sql.format(
                     query=query.lower(),
@@ -432,7 +431,6 @@ def paged_dropdown(request):
 
                 if len(rows) == 1:
                     data.insert(0, {"id": str(rows[0][1]), "text": rows[0][0], "depth": 1, "collector": False})
-                print(data)
     except:
         pass
 
