@@ -8,12 +8,16 @@ define(['require'], function (require) {
 
     const widgets = JSON.parse(removeTrailingCommaFromObject(widgetData));
 
-    // SAMPLE WIDGET HAS BAD TEMPLATE REQUIRE
-    delete widgets['6cf125cc-a253-43ce-8d3c-7f791124bca9']
-
-
     Object.keys(widgets).forEach((key) => {
-        require(`./${widgets[key]['component']}`);
+        require('views/components/widgets/sample-widget');
+        require('views/components/widgets/resource-instance-select');
+        
+        try {  // first try to load directory path
+            require(`../../../../../sfplanning/sfplanning/media/js/${widgets[key]['component']}`);
+        }
+        catch(e) {  // if directory path fails, load arches-core path
+            require(`./${widgets[key]['component']}`);
+        }
     });
 
     return widgets;
