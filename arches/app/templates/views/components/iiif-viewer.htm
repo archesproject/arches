@@ -391,15 +391,7 @@
                                     <img data-bind="attr: { src: $data.thumbnail || '{% static 'img/photo_missing.png' %}', title: $data.label}">
                                 </div>
                                 <div style="text-align:center;" class="iiif-gallery-canvas-label">
-                                    <!--ko if: getCanvasService($data) === selectedCanvas() && $parent.selectPrimaryPanel()  -->
-                                    <span data-bind="text: $parent.canvasLabel"></span>
-                                    <!--/ko -->
-                                    <!--ko if: getCanvasService($data) === selectedCanvas() && !$parent.selectPrimaryPanel() -->
-                                    <span data-bind="text: $parent.secondaryLabel"></span>
-                                    <!--/ko -->   
-                                    <!--ko ifnot: getCanvasService($data) === selectedCanvas() -->
                                     <span data-bind="text: label"></span>
-                                    <!--/ko -->                                
                                     <span class="annotation-count">
                                         <!--ko if: getAnnotationCount(getCanvasService($data)) -->
                                         <span data-bind="text: getAnnotationCount(getCanvasService($data))"></span> {% trans "Annotation(s)" %}
