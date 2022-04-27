@@ -508,11 +508,26 @@ define([
             self.greyscale(false);
         };
 
+
+        const loadComparison = () => {
+            const map = self.map();
+            if(map){
+                if(sideBySideControl){
+                    map.removeControl(sideBySideControl);
+                }
+                sideBySideControl = L.control.sideBySide(canvasLayer, secondaryCanvasLayer)
+                sideBySideControl.addTo(map);
+                map.fitBounds(map.getBounds());
+            }
+        };
+
         var addCanvasLayer = function() {
-            var map = self.map();
-            var canvas = self.canvas();
+            const map = self.map();
+            const canvas = self.canvas();
+            const secondaryCanvas = self.secondaryCanvas();
 
             if(canvas && canvas != self.imageToolSelector()){
+                self.selectPrimaryPanel(true);
                 self.imageToolSelector(canvas);
             }
 
@@ -527,6 +542,10 @@ define([
                         className: "iiif-layer-primary"
                     });
                     canvasLayer.addTo(map);
+
+                    if(secondaryCanvas){
+                        canvasLayer.on('tileload', loadComparison)
+                    }
                     updateCanvasLayerFilter();
                 }
             }
@@ -538,6 +557,7 @@ define([
             const primaryCanvas = self.canvas();
             const secondaryCanvas = self.secondaryCanvas();
             if(secondaryCanvas && secondaryCanvas != self.imageToolSelector()){
+                self.selectPrimaryPanel(false);
                 self.imageToolSelector(secondaryCanvas);
             }
 
@@ -552,14 +572,7 @@ define([
                     className: "iiif-layer-secondary"
                 }).addTo(map);
 
-                const loadComparison = () => {
-                    if(sideBySideControl){
-                        map.removeControl(sideBySideControl);
-                    }
-                    sideBySideControl = L.control.sideBySide(canvasLayer, secondaryCanvasLayer)
-                    sideBySideControl.addTo(map);
-                    map.fitBounds(map.getBounds())
-                }
+                
 
                 secondaryCanvasLayer.on('tileload', loadComparison)
                 
@@ -592,12 +605,12 @@ define([
             if (service && self.selectPrimaryPanel()) {
                 self.canvas(service);
                 self.canvasObject(canvas);
-                self.origCanvasLabel = self.getManifestDataValue(canvas, 'label', true);
-                self.canvasLabel(self.getManifestDataValue(canvas, 'label', true));
+                //self.origCanvasLabel = self.getManifestDataValue(canvas, 'label', true);
+                //self.canvasLabel(self.getManifestDataValue(canvas, 'label', true));
             } else {
                 self.secondaryCanvas(service);
                 self.secondaryCanvasObject(canvas);
-                self.secondaryLabel(self.getManifestDataValue(canvas, 'label', true));
+                //self.secondaryLabel(self.getManifestDataValue(canvas, 'label', true));
             }
         };
 
