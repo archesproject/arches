@@ -17,6 +17,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 -->
 {% extends "base-manager.htm" %}
 {% load staticfiles %}
+{% load template_tags %}
 {% load i18n %}
 
 {% block title %}
@@ -49,7 +50,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                             <script type="text/html" id="selectGraphTemplate">
                                 <option disabled selected value>{% trans "Find a Resource Model/Branch..." %}</option>
                                 <!-- ko foreach: groups -->
-                                    <optgroup data-bind="attr: { 'label': (name==='Resource Models')?'{% trans "Resource Models" %}':'{% trans "Branches" %}' }, foreach: items">
+                                    <optgroup data-bind="attr: { 'label': (name==='Resource Models')?{% quoted_trans "Resource Models" %}:{% quoted_trans "Branches" %}}, foreach: items">
                                         <option data-bind="value: graphid, text: name"></option>
                                     </optgroup>
                                 <!-- /ko -->
@@ -133,7 +134,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                         </ul>
                     </div>
                     <div style="margin-top: auto;">
-                        <p class="resource-status-label">{% trans "Status" %}: <span class="resource-status" data-bind="text:isactive?'{% trans "Active" %}':'{% trans "Inactive" %}'"></span></p>
+                        <p class="resource-status-label">{% trans "Status" %}: <span class="resource-status" data-bind="text:isactive?{% quoted_trans "Active" %}:{% quoted_trans "Inactive" %}"></span></p>
                     </div>
                 </div>
             </div>

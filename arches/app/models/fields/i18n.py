@@ -250,7 +250,7 @@ class I18n_JSON(object):
             else:
                 sql = self.attname
                 for prop, value in self.raw_value.items():
-                    escaped_value = json.dumps(value).replace("%", "%%")
+                    escaped_value = json.dumps(value).replace("%", "%%").replace("'", "''")
                     if prop in self.i18n_properties and isinstance(value, str):
                         sql = f"""CASE WHEN jsonb_typeof({self.attname}->'{prop}') = 'object'
                         THEN jsonb_set({sql}, array['{prop}','{self.lang}'], '{escaped_value}')
@@ -309,7 +309,7 @@ class I18n_JSON(object):
         eg: if the active language is Spanish then the above returned
         object would be {"Color": "asul"}
 
-        Keyword Arguaments:
+        Keyword Arguments:
         use_raw_i18n_json -- defaults to False, set to True to return the raw object saved in the db
         """
 

@@ -15,3 +15,25 @@
     right: auto;
     left: 0;
 }
+
+label.form-checkbox.form-normal{
+    &:before {
+        right: auto;
+        top: auto;
+    }
+
+    &:not(.disabled):hover:after {
+        right: 8px;
+    }
+
+    &.active
+    {
+        &:after {
+            right: 8px;
+        }
+    }
+}
+
+.form-checkbox.form-normal:before{
+    right: 1px;
+}

@@ -17,6 +17,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 -->
 {% extends "base-manager.htm" %}
 {% load staticfiles %}
+{% load template_tags %}
 {% load i18n %}
 
 {% block title %}
@@ -40,11 +41,10 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                         <a class="page-header text-overflow graph-find" href="#" data-bind="click: function () { showFind(!showFind()) }"> {% trans "Find" %} </a>
                     </div>
 
-                    <!-- Find resource -->
-                    <div class="find-widget" style="display: none;" data-bind="visible: showFind()">
-                        <div>
-                            <select data-bind="chosen: {width: '100%'}, value: graphId, options: resources, optionsText: 'name', optionsValue: 'graphid', optionsCaption: '{% trans "Select a resource..." %}', optionsAfterRender: setResourceOptionDisable"></select>
-                        </div>
+                <!-- Find resource -->
+                <div class="find-widget" style="display: none;" data-bind="visible: showFind()">
+                    <div>
+                        <select data-bind="chosen: {width: '100%'}, value: graphId, options: resources, optionsText: 'name', optionsValue: 'graphid', optionsCaption: {% quoted_trans "Select a resource..." %}, optionsAfterRender: setResourceOptionDisable"></select>
                     </div>
                 </div>
 
