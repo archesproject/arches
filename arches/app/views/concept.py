@@ -420,11 +420,7 @@ def paged_dropdown(request):
                 """
 
                 languageid = get_language().lower()
-                sql = sql.format(
-                    query=query.lower(),
-                    languageid= languageid,
-                    short_languageid=languageid.split("-")[0]
-                )
+                sql = sql.format(query=query.lower(), languageid=languageid, short_languageid=languageid.split("-")[0])
                 cursor = connection.cursor()
                 cursor.execute(sql)
                 rows = cursor.fetchall()
