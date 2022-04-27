@@ -20,6 +20,9 @@ define([
     var Workflow = function(config) {
         var self = this;
 
+
+        console.log("()DSDS()", config)
+
         this.id = ko.observable();
         this.workflowName = ko.observable();
 
@@ -28,6 +31,7 @@ define([
         this.pan = ko.observable();
         this.alert = config.alert || ko.observable(null);
         this.quitUrl = config.quitUrl || arches.urls.search_home;
+        this.plugin = config.plugin
         this.isWorkflowFinished = ko.observable(false);
         
         this.stepConfig;  /* overwritten in workflow.js file */

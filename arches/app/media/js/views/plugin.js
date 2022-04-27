@@ -17,9 +17,14 @@ define([
         }
     });
 
+    console.log("DS()", data, plugins)
+
     if (!data.config) data.config = {};
+    
     data.config.loading = ko.observable(false);
     data.config.alert = ko.observable(null);
+    data.config.plugin = data;
+
     return new BaseManagerView({
         viewModel: {
             loading: data.config.loading,

@@ -256,6 +256,7 @@ define([
                         onSuccess(response);
                     }
                 }).fail(function(response) {
+                    console.log("BIODS", response)
                     if (typeof onFail === 'function') {
                         onFail(response);
                     }

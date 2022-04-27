@@ -13,6 +13,7 @@
         urlArgs: '_dc={{ app_settings.VERSION }}',
         paths: {
             'underscore': "{% webpack_static 'node_modules/underscore/underscore-min' %}" ,
+            'templates/views/components/plugins/survey-unit-workflow.htm': '{% url "templates" ""%}'.replace(/\/$/, "views/components/plugins/survey-unit-workflow.htm"),
         },
         packages: [{
             name: "codemirror",

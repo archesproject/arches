@@ -318,7 +318,7 @@ TEMPLATES = [
         "BACKEND": "django.template.backends.django.DjangoTemplates",
         "DIRS": [
             # insert your TEMPLATE_DIRS here
-            # os.path.join(ROOT_DIR, "app", "templates"),
+            os.path.join(ROOT_DIR, "app", "templates"),
             os.path.join(ROOT_DIR, "app", "media", "build", "templates"),
         ],
         "APP_DIRS": True,
