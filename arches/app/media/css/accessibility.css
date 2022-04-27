@@ -323,7 +323,8 @@ div.search-facet-item:focus {
     padding: 4px;
 }
 
-.resource_search_widget_dropdown ul .select2-disabled div span span button {
+.resource_search_widget_dropdown ul .select2-disabled div span span button,
+.resource_search_widget_dropdown ul .select2-disabled .group {
     width: auto;
 }
 
