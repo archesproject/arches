@@ -17,8 +17,6 @@ define([
         }
     });
 
-    console.log("DS()", data, plugins)
-
     if (!data.config) data.config = {};
     
     data.config.loading = ko.observable(false);
