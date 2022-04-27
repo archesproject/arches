@@ -25,6 +25,7 @@
 @import "sidenav.scss";
 @import "edit-history.scss";
 @import "jqtree.scss";
+@import "rdm.scss";
 
 img {
     image-orientation: from-image;
@@ -2709,12 +2710,13 @@ span.icon-wrap.icon-circle.bg-gray-dark:hover {
 }
 
 .select2-container .select2-choice {
-    display: block;
+    display: flex;
     height: 26px;
     padding: 0 0 0 8px;
     overflow: hidden;
     position: relative;
-    border: 1px solid #aaa;
+    // border: 1px solid #aaa;
+    border: none !important;
     white-space: nowrap;
     line-height: 26px;
     color: #444;
@@ -5301,7 +5303,7 @@ div.dropdown-menu.open {
 
 .concept_result_schemaname {
     font-size: 11px;
-    padding-left: 10px;
+    padding: 0px 10px;
 }
 
 .layer-list .fdg-node-filter {
