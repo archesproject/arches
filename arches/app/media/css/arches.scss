@@ -5899,7 +5899,7 @@ div.card-grid-item.selected {
     height: 150px;
     background: #102F4F;
     width: 100%;
-    padding: 40px 150px 0px 150px;
+    padding: 40px 100px 0px 100px;
     border-bottom: 1px solid #520008;
 }
 
@@ -5934,19 +5934,13 @@ th.notif-type {
 }
 
 .profile-full-name {
-    position: absolute;
     color: #fff;
     font-size: 2.6em;
-    top: 35px;
-    left: 100px;
 }
 
 .profile-e-mail {
-    position: absolute;
     color: #fff;
     font-size: 16px;
-    top: 80px;
-    left: 100px;
     color: #ddd;
     font-weight: 500;
 }
