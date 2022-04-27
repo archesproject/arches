@@ -518,10 +518,6 @@ div.search-facet-item:focus {
     color: #fff;
 }
 
-.settings-panel-body .graph-designer {
-    height: calc(70vh - 205px);
-}
-
 .function-manager-container .list-wrapper {
     overflow-x: hidden;
 }
@@ -835,5 +831,9 @@ div.search-facet-item:focus {
 
     .find-widget {
         width: 42vw;
+    }
+
+    .settings-panel-body .graph-designer {
+        height: calc(70vh - 205px);
     }
 }
