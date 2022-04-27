@@ -15,7 +15,17 @@ GNU Affero General Public License for more details.
 You should have received a copy of the GNU Affero General Public License
 along with this program. If not, see <http://www.gnu.org/licenses/>.
 -->
-{% extends "base-manager.htm" %} {% load staticfiles %} {% load i18n %} {% block title %} {{ block.super }} {% trans "Account Settings" %} {% endblock title %} {% block main_content %}
+{% extends "base-manager.htm" %} 
+{% load staticfiles %} 
+{% load template_tags %}
+{% load i18n %} 
+
+{% block title %} 
+{{ block.super }} 
+{% trans "Account Settings" %} 
+{% endblock title %} 
+
+{% block main_content %}
 <div class="scroll-y">
 
     <!-- Main Editor -->
@@ -365,7 +375,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 
                                             <div class="project-panel-header">
                                                 <div class="user-survey">
-                                                    <div class="project-status" data-bind="text:vm.mobilesurvey.active() ? '{% trans "Active" %}' : '{% trans "Inactive" %}', css: {active: vm.mobilesurvey.active()}"></div>
+                                                    <div class="project-status" data-bind="text:vm.mobilesurvey.active() ? {% quoted_trans "Active" %} : {% quoted_trans "Inactive" %}, css: {active: vm.mobilesurvey.active()}"></div>
                                                     <ul class="project-metadata">
                                                         <li class="project-metadata-item">
                                                             <span data-bind="text: vm.mobilesurvey.startdate() || '?'"></span>
@@ -374,7 +384,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                                                         </li>
                                                     </ul>
                                                 </div>
-                                                <h3 class="project-panel-title" data-bind="text: vm.mobilesurvey.name() === '' ? '{% trans "Unnamed Survey" %}' : vm.mobilesurvey.name()"></h3>
+                                                <h3 class="project-panel-title" data-bind="text: vm.mobilesurvey.name() === '' ? {% quoted_trans "Unnamed Survey" %} : vm.mobilesurvey.name()"></h3>
 
                                                 <div class="">
                                                     <div class="project-details">
