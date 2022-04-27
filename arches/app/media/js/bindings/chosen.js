@@ -4,7 +4,7 @@ define([
     'knockout',
     'arches',
     'chosen'
-], function ($, _, ko, arches) {
+], function($, _, ko, arches) {
     /**
     * A knockout.js binding for the "chosen.js" select box - https://harvesthq.github.io/chosen/
     * - pass options to chosen using the following syntax in the knockout data-bind attribute
