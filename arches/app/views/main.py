@@ -58,7 +58,7 @@ def function_templates(request, template):
 
 def templates(request, template):
     if not template:
-        template = request.GET.get('template')
+        template = request.GET.get("template")
 
     try:
         return render(request, template)
