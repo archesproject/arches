@@ -11,6 +11,11 @@
     }
 }
 
+.resource-toolbar .dropdown-menu .resource-grid-item .dropdown-menu {
+    right: auto;
+    left: 0;
+}
+
 label.form-checkbox.form-normal{
     &:before {
         right: auto;

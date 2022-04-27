@@ -4642,16 +4642,18 @@ div.dropdown-menu.open {
 }
 
 .resource-grid-item {
-    float: left;
-    width: 100%;
     border-bottom: 1px solid #ddd;
     border-left: 1px solid #ebeef0;
     border-right: 1px solid #ebeef0;
     margin: 0;
-}
 
-.resource-grid-item:first-of-type {
-    border-top: 1px solid #ddd;
+    &:first-of-type {
+        border-top: 1px solid #ddd;
+    }
+    .dropdown-menu{
+        left: auto;
+        right: 0;
+    }
 }
 
 .resource-grid-main-container {
@@ -4723,7 +4725,7 @@ div.dropdown-menu.open {
     transform: translate(0px, 7px);
     background: #e2e2e2;
     border: 1px solid #ddd;
-    margin-bottom: 10px;
+    margin: 7px 5px;
     text-align: center;
 }
 
@@ -4742,8 +4744,8 @@ div.dropdown-menu.open {
 }
 
 .resource-grid-subtitle {
-    padding-left: 69px;
-    margin-top: -20px;
+    margin: 0 78px;
+    margin-top: -14px;
     color: #999;
     font-size: 12px;
     width: 500px;
@@ -4754,8 +4756,9 @@ div.dropdown-menu.open {
 
 .resource-grid-item .resource-grid-tools-container {
     flex-direction: column;
-    padding: 15px;
+    margin: 15px;
     display: flex;
+    width: 76px;
 }
 
 .report-image-grid .resource-grid-item:last-of-type .resource-grid-tools-container .btn-group .manage-menu {
@@ -5024,7 +5027,7 @@ div.dropdown-menu.open {
 }
 
 .find-widget {
-    top: 10px;
+    width: 450px;
     z-index: 10;
 }
 
@@ -6460,11 +6463,39 @@ th.notif-type {
     padding: 0 55px;
     align-items: center;
     &>div:first-child{
+        flex: 1;
+        display: flex;
+        align-items: center;
     }
 
     .resource-tools .resource-grid-title {
         margin: 0 5px;
+
+        &:not(.active) {
+            cursor: pointer;
+        }
     } 
+
+    .graph-find {
+        margin-top: 0px;
+        font-size: 19px;
+        color: #999;
+        padding: 0;
+        margin: 0 20px;
+        cursor: pointer;
+    }
+
+    .dropdown-menu {
+        font-size: 13px;
+        border-radius: 0;
+        box-shadow: 0 4px 8px 0 RGB(0 0 0 / 15%);
+        margin: 0;
+        padding: 0;
+        border: 1px solid #e9e9e9;
+        left: auto;
+        right: 0;
+    }
+
 }
 
 .resource-selector {
@@ -7969,7 +8000,7 @@ div.hide-file-list>div>div>div>div>form>div>div:nth-child(3) {
 
 .resource-grid-title {
     font-weight: normal;
-    padding: 3px 20px 0 20px;
+    padding: 0 20px;
     font-size: 1.416em;
     line-height: 50px;
     display: inline-block;
@@ -8006,25 +8037,6 @@ div.hide-file-list>div>div>div>div>form>div>div:nth-child(3) {
     padding-left: 0px;
 }
 
-.graph-find {
-    margin-top: 0px;
-    font-size: 19px;
-    color: #999;
-    padding: 0;
-    margin: 0 20px;
-    cursor: pointer;
-}
-
-.dropdown-menu {
-    font-size: 13px;
-    border-radius: 0;
-    box-shadow: 0 4px 8px 0 RGB(0 0 0 / 15%);
-    margin: 0;
-    padding: 0;
-    border: 1px solid #e9e9e9;
-    left: auto;
-    right: 0;
-}
 
 .switch-panel {
     padding: 5px
