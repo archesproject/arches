@@ -1263,6 +1263,18 @@ class CsvReader(Reader):
                         populated_cardinality_1_nodegroups[resourceinstanceid] = []
 
                     legacyid = row["LegacyID"] if row["LegacyID"] else resourceinstanceid
+                    if "SPATIAL_GEO" in row and row["SPATIAL_GEO"] and row["SPATIAL_GEO"] != '':
+                        slice_at = row["SPATIAL_GEO"].index('(')
+                        geom = row["SPATIAL_GEO"][slice_at:]
+                        counter = 0
+                        for char in  geom:
+                            if char == '(':
+                                counter += 1
+                            elif char == ')':
+                                counter -= 1
+                        if counter != 0:
+                            print(f"ERROR at {legacyid}")
+                            row["SPATIAL_GEO"] = ''
                     source_data = column_names_to_targetids(row, mapping, row_number)
                     group_no = False
                     group_valid = "GROUP_NO" in row and row["GROUP_NO"] and row["GROUP_NO"] != ""
