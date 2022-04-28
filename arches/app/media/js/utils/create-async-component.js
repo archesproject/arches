@@ -32,9 +32,9 @@ define(['jquery', 'knockout', 'arches'], function($, ko, arches) {
                 this.injectComponent = function(){ injectComponent(htmlElementId, params, viewModel, templatePath, hasAsyncViewModel) }
             },
             template: `
-                <div style='width: 100%; height: 100%;' id=${htmlElementId}>
+                <span style='width: 100%; height: 100%;' id=${htmlElementId}>
                     <div style='display:none' data-bind="click: $data.injectComponent()"></div>
-                </div>
+                </span>
             `
         });
     }
