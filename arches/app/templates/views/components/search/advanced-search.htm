@@ -17,17 +17,20 @@
             </div>
             <!-- ko foreach: searchableGraphs -->
                 <!-- ko if: cards().length > 0  -->
-                <div class="search-facet-item disabled">
+                <div tabindex="0" class="search-facet-item disabled" data-bind="click: function () { collapsed(!collapsed()) }">
                     <h4 class="search-facet-item-heading">
                         <strong data-bind="text: name"></strong>
+                        <span><i class="fa report-expander print-hide" data-bind="css: {'fa-angle-down': !collapsed(), 'fa-angle-right': collapsed()}"></i></span>
                     </h4>
                 </div>
+                <div data-bind="visible: !collapsed()">
                     <!-- ko foreach: cards -->
                     <a href="#" class="search-facet-item" data-bind="click: addFacet">
                         <h4 class="search-facet-item-heading" data-bind="text: name"></h4>
                         <p class="list-group-item-text"></p>
                     </a>
                     <!-- /ko -->
+                </div>
                 <!-- /ko -->
             <!-- /ko -->
         </div>
@@ -67,7 +70,7 @@
                 <!-- ko foreach: card.nodes -->
                 <div class="facet-body">
 
-                    <div class="facet-label" data-bind="text: label"></div>
+                    <div class="facet-label" data-bind="text: $data.label"></div>
                     <div data-bind="component: {
                         name: self.datatypelookup[datatype].configname,
                         params: {

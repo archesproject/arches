@@ -9,18 +9,27 @@ define([
     'views/components/widgets/map/map-styles',
     'turf',
     'geohash',
-    'mapbox-gl',
-    'mapbox-gl-draw',
     'geojson-extent',
     'uuid',
     'geojsonhint',
-    'codemirror/mode/javascript/javascript'
-], function($, _, arches, ko, BaseFilter, MapComponentViewModel, binFeatureCollection, mapStyles, turf, geohash, mapboxgl, MapboxDraw, geojsonExtent, uuid, geojsonhint) {
+], function($, _, arches, ko, BaseFilter, MapComponentViewModel, binFeatureCollection, mapStyles, turf, geohash,  geojsonExtent, uuid, geojsonhint) {
     var componentName = 'map-filter';
     return ko.components.register(componentName, {
         viewModel: BaseFilter.extend({
             initialize: function(options) {
                 var self = this;
+
+                this.dependenciesLoaded = ko.observable(false)
+
+                require(['mapbox-gl', 'mapbox-gl-draw'], (mapbox, mbdraw) => {
+                    self.mapboxgl = mapbox;
+                    self.MapboxDraw = mbdraw;
+                    self.dependenciesLoaded(true);
+                    if(self.map()){
+                        self.map.valueHasMutated()
+                    }
+                });
+
                 options.name = "Map Filter";
                 BaseFilter.prototype.initialize.call(this, options);
 
@@ -132,7 +141,7 @@ define([
                         geoJSON.features = geoJSON.features.slice(0, 1);
                         if(geoJSON.features.length > 0){
                             var extent = geojsonExtent(geoJSON);
-                            var bounds = new mapboxgl.LngLatBounds(extent);
+                            var bounds = new this.mapboxgl.LngLatBounds(extent);
                             this.map().fitBounds(bounds, {
                                 padding: parseInt(this.buffer(), 10)
                             });
@@ -262,15 +271,18 @@ define([
                     var agg = ko.unwrap(self.searchAggregations);
                     var features = [];
                     var mouseoverInstanceId = self.mouseoverInstanceId();
-                    _.each(agg.results, function(result) {
-                        _.each(result._source.points, function(point) {
-                            var feature = turf.point([point.point.lon, point.point.lat], _.extend(result._source, {
-                                resourceinstanceid: result._id,
-                                highlight: result._id === mouseoverInstanceId
-                            }));
-                            features.push(feature);
+                    
+                    if (agg) {
+                        _.each(agg.results, function(result) {
+                            _.each(result._source.points, function(point) {
+                                var feature = turf.point([point.point.lon, point.point.lat], _.extend(result._source, {
+                                    resourceinstanceid: result._id,
+                                    highlight: result._id === mouseoverInstanceId
+                                }));
+                                features.push(feature);
+                            });
                         });
-                    });
+                    }
 
                     var pointsFC = turf.featureCollection(features);
                     pointSource.setData(pointsFC);
@@ -280,7 +292,7 @@ define([
                     if (self.filter.feature_collection() && self.filter.feature_collection()['features'].length > 0) {
                         var geojsonFC = self.filter.feature_collection();
                         var extent = geojsonExtent(geojsonFC);
-                        var bounds = new mapboxgl.LngLatBounds(extent);
+                        var bounds = new this.mapboxgl.LngLatBounds(extent);
                         self.map().fitBounds(bounds, {
                             padding: self.buffer()
                         });
@@ -349,14 +361,17 @@ define([
             },
 
             setupDraw: function() {
+                if(!this.map() || !this.dependenciesLoaded()){
+                    return;
+                }
                 var self = this;
-                var modes = MapboxDraw.modes;
+                var modes = this.MapboxDraw.modes;
                 modes.static = {
                     toDisplayFeatures: function(state, geojson, display) {
                         display(geojson);
                     }
                 };
-                this.draw = new MapboxDraw({
+                this.draw = new this.MapboxDraw({
                     displayControlsDefault: false,
                     modes: modes
                 });
@@ -481,7 +496,7 @@ define([
                         "features": []
                     }
                 });
-                var bounds = new mapboxgl.LngLatBounds(geojsonExtent(mapData.geom));
+                var bounds = new this.mapboxgl.LngLatBounds(geojsonExtent(mapData.geom));
                 var maxZoom = ko.unwrap(this.maxZoom);
                 this.map().fitBounds(bounds, {
                     maxZoom: maxZoom > 17 ? 17 : maxZoom

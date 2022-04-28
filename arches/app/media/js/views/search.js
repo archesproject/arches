@@ -118,6 +118,8 @@ define([
             _.extend(this, this.viewModel.sharedStateObject);
             this.viewModel.sharedStateObject.total = this.viewModel.total;
             this.viewModel.sharedStateObject.loading = this.viewModel.loading;
+            this.viewModel.sharedStateObject.userCanEditResources = this.viewModel.userCanEditResources;
+            this.viewModel.sharedStateObject.userCanReadResources = this.viewModel.userCanReadResources;
             this.queryString = ko.computed(function() {
                 return JSON.stringify(this.query());
             }, this);
@@ -126,18 +128,18 @@ define([
                 this.doQuery();
             }, this);
 
-            BaseManagerView.prototype.initialize.call(this, options);
+            this.viewModel.loading(true);
 
-            this.doQuery();
+            BaseManagerView.prototype.initialize.call(this, options);
         },
 
         doQuery: function() {
             var queryString = JSON.parse(this.queryString());
+
             if (this.updateRequest) {
                 this.updateRequest.abort();
             }
 
-            this.viewModel.loading(true);
             this.updateRequest = $.ajax({
                 type: "GET",
                 url: arches.urls.search_results,
@@ -166,7 +168,6 @@ define([
                     }
                 },
                 complete: function(request, status) {
-                    this.viewModel.loading(false);
                     this.updateRequest = undefined;
                     window.history.pushState({}, '', '?' + $.param(queryString).split('+').join('%20'));
                 }

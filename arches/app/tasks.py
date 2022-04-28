@@ -11,6 +11,8 @@ from django.db import connection
 from django.http import HttpRequest
 from django.utils.translation import ugettext as _
 from arches.app.models import models
+from arches.app.utils import import_class_from_string
+from tempfile import NamedTemporaryFile
 
 
 @shared_task
@@ -49,7 +51,7 @@ def sync(self, surveyid=None, userid=None, synclogid=None):
 
 
 @shared_task(bind=True)
-def export_search_results(self, userid, request_values, format):
+def export_search_results(self, userid, request_values, format, report_link):
     from arches.app.search.search_export import SearchResultsExporter
     from arches.app.models.system_settings import settings
 
@@ -65,9 +67,21 @@ def export_search_results(self, userid, request_values, format):
     for k, v in request_values.items():
         new_request.GET.__setitem__(k, v[0])
     new_request.path = request_values["path"]
-    exporter = SearchResultsExporter(search_request=new_request)
-    files, export_info = exporter.export(format)
-    exportid = exporter.write_export_zipfile(files, export_info)
+    if format == "tilexl":
+        exporter = SearchResultsExporter(search_request=new_request)
+        export_files, export_info = exporter.export(format, report_link)
+        wb = export_files[0]["outputfile"]
+        with NamedTemporaryFile() as tmp:
+            wb.save(tmp.name)
+            tmp.seek(0)
+            stream = tmp.read()
+            export_files[0]["outputfile"] = tmp
+            exportid = exporter.write_export_zipfile(export_files, export_info, export_name)
+    else:
+        exporter = SearchResultsExporter(search_request=new_request)
+        files, export_info = exporter.export(format, report_link)
+        exportid = exporter.write_export_zipfile(files, export_info, export_name)
+
     search_history_obj = models.SearchExportHistory.objects.get(pk=exportid)
 
     return {
@@ -103,8 +117,26 @@ def import_business_data(
     self, data_source="", overwrite="", bulk_load=False, create_concepts=False, create_collections=False, prevent_indexing=False
 ):
     management.call_command(
-        "packages", operation="import_business_data", source=data_source, overwrite=True, prevent_indexing=prevent_indexing
+        "packages",
+        operation="import_business_data",
+        source=data_source,
+        bulk_load=bulk_load,
+        overwrite=overwrite,
+        prevent_indexing=prevent_indexing,
     )
+
+
+@shared_task(bind=True)
+def index_resource(self, module, index_name, resource_id, tile_ids):
+    from arches.app.models.resource import Resource  # avoids circular import
+
+    resource = Resource.objects.get(pk=resource_id)
+    tiles = [models.TileModel.objects.get(pk=tile_id) for tile_id in tile_ids]
+
+    es_index = import_class_from_string(module)(index_name)
+    document, document_id = es_index.get_documents_to_index(resource, tiles)
+
+    return es_index.index_document(document=document, id=document_id)
 
 
 @shared_task

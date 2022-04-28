@@ -1,61 +1,277 @@
 {% load i18n %}
-<!--ko if: ready() -->
 <div class="workflow-plugin">
-    <!--ko if: ko.unwrap(activeStep) -->
-    <div class="workflowstep-nav">
-        <!--ko foreach: {data: steps, as: 'step'}-->
-            <div class="nav-group">
+    <!-- ko if: ko.unwrap(activeStep) -->
+    <div class="tabbed-workflow">
+
+        <div class="tabbed-workflow-title-bar">
+            <div class="workflow-name-container">
+                <div class="workflow-name" data-bind="text: workflowName() + ' Workflow'">{% trans "Insert Workflow Name" %}</div>
+            </div>
+
+            <div class="workflow-top-control">
+                <!-- ko if: (activeStep()._index === steps().length - 1) || isWorkflowFinished() -->
+                <button 
+                    data-bind="click: finishWorkflow"
+                    class="btn btn-success"
+                >
+                <i class="fa fa-check"></i>
+                <span class="verbose">
+                    {% trans "Save and Complete Workflow" %}
+                </span>
+                <span class="succinct">
+                    {% trans "Complete" %}
+                </span>
+                </button>
+                <!-- /ko -->
+                <button 
+                    data-bind="click: quitWorkflow" 
+                    class="btn btn-danger"
+                >
+                    <i class=" ion-android-cancel"></i>
+                    <span>
+                        {% trans "Delete" %}
+                    </span>
+                </button>
+            </div>
+        </div>
+        
+        <div class="workflow-nav-tab-container" data-bind="gallery: pan, duration: 400, thumbnailclass: 'workflow-nav-tabs'">
+            <div class="workflow-tab-controls right" data-bind="click: function(){ updatePan('left') }"><i class="fa fa-angle-left"></i></div>
+                <div class="workflow-nav-tabs">
+                    <ul class="nav nav-tabs workflow-nav-tab-list">
+                        <!--ko foreach: {data: $data.steps(), as: 'step'} -->
+                            <li 
+                                class="workflow-nav-tab-list-item" 
+                                data-bind="
+                                    css: { active: step.active() },
+                                    container: '.workflow-nav-tab-container',
+                                    scrollDirection: 'horizontal',
+                                    scrollTo: step.active(),
+                                "
+                            >
+                                <div
+                                    class='workflow-nav-tab'
+                                    data-bind="{
+                                        css: { 
+                                            active: step.active(), 
+                                            inactive: (
+                                                !step.active() 
+                                                && (
+                                                    step.complete()
+                                                    || ( step._index <= $parent.furthestValidStepIndex() )
+                                                )
+
+                                            ),
+                                            disabled: (
+                                                !step.active() 
+                                                && step._index > $parent.furthestValidStepIndex()
+                                            ),
+                                        },
+                                        click: function() { 
+                                            if (
+                                                !step.active() 
+                                                && step._index <= $parent.furthestValidStepIndex()
+                                            ) { 
+                                                $parent.activeStep(step) 
+                                            }
+                                        },
+                                    }" 
+                                >
+                                    <div style="display: flex; flex-direction: row; justify-content: center; align-items: center;">
+                                        <span
+                                            style="margin-right: 4px;"
+                                            class="workflow-nav-tab-arrow"
+                                            data-bind="{
+                                                css: {
+                                                    disabled: $parent.activeStep()._index === 0,
+                                                },
+                                                visible: step.active() && step._index !== 0,
+                                            }"
+                                        >
+                                            <i class="fa fa-caret-left"></i>
+                                        </span>
+
+                                        <span style="font-size: 14px;" data-bind="text: ko.unwrap(step.title)"></span>
+
+                                        <span
+                                            style="margin-left: 4px;"
+                                            class="workflow-nav-tab-arrow"
+                                            data-bind="{
+                                                css: {
+                                                    disabled: (
+                                                        ( $parent.activeStep() && $parent.activeStep().required() && !$parent.activeStep().complete() )
+                                                    ),
+                                                },
+                                                visible: step.active() && step._index !== $parent.steps().length - 1,
+                                            }"
+                                        >
+                                            <i class="fa fa-caret-right"></i>
+                                        </span>
+                                    </div>
+                                </div>
+                            </li>
+                        <!-- /ko -->
+                    </ul>
+                </div>
+            <div class="workflow-tab-controls left" data-bind="click: function(){ updatePan('right') }"><i class="fa fa-angle-right"></i></div>
+        </div>
+        <div class="workflow-step-title">
+            <h2>
+                <i class="fa fa-list-ol text-center icon-wrap bg-gray ep-graph-title-icon"></i>
+                <span data-bind="text: activeStep().title"></span>
+            </h2>
+        </div>
+        <div class="tabbed-workflow-step-container">
+            <workflow-step params='step: activeStep()'></workflow-step>
+        </div>
+
+        <div class="tabbed-workflow-footer">
+
+            <div class="tabbed-workflow-footer-button-container">
+                <!-- ko if: activeStep()._index > 0 -->
+                <button 
+                    class="btn btn-primary"
+                    data-bind="click: back"
+                >
+                    <i class="fa fa-caret-left"></i>
+                    <span class="verbose">
+                        {% trans  "Previous Step" %}
+                    </span>
+                    <span class="succinct">
+                        {% trans  "Previous" %}
+                    </span>
+                </button>
+                <!-- /ko -->
+                <!-- ko if: activeStep().hasUnsavedData() -->
+                    <!-- ko if: !$data.hiddenWorkflowButtons().includes('undo') && !activeStep().saveWithoutProgressing()  -->
+                    <button
+                        class="btn btn-danger static-save-button"
+                        data-bind="{
+                            css: {
+                                disabled: !activeStep().hasUnsavedData(),
+                            },
+                            click: activeStep().undo
+                        }"
+                    >
+                        <i class="fa fa-undo"></i>
+                        <span>
+                            {% trans  "Undo" %}
+                        </span>
+                    </button>
+                    <!-- /ko -->
+                    <!-- ko if: !$data.hiddenWorkflowButtons().includes('save') -->
+                        <!-- ko if: activeStep().saveWithoutProgressing() -->
+                            <button
+                                class="btn btn-success"
+                                data-bind="
+                                    click: $data.staticSaveActiveStep
+                                "
+                            >
+                                <i class="ion-android-cloud-done"></i>
+                                <span class="verbose">
+                                        {% trans "Save" %}
+                                </span>
+                                <span class="succinct">
+                                    {% trans  "Save" %}
+                                </span>
+                            </button>
+                        <!-- /ko -->
+                        <!-- ko ifnot: activeStep().saveWithoutProgressing() -->
+                            <button
+                                class="btn btn-success"
+                                data-bind="
+                                    click: $data.saveActiveStep
+                                "
+                            >
+                                <i class="ion-android-cloud-done"></i>
+                                <span class="verbose">
+                                    {% trans  "Save and Continue" %}
+                                </span>
+                                <span class="succinct">
+                                    {% trans  "Next" %}
+                                </span>
+                                <i class="fa fa-caret-right"></i>
+                            </button>
+                        <!-- /ko -->
+                    <!-- /ko -->
+                    <!-- ko if: $data.hiddenWorkflowButtons().includes('save') || activeStep().saveWithoutProgressing() -->
+                        <!-- ko if: activeStep()._index < steps().length - 1 -->
+                        <button
+                            class="btn btn-primary"
+                            data-bind="
+                                click: next,
+                                css: {
+                                    disabled: activeStep().required() && !activeStep().complete(),
+                                }
+                            "
+                        >
+                            <span class="verbose">
+                                {% trans  "Next Step" %}
+                            </span>
+                            <span class="succinct">
+                                {% trans  "Next" %}
+                            </span>
+                            <i class="fa fa-caret-right"></i>
+                        </button>
+                        <!-- /ko -->
+                    <!-- /ko -->
+                <!-- /ko -->
+                <!-- ko ifnot: activeStep().hasUnsavedData() -->
+                    <!-- ko if: activeStep()._index < steps().length - 1 -->
+                    <button
+                        class="btn btn-primary"
+                        data-bind="
+                            click: next,
+                            css: {
+                                disabled: activeStep().required() && !activeStep().complete(),
+                            }
+                        "
+                    >
+                        <span class="verbose">
+                            {% trans  "Next Step" %}
+                        </span>
+                        <span class="succinct">
+                            {% trans  "Next" %}
+                        </span>
+                        <i class="fa fa-caret-right"></i>
+                    </button>
+                    <!-- /ko -->
+                <!-- /ko -->
+            </div>
+
+
+            <div class="step-metadata">
+                <div class="step-counter">
+                    <span 
+                        style="padding-right: 2px;"
+                        data-bind="text:activeStep()['_index'] + 1"
+                    ></span>
+                    <span data-bind="text:`/ ${steps().length}`"></span>
+                    
+                </div>
+    
+                <!--ko if: ko.unwrap(activeStep().informationBoxData) -->
                 <div
                     data-bind="{
-                        click: function() { if (step._index <= $parent.furthestValidStepIndex()) { $parent.activeStep(step) }},
-                        event: { mouseover: function(){$parent.hoverStep(step)}, mouseout: function(){$parent.hoverStep(null)}},
-                        css: { selectable: step.complete() || ($parent.steps[step._index - 1] && $parent.steps[step._index - 1].complete()) || $parent.isWorkflowFinished() === true, 'can-advance': ($parent.steps[step._index - 1] && $parent.steps[step._index - 1].complete() === true) || $parent.isWorkflowFinished() === true }
+                        component: { 
+                            name: 'views/components/simple-switch', 
+                            params: {
+                                value: activeStep().informationBoxData()['displayed'], 
+                                config:{
+                                    label: '{% trans "Show Step Information" %}',
+                                    setvalue: activeStep().toggleInformationBox,
+                                    getvalue: activeStep().informationBoxData()['displayed'],
+                                }
+                            }
+                        }
                     }"
-                >
-                    <i class="fa fa-lg" data-bind="class: step.iconClass"></i>
-                </div>
-
-                <!--ko if: $parent.hoverStep() && $parent.hoverStep()._index === step._index -->
-                <div class="step-title">
-                    <div class="arrow-up"></div>
-                    <div class="step-title-text" data-bind="text:$parent.hoverStep().title"></div>
-                </div>
-                <!--/ko-->
+                ></div>
+                <!-- /ko -->
             </div>
-        <!--/ko-->
-        
-        <div class="workflow-nav-controls">
-            <!--ko if: activeStep()._index+1 !== steps.length -->
-            <button data-bind="click: finishWorkflow, css:{disabled: isWorkflowFinished() === false}" class="btn btn-mint btn-labeled"><i class="btn-label ion-android-cloud-done"></i>{% trans "Finish" %}</button>
-            <!--/ko-->
-            <!--ko if: activeStep()._index+1 === steps.length -->
-            <button disabled class="btn btn-mint btn-labeled"><i class="btn-label ion-android-cloud-done"></i>{% trans "Finished!" %}</button>
-            <!--/ko-->
-            <button data-bind="click: quitWorkflow" class="btn btn-dark btn-labeled"><i class="btn-label ion-android-cancel"></i>{% trans "Quit" %}</button>
+
+
+
         </div>
     </div>
-
-    <div class="workflow-step-container">
-        <div class="workflow-step-description-container">
-            <div class="workflow-nav-controls left"><i class="ion-arrow-left-b" data-bind="click: back, css: {inactive: activeStep()._index === 0}"></i></div>
-            <div class="workflow-step-description">
-                 <div class="title" data-bind="text:activeStep().title"></div>
-                 <div class="workflow-name" data-bind="text: workflowName() + ' Workflow'">{% trans "Insert Workflow Name" %}</div>
-                 <div class="subtitle" data-bind="text:activeStep().subtitle"></div>
-                 <div class="step">{% trans "Step" %} <span data-bind="text:activeStep()._index+1"></span> {% trans "of" %} <span data-bind="text:steps.length"></span>: <span data-bind="text:activeStep().description"></span></div>
-            </div>
-            <div class="workflow-nav-controls right"><i class="ion-arrow-right-b" data-bind="click: next, css: {inactive: (activeStep().complete() !== true) && activeStep().required() !== false }"></i></div>
-        </div>
-
-        <div class='workflow-step-body'>
-            <!--ko if: activeStep().componentname-->
-                <!-- ko component: {
-                    name: activeStep().componentname,
-                    params: activeStep()
-                } --><!--/ko-->
-                <!--/ko-->
-        </div>
-    </div>
-    <!--/ko-->
+    <!-- /ko -->
 </div>
-<!--/ko-->

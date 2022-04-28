@@ -146,13 +146,14 @@ class ManifestManagerView(View):
 
         def create_image(file):
             new_image_id = uuid.uuid4()
-            new_image = models.ManifestImage.objects.create(imageid=new_image_id, image=file)
-            new_image.save()
+            new_image_file = models.File.objects.create(fileid=new_image_id, path=file)
+            new_image_file.save()
 
-            file_name = os.path.basename(new_image.image.name)
+            file_name = os.path.basename(new_image_file.path.name)
             file_url = f"{request.scheme}://{request.get_host()}/iiifserver/iiif/2/{file_name}"
             file_json_url = f"{self.cantaloupe_uri}/2/{file_name}/info.json"
             image_json = self.fetch(file_json_url)
+
             return image_json, new_image_id, file_url
 
         def get_image_count(manifest):
@@ -216,6 +217,7 @@ class ManifestManagerView(View):
                         image_json, image_id, file_url = create_image(f)
                     except:
                         return
+
                     canvas = create_canvas(image_json, file_url, os.path.splitext(f.name)[0], image_id)
                     canvases.append(canvas)
                 else:
@@ -224,9 +226,13 @@ class ManifestManagerView(View):
             pres_dict = create_manifest(canvases=canvases)
             manifest = models.IIIFManifest.objects.create(label=name, description=desc, manifest=pres_dict)
             manifest_id = manifest.id
+
             json_url = f"/manifest/{manifest_id}"
             manifest.url = json_url
+            manifest.manifest["@id"] = f"{request.scheme}://{request.get_host()}{json_url}"
+
             manifest.save()
+
             return JSONResponse(manifest)
         else:
             manifest = models.IIIFManifest.objects.get(url=manifest_url)

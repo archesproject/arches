@@ -21,7 +21,7 @@ from arches.app.utils.module_importer import get_class_from_modulename
 from arches.app.utils.permission_backend import user_is_resource_reviewer
 from arches.app.utils.geo_utils import GeoUtils
 import arches.app.utils.task_management as task_management
-from arches.app.search.elasticsearch_dsl_builder import Bool, Match, Range, Term, Terms, Nested, Exists, RangeDSLException
+from arches.app.search.elasticsearch_dsl_builder import Query, Dsl, Bool, Match, Range, Term, Terms, Nested, Exists, RangeDSLException
 from arches.app.search.search_engine_factory import SearchEngineInstance as se
 from arches.app.search.mappings import RESOURCES_INDEX, RESOURCE_RELATIONS_INDEX
 from django.core.cache import cache
@@ -34,9 +34,9 @@ from django.contrib.gis.geos import Polygon
 from django.core.exceptions import ObjectDoesNotExist
 from django.core.exceptions import ValidationError
 from django.db import connection, transaction
+
 from elasticsearch import Elasticsearch
 from elasticsearch.exceptions import NotFoundError
-from edtf import parse_edtf
 
 
 # One benefit of shifting to python3.x would be to use
@@ -53,6 +53,7 @@ EARTHCIRCUM = 40075016.6856
 PIXELSPERTILE = 256
 
 logger = logging.getLogger(__name__)
+
 
 class DataTypeFactory(object):
     _datatypes = None
@@ -165,6 +166,13 @@ class NumberDataType(BaseDataType):
             errors.append(error_message)
         return errors
 
+    def get_display_value(self, tile, node):
+        data = self.get_tile_data(tile)
+        if data:
+            display_value = data.get(str(node.nodeid))
+            if display_value is not None:
+                return str(display_value)
+
     def transform_value_for_tile(self, value, **kwargs):
         try:
             if value == "":
@@ -250,6 +258,34 @@ class BooleanDataType(BaseDataType):
 
         return errors
 
+    def get_display_value(self, tile, node):
+        data = self.get_tile_data(tile)
+        if data:
+            raw_value = data.get(str(node.nodeid))
+            if raw_value is not None:
+                return str(raw_value)
+
+        # TODO: When APIv1 is retired, replace the body of get_display_value with the following
+        # data = self.get_tile_data(tile)
+
+        # if data:
+        #     trueDisplay = node.config["trueLabel"]
+        #     falseDisplay = node.config["falseLabel"]
+        #     raw_value = data.get(str(node.nodeid))
+        #     if raw_value is not None:
+        #         return trueDisplay if raw_value else falseDisplay
+
+    def to_json(self, tile, node):
+        """
+        Returns a value for display in a json object
+        """
+
+        data = self.get_tile_data(tile)
+        if data:
+            value = data.get(str(node.nodeid))
+            label = node.config["trueLabel"] if value is True else node.config["falseLabel"]
+            return self.compile_json(tile, node, display_value=label, value=value)
+
     def transform_value_for_tile(self, value, **kwargs):
         return bool(util.strtobool(str(value)))
 
@@ -318,19 +354,23 @@ class DateDataType(BaseDataType):
         return valid_date_format, valid
 
     def transform_value_for_tile(self, value, **kwargs):
-        if type(value) == list:
-            value = value[0]
-        valid_date_format, valid = self.get_valid_date_format(value)
-        if valid:
-            v = datetime.strptime(value, valid_date_format)
-        else:
-            v = datetime.strptime(value, settings.DATE_IMPORT_EXPORT_FORMAT)
-        # The .astimezone() function throws an error on Windows for dates before 1970
-        try:
-            v = v.astimezone()
-        except:
-            v = self.backup_astimezone(v)
-        value = v.isoformat(timespec="milliseconds")
+        value = None if value == "" else value
+        if value is not None:
+            if type(value) == list:
+                value = value[0]
+            elif type(value) == str and len(value) < 4 and value.startswith("-") is False:  # a year before 1000 but not BCE
+                value = value.zfill(4)
+            valid_date_format, valid = self.get_valid_date_format(value)
+            if valid:
+                v = datetime.strptime(value, valid_date_format)
+            else:
+                v = datetime.strptime(value, settings.DATE_IMPORT_EXPORT_FORMAT)
+            # The .astimezone() function throws an error on Windows for dates before 1970
+            try:
+                v = v.astimezone()
+            except:
+                v = self.backup_astimezone(v)
+            value = v.isoformat(timespec="milliseconds")
         return value
 
     def backup_astimezone(self, dt):
@@ -359,6 +399,23 @@ class DateDataType(BaseDataType):
         else:
             logger.warning(_("{value} is an invalid date format").format(**locals()))
         return value
+
+    def add_missing_colon_to_timezone(self, value):
+        """
+        Python will parse a timezone with a colon (-07:00) but will not add a colon to a timezone using strftime.
+        Elastic will not index a time with a timezone without a colon, so this method ensures the colon is added
+        if it is missing.
+        """
+
+        format = self.get_valid_date_format(value)[0]
+        if format.endswith("z") and value[-5] in ("-", "+"):
+            return "{0}:{1}".format(value[:-2], value[-2:])
+        else:
+            return value
+
+    def pre_tile_save(self, tile, nodeid):
+        if tile.data[nodeid]:
+            tile.data[nodeid] = self.add_missing_colon_to_timezone(tile.data[nodeid])
 
     def append_to_document(self, document, nodevalue, nodeid, tile, provisional=False):
         document["dates"].append(
@@ -428,11 +485,20 @@ class DateDataType(BaseDataType):
 
 
 class EDTFDataType(BaseDataType):
+    def transform_value_for_tile(self, value, **kwargs):
+        transformed_value = ExtendedDateFormat(value)
+        if transformed_value.edtf is None:
+            return value, False
+        return str(transformed_value.edtf), True
+
+    def pre_tile_save(self, tile, nodeid):
+        tile.data[nodeid], valid = self.transform_value_for_tile(tile.data[nodeid])
+
     def validate(self, value, row_number=None, source="", node=None, nodeid=None, strict=False):
         errors = []
         if value is not None:
             if not ExtendedDateFormat(value).is_valid():
-                message = _("Incorrect Extended Date Time Format. See http://www.loc.gov/standards/datetime/ for supported formats.")
+                message = _("Incorrect Extended Date Time Format. See http://www.loc.gov/standards/datetime/ for supported formats")
                 error_message = self.create_error_message(value, source, row_number, message)
                 errors.append(error_message)
         return errors
@@ -577,6 +643,11 @@ class GeojsonFeatureCollectionDataType(BaseDataType):
                     error_message = self.create_error_message(value, source, row_number, message)
                     errors.append(error_message)
         return errors
+
+    def to_json(self, tile, node):
+        data = self.get_tile_data(tile)
+        if data:
+            return self.compile_json(tile, node, geojson=data.get(str(node.nodeid)))
 
     def clean(self, tile, nodeid):
         if tile.data[nodeid] is not None and "features" in tile.data[nodeid]:
@@ -1081,8 +1152,20 @@ class GeojsonFeatureCollectionDataType(BaseDataType):
                 cursor.execute("SELECT * FROM refresh_geojson_geometries();")
 
     def default_es_mapping(self):
-        # let ES dyanamically map this datatype
-        return
+        mapping = {
+            "properties": {
+                "features": {
+                    "properties": {
+                        "geometry": {"properties": {"coordinates": {"type": "float"}, "type": {"type": "keyword"}}},
+                        "id": {"type": "keyword"},
+                        "type": {"type": "keyword"},
+                        "properties": {"type": "object"},
+                    }
+                },
+                "type": {"type": "keyword"},
+            }
+        }
+        return mapping
 
     def is_a_literal_in_rdf(self):
         return True
@@ -1197,6 +1280,11 @@ class FileListDataType(BaseDataType):
             file_urls = " | ".join([file["url"] for file in files])
 
         return file_urls
+
+    def to_json(self, tile, node):
+        data = self.get_tile_data(tile)
+        if data:
+            return self.compile_json(tile, node, file_details=data[str(node.pk)])
 
     def handle_request(self, current_tile, request, node):
         # this does not get called when saving data from the mobile app
@@ -1693,12 +1781,12 @@ class DomainListDataType(BaseDomainDataType):
 
 class ResourceInstanceDataType(BaseDataType):
     """
-        tile data comes from the client looking like this:
-        {
-            "resourceId": "",
-            "ontologyProperty": "",
-            "inverseOntologyProperty": ""
-        }
+    tile data comes from the client looking like this:
+    {
+        "resourceId": "",
+        "ontologyProperty": "",
+        "inverseOntologyProperty": ""
+    }
 
     """
 
@@ -1707,52 +1795,6 @@ class ResourceInstanceDataType(BaseDataType):
             nodevalue = [nodevalue]
         return nodevalue
 
-    def disambiguate(self, nodevalue):
-        ret = []
-        if nodevalue is not None:
-            resourceXresourceList = self.get_id_list(nodevalue)
-            for resourceXresource in resourceXresourceList:
-                resourceid = None
-                displayname = ""
-                if isinstance(resourceXresource, str):
-                    resourceXresourceId = resourceXresource
-                else:
-                    resourceXresourceId = resourceXresource["resourceXresourceId"]
-                if not resourceXresourceId:
-                    continue
-                try:
-                    rr = models.ResourceXResource.objects.get(pk=resourceXresourceId)
-                    resourceid = str(rr.resourceinstanceidto_id)
-                    resource_document = se.search(index=RESOURCES_INDEX, id=resourceid)
-                    displayname = resource_document["_source"]["displayname"]
-                except NotFoundError as e:
-                    try:
-                        from arches.app.models.resource import Resource
-
-                        displayname = Resource.objects.get(pk=resourceid).displayname
-                    except ObjectDoesNotExist:
-                        rr = None
-                        logger.info(
-                            f"Resource with resourceXresourceId {resourceXresourceId} not available. This message may appear during resource load, \
-                                in which case the problem will be resolved once the related resource is loaded"
-                        )
-                except ObjectDoesNotExist:
-                    rr = None
-                    logger.info(
-                        f"Resource with resourceXresourceId {resourceXresourceId} not available. This message may appear during resource load, \
-                            in which case the problem will be resolved once the related resource is loaded"
-                    )
-                if rr is not None:
-                    ret.append(
-                        {
-                            "resourceName": displayname,
-                            "resourceId": resourceid,
-                            "ontologyProperty": rr.relationshiptype,
-                            "inverseOntologyProperty": rr.inverserelationshiptype,
-                        }
-                    )
-        return ret
-
     def validate(self, value, row_number=None, source="", node=None, nodeid=None, strict=False):
         errors = []
         if value is not None:
@@ -1760,7 +1802,28 @@ class ResourceInstanceDataType(BaseDataType):
             for resourceXresourceId in resourceXresourceIds:
                 resourceid = resourceXresourceId["resourceId"]
                 try:
-                    models.ResourceInstance.objects.get(pk=resourceid)
+                    if not node:
+                        node = models.Node.objects.get(pk=nodeid)
+                    if node.config["searchString"] != "":
+                        dsl = node.config["searchDsl"]
+                        if dsl:
+                            query = Query(se)
+                            bool_query = Bool()
+                            ri_query = Dsl(dsl)
+                            bool_query.must(ri_query)
+                            ids_query = Dsl({"ids": {"values": [resourceid]}})
+                            bool_query.must(ids_query)
+                            query.add_query(bool_query)
+                            try:
+                                results = query.search(index=RESOURCES_INDEX)
+                                count = results["hits"]["total"]["value"]
+                                assert count == 1
+                            except:
+                                raise ObjectDoesNotExist()
+                    if len(node.config["graphs"]) > 0:
+                        graphids = map(lambda x: x["graphid"], node.config["graphs"])
+                        if not models.ResourceInstance.objects.filter(pk=resourceid, graph_id__in=graphids).exists():
+                            raise ObjectDoesNotExist()
                 except ObjectDoesNotExist:
                     message = _("The related resource with id '{0}' is not in the system.".format(resourceid))
                     error_type = "WARNING"
@@ -1841,10 +1904,41 @@ class ResourceInstanceDataType(BaseDataType):
                 se.delete(index=RESOURCE_RELATIONS_INDEX, id=related["resourceXresourceId"])
 
     def get_display_value(self, tile, node):
+        from arches.app.models.resource import Resource  # import here rather than top to avoid circular import
+
+        resourceid = None
         data = self.get_tile_data(tile)
-        nodevalue = data[str(node.nodeid)]
-        items = self.disambiguate(nodevalue)
-        return ", ".join([item["resourceName"] for item in items])
+        nodevalue = self.get_id_list(data[str(node.nodeid)])
+
+        items = []
+        for resourceXresource in nodevalue:
+            try:
+                resourceid = resourceXresource["resourceId"]
+                related_resource = Resource.objects.get(pk=resourceid)
+                displayname = related_resource.displayname
+                if displayname is not None:
+                    items.append(displayname)
+            except (TypeError, KeyError):
+                pass
+            except:
+                logger.info(f'Resource with id "{resourceid}" not in the system.')
+        return ", ".join(items)
+
+    def to_json(self, tile, node):
+        from arches.app.models.resource import Resource  # import here rather than top to avoid circular import
+
+        data = self.get_tile_data(tile)
+        if data:
+            nodevalue = self.get_id_list(data[str(node.nodeid)])
+
+            for resourceXresource in nodevalue:
+                try:
+                    return self.compile_json(tile, node, **resourceXresource)
+                except (TypeError, KeyError):
+                    pass
+                except:
+                    resourceid = resourceXresource["resourceId"]
+                    logger.info(f'Resource with id "{resourceid}" not in the system.')
 
     def append_to_document(self, document, nodevalue, nodeid, tile, provisional=False):
         if type(nodevalue) != list and nodevalue is not None:
@@ -1869,7 +1963,6 @@ class ResourceInstanceDataType(BaseDataType):
             # data should come in as json but python list is accepted as well
             if isinstance(value, list):
                 return value
-
 
     def transform_export_values(self, value, *args, **kwargs):
         return json.dumps(value)
@@ -1958,6 +2051,27 @@ class ResourceInstanceDataType(BaseDataType):
 
 
 class ResourceInstanceListDataType(ResourceInstanceDataType):
+    def to_json(self, tile, node):
+        from arches.app.models.resource import Resource  # import here rather than top to avoid circular import
+
+        resourceid = None
+        data = self.get_tile_data(tile)
+        if data:
+            nodevalue = self.get_id_list(data[str(node.nodeid)])
+            items = []
+
+            for resourceXresource in nodevalue:
+                try:
+                    resourceid = resourceXresource["resourceId"]
+                    related_resource = Resource.objects.get(pk=resourceid)
+                    displayname = related_resource.displayname
+                    resourceXresource["display_value"] = displayname
+                    items.append(resourceXresource)
+                except (TypeError, KeyError):
+                    pass
+                except:
+                    logger.info(f'Resource with id "{resourceid}" not in the system.')
+            return self.compile_json(tile, node, instance_details=items)
 
     def collects_multiple_values(self):
         return True
@@ -1975,14 +2089,17 @@ class NodeValueDataType(BaseDataType):
 
     def get_display_value(self, tile, node):
         datatype_factory = DataTypeFactory()
-        value_node = models.Node.objects.get(nodeid=node.config["nodeid"])
-        data = self.get_tile_data(tile)
-        tileid = data[str(node.pk)]
-        if tileid:
-            value_tile = models.TileModel.objects.get(tileid=tileid)
-            datatype = datatype_factory.get_instance(value_node.datatype)
-            return datatype.get_display_value(value_tile, value_node)
-        return ""
+        try:
+            value_node = models.Node.objects.get(nodeid=node.config["nodeid"])
+            data = self.get_tile_data(tile)
+            tileid = data[str(node.pk)]
+            if tileid:
+                value_tile = models.TileModel.objects.get(tileid=tileid)
+                datatype = datatype_factory.get_instance(value_node.datatype)
+                return datatype.get_display_value(value_tile, value_node)
+            return ""
+        except:
+            raise Exception(f'Node with name "{node.name}" is not configured correctly.')
 
     def append_to_document(self, document, nodevalue, nodeid, tile, provisional=False):
         pass
@@ -1992,21 +2109,48 @@ class NodeValueDataType(BaseDataType):
 
 
 class AnnotationDataType(BaseDataType):
-    def validate(self, value, source=None, node=None, strict=False):
+    def validate(self, value, row_number=None, source=None, node=None, nodeid=None, strict=False):
         errors = []
         return errors
 
+    def to_json(self, tile, node):
+        data = self.get_tile_data(tile)
+        if data:
+            return self.compile_json(tile, node, geojson=data.get(str(node.nodeid)))
+
     def append_to_document(self, document, nodevalue, nodeid, tile, provisional=False):
-        # document["strings"].append({"string": nodevalue["address"], "nodegroup_id": tile.nodegroup_id})
         return
+
+    def transform_value_for_tile(self, value, **kwargs):
+        try:
+            return json.loads(value)
+        except ValueError:
+            # do this if json (invalid) is formatted with single quotes, re #6390
+            return ast.literal_eval(value)
+        except TypeError:
+            # data should come in as json but python list is accepted as well
+            if isinstance(value, list):
+                return value
 
     def get_search_terms(self, nodevalue, nodeid=None):
         # return [nodevalue["address"]]
         return []
 
     def default_es_mapping(self):
-        # let ES dyanamically map this datatype
-        return
+        mapping = {
+            "properties": {
+                "features": {
+                    "properties": {
+                        "geometry": {"properties": {"coordinates": {"type": "float"}, "type": {"type": "keyword"}}},
+                        "id": {"type": "keyword"},
+                        "type": {"type": "keyword"},
+                        "properties": {"type": "object"},
+                    }
+                },
+                "type": {"type": "keyword"},
+            }
+        }
+        return mapping
 
 
 def get_value_from_jsonld(json_ld_node):

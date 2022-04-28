@@ -10,7 +10,7 @@
         <!-- ko if: reportExpanded() -->
         <!-- ko foreach: { data: self.preview ? [card.newTile] : card.tiles, as: 'tile' } -->
 
-        <div class="rp-card-section" data-bind="event : { dblclick: function(){tile.selected(true) }}, css: {'provisional': tile.provisionaledits() !== null && tile.userisreviewer === false, 'fullyprovisional': tile.isfullyprovisional()}, attr: {id: tile.tileid}">
+        <div class="rp-card-section" data-bind="event : { dblclick: function(){tile.selected(true) }}, css: {'provisional': ko.unwrap(tile.provisionaledits) !== null && tile.userisreviewer === false, 'fullyprovisional': tile.isfullyprovisional()}, attr: {id: tile.tileid}">
             <!-- ko if: $index() !== 0 --><hr class="rp-tile-separator"><!-- /ko -->
             <div style="display: inline-flex; width: 100%; justify-content: space-between;">
                 <span data-bind="visible: tile.parent.model.get('widgets')().length === 0"></span>
@@ -45,7 +45,12 @@
                         <!-- ko if: tile.parent.selected() && tile.parent.cardinality == 'n' -->
                         <i class="fa fa-copy" data-bind="click: function(){tile.parent.copyTile(tile)}"></i>
                         <!-- /ko -->
-                        <i class="fa fa-pencil" data-bind="click: function(){tile.selected(true)}"></i>
+                        <i 
+                            class="fa fa-pencil" 
+                            data-bind="
+                                click: function(){if ($parent?.form?.workflowId) { $parent.selectWorkflowTile(tile); } else { tile.selected(true); } }
+                            "
+                        ></i>
                         <i class="fa fa-trash" data-bind="click: function(){console.log(tile); tile.deleteTile()}"></i>
                     </div>
                     <!-- /ko -->

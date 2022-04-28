@@ -1,0 +1,101 @@
+{% load i18n %}
+
+<!-- ko with: $data.workflowComponentAbstract -->
+<div style="display: flex; height: 100%;">
+    <div class="workflow-component" style="width: 100%; height: inherit;">
+        <!-- ko if: !loading() && !saving() && isStepActive() -->
+        <div class="workflow-component-element"
+        style="height: inherit; display: unset;"
+        data-bind="component: {
+            name: componentData['componentName'],
+            params: {
+                ...componentData['parameters'],
+                form: $data,
+                pageVm: $root,
+                value: $data.value
+            }
+        }"></div>
+        <!-- /ko -->
+
+        <!-- ko if: componentData['tilesManaged'] === "many" -->
+        <!-- ko if: dirty -->
+            <div style="display: flex; justify-content: flex-end; padding: 0 18px;">
+                <button 
+                    class="btn btn-workflow-tile btn-danger" 
+                    style="margin-right: 8px;"
+                    data-bind="click: clearEditor"
+                >
+                    {% trans "Clear" %}
+                </button>
+
+                <button 
+                    class="btn btn-workflow-tile btn-success" 
+                    data-bind="{
+                        click: addOrUpdateTile,
+                        text: tileLoadedInEditor() ? 'Save' : 'Add'
+                    }"
+                ></button>
+            </div>
+        <!-- /ko -->
+        <!-- /ko -->
+    </div>
+
+        <!-- ko if: componentData['tilesManaged'] === "many" -->
+        <div class="wf-step-multi-tile-container">
+            
+            <h4 data-bind="text: (itemName())"></h4>
+            
+
+            <!-- ko if: !tiles() || tiles().length === 0 -->
+            <div class="wf-multi-tile-step-list-empty">
+                <p data-bind="text: ('No '+itemName()+' added yet. Add one or multiple '+itemName()+'.')"></p>
+            </div>
+            <!-- /ko -->
+
+            <div style="position: relative; overflow-y: scroll; flex: auto;">
+                <div style="position: absolute; left: 6px; right: 6px;">
+                    <!-- ko foreach: {data: tiles(), as: 'tile'} -->
+                        <div class="wf-multi-tile-step-card">
+                            <div class="wf-multi-tile-card-info">
+                                <div class="workflow-step-icon complete"><span><i class="fa fa-hashtag"></i></span></div>
+                                <div class="wf-multi-tile-card-info-details">
+                                    <!-- ko foreach: {data: tile.parent.widgets(), as: 'widget'} -->
+                                        <!-- ko if: widget.visible -->
+                                            <!-- ko component: {
+                                                name: widget.widgetLookup[widget.get("widget_id")()].name,
+                                                params: {
+                                                    config: widget.configJSON,
+                                                    label: widget.label(),
+                                                    node: widget.node,
+                                                    value: tile.data[widget.node_id()],
+                                                    state: "report",
+                                                }
+                                            } --><!-- /ko -->
+                                        <!-- /ko -->
+                                    <!-- /ko -->
+                                </div>
+                            </div>
+                            <div class="wf-multi-tile-step-card-controls">
+                                <div 
+                                    data-bind="click: function(){$parent.removeTile(tile)}"
+                                >
+                                    <i class="fa fa-times-circle"></i>
+                                    <span>
+                                        {% trans "Remove" %}
+                                    </span>
+                                </div>
+                                <div data-bind="click: function(){$parent.loadTileIntoEditor(tile)}">
+                                    <i class="fa fa-pencil"></i>
+                                    <span>
+                                        {% trans "Edit" %}
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                    <!-- /ko -->
+                </div>
+            </div>
+        </div>
+        <!-- /ko -->
+</div>
+<!-- /ko -->

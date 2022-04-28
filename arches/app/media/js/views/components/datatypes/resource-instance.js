@@ -35,8 +35,12 @@ define([
                 } else if (params.widget) {
                     this.isEditable = params.widget.card.get('is_editable');
                 }
+                
                 this.node = params;
                 this.config = params.config;
+                this.openSearch = function(){
+                    window.open(self.config.searchString(), '_blank');
+                };
                 this.selectedResourceModel = ko.observable('');
                 this.selectedResourceModel.subscribe(function(resourceType) {
                     if (resourceType.length > 0) {
@@ -45,7 +49,7 @@ define([
                         self.selectedResourceModel([]);
                     }
                 });
-
+                
                 this.selectedResourceType = ko.observable(null);
                 this.toggleSelectedResource = function(resourceRelationship) {
                     if (self.selectedResourceType() === resourceRelationship) {
@@ -54,7 +58,7 @@ define([
                         self.selectedResourceType(resourceRelationship);
                     }
                 };
-
+                
                 var preventSetup = false;
                 var setupConfig = function(graph) {
                     var model = _.find(self.resourceModels, function(model){
@@ -62,40 +66,45 @@ define([
                     });
                     graph.ontologyProperty = ko.observable(ko.unwrap(graph.ontologyProperty));
                     graph.inverseOntologyProperty = ko.observable(ko.unwrap(graph.inverseOntologyProperty));
-                    // use this so that graph.name won't get saved back to the node config
-                    Object.defineProperty(graph, 'name', {
-                        value: model.name
-                    });
-                    window.fetch(arches.urls.graph_nodes(graph.graphid))
-                        .then(function(response){
-                            if(response.ok) {
-                                return response.json();
-                            }
-                            throw("error");
-                        })
-                        .then(function(json) {
-                            var node = _.find(json, function(node) {
-                                return node.istopnode;
-                            });
-                            // use this so that graph.ontologyclass won't get saved back to the node config
-                            Object.defineProperty(graph, 'ontologyClass', {
-                                value: node.ontologyclass
-                            });
-                        });
-
-                    // need to listen to these properties change so we can 
-                    // trigger a "dirty" state in the config
-                    var triggerDirtyState = function() {
-                        preventSetup = true;
-                        self.config.graphs(self.config.graphs());
-                        preventSetup = false;
-                    };
-                    graph.ontologyProperty.subscribe(triggerDirtyState);
-                    graph.inverseOntologyProperty.subscribe(triggerDirtyState);
-
                     graph.removeRelationship = function(graph){
                         self.config.graphs.remove(graph);
                     };
+                    if(!!model){
+                        // use this so that graph.name won't get saved back to the node config
+                        Object.defineProperty(graph, 'name', {
+                            value: model.name
+                        });
+                        window.fetch(arches.urls.graph_nodes(graph.graphid))
+                            .then(function(response){
+                                if(response.ok) {
+                                    return response.json();
+                                }
+                                throw("error");
+                            })
+                            .then(function(json) {
+                                var node = _.find(json, function(node) {
+                                    return node.istopnode;
+                                });
+                                // use this so that graph.ontologyclass won't get saved back to the node config
+                                Object.defineProperty(graph, 'ontologyClass', {
+                                    value: node.ontologyclass
+                                });
+                            });
+
+                        // need to listen to these properties change so we can 
+                        // trigger a "dirty" state in the config
+                        var triggerDirtyState = function() {
+                            preventSetup = true;
+                            self.config.graphs(self.config.graphs());
+                            preventSetup = false;
+                        };
+                        graph.ontologyProperty.subscribe(triggerDirtyState);
+                        graph.inverseOntologyProperty.subscribe(triggerDirtyState);
+                    }else{
+                        Object.defineProperty(graph, 'name', {
+                            value: arches.translations.modelDoesNotExist
+                        });
+                    }
                 };
 
                 this.config.graphs().forEach(function(graph) {
@@ -108,6 +117,25 @@ define([
                         graphs.forEach(function(graph) {
                             setupConfig(graph);
                         });
+                    }
+                });
+
+                this.config.searchString.subscribe(function(searchString){
+                    if(searchString !== ''){
+                        var searchUrl = new URL(ko.unwrap(searchString));
+                        var queryString = new URLSearchParams(searchUrl.search);
+                        window.fetch(arches.urls.get_dsl + '?' + queryString.toString())
+                            .then(function(response){
+                                if(response.ok) {
+                                    return response.json();
+                                }
+                                throw("error");
+                            })
+                            .then(function(json) {
+                                self.config.searchDsl(json.query);
+                            });
+                    } else {
+                        self.config.searchDsl('');
                     }
                 });
 

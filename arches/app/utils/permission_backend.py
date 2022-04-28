@@ -1,23 +1,22 @@
-from arches.app.models.models import Node, TileModel
+import inspect
+
+from arches.app.models.models import *
 from arches.app.models.system_settings import settings
-from guardian.backends import check_support
-from guardian.backends import ObjectPermissionBackend
+from guardian.backends import check_support, ObjectPermissionBackend
 from django.core.exceptions import ObjectDoesNotExist
 from guardian.core import ObjectPermissionChecker
 from guardian.shortcuts import (
     get_perms,
-    get_objects_for_user,
     get_group_perms,
     get_user_perms,
     get_users_with_perms,
-    remove_perm,
-    assign_perm,
 )
 from guardian.models import GroupObjectPermission, UserObjectPermission
 from guardian.exceptions import WrongAppError
-from django.contrib.auth.models import User, Group, Permission
+from django.contrib.auth.models import User, Group
+from django.contrib.gis.db.models import Model
+from django.core.cache import caches
 from arches.app.models.models import ResourceInstance
-from arches.app.search.search_engine_factory import SearchEngineFactory
 from arches.app.search.elasticsearch_dsl_builder import Bool, Query, Terms, Nested
 from arches.app.search.mappings import RESOURCES_INDEX
 
@@ -34,19 +33,17 @@ class PermissionBackend(ObjectPermissionBackend):
             if app_label != obj._meta.app_label:
                 raise WrongAppError("Passed perm has app label of '%s' and " "given obj has '%s'" % (app_label, obj._meta.app_label))
 
-        explicitly_defined_perms = get_perms(user_obj, obj)
+        ObjPermissionChecker = CachedObjectPermissionChecker(user_obj, obj)
+        explicitly_defined_perms = ObjPermissionChecker.get_perms(obj)
+
         if len(explicitly_defined_perms) > 0:
             if "no_access_to_nodegroup" in explicitly_defined_perms:
                 return False
             else:
-                return perm in explicitly_defined_perms
+                return bool(perm in explicitly_defined_perms)
         else:
-            default_perms = []
-            for group in user_obj.groups.all():
-                for permission in group.permissions.all():
-                    if perm in permission.codename:
-                        return True
-            return False
+            UserPermissionChecker = CachedUserPermissionChecker(user_obj)
+            return bool(UserPermissionChecker.user_has_permission(perm))
 
 
 def get_restricted_users(resource):
@@ -177,18 +174,34 @@ def get_nodegroups_by_perm(user, perms, any_perm=True):
     any_perm -- True to check ANY perm in "perms" or False to check ALL perms
 
     """
+    if not isinstance(perms, list):
+        perms = [perms]
 
-    A = set(
-        get_objects_for_user(
-            user,
-            ["models.read_nodegroup", "models.write_nodegroup", "models.delete_nodegroup", "models.no_access_to_nodegroup"],
-            accept_global_perms=False,
-            any_perm=True,
-        )
-    )
-    B = set(get_objects_for_user(user, perms, accept_global_perms=False, any_perm=any_perm))
-    C = set(get_objects_for_user(user, perms, accept_global_perms=True, any_perm=any_perm))
-    return list(C - A | B)
+    formatted_perms = []
+    # in some cases, `perms` can have a `model.` prefix
+    for perm in perms:
+        if len(perm.split(".")) > 1:
+            formatted_perms.append(perm.split(".")[1])
+        else:
+            formatted_perms.append(perm)
+
+    permitted_nodegroups = set()
+    NodegroupPermissionsChecker = CachedObjectPermissionChecker(user, NodeGroup)
+
+    for nodegroup in NodeGroup.objects.all():
+        explicit_perms = NodegroupPermissionsChecker.get_perms(nodegroup)
+
+        if len(explicit_perms):
+            if any_perm:
+                if len(set(formatted_perms) & set(explicit_perms)):
+                    permitted_nodegroups.add(nodegroup)
+            else:
+                if set(formatted_perms) == set(explicit_perms):
+                    permitted_nodegroups.add(nodegroup)
+        else:  # if no explicit permissions, object is considered accessible by all with group permissions
+            permitted_nodegroups.add(nodegroup)
+
+    return permitted_nodegroups
 
 
 def get_editable_resource_types(user):
@@ -293,7 +306,9 @@ def check_resource_instance_permissions(user, resourceid, permission):
     try:
         resource = ResourceInstance.objects.get(resourceinstanceid=resourceid)
         result["resource"] = resource
+
         all_perms = get_perms(user, resource)
+
         if len(all_perms) == 0:  # no permissions assigned. permission implied
             result["permitted"] = "unknown"
             return result
@@ -329,7 +344,6 @@ def user_can_read_resource(user, resourceid=None):
     Requires that a user be able to read an instance and read a single nodegroup of a resource
 
     """
-
     if user.is_authenticated:
         if user.is_superuser:
             return True
@@ -352,7 +366,6 @@ def user_can_edit_resource(user, resourceid=None):
     Requires that a user be able to edit an instance and delete a single nodegroup of a resource
 
     """
-
     if user.is_authenticated:
         if user.is_superuser:
             return True
@@ -423,4 +436,74 @@ def user_is_resource_reviewer(user):
     Single test for whether a user is in the Resource Reviewer group
     """
 
-    return user.groups.filter(name='Resource Reviewer').exists()
+    return user.groups.filter(name="Resource Reviewer").exists()
+
+
+def user_created_transaction(user, transactionid):
+    if user.is_authenticated:
+        if user.is_superuser:
+            return True
+        if EditLog.objects.filter(transactionid=transactionid, userid=user.id).count() > 0:
+            return True
+    return False
+
+
+class CachedObjectPermissionChecker:
+    """
+    A permission checker that leverages the 'user_permission' cache to check object-level user permissions.
+    """
+
+    def __new__(cls, user, input):
+        if inspect.isclass(input):
+            classname = input.__name__
+        elif isinstance(input, Model):
+            classname = input.__class__.__name__
+        elif isinstance(input, str) and globals().get(input):
+            classname = input
+        else:
+            raise Exception("Cannot derive model from input.")
+
+        user_permission_cache = caches["user_permission"]
+
+        current_user_cached_permissions = user_permission_cache.get(str(user.pk), {})
+
+        if current_user_cached_permissions.get(classname):
+            checker = current_user_cached_permissions.get(classname)
+        else:
+            checker = ObjectPermissionChecker(user)
+            checker.prefetch_perms(globals()[classname].objects.all())
+
+            current_user_cached_permissions[classname] = checker
+            user_permission_cache.set(str(user.pk), current_user_cached_permissions)
+
+        return checker
+
+
+class CachedUserPermissionChecker:
+    """
+    A permission checker that leverages the 'user_permission' cache to check user-level user permissions.
+    """
+
+    def __init__(self, user):
+        user_permission_cache = caches["user_permission"]
+        current_user_cached_permissions = user_permission_cache.get(str(user.pk), {})
+
+        if current_user_cached_permissions.get("user_permissions"):
+            user_permissions = current_user_cached_permissions.get("user_permissions")
+        else:
+            user_permissions = set()
+
+            for group in user.groups.all():
+                for permission in group.permissions.all():
+                    user_permissions.add(permission.codename)
+
+            current_user_cached_permissions["user_permissions"] = user_permissions
+            user_permission_cache.set(str(user.pk), current_user_cached_permissions)
+
+        self.user_permissions = user_permissions
+
+    def user_has_permission(self, permission):
+        if permission in self.user_permissions:
+            return True
+        else:
+            return False

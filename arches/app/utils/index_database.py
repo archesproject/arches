@@ -1,5 +1,10 @@
+import django
+
+django.setup()
+
 import pyprind
-from django.db import connection
+import sys
+from django.db import connection, connections
 from django.db.models import Q
 from arches.app.models import models
 from arches.app.models.models import Value
@@ -14,7 +19,15 @@ from arches.app.utils import import_class_from_string
 from datetime import datetime
 
 
-def index_db(clear_index=True, batch_size=settings.BULK_IMPORT_BATCH_SIZE, quiet=False):
+import multiprocessing
+import os
+import math
+import logging
+
+logger = logging.getLogger(__name__)
+
+
+def index_db(clear_index=True, batch_size=settings.BULK_IMPORT_BATCH_SIZE, quiet=False, use_multiprocessing=False, max_subprocesses=0):
     """
     Deletes any existing indicies from elasticsearch and then indexes all
     concepts and resources from the database
@@ -23,16 +36,25 @@ def index_db(clear_index=True, batch_size=settings.BULK_IMPORT_BATCH_SIZE, quiet
     clear_index -- set to True to remove all the resources and concepts from the index before the reindexing operation
     batch_size -- the number of records to index as a group, the larger the number to more memory required
     quiet -- Silences the status bar output during certain operations, use in celery operations for example
-
+    use_multiprocessing (default False) -- runs the reindexing in multiple subprocesses to take advantage of parallel indexing
+    max_subprocesses - limits multiprocessing to a this number of processes. Default is half cpu count.
     """
 
     index_concepts(clear_index=clear_index, batch_size=batch_size)
-    index_resources(clear_index=clear_index, batch_size=batch_size, quiet=quiet)
+    index_resources(
+        clear_index=clear_index,
+        batch_size=batch_size,
+        quiet=quiet,
+        use_multiprocessing=use_multiprocessing,
+        max_subprocesses=max_subprocesses,
+    )
     index_custom_indexes(clear_index=clear_index, batch_size=batch_size, quiet=quiet)
     index_resource_relations(clear_index=clear_index, batch_size=batch_size)
 
 
-def index_resources(clear_index=True, batch_size=settings.BULK_IMPORT_BATCH_SIZE, quiet=False):
+def index_resources(
+    clear_index=True, batch_size=settings.BULK_IMPORT_BATCH_SIZE, quiet=False, use_multiprocessing=False, max_subprocesses=0
+):
     """
     Indexes all resources from the database
 
@@ -40,22 +62,29 @@ def index_resources(clear_index=True, batch_size=settings.BULK_IMPORT_BATCH_SIZE
     clear_index -- set to True to remove all the resources from the index before the reindexing operation
     batch_size -- the number of records to index as a group, the larger the number to more memory required
     quiet -- Silences the status bar output during certain operations, use in celery operations for example
+    use_multiprocessing (default False) -- runs the reindexing in multiple subprocesses to take advantage of parallel indexing
+    max_subprocesses -- explicitly sets the size of process pool. Auto limits to cpu count if more than this.
 
     """
-
-    if clear_index:
-        q = Query(se=se)
-        q.delete(index=TERMS_INDEX)
 
     resource_types = (
         models.GraphModel.objects.filter(isresource=True)
         .exclude(graphid=settings.SYSTEM_SETTINGS_RESOURCE_MODEL_ID)
         .values_list("graphid", flat=True)
     )
-    index_resources_by_type(resource_types, clear_index=clear_index, batch_size=batch_size, quiet=quiet)
+    index_resources_by_type(
+        resource_types,
+        clear_index=clear_index,
+        batch_size=batch_size,
+        quiet=quiet,
+        use_multiprocessing=use_multiprocessing,
+        max_subprocesses=max_subprocesses,
+    )
 
 
-def index_resources_by_type(resource_types, clear_index=True, batch_size=settings.BULK_IMPORT_BATCH_SIZE, quiet=False):
+def index_resources_by_type(
+    resource_types, clear_index=True, batch_size=settings.BULK_IMPORT_BATCH_SIZE, quiet=False, use_multiprocessing=False, max_subprocesses=0
+):
     """
     Indexes all resources of a given type(s)
 
@@ -66,47 +95,155 @@ def index_resources_by_type(resource_types, clear_index=True, batch_size=setting
     clear_index -- set to True to remove all the resources of the types passed in from the index before the reindexing operation
     batch_size -- the number of records to index as a group, the larger the number to more memory required
     quiet -- Silences the status bar output during certain operations, use in celery operations for example
+    use_multiprocessing (default False) -- runs the reindexing in multiple subprocesses to take advantage of parallel indexing
+    max_subprocesses (default 0) -- explicitly set the number of processes to use.
 
     """
 
     status = ""
-    datatype_factory = DataTypeFactory()
-    node_datatypes = {str(nodeid): datatype for nodeid, datatype in models.Node.objects.values_list("nodeid", "datatype")}
+
+    if isinstance(resource_types, str):
+        try:
+            resource_types = resource_types.split(",")
+        except:
+            pass
+        # resource_types = [resource_types]
 
     for resource_type in resource_types:
         start = datetime.now()
-        resources = Resource.objects.filter(graph_id=str(resource_type))
+
         graph_name = models.GraphModel.objects.get(graphid=str(resource_type)).name
-        print("Indexing resource type '{0}'".format(graph_name))
+        logger.info("Indexing resource type '{0}'".format(graph_name))
+
+        if clear_index:
+            tq = Query(se=se)
+            cards = models.CardModel.objects.filter(graph_id=str(resource_type)).select_related("nodegroup")
+            for nodegroup in [card.nodegroup for card in cards]:
+                term = Term(field="nodegroupid", term=str(nodegroup.nodegroupid))
+                tq.add_query(term)
+            tq.delete(index=TERMS_INDEX, refresh=True)
+
+            rq = Query(se=se)
+            term = Term(field="graph_id", term=str(resource_type))
+            rq.add_query(term)
+            rq.delete(index=RESOURCES_INDEX, refresh=True)
+
+        if use_multiprocessing:
+            try:
+                multiprocessing.set_start_method("spawn")
+            except:
+                pass
+
+            logger.debug(f"... multiprocessing method: {multiprocessing.get_start_method()}")
+            resources = [
+                str(rid) for rid in Resource.objects.filter(graph_id=str(resource_type)).values_list("resourceinstanceid", flat=True)
+            ]
+            resource_batches = []
+            resource_count = 0
+            batch_number = 0
+            resource_batches.append([])
+
+            for resource in resources:
+                resource_count += 1
+                resource_batches[batch_number].append(resource)
+                if resource_count == batch_size:
+                    resource_batches.append([])
+                    batch_number += 1
+                    resource_count = 0
+
+            connections.close_all()
+
+            if quiet is False:
+                bar = pyprind.ProgBar(len(resource_batches), bar_char="█", stream=sys.stdout) if len(resource_batches) > 1 else None
+
+            def process_complete_callback(result):
+                if quiet is False and bar is not None:
+                    bar.update(item_id=result)
+
+            def process_error_callback(err):
+                import traceback
+
+                if quiet is False and bar is not None:
+                    bar.update()
+                try:
+                    raise err
+                except:
+                    tb = traceback.format_exc()
+                finally:
+                    logger.error(f"Error indexing resource batch, type {type(err)}, message: {err}, \n>>>>>>>>>>>>>> TRACEBACK: {tb}")
+
+            default_process_count = math.ceil(multiprocessing.cpu_count() / 2)
+            if max_subprocesses == 0:
+                process_count = default_process_count
+            elif max_subprocesses > multiprocessing.cpu_count():
+                process_count = multiprocessing.cpu_count()
+                logger.debug(f"... max_subprocess count exceeds CPU count. Limiting to {process_count}")
+            else:
+                process_count = max_subprocesses
+
+            logger.debug(f"... multiprocessing process count: {process_count}")
+            logger.debug(f"... resource type batch count (batch size={batch_size}): {len(resource_batches)}")
+            with multiprocessing.Pool(processes=process_count) as pool:
+                for resource_batch in resource_batches:
+                    pool.apply_async(
+                        _index_resource_batch,
+                        args=(resource_batch,),
+                        callback=process_complete_callback,
+                        error_callback=process_error_callback,
+                    )
+                pool.close()
+                pool.join()
+
+        else:
+            resources = Resource.objects.filter(graph_id=str(resource_type))
+            datatype_factory = DataTypeFactory()
+            node_datatypes = {str(nodeid): datatype for nodeid, datatype in models.Node.objects.values_list("nodeid", "datatype")}
+            with se.BulkIndexer(batch_size=batch_size, refresh=True) as doc_indexer:
+                with se.BulkIndexer(batch_size=batch_size, refresh=True) as term_indexer:
+                    if quiet is False:
+                        bar = pyprind.ProgBar(len(resources), bar_char="█", title=graph_name) if len(resources) > 1 else None
+                    for resource in resources:
+                        if quiet is False and bar is not None:
+                            bar.update(item_id=resource)
+                        document, terms = resource.get_documents_to_index(
+                            fetchTiles=True, datatype_factory=datatype_factory, node_datatypes=node_datatypes
+                        )
+                        doc_indexer.add(index=RESOURCES_INDEX, id=document["resourceinstanceid"], data=document)
+                        for term in terms:
+                            term_indexer.add(index=TERMS_INDEX, id=term["_id"], data=term["_source"])
 
         q = Query(se=se)
         term = Term(field="graph_id", term=str(resource_type))
         q.add_query(term)
-        if clear_index:
-            q.delete(index=RESOURCES_INDEX, refresh=True)
-
-        with se.BulkIndexer(batch_size=batch_size, refresh=True) as doc_indexer:
-            with se.BulkIndexer(batch_size=batch_size, refresh=True) as term_indexer:
-                if quiet is False:
-                    bar = pyprind.ProgBar(len(resources), bar_char="█") if len(resources) > 1 else None
-                for resource in resources:
-                    if quiet is False and bar is not None:
-                        bar.update(item_id=resource)
-                    document, terms = resource.get_documents_to_index(
-                        fetchTiles=True, datatype_factory=datatype_factory, node_datatypes=node_datatypes
-                    )
-                    doc_indexer.add(index=RESOURCES_INDEX, id=document["resourceinstanceid"], data=document)
-                    for term in terms:
-                        term_indexer.add(index=TERMS_INDEX, id=term["_id"], data=term["_source"])
-
         result_summary = {"database": len(resources), "indexed": se.count(index=RESOURCES_INDEX, body=q.dsl)}
         status = "Passed" if result_summary["database"] == result_summary["indexed"] else "Failed"
-        print(
+        logger.info(
             "Status: {0}, Resource Type: {1}, In Database: {2}, Indexed: {3}, Took: {4} seconds".format(
                 status, graph_name, result_summary["database"], result_summary["indexed"], (datetime.now() - start).seconds
             )
         )
     return status
+
+
+def _index_resource_batch(resourceids):
+    from arches.app.search.search_engine_factory import SearchEngineInstance as _se
+
+    resources = Resource.objects.filter(resourceinstanceid__in=resourceids)
+    batch_size = int(len(resourceids) / 2)
+    datatype_factory = DataTypeFactory()
+    node_datatypes = {str(nodeid): datatype for nodeid, datatype in models.Node.objects.values_list("nodeid", "datatype")}
+
+    with _se.BulkIndexer(batch_size=batch_size, refresh=True, timeout=30, max_retries=10, retry_on_timeout=True) as doc_indexer:
+        with _se.BulkIndexer(batch_size=batch_size, refresh=True, timeout=30, max_retries=10, retry_on_timeout=True) as term_indexer:
+            for resource in resources:
+                document, terms = resource.get_documents_to_index(
+                    fetchTiles=True, datatype_factory=datatype_factory, node_datatypes=node_datatypes
+                )
+                doc_indexer.add(index=RESOURCES_INDEX, id=document["resourceinstanceid"], data=document)
+                for term in terms:
+                    term_indexer.add(index=TERMS_INDEX, id=term["_id"], data=term["_source"])
+
+    return os.getpid()
 
 
 def index_custom_indexes(index_name=None, clear_index=True, batch_size=settings.BULK_IMPORT_BATCH_SIZE, quiet=False):
@@ -141,7 +278,7 @@ def index_resource_relations(clear_index=True, batch_size=settings.BULK_IMPORT_B
     """
 
     start = datetime.now()
-    print("Indexing resource to resource relations")
+    logger.info("Indexing resource to resource relations")
 
     cursor = connection.cursor()
     if clear_index:
@@ -176,7 +313,7 @@ def index_resource_relations(clear_index=True, batch_size=settings.BULK_IMPORT_B
             resource_relations_indexer.add(index=RESOURCE_RELATIONS_INDEX, id=doc["resourcexid"], data=doc)
 
     index_count = se.count(index=RESOURCE_RELATIONS_INDEX)
-    print(
+    logger.info(
         "Status: {0}, In Database: {1}, Indexed: {2}, Took: {3} seconds".format(
             "Passed" if cursor.rowcount == index_count else "Failed", cursor.rowcount, index_count, (datetime.now() - start).seconds
         )
@@ -194,7 +331,7 @@ def index_concepts(clear_index=True, batch_size=settings.BULK_IMPORT_BATCH_SIZE)
     """
 
     start = datetime.now()
-    print("Indexing concepts")
+    logger.info("Indexing concepts")
     cursor = connection.cursor()
     if clear_index:
         q = Query(se=se)
@@ -216,7 +353,6 @@ def index_concepts(clear_index=True, batch_size=settings.BULK_IMPORT_BATCH_SIZE)
             }
             concept_indexer.add(index=CONCEPTS_INDEX, id=doc["id"], data=doc)
             indexed_values.append(doc["id"])
-
 
         valueTypes = []
         for valuetype in models.DValueType.objects.filter(category="label").values_list("valuetype", flat=True):
@@ -280,7 +416,7 @@ def index_concepts(clear_index=True, batch_size=settings.BULK_IMPORT_BATCH_SIZE)
     concept_count_in_db = cursor.fetchone()[0]
     index_count = se.count(index=CONCEPTS_INDEX)
 
-    print(
+    logger.info(
         "Status: {0}, In Database: {1}, Indexed: {2}, Took: {3} seconds".format(
             "Passed" if concept_count_in_db == index_count else "Failed", concept_count_in_db, index_count, (datetime.now() - start).seconds
         )

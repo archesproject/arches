@@ -23,22 +23,20 @@
             <a class="search-candidate-link" href="" data-bind="click: showDetails"><i class="fa fa-info-circle"></i> {% trans "Details" %} </a>
             <!-- /ko -->
 
-            {% if user|can_edit_resource_instance %}
             <!--ko if: canEdit -->
             <a class="search-candidate-link" href="" data-bind="click: $parent.editResource.bind($parent)"><i class="ion-ios-refresh-empty"></i> {% trans "Edit" %} </a>
             <!--/ko-->
-            {% endif %}
             
             <!-- ko if: !!$parent.mapFilter -->
             <a class="search-candidate-link" href="" data-bind="visible: point, click: mapLinkClicked"><i class="fa fa-map-marker"></i> {% trans "Map" %} </a>
             <!-- /ko -->
 
             <!--ko ifnot: $root.resourceEditorContext -->
-            {% if user|can_read_resource_instance %}
-                <!--ko if: !!$parent.relatedResourcesManager -->
+
+                <!--ko if: !!$parent.relatedResourcesManager && canRead -->
                 <a class="search-candidate-link pull-right" href="" data-bind="click: showrelated"><i class="fa fa-code-fork"></i> {% trans "Related Resources" %} </a>
-                {% endif %}
                 <!--/ko-->
+
                 <!--ko if: $root.resourceEditorContext -->
                     <!--ko if: relatable & $root.editingInstanceId != resourceinstanceid -->
                     <a class="search-candidate-link pull-right" href="" data-bind="click: function(val){relationshipcandidacy(val); showrelated()}"><i class="fa fa-code-fork"></i> {% trans "Relate Resource" %} </a>
