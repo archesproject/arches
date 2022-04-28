@@ -28,7 +28,7 @@ class Migration(migrations.Migration):
                         "triggering_nodegroups": [],
                         "selected_nodes": [],
                         "modulename": ""
-                    }', 
+                    }',
                     'resource_edits.py',
                     'ResourceEdits',
                     'views/components/functions/resource-edits'
