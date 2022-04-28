@@ -1,6 +1,5 @@
 {% load i18n %}
 
-<!-- ko with: $data.workflowComponentAbstract -->
 <div style="display: flex; height: 100%;">
     <div class="workflow-component" style="width: 100%; height: inherit;">
         <!-- ko if: !loading() && !saving() && isStepActive() -->
@@ -40,7 +39,7 @@
         <!-- /ko -->
     </div>
 
-        <!-- ko if: componentData['tilesManaged'] === "many" -->
+    <!-- ko if: componentData['tilesManaged'] === "many" -->
         <div class="wf-step-multi-tile-container">
             
             <h4 data-bind="text: (itemName())"></h4>
@@ -96,6 +95,5 @@
                 </div>
             </div>
         </div>
-        <!-- /ko -->
+    <!-- /ko -->
 </div>
-<!-- /ko -->

@@ -55,9 +55,13 @@
 
                 <!-- ko if: !$parent.loading() && !$parent.saving() -->
                     <!-- ko foreach: { data: layoutSection[1], as: 'uniqueInstanceName'} -->
-                        <workflow-component-abstract 
-                            params='workflowComponentAbstract: ko.unwrap($parents[1].workflowComponentAbstractLookup()[uniqueInstanceName])'
-                        ></workflow-component-abstract>
+                        <!-- ko component: {
+                            name: 'workflow-component-abstract',
+                            params: {
+                                asyncViewModel: ko.unwrap($parents[1].workflowComponentAbstractLookup()[uniqueInstanceName]),
+                                ...ko.unwrap($parents[1].workflowComponentAbstractLookup()[uniqueInstanceName])
+                            }
+                        } --><!-- /ko -->
                     <!-- /ko -->
                 <!-- /ko -->
             </div>

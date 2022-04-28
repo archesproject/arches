@@ -9,7 +9,9 @@ define([
     'viewmodels/provisional-tile',
     'viewmodels/alert',
     'uuid',
-], function(_, $, ko, koMapping, arches, GraphModel, CardViewModel, ProvisionalTileViewModel, AlertViewModel, uuid) {
+    'utils/create-async-component',
+    'templates/views/components/workflows/workflow-component-abstract.htm'
+], function(_, $, ko, koMapping, arches, GraphModel, CardViewModel, ProvisionalTileViewModel, AlertViewModel, uuid, createAsyncComponent) {
     WORKFLOW_COMPONENT_ABSTRACTS_LABEL = 'workflow-component-abstracts';
 
     function NonTileBasedComponent() {
@@ -618,6 +620,7 @@ define([
                     hasUnsavedData = true;
                 }
             }
+
             return hasUnsavedData;
         });
 
@@ -759,9 +762,7 @@ define([
         this.initialize();
     }
 
-    ko.components.register('workflow-component-abstract', {
-        template: window['workflow-component-abstract-template']
-    });
+    createAsyncComponent('workflow-component-abstract', null, 'templates/views/components/workflows/workflow-component-abstract.htm', true);
 
     return WorkflowComponentAbstract;
 });
