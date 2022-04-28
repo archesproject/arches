@@ -1,4 +1,5 @@
 {% extends "views/components/widgets/base.htm" %}
+{% load template_tags %}
 {% load i18n %}
 
 {% block form %}
@@ -27,7 +28,7 @@
 {% block report %}
 <dt data-bind="text: label"></dt>
 <!-- ko if: canvasConfigs.length === 0 -->
-<dd data-bind="text: displayValue() || '{% trans "None" %}'"></dd>
+<dd data-bind="text: displayValue() || {% quoted_trans "None" %}"></dd>
 <!-- /ko -->
 <!-- ko if: canvasConfigs.length > 0 -->
 <div class="iiif-widget-report">

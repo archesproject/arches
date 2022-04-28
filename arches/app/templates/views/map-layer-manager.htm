@@ -17,6 +17,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 -->
 {% extends "base-manager.htm" %}
 {% load staticfiles %}
+{% load template_tags %}
 {% load i18n %}
 
 
@@ -68,7 +69,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                             <div class="crud-card-subtitle" data-bind="text: item.name"></div>
                             <!-- /ko -->
                             <!-- ko if: !item.nodeid -->
-                            <div class="crud-card-subtitle" data-bind="text: item.isoverlay ? '{% trans "Overlay" %}' : '{% trans "Basemap" %}'"></div>
+                            <div class="crud-card-subtitle" data-bind="text: item.isoverlay ? {% quoted_trans "Overlay" %} : {% quoted_trans "Basemap" %}"></div>
                             <!-- /ko -->
                         </div>
                         <!-- /ko -->
@@ -200,7 +201,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 
                                                             <div class="form-group" map-service-manage-layer-name>
                                                                 <div>
-                                                                    <label class="control-label map-service-manage-control-label" data-bind="text: selection().isoverlay ? '{% trans "Add to map by default:" %}' : '{% trans "Default basemap:" %}'"></label>
+                                                                    <label class="control-label map-service-manage-control-label" data-bind="text: selection().isoverlay ? {% quoted_trans "Add to map by default:" %} : {% quoted_trans "Default basemap:" %}"></label>
                                                                     
                                                                     <span class="switch switch-small" style="margin-top: 0px;"data-bind="css: {
                                                                                 'on': selection().addtomap()

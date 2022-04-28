@@ -17,6 +17,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 -->
 {% extends "base-manager.htm" %}
 {% load staticfiles %}
+{% load template_tags %}
 {% load i18n %}
 
 {% block title %}
@@ -49,7 +50,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                             <script type="text/html" id="selectGraphTemplate">
                                 <option disabled selected value>{% trans "Find a Resource Model/Branch..." %}</option>
                                 <!-- ko foreach: groups -->
-                                    <optgroup data-bind="attr: { 'label': (name==='Resource Models')?'{% trans "Resource Models" %}':'{% trans "Branches" %}' }, foreach: items">
+                                    <optgroup data-bind="attr: { 'label': (name==='Resource Models')?{% quoted_trans "Resource Models" %}:{% quoted_trans "Branches" %}}, foreach: items">
                                         <option data-bind="value: graphid, text: name"></option>
                                     </optgroup>
                                 <!-- /ko -->
@@ -69,7 +70,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                 <button class="btn btn-primary dropdown-toggle" data-toggle="dropdown" type="button" aria-expanded="false">
                     {% trans "Add" %} <i class="ion-more"></i>
                 </button>
-                <ul class="dropdown-menu dropdown-menu-right" data-bind="event: {mouseleave: leaveDropdown}">
+                <ul class="dropdown-menu" data-bind="event: {mouseleave: leaveDropdown}">
                     <li><a href="#" data-bind="click: newResource">{% trans "New Resource Model" %}</a></li>
                     <li><a href="#" data-bind="click: newGraph">{% trans "New Branch" %}</a></li>
                     <li class="file-upload upload">
@@ -106,7 +107,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                 <div class="resource-grid-tools-container" data-bind="clickBubble: false, hover: hover">
                     <div class="btn-group">
                         <button class="btn btn-sm btn-mint dropdown-toggle graph-btn" data-toggle="dropdown" type="button" aria-expanded="false"> {% trans "Manage" %} <i class="ion-ios-more"></i></button>
-                        <ul class="dropdown-menu dropdown-menu-right manage-menu" data-bind="event: {mouseleave: $parent.leaveDropdown}">
+                        <ul class="dropdown-menu manage-menu" data-bind="event: {mouseleave: $parent.leaveDropdown}">
                             <li>
                                 <a href="#" data-bind="click:function() { $parent.navigate($parent.arches.urls.graph_designer(graphid)) }, attr: { href: $parent.arches.urls.graph_designer(graphid) }"><i class="fa fa-sitemap"></i> {% trans "Manage Graph" %}</a>
                             </li>
@@ -133,7 +134,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                         </ul>
                     </div>
                     <div style="margin-top: auto;">
-                        <p class="resource-status-label">{% trans "Status" %}: <span class="resource-status" data-bind="text:isactive?'{% trans "Active" %}':'{% trans "Inactive" %}'"></span></p>
+                        <p class="resource-status-label">{% trans "Status" %}: <span class="resource-status" data-bind="text:isactive?{% quoted_trans "Active" %}:{% quoted_trans "Inactive" %}"></span></p>
                     </div>
                 </div>
             </div>
