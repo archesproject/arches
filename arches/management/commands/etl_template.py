@@ -32,11 +32,11 @@ class Command(BaseCommand):
 
     def add_arguments(self, parser):
         parser.add_argument(
-            "-t", "--template", action="store", dest="template", default="branchcsv", help="Type of template you would like to create."
+            "-t", "--template", action="store", dest="template", default="branchcsv", help="Type of template you would like to create - options include 'branchcsv'."
         )
-        parser.add_argument("-d", "--dest", action="store", dest="dest", default="", help="Directory where template should be saved")
+        parser.add_argument("-d", "--dest", action="store", dest="dest", default="", help="Destination (directory and filename) where template should be saved. e.g. ~/Documents/mytemplate.xlsx")
         parser.add_argument(
-            "-g", "--graph", action="store", dest="graph", default="", help="Graph for which you would like an import template"
+            "-g", "--graph", action="store", dest="graph", default="", help="Graphid for your template"
         )
 
     def handle(self, *args, **options):
