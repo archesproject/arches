@@ -7,7 +7,6 @@ class Migration(migrations.Migration):
         ("models", "7262_report_template_data_fetch_bool"),
     ]
 
-
     operations = [
         migrations.RunSQL(
             """
@@ -41,4 +40,3 @@ class Migration(migrations.Migration):
             """,
         )
     ]
-
