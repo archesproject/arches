@@ -23,7 +23,7 @@ define([
                         return response.json();
                     }
                 }).then(function(response) {
-                    if (response &&  response.result === "success"){
+                    if (response?.result === "success"){
                         self.response(null);
                     }
                 }).catch(function(err) {    
