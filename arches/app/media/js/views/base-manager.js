@@ -40,6 +40,7 @@ define([
                 });
             });
             options.viewModel.resources = ko.computed(function() {
+                console.log("#(#(#", options, options.resources)
                 return  ko.utils.arrayFilter(options.viewModel.allGraphs(), function(graph) {
                     return graph.isresource;
                 });

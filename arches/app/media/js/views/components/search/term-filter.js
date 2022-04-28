@@ -3,11 +3,15 @@ define([
     'knockout-mapping',
     'underscore',
     'views/components/search/base-filter',
+    'utils/create-async-component',
     'bindings/term-search',
-], function(ko, koMapping, _, BaseFilter, termSearchComponent) {
+    'templates/views/components/search/term-filter.htm',
+], function(ko, koMapping, _, BaseFilter, createAsyncComponent) {
     var componentName = 'term-filter';
-    return ko.components.register(componentName, {
-        viewModel: BaseFilter.extend({
+
+    return createAsyncComponent(
+        componentName,
+        BaseFilter.extend({
             initialize: function(options) {
                 options.name = 'Term Filter';
                 BaseFilter.prototype.initialize.call(this, options);
@@ -103,6 +107,6 @@ define([
                 this.filter.tags.removeAll();
             }
         }),
-        template: window['term-filter-template']
-    });
+        'templates/views/components/search/term-filter.htm'
+    );
 });
