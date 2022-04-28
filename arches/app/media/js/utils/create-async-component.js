@@ -1,4 +1,8 @@
 define(['jquery', 'knockout', 'arches'], function($, ko, arches) {
+    function generateRandomString(spreadIntervalStart, spreadIntervalEnd) {
+        return Math.random().toString(36).substring(spreadIntervalStart,spreadIntervalEnd);
+    }
+
     function injectComponent(htmlElementId, params, viewModel, templatePath, hasAsyncViewModel) {
         $.ajax({
             type: 'GET',
@@ -20,7 +24,7 @@ define(['jquery', 'knockout', 'arches'], function($, ko, arches) {
     }
 
     return function createAsyncComponent(componentName, viewModel, templatePath, hasAsyncViewModel) {
-        const htmlElementId = `${componentName}--injection-site`;
+        const htmlElementId = `${componentName}--injection-site-${generateRandomString(2, 6)}`;
 
         return ko.components.register(componentName, {
             viewModel: function(params){

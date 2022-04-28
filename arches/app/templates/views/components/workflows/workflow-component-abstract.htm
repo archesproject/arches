@@ -1,19 +1,22 @@
 {% load i18n %}
 
 <div style="display: flex; height: 100%;">
+    <!-- ko with: $data.component -->
     <div class="workflow-component" style="width: 100%; height: inherit;">
         <!-- ko if: !loading() && !saving() && isStepActive() -->
-        <div class="workflow-component-element"
-        style="height: inherit; display: unset;"
-        data-bind="component: {
-            name: componentData['componentName'],
-            params: {
-                ...componentData['parameters'],
-                form: $data,
-                pageVm: $root,
-                value: $data.value
-            }
-        }"></div>
+        <div 
+            class="workflow-component-element"
+            style="height: inherit; display: unset;"
+            data-bind="component: {
+                name: componentData['componentName'],
+                params: {
+                    ...componentData['parameters'],
+                    form: $data,
+                    pageVm: $root,
+                    value: $data.value
+                }
+            }"
+        ></div>
         <!-- /ko -->
 
         <!-- ko if: componentData['tilesManaged'] === "many" -->
@@ -95,5 +98,6 @@
                 </div>
             </div>
         </div>
+    <!-- /ko -->
     <!-- /ko -->
 </div>
