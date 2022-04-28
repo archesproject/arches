@@ -5,113 +5,118 @@ define([
     'card-components',
     'report-templates',
     'views/components/search/base-filter',
+    'utils/create-async-component',
     'models/report',
     'viewmodels/card',
     'views/components/resource-report-abstract',
-    'bindings/chosen'
-], function($, _, ko, cardComponents, reportLookup, BaseFilter, ReportModel, CardViewModel) {
+    'bindings/chosen',
+    'templates/views/components/search/search-result-details.htm'
+], function($, _, ko, cardComponents, reportLookup, BaseFilter, createAsyncComponent, ReportModel, CardViewModel) {
     var componentName = 'search-result-details';
-    return ko.components.register(componentName, {
-        viewModel: BaseFilter.extend({
-            initialize: function(options) {
-                var self = this;
+    const viewModel = BaseFilter.extend({
+        initialize: function(options) {
+            var self = this;
 
-                options.name = 'Search Result Details';
-                this.requiredFilters = ['search-results'];
+            options.name = 'Search Result Details';
+            this.requiredFilters = ['search-results'];
 
-                BaseFilter.prototype.initialize.call(this, options);
+            BaseFilter.prototype.initialize.call(this, options);
 
-                this.options = options;
+            this.options = options;
 
-                this.report = ko.observable();
-                this.loading = ko.observable(false);
-                this.reportExpanded = ko.observable();
+            this.report = ko.observable();
+            this.loading = ko.observable(false);
+            this.reportExpanded = ko.observable();
 
-                var setSearchResults = function(){
-                    options.searchResultsVm = self.getFilter('search-results');
-                    options.searchResultsVm.details = self;
-                    options.filters[componentName](self);           
+            var setSearchResults = function(){
+                options.searchResultsVm = self.getFilter('search-results');
+                options.searchResultsVm.details = self;
+                options.filters[componentName](self);           
+            };
+
+            if (this.requiredFiltersLoaded() === false) {
+                this.requiredFiltersLoaded.subscribe(setSearchResults, this);
+            } else {
+                setSearchResults();
+            }
+
+            var query = this.query();
+            query['tiles'] = true;
+            this.query(query);
+
+            this.setupReport = function(source, bulkResourceReportCache, bulkDisambiguatedResourceInstanceCache) {    
+                self.loading(true);
+
+                var sourceData = {
+                    "tiles": source.tiles,
+                    "displayname": source.displayname,
+                    "resourceid": source.resourceinstanceid
                 };
 
-                if (this.requiredFiltersLoaded() === false) {
-                    this.requiredFiltersLoaded.subscribe(setSearchResults, this);
-                } else {
-                    setSearchResults();
-                }
+                var graphId = source['graph_id'];
+                var resourceId = source['resourceinstanceid'];
 
-                var query = this.query();
-                query['tiles'] = true;
-                this.query(query);
+                ko.computed(() => {
+                    bulkResourceReportCache();
+                    bulkDisambiguatedResourceInstanceCache();
 
-                this.setupReport = function(source, bulkResourceReportCache, bulkDisambiguatedResourceInstanceCache) {    
-                    self.loading(true);
+                    if(bulkResourceReportCache()[graphId] && bulkDisambiguatedResourceInstanceCache()[resourceId])
+                    {
+                        self.createReport(sourceData, bulkResourceReportCache()[graphId], bulkDisambiguatedResourceInstanceCache()[resourceId]);
+                        self.loading(false)
+                    }
+                });
 
-                    var sourceData = {
-                        "tiles": source.tiles,
-                        "displayname": source.displayname,
-                        "resourceid": source.resourceinstanceid
-                    };
+            };
 
-                    var graphId = source['graph_id'];
-                    var resourceId = source['resourceinstanceid'];
+            this.createReport = function(sourceData, bulkResourceReportCacheData, bulkDisambiguatedResourceInstanceCacheData) {
+                var data = { ...sourceData };
 
-                    ko.computed(() => {
-                        bulkResourceReportCache();
-                        bulkDisambiguatedResourceInstanceCache();
-
-                        if(bulkResourceReportCache()[graphId] && bulkDisambiguatedResourceInstanceCache()[resourceId])
-                        {
-                            self.createReport(sourceData, bulkResourceReportCache()[graphId], bulkDisambiguatedResourceInstanceCache()[resourceId]);
-                            self.loading(false)
-                        }
+                if (bulkResourceReportCacheData.graph) {
+                    data.cards = _.filter(bulkResourceReportCacheData.cards, function(card) {
+                        var nodegroup = _.find(bulkResourceReportCacheData.graph.nodegroups, function(group) {
+                            return group.nodegroupid === card.nodegroup_id;
+                        });
+                        return !nodegroup || !nodegroup.parentnodegroup_id;
+                    }).map(function(card) {
+                        return new CardViewModel({
+                            card: card,
+                            graphModel: bulkResourceReportCacheData.graphModel,
+                            resourceId: data.resourceid,
+                            displayname: data.displayname,
+                            cards: bulkResourceReportCacheData.cards,
+                            tiles: data.tiles,
+                            cardwidgets: bulkResourceReportCacheData.cardwidgets
+                        });
                     });
 
-                };
+                    data.templates = reportLookup;
+                    data.cardComponents = cardComponents;
 
-                this.createReport = function(sourceData, bulkResourceReportCacheData, bulkDisambiguatedResourceInstanceCacheData) {
-                    var data = { ...sourceData };
+                    var report = new ReportModel(_.extend(data, {
+                        graphModel: bulkResourceReportCacheData.graphModel,
+                        graph: bulkResourceReportCacheData.graph,
+                        datatypes: bulkResourceReportCacheData.datatypes,
+                    }));
 
-                    if (bulkResourceReportCacheData.graph) {
-                        data.cards = _.filter(bulkResourceReportCacheData.cards, function(card) {
-                            var nodegroup = _.find(bulkResourceReportCacheData.graph.nodegroups, function(group) {
-                                return group.nodegroupid === card.nodegroup_id;
-                            });
-                            return !nodegroup || !nodegroup.parentnodegroup_id;
-                        }).map(function(card) {
-                            return new CardViewModel({
-                                card: card,
-                                graphModel: bulkResourceReportCacheData.graphModel,
-                                resourceId: data.resourceid,
-                                displayname: data.displayname,
-                                cards: bulkResourceReportCacheData.cards,
-                                tiles: data.tiles,
-                                cardwidgets: bulkResourceReportCacheData.cardwidgets
-                            });
-                        });
-    
-                        data.templates = reportLookup;
-                        data.cardComponents = cardComponents;
+                    report.report_json = bulkDisambiguatedResourceInstanceCacheData;
 
-                        var report = new ReportModel(_.extend(data, {
-                            graphModel: bulkResourceReportCacheData.graphModel,
-                            graph: bulkResourceReportCacheData.graph,
-                            datatypes: bulkResourceReportCacheData.datatypes,
-                        }));
+                    self.report(report);
+                }
+                else {
+                    self.report({
+                        templateId: ko.observable(bulkResourceReportCacheData.template_id),
+                        report_json: bulkDisambiguatedResourceInstanceCacheData,
+                    });
 
-                        report.report_json = bulkDisambiguatedResourceInstanceCacheData;
-    
-                        self.report(report);
-                    }
-                    else {
-                        self.report({
-                            templateId: ko.observable(bulkResourceReportCacheData.template_id),
-                            report_json: bulkDisambiguatedResourceInstanceCacheData,
-                        });
-
-                    }
-                };
-            }
-        }),
-        template: window['search-result-details-template']
+                }
+            };
+        }
     });
+
+    return createAsyncComponent(
+        componentName,
+        viewModel,
+        'templates/views/components/search/search-result-details.htm'
+    );
 });
