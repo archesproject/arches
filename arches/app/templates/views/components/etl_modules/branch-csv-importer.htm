@@ -67,7 +67,7 @@
             <!-- ko foreach: {data: validationError, as: 'error'} -->
             <tr>
                 <td data-bind="text: error[0]"></td>
-                <td data-bind="text: error[1]"></td>
+                <td data-bind="text: error[1].replace('|','\n')" style= "white-space: pre-line;"></td>
             </tr>
             <!-- /ko -->        
         </table>
