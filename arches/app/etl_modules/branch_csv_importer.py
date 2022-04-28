@@ -110,10 +110,10 @@ class BranchCsvImporter:
                 valid = True if len(validation_errors) == 0 else False
                 if not valid:
                     tile_valid = False
-                error_message = ''
+                error_message = ""
                 for error in validation_errors:
-                    error_message = '{0}|{1}'.format(error_message, error['message']) if error_message != '' else error['message']
-                        
+                    error_message = "{0}|{1}".format(error_message, error["message"]) if error_message != "" else error["message"]
+
                 tile_value[nodeid] = {"value": value, "valid": valid, "source": source_value, "notes": error_message, "datatype": datatype}
             except KeyError as e:
                 pass
