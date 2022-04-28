@@ -1,6 +1,7 @@
 import os
 import logging
 import math
+import shutil
 import uuid
 import zipfile
 from openpyxl import load_workbook
@@ -20,6 +21,7 @@ class BranchCsvImporter:
         self.userid = request.user.id
         self.datatype_factory = DataTypeFactory()
         self.legacyid_lookup = {}
+        self.temp_path = ""
 
     def filesize_format(self, bytes):
         """Convert bytes to readable units"""
@@ -28,11 +30,6 @@ class BranchCsvImporter:
             return "0 kb"
         log = math.floor(math.log(bytes, 1024))
         return "{0:.2f} {1}".format(bytes / math.pow(1024, log), ["bytes", "kb", "mb", "gb"][int(log)])
-
-    def clear_temp_dir(self, dir):
-        for (dirpath, dirnames, filenames) in os.walk(dir):
-            for filename in filenames:
-                os.remove(os.path.join(dirpath, filename))
 
     def get_graph_tree(self, graphid):
         with connection.cursor() as cursor:
@@ -76,7 +73,7 @@ class BranchCsvImporter:
         try:
             uuid.UUID(resourceid)
             legacyid = None
-        except AttributeError:
+        except (AttributeError, ValueError):
             legacyid = resourceid
             if legacyid not in self.legacyid_lookup:
                 self.legacyid_lookup[legacyid] = uuid.uuid4()
@@ -97,14 +94,14 @@ class BranchCsvImporter:
                 source_value = row_details[key]
                 config = node_details["config"]
                 if datatype == "file-list":
-                    config["path"] = "tmp"
+                    config["path"] = self.temp_dir
                 try:
                     config["nodeid"] = nodeid
                 except TypeError:
                     config = {}
                 value = datatype_instance.transform_value_for_tile(source_value, **config) if source_value is not None else None
                 if datatype == "file-list":
-                    valid = True if len(datatype_instance.validate(value, nodeid=nodeid, path="tmp")) == 0 else False
+                    valid = True if len(datatype_instance.validate(value, nodeid=nodeid, path=self.temp_dir)) == 0 else False
                 else:
                     valid = True if len(datatype_instance.validate(value, nodeid=nodeid)) == 0 else False
                 if not valid:
@@ -193,7 +190,8 @@ class BranchCsvImporter:
     def read(self, request):
         self.loadid = request.POST.get("load_id")
         content = request.FILES["file"]
-        temp_dir = os.path.join(settings.APP_ROOT, "tmp")
+        self.temp_dir = os.path.join(settings.APP_ROOT, "tmp", self.loadid)
+        os.mkdir(self.temp_dir, 0o770)
         result = {"summary": {"name": content.name, "size": self.filesize_format(content.size), "files": {}}}
         with zipfile.ZipFile(content, "r") as zip_ref:
             files = zip_ref.infolist()
@@ -201,10 +199,10 @@ class BranchCsvImporter:
                 if not file.filename.startswith("__MACOSX"):
                     if not file.is_dir():
                         result["summary"]["files"][file.filename] = {"size": (self.filesize_format(file.file_size))}
-                    zip_ref.extract(file, temp_dir)
-        self.stage_excel_file(temp_dir, result["summary"]["files"])
-        self.clear_temp_dir(temp_dir)
+                    zip_ref.extract(file, self.temp_dir)
+        self.stage_excel_file(self.temp_dir, result["summary"]["files"])
         result["validation"] = self.validate(request)
+        shutil.rmtree(self.temp_dir)
         return {"success": result["validation"]["success"], "data": result}
 
     def validate(self, request):
