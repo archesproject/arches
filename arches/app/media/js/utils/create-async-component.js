@@ -24,7 +24,8 @@ define(['jquery', 'knockout', 'arches'], function($, ko, arches) {
     }
 
     return function createAsyncComponent(componentName, viewModel, templatePath, hasAsyncViewModel) {
-        const htmlElementId = `${componentName}--injection-site-${generateRandomString(2, 6)}`;
+        const cleanedComponentName = componentName.replace(/\//g, '-');
+        const htmlElementId = `${cleanedComponentName}--injection-site-${generateRandomString(2, 6)}`;
 
         return ko.components.register(componentName, {
             viewModel: function(params){
