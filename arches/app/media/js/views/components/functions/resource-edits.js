@@ -16,16 +16,16 @@ function(ko, FunctionViewModel, GraphModel, GraphTree) {
             });
             this.graphTree.selectItem = function(selectedNode){
                 if(self.nodeCollectsData(selectedNode)){
-                    selectedNode.selected(!selectedNode.selected())
+                    selectedNode.selected(!selectedNode.selected());
                 }
             };
             
             this.items = this.graphTree.items;
             this.items().forEach(function(node) {
-                var selected = this.config.selected_nodes().find(function(selected_nodeid){
-                    return node.id === selected_nodeid;
-                })
-                node.selected(!!selected)
+                var selected = this.config.selected_nodes().find(function(selectedNodeid){
+                    return node.id === selectedNodeid;
+                });
+                node.selected(!!selected);
             }, this);
 
             this.nodeCollectsData = function(node) {
@@ -37,7 +37,7 @@ function(ko, FunctionViewModel, GraphModel, GraphTree) {
             this.selectedNodes = ko.computed(function(){
                 return this.items().filter(function(node){
                     return node.selected();
-                })
+                });
             }, this);
 
             this.selectedNodeNames = ko.computed(function() {
@@ -46,12 +46,11 @@ function(ko, FunctionViewModel, GraphModel, GraphTree) {
                     if(currentnode.selected()) {
                         nodenames.push(currentnode.name());
                     }
-                }, nodenames)
+                }, nodenames);
                 return nodenames;
             }, this);
 
             this.selectedNodes.subscribe(function(nodes){
-                console.log(nodes);
                 var nodeids = [];
                 var nodegroups = [];
                 nodes.forEach(function(node) {
