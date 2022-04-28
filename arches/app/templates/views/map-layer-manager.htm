@@ -174,7 +174,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                             <!-- Service Styling -->
                             <div class="row map-service-container" style="padding-left: 10px; padding-right: 10px;">
                                 <div class="">
-                                    <div class="tab-base map-service-tabs" style="">
+                                    <div class="tab-base map-service-tabs">
 
                                         <!-- Resource Styling Tabs -->
                                         <ul class="nav nav-tabs map-service-nav-tabs">
@@ -191,19 +191,19 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                                             <div id="settings-panel" class="tab-pane fade active in">
                                                 <div class="row service-widget-container">
                                                     <div class="form-horizontal">
-                                                        <div class="panel-body" style="padding-top: 10px;">
+                                                        <div class="panel-body">
                                                             <div class="form-group map-service-manage-layer-name">
-                                                                <label class="control-label">{% trans "Layer Name:" %}</label>
-                                                                <div class="">
+                                                                <label class="col-sm-3 control-label map-service-manage-control-label">{% trans "Layer Name:" %}</label>
+                                                                <div class="col-sm-9">
                                                                     <input type="text" class="form-control" data-bind="valueUpdate: 'keyup', value: selection().name">
                                                                 </div>
                                                             </div>
 
                                                             <div class="form-group" map-service-manage-layer-name>
                                                                 <div>
-                                                                    <label class="control-label map-service-manage-control-label" data-bind="text: selection().isoverlay ? {% quoted_trans "Add to map by default:" %} : {% quoted_trans "Default basemap:" %}"></label>
+                                                                    <label class="col-sm-3 control-label map-service-manage-control-label" data-bind="text: selection().isoverlay ? {% quoted_trans "Add to map by default:" %} : {% quoted_trans "Default basemap:" %}"></label>
                                                                     
-                                                                    <span class="switch switch-small" style="margin-top: 0px;"data-bind="css: {
+                                                                    <span class="col-sm-9 switch switch-small" style="margin-top: 10px;"data-bind="css: {
                                                                                 'on': selection().addtomap()
                                                                             }, click: function () {
                                                                                 selection().addtomap(!selection().addtomap());

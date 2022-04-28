@@ -9589,7 +9589,8 @@ a.clear-geojson-button:hover {
 
 .map-style-panel-body-control-label {
     display: flex;
-    flex-direction: row-reverse;   
+    flex-direction: row-reverse;
+    margin: 0px 5px;
 }
 
 .clustering-pane-form-group {
@@ -10938,7 +10939,6 @@ table.table.dataTable {
         margin-bottom: 10px;
         display: flex;
         flex-wrap: wrap;
-        flex-direction: column;
     }
 }
 
@@ -11067,6 +11067,7 @@ table.table.dataTable {
     display: flex;
     flex-direction: column;
     flex-wrap: wrap;
+    width: 100%;
 }
 
 .hover-feature-loading {
