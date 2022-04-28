@@ -499,7 +499,7 @@ class CsvReader(Reader):
 
             return display_nodeids
 
-        def process_resourceid(resourceid, overwrite):
+        def process_resourceid(resourceid, legacyid, overwrite):
             # Test if resourceid is a UUID.
             try:
                 resourceinstanceid = uuid.UUID(resourceid)
@@ -509,11 +509,16 @@ class CsvReader(Reader):
                         Resource.objects.get(pk=resourceid).delete(index=False)
                     except:
                         ret = list(Resource.objects.filter(legacyid=resourceid))
+                        if legacyid:
+                            ret.extend(list(Resource.objects.filter(legacyid=legacyid)))
                         for r in ret:
                             r.delete(index=False)
             except:
                 # Get resources with the given legacyid
-                ret = Resource.objects.filter(legacyid=resourceid)
+                ret = list(Resource.objects.filter(legacyid=resourceid))
+                if legacyid:
+                    ret.extend(list(Resource.objects.filter(legacyid=legacyid)))
+
                 # If more than one resource is returned than make resource = None. This should never actually happen.
                 if len(ret) > 1:
                     resourceinstanceid = None
@@ -531,8 +536,9 @@ class CsvReader(Reader):
         try:
             with transaction.atomic():
                 save_count = 0
+                legacyid = business_data[0]["LegacyID"] if "LegacyID" in business_data[0] else None
                 try:
-                    resourceinstanceid = process_resourceid(business_data[0]["ResourceID"], overwrite)
+                    resourceinstanceid = process_resourceid(business_data[0]["ResourceID"], legacyid, overwrite)
                 except KeyError:
                     print("*" * 80)
                     print(
@@ -1258,7 +1264,7 @@ class CsvReader(Reader):
                         )
 
                         # reset values for next resource instance
-                        resourceinstanceid = process_resourceid(row["ResourceID"], overwrite)
+                        resourceinstanceid = process_resourceid(row["ResourceID"], legacyid, overwrite)
                         populated_cardinality_1_nodegroups.clear()
                         populated_cardinality_1_nodegroups[resourceinstanceid] = []
 
