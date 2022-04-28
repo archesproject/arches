@@ -104,12 +104,17 @@ class BranchCsvImporter:
                     config = {}
                 value = datatype_instance.transform_value_for_tile(source_value, **config) if source_value is not None else None
                 if datatype == "file-list":
-                    valid = True if len(datatype_instance.validate(value, nodeid=nodeid, path="tmp")) == 0 else False
+                    validation_errors = datatype_instance.validate(value, nodeid=nodeid, path="tmp")
                 else:
-                    valid = True if len(datatype_instance.validate(value, nodeid=nodeid)) == 0 else False
+                    validation_errors = datatype_instance.validate(value, nodeid=nodeid)
+                valid = True if len(validation_errors) == 0 else False
                 if not valid:
                     tile_valid = False
-                tile_value[nodeid] = {"value": value, "valid": valid, "source": source_value, "notes": None, "datatype": datatype}
+                error_message = ''
+                for error in validation_errors:
+                    error_message = '{0}|{1}'.format(error_message, error['message']) if error_message != '' else error['message']
+                        
+                tile_value[nodeid] = {"value": value, "valid": valid, "source": source_value, "notes": error_message, "datatype": datatype}
             except KeyError as e:
                 pass
 
