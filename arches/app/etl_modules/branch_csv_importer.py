@@ -24,7 +24,7 @@ class BranchCsvImporter:
     def filesize_format(self, bytes):
         """Convert bytes to readable units"""
         bytes = int(bytes)
-        if bytes is 0:
+        if bytes == 0:
             return "0 kb"
         log = math.floor(math.log(bytes, 1024))
         return "{0:.2f} {1}".format(bytes / math.pow(1024, log), ["bytes", "kb", "mb", "gb"][int(log)])
@@ -96,12 +96,17 @@ class BranchCsvImporter:
                 datatype_instance = self.datatype_factory.get_instance(datatype)
                 source_value = row_details[key]
                 config = node_details["config"]
+                if datatype == "file-list":
+                    config["path"] = "tmp"
                 try:
                     config["nodeid"] = nodeid
                 except TypeError:
                     config = {}
                 value = datatype_instance.transform_value_for_tile(source_value, **config) if source_value is not None else None
-                valid = True if len(datatype_instance.validate(value)) == 0 else False
+                if datatype == "file-list":
+                    valid = True if len(datatype_instance.validate(value, nodeid=nodeid, path="tmp")) == 0 else False
+                else:
+                    valid = True if len(datatype_instance.validate(value, nodeid=nodeid)) == 0 else False
                 if not valid:
                     tile_valid = False
                 tile_value[nodeid] = {"value": value, "valid": valid, "source": source_value, "notes": None, "datatype": datatype}
@@ -206,10 +211,8 @@ class BranchCsvImporter:
         """Validation is actually done - we're just getting the report here"""
         success = True
         with connection.cursor() as cursor:
-            cursor.execute("""SELECT __arches_load_staging_report_errors(%s)""", (self.loadid,))
+            cursor.execute("""SELECT * FROM __arches_load_staging_report_errors(%s)""", (self.loadid,))
             row = cursor.fetchall()
-            if len(row):
-                success = False
         return {"success": success, "data": row}
 
     def write(self, request):

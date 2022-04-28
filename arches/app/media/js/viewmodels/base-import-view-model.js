@@ -16,6 +16,7 @@ define(['jquery', 'knockout', 'uuid', 'arches', 'js-cookie'], function($, ko, uu
             return "unique_id_" + uuid.generate();
         });
         this.response = ko.observable();
+        this.validationError = ko.observable();
 
         this.addFile = function(file){
             self.loading(true);
@@ -29,6 +30,7 @@ define(['jquery', 'knockout', 'uuid', 'arches', 'js-cookie'], function($, ko, uu
                 }
             }).then(function(response) {
                 self.response(response);
+                self.validationError(response.result.validation.data);
             }).catch(function(err) {    
                 // eslint-disable-next-line no-console
                 console.log(err);
