@@ -10,20 +10,17 @@ define(['jquery', 'knockout', 'arches'], function($, ko, arches) {
             complete: function(e) {
                 const injectionSite = document.querySelector(`#${htmlElementId}`);
 
-                injectionSite.insertAdjacentHTML('afterend', e.responseText);
-                const injectionSiteNextSibling = injectionSite.nextElementSibling;  // gets rendered version of e.responseText
+                injectionSite.innerHTML = e.responseText;
+                injectionSite.style.display = 'contents';
 
                 if (hasAsyncViewModel === true) {
-                    ko.cleanNode(injectionSiteNextSibling);
-                    ko.applyBindings( params.asyncViewModel, injectionSiteNextSibling);
+                    ko.cleanNode(injectionSite);
+                    ko.applyBindings( params.asyncViewModel, injectionSite);
                 }
                 else if (viewModel) {
-                    ko.cleanNode(injectionSiteNextSibling);
-                    ko.applyBindings( new viewModel(ko.unwrap(params)), injectionSiteNextSibling);
+                    ko.cleanNode(injectionSite);
+                    ko.applyBindings( new viewModel(ko.unwrap(params)), injectionSite);
                 }
-
-                const injectionSiteParent = injectionSite.parentNode;
-                injectionSiteParent.removeChild(injectionSite);
             }
         });
     }
@@ -38,7 +35,7 @@ define(['jquery', 'knockout', 'arches'], function($, ko, arches) {
             },
             template: `
                 <div id=${htmlElementId}>
-                    <div data-bind="click: $data.injectComponent()"></div>
+                    <div data-bind="event: {load: $data.injectComponent()}"></div>
                 </div>
             `
         });
