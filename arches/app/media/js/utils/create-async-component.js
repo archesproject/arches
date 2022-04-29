@@ -9,16 +9,21 @@ define(['jquery', 'knockout', 'arches'], function($, ko, arches) {
             url: arches.urls.root + templatePath,
             complete: function(e) {
                 const injectionSite = document.querySelector(`#${htmlElementId}`);
-                injectionSite.innerHTML = e.responseText;
+
+                injectionSite.insertAdjacentHTML('afterend', e.responseText);
+                const injectionSiteNextSibling = injectionSite.nextElementSibling;  // gets rendered version of e.responseText
 
                 if (hasAsyncViewModel === true) {
-                    ko.cleanNode(injectionSite);
-                    ko.applyBindings( params.asyncViewModel, injectionSite );
+                    ko.cleanNode(injectionSiteNextSibling);
+                    ko.applyBindings( params.asyncViewModel, injectionSiteNextSibling);
                 }
                 else if (viewModel) {
-                    ko.cleanNode(injectionSite);
-                    ko.applyBindings( new viewModel(ko.unwrap(params)), injectionSite );
+                    ko.cleanNode(injectionSiteNextSibling);
+                    ko.applyBindings( new viewModel(ko.unwrap(params)), injectionSiteNextSibling);
                 }
+
+                const injectionSiteParent = injectionSite.parentNode;
+                injectionSiteParent.removeChild(injectionSite);
             }
         });
     }
@@ -32,9 +37,9 @@ define(['jquery', 'knockout', 'arches'], function($, ko, arches) {
                 this.injectComponent = function(){ injectComponent(htmlElementId, params, viewModel, templatePath, hasAsyncViewModel) }
             },
             template: `
-                <span style='width: 100%; height: 100%;' id=${htmlElementId}>
-                    <div style='display:none' data-bind="click: $data.injectComponent()"></div>
-                </span>
+                <div id=${htmlElementId}>
+                    <div data-bind="click: $data.injectComponent()"></div>
+                </div>
             `
         });
     }
