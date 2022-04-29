@@ -28,13 +28,6 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 
         <div class="flex search-results-panel">
             <div class="search-attribute-widget">
-
-                <script style="display: none;">
-                    window['saved-search-template'] = `{% include 'views/components/search/saved-searches.htm' %}`
-                    window['search-export-template'] = `{% include 'views/components/search/search-export.htm' %}`
-                    window['time-filter-template'] = `{% include 'views/components/search/time-filter.htm' %}`
-                </script>
-
                 <div class="search-dropdown" data-bind="component: {
                     name: 'term-filter',
                     params: sharedStateObject
