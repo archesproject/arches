@@ -115,9 +115,9 @@ add_validation_reporting_functions = """
                 END IF;
                 -- we could add the nodeid (_key), but let's not be verbose just yet
                 IF _result IS NULL THEN
-                _result := _note;
+                _result := _value ->> 'notes';
                 ELSE
-                _result := '|' || _note;
+                _result := '|' || _value ->> 'notes';
                 END IF;
             END IF;
         END LOOP;

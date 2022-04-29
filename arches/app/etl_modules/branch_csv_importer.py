@@ -5,6 +5,7 @@ import uuid
 import zipfile
 from openpyxl import load_workbook
 from django.db import connection
+from django.db.utils import IntegrityError
 from arches.app.datatypes.datatypes import DataTypeFactory
 from arches.app.models.models import Node
 from arches.app.models.system_settings import settings
@@ -104,12 +105,17 @@ class BranchCsvImporter:
                     config = {}
                 value = datatype_instance.transform_value_for_tile(source_value, **config) if source_value is not None else None
                 if datatype == "file-list":
-                    valid = True if len(datatype_instance.validate(value, nodeid=nodeid, path="tmp")) == 0 else False
+                    validation_errors = datatype_instance.validate(value, nodeid=nodeid, path="tmp")
                 else:
-                    valid = True if len(datatype_instance.validate(value, nodeid=nodeid)) == 0 else False
+                    validation_errors = datatype_instance.validate(value, nodeid=nodeid)
+                valid = True if len(validation_errors) == 0 else False
                 if not valid:
                     tile_valid = False
-                tile_value[nodeid] = {"value": value, "valid": valid, "source": source_value, "notes": None, "datatype": datatype}
+                error_message = ""
+                for error in validation_errors:
+                    error_message = "{0}|{1}".format(error_message, error["message"]) if error_message != "" else error["message"]
+
+                tile_value[nodeid] = {"value": value, "valid": valid, "source": source_value, "notes": error_message, "datatype": datatype}
             except KeyError as e:
                 pass
 
@@ -217,10 +223,12 @@ class BranchCsvImporter:
 
     def write(self, request):
         self.loadid = request.POST.get("load_id")
-        with connection.cursor() as cursor:
-            cursor.execute("""SELECT * FROM __arches_staging_to_tile(%s)""", [self.loadid])
-            row = cursor.fetchall()
-
+        try:
+            with connection.cursor() as cursor:
+                cursor.execute("""SELECT * FROM __arches_staging_to_tile(%s)""", [self.loadid])
+                row = cursor.fetchall()
+        except IntegrityError as e:
+            return {"success": False, "data": e}
         index_resources_by_transaction(self.loadid, quiet=True, use_multiprocessing=True)
         if row[0][0]:
             return {"success": True, "data": "success"}
