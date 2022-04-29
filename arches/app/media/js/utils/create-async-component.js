@@ -8,10 +8,11 @@ define(['jquery', 'knockout', 'arches'], function($, ko, arches) {
             type: 'GET',
             url: arches.urls.root + templatePath,
             complete: function(e) {
-                const injectionSite = document.querySelector(`#${htmlElementId}`);
+                const injectionSite = document.querySelector(`.${htmlElementId}`);
 
                 injectionSite.innerHTML = e.responseText;
                 injectionSite.style.display = 'contents';
+                injectionSite.className = null;
 
                 if (hasAsyncViewModel === true) {
                     ko.cleanNode(injectionSite);
@@ -34,7 +35,7 @@ define(['jquery', 'knockout', 'arches'], function($, ko, arches) {
                 this.injectComponent = function(){ injectComponent(htmlElementId, params, viewModel, templatePath, hasAsyncViewModel) }
             },
             template: `
-                <div id=${htmlElementId}>
+                <div class=${htmlElementId}>
                     <div data-bind="event: {load: $data.injectComponent()}"></div>
                 </div>
             `

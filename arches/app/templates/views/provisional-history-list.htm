@@ -22,7 +22,15 @@
             </select>
         </div>
 
-        <div data-bind="component: { name: 'views/components/simple-switch', params: {value: sortDescending, config:{ label: '{% trans "Youngest to oldest" %}', subtitle: ''}}}"></div>
+        <div 
+            data-bind="component: { 
+                name: 'views/components/simple-switch', 
+                params: {
+                    value: sortDescending, 
+                    config:{ label: '{% trans "Youngest to oldest" %}', subtitle: ''}
+                }
+            }"
+        ></div>
     </div>
     <!-- /ko -->
     {% endblock %}

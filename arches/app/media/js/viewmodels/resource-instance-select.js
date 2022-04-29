@@ -205,8 +205,10 @@ define([
                         }
                     })
                     .then(function(json) {
-                        resourceLookup[resourceid] = json["results"]["hits"]["hits"][0];
-                        return resourceLookup[resourceid];
+                        if (json) {
+                            resourceLookup[resourceid] = json["results"]["hits"]["hits"][0];
+                            return resourceLookup[resourceid];
+                        }
                     });
             }
         };
@@ -232,11 +234,13 @@ define([
                             }
                             self.lookupResourceInstanceData(ko.unwrap(val.resourceId))
                                 .then(function(resourceInstance) {
-                                    names.push(resourceInstance["_source"].displayname);
-                                    self.displayValue(names.join(', '));
-                                    val.resourceName(resourceInstance["_source"].displayname)
-                                    val.iconClass(self.graphLookup[resourceInstance["_source"].graph_id]?.iconclass || 'fa fa-question')
-                                    val.ontologyClass(resourceInstance["_source"].root_ontology_class);
+                                    if (resourceInstance) {
+                                        names.push(resourceInstance["_source"].displayname);
+                                        self.displayValue(names.join(', '));
+                                        val.resourceName(resourceInstance["_source"].displayname)
+                                        val.iconClass(self.graphLookup[resourceInstance["_source"].graph_id]?.iconclass || 'fa fa-question')
+                                        val.ontologyClass(resourceInstance["_source"].root_ontology_class);
+                                    }
                                 });
                         }
                     });

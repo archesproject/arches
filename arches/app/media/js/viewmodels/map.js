@@ -4,8 +4,8 @@ define([
     'knockout',
     'knockout-mapping',
     'arches',
-    'text!templates/views/components/map-popup.htm'
-], function($, _, ko, koMapping, arches, popupTemplate) {
+    'templates/views/components/map-popup.htm'
+], function($, _, ko, koMapping, arches) {
     const viewModel = function(params) {
         var self = this;
 
@@ -430,14 +430,21 @@ define([
             };
         };
 
-        this.popupTemplate = popupTemplate;
+        this.renderedPopupTemplate = null;
+        $.ajax({
+            type: 'GET',
+            url: arches.urls.root + 'templates/views/components/map-popup.htm',
+            complete: function(e) {
+                self.renderedPopupTemplate = e.responseText;
+            }
+        });
 
         this.onFeatureClick = function(features, lngLat, MapboxGl) {
             const map = self.map();
             const mapStyle = map.getStyle();
             self.popup = new MapboxGl.Popup()
                 .setLngLat(lngLat)
-                .setHTML(self.popupTemplate)
+                .setHTML(self.renderedPopupTemplate)
                 .addTo(map);
             ko.applyBindingsToDescendants(
                 self.getPopupData(features),
