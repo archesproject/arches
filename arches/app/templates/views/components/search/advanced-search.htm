@@ -44,10 +44,8 @@
                 <!-- Splash Title -->
                 <div class="rr-splash-title">{% trans "Advanced Search" %}</div>
                 <!-- Splash Instructions -->
-                <div class="rr-splash-description">{% trans "With Advanced Search you can build more sophisticated
-                    search queries." %}</div>
-                <div class="rr-splash-description">{% trans "Select the search facets you wish to query from the list on
-                    the right. Then enter your" %}</div>
+                <div class="rr-splash-description">{% trans "With Advanced Search you can build more sophisticated search queries." %}</div>
+                <div class="rr-splash-description">{% trans "Select the search facets you wish to query from the list on the right. Then enter your" %}</div>
                 <div class="rr-splash-description">{% trans "criteria to customize your search filters" %}</div>
             </div>
         </div>
@@ -55,11 +53,9 @@
         <!-- ko if: $index  -->
         <div class="btn-group btn-group-sm facet-btn-group">
             <button class="btn btn-warning btn-active-dark facet-btn"
-                data-bind="css: {'selected': value.op() === 'and'}, click: function () { value.op('and'); }">{% trans
-                "And" %}</button>
+                data-bind="css: {'selected': value.op() === 'and'}, click: function () { value.op('and'); }">{% trans "And" %}</button>
             <button class="btn btn-warning btn-active-dark facet-btn"
-                data-bind="css: {'selected': value.op() === 'or'}, click: function () { value.op('or'); }">{% trans "Or"
-                %}</button>
+                data-bind="css: {'selected': value.op() === 'or'}, click: function () { value.op('or'); }">{% trans "Or" %}</button>
         </div>
         <!-- /ko -->
         <div class="faceted-search-card-container">
@@ -82,8 +78,7 @@
                 <!-- /ko -->
                 <div class="facet-search-button pull-right">
                     <button class="btn btn-sm btn-primary"
-                        data-bind="click: function (facet) { self.filter.facets.remove(facet); }">{% trans "Remove"
-                        %}</button>
+                        data-bind="click: function (facet) { self.filter.facets.remove(facet); }">{% trans "Remove" %}</button>
                 </div>
             </div>
         </div>
