@@ -6,8 +6,10 @@ define([
     'report-templates',
     'models/report',
     'models/graph',
-    'viewmodels/card'
-], function($, _, ko, arches, reportLookup, ReportModel, GraphModel) {
+    'utils/create-async-component',
+    'viewmodels/card',
+    'templates/views/components/resource-report-abstract.htm'
+], function($, _, ko, arches, reportLookup, ReportModel, GraphModel, createAsyncComponent) {
     var ResourceReportAbstract = function(params) {
         var self = this;
         var CardViewModel = require('viewmodels/card');
@@ -135,9 +137,12 @@ define([
 
         self.initialize();
     };
-    ko.components.register('resource-report-abstract', {
-        viewModel: ResourceReportAbstract,
-        template: window['resource-report-abstract-template']
-    });
+
+    createAsyncComponent(
+        'resource-report-abstract',
+        ResourceReportAbstract,
+        'templates/views/components/resource-report-abstract.htm'
+    )
+
     return ResourceReportAbstract;
 });

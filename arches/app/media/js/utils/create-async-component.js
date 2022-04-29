@@ -4,15 +4,15 @@ define(['jquery', 'knockout', 'arches'], function($, ko, arches) {
     }
 
     function injectComponent(htmlElementId, params, viewModel, templatePath, hasAsyncViewModel) {
+        const injectionSite = document.querySelector(`.${htmlElementId}`);
+        injectionSite.style.display = 'contents';
+        injectionSite.className = '';
+
         $.ajax({
             type: 'GET',
             url: arches.urls.root + templatePath,
             complete: function(e) {
-                const injectionSite = document.querySelector(`.${htmlElementId}`);
-
                 injectionSite.innerHTML = e.responseText;
-                injectionSite.style.display = 'contents';
-                injectionSite.className = null;
 
                 if (hasAsyncViewModel === true) {
                     ko.cleanNode(injectionSite);

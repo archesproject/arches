@@ -1,9 +1,12 @@
 define([
     'knockout',
-    'viewmodels/card-component'
-], function(ko, CardComponentViewModel) {
-    return ko.components.register('default-card', {
-        viewModel: CardComponentViewModel,
-        template: window['default-card-template']
-    });
+    'viewmodels/card-component',
+    'utils/create-async-component',
+    'templates/views/components/cards/default.htm'
+], function(ko, CardComponentViewModel, createAsyncComponent) {
+    return createAsyncComponent(
+        'default-card',
+        CardComponentViewModel,
+        'templates/views/components/cards/default.htm'
+    );
 });

@@ -42,9 +42,6 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
     <link rel="shortcut icon" href="{% static 'img/favicon.png' %}" />
 
     <script style="display: none;">
-        window['related-resources-graph-template'] = `{% include 'views/components/related-resources-graph.htm' %}`
-        window['map-component-template'] = `{% include 'views/components/map.htm' %}`
-
         window['default-report-template'] = `{% include 'views/report-templates/default.htm' %}`
         window['map-report-template'] = `{% include 'views/report-templates/map.htm' %}`
 
@@ -89,10 +86,6 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
         window['switch-widget-template'] = `{% include 'views/components/widgets/switch.htm' %}`
         window['text-widget-template'] = `{% include 'views/components/widgets/text.htm' %}`
         window['urldatatype-widget-template'] = `{% include 'views/components/widgets/urldatatype.htm' %}`
-
-        window['resource-report-abstract-template'] = `{% include 'views/components/resource-report-abstract.htm' %}`
-
-
     </script>
     {% block css %}
         {% compress css %}
