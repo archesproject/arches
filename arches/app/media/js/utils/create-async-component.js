@@ -3,10 +3,12 @@ define(['jquery', 'knockout', 'arches'], function($, ko, arches) {
         return Math.random().toString(36).substring(spreadIntervalStart,spreadIntervalEnd);
     }
 
-    function injectComponent(htmlElementId, params, viewModel, templatePath, hasAsyncViewModel) {
-        const injectionSite = document.querySelector(`.${htmlElementId}`);
+    function injectComponent(injectionSite, componentName, params, viewModel, templatePath, hasAsyncViewModel) {
+        const cleanedComponentName = componentName.replace(/\//g, '-');
+        const htmlElementId = `${cleanedComponentName}--injection-site-${generateRandomString(2, 6)}`;
+
         injectionSite.style.display = 'contents';
-        injectionSite.className = '';
+        injectionSite.id = htmlElementId;
 
         $.ajax({
             type: 'GET',
@@ -27,16 +29,13 @@ define(['jquery', 'knockout', 'arches'], function($, ko, arches) {
     }
 
     return function createAsyncComponent(componentName, viewModel, templatePath, hasAsyncViewModel) {
-        const cleanedComponentName = componentName.replace(/\//g, '-');
-        const htmlElementId = `${cleanedComponentName}--injection-site-${generateRandomString(2, 6)}`;
-
         return ko.components.register(componentName, {
             viewModel: function(params){
-                this.injectComponent = function(){ injectComponent(htmlElementId, params, viewModel, templatePath, hasAsyncViewModel) }
+                this.injectComponent = function(injectionSite){ injectComponent(injectionSite, componentName, params, viewModel, templatePath, hasAsyncViewModel) }
             },
             template: `
-                <div class=${htmlElementId}>
-                    <div data-bind="event: {load: $data.injectComponent()}"></div>
+                <div>
+                    <div data-bind="event: {load: $data.injectComponent($element.parentElement)}"></div>
                 </div>
             `
         });

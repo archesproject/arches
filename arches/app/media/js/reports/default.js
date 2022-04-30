@@ -1,10 +1,17 @@
-define(['knockout', 'viewmodels/report'], function(ko, ReportViewModel) {
-    return ko.components.register('default-report', {
-        viewModel: function(params) {
-            params.configKeys = [];
+define([
+    'knockout', 
+    'viewmodels/report', 
+    'utils/create-async-component',
+    '../../../templates/views/report-templates/default.htm'
+], function(ko, ReportViewModel, createAsyncComponent) {
+    const viewModel = function(params) {
+        params.configKeys = [];
+        ReportViewModel.apply(this, [params]);
+    };
 
-            ReportViewModel.apply(this, [params]);
-        },
-        template: window['default-report-template']
-    });
+    return createAsyncComponent(
+        'default-report',
+        viewModel,
+        '../../../templates/views/report-templates/default.htm'
+    );
 });
