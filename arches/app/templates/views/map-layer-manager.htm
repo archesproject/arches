@@ -125,8 +125,8 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                             </div>
                         </div>
 
-                        <div class="panel-body basemap-preview-panel">
-                            <div class="row map-service-container">
+                        <div class="panel-body map-preview-panel">
+                            <div class="map-service-container">
                                 <div>
                                     <h3 class="config-title"><i class="fa fa-binoculars"></i> {% trans "Layer Preview" %}</h3>
 
@@ -172,7 +172,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                             </div>
 
                             <!-- Service Styling -->
-                            <div class="row map-service-container" style="padding-left: 10px; padding-right: 10px;">
+                            <div class="map-service-container">
                                 <div class="">
                                     <div class="tab-base map-service-tabs">
 
@@ -227,36 +227,15 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                                                             </div>
 
                                                             <div class="form-group">
-                                                                <!-- Icon search -->
-                                                                <div style="padding-left: 10px;">
-                                                                    <div class="relative" style="padding: 10px 0px;">
-
-                                                                        <div>
-                                                                            {% trans "Layer icon:" %}
-                                                                            <button data-bind="css: 'btn btn-default btn-icon icon-lg ' + selection().icon(), click: function() {}" style="height: 35px; width: 35px;"></button>
-                                                                        </div>
-
-                                                                        <div style="position: absolute; left: 110px; top: 10px;">
-                                                                            <input type="text" class="form-control" style="width: 366px; height: 36px;" placeholder="{% trans "Find an icon" %}" data-bind="value:iconFilter, valueUpdate: 'keyup'">
-
-                                                                            <!-- ko if: iconFilter() !== '' -->
-                                                                            <span class="clear-search" style="position: absolute; left: 345px; top: 5px; color: #123; font-size: 17px;" data-bind="click: function () { iconFilter(''); }"><i class="fa fa-times-circle"></i></span>
-                                                                            <!-- /ko -->
-                                                                        </div>
-                                                                    </div>
-                                                                </div>
-
-                                                                <!-- Icon List -->
-                                                                <div style="height: 300px;overflow-y: scroll;padding: 15px;border: 1px solid #e9e9e9;">
-                                                                    <div class="row">
-
-                                                                        <!-- ko foreach: icons -->
-                                                                        <div class="col-xs-6 col-md-3 col-sm-4 demo-icon-font" data-bind="css: {'selected': (cssclass === $root.selection().icon())}, click: function() { $root.selection().icon(cssclass) }">
-                                                                            <i data-bind="css: cssclass"></i> <span data-bind="text: name"></span>
-                                                                        </div>
-                                                                        <!-- /ko -->
-
-                                                                    </div>
+                                                                <div data-bind="component: {
+                                                                    name: 'views/components/icon-selector',
+                                                                    params: {
+                                                                        selectedIconObservable: selection().icon,
+                                                                        iconFilter: iconFilter,
+                                                                        iconList: icons,
+                                                                        label: {% quoted_trans "Layer icon:" %}
+                                                                    }
+                                                                }">
                                                                 </div>
                                                             </div>
 
@@ -287,18 +266,6 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 
                                         </div>
                                     </div>
-                                </div>
-                            </div>
-
-                            <div style="display: flex; margin: 0 12.5px;">
-                                <div style="flex: 1"></div>
-                                <div>
-                                    <button class="btn btn-danger btn-labeled btn-active-dark fa fa-trash pull-right mar-top" data-bind="click: function () { selection().delete() }"><span>{% trans "Delete Layer" %}</span></button>
-
-                                    <!-- ko if: selection().dirty() -->
-                                    <button class="btn btn-primary btn-labeled btn-active-dark fa fa-check pull-right mar-top" data-bind="click: function () { selection().save() }"><span>{% trans "Save Edits" %}</span></button>
-                                    <button class="btn btn-mint btn-labeled btn-active-dark fa fa-undo pull-right mar-top" data-bind="click: function () { selection().reset() }"><span>{% trans "Discard Edits" %}</span></button>
-                                    <!-- /ko -->
                                 </div>
                             </div>
 

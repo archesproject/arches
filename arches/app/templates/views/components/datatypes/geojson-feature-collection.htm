@@ -1,6 +1,8 @@
+{% load template_tags %}
 {% load i18n %}
+
 <!-- ko if: $data.layer -->
-<div class="row map-service-container">
+<div class="map-service-container">
 
 
     <div class="flex">
@@ -60,7 +62,7 @@
     <!-- /ko -->
 
     <!-- Service Styling -->
-    <div class="row map-service-container" style="padding-left: 13px; padding-right: 13px;">
+    <div class="map-service-container">
         <div class="flex" style="width:100%">
             <div class="tab-base map-service-tabs">
 
@@ -105,36 +107,15 @@
                                         </div>
                                     </div>
                                     <div class="form-group">
-                                        <!-- Icon search -->
-                                        <div style="padding-left: 10px;">
-                                            <div class="relative" style="padding: 10px 0px;">
-
-                                                <div>
-                                                    {% trans "Layer icon:" %}
-                                                    <button data-bind="css: 'btn btn-default btn-icon icon-lg ' + (config.layerIcon() || layer.icon), click: function() {}" style="height: 35px; width: 35px;"></button>
-                                                </div>
-
-                                                <div style="position: absolute; margin: 0 110px; top: 10px;">
-                                                    <input type="text" class="form-control" style="width: 366px; height: 36px;" placeholder="{% trans "Find an icon" %}" data-bind="value:iconFilter, valueUpdate: 'keyup'">
-
-                                                    <!-- ko if: iconFilter() !== '' -->
-                                                    <span class="clear-search" style="position: absolute; left: 345px; top: 5px; color: #123; font-size: 17px;" data-bind="click: function () { iconFilter(''); }"><i class="fa fa-times-circle"></i></span>
-                                                    <!-- /ko -->
-                                                </div>
-                                            </div>
-                                        </div>
-
-                                        <!-- Icon List -->
-                                        <div style="height: 300px;overflow-y: scroll;padding: 15px;border: 1px solid #e9e9e9;">
-                                            <div class="row map-service-manage-icon-selector">
-
-                                                <!-- ko foreach: icons -->
-                                                <div class="col-xs-6 col-md-3 col-sm-4 demo-icon-font" data-bind="css: {'selected': (cssclass === ($parent.config.layerIcon() || $parent.layer.icon))}, click: function() { $parent.config.layerIcon(cssclass) }">
-                                                    <i data-bind="css: cssclass"></i> <span data-bind="text: name"></span>
-                                                </div>
-                                                <!-- /ko -->
-
-                                            </div>
+                                        <div data-bind="component: {
+                                            name: 'views/components/icon-selector',
+                                            params: {
+                                                selectedIconObservable: config.layerIcon,
+                                                iconFilter: iconFilter,
+                                                iconList: icons,
+                                                label: {% quoted_trans " Layer icon:"%} 
+                                            } 
+                                        }">
                                         </div>
                                     </div>
                                     <div class="form-group">
@@ -376,10 +357,6 @@
                         </div>
                     </div>
                 </div>
-                <!-- ko if: node.dirty() -->
-                <button class="btn btn-primary btn-labeled btn-active-dark fa fa-check pull-right mar-top" data-bind="click: function () { saveNode() }"><span>{% trans "Save Edits" %}</span></button>
-                <button class="btn btn-mint btn-labeled btn-active-dark fa fa-undo pull-right mar-top" data-bind="click: function () { node.reset() }"><span>{% trans "Discard Edits" %}</span></button>
-                <!-- /ko -->
             </div>
         </div>
     </div>
