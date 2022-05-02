@@ -1,20 +1,26 @@
 define([
     'knockout',
     'underscore',
-], function(ko, _) {
+    'utils/create-async-component',
+    'templates/views/components/datatypes/file-list.htm'
+], function(ko, _, createAsyncComponent) {
     var name = 'file-list-datatype-config';
-    ko.components.register(name, {
-        viewModel: function(params) {
-            this.config = params.config;
-            this.search = params.search;
-            this.maxFiles = ko.observable(params.config.maxFiles());
-            this.maxFiles.subscribe(function(val) {
-                var int = parseInt(val);
-                if(int > 0) { params.config.maxFiles(int); }
-            });
-            this.activated = params.config.activateMax;
-        },
-        template: window['file-list-datatype-template']
-    });
+    const viewModel = function(params) {
+        this.config = params.config;
+        this.search = params.search;
+        this.maxFiles = ko.observable(params.config.maxFiles());
+        this.maxFiles.subscribe(function(val) {
+            var int = parseInt(val);
+            if(int > 0) { params.config.maxFiles(int); }
+        });
+        this.activated = params.config.activateMax;
+    };
+
+    createAsyncComponent(
+        name,
+        viewModel,
+        'templates/views/components/datatypes/file-list.htm'
+    );
+
     return name;
 });
