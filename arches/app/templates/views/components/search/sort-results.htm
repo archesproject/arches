@@ -1,7 +1,8 @@
+{% load template_tags %}
 {% load i18n %}
 
 <!-- Sort Results Selector-->
-<select style="text-align-last:unset;" data-bind="value: filter, options: [{'id':'', 'name':'{% trans "Unsorted" %}'}, {'id':'asc', 'name':'{% trans "Ascending" %}'}, {'id':'desc', 'name'
-    : '{% trans "Descending" %}' }], chosen: { width: '100%', disable_search: true}, optionsText: 'name' , optionsValue: 'id' ,">
+<select style="text-align-last:unset;" data-bind="value: filter, options: [{'id':'', 'name':{% quoted_trans "Unsorted" %}}, {'id':'asc', 'name':{% quoted_trans "Ascending" %}}, {'id':'desc', 'name'
+    : {% quoted_trans "Descending" %} }], chosen: { width: '100%', disable_search: true}, optionsText: 'name' , optionsValue: 'id' ,">
 </select>
 <!-- End Sort Results Selector-->

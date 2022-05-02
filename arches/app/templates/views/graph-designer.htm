@@ -17,6 +17,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 -->
 {% extends "base-manager.htm" %}
 {% load staticfiles %}
+{% load template_tags %}
 {% load i18n %}
 
 
@@ -30,7 +31,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 <div class="ep-tools-title">
     <h1 class="page-header text-overflow ep-graph-title">
         <i class="text-center icon-wrap bg-gray ep-graph-title-icon" data-bind="css: (graph.iconclass() || 'fa fa-question')" ></i>
-        <span data-bind="text: graph.name()"></span><span class="graph-type" data-bind="text: graph.isresource() ? '({% trans "Resource Model" %})' : '({% trans "Branch" %})'"></span>
+        <span data-bind="text: graph.name()"></span><span class="graph-type" data-bind="text: graph.isresource() ? &quot;({% trans "Resource Model" %})&quot; : &quot;({% trans "Branch" %})&quot;"></span>
     </h1>
 </div>
 {% endblock graph_title %}
@@ -49,7 +50,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                 <script type="text/html" id="selectGraphTemplate">
                     <option disabled selected value>{% trans "Find a Resource Model/Branch..." %}</option>
                     <!-- ko foreach: groups -->
-                        <optgroup data-bind="attr: { 'label': (name==='Resource Models')?'{% trans "Resource Models" %}':'{% trans "Branches" %}' }, foreach: items">
+                        <optgroup data-bind="attr: { 'label': (name==='Resource Models')?{% quoted_trans "Resou$rce Models" %}:{% quoted_trans "Branches" %}}, foreach: items">
                             <option data-bind="value: graphid, text: name"></option>
                         </optgroup>
                     <!-- /ko -->

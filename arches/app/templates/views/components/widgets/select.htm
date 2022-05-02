@@ -1,4 +1,5 @@
 {% extends "views/components/widgets/base.htm" %}
+{% load template_tags %}
 {% load i18n %}
 
 {% block form %}
@@ -51,7 +52,7 @@
                             data: options,
                             value: defaultValue,
                             multiple: multiple,
-                            placeholder: '{% trans "Select default value" %}',
+                            placeholder: {% quoted_trans "Select default value" %},
                             allowClear: true
                         }
                     }">
