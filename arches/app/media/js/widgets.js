@@ -9,9 +9,6 @@ define(['require'], function (require) {
     const widgets = JSON.parse(removeTrailingCommaFromObject(widgetData));
 
     Object.keys(widgets).forEach((key) => {
-        require('views/components/widgets/sample-widget');
-        require('views/components/widgets/resource-instance-select');
-        
         try {  // first try to load project path
             require(`../../../../../sfplanning/sfplanning/media/js/${widgets[key]['component']}`);
         }

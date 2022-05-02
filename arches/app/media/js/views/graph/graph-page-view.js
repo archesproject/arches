@@ -2,7 +2,7 @@ define([
     'knockout',
     'underscore',
     'views/base-manager',
-    'graph-base-data',
+    'views/graph/graph-base-data',
     'bindings/chosen',
 ], function(ko, _, BaseManager, data) {
     /**

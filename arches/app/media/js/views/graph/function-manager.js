@@ -9,7 +9,7 @@ require([
     'views/graph/function-manager/applied-function-list',
     'models/function',
     'models/function-x-graph',
-    'graph-base-data',
+    'views/graph/graph-base-data',
 ], function($, _, ko, arches, GraphPageView, JsonErrorAlertViewModel, FunctionList, AppliedFunctionList, FunctionModel, FunctionXGraphModel, baseData) {
     const data = window['graph-functions-data'];
 
