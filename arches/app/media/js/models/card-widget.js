@@ -140,7 +140,13 @@ define([
                         },
                         write: function(value) {
                             var key;
-                            var defaultConfig = JSON.parse(widgets[value].defaultconfig);
+
+                            let defaultConfig = ko.unwrap(widgets[value].defaultconfig);
+                            if (
+                                !(defaultConfig instanceof Object)
+                            ) {
+                                defaultConfig = JSON.parse(ko.unwrap(widgets[value].defaultconfig));
+                            }
                             for (key in defaultConfig) {
                                 defaultConfig[key] = ko.observable(defaultConfig[key]);
                             }
