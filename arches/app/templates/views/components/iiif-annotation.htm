@@ -1,4 +1,5 @@
 {% extends "views/components/iiif-viewer.htm" %}
+{% load template_tags %}
 {% load i18n %}
 
 {% block tabs %}
@@ -109,7 +110,7 @@
                                     <div class="style-tools-collapser" data-bind=" click: function() {
                                         self.showStylingTools(!self.showStylingTools());
                                     }">
-                                        <span data-bind="text: self.showStylingTools() ? '{% trans "Hide Style Tools" %}' : '{% trans "Show Style Tools" %}'"></span>
+                                        <span data-bind="text: self.showStylingTools() ? {% quoted_trans "Hide Style Tools" %} : {% quoted_trans "Show Style Tools" %}"></span>
                                         <i class="fa" data-bind="{
                                             css: {
                                                 'fa-caret-down' : !self.showStylingTools(),
