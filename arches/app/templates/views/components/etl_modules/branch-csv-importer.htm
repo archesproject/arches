@@ -96,7 +96,7 @@
         <!-- /ko -->
         <!-- ko if: validationError()?.length > 0 || loadStatus() == "failed" -->
          <button class="btn btn-shim btn-labeled btn-lg fa fa-undo btn-danger" data-bind="click: function(){
-             alert().close();
+             alert()?.close();
              response(null);
              loadStatus('ready');
             }">{% trans "Reload" %}</button>
