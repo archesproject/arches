@@ -328,6 +328,7 @@
                 </span>
                 <!--/ko -->
                 <!--ko if: manifestError() -->
+                <span data-bind="text: console.log(manifestError())"></span>
                 <span class="manifest-editor-error">
                     {% trans "Error loading manifest..." %}
                 </span>

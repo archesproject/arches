@@ -1,3 +1,5 @@
+const {map} = require("jquery");
+
 define([
     'arches',
     'jquery',
@@ -52,6 +54,8 @@ define([
         this.showImageModifiers = ko.observable(false);
         this.renderContext = ko.observable(params.renderContext);
         this.showModeSelector = ko.observable(true);
+        this.primaryLayerLoaded = true;
+        this.secondaryLayerLoaded = true;
         let primaryPanelFilters
         let secondaryPanelFilters;
 
@@ -97,13 +101,15 @@ define([
         this.compareMode.subscribe((mode) => {
             if(!mode){
                 const map = self.map();
-                if(sideBySideControl){
+
+                if(secondaryCanvasLayer && map.hasLayer(secondaryCanvasLayer)){
+                    map.removeLayer(secondaryCanvasLayer)
+                }
+
+                if(sideBySideControl && sideBySideControl?._map){
                     map.removeControl(sideBySideControl);
                 }
     
-                if(secondaryCanvasLayer){
-                    map.removeLayer(secondaryCanvasLayer)
-                }
                 self.secondaryCanvas(undefined);
                 self.secondaryLabel(undefined);
                 self.showImageModifiers(false);
@@ -349,7 +355,7 @@ define([
                 return `<div class="image"><img src="${item.thumbnail}"/></div><div class="title">${item.label}</div>`; 
             },
             formatSelection: function(item) {
-                return item.label;
+                return item?.label;
             },
             clear: function(abc) {
                 self.canvases('');
@@ -511,28 +517,29 @@ define([
 
         const loadComparison = () => {
             const map = self.map();
-            if(map){
+            if(map && self.primaryLayerLoaded && self.secondaryLayerLoaded){
+                // remove the control if it's been added to the map already
                 if(sideBySideControl){
                     map.removeControl(sideBySideControl);
                 }
-                sideBySideControl = L.control.sideBySide(canvasLayer, secondaryCanvasLayer)
+
+                // add the control back, comparing the appropriate layers
+                sideBySideControl = L.control.sideBySide(canvasLayer, secondaryCanvasLayer);
                 sideBySideControl.addTo(map);
                 map.fitBounds(map.getBounds());
             }
         };
 
-        var addCanvasLayer = function() {
+        var updatePrimaryCanvasLayer = function() {
             const map = self.map();
             const canvas = self.canvas();
-            const secondaryCanvas = self.secondaryCanvas();
 
-            if(canvas && canvas != self.imageToolSelector()){
-                self.selectPrimaryPanel(true);
+            if(self.selectPrimaryPanel() && canvas && canvas != self.imageToolSelector()){
                 self.imageToolSelector(canvas);
             }
 
             if (map && canvas) {
-                if (canvasLayer) {
+                if (canvasLayer && map.hasLayer(canvasLayer)) {
                     map.removeLayer(canvasLayer);
                     canvasLayer = undefined;
                 }
@@ -543,8 +550,9 @@ define([
                     });
                     canvasLayer.addTo(map);
 
-                    if(secondaryCanvas){
-                        canvasLayer.on('tileload', loadComparison)
+                    if(self.compareMode()){
+                        self.primaryLayerLoaded = false;
+                        canvasLayer.on('load', primaryLayerLoaded)
                     }
                     updateCanvasLayerFilter();
                 }
@@ -552,7 +560,12 @@ define([
             self.zoomToCanvas = false;
         };
 
-        const compareCanvasLayers = (value) => {
+        const primaryLayerLoaded = function() {
+            self.primaryLayerLoaded = true;
+            loadComparison();
+        }
+
+        const updateSecondaryCanvasLayer = () => {
             const map = self.map();
             const primaryCanvas = self.canvas();
             const secondaryCanvas = self.secondaryCanvas();
@@ -562,7 +575,7 @@ define([
             }
 
             if (map && primaryCanvas && secondaryCanvas) {
-                if(secondaryCanvasLayer) {
+                if(secondaryCanvasLayer && map.hasLayer(secondaryCanvasLayer)) {
                     map.removeLayer(secondaryCanvasLayer);
                     secondaryCanvasLayer = undefined;
                 }
@@ -572,23 +585,28 @@ define([
                     className: "iiif-layer-secondary"
                 }).addTo(map);
 
-                
-
-                secondaryCanvasLayer.on('tileload', loadComparison)
+                self.secondaryLayerLoaded = false;                
+                secondaryCanvasLayer.on('load', secondaryLayerLoaded)
                 
                 updateCanvasLayerFilter();
             }
         };
 
+        const secondaryLayerLoaded = function() {
+            self.secondaryLayerLoaded = true;
+            self.canvas.valueHasMutated();
+            loadComparison();
+        }
+
         this.map.subscribe(function(map) {
             L.control.fullscreen({
                 fullscreenElement: $(map.getContainer()).closest('.workbench-card-wrapper')[0]
             }).addTo(map);
-            addCanvasLayer();
+            updatePrimaryCanvasLayer();
             map.addLayer(annotationFeatureGroup);
         });
-        this.canvas.subscribe(addCanvasLayer);
-        this.secondaryCanvas.subscribe(compareCanvasLayers)
+        this.canvas.subscribe(updatePrimaryCanvasLayer);
+        this.secondaryCanvas.subscribe(updateSecondaryCanvasLayer);
 
         this.setSecondaryCanvas = (canvas) => {
             const service = self.getCanvasService(canvas);
@@ -605,12 +623,9 @@ define([
             if (service && self.selectPrimaryPanel()) {
                 self.canvas(service);
                 self.canvasObject(canvas);
-                //self.origCanvasLabel = self.getManifestDataValue(canvas, 'label', true);
-                //self.canvasLabel(self.getManifestDataValue(canvas, 'label', true));
             } else {
                 self.secondaryCanvas(service);
                 self.secondaryCanvasObject(canvas);
-                //self.secondaryLabel(self.getManifestDataValue(canvas, 'label', true));
             }
         };
 
@@ -634,7 +649,14 @@ define([
                             canvasIndex = sequence.canvases.findIndex(function(c){return c.images[0].resource.service['@id'] === self.canvas();});
                         }
                         var canvas = sequence.canvases[canvasIndex];
-                        self.selectCanvas(canvas);
+                        
+                        if(self.compareMode()){
+                            self.primaryLayerLoaded = false;
+                            self.secondaryLayerLoaded = false;
+                            const service = self.getCanvasService(canvas)
+                            self.canvas(service);
+                            self.secondaryCanvas(service);
+                        }
                     }    
                 }
                 self.updateCanvas = true;
