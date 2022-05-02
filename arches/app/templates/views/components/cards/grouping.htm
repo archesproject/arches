@@ -83,14 +83,14 @@
 
 
 {% block designer_tree %}
-<li role="treeitem card-treeitem" class="jstree-node" data-bind="css: {'jstree-open': ((card.cards().length > 0 || card.widgets().length > 0) && card.expanded()), 'jstree-closed' : ((card.cards().length > 0 || card.widgets().length > 0) && !card.expanded()), 'jstree-leaf': card.cards().length === 0 && card.widgets().length === 0}, scrollTo: card.scrollTo, container: '.designer-card-tree'">
-    <i class="jstree-icon jstree-ocl" role="presentation" data-bind="click: function(){card.expanded(!card.expanded())}"></i>
-    <a class="jstree-anchor" href="#" tabindex="-1" data-bind="css:{'filtered': card.highlight(), 'jstree-clicked': card.selected, 'child-selected': card.isChildSelected(), 'func-node': card.isFuncNode()}, click: function () { card.selected(true) },">
+<li role="treeitem card-treeitem" class="jstree-node" data-bind="css: {'jstree-open': ((card.cards().length > 0 || card.widgets().length > 0) && card.expanded()), 'jstree-closed' : ((card.cards().length > 0 || self.card.widgets().length > 0) && !self.card.expanded()), 'jstree-leaf': self.card.cards().length === 0 && self.card.widgets().length === 0}, scrollTo: self.card.scrollTo, container: '.designer-card-tree'">
+    <i class="jstree-icon jstree-ocl" role="presentation" data-bind="click: function(){self.card.expanded(!self.card.expanded())}"></i>
+    <a class="jstree-anchor" href="#" tabindex="-1" data-bind="css:{'filtered': self.card.highlight(), 'jstree-clicked': self.card.selected, 'child-selected': self.card.isChildSelected(), 'func-node': self.card.isFuncNode()}, click: function () { self.card.selected(true) },">
         <i class="fa fa-file-o" role="presentation"></i>
-        <span style="padding-right: 5px;" data-bind="text: card.model.name"></span>
+        <span style="padding-right: 5px;" data-bind="text: self.card.model.name"></span>
     </a>
 
-    <!-- ko if: card.cards().length > 0 || card.widgets().length > 0 -->
+    <!-- ko if: self.card.cards().length > 0 || self.card.widgets().length > 0 -->
     <ul data-bind="sortable: {
                 data: sortedWidgetIds,
                 as: 'nodeId',
@@ -100,7 +100,7 @@
         <div>
             <!-- ko let: {widget:$parent.widgetInstanceDataLookup[nodeId]} -->
             <li role="treeitem" class="jstree-node jstree-leaf" data-bind="css: {
-                    'jstree-last': $index() === (card.widgets().length - 1) && card.cards().length === 0
+                    'jstree-last': $index() === (self.card.widgets().length - 1) && self.card.cards().length === 0
                 }">
                 <i class="jstree-icon jstree-ocl" role="presentation"></i>
                 <a class="jstree-anchor" href="#" tabindex="-1" data-bind="click: function(d, e) {widget.selected(true); e.stopPropagation(); }, css:{'jstree-clicked': widget.selected, 'hover': widget.hovered}, event: { mouseover: function(){ widget.hovered(true) }, mouseout: function(){ widget.hovered(null) } }">
@@ -193,12 +193,12 @@
                         <div data-bind='component: {
                             name: self.form.widgetLookup[widget.widget_id()].name,
                             params: {
-                                formData: $component.getTile(widget.card.id).formData,
-                                tile: $component.getTile(widget.card.id),
+                                formData: self.getTile(widget.card.id).formData,
+                                tile: self.getTile(widget.card.id),
                                 form: self.form,
                                 config: widget.configJSON,
                                 label: widget.label(),
-                                value: $component.getTile(widget.card.id).data[widget.node_id()],
+                                value: self.getTile(widget.card.id).data[widget.node_id()],
                                 node: self.form.nodeLookup[widget.node_id()],
                                 expanded: self.expanded,
                                 graph: self.form.graph,
