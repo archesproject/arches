@@ -1,8 +1,7 @@
-import json
 import logging
 from django.views.generic import View
 from arches.app.models.models import ETLModule, LoadEvent, LoadStaging
-from arches.app.utils.response import JSONResponse
+from arches.app.utils.response import JSONResponse, JSONErrorResponse
 
 logger = logging.getLogger(__name__)
 
@@ -39,4 +38,4 @@ class ETLManagerView(View):
             ret = {"result": response["data"]}
             return JSONResponse(ret)
         else:
-            return JSONResponse(status=400, reason=response["data"])
+            return JSONErrorResponse(content=response)
