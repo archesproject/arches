@@ -5,6 +5,7 @@ define([
     'arches',
     'viewmodels/widget',
     'viewmodels/map-editor',
+    'utils/create-async-component',
     'bindings/chosen',
     'bindings/codemirror',
     'select2',
@@ -12,7 +13,8 @@ define([
     'bindings/fadeVisible',
     'bindings/mapbox-gl',
     'bindings/color-picker',
-], function(_, ko, koMapping, arches, WidgetViewModel, MapEditorViewModel) {
+    'templates/views/components/widgets/map.htm'
+], function(_, ko, koMapping, arches, WidgetViewModel, MapEditorViewModel, createAsyncComponent) {
     var viewModel = function(params) {
         this.context = params.type;
 
@@ -98,9 +100,11 @@ define([
 
         MapEditorViewModel.apply(this, [params]);
     };
-    ko.components.register('map-widget', {
-        viewModel: viewModel,
-        template: window['map-widget-template']
-    });
+
+    createAsyncComponent(
+        'map-widget',
+        viewModel,
+        'templates/views/components/widgets/map.htm'
+    );
     return viewModel;
 });

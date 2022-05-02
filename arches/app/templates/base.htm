@@ -41,25 +41,6 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 
     <link rel="shortcut icon" href="{% static 'img/favicon.png' %}" />
 
-    <script style="display: none;">
-        window['checkbox-widget-template'] = `{% include 'views/components/widgets/checkbox.htm' %}`
-        window['concept-select-widget-template'] = `{% include 'views/components/widgets/concept-select.htm' %}`
-        window['datepicker-widget-template'] = `{% include 'views/components/widgets/datepicker.htm' %}`
-        window['edtf-widget-template'] = `{% include 'views/components/widgets/edtf.htm' %}`
-        window['file-widget-template'] = `{% include 'views/components/widgets/file.htm' %}`
-        window['iiif-widget-template'] = `{% include 'views/components/widgets/iiif.htm' %}`
-        window['map-widget-template'] = `{% include 'views/components/widgets/map.htm' %}`
-        window['node-value-select-widget-template'] = `{% include 'views/components/widgets/node-value-select.htm' %}`
-        window['number-widget-template'] = `{% include 'views/components/widgets/number.htm' %}`
-        window['radio-boolean-widget-template'] = `{% include 'views/components/widgets/radio-boolean.htm' %}`
-        window['radio-widget-template'] = `{% include 'views/components/widgets/radio.htm' %}`
-        window['resource-instance-select-widget-template'] = `{% include 'views/components/widgets/resource-instance-select.htm' %}`
-        window['rich-text-widget-template'] = `{% include 'views/components/widgets/rich-text.htm' %}`
-        window['select-widget-template'] = `{% include 'views/components/widgets/select.htm' %}`
-        window['switch-widget-template'] = `{% include 'views/components/widgets/switch.htm' %}`
-        window['text-widget-template'] = `{% include 'views/components/widgets/text.htm' %}`
-        window['urldatatype-widget-template'] = `{% include 'views/components/widgets/urldatatype.htm' %}`
-    </script>
     {% block css %}
         {% compress css %}
         <link type="text/x-scss" href="{% static 'css/arches.scss' %}" rel="stylesheet" media="screen">

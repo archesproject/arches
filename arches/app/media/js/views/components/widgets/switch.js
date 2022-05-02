@@ -1,4 +1,10 @@
-define(['knockout', 'underscore', 'viewmodels/widget'], function(ko, _, WidgetViewModel) {
+define([
+    'knockout', 
+    'underscore', 
+    'viewmodels/widget',
+    'utils/create-async-component',
+    'templates/views/components/widgets/switch.htm' 
+], function(ko, _, WidgetViewModel, createAsyncComponent) {
     /**
     * knockout components namespace used in arches
     * @external "ko.components"
@@ -76,8 +82,9 @@ define(['knockout', 'underscore', 'viewmodels/widget'], function(ko, _, WidgetVi
         this.disposables.push(this.getdefault);
     };
 
-    return ko.components.register('switch-widget', {
-        viewModel: SwitchWidget,
-        template: window['switch-widget-template']
-    });
+    return createAsyncComponent(
+        'switch-widget',
+        SwitchWidget,
+        'templates/views/components/widgets/switch.htm' 
+    );
 });

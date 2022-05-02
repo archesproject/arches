@@ -1,4 +1,10 @@
-define(['knockout', 'underscore', 'viewmodels/widget'], function (ko, _, WidgetViewModel) {
+define([
+    'knockout', 
+    'underscore', 
+    'viewmodels/widget',
+    'utils/create-async-component',
+    'templates/views/components/widgets/text.htm'
+], function (ko, _, WidgetViewModel, createAsyncComponent) {
     /**
     * registers a text-widget component for use in forms
     * @function external:"ko.components".text-widget
@@ -10,18 +16,21 @@ define(['knockout', 'underscore', 'viewmodels/widget'], function (ko, _, WidgetV
     * @param {string} params.config().uneditable - disables widget
     */
 
-    return ko.components.register('text-widget', {
-        viewModel: function (params) {
-            params.configKeys = ['placeholder', 'width', 'maxLength', 'defaultValue', 'uneditable'];
-    
-            WidgetViewModel.apply(this, [params]);
-    
-            let self = this;
-    
-            this.disable = ko.computed(() => {
-                return ko.unwrap(self.disabled) || ko.unwrap(self.uneditable); 
-            }, self);
-        },
-        template: window['text-widget-template']
-    });
+    const viewModel = function (params) {
+        params.configKeys = ['placeholder', 'width', 'maxLength', 'defaultValue', 'uneditable'];
+
+        WidgetViewModel.apply(this, [params]);
+
+        let self = this;
+
+        this.disable = ko.computed(() => {
+            return ko.unwrap(self.disabled) || ko.unwrap(self.uneditable); 
+        }, self);
+    };
+
+    return createAsyncComponent(
+        'text-widget',
+        viewModel,
+        'templates/views/components/widgets/text.htm'
+    );
 });

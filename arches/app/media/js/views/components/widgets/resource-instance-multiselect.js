@@ -1,14 +1,20 @@
 define([
     'knockout',
     'viewmodels/resource-instance-select',
-    'bindings/select2-query'
-], function(ko, ResourceInstanceSelectViewModel) {
-    return ko.components.register('resource-instance-multiselect-widget', {
-        viewModel: function(params) {
-            params.multiple = true;
-            params.datatype = 'resource-instance-list';
-            ResourceInstanceSelectViewModel.apply(this, [params]);
-        },
-        template: window['resource-instance-select-widget-template']
-    });
+    'utils/create-async-component',
+    'bindings/select2-query',
+    'templates/views/components/widgets/resource-instance-select.htm'
+], function(ko, ResourceInstanceSelectViewModel, createAsyncComponent) {
+    const viewModel =  function(params) {
+        params.multiple = true;
+        params.datatype = 'resource-instance-list';
+        ResourceInstanceSelectViewModel.apply(this, [params]);
+    };
+
+    return createAsyncComponent(
+        'resource-instance-multiselect-widget',
+        viewModel,
+        'templates/views/components/widgets/resource-instance-select.htm'
+
+    );
 });

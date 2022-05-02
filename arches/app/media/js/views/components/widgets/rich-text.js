@@ -1,4 +1,11 @@
-define(['knockout', 'underscore', 'viewmodels/widget', 'bindings/ckeditor'], function (ko, _, WidgetViewModel) {
+define([
+    'knockout', 
+    'underscore', 
+    'viewmodels/widget', 
+    'utils/create-async-component',
+    'bindings/ckeditor',
+    'templates/views/components/widgets/rich-text.htm'
+], function (ko, _, WidgetViewModel, createAsyncComponent) {
     /**
     * registers a rich-text-widget component for use in forms
     * @function external:"ko.components".rich-text-widget
@@ -6,12 +13,16 @@ define(['knockout', 'underscore', 'viewmodels/widget', 'bindings/ckeditor'], fun
     * @param {string} params.value - the value being managed
     * @param {function} params.config - observable containing config object
     */
-    return ko.components.register('rich-text-widget', {
-        viewModel: function(params) {
-            params.configKeys = ['displayfullvalue'];
-            WidgetViewModel.apply(this, [params]);
-            this.displayfullvalue(params.displayfullvalue);
-        },
-        template: window['rich-text-widget-template']
-    });
+
+    const viewModel = function(params) {
+        params.configKeys = ['displayfullvalue'];
+        WidgetViewModel.apply(this, [params]);
+        this.displayfullvalue(params.displayfullvalue);
+    };
+
+    return createAsyncComponent(
+        'rich-text-widget',
+        viewModel,
+        'templates/views/components/widgets/rich-text.htm'
+    );
 });

@@ -1,4 +1,11 @@
-define(['knockout', 'underscore', 'viewmodels/widget', 'bindings/formattedNumber'], function (ko, _, WidgetViewModel) {
+define([
+    'knockout', 
+    'underscore', 
+    'viewmodels/widget', 
+    'utils/create-async-component',
+    'bindings/formattedNumber',
+    'templates/views/components/widgets/number.htm'
+], function (ko, _, WidgetViewModel, createAsyncComponent) {
     /**
     * registers a text-widget component for use in forms
     * @function external:"ko.components".text-widget
@@ -9,7 +16,6 @@ define(['knockout', 'underscore', 'viewmodels/widget', 'bindings/formattedNumber
     * @param {string} params.config().placeholder - default text to show in the text input
     * @param {string} params.config().uneditable - disables widget
     */
-
 
     var NumberWidget = function(params) {
         params.configKeys = ['placeholder', 'width', 'min', 'max', 'step', 'precision', 'prefix', 'suffix', 'defaultValue', 'format', 'uneditable'];
@@ -60,8 +66,9 @@ define(['knockout', 'underscore', 'viewmodels/widget', 'bindings/formattedNumber
         self.disposables.push(this.updateVal);
     };
 
-    return ko.components.register('number-widget', {
-        viewModel: NumberWidget,
-        template: window['number-widget-template']
-    });
+    return createAsyncComponent(
+        'number-widget',
+        NumberWidget,
+        'templates/views/components/widgets/number.htm'
+    );
 });

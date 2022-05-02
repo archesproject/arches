@@ -1,8 +1,10 @@
 define([
     'knockout',
     'viewmodels/domain-widget',
-    'plugins/knockout-select2'
-], function(ko, DomainWidgetViewModel) {
+    'utils/create-async-component',
+    'plugins/knockout-select2',
+    'templates/views/components/widgets/checkbox.htm'
+], function(ko, DomainWidgetViewModel, createAsyncComponent) {
     /**
      * registers a select-widget component for use in forms
      * @function external:"ko.components".select-widget
@@ -13,13 +15,17 @@ define([
      * @param {string} params.config.placeholder - default text to show in the select input
      * @param {string} params.config.options -
      */
-    return ko.components.register('domain-checkbox-widget', {
-        viewModel: function(params) {
-            params.configKeys = ['defaultValue'];
-            DomainWidgetViewModel.apply(this, [params]);
+    
+    const viewModel = function(params) {
+        params.configKeys = ['defaultValue'];
+        DomainWidgetViewModel.apply(this, [params]);
 
-            this.multiple = true;
-        },
-        template: window['checkbox-widget-template']
-    });
+        this.multiple = true;
+    };
+
+    return createAsyncComponent(
+        'domain-checkbox-widget',
+        viewModel,
+        'templates/views/components/widgets/checkbox.htm'
+    );
 });

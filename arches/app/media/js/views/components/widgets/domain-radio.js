@@ -1,7 +1,9 @@
 define([
     'knockout',
-    'viewmodels/domain-widget'
-], function(ko, DomainWidgetViewModel) {
+    'viewmodels/domain-widget',
+    'utils/create-async-component',
+    'templates/views/components/widgets/radio.htm'
+], function(ko, DomainWidgetViewModel, createAsyncComponent) {
     /**
      * registers a select-widget component for use in forms
      * @function external:"ko.components".select-widget
@@ -12,11 +14,15 @@ define([
      * @param {string} params.config.placeholder - default text to show in the select input
      * @param {string} params.config.options -
      */
-    return ko.components.register('domain-radio-widget', {
-        viewModel: function(params) {
-            params.configKeys = ['defaultValue'];
-            DomainWidgetViewModel.apply(this, [params]);
-        },
-        template: window['radio-widget-template']
-    });
+
+    const viewModel = function(params) {
+        params.configKeys = ['defaultValue'];
+        DomainWidgetViewModel.apply(this, [params]);
+    };
+
+    createAsyncComponent(
+        'domain-radio-widget',
+        viewModel,
+        'templates/views/components/widgets/radio.htm'
+    );
 });
