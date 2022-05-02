@@ -24,6 +24,7 @@
 @import url(../css/base-manager.css);
 @import "sidenav.scss";
 @import "edit-history.scss";
+@import "tree.scss";
 @import "jqtree.scss";
 @import "rdm.scss";
 
@@ -12826,54 +12827,6 @@ ul.select2-choices:after {
 
 .current-crumb {
     font-weight: 400;
-}
-
-.resource-editor-tree {
-    height: calc(100vh - 125px);
-    overflow-y: auto;
-    overflow-x: hidden;
-    background: #ecf0f5;
-    padding-bottom: 50px;
-}
-
-a.jstree-anchor strong {
-    font-weight: 500;
-}
-
-// .expanded-nav {
-//     white-space: nowrap;
-//     overflow: hidden;
-//     text-overflow: ellipsis;
-// }
-
-.add-new-tile {
-    display: none;
-}
-
-.jstree-anchor:hover .add-new-tile,
-.add-new-tile.jstree-clicked {
-    display: inline;
-}
-
-a.jstree-anchor.disabled {
-    color: #ccc;
-}
-
-a.jstree-anchor.permissions-widget {
-    color: #bbb;
-    cursor: default;
-    pointer-events: none;
-}
-
-.jstree-default .card-designer-tree li {
-    background-image: url("tree/32px.png");
-    background-position: -292px -4px;
-    background-repeat: repeat-y;
-}
-
-.jstree-default .card-designer-tree li.jstree-last,
-.jstree-default .card-designer-tree .jstree-last>li {
-    background: transparent;
 }
 
 .card-summary-section li {
