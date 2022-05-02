@@ -8,9 +8,11 @@ define([
     'viewmodels/map-editor',
     'viewmodels/map-filter',
     'views/components/cards/select-related-feature-layers',
-    'templates/views/components/cards/related-resources-map-popup.htm',
-    'views/components/datatypes/geojson-feature-collection',
-], function($, ko, koMapping, geojsonExtent, arches, CardComponentViewModel, MapEditorViewModel, MapFilterViewModel, selectFeatureLayersFactory) {
+    'utils/create-async-component',
+    'templates/views/components/cards/related-resources-map.htm',
+
+
+], function($, ko, koMapping, geojsonExtent, arches, CardComponentViewModel, MapEditorViewModel, MapFilterViewModel, selectFeatureLayersFactory, createAsyncComponent) {
     var viewModel = function(params) {
         var self = this;
 
@@ -428,9 +430,12 @@ define([
             }
         });
     };
-    ko.components.register('related-resources-map-card', {
-        viewModel: viewModel,
-        template: window['related-resources-map-card-template']
-    });
+
+    createAsyncComponent(
+        'related-resources-map-card',
+        viewModel,
+        'templates/views/components/cards/related-resources-map.htm'
+    );
+
     return viewModel;
 });
