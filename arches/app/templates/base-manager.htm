@@ -471,24 +471,15 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 
 
 {% block pre_require_js %}
-    <script>
-        {% autoescape off %}
-        window['view-data'] = {
-            graphs: {{graphs}},
-            createableResources: {{createable_resources}},
-            help: "{{nav.help.template}}",
-            userCanEditResources: JSON.parse('{{ user_can_edit }}'.toLowerCase()),
-            userCanReadResources: JSON.parse('{{ user_can_read }}'.toLowerCase())
-        };
-        // define('view-data', [], function () {
-        //     return {
-        //         graphs: {{graphs}},
-        //         createableResources: {{createable_resources}},
-        //         help: "{{nav.help.template}}",
-        //         userCanEditResources: JSON.parse('{{ user_can_edit }}'.toLowerCase()),
-        //         userCanReadResources: JSON.parse('{{ user_can_read }}'.toLowerCase())
-        //     };
-        // });
-        {% endautoescape %}
-    </script>
+    <div 
+        id="viewData"
+        style="display: none;"
+        viewData='{
+            "graphs": {{graphs}},
+            "createableResources": {{createable_resources}},
+            "help": "{{nav.help.template}}",
+            "userCanEditResources": "{{ user_can_edit|lower }}",
+            "userCanReadResources": "{{ user_can_read|lower }}"
+        }'
+    ></div>
 {% endblock pre_require_js %}

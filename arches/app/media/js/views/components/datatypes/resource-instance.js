@@ -2,12 +2,12 @@ define([
     'knockout',
     'underscore',
     'arches',
+    'view-data',
     'utils/ontology',
     'utils/create-async-component',
     'views/components/widgets/resource-instance-select',
     'templates/views/components/datatypes/resource-instance.htm'
-], function(ko, _, arches, ontologyUtils, createAsyncComponent) {
-    const data = window['view-data'];
+], function(ko, _, arches, data, ontologyUtils, createAsyncComponent) {
     var name = 'resource-instance-datatype-config';
     const viewModel = function(params) {
         var self = this;

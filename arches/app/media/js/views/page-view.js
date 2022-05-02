@@ -5,6 +5,7 @@ define([
     'knockout',
     'moment',
     'arches',
+    'view-data',
     'viewmodels/alert',
     'views/provisional-history-list',
     'views/notifications-list',
@@ -12,9 +13,7 @@ define([
     'bootstrap',
     'bindings/slide',
     'jquery-ui',
-], function($, _, Backbone, ko, moment, arches, AlertViewModel, ProvisionalHistoryList, NotificationsList) {
-    const viewData = window['view-data'];
-
+], function($, _, Backbone, ko, moment, arches, viewData, AlertViewModel, ProvisionalHistoryList, NotificationsList) {
     /**
     * A backbone view representing a basic page in arches.  It sets up the
     * viewModel defaults, optionally accepts additional view model data and

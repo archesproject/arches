@@ -7,13 +7,12 @@ define(['jquery',
     'knockout',
     'knockout-mapping',
     'models/graph',
+    'view-data',
     'utils/create-async-component',
     'bootstrap-datetimepicker',
     'plugins/knockout-select2',
     'templates/views/components/search/search-results.htm'
-], function($, _, arches, BaseFilter, bootstrap, select2, ko, koMapping, GraphModel, createAsyncComponent) {
-    const viewdata = window['view-data'];
-
+], function($, _, arches, BaseFilter, bootstrap, select2, ko, koMapping, GraphModel, viewdata, createAsyncComponent) {
     var componentName = 'search-results';
 
     const viewModel = BaseFilter.extend({
