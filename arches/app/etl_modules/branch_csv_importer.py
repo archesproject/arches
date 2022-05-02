@@ -7,6 +7,7 @@ import zipfile
 from openpyxl import load_workbook
 from django.db import connection
 from django.db.utils import IntegrityError
+from django.utils.translation import ugettext as _
 from arches.app.datatypes.datatypes import DataTypeFactory
 from arches.app.models.models import Node
 from arches.app.models.system_settings import settings
@@ -226,7 +227,14 @@ class BranchCsvImporter:
                 cursor.execute("""SELECT * FROM __arches_staging_to_tile(%s)""", [self.loadid])
                 row = cursor.fetchall()
         except IntegrityError as e:
-            return {"success": False, "data": e}
+            logger.error(e)
+            return {
+                "status": 400,
+                "success": False,
+                "title": _("Failed to complete load"),
+                "message": _("Be sure any resources you are loading do not have resource ids that already exist in the system")
+            }
+            
         index_resources_by_transaction(self.loadid, quiet=True, use_multiprocessing=True)
         if row[0][0]:
             return {"success": True, "data": "success"}

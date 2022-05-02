@@ -2,33 +2,35 @@ define([
     'underscore',
     'knockout',
     'viewmodels/base-import-view-model',
+    'viewmodels/alert',
     'dropzone',
     'bindings/dropzone',
-], function(_, ko, ImporterViewModel, dropzone) {
+], function(_, ko, ImporterViewModel, AlertViewModel, dropzone) {
     return ko.components.register('branch-csv-importer', {
         viewModel: function(params) {
             const self = this;
             this.moduleId = params.etlmoduleid;
             ImporterViewModel.apply(this, arguments);
             this.loading = params.config.loading;
-            this.response.subscribe(val => {
-                console.log(val);
-            });
+            this.loadStatus = ko.observable('ready');
 
             this.write = function(){
                 self.loading(true);
+                self.loadStatus("loading");
                 self.submit('write').then(function(response){
                     self.loading(false);
-                    if (response.ok) {
-                        return response.json();
-                    }
+                    return response.json();
                 }).then(function(response) {
                     if (response?.result === "success"){
-                        self.response(null);
+                        self.loadStatus('successful');
+                    } else {
+                        self.alert(new AlertViewModel('ep-alert-red', response.title, response.message));
+                        self.loadStatus('failed');
                     }
                 }).catch(function(err) {    
                     // eslint-disable-next-line no-console
                     console.log(err);
+                    self.loadStatus('failed');
                 });
             };    
         },
