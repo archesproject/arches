@@ -92,7 +92,10 @@
         <button class="btn btn-shim btn-labeled btn-lg fa fa-times btn-danger" data-bind="click: function(){response(null);}">{% trans "Cancel" %}</button>
         <!-- /ko -->
         <!-- ko if: loadStatus() == "successful" -->
-        <button class="btn btn-shim btn-labeled btn-lg fa fa-check btn-primary"  data-bind="click: function(){response(null);}">{% trans "OK" %}</button>
+        <button class="btn btn-shim btn-labeled btn-lg fa fa-check btn-primary"  data-bind="click: function(){
+             response(null);
+             loadStatus('ready');
+            }">{% trans "OK" %}</button>
         <!-- /ko -->
         <!-- ko if: validationError()?.length > 0 || loadStatus() == "failed" -->
          <button class="btn btn-shim btn-labeled btn-lg fa fa-undo btn-danger" data-bind="click: function(){
