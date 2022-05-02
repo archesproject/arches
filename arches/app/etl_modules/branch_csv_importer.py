@@ -232,9 +232,9 @@ class BranchCsvImporter:
                 "status": 400,
                 "success": False,
                 "title": _("Failed to complete load"),
-                "message": _("Be sure any resources you are loading do not have resource ids that already exist in the system")
+                "message": _("Be sure any resources you are loading do not have resource ids that already exist in the system"),
             }
-            
+
         index_resources_by_transaction(self.loadid, quiet=True, use_multiprocessing=True)
         if row[0][0]:
             return {"success": True, "data": "success"}
