@@ -7,8 +7,9 @@ define(['jquery', 'knockout', 'uuid', 'arches', 'js-cookie'], function($, ko, uu
     *
     * @param  {string} params
     */
-    const ImportModuleViewModel = function() {
+    const ImportModuleViewModel = function(params) {
         const self = this;
+        this.alert = params.alert;
         this.fileAdded = ko.observable(false);
         this.fileInfo = ko.observable({name:"", size:""});
         this.formData = new window.FormData();
