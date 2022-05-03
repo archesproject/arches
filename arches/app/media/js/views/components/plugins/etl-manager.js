@@ -5,7 +5,8 @@ define([
 ], function(ko, arches, Cookies) {
     return ko.components.register('etl-manager', {
         viewModel: function(params) {
-            var self = this;
+            console.log(params)
+            const self = this;
             this.loading = params.loading;
             this.alert = params.alert;
             this.loading(true);
@@ -14,7 +15,13 @@ define([
             this.isImport = ko.observable(true);
             this.loadEvents = ko.observable();
             this.selectedLoadEvent = ko.observable();
-            this.selectedLoadEvent.subscribe(function(val){console.log(val)})
+            this.validated = ko.observable();
+            this.validationError = ko.observableArray();
+
+            this.selectedLoadEvent.subscribe(function(val){
+                console.log(val);
+                self.fetchValidation(val.loadid);
+            })
             this.moduleSearchString = ko.observable('');
             this.tabs = [
                 {id: 'start', title: 'Start'},
@@ -26,6 +33,7 @@ define([
                 self.selectedModule(etlmodule);
                 self.activeTab("details");
             };
+            this.selectedModule.subscribe(val => console.log(val))
 
             this.fetchLoadEvent = function(){
                 const url = arches.urls.etl_manager + "?action=loadEvent";
@@ -53,7 +61,7 @@ define([
                         return response.json();
                     }
                 }).then(function(data){
-                    console.log(data[user]);
+                    console.log(data);
                     return data[user]
                 });
             }
@@ -66,6 +74,19 @@ define([
                     }
                 }).then(function(data){
                     console.log(data)
+                });
+            };
+
+            this.fetchValidation = function(loadid){
+                const url = arches.urls.etl_manager + "?action=validate&loadid="+loadid;
+                window.fetch(url).then(function(response){
+                    if(response.ok){
+                        return response.json();
+                    }
+                }).then(function(data){
+                    console.log(data);
+                    self.validated(true);
+                    self.validationError(data.data);
                 });
             };
 

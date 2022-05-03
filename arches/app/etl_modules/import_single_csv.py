@@ -84,13 +84,6 @@ class ImportSingleCsv:
         Collects error messages if any and returns table of error messages
         """
 
-        fieldnames = request.POST.get("fieldnames").split(",")
-        column_names = [fieldname for fieldname in fieldnames if fieldname != ""]
-        if len(column_names) == 0:
-            message = "No valid node is selected"
-            return {"success": False, "data": message}
-
-        self.populate_staging_table(request)
         with connection.cursor() as cursor:
             cursor.execute("""SELECT * FROM __arches_load_staging_report_errors(%s)""", [self.loadid])
             rows = cursor.fetchall()
@@ -100,6 +93,14 @@ class ImportSingleCsv:
         """
         Move the records from load_staging to tiles table using db function
         """
+
+        fieldnames = request.POST.get("fieldnames").split(",")
+        column_names = [fieldname for fieldname in fieldnames if fieldname != ""]
+        if len(column_names) == 0:
+            message = "No valid node is selected"
+            return {"success": False, "data": message}
+
+        self.populate_staging_table(request)
 
         with connection.cursor() as cursor:
             cursor.execute("""SELECT * FROM __arches_staging_to_tile(%s)""", [self.loadid])
@@ -126,8 +127,8 @@ class ImportSingleCsv:
 
         with connection.cursor() as cursor:
             cursor.execute(
-                """INSERT INTO load_event (loadid, complete, load_details, user_id) VALUES (%s, %s, %s, %s)""",
-                (self.loadid, False, json.dumps(mapping_details), self.userid),
+                """INSERT INTO load_event (loadid, complete, etl_module, load_details, user_id) VALUES (%s, %s, %s, %s, %s)""",
+                (self.loadid, False, "import-single-csv", json.dumps(mapping_details), self.userid),
             )
 
         for row in reader:
@@ -141,18 +142,20 @@ class ImportSingleCsv:
                 datatype = self.node_lookup[graphid].get(nodeid=node).datatype
                 datatype_instance = self.datatype_factory.get_instance(datatype)
                 source_value = row[key]
-                error = datatype_instance.validate(source_value)
-                valid = True if len(error) == 0 else False
-                notes = None if valid else error[0]["message"]
+                errors = datatype_instance.validate(source_value)
+                valid = True if len(errors) == 0 else False
                 value = datatype_instance.transform_value_for_tile(source_value) if source_value is not None and valid else None
+                error_message = ""
+                for error in errors:
+                    error_message = "{0}|{1}".format(error_message, error["message"]) if error_message != "" else error["message"]
 
                 if nodegroupid in dict_by_nodegroup:
                     dict_by_nodegroup[nodegroupid].append(
-                        {node: {"value": value, "valid": valid, "source": source_value, "notes": notes, "datatype": datatype}}
+                        {node: {"value": value, "valid": valid, "source": source_value, "notes": error_message, "datatype": datatype}}
                     )
                 else:
                     dict_by_nodegroup[nodegroupid] = [
-                        {node: {"value": value, "valid": valid, "source": source_value, "notes": notes, "datatype": datatype}}
+                        {node: {"value": value, "valid": valid, "source": source_value, "notes": error_message, "datatype": datatype}}
                     ]
 
             for nodegroup in dict_by_nodegroup:

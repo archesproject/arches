@@ -1,4 +1,5 @@
 import logging
+from django.db import connection
 from django.views.generic import View
 from arches.app.models.models import ETLModule, LoadEvent, LoadStaging
 from arches.app.utils.response import JSONResponse, JSONErrorResponse
@@ -11,6 +12,17 @@ class ETLManagerView(View):
     to get the ETL modules from db
     """
 
+    def validate(self, loadid):
+        """
+        Creates records in the load_staging table (validated before poulating the load_staging table with error message)
+        Collects error messages if any and returns table of error messages
+        """
+
+        with connection.cursor() as cursor:
+            cursor.execute("""SELECT * FROM __arches_load_staging_report_errors(%s)""", [loadid])
+            rows = cursor.fetchall()
+        return {"success": True, "data": rows}
+
     def get(self, request):
         action = request.GET.get("action", None)
         loadid = request.GET.get("loadid", None)
@@ -20,8 +32,8 @@ class ETLManagerView(View):
             response = LoadEvent.objects.all()
         elif action == "stagedData" and loadid:
             response = LoadStaging.objects.get(loadid=loadid)
-        print(action)
-        print(response)
+        elif action == "validate" and loadid:
+            response = self.validate(loadid)
         return JSONResponse(response)
 
     def post(self, request):

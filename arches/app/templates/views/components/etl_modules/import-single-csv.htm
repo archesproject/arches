@@ -1,4 +1,7 @@
+{% extends "views/components/etl_modules/base-import.htm" %}
 {% load i18n %}
+
+{% block task_details %}
 <!-- ko ifnot: loading() -->
 <!-- ko ifnot: fileAdded() -->
 <div data-bind="dropzone: dropzoneOptions" class="file-select loader-select" style="height: 100%; width: 100%; background: white">
@@ -101,36 +104,6 @@
         <div data-bind="text: '{% trans 'Showing All ' %}' + csvExample().length + '{% trans ' Rows' %}'"></div>
         <!-- /ko -->
     </div>
-    <div class="etl-module-component">
-        <!-- ko if: validated -->
-        <h4>{% trans "Validation Errors" %}</h4>
-        <table class="table table-striped" style="margin-top: 25px; border: 1px solid rgba(0,0,0,0.14)" width="100%">
-            <thead>
-                <tr>
-                    <th data-bind="text: 'Error'"></th>
-                    <th data-bind="text: 'Source'"></th>
-                </tr>
-            </thead>
-            <!-- ko if: validationError().length -->
-            <tbody>
-                <!-- ko foreach: validationError -->
-                <tr>
-                    <td data-bind="text: $data[1]"></td>
-                    <td data-bind="text: $data[0]"></td>
-                </tr>
-                <!-- /ko -->
-            </tbody>
-            <!-- /ko -->
-            <!-- ko ifnot: validationError().length -->
-            <tbody>
-                <tr>
-                    <td colspan="3">{% trans "No Error Found" %}</td>
-                </tr>
-            </tbody>
-            <!-- /ko -->                
-        </table>
-        <!-- /ko -->
-    </div>
 </div>
 <div class="etl-module-button-container">
     <button data-bind="click: write" class="btn btn-success">
@@ -142,3 +115,22 @@
 </div>
 <!-- /ko -->
 <!-- /ko -->
+{% endblock task_details %}
+
+{% block etl_status %}
+<div>
+    <h4>{% trans "Import Single CSV" %}</h4>
+    <!-- ko if: load_details -->
+    <div>
+        <span style="font-size: 15px; padding-right: 3px;">{% trans 'Target Resource:' %}</span>
+        <span data-bind="text: load_details.graph"></span>    
+    </div>
+    <div>
+        <span style="font-size: 15px; padding-right: 3px;">{% trans 'Target Fields:' %}</span>
+        <!-- ko foreach: load_details.mapping -->
+        <span data-bind="text: $data.node"></span><span>;</span>
+        <!-- /ko -->
+    </div>
+    <!-- /ko -->
+</div>
+{% endblock etl_status %}

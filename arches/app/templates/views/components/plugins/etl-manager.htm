@@ -55,8 +55,11 @@
             <div class="content-panel">
                 <div class="" data-bind="component: {
                     name: selectedModule().componentname,
-                    loading: selectedModule().loading,
-                    params: selectedModule(),
+                    loading: loading,
+                    params: {
+                                state: 'details',
+                                ...selectedModule()
+                            }
                 }"></div>
             </div>
         </div>
@@ -73,7 +76,7 @@
                                 <tr>
                                     <td data-bind="click: function(){$parent.selectedLoadEvent(event)}" style="display: flex; padding:5px; flex-direction: column; justify-content: space-between; cursor: pointer; height:75px; width: 300px;">
                                         <div>
-                                            <div data-bind="text: event.load_description"></div>
+                                            <div data-bind="text: event.etl_module"></div>
                                         </div>
                                         <div style="display: flex; flex-direction: row; justify-content: space-between;">
                                             <div>
@@ -114,18 +117,44 @@
                 </div>
                 <div class="etl-module-preview" style="height: calc(100vh - 50px); width: calc(100vw - 400px); padding: 25px; overflow: scroll;">
                     <div class="etl-module-info" data-bind="if: selectedLoadEvent()">
-                        <div>
-                            <h4 data-bind='text: selectedLoadEvent().load_description'></h4>
-                            <div>
-                                <span style="font-size: 15px; padding-right: 3px;">{% trans 'Target Resource:' %}</span>
-                                <span data-bind="text: selectedLoadEvent().load_details.graph"></span>    
-                            </div>
-                            <div>
-                                <span style="font-size: 15px; padding-right: 3px;">{% trans 'Target Fields:' %}</span>
-                                <!-- ko foreach: selectedLoadEvent().load_details.mapping -->
-                                <span data-bind="text: $data.node"></span><span>;</span>
+                        <div class="" data-bind="component: {
+                            name: selectedLoadEvent().etl_module,
+                            loading: loading,
+                            params: {
+                                        state: 'status',
+                                        load_details: selectedLoadEvent().load_details,
+                                        ...selectedModule(),
+                                    },
+                        }"></div>
+                        <div class="etl-module-component">
+                            <!-- ko if: validated -->
+                            <h4>{% trans "Validation Errors" %}</h4>
+                            <table class="table table-striped" style="margin-top: 25px; border: 1px solid rgba(0,0,0,0.14)" width="100%">
+                                <thead>
+                                    <tr>
+                                        <th data-bind="text: 'Error'"></th>
+                                        <th data-bind="text: 'Source'"></th>
+                                    </tr>
+                                </thead>
+                                <!-- ko if: validationError().length -->
+                                <tbody>
+                                    <!-- ko foreach: validationError -->
+                                    <tr>
+                                        <td data-bind="text: $data[1]"></td>
+                                        <td data-bind="text: $data[0]"></td>
+                                    </tr>
+                                    <!-- /ko -->
+                                </tbody>
                                 <!-- /ko -->
-                            </div>
+                                <!-- ko ifnot: validationError().length -->
+                                <tbody>
+                                    <tr>
+                                        <td colspan="3">{% trans "No Error Found" %}</td>
+                                    </tr>
+                                </tbody>
+                                <!-- /ko -->                
+                            </table>
+                            <!-- /ko -->
                         </div>
                         <div data-bind="if: selectedLoadEvent()">
                             <h4>{% trans "Loading data" %}</h4>

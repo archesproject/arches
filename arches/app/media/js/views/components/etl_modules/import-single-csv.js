@@ -11,8 +11,12 @@ define([
 ], function(ko, koMapping, $, dropzone, uuid, arches) {
     return ko.components.register('import-single-csv', {
         viewModel: function(params) {
-            var self = this;
-            this.loading = params.config.loading;
+            const self = this;
+
+            this.load_details = params.load_details;
+            this.state = params.state;
+            this.loading = params.loading || params.config?.loading || ko.observable();
+
             this.moduleId = params.etlmoduleid;
             this.loading(true);
             this.graphs = ko.observable();
