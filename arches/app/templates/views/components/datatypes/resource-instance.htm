@@ -1,4 +1,6 @@
+{% load template_tags %}
 {% load i18n %}
+
 <!-- ko ifnot: $data.search -->
 <!--ko let: {self: $data} -->
 <div class="node-widget-label concept-label" style="width:540px;">
@@ -47,7 +49,7 @@
                                 <span class="col-xs-12">
                                     <input style="width:100%; display:inline-block; margin: 3px 0px;" data-bind="
                                         select2Query: {
-                                            select2Config: self.getSelect2ConfigForOntologyProperties($data.ontologyProperty, self.rootOntologyClass, $data.ontologyClass, '{% trans 'Select an Ontology Property' %}', true)
+                                            select2Config: self.getSelect2ConfigForOntologyProperties($data.ontologyProperty, self.rootOntologyClass, $data.ontologyClass, {% quoted_trans 'Select an Ontology Property' %}, true)
                                         }
                                     ">
                                 </span>
@@ -71,7 +73,7 @@
                                 <span class="col-xs-12">
                                     <input style="width:100%; display:inline-block; margin: 3px 0px;" data-bind="
                                         select2Query: {
-                                            select2Config: self.getSelect2ConfigForOntologyProperties($data.inverseOntologyProperty, $data.ontologyClass, self.rootOntologyClass, '{% trans 'Select an Ontology Property' %}', true)
+                                            select2Config: self.getSelect2ConfigForOntologyProperties($data.inverseOntologyProperty, $data.ontologyClass, self.rootOntologyClass, {% quoted_trans 'Select an Ontology Property' %}, true)
                                         }
                                     ">
                                 </span>
@@ -115,7 +117,7 @@
         name:  datatype.datatype.includes('list') ? 'resource-instance-multiselect-widget' : 'resource-instance-select-widget',
         params: {
             config: {
-                placeholder: '{% trans "Select a resource" %}'
+                placeholder: "{% trans "Select a resource" %}"
             },
             label: '',
             value: searchValue,

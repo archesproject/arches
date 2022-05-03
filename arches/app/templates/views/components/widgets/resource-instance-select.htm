@@ -1,4 +1,5 @@
 {% extends "views/components/widgets/base.htm" %}
+{% load template_tags %}
 {% load i18n %}
 
 {% block form %}
@@ -90,7 +91,7 @@
                                     <span class="col-xs-12">
                                         <input style="max-width:100%; display:inline-block; margin: 3px 0px;" data-bind="
                                         select2Query: {
-                                            select2Config: self.getSelect2ConfigForOntologyProperties($data.ontologyProperty, self.rootOntologyClass, $data.ontologyClass(), '{% trans 'Select an Ontology Property' %}')}">
+                                            select2Config: self.getSelect2ConfigForOntologyProperties($data.ontologyProperty, self.rootOntologyClass, $data.ontologyClass(), {% quoted_trans 'Select an Ontology Property' %})}">
                                     </span>
 
                                     <!-- rr name -->
@@ -112,7 +113,7 @@
                                     <span class="col-xs-12">
                                         <input style="width:100%; display:inline-block; margin: 3px 0px;" data-bind="
                                         select2Query: {
-                                            select2Config: self.getSelect2ConfigForOntologyProperties($data.inverseOntologyProperty, $data.ontologyClass(), self.rootOntologyClass, '{% trans 'Select an Ontology Property' %}')}">
+                                            select2Config: self.getSelect2ConfigForOntologyProperties($data.inverseOntologyProperty, $data.ontologyClass(), self.rootOntologyClass, {% quoted_trans 'Select an Ontology Property' %})}">
                                     </span>
 
                                     <!-- Instance name -->
@@ -266,7 +267,7 @@
                                             <input style="max-width:100%; display:inline-block; margin: 3px 0px;"
                                                 data-bind="
                                             select2Query: {
-                                                select2Config: self.getSelect2ConfigForOntologyProperties($data.ontologyProperty, self.rootOntologyClass, $data.ontologyClass(), '{% trans 'Select an Ontology Property' %}')}">
+                                                select2Config: self.getSelect2ConfigForOntologyProperties($data.ontologyProperty, self.rootOntologyClass, $data.ontologyClass(), {% quoted_trans 'Select an Ontology Property' %})}">
                                         </span>
     
                                         <!-- rr name -->
@@ -291,7 +292,7 @@
                                             <input style="width:100%; display:inline-block; margin: 3px 0px;"
                                                 data-bind="
                                             select2Query: {
-                                                select2Config: self.getSelect2ConfigForOntologyProperties($data.inverseOntologyProperty, $data.ontologyClass(), self.rootOntologyClass, '{% trans 'Select an Ontology Property' %}')}">
+                                                select2Config: self.getSelect2ConfigForOntologyProperties($data.inverseOntologyProperty, $data.ontologyClass(), self.rootOntologyClass, {% quoted_trans 'Select an Ontology Property' %})}">
                                         </span>
     
                                         <!-- Instance name -->
