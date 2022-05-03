@@ -7,7 +7,7 @@
             <!-- <div class="etl-manager-tab" data-bind="click: function(){$parent.activeTab(tab.id)}, css: {active: $parent.activeTab() === tab.id, 'disabled': true}, text: tab.title"></div> -->
             <!-- /ko -->
             <div class="etl-manager-tab" data-bind="click: function(){activeTab('start')}, css: {active: activeTab() === 'start', 'disabled': false}, text: 'Start'"></div>
-            <div class="etl-manager-tab" data-bind="click: function(){activeTab('details')}, css: {active: activeTab() === 'details', 'disabled': false}, text: 'Task Details'"></div>
+            <div class="etl-manager-tab" data-bind="click: function(){activeTab('details')}, css: {active: activeTab() === 'details', 'disabled': !selectedModule()}, text: 'Task Details'"></div>
             <div class="etl-manager-tab" data-bind="click: function(){activeTab('import'); fetchLoadEvent()}, css: {active: activeTab() === 'import', 'disabled': false}, text: 'Import Tasks'"></div>
             <div class="etl-manager-tab" data-bind="click: function(){activeTab('export')}, css: {active: activeTab() === 'export', 'disabled': false}, text: 'Export Tasks'"></div>
         </div>
@@ -81,7 +81,7 @@
                                         <div style="display: flex; flex-direction: row; justify-content: space-between;">
                                             <div>
                                                 <div data-bind="text: $parent.getUserName(event.user_id)"></div>
-                                                <div data-bind="text: event.load_start_time"></div>
+                                                <div data-bind="text: $parent.formatTime(event.load_start_time)"></div>
                                             </div>
                                             <div>
                                                 <!-- ko if: event.complete && event.successful -->

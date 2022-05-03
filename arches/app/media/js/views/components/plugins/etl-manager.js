@@ -48,22 +48,35 @@ define([
             };
 
             this.getUserName = function(user){
-                window.fetch(arches.urls.get_user_names,{
+                self.loading(true);
+                $.ajax({
+                    url: arches.urls.get_user_names,
+                    context: this,
                     method: 'POST',
-                    credentials: 'include',
-                    body: JSON.stringify({userids: [user]}),
-                    headers: {
-                        'Content-Type': 'application/json',
-                        "X-CSRFToken": Cookies.get('csrftoken')
-                    },
-                }).then(function(response){
-                    if(response.ok){
-                        return response.json();
-                    }
-                }).then(function(data){
-                    console.log(data);
-                    return data[user]
-                });
+                    data: { userids: JSON.stringify([user]) },
+                    dataType: 'json'
+                }).done(function(data){
+                    console.log(data[user])
+                    return data[user];
+                }).always(function(){
+                    self.loading(false);
+                })
+                // window.fetch(arches.urls.get_user_names,{
+                //     method: 'POST',
+                //     credentials: 'include',
+                //     body: JSON.stringify({userids: [user]}),
+                //     headers: {
+                //         'Content-Type': 'application/json',
+                //         "X-CSRFToken": Cookies.get('csrftoken')
+                //     },
+                // }).then(function(response){
+                //     if(response.ok){
+                //         return response.json();
+                //     }
+                // }).then(function(data){
+                //     console.log("user:",data);
+                //     return data[user]
+                // });
             }
 
             this.fetchStagedData = function(loadid){
@@ -84,7 +97,6 @@ define([
                         return response.json();
                     }
                 }).then(function(data){
-                    console.log(data);
                     self.validated(true);
                     self.validationError(data.data);
                 });
