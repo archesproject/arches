@@ -350,7 +350,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                 {% if nav.search %}
                 <a href="{% url 'search_home' %}" class="ep-tools ep-tools-right"
                     data-bind="click:function () { navigate('{% url 'search_home' %}') }">
-                    <div class="" data-placement="bottom" data-toggle="tooltip" data-original-title='{% trans "Search" %}'>
+                    <div class="" data-placement="bottom" data-toggle="tooltip" data-original-title="{% trans "Search" %}">
                         <i class="ion-search"></i>
             
                     </div>
@@ -361,7 +361,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                 {% if user_is_reviewer == False and user_can_edit %}
                 <a href="{% url 'search_home' %}" class="ep-edits-toggle ep-tools ep-tools-right"
                     data-bind="click:function () { getProvisionalHistory(); }">
-                    <div class="" data-placement="bottom" data-toggle="tooltip" data-original-title='{% trans "My Recent Edits" %}'>
+                    <div class="" data-placement="bottom" data-toggle="tooltip" data-original-title="{% trans "My Recent Edits" %}">
                         <i class="ion-clock"></i>
                     </div>
                 </a>
@@ -370,7 +370,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                 {% if nav.res_edit and user_can_edit %}
                 <a href="{% url 'resource_editor' resourceid %}" class="ep-tools ep-tools-right"
                     data-bind="click:function () { navigate('{% url 'resource_editor' resourceid %}') }">
-                    <div class="" data-placement="bottom" data-toggle="tooltip" data-original-title='{% trans "Edit Resource" %}'>
+                    <div class="" data-placement="bottom" data-toggle="tooltip" data-original-title="{% trans "Edit Resource" %}">
                         <i class="ion-edit"></i>
                     </div>
                 </a>
@@ -378,7 +378,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
             
                 {% if nav.print %}
                 <a href="" class="ep-tools ep-tools-right" data-bind="click: function() { window.print() }">
-                    <div class="" data-placement="bottom" data-toggle="tooltip" data-original-title='{% trans "Print" %}'>
+                    <div class="" data-placement="bottom" data-toggle="tooltip" data-original-title="{% trans "Print" %}">
                         <i class="ion-printer"></i>
                     </div>
                 </a>
@@ -387,7 +387,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                 {% if nav.help %}
                 <a href="javascript:void(0)" class="ep-help-toggle ep-tools ep-tools-right"
                     data-bind="click: function(){ getHelp('{{ nav.help.template }}'); helpOpen(true) }">
-                    <div class="" data-placement="bottom" data-toggle="tooltip" data-original-title='{% trans "Help" %}'>
+                    <div class="" data-placement="bottom" data-toggle="tooltip" data-original-title="{% trans "Help" %}">
                         <i class="ion-help"></i>
                     </div>
                 </a>
@@ -402,7 +402,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                     </div>
                     <a href="javascript:void(0);" data-bind="click: function() {getNotifications();}"
                         class="ep-notifs-toggle ep-notifs-close ep-tools ep-tools-right">
-                        <div class="" data-placement="bottom" data-toggle="tooltip" data-original-title='{% trans "Close" %}'>
+                        <div class="" data-placement="bottom" data-toggle="tooltip" data-original-title="{% trans "Close" %}">
                             <i class="fa fa-times-circle fa-lg"></i>
                         </div>
                     </a>
@@ -424,7 +424,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                     </div>
                     <a href="javascript:void(0);" class="ep-edits-toggle ep-edits-close ep-tools ep-tools-right"
                         style="border:none;">
-                        <div class="" data-placement="bottom" data-toggle="tooltip" data-original-title='{% trans "Close" %}'>
+                        <div class="" data-placement="bottom" data-toggle="tooltip" data-original-title="{% trans "Close" %}">
                             <i class="fa fa-times-circle fa-lg"></i>
                         </div>
                     </a>
@@ -447,7 +447,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                     </div>
                     <a href="javascript:void(0);" class="ep-help-toggle ep-help-close ep-tools ep-tools-right" style="border:none"
                         data-bind="click: function(){helpOpen(false)}">
-                        <div class="" data-placement="bottom" data-toggle="tooltip" data-original-title='{% trans "Close Help" %}'>
+                        <div class="" data-placement="bottom" data-toggle="tooltip" data-original-title="{% trans "Close Help" %}">
                             <i class="fa fa-times-circle fa-lg"></i>
                         </div>
                     </a>

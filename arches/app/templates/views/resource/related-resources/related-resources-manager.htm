@@ -135,7 +135,7 @@
                                         <span class="col-sm-4">
                                             <input style="width:30%; display:inline-block;" data-bind="
                                                 select2Query: {
-                                                    select2Config: self.getSelect2ConfigForOntologyProperties(relationship.relationshiptype, self.rootOntologyClass, relationship.resource.root_ontology_class, '{% trans 'Select an Ontology Property' %}')
+                                                    select2Config: self.getSelect2ConfigForOntologyProperties(relationship.relationshiptype, self.rootOntologyClass, relationship.resource.root_ontology_class, {% quoted_trans 'Select an Ontology Property' %})
                                                 }
                                             ">
                                         </span>
@@ -152,7 +152,7 @@
                                         <span class="col-sm-4">
                                             <input style="width:30%; display:inline-block;" data-bind="
                                                 select2Query: {
-                                                    select2Config: self.getSelect2ConfigForOntologyProperties(relationship.inverserelationshiptype, relationship.resource.root_ontology_class, self.rootOntologyClass, '{% trans 'Select an Ontology Property' %}')
+                                                    select2Config: self.getSelect2ConfigForOntologyProperties(relationship.inverserelationshiptype, relationship.resource.root_ontology_class, self.rootOntologyClass, {% quoted_trans 'Select an Ontology Property' %})
                                                 }
                                             ">
                                         </span>
@@ -171,7 +171,7 @@
                                         <span class="col-sm-4">
                                             <input style="width:30%; display:inline-block;" data-bind="
                                                 select2Query: {
-                                                    select2Config: self.getSelect2ConfigForOntologyProperties(relationship.inverserelationshiptype, self.rootOntologyClass, relationship.resource.root_ontology_class, '{% trans 'Select an Ontology Property' %}')
+                                                    select2Config: self.getSelect2ConfigForOntologyProperties(relationship.inverserelationshiptype, self.rootOntologyClass, relationship.resource.root_ontology_class, {% quoted_trans 'Select an Ontology Property' %})
                                                 }
                                             ">
                                         </span>
@@ -188,7 +188,7 @@
                                             <span class="col-sm-4">
                                                 <input style="width:30%; display:inline-block;" data-bind="
                                                     select2Query: {
-                                                        select2Config: self.getSelect2ConfigForOntologyProperties(relationship.relationshiptype, relationship.resource.root_ontology_class, self.rootOntologyClass, '{% trans 'Select an Ontology Property' %}')
+                                                        select2Config: self.getSelect2ConfigForOntologyProperties(relationship.relationshiptype, relationship.resource.root_ontology_class, self.rootOntologyClass, {% quoted_trans 'Select an Ontology Property' %})
                                                     }
                                                 ">
                                             </span>

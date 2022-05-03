@@ -53,7 +53,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
             <div class="search-tools-container">
                 <!-- Result Count and ordering Block -->
                 <div class="search-count-container">
-                    <h3 class="search-title" data-bind="text: '{% trans 'Results: ' %}' + total()"></h3>
+                    <h3 class="search-title" data-bind="text: {% quoted_trans 'Results: ' %} + total()"></h3>
                 </div>
                 <div class="search-controls-container">
                     <!--ko if: ko.unwrap(sharedStateObject.filterApplied) -->

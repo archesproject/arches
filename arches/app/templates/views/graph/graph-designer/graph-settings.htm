@@ -1,3 +1,4 @@
+{% load template_tags %}
 {% load i18n %}
 
 <div style="height: 100%;" id="external-page-content">
@@ -20,7 +21,7 @@
             style="padding: 20px;"
             class="settings-panel-body set-variable-pixel-height"
         >
-            <div class="graph-designer-header" data-bind="text: graph.isresource() ? '{% trans 'Resource Model Identifiers' %}' : '{% trans 'Branch Identifiers' %}' "></div>
+            <div class="graph-designer-header" data-bind="text: graph.isresource() ? {% quoted_trans 'Resource Model Identifiers' %} : {% quoted_trans 'Branch Identifiers' %} "></div>
             <div id="cards" class="graph-settings-panel-body fade in">
                 <form class="widgets">
                     <div class="row widget-container">
@@ -56,7 +57,7 @@
                             </div>
 
                             <div class="col-xs-12 crm-selector">
-                                <select class="design" data-bind="attr: {'disabled': graphSettingsViewModel.nodeCount() > 1 }, value: graph.ontology_id, valueAllowUnset: true, options: ontologies, optionsText: 'name', optionsValue:'ontologyid', optionsCaption: '{% trans "No ontology" %}', chosen: {disable_search_threshold: 10, width: '500px'}"></select>
+                                <select class="design" data-bind="attr: {'disabled': graphSettingsViewModel.nodeCount() > 1 }, value: graph.ontology_id, valueAllowUnset: true, options: ontologies, optionsText: 'name', optionsValue:'ontologyid', optionsCaption: {% quoted_trans "No ontology" %}, chosen: {disable_search_threshold: 10, width: '500px'}"></select>
                             </div>
                         </div>
                     </div>
@@ -109,7 +110,7 @@
                             </div>
 
                             <div class="col-xs-12 crm-selector">
-                                <select class="design" data-bind="value: graphSettingsViewModel.graph.root.datatype, options: datatypes, optionsCaption: '{% trans 'Choose a data type' %}', chosen: {disable_search_threshold: 10, width: '500px'}"></select>
+                                <select class="design" data-bind="value: graphSettingsViewModel.graph.root.datatype, options: datatypes, optionsCaption: {% quoted_trans 'Choose a data type' %}, chosen: {disable_search_threshold: 10, width: '500px'}"></select>
                             </div>
                         </div>
                     </div>
