@@ -10324,6 +10324,9 @@ a.search-query-link-captions:focus {
     transition: all .5s;
     margin-top: inherit;
     z-index: 5;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
 }
 
 .search-tools-container {
@@ -10409,15 +10412,14 @@ a.search-query-link-captions:focus {
     background: #f4f4f4;
     border-top: 1px solid #ddd;
     height: 50px;
-}
+    justify-content: center;
+    display: flex;
+    align-items: center;
 
-.search-footer {
     #paginator {
-        display: flex;
-        justify-content: center;
         .pagination {
-            padding: 0;
-            margin: 20px 0;
+            padding: 0px;
+            margin: 5px 0px 0px 0px;
         }
     }
 }
