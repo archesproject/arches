@@ -3080,23 +3080,45 @@ a.select2-search-choice-close {
     padding: 0 20px 20px 0;
 }
 
-.clear-search {
-    position: absolute;
-    right: -5px;
-    top: 3px;
-    color: #123;
-    font-size: 19px;
-}
+.icon-selector{
+    .clear-search {
+        color: #123;
+        font-size: 17px;
+        margin: 7px -30px;
+    }
+    
+    .clear-search:hover {
+        cursor: pointer;
+        color: rgba(0, 0, 0, 0.95);
+    }
 
-.clear-search:hover {
-    cursor: pointer;
-    color: rgba(0, 0, 0, 0.95);
-}
+    .icon-list{
+        height: 300px;
+        overflow-y: scroll;
+        padding: 15px;
+        border: 1px solid #e9e9e9;
+    }
+    
+    .list-filter {
+        position: relative;
+        margin-bottom: 8px;
+        margin-right: 0px;
+    }
 
-.list-filter {
-    position: relative;
-    margin-bottom: 8px;
-    margin-right: 0px;
+    .demo-icon-font {
+        font-size: 14px;
+        margin-bottom: 6px;
+        padding: 4px 8px;
+    }
+
+    .demo-icon-font:hover {
+        cursor: pointer;
+        background: #eee;
+    }
+
+    .demo-icon-font .selected {
+        background: #eee;
+    }
 }
 
 .key {
@@ -4279,6 +4301,7 @@ div.dropdown-menu.open {
     border-radius: 13px;
     height: 13px;
     width: 25px;
+    margin: 0 4px;
 }
 
 .switch-small>small {
@@ -5071,22 +5094,6 @@ div.dropdown-menu.open {
 .btn-flat:hover {
     color: #fff;
     background: #8ce196;
-}
-
-.demo-icon-font {
-    font-size: 14px;
-    margin-bottom: 6px;
-    padding-top: 4px;
-    padding-bottom: 4px;
-}
-
-.demo-icon-font:hover {
-    cursor: pointer;
-    background: #eee;
-}
-
-.demo-icon-font .selected {
-    background: #eee;
 }
 
 .library-in {
@@ -7198,7 +7205,7 @@ ul div .card-tree-list span .card-tree-list-item .card-tree-list-icon {
 
 .panel-config .widget-config-container .control-label {
     padding-top: 5px;
-    padding-left: 5px;
+    // padding-left: 5px;
 }
 
 
@@ -8899,6 +8906,17 @@ div.row.widget-wrapper.report-header:hover {
     display: none;
 }
 
+.map-service-manage-control-label {
+    display: flex;
+    justify-content: flex-end;
+    margin: 0 20px;
+}
+
+.permission-user-group-container {
+    display: flex;
+    flex-direction: column;
+}
+
 .map-widget-container-expanded {
     top: 6px;
     right: 10px;
@@ -9589,6 +9607,21 @@ a.clear-geojson-button:hover {
     white-space: nowrap;
     overflow: scroll;
     text-overflow: ellipsis;
+}
+
+.map-style-panel-body-form-group {
+    display: flex;
+}
+
+.map-style-panel-body-control-label {
+    display: flex;
+    flex-direction: row-reverse;
+    margin: 0px 5px;
+    text-align: end;
+}
+
+.clustering-pane-form-group {
+    display: flex;
 }
 
 .mapboxgl-canvas:focus {
@@ -10907,6 +10940,8 @@ table.table.dataTable {
 
 .map-preview-panel {
     padding-top: 5px;
+    height: calc(100vh - 175px);
+    overflow: scroll;
 }
 
 .panel>.panel-heading {
@@ -10926,13 +10961,8 @@ table.table.dataTable {
     }
 }
 
-.basemap-preview-panel {
-    padding-top: 5px;
-    padding-left: 7.5px;
-}
 
 .map-service-container {
-    padding: 10px;
     .config-title {
         margin: 0;
         flex: 1;
@@ -10941,6 +10971,7 @@ table.table.dataTable {
         align-items: center;
         margin-bottom: 10px;
         display: flex;
+        flex-wrap: wrap;
     }
 }
 
@@ -10958,6 +10989,16 @@ table.table.dataTable {
     }
 }
 
+.map-service-manage-layer-name {
+    display: flex;
+    align-items: center;
+}
+
+.map-service-manage-icon-selector {
+    display: flex;
+    flex-wrap: wrap;
+}
+
 .map-service-preview {
     background: #f4f4f4;
     border: 1px solid #ddd;
@@ -10969,18 +11010,17 @@ table.table.dataTable {
 }
 
 .advanced-map-style-switch {
-    margin-top: -45px;
+    margin-top: -35px;
     margin-right: 10px;
     margin-bottom: 10px;
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
 }
 
 .service-url {
     font-size: 12px;
     color: #999;
-}
-
-.service-switch-shim {
-    margin-top: 8px;
 }
 
 .config-title {
@@ -11045,7 +11085,7 @@ table.table.dataTable {
 }
 
 .map-server-instructions {
-    padding: 0px 10px 20px 10px;
+    padding: 20px 10px 20px 10px;
     color: #808080;
 }
 
@@ -11057,6 +11097,10 @@ table.table.dataTable {
     border: 1px solid #ddd;
     background: #f9f9f9;
     margin-bottom: 0px;
+    display: flex;
+    flex-direction: column;
+    flex-wrap: wrap;
+    width: 100%;
 }
 
 .hover-feature-loading {
@@ -14535,6 +14579,8 @@ ul.select2-choices:after {
 
     .dl-horizontal dt {
         margin-bottom: 0px;
+        display: flex;
+        flex-direction: row-reverse;
     }
 
     .dl-horizontal dd {
