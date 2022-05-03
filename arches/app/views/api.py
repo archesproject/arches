@@ -504,7 +504,6 @@ class Graphs(APIBase):
             exclusions = []
 
         perm = "read_nodegroup"
-        graph = cache.get(f"graph_{graph_id}")
         user = request.user
 
         if graph is None:
