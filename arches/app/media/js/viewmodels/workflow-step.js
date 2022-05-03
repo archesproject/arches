@@ -262,11 +262,5 @@ define([
     
     createAsyncComponent('workflow-step', null, 'templates/views/components/plugins/workflow-step.htm', true);
 
-
-    // /* only register template here, params are passed at the workflow level */ 
-    // ko.components.register('workflow-step', {
-    //     template: window['workflow-step-template']
-    // });
-
     return WorkflowStep;
 });

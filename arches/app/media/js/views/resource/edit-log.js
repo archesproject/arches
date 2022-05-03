@@ -4,9 +4,9 @@ require([
     'knockout',
     'moment',
     'views/base-manager',
+    'views/resource/resource-edit-history-data',
     'bindings/chosen'
-], function($, _, ko, moment, BaseManagerView) {
-    const data = window['resource-edit-history-data'];
+], function($, _, ko, moment, BaseManagerView, data) {
     var ResourceEditLogView = BaseManagerView.extend({
         initialize: function(options){
             var self = this;

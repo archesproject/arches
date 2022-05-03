@@ -144,17 +144,14 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 
 {% block pre_require_js %}
 {{ block.super }}
+<div 
+    id="graphManagerData"
+    style="display: none;"
+    graphManagerData='{
+        "root_nodes": {{ root_nodes }}
+    }'
+></div>
 <script>
     require(['underscore']);
-{% autoescape off %}
-    window['graph-manager-data'] = {
-        root_nodes: {{ root_nodes }}
-    };
-    // define('graph-manager-data', [], function () {
-    //     return {
-    //         root_nodes: {{ root_nodes }}
-    //     };
-    // });
-    {% endautoescape %}
 </script>
 {% endblock pre_require_js %}

@@ -3,6 +3,7 @@ require([
     'underscore',
     'knockout',
     'arches',
+    'views/graph-manager-data',
     'views/base-manager',
     'viewmodels/alert',
     'viewmodels/alert-json',
@@ -10,8 +11,7 @@ require([
     'bindings/hover',
     'bindings/chosen',
     'utils/set-csrf-token',
-], function($, _, ko, arches, BaseManager, AlertViewModel, JsonErrorAlertViewModel) {   
-    const graphManagerData = window['graph-manager-data'];
+], function($, _, ko, arches, graphManagerData, BaseManager, AlertViewModel, JsonErrorAlertViewModel) {   
     var GraphView = BaseManager.extend({
         /**
         * Initializes an instance of BaseManager, optionally using a passed in view
