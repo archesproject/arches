@@ -8696,17 +8696,23 @@ a.mega-dropdown-toggle.disabled {
     margin-bottom: 0px;
 }
 
+.resource-report-abstract-container {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+}
+
 .rp-card-section {        
     
     padding-bottom: 10px;
     padding-top: 0px;
     position: relative;
     margin: 10px 20px;
-
+    
     .rp-report-container-tile{
         padding: 0;
     }
-
+    
     .rp-report-tile{
         &.provisional-edit-cards {
             padding-left: 0px;
@@ -8716,18 +8722,23 @@ a.mega-dropdown-toggle.disabled {
         .dl-horizontal {
             margin-bottom: 0px;
             display: grid;
-            grid-template-columns: 200px 1fr;
-            align-items: center;
-
+            grid-template-columns: 260px 1fr;
+            align-items: start;
+            
             dt {
                 grid-column: 1;
                 font-weight: 600;
-                text-align: start;
+                text-align: end;
                 width: auto;
                 
             }
             dd {
                 grid-column: 2;
+                margin: 0px;
+                padding-top: 5px;
+                padding-bottom: 5px;
+                padding-inline-start: 20px;
+                padding-inline-end: 100px;
             }
         }
     }
@@ -14499,7 +14510,7 @@ ul.select2-choices:after {
 
     .dl-horizontal dd {
         padding-right: 20px;
-        margin-left: 220px;
+        margin: 0px;
         word-break: break-word;
     }
 
@@ -14529,7 +14540,7 @@ ul.select2-choices:after {
 
     .dl-horizontal dd {
         padding: 0 20px;
-        margin: 0;
+        margin: 0px;
         word-break: break-word;
     }
 
@@ -14662,7 +14673,7 @@ ul.select2-choices:after {
     }
 
     .dl-horizontal dd {
-        margin-left: 280px;
+        margin: 0px;
         padding-right: 100px;
         word-break: break-word;
     }
@@ -14693,6 +14704,25 @@ ul.select2-choices:after {
         display: none;
         height: 0;
     }
+
+    .resource-report-abstract-container {
+        height: auto !important;
+    }
+
+    .rp-card-section .rp-report-tile .dl-horizontal {
+        display: block;
+
+        dt {
+            padding: 5px 0px;
+            text-align: start;
+        }
+        
+        dd {
+            margin: 0px 20px;
+            padding: 0px;
+        }
+    }
+
 }
 
 #user-profile {
