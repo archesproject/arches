@@ -2743,8 +2743,8 @@ span.icon-wrap.icon-circle.bg-gray-dark:hover {
 }
 
 .input-group-addon:first-child{
-    border-left: 1px solid #e1e5ea;
-    border-right: none;
+    border-inline-start: 1px solid #e1e5ea;
+    border-inline-end: none;
 }
 
 .widget-input-label {
