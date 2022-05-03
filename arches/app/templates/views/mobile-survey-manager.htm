@@ -122,14 +122,11 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 
 {% block pre_require_js %}
 {{block.super}}
-    <script>
-        window['mobile-survey-manager-data'] = {
-            mobilesurveys: {{mobile_surveys}}
-        };
-        // {% autoescape off %}define('mobile-survey-manager-data', [], function() {
-        //     return {
-        //         mobilesurveys: {{mobile_surveys}}
-        //     };
-        // });{% endautoescape %}
-    </script>
+<div 
+    id="mobileSurveyManagerData"
+    style="display: none;"
+    mobileSurveyManagerData='{
+        "mobilesurveys": {{mobile_surveys}}
+    }'
+></div>
 {% endblock pre_require_js %}

@@ -7,11 +7,11 @@ define([
     'viewmodels/alert',
     'models/mobile-survey',
     'views/mobile-survey-manager/mobile-survey-tree',
+    'views/mobile-survey-manager-data',
     'bindings/datepicker',
     'bindings/resizable-sidepanel',
     'bindings/select2-query'
-], function(_, ko, arches, BaseManagerView, MobileSurveyViewModel, AlertViewModel, MobileSurveyModel, Tree,) {
-    const data = window['mobile-survey-manager-data'];
+], function(_, ko, arches, BaseManagerView, MobileSurveyViewModel, AlertViewModel, MobileSurveyModel, Tree, data) {
     var viewModel = new MobileSurveyViewModel(data);
     viewModel.saveMobileSurvey = function() {
         var self = this;

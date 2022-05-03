@@ -4,10 +4,10 @@ require([
     'knockout',
     'knockout-mapping',
     'views/graph/graph-page-view',
+    'views/graph/graph-settings-data',
     'bindings/color-picker',
     'models/node'
-], function($, _, ko, koMapping, PageView, colorpicker, NodeModel) {
-    const data = window['graph-settings-data'];
+], function($, _, ko, koMapping, PageView, data, colorpicker, NodeModel) {
     /**
     * prep data for models
     */

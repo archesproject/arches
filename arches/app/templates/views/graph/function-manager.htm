@@ -153,26 +153,12 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 
 {% block pre_require_js %}
 {{block.super}}
-<script>
-    {% autoescape off %}
-    window['graph-functions-data'] = {
-        functions: {{functions}},
-        applied_functions: {{applied_functions}},
-        // datatypes: {{ datatypes_json }},
-        // widgets: {{ widgets_json }},
-        // resourceid: '{{resourceid}}',
-        // graph: {{graph_json}},
-    };
-    // define('graph-functions-data', [], function () {
-    //     return {
-    //         functions: {{functions}},
-    //         applied_functions: {{applied_functions}},
-    //         // datatypes: {{ datatypes_json }},
-    //         // widgets: {{ widgets_json }},
-    //         // resourceid: '{{resourceid}}',
-    //         // graph: {{graph_json}},
-    //     };
-    // });
-    {% endautoescape %}
-</script>
+<div 
+    id="graphFunctionsData"
+    style="display: none;"
+    graphFunctionsData='{
+        "functions": {{functions}},
+        "applied_functions": {{applied_functions}},
+    }'
+></div>
 {% endblock pre_require_js %}

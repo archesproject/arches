@@ -468,21 +468,14 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 {% endblock main_content %}
 {% block pre_require_js %}
 {{ block.super }}
-<script>{% autoescape off %}
-    window['profile-manager-data'] = {
-        'error_count': {{form.errors|length}},
-        'mobilesurveys': {{user_surveys}},
-        'identities': {{identities}},
-        'resources': {{resources}}
-    }
-    // define('profile-manager-data', [], function() {
-    //     return {
-    //         'error_count': {{form.errors|length}},
-    //         'mobilesurveys': {{user_surveys}},
-    //         'identities': {{identities}},
-    //         'resources': {{resources}}
-    //     }
-    // });
-{% endautoescape %}</script>
-
+<div 
+    id="profileManagerData"
+    style="display: none;"
+    profileManagerData='{
+        "error_count": {{form.errors|length}},
+        "mobilesurveys": {{user_surveys}},
+        "identities": {{identities}},
+        "resources": {{resources}}
+    }'
+></div>
 {% endblock pre_require_js %}

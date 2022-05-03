@@ -9,11 +9,11 @@ define([
     'models/node',
     'viewmodels/alert',
     'views/components/widgets/map/bin-feature-collection',
+    'views/map-layer-manager-data',
     'bindings/mapbox-gl',
     'bindings/codemirror',
     'views/components/datatypes/geojson-feature-collection',
-], function($, ko, _, arches, turf, geohash, BaseManagerView, NodeModel, AlertViewModel, binFeatureCollection) {
-    const data = window['map-layer-manager-data'];
+], function($, ko, _, arches, turf, geohash, BaseManagerView, NodeModel, AlertViewModel, binFeatureCollection, data) {
     var vm = {
         map: null,
         geomNodes: [],

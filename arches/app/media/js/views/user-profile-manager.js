@@ -8,9 +8,9 @@ define([
     'models/mobile-survey',
     'views/base-manager',
     'views/mobile-survey-manager/identity-list',
+    'views/profile-manager-data',
     'utils/set-csrf-token'
-], function($, _, ko, koMapping, arches, MobileSurveyViewModel, MobileSurveyModel, BaseManagerView, IdentityList) {
-    const data = window['profile-manager-data'];
+], function($, _, ko, koMapping, arches, MobileSurveyViewModel, MobileSurveyModel, BaseManagerView, IdentityList, data) {
     var UserProfileManager = BaseManagerView.extend({
         initialize: function(options) {
             var self = this;
