@@ -8739,6 +8739,7 @@ a.mega-dropdown-toggle.disabled {
                 padding-bottom: 5px;
                 padding-inline-start: 20px;
                 padding-inline-end: 50px;
+                word-break: break-word;
             }
         }
     }
@@ -14510,7 +14511,6 @@ ul.select2-choices:after {
     .dl-horizontal dd {
         padding-right: 20px;
         margin: 0px;
-        word-break: break-word;
     }
 
     .dl-horizontal dt {
