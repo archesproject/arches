@@ -1,4 +1,4 @@
-define(['require'], function (require) {
+define(['utils/load-component-dependencies'], function (loadComponentDependencies) {
     function removeTrailingCommaFromObject(string) {
         return string.replace(/,\s*}*$/, "}");
     }
@@ -7,14 +7,7 @@ define(['require'], function (require) {
     const geocoderTemplateData = geocoderTemplateDataHTML.getAttribute('geocoderTemplates');
     const geocoderTemplates = JSON.parse(removeTrailingCommaFromObject(geocoderTemplateData));
 
-    Object.keys(geocoderTemplates).forEach((key) => {
-        try {  // first try to load project path
-            require(`../../../../../sfplanning/sfplanning/media/js/${geocoderTemplates[key]['component']}`);
-        }
-        catch(e) {  // if project path fails, load arches-core path
-            require(`./${geocoderTemplates[key]['component']}`);
-        }
-    });
+    loadComponentDependencies(Object.values(geocoderTemplates).map(value => value['component']));
 
     return geocoderTemplates;
 });

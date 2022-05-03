@@ -1,4 +1,4 @@
-define(['require'], function (require) {
+define(['utils/load-component-dependencies'], function (loadComponentDependencies) {
     function removeTrailingCommaFromObject(string) {
         return string.replace(/,\s*}*$/, "}");
     }
@@ -7,14 +7,7 @@ define(['require'], function (require) {
     const widgetData = widgetDataHTML.getAttribute('widgets');
     const widgets = JSON.parse(removeTrailingCommaFromObject(widgetData));
 
-    Object.keys(widgets).forEach((key) => {
-        try {  // first try to load project path
-            require(`${PROJECT_PATH}/media/js/${widgets[key]['component']}`);
-        }
-        catch(e) {  // if project path fails, load arches-core path
-            require(`./${widgets[key]['component']}`);
-        }
-    });
+    loadComponentDependencies(Object.values(widgets).map(value => value['component']));
 
     return widgets;
 });

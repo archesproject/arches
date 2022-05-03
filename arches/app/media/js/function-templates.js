@@ -1,4 +1,4 @@
-define(['require'], function (require) {
+define(['utils/load-component-dependencies'], function (loadComponentDependencies) {
     function removeTrailingCommaFromObject(string) {
         return string.replace(/,\s*}*$/, "}");
     }
@@ -6,15 +6,8 @@ define(['require'], function (require) {
     const functionTemplateDataHTML = document.querySelector('#functionTemplateData');
     const functionTemplateData = functionTemplateDataHTML.getAttribute('functionTemplates');
     const functionTemplates = JSON.parse(removeTrailingCommaFromObject(functionTemplateData));
-
-    Object.keys(functionTemplates).forEach((key) => {
-        try {  // first try to load project path
-            require(`../../../../../sfplanning/sfplanning/media/js/${functionTemplates[key]['component']}`);
-        }
-        catch(e) {  // if project path fails, load arches-core path
-            require(`./${functionTemplates[key]['component']}`);
-        }
-    });
+    
+    loadComponentDependencies(Object.values(functionTemplates).map(value => value['component']));
 
     return functionTemplates;
 });
