@@ -506,29 +506,32 @@ class Graphs(APIBase):
         perm = "read_nodegroup"
         user = request.user
 
-        if graph is None:
+        if graph_id:
             graph = Graph.objects.get(graphid=graph_id)
-        graph = JSONSerializer().serializeToPython(graph, sort_keys=False, exclude=["is_editable", "functions"] + exclusions)
+            graph = JSONSerializer().serializeToPython(graph, sort_keys=False, exclude=["is_editable", "functions"] + exclusions)
 
-        if get_cards:
-            datatypes = models.DDataType.objects.all()
-            cards = CardProxyModel.objects.filter(graph_id=graph_id).order_by("sortorder")
-            permitted_cards = []
-            for card in cards:
-                if user.has_perm(perm, card.nodegroup):
-                    card.filter_by_perm(user, perm)
-                    permitted_cards.append(card)
-            cardwidgets = [
-                widget
-                for widgets in [card.cardxnodexwidget_set.order_by("sortorder").all() for card in permitted_cards]
-                for widget in widgets
-            ]
+            if get_cards:
+                datatypes = models.DDataType.objects.all()
+                cards = CardProxyModel.objects.filter(graph_id=graph_id).order_by("sortorder")
+                permitted_cards = []
+                for card in cards:
+                    if user.has_perm(perm, card.nodegroup):
+                        card.filter_by_perm(user, perm)
+                        permitted_cards.append(card)
+                cardwidgets = [
+                    widget
+                    for widgets in [card.cardxnodexwidget_set.order_by("sortorder").all() for card in permitted_cards]
+                    for widget in widgets
+                ]
 
-            permitted_cards = JSONSerializer().serializeToPython(permitted_cards, sort_keys=False, exclude=["is_editable"])
+                permitted_cards = JSONSerializer().serializeToPython(permitted_cards, sort_keys=False, exclude=["is_editable"])
 
-            return JSONResponse({"datatypes": datatypes, "cards": permitted_cards, "graph": graph, "cardwidgets": cardwidgets})
+                return JSONResponse({"datatypes": datatypes, "cards": permitted_cards, "graph": graph, "cardwidgets": cardwidgets})
+            else:
+                return JSONResponse({"graph": graph})
         else:
-            return JSONResponse({"graph": graph})
+            graphs = models.GraphModel.objects.all()
+            return JSONResponse(JSONSerializer().serializeToPython(graphs))
 
 
 @method_decorator(csrf_exempt, name="dispatch")
