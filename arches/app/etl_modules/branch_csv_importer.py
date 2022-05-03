@@ -181,7 +181,7 @@ class BranchCsvImporter:
                     node_lookup = self.get_node_lookup(nodes)
                     with connection.cursor() as cursor:
                         cursor.execute(
-                            """INSERT INTO load_event (loadid, complete, user_id) VALUES (%s, %s, %s)""", (self.loadid, False, self.userid)
+                            """INSERT INTO load_event (loadid, etl_module, complete, user_id) VALUES (%s, %s, %s, %s)""", (self.loadid, "branch-csv-mport", False, self.userid)
                         )
                         for worksheet in workbook.worksheets:
                             if worksheet.title.lower() != "metadata":

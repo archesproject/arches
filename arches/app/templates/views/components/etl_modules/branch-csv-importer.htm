@@ -1,4 +1,7 @@
+{% extends "views/components/etl_modules/base-import.htm" %}
 {% load i18n %}
+
+{% block task_details %}
 <!-- ko ifnot: loading() -->
     <div class="branch-csv-etl">
         <!-- ko ifnot: response() -->
@@ -108,3 +111,7 @@
         <!-- /ko -->
     </div>
 <!--/ko-->
+{% endblock task_details %}
+
+{% block etl_status %}
+{% endblock etl_status %}
