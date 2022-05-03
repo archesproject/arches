@@ -3106,6 +3106,21 @@ a.select2-search-choice-close {
         margin-bottom: 8px;
         margin-right: 0px;
     }
+
+    .demo-icon-font {
+        font-size: 14px;
+        margin-bottom: 6px;
+        padding: 4px 8px;
+    }
+
+    .demo-icon-font:hover {
+        cursor: pointer;
+        background: #eee;
+    }
+
+    .demo-icon-font .selected {
+        background: #eee;
+    }
 }
 
 .key {
@@ -5081,22 +5096,6 @@ div.dropdown-menu.open {
 .btn-flat:hover {
     color: #fff;
     background: #8ce196;
-}
-
-.demo-icon-font {
-    font-size: 14px;
-    margin-bottom: 6px;
-    padding-top: 4px;
-    padding-bottom: 4px;
-}
-
-.demo-icon-font:hover {
-    cursor: pointer;
-    background: #eee;
-}
-
-.demo-icon-font .selected {
-    background: #eee;
 }
 
 .library-in {
