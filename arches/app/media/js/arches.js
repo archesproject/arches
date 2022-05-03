@@ -58,6 +58,7 @@ define(['utils/set-csrf-token'], function () {
     }
 
     const archesData = document.querySelector('#arches-data');
+    window['foo'] = 'sfplanning'
 
     return {
         celeryRunning: archesData.getAttribute('celeryRunning'),
@@ -88,6 +89,7 @@ define(['utils/set-csrf-token'], function () {
         mapMarkers: JSON.parse(removeTrailingCommaFromArray(archesData.getAttribute('mapMarkers'))),
         mapSources: JSON.parse(removeTrailingCommaFromObject(archesData.getAttribute('mapSources'))),
         preferredCoordinateSystems: JSON.parse(archesData.getAttribute('preferredCoordinateSystems')),
+        projectRoot: archesData.getAttribute('projectRoot'),
         requestFailed: JSON.parse(archesData.getAttribute('requestFailed')),
         resourceCopyFailed: JSON.parse(archesData.getAttribute('resourceCopyFailed')),
         resourceCopySuccess: JSON.parse(archesData.getAttribute('resourceCopySuccess')),

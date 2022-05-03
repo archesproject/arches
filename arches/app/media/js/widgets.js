@@ -9,7 +9,7 @@ define(['require'], function (require) {
 
     Object.keys(widgets).forEach((key) => {
         try {  // first try to load project path
-            require(`../../../../../sfplanning/sfplanning/media/js/${widgets[key]['component']}`);
+            require(`${PROJECT_PATH}/media/js/${widgets[key]['component']}`);
         }
         catch(e) {  // if project path fails, load arches-core path
             require(`./${widgets[key]['component']}`);

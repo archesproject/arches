@@ -69,6 +69,7 @@ def app_settings(request):
         "app_settings": {
             "VERSION": __version__,
             "APP_NAME": settings.APP_NAME,
+            "APP_ROOT": settings.APP_ROOT,
             "GOOGLE_ANALYTICS_TRACKING_ID": settings.GOOGLE_ANALYTICS_TRACKING_ID,
             "USE_SEMANTIC_RESOURCE_RELATIONSHIPS": settings.USE_SEMANTIC_RESOURCE_RELATIONSHIPS,
             "SEARCH_EXPORT_IMMEDIATE_DOWNLOAD_THRESHOLD": settings.SEARCH_EXPORT_IMMEDIATE_DOWNLOAD_THRESHOLD,
