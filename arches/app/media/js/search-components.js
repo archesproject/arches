@@ -8,7 +8,12 @@ define(['require'], function (require) {
     const searchComponents = JSON.parse(removeTrailingCommaFromObject(searchComponentData));
 
     Object.keys(searchComponents).forEach((key) => {
-        require(`./${searchComponents[key]['componentpath']}`);
+        try {  // first try to load project path
+            require(`../../../../../sfplanning/sfplanning/media/js/${searchComponents[key]['componentpath']}`);
+        }
+        catch(e) {  // if project path fails, load arches-core path
+            require(`./${searchComponents[key]['componentpath']}`);
+        }
     });
 
     return searchComponents;

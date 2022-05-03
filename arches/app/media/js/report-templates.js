@@ -8,7 +8,12 @@ define(['require'], function (require) {
     const reportTemplates = JSON.parse(removeTrailingCommaFromObject(reportTemplateData));
 
     Object.keys(reportTemplates).forEach((key) => {
-        require(`./${reportTemplates[key]['component']}`);
+        try {  // first try to load project path
+            require(`../../../../../sfplanning/sfplanning/media/js/${reportTemplates[key]['component']}`);
+        }
+        catch(e) {  // if project path fails, load arches-core path
+            require(`./${reportTemplates[key]['component']}`);
+        }
     });
 
     return reportTemplates;

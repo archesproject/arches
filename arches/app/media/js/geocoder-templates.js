@@ -8,7 +8,12 @@ define(['require'], function (require) {
     const geocoderTemplates = JSON.parse(removeTrailingCommaFromObject(geocoderTemplateData));
 
     Object.keys(geocoderTemplates).forEach((key) => {
-        require(`./${geocoderTemplates[key]['component']}`);
+        try {  // first try to load project path
+            require(`../../../../../sfplanning/sfplanning/media/js/${geocoderTemplates[key]['component']}`);
+        }
+        catch(e) {  // if project path fails, load arches-core path
+            require(`./${geocoderTemplates[key]['component']}`);
+        }
     });
 
     return geocoderTemplates;

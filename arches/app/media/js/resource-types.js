@@ -8,7 +8,12 @@ define(['require'], function (require) {
     const resourceTypes = JSON.parse(removeTrailingCommaFromObject(resourceTypeData));
 
     Object.keys(resourceTypes).forEach((key) => {
-        require(`./${resourceTypes[key]['component']}`);
+        try {  // first try to load project path
+            require(`../../../../../sfplanning/sfplanning/media/js/${resourceTypes[key]['component']}`);
+        }
+        catch(e) {  // if project path fails, load arches-core path
+            require(`./${resourceTypes[key]['component']}`);
+        }
     });
 
     return resourceTypes;

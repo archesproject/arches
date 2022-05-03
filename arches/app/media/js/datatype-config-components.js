@@ -8,7 +8,12 @@ define(['require'], function (require) {
     const datatypeConfigComponents = JSON.parse(removeTrailingCommaFromObject(datatypeConfigComponentData));
 
     Object.keys(datatypeConfigComponents).forEach((key) => {
-        require(`./${datatypeConfigComponents[key]['configcomponent']}`);
+        try {  // first try to load project path
+            require(`../../../../../sfplanning/sfplanning/media/js/${datatypeConfigComponents[key]['configcomponent']}`);
+        }
+        catch(e) {  // if project path fails, load arches-core path
+            require(`./${datatypeConfigComponents[key]['configcomponent']}`);
+        }
     });
 
     return datatypeConfigComponents;

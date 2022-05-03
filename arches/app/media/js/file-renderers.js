@@ -8,7 +8,12 @@ define(['require'], function (require) {
     const fileRenderers = JSON.parse(removeTrailingCommaFromObject(fileRendererData));
 
     Object.keys(fileRenderers).forEach((key) => {
-        require(`./${fileRenderers[key]['component']}`);
+        try {  // first try to load project path
+            require(`../../../../../sfplanning/sfplanning/media/js/${fileRenderers[key]['component']}`);
+        }
+        catch(e) {  // if project path fails, load arches-core path
+            require(`./${fileRenderers[key]['component']}`);
+        }
     });
 
     return fileRenderers;

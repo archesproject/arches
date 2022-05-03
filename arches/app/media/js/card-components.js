@@ -8,7 +8,12 @@ define(['require'], function (require) {
     const cardComponents = JSON.parse(removeTrailingCommaFromObject(cardComponentData));
 
     Object.keys(cardComponents).forEach((key) => {
-        require(`./${cardComponents[key]['component']}`);
+        try {  // first try to load project path
+            require(`../../../../../sfplanning/sfplanning/media/js/${cardComponents[key]['component']}`);
+        }
+        catch(e) {  // if project path fails, load arches-core path
+            require(`./${cardComponents[key]['component']}`);
+        }
     });
 
     return cardComponents;

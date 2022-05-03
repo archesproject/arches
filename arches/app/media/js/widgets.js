@@ -5,7 +5,6 @@ define(['require'], function (require) {
 
     const widgetDataHTML = document.querySelector('#widgetData');
     const widgetData = widgetDataHTML.getAttribute('widgets');
-
     const widgets = JSON.parse(removeTrailingCommaFromObject(widgetData));
 
     Object.keys(widgets).forEach((key) => {

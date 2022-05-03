@@ -5,7 +5,6 @@ define(['require'], function (require) {
 
     const pluginsDataHTML = document.querySelector('#pluginsData');
     const pluginsData = pluginsDataHTML.getAttribute('plugins');
-
     const plugins = JSON.parse(removeTrailingCommaFromObject(pluginsData));
 
     Object.keys(plugins).forEach((key) => {
