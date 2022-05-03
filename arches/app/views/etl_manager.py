@@ -1,4 +1,3 @@
-import json
 import logging
 from django.views.generic import View
 from arches.app.models.models import ETLModule
@@ -31,3 +30,8 @@ class ETLManagerView(View):
             return JSONResponse(ret)
         else:
             return JSONResponse(status=400, reason=response["data"])
+
+# class Templates(View):
+
+#     def get(self, request):
+

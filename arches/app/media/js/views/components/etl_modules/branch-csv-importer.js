@@ -2,18 +2,32 @@ define([
     'underscore',
     'knockout',
     'viewmodels/base-import-view-model',
+    'arches',
     'dropzone',
     'bindings/dropzone',
-], function(_, ko, ImporterViewModel, dropzone) {
+    'bindings/select2-query'
+], function(_, ko, ImporterViewModel, arches, dropzone) {
     return ko.components.register('branch-csv-importer', {
         viewModel: function(params) {
             const self = this;
             this.moduleId = params.etlmoduleid;
             ImporterViewModel.apply(this, arguments);
             this.loading = params.config.loading;
-            this.response.subscribe(val => {
-                console.log(val);
-            });
+            this.templates = ko.observableArray();
+            this.selectedTemplate = ko.observable();
+
+            const getGraphs = async function() {
+                let response = await fetch(arches.urls.graphs_api);
+                if (response.ok) {
+                    let graphs = await response.json();
+                    let templates = graphs.map(function(graph){
+                        return {text: graph.name, id: graph.graphid};
+                    });
+                    self.templates(templates);
+                }
+              }
+
+            getGraphs();
 
             this.write = function(){
                 self.loading(true);

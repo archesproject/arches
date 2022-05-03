@@ -1,7 +1,36 @@
 {% load i18n %}
 <!-- ko ifnot: loading() --><!-- ko ifnot: response() -->
-<div data-bind="dropzone: dropzoneOptions" class="file-select loader-select" style="height: 100%; width: 100%">
-    <div>
+<div class="file-select loader-select" style="display: flex; height: 100%; width: 100%">
+    <div style="width: 50%">
+        <div class="manifest-manager-main-menu-circle loader-button">
+            <span><i style="color: #000" class="fa fa-file-text-o r-select-icon"></i></span>
+        </div> 
+        <h2>{% trans 'Download Templates' %}</h2>
+        <h4>{% trans 'Select a Resource Model' %}</h4>
+        <div style="display: flex; padding: 15px 25px; flex-direction: column; justify-content: center; align-items: center;">
+            <div style="width: 250px; display:flex; flex-direction: column;">
+                <div>
+                    <!-- ko if: templates().length -->
+                    <input style="display:inline-block;" data-bind="select2Query: {
+                        select2Config: {
+                            clickBubble: true,
+                            disabled: false,
+                            data: {results: templates()},
+                            value: selectedTemplate,
+                            allowClear: true,
+                            multiple: false,
+                            placeholder: {% trans "'Select Template'" %}}}">
+                    <!--/ko-->
+                </div>
+            </div>
+            <!-- ko if: selectedTemplate() -->
+            <button style="border-top: 1px solid #c4c4c4; margin: 15px;" class="btn btn-primary btn-labeled btn-lg fa fa-download" >
+                {% trans 'Download' %}
+            </button>
+            <!-- /ko -->
+        </div>
+    </div>
+    <div data-bind="dropzone: dropzoneOptions" style="width: 50%">
         <div class="manifest-manager-main-menu-circle loader-button">
             <span><i style="color: #000" class="fa fa-cloud-upload r-select-icon"></i></span>
         </div> 
