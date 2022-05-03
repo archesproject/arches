@@ -649,13 +649,17 @@ define([
                             canvasIndex = sequence.canvases.findIndex(function(c){return c.images[0].resource.service['@id'] === self.canvas();});
                         }
                         var canvas = sequence.canvases[canvasIndex];
-                        
+
+                        self.primaryLayerLoaded = false;
+                        self.secondaryLayerLoaded = false;
+                        const service = self.getCanvasService(canvas);
+                        self.zoomToCanvas = true;
+                        self.canvas(service);
+                        self.canvasObject(canvas);
+
                         if(self.compareMode()){
-                            self.primaryLayerLoaded = false;
-                            self.secondaryLayerLoaded = false;
-                            const service = self.getCanvasService(canvas)
-                            self.canvas(service);
                             self.secondaryCanvas(service);
+                            self.secondaryCanvasObject(canvas);
                         }
                     }    
                 }
