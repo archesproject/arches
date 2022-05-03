@@ -223,7 +223,6 @@ add_staging_to_tile_function = """
             _key text;
             _value text;
         BEGIN
-            UPDATE load_event SET load_start_time = now() WHERE loadid = load_id;
             FOR staged_value, instance_id, legacy_id, tile_id, parent_id, group_id, passed, graph_id IN
                     (
                         SELECT value, resourceid, legacyid, tileid, parenttileid, ls.nodegroupid, passes_validation, n.graphid

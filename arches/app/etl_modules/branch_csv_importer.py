@@ -1,6 +1,7 @@
-import os
+from datetime import datetime
 import logging
 import math
+import os
 import shutil
 import uuid
 import zipfile
@@ -181,7 +182,7 @@ class BranchCsvImporter:
                     node_lookup = self.get_node_lookup(nodes)
                     with connection.cursor() as cursor:
                         cursor.execute(
-                            """INSERT INTO load_event (loadid, etl_module, complete, user_id) VALUES (%s, %s, %s, %s)""", (self.loadid, "branch-csv-mport", False, self.userid)
+                            """INSERT INTO load_event (loadid, etl_module, complete, load_start_time, user_id) VALUES (%s, %s, %s, %s, %s)""", (self.loadid, "branch-csv-importer", False, datetime.now(), self.userid)
                         )
                         for worksheet in workbook.worksheets:
                             if worksheet.title.lower() != "metadata":
