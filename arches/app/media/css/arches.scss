@@ -2742,6 +2742,11 @@ span.icon-wrap.icon-circle.bg-gray-dark:hover {
     background: #fafafa;
 }
 
+.input-group-addon:first-child{
+    border-inline-start: 1px solid #e1e5ea;
+    border-inline-end: none;
+}
+
 .widget-input-label {
     font-size: 12px;
     margin-top: 2px;
