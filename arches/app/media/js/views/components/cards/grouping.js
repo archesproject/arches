@@ -25,6 +25,8 @@ define([
         this.saving = params.form?.saving || ko.observable(false);
         this.tiles = [];
         this.widgetInstanceDataLookup = {};
+        this.showGrid = params?.form?.showGrid;
+        this.toggleGrid = params?.form?.toggleGrid;
 
         /*
             'sortedWidgetIds' originally referred to entries in the
