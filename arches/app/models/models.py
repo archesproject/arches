@@ -1438,6 +1438,7 @@ class LoadEvent(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     complete = models.BooleanField(default=False)
     successful = models.BooleanField(blank=True, null=True)
+    etl_module = models.TextField()
     load_description = models.TextField(blank=True, null=True)
     load_details = JSONField(blank=True, null=True)
     error_message = models.TextField(blank=True, null=True)
