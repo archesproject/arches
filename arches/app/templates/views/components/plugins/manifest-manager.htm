@@ -1,5 +1,6 @@
 {% extends "views/components/iiif-viewer.htm" %}
 {% load staticfiles %}
+{% load template_tags %}
 {% load i18n %}
 
 {% block tabs %}
@@ -263,7 +264,7 @@
 
 {% block gallery_header %}
     <div>
-        <span class="iiif-gallery-manifest-label" data-bind="text: manifestData() ? manifestName() : '{% trans "No manifest selected..." %}'"></span>
+        <span class="iiif-gallery-manifest-label" data-bind="text: manifestData() ? manifestName() : {% quoted_trans "No manifest selected..." %}"></span>
     </div>                 
     <div>
         <span class="iiif-gallery-sequence-label" data-bind="click: function(){expandGallery(!expandGallery())}">
