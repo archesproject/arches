@@ -15,7 +15,13 @@ define([
             this.loading = params.config.loading;
             this.templates = ko.observableArray();
             this.selectedTemplate = ko.observable();
+            
 
+
+            this.downloadTemplate = async () => {
+                window.location.href = `/etl-manager/templates?id=${this.selectedTemplate()}&format=xls&filename=${this.templates().filter(x => x.id == this.selectedTemplate())[0].text}%20-%20Template.xls`;
+                this.loading(false);
+            };
             const getGraphs = async function() {
                 let response = await fetch(arches.urls.graphs_api);
                 if (response.ok) {

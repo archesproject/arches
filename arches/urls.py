@@ -22,7 +22,7 @@ from django.conf.urls import include, url
 from django.contrib.staticfiles.urls import staticfiles_urlpatterns
 from arches.app.views import concept, main, map, search, graph, api
 from arches.app.views.admin import ReIndexResources, FileView, ClearUserPermissionCache
-from arches.app.views.etl_manager import ETLManagerView
+from arches.app.views.etl_manager import ETLManagerView, Templates
 from arches.app.views.graph import (
     GraphDesignerView,
     GraphSettingsView,
@@ -294,7 +294,8 @@ urlpatterns = [
     url(r"^iiifannotationnodes$", api.IIIFAnnotationNodes.as_view(), name="iiifannotationnodes"),
     url(r"^manifest/(?P<id>[0-9]+)$", api.Manifest.as_view(), name="manifest"),
     url(r"^image-service-manager", ManifestManagerView.as_view(), name="manifest_manager"),
-    url(r"^etl-manager", ETLManagerView.as_view(), name="etl_manager"),
+    url(r"^etl-manager$", ETLManagerView.as_view(), name="etl_manager"),
+    url(r"^etl-manager/templates$", Templates.as_view(), name="etl_manager_templates"),
     url(r"^clear-user-permission-cache", ClearUserPermissionCache.as_view(), name="clear_user_permission_cache"),
     url(r"^transform-edtf-for-tile", api.TransformEdtfForTile.as_view(), name="transform_edtf_for_tile"),
 ]
