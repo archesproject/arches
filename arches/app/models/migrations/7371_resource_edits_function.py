@@ -4,7 +4,7 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ("models", "7262_report_template_data_fetch_bool"),
+        ("models", "8247_update_primary_descriptors_config"),
     ]
 
     operations = [
