@@ -5,7 +5,6 @@ define([
 ], function(ko, arches, Cookies) {
     return ko.components.register('etl-manager', {
         viewModel: function(params) {
-            console.log(params)
             const self = this;
             this.loading = params.loading;
             this.alert = params.alert;
@@ -47,6 +46,27 @@ define([
                 });
             };
 
+            this.cleanLoadEvent = function(loadid) {
+                const url = arches.urls.etl_manager + "?action=cleanEvent&loadid="+loadid;
+                window.fetch(url).then(function(response){
+                    if(response.ok){
+                        return response.json();
+                    }
+                }).then(function(data){
+                    console.log(data)
+                });
+            };
+
+            this.reverseTransactions = function(loadid) {
+                self.loading(true);
+                $.ajax({
+                    type: "POST",
+                    url: arches.urls.transaction_reverse(loadid)
+                }).then(function() {
+                    self.loading(false);
+                });
+            };
+    
             this.getUserName = function(user){
                 self.loading(true);
                 $.ajax({
@@ -104,11 +124,11 @@ define([
 
             this.formatTime = function(timeString){
                 if (timeString){
-                    timeObject = new Date(timeString)
+                    timeObject = new Date(timeString);
+                    return timeObject.toLocaleString();
                 } else {
                     return null;
                 }
-                return timeObject.toLocaleString();
             };
 
             this.timeDifference = function(endTime, startTime){

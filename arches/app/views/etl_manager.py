@@ -23,6 +23,12 @@ class ETLManagerView(View):
             rows = cursor.fetchall()
         return {"success": True, "data": rows}
 
+    def clean_load_event(self, loadid):
+        with connection.cursor() as cursor:
+            cursor.execute("""DELETE FROM load_staging WHERE loadid = %s""", [loadid])
+            cursor.execute("""DELETE FROM load_event WHERE loadid = %s""", [loadid])
+        return {"success": True, "data": ""}
+
     def get(self, request):
         action = request.GET.get("action", None)
         loadid = request.GET.get("loadid", None)
@@ -34,6 +40,8 @@ class ETLManagerView(View):
             response = LoadStaging.objects.get(loadid=loadid)
         elif action == "validate" and loadid:
             response = self.validate(loadid)
+        elif action == "cleanEvent" and loadid:
+            response = self.clean_load_event(loadid)            
         return JSONResponse(response)
 
     def post(self, request):
