@@ -3,7 +3,6 @@ define([
     'underscore', 
     'viewmodels/widget',
     'utils/create-async-component',
-    'templates/views/components/widgets/text.htm'
 ], function (ko, _, WidgetViewModel, createAsyncComponent) {
     /**
     * registers a text-widget component for use in forms

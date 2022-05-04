@@ -4,7 +4,6 @@ define([
     'arches',
     'utils/create-async-component',
     'bindings/smartresize',
-    'templates/views/components/search/saved-searches.htm'
 ], function($, ko, arches, createAsyncComponent) {
     var componentName = 'saved-searches';
     const viewModel = function(params) {

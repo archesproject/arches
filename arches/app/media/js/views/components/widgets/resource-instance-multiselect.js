@@ -3,7 +3,6 @@ define([
     'viewmodels/resource-instance-select',
     'utils/create-async-component',
     'bindings/select2-query',
-    'templates/views/components/widgets/resource-instance-select.htm'
 ], function(ko, ResourceInstanceSelectViewModel, createAsyncComponent) {
     const viewModel =  function(params) {
         params.multiple = true;

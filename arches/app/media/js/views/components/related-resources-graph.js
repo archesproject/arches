@@ -4,7 +4,6 @@ define([
     'views/components/workbench',
     'utils/create-async-component',
     'bindings/cytoscape',
-    'templates/views/components/related-resources-graph.htm'
 ], function(ko, arches, WorkbenchViewmodel, createAsyncComponent) {
     const viewModel = function(params) {
         var self = this;

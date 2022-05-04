@@ -11,7 +11,6 @@ define(['jquery',
     'utils/create-async-component',
     'bootstrap-datetimepicker',
     'plugins/knockout-select2',
-    'templates/views/components/search/search-results.htm'
 ], function($, _, arches, BaseFilter, bootstrap, select2, ko, koMapping, GraphModel, viewdata, createAsyncComponent) {
     var componentName = 'search-results';
 
@@ -161,7 +160,6 @@ define(['jquery',
                     });
                 }
 
-                console.log("#@()", self)
                 this.searchResults.results.hits.hits.forEach(function(result){
                     var graphdata = _.find(viewdata.graphs, function(graphdata){
                         return result._source.graph_id === graphdata.graphid;

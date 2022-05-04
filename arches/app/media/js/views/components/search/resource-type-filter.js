@@ -2,7 +2,6 @@ define([
     'knockout',
     'views/components/search/base-filter',
     'utils/create-async-component',
-    'templates/views/components/search/resource-type-filter.htm'
 ], function(ko, BaseFilter, createAsyncComponent) {
     var componentName = 'resource-type-filter';
     const viewModel = BaseFilter.extend({

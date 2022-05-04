@@ -2,7 +2,6 @@ define([
     'knockout',
     'underscore',
     'utils/create-async-component',
-    'templates/views/components/datatypes/file-list.htm'
 ], function(ko, _, createAsyncComponent) {
     var name = 'file-list-datatype-config';
     const viewModel = function(params) {

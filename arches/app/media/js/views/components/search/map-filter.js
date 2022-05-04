@@ -13,7 +13,6 @@ define([
     'geojson-extent',
     'uuid',
     'geojsonhint',
-    'templates/views/components/search/map-filter.htm'
 ], function($, _, ko, arches, createAsyncComponent, BaseFilter, MapComponentViewModel, binFeatureCollection, mapStyles, turf, geohash,  geojsonExtent, uuid, geojsonhint) {
     var componentName = 'map-filter';
     const viewModel = BaseFilter.extend({

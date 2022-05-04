@@ -8,7 +8,6 @@ define([
     'models/graph',
     'utils/create-async-component',
     'viewmodels/card',
-    'templates/views/components/resource-report-abstract.htm'
 ], function($, _, ko, arches, reportLookup, ReportModel, GraphModel, createAsyncComponent) {
     var ResourceReportAbstract = function(params) {
         var self = this;

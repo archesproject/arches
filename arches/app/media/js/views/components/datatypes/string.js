@@ -1,7 +1,6 @@
 define([
     'knockout',
     'utils/create-async-component',
-    'templates/views/components/datatypes/string.htm'
 ], function (ko, createAsyncComponent) {
     var name = 'string-datatype-config';
     const viewModel = function(params) {

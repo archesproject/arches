@@ -8,7 +8,6 @@ define([
     'bindings/mapbox-gl',
     'bindings/codemirror',
     'bindings/ckeditor',
-    'templates/views/components/datatypes/geojson-feature-collection.htm'
 ], function($, ko, _, arches, createAsyncComponent) {
     var name = 'geojson-feature-collection-datatype-config';
     const viewModel = function(params) {

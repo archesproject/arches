@@ -4,7 +4,6 @@ define([
     'underscore',
     'arches',
     'utils/create-async-component',
-    'templates/views/components/datatypes/node-value.htm'
 ], function ($, ko, _, arches, createAsyncComponent) {
     var name = 'node-value-datatype-config';
     const viewModel = function(params) {

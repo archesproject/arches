@@ -2,7 +2,6 @@ define([
     'knockout',
     'utils/create-async-component',
     'views/components/widgets/map',
-    'templates/views/components/plugins/map.htm'
 ], function(ko, createAsyncComponent) {
     const viewModel = function() {
         this.configJSON = {

@@ -3,7 +3,6 @@ define([
     'arches', 
     'viewmodels/concept-select', 
     'utils/create-async-component', 
-    'templates/views/components/datatypes/concept.htm'
 ], function (ko, arches, ConceptSelectViewModel, createAsyncComponent) {
     var name = 'concept-datatype-config';
     const viewModel = function(params) {

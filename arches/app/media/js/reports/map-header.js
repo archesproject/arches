@@ -6,7 +6,6 @@ define([
     'views/components/map',
     'views/components/cards/select-feature-layers',
     'utils/create-async-component',
-    'templates/views/components/map.htm'
 ], function(ko, koMapping, _, geojsonExtent, MapComponentViewModel, selectFeatureLayersFactory, createAsyncComponent) {
     const viewModel = function(params) {
         var self = this;

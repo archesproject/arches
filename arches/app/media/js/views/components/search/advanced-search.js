@@ -7,7 +7,6 @@ define([
     'views/components/search/base-filter',
     'utils/create-async-component',
     'bindings/let',
-    'templates/views/components/search/advanced-search.htm'
 ], function($, _, ko, koMapping, arches, BaseFilter, createAsyncComponent) {
     var componentName = 'advanced-search';
     const viewModel = BaseFilter.extend({

@@ -10,7 +10,6 @@ define([
     'viewmodels/card',
     'views/components/resource-report-abstract',
     'bindings/chosen',
-    'templates/views/components/search/search-result-details.htm'
 ], function($, _, ko, cardComponents, reportLookup, BaseFilter, createAsyncComponent, ReportModel, CardViewModel) {
     var componentName = 'search-result-details';
     const viewModel = BaseFilter.extend({

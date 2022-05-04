@@ -10,7 +10,6 @@ define([
     'viewmodels/alert',
     'uuid',
     'utils/create-async-component',
-    'templates/views/components/workflows/workflow-component-abstract.htm'
 ], function(_, $, ko, koMapping, arches, GraphModel, CardViewModel, ProvisionalTileViewModel, AlertViewModel, uuid, createAsyncComponent) {
     WORKFLOW_COMPONENT_ABSTRACTS_LABEL = 'workflow-component-abstracts';
 

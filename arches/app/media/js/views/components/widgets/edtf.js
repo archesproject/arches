@@ -4,7 +4,6 @@ define([
     'arches',
     'viewmodels/widget',
     'utils/create-async-component',
-    'templates/views/components/widgets/edtf.htm'
 ], function(ko, _, arches, WidgetViewModel, createAsyncComponent) {
     /**
     * registers a edtf-widget component for use in forms

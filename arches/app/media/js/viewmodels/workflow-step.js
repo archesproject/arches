@@ -5,7 +5,6 @@ define([
     'uuid',
     'utils/create-async-component',
     'views/components/workflows/workflow-component-abstract',
-    'templates/views/components/plugins/workflow-step.htm'
 ], function(ko, _, koMapping, uuid, createAsyncComponent, WorkflowComponentAbstract) {
     STEPS_LABEL = 'workflow-steps';
     STEP_ID_LABEL = 'workflow-step-id';

@@ -3,7 +3,6 @@ define([
     'underscore', 
     'viewmodels/widget',
     'utils/create-async-component',
-    'templates/views/components/widgets/switch.htm' 
 ], function(ko, _, WidgetViewModel, createAsyncComponent) {
     /**
     * knockout components namespace used in arches

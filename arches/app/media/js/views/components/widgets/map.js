@@ -13,7 +13,6 @@ define([
     'bindings/fadeVisible',
     'bindings/mapbox-gl',
     'bindings/color-picker',
-    'templates/views/components/widgets/map.htm'
 ], function(_, ko, koMapping, arches, WidgetViewModel, MapEditorViewModel, createAsyncComponent) {
     var viewModel = function(params) {
         this.context = params.type;

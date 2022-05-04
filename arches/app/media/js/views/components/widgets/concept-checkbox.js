@@ -3,7 +3,6 @@ define([
     'viewmodels/concept-widget',
     'utils/create-async-component',
     'plugins/knockout-select2',
-    'templates/views/components/widgets/checkbox.htm'
 ], function(ko, ConceptWidgetViewModel, createAsyncComponent) {
     /**
      * registers a select-widget component for use in forms

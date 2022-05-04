@@ -3,7 +3,6 @@ define([
     'viewmodels/concept-select',
     'utils/create-async-component',
     'bindings/select2-query',
-    'templates/views/components/widgets/concept-select.htm'
 ], function(ko, ConceptSelectViewModel, createAsyncComponent) {
     const viewModel = function(params) {
         params.multiple = true;

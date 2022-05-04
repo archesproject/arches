@@ -1,4 +1,4 @@
-define(['knockout', 'utils/create-async-component', 'templates/views/components/datatypes/boolean.htm'], function(ko, createAsyncComponent) {
+define(['knockout', 'utils/create-async-component'], function(ko, createAsyncComponent) {
     var name = 'boolean-datatype-config';
 
     const viewModel = function(params) {

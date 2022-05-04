@@ -4,7 +4,6 @@ define([
     'viewmodels/widget', 
     'utils/create-async-component',
     'bindings/formattedNumber',
-    'templates/views/components/widgets/number.htm'
 ], function (ko, _, WidgetViewModel, createAsyncComponent) {
     /**
     * registers a text-widget component for use in forms

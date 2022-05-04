@@ -5,7 +5,6 @@ define([
     'views/components/search/base-filter',
     'utils/create-async-component',
     'bindings/term-search',
-    'templates/views/components/search/term-filter.htm',
 ], function(ko, koMapping, _, BaseFilter, createAsyncComponent) {
     var componentName = 'term-filter';
     const viewModel = BaseFilter.extend({

@@ -6,7 +6,6 @@ define([
     'utils/ontology',
     'utils/create-async-component',
     'views/components/widgets/resource-instance-select',
-    'templates/views/components/datatypes/resource-instance.htm'
 ], function(ko, _, arches, data, ontologyUtils, createAsyncComponent) {
     var name = 'resource-instance-datatype-config';
     const viewModel = function(params) {

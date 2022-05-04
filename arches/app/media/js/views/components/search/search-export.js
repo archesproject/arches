@@ -5,7 +5,6 @@ define(['jquery',
     'bindings/fadeVisible',
     'bindings/clipboard',
     'views/components/simple-switch',
-    'templates/views/components/search/search-export.htm'
 ],
 function($, ko, arches, createAsyncComponent) {
     var componentName = 'search-export';

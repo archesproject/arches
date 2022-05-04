@@ -2,7 +2,6 @@ define([
     'knockout', 
     'viewmodels/widget',
     'utils/create-async-component',
-    'templates/views/components/widgets/urldatatype.htm'
 ], function(ko, WidgetViewModel, createAsyncComponent) {
     var name = 'urldatatype';
     const viewModel = function(params) {

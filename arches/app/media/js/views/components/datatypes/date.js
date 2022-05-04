@@ -1,4 +1,4 @@
-define(['knockout', 'utils/create-async-component', 'templates/views/components/datatypes/date.htm'], function(ko, createAsyncComponent) {
+define(['knockout', 'utils/create-async-component'], function(ko, createAsyncComponent) {
     var name = 'date-datatype-config';
     const viewModel = function(params) {
         var self = this;

@@ -1,4 +1,4 @@
-define(['knockout', 'viewmodels/widget', 'utils/create-async-component', 'templates/views/components/simple-switch.htm'], function (ko, WidgetViewModel, createAsyncComponent) {
+define(['knockout', 'viewmodels/widget', 'utils/create-async-component'], function (ko, WidgetViewModel, createAsyncComponent) {
     /**
     * knockout components namespace used in arches
     * @external "ko.components"

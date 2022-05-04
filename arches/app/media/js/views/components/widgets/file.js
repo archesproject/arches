@@ -7,7 +7,6 @@ define([
     'viewmodels/file-widget',
     'utils/create-async-component',
     'bindings/dropzone',
-    'templates/views/components/widgets/file.htm'
 ], function($, ko, _, Dropzone, uuid, FileWidgetViewModel, createAsyncComponent) {
     /**
      * registers a file-widget component for use in forms

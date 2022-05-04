@@ -2,7 +2,6 @@ define([
     'knockout', 
     'uuid', 
     'utils/create-async-component',
-    'templates/views/components/datatypes/domain-value.htm'
 ], function (ko, uuid, createAsyncComponent) {
     const name = 'domain-value-datatype-config';
     const viewModel = function(params) {

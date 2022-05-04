@@ -5,7 +5,6 @@ define([
     'knockout',
     'utils/create-async-component',
     'chosen',
-    'templates/views/components/search/sort-results.htm'
 ], function($, _, BaseFilter, ko, createAsyncComponent) {
     var componentName = 'sort-results';
     const viewModel = BaseFilter.extend({

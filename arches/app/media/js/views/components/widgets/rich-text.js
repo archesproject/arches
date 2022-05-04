@@ -4,7 +4,6 @@ define([
     'viewmodels/widget', 
     'utils/create-async-component',
     'bindings/ckeditor',
-    'templates/views/components/widgets/rich-text.htm'
 ], function (ko, _, WidgetViewModel, createAsyncComponent) {
     /**
     * registers a rich-text-widget component for use in forms

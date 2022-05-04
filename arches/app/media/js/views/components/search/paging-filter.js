@@ -3,7 +3,6 @@ define([
     'knockout',
     'knockout-mapping',
     'utils/create-async-component',
-    'templates/views/components/search/paging-filter.htm'
 ], function(BaseFilter, ko, koMapping, createAsyncComponent) {
     var componentName = 'paging-filter';
     const viewModel = BaseFilter.extend({

@@ -1,7 +1,6 @@
 define([
     'knockout',
     'utils/create-async-component',
-    'templates/views/components/datatypes/number.htm'
 ], function (ko, createAsyncComponent) {
     var name = 'number-datatype-config';
     const viewModel = function(params) {

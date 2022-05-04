@@ -4,7 +4,6 @@ define(['knockout',
     'views/components/search/base-filter',
     'utils/create-async-component',
     'views/components/related-resources-graph',
-    'templates/views/components/search/related-resources-filter.htm'
 ], function(ko, arches, RelatedResourcesManager, BaseFilter, createAsyncComponent) {
     var componentName = 'related-resources-filter';
     const viewModel = BaseFilter.extend ({

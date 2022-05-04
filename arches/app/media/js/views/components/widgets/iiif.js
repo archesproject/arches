@@ -8,7 +8,6 @@ define([
     'geojson-extent',
     'utils/create-async-component',
     'leaflet-fullscreen',
-    'templates/views/components/widgets/iiif.htm'
 ], function(_, L, ko, koMapping, WidgetViewModel, IIIFAnnotationViewmodel, geojsonExtent, createAsyncComponent) {
     const viewModel = function(params) {
         var self = this;

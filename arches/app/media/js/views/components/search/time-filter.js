@@ -9,7 +9,6 @@ define([
     'bindings/datepicker',
     'bindings/chosen',
     'bindings/time-wheel',
-    'templates/views/components/search/time-filter.htm'
 ], function($, _, ko, moment, arches, BaseFilter, createAsyncComponent) {
     var componentName = 'time-filter';
     const viewModel = BaseFilter.extend({
