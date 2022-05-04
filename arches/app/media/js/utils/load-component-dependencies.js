@@ -5,7 +5,7 @@ define([], function() {
                 require(`${PROJECT_PATH}/media/js/${componentPath}`);
             }
             catch(e) {  // if project path fails, load arches-core path
-                require(`${ARCHES_CORE_PATH}/app/media/js/${componentPath}`);
+                require(`${ARCHES_CORE_PATH}/media/js/${componentPath}`);
             }
         }
     };
