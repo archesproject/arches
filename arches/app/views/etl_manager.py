@@ -41,7 +41,7 @@ class ETLManagerView(View):
         elif action == "validate" and loadid:
             response = self.validate(loadid)
         elif action == "cleanEvent" and loadid:
-            response = self.clean_load_event(loadid)            
+            response = self.clean_load_event(loadid)
         return JSONResponse(response)
 
     def post(self, request):
