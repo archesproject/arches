@@ -15,7 +15,7 @@ define([
 
             this.load_details = params.load_details;
             this.state = params.state;
-            this.loading = params.loading || params.config?.loading || ko.observable();
+            this.loading = params.loading || ko.observable();
 
             this.moduleId = params.etlmoduleid;
             this.loading(true);
@@ -161,16 +161,6 @@ define([
                 self.submit('write').then(data => {
                     console.log(data.result);
                 }).fail(error => console.log(error));
-            };
-
-            this.changeFormat =function(){
-                console.log("format changed");
-            };
-
-            const findField = (node) => {
-                return koMapping.toJS(self.fieldMapping).find(mapping => 
-                    node.toLowerCase() === mapping.node.toLowerCase()
-                ).field;
             };
 
             this.validate =function(){
