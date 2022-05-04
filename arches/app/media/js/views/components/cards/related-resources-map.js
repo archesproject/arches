@@ -9,9 +9,6 @@ define([
     'viewmodels/map-filter',
     'views/components/cards/select-related-feature-layers',
     'utils/create-async-component',
-    'templates/views/components/cards/related-resources-map.htm',
-
-
 ], function($, ko, koMapping, geojsonExtent, arches, CardComponentViewModel, MapEditorViewModel, MapFilterViewModel, selectFeatureLayersFactory, createAsyncComponent) {
     var viewModel = function(params) {
         var self = this;

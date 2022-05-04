@@ -7,7 +7,6 @@ define([
     'viewmodels/alert',
     'utils/create-async-component',
     'chosen',
-    'templates/views/components/cards/grouping.htm'
 ], function(_, $, ko, arches, CardComponentViewModel, AlertViewModel, createAsyncComponent) {
     var flattenTree = function(parents, flatList) {
         _.each(ko.unwrap(parents), function(parent) {

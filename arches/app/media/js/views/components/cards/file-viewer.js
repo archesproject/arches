@@ -13,7 +13,6 @@ define([
     'bindings/scroll-to-file',
     'dropzone',
     'bindings/dropzone',
-    'templates/views/components/cards/file-viewer.htm'
 ], function($, ko, uuid, arches, fileRenderers, CardComponentViewModel, CardMultiSelectViewModel, WorkbenchComponentViewModel, createAsyncComponent) {
     const viewModel = function(params) {
         params.configKeys = ['acceptedFiles', 'maxFilesize'];

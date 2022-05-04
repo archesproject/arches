@@ -7,7 +7,6 @@ define([
     'bindings/chosen',
     'bindings/codemirror',
     'views/components/datatypes/geojson-feature-collection',
-    'templates/views/components/cards/map.htm'
 ], function(ko, arches, CardComponentViewModel, MapEditorViewModel, createAsyncComponent) {
     var viewModel = function(params) {
         var self = this;

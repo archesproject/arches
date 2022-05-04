@@ -12,7 +12,6 @@ define([
     'bindings/fadeVisible',
     'bindings/dropzone',
     'bindings/gallery',
-    'templates/views/components/cards/photo-gallery-card.htm'
 ], function(ko, koMapping, _, Dropzone, uuid, CardComponentViewModel, WorkbenchComponentViewModel, PhotoGallery, createAsyncComponent) {
     const viewModel = function(params) {
         params.configKeys = ['acceptedFiles', 'maxFilesize'];

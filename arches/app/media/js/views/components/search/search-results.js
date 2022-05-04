@@ -161,16 +161,7 @@ define(['jquery',
                     });
                 }
 
-                var resourceIdsToFetch = this.searchResults.results.hits.hits.reduce(function(acc, hit) {
-                    var resourceId = hit['_source']['resourceinstanceid'];
-                    
-                    if (!ko.unwrap(self.bulkDisambiguatedResourceInstanceCache)[resourceId]) {
-                        acc.push(resourceId);
-                    }
-
-                    return acc;
-                }, []);
-
+                console.log("#@()", self)
                 this.searchResults.results.hits.hits.forEach(function(result){
                     var graphdata = _.find(viewdata.graphs, function(graphdata){
                         return result._source.graph_id === graphdata.graphid;

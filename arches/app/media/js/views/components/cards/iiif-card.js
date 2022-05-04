@@ -5,7 +5,6 @@ define([
     'views/components/iiif-annotation',
     'viewmodels/alert',
     'utils/create-async-component',
-    'templates/views/components/cards/iiif-card.htm'
 ], function(ko, koMapping, CardComponentViewModel, IIIFAnnotationViewmodel, AlertViewModel, createAsyncComponent) {
     const viewModel = function(params) {
         var self = this;
