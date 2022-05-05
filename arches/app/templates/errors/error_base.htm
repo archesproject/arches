@@ -18,6 +18,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 {% load staticfiles %}
 {% load i18n %}
 {% load compress %}
+{% load webpack_static from webpack_loader %}
 
 <!DOCTYPE html>
 <!--[if IE 8]> <html lang="en" class="ie8"> <![endif]-->
@@ -37,17 +38,17 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
     <meta name="description" content="">
     <meta name="author" content="">
 
-    <link rel="shortcut icon" href="{% static 'img/favicon.png' %}" />
+    <link rel="shortcut icon" href="{% webpack_static 'img/favicon.png' %}" />
 
     {% block css %}
         {% compress css %}
-        <link type="text/x-scss" href="{% static 'css/arches.scss' %}" rel="stylesheet" media="screen">
+        <link type="text/x-scss" href="{% webpack_static 'css/arches.scss' %}" rel="stylesheet" media="screen">
     	{% endcompress %}
         {% if app_settings.ACCESSIBILITY_MODE %}
-        <link href="{% static 'css/accessibility.css' %}" rel="stylesheet">
+        <link href="{% webpack_static 'css/accessibility.css' %}" rel="stylesheet">
         {% endif %}
-        <link href="{% static 'css/package.css' %}" rel="stylesheet">
-        <link href="{% static 'css/project.css' %}" rel="stylesheet">
+        <link href="{% webpack_static 'css/package.css' %}" rel="stylesheet">
+        <link href="{% webpack_static 'css/project.css' %}" rel="stylesheet">
     {% endblock css%}
 
 </head>

@@ -18,6 +18,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 {% extends "base-manager.htm" %}
 {% load staticfiles %}
 {% load i18n %}
+{% load webpack_static from webpack_loader %}
 
 {% block main_content %}
 
@@ -28,7 +29,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 
             <!-- Image -->
             <div class="img-circle rr-splash-img-container surveys">
-                <img class="rr-splash-img" src="{% static "img/multiple_inputs.png" %}" alt="Resource Editor">
+                <img class="rr-splash-img" src="{% webpack_static "img/multiple_inputs.png" %}" alt="Resource Editor">
             </div>
 
             <!-- Splash Title -->

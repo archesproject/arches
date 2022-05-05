@@ -1,6 +1,7 @@
 {% extends "views/components/workbench.htm" %}
 {% load staticfiles %}
 {% load i18n %}
+{% load webpack_static from webpack_loader %}
 
 {% block tabs %}
 <div class="workbench-card-sidebar-tab" data-bind="click: function() {
@@ -388,7 +389,7 @@
                                 annotated: getAnnotationCount(getCanvasService($data))
                             }">
                                 <div style="text-align:center" class="iiif-gallery-canvas-thumbnail">
-                                    <img data-bind="attr: { src: $data.thumbnail || '{% static 'img/photo_missing.png' %}', title: $data.label}">
+                                    <img data-bind="attr: { src: $data.thumbnail || '{% webpack_static 'img/photo_missing.png' %}', title: $data.label}">
                                 </div>
                                 <div style="text-align:center;" class="iiif-gallery-canvas-label">
                                     <!--ko if: getCanvasService($data) === selectedCanvas() && $parent.selectPrimaryPanel()  -->

@@ -36,7 +36,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
     <meta name="description" content="">
     <meta name="author" content="">
 
-    <link rel="shortcut icon" href="{% static 'img/favicon.png' %}" />
+    <link rel="shortcut icon" href="{% webpack_static 'img/favicon.png' %}" />
 
     <link rel='stylesheet' type='text/css' href='//fonts.googleapis.com/css?family=Open+Sans:400,300,600&amp;subset=cyrillic,latin'>
     <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.2/css/bootstrap.min.css">
@@ -163,7 +163,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                             <!-- SLIDE 1 -->
                             <li data-transition="fade" data-slotamount="9" data-masterspeed="0" data-title="Slide 1">
                                 <!-- MAIN IMAGE -->
-                                <img src="{% static 'img/landing/landing-primary.jpg' %}" alt="slidebg1" data-bgfit="cover" data-bgposition="center center" data-bgrepeat="no-repeat">
+                                <img src="{% webpack_static 'img/landing/landing-primary.jpg' %}" alt="slidebg1" data-bgfit="cover" data-bgposition="center center" data-bgrepeat="no-repeat">
                                 <!-- LAYERS -->
                                 <!-- NEW LAYER -->
                                 <div class="tp-caption sft start text-bold v5-splash-caption" delay="4500" data-hoffset="0" data-y="400" data-speed="800" data-start="100" data-easing="Back.easeInOut" data-endspeed="300" data-x="0">
@@ -209,7 +209,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 
                     <!-- Content -->
                     <div class="splash-img">
-                        <img src="{% static 'img/landing/imac_designer.png' %}"  alt="Arches Designer">
+                        <img src="{% webpack_static 'img/landing/imac_designer.png' %}"  alt="Arches Designer">
                     </div>
 
                     <!-- Sub-section -->
@@ -222,7 +222,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                                 <p class="sub-block-description">
                                     {% trans "Arches automatically creates data entry forms based on your data models.  Use Arches' Card Manager to configure the look and feel of your data entry UI." %}
                                 </p>
-                                <img class="sub-block-image" src="{% static 'img/landing/card_manager.png' %}" alt="Card Manager">
+                                <img class="sub-block-image" src="{% webpack_static 'img/landing/card_manager.png' %}" alt="Card Manager">
                             </div>
                         </div>
 
@@ -233,7 +233,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                                 <p class="sub-block-description">
                                     {% trans "Use Arches' Permissions Manager to set up data access rules for all your user groups and individual accounts.  You can define read/write/delete and no-access permissions." %}
                                 </p>
-                                <img class="sub-block-image" src="{% static 'img/landing/permissions_manager.png' %}" alt="Permissions Manager">
+                                <img class="sub-block-image" src="{% webpack_static 'img/landing/permissions_manager.png' %}" alt="Permissions Manager">
                             </div>
                         </div>
 
@@ -263,7 +263,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 
                     <!-- Content -->
                     <div class="splash-img">
-                        <img class="sub-block-image" src="{% static 'img/landing/consultation_workflow.jpg' %}" alt="Arches Workflows">
+                        <img class="sub-block-image" src="{% webpack_static 'img/landing/consultation_workflow.jpg' %}" alt="Arches Workflows">
                     </div>
 
                 </div>
@@ -288,7 +288,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                     </div>
 
                     <div class="splash-img">
-                        <img class="sub-block-image" src="{% static 'img/landing/arches_search.png' %}" alt="Arches Search">
+                        <img class="sub-block-image" src="{% webpack_static 'img/landing/arches_search.png' %}" alt="Arches Search">
                     </div>
 
                     <!-- Sub-section -->
@@ -323,7 +323,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                     <!-- Content -->
                     <div class="row">
                         <div class="col-md-6 col-lg-4 text-center">
-                            <img class="iphone" src="{% static 'img/landing/IPhone_8_map.png' %}" alt="Arches Designer">
+                            <img class="iphone" src="{% webpack_static 'img/landing/IPhone_8_map.png' %}" alt="Arches Designer">
                         </div>
                         <div class="col-md-6 col-lg-8">
                             <div class="mobile-description-container">

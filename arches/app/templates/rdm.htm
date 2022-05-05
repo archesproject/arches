@@ -2,6 +2,7 @@
 {% load i18n %}
 
 {% load staticfiles %}
+{% load webpack_static from webpack_loader %}
 
 {% block title %}
 {{ block.super }}
@@ -9,10 +10,10 @@
 {% endblock title %}
 
 {% block css %}
-    <link rel="stylesheet" href="{% static 'css/main.css' %}">
-    <link rel="stylesheet" href="{% static 'css/plugins/smartadmin-production.css' %}" type="text/css" media="screen">
+    <link rel="stylesheet" href="{% webpack_static 'css/main.css' %}">
+    <link rel="stylesheet" href="{% webpack_static 'css/plugins/smartadmin-production.css' %}" type="text/css" media="screen">
     {{ block.super }}
-    <link rel="stylesheet" href="{% static 'node_modules/jqtree/jqtree.css' %}">
+    <link rel="stylesheet" href="{% webpack_static 'node_modules/jqtree/jqtree.css' %}">
 {% endblock css %}
 
 {% block main_content %}
