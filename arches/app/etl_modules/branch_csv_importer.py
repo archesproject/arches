@@ -3,6 +3,7 @@ import logging
 import math
 import uuid
 import zipfile
+from django.http import HttpResponse
 from openpyxl import load_workbook
 from django.db import connection
 from django.db.utils import IntegrityError
@@ -11,6 +12,8 @@ from arches.app.models.models import Node
 from arches.app.models.system_settings import settings
 from arches.app.utils.betterJSONSerializer import JSONSerializer
 from arches.app.utils.index_database import index_resources_by_transaction
+from arches.management.commands.etl_template import create_workbook
+from openpyxl.writer.excel import save_virtual_workbook
 
 logger = logging.getLogger(__name__)
 
@@ -232,5 +235,16 @@ class BranchCsvImporter:
         index_resources_by_transaction(self.loadid, quiet=True, use_multiprocessing=True)
         if row[0][0]:
             return {"success": True, "data": "success"}
+        else:
+            return {"success": False, "data": "failed"}
+
+    def download(self, request):
+        format = request.POST.get('format')
+        filename = request.POST.get('filename')
+        if(format == "xls"):
+            wb = create_workbook(request.POST.get('id'))
+            response = HttpResponse(save_virtual_workbook(wb), content_type='application/vnd.ms-excel')
+            response['Content-Disposition'] = 'attachment'
+            return {"success": True, "raw": response}
         else:
             return {"success": False, "data": "failed"}

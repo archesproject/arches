@@ -3,8 +3,6 @@ from django.http import HttpResponse
 from django.views.generic import View
 from arches.app.models.models import ETLModule
 from arches.app.utils.response import JSONResponse
-from arches.management.commands.etl_template import create_workbook
-from openpyxl.writer.excel import save_virtual_workbook
 
 logger = logging.getLogger(__name__)
 
@@ -28,19 +26,10 @@ class ETLManagerView(View):
         import_module = ETLModule.objects.get(pk=module).get_class_module()(request)
         import_function = getattr(import_module, action)
         response = import_function(request=request)
-        if response["success"]:
+        if response["success"] and not "raw" in response:
             ret = {"result": response["data"]}
             return JSONResponse(ret)
+        elif response["success"] and "raw" in response:
+            return response["raw"]
         else:
             return JSONResponse(status=400, reason=response["data"])
-
-class Templates(View):
-    def get(self, request):
-        format = request.GET.get('format')
-        filename = request.GET.get('filename')
-        if(format == "xls"):
-            wb = create_workbook(request.GET.get('id'))
-            print(wb)
-            response = HttpResponse(save_virtual_workbook(wb), content_type='application/vnd.ms-excel')
-            response['Content-Disposition'] = 'attachment; filename="{0}"'.format(filename)
-            return response
