@@ -3,14 +3,11 @@
 <!-- ko if: !loading() -->
 <div class="workflow-plugin" style="display: flex; flex-direction: column;">
     <div class="etl-manager-tab-container">
-        <div class="etl-manager-tabs">
-            <!-- ko foreach: {data: tabs, as: 'tab'} -->
-            <!-- <div class="etl-manager-tab" data-bind="click: function(){$parent.activeTab(tab.id)}, css: {active: $parent.activeTab() === tab.id, 'disabled': true}, text: tab.title"></div> -->
-            <!-- /ko -->
-            <div class="etl-manager-tab" data-bind="click: function(){activeTab('start')}, css: {active: activeTab() === 'start', 'disabled': false}, text: 'Start'"></div>
-            <div class="etl-manager-tab" data-bind="click: function(){activeTab('details')}, css: {active: activeTab() === 'details', 'disabled': !selectedModule()}, text: 'Task Details'"></div>
-            <div class="etl-manager-tab" data-bind="click: function(){activeTab('import'); fetchLoadEvent()}, css: {active: activeTab() === 'import', 'disabled': false}, text: 'Import Tasks'"></div>
-            <div class="etl-manager-tab" data-bind="click: function(){activeTab('export')}, css: {active: activeTab() === 'export', 'disabled': false}, text: 'Export Tasks'"></div>
+        <div class="etl-manager-tabs" style="height: 50px;">
+            <div class="etl-manager-tab" style="" data-bind="click: function(){activeTab('start')}, css: {active: activeTab() === 'start', 'disabled': false}, text: 'Start'"></div>
+            <div class="etl-manager-tab" style="font-size: 13pt;" data-bind="click: function(){activeTab('details')}, css: {active: activeTab() === 'details', 'disabled': !selectedModule()}, text: 'Task Details'"></div>
+            <div class="etl-manager-tab" style="font-size: 13pt;" data-bind="click: function(){activeTab('import'); fetchLoadEvent()}, css: {active: activeTab() === 'import', 'disabled': false}, text: 'Import Tasks'"></div>
+            <div class="etl-manager-tab" style="font-size: 13pt;" data-bind="click: function(){activeTab('export')}, css: {active: activeTab() === 'export', 'disabled': true}, text: 'Export Tasks'"></div>
         </div>
     </div>
     <div data-bind="if: activeTab() === 'start'">
@@ -68,41 +65,41 @@
         <!-- /ko -->
     </div>
     <div data-bind="if: activeTab() === 'import'">
-        <div class="etl-module-writer-container" style="display: flex; flex-direction: column;">
+        <div class="etl-module-status-container" style="display: flex; flex-direction: column;">
             <div class="etl-module-preview-container" style="display: inline-flex; flex-direction: row;">
-                <div class="etl-module-mapping" style="height: calc(100vh - 50px); width: 400px; padding: 25px; overflow: scroll;" data-bind="resizableSidepanel:true">
-                    <h3>{% trans "ETL History" %}</h3>
-                    <div class="etl-table">
-                        <table class="table-striped" style="min-width: 50px; border: 1px solid rgba(0,0,0,0.14);">
+                <div class="etl-module-mapping" style="height: calc(100vh - 95px); width: auto; padding-bottom:25px; overflow: scroll;">
+                    <div class="etl-manager-status-filter-container">
+                        <input class="etl-manager-filter-input" type="text" placeholder = "Filter Tasks..." data-bind="textInput: taskSearchString">
+                    </div>            
+                    <div class="etl-status-table">
+                        <table class="" style="min-width: 50px; border: 1px solid rgba(0,0,0,0.14);">
                             <tbody data-bind="foreach: {data: loadEvents, as: 'event'}">
-                                <tr>
-                                    <td data-bind="click: function(){$parent.selectedLoadEvent(event)}" style="display: flex; padding:5px; flex-direction: column; justify-content: space-between; cursor: pointer; height:75px; width: 300px;">
+                                <!-- ko if: !$parent.taskSearchString() || event.etl_module.toLowerCase().includes($parent.taskSearchString().toLowerCase()) -->
+                                <tr data-bind="css: {'selected': event == $parent.selectedLoadEvent()}">
+                                    <td data-bind="click: function(){$parent.selectedLoadEvent(event)}" style="display: block; padding: 10px 15px; flex-direction: column; justify-content: space-between; cursor: pointer; height: 80px; width: 400px;">
                                         <div>
-                                            <div data-bind="text: event.etl_module"></div>
+                                            <div data-bind="text: event.etl_module" style="font-size: 13pt; color: rgb(4, 4, 45)"></div>
                                         </div>
                                         <div style="display: flex; flex-direction: row; justify-content: space-between;">
                                             <div>
                                                 <div data-bind="text: $parent.getUserName(event.user_id)"></div>
-                                                <div data-bind="text: console.log($parent.getUserName(event.user_id))"></div>
                                                 <div data-bind="text: event.user_id"></div>
                                                 <div data-bind="text: $parent.formatTime(event.load_start_time)"></div>
                                             </div>
                                             <div>
                                                 <!-- ko if: event.complete && event.successful -->
-                                                <button class="btn btn-success">{% trans "Finished" %}</button>
+                                                <button class="btn btn-success" style="width:150px;">{% trans "Finished" %}</button>
                                                 <!-- /ko -->
                                                 <!-- ko if: (event.complete && !event.successful) || !event.load_start_time -->
-                                                <button class="btn btn-danger">{% trans "Failed" %}</button>
+                                                <button class="btn btn-danger" style="width:150px;">{% trans "Failed" %}</button>
                                                 <!-- /ko -->
                                                 <!-- ko if: !event.complete && event.load_start_time -->
-                                                <button class="btn btn-warning">{% trans "Running" %}</button>
+                                                <button class="btn btn-warning" style="width:150px;">{% trans "Running" %}</button>
                                                 <!-- /ko -->
                                             </div>
                                         </div>
                                     </td>
-                                </tr>
-                                <tr>
-                                    <td style="height:30px; border-bottom: 1px solid rgba(0,0,0,0.14)">
+                                    <td style="background: #eee; display: block; height: 35px; padding: 10px 15px; border: 1px solid rgba(0,0,0,0.14)">
                                         <!-- ko if: event.complete && event.successful -->
                                         <a style="color: steelblue; text-decoration: underline; padding-right: 10px; cursor: pointer;" data-bind="click: function() { $parent.cleanLoadEvent(event.loadid) }">{% trans "clean up" %}</a>
                                         <a style="color: steelblue; text-decoration: underline; padding-right: 10px; cursor: pointer;" data-bind="click: function() { $parent.reverseTransactions(event.loadid) }">{% trans "undo import" %}</a>
@@ -111,15 +108,16 @@
                                         <a style="color: steelblue; text-decoration: underline; padding-right: 10px; cursor: pointer;" data-bind="click: function() { $parent.cleanLoadEvent(event.loadid) }">{% trans "clean up" %}</a>
                                         <!-- /ko -->
                                         <!-- ko if: !event.complete && event.load_start_time -->
-                                        <a style="color: steelblue; text-decoration: underline; padding-right: 10px;" data-bind="attr: {href: ''}">{% trans "stop task" %}</a>
+                                        <a style="color: steelblue; text-decoration: underline; padding-right: 10px; cursor: pointer;" data-bind="click: function() { $parent.cleanLoadEvent(event.loadid) }">{% trans "stop task" %}</a>
                                         <!-- /ko -->
                                     </td>
                                 </tr>
-                            <tbody>
+                                <!-- /ko -->
+                            </tbody>
                         </table>
                     </div>
                 </div>
-                <div class="etl-module-preview" style="height: calc(100vh - 50px); width: calc(100vw - 400px); padding: 25px; overflow: scroll;">
+                <div class="etl-module-preview" style="height: calc(100vh - 95px); width: calc(100vw - 400px); padding: 25px; overflow: scroll;">
                     <div class="etl-module-info" data-bind="if: selectedLoadEvent()">
                         <div class="" data-bind="component: {
                             name: selectedLoadEvent().etl_module,

@@ -12,11 +12,10 @@ define([
 
             this.load_details = params.load_details;
             this.state = params.state;
-            this.loading = params.loading || params.config?.loading || ko.observable();
+            this.loading = params.loading || ko.observable();
 
             this.moduleId = params.etlmoduleid;
             ImporterViewModel.apply(this, arguments);
-            this.loading = params.loading || params.config?.loading || ko.observable();
             this.loadStatus = ko.observable('ready');
 
             this.write = function(){

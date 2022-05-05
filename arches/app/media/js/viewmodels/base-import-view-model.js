@@ -30,6 +30,7 @@ define(['jquery', 'knockout', 'uuid', 'arches', 'js-cookie'], function($, ko, uu
                     return response.json();
                 }
             }).then(function(response) {
+                console.log(response);
                 self.response(response);
                 self.validationError(response.result.validation.data);
             }).catch(function(err) {    

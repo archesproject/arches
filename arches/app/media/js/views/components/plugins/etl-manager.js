@@ -22,6 +22,7 @@ define([
                 self.fetchValidation(val.loadid);
             })
             this.moduleSearchString = ko.observable('');
+            this.taskSearchString = ko.observable('');
             this.tabs = [
                 {id: 'start', title: 'Start'},
                 {id: 'details', title: 'Task Details'},
@@ -41,6 +42,7 @@ define([
                         return response.json();
                     }
                 }).then(function(data){
+                    console.log(data)
                     self.loadEvents(data);
                     self.selectedLoadEvent(data[0]);
                 });
@@ -53,7 +55,9 @@ define([
                         return response.json();
                     }
                 }).then(function(data){
-                    console.log(data)
+                    console.log(data);
+                    self.init();
+                    self.activeTab("import");
                 });
             };
 
@@ -76,7 +80,6 @@ define([
                     data: { userids: JSON.stringify([user]) },
                     dataType: 'json'
                 }).done(function(data){
-                    console.log(data[user])
                     return data[user];
                 }).always(function(){
                     self.loading(false);
@@ -149,7 +152,7 @@ define([
                     }
                     }).then(function(data){
                         self.etlModules = data.map(function(etl){
-                            etl.config.loading = self.loading;
+                            // etl.config.loading = self.loading;
                             etl.alert = self.alert;
                             require([etl.component]);
                             return etl;

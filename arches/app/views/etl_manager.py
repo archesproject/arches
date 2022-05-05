@@ -50,8 +50,8 @@ class ETLManagerView(View):
         possible actions are "import", "validate", "return first line", ""
         """
         action = request.POST.get("action")
-        module = request.POST.get("module")
-        import_module = ETLModule.objects.get(pk=module).get_class_module()(request)
+        moduleid = request.POST.get("module")
+        import_module = ETLModule.objects.get(pk=moduleid).get_class_module()(request)
         import_function = getattr(import_module, action)
         response = import_function(request=request)
         if response["success"]:

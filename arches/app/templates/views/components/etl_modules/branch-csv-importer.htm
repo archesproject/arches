@@ -5,6 +5,7 @@
 <!-- ko ifnot: loading() -->
     <div class="branch-csv-etl">
         <!-- ko ifnot: response() -->
+        <div data-bind="text: console.log(response())"></div>
         <div data-bind="dropzone: dropzoneOptions" class="file-select loader-select">
             <div>
                 <div class="manifest-manager-main-menu-circle loader-button">
