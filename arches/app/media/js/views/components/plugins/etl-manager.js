@@ -18,7 +18,6 @@ define([
             this.validationError = ko.observableArray();
 
             this.selectedLoadEvent.subscribe(function(val){
-                console.log(val);
                 self.fetchValidation(val.loadid);
             })
             this.moduleSearchString = ko.observable('');
@@ -42,7 +41,7 @@ define([
                         return response.json();
                     }
                 }).then(function(data){
-                    console.log(data)
+                    data.sort((a,b) => Date.parse(b.load_start_time) - Date.parse(a.load_start_time));
                     self.loadEvents(data);
                     self.selectedLoadEvent(data[0]);
                 });
@@ -70,36 +69,13 @@ define([
                     self.loading(false);
                 });
             };
-    
-            this.getUserName = function(user){
-                self.loading(true);
-                $.ajax({
-                    url: arches.urls.get_user_names,
-                    context: this,
-                    method: 'POST',
-                    data: { userids: JSON.stringify([user]) },
-                    dataType: 'json'
-                }).done(function(data){
-                    return data[user];
-                }).always(function(){
-                    self.loading(false);
-                })
-                // window.fetch(arches.urls.get_user_names,{
-                //     method: 'POST',
-                //     credentials: 'include',
-                //     body: JSON.stringify({userids: [user]}),
-                //     headers: {
-                //         'Content-Type': 'application/json',
-                //         "X-CSRFToken": Cookies.get('csrftoken')
-                //     },
-                // }).then(function(response){
-                //     if(response.ok){
-                //         return response.json();
-                //     }
-                // }).then(function(data){
-                //     console.log("user:",data);
-                //     return data[user]
-                // });
+
+            this.formatUserName = function(event){
+                if (event.first_name || event.last_name) {
+                    return [event.first_name, event.last_name].join(" ");
+                } else {
+                    return event.username;
+                }
             }
 
             this.fetchStagedData = function(loadid){

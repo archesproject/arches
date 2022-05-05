@@ -1,5 +1,6 @@
 import logging
 from django.db import connection
+from django.forms.models import model_to_dict
 from django.views.generic import View
 from arches.app.models.models import ETLModule, LoadEvent, LoadStaging
 from arches.app.utils.response import JSONResponse, JSONErrorResponse
@@ -35,7 +36,8 @@ class ETLManagerView(View):
         if action == "modules" or action is None:
             response = ETLModule.objects.all()
         elif action == "loadEvent":
-            response = LoadEvent.objects.all()
+            events = LoadEvent.objects.all().prefetch_related('user')
+            response = [{**model_to_dict(event), **model_to_dict(event.user)} for event in events]
         elif action == "stagedData" and loadid:
             response = LoadStaging.objects.get(loadid=loadid)
         elif action == "validate" and loadid:
