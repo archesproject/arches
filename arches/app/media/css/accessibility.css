@@ -83,7 +83,8 @@ a:focus,
     border: 3px solid #fff;
 }
 
-.down-button-icon {
+.down-button-icon,
+.tab-base .nav-tabs>li:not(.active)>a {
     opacity: 1;
 }
 
@@ -104,7 +105,8 @@ a:focus,
 .arches-signin .panel-footer,
 .password-rule,
 .rp-no-data,
-.graph-designer-tab-container .nav-tabs > li:not(.active) > a {
+.graph-designer-tab-container .nav-tabs > li:not(.active) > a,
+.crud-card-subtitle {
     color: #494949;
 }
 
@@ -155,7 +157,10 @@ a:focus,
 .resource-tools a.resource-grid-title,
 .graph-find,
 .map-manager-container .category-title,
-.map-manager-container .service-url {
+.map-manager-container .service-url,
+.map-service-nav-tabs .nav-tabs>li.active>a,
+.map-service-nav-tabs .nav-tabs>li.active>a:focus,
+.map-service-nav-tabs .nav-tabs>li.active>a:hover {
     color: #000 !important;
 }
 
@@ -844,5 +849,13 @@ div.search-facet-item:focus {
 
     .settings-panel-body .graph-designer {
         height: calc(70vh - 205px);
+    }
+
+    .map-manager-container .panel-heading span {
+        font-size: 2.8vw;
+    }
+
+    .map-manager-container .category-title {
+        padding: 9px 5px;
     }
 }
