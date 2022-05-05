@@ -42,7 +42,6 @@ class Command(BaseCommand):
     def handle(self, *args, **options):
         self.create_template(template=options["template"], dest=options["dest"], graphid=options["graph"])
 
-
     def create_branchcsv_template(self, dest, graphid):
         wb = create_workbook(graphid)
         wb.save(filename=dest)
@@ -50,6 +49,7 @@ class Command(BaseCommand):
     def create_template(self, template, dest, graphid):
         if template == "branchcsv":
             self.create_branchcsv_template(dest, graphid)
+
 
 def write_metadata(workbook, metadata):
     metadata_sheet = workbook.create_sheet(title="metadata")
@@ -61,6 +61,7 @@ def write_metadata(workbook, metadata):
         metadata_sheet.cell(column=1, row=i + 6, value=node["alias"])
         metadata_sheet.cell(column=2, row=i + 6, value=node["datatype"])
 
+
 def style_header(length, width, sheet):
     thin = styles.Side(border_style="thin", color="000000")
     fill = styles.PatternFill("solid", fgColor="eeeeee")
@@ -69,6 +70,7 @@ def style_header(length, width, sheet):
         for column in range(1, width + 1):
             sheet.cell(row=row, column=column).fill = fill
             sheet.cell(row=row, column=column).border = border
+
 
 def create_workbook(graphid) -> Workbook:
     wb = Workbook()

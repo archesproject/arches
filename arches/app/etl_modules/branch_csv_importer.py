@@ -239,12 +239,12 @@ class BranchCsvImporter:
             return {"success": False, "data": "failed"}
 
     def download(self, request):
-        format = request.POST.get('format')
-        filename = request.POST.get('filename')
-        if(format == "xls"):
-            wb = create_workbook(request.POST.get('id'))
-            response = HttpResponse(save_virtual_workbook(wb), content_type='application/vnd.ms-excel')
-            response['Content-Disposition'] = 'attachment'
+        format = request.POST.get("format")
+        filename = request.POST.get("filename")
+        if format == "xls":
+            wb = create_workbook(request.POST.get("id"))
+            response = HttpResponse(save_virtual_workbook(wb), content_type="application/vnd.ms-excel")
+            response["Content-Disposition"] = "attachment"
             return {"success": True, "raw": response}
         else:
             return {"success": False, "data": "failed"}
