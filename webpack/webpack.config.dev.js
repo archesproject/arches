@@ -3,13 +3,13 @@ const Webpack = require('webpack');
 const { merge } = require('webpack-merge');
 const StylelintPlugin = require('stylelint-webpack-plugin');
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');
-
 const ESLintPlugin = require('eslint-webpack-plugin');
-const HtmlWebpackPlugin = require('html-webpack-plugin');
 
-const common = require('./webpack.common.js');
+const commonWebpackConfig = require('./webpack.common.js');
 
-module.exports = merge(common, {
+ARCHES_CORE_PATH = Path.resolve(__dirname.split('/webpack')[0], './arches/app');
+
+module.exports = merge(commonWebpackConfig, {
     mode: 'development',
     devtool: 'inline-cheap-source-map',
     output: {
@@ -36,7 +36,7 @@ module.exports = merge(common, {
             {
                 test: /\.js$/,
                 exclude: /node_modules/,
-                loader: './arches/app/media/node_modules/babel-loader',
+                loader: `${ARCHES_CORE_PATH}/media/node_modules/babel-loader`,
                 options: {
                     presets: ['@babel/preset-env']
                 }
@@ -48,13 +48,13 @@ module.exports = merge(common, {
                         'loader': MiniCssExtractPlugin.loader,
                     },
                     {
-                        'loader': './arches/app/media/node_modules/css-loader',
+                        'loader': `${ARCHES_CORE_PATH}/media/node_modules/css-loader`,
                     },
                     {
-                        'loader': './arches/app/media/node_modules/postcss-loader',
+                        'loader': `${ARCHES_CORE_PATH}/media/node_modules/postcss-loader`,
                     },
                     {
-                        'loader': './arches/app/media/node_modules/sass-loader',
+                        'loader': `${ARCHES_CORE_PATH}/media/node_modules/sass-loader`,
                     }
                 ],
             },
