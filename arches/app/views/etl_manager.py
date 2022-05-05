@@ -36,7 +36,7 @@ class ETLManagerView(View):
         if action == "modules" or action is None:
             response = ETLModule.objects.all()
         elif action == "loadEvent":
-            events = LoadEvent.objects.all().prefetch_related('user')
+            events = LoadEvent.objects.all().prefetch_related("user")
             response = [{**model_to_dict(event), **model_to_dict(event.user)} for event in events]
         elif action == "stagedData" and loadid:
             response = LoadStaging.objects.get(loadid=loadid)
