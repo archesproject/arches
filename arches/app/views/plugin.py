@@ -34,13 +34,16 @@ class PluginView(MapBaseManagerView):
         else:
             plugin = models.Plugin.objects.get(pk=pluginid)
         if not request.user.has_perm("view_plugin", plugin):
-            return redirect("home")
+            if slug is not None:
+                return redirect("/auth?next=/plugins/{}".format(slug))
+            if slug is not None:
+                return redirect("/auth?next=/plugins/{}".format(pluginid))
         if request.GET.get("json", False):
             return JSONResponse(plugin)
         resource_graphs = (
             models.GraphModel.objects.exclude(pk=settings.SYSTEM_SETTINGS_RESOURCE_MODEL_ID)
             .exclude(isresource=False)
-            .exclude(isactive=False)
+            .exclude(publication=None)
         )
         widgets = models.Widget.objects.all()
         card_components = models.CardComponent.objects.all()

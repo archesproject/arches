@@ -133,6 +133,7 @@ class ResourceTests(ArchesTestCase):
     @classmethod
     def tearDownClass(cls):
         cls.user.delete()
+        Resource.objects.filter(graph_id=cls.search_model_graphid).delete()
         models.GraphModel.objects.filter(pk=cls.search_model_graphid).delete()
 
     def test_get_node_value_string(self):

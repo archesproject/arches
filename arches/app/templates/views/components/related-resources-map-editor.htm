@@ -18,9 +18,10 @@
     <div class="workbench-card-sidepanel-header-container">
         <h4 class="workbench-card-sidepanel-header" data-bind="click: hideSidePanel, text: card.model.name"></h4>
     </div>
+    <div class="workbench-card-sidepanel-border"></div>
 
-
-    <div style="margin: 70px 10px 0px;">
+    <div class="workbench-card-sidepanel-body">
+    <div style="margin: 10px 10px 0px;">
         <div class='control-label widget-input-label'>{% trans "Participating Layers" %}</div>
         <!-- ko foreach: {data: self.nodeDetails, as: 'nodeInfo'} -->
         <div data-bind="css: {'active-overlay': self.filterNodeIds.indexOf(nodeInfo.nodeid) > -1}">
@@ -38,7 +39,7 @@
         <!-- /ko -->
     </div>
 
-    <div data-bind="css: card.model.cssclass" style="height: calc(100% - 80px)">
+    <div data-bind="css: card.model.cssclass">
         {% block additional_content %}
         {% endblock additional_content %}
         <!-- ko if: reviewer && provisionalTileViewModel.selectedProvisionalEdit() -->
@@ -171,12 +172,6 @@
                         </div>
                         <!-- /ko -->
                     <!-- /ko -->
-                </div>
-
-                <div class="display-in-workflow-step install-buttons">
-                    <button class="btn btn-shim btn-danger btn-labeled btn-lg fa fa-times" data-bind="click: function () {
-                        showRelatedQuery(false);
-                    }"><span>{% trans 'Close' %}</span></button>
                 </div>
             </div>
             <!-- /ko-->
@@ -361,6 +356,14 @@
             </div>
         </div>
     </div>
+</div>
+<!-- ko if: showRelatedQuery -->
+<div class="display-in-workflow-step">
+    <button class="btn btn-shim btn-danger btn-labeled btn-lg fa fa-times" data-bind="click: function () {
+        showRelatedQuery(false);
+    }">{% trans 'Close' %}</button>
+</div>
+<!--/ko -->
 <!--/ko -->
 {{ block.super }}
 {% endblock sidepanel %}

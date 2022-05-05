@@ -15,11 +15,13 @@ import uuid
 import datetime
 import logging
 from datetime import timedelta
+
 from arches.app.utils.module_importer import get_class_from_modulename
 from arches.app.models.fields.i18n import I18n_TextField, I18n_JSONField
 from django.forms.models import model_to_dict
 from django.contrib.gis.db import models
 from django.contrib.postgres.fields import JSONField
+from django.core.cache import caches
 from django.core.files.storage import FileSystemStorage
 from django.core.mail import EmailMultiAlternatives, get_connection
 from django.template.loader import get_template, render_to_string
@@ -359,7 +361,6 @@ class FunctionXGraph(models.Model):
         db_table = "functions_x_graphs"
         unique_together = ("function", "graph")
 
-
 class GraphModel(models.Model):
     graphid = models.UUIDField(primary_key=True, default=uuid.uuid1)  # This field type is a guess.
     name = I18n_TextField(blank=True, null=True)
@@ -369,7 +370,6 @@ class GraphModel(models.Model):
     deploymentdate = models.DateTimeField(blank=True, null=True)
     version = models.TextField(blank=True, null=True)
     isresource = models.BooleanField()
-    isactive = models.BooleanField()
     iconclass = models.TextField(blank=True, null=True)
     color = models.TextField(blank=True, null=True)
     subtitle = I18n_TextField(blank=True, null=True)
@@ -383,13 +383,14 @@ class GraphModel(models.Model):
     )
     config = JSONField(db_column="config", default=dict)
     slug = models.TextField(validators=[validate_slug], unique=True, null=True)
+    publication = models.ForeignKey("GraphPublication", db_column="publicationid", null=True, on_delete=models.SET_NULL)
 
     @property
     def disable_instance_creation(self):
         if not self.isresource:
             return _("Only resource models may be edited - branches are not editable")
-        if not self.isactive:
-            return _("This Model is Inactive and not available for editing")
+        if not self.publication:
+            return _("This Model is currently unpublished and not available for instance creation.")
         return False
 
     def is_editable(self):
@@ -406,6 +407,19 @@ class GraphModel(models.Model):
     class Meta:
         managed = True
         db_table = "graphs"
+
+
+class GraphPublication(models.Model):
+    publicationid = models.UUIDField(primary_key=True, serialize=False, default=uuid.uuid1)
+    notes = models.TextField(blank=True, null=True)
+    graph = models.ForeignKey(GraphModel, db_column="graphid", on_delete=models.CASCADE)
+    serialized_graph = JSONField(blank=True, null=True, db_column="serialized_graph")
+    user = models.ForeignKey(User, db_column="userid", null=True, on_delete=models.CASCADE)
+    published_time = models.DateTimeField(default=datetime.datetime.now, null=False)
+
+    class Meta:
+        managed = True
+        db_table = "graph_publications"
 
 
 class Icon(models.Model):
@@ -482,6 +496,7 @@ class Node(models.Model):
     sortorder = models.IntegerField(blank=True, null=True, default=0)
     fieldname = models.TextField(blank=True, null=True)
     exportable = models.BooleanField(default=False, null=True)
+    alias = models.TextField(blank=True, null=True)
 
     def get_child_nodes_and_edges(self):
         """
@@ -550,8 +565,16 @@ class Node(models.Model):
         db_table = "nodes"
         constraints = [
             models.UniqueConstraint(fields=["name", "nodegroup"], name="unique_nodename_nodegroup"),
+            models.UniqueConstraint(fields=["alias", "graph"], name="unique_alias_graph"),
         ]
 
+
+@receiver(post_save, sender=Node)
+def clear_user_permission_cache(sender, instance, **kwargs):
+    user_permission_cache = caches["user_permission"]
+
+    if user_permission_cache:
+        user_permission_cache.clear()
 
 class Ontology(models.Model):
     ontologyid = models.UUIDField(default=uuid.uuid1, primary_key=True)
@@ -783,8 +806,13 @@ class ResourceXResource(models.Model):
 class ResourceInstance(models.Model):
     resourceinstanceid = models.UUIDField(primary_key=True, default=uuid.uuid1)  # This field type is a guess.
     graph = models.ForeignKey(GraphModel, db_column="graphid", on_delete=models.CASCADE)
+    graph_publication = models.ForeignKey(GraphPublication, db_column="graphpublicationid", on_delete=models.PROTECT)
     legacyid = models.TextField(blank=True, unique=True, null=True)
     createdtime = models.DateTimeField(auto_now_add=True)
+
+    def save(self, *args, **kwargs):
+        self.graph_publication = self.graph.publication
+        super(ResourceInstance, self).save()
 
     class Meta:
         managed = True

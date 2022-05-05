@@ -176,7 +176,6 @@
             "graphid": "d84a098c-368b-11e8-bafc-c4b301baab9f",
             "iconclass": "",
             "is_editable": false,
-            "isactive": true,
             "isresource": true,
             "name": "Mobile Survey Test",
             "nodegroups": [
@@ -245,7 +244,7 @@
                     "config": {
                         "addToMap": false,
                         "advancedStyle": "",
-                        "advancedStyling": false, 
+                        "advancedStyling": false,
                         "clusterDistance": 20,
                         "clusterMaxZoom": 5,
                         "clusterMinPoints": 3,
@@ -280,6 +279,13 @@
                 }
             ],
             "ontology_id": null,
+            "publication": {
+                "graph_id": "d84a098c-368b-11e8-bafc-c4b301baab9f",
+                "notes": "Initial migration.",
+                "publicationid": "2419866c-e28b-466c-a9ac-85895b225f1d",
+                "published_time": "2022-03-22T13:29:06.593",
+                "user_id": null
+            },
             "relatable_resource_model_ids": [],
             "reports": [],
             "resource_2_resource_constraints": [],

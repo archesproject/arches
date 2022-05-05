@@ -60,7 +60,7 @@
                         {% endblock editor_tree_node_content %}
                     </strong>
                 </a>
-                <!-- ko if: cards.length > 0 -->
+                <!-- ko if: cards.length > 0 && card.expanded() -->
                 <ul class="jstree-children" aria-expanded="true" data-bind="foreach: {
                         data: cards,
                         as: 'card'
@@ -96,7 +96,7 @@
         <span style="font-weight:bold" data-bind="text: ': ' + card.model.nodegroup_id()"></span>
         <!-- /ko -->
     </a>
-    <!-- ko if: card.cards().length > 0 || card.widgets().length > 0 -->
+    <!-- ko if: (card.cards().length > 0 || card.widgets().length > 0) && card.expanded()  -->
     <ul class="jstree-children card-designer-tree" aria-expanded="true">
         <div data-bind="sortable: {
                 data: card.widgets,
@@ -167,7 +167,7 @@
             <!-- /ko -->
         </span>
     </a>
-    <!-- ko if: card.cards().length > 0 || card.widgets().length > 0 -->
+    <!-- ko if: (card.cards().length > 0 || card.widgets().length > 0) && card.expanded() -->
     <ul class="jstree-children card-designer-tree" aria-expanded="true">
         {% block designer_tree_widgets %}
         <div data-bind="sortable: {

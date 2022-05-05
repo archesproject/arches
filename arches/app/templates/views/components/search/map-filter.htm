@@ -18,7 +18,9 @@
     <div class="workbench-card-sidepanel-header-container">
         <h4 class="workbench-card-sidepanel-header" data-bind="click: hideSidePanel">{% trans "Map Search" %}</h4>
     </div>
+    <div class="workbench-card-sidepanel-border"></div>
 
+    <div class="workbench-card-sidepanel-body">
     <!-- ko if: geoJSONString() === undefined -->
     <div class="spatial-filter-container">
         
@@ -89,6 +91,7 @@
             {% trans "Clear filter" %}
         </a>
 
+    </div>
     </div>
 
     <!-- ko if: geoJSONString() !== undefined -->

@@ -1,4 +1,4 @@
-define(['underscore', 'knockout', 'mapbox-gl-draw'], function(_, ko, MapboxDraw) {
+define(['underscore', 'knockout'], function(_, ko) {
     /**
      * A viewmodel used for managing a spatial search filter.
      *
@@ -195,43 +195,46 @@ define(['underscore', 'knockout', 'mapbox-gl-draw'], function(_, ko, MapboxDraw)
         };
 
         this.setupDraw = function() {
-            var self = this;
-            if (!this.draw) {
-                var modes = MapboxDraw.modes;
-                modes.static = {
-                    toDisplayFeatures: function(state, geojson, display) {
-                        display(geojson);
-                    }
-                };
-                this.draw = new MapboxDraw({
-                    displayControlsDefault: false,
-                    modes: modes
-                });
-                this.map().addControl(this.draw);
-            }
-            this.map().on('draw.create', function(e) {
-                if (self.searchContext()) {
-                    self.draw.getAll().features.forEach(function(feature){
-                        if(feature.id !== e.features[0].id) {
-                            if (feature.properties.searchGeom) {
-                                self.draw.delete(feature.id);
-                            }
-                        } else {
-                            self.draw.setFeatureProperty(feature.id, 'nodeId', null);
-                            self.draw.setFeatureProperty(feature.id, 'searchGeom', true);
+            require(['mapbox-gl-draw'], (MapboxDraw) => {
+                var self = this;
+                if (!this.draw) {
+                    var modes = MapboxDraw.modes;
+                    modes.static = {
+                        toDisplayFeatures: function(state, geojson, display) {
+                            display(geojson);
                         }
+                    };
+                    this.draw = new MapboxDraw({
+                        displayControlsDefault: false,
+                        modes: modes
                     });
-                    self.searchGeometries(e.features);
-                    self.updateFilter();
-                    self.drawMode(undefined);
+                    this.map().addControl(this.draw);
                 }
+                this.map().on('draw.create', function(e) {
+                    if (self.searchContext()) {
+                        self.draw.getAll().features.forEach(function(feature){
+                            if(feature.id !== e.features[0].id) {
+                                if (feature.properties.searchGeom) {
+                                    self.draw.delete(feature.id);
+                                }
+                            } else {
+                                self.draw.setFeatureProperty(feature.id, 'nodeId', null);
+                                self.draw.setFeatureProperty(feature.id, 'searchGeom', true);
+                            }
+                        });
+                        self.searchGeometries(e.features);
+                        self.updateFilter();
+                        self.drawMode(undefined);
+                    }
+                });
+                this.map().on('draw.update', function(e) {
+                    if (self.searchContext()) {
+                        self.searchGeometries(e.features);
+                        self.updateFilter();
+                    }
+                });
             });
-            this.map().on('draw.update', function(e) {
-                if (self.searchContext()) {
-                    self.searchGeometries(e.features);
-                    self.updateFilter();
-                }
-            });
+            
         };
 
         this.makeSearchFeature = function(feature) {

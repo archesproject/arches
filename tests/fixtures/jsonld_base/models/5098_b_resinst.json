@@ -51,9 +51,15 @@
             ],
             "functions_x_graphs": [],
             "graphid": "40dbcffa-faa1-11e9-84de-3af9d3b32b71",
+            "publication": {
+                "graph_id": "40dbcffa-faa1-11e9-84de-3af9d3b32b71",
+                "notes": "Initial migration.",
+                "publicationid": "12bb206e-4170-462f-8910-60d6724a7833",
+                "published_time": "2022-03-22T13:29:06.593",
+                "user_id": null
+            },
             "iconclass": "",
             "is_editable": false,
-            "isactive": true,
             "isresource": true,
             "jsonldcontext": null,
             "name": "5098_b_resinst",

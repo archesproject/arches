@@ -39,7 +39,8 @@ admin.site.register(
         models.IIIFManifest,
         models.GroupMapSettings,
         models.Language,
+        models.NodeGroup,
     ]
 )
 
-admin.site.register([models.Plugin, models.NodeGroup], GuardedAdmin)
+admin.site.register([models.Plugin], GuardedAdmin)

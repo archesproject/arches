@@ -531,21 +531,23 @@ class CsvReader(Reader):
 
         def get_display_nodes(graphid):
             display_nodeids = []
-            functions = FunctionXGraph.objects.filter(function_id="60000000-0000-0000-0000-000000000001", graph_id=graphid)
+            functions = FunctionXGraph.objects.filter(function__functiontype="primarydescriptors", graph_id=graphid)
             for function in functions:
                 f = function.config
                 del f["triggering_nodegroups"]
 
-                for k, v in f.items():
+                for k, v in f["descriptor_types"].items():
                     v["node_ids"] = []
-                    v["string_template"] = v["string_template"].replace("<", "").replace(">", "").split(", ")
+                    v["string_template"] = (
+                        v["string_template"].replace("<", "").replace(">", "").split(", ") if "string_template" in v else ""
+                    )
                     if "nodegroup_id" in v and v["nodegroup_id"] != "":
                         nodes = Node.objects.filter(nodegroup_id=v["nodegroup_id"])
                         for node in nodes:
                             if node.name in v["string_template"]:
                                 display_nodeids.append(str(node.nodeid))
 
-                for k, v in f.items():
+                for k, v in f["descriptor_types"].items():
                     if "string_template" in v and v["string_template"] != [""]:
                         print(
                             "The {0} {1} in the {2} display function.".format(

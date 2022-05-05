@@ -16,11 +16,10 @@
 {% block sidepanel %}
 <!-- ko foreach: { data: [$data], as: 'self' } -->
 <!--ko if: activeTab() === 'editor' -->
-    <div class="workbench-header-buffer">
-        <div class="workbench-card-sidepanel-header-container">
-            <h4 class="workbench-card-sidepanel-header" data-bind="click: hideSidePanel, text: label"></h4>
-        </div>
+    <div class="workbench-card-sidepanel-header-container">
+        <h4 class="workbench-card-sidepanel-header" data-bind="click: hideSidePanel, text: label"></h4>
     </div>
+    <div class="workbench-card-sidepanel-border"></div>
 
     <div>
         <div class="new-provisional-edit-card-container">

@@ -29,8 +29,10 @@
 <div class="workbench-card-sidepanel-header-container">
     <h4 class="workbench-card-sidepanel-header" data-bind="click: hideSidePanel">{% trans "Image Tools" %}</h4>
 </div>
+<div class="workbench-card-sidepanel-border"></div>
+<div class="workbench-card-sidepanel-body">
 <div class="iiif-image-tools">
-    <div class="layout">
+    <div data-bind="if: showModeSelector" class="layout">
         <div>Panel Layout</div>
         <div class="mode-selector">
             <div data-bind="click: function(){ compareMode(false) }, css: { selected: !compareMode() }">
@@ -59,7 +61,7 @@
         </div>
     </div>
 
-    <div style="width: 96%; margin: 20px 0px;">
+    <div data-bind="if: showModeSelector" style="width: 96%; margin: 20px 0px;">
         <input class="form-control input-lg widget-input"
             data-bind="value: imageToolSelector,
             select2Query: {
@@ -120,6 +122,7 @@
         <button class="btn btn-shim btn-danger btn-labeled btn-lg fa fa-refresh" data-bind="click: resetImageSettings"><span>{% trans 'Reset to defaults' %}</span></button>
     </div>
 </div>
+</div>
 <!--/ko -->
 <!--ko if: activeTab() === 'annotations' -->
 <div class="workbench-card-sidepanel-header-container">
@@ -127,6 +130,8 @@
         {% trans "Annotation Overlays" %}
     </h4>
 </div>
+<div class="workbench-card-sidepanel-border"></div>
+<div class="workbench-card-sidepanel-body">
 <div class="overlays-listing-container" data-bind="sortable: {
     data: annotationNodes
 }">
@@ -146,6 +151,7 @@
             </div>
         </div>
     </div>
+</div>
 </div>
 <!--/ko -->
 {% endblock sidepanel %}
@@ -255,7 +261,7 @@
             <div class="hide-gallery-control" data-bind="click: toggleGallery">
                 <span>{% trans "Hide Gallery" %}</span>
             </div>
-            <div class="mode-selector">
+            <div data-bind="if: showModeSelector"  class="mode-selector">
                 <div>Panels</div>
                 <div class="mode-selector-buttons" >
                     <div class="single-panel" data-bind="click: function(){compareMode(false)}, css: {selected: !compareMode()}">
