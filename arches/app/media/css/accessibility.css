@@ -153,7 +153,9 @@ a:focus,
 .search-export .instruction h4,
 .report-print-date,
 .resource-tools a.resource-grid-title,
-.graph-find {
+.graph-find,
+.map-manager-container .category-title,
+.map-manager-container .service-url {
     color: #000 !important;
 }
 
@@ -565,7 +567,7 @@ div.search-facet-item:focus {
         overflow-y: auto;
     }
 
-    .card-form-preview-container {
+    .card-form-preview-container:not(.map-manager-container .card-form-preview-container) {
         height: calc(70vh - 155px);
         overflow-y: auto;
     }
@@ -723,8 +725,10 @@ div.search-facet-item:focus {
 
     .resource-editor-container,
     .graph-designer-panels-container,
-    .function-manager-container {
+    .function-manager-container,
+    .map-manager-container {
         flex-direction: column;
+        overflow-y: auto;
     }
 
     .resource-editor-container .left-panel,

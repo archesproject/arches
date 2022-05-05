@@ -10,9 +10,9 @@
 
 
 {% block main_content %}
-<div class="content-panel map-manager-container" data-bind="click:function() { menuActive(false); }">
-    <div class="flex">
-        <div class="left-column-crud-container form-list" style="overflow-y: hidden;">
+<div class="content-panel" data-bind="click:function() { menuActive(false); }">
+    <div class="flex map-manager-container">
+        <div class="left-column-crud-container form-list">
             <div class="layer-filter">
                 <!-- Layer Filter -->
                 <div class="list-filter" data-bind="">
@@ -58,7 +58,7 @@
         </div>
 
         <!-- Basemap/Overlays Config -->
-        <div class="card-form-preview-container" style="height: calc(100vh + 100px);">
+        <div class="card-form-preview-container">
 
             <!-- Header -->
             <div class="category-header">
