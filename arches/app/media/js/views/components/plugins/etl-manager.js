@@ -1,8 +1,8 @@
 define([
+    'jquery',
     'knockout',
     'arches',
-    'js-cookie'
-], function(ko, arches, Cookies) {
+], function($, ko, arches) {
     return ko.components.register('etl-manager', {
         viewModel: function(params) {
             const self = this;
@@ -19,7 +19,7 @@ define([
 
             this.selectedLoadEvent.subscribe(function(val){
                 self.fetchValidation(val.loadid);
-            })
+            });
             this.moduleSearchString = ko.observable('');
             this.taskSearchString = ko.observable('');
             this.tabs = [
@@ -32,7 +32,6 @@ define([
                 self.selectedModule(etlmodule);
                 self.activeTab("details");
             };
-            this.selectedModule.subscribe(val => console.log(val))
 
             this.fetchLoadEvent = function(){
                 const url = arches.urls.etl_manager + "?action=loadEvent";
@@ -76,7 +75,7 @@ define([
                 } else {
                     return event.username;
                 }
-            }
+            };
 
             this.fetchStagedData = function(loadid){
                 const url = arches.urls.etl_manager + "?action=stagedData&loadid="+loadid;
@@ -85,7 +84,7 @@ define([
                         return response.json();
                     }
                 }).then(function(data){
-                    console.log(data)
+                    console.log(data);
                 });
             };
 
@@ -103,7 +102,7 @@ define([
 
             this.formatTime = function(timeString){
                 if (timeString){
-                    timeObject = new Date(timeString);
+                    const timeObject = new Date(timeString);
                     return timeObject.toLocaleString();
                 } else {
                     return null;
@@ -118,7 +117,7 @@ define([
                 timeDiff -= minutes * 60000;
                 const seconds = Math.floor(timeDiff / 1000);
                 return `${hours}:${('0' + minutes).slice(-2)}:${('0' + seconds).slice(-2)}`;
-            }
+            };
 
             this.init = function(){
                 const url = arches.urls.etl_manager + "?action=modules";
@@ -128,16 +127,14 @@ define([
                     }
                     }).then(function(data){
                         self.etlModules = data.map(function(etl){
-                            // etl.config.loading = self.loading;
                             etl.alert = self.alert;
                             require([etl.component]);
                             return etl;
                         });
                         self.loading(false);
                     });
-                    this.activeTab("start");
+                this.activeTab("start");
             };
-
             this.init();
         },
         template: { require: 'text!templates/views/components/plugins/etl-manager.htm' }
