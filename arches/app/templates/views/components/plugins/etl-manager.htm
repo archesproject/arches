@@ -67,16 +67,16 @@
     <div data-bind="if: activeTab() === 'import'">
         <div class="etl-module-status-container" style="display: flex; flex-direction: column;">
             <div class="etl-module-preview-container" style="display: inline-flex; flex-direction: row;">
-                <div class="etl-module-mapping" style="height: calc(100vh - 95px); width: auto; padding-bottom:25px; overflow: scroll;">
+                <div class="etl-module-status" style="height: calc(100vh - 95px); width: auto; border-right: 1px solid rgba(0,0,0,0.14);padding-bottom:25px; overflow: scroll;">
                     <div class="etl-manager-status-filter-container">
                         <input class="etl-manager-filter-input" type="text" placeholder = "Filter Tasks..." data-bind="textInput: taskSearchString">
                     </div>            
                     <div class="etl-status-table">
-                        <table class="" style="min-width: 50px; border: 1px solid rgba(0,0,0,0.14);">
+                        <table class="" style="min-width: 50px;">
                             <tbody data-bind="foreach: {data: loadEvents, as: 'event'}">
                                 <!-- ko if: !$parent.taskSearchString() || event.etl_module.toLowerCase().includes($parent.taskSearchString().toLowerCase()) -->
                                 <tr data-bind="css: {'selected': event == $parent.selectedLoadEvent()}">
-                                    <td data-bind="click: function(){$parent.selectedLoadEvent(event)}" style="display: block; padding: 10px 15px; flex-direction: column; justify-content: space-between; cursor: pointer; height: 80px; width: 400px;">
+                                    <td data-bind="click: function(){$parent.selectedLoadEvent(event)}" style="display: block; border-top: 1px solid rgba(0,0,0,0.14); padding: 10px 15px; flex-direction: column; justify-content: space-between; cursor: pointer; height: 80px; width: 400px;">
                                         <div>
                                             <div data-bind="text: event.etl_module" style="font-size: 13pt; color: rgb(4, 4, 45)"></div>
                                         </div>
@@ -99,7 +99,7 @@
                                             </div>
                                         </div>
                                     </td>
-                                    <td style="background: #eee; display: block; height: 35px; padding: 10px 15px; border: 1px solid rgba(0,0,0,0.14)">
+                                    <td style="background: #eee; display: block; height: 35px; padding: 10px 15px; border-top: 1px solid rgba(0,0,0,0.14)">
                                         <!-- ko if: event.complete && event.successful -->
                                         <a style="color: steelblue; text-decoration: underline; padding-right: 10px; cursor: pointer;" data-bind="click: function() { $parent.cleanLoadEvent(event.loadid) }">{% trans "clean up" %}</a>
                                         <a style="color: steelblue; text-decoration: underline; padding-right: 10px; cursor: pointer;" data-bind="click: function() { $parent.reverseTransactions(event.loadid) }">{% trans "undo import" %}</a>
