@@ -19,7 +19,6 @@ define([
     */
 
     var MobileSurveyViewModel = function(params) {
-        console.log("!()!()!()!()", params)
         var self = this;
         this.dateFormat = 'YYYY-MM-DD';
         this.allResources = params.resources;
