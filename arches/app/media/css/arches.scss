@@ -764,7 +764,9 @@ input[type="checkbox"] {
     color: #f9f9f9;
     padding: 10px 12px;
     display: flex;
-    justify-content: space-between;
+    position: fixed;
+    bottom: 0;
+    width: 100%;
 }
 
 .tabbed-workflow-footer .step-counter {
@@ -14952,18 +14954,7 @@ a.jstree-anchor.permissions-widget {
     margin-top: 50px;
 }
 
-.etl-module-button-container {
-    display: inline-flex;
-    position: fixed;
-    background-color: #445769;
-    border-top: 1px solid #0E2031;
-    padding: 15px 20px;
-    bottom: 0;
-    width: 100%;
-    height: 65px;
-}
-
-.etl-module-button-container .btn {
+.etl-module-footer .btn {
     border-radius: 2px;
     margin-right: 20px;
 }
