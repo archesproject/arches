@@ -37,7 +37,10 @@ class ETLManagerView(View):
             response = ETLModule.objects.all()
         elif action == "loadEvent":
             events = LoadEvent.objects.all().prefetch_related("user", "etl_module")
-            response = [{**model_to_dict(event), "user": {**model_to_dict(event.user)}, "etl_module": {**model_to_dict(event.etl_module)}} for event in events]
+            response = [
+                {**model_to_dict(event), "user": {**model_to_dict(event.user)}, "etl_module": {**model_to_dict(event.etl_module)}}
+                for event in events
+            ]
         elif action == "stagedData" and loadid:
             response = LoadStaging.objects.get(loadid=loadid)
         elif action == "validate" and loadid:
