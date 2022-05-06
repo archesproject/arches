@@ -257,13 +257,12 @@ MEDIA_URL = "/files/"
 # Don't put anything in this directory yourself; store your static files
 # in apps' "static/" subdirectories and in STATICFILES_DIRS.
 # Example: "/home/media/media.lawrence.com/static/"
-STATIC_ROOT = ""
+STATIC_ROOT = os.path.join(ROOT_DIR, "staticfiles")
 
 # URL prefix for static files.
 # Example: "http://media.lawrence.com/static/"
 STATIC_URL = "/foo/"
 
-STATIC_ROOT = os.path.join(ROOT_DIR, "staticfiles")
 STATICFILES_STORAGE = "django.contrib.staticfiles.storage.ManifestStaticFilesStorage"
 
 # when hosting Arches under a sub path set this value to the sub path eg : "/{sub_path}/"
@@ -390,7 +389,7 @@ MIDDLEWARE = [
 
 WEBPACK_LOADER = {
     "DEFAULT": {
-        "STATS_FILE": os.path.join(ROOT_DIR, "../webpack/webpack-stats.json"),
+        "STATS_FILE": os.path.join(ROOT_DIR, "app/webpack/webpack-stats.json"),
     },
 }
 
