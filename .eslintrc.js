@@ -3,14 +3,14 @@ module.exports = {
         "eslint:recommended"
     ],
     "env": {
-		"browser": true,
-		"es6": true,
-		"node": true
+        "browser": true,
+        "es6": true,
+        "node": true
     },
     "parserOptions": {
-		"ecmaVersion": 11,
-		"sourceType": "module",
-		"requireConfigFile": false
+        "ecmaVersion": 11,
+        "sourceType": "module",
+        "requireConfigFile": false
     },
     "globals": {
         "define": false,
