@@ -387,9 +387,14 @@ MIDDLEWARE = [
     "arches.app.utils.middleware.SetAnonymousUser",
 ]
 
+webpack_stats_filepath = os.path.join(ROOT_DIR, "app/webpack/webpack-stats.json")
+
+if not os.path.exists(webpack_stats_filepath):
+    webpack_stats_filepath = os.path.join(ROOT_DIR[:-7], "app/webpack/webpack-stats.json")  # removes extra `/arches` in remote testing environments
+
 WEBPACK_LOADER = {
     "DEFAULT": {
-        "STATS_FILE": os.path.abspath(os.path.join(ROOT_DIR, "app/webpack/webpack-stats.json")),
+        "STATS_FILE": webpack_stats_filepath,
     },
 }
 
