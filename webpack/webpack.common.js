@@ -38,7 +38,7 @@ module.exports = {
     },
     output: {
         path: Path.resolve(__dirname, `${PROJECT_PATH}/media/build`),
-        publicPath: '/foo/',
+        publicPath: '/static/',
         libraryTarget: 'amd-require',
         clean: true,
     },
