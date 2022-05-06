@@ -389,10 +389,7 @@ MIDDLEWARE = [
 
 WEBPACK_LOADER = {
     "DEFAULT": {
-        "STATS_FILE": os.path.join(
-            ROOT_DIR[:-7],  # removes superflous `/arches` from filepath
-            "webpack/webpack-stats.json"
-        ),
+        "STATS_FILE": os.path.join(ROOT_DIR[:-7], "webpack/webpack-stats.json"),  # removes superflous `/arches` from filepath
     },
 }
 
