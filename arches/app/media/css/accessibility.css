@@ -534,6 +534,38 @@ div.search-facet-item:focus {
     overflow-x: hidden;
 }
 
+.map-manager-container .left-column-crud-container {
+    flex: 0 0 37vw;
+}
+
+.map-manager-container .grid {
+    overflow-y: auto;
+    overflow-x: hidden;
+}
+
+.map-manager-container .library-card {
+    height: auto;
+    min-height: 60px;
+}
+
+.map-manager-container .crud-card-main {
+    position: relative;
+    left: auto;
+    top: auto;
+    height: auto;
+    white-space: normal;
+    margin-left: 55px;
+    margin-top: 7px;
+    width: auto;
+}
+
+.map-manager-container .crud-card-subtitle {
+    position: relative;
+    left: auto;
+    top: auto;
+    margin-left: 55px;
+}
+
 /******************************************************************/
 /* Media queries                                                  */
 /******************************************************************/
