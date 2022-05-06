@@ -1,5 +1,5 @@
 module.exports = {
-    "parser": "@babel/eslint-parser",
+    "parser": "arches/app/media/node_modules/@babel/eslint-parser",
     "extends": [
       "eslint:recommended"
     ],
