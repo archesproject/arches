@@ -58,7 +58,6 @@ define(['utils/set-csrf-token'], function () {
     }
 
     const archesData = document.querySelector('#arches-data');
-    window['foo'] = 'sfplanning'
 
     return {
         celeryRunning: archesData.getAttribute('celeryRunning'),

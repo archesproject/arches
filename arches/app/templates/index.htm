@@ -447,9 +447,8 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 <script>
 
     require.config({
-        // baseUrl: 'foo/build/js',
+        baseUrl: "{% webpack_static 'build/js' %}",
         paths: {
-            // 'templates': '{% url "templates" ""%}'.replace(/\/$/, ""),
             'text': "{% webpack_static 'node_modules/requirejs-text/text' %}",
             'jquery': "{% webpack_static 'node_modules/jquery/dist/jquery.min' %}",
             'jquery-ui': "{% webpack_static 'node_modules/jqueryui/jquery-ui.min' %}",

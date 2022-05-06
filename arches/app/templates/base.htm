@@ -70,13 +70,13 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 </body>
 
 {% block javascript %}
+    <script src="{% webpack_static 'node_modules/requirejs/require.js' %}"></script>
+
     {% block pre_require_js %}
     {% endblock pre_require_js %}
 
-    <script src="{% webpack_static 'node_modules/requirejs/require.js' %}"></script>
-
     {% include 'javascript.htm' %}
-
+    
     <script src="{% webpack_static '' %}/build/js/{{main_script}}.js"></script>
 
     {% if app_settings.GOOGLE_ANALYTICS_TRACKING_ID != None %}
