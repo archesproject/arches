@@ -25,7 +25,7 @@ module.exports = {
         "URLSearchParams": false,
         "fetch": false
     },
-    "ignorePatterns": [".eslintrc", "**/media/plugins/*"],
+    "ignorePatterns": [".eslintrc.js", "**/media/plugins/*"],
     "rules": {
         "semi": ["error", "always"],
         "indent": ["error", 4],
