@@ -774,7 +774,8 @@ div.search-facet-item:focus {
         overflow-y: auto;
     }
 
-    .resource-editor-container .left-panel .resource-editor-tree{
+    .resource-editor-container .left-panel .resource-editor-tree,
+    .map-manager-container .layer-list {
         height: auto;
     }
 
