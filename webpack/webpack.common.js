@@ -7,11 +7,8 @@ const BundleTracker = require('webpack-bundle-tracker');
 const { buildHTMLWebpackPluginList } = require('./webpack-utils/build-html-webpack-plugin-list');
 const { buildTemplateFilePathLookup } = require('./webpack-utils/build-template-filepath-lookup');
 const { buildJavascriptFilepathLookup } = require('./webpack-utils/build-javascript-filepath-lookup');
+const { ARCHES_CORE_PATH, PROJECT_PATH } = require('./webpack-paths');
 
-
-PROJECT_PATH = __dirname.split('/webpack')[0];
-ARCHES_CORE_PATH = Path.resolve(__dirname.split('/webpack')[0], './arches/app');
-PROJECT_PATH = ARCHES_CORE_PATH
 
 const archesCoreEntryPointConfiguration = buildJavascriptFilepathLookup(Path.resolve(__dirname, `${ARCHES_CORE_PATH}/media/js`), {});
 const projectEntryPointConfiguration = buildJavascriptFilepathLookup(Path.resolve(__dirname, `${PROJECT_PATH}/media/js`), {});
