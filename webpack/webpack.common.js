@@ -84,8 +84,8 @@ module.exports = {
             'plugins/knockout-select2': Path.resolve(__dirname, `${ARCHES_CORE_PATH}/media/plugins`, 'knockout-select2.js'),
             'nifty': Path.resolve(__dirname, `${ARCHES_CORE_PATH}/media/plugins`, 'nifty'),
             'leaflet-side-by-side': Path.resolve(__dirname, `${ARCHES_CORE_PATH}/media/plugins`, 'leaflet-side-by-side/index'),
-            // 'themepunch-tools': Path.resolve(__dirname, `${PROJECT_PATH}/media/plugins`, 'revolution-slider/rs-plugin/js/jquery.themepunch.tools.min'),
-            // 'revolution-slider': Path.resolve(__dirname, `${PROJECT_PATH}/media/plugins`, 'revolution-slider'),
+            'themepunch-tools': Path.resolve(__dirname, `${PROJECT_PATH}/media/plugins`, 'revolution-slider/rs-plugin/js/jquery.themepunch.tools.min'),
+            'revolution-slider': Path.resolve(__dirname, `${PROJECT_PATH}/media/plugins`, 'revolution-slider'),
             
             'async': Path.resolve(__dirname, `${PROJECT_PATH}/media/node_modules/requirejs-plugins/src/async`),
             'text': Path.resolve(__dirname, `${PROJECT_PATH}/media/node_modules/requirejs-text/text`),
