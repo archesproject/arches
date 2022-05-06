@@ -1,5 +1,4 @@
 module.exports = {
-    "parser": "arches/app/media/node_modules/@babel/eslint-parser",
     "extends": [
       "eslint:recommended"
     ],
@@ -9,7 +8,7 @@ module.exports = {
       "node": true
     },
     "parserOptions": {
-      "ecmaVersion": 8,
+      "ecmaVersion": "latest",
       "sourceType": "module",
       "requireConfigFile": false
     },
@@ -26,6 +25,7 @@ module.exports = {
         "URLSearchParams": false,
         "fetch": false
     },
+    "ignorePatterns": ["**/media/plugins/*"],
     "rules": {
         "semi": ["error", "always"],
         "indent": ["error", 4],
