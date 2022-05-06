@@ -24,7 +24,8 @@ const _buildHtmlWebpackPluginList = function(path, outerAcc, templateDirectoryPa
             acc.push(new HtmlWebpackPlugin({
                 template: `${templateDirectoryPath}/${filename}${parsedPath['ext']}`, // relative path to the HTML files
                 filename: `templates/${filename}${parsedPath['ext']}`, // output HTML files
-                chunks:  [ Path.resolve(__dirname, `${javascriptDirectoryPath}/${filename}.js`) ] // respective JS files
+                chunks:  [ Path.resolve(__dirname, `${javascriptDirectoryPath}/${filename}.js`) ], // respective JS files
+                minify: false
             }));
             return acc;
         }

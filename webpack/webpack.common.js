@@ -4,7 +4,6 @@ const { CleanWebpackPlugin } = require('clean-webpack-plugin');
 const CopyWebpackPlugin = require('copy-webpack-plugin');
 const BundleTracker = require('webpack-bundle-tracker');
 
-const { buildHTMLWebpackPluginList } = require('./webpack-utils/build-html-webpack-plugin-list');
 const { buildTemplateFilePathLookup } = require('./webpack-utils/build-template-filepath-lookup');
 const { buildJavascriptFilepathLookup } = require('./webpack-utils/build-javascript-filepath-lookup');
 const { ARCHES_CORE_PATH, PROJECT_PATH } = require('./webpack-paths');
@@ -57,14 +56,7 @@ module.exports = {
             $:  Path.resolve(__dirname, `${PROJECT_PATH}/media/node_modules/jquery/dist/jquery.min`),
         }),
         new BundleTracker({ filename: Path.resolve(__dirname, `webpack-stats.json`) }),
-    ].concat(
-        buildHTMLWebpackPluginList(
-            Path.resolve(__dirname, `${PROJECT_PATH}/templates`),
-            Path.resolve(__dirname, `${PROJECT_PATH}/media/js`),
-            Path.resolve(__dirname, `${ARCHES_CORE_PATH}/templates`),
-            Path.resolve(__dirname, `${ARCHES_CORE_PATH}/media/js`),
-        )
-    ),
+    ],
     resolveLoader: {
         alias: {
             text: 'text-loader'
