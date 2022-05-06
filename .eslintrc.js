@@ -8,7 +8,7 @@ module.exports = {
       "node": true
     },
     "parserOptions": {
-      "ecmaVersion": "latest",
+      "ecmaVersion": 2022,
       "sourceType": "module",
       "requireConfigFile": false
     },
