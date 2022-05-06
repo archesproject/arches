@@ -17,6 +17,11 @@ define([
             this.templates = ko.observableArray();
             this.selectedTemplate = ko.observable();
             this.loadStatus = ko.observable('ready');
+            this.downloadMode = ko.observable(false);
+
+            this.toggleDownloadMode = () => {
+                this.downloadMode(!this.downloadMode());
+            } 
 
             function getCookie(name) {
                 if (!document.cookie) {

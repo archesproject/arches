@@ -734,28 +734,37 @@ input[type="checkbox"] {
     display: flex;
     flex-direction: column;
     justify-content: space-between;
-}
 
-.branch-csv-etl .loader-select {
-    height: calc(100% - 50px);
-    text-align: center;
-    margin: 25px 25px;
-    background: #f6f6f6;
-    border: 1px solid #cdcdcd;
-}
+    .loader-select {
+        height: calc(100% - 50px);
+        text-align: center;
+        background: #f6f6f6;
+        border: 1px solid #cdcdcd;
+        align-items: center;
+        justify-content: center;
+        height: 100%;
+        width: 100%;
+        display: flex;
+    }
 
-.branch-csv-etl .summary-header {
-    padding: 5px 0px 3px;
-    font-weight: 525;
-    font-size: 13px;
-    color: #2d5576;
-}
+    .summary-header {
+        padding: 5px 0px 3px;
+        font-weight: 525;
+        font-size: 13px;
+        color: #2d5576;
+    }
 
-.branch-csv-etl .summary-title {
-    padding: 5px 0px 3px;
-    font-weight: 550;
-    font-size: 15px;
-    color: #2d5576;
+    .summary-title {
+        padding: 5px 0px 3px;
+        font-weight: 550;
+        font-size: 15px;
+        color: #2d5576;
+    }
+    h5 {
+        font-size: 15px;
+        color: #999;
+        font-weight: 500;
+    }
 }
 
 .tabbed-workflow-footer, .etl-module-footer {
