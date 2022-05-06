@@ -354,9 +354,9 @@ def monkey_get_documents_to_index(self, node_info):
     document["displayname"] = None
     document["root_ontology_class"] = self.get_root_ontology()
     document["legacyid"] = self.legacyid
-    document["displayname"] = self.displayname
-    document["displaydescription"] = self.displaydescription
-    document["map_popup"] = self.map_popup
+    document["displayname"] = self.displayname()
+    document["displaydescription"] = self.displaydescription()
+    document["map_popup"] = self.map_popup()
     document["tiles"] = self.tiles
     document["permissions"] = {"users_without_read_perm": []}
     document["permissions"]["users_without_edit_perm"] = []
