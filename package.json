@@ -2,9 +2,6 @@
     "name": "arches",
     "version": "6.0.1",
     "scripts": {
-        "lint": "npm run lint:styles; npm run lint:scripts",
-        "lint:styles": "stylelint src",
-        "lint:scripts": "eslint src",
         "build": "NODE_PATH=./arches/app/media/node_modules NODE_ENV=production ./arches/app/media/node_modules/.bin/webpack --config webpack/webpack.config.prod.js",
         "test": "NODE_PATH=./arches/app/media/node_modules ./arches/app/media/node_modules/.bin/webpack --config webpack/webpack.config.dev.js",
         "start": "NODE_PATH=./arches/app/media/node_modules ./arches/app/media/node_modules/.bin/webpack --watch --config webpack/webpack.config.dev.js"
