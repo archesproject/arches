@@ -22,13 +22,13 @@ define([
                 dateNodeId: ko.observable(null),
                 inverted: ko.observable(false)
             };
-            this.filter.fromDate.subscribe(function (fromDate) {
+            this.filter.fromDate.subscribe(function(fromDate) {
                 var toDate = this.filter.toDate();
                 if (fromDate && toDate && !this.isFromLessThanTo(fromDate, toDate)) {
                     this.filter.toDate(fromDate);
                 }
             }, this);
-            this.filter.toDate.subscribe(function (toDate) {
+            this.filter.toDate.subscribe(function(toDate) {
                 var fromDate = this.filter.fromDate();
                 if (fromDate && toDate && !this.isFromLessThanTo(fromDate, toDate)) {
                     this.filter.fromDate(toDate);
@@ -43,7 +43,7 @@ define([
             this.getTimeWheelConfig();
             this.date_nodes = ko.observableArray();
             this.graph_models = ko.observableArray();
-            this.selectedPeriod.subscribe(function (d) {
+            this.selectedPeriod.subscribe(function(d) {
                 if (d) {
                     var start = moment(0, 'YYYY').add(d.data.start, 'years').format(this.format);
                     var end = moment(0, 'YYYY').add(d.data.end, 'years').format(this.format);
@@ -59,33 +59,33 @@ define([
                 var from = today.format(this.format);
                 var to = today.format(this.format);
                 switch (value) {
-                    case "today":
-                        break;
-                    case "last-7":
-                        from = today.subtract(7, 'days').format(this.format);
-                        break;
-                    case "last-30":
-                        from = today.subtract(30, 'days').format(this.format);
-                        break;
-                    case "this-week":
-                        from = today.day(0).format(this.format);
-                        to = today.day(6).format(this.format);
-                        break;
-                    case "this-month":
-                        from = today.date(1).format(this.format);
-                        to = moment().month(today.month()+1).date(0).format(this.format);
-                        break;
-                    case "this-quarter":
-                        from = moment().date(1).quarter(today.quarter()).format(this.format);
-                        to = moment().date(1).quarter(today.quarter()+1).format(this.format);
-                        break;
-                    case "this-year":
-                        var first = today.dayOfYear(1);
-                        from = first.format(this.format);
-                        to = first.add(1, 'years').subtract(1, 'days').format(this.format);
-                        break;
-                    default:
-                        return;
+                case "today":
+                    break;
+                case "last-7":
+                    from = today.subtract(7, 'days').format(this.format);
+                    break;
+                case "last-30":
+                    from = today.subtract(30, 'days').format(this.format);
+                    break;
+                case "this-week":
+                    from = today.day(0).format(this.format);
+                    to = today.day(6).format(this.format);
+                    break;
+                case "this-month":
+                    from = today.date(1).format(this.format);
+                    to = moment().month(today.month()+1).date(0).format(this.format);
+                    break;
+                case "this-quarter":
+                    from = moment().date(1).quarter(today.quarter()).format(this.format);
+                    to = moment().date(1).quarter(today.quarter()+1).format(this.format);
+                    break;
+                case "this-year":
+                    var first = today.dayOfYear(1);
+                    from = first.format(this.format);
+                    to = first.add(1, 'years').subtract(1, 'days').format(this.format);
+                    break;
+                default:
+                    return;
                 }
                 this.filter.toDate(to);
                 this.filter.fromDate(from);
@@ -190,5 +190,5 @@ define([
         componentName,
         viewModel,
         'templates/views/components/search/time-filter.htm'
-    )
+    );
 });

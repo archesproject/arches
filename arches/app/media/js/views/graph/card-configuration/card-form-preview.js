@@ -24,7 +24,7 @@ define([
             this.selection = options.selection || ko.observable(this.card);
             this.helpPreviewActive = options.helpPreviewActive || ko.observable(false);
             this.widgetLookup = widgets;
-            this.currentTabIndex = ko.computed(function () {
+            this.currentTabIndex = ko.computed(function() {
                 if (!self.card.isContainer() || self.selection() === self.card) {
                     return 0;
                 }
@@ -35,7 +35,7 @@ define([
                 var index = self.card.get('cards')().indexOf(card);
                 return index;
             });
-            this.currentTabCard = ko.computed(function () {
+            this.currentTabCard = ko.computed(function() {
                 if(this.card.get('cards')().length === 0){
                     return this.card;
                 }else{
@@ -51,7 +51,7 @@ define([
         * @memberof CardFormPreview.prototype
         * @param  {object} e - the ko.sortable event object
         */
-        beforeMove: function (e) {
+        beforeMove: function(e) {
             e.cancelDrop = (e.sourceParent!==e.targetParent);
         }
     });

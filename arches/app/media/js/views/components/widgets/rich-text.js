@@ -4,7 +4,7 @@ define([
     'viewmodels/widget', 
     'utils/create-async-component',
     'bindings/ckeditor',
-], function (ko, _, WidgetViewModel, createAsyncComponent) {
+], function(ko, _, WidgetViewModel, createAsyncComponent) {
     /**
     * registers a rich-text-widget component for use in forms
     * @function external:"ko.components".rich-text-widget

@@ -1,4 +1,4 @@
-define(['jquery', 'underscore', 'backbone', 'select2', 'arches'], function ($, _, Backbone, Select2, arches) {
+define(['jquery', 'underscore', 'backbone', 'select2', 'arches'], function($, _, Backbone, Select2, arches) {
     return Backbone.View.extend({
 
         initialize: function(options) {
@@ -15,13 +15,13 @@ define(['jquery', 'underscore', 'backbone', 'select2', 'arches'], function ($, _
                 ajax: {
                     url: this.getUrl(),
                     dataType: 'json',
-                    data: function (term, page) {
+                    data: function(term, page) {
                         return {
                             q: term, // search term
                             page_limit: 30
                         };
                     },
-                    results: function (data, page) {
+                    results: function(data, page) {
                         var results = [];
                         $.each(data.hits.hits, function(){
                             results.push({

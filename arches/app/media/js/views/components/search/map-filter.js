@@ -19,14 +19,14 @@ define([
         initialize: function(options) {
             var self = this;
 
-            this.dependenciesLoaded = ko.observable(false)
+            this.dependenciesLoaded = ko.observable(false);
 
             require(['mapbox-gl', 'mapbox-gl-draw'], (mapbox, mbdraw) => {
                 self.mapboxgl = mapbox;
                 self.MapboxDraw = mbdraw;
                 self.dependenciesLoaded(true);
                 if(self.map()){
-                    self.map.valueHasMutated()
+                    self.map.valueHasMutated();
                 }
             });
 
@@ -79,17 +79,17 @@ define([
                         }
                     },
                     {
-                    "id": "geojson-search-buffer",
-                    "type": "fill",
-                    "layout": {
-                        "visibility": "visible"
-                    },
-                    "paint": {
-                        "fill-color": "#3bb2d0",
-                        "fill-outline-color": "#3bb2d0",
-                        "fill-opacity": 0.2
-                    },
-                    "source": "geojson-search-buffer-data"
+                        "id": "geojson-search-buffer",
+                        "type": "fill",
+                        "layout": {
+                            "visibility": "visible"
+                        },
+                        "paint": {
+                            "fill-color": "#3bb2d0",
+                            "fill-outline-color": "#3bb2d0",
+                            "fill-opacity": 0.2
+                        },
+                        "source": "geojson-search-buffer-data"
                     }
                 ]
             );
@@ -192,7 +192,7 @@ define([
                         }
                     }
 
-                     if (!!feature.properties && !!feature.properties.inverted){
+                    if (!!feature.properties && !!feature.properties.inverted){
                         var inverted = feature.properties.inverted;
                         try{
                             var bufferWidth = parseInt(buffer.width, 10);
@@ -381,7 +381,7 @@ define([
                     if(feature.id !== e.features[0].id){
                         self.draw.delete(feature.id);
                     }
-                })
+                });
                 self.searchGeometries(e.features);
                 self.updateFilter();
                 self.drawMode(undefined);
@@ -390,7 +390,7 @@ define([
                 self.searchGeometries(e.features);
                 self.updateFilter();
             });
-            this.map().on("draw.modechange", function (e) {
+            this.map().on("draw.modechange", function(e) {
                 self.map().draw_mode = e.mode;
             });
         },
@@ -423,12 +423,12 @@ define([
             this.drawMode(undefined);
         },
 
-        useMaxBuffer: function (unit, buffer, maxBuffer) {
+        useMaxBuffer: function(unit, buffer, maxBuffer) {
             res = false;
             if (unit === 'ft') {
-                res = (buffer * 0.3048) > maxBuffer
+                res = (buffer * 0.3048) > maxBuffer;
             } else {
-                res = buffer > maxBuffer
+                res = buffer > maxBuffer;
             }
             return res;
         },
@@ -521,7 +521,7 @@ define([
         restoreState: function() {
             var query = this.query();
             var buffer = 10;
-            var bufferUnit = 'm'
+            var bufferUnit = 'm';
             var inverted = false;
             var hasSpatialFilter = false;
             if (componentName in query) {
@@ -532,7 +532,7 @@ define([
                     inverted = properties.inverted;
                     this.filter.feature_collection(mapQuery);
                     buffer = properties.buffer.width;
-                    bufferUnit = properties.buffer.unit
+                    bufferUnit = properties.buffer.unit;
                     this.draw.set({
                         "type": "FeatureCollection",
                         "features": mapQuery.features

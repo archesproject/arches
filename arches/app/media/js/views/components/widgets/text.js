@@ -3,7 +3,7 @@ define([
     'underscore', 
     'viewmodels/widget',
     'utils/create-async-component',
-], function (ko, _, WidgetViewModel, createAsyncComponent) {
+], function(ko, _, WidgetViewModel, createAsyncComponent) {
     /**
     * registers a text-widget component for use in forms
     * @function external:"ko.components".text-widget
@@ -15,7 +15,7 @@ define([
     * @param {string} params.config().uneditable - disables widget
     */
 
-    const viewModel = function (params) {
+    const viewModel = function(params) {
         params.configKeys = ['placeholder', 'width', 'maxLength', 'defaultValue', 'uneditable'];
 
         WidgetViewModel.apply(this, [params]);

@@ -34,7 +34,7 @@ define(['knockout', 'utils/create-async-component'], function(ko, createAsyncCom
                 return {
                     op: self.op(),
                     val: self.searchValue()
-                }
+                };
             }).extend({ throttle: 750 });
             params.filterValue(this.filterValue());
             this.filterValue.subscribe(function(val) {

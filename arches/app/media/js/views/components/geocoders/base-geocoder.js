@@ -78,7 +78,7 @@ define(
                     }
                 }
                 return true;
-            }
+            };
 
             /**
              * Reloads the geocode layer when a new geocode request is made
@@ -106,10 +106,10 @@ define(
                 } else {
                     self.map.removeLayer('geocode-point');
                 }
-            }
+            };
 
             this.selection.subscribe(this.updateSelection);
-        }
+        };
 
         return BaseGeocoderViewModel;
     }

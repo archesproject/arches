@@ -1,5 +1,5 @@
 // knockout-sortable 0.15.0 | (c) 2016 Ryan Niemeyer |  http://www.opensource.org/licenses/mit-license
-;(function(factory) {
+(function(factory) {
     if (typeof define === "function" && define.amd) {
         // AMD anonymous module
         define(["knockout", "jquery", "jquery-ui"], factory);
@@ -51,7 +51,7 @@
             result[dataName] = valueAccessor();
         }
 
-        ko.utils.arrayForEach(["afterAdd", "afterRender", "as", "beforeRemove", "includeDestroyed", "templateEngine", "templateOptions", "nodes"], function (option) {
+        ko.utils.arrayForEach(["afterAdd", "afterRender", "as", "beforeRemove", "includeDestroyed", "templateEngine", "templateOptions", "nodes"], function(option) {
             if (options.hasOwnProperty(option)) {
                 result[option] = options[option];
             } else if (ko.bindingHandlers.sortable.hasOwnProperty(option)) {

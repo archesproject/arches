@@ -1,4 +1,4 @@
-define(['knockout', 'viewmodels/widget', 'utils/create-async-component'], function (ko, WidgetViewModel, createAsyncComponent) {
+define(['knockout', 'viewmodels/widget', 'utils/create-async-component'], function(ko, WidgetViewModel, createAsyncComponent) {
     /**
     * knockout components namespace used in arches
     * @external "ko.components"
@@ -30,7 +30,7 @@ define(['knockout', 'viewmodels/widget', 'utils/create-async-component'], functi
                 }else{
                     self.value(self.on);
                 }
-            }
+            };
             this.getvalue = this.config().getvalue || ko.computed(function(){
                 return this.value() === this.on;
             }, this);

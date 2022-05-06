@@ -26,7 +26,7 @@ define([
                 _.each(tags, function(tag){
                     if(tag.status === 'deleted'){
                         var found = _.find(this.filter.tags, function(currentTag){
-                           return tag.value.type === currentTag.type;
+                            return tag.value.type === currentTag.type;
                         }, this);
                         if(!found){
                             _.each(this.filters, function(filter){

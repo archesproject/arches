@@ -39,7 +39,7 @@ define([
             var diameter = this.$el.width() < this.$el.height() ? this.$el.width() : this.$el.height();
 
             this.tree = d3.layout.tree()
-                .children(function (d) {
+                .children(function(d) {
                     return d.childNodes();
                 })
                 .size([360, this.getsize()])
@@ -53,14 +53,14 @@ define([
                 });
 
             this.zoom = d3.behavior.zoom().on("zoom", function() {
-                    self.redraw();
-                });
+                self.redraw();
+            });
 
             this.svg = d3.select(this.el).append("svg")
                 .attr("width", "100%")
                 .attr("height", this.$el.height())
                 .call(this.zoom)
-                .append("g")
+                .append("g");
 
             this.render();
             setTimeout(function(){
@@ -72,11 +72,11 @@ define([
         * Renders the nodes and edges as a D3 graph
         * @memberof GraphBase.prototype
         */
-        render: function () {
+        render: function() {
             var self = this;
             this.root = undefined;
 
-            this.nodes().forEach(function (node) {
+            this.nodes().forEach(function(node) {
                 if (node.istopnode) {
                     this.root = node;
                 }
@@ -87,7 +87,7 @@ define([
                 if (isNaN(node.x)) {
                     node.x = 0;
                 }
-            })
+            });
 
             this.renderLinks();
             this.renderNodes();
@@ -99,7 +99,7 @@ define([
         */
         renderNodes: function(){
             this.allNodes = this.svg.selectAll("g")
-                .data(this.tree_nodes, function(d) { return d.nodeid });
+                .data(this.tree_nodes, function(d) { return d.nodeid; });
 
             this.node = this.allNodes.enter().append("g")
                 .attr("class", 'node')
@@ -108,7 +108,7 @@ define([
                 });
 
             this.node.append("circle")
-                .attr("r", this.nodeSize)
+                .attr("r", this.nodeSize);
 
             this.renderNodeText();
         },
@@ -120,11 +120,11 @@ define([
         renderNodeText: function(){
             var self = this;
             this.node.append("text")
-                .attr("dy", function(d){return d.children ? "-.31em" : ".31em"})
+                .attr("dy", function(d){return d.children ? "-.31em" : ".31em";})
                 .attr("class", 'graph-node-text')
                 .attr("text-anchor", function(d) { return d.x < 180 ? "start" : "end"; })
                 .attr("transform", function(d) { return d.x < 180 ? "translate(" + self.nodeLabelOffset + ")" : "rotate(180)translate(-" + self.nodeLabelOffset + ")"; })
-                .text(function (d) {
+                .text(function(d) {
                     if(d.name().length > 16*self.currentScale) {
                         return d.name().substring(0,16*self.currentScale)+'...';
                     }
@@ -140,7 +140,7 @@ define([
             var links = this.tree.links(this.tree_nodes);
 
             var link = this.svg.selectAll(".link")
-                .data(links, function(d) { return d.target.nodeid });
+                .data(links, function(d) { return d.target.nodeid; });
             link.enter().append("path")
                 .attr("class", "link")
                 .attr("d", this.diagonal);
@@ -154,7 +154,7 @@ define([
         * @param {boolean} [force=false] - if true remove and re-add all the nodes and edges in the graph,
         * used after adding/removing nodes from the graph
         */
-        redraw: function (force) {
+        redraw: function(force) {
             var self = this;
             var previousScale = this.currentScale;
             force = force || false;
@@ -179,7 +179,7 @@ define([
                 this.allNodes.remove();
                 this.svg.selectAll(".link").remove();
                 this.tree = d3.layout.tree()
-                    .children(function (d) {
+                    .children(function(d) {
                         return d.childNodes();
                     })
                     .size([360, this.getsize() * this.currentScale])
@@ -198,7 +198,7 @@ define([
             d3.select(this.el)
                 .style("height", this.$el.height() + "px")
                 .select("svg")
-                    .attr("height", this.$el.height());
+                .attr("height", this.$el.height());
 
             this.center = [(this.$el.width() / 2), this.$el.height() / 2];
             var xt = this.currentOffset[0] + this.center[0];
@@ -209,7 +209,7 @@ define([
                 " scale(" + this.currentScale + ")");
         },
 
-        zoomTo: function (node) {
+        zoomTo: function(node) {
             var x = -node.y * Math.cos((node.x - 90) / 180 * Math.PI)*this.currentScale;
             var y = -node.y * Math.sin((node.x - 90) / 180 * Math.PI)*this.currentScale;
 

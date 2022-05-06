@@ -35,7 +35,7 @@ define([
 
             for (var widget of widgets) {
                 widget.config.basemap(self.basemap());
-                widget.config.overlayConfigs(self.overlayConfigs())
+                widget.config.overlayConfigs(self.overlayConfigs());
                 widget.config.centerX(self.centerX());
                 widget.config.centerY(self.centerY());
                 widget.config.zoom(self.zoom());

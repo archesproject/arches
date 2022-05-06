@@ -22,6 +22,7 @@ module.exports = merge(commonWebpackConfig, {
     plugins: [
         // new ESLintPlugin({
         //     extensions: [`js`, `jsx`],
+        //     fix: true,
         // }),
         new Webpack.DefinePlugin({
             'process.env.NODE_ENV': JSON.stringify('development'),

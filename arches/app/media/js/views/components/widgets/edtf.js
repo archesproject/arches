@@ -35,13 +35,13 @@ define([
                     self.transformedEdtf(null);
                 }
             });
-        }
+        };
         
-        this.getEdtf(params.value())
+        this.getEdtf(params.value());
         if (params.state !== 'report') {
             params.value.subscribe(val => {
                 self.getEdtf(val);
-            })
+            });
         }
 
         WidgetViewModel.apply(this, [params]);

@@ -43,7 +43,7 @@ define([
             });
 
             if(this.renderContext() == "manifest-workflow"){
-                this.showModeSelector(false)
+                this.showModeSelector(false);
             }
             this.isManifestDirty = ko.computed(function() {
                 return ((ko.unwrap(self.manifestName) !== self.origManifestName) ||

@@ -126,56 +126,56 @@ define(function() {
 
     var getSearchQueryStyles = function() {
         return [
-        {
-            "id": "search-poly",
-            "type": "fill",
-            "source": "search-query",
-            "layout": {
-                "visibility": "visible"
+            {
+                "id": "search-poly",
+                "type": "fill",
+                "source": "search-query",
+                "layout": {
+                    "visibility": "visible"
+                },
+                "filter": ["all", ["==", "$type", "Polygon"]],
+                "paint": {
+                    "fill-color": "#0000FF",
+                    "fill-opacity": 0.4
+                }
             },
-            "filter": ["all", ["==", "$type", "Polygon"]],
-            "paint": {
-                "fill-color": "#0000FF",
-                "fill-opacity": 0.4
-            }
-        },
-        {
-            "id": "search-line",
-            "type": "line",
-            "source": "search-query",
-            "layout": {
-                "visibility": "visible"
-            },
-            "filter": ["all", ["==", "$type", "LineString"]],
-            "paint": {
-                "line-color": "#0000FF",
-                "line-width": 2.0
-            }
-        }, {
-            "id": "search-point",
-            "type": "circle",
-            "source": "search-query",
-            "layout": {
-                "visibility": "visible"
-            },
-            "filter": ["==", "$type", "Point"],
-            "paint": {
-                "circle-radius": 5,
-                "circle-color": "#0000FF"
-            }
-        },{
-            "id": "buffer-layer",
-            "type": "fill",
-            "source": "search-query",
-            "filter": ["all", ["==", "$type", "Polygon"],
-                ["==", "id", "buffer-layer"]
-            ],
-            "paint": {
-                "fill-color": "#0000FF",
-                "fill-outline-color": "#0000FF",
-                "fill-opacity": 0.1
-            }
-        }]
+            {
+                "id": "search-line",
+                "type": "line",
+                "source": "search-query",
+                "layout": {
+                    "visibility": "visible"
+                },
+                "filter": ["all", ["==", "$type", "LineString"]],
+                "paint": {
+                    "line-color": "#0000FF",
+                    "line-width": 2.0
+                }
+            }, {
+                "id": "search-point",
+                "type": "circle",
+                "source": "search-query",
+                "layout": {
+                    "visibility": "visible"
+                },
+                "filter": ["==", "$type", "Point"],
+                "paint": {
+                    "circle-radius": 5,
+                    "circle-color": "#0000FF"
+                }
+            },{
+                "id": "buffer-layer",
+                "type": "fill",
+                "source": "search-query",
+                "filter": ["all", ["==", "$type", "Polygon"],
+                    ["==", "id", "buffer-layer"]
+                ],
+                "paint": {
+                    "fill-color": "#0000FF",
+                    "fill-outline-color": "#0000FF",
+                    "fill-opacity": 0.1
+                }
+            }];
     };
 
     return {

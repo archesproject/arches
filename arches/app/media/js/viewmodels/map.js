@@ -99,7 +99,7 @@ define([
         
         this.zoom = ko.observable(ko.unwrap(params.zoom) || arches.mapDefaultZoom);
         this.zoom.subscribe(function(level) {
-            if (level && self.map()) { self.map().setZoom(level) };
+            if (level && self.map()) { self.map().setZoom(level); }
 
             if (ko.isObservable(params.zoom) && params.zoom() !== level) {
                 params.zoom(level);
@@ -109,9 +109,9 @@ define([
         this.overlayConfigs = ko.observableArray(ko.unwrap(params.overlayConfigs));
         this.overlayConfigs.subscribe(function(overlayConfigs) {
             if (ko.isObservable(params.overlayConfigs)) {
-                params.overlayConfigs(overlayConfigs)
+                params.overlayConfigs(overlayConfigs);
             }
-        })
+        });
         
         this.activeBasemap = ko.observable();  // params.basemap is a string, activeBasemap is a map. Cannot initialize from params.
         this.activeBasemap.subscribe(function(basemap) {
@@ -147,15 +147,15 @@ define([
                 
                 layer.updateParent = function(parent) {
                     if (self.overlayConfigs.indexOf(layer.maplayerid) === -1) {
-                        self.overlayConfigs.push(layer.maplayerid)
-                        layer.opacity(100)
+                        self.overlayConfigs.push(layer.maplayerid);
+                        layer.opacity(100);
                     } else {
                         self.overlayConfigs.remove(layer.maplayerid);
-                        layer.opacity(0)
+                        layer.opacity(0);
                     }
                     
                     if (parent !== self) {
-                        parent.overlayConfigs(self.overlayConfigs())
+                        parent.overlayConfigs(self.overlayConfigs());
 
                         if (params.inWidget) {
                             try {

@@ -44,7 +44,7 @@ define([
                     description: self.description(),
                     functiontype: self.functiontype(),
                     component: self.component(),
-                }))
+                }));
             });
 
             self.dirty = ko.computed(function() {

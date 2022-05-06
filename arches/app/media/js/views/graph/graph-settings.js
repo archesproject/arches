@@ -28,14 +28,14 @@ require([
         datatypelookup: [],
         graph: graph,
         ontology_namespaces: data.ontology_namespaces
-    })
+    });
 
     var ontologyClass = ko.observable(data.node.ontologyclass);
     var jsonData = ko.computed(function() {
         var relatableResourceIds = _.filter(data.resources, function(resource){
             return resource.isRelatable();
         }).map(function(resource){
-            return resource.id
+            return resource.id;
         });
         if (graph.ontology_id() === undefined) {
             graph.ontology_id(null);
@@ -47,14 +47,14 @@ require([
         });
     });
     var jsonCache = ko.observable(jsonData());
-    var dirty = ko.computed(function () {
+    var dirty = ko.computed(function() {
         return jsonData() !== jsonCache();
     });
     var viewModel = {
         dirty: dirty,
         iconFilter: iconFilter,
-        icons: ko.computed(function () {
-            return _.filter(data.icons, function (icon) {
+        icons: ko.computed(function() {
+            return _.filter(data.icons, function(icon) {
                 return icon.name.indexOf(iconFilter()) >= 0;
             });
         }),
@@ -62,13 +62,13 @@ require([
         relatable_resources: data.resources,
         ontologies: data.ontologies,
         ontologyClass: ontologyClass,
-        ontologyClasses: ko.computed(function () {
-            return _.filter(data.ontologyClasses, function (ontologyClass) {
+        ontologyClasses: ko.computed(function() {
+            return _.filter(data.ontologyClasses, function(ontologyClass) {
                 ontologyClass.display = rootNode.getFriendlyOntolgyName(ontologyClass.source);
                 return ontologyClass.ontology_id === graph.ontology_id();
             });
         }),
-        save: function () {
+        save: function() {
             pageView.viewModel.loading(true);
             $.ajax({
                 type: "POST",
@@ -83,14 +83,14 @@ require([
                 }
             });
         },
-        reset: function () {
+        reset: function() {
             _.each(JSON.parse(srcJSON), function(value, key) {
                 if (ko.isObservable(graph[key])) {
                     graph[key](value);
-                };
+                }
             });
             JSON.parse(resourceJSON).forEach(function(jsonResource) {
-                var resource = _.find(data.resources, function (resource) {
+                var resource = _.find(data.resources, function(resource) {
                     return resource.id === jsonResource.id;
                 });
                 resource.isRelatable(jsonResource.is_relatable);

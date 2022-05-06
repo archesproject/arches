@@ -1,10 +1,10 @@
-define([], function () {
+define([], function() {
     function removeTrailingCommaFromObject(string) {
         return string.replace(/,\s*}*$/, "}");
     }
 
     function forceDoubleQuotes(string) {
-        return string.replace(/'/g, '"')
+        return string.replace(/'/g, '"');
     }
 
     const graphDesignerDataHTML = document.querySelector('#graphDesignerData');

@@ -1,5 +1,5 @@
 define(['underscore', 'knockout', 'turf', 'arches'], function(_, ko, turf, arches) {
-    return function (searchAggregations) {
+    return function(searchAggregations) {
         var cellWidth = arches.hexBinSize;
         var units = 'kilometers';
         var hexGrid = turf.hexGrid(arches.hexBinBounds, cellWidth, units);

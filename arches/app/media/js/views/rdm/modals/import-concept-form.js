@@ -1,4 +1,4 @@
-define(['jquery', 'backbone', 'arches', 'models/concept'], function ($, Backbone, arches, ConceptModel) {
+define(['jquery', 'backbone', 'arches', 'models/concept'], function($, Backbone, arches, ConceptModel) {
     return Backbone.View.extend({
 
         initialize: function(){
@@ -16,13 +16,13 @@ define(['jquery', 'backbone', 'arches', 'models/concept'], function ($, Backbone
                 ajax: {
                     url: arches.urls.search_sparql_endpoint,
                     dataType: 'json',
-                    data: function (term, page) {
+                    data: function(term, page) {
                         return {
                             terms: term,
                             endpoint: self.endpoint.val()
                         };
                     },
-                    results: function (data, page) {
+                    results: function(data, page) {
                         return {results: data.results.bindings};
                     }
                 },
@@ -30,7 +30,7 @@ define(['jquery', 'backbone', 'arches', 'models/concept'], function ($, Backbone
                     var markup=[];
                     window.Select2.util.markMatch(result.Term.value, query.term, markup, escapeMarkup);
                     if (!result.ScopeNote){
-                        result.ScopeNote = {'value': ''}
+                        result.ScopeNote = {'value': ''};
                     }
                     var formatedresult = '<span class="concept_result">' + markup.join("")  + '</span> - <a href="' + result.Subject.value + '" target="_blank">' + result.Subject.value + '</a><div><i class="concept_result_schemaname">(' + result.ScopeNote.value + ')</i></div>';
                     return formatedresult;
@@ -59,9 +59,9 @@ define(['jquery', 'backbone', 'arches', 'models/concept'], function ($, Backbone
                         url: arches.urls.from_sparql_endpoint.replace('aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa', self.model.get('id')),
                         data: JSON.stringify(data),
                         success: function(){
-                            self.modal.on('hidden.bs.modal', function (e) {
+                            self.modal.on('hidden.bs.modal', function(e) {
                                 self.trigger('conceptsImported');
-                            })
+                            });
                             self.modal.modal('hide');
                         }, 
                         error: function(response){

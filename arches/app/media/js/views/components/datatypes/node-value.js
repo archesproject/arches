@@ -4,14 +4,14 @@ define([
     'underscore',
     'arches',
     'utils/create-async-component',
-], function ($, ko, _, arches, createAsyncComponent) {
+], function($, ko, _, arches, createAsyncComponent) {
     var name = 'node-value-datatype-config';
     const viewModel = function(params) {
         var self = this;
         this.nodes = [{
             id: null,
             name: ko.observable('')
-        }]
+        }];
         if (params.graph) {
             this.nodes = this.nodes.concat(
                 _.filter(params.graph.get('nodes')(), function(node) {
@@ -44,14 +44,14 @@ define([
                             data: {
                                 parent_nodeid: params.id
                             },
-                            success: function (response) {
+                            success: function(response) {
                                 self.properties(
                                     properties.concat(
-                                        _.map(response, function (prop) {
+                                        _.map(response, function(prop) {
                                             return {
                                                 name: node.getFriendlyOntolgyName(prop.ontology_property),
                                                 id: prop.ontology_property
-                                            }
+                                            };
                                         })
                                     )
                                 );
@@ -61,45 +61,45 @@ define([
                 } else {
                     self.properties(properties);
                 }
-            }
+            };
             updateProperties();
             this.config.nodeid.subscribe(updateProperties);
             this.isEditable = true;
             if (params.graph) {
-                this.propertyName = ko.computed(function () {
+                this.propertyName = ko.computed(function() {
                     var propertyId = self.config.property();
                     var selectedProperty = _.find(self.properties(), function(property) {
                         return property.id === propertyId;
                     });
                     return selectedProperty ? selectedProperty.name : '';
                 });
-                this.relatedNodeName = ko.computed(function () {
+                this.relatedNodeName = ko.computed(function() {
                     var nodeid = self.config.nodeid();
                     var relatedNode =  _.find(params.graph.get('nodes')(), function(node) {
                         return node.id === nodeid;
                     });
                     return relatedNode ? relatedNode.name() : '';
                 });
-                var cards = _.filter(params.graph.get('cards')(), function(card){return card.nodegroup_id === params.nodeGroupId()})
+                var cards = _.filter(params.graph.get('cards')(), function(card){return card.nodegroup_id === params.nodeGroupId();});
                 if (cards.length) {
-                    this.isEditable = cards[0].is_editable
+                    this.isEditable = cards[0].is_editable;
                 }
             } else if (params.widget) {
-                this.isEditable = params.widget.card.get('is_editable')
+                this.isEditable = params.widget.card.get('is_editable');
             }
         } else {
             var filter = params.filterValue();
             this.node = params.node;
             this.op = ko.observable(filter.op || '');
             this.searchValue = ko.observable(filter.val || '');
-            this.filterValue = ko.computed(function () {
+            this.filterValue = ko.computed(function() {
                 return {
                     op: self.op(),
                     val: self.searchValue() || ''
-                }
+                };
             }).extend({ throttle: 750 });
             params.filterValue(this.filterValue());
-            this.filterValue.subscribe(function (val) {
+            this.filterValue.subscribe(function(val) {
                 params.filterValue(val);
             });
         }

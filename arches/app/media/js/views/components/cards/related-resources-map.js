@@ -34,9 +34,9 @@ define([
         ];
         CardComponentViewModel.apply(this, [params]);
         var selectLayerConfig = {};
-        selectLayerConfig.defaultcolor = this.defaultcolor()
-        selectLayerConfig.selectioncolor = this.selectioncolor()
-        selectLayerConfig.hovercolor = this.hovercolor()
+        selectLayerConfig.defaultcolor = this.defaultcolor();
+        selectLayerConfig.selectioncolor = this.selectioncolor();
+        selectLayerConfig.hovercolor = this.hovercolor();
         selectLayerConfig.colorpalette = typeof this.colorpalette() === 'string' ? this.colorpalette().split(",") : this.colorpalette();
         selectLayerConfig.fillopacity = Number(this.fillopacity());
         selectLayerConfig.overviewzoom = Number(this.overviewzoom());
@@ -77,14 +77,14 @@ define([
             set/get logic to ensure all data values are equal between parent and children
         */
 
-       this.basemap = ko.observable();
-       this.overlayConfigs = ko.observable();
-       this.centerX = ko.observable();
-       this.centerY = ko.observable();
+        this.basemap = ko.observable();
+        this.overlayConfigs = ko.observable();
+        this.centerX = ko.observable();
+        this.centerY = ko.observable();
 
-       for (var widget of self.widgets) {
+        for (var widget of self.widgets) {
             if (widget.config.basemap) {
-               self.basemap(widget.config.basemap());
+                self.basemap(widget.config.basemap());
             }
             if (widget.config.overlayConfigs) {
                 self.overlayConfigs(widget.config.overlayConfigs());
@@ -100,28 +100,28 @@ define([
         this.basemap.subscribe(function(map) {
             for (var widget of self.widgets) {
                 if (widget.config.basemap) {
-                    widget.config.basemap(map)
+                    widget.config.basemap(map);
                 }
             }
         });
         this.overlayConfigs.subscribe(function(configs) {
             for (var widget of self.widgets) {
                 if (widget.config.overlayConfigs) {
-                    widget.config.overlayConfigs(configs)
+                    widget.config.overlayConfigs(configs);
                 }
             }
         });
         this.centerX.subscribe(function(x) {
             for (var widget of self.widgets) {
                 if (widget.config.centerX) {
-                    widget.config.centerX(x)
+                    widget.config.centerX(x);
                 }
             }
         });
         this.centerY.subscribe(function(y) {
             for (var widget of self.widgets) {
                 if (widget.config.centerY) {
-                    widget.config.centerY(y)
+                    widget.config.centerY(y);
                 }
             }
         });
@@ -132,7 +132,7 @@ define([
 
             for (var widget of self.widgets) {
                 if (widget.config.zoom) {
-                    widget.config.zoom(zoom)
+                    widget.config.zoom(zoom);
                 }
             }
         });
@@ -150,14 +150,14 @@ define([
         this.nodeDetails = ko.observableArray();
         this.nodeids.forEach(function(nodeid) {
             fetch(arches.urls.api_nodes(nodeid))
-              .then(response => response.json())
-              .then(data => {
-                self.nodeDetails.push(data[0]);
-              })
-              .catch((error) => {
-                console.error('Error:', error);
-              });
-        })
+                .then(response => response.json())
+                .then(data => {
+                    self.nodeDetails.push(data[0]);
+                })
+                .catch((error) => {
+                    console.error('Error:', error);
+                });
+        });
         var parsedNodeIds = JSON.parse(JSON.stringify(this.nodeids));
         var firstNode = parsedNodeIds.length > 0 ? [parsedNodeIds[0]] : [];
         this.filterNodeIds = ko.observableArray(firstNode);
@@ -197,8 +197,8 @@ define([
                 }
             });
             return tileResourceIds
-                .map(function(resourceid){return self.relatedResourceDetails[resourceid]})
-                .filter(function(val){return val !== undefined});
+                .map(function(resourceid){return self.relatedResourceDetails[resourceid];})
+                .filter(function(val){return val !== undefined;});
         });
 
         this.showRelatedQuery = ko.observable(false);
@@ -296,7 +296,7 @@ define([
                 graphid: ko.unwrap(resourceData.graphid),
                 displayname: ko.unwrap(resourceData.displayname),
                 resourceinstanceid: ko.unwrap(resourceData.resourceinstanceid)
-            }
+            };
             zoomToData = false;
             var graphconfig = widget.node.config.graphs().find(function(graph){return graph.graphid === ko.unwrap(resourceData.graphid);});
             var val = [{
@@ -322,7 +322,7 @@ define([
         this.unrelateResource = function(resourceData, widget) {
             var id = widget.node_id();
             var resourceinstanceid = ko.unwrap(resourceData.resourceinstanceid);
-            var related = resourceData.mapCard.tile.data[id]()
+            var related = resourceData.mapCard.tile.data[id]();
             for( var i = 0; i < related.length; i++){ 
                 if ( ko.unwrap(related[i].resourceId) === resourceinstanceid) { 
                     related.splice(i, 1); 
@@ -417,7 +417,7 @@ define([
                     var feature;
                     if (features.length && features[0].properties.resourceinstanceid) {
                         feature = features[0].properties.resourceinstanceid;
-                        if (self.relatedResources().filter(function(val){return val.resourceinstanceid === feature}).length) {
+                        if (self.relatedResources().filter(function(val){return val.resourceinstanceid === feature;}).length) {
                             self.hoverId(feature);
                         }
                     } else {

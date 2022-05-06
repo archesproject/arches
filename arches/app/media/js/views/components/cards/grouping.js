@@ -201,7 +201,7 @@ define([
         if (ko.isObservable(params.dirty)) {
             this.dirty.subscribe(function(dirty) {
                 params.dirty(dirty);
-            })
+            });
         }
 
         this.previouslySaved = ko.computed(function() {
@@ -311,7 +311,7 @@ define([
         'grouping-card-component',
         viewModel,
         'templates/views/components/cards/grouping.htm'
-    )
+    );
     
     return viewModel;
 });

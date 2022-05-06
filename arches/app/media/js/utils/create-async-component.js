@@ -31,7 +31,7 @@ define(['jquery', 'knockout', 'arches'], function($, ko, arches) {
     return function createAsyncComponent(componentName, viewModel, templatePath, hasAsyncViewModel) {
         return ko.components.register(componentName, {
             viewModel: function(params){
-                this.injectComponent = function(injectionSite){ injectComponent(injectionSite, componentName, params, viewModel, templatePath, hasAsyncViewModel) }
+                this.injectComponent = function(injectionSite){ injectComponent(injectionSite, componentName, params, viewModel, templatePath, hasAsyncViewModel); };
             },
             template: `
                 <div>
@@ -39,5 +39,5 @@ define(['jquery', 'knockout', 'arches'], function($, ko, arches) {
                 </div>
             `
         });
-    }
+    };
 });

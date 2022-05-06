@@ -141,7 +141,7 @@ define([
         'resource-report-abstract',
         ResourceReportAbstract,
         'templates/views/components/resource-report-abstract.htm'
-    )
+    );
 
     return ResourceReportAbstract;
 });

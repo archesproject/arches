@@ -3,7 +3,7 @@ define([
     'arches', 
     'viewmodels/concept-select', 
     'utils/create-async-component', 
-], function (ko, arches, ConceptSelectViewModel, createAsyncComponent) {
+], function(ko, arches, ConceptSelectViewModel, createAsyncComponent) {
     var name = 'concept-datatype-config';
     const viewModel = function(params) {
         this.search = params.search;
@@ -21,29 +21,29 @@ define([
             }
             params.value = this.searchValue;
             ConceptSelectViewModel.apply(this, [params]);
-            this.filterValue = ko.computed(function () {
+            this.filterValue = ko.computed(function() {
                 return {
                     op: self.op(),
                     val: self.searchValue()
-                }
+                };
             });
             params.filterValue(this.filterValue());
-            this.filterValue.subscribe(function (val) {
+            this.filterValue.subscribe(function(val) {
                 params.filterValue(val);
             });
         } else {
             this.conceptCollections = ko.observableArray([]);
             this.isEditable = true;
             if (params.graph) {
-                var cards = _.filter(params.graph.get('cards')(), function(card){return card.nodegroup_id === params.nodeGroupId()})
+                var cards = _.filter(params.graph.get('cards')(), function(card){return card.nodegroup_id === params.nodeGroupId();});
                 if (cards.length) {
-                    this.isEditable = cards[0].is_editable
+                    this.isEditable = cards[0].is_editable;
                 }
             } else if (params.widget) {
-                this.isEditable = params.widget.card.get('is_editable')
+                this.isEditable = params.widget.card.get('is_editable');
             }
             this.topConcept = params.config.rdmCollection;
-            this.initialTopConcept = this.topConcept()
+            this.initialTopConcept = this.topConcept();
             if (arches.conceptCollections.length === 0) {
                 var self = this;
                 $.ajax({
@@ -58,8 +58,8 @@ define([
                     });
                     self.topConcept(self.initialTopConcept);
                 }).fail(function(error){
-                    console.log(error)
-                })
+                    console.log(error);
+                });
             } else {
                 this.conceptCollections(arches.conceptCollections);
                 if (this.conceptCollections()[0].label != null) {

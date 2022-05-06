@@ -27,13 +27,13 @@ define([
             this.disableAppendButton = options.disableAppendButton || ko.observable(false);
             this.graphModel = options.graphModel;
             this.selectedNode = this.graphModel.get('selectedNode');
-            options.branches.forEach(function (branch) {
+            options.branches.forEach(function(branch) {
                 branch.selected = ko.observable(false);
                 branch.filtered = ko.observable(false);
                 branch.graphModel = new GraphModel({
                     data: branch,
                     selectRoot: false
-                })
+                });
                 this.items.push(branch);
             }, this);
             this.selectedBranch = ko.observable(null);
@@ -47,7 +47,7 @@ define([
                 filtered_items.sort(function(a,b) {
                     return a.name.toLowerCase() > b.name.toLowerCase() ? 1 : -1;});
                 return filtered_items;
-            }, this)
+            }, this);
 
             // update the list of items in the branch list 
             // when any of these properties change
@@ -79,13 +79,13 @@ define([
             this.loadingBranchDomains(true);
             this.items().forEach(function(branch, i){
                 domainConnections.push(branch.graphModel.loadDomainConnections());
-            }, this)
+            }, this);
 
             $.when(...domainConnections)
-            .then(function(){
-                self.loadingBranchDomains(false);
-                self.filterFunction();
-            });
+                .then(function(){
+                    self.loadingBranchDomains(false);
+                    self.filterFunction();
+                });
 
         },
 
@@ -148,7 +148,7 @@ define([
                             this.closeForm();
                         }
                     }, this), 300, true);
-                }, this)
+                }, this);
             }
         },
 

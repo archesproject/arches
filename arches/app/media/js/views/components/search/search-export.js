@@ -98,5 +98,5 @@ function($, ko, arches, createAsyncComponent) {
         componentName,
         viewModel,
         'templates/views/components/search/search-export.htm'
-    )
+    );
 });

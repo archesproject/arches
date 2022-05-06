@@ -1,4 +1,4 @@
-define(['views/graph/graph-base-data'], function (data) {
+define(['views/graph/graph-base-data'], function(data) {
     /**
     * A base viewmodel for functions
     *

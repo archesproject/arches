@@ -1,4 +1,4 @@
-define([], function () {
+define([], function() {
     function removeTrailingCommaFromObject(string) {
         return string.replace(/,\s*}*$/, "}");
     }

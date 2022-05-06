@@ -80,8 +80,8 @@
         $(element).select2(bindingValue);
 
         if (allBindings[dataBindingName]().length > 0) {
-          $(element).select2('data', allBindings[dataBindingName]());
-          $(element).trigger('change');
+            $(element).select2('data', allBindings[dataBindingName]());
+            $(element).trigger('change');
         }
         // Destroy select2 on element disposal
         ko.utils.domNodeDisposal.addDisposeCallback(element, function() {

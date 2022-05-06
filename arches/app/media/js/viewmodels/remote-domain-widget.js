@@ -2,7 +2,7 @@ define([
     'jquery',
     'underscore',
     'viewmodels/domain-widget'
-], function ($, _, DomainWidgetViewModel) {
+], function($, _, DomainWidgetViewModel) {
     /**
     * A viewmodel used for remote domain widgets
     *
@@ -23,7 +23,7 @@ define([
             params.prepData :
             function(data) { return data; };
 
-        var getOptions = function (url) {
+        var getOptions = function(url) {
             if (url) {
                 $.ajax({
                     url: url,
@@ -32,7 +32,7 @@ define([
                     self.options(prepData(data));
                 });
             }
-        }
+        };
 
         this.url.subscribe(getOptions);
         getOptions(this.url());

@@ -1,4 +1,4 @@
-define(['utils/load-component-dependencies'], function (loadComponentDependencies) {
+define(['utils/load-component-dependencies'], function(loadComponentDependencies) {
     function removeTrailingCommaFromObject(string) {
         return string.replace(/,\s*}*$/, "}");
     }

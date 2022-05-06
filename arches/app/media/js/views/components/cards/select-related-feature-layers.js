@@ -6,29 +6,29 @@ define([], function() {
         hoverId = hoverId;
         var selectionColor = layerConfig.selectioncolor;
         var hoverColor = layerConfig.hovercolor;
-        var colorPalette = layerConfig.colorpalette
+        var colorPalette = layerConfig.colorpalette;
 
         var createColorExpressions = function(defaultColor, colorPalette){
             if (nodeids) {
                 var colorExpressions = ['case'];
                 nodeids.forEach(function(nodeid, i) {
-                    colorExpressions.push(['==', ['get', 'nodeid'], nodeid])
+                    colorExpressions.push(['==', ['get', 'nodeid'], nodeid]);
                     if (i <= colorPalette.length) {
                         colorExpressions.push(colorPalette[i]);
                     } else {
                         colorExpressions.push(colorPalette[Math.floor(Math.random() * Math.floor(colorPalette.length))]);
                     }
                 });
-                colorExpressions.push(color)
+                colorExpressions.push(color);
                 return colorExpressions;
             } else {
                 return defaultColor;
             }
-        } 
+        }; 
         color = createColorExpressions(color, colorPalette);
-        var nodeFilter = ["!=", "resourceinstanceid", "x"] // just a placeholder if there are no filterNodeids
+        var nodeFilter = ["!=", "resourceinstanceid", "x"]; // just a placeholder if there are no filterNodeids
         if (filteredNodeids && nodeids.length > 0) {
-            var nodeFilter = filteredNodeids.map(id => ["==", "nodeid", id])
+            var nodeFilter = filteredNodeids.map(id => ["==", "nodeid", id]);
             nodeFilter.splice(0, 0, 'any');
         }
         if (selectedResourceIds && selectedResourceIds.length > 0) {
@@ -46,7 +46,7 @@ define([], function() {
             "minzoom": layerConfig.minzoom,
             "filter": ['all',[
                 "==", "$type", "Polygon"
-                ], nodeFilter
+            ], nodeFilter
             ],
             "paint": {
                 "fill-color": color,

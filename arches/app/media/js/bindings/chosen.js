@@ -3,7 +3,7 @@ define([
     'underscore',
     'knockout',
     'chosen'
-], function ($, _, ko) {
+], function($, _, ko) {
     /**
     * A knockout.js binding for the "chosen.js" select box - https://harvesthq.github.io/chosen/
     * - pass options to chosen using the following syntax in the knockout data-bind attribute

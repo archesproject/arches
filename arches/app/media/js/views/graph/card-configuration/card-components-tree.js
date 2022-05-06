@@ -27,7 +27,7 @@ define([
         * @memberof CardComponentsTree.prototype
         * @param  {object} e - the ko.sortable event object
         */
-        beforeMove: function (e) {
+        beforeMove: function(e) {
             e.cancelDrop = (e.sourceParent!==e.targetParent);
         }
     });

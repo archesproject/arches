@@ -50,7 +50,7 @@ define([
         this.showImageModifiers = ko.observable(false);
         this.renderContext = ko.observable(params.renderContext);
         this.showModeSelector = ko.observable(true);
-        let primaryPanelFilters
+        let primaryPanelFilters;
         let secondaryPanelFilters;
 
         this.selectPrimaryPanel.subscribe((value) => {
@@ -100,7 +100,7 @@ define([
                 }
     
                 if(secondaryCanvasLayer){
-                    map.removeLayer(secondaryCanvasLayer)
+                    map.removeLayer(secondaryCanvasLayer);
                 }
                 self.secondaryCanvas(undefined);
                 self.secondaryLabel(undefined);
@@ -351,10 +351,10 @@ define([
                 return self.canvases() === '' || !self.canvases();
             }, this),
             initSelection: function(element, callback) {
-                const canvasObject = self.canvases().find(canvas => self.getCanvasService(canvas) == element.val())
+                const canvasObject = self.canvases().find(canvas => self.getCanvasService(canvas) == element.val());
                 callback(canvasObject);
             }
-        }
+        };
 
         this.rightSideSelectConfig = {
             ...splitSelectConfig,
@@ -437,7 +437,7 @@ define([
             }
             self.floatingLocation(location);
             if(self.floatingLocation() == "left") {
-                self.selectPrimaryPanel(true)
+                self.selectPrimaryPanel(true);
             } else {
                 self.selectPrimaryPanel(false);
             }
@@ -472,20 +472,20 @@ define([
             const greyscale = self.greyscale();
 
             return { brightness, contrast, saturation, greyscale };
-        })
+        });
 
         this.canvasFilter.subscribe((value) => {
             console.log(value);
-        })
+        });
         var updateCanvasLayerFilter = function() {
             var filter = self.canvasFilter();
             var map = self.map();
             let layer;
             if (map) {
                 if(self.selectPrimaryPanel()){
-                    layer = map.getPane('tilePane').querySelector('.iiif-layer-primary')
+                    layer = map.getPane('tilePane').querySelector('.iiif-layer-primary');
                 } else {
-                    layer = map.getPane('tilePane').querySelector('.iiif-layer-secondary')
+                    layer = map.getPane('tilePane').querySelector('.iiif-layer-secondary');
                 }
                 if(layer && layer !== null){
                     layer.style.filter = filter;
@@ -549,12 +549,12 @@ define([
                     if(sideBySideControl){
                         map.removeControl(sideBySideControl);
                     }
-                    sideBySideControl = L.control.sideBySide(canvasLayer, secondaryCanvasLayer)
+                    sideBySideControl = L.control.sideBySide(canvasLayer, secondaryCanvasLayer);
                     sideBySideControl.addTo(map);
-                    map.fitBounds(map.getBounds())
-                }
+                    map.fitBounds(map.getBounds());
+                };
 
-                secondaryCanvasLayer.on('tileload', loadComparison)
+                secondaryCanvasLayer.on('tileload', loadComparison);
                 
                 updateCanvasLayerFilter();
             }
@@ -568,14 +568,14 @@ define([
             map.addLayer(annotationFeatureGroup);
         });
         this.canvas.subscribe(addCanvasLayer);
-        this.secondaryCanvas.subscribe(compareCanvasLayers)
+        this.secondaryCanvas.subscribe(compareCanvasLayers);
 
         this.setSecondaryCanvas = (canvas) => {
             const service = self.getCanvasService(canvas);
             if(service){
                 self.secondaryCanvas(service);
             }
-        }
+        };
 
         this.selectCanvas = function(canvas) {
             self.zoomToCanvas = true;

@@ -199,7 +199,7 @@ define([
             });
         },
 
-        addImageClicked: function (e) {
+        addImageClicked: function(e) {
             this.model.reset();
             var self = this;
             var form = new AddImageForm({
@@ -250,7 +250,7 @@ define([
                     }
                 }, self);
             }else{
-                modal.on('hidden.bs.modal', function () {
+                modal.on('hidden.bs.modal', function() {
                     var model;
 
                     if (data.action === 'delete-value') {

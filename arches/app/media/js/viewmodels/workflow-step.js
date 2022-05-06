@@ -199,7 +199,7 @@ define([
                     resolve(...values);
                 });
             });
-        }
+        };
 
         this.setToLocalStorage = function(key, value) {
             var allStepsLocalStorageData = JSON.parse(localStorage.getItem(STEPS_LABEL)) || {};

@@ -1,4 +1,4 @@
-define(['require'], function (require) {
+define(['require'], function(require) {
     function removeTrailingCommaFromObject(string) {
         return string.replace(/,\s*}*$/, "}");
     }

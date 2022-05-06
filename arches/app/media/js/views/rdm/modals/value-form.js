@@ -1,4 +1,4 @@
-define(['jquery', 'backbone', 'bootstrap', 'select2'], function ($, Backbone) {
+define(['jquery', 'backbone', 'bootstrap', 'select2'], function($, Backbone) {
     return Backbone.View.extend({
         initialize: function(options) {
             var self = this,
@@ -7,14 +7,14 @@ define(['jquery', 'backbone', 'bootstrap', 'select2'], function ($, Backbone) {
                 noteData = {},
                 sortorderId, modal, titles;
 
-            this.$el.find('.pref-label-data').each(function (i, el) {
+            this.$el.find('.pref-label-data').each(function(i, el) {
                 var data = $(el).data();
                 if(data.type === 'prefLabel'){
                     prefLabels[data.language] = data.id;
                 }
             });
 
-            this.$el.find('.note-data').each(function (i, el) {
+            this.$el.find('.note-data').each(function(i, el) {
                 var data = $(el).data();
                 if (!noteData[data.valuetype]) {
                     noteData[data.valuetype] = {};
@@ -22,21 +22,21 @@ define(['jquery', 'backbone', 'bootstrap', 'select2'], function ($, Backbone) {
                 noteData[data.valuetype][data.language] = data.id;
             });
 
-            this.$el.find('.sortorder-data').each(function (i, el) {
+            this.$el.find('.sortorder-data').each(function(i, el) {
                 sortorderId = $(el).data().id;
             });
 
             this.valuemodel = this.model.get('values')[0];
 
             switch(this.valuemodel.get('category')) {
-                case 'label':
-                    modal = this.$el.find('#labelmodal');
-                    break;
-                case 'note':
-                    modal = this.$el.find('#notemodal');
-                    break;
-                default:
-                    modal = this.$el.find('#related_valuemodal');
+            case 'label':
+                modal = this.$el.find('#labelmodal');
+                break;
+            case 'note':
+                modal = this.$el.find('#notemodal');
+                break;
+            default:
+                modal = this.$el.find('#related_valuemodal');
             }
 
             titles = modal.find('.modal-title').data();
@@ -112,7 +112,7 @@ define(['jquery', 'backbone', 'bootstrap', 'select2'], function ($, Backbone) {
                         language: self.languageInput.select2("val")
                     });
                     self.model.set('values', [self.valuemodel]);
-                    modal.on('hidden.bs.modal', function () {
+                    modal.on('hidden.bs.modal', function() {
                         self.model.save(function() {
                             self.model.set('values', []);
                         });    
@@ -126,7 +126,7 @@ define(['jquery', 'backbone', 'bootstrap', 'select2'], function ($, Backbone) {
             modal.modal('show');
         },
         
-        render: function () {
+        render: function() {
             this.valueInput.val(this.valuemodel.get('value'));
             this.idInput.val(this.valuemodel.get('id'));
             if(this.valuemodel.get('type') !== ''){

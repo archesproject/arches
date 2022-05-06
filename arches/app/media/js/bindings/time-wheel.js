@@ -49,10 +49,10 @@ define([
                 if (!d) {
                     clearHighlight();
                 }
-            })
+            });
 
             var g = ko.utils.domData.get(element, 'vis');
-            g.on("mouseleave", function (event) {
+            g.on("mouseleave", function(event) {
                 var d = selectedPeriod();
                 if (d) {
                     highlightPeriod(event, d);
@@ -75,7 +75,7 @@ define([
                 return d3.partition()
                     .size([2 * Math.PI, root.height + 1])
                     (root);
-            }
+            };
 
             var d3ClickManager = function() {
                 // we want to a distinguish single/double click
@@ -110,7 +110,7 @@ define([
                             }
                         }
                     });
-                };
+                }
                 // Copies a variable number of methods from source to target.
                 var d3rebind = function(target, source) {
                     var i = 1, n = arguments.length, method;
@@ -123,19 +123,19 @@ define([
                 // If passed with arguments, sets the value and returns the target.
                 function d3_rebind(target, source, method) {
                     return function() {
-                    var value = method.apply(source, arguments);
-                    return value === source ? target : value;
+                        var value = method.apply(source, arguments);
+                        return value === source ? target : value;
                     };
                 }
                 return d3rebind(cc, dispatcher, 'on');
-            }
+            };
             var clickmanager = d3ClickManager();
             clickmanager.on("click", function(event, d) {
                 selectedPeriod(d);
             })
-            .on("dblclick", function(event, d) {
-                dblclick(d);
-            });
+                .on("dblclick", function(event, d) {
+                    dblclick(d);
+                });
 
             function highlightPeriod(event, d) {
                 count = d.data.size;
@@ -153,7 +153,7 @@ define([
                     current = current.parent;
                 }
 
-                sequenceArray.push(count + ' hits')
+                sequenceArray.push(count + ' hits');
 
                 breadCrumb(sequenceArray.join(' - '));
 
@@ -165,20 +165,20 @@ define([
                 path.filter(function(d) {
                     return (sequenceArray.indexOf(d.data.name) >= 0);
                 })
-                .style("opacity", 1);
+                    .style("opacity", 1);
             }
 
             function clearHighlight(){
                 d3.selectAll("path")
                     .style("opacity", 1);
-                breadCrumb(arches.translations.timeWheelDateMatches.replace("${total}", total))
+                breadCrumb(arches.translations.timeWheelDateMatches.replace("${total}", total));
             }
 
             selectedPeriod.subscribe(function(d) {
                 if (!d) {
                     clearHighlight();
                 }
-            })
+            });
 
             if(!!configJSON){
                 var root = partition(configJSON);
@@ -205,7 +205,7 @@ define([
                     })
                     .outerRadius(function(d) {
                         return Math.max(d.y0 * radius, d.y1 * radius - 1);
-                    })
+                    });
 
                 var path = g.append("g")
                     .selectAll("path")
@@ -218,7 +218,7 @@ define([
                     .call(clickmanager);
     
                 path.filter(d => d.children)
-                    .style("cursor", "pointer")
+                    .style("cursor", "pointer");
 
                 var format = d3.format(",d");
     
@@ -236,10 +236,10 @@ define([
                     parent.datum(p.parent || root);
     
                     root.each(d => d.target = {
-                    x0: Math.max(0, Math.min(1, (d.x0 - p.x0) / (p.x1 - p.x0))) * 2 * Math.PI,
-                    x1: Math.max(0, Math.min(1, (d.x1 - p.x0) / (p.x1 - p.x0))) * 2 * Math.PI,
-                    y0: Math.max(0, d.y0 - p.depth),
-                    y1: Math.max(0, d.y1 - p.depth)
+                        x0: Math.max(0, Math.min(1, (d.x0 - p.x0) / (p.x1 - p.x0))) * 2 * Math.PI,
+                        x1: Math.max(0, Math.min(1, (d.x1 - p.x0) / (p.x1 - p.x0))) * 2 * Math.PI,
+                        y0: Math.max(0, d.y0 - p.depth),
+                        y1: Math.max(0, d.y1 - p.depth)
                     });
     
                     var t = g.transition().duration(750);
@@ -268,6 +268,6 @@ define([
             }
 
         }
-    }
+    };
     return ko.bindingHandlers.timeWheel;
 });

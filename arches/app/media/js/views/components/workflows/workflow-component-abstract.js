@@ -49,7 +49,7 @@ define([
 
         this.loadData = function(loadedData) {
             if (!Array.isArray(loadedData)) {
-                var data = [loadedData]
+                var data = [loadedData];
             }
             else {
                 var data = loadedData;
@@ -626,7 +626,7 @@ define([
         this.initialize = function() {
             /* cached ID logic */ 
             if (params.workflowComponentAbstractId) {
-                self.id(params.workflowComponentAbstractId)
+                self.id(params.workflowComponentAbstractId);
             }
             else {
                 self.id(uuid.generate());
@@ -685,7 +685,7 @@ define([
             else if (self.componentData.tilesManaged === "many") {
                 MultipleTileBasedComponent.apply(self, [params.title] );
             }
-        }
+        };
 
         this.setToLocalStorage = function(key, value) {
             var allComponentsLocalStorageData = JSON.parse(localStorage.getItem(WORKFLOW_COMPONENT_ABSTRACTS_LABEL)) || {};

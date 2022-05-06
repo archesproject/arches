@@ -53,7 +53,7 @@ define([
 
         this.steps.subscribe(() => {
             this.furthestValidStepIndex.valueHasMutated();
-        })
+        });
         
         this.initialize = function() {
             self.getWorkflowMetaData(self.componentName).then(function(workflowJson) {
@@ -122,11 +122,11 @@ define([
 
             if (!workflowMetaDataLocalStorageData[workflowName]) {
                 workflowMetaDataLocalStorageData[workflowName] = {};
-            };
+            }
 
             if (!workflowMetaDataLocalStorageData[workflowName][stepName]) {
                 workflowMetaDataLocalStorageData[workflowName][stepName] = {};
-            };
+            }
             
             workflowMetaDataLocalStorageData[workflowName][stepName][key] = value;
 
@@ -295,7 +295,7 @@ define([
             self.stepConfig.forEach(function(stepConfigData) {
                 steps.push(
                     self.createStep(stepConfigData)
-                )
+                );
             });
 
             var idx = 0;
@@ -315,7 +315,7 @@ define([
                         if (stepData) {
                             childStep = self.createStep(stepData);
                         }
-                        currentStep.locked(true)
+                        currentStep.locked(true);
                     }
                     else if (defaultStepChoice) {
                         childStep = self.createStep(defaultStepChoice);

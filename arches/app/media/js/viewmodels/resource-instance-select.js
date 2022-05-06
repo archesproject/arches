@@ -237,8 +237,8 @@ define([
                                     if (resourceInstance) {
                                         names.push(resourceInstance["_source"].displayname);
                                         self.displayValue(names.join(', '));
-                                        val.resourceName(resourceInstance["_source"].displayname)
-                                        val.iconClass(self.graphLookup[resourceInstance["_source"].graph_id]?.iconclass || 'fa fa-question')
+                                        val.resourceName(resourceInstance["_source"].displayname);
+                                        val.iconClass(self.graphLookup[resourceInstance["_source"].graph_id]?.iconclass || 'fa fa-question');
                                         val.ontologyClass(resourceInstance["_source"].root_ontology_class);
                                     }
                                 });
@@ -455,7 +455,7 @@ define([
             },
             formatResult: function(item) {
                 if (item._source) {
-                    iconClass = self.graphLookup[item._source.graph_id]?.iconclass
+                    iconClass = self.graphLookup[item._source.graph_id]?.iconclass;
                     return `<i class="fa ${iconClass} sm-icon-wrap"></i> ${item._source.displayname}`;
                 } else {
                     if (self.allowInstanceCreation) {

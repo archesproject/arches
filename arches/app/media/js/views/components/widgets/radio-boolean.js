@@ -3,7 +3,7 @@ define([
     'underscore', 
     'viewmodels/widget',
     'utils/create-async-component',
-], function (ko, _, WidgetViewModel, createAsyncComponent) {
+], function(ko, _, WidgetViewModel, createAsyncComponent) {
     /**
     * knockout components namespace used in arches
     * @external "ko.components"
@@ -26,34 +26,34 @@ define([
         params.configKeys = ['trueLabel', 'falseLabel', 'defaultValue'];
         WidgetViewModel.apply(this, [params]);
         var self = this;
-        this.setValue = function (val) {
+        this.setValue = function(val) {
             if (ko.unwrap(self.disabled) === false) {
                 if (val === self.value()) {
-                    self.value(null)
+                    self.value(null);
                 } else {
                     self.value(val);
                 }
             }
-        }
+        };
 
-        this.displayValue = ko.computed(function () {
+        this.displayValue = ko.computed(function() {
             if (this.value()===true) {
                 return this.node.config.trueLabel;
             }
             else if (this.value()===false) {
                 return this.node.config.falseLabel;
             }
-        }, self)
+        }, self);
 
-        this.setDefaultValue = function (val) {
+        this.setDefaultValue = function(val) {
             if (val === self.defaultValue()) {
-                self.defaultValue(null)
+                self.defaultValue(null);
             } else {
                 self.defaultValue(val);
             }
-        }
+        };
 
-        var defaultValue = ko.unwrap(this.defaultValue)
+        var defaultValue = ko.unwrap(this.defaultValue);
         if (self.value() === null && self.defaultValue() !== null) {
             self.value(self.defaultValue());
         }

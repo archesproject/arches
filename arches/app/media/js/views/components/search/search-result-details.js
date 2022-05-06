@@ -62,7 +62,7 @@ define([
                     if(bulkResourceReportCache()[graphId] && bulkDisambiguatedResourceInstanceCache()[resourceId])
                     {
                         self.createReport(sourceData, bulkResourceReportCache()[graphId], bulkDisambiguatedResourceInstanceCache()[resourceId]);
-                        self.loading(false)
+                        self.loading(false);
                     }
                 });
 

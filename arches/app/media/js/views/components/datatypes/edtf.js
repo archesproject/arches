@@ -1,4 +1,4 @@
-define(['knockout', 'utils/create-async-component'], function (ko, createAsyncComponent) {
+define(['knockout', 'utils/create-async-component'], function(ko, createAsyncComponent) {
     var name = 'edtf-datatype-config';
     const viewModel = function(params) {
         var self = this;
@@ -8,14 +8,14 @@ define(['knockout', 'utils/create-async-component'], function (ko, createAsyncCo
             var filter = params.filterValue();
             this.op = ko.observable(filter.op || '');
             this.searchValue = ko.observable(filter.val || '');
-            this.filterValue = ko.computed(function () {
+            this.filterValue = ko.computed(function() {
                 return {
                     op: self.op(),
                     val: self.searchValue()
-                }
+                };
             }).extend({ throttle: 750 });
             params.filterValue(this.filterValue());
-            this.filterValue.subscribe(function (val) {
+            this.filterValue.subscribe(function(val) {
                 params.filterValue(val);
             });
         }

@@ -144,7 +144,7 @@ define([
             tile.selected(true);
             self.tile = tile;
             params.dirty(true);
-        }
+        };
 
         this.saveTile = function(callback) {
             self.loading(true);
@@ -227,7 +227,7 @@ define([
             });
         };
         
-        this.createParentAndChild = async (parenttile, childcard) => {
+        this.createParentAndChild = async(parenttile, childcard) => {
             try{
                 const newSave = await self.card.saveParentTile(parenttile);
                 if(newSave){

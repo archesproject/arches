@@ -172,7 +172,7 @@ define([
         name,
         viewModel,
         'templates/views/components/datatypes/resource-instance.htm'
-    )
+    );
 
     return name;
 });

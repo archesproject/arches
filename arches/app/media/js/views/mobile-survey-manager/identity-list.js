@@ -28,18 +28,18 @@ define([
             this.items = options.items;
             _.each(this.items(), function(item){
                 item.approved = ko.observable(false);
-            })
-            this.usersGroups = ko.observableArray()
+            });
+            this.usersGroups = ko.observableArray();
             this.selected = ko.computed(function(){
                 var res = self.selectedItems().length > 0 ? self.selectedItems()[0] : '';
                 return res;
-            })
+            });
             this.filteredItems = ko.computed(function(){
-                var filtered = _.filter(self.items(), function(item){return !item.filtered()});
+                var filtered = _.filter(self.items(), function(item){return !item.filtered();});
                 self.selectedIndex(_.indexOf(filtered, self.selected()));
-                self.hideIdentityDetails(!_.contains(filtered, self.selected())) //If the selected item is filtered out, we need to hide its cards
+                self.hideIdentityDetails(!_.contains(filtered, self.selected())); //If the selected item is filtered out, we need to hide its cards
                 return filtered;
-            })
+            });
         }
 
 
