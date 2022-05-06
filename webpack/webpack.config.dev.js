@@ -38,7 +38,8 @@ module.exports = merge(commonWebpackConfig, {
                 exclude: /node_modules/,
                 loader: `${ARCHES_CORE_PATH}/media/node_modules/babel-loader`,
                 options: {
-                    presets: ['@babel/preset-env']
+                    presets: ['@babel/preset-env'],
+                    cacheDirectory: `${ARCHES_CORE_PATH}/media/node_modules/.cache/babel-loader`,
                 }
             },
             {

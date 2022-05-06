@@ -59,7 +59,7 @@ module.exports = {
             jQuery:  Path.resolve(__dirname, `${PROJECT_PATH}/media/node_modules/jquery/dist/jquery.min`),
             $:  Path.resolve(__dirname, `${PROJECT_PATH}/media/node_modules/jquery/dist/jquery.min`),
         }),
-        new BundleTracker({ filename: `${PROJECT_PATH}/webpack/webpack-stats.json` }),
+        new BundleTracker({ filename: Path.resolve(__dirname, `webpack-stats.json`) }),
     ].concat(
         buildHTMLWebpackPluginList(
             Path.resolve(__dirname, `${PROJECT_PATH}/templates`),
