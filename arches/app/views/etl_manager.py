@@ -26,7 +26,7 @@ class ETLManagerView(View):
         import_module = ETLModule.objects.get(pk=module).get_class_module()(request)
         import_function = getattr(import_module, action)
         response = import_function(request=request)
-        if response["success"] and not "raw" in response:
+        if response["success"] and "raw" not in response:
             ret = {"result": response["data"]}
             return JSONResponse(ret)
         elif response["success"] and "raw" in response:
