@@ -1,12 +1,14 @@
 import os
 import logging
 import math
+import shutil
 import uuid
 import zipfile
 from django.http import HttpResponse
 from openpyxl import load_workbook
 from django.db import connection
 from django.db.utils import IntegrityError
+from django.utils.translation import ugettext as _
 from arches.app.datatypes.datatypes import DataTypeFactory
 from arches.app.models.models import Node
 from arches.app.models.system_settings import settings
@@ -24,6 +26,7 @@ class BranchCsvImporter:
         self.userid = request.user.id
         self.datatype_factory = DataTypeFactory()
         self.legacyid_lookup = {}
+        self.temp_path = ""
 
     def filesize_format(self, bytes):
         """Convert bytes to readable units"""
@@ -32,11 +35,6 @@ class BranchCsvImporter:
             return "0 kb"
         log = math.floor(math.log(bytes, 1024))
         return "{0:.2f} {1}".format(bytes / math.pow(1024, log), ["bytes", "kb", "mb", "gb"][int(log)])
-
-    def clear_temp_dir(self, dir):
-        for (dirpath, dirnames, filenames) in os.walk(dir):
-            for filename in filenames:
-                os.remove(os.path.join(dirpath, filename))
 
     def get_graph_tree(self, graphid):
         with connection.cursor() as cursor:
@@ -80,7 +78,7 @@ class BranchCsvImporter:
         try:
             uuid.UUID(resourceid)
             legacyid = None
-        except AttributeError:
+        except (AttributeError, ValueError):
             legacyid = resourceid
             if legacyid not in self.legacyid_lookup:
                 self.legacyid_lookup[legacyid] = uuid.uuid4()
@@ -101,14 +99,14 @@ class BranchCsvImporter:
                 source_value = row_details[key]
                 config = node_details["config"]
                 if datatype == "file-list":
-                    config["path"] = "tmp"
+                    config["path"] = self.temp_dir
                 try:
                     config["nodeid"] = nodeid
                 except TypeError:
                     config = {}
                 value = datatype_instance.transform_value_for_tile(source_value, **config) if source_value is not None else None
                 if datatype == "file-list":
-                    validation_errors = datatype_instance.validate(value, nodeid=nodeid, path="tmp")
+                    validation_errors = datatype_instance.validate(value, nodeid=nodeid, path=self.temp_dir)
                 else:
                     validation_errors = datatype_instance.validate(value, nodeid=nodeid)
                 valid = True if len(validation_errors) == 0 else False
@@ -202,7 +200,8 @@ class BranchCsvImporter:
     def read(self, request):
         self.loadid = request.POST.get("load_id")
         content = request.FILES["file"]
-        temp_dir = os.path.join(settings.APP_ROOT, "tmp")
+        self.temp_dir = os.path.join(settings.APP_ROOT, "tmp", self.loadid)
+        os.mkdir(self.temp_dir, 0o770)
         result = {"summary": {"name": content.name, "size": self.filesize_format(content.size), "files": {}}}
         with zipfile.ZipFile(content, "r") as zip_ref:
             files = zip_ref.infolist()
@@ -210,10 +209,10 @@ class BranchCsvImporter:
                 if not file.filename.startswith("__MACOSX"):
                     if not file.is_dir():
                         result["summary"]["files"][file.filename] = {"size": (self.filesize_format(file.file_size))}
-                    zip_ref.extract(file, temp_dir)
-        self.stage_excel_file(temp_dir, result["summary"]["files"])
-        self.clear_temp_dir(temp_dir)
+                    zip_ref.extract(file, self.temp_dir)
+        self.stage_excel_file(self.temp_dir, result["summary"]["files"])
         result["validation"] = self.validate(request)
+        shutil.rmtree(self.temp_dir)
         return {"success": result["validation"]["success"], "data": result}
 
     def validate(self, request):
@@ -231,7 +230,14 @@ class BranchCsvImporter:
                 cursor.execute("""SELECT * FROM __arches_staging_to_tile(%s)""", [self.loadid])
                 row = cursor.fetchall()
         except IntegrityError as e:
-            return {"success": False, "data": e}
+            logger.error(e)
+            return {
+                "status": 400,
+                "success": False,
+                "title": _("Failed to complete load"),
+                "message": _("Be sure any resources you are loading do not have resource ids that already exist in the system"),
+            }
+
         index_resources_by_transaction(self.loadid, quiet=True, use_multiprocessing=True)
         if row[0][0]:
             return {"success": True, "data": "success"}

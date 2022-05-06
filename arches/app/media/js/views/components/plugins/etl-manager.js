@@ -6,6 +6,7 @@ define([
         viewModel: function(params) {
             var self = this;
             this.loading = params.loading;
+            this.alert = params.alert;
             this.loading(true);
             this.selectedModule = ko.observable();
 
@@ -19,6 +20,7 @@ define([
                     .then(function(data){
                         self.etlModules = data.map(function(etl){
                             etl.config.loading = self.loading;
+                            etl.alert = self.alert;
                             require([etl.component]);
                             return etl;
                         });

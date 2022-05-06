@@ -2,11 +2,12 @@ define([
     'underscore',
     'knockout',
     'viewmodels/base-import-view-model',
+    'viewmodels/alert',
     'arches',
     'dropzone',
+    'bindings/select2-query',
     'bindings/dropzone',
-    'bindings/select2-query'
-], function(_, ko, ImporterViewModel, arches, dropzone) {
+], function(_, ko, ImporterViewModel, AlertViewModel, arches, dropzone) {
     return ko.components.register('branch-csv-importer', {
         viewModel: function(params) {
             const self = this;
@@ -15,6 +16,7 @@ define([
             this.loading = params.config.loading;
             this.templates = ko.observableArray();
             this.selectedTemplate = ko.observable();
+            this.loadStatus = ko.observable('ready');
 
             function getCookie(name) {
                 if (!document.cookie) {
@@ -79,18 +81,21 @@ define([
 
             this.write = function(){
                 self.loading(true);
+                self.loadStatus("loading");
                 self.submit('write').then(function(response){
                     self.loading(false);
-                    if (response.ok) {
-                        return response.json();
-                    }
+                    return response.json();
                 }).then(function(response) {
                     if (response?.result === "success"){
-                        self.response(null);
+                        self.loadStatus('successful');
+                    } else {
+                        self.alert(new AlertViewModel('ep-alert-red', response.title, response.message));
+                        self.loadStatus('failed');
                     }
                 }).catch(function(err) {    
                     // eslint-disable-next-line no-console
                     console.log(err);
+                    self.loadStatus('failed');
                 });
             };    
         },

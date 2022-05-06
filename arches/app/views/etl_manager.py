@@ -2,7 +2,7 @@ import logging
 from django.http import HttpResponse
 from django.views.generic import View
 from arches.app.models.models import ETLModule
-from arches.app.utils.response import JSONResponse
+from arches.app.utils.response import JSONResponse, JSONErrorResponse
 
 logger = logging.getLogger(__name__)
 
@@ -32,4 +32,4 @@ class ETLManagerView(View):
         elif response["success"] and "raw" in response:
             return response["raw"]
         else:
-            return JSONResponse(status=400, reason=response["data"])
+            return JSONErrorResponse(content=response)
