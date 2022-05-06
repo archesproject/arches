@@ -26,6 +26,7 @@ class ImportSingleCsv:
         self.request = request
         self.userid = request.user.id
         self.loadid = request.POST.get("load_id")
+        self.moduleid = request.POST.get("module")
         self.datatype_factory = DataTypeFactory()
         self.node_lookup = {}
         self.blank_tile_lookup = {}
@@ -127,8 +128,8 @@ class ImportSingleCsv:
 
         with connection.cursor() as cursor:
             cursor.execute(
-                """INSERT INTO load_event (loadid, complete, etl_module, load_details, load_start_time, user_id) VALUES (%s, %s, %s, %s, %s, %s)""",
-                (self.loadid, False, "import-single-csv", json.dumps(mapping_details), datetime.now(), self.userid),
+                """INSERT INTO load_event (loadid, complete, etl_module_id, load_details, load_start_time, user_id) VALUES (%s, %s, %s, %s, %s, %s)""",
+                (self.loadid, False, self.moduleid, json.dumps(mapping_details), datetime.now(), self.userid),
             )
 
         for row in reader:

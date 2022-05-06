@@ -353,7 +353,7 @@ class Migration(migrations.Migration):
                 ("loadid", models.UUIDField(default=uuid.uuid4, primary_key=True, serialize=False)),
                 ("complete", models.BooleanField(default=False)),
                 ("successful", models.BooleanField(blank=True, null=True)),
-                ("etl_module", models.TextField()),
+                ("etl_module", models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='models.ETLModule')),
                 ("load_description", models.TextField(blank=True, null=True)),
                 ("load_details", django.contrib.postgres.fields.jsonb.JSONField(blank=True, null=True)),
                 ("error_message", models.TextField(blank=True, null=True)),

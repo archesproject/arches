@@ -79,11 +79,11 @@
                                 <tr data-bind="css: {'selected': event == $parent.selectedLoadEvent()}">
                                     <td data-bind="click: function(){$parent.selectedLoadEvent(event)}" style="display: block; border-top: 1px solid rgba(0,0,0,0.14); padding: 10px 15px; flex-direction: column; justify-content: space-between; cursor: pointer; height: 80px; width: 400px;">
                                         <div>
-                                            <div data-bind="text: event.etl_module" style="font-size: 13pt; color: rgb(4, 4, 45)"></div>
+                                            <div data-bind="text: event.etl_module.name" style="font-size: 13pt; color: rgb(4, 4, 45)"></div>
                                         </div>
                                         <div style="display: flex; flex-direction: row; justify-content: space-between;">
                                             <div>
-                                                <div data-bind="text: $parent.formatUserName(event)"></div>
+                                                <div data-bind="text: $parent.formatUserName(event.user)"></div>
                                                 <div data-bind="text: $parent.formatTime(event.load_start_time)"></div>
                                             </div>
                                             <div>
@@ -120,7 +120,7 @@
                 <div class="etl-module-preview" style="height: calc(100vh - 95px); width: calc(100vw - 450px); padding: 25px; overflow: scroll;">
                     <div class="etl-module-info" data-bind="if: selectedLoadEvent()">
                         <div class="" data-bind="component: {
-                            name: selectedLoadEvent().etl_module,
+                            name: selectedLoadEvent().etl_module.componentname,
                             loading: loading,
                             params: {
                                         state: 'status',

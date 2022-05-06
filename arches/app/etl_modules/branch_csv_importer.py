@@ -22,6 +22,7 @@ class BranchCsvImporter:
     def __init__(self, request=None):
         self.request = request
         self.userid = request.user.id
+        self.moduleid = request.POST.get("module")
         self.datatype_factory = DataTypeFactory()
         self.legacyid_lookup = {}
         self.temp_path = ""
@@ -182,8 +183,8 @@ class BranchCsvImporter:
                     node_lookup = self.get_node_lookup(nodes)
                     with connection.cursor() as cursor:
                         cursor.execute(
-                            """INSERT INTO load_event (loadid, etl_module, complete, load_start_time, user_id) VALUES (%s, %s, %s, %s, %s)""",
-                            (self.loadid, "branch-csv-importer", False, datetime.now(), self.userid),
+                            """INSERT INTO load_event (loadid, etl_module_id, complete, load_start_time, user_id) VALUES (%s, %s, %s, %s, %s)""",
+                            (self.loadid, self.moduleid, False, datetime.now(), self.userid),
                         )
                         for worksheet in workbook.worksheets:
                             if worksheet.title.lower() != "metadata":
