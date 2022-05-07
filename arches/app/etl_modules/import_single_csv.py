@@ -113,6 +113,19 @@ class ImportSingleCsv:
         else:
             return {"success": False, "data": "failed"}
 
+    def start(self, request):
+
+        graphid = request.POST.get("graphid")
+        csv_mapping = request.POST.get("fieldMapping")
+        mapping_details = {"mapping": json.loads(csv_mapping), "graph": graphid}
+        with connection.cursor() as cursor:
+            cursor.execute(
+                """INSERT INTO load_event (loadid, complete, etl_module_id, load_details, load_start_time, user_id) VALUES (%s, %s, %s, %s, %s, %s)""",
+                (self.loadid, False, self.moduleid, json.dumps(mapping_details), datetime.now(), self.userid),
+            )
+        message = "load event created"
+        return {"success": True, "data": message}
+
     def populate_staging_table(self, request):
 
         file = request.FILES.get("file")
@@ -120,17 +133,9 @@ class ImportSingleCsv:
         has_headers = request.POST.get("hasHeaders")
         fieldnames = request.POST.get("fieldnames").split(",")
         csvfile = file.read().decode("utf-8")
-        csv_mapping = request.POST.get("fieldMapping")
-        mapping_details = {"mapping": json.loads(csv_mapping), "graph": graphid}
         reader = csv.DictReader(io.StringIO(csvfile), fieldnames=fieldnames)
         if has_headers:
             next(reader)
-
-        with connection.cursor() as cursor:
-            cursor.execute(
-                """INSERT INTO load_event (loadid, complete, etl_module_id, load_details, load_start_time, user_id) VALUES (%s, %s, %s, %s, %s, %s)""",
-                (self.loadid, False, self.moduleid, json.dumps(mapping_details), datetime.now(), self.userid),
-            )
 
         for row in reader:
             resourceid = uuid.uuid4()

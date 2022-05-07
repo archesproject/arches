@@ -33,6 +33,12 @@ define([
                 self.activeTab("details");
             };
 
+            this.activeTab.subscribe(val => {
+                if (val == "import") {
+                    self.fetchLoadEvent();
+                }
+            });
+
             this.fetchLoadEvent = function(){
                 const url = arches.urls.etl_manager + "?action=loadEvent";
                 window.fetch(url).then(function(response){

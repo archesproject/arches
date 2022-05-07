@@ -14926,7 +14926,9 @@ a.jstree-anchor.permissions-widget {
 }
 
 .etl-manager-status-filter-container {
-    margin: 20px;
+    margin: 20px 10px;
+    display: flex;
+    justify-content: space-between;
 }
 
 .etl-module-component-container {

@@ -158,10 +158,15 @@ define([
                 self.formData.append('fieldMapping', JSON.stringify(fieldMapping));
                 self.formData.append('hasHeaders', self.hasHeaders());
                 self.formData.append('graphid', self.selectedGraph());
-                params.activeTab("import")
-                self.submit('write').then(data => {
-                    console.log(data.result);
-                }).fail(error => console.log(error));
+                self.loading(true);
+                self.submit('start').then(data => {
+                    console.log(data.result)
+                    // self.loading(false);
+                    params.activeTab("import")
+                    self.submit('write').then(data => {
+                        console.log(data.result);
+                    }).fail(error => console.log(error));
+                }).fail(error => console.log(error))
             };
 
             this.validate =function(){
