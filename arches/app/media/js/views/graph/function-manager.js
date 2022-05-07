@@ -11,6 +11,7 @@ require([
     'models/function-x-graph',
     'views/graph/graph-base-data',
     'views/graph/graph-functions-data',
+    'views/components/functions/primary-descriptors'
 ], function($, _, ko, arches, GraphPageView, JsonErrorAlertViewModel, FunctionList, AppliedFunctionList, FunctionModel, FunctionXGraphModel, baseData, data) {
     /**
     * set up the page view model with the graph model and related sub views
