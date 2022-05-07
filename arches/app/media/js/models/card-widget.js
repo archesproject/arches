@@ -140,7 +140,6 @@ define([
                         },
                         write: function(value) {
                             var key;
-
                             let defaultConfig = ko.unwrap(widgets[value].defaultconfig);
                             if (
                                 !(defaultConfig instanceof Object)

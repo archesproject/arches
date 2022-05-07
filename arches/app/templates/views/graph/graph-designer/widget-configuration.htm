@@ -17,7 +17,7 @@
                 {% trans "Widget Label" %}
             </div>
             <div class="pad-no">
-                <input type="" placeholder="{% trans "Widget Label" %}" id="" class="form-control input-md widget-input" data-bind="textInput: label">
+                <input type="" placeholder="{% trans "Widget Label" %}" id="" class="form-control input-md widget-input" data-bind="textInput: $data.label">
             </div>
         </div>
 
@@ -26,7 +26,7 @@
                 {% trans "Template" %}
             </div>
             <div class="pad-no">
-                <select class="design" data-bind="value: widget_id, options: widgetList(), optionsText: 'name', optionsValue: 'id', chosen: {disable_search_threshold: 10, width: '100%'}"></select>
+                <select class="design" data-bind="value: widget_id, options: $data.widgetList && $data.widgetList(), optionsText: 'name', optionsValue: 'id', chosen: {disable_search_threshold: 10, width: '100%'}"></select>
             </div>
         </div>
 

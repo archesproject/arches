@@ -8,8 +8,8 @@ define([
     return function(params) {
         var self = this;
 
-        if (!params.card && params.form.card) {
-            params.card = params.form.card();
+        if (!params.card && ko.unwrap(params.form.card)) {
+            params.card = ko.unwrap(params.form.card);
         }
 
         this.inResourceEditor = location.pathname.includes(arches.urls.resource_editor);
