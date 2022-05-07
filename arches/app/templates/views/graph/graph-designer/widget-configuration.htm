@@ -26,7 +26,7 @@
                 {% trans "Template" %}
             </div>
             <div class="pad-no">
-                <select class="design" data-bind="value: widget_id, options: $data.widgetList && $data.widgetList(), optionsText: 'name', optionsValue: 'id', chosen: {disable_search_threshold: 10, width: '100%'}"></select>
+                <select class="design" data-bind="value: $data.widget_id, options: $data.widgetList && $data.widgetList(), optionsText: 'name', optionsValue: 'id', chosen: {disable_search_threshold: 10, width: '100%'}"></select>
             </div>
         </div>
 
@@ -35,26 +35,27 @@
                 {% trans "Visibility" %}
             </div>
             <div class="pad-no">
-                <div data-bind="component: { name: 'views/components/simple-switch', params: {value: visible, config:{label: '{% trans "Make Widget Visible" %}', subtitle: '{% trans "Show this widget by default" %}'}}}"></div>
+                <div data-bind="component: { name: 'views/components/simple-switch', params: {value: $data.visible, config:{label: '{% trans "Make Widget Visible" %}', subtitle: '{% trans "Show this widget by default" %}'}}}"></div>
             </div>
         </div>
 
+        <!-- ko if: ko.unwrap($data.widget_id)  -->
         <div class="widget-config-container" style="margin-top: 5px;" data-bind='component: {
-            name: widgetLookup[widget_id()].name,
+            name: $data.widgetLookup[ko.unwrap($data.widget_id)].name,
             params: {
-                config: configJSON,
+                config: $data.configJSON,
                 configForm: true,
                 value: ko.observable(null),
-                node: node
+                node: $data.node
             }
         }'></div>
+        <!-- /ko -->
 
 
+        <!-- ko if: ko.isObservable($data.card) -->
+        <div class="node-config-item switch-panel" data-bind="css: {'disabled': $data.checkIfImmutable() }">
 
-        <!-- ko if: ko.isObservable(card) -->
-        <div class="node-config-item switch-panel" data-bind="css: {'disabled': checkIfImmutable() }">
-
-            <span class="switch switch-small arches-switch" data-bind="css: {'on': node.isrequired(), 'disabled': checkIfImmutable() }, click: toggleRequired"><small></small></span>
+            <span class="switch switch-small arches-switch" data-bind="css: {'on': $data.node.isrequired(), 'disabled': $data.checkIfImmutable() }, click: $data.toggleRequired"><small></small></span>
 
             <p class="control-label" style="margin-left: 40px; margin-top: -17px; margin-bottom: 0px;">
                 {% trans "Required" %}

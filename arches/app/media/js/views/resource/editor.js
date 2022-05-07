@@ -15,10 +15,6 @@ define([
     'bindings/resizable-sidepanel',
     'bindings/sortable',
     'moment',
-    'views/components/resource-report-abstract',
-    'reports/default',
-    'views/components/widgets/number',
-    'views/components/plugins/map'
 ], function($, _, ko, arches, reportLookup, BaseManagerView, AlertViewModel, JsonErrorAlertViewModel, GraphModel, ReportModel, CardViewModel, ProvisionalTileViewModel, data) {
     var handlers = {
         'after-update': [],

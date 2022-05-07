@@ -8,13 +8,15 @@ define([
     'views/components/widgets/resource-instance-multiselect',
     'views/resource/related-resources-node-list',
     'utils/ontology',
+    'utils/create-async-component',
     'views/components/related-resources-graph',
     'plugins/knockout-select2',
     'bindings/datepicker',
     'bindings/datatable'
-], function($, _, Backbone, ko, koMapping, arches, ResourceInstanceSelect, RelatedResourcesNodeList, ontologyUtils) {
-    return ko.components.register('related-resources-manager', {
-        viewModel: Backbone.View.extend({
+], function($, _, Backbone, ko, koMapping, arches, ResourceInstanceSelect, RelatedResourcesNodeList, ontologyUtils, createAsyncComponent) {
+    return createAsyncComponent(
+        'related-resources-manager',
+        Backbone.View.extend({
             initialize: function(options) {
                 var self = this;
                 this.searchResults = options.searchResultsVm;
@@ -559,6 +561,10 @@ define([
                     });
             },
         }),
-        template: { require: 'text!templates/views/resource/related-resources/related-resources-manager.htm' }
-    });
+        'templates/views/resource/related-resources/related-resources-manager.htm'
+    )
+    // return ko.components.register('related-resources-manager', {
+    //     viewModel: ,
+    //     template: { require: 'text!templates/views/resource/related-resources/related-resources-manager.htm' }
+    // });
 });
