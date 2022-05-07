@@ -8,6 +8,7 @@
 {% block require_config %}
 <script>
     var CKEDITOR_BASEPATH = "{% webpack_static 'node_modules/ckeditor/' %}";
+    window.CKEDITOR_BASEPATH = CKEDITOR_BASEPATH;
     require.config({
         baseUrl: "{% webpack_static 'build/js' %}",
         urlArgs: '_dc={{ app_settings.VERSION }}',

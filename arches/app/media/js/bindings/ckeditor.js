@@ -1,7 +1,7 @@
 define([
     'jquery',
     'underscore',
-    'knockout'
+    'knockout',
 ], function($, _, ko) {
     /**
     * A knockout.js binding for the "ckeditor" rich text editor widget
@@ -72,7 +72,7 @@ define([
 
     ko.bindingHandlers.ckeditor = {
         init: (element, valueAccessor, allBindings) => {
-            require(['ckeditor-jquery', 'ckeditor'], () => {
+            require(['jquery', 'ckeditor-jquery', 'ckeditor'], () => {
                 initialize(element, valueAccessor, allBindings);
             });
         }
