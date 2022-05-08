@@ -1,17 +1,14 @@
 """
 ARCHES - a program developed to inventory and manage immovable cultural heritage.
 Copyright (C) 2013 J. Paul Getty Trust and World Monuments Fund
-
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU Affero General Public License as
 published by the Free Software Foundation, either version 3 of the
 License, or (at your option) any later version.
-
 This program is distributed in the hope that it will be useful,
 but WITHOUT ANY WARRANTY; without even the implied warranty of
 MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 GNU Affero General Public License for more details.
-
 You should have received a copy of the GNU Affero General Public License
 along with this program. If not, see <http://www.gnu.org/licenses/>.
 """
@@ -45,12 +42,15 @@ from arches.app.models.concept import get_preflabel_from_conceptid
 from arches.app.utils.permission_backend import get_nodegroups_by_perm, user_is_resource_reviewer
 import arches.app.utils.zip as zip_utils
 import arches.app.utils.task_management as task_management
+from arches.app.utils.data_management.resources.formats.htmlfile import HtmlWriter
 import arches.app.tasks as tasks
 from io import StringIO
 from tempfile import NamedTemporaryFile
 from openpyxl import Workbook
+from arches.app.models.system_settings import settings
 
 logger = logging.getLogger(__name__)
+
 
 class SearchView(MapBaseManagerView):
     def get(self, request):
@@ -107,6 +107,7 @@ class SearchView(MapBaseManagerView):
             "template": "search-help",
         }
         context["celery_running"] = task_management.check_if_celery_available()
+        context["export_html_templates"] = HtmlWriter.get_graphids_with_export_template()
 
         return render(request, "views/search.htm", context)
 

@@ -1,17 +1,14 @@
 """
 ARCHES - a program developed to inventory and manage immovable cultural heritage.
 Copyright (C) 2013 J. Paul Getty Trust and World Monuments Fund
-
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU Affero General Public License as
 published by the Free Software Foundation, either version 3 of the
 License, or (at your option) any later version.
-
 This program is distributed in the hope that it will be useful,
 but WITHOUT ANY WARRANTY; without even the implied warranty of
 MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 GNU Affero General Public License for more details.
-
 You should have received a copy of the GNU Affero General Public License
 along with this program. If not, see <http://www.gnu.org/licenses/>.
 """
@@ -23,6 +20,12 @@ from arches.app.models.resource import Resource
 from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializer
 from django.views.generic import TemplateView
 from arches.app.datatypes.datatypes import DataTypeFactory
+from arches.app.utils.permission_backend import (
+    get_createable_resource_types,
+    user_is_resource_reviewer,
+    get_editable_resource_types,
+    get_resource_types_by_perm,
+)
 from arches.app.utils.permission_backend import get_createable_resource_types, user_is_resource_reviewer
 
 class BaseManagerView(TemplateView):
@@ -70,6 +73,15 @@ class BaseManagerView(TemplateView):
             "print": False,
         }
         context["user_is_reviewer"] = user_is_resource_reviewer(self.request.user)
+        context["user_can_edit"] = len(get_editable_resource_types(self.request.user)) > 0
+        context["user_can_read"] = (
+            len(
+                get_resource_types_by_perm(
+                    self.request.user, ["models.write_nodegroup", "models.delete_nodegroup", "models.read_nodegroup"]
+                )
+            )
+            > 0
+        )
         context["app_name"] = settings.APP_NAME
         context["show_language_swtich"] = settings.SHOW_LANGUAGE_SWITCH
         return context

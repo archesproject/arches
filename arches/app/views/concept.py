@@ -1,17 +1,14 @@
 """
 ARCHES - a program developed to inventory and manage immovable cultural heritage.
 Copyright (C) 2013 J. Paul Getty Trust and World Monuments Fund
-
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU Affero General Public License as
 published by the Free Software Foundation, either version 3 of the
 License, or (at your option) any later version.
-
 This program is distributed in the hope that it will be useful,
 but WITHOUT ANY WARRANTY; without even the implied warranty of
 MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 GNU Affero General Public License for more details.
-
 You should have received a copy of the GNU Affero General Public License
 along with this program. If not, see <http://www.gnu.org/licenses/>.
 """
@@ -151,6 +148,10 @@ def concept(request, conceptid):
         for value in concept_graph.values:
             if value.category == "label":
                 labels.append(value)
+            if value.type == "image":
+                value.full_image_url = (
+                    (settings.FORCE_SCRIPT_NAME if settings.FORCE_SCRIPT_NAME is not None else "") + settings.MEDIA_URL + value.value
+                ).replace("//", "/")
 
         if (mode == "semantic" or mode == "") and (
             concept_graph.nodetype == "Concept" or concept_graph.nodetype == "ConceptScheme" or concept_graph.nodetype == "EntityType"
@@ -168,6 +169,7 @@ def concept(request, conceptid):
                 request,
                 "views/rdm/concept-report.htm",
                 {
+                    "FORCE_SCRIPT_NAME": settings.FORCE_SCRIPT_NAME,
                     "lang": lang,
                     "prefLabel": prefLabel,
                     "labels": labels,
