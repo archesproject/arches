@@ -16,10 +16,8 @@ class BaseDataType(object):
     def validate(self, value, row_number=None, source=None, node=None, nodeid=None, strict=False):
         """
         Used to validate data in a node of given datatype
-
         Arguments:
         value -- (required) the value of the node being validated
-
         Keyword Arguments:
         row_number -- (optional) this is specific to csv import and should be removed
         source -- (optional) this is specific to csv import and should be removed
@@ -298,14 +296,12 @@ class BaseDataType(object):
     def pre_tile_save(self, tile, nodeid):
         """
         Called during tile.save operation but before the tile is actually saved to the database
-
         """
         pass
 
     def post_tile_delete(self, tile, nodeid, index=True):
         """
         Called following the tile.delete operation
-
         """
         pass
 
@@ -314,7 +310,6 @@ class BaseDataType(object):
         Convenience method to determine whether or not this datatype's `to_rdf` method will express
         its data as an RDF Literal value or as a more complex graph of nodes.
         :return:
-
         True: `to_rdf()` turns the range node tile data into a suitable Literal value
         False:  `to_rdf()` uses the data to construct something more complex.
         """
@@ -404,8 +399,32 @@ class BaseDataType(object):
         ret = None
         default_mapping = self.default_es_mapping()
         if default_mapping:
-            ret = {"properties": {"tiles": {"type": "nested", "properties": {"data": {"properties": {str(nodeid): default_mapping}}},}}}
+            ret = {
+                "properties": {
+                    "tiles": {
+                        "type": "nested",
+                        "properties": {"data": {"properties": {str(nodeid): default_mapping}}},
+                    }
+                }
+            }
         return ret
 
-    def disambiguate(self, value):
-        return value
+    def to_json(self, tile, node):
+        """
+        Returns a value for display in a json object
+        """
+        return self.compile_json(tile, node)
+
+    def compile_json(self, tile, node, **kwargs):
+        """
+        Compiles an object for presentation for use in the to_json method
+        Arguments:
+        tile -- (required) the tile model for the datatype
+        node -- (required) the node model related to the tile
+        Keyword Arguments:
+        optional number of arguments to add to the opject
+        """
+
+        ret = {"@display_value": self.get_display_value(tile, node)}
+        ret.update(kwargs)
+        return ret

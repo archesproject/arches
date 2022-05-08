@@ -1,17 +1,14 @@
 """
 ARCHES - a program developed to inventory and manage immovable cultural heritage.
 Copyright (C) 2013 J. Paul Getty Trust and World Monuments Fund
-
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU Affero General Public License as
 published by the Free Software Foundation, either version 3 of the
 License, or (at your option) any later version.
-
 This program is distributed in the hope that it will be useful,
 but WITHOUT ANY WARRANTY; without even the implied warranty of
 MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 GNU Affero General Public License for more details.
-
 You should have received a copy of the GNU Affero General Public License
 along with this program. If not, see <http://www.gnu.org/licenses/>.
 """
@@ -97,6 +94,7 @@ RESOURCE_FORMATTERS = {
     "n3": "arches.app.utils.data_management.resources.formats.rdffile.RdfWriter",
     "nt": "arches.app.utils.data_management.resources.formats.rdffile.RdfWriter",
     "trix": "arches.app.utils.data_management.resources.formats.rdffile.RdfWriter",
+    "html": "arches.app.utils.data_management.resources.formats.htmlfile.HtmlWriter",
 }
 
 # Hide nodes and cards in a report that have no data
@@ -128,6 +126,10 @@ JSONLD_CONTEXT_CACHE_TIMEOUT = 43800  # in minutes (43800 minutes ~= 1 month)
 # Ideally this should point to the url where you host your site
 # Make sure to use a trailing slash
 ARCHES_NAMESPACE_FOR_DATA_EXPORT = "http://localhost:8000/"
+
+# This is used to indicate whether the data in the CSV and SHP exports should be
+# ordered as seen in the resource cards or not.
+EXPORT_DATA_FIELDS_IN_CARD_ORDER = False
 
 RDM_JSONLD_CONTEXT = {"arches": ARCHES_NAMESPACE_FOR_DATA_EXPORT}
 
@@ -220,20 +222,26 @@ LOCALE_PATHS = [
 # calendars according to the current locale
 USE_L10N = True
 
-# Absolute filesystem path to the directory that will hold user-uploaded files.
-MEDIA_ROOT = os.path.join(ROOT_DIR)
-
 # Sets default max upload size to 15MB
 DATA_UPLOAD_MAX_MEMORY_SIZE = 15728640
-
-# URL that handles the media served from MEDIA_ROOT, used for managing stored files.
-# It must end in a slash if set to a non-empty value.
-MEDIA_URL = "/files/"
 
 # By setting RESTRICT_MEDIA_ACCESS to True, media file requests will be
 # served by Django rather than your web server (e.g. Apache). This allows file requests to be checked against nodegroup permissions.
 # However, this will adversely impact performace when serving large files or during periods of high traffic.
 RESTRICT_MEDIA_ACCESS = False
+
+
+# By setting RESTRICT_CELERY_EXPORT_FOR_ANONYMOUS_USER to True, if the user is attempting
+# to export search results above the SEARCH_EXPORT_IMMEDIATE_DOWNLOAD_THRESHOLD
+# value and is not signed in with a user account then the request will not be allowed.
+RESTRICT_CELERY_EXPORT_FOR_ANONYMOUS_USER = False
+
+# Absolute filesystem path to the directory that will hold user-uploaded files.
+MEDIA_ROOT = os.path.join(ROOT_DIR)
+
+# URL that handles the media served from MEDIA_ROOT, used for managing stored files.
+# It must end in a slash if set to a non-empty value.
+MEDIA_URL = "/files/"
 
 # Absolute path to the directory static files should be collected to.
 # Don't put anything in this directory yourself; store your static files
@@ -244,6 +252,9 @@ STATIC_ROOT = ""
 # URL prefix for static files.
 # Example: "http://media.lawrence.com/static/"
 STATIC_URL = "/media/"
+
+# when hosting Arches under a sub path set this value to the sub path eg : "/{sub_path}/"
+FORCE_SCRIPT_NAME = None
 
 # URL prefix for admin static files -- CSS, JavaScript and images.
 # Make sure to use a trailing slash.
@@ -501,6 +512,10 @@ PHONE_REGEX = r"^\+\d{8,15}$"
 SEARCH_ITEMS_PER_PAGE = 5
 SEARCH_EXPORT_LIMIT = 100000
 SEARCH_EXPORT_IMMEDIATE_DOWNLOAD_THRESHOLD = 2000  # The maximum number of instances a user can download from search export without celery
+
+# The maximum number of instances a user can download using HTML format from search export without celery
+SEARCH_EXPORT_IMMEDIATE_DOWNLOAD_THRESHOLD_HTML_FORMAT = 10
+
 RELATED_RESOURCES_PER_PAGE = 15
 RELATED_RESOURCES_EXPORT_LIMIT = 10000
 SEARCH_DROPDOWN_LENGTH = 100
@@ -609,6 +624,12 @@ CELERY_BEAT_SCHEDULE = {
     "notification": {"task": "arches.app.tasks.message", "schedule": CELERY_SEARCH_EXPORT_CHECK, "args": ("Celery Beat is Running",)},
 }
 
+# Set to True if you want to send celery tasks to the broker without being able to detect celery.
+# This might be necessary if the worker pool is regulary fully active, with no idle workers, or if
+# you need to run the celery task using solo pool (e.g. on Windows). You may need to provide another
+# way of monitoring celery so you can detect the background task not being available.
+CELERY_CHECK_ONLY_INSPECT_BROKER = False
+
 AUTO_REFRESH_GEOM_VIEW = True
 TILE_CACHE_TIMEOUT = 600  # seconds
 CLUSTER_DISTANCE_MAX = 5000  # meters
@@ -616,6 +637,8 @@ GRAPH_MODEL_CACHE_TIMEOUT = None  # seconds * hours * days = ~1mo
 
 CANTALOUPE_DIR = os.path.join(ROOT_DIR, "uploadedfiles")
 CANTALOUPE_HTTP_ENDPOINT = "http://localhost:8182/"
+
+ACCESSIBILITY_MODE = False
 
 COMPRESS_PRECOMPILERS = (("text/x-scss", "django_libsass.SassCompiler"),)
 

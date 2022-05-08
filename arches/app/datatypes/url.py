@@ -1,16 +1,13 @@
 """
 Copyright (C) 2019 J. Paul Getty Trust
-
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU Affero General Public License as
 published by the Free Software Foundation, either version 3 of the
 License, or (at your option) any later version.
-
 This program is distributed in the hope that it will be useful,
 but WITHOUT ANY WARRANTY; without even the implied warranty of
 MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 GNU Affero General Public License for more details.
-
 You should have received a copy of the GNU Affero General Public License
 along with this program.  If not, see <https://www.gnu.org/licenses/>.
 """
@@ -65,34 +62,34 @@ class URLDataType(BaseDataType):
 
     URL_REGEX = re.compile(r"https?:\/\/(www\.)?[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_\+.~#?&//=]*)")
 
-    def validate(self, value, row_number=None, source=None, node=None, nodeid=None):
+    def validate(self, value, row_number=None, source=None, node=None, nodeid=None, strict=False):
         errors = []
-        try:
-            if value.get("url") is not None:
-                # check URL conforms to URL structure
-                url_test = self.URL_REGEX.match(value["url"])
-                if url_test is None:
-                    raise FailRegexURLMatch
-        except FailRegexURLMatch:
-            errors.append(
-                {
-                    "type": "ERROR",
-                    "message": "datatype: {0} value: {1} {2} {3} - {4}. {5}".format(
-                        self.datatype_model.datatype,
-                        value,
-                        source,
-                        row_number,
-                        "this is not a valid HTTP/HTTPS URL",
-                        "This data was not imported.",
-                    ),
-                }
-            )
+        if value is not None:
+            try:
+                if value.get("url") is not None:
+                    # check URL conforms to URL structure
+                    url_test = self.URL_REGEX.match(value["url"])
+                    if url_test is None:
+                        raise FailRegexURLMatch
+            except FailRegexURLMatch:
+                errors.append(
+                    {
+                        "type": "ERROR",
+                        "message": "datatype: {0} value: {1} {2} {3} - {4}. {5}".format(
+                            self.datatype_model.datatype,
+                            value,
+                            source,
+                            row_number,
+                            "this is not a valid HTTP/HTTPS URL",
+                            "This data was not imported.",
+                        ),
+                    }
+                )
         return errors
 
-    def transform_value_for_tile(self, value):
+    def transform_value_for_tile(self, value, **kwargs):
         """
         Used, for example, during import for transforming incomming data to
-
         Arguments
         value -- can either be a url string like "http://archesproject.org" or
         a json string like '{"url": "", "url_label": ""}'
@@ -117,6 +114,11 @@ class URLDataType(BaseDataType):
 
             if display_value:
                 return json.dumps(display_value)
+
+    def to_json(self, tile, node):
+        data = self.get_tile_data(tile)
+        if data:
+            return self.compile_json(tile, node, **data.get(str(node.nodeid)))
 
     def append_to_document(self, document, nodevalue, nodeid, tile, provisional=False):
         if nodevalue.get("url") is not None:

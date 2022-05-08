@@ -21,13 +21,10 @@ class BaseIndex(object):
     def prepare_index(self):
         """
         Defines the Elastic Search mapping and settings for an index
-
         Arguments:
         None
-
         Keyword Arguments:
         None
-
         Return: None
         """
 
@@ -39,14 +36,11 @@ class BaseIndex(object):
     def get_documents_to_index(self, resourceinstance, tiles):
         """
         Gets a document to index into Elastic Search
-
         Arguments:
         resourceinstance -- resource instance object
         tiles -- list of tiles that make up the resource instance
-
         Keyword Arguments:
         None
-
         Return: tuple of (document, document id)
         """
 
@@ -55,14 +49,11 @@ class BaseIndex(object):
     def index_document(self, document=None, id=None):
         """
         Indexes a document into Elastic Search
-
         Arguments:
         None
-
         Keyword Arguments:
         document -- the document to index
         id -- the id of the document
-
         Return: None
         """
 
@@ -72,12 +63,10 @@ class BaseIndex(object):
     def index_resources(self, resources=None, batch_size=settings.BULK_IMPORT_BATCH_SIZE, quiet=False):
         """
         Indexes a list of resources in bulk to Elastic Search
-
         Keyword Arguments:
         resources -- the list of resource instances to index
         batch_size -- the number of records to index as a group, the larger the number to more memory required
         quiet -- Silences the status bar output during certain operations, use in celery operations for example
-
         Return: None
         """
 
@@ -109,7 +98,6 @@ class BaseIndex(object):
         """
         Deletes documents from an index based on the passed in list of resources
         Delete by query, so this is a single operation
-
         Keyword Arguments:
         resources -- a single resource instance or a list of resource instances
         """
@@ -129,13 +117,10 @@ class BaseIndex(object):
     def delete_index(self):
         """
         Deletes this index from Elastic Search
-
         Arguments:
         None
-
         Keyword Arguments:
         None
-
         Return: None
         """
 
@@ -145,17 +130,14 @@ class BaseIndex(object):
         """
         Reindexes the index.  By default this does nothing, it needs to be implemented in a subclass.
         By default you can pass in a list of graph ids to trigger the reindex.  This will loop through all resource instances of each graph type.
-
             Example subclass command:
             def reindex(self, clear_index=True):
                 PARCEL_GRAPHID = "e3c35dca-5e72-11ea-a2d3-dca90488358a"
                 super(CustomIndexName, self).reindex(graphids=[PARCEL_GRAPHID], clear_index=clear_index)
-
         Keyword Arguments:
         graphids -- list of graphs ids to trigger the reindex on, will get all resource instances of each graph id supplied
         clear_index -- True(default) to clear all documents out of the index before reindexing begins
         batch_size -- the number of records to index as a group, the larger the number to more memory required
-
         Return: None
         """
 

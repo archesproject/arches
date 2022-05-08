@@ -1,17 +1,14 @@
 """
 ARCHES - a program developed to inventory and manage immovable cultural heritage.
 Copyright (C) 2013 J. Paul Getty Trust and World Monuments Fund
-
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU Affero General Public License as
 published by the Free Software Foundation, either version 3 of the
 License, or (at your option) any later version.
-
 This program is distributed in the hope that it will be useful,
 but WITHOUT ANY WARRANTY; without even the implied warranty of
 MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 GNU Affero General Public License for more details.
-
 You should have received a copy of the GNU Affero General Public License
 along with this program. If not, see <http://www.gnu.org/licenses/>.
 """
@@ -30,7 +27,6 @@ RESOURCE_RELATIONS_INDEX = "resource_relations"
 def prepare_terms_index(create=False):
     """
     Creates the settings and mappings in Elasticsearch to support term search
-
     """
 
     index_settings = {
@@ -63,7 +59,6 @@ def prepare_terms_index(create=False):
 def prepare_concepts_index(create=False):
     """
     Creates the settings and mappings in Elasticsearch to support term search
-
     """
 
     index_settings = {
@@ -108,7 +103,6 @@ def delete_concepts_index():
 def prepare_search_index(create=False):
     """
     Creates the settings and mappings in Elasticsearch to support resource search
-
     """
 
     index_settings = {
@@ -205,7 +199,7 @@ def prepare_search_index(create=False):
                     "dates": {
                         "type": "nested",
                         "properties": {
-                            "date": {"type": "integer"},
+                            "date": {"type": "long"},
                             "nodegroup_id": {"type": "keyword"},
                             "nodeid": {"type": "keyword"},
                             "provisional": {"type": "boolean"},
@@ -222,7 +216,7 @@ def prepare_search_index(create=False):
                     "date_ranges": {
                         "type": "nested",
                         "properties": {
-                            "date_range": {"type": "integer_range"},
+                            "date_range": {"type": "long_range"},
                             "nodegroup_id": {"type": "keyword"},
                             "provisional": {"type": "boolean"},
                         },
@@ -233,6 +227,7 @@ def prepare_search_index(create=False):
     }
     try:
         from arches.app.datatypes.datatypes import DataTypeFactory
+
         datatype_factory = DataTypeFactory()
         data = index_settings["mappings"]["_doc"]["properties"]["tiles"]["properties"]["data"]["properties"]
         for node in models.Node.objects.all():
@@ -258,7 +253,6 @@ def delete_search_index():
 def prepare_resource_relations_index(create=False):
     """
     Creates the settings and mappings in Elasticsearch to support related resources
-
     """
 
     index_settings = {

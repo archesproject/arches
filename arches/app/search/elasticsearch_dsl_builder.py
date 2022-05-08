@@ -1,17 +1,14 @@
 """
 ARCHES - a program developed to inventory and manage immovable cultural heritage.
 Copyright (C) 2013 J. Paul Getty Trust and World Monuments Fund
-
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU Affero General Public License as
 published by the Free Software Foundation, either version 3 of the
 License, or (at your option) any later version.
-
 This program is distributed in the hope that it will be useful,
 but WITHOUT ANY WARRANTY; without even the implied warranty of
 MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 GNU Affero General Public License for more details.
-
 You should have received a copy of the GNU Affero General Public License
 along with this program. If not, see <http://www.gnu.org/licenses/>.
 """
@@ -45,7 +42,6 @@ class Dsl(object):
 class Query(Dsl):
     """
     http://www.elastic.co/guide/en/elasticsearch/reference/current/query-dsl.html
-
     """
 
     def __init__(self, se, **kwargs):
@@ -112,7 +108,6 @@ class Query(Dsl):
 class Bool(Dsl):
     """
     http://www.elastic.co/guide/en/elasticsearch/reference/current/query-dsl-bool-query.html
-
     """
 
     def __init__(self, dsl=None, **kwargs):
@@ -164,7 +159,6 @@ class Bool(Dsl):
 class Match(Dsl):
     """
     http://www.elastic.co/guide/en/elasticsearch/reference/current/query-dsl-match-query.html
-
     """
 
     def __init__(self, **kwargs):
@@ -194,10 +188,8 @@ class Match(Dsl):
 class Nested(Dsl):
     """
     http://www.elastic.co/guide/en/elasticsearch/reference/current/query-dsl-nested-query.html
-
     Note:
         score_mode can only be used when the nested dsl is used within a query but not within a filter
-
     """
 
     def __init__(self, **kwargs):
@@ -222,7 +214,6 @@ class Nested(Dsl):
 class Term(Dsl):
     """
     https://www.elastic.co/guide/en/elasticsearch/reference/current/query-dsl-term-query.html
-
     """
 
     def __init__(self, **kwargs):
@@ -235,7 +226,6 @@ class Term(Dsl):
 class Terms(Dsl):
     """
     http://www.elastic.co/guide/en/elasticsearch/reference/current/query-dsl-terms-query.html
-
     """
 
     def __init__(self, **kwargs):
@@ -252,7 +242,6 @@ class GeoShape(Dsl):
     """
     http://www.elastic.co/guide/en/elasticsearch/reference/current/query-dsl-geo-shape-query.html
     http://www.elastic.co/guide/en/elasticsearch/reference/current/mapping-geo-shape-type.html
-
     """
 
     def __init__(self, **kwargs):
@@ -266,7 +255,6 @@ class GeoShape(Dsl):
 class Range(Dsl):
     """
     http://www.elastic.co/guide/en/elasticsearch/reference/current/query-dsl-range-query.html
-
     """
 
     def __init__(self, **kwargs):
@@ -311,7 +299,6 @@ class RangeDSLException(Exception):
 class SimpleQueryString(Dsl):
     """
     http://www.elastic.co/guide/en/elasticsearch/reference/current/query-dsl-simple-query-string-query.html
-
     """
 
     def __init__(self, **kwargs):
@@ -335,7 +322,6 @@ class SimpleQueryString(Dsl):
 class Exists(Dsl):
     """
     https://www.elastic.co/guide/en/elasticsearch/reference/current/query-dsl-exists-query.html
-
     """
 
     def __init__(self, **kwargs):
@@ -346,10 +332,8 @@ class Exists(Dsl):
 class Ids(Dsl):
     """
     https://www.elastic.co/guide/en/elasticsearch/reference/current/query-dsl-ids-query.html
-
     Keyword Arguments:
     ids -- a single document id as a string, or a list of document ids
-
     """
 
     def __init__(self, **kwargs):
@@ -362,7 +346,6 @@ class Ids(Dsl):
 class Aggregation(Dsl):
     """
     https://www.elastic.co/guide/en/elasticsearch/reference/current/search-aggregations.html
-
     """
 
     def __init__(self, **kwargs):
@@ -411,7 +394,6 @@ class AggregationDSLException(Exception):
 class GeoHashGridAgg(Aggregation):
     """
     https://www.elastic.co/guide/en/elasticsearch/reference/current/search-aggregations-bucket-geohashgrid-aggregation.html
-
     """
 
     def __init__(self, **kwargs):
@@ -425,7 +407,6 @@ class GeoHashGridAgg(Aggregation):
 class GeoBoundsAgg(Aggregation):
     """
     https://www.elastic.co/guide/en/elasticsearch/reference/current/search-aggregations-bucket-geohashgrid-aggregation.html
-
     """
 
     def __init__(self, **kwargs):
@@ -439,7 +420,6 @@ class GeoBoundsAgg(Aggregation):
 class CoreDateAgg(Aggregation):
     """
     https://www.elastic.co/guide/en/elasticsearch/reference/current/search-aggregations.html
-
     """
 
     def __init__(self, **kwargs):
@@ -454,7 +434,6 @@ class CoreDateAgg(Aggregation):
 class MinAgg(CoreDateAgg):
     """
     https://www.elastic.co/guide/en/elasticsearch/reference/current/search-aggregations-metrics-min-aggregation.html
-
     """
 
     def __init__(self, **kwargs):
@@ -465,7 +444,6 @@ class MinAgg(CoreDateAgg):
 class MaxAgg(CoreDateAgg):
     """
     https://www.elastic.co/guide/en/elasticsearch/reference/current/search-aggregations-metrics-max-aggregation.html
-
     """
 
     def __init__(self, **kwargs):
@@ -476,7 +454,6 @@ class MaxAgg(CoreDateAgg):
 class DateRangeAgg(CoreDateAgg):
     """
     https://www.elastic.co/guide/en/elasticsearch/reference/current/search-aggregations-bucket-daterange-aggregation.html
-
     """
 
     def __init__(self, **kwargs):
@@ -510,7 +487,6 @@ class DateRangeAgg(CoreDateAgg):
 class RangeAgg(Aggregation):
     """
     https://www.elastic.co/guide/en/elasticsearch/reference/current/search-aggregations-bucket-range-aggregation.html
-
     """
 
     def __init__(self, **kwargs):
@@ -544,7 +520,6 @@ class RangeAgg(Aggregation):
 class FiltersAgg(Aggregation):
     """
     http://www.elastic.co/guide/en/elasticsearch/reference/current/query-dsl-range-query.html
-
     """
 
     def __init__(self, **kwargs):
@@ -560,7 +535,6 @@ class FiltersAgg(Aggregation):
 class NestedAgg(Aggregation):
     """
     http://www.elastic.co/guide/en/elasticsearch/reference/current/search-aggregations-bucket-nested-aggregation.html
-
     """
 
     def __init__(self, **kwargs):

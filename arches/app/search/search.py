@@ -1,17 +1,14 @@
 """
 ARCHES - a program developed to inventory and manage immovable cultural heritage.
 Copyright (C) 2013 J. Paul Getty Trust and World Monuments Fund
-
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU Affero General Public License as
 published by the Free Software Foundation, either version 3 of the
 License, or (at your option) any later version.
-
 This program is distributed in the hope that it will be useful,
 but WITHOUT ANY WARRANTY; without even the implied warranty of
 MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 GNU Affero General Public License for more details.
-
 You should have received a copy of the GNU Affero General Public License
 along with this program. If not, see <http://www.gnu.org/licenses/>.
 """
@@ -64,7 +61,6 @@ class SearchEngine(object):
         Deletes a document from the index
         Pass an index and id to delete a specific document
         Pass a body with a query dsl to delete by query
-
         """
 
         kwargs = self._add_prefix(**kwargs)
@@ -106,7 +102,6 @@ class SearchEngine(object):
     def delete_index(self, **kwargs):
         """
         Deletes an entire index
-
         """
 
         kwargs = self._add_prefix(**kwargs)
@@ -118,7 +113,6 @@ class SearchEngine(object):
         Search for an item in the index.
         Pass an index and id (or list of ids) to get a specific document(s)
         Pass a body with a query dsl to perform a search
-
         """
 
         kwargs = self._add_prefix(**kwargs)
@@ -149,7 +143,6 @@ class SearchEngine(object):
     def create_mapping(self, index, fieldname="", fieldtype="string", fieldindex=None, body=None):
         """
         Creates an Elasticsearch body for a single field given an index name and type name
-
         """
 
         index = self._add_prefix(index)
@@ -165,12 +158,9 @@ class SearchEngine(object):
     def index_data(self, index=None, body=None, idfield=None, id=None, **kwargs):
         """
         Indexes a document or list of documents into Elasticsearch
-
         If "id" is supplied then will use that as the id of the document
-
         If "idfield" is supplied then will try to find that property in the
             document itself and use the value found for the id of the document
-
         """
 
         index = self._add_prefix(index)

@@ -24,7 +24,6 @@ class BaseSearchFilter:
     def append_dsl(self, search_results_object, permitted_nodegroups, include_provisional):
         """
         used to append ES query dsl to the search request
-
         """
 
         pass
@@ -32,7 +31,6 @@ class BaseSearchFilter:
     def view_data(self):
         """
         data that the view should gather to pass to the front end
-
         """
 
         pass
@@ -40,7 +38,6 @@ class BaseSearchFilter:
     def post_search_hook(self, search_results_object, results, permitted_nodegroups):
         """
         code to run after the search results have been retrieved
-
         """
 
         pass
