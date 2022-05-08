@@ -1,17 +1,14 @@
 """
 ARCHES - a program developed to inventory and manage immovable cultural heritage.
 Copyright (C) 2013 J. Paul Getty Trust and World Monuments Fund
-
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU Affero General Public License as
 published by the Free Software Foundation, either version 3 of the
 License, or (at your option) any later version.
-
 This program is distributed in the hope that it will be useful,
 but WITHOUT ANY WARRANTY; without even the implied warranty of
 MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 GNU Affero General Public License for more details.
-
 You should have received a copy of the GNU Affero General Public License
 along with this program. If not, see <http://www.gnu.org/licenses/>.
 """
@@ -28,7 +25,6 @@ from django.core.cache import cache
 class Card(models.CardModel):
     """
     Used for mapping complete card object to and from the database
-
     """
 
     class Meta:
@@ -71,27 +67,21 @@ class Card(models.CardModel):
     def __init__(self, *args, **kwargs):
         """
         Init a Card from a dictionary representation of from a model method call
-
         init this object by using Django query syntax, eg:
         .. code-block:: python
-
             Card.objects.get(pk=some_card_id)
             # or
             Card.objects.filter(name=some_value_to_filter_by)
-
         OR, init this object with a dictionary, eg:
         .. code-block:: python
-
             Card({
                 name:'some name',
                 cardid: '12341234-1234-1234-1324-1234123433433',
                 ...
             })
-
         Arguments:
         args -- a dictionary of properties repsenting a Card object
         kwargs -- unused
-
         """
 
         super(Card, self).__init__(*args, **kwargs)
@@ -117,6 +107,8 @@ class Card(models.CardModel):
         self.nodes = []
         self.ontologyproperty = None
         self.constraints = []
+
+        self.datatypes = list(models.DDataType.objects.all())
 
         if args:
             if isinstance(args[0], dict):
@@ -170,14 +162,13 @@ class Card(models.CardModel):
 
                 sub_groups = models.NodeGroup.objects.filter(parentnodegroup=self.nodegroup)
                 for sub_group in sub_groups:
-                    self.cards.extend(Card.objects.filter(nodegroup=sub_group))
+                    self.cards.extend(Card.objects.select_related("nodegroup").filter(nodegroup=sub_group))
 
                 self.cardinality = self.nodegroup.cardinality
 
     def save(self):
         """
         Saves a card and its parent ontology property back to the db
-
         """
         with transaction.atomic():
             if self.graph.ontology and self.graph.isresource:
@@ -206,18 +197,15 @@ class Card(models.CardModel):
     def get_edge_to_parent(self):
         """
         Finds the edge model that relates this card to it's parent node
-
         """
         return models.Edge.objects.get(rangenode_id=self.nodegroup_id)
 
     def filter_by_perm(self, user, perm):
         """
         Filters out any cards that don't have the permission for the user
-
         Arguments:
         user -- the user object to check permsission against
         perm -- the permission string to check (eg: 'read_nodegroup')
-
         """
         if user:
             if user.has_perm(perm, self.nodegroup):
@@ -235,9 +223,7 @@ class Card(models.CardModel):
     def serialize(self, fields=None, exclude=None):
         """
         serialize to a different form than used by the internal class structure
-
         """
-
         exclude = [] if exclude is None else exclude
         ret = JSONSerializer().handle_model(self, fields, exclude)
 
@@ -258,13 +244,15 @@ class Card(models.CardModel):
         # even if a widget hasn't been configured
         ret["widgets"] = self.widgets
         if "widgets" not in exclude:
+            widgets = self.datatypes
+
             for node in ret["nodes"]:
                 found = False
                 for widget in ret["widgets"]:
                     if node.nodeid == widget.node_id:
                         found = True
                 if not found:
-                    widget = models.DDataType.objects.get(pk=node.datatype).defaultwidget
+                    widget = [widget for widget in widgets if widget.pk == node.datatype][0].defaultwidget
                     if widget:
                         widget_model = models.CardXNodeXWidget()
                         widget_model.node_id = node.nodeid

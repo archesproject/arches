@@ -1,17 +1,14 @@
 """
 ARCHES - a program developed to inventory and manage immovable cultural heritage.
 Copyright (C) 2013 J. Paul Getty Trust and World Monuments Fund
-
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU Affero General Public License as
 published by the Free Software Foundation, either version 3 of the
 License, or (at your option) any later version.
-
 This program is distributed in the hope that it will be useful,
 but WITHOUT ANY WARRANTY; without even the implied warranty of
 MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 GNU Affero General Public License for more details.
-
 You should have received a copy of the GNU Affero General Public License
 along with this program. If not, see <http://www.gnu.org/licenses/>.
 """
@@ -47,7 +44,6 @@ logger = logging.getLogger(__name__)
 class Tile(models.TileModel):
     """
     Used for mapping complete tile object to and from the database
-
     """
 
     class Meta:
@@ -56,27 +52,21 @@ class Tile(models.TileModel):
     def __init__(self, *args, **kwargs):
         """
         Init a Tile from a dictionary representation of from a model method call
-
         init this object by using Django query syntax, eg:
         .. code-block:: python
-
             Tile.objects.get(pk=some_tile_id)
             # or
             Tile.objects.filter(name=some_value_to_filter_by)
-
         OR, init this object with a dictionary, eg:
         .. code-block:: python
-
             Tile({
                 name:'some name',
                 tileid: '12341234-1234-1234-1324-1234123433433',
                 ...
             })
-
         Arguments:
         args -- a dictionary of properties repsenting a Tile object
         kwargs -- unused
-
         """
 
         super(Tile, self).__init__(*args, **kwargs)
@@ -173,7 +163,6 @@ class Tile(models.TileModel):
     def apply_provisional_edit(self, user, data, action="create", status="review", existing_model=None):
         """
         Creates or updates the json stored in a tile's provisionaledits db_column
-
         """
         if self.tile_collects_data() is True and data != {}:
 
@@ -202,7 +191,6 @@ class Tile(models.TileModel):
         """
         Returns True if a tile has been created as provisional and has not yet
         been approved by a user in the resource reviewer group
-
         """
 
         result = False
@@ -216,7 +204,6 @@ class Tile(models.TileModel):
         Returns True if a user was the creator of a provisional tile that has not
         yet been approved. This is used to confirm whether a provisional user
         is allowed to edit and delete their provisional data.
-
         """
         if self.provisionaledits is None:
             return False
@@ -539,7 +526,6 @@ class Tile(models.TileModel):
     def index(self):
         """
         Indexes all the nessesary documents related to resources to support the map, search, and reports
-
         """
 
         Resource.objects.get(pk=self.resourceinstance_id).index()
@@ -610,7 +596,6 @@ class Tile(models.TileModel):
         """
         Updates the value of a node in a tile. Creates the tile and parent tiles if they do not yet
         exist.
-
         """
         if tileid and models.TileModel.objects.filter(pk=tileid).exists():
             tile = Tile.objects.get(pk=tileid)
@@ -699,7 +684,6 @@ class Tile(models.TileModel):
     def serialize(self, fields=None, exclude=None):
         """
         serialize to a different form then used by the internal class structure
-
         """
 
         ret = JSONSerializer().handle_model(self)

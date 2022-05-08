@@ -1,17 +1,14 @@
 """
 ARCHES - a program developed to inventory and manage immovable cultural heritage.
 Copyright (C) 2013 J. Paul Getty Trust and World Monuments Fund
-
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU Affero General Public License as
 published by the Free Software Foundation, either version 3 of the
 License, or (at your option) any later version.
-
 This program is distributed in the hope that it will be useful,
 but WITHOUT ANY WARRANTY; without even the implied warranty of
 MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 GNU Affero General Public License for more details.
-
 You should have received a copy of the GNU Affero General Public License
 along with this program. If not, see <http://www.gnu.org/licenses/>.
 """
@@ -39,7 +36,6 @@ logger = logging.getLogger(__name__)
 class Graph(models.GraphModel):
     """
     Used for mapping complete resource graph objects to and from the database
-
     """
 
     class Meta:
@@ -168,10 +164,8 @@ class Graph(models.GraphModel):
     def add_node(self, node, nodegroups=None):
         """
         Adds a node to this graph
-
         Arguments:
         node -- a dictionary representing a Node instance or an actual models.Node instance
-
         """
         if not isinstance(node, models.Node):
             nodeobj = node.copy()
@@ -216,13 +210,10 @@ class Graph(models.GraphModel):
     def add_edge(self, edge):
         """
         Adds an edge to this graph
-
         will throw an error if the domain or range nodes referenced in this edge haven't
         already been added to this graph
-
         Arguments:
         edge -- a dictionary representing a Edge instance or an actual models.Edge instance
-
         """
 
         if not isinstance(edge, models.Edge):
@@ -256,10 +247,8 @@ class Graph(models.GraphModel):
     def add_card(self, card):
         """
         Adds a card to this graph
-
         Arguments:
         card -- a dictionary representing a Card instance or an actual models.CardModel instance
-
         """
         if not isinstance(card, models.CardModel):
             cardobj = card.copy()
@@ -299,10 +288,8 @@ class Graph(models.GraphModel):
     def add_function(self, function):
         """
         Adds a FunctionXGraph record to this graph
-
         Arguments:
         node -- an object representing a FunctionXGraph instance or an actual models.CardModel instance
-
         """
 
         if not isinstance(function, models.FunctionXGraph):
@@ -351,10 +338,8 @@ class Graph(models.GraphModel):
         """
         Saves an a graph and its nodes, edges, and nodegroups back to the db
         creates associated card objects if any of the nodegroups don't already have a card
-
         Arguments:
         validate -- True to validate the graph before saving, defaults to True
-
         """
 
         if validate:
@@ -437,7 +422,6 @@ class Graph(models.GraphModel):
     def delete_instances(self, verbose=False):
         """
         deletes all associated resource instances
-
         """
         if verbose is True:
             bar = pyprind.ProgBar(Resource.objects.filter(graph_id=self.graphid).count())
@@ -451,10 +435,8 @@ class Graph(models.GraphModel):
     def get_tree(self, root=None):
         """
         returns a tree based representation of this graph
-
         Keyword Arguments:
         root -- the node from which to root the tree, defaults to the root node of this graph
-
         """
 
         tree = {"node": root if root else self.root, "children": [], "parent_edge": None}
@@ -471,7 +453,6 @@ class Graph(models.GraphModel):
     def populate_null_nodegroups(self):
         """
         populates any blank nodegroup ids of the nodes in this graph with the nearest parent node
-
         """
 
         tree = self.get_tree()
@@ -496,18 +477,13 @@ class Graph(models.GraphModel):
     def append_branch(self, property, nodeid=None, graphid=None, skip_validation=False):
         """
         Appends a branch onto this graph
-
         Arguments:
         property -- the property to use when appending the branch
-
         Keyword Arguments:
         nodeid -- if given will append the branch to this node, if not supplied will
         append the branch to the root of this graph
-
         graphid -- get the branch to append based on the graphid
-
         skip_validation -- don't validate the resultant graph (post append), defaults to False
-
         """
 
         branch_graph = Graph(graphid)
@@ -542,7 +518,6 @@ class Graph(models.GraphModel):
     def make_name_unique(self, name, names_to_check):
         """
         Makes a name unique among a list of name
-
         Arguments:
         name -- the name to check and modfiy to make unique in the list of "names_to_check"
         names_to_check -- a list of names that "name" should be unique among
@@ -558,11 +533,9 @@ class Graph(models.GraphModel):
     def append_node(self, nodeid=None):
         """
         Appends a single node onto this graph
-
         Keyword Arguments:
         nodeid -- if given will append the node to this node, if not supplied will
         append the node to the root of this graph
-
         """
 
         node_names = [node.name for node in self.nodes.values()]
@@ -613,7 +586,6 @@ class Graph(models.GraphModel):
     def clear_ontology_references(self):
         """
         removes any references to ontology classes and properties in a graph
-
         """
 
         for node_id, node in self.nodes.items():
@@ -639,7 +611,6 @@ class Graph(models.GraphModel):
         """
         Copies the graph_x_function relationships from a different graph and relates
         the same functions to this graph.
-
         """
         for function_x_graph in other_graph.functionxgraph_set.all():
             config_copy = self.replace_config_ids(function_x_graph.config, id_maps)
@@ -649,7 +620,6 @@ class Graph(models.GraphModel):
     def copy(self, root=None):
         """
         returns an unsaved copy of self
-
         """
 
         nodegroup_map = {}
@@ -690,6 +660,10 @@ class Graph(models.GraphModel):
         # returns a list of node ids sorted by nodes that are collector nodes first and then others last
         node_ids = sorted(copy_of_self.nodes, key=lambda node_id: copy_of_self.nodes[node_id].is_collector, reverse=True)
 
+        for nodeid, node in copy_of_self.nodes.items():
+            if node.datatype == "geojson-feature-collection":
+                node.config["advancedStyle"] = ""
+                node.config["advancedStyling"] = False
         copy_of_self.pk = uuid.uuid1()
         node_map = {}
         card_map = {}
@@ -739,16 +713,11 @@ class Graph(models.GraphModel):
     def move_node(self, nodeid, property, newparentnodeid, skip_validation=False):
         """
         move a node and it's children to a different location within this graph
-
         Arguments:
         nodeid -- the id of node being moved
-
         property -- the property value to conect the node to it's new parent nodegroup
-
         newparentnodeid -- the parent node id that the node is being moved to
-
         skip_validation -- don't validate the resultant graph (post move), defaults to False
-
         """
 
         ret = {"nodes": [], "edges": []}
@@ -792,10 +761,8 @@ class Graph(models.GraphModel):
     def update_node(self, node):
         """
         updates a node in the graph
-
         Arguments:
         node -- a python dictionary representing a node object to be used to update the graph
-
         """
         node["nodeid"] = uuid.UUID(str(node.get("nodeid")))
         old_node = self.nodes.pop(node["nodeid"])
@@ -841,10 +808,8 @@ class Graph(models.GraphModel):
     def delete_node(self, node=None):
         """
         deletes a node and all if it's children from a graph
-
         Arguments:
         node -- a node id or Node model to delete from the graph
-
         """
 
         if node is not None:
@@ -884,13 +849,10 @@ class Graph(models.GraphModel):
     def can_append(self, graphToAppend, nodeToAppendTo):
         """
         can_append - test to see whether or not a graph can be appened to this graph at a specific location
-
         returns true if the graph can be appended, false otherwise
-
         Arguments:
         graphToAppend -- the Graph to test appending on to this graph
         nodeToAppendTo -- the node from which to append the graph
-
         """
 
         found = False
@@ -914,10 +876,8 @@ class Graph(models.GraphModel):
     def get_parent_node(self, nodeid):
         """
         get the parent node of a node with the given nodeid
-
         Arguments:
         nodeid -- the node we want to find the parent of
-
         """
 
         if str(self.root.nodeid) == str(nodeid):
@@ -931,10 +891,8 @@ class Graph(models.GraphModel):
     def get_child_nodes(self, nodeid):
         """
         get the child nodes of a node with the given nodeid
-
         Arguments:
         nodeid -- the node we want to find the children of
-
         """
 
         ret = []
@@ -946,7 +904,6 @@ class Graph(models.GraphModel):
     def get_sibling_nodes(self, node):
         """
         Given a node will get all of that nodes siblings excluding the given node itself
-
         """
 
         sibling_nodes = []
@@ -963,10 +920,8 @@ class Graph(models.GraphModel):
     def get_out_edges(self, nodeid):
         """
         get all the edges of a node with the given nodeid where that node is the domainnode
-
         Arguments:
         nodeid -- the nodeid of the node we want to find the edges of
-
         """
 
         ret = []
@@ -978,12 +933,9 @@ class Graph(models.GraphModel):
     def is_node_in_child_group(self, node):
         """
         test to see if the node is in a group that is a child to another group
-
         return true if the node is in a child group, false otherwise
-
         Arguments:
         node -- the node to test
-
         """
 
         hasParentGroup = False
@@ -1000,12 +952,9 @@ class Graph(models.GraphModel):
     def get_parent_nodes_and_edges(self, node):
         """
         given a node, get all the parent nodes and edges
-
         returns an object with a list of nodes and edges
-
         Arguments:
         node -- the node from which to get the node's parents
-
         """
 
         nodes = []
@@ -1024,12 +973,9 @@ class Graph(models.GraphModel):
     def is_group_semantic(self, node):
         """
         test to see if all the nodes in a group are semantic
-
         returns true if the group contains only semantic nodes, otherwise false
-
         Arguments:
         node -- the node to use as a basis of finding the group
-
         """
 
         for node in self.get_grouped_nodes(node):
@@ -1041,12 +987,9 @@ class Graph(models.GraphModel):
     def get_grouped_nodes(self, node):
         """
         given a node, get any other nodes that share the same group
-
         returns a list of nodes
-
         Arguments:
         node -- the node to use as a basis of finding the group
-
         """
 
         ret = []
@@ -1063,10 +1006,8 @@ class Graph(models.GraphModel):
     def get_valid_domain_ontology_classes(self, nodeid=None):
         """
         gets the ontology properties (and related classes) this graph can have with a parent node
-
         Keyword Arguments:
         nodeid -- {default=root node id} the id of the node to use as the lookup for valid ontologyclasses
-
         """
         if self.ontology is not None:
             source = self.nodes[uuid.UUID(str(nodeid))].ontologyclass if nodeid is not None else self.root.ontologyclass
@@ -1079,10 +1020,8 @@ class Graph(models.GraphModel):
         """
         get possible ontology properties (and related classes) a node with the given nodeid can have
         taking into consideration its current position in the graph
-
         Arguments:
         nodeid -- the id of the node in question
-
         """
 
         ret = []
@@ -1145,7 +1084,6 @@ class Graph(models.GraphModel):
     def get_nodegroups(self, nodegroupid=None):
         """
         get the nodegroups associated with this graph
-
         """
 
         nodegroups = set()
@@ -1160,11 +1098,8 @@ class Graph(models.GraphModel):
         """
         get a nodegroup from an id by first looking through the nodes and cards associated with this graph.
         if not found then get the nodegroup instance from the database, otherwise return a new instance of a nodegroup
-
         Keyword Arguments
-
         nodegroupid -- return a nodegroup with this id
-
         """
 
         for nodegroup in self.get_nodegroups():
@@ -1178,7 +1113,6 @@ class Graph(models.GraphModel):
     def get_root_nodegroup(self):
         """
         gets the top level nodegroup (the first nodegroup that doesn't have a parentnodegroup)
-
         """
 
         for nodegroup in self.get_nodegroups():
@@ -1188,7 +1122,6 @@ class Graph(models.GraphModel):
     def get_root_card(self):
         """
         gets the top level card/card container
-
         """
 
         for card in self.cards.values():
@@ -1198,7 +1131,6 @@ class Graph(models.GraphModel):
     def get_cards(self, check_if_editable=True):
         """
         get the card data (if any) associated with this graph
-
         """
 
         cards = []
@@ -1234,7 +1166,6 @@ class Graph(models.GraphModel):
     def get_widgets(self):
         """
         get the widget data (if any) associated with this graph
-
         """
         widgets = []
         for widget in self.widgets.values():
@@ -1246,10 +1177,8 @@ class Graph(models.GraphModel):
     def serialize(self, fields=None, exclude=None):
         """
         serialize to a different form then used by the internal class structure
-
         used to append additional values (like parent ontology properties) that
         internal objects (like models.Nodes) don't support
-
         """
         exclude = [] if exclude is None else exclude
 
@@ -1385,7 +1314,6 @@ class Graph(models.GraphModel):
             - A node group can only have child node groups if the node group only contains semantic nodes
             - If graph has an ontology, nodes must have classes and edges must have properties that are ontologically valid
             - If the graph has no ontology, nodes and edges should have null values for ontology class and property respectively
-
         """
         # validates that the resource graph is editable despite having saved instances.
         self.check_if_resource_is_editable()

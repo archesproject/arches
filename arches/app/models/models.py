@@ -215,6 +215,7 @@ class Edge(models.Model):
 
 class EditLog(models.Model):
     editlogid = models.UUIDField(primary_key=True, default=uuid.uuid1)
+    transactionid = models.UUIDField(default=uuid.uuid1)
     resourcedisplayname = models.TextField(blank=True, null=True)
     resourceclassid = models.TextField(blank=True, null=True)
     resourceinstanceid = models.TextField(blank=True, null=True)
@@ -453,7 +454,6 @@ class NodeGroup(models.Model):
 class Node(models.Model):
     """
     Name is unique across all resources because it ties a node to values within tiles. Recommend prepending resource class to node name.
-
     """
 
     nodeid = models.UUIDField(primary_key=True, default=uuid.uuid1)
@@ -474,9 +474,7 @@ class Node(models.Model):
     def get_child_nodes_and_edges(self):
         """
         gather up the child nodes and edges of this node
-
         returns a tuple of nodes and edges
-
         """
         nodes = []
         edges = []
@@ -492,14 +490,13 @@ class Node(models.Model):
     def get_direct_child_nodes(self):
         """
         gets all child nodes exactly one level lower in graph
-
         returns a list of nodes
         """
         return [edge.rangenode for edge in Edge.objects.filter(domainnode=self)]
 
     @property
     def is_collector(self):
-        return str(self.nodeid) == str(self.nodegroup_id) and self.nodegroup is not None
+        return str(self.nodeid) == str(self.nodegroup_id) and self.nodegroup_id is not None
 
     def is_editable(self):
         if settings.OVERRIDE_RESOURCE_MODEL_LOCK is True:
@@ -537,7 +534,7 @@ class Node(models.Model):
         managed = True
         db_table = "nodes"
         constraints = [
-            models.UniqueConstraint(fields=["name", "nodegroupid"], name="unique_nodename_nodegroup"),
+            models.UniqueConstraint(fields=["name", "nodegroup"], name="unique_nodename_nodegroup"),
         ]
 
 
@@ -559,14 +556,10 @@ class Ontology(models.Model):
 class OntologyClass(models.Model):
     """
     the target JSONField has this schema:
-
     values are dictionaries with 2 properties, 'down' and 'up' and within each of those another 2 properties,
     'ontology_property' and 'ontology_classes'
-
     "down" assumes a known domain class, while "up" assumes a known range class
-
     .. code-block:: python
-
         "down":[
             {
                 "ontology_property": "P1_is_identified_by",
@@ -590,7 +583,6 @@ class OntologyClass(models.Model):
                 ]
             }
         ]
-
     """
 
     ontologyclassid = models.UUIDField(default=uuid.uuid1, primary_key=True)
@@ -824,29 +816,21 @@ class SearchExportHistory(models.Model):
 class TileModel(models.Model):  # Tile
     """
     the data JSONField has this schema:
-
     values are dictionaries with n number of keys that represent nodeid's and values the value of that node instance
-
     .. code-block:: python
-
         {
             nodeid: node value,
             nodeid: node value,
             ...
         }
-
         {
             "20000000-0000-0000-0000-000000000002": "John",
             "20000000-0000-0000-0000-000000000003": "Smith",
             "20000000-0000-0000-0000-000000000004": "Primary"
         }
-
     the provisionaledits JSONField has this schema:
-
     values are dictionaries with n number of keys that represent nodeid's and values the value of that node instance
-
     .. code-block:: python
-
         {
             userid: {
                 value: node value,
@@ -858,7 +842,6 @@ class TileModel(models.Model):  # Tile
                 }
             ...
         }
-
         {
             1: {
                 "value": {
@@ -881,7 +864,6 @@ class TileModel(models.Model):  # Tile
                 "status": "review",
                 "action": "update",
         }
-
     """
 
     tileid = models.UUIDField(primary_key=True, default=uuid.uuid1)  # This field type is a guess.
@@ -1076,7 +1058,6 @@ class UserProfile(models.Model):
 
     def is_reviewer(self):
         """DEPRECATED Use new pattern:
-
         from arches.app.utils.permission_backend import user_is_resource_reviewer
         is_reviewer = user_is_resource_reviewer(user)
         """

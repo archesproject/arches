@@ -1,17 +1,14 @@
 """
 ARCHES - a program developed to inventory and manage immovable cultural heritage.
 Copyright (C) 2013 J. Paul Getty Trust and World Monuments Fund
-
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU Affero General Public License as
 published by the Free Software Foundation, either version 3 of the
 License, or (at your option) any later version.
-
 This program is distributed in the hope that it will be useful,
 but WITHOUT ANY WARRANTY; without even the implied warranty of
 MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 GNU Affero General Public License for more details.
-
 You should have received a copy of the GNU Affero General Public License
 along with this program. If not, see <http://www.gnu.org/licenses/>.
 """
@@ -305,11 +302,9 @@ class Concept(object):
         Deletes any subconcepts associated with this concept and additionally this concept if 'delete_self' is True
         If any parentconcepts or relatedconcepts are included then it will only delete the relationship to those concepts but not the concepts themselves
         If any values are passed, then those values as well as the relationship to those values will be deleted
-
         Note, django will automatically take care of deleting any db models that have a foreign key relationship to the model being deleted
         (eg: deleting a concept model will also delete all values and relationships), but because we need to manage deleting
         parent concepts and related concepts and values we have to do that here too
-
         """
 
         for subconcept in self.subconcepts:
@@ -402,7 +397,6 @@ class Concept(object):
     def add_relation(self, concepttorelate, relationtype):
         """
         Relates this concept to 'concepttorelate' via the relationtype
-
         """
 
         relation, created = models.Relation.objects.get_or_create(
@@ -418,7 +412,6 @@ class Concept(object):
         If the nodetype == 'Concept' then return ConceptValue objects keyed to the concept id
         If the nodetype == 'ConceptScheme' then return a ConceptValue object with the value set to any ONE prefLabel keyed to the concept id
         We do this because it takes so long to gather the ids of the concepts when deleting a Scheme or Group
-
         """
 
         concepts_to_delete = {}
@@ -496,8 +489,13 @@ class Concept(object):
     ):
         """
         Recursively builds a list of concept relations for a given concept and all it's subconcepts based on its relationship type and valuetypes.
-
         """
+
+        # if the conceptid isn't a UUID then Postgres will throw an error and transactions will be aborted #7822
+        try:
+            uuid.UUID(conceptid)
+        except:
+            return []
 
         languageid = get_language() if languageid is None else languageid
         relationtypes = " or ".join(["r.relationtype = '%s'" % (relationtype) for relationtype in relationtypes])
@@ -510,7 +508,6 @@ class Concept(object):
         if order_hierarchically:
             sql = """
                 WITH RECURSIVE
-
                  ordered_relationships AS (
                     (
                         SELECT r.conceptidfrom, r.conceptidto, r.relationtype, (
@@ -580,7 +577,6 @@ class Concept(object):
                         ORDER BY sortorder, valuesto
                     )
                 ),
-
                 children AS (
                     SELECT r.conceptidfrom, r.conceptidto,
                         to_char(row_number() OVER (), 'fm000000') as row,
@@ -599,9 +595,7 @@ class Concept(object):
                         WHERE ({relationtypes})
                         {depth_limit}
                 )
-
                 {subquery}
-
                 SELECT
                 (
                     select row_to_json(d)
@@ -620,9 +614,7 @@ class Concept(object):
                     ) d
                 ) as valueto,
                 depth, collector, count(*) OVER() AS full_count
-
                FROM {recursive_table} order by row {limit_clause};
-
             """
 
             subquery = (
@@ -691,7 +683,6 @@ class Concept(object):
                     )
                     SELECT distinct {columns}
                     FROM results {limit_clause}
-
             """
 
             if not columns:
@@ -722,9 +713,7 @@ class Concept(object):
         """
         Traverses a concept graph from self to leaf (direction='down') or root (direction='up') calling
         the given function on each node, passes an optional scope to each function
-
         Return a value from the function to prematurely end the traversal
-
         """
 
         _cache = kwargs.pop("_cache", [])
@@ -809,7 +798,6 @@ class Concept(object):
     def flatten(self, ret=None):
         """
         Flattens the graph into a unordered list of concepts
-
         """
 
         if ret is None:
@@ -1106,7 +1094,6 @@ class Concept(object):
     def get_context(self):
         """
         get the Top Concept that the Concept particpates in
-
         """
 
         if self.nodetype == "Concept" or self.nodetype == "Collection":
@@ -1128,7 +1115,6 @@ class Concept(object):
     def get_scheme(self):
         """
         get the ConceptScheme that the Concept particpates in
-
         """
 
         topConcept = self.get_context()
@@ -1167,7 +1153,6 @@ class Concept(object):
         """
         For a given entitytypeid creates a dictionary representing that entitytypeid's concept graph (member pathway) formatted to support
         select2 dropdowns
-
         """
         cursor = connection.cursor()
 

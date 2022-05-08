@@ -1,17 +1,14 @@
 """
 ARCHES - a program developed to inventory and manage immovable cultural heritage.
 Copyright (C) 2013 J. Paul Getty Trust and World Monuments Fund
-
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU Affero General Public License as
 published by the Free Software Foundation, either version 3 of the
 License, or (at your option) any later version.
-
 This program is distributed in the hope that it will be useful,
 but WITHOUT ANY WARRANTY; without even the implied warranty of
 MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 GNU Affero General Public License for more details.
-
 You should have received a copy of the GNU Affero General Public License
 along with this program. If not, see <http://www.gnu.org/licenses/>.
 """
@@ -25,16 +22,12 @@ from arches.app.models import models
 class SystemSettings(LazySettings):
     """
     This class can be used just like you would use settings.py
-
     To use, import like you would the django settings module:
-
         from system_settings import settings
         ....
         settings.SEARCH_ITEMS_PER_PAGE
-
         # will list all settings
         print settings
-
     """
 
     SYSTEM_SETTINGS_RESOURCE_MODEL_ID = "ff623370-fa12-11e6-b98b-6c4008b05c4c"
@@ -57,10 +50,8 @@ class SystemSettings(LazySettings):
         By default get settings from this class which is initially populated from the settings.py filter
         If a setting is requested that isn't found, assume it's saved in the database and try and retrieve it from there
         by calling update_from_db first which populates this class with any settings from the database
-
         What this means is that update_from_db will only be called once a setting is requested that isn't initially in the settings.py file
         Only then will settings from the database be applied (and potentially overwrite settings found in settings.py)
-
         """
 
         try:
@@ -83,7 +74,6 @@ class SystemSettings(LazySettings):
     def update_from_db(self, **kwargs):
         """
         Updates the settings the Arches System Settings graph tile instances stored in the database
-
         """
 
         # get all the possible settings defined by the Arches System Settings Graph
