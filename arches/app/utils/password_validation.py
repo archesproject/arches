@@ -24,7 +24,6 @@ class SpecialCharacterValidator:
     """
     Password validator to ensure that passwords contain one or more in a list
     of characters
-
     """
 
     def __init__(self, special_characters=("!", "@", "#")):
@@ -46,7 +45,6 @@ class SpecialCharacterValidator:
 class HasNumericCharacterValidator:
     """
     Password validator to ensure that passwords contain number
-
     """
 
     def validate(self, password, user=None):
@@ -64,7 +62,6 @@ class HasUpperAndLowerCaseValidator:
     """
     Password validator to ensure that passwords contain both upper and lower
     characters
-
     """
 
     def validate(self, password, user=None):

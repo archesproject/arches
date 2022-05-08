@@ -122,7 +122,6 @@ class ExtendedDateFormat(SortableDateRange):
     def handle_object(self, object, fuzzy_padding=None):
         """
         Called to handle any date type, looks for the correct handling
-
         """
 
         if isinstance(object, Date) or isinstance(object, Season) or isinstance(object, Unspecified):

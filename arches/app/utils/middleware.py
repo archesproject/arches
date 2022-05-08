@@ -36,9 +36,7 @@ class ModifyAuthorizationHeader(MiddlewareMixin):
 class TokenMiddleware(MiddlewareMixin):
     """
     puts the Bearer token found in the request header onto the request object
-
     pulled from http://www.django-rest-framework.org
-
     """
 
     def get_authorization_header(self, request):

@@ -12,11 +12,9 @@ except:
 
 def profile(log_file):
     """Profile some callable.
-
     This decorator uses the hotshot profiler to profile some callable (like
     a view function or method) and dumps the profile data somewhere sensible
     for later processing and examination.
-
     It takes one argument, the profile log name. If it's a relative path, it
     places it under the PROFILE_LOG_BASE. It also inserts a time stamp into the
     file name, such that 'my_view.prof' become 'my_view-20100211T170321.prof',

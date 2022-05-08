@@ -1,17 +1,14 @@
 """
 ARCHES - a program developed to inventory and manage immovable cultural heritage.
 Copyright (C) 2013 J. Paul Getty Trust and World Monuments Fund
-
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU Affero General Public License as
 published by the Free Software Foundation, either version 3 of the
 License, or (at your option) any later version.
-
 This program is distributed in the hope that it will be useful,
 but WITHOUT ANY WARRANTY; without even the implied warranty of
 MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 GNU Affero General Public License for more details.
-
 You should have received a copy of the GNU Affero General Public License
 along with this program. If not, see <http://www.gnu.org/licenses/>.
 """
@@ -27,6 +24,7 @@ from arches.app.utils.permission_backend import user_can_read_resource
 from arches.app.utils.permission_backend import user_can_edit_resource
 from arches.app.utils.permission_backend import user_can_delete_resource
 from arches.app.utils.permission_backend import user_can_read_concepts
+from arches.app.utils.permission_backend import user_created_transaction
 from django.contrib.auth.decorators import user_passes_test
 
 # Get an instance of a logger
@@ -61,7 +59,6 @@ def deprecated(func):
 def group_required(*group_names):
     """
     Requires user membership in at least one of the groups passed in.
-
     """
 
     def in_groups(u):
@@ -89,7 +86,6 @@ def can_edit_resource_instance(function):
 def can_read_resource_instance(function):
     """
     Requires that a user be able to edit or delete a single nodegroup of a resource
-
     """
 
     @functools.wraps(function)
@@ -107,7 +103,6 @@ def can_read_resource_instance(function):
 def can_delete_resource_instance(function):
     """
     Requires that a user be able to edit or delete a single nodegroup of a resource
-
     """
 
     @functools.wraps(function)
@@ -125,7 +120,19 @@ def can_delete_resource_instance(function):
 def can_read_concept():
     """
     Requires that a user be able to edit or delete a single nodegroup of a resource
-
     """
 
     return user_passes_test(user_can_read_concepts)
+
+
+# Checks whether current user is the one who created a particular transaction ID
+def user_created_transaction_match(function):
+    @functools.wraps(function)
+    def wrapper(request, *args, **kwargs):
+        transactionid = kwargs["transactionid"] if "transactionid" in kwargs else None
+        if user_created_transaction(request.user, transactionid=transactionid):
+            return function(request, *args, **kwargs)
+        else:
+            raise PermissionDenied
+
+    return wrapper

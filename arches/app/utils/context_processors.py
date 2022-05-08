@@ -1,17 +1,14 @@
 """
 ARCHES - a program developed to inventory and manage immovable cultural heritage.
 Copyright (C) 2013 J. Paul Getty Trust and World Monuments Fund
-
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU Affero General Public License as
 published by the Free Software Foundation, either version 3 of the
 License, or (at your option) any later version.
-
 This program is distributed in the hope that it will be useful,
 but WITHOUT ANY WARRANTY; without even the implied warranty of
 MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 GNU Affero General Public License for more details.
-
 You should have received a copy of the GNU Affero General Public License
 along with this program. If not, see <http://www.gnu.org/licenses/>.
 """
@@ -73,6 +70,10 @@ def app_settings(request):
             "GOOGLE_ANALYTICS_TRACKING_ID": settings.GOOGLE_ANALYTICS_TRACKING_ID,
             "USE_SEMANTIC_RESOURCE_RELATIONSHIPS": settings.USE_SEMANTIC_RESOURCE_RELATIONSHIPS,
             "SEARCH_EXPORT_IMMEDIATE_DOWNLOAD_THRESHOLD": settings.SEARCH_EXPORT_IMMEDIATE_DOWNLOAD_THRESHOLD,
+            "SEARCH_EXPORT_IMMEDIATE_DOWNLOAD_THRESHOLD_HTML_FORMAT": settings.SEARCH_EXPORT_IMMEDIATE_DOWNLOAD_THRESHOLD_HTML_FORMAT,
             "RENDERERS": settings.RENDERERS,
+            "ACCESSIBILITY_MODE": settings.ACCESSIBILITY_MODE,
+            "FORCE_SCRIPT_NAME": settings.FORCE_SCRIPT_NAME if settings.FORCE_SCRIPT_NAME is not None else "",
+            "RESTRICT_CELERY_EXPORT_FOR_ANONYMOUS_USER": settings.RESTRICT_CELERY_EXPORT_FOR_ANONYMOUS_USER,
         }
     }

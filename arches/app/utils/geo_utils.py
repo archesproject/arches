@@ -8,7 +8,6 @@ class GeoUtils(object):
     def set_precision(self, coordinates, precision):
         """
         returns the passed in coordinates with the specified precision
-
         """
 
         result = []
@@ -29,7 +28,6 @@ class GeoUtils(object):
         """
         Takes a geojson object with polygon(s) and returns the coordinates of
         the extent of the polygons.
-
         """
         geom_collection = self.create_geom_collection_from_geojson(geojson)
         bounds = geom_collection.extent
@@ -38,7 +36,6 @@ class GeoUtils(object):
     def get_centroid(self, geojson):
         """
         Takes a geojson object with polygon(s) and returns its center point as geojson.
-
         """
         geom_collection = self.create_geom_collection_from_geojson(geojson)
         centroid = geom_collection.centroid.geojson

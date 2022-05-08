@@ -1,4 +1,4 @@
-from arches.app.models.models import Node, TileModel
+from arches.app.models.models import Node, TileModel, EditLog
 from arches.app.models.system_settings import settings
 from guardian.backends import check_support
 from guardian.backends import ObjectPermissionBackend
@@ -53,7 +53,6 @@ def get_restricted_users(resource):
     """
     Takes a resource instance and identifies which users are explicitly restricted from
     reading, editing, deleting, or accessing it.
-
     """
 
     user_perms = get_users_with_perms(resource, attach_perms=True, with_group_users=False)
@@ -122,11 +121,9 @@ def get_restricted_instances(user, search_engine=None, allresources=False):
 def get_groups_for_object(perm, obj):
     """
     returns a list of group objects that have the given permission on the given object
-
     Arguments:
     perm -- the permssion string eg: "read_nodegroup"
     obj -- the model instance to check
-
     """
 
     def has_group_perm(group, perm, obj):
@@ -153,11 +150,9 @@ def get_groups_for_object(perm, obj):
 def get_users_for_object(perm, obj):
     """
     returns a list of user objects that have the given permission on the given object
-
     Arguments:
     perm -- the permssion string eg: "read_nodegroup"
     obj -- the model instance to check
-
     """
 
     ret = []
@@ -170,12 +165,10 @@ def get_users_for_object(perm, obj):
 def get_nodegroups_by_perm(user, perms, any_perm=True):
     """
     returns a list of node groups that a user has the given permission on
-
     Arguments:
     user -- the user to check
     perms -- the permssion string eg: "read_nodegroup" or list of strings
     any_perm -- True to check ANY perm in "perms" or False to check ALL perms
-
     """
 
     A = set(
@@ -194,10 +187,8 @@ def get_nodegroups_by_perm(user, perms, any_perm=True):
 def get_editable_resource_types(user):
     """
     returns a list of graphs of which a user can edit resource instances
-
     Arguments:
     user -- the user to check
-
     """
 
     if user_is_resource_editor(user):
@@ -209,10 +200,8 @@ def get_editable_resource_types(user):
 def get_createable_resource_types(user):
     """
     returns a list of graphs of which a user can create resource instances
-
     Arguments:
     user -- the user to check
-
     """
 
     return get_resource_types_by_perm(user, "models.write_nodegroup")
@@ -221,12 +210,10 @@ def get_createable_resource_types(user):
 def get_resource_types_by_perm(user, perms):
     """
     returns a list of graphs for which a user has specific node permissions
-
     Arguments:
     user -- the user to check
     perms -- the permssion string eg: "read_nodegroup" or list of strings
     resource -- a resource instance to check if a user has permissions to that resource's type specifically
-
     """
 
     graphs = set()
@@ -240,11 +227,9 @@ def get_resource_types_by_perm(user, perms):
 def user_can_edit_model_nodegroups(user, resource):
     """
     returns a list of graphs of which a user can edit resource instances
-
     Arguments:
     user -- the user to check
     resource -- an instance of a model
-
     """
 
     return user_has_resource_model_permissions(user, ["models.write_nodegroup"], resource)
@@ -253,11 +238,9 @@ def user_can_edit_model_nodegroups(user, resource):
 def user_can_delete_model_nodegroups(user, resource):
     """
     returns a list of graphs of which a user can edit resource instances
-
     Arguments:
     user -- the user to check
     resource -- an instance of a model
-
     """
 
     return user_has_resource_model_permissions(user, ["models.delete_nodegroup"], resource)
@@ -266,12 +249,10 @@ def user_can_delete_model_nodegroups(user, resource):
 def user_has_resource_model_permissions(user, perms, resource):
     """
     Checks if a user has any explicit permissions to a model's nodegroups
-
     Arguments:
     user -- the user to check
     perms -- the permssion string eg: "read_nodegroup" or list of strings
     resource -- a resource instance to check if a user has permissions to that resource's type specifically
-
     """
 
     nodegroups = get_nodegroups_by_perm(user, perms)
@@ -282,12 +263,10 @@ def user_has_resource_model_permissions(user, perms, resource):
 def check_resource_instance_permissions(user, resourceid, permission):
     """
     Checks if a user has permission to access a resource instance
-
     Arguments:
     user -- the user to check
     resourceid -- the id of the resource
     permission -- the permission codename (e.g. 'view_resourceinstance') for which to check
-
     """
     result = {}
     try:
@@ -327,7 +306,6 @@ def check_resource_instance_permissions(user, resourceid, permission):
 def user_can_read_resource(user, resourceid=None):
     """
     Requires that a user be able to read an instance and read a single nodegroup of a resource
-
     """
 
     if user.is_authenticated:
@@ -350,7 +328,6 @@ def user_can_read_resource(user, resourceid=None):
 def user_can_edit_resource(user, resourceid=None):
     """
     Requires that a user be able to edit an instance and delete a single nodegroup of a resource
-
     """
 
     if user.is_authenticated:
@@ -375,7 +352,6 @@ def user_can_edit_resource(user, resourceid=None):
 def user_can_delete_resource(user, resourceid=None):
     """
     Requires that a user be permitted to delete an instance
-
     """
     if user.is_authenticated:
         if user.is_superuser:
@@ -402,7 +378,6 @@ def user_can_delete_resource(user, resourceid=None):
 def user_can_read_concepts(user):
     """
     Requires that a user is a part of the RDM Administrator group
-
     """
 
     if user.is_authenticated:
@@ -423,4 +398,13 @@ def user_is_resource_reviewer(user):
     Single test for whether a user is in the Resource Reviewer group
     """
 
-    return user.groups.filter(name='Resource Reviewer').exists()
+    return user.groups.filter(name="Resource Reviewer").exists()
+
+
+def user_created_transaction(user, transactionid):
+    if user.is_authenticated:
+        if user.is_superuser:
+            return True
+        if EditLog.objects.filter(transactionid=transactionid, userid=user.id).count() > 0:
+            return True
+    return False
