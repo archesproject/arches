@@ -239,9 +239,7 @@ class Writer(object):
     def write_resources(self, graph_id=None, resourceinstanceids=None, **kwargs):
         """
         Returns a list of dictionaries with the following format:
-
         {'name':file name, 'outputfile': a SringIO buffer of resource instance data in the specified format}
-
         """
 
         self.get_tiles(graph_id=graph_id, resourceinstanceids=resourceinstanceids, **kwargs)
@@ -249,9 +247,7 @@ class Writer(object):
     def write_resource_relations(self):
         """
         Returns a list of dictionaries with the following format:
-
         {'name':file name, 'outputfile': a SringIO buffer of resource relations data in the specified format}
-
         """
 
         pass
@@ -259,12 +255,10 @@ class Writer(object):
     def get_tiles(self, graph_id=None, resourceinstanceids=None, **kwargs):
         """
         Returns a dictionary of tiles keyed by their resourceinstanceid
-
         {
             'resourcs instance UUID': [tile list],
             ...
         }
-
         """
 
         user = kwargs.get("user", None)
