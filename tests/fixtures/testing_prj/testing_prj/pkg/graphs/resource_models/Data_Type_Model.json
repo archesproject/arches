@@ -615,7 +615,7 @@
             "config": {},
             "deploymentdate": null,
             "deploymentfile": null,
-            "description": "Testing model created for 4.3 testing.  \\nIncludes data types: Strings, Concepts, Domains, Images, Dates, Number, Boolean, Resource instance type, Node data type.  Also all three flavors of reports and descriptor function.\\n", 
+            "description": "Testing model created for 4.3 testing.  \\nIncludes data types: Strings, Concepts, Domains, Images, Dates, Number, Boolean, Resource instance type, Node data type.  Also all three flavors of reports and descriptor function.\\n",
             "edges": [
                 {
                     "description": null,
@@ -882,17 +882,21 @@
             "functions_x_graphs": [
                 {
                     "config": {
-                        "description": {
-                            "nodegroup_id": "46f4da0c-95bd-11e8-8f87-acde48001122",
-                            "string_template": " <rich text widget>"
-                        },
-                        "map_popup": {
-                            "nodegroup_id": "46f4da0c-95bd-11e8-8f87-acde48001122",
-                            "string_template": "<rich text widget>"
-                        },
-                        "name": {
-                            "nodegroup_id": "46f4da0c-95bd-11e8-8f87-acde48001122",
-                            "string_template": " <text widget>"
+                        "module": "arches.app.functions.primary_descriptors",
+                        "class_name": "PrimaryDescriptorsFunction",
+                        "descriptor_types": {
+                            "description": {
+                                "nodegroup_id": "46f4da0c-95bd-11e8-8f87-acde48001122",
+                                "string_template": " <rich text widget>"
+                            },
+                            "map_popup": {
+                                "nodegroup_id": "46f4da0c-95bd-11e8-8f87-acde48001122",
+                                "string_template": "<rich text widget>"
+                            },
+                            "name": {
+                                "nodegroup_id": "46f4da0c-95bd-11e8-8f87-acde48001122",
+                                "string_template": " <text widget>"
+                            }
                         },
                         "triggering_nodegroups": []
                     },
@@ -902,9 +906,15 @@
                 }
             ],
             "graphid": "330802c5-95bd-11e8-b7ac-acde48001122",
+            "publication": {
+                "graph_id": "330802c5-95bd-11e8-b7ac-acde48001122",
+                "notes": "Initial migration.",
+                "publicationid": "d5419599-fece-4dd6-8fb7-89df264ba7bc",
+                "published_time": "2022-03-22T13:29:06.593",
+                "user_id": null
+            },
             "iconclass": "",
             "is_editable": false,
-            "isactive": true,
             "isresource": true,
             "jsonldcontext": null,
             "name": "Data Type Testing Model",

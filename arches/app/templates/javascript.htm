@@ -189,6 +189,7 @@
                 from_sparql_endpoint: "{% url 'from_sparql_endpoint' 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa' %}",
                 search_sparql_endpoint: "{% url 'search_sparql_endpoint' %}",
                 confirm_delete: "{% url 'confirm_delete' 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa' %}",
+                search_home: "{% url 'search_home' %}",
                 search_terms: "{% url 'search_terms' %}",
                 search_results: "{% url 'search_results' %}",
                 export_results: "{% url 'export_results' %}",
@@ -240,6 +241,8 @@
                 get_domain_connections: function(graphid){return "{% url 'get_domain_connections' 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa' %}".replace('aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa', graphid)},
                 clone_graph: function(graphid){return "{% url 'clone_graph' 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa' %}".replace('aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa', graphid)},
                 export_graph: function(graphid){return "{% url 'export_graph' 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa' %}".replace('aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa', graphid)},
+                publish_graph: function(graphid){return "{% url 'publish_graph' 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa' %}".replace('aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa', graphid)},
+                unpublish_graph: function(graphid){return "{% url 'unpublish_graph' 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa' %}".replace('aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa', graphid)},
                 delete_graph: function(graphid){return "{% url 'delete_graph' 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa' %}".replace('aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa', graphid)},
                 delete_instances: function(graphid){return "{% url 'delete_instances' 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa' %}".replace('aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa', graphid)},
                 export_mapping_file: function(graphid){return "{% url 'export_mapping_file' 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa' %}".replace('aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa', graphid)},
@@ -256,6 +259,9 @@
                 api_card: "{% url 'api_card' 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa' %}".replace('aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa', ''),
                 api_tiles: function (tileid) {
                     return "{% url 'api_tiles' 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa' %}".replace('aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa', tileid)
+                },
+                api_nodegroup: function (nodegroupid) {
+                    return "{% url 'api_nodegroup' 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa' %}".replace('aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa', nodegroupid)
                 },
                 api_nodes: function (nodeid) {
                     return "{% url 'api_nodes' 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa' %}".replace('aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa', nodeid)
@@ -275,6 +281,7 @@
                 iiifannotationnodes: "{% url 'iiifannotationnodes' %}",
                 validatejson: "{% url 'validatejson' 'aaaa'%}".replace('aaaa', ''),
                 get_dsl: "{% url 'get_dsl' %}",
+                transform_edtf_for_tile: "{% url 'transform_edtf_for_tile' %}",
                 {% block urls %}{% endblock urls %}
             },
             geocoderPlaceHolder: "{% trans 'Find an address...' %}",
@@ -315,6 +322,10 @@
             resourceCopyFailed: {
                 title: "{% trans 'Resource Copy Failed...'%}",
                 text: "{% trans 'Sorry! The copy request failed. Please try again.  Contact your system administrator if the problem persists.' %}"
+            },
+            resourceHasUnpublishedGraph: {
+                title: "{% trans 'This resource is based on an unpublished graph.' %}",
+                text: "{% trans 'To continue, please ensure the graph is published.' %}"
             },
             mapboxApiKey: '{{ map_info.mapbox_api_key }}',
             activeLanguage: '{{ app_settings.ACTIVE_LANGUAGE }}',

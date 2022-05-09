@@ -51,6 +51,8 @@ class JSONSerializer(object):
         self.exclude = options.pop("exclude", None)
         self.use_natural_keys = options.pop("use_natural_keys", False)
         self.geom_format = options.pop("geom_format", "wkt")
+        self.force_recalculation = options.pop("force_recalculation", False)
+
         return self.handle_object(obj, **self.options)
 
     def serialize(self, obj, **options):
@@ -63,10 +65,11 @@ class JSONSerializer(object):
         sort_keys = options.pop("sort_keys", True)
         options.pop("fields", None)
         options.pop("exclude", None)
+        options.pop("force_recalculation", False)
         return json.dumps(obj, cls=DjangoJSONEncoder, sort_keys=sort_keys, **options.copy())
 
     def handle_object(self, object, **kwargs):
-        """ Called to handle everything, looks for the correct handling """
+        """Called to handle everything, looks for the correct handling"""
         # print type(object)
         # print object
         # print inspect.isclass(object)
@@ -84,8 +87,17 @@ class JSONSerializer(object):
             return self.handle_list(object)
         elif isinstance(object, Model):
             if hasattr(object, "serialize"):
-                exclude = self.exclude
-                return self.handle_object(getattr(object, "serialize")(**kwargs), **kwargs)
+                serialize_function = getattr(object, "serialize")
+
+                # if the model's `serialize` method leverages a cache, force it recalculate all fields instead if arg is supplied
+                if self.force_recalculation:
+                    signature = inspect.signature(serialize_function)
+
+                    if "force_recalculation" in [parameter.name for parameter in signature.parameters.values()]:
+                        kwargs["force_recalculation"] = True
+                        # return self.handle_object(serialize_function(**kwargs), **kwargs)
+
+                return self.handle_object(serialize_function(**kwargs), **kwargs)
             else:
                 return self.handle_model(object, **kwargs)
             # return PythonSerializer().serialize([object],**self.options.copy())[0]['fields']

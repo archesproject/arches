@@ -35,14 +35,13 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                 <div class="layer-list">
                     <!-- Layer Filter -->
                     <div class="list-filter" data-bind="">
-                        <input type="text" class="form-control" style="" placeholder="Find a layer..." data-bind="value: listFilter, valueUpdate: 'keyup'">
+                        <input type="text" class="form-control" placeholder="Find a layer..." data-bind="value: listFilter, valueUpdate: 'keyup'">
 
                         <!-- Clear Search -->
                         <span class="clear-node-search" data-bind="click: function () { listFilter(''); }"><i class="fa fa-times-circle"></i></span>
                     </div>
-
                 </div>
-                <div class="report-image-grid relative">
+                <div class="layer-list">
                     <div class="grid">
                         <!-- ko foreach: { data: listItems(), as: "item" } -->
                         <div class="library-card selected-card" data-bind="click: function () { $parent.selection(item) }, css: {'selected': $parent.selection() === item}">
@@ -50,10 +49,10 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                             <div class="library-icon">
                                 <span class="icon-wrap icon-wrap-sm icon-circle branch-icon bg-primary">
                                     <!-- ko if: item.nodeid -->
-                                    <i class="" data-bind="css: item.config.layerIcon() || item.layer.icon"></i>
+                                    <i data-bind="css: item.config.layerIcon() || item.layer.icon"></i>
                                     <!-- /ko -->
                                     <!-- ko if: !item.nodeid -->
-                                    <i class="" data-bind="css: item.icon"></i>
+                                    <i data-bind="css: item.icon"></i>
                                     <!-- /ko -->
                                 </span>
                             </div>
@@ -80,10 +79,10 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
             </div>
 
             <!-- Basemap/Overlays Config -->
-            <div class="card-form-preview-container">
+            <div class="card-form-preview-container" style="height: calc(100vh + 100px);">
 
                 <!-- Header -->
-                <div class="category-header" style="">
+                <div class="category-header">
                     <!-- Resource/Graph Toggle -->
                     <div style="display: block;">
                         <a id="" class="category-title" href="" data-bind="css: { 'active': selectedList() && selectedList() === geomNodes  }, click: function() { selectedList(geomNodes); }">{% trans "Resource Layers" %}</a>
@@ -175,7 +174,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 
                             <!-- Service Styling -->
                             <div class="map-service-container">
-                                <div class="">
+                                <div>
                                     <div class="tab-base map-service-tabs">
 
                                         <!-- Resource Styling Tabs -->
@@ -183,7 +182,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                                             <li class="active">
                                                 <a class="config-title-tab mar-no" data-toggle="tab" href="#settings-panel" aria-expanded="false"><i class="ion-ios-settings-strong"></i> {% trans "Settings" %}</a>
                                             </li>
-                                            <li class="">
+                                            <li>
                                                 <a class="config-title-tab mar-no" data-toggle="tab" href="#styling-panel" aria-expanded="false"><i class="ion-image"></i> {% trans "Service Styling" %}</a>
                                             </li>
                                         </ul>
@@ -263,7 +262,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 
                                             <div id="styling-panel" class="tab-pane fade">
                                                 <div class="row" style="margin-top: -5px; margin-left: -5px; margin-right: -5px; margin-bottom: 10px;">
-                                                    <div class="" data-bind="codemirror: { value: selectedLayerJSON, mode: { name: 'javascript', json: true }, theme: 'monokai' }"></div>
+                                                    <div data-bind="codemirror: { value: selectedLayerJSON, mode: { name: 'javascript', json: true }, theme: 'monokai' }"></div>
                                                 </div>
                                             </div>
 

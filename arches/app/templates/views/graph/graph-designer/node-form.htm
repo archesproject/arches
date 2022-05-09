@@ -47,6 +47,20 @@
                         </div>
                     </div>
 
+                    <div class="row widget-container">
+                        <div class="form-group">
+                            <div class="relative">
+                                <label class="col-xs-12 control-label widget-input-label">
+                                    {% trans "Node Name Alias" %}
+                                </label>
+                            </div>
+
+                            <div class="col-xs-12">
+                                <input type="text" disabled placeholder="{% trans 'Unique alias generated from this node\'s name' %}"class="form-control" data-bind="textInput: node().alias">
+                            </div>
+                        </div>
+                    </div>
+
                     <!-- ko if: hasOntology -->
                     <!-- ko if: !node().istopnode -->
                     <div class="row widget-container">

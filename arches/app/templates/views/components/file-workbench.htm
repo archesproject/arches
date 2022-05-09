@@ -22,9 +22,9 @@
     <span class="map-sidebar-text">{% trans "Edit" %}</span>
 </div>
 <!--ko foreach: fileFormatRenderers-->
-        <!--ko if: ko.unwrap($parent.displayContent) && $parent.displayContent().renderer && ($parent.displayContent().renderer.id === $data.id) -->
+        <!--ko if: ko.unwrap($parent.displayContent) && $parent.displayContent().renderer && ($parent.displayContent().renderer.id === $data.id) && $parent.rendererComponentName -->
             <!-- ko component: {
-                name: $data.name,
+                name: $parent.rendererComponentName,
                 params: {
                     fileViewer: $parent,
                     card: $parent.card,
@@ -48,9 +48,9 @@
             <div id="hidden-dz-previews" style="display:none"></div>
             <!--ko if: displayContent() -->
                         <!--ko foreach: fileFormatRenderers-->
-                            <!--ko if: $data.id && $parent.displayContent().renderer && $parent.displayContent().renderer.id === $data.id -->
+                            <!--ko if: $data.id && $parent.displayContent().renderer && $parent.displayContent().renderer.id === $data.id && $parent.rendererComponentName -->
                                 <!-- ko component: {
-                                    name: $data.name,
+                                    name: $parent.rendererComponentName,
                                     params: {
                                         fileViewer: $parent,
                                         card: $parent.card,
@@ -198,11 +198,12 @@
 
 {% block sidepanel %}
 <!--ko if: activeTab() === 'manage' -->
-<div class="workbench-header-buffer">
-    <div class="workbench-card-sidepanel-header-container">
-        <h4 class="workbench-card-sidepanel-header" data-bind="click: hideSidePanel, text: 'Manage Files/Loaders'"></h4>
-    </div>
+<div class="workbench-card-sidepanel-header-container">
+    <h4 class="workbench-card-sidepanel-header" data-bind="click: hideSidePanel, text: 'Manage Files/Loaders'"></h4>
 </div>
+<div class="workbench-card-sidepanel-border"></div>
+<div class="workbench-card-sidepanel-body">
+
 <div class="file-workbench-filter">
     <h2 class="file-workbench-filter-header">{% trans "File Filter" %}</h2>
     <input type="text" class="form-control" style="width: 100%; height:initial" placeholder="{% trans 'e.g.: .txt' %}" data-bind="textInput: filter"></input>
@@ -260,14 +261,16 @@
         <button style="margin-right: 3px;" class="btn btn-lg btn-workbench btn-primary" data-bind="click: function(){$parent.applyRendererToStaged($parent.getFileFormatRenderer(managerRenderer()))}"><i class="fa fa-gears"></i> {% trans 'Apply to Selected Files' %}</button>
     </div>
 </div>
+</div>
 <!--/ko-->
 
 <!--ko if: activeTab() === 'edit' -->
-<div class="workbench-header-buffer">
-    <div class="workbench-card-sidepanel-header-container">
-        <h4 class="workbench-card-sidepanel-header" data-bind="click: hideSidePanel, text: card.model.name"></h4>
-    </div>
+<div class="workbench-card-sidepanel-header-container">
+    <h4 class="workbench-card-sidepanel-header" data-bind="click: hideSidePanel, text: card.model.name"></h4>
 </div>
+<div class="workbench-card-sidepanel-border"></div>
+
+<div class="workbench-card-sidepanel-body">
 <div class="file-workbench-filter">
     <h2 class="file-workbench-filter-header">{% trans 'File Filter' %}</h2>
     <input type="text" class="form-control" style="width: 100%; height:initial" placeholder="{% trans 'e.g.: .txt' %}" data-bind="textInput: filter"></input>
@@ -285,8 +288,7 @@
 </div>
 <div class='file-workbench-filecount' data-bind='text: card.tiles().length + "{% trans ' files uploaded' %}"'></div>
 
-<div class="workbench-sidepanel-card-container" data-bind="css: card.model.cssclass">
-
+<div data-bind="css: card.model.cssclass">
     <!-- ko if: reviewer && provisionalTileViewModel.selectedProvisionalEdit() -->
     <div class="edit-message-container">
         <span>{% trans 'Currently showing edits by' %}</span>
@@ -455,13 +457,14 @@
         </div>
     </div>
 </div>
+</div>
 
 <!--/ko-->
 
 <!--ko foreach: fileFormatRenderers-->
-        <!--ko if: ko.unwrap($parent.displayContent) && $parent.displayContent().renderer && ($parent.displayContent().renderer.id === $data.id) -->
+        <!--ko if: ko.unwrap($parent.displayContent) && $parent.displayContent().renderer && ($parent.displayContent().renderer.id === $data.id) && $parent.rendererComponentName -->
     <!-- ko component: {
-        name: $data.name,
+        name: $parent.rendererComponentName,
         params: {
             fileViewer: $parent,
             card: $parent.card,

@@ -36,7 +36,8 @@ from arches.app.models.system_settings import settings
 from arches.app.search.search_engine_factory import SearchEngineInstance as se
 from arches.app.search.mappings import TERMS_INDEX, RESOURCE_RELATIONS_INDEX, RESOURCES_INDEX
 from arches.app.search.elasticsearch_dsl_builder import Query, Bool, Terms, Nested
-from arches.app.utils import import_class_from_string
+from arches.app.tasks import index_resource
+from arches.app.utils import import_class_from_string, task_management
 from arches.app.utils.label_based_graph import LabelBasedGraph
 from arches.app.utils.label_based_graph_v2 import LabelBasedGraph as LabelBasedGraphV2
 from guardian.shortcuts import assign_perm, remove_perm
@@ -71,11 +72,12 @@ class Resource(models.ResourceInstance):
         self.tiles = []
 
     def get_descriptor(self, descriptor):
-        module = importlib.import_module("arches.app.functions.primary_descriptors")
-        PrimaryDescriptorsFunction = getattr(module, "PrimaryDescriptorsFunction")()
-        functionConfig = models.FunctionXGraph.objects.filter(graph_id=self.graph_id, function__functiontype="primarydescriptors")
-        if len(functionConfig) == 1:
-            return PrimaryDescriptorsFunction.get_primary_descriptor_from_nodes(self, functionConfig[0].config[descriptor])
+        graph_function = models.FunctionXGraph.objects.filter(
+            graph_id=self.graph_id, function__functiontype="primarydescriptors"
+        ).select_related("function")
+        if len(graph_function) == 1:
+            module = graph_function[0].function.get_class_module()()
+            return module.get_primary_descriptor_from_nodes(self, graph_function[0].config["descriptor_types"][descriptor])
         else:
             return "undefined"
 
@@ -117,10 +119,7 @@ class Resource(models.ResourceInstance):
         index -- True(default) to index the resource, otherwise don't index the resource
 
         """
-        graph = models.GraphModel.objects.get(graphid=self.graph_id)
-        if graph.isactive is False:
-            message = _("This model is not yet active; unable to save.")
-            raise ModelInactiveError(message)
+        # TODO: 7783 cbyrd throw error if graph is unpublished
         request = kwargs.pop("request", None)
         user = kwargs.pop("user", None)
         index = kwargs.pop("index", True)
@@ -242,10 +241,15 @@ class Resource(models.ResourceInstance):
             for term in terms:
                 se.index_data("terms", body=term["_source"], id=term["_id"])
 
+            celery_worker_running = task_management.check_if_celery_available()
+
             for index in settings.ELASTICSEARCH_CUSTOM_INDEXES:
-                es_index = import_class_from_string(index["module"])(index["name"])
-                doc, doc_id = es_index.get_documents_to_index(self, document["tiles"])
-                es_index.index_document(document=doc, id=doc_id)
+                if celery_worker_running and index.get("should_update_asynchronously"):
+                    index_resource.apply_async([index["module"], index["name"], self.pk, [tile.pk for tile in document["tiles"]]])
+                else:
+                    es_index = import_class_from_string(index["module"])(index["name"])
+                    doc, doc_id = es_index.get_documents_to_index(self, document["tiles"])
+                    es_index.index_document(document=doc, id=doc_id)
 
     def get_documents_to_index(self, fetchTiles=True, datatype_factory=None, node_datatypes=None):
         """
@@ -312,8 +316,8 @@ class Resource(models.ResourceInstance):
 
         for tile in document["tiles"]:
             for nodeid, nodevalue in tile.data.items():
-                datatype = node_datatypes[nodeid]
                 if nodevalue != "" and nodevalue != [] and nodevalue != {} and nodevalue is not None:
+                    datatype = node_datatypes[nodeid]
                     datatype_instance = datatype_factory.get_instance(datatype)
                     datatype_instance.append_to_document(document, nodevalue, nodeid, tile)
                     node_terms = datatype_instance.get_search_terms(nodevalue, nodeid)
@@ -342,8 +346,8 @@ class Resource(models.ResourceInstance):
                     for user, edit in provisionaledits.items():
                         if edit["status"] == "review":
                             for nodeid, nodevalue in edit["value"].items():
-                                datatype = node_datatypes[nodeid]
                                 if nodevalue != "" and nodevalue != [] and nodevalue != {} and nodevalue is not None:
+                                    datatype = node_datatypes[nodeid]
                                     datatype_instance = datatype_factory.get_instance(datatype)
                                     datatype_instance.append_to_document(document, nodevalue, nodeid, tile, True)
                                     node_terms = datatype_instance.get_search_terms(nodevalue, nodeid)
@@ -376,10 +380,7 @@ class Resource(models.ResourceInstance):
         # - that the index for the to-be-deleted resource gets deleted
 
         permit_deletion = False
-        graph = models.GraphModel.objects.get(graphid=self.graph_id)
-        if graph.isactive is False:
-            message = _("This model is not yet active; unable to delete.")
-            raise ModelInactiveError(message)
+        # TODO: 7783 cbyrd throw error if graph is unpublished
         if user != {}:
             user_is_reviewer = user_is_resource_reviewer(user)
             if user_is_reviewer is False:
@@ -499,7 +500,7 @@ class Resource(models.ResourceInstance):
                 models.GraphModel.objects.all()
                 .exclude(pk=settings.SYSTEM_SETTINGS_RESOURCE_MODEL_ID)
                 .exclude(isresource=False)
-                .exclude(isactive=False)
+                .exclude(publication=None)
             )
 
         graph_lookup = {
@@ -539,7 +540,7 @@ class Resource(models.ResourceInstance):
             resourceinstanceid=self.resourceinstanceid, start=start, limit=limit, resourceinstance_graphid=resourceinstance_graphid,
         )
 
-        
+
 
         ret["total"] = resource_relations["hits"]["total"]
         instanceids = set()
@@ -628,7 +629,7 @@ class Resource(models.ResourceInstance):
 
         return JSONSerializer().serializeToPython(ret)
 
-    def to_json(self, compact=True, hide_empty_nodes=False, user=None, perm=None, version=None):
+    def to_json(self, compact=True, hide_empty_nodes=False, user=None, perm=None, version=None, hide_hidden_nodes=False):
         """
         Returns resource represented as disambiguated JSON graph
 
@@ -637,9 +638,13 @@ class Resource(models.ResourceInstance):
         hide_empty_nodes -- type bool: hide nodes without data
         """
         if version is None:
-            return LabelBasedGraph.from_resource(resource=self, compact=compact, hide_empty_nodes=hide_empty_nodes, user=user, perm=perm)
+            return LabelBasedGraph.from_resource(
+                resource=self, compact=compact, hide_empty_nodes=hide_empty_nodes, user=user, perm=perm, hide_hidden_nodes=hide_hidden_nodes
+            )
         elif version == "beta":
-            return LabelBasedGraphV2.from_resource(resource=self, compact=compact, hide_empty_nodes=hide_empty_nodes, user=user, perm=perm)
+            return LabelBasedGraphV2.from_resource(
+                resource=self, compact=compact, hide_empty_nodes=hide_empty_nodes, user=user, perm=perm, hide_hidden_nodes=hide_hidden_nodes
+            )
 
     @staticmethod
     def to_json__bulk(resources, compact=True, hide_empty_nodes=False, version=None):
@@ -719,9 +724,19 @@ def is_uuid(value_to_test):
         return False
 
 
-class ModelInactiveError(Exception):
+class PublishedModelError(Exception):
     def __init__(self, message, code=None):
-        self.title = _("Model Inactive Error")
+        self.title = _("Published Model Error")
+        self.message = message
+        self.code = code
+
+    def __str__(self):
+        return repr(self.message)
+
+
+class UnpublishedModelError(Exception):
+    def __init__(self, message, code=None):
+        self.title = _("Unpublished Model Error")
         self.message = message
         self.code = code
 

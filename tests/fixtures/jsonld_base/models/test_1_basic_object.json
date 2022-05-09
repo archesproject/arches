@@ -66,9 +66,15 @@
             ],
             "functions_x_graphs": [],
             "graphid": "bf734b4e-f6b5-11e9-8f09-a4d18cec433a",
+            "publication": {
+                "graph_id": "bf734b4e-f6b5-11e9-8f09-a4d18cec433a",
+                "notes": "Initial migration.",
+                "publicationid": "b81fc691-1435-44d2-a8d3-01cd100ba0aa",
+                "published_time": "2022-03-22T13:29:06.593",
+                "user_id": null
+            },
             "iconclass": "",
             "is_editable": false,
-            "isactive": true,
             "isresource": true,
             "jsonldcontext": null,
             "name": "test_1_basic_object",

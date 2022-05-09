@@ -81,25 +81,6 @@
             <div id="meta-card" class="graph-settings-panel-body fade in">
 
                 <form class="widgets">
-                    <div class="row widget-container">
-                        <div class="form-group">
-                            <div class="relative">
-                                <label class="col-xs-12 control-label widget-input-label"> {% trans "Status" %} </label>
-                            </div>
-
-                            <div class="col-xs-12">
-                                <div class="">
-                                    <label data-bind="css: { 'active': graph.isactive() }, click: function () { graph.isactive(true) }" class="form-radio form-normal form-text">
-                                        <input type="radio" name="stat-w-label" data-bind="checked: graph.isactive" value="true"> {% trans "Active" %}
-                                    </label>
-                                    <label data-bind="css: { 'active': !graph.isactive() }, click: function () { graph.isactive(false) }" class="form-radio form-normal form-text">
-                                        <input type="radio" name="stat-w-label" data-bind="checked: graph.isactive" value="false"> {% trans "Inactive" %}
-                                    </label>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
                     <!-- ko ifnot: graph.isresource() -->
                     <div class="row widget-container data-type">
                         <div class="form-group">

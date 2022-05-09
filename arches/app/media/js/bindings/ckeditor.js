@@ -15,86 +15,92 @@ define([
     * @constructor
     * @name ckeditor
     */
-    ko.bindingHandlers.ckeditor = {
-        init: function (element, valueAccessor, allBindings, viewModel, bindingContext) {
-            var modelValue = valueAccessor();
-            var value = ko.utils.unwrapObservable(valueAccessor());
-            const language = allBindings.get('language') || ko.observable(arches.activeLanguage);
-            const direction = allBindings.get('direction') || ko.observable(arches.activeLanguageDir);
-            var $element = $(element);
-            var options = {bodyId: 'ckeditor'};
 
-            if (allBindings.has('ckeditorOptions')){
-                var opts = allBindings.get('ckeditorOptions');
-                options = (typeof opts === 'object') ? opts : {};
-            };
+    const initialize = function (element, valueAccessor, allBindings) {
+        var modelValue = valueAccessor();
+        var value = ko.utils.unwrapObservable(valueAccessor());
+        const language = allBindings.get('language') || ko.observable(arches.activeLanguage);
+        const direction = allBindings.get('direction') || ko.observable(arches.activeLanguageDir);
+        var $element = $(element);
+        var options = {bodyId: 'ckeditor'};
+        const languageList = [];
+        
+        for(const lang of Object.keys(arches.languages)){
+            languageList.push(`${lang}:${arches.languages[lang]}`)
+        }
 
-            const languageList = [];
-            for(const lang of Object.keys(arches.languages)){
-                languageList.push(`${lang}:${arches.languages[lang]}`)
+        CKEDITOR.config.language_list = languageList;
+        CKEDITOR.config.language = language();
+        CKEDITOR.config.contentsLangDirection = direction();
+
+        direction.subscribe(newValue => {
+            CKEDITOR.config.contentsLangDirection = newValue;
+            CKEDITOR.replace('ckeditor', CKEDITOR.config);
+        });
+
+        language.subscribe(newValue => {
+            CKEDITOR.config.language = newValue;
+        });
+
+        if (allBindings.has('ckeditorOptions')){
+            var opts = allBindings.get('ckeditorOptions');
+            options = (typeof opts === 'object') ? opts : {};
+        };
+
+        // Set initial value and create the CKEditor
+        $element.html(value);
+        var editor = $element.ckeditor(options).editor;
+
+        allBindings()?.attr?.disabled?.subscribe(disabled => {
+            if(CKEDITOR.currentInstance && disabled === true || disabled === false) {
+                editor?.setReadOnly(disabled);
             }
+        });
 
-            CKEDITOR.config.language_list = languageList;
-            CKEDITOR.config.language = language();
-            CKEDITOR.config.contentsLangDirection = direction();
+        // bind to change events and link it to the observable
+        var onChange = function (e) {
+            var self = this;
 
-            direction.subscribe(newValue => {
-                CKEDITOR.config.contentsLangDirection = newValue;
-                CKEDITOR.replace('ckeditor', CKEDITOR.config);
-            });
-
-            language.subscribe(newValue => {
-                CKEDITOR.config.language = newValue;
-            });
-
-            // Set initial value and create the CKEditor
-            $element.html(value);
-            var editor = $element.ckeditor(options).editor;
-
-            allBindings()?.attr?.disabled?.subscribe(disabled => {
-                if(CKEDITOR.currentInstance && disabled === true || disabled === false) {
-                    editor?.setReadOnly(disabled);
+            if (ko.isWriteableObservable(self)) {
+                var newValue = $(e.listenerData).val();
+                if (!((self() === null || self() === "") && (newValue === null || newValue === ""))) {
+                    self(newValue);
                 }
-            });
+            }
+            return true;
+        };
+        editor.on('change', onChange, modelValue, element);
+        editor.on('afterCommandExec', (event => {
+            if(event.data.name == 'language'){
+                language(event.data.commandData);
+            }
+        }), modelValue, element);
 
-            // bind to change events and link it to the observable
-            var onChange = function (e) {
-                var self = this;
+        modelValue.subscribe(function(newValue){
+            var self = this;
+            var $element = $(element);
+            var newValue = ko.utils.unwrapObservable(valueAccessor());
+            if (editor.getData() != newValue) {
+                // remove the listener and then add back to prevent `setData`
+                // from triggering the onChange event
+                editor.removeListener('change', onChange );
+                editor.setData(newValue);
+                editor.on('change', onChange, modelValue, element);
+            }
+        }, this)
 
-                if (ko.isWriteableObservable(self)) {
-                    var newValue = $(e.listenerData).val();
-                    if (!((self() === null || self() === "") && (newValue === null || newValue === ""))) {
-                        self(newValue);
-                    }
-                }
-                return true;
-            };
-            editor.on('change', onChange, modelValue, element);
-            editor.on('afterCommandExec', (event => {
-                if(event.data.name == 'language'){
-                    language(event.data.commandData);
-                }
-            }), modelValue, element);
+        // Handle disposal if KO removes an editor through template binding
+        ko.utils.domNodeDisposal.addDisposeCallback(element, function () {
+            editor.updateElement();
+            editor.destroy();
+        });
+    };
 
-            modelValue.subscribe(function(newValue){
-                var self = this;
-                var $element = $(element);
-                var newValue = ko.utils.unwrapObservable(valueAccessor());
-                if (editor.getData() != newValue) {
-                    // remove the listener and then add back to prevent `setData`
-                    // from triggering the onChange event
-                    editor.removeListener('change', onChange );
-                    editor.setData(newValue);
-                    editor.on('change', onChange, modelValue, element);
-                }
-            }, this)
-
-
-            // Handle disposal if KO removes an editor through template binding
-            ko.utils.domNodeDisposal.addDisposeCallback(element, function () {
-                editor.updateElement();
-                editor.destroy();
-            });
+    ko.bindingHandlers.ckeditor = {
+        init: (element, valueAccessor, allBindings) => {
+            require(['ckeditor-jquery', 'ckeditor'], () => {
+                initialize(element, valueAccessor, allBindings);
+            })
         }
     };
 

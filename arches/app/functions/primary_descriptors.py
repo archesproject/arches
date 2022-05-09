@@ -7,7 +7,12 @@ from arches.app.datatypes.datatypes import DataTypeFactory
 from django.utils.translation import ugettext as _
 
 
-class PrimaryDescriptorsFunction(BaseFunction):
+class AbstractPrimaryDescriptorsFunction(BaseFunction):
+    def get_primary_descriptor_from_nodes(self, resource, config):
+        pass
+
+
+class PrimaryDescriptorsFunction(AbstractPrimaryDescriptorsFunction):
     def get_primary_descriptor_from_nodes(self, resource, config):
         datatype_factory = None
         try:

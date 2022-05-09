@@ -141,12 +141,21 @@ define([
             return values;
         };
 
+        this.selectWorkflowTile = function(tile) {  // used for cardinality 'n' cards in workflows
+            tile.selected(true);
+            self.tile = tile;
+            params.dirty(true);
+        }
+
         this.saveTile = function(callback) {
             self.loading(true);
             self.tile.transactionId = params.form?.workflowId || undefined;
             self.tile.resourceinstance_id = self.tile.resourceinstance_id || ko.unwrap(params.form?.resourceId);
             self.tile.save(function(response) {
                 self.loading(false);
+                if(params?.form?.error){
+                    params.form.error(response.responseJSON.message);
+                }
                 params.pageVm.alert(
                     new AlertViewModel(
                         'ep-alert-red',
@@ -181,6 +190,11 @@ define([
             params.form.save = saveTileInWorkflow;
         }
 
+        if (params.renderContext === 'workflow') {
+            self.card.selected(true);  // cardinality 'n' cards will display appropriately
+            self.inResourceEditor = true;
+        }
+
         this.saveTileAddNew = function() {
             self.saveTile(function() {
                 window.setTimeout(function() {
@@ -207,6 +221,7 @@ define([
                 }
             }, function() {
                 self.loading(false);
+                if (typeof self.onDeleteSuccess === 'function') self.onDeleteSuccess();
                 if (params.form.onDeleteSuccess) {
                     params.form.onDeleteSuccess(self.tile);
                 }

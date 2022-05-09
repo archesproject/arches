@@ -127,9 +127,15 @@
             ],
             "functions_x_graphs": [],
             "graphid": "d5456066-107c-11ea-b7e9-acde48001122",
+            "publication": {
+                "graph_id": "d5456066-107c-11ea-b7e9-acde48001122",
+                "notes": "Initial migration.",
+                "publicationid": "aab38a3a-4dc9-4bea-b1cb-3d3454e32015",
+                "published_time": "2022-03-22T13:29:06.593",
+                "user_id": null
+            },
             "iconclass": "",
             "is_editable": false,
-            "isactive": true,
             "isresource": true,
             "jsonldcontext": null,
             "name": "test string to path",
