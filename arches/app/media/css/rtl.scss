@@ -11,6 +11,28 @@
     }
 }
 
+.side-column-crud-container {
+    border-left: 1px solid #ddd;
+    border-right: none;
+    .clear-node-search {
+        left: 10px;
+        right: auto;
+    }
+    .grid { 
+        .library-card {
+            border-right: 5px solid transparent;
+            &.selected.selected-card {
+                border-right: 5px solid steelblue;
+                border-left: none;
+            }
+            &:hover {
+                border-right: 5px solid steelblue;
+                border-left: none;
+            }
+        }
+    }
+}
+
 .search-type-btn-popup {
     border-left: none;
     border-right: 1px solid #BBD1EA; 
