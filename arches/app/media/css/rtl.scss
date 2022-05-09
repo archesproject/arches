@@ -20,6 +20,7 @@
     }
     .grid { 
         .library-card {
+            border-right: 5px solid transparent;
             &.selected.selected-card {
                 border-right: 5px solid steelblue;
                 border-left: none;
