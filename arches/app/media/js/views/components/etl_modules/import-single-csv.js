@@ -160,11 +160,11 @@ define([
                 self.formData.append('graphid', self.selectedGraph());
                 self.loading(true);
                 self.submit('start').then(data => {
-                    params.activeTab("import")
+                    params.activeTab("import");
                     self.submit('write').then(data => {
                         console.log(data.result);
                     }).fail(error => console.log(error));
-                }).fail(error => console.log(error))
+                }).fail(error => console.log(error));
             };
 
             this.validate =function(){

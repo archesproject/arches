@@ -133,17 +133,17 @@ define([
             this.init = function(){
                 const url = arches.urls.etl_manager + "?action=modules";
                 window.fetch(url).then(function(response){
-                        if(response.ok){
-                            return response.json();
+                    if(response.ok){
+                        return response.json();
                     }
-                    }).then(function(data){
-                        self.etlModules = data.map(function(etl){
-                            etl.alert = self.alert;
-                            require([etl.component]);
-                            return etl;
-                        });
-                        self.loading(false);
+                }).then(function(data){
+                    self.etlModules = data.map(function(etl){
+                        etl.alert = self.alert;
+                        require([etl.component]);
+                        return etl;
                     });
+                    self.loading(false);
+                });
                 this.activeTab("start");
             };
             this.init();
