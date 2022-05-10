@@ -6700,7 +6700,7 @@ th.notif-type {
 }
 
 .ep-form-toolbar div:nth-last-child(2) {
-    margin-right: auto;
+    // margin-right: auto;
 }
 
 .ep-form-toolbar-title {
@@ -8972,8 +8972,12 @@ a.mega-dropdown-toggle.disabled {
 .report-print-date {
     font-size: 11px;
     color: #999;
-    margin: 7px;
-    padding-right: 20px;
+}
+
+.report-print-date .toggle-container {
+    display: flex;
+    flex-direction: column;
+    margin: 0 -25px;
 }
 
 .report-toolbar {
@@ -15004,6 +15008,39 @@ ul.select2-choices:after {
 
 }
 
+.report-toolbar-preview {
+    .ep-form-toolbar-tools {
+        display: flex;
+        flex-direction: column;
+        align-items: flex-end;
+    }
+    .report-print-date {
+        margin: 0;
+        
+        .toggle-container {
+            flex-direction: row;
+            margin: 0;
+            padding: 0px;
+            padding-top: 5px;
+
+            &>div {
+                display: flex;
+                flex-direction: row;
+            }
+
+            .arches-toggle-sm {
+                margin: 0;
+            }
+
+            .arches-toggle-subtitle {
+                margin-left: 0;
+                padding-right: 0;
+            }
+        }
+    }
+    
+}
+
 #user-profile {
     .account-wrapper
     { 
@@ -15052,7 +15089,7 @@ ul.select2-choices:after {
         padding: 0;
     }
 
-    .profile-list {
+    .profile-listt {
         display: flex;
         width: 100%;
         padding: 40px 100px;
