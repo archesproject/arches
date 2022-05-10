@@ -21,7 +21,7 @@
             <div class="workflow-select-card-container">
                 <!-- ko foreach: {data: etlModules, as: 'etlmodule', noChildContext: true} -->
                     <!-- ko if: isImport() && (!moduleSearchString() || !!moduleSearchString() && etlmodule.name.toLowerCase().includes(moduleSearchString().toLowerCase()) ) -->
-                    <a href="#" data-bind="if: etlmodule.type === 'import', click: function() { selectModule(etlmodule) }">
+                    <a href="#" data-bind="if: etlmodule.etl_type === 'import', click: function() { selectModule(etlmodule) }">
                         <div data-bind="style: {'background-color': etlmodule.config.bgColor}" class="workflow-select-card">
                             <h4 class="workflow-select-title" data-bind="text: etlmodule.name"></h4>
                             <div data-bind="style: {'background-color': etlmodule.config.circleColor}" class="workflow-select-wf-circle">
@@ -32,7 +32,7 @@
                     </a>
                     <!-- /ko -->
                     <!-- ko if: !isImport() && (!moduleSearchString() || !!moduleSearchString() && etlmodule.name.toLowerCase().includes(moduleSearchString().toLowerCase()) )-->
-                    <a href="#" data-bind="if: etlmodule.type === 'export', click: function() { selectModule(etlmodule) }">
+                    <a href="#" data-bind="if: etlmodule.etl_type === 'export', click: function() { selectModule(etlmodule) }">
                         <div data-bind="style: {'background-color': etlmodule.config.bgColor}" class="workflow-select-card">
                             <h4 class="workflow-select-title" data-bind="text: etlmodule.name"></h4>
                             <div data-bind="style: {'background-color': etlmodule.config.circleColor}" class="workflow-select-wf-circle">
