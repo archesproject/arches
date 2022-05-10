@@ -1,6 +1,7 @@
 import logging
 from django.db import connection
 from django.forms.models import model_to_dict
+from django.http import HttpResponse
 from django.views.generic import View
 from arches.app.models.models import ETLModule, LoadEvent, LoadStaging
 from arches.app.utils.response import JSONResponse, JSONErrorResponse
@@ -59,8 +60,10 @@ class ETLManagerView(View):
         import_module = ETLModule.objects.get(pk=moduleid).get_class_module()(request)
         import_function = getattr(import_module, action)
         response = import_function(request=request)
-        if response["success"]:
+        if response["success"] and "raw" not in response:
             ret = {"result": response["data"]}
             return JSONResponse(ret)
+        elif response["success"] and "raw" in response:
+            return response["raw"]
         else:
             return JSONErrorResponse(content=response)

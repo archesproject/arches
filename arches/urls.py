@@ -233,6 +233,7 @@ urlpatterns = [
     url(r"^mobileprojects/(?:(?P<surveyid>%s))?$" % uuid_regex, api.Surveys.as_view(), name="mobileprojects"),
     url(r"^sync/(?P<surveyid>%s|())$" % uuid_regex, api.Sync.as_view(), name="sync"),
     url(r"^checksyncstatus/(?P<synclogid>%s|())$" % uuid_regex, api.CheckSyncStatus.as_view(), name="checksyncstatus"),
+    url(r"^graphs", api.Graphs.as_view(), name="graphs_all_api"),
     url(r"^graphs/(?P<graph_id>%s)$" % (uuid_regex), api.Graphs.as_view(), name="graphs_api"),
     url(r"^resources/(?P<graphid>%s)/(?P<resourceid>%s|())$" % (uuid_regex, uuid_regex), api.Resources.as_view(), name="resources_graphid"),
     url(r"^resources/(?P<slug>[-\w]+)/(?P<resourceid>%s|())$" % uuid_regex, api.Resources.as_view(), name="resources_slug"),
@@ -293,7 +294,7 @@ urlpatterns = [
     url(r"^iiifannotationnodes$", api.IIIFAnnotationNodes.as_view(), name="iiifannotationnodes"),
     url(r"^manifest/(?P<id>[0-9]+)$", api.Manifest.as_view(), name="manifest"),
     url(r"^image-service-manager", ManifestManagerView.as_view(), name="manifest_manager"),
-    url(r"^etl-manager", ETLManagerView.as_view(), name="etl_manager"),
+    url(r"^etl-manager$", ETLManagerView.as_view(), name="etl_manager"),
     url(r"^clear-user-permission-cache", ClearUserPermissionCache.as_view(), name="clear_user_permission_cache"),
     url(r"^transform-edtf-for-tile", api.TransformEdtfForTile.as_view(), name="transform_edtf_for_tile"),
 ]

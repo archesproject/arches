@@ -52,65 +52,72 @@ class Command(BaseCommand):
     def handle(self, *args, **options):
         self.create_template(template=options["template"], dest=options["dest"], graphid=options["graph"])
 
-    def write_metadata(self, workbook, metadata):
-        metadata_sheet = workbook.create_sheet(title="metadata")
-        metadata_sheet[f"A1"] = "graphid"
-        metadata_sheet[f"B1"] = metadata["graphid"]
-        metadata_sheet[f"A5"] = "node"
-        metadata_sheet[f"B5"] = "datatype"
-        for i, node in enumerate(metadata["nodes"]):
-            metadata_sheet.cell(column=1, row=i + 6, value=node["alias"])
-            metadata_sheet.cell(column=2, row=i + 6, value=node["datatype"])
-
-    def style_header(self, length, width, sheet):
-        thin = styles.Side(border_style="thin", color="000000")
-        fill = styles.PatternFill("solid", fgColor="eeeeee")
-        border = styles.Border(top=thin, left=thin, right=thin, bottom=thin)
-        for row in range(1, length + 1):
-            for column in range(1, width + 1):
-                sheet.cell(row=row, column=column).fill = fill
-                sheet.cell(row=row, column=column).border = border
-
     def create_branchcsv_template(self, dest, graphid):
-        wb = Workbook()
-        columns = ("root_nodegroupid", "nodegroupid", "parent_nodegroupid", "alias", "name", "depth", "path", "cardinality")
-        with connection.cursor() as cursor:
-            cursor.execute("""SELECT * FROM __get_nodegroup_tree_by_graph(%s)""", (graphid,))
-            rows = cursor.fetchall()
-            first_sheet = True
-            metadata = {"nodes": [], "graphid": graphid}
-            column_length = 0
-            for row in rows:
-                details = dict(zip(columns, row))
-                tab = "    " * details["depth"]
-                nodes = Node.objects.filter(nodegroup_id=details["nodegroupid"]).exclude(datatype="semantic").values("datatype", "alias")
-                metadata["nodes"] += nodes
-                if details["depth"] == 0:
-                    column_length = 0
-                    if first_sheet is True:
-                        sheet = wb.active
-                        sheet.title = details["alias"]
-                        first_sheet = False
-                    else:
-                        sheet = wb.create_sheet(title=details["alias"])
-                    row_number = 2
-                    sheet[f"A1"] = "resource_id"
-                    sheet[f"B1"] = "nodegroup"
-                    sheet[f"A{row_number}"] = "--"
-                    sheet[f"B2"] = f'{tab}{details["alias"]}  ({details["cardinality"]})'
-                    for i, node in enumerate(nodes):
-                        sheet.cell(column=i + 3, row=row_number, value=f"{node['alias']}")
-                else:
-                    row_number += 1
-                    sheet[f"A{row_number}"] = "--"
-                    sheet[f"B{row_number}"] = f'{tab}{details["alias"]}  ({details["cardinality"]})'
-                    for i, node in enumerate(nodes):
-                        sheet.cell(column=i + 3, row=row_number, value=f"{node['alias']}")
-                column_length = len(nodes) if len(nodes) > column_length else column_length
-                self.style_header(row_number, column_length + 2, sheet)
-            self.write_metadata(wb, metadata)
-            wb.save(filename=dest)
+        wb = create_workbook(graphid)
+        wb.save(filename=dest)
 
     def create_template(self, template, dest, graphid):
         if template == "branchcsv":
             self.create_branchcsv_template(dest, graphid)
+
+
+def write_metadata(workbook, metadata):
+    metadata_sheet = workbook.create_sheet(title="metadata")
+    metadata_sheet[f"A1"] = "graphid"
+    metadata_sheet[f"B1"] = metadata["graphid"]
+    metadata_sheet[f"A5"] = "node"
+    metadata_sheet[f"B5"] = "datatype"
+    for i, node in enumerate(metadata["nodes"]):
+        metadata_sheet.cell(column=1, row=i + 6, value=node["alias"])
+        metadata_sheet.cell(column=2, row=i + 6, value=node["datatype"])
+
+
+def style_header(length, width, sheet):
+    thin = styles.Side(border_style="thin", color="000000")
+    fill = styles.PatternFill("solid", fgColor="eeeeee")
+    border = styles.Border(top=thin, left=thin, right=thin, bottom=thin)
+    for row in range(1, length + 1):
+        for column in range(1, width + 1):
+            sheet.cell(row=row, column=column).fill = fill
+            sheet.cell(row=row, column=column).border = border
+
+
+def create_workbook(graphid) -> Workbook:
+    wb = Workbook()
+    columns = ("root_nodegroupid", "nodegroupid", "parent_nodegroupid", "alias", "name", "depth", "path", "cardinality")
+    with connection.cursor() as cursor:
+        cursor.execute("""SELECT * FROM __get_nodegroup_tree_by_graph(%s)""", (graphid,))
+        rows = cursor.fetchall()
+        first_sheet = True
+        metadata = {"nodes": [], "graphid": graphid}
+        column_length = 0
+        for row in rows:
+            details = dict(zip(columns, row))
+            tab = "    " * details["depth"]
+            nodes = Node.objects.filter(nodegroup_id=details["nodegroupid"]).exclude(datatype="semantic").values("datatype", "alias")
+            metadata["nodes"] += nodes
+            if details["depth"] == 0:
+                column_length = 0
+                if first_sheet is True:
+                    sheet = wb.active
+                    sheet.title = details["alias"]
+                    first_sheet = False
+                else:
+                    sheet = wb.create_sheet(title=details["alias"])
+                row_number = 2
+                sheet[f"A1"] = "resource_id"
+                sheet[f"B1"] = "nodegroup"
+                sheet[f"A{row_number}"] = "--"
+                sheet[f"B2"] = f'{tab}{details["alias"]}  ({details["cardinality"]})'
+                for i, node in enumerate(nodes):
+                    sheet.cell(column=i + 3, row=row_number, value=f"{node['alias']}")
+            else:
+                row_number += 1
+                sheet[f"A{row_number}"] = "--"
+                sheet[f"B{row_number}"] = f'{tab}{details["alias"]}  ({details["cardinality"]})'
+                for i, node in enumerate(nodes):
+                    sheet.cell(column=i + 3, row=row_number, value=f"{node['alias']}")
+            column_length = len(nodes) if len(nodes) > column_length else column_length
+            style_header(row_number, column_length + 2, sheet)
+        write_metadata(wb, metadata)
+        return wb
