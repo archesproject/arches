@@ -72,7 +72,8 @@ define([
 
     ko.bindingHandlers.ckeditor = {
         init: (element, valueAccessor, allBindings) => {
-            require(['jquery', 'ckeditor-jquery', 'ckeditor'], () => {
+            window.jQuery = $;
+            require(['ckeditor', 'ckeditor-jquery',], () => {
                 initialize(element, valueAccessor, allBindings);
             });
         }
