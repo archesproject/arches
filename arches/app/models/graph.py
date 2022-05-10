@@ -111,7 +111,7 @@ class Graph(models.GraphModel):
 
                 self.populate_null_nodegroups()
 
-                if "publication" in args[0]:
+                if "publication" in args[0] and args[0]["publication"] is not None:
                     publication_data = args[0]["publication"]
                     publication_data["serialized_graph"] = JSONDeserializer().deserialize(
                         JSONSerializer().serialize(self, force_recalculation=True)
