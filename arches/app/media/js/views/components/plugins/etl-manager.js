@@ -67,9 +67,14 @@ define([
 
             this.reverseTransactions = function(loadid) {
                 self.loading(true);
-                $.ajax({
-                    type: "POST",
-                    url: arches.urls.transaction_reverse(loadid)
+                window.fetch(arches.urls.transaction_reverse(loadid),{
+                    method: 'POST',
+                    credentials: 'include',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                }).then(function(response) {
+                    return response.json();
                 }).then(function() {
                     self.loading(false);
                 });
