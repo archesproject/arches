@@ -14957,6 +14957,21 @@ a.jstree-anchor.permissions-widget {
     border: 2px solid rgb(56, 110, 178);
 }
 
+.etl-status-table .btn-success, .btn-success:hover{
+    background: #00ca4e;
+    border-color: #00ca4e;
+}
+
+.etl-status-table .btn-warning, .btn-warning:hover{
+    background: #ffbd44;
+    border-color: #ffbd44;
+}
+
+.etl-status-table .btn-danger, .btn-danger:hover{
+    background: #ff605c;
+    border-color: #ff605c;
+}
+
 .etl-module-component.etl-module-status {
     width: 400px;
 }
