@@ -773,7 +773,9 @@ input[type="checkbox"] {
     color: #f9f9f9;
     padding: 10px 12px;
     display: flex;
-    justify-content: space-between;
+    position: fixed;
+    bottom: 0;
+    width: 100%;
 }
 
 .tabbed-workflow-footer .step-counter {
@@ -14863,4 +14865,122 @@ a.jstree-anchor.permissions-widget {
         display: none;
         height: 0;
     }
+}
+
+.etl-manager-tabs {
+    background: #F7F9FB;
+    height: 45px;
+}
+
+.etl-manager-tab {
+    min-width: 150px;
+    padding: 12px 20px;
+    border: 1px solid #BBD1EA;
+    background: #F7F9FB;
+    font-size: 13pt;
+    display: inline-block;
+    text-align: center;
+    margin-right: -5px;
+}
+
+.etl-manager-tab:hover {
+    cursor: pointer;
+}
+
+.etl-manager-tab.disabled {
+    background-color: #fff;
+    color: grey;
+    cursor: default;
+    pointer-events: none;
+}
+
+.etl-manager-tab.active {
+    background-color: #fff;
+    border-bottom: 1px solid #fff;
+    font-weight: 600;
+}
+
+.etl-manager-filter-container {
+    margin: 50px;
+}
+
+.etl-manager-filter-button {
+    min-width: 150px;
+    padding: 12px 20px;
+    border: 1px solid #BBD1EA;
+    background: #F7F9FB;
+    font-size: 14px;
+    height: 45px;
+    display: inline-block;
+    text-align: center;
+    margin-right: -5px;
+}
+
+.etl-manager-filter-button:hover {
+    cursor: pointer;
+}
+
+.etl-manager-filter-button.active {
+    background-color: #fff;
+    font-weight: 600;
+}
+
+.etl-manager-filter-input {
+    min-width: 300px;
+    border: 1px solid #BBD1EA;
+    font-size: 12px;
+    height: 30px;
+    margin-left: 20px;
+    padding-left: 20px;
+}
+
+.etl-manager-status-filter-container {
+    margin: 20px 10px;
+    display: flex;
+    justify-content: space-between;
+}
+
+.etl-module-component-container {
+    height: calc(100vh - 160px);
+    width: 100%;
+    padding: 25px;
+    overflow: scroll;
+}
+
+.etl-module-status-container {
+    height: calc(100vh - 95px);
+    width: 100%;
+    overflow: scroll;
+}
+
+.etl-status-table .selected {
+    border: 2px solid rgb(56, 110, 178);
+}
+
+.etl-status-table .btn-success, .btn-success:hover{
+    background: #00ca4e;
+    border-color: #00ca4e;
+}
+
+.etl-status-table .btn-warning, .btn-warning:hover{
+    background: #ffbd44;
+    border-color: #ffbd44;
+}
+
+.etl-status-table .btn-danger, .btn-danger:hover{
+    background: #ff605c;
+    border-color: #ff605c;
+}
+
+.etl-module-component.etl-module-status {
+    width: 400px;
+}
+
+.etl-module-component {
+    margin-top: 50px;
+}
+
+.etl-module-footer .btn {
+    border-radius: 2px;
+    margin-right: 20px;
 }

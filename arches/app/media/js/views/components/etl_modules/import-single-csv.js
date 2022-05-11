@@ -11,8 +11,12 @@ define([
 ], function(ko, koMapping, $, dropzone, uuid, arches) {
     return ko.components.register('import-single-csv', {
         viewModel: function(params) {
-            var self = this;
-            this.loading = params.config.loading;
+            const self = this;
+
+            this.load_details = params.load_details;
+            this.state = params.state;
+            this.loading = params.loading || ko.observable();
+
             this.moduleId = params.etlmoduleid;
             this.loading(true);
             this.graphs = ko.observable();
@@ -87,8 +91,7 @@ define([
                 return '<strong>' + parseFloat((bytes / Math.pow(k, i)).toFixed(dm)) + '</strong> ' + sizes[i];
             };
 
-            this.csvArray.subscribe(function(val){ //array of array
-                console.log(val)
+            this.csvArray.subscribe(function(val){
                 self.numberOfCol(val[0].length);
                 let i = 1;
                 if (self.hasHeaders()) {
@@ -155,19 +158,14 @@ define([
                 self.formData.append('fieldMapping', JSON.stringify(fieldMapping));
                 self.formData.append('hasHeaders', self.hasHeaders());
                 self.formData.append('graphid', self.selectedGraph());
-                self.submit('write').then(data => {
-                    console.log(data.result);
+                self.loading(true);
+                self.submit('start').then(data => {
+                    params.activeTab("import");
+                    self.formData.append('async', true);
+                    self.submit('write').then(data => {
+                        console.log(data.result);
+                    }).fail(error => console.log(error));
                 }).fail(error => console.log(error));
-            };
-
-            this.changeFormat =function(){
-                console.log("format changed");
-            };
-
-            const findField = (node) => {
-                return koMapping.toJS(self.fieldMapping).find(mapping => 
-                    node.toLowerCase() === mapping.node.toLowerCase()
-                ).field;
             };
 
             this.validate =function(){

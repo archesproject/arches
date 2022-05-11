@@ -26,6 +26,7 @@ class ImportSingleCsv:
         self.request = request
         self.userid = request.user.id
         self.loadid = request.POST.get("load_id")
+        self.moduleid = request.POST.get("module")
         self.datatype_factory = DataTypeFactory()
         self.node_lookup = {}
         self.blank_tile_lookup = {}
@@ -84,13 +85,6 @@ class ImportSingleCsv:
         Collects error messages if any and returns table of error messages
         """
 
-        fieldnames = request.POST.get("fieldnames").split(",")
-        column_names = [fieldname for fieldname in fieldnames if fieldname != ""]
-        if len(column_names) == 0:
-            message = "No valid node is selected"
-            return {"success": False, "error": message}
-
-        self.populate_staging_table(request)
         with connection.cursor() as cursor:
             cursor.execute("""SELECT * FROM __arches_load_staging_report_errors(%s)""", [self.loadid])
             rows = cursor.fetchall()
@@ -101,15 +95,53 @@ class ImportSingleCsv:
         Move the records from load_staging to tiles table using db function
         """
 
-        with connection.cursor() as cursor:
-            cursor.execute("""SELECT * FROM __arches_staging_to_tile(%s)""", [self.loadid])
-            row = cursor.fetchall()
+        fieldnames = request.POST.get("fieldnames").split(",")
+        column_names = [fieldname for fieldname in fieldnames if fieldname != ""]
+        if len(column_names) == 0:
+            with connection.cursor() as cursor:
+                cursor.execute(
+                    """UPDATE load_event SET status = %s WHERE loadid = %s""",
+                    ("failed", self.loadid),
+                )
+            message = "No valid node is selected"
+            return {"success": False, "data": message}
 
-        index_resources_by_transaction(self.loadid, quiet=True, use_multiprocessing=True)
+        self.populate_staging_table(request)
+
+        validation = self.validate(request)
+        if len(validation["data"]) != 0:
+            with connection.cursor() as cursor:
+                cursor.execute(
+                    """UPDATE load_event SET status = %s WHERE loadid = %s""",
+                    ("failed", self.loadid),
+                )
+            return {"success": False, "data": "failed"}
+        else:
+            with connection.cursor() as cursor:
+                cursor.execute("""SELECT * FROM __arches_staging_to_tile(%s)""", [self.loadid])
+                row = cursor.fetchall()
         if row[0][0]:
+            index_resources_by_transaction(self.loadid, quiet=True, use_multiprocessing=True)
+            with connection.cursor() as cursor:
+                cursor.execute(
+                    """UPDATE load_event SET status = %s WHERE loadid = %s""",
+                    ("completed", self.loadid),
+                )
             return {"success": True, "data": "success"}
         else:
             return {"success": False, "data": "failed"}
+
+    def start(self, request):
+        graphid = request.POST.get("graphid")
+        csv_mapping = request.POST.get("fieldMapping")
+        mapping_details = {"mapping": json.loads(csv_mapping), "graph": graphid}
+        with connection.cursor() as cursor:
+            cursor.execute(
+                """INSERT INTO load_event (loadid, complete, status, etl_module_id, load_details, load_start_time, user_id) VALUES (%s, %s, %s, %s, %s, %s, %s)""",
+                (self.loadid, False, "running", self.moduleid, json.dumps(mapping_details), datetime.now(), self.userid),
+            )
+        message = "load event created"
+        return {"success": True, "data": message}
 
     def populate_staging_table(self, request):
 
@@ -118,17 +150,9 @@ class ImportSingleCsv:
         has_headers = request.POST.get("hasHeaders")
         fieldnames = request.POST.get("fieldnames").split(",")
         csvfile = file.read().decode("utf-8")
-        csv_mapping = request.POST.get("fieldMapping")
-        mapping_details = {"mapping": json.loads(csv_mapping), "graph": graphid}
         reader = csv.DictReader(io.StringIO(csvfile), fieldnames=fieldnames)
         if has_headers:
             next(reader)
-
-        with connection.cursor() as cursor:
-            cursor.execute(
-                """INSERT INTO load_event (loadid, complete, load_details, user_id) VALUES (%s, %s, %s, %s)""",
-                (self.loadid, False, json.dumps(mapping_details), self.userid),
-            )
 
         for row in reader:
             resourceid = uuid.uuid4()
@@ -141,18 +165,20 @@ class ImportSingleCsv:
                 datatype = self.node_lookup[graphid].get(nodeid=node).datatype
                 datatype_instance = self.datatype_factory.get_instance(datatype)
                 source_value = row[key]
-                error = datatype_instance.validate(source_value)
-                valid = True if len(error) == 0 else False
-                notes = None if valid else error[0]["message"]
+                errors = datatype_instance.validate(source_value)
+                valid = True if len(errors) == 0 else False
                 value = datatype_instance.transform_value_for_tile(source_value) if source_value is not None and valid else None
+                error_message = ""
+                for error in errors:
+                    error_message = "{0}|{1}".format(error_message, error["message"]) if error_message != "" else error["message"]
 
                 if nodegroupid in dict_by_nodegroup:
                     dict_by_nodegroup[nodegroupid].append(
-                        {node: {"value": value, "valid": valid, "source": source_value, "notes": notes, "datatype": datatype}}
+                        {node: {"value": value, "valid": valid, "source": source_value, "notes": error_message, "datatype": datatype}}
                     )
                 else:
                     dict_by_nodegroup[nodegroupid] = [
-                        {node: {"value": value, "valid": valid, "source": source_value, "notes": notes, "datatype": datatype}}
+                        {node: {"value": value, "valid": valid, "source": source_value, "notes": error_message, "datatype": datatype}}
                     ]
 
             for nodegroup in dict_by_nodegroup:

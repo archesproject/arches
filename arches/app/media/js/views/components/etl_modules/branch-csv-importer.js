@@ -11,9 +11,13 @@ define([
     return ko.components.register('branch-csv-importer', {
         viewModel: function(params) {
             const self = this;
+
+            this.load_details = params.load_details;
+            this.state = params.state;
+            this.loading = params.loading || ko.observable();
+
             this.moduleId = params.etlmoduleid;
             ImporterViewModel.apply(this, arguments);
-            this.loading = params.config.loading;
             this.templates = ko.observableArray();
             this.selectedTemplate = ko.observable();
             this.loadStatus = ko.observable('ready');
@@ -84,6 +88,28 @@ define([
 
             getGraphs();
 
+            this.addFile = function(file){
+                self.loading(true);
+                self.fileInfo({name: file.name, size: file.size});
+                self.formData.append('file', file, file.name);
+
+                self.submit('start').then(function(response){
+                    if (response.ok) {
+                        return response.json();
+                    }
+                }).then(function() {
+                    params.activeTab("import");
+                    self.submit('read').then(function(response){
+                        self.fileAdded(true);
+                        self.loading(false);
+                    })
+                }).catch(function(err) {    
+                        // eslint-disable-next-line no-console
+                        console.log(err);
+                        self.loading(false);
+                });
+            };
+        
             this.write = function(){
                 self.loading(true);
                 self.loadStatus("loading");

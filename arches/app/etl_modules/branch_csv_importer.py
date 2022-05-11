@@ -1,6 +1,8 @@
-import os
+from datetime import datetime
+import json
 import logging
 import math
+import os
 import shutil
 import uuid
 import zipfile
@@ -24,6 +26,7 @@ class BranchCsvImporter:
     def __init__(self, request=None):
         self.request = request
         self.userid = request.user.id
+        self.moduleid = request.POST.get("module")
         self.datatype_factory = DataTypeFactory()
         self.legacyid_lookup = {}
         self.temp_path = ""
@@ -174,28 +177,43 @@ class BranchCsvImporter:
         for (dirpath, dirnames, filenames) in os.walk(dir):
             for filename in filenames:
                 if filename.endswith("xlsx"):
-                    summary[filename]["worksheets"] = []
+                    summary["files"][filename]["worksheets"] = []
                     workbook = load_workbook(filename=os.path.join(dirpath, filename))
                     try:
                         graphid = workbook.get_sheet_by_name("metadata")["B1"].value
                     except KeyError:
+                        with connection.cursor() as cursor:
+                            cursor.execute(
+                                """UPDATE load_event SET status = %s WHERE loadid = %s""",
+                                ("failed", self.loadid),
+                            )
                         raise ValueError("A graphid is not available in the metadata worksheet")
                     nodegroup_lookup, nodes = self.get_graph_tree(graphid)
                     node_lookup = self.get_node_lookup(nodes)
                     with connection.cursor() as cursor:
                         cursor.execute(
-                            """INSERT INTO load_event (loadid, complete, user_id) VALUES (%s, %s, %s)""", (self.loadid, False, self.userid)
+                            """UPDATE load_event SET load_details = %s WHERE loadid = %s""",
+                            (json.dumps(summary), self.loadid),
                         )
                         for worksheet in workbook.worksheets:
                             if worksheet.title.lower() != "metadata":
                                 details = self.process_worksheet(worksheet, cursor, node_lookup, nodegroup_lookup)
-                                summary[filename]["worksheets"].append(details)
+                                summary["files"][filename]["worksheets"].append(details)
 
     def get_node_lookup(self, nodes):
         lookup = {}
         for node in nodes:
             lookup[node.alias] = {"nodeid": str(node.nodeid), "datatype": node.datatype, "config": node.config}
         return lookup
+
+    def start(self, request):
+        self.loadid = request.POST.get("load_id")
+        with connection.cursor() as cursor:
+            cursor.execute(
+                """INSERT INTO load_event (loadid, etl_module_id, complete, status, load_start_time, user_id) VALUES (%s, %s, %s, %s, %s, %s)""",
+                (self.loadid, self.moduleid, False, "running", datetime.now(), self.userid),
+            )
+        return {"success": True, "data": "event created"}
 
     def read(self, request):
         self.loadid = request.POST.get("load_id")
@@ -210,8 +228,16 @@ class BranchCsvImporter:
                     if not file.is_dir():
                         result["summary"]["files"][file.filename] = {"size": (self.filesize_format(file.file_size))}
                     zip_ref.extract(file, self.temp_dir)
-        self.stage_excel_file(self.temp_dir, result["summary"]["files"])
+        self.stage_excel_file(self.temp_dir, result["summary"])
         result["validation"] = self.validate(request)
+        if len(result["validation"]["data"]) == 0:
+            self.write(request)
+        else:
+            with connection.cursor() as cursor:
+                cursor.execute(
+                    """UPDATE load_event SET status = %s WHERE loadid = %s""",
+                    ("failed", self.loadid),
+                )
         shutil.rmtree(self.temp_dir)
         return {"success": result["validation"]["success"], "data": result}
 
@@ -231,17 +257,33 @@ class BranchCsvImporter:
                 row = cursor.fetchall()
         except IntegrityError as e:
             logger.error(e)
+            with connection.cursor() as cursor:
+                cursor.execute(
+                    """UPDATE load_event SET status = %s WHERE loadid = %s""",
+                    ("failed", self.loadid),
+                )
             return {
                 "status": 400,
                 "success": False,
                 "title": _("Failed to complete load"),
                 "message": _("Be sure any resources you are loading do not have resource ids that already exist in the system"),
             }
-
-        index_resources_by_transaction(self.loadid, quiet=True, use_multiprocessing=True)
+        print(row[0][0])
         if row[0][0]:
+            index_resources_by_transaction(self.loadid, quiet=True, use_multiprocessing=True)
+
+            with connection.cursor() as cursor:
+                cursor.execute(
+                    """UPDATE load_event SET status = %s WHERE loadid = %s""",
+                    ("completed", self.loadid),
+                )
             return {"success": True, "data": "success"}
         else:
+            with connection.cursor() as cursor:
+                cursor.execute(
+                    """UPDATE load_event SET status = %s WHERE loadid = %s""",
+                    ("failed", self.loadid),
+                )
             return {"success": False, "data": "failed"}
 
     def download(self, request):

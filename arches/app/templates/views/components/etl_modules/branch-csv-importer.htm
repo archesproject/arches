@@ -1,4 +1,7 @@
+{% extends "views/components/etl_modules/base-import.htm" %}
 {% load i18n %}
+
+{% block task_details %}
 <!-- ko ifnot: loading() -->
     <div class="branch-csv-etl">
         <!-- ko ifnot: response() -->
@@ -67,79 +70,41 @@
             </div>
         </div>
         <!-- /ko -->
-        <!-- ko if: response -->
-        <div style="display: grid; row-gap: 2px; height:fit-content; padding:15px 20px; color: steelblue;">
-        <div class="summary-title">{% trans "Format: Branch CSV" %}</div>
-        <div class="summary-title">{% trans "File Summary" %}</div>
-        <div>
-            <div style="display: inline-grid; grid-template-columns: auto auto; column-gap: 10px;">
-                <div class="summary-header">{% trans "File" %}</div>
-                <div class="summary-header">{% trans "Size" %}</div>            
-                <div data-bind="text: response().result.summary.name"></div>
-                <div data-bind="text: response().result.summary.size"></div>
-                <!--ko foreach: {data: Object.keys(response().result.summary.files).filter(n => !n.endsWith('.xlsx')), as: 'file'}-->
-                    <div data-bind="text: file"></div>
-                    <!-- ko foreach: {data: $parent.response().result.summary.files[file], as: 'details'} -->
-                    <div data-bind="text: details.size"></div>
-                    <!-- /ko -->
-                <!-- /ko -->
-                <!--ko foreach: {data: Object.keys(response().result.summary.files).filter(n => n.endsWith('.xlsx')), as: 'file'}-->
-                <div data-bind="text: file"></div>
-                    <!-- ko foreach: {data: $parent.response().result.summary.files[file], as: 'details'} -->
-                    <div data-bind="text: details.size"></div>
-                    <div class="summary-header">{% trans "Worksheets" %}</div>
-                    <div class="summary-header">{% trans "Rows" %}</div>
-                    <!--ko foreach: $data.worksheets-->
-                    <div data-bind="text: $data.name"></div>
-                    <div data-bind="text: $data.rows"></div>
-                    <!-- /ko -->
-                    <!-- /ko -->
-                <!-- /ko -->
-            </div>
-            <div style="margin-top: 20px;">
-                <!-- ko if: validationError() && validationError().length > 0 -->
-                <div class="summary-title">{% trans "Validation Errors" %}</div>
-                <table class="table table-striped"  style="border: 1px solid rgba(0,0,0,0.14)">
-                    <tr>
-                        <th>{% trans "Location" %}</th>    
-                        <th>{% trans "Error" %}</th>
-                    </tr>
-                    <!-- ko foreach: {data: validationError, as: 'error'} -->
-                    <tr data-bind="value: console.log(error)">
-                        <td data-bind="text: error[0]"></td>
-                        <td data-bind="text: error[1]?.replace('|','\n')" style= "white-space: pre-line;"></td>
-                    </tr>
-                    <!-- /ko -->        
-                </table>
-                <!-- /ko -->
-                <!-- ko if: loadStatus() === "successful" -->
-                <div>{% trans "Data Successfully Loaded" %}</div>
-                <!-- /ko -->
-            </div>
-        </div>
-        </div>
-        <!--/ko-->
-
-         <!-- ko if: response -->
-        <div  class="tabbed-workflow-footer, etl-module-footer">
-        <!-- ko if: validationError()?.length == 0 && loadStatus() == "ready" -->
-        <button class="btn btn-shim btn-labeled btn-lg fa fa-check btn-primary"  data-bind="click: function(){ write(); }">{% trans "Submit" %}</button>
-        <button class="btn btn-shim btn-labeled btn-lg fa fa-times btn-danger" data-bind="click: function(){response(null);}">{% trans "Cancel" %}</button>
-        <!-- /ko -->
-        <!-- ko if: loadStatus() == "successful" -->
-        <button class="btn btn-shim btn-labeled btn-lg fa fa-check btn-primary"  data-bind="click: function(){
-             response(null);
-             loadStatus('ready');
-            }">{% trans "OK" %}</button>
-        <!-- /ko -->
-        <!-- ko if: validationError()?.length > 0 || loadStatus() == "failed" -->
-         <button class="btn btn-shim btn-labeled btn-lg fa fa-undo btn-danger" data-bind="click: function(){
-             alert()?.close();
-             response(null);
-             loadStatus('ready');
-            }">{% trans "Reload" %}</button>
-        <!-- /ko -->
-        </div>
-        <!-- /ko -->
     </div>
 <!--/ko-->
+{% endblock task_details %}
+
+{% block etl_status %}
+<div style="display: grid; row-gap: 2px; height:fit-content;">
+    <h4 class="summary-title">{% trans "Import Branch CSV" %}</h4>
+    <!-- ko if: load_details -->
+    <div style="padding:15px 20px;">
+        <h4 class="summary-title">{% trans "File Summary" %}</h4>
+        <div style="display: inline-grid; grid-template-columns: auto auto; column-gap: 10px;">
+            <div class="summary-header">{% trans "File" %}</div>
+            <div class="summary-header">{% trans "Size" %}</div>            
+            <div data-bind="text: load_details.name"></div>
+            <div data-bind="text: load_details.size"></div>
+            <!--ko foreach: {data: Object.keys(load_details.files).filter(n => !n.endsWith('.xlsx')), as: 'file'}-->
+                <div data-bind="text: file"></div>
+                <!-- ko foreach: {data: $parent.load_details.files[file], as: 'details'} -->
+                <div data-bind="text: details.size"></div>
+                <!-- /ko -->
+            <!-- /ko -->
+            <!--ko foreach: {data: Object.keys(load_details.files).filter(n => n.endsWith('.xlsx')), as: 'file'}-->
+            <div data-bind="text: file"></div>
+                <!-- ko foreach: {data: $parent.load_details.files[file], as: 'details'} -->
+                <div data-bind="text: details.size"></div>
+                <div class="summary-header">{% trans "Worksheets" %}</div>
+                <div class="summary-header">{% trans "Rows" %}</div>
+                <!--ko foreach: $data.worksheets-->
+                <div data-bind="text: $data.name"></div>
+                <div data-bind="text: $data.rows"></div>
+                <!-- /ko -->
+                <!-- /ko -->
+            <!-- /ko -->
+        </div>
+    </div>
+    <!--/ko-->
+</div>
+{% endblock etl_status %}

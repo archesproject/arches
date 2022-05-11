@@ -36,7 +36,7 @@ add_csv_importer = """
         etlmoduleid,
         name,
         description,
-        type,
+        etl_type,
         component,
         componentname,
         modulename,
@@ -66,7 +66,7 @@ add_branch_csv_importer = """
         etlmoduleid,
         name,
         description,
-        type,
+        etl_type,
         component,
         componentname,
         modulename,
@@ -223,7 +223,6 @@ add_staging_to_tile_function = """
             _key text;
             _value text;
         BEGIN
-            UPDATE load_event SET load_start_time = now() WHERE loadid = load_id;
             FOR staged_value, instance_id, legacy_id, tile_id, parent_id, group_id, passed, graph_id IN
                     (
                         SELECT value, resourceid, legacyid, tileid, parenttileid, ls.nodegroupid, passes_validation, n.graphid
@@ -309,7 +308,7 @@ class Migration(migrations.Migration):
                 ("etlmoduleid", models.UUIDField(default=uuid.uuid1, primary_key=True, serialize=False)),
                 ("name", models.TextField()),
                 ("description", models.TextField(blank=True, null=True)),
-                ("type", models.TextField()),
+                ("etl_type", models.TextField()),
                 ("component", models.TextField()),
                 ("componentname", models.TextField()),
                 ("modulename", models.TextField(blank=True, null=True)),
@@ -354,6 +353,8 @@ class Migration(migrations.Migration):
                 ("loadid", models.UUIDField(default=uuid.uuid4, primary_key=True, serialize=False)),
                 ("complete", models.BooleanField(default=False)),
                 ("successful", models.BooleanField(blank=True, null=True)),
+                ("status", models.TextField(blank=True, null=True)),
+                ("etl_module", models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to="models.ETLModule")),
                 ("load_description", models.TextField(blank=True, null=True)),
                 ("load_details", django.contrib.postgres.fields.jsonb.JSONField(blank=True, null=True)),
                 ("error_message", models.TextField(blank=True, null=True)),

@@ -1,7 +1,10 @@
+{% extends "views/components/etl_modules/base-import.htm" %}
 {% load i18n %}
+
+{% block task_details %}
 <!-- ko ifnot: loading() -->
 <!-- ko ifnot: fileAdded() -->
-<div data-bind="dropzone: dropzoneOptions" class="file-select loader-select" style="height: 100%; width: 100%">
+<div data-bind="dropzone: dropzoneOptions" class="file-select loader-select" style="height: 100%; width: 100%; background: white">
     <div>
         <div class="manifest-manager-main-menu-circle loader-button">
             <span><i style="color: #000" class="fa fa-cloud-upload r-select-icon"></i></span>
@@ -33,149 +36,101 @@
 <!-- /ko -->
 
 <!-- ko if: fileAdded() -->
-<div class="etl-module-writer-container" style="display: flex; flex-direction: column;">
-    <div class="etl-module-preview-container" style="display: inline-flex; flex-direction: row;">
-        <div class="etl-module-mapping" style="height: calc(100vh - 50px); width: 400px; padding: 25px; overflow: scroll;" data-bind="resizableSidepanel:true">
-            <h3>{% trans "Format: Single .csv File Import" %}</h3>
-
-            <div class="etl-module-mapping" style="margin: 50px 0px;">
-                <h4>{% trans "Target Model" %}</h4>
-                <select data-bind="
-                    value: selectedGraph,
-                    options: graphs,
-                    optionsText: 'name',
-                    optionsValue: 'graphid',
-                    optionsCaption: '{% trans "Select a Resource Model..." %}',
-                    valueAllowUnset: true,
-                    chosen: {width: '100%'}"
-                ></select>
-            </div>
-
-            <h4>{% trans "Import Details" %}</h4>
-            <label class="form-checkbox form-normal form-primary" style="padding-left: 25px; padding-top: 3px;">
-                <input type="checkbox" data-bind="checked: hasHeaders">{% trans "Column names in the first row" %}
-            </label>
-            <div class="etl-table">
-                <table class="table table-striped" style="margin-top: 25px; border: 1px solid rgba(0,0,0,0.14)">
-                    <thead>
-                        <tr>
-                            <th>{% trans "Copy From" %}</th>
-                            <th>{% trans "Import To" %}</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <!-- ko foreach: { data: fieldMapping, as: 'mapping', noChildContext: true } -->
-                        <tr>
-                            <td data-bind="text: mapping.field"></td>
-                            <!-- ko if: nodes() -->
-                            <td>
-                                <select data-bind="
-                                    value: mapping.node,
-                                    options: nodes,
-                                    optionsText: 'alias',
-                                    optionsCaption: '{% trans "Select a Node..." %}',
-                                    optionsValue: 'alias',
-                                    valueAllowUnset: true,
-                                    chosen: {width: '100%'}"
-                                ></select>
-                            </td>
-                            <!-- /ko -->
-                        </tr>
-                        <!-- /ko -->
-                    </tbody>
-                </table>
-            </div>
-        </div>
-        <div class="etl-module-preview" style="height: calc(100vh - 100px); width: calc(100vw - 400px); padding: 25px; overflow: scroll;">
-            <h3>{% trans "Data Preview" %}</h3>
-            <div class="etl-module-info" style="font-size: 10pt; margin: 50px 0px;">
-                <h4>{% trans "File Info" %}</h4>
-                <div data-bind="text: fileInfo().name"></div>
-                <div data-bind="html: '{% trans "File Size: " %}' + formatSize(fileInfo().size)"></div>
-                <div data-bind="text: '{% trans "Number of Row: " %}' + numberOfRow()"></div>
-            </div>
-            <div class="etl-table" style="margin-bottom: 50px;">
-                <table class="table table-striped" style="margin-top: 25px; border: 1px solid rgba(0,0,0,0.14)" width="100%">
-                    <thead>
-                        <tr>
-                            <!-- ko foreach: headers -->
-                            <th data-bind="text: $data"></th>
-                            <!-- /ko -->
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <!-- ko foreach: { data: csvExample, as: "row", noChildContext: true }-->
-                        <tr>
-                            <!-- ko foreach: { data: row, as: "cell" }  -->
-                            <td data-bind="text: cell"></td>
-                            <!-- /ko -->
-                        </tr>
-                        <!-- /ko -->
-                    </tbody>
-                </table>
-                <!-- ko if: csvExample().length >= 5-->
-                <div data-bind="text: '{% trans 'Showing First ' %}' + csvExample().length + '{% trans ' Rows' %}'"></div>
-                <!-- /ko -->
-                <!-- ko ifnot: csvExample().length >= 5 -->
-                <div data-bind="text: '{% trans 'Showing All ' %}' + csvExample().length + '{% trans ' Rows' %}'"></div>
-                <!-- /ko -->
-            </div>
-            <div>
-                <!-- ko if: validated -->
-                <h4>{% trans "Validation Errors" %}</h4>
-                <table class="table table-striped" style="margin-top: 25px; border: 1px solid rgba(0,0,0,0.14)" width="100%">
-                    <thead>
-                        <tr>
-                            <th data-bind="text: 'Error'"></th>
-                            <th data-bind="text: 'Source'"></th>
-                        </tr>
-                    </thead>
-                    <!-- ko if: validationError().length -->
-                    <tbody>
-                        <!-- ko foreach: validationError -->
-                        <tr>
-                            <td data-bind="text: $data[1]"></td>
-                            <td data-bind="text: $data[0]"></td>
-                        </tr>
-                        <!-- /ko -->
-                    </tbody>
-                    <!-- /ko -->
-                    <!-- ko ifnot: validationError().length -->
-                    <tbody>
-                        <tr>
-                            <td colspan="3">{% trans "No Error Found" %}</td>
-                        </tr>
-                    </tbody>
-                    <!-- /ko -->                
-                </table>
-                <!-- /ko -->
-            </div>
-            <div class="etl-module-buttons" style="display: inline-flex; flex-direction:row; justify-content: flex-end; margin-top: 25px;">
-                <button data-bind="click: changeFormat" class="btn btn-primary" style="display: none; margin-right: 10px;">
-                    <span>{% trans "Select a different format" %}</span>
-                </button>
-                <!-- ko ifnot: validated -->
-                <button data-bind="click: validate" class="btn btn-success" style="margin-right: 10px;">
-                    <span>{% trans "Validate data before import" %}</span>
-                </button>
-                <!-- /ko -->
-                <!-- ko if: validated() && validationError().length === 0 -->
-                <button data-bind="click: write" class="btn btn-success" style="margin-right: 10px;">
-                    <span>{% trans "Import data" %}</span>
-                </button>
-                <!-- /ko -->
-                <!-- ko if: validated() && validationError().length !== 0 -->
-                <!-- button data-bind="click: function () { fileAdded(false); }" class="btn btn-danger" style="margin-right: 10px;" -->
-                <button data-bind="click: function () { $parent.selectedModule(null); }" class="btn btn-danger" style="margin-right: 10px;">
-                    <span>{% trans "Reload File" %}</span>
-                </button>
-                <!-- /ko -->
-                <button data-bind="click: function () { $parent.selectedModule(null); }" class="btn btn-danger" style="margin-right: 10px;">
-                    <span>{% trans "Cancel File Import" %}</span>
-                </button>
-            </div>    
-        </div>
+<div class="etl-module-component-container">
+    <h3>{% trans "Format: Single .csv File Import" %}</h3>
+    <div class="etl-module-component">
+        <h4>{% trans "File Summary" %}</h4>
+        <div data-bind="text: fileInfo().name"></div>
+        <div data-bind="html: '{% trans "File Size: " %}' + formatSize(fileInfo().size)"></div>
+        <div data-bind="text: '{% trans "Number of Row: " %}' + numberOfRow()"></div>
     </div>
+    <div class="etl-module-component etl-module-mapping">
+        <h4>{% trans "Target Model" %}</h4>
+        <select data-bind="
+            value: selectedGraph,
+            options: graphs,
+            optionsText: 'name',
+            optionsValue: 'graphid',
+            optionsCaption: '{% trans "Select a Resource Model..." %}',
+            valueAllowUnset: true,
+            chosen: {width: '100%'}"
+        ></select>
+    </div>
+    <div class="etl-module-component">
+        <h4>{% trans "Import Details" %}</h4>
+        <label class="form-checkbox form-normal form-primary" style="padding-left: 25px; padding-top: 3px;">
+            <input type="checkbox" data-bind="checked: hasHeaders">{% trans "Column names in the first row" %}
+        </label>
+        <table class="table table-striped" style="margin-top: 25px; border: 1px solid rgba(0,0,0,0.14)" width="100%">
+            <thead>
+                <tr>
+                <!-- ko foreach: { data: fieldMapping, as: 'mapping', noChildContext: true } -->
+                    <!-- ko if: nodes() -->
+                    <th>
+                        <select data-bind="
+                            value: mapping.node,
+                            options: nodes,
+                            optionsText: 'alias',
+                            optionsCaption: '{% trans "Select a Node..." %}',
+                            optionsValue: 'alias',
+                            valueAllowUnset: true,
+                            chosen: {width: '100%'}"
+                        ></select>
+                    </th>
+                    <!-- /ko -->
+                <!-- /ko -->
+            </thead>
+            <thead>
+                <tr>
+                    <!-- ko foreach: headers -->
+                    <th data-bind="text: $data"></th>
+                    <!-- /ko -->
+                </tr>
+            </thead>
+            <tbody>
+                <!-- ko foreach: { data: csvExample, as: "row", noChildContext: true }-->
+                <tr>
+                    <!-- ko foreach: { data: row, as: "cell" }  -->
+                    <td data-bind="text: cell"></td>
+                    <!-- /ko -->
+                </tr>
+                <!-- /ko -->
+            </tbody>
+        </table>
+        <!-- ko if: csvExample().length >= 5-->
+        <div data-bind="text: '{% trans 'Showing First ' %}' + csvExample().length + '{% trans ' Rows' %}'"></div>
+        <!-- /ko -->
+        <!-- ko ifnot: csvExample().length >= 5 -->
+        <div data-bind="text: '{% trans 'Showing All ' %}' + csvExample().length + '{% trans ' Rows' %}'"></div>
+        <!-- /ko -->
+    </div>
+</div>
+<div class="etl-module-footer">
+    <button data-bind="click: write" class="btn btn-success">
+        <span>{% trans "Import data" %}</span>
+    </button>
+    <button data-bind="click: function () { $parent.selectedModule(null); }" class="btn btn-danger">
+        <span>{% trans "Cancel File Import" %}</span>
+    </button>
 </div>
 <!-- /ko -->
 <!-- /ko -->
+{% endblock task_details %}
+
+{% block etl_status %}
+<div>
+    <h4>{% trans "Import Single CSV" %}</h4>
+    <!-- ko if: load_details -->
+    <div>
+        <span style="font-size: 15px; padding-right: 3px;">{% trans 'Target Resource:' %}</span>
+        <span data-bind="text: load_details.graph"></span>    
+    </div>
+    <div>
+        <span style="font-size: 15px; padding-right: 3px;">{% trans 'Target Fields:' %}</span>
+        <!-- ko foreach: load_details.mapping -->
+        <span data-bind="text: $data.node"></span><span>;</span>
+        <!-- /ko -->
+    </div>
+    <!-- /ko -->
+</div>
+{% endblock etl_status %}
