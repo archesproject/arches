@@ -1,4 +1,5 @@
 from datetime import datetime
+import json
 import logging
 import math
 import os
@@ -176,7 +177,7 @@ class BranchCsvImporter:
         for (dirpath, dirnames, filenames) in os.walk(dir):
             for filename in filenames:
                 if filename.endswith("xlsx"):
-                    summary[filename]["worksheets"] = []
+                    summary["files"][filename]["worksheets"] = []
                     workbook = load_workbook(filename=os.path.join(dirpath, filename))
                     try:
                         graphid = workbook.get_sheet_by_name("metadata")["B1"].value
@@ -186,13 +187,13 @@ class BranchCsvImporter:
                     node_lookup = self.get_node_lookup(nodes)
                     with connection.cursor() as cursor:
                         cursor.execute(
-                            """INSERT INTO load_event (loadid, etl_module_id, complete, load_start_time, user_id) VALUES (%s, %s, %s, %s, %s)""",
-                            (self.loadid, self.moduleid, False, datetime.now(), self.userid),
+                            """INSERT INTO load_event (loadid, etl_module_id, load_details, complete, load_start_time, user_id) VALUES (%s, %s, %s, %s, %s, %s)""",
+                            (self.loadid, self.moduleid, json.dumps(summary), False, datetime.now(), self.userid),
                         )
                         for worksheet in workbook.worksheets:
                             if worksheet.title.lower() != "metadata":
                                 details = self.process_worksheet(worksheet, cursor, node_lookup, nodegroup_lookup)
-                                summary[filename]["worksheets"].append(details)
+                                summary["files"][filename]["worksheets"].append(details)
 
     def get_node_lookup(self, nodes):
         lookup = {}
@@ -213,7 +214,7 @@ class BranchCsvImporter:
                     if not file.is_dir():
                         result["summary"]["files"][file.filename] = {"size": (self.filesize_format(file.file_size))}
                     zip_ref.extract(file, self.temp_dir)
-        self.stage_excel_file(self.temp_dir, result["summary"]["files"])
+        self.stage_excel_file(self.temp_dir, result["summary"])
         result["validation"] = self.validate(request)
         shutil.rmtree(self.temp_dir)
         return {"success": result["validation"]["success"], "data": result}

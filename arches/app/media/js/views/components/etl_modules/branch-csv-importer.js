@@ -88,6 +88,29 @@ define([
 
             getGraphs();
 
+            this.addFile = function(file){
+                self.loading(true);
+                self.fileInfo({name: file.name, size: file.size});
+                self.formData.append('file', file, file.name);
+                self.submit('read').then(function(response){
+                    self.fileAdded(true);
+                    self.loading(false);
+                    if (response.ok) {
+                        return response.json();
+                    }
+                }).then(function(response) {
+                    console.log(response);
+                    self.write();
+                    params.activeTab("import");
+                    // self.response(response);
+                    // self.validationError(response.result.validation.data);
+                }).catch(function(err) {    
+                    // eslint-disable-next-line no-console
+                    console.log(err);
+                    self.loading(false);
+                });
+            };
+        
             this.write = function(){
                 self.loading(true);
                 self.loadStatus("loading");
