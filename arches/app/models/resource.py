@@ -614,6 +614,7 @@ class Resource(models.ResourceInstance):
         """
 
         ret = JSONSerializer().handle_model(self)
+        ret["displayname"] = self.displayname()
         ret["tiles"] = self.tiles
 
         return JSONSerializer().serializeToPython(ret)
