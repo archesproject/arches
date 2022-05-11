@@ -98,30 +98,47 @@ class ImportSingleCsv:
         fieldnames = request.POST.get("fieldnames").split(",")
         column_names = [fieldname for fieldname in fieldnames if fieldname != ""]
         if len(column_names) == 0:
+            with connection.cursor() as cursor:
+                cursor.execute(
+                    """UPDATE load_event SET status = %s WHERE loadid = %s""",
+                    ("failed", self.loadid),
+                )
             message = "No valid node is selected"
             return {"success": False, "data": message}
 
         self.populate_staging_table(request)
 
-        with connection.cursor() as cursor:
-            cursor.execute("""SELECT * FROM __arches_staging_to_tile(%s)""", [self.loadid])
-            row = cursor.fetchall()
-
-        index_resources_by_transaction(self.loadid, quiet=True, use_multiprocessing=True)
+        validation = self.validate(request)
+        if len(validation["data"]) != 0:
+            with connection.cursor() as cursor:
+                cursor.execute(
+                    """UPDATE load_event SET status = %s WHERE loadid = %s""",
+                    ("failed", self.loadid),
+                )
+            return {"success": False, "data": "failed"}
+        else:
+            with connection.cursor() as cursor:
+                cursor.execute("""SELECT * FROM __arches_staging_to_tile(%s)""", [self.loadid])
+                row = cursor.fetchall()
         if row[0][0]:
+            index_resources_by_transaction(self.loadid, quiet=True, use_multiprocessing=True)
+            with connection.cursor() as cursor:
+                cursor.execute(
+                    """UPDATE load_event SET status = %s WHERE loadid = %s""",
+                    ("completed", self.loadid),
+                )
             return {"success": True, "data": "success"}
         else:
             return {"success": False, "data": "failed"}
 
     def start(self, request):
-
         graphid = request.POST.get("graphid")
         csv_mapping = request.POST.get("fieldMapping")
         mapping_details = {"mapping": json.loads(csv_mapping), "graph": graphid}
         with connection.cursor() as cursor:
             cursor.execute(
-                """INSERT INTO load_event (loadid, complete, etl_module_id, load_details, load_start_time, user_id) VALUES (%s, %s, %s, %s, %s, %s)""",
-                (self.loadid, False, self.moduleid, json.dumps(mapping_details), datetime.now(), self.userid),
+                """INSERT INTO load_event (loadid, complete, status, etl_module_id, load_details, load_start_time, user_id) VALUES (%s, %s, %s, %s, %s, %s, %s)""",
+                (self.loadid, False, "running", self.moduleid, json.dumps(mapping_details), datetime.now(), self.userid),
             )
         message = "load event created"
         return {"success": True, "data": message}

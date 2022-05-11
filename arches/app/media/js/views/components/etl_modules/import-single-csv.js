@@ -161,6 +161,7 @@ define([
                 self.loading(true);
                 self.submit('start').then(data => {
                     params.activeTab("import");
+                    self.formData.append('async', true);
                     self.submit('write').then(data => {
                         console.log(data.result);
                     }).fail(error => console.log(error));
