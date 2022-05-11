@@ -24,7 +24,8 @@
     </a>
     <ul class="jstree-children" aria-expanded="true">
         <!-- ko foreach: {data: sortedWidgetIds, as: 'nodeId'} -->
-        <!-- ko let: $parent.getDataForDisplay(nodeId) --> 
+        <!-- ko let: $parent.getDataForDisplay(nodeId) -->
+        <!-- ko if: widget.visible -->
         <!-- the let statement above returns an object of the form {widget: null, tile: null: tileData: null, card: null} -->
             <li role="treeitem" class="jstree-node" data-bind="css: {'jstree-open': (card.cards.length > 0 && expanded), 'jstree-closed' : (card.cards.length > 0 && !expanded()), 'jstree-leaf': card.cards.length === 0}">
                 <i tabindex="0" class="jstree-icon jstree-ocl" role="presentation" data-bind="click: function(){expanded(!expanded())}" onkeypress="$(this).trigger('click');"></i>
@@ -39,7 +40,7 @@
                             params: {
                                 tile: tile,
                                 node: self.form.nodeLookup[widget.node_id()],
-                                config: widget.config,
+                                config: widget.configJSON,
                                 label: widget.label(),
                                 value: tile.data[widget.node_id()],
                                 type: 'resource-editor',
@@ -73,6 +74,7 @@
                 </ul>
                 <!-- /ko -->
             </li>
+        <!-- /ko -->
         <!-- /ko -->
         <!-- /ko -->
     </ul>

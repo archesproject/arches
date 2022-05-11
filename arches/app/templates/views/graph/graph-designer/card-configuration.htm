@@ -13,39 +13,39 @@
     <!-- Card Container Base Settings Form -->
     <div id="card-crud-settings" class="tab-pane fade in active">
         <div class="node-config-item">
-            <div class="control-label">
+            <label class="control-label" for="cardtype">
                 {% trans "Card Type" %}
-            </div>
+            </label>
             <div>
-                <select class="resources" data-bind="value: model.component_id, options: $parent.cardComponents, optionsText: 'name', optionsValue: 'componentid', optionsCaption: '{% trans "Choose a card component..." %}', chosen: {disable_search_threshold: 10, width: '100%'}"></select>
+                <select id="cardtype" class="resources" data-bind="value: model.component_id, options: $parent.cardComponents, optionsText: 'name', optionsValue: 'componentid', optionsCaption: '{% trans "Choose a card component..." %}', chosen: {disable_search_threshold: 10, width: '100%'}"></select>
             </div>
         </div>
 
-        <div class="">
+        <div>
             <div class="node-config-item">
-                <div class="control-label">
+                <label class="control-label" for="cardtitle">
                     {% trans "Card Title" %}
-                </div>
+                </label>
                 <div>
-                    <input type="" placeholder="{% trans "Card name" %}" class="form-control input-md widget-input" data-bind="textInput: model.name">
+                    <input id="cardtitle" type="" placeholder="{% trans "Card name" %}" class="form-control input-md widget-input" data-bind="textInput: model.name">
                 </div>
             </div>
 
             <div class="node-config-item">
-                <div class="control-label">
+                <label class="control-label" for="subtitle">
                     {% trans "Subtitle" %}
-                </div>
+                </label>
                 <div>
-                    <input type="" placeholder="{% trans " " %}" class="form-control input-md widget-input" data-bind="textInput: model.instructions">
+                    <input id="subtitle" type="" placeholder="{% trans " " %}" class="form-control input-md widget-input" data-bind="textInput: model.instructions">
                 </div>
             </div>
 
             <div class="node-config-item">
-                <div class="control-label">
+                <label class="control-label" for="cssclasses">
                     {% trans "CSS Classes (Optional)" %}
-                </div>
+                </label>
                 <div>
-                    <input type="" placeholder="{% trans " " %}" class="form-control input-md widget-input" data-bind="textInput: model.cssclass">
+                    <input id="cssclasses" type="" placeholder="{% trans " " %}" class="form-control input-md widget-input" data-bind="textInput: model.cssclass">
                 </div>
             </div>
 

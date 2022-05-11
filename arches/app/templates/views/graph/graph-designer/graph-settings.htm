@@ -26,13 +26,13 @@
                     <div class="row widget-container">
                         <div class="form-group">
                             <div class="relative">
-                                <label class="col-xs-12 control-label widget-input-label">
+                                <label class="col-xs-12 control-label widget-input-label" for="resourcename">
                                     {% trans "Name" %}
                                 </label>
                             </div>
 
                             <div class="col-xs-12">
-                                <input placeholder="{% trans "Name" %}" class="form-control input-md widget-input" data-bind="value:graph.name, valueUpdate: 'keyup'">
+                                <input id="resourcename" placeholder="{% trans "Name" %}" class="form-control input-md widget-input" data-bind="value:graph.name, valueUpdate: 'keyup'">
                             </div>
                         </div>
                     </div>
@@ -40,11 +40,11 @@
                     <div class="row widget-container">
                         <div class="form-group">
                             <div class="relative">
-                                <label class="col-xs-12 control-label widget-input-label"> {% trans "Subtitle" %} </label>
+                                <label class="col-xs-12 control-label widget-input-label" for="resourcesubtitle"> {% trans "Subtitle" %} </label>
                             </div>
 
                             <div class="col-xs-12">
-                                <input placeholder="{% trans "Subtitle" %}" class="form-control input-md widget-input" data-bind="value:graph.subtitle, valueUpdate: 'keyup'">
+                                <input id="resourcesubtitle" placeholder="{% trans "Subtitle" %}" class="form-control input-md widget-input" data-bind="value:graph.subtitle, valueUpdate: 'keyup'">
                             </div>
                         </div>
                     </div>
@@ -52,11 +52,11 @@
                     <div class="row widget-container">
                         <div class="form-group">
                             <div class="relative">
-                                <label class="col-xs-12 control-label widget-input-label"> {% trans "Ontology" %} </label>
+                                <label class="col-xs-12 control-label widget-input-label" for="resourceontology"> {% trans "Ontology" %} </label>
                             </div>
 
                             <div class="col-xs-12 crm-selector">
-                                <select class="design" data-bind="attr: {'disabled': graphSettingsViewModel.nodeCount() > 1 }, value: graph.ontology_id, valueAllowUnset: true, options: ontologies, optionsText: 'name', optionsValue:'ontologyid', optionsCaption: '{% trans "No ontology" %}', chosen: {disable_search_threshold: 10, width: '500px'}"></select>
+                                <select id="resourceontology" class="design" data-bind="attr: {'disabled': graphSettingsViewModel.nodeCount() > 1 }, value: graph.ontology_id, valueAllowUnset: true, options: ontologies, optionsText: 'name', optionsValue:'ontologyid', optionsCaption: '{% trans "No ontology" %}', chosen: {disable_search_threshold: 10, width: '500px'}"></select>
                             </div>
                         </div>
                     </div>
@@ -64,11 +64,11 @@
                     <div class="row widget-container" data-bind="if: graph.ontology_id()">
                         <div class="form-group">
                             <div class="relative">
-                                <label class="col-xs-12 control-label widget-input-label"> {% trans "Root Class" %} </label>
+                                <label class="col-xs-12 control-label widget-input-label" for="rootclass"> {% trans "Root Class" %} </label>
                             </div>
 
                             <div class="col-xs-12 crm-selector">
-                                <select class="design" data-bind="attr: {'disabled': graphSettingsViewModel.nodeCount() > 1 }, value: graphSettingsViewModel.ontologyClass, valueAllowUnset: false, options: ontologyClasses, optionsText: 'display', optionsValue:'source', chosen: {disable_search_threshold: 10, width: '500px', search_contains: true}"></select>
+                                <select id="rootclass" class="design" data-bind="attr: {'disabled': graphSettingsViewModel.nodeCount() > 1 }, value: graphSettingsViewModel.ontologyClass, valueAllowUnset: false, options: ontologyClasses, optionsText: 'display', optionsValue:'source', chosen: {disable_search_threshold: 10, width: '500px', search_contains: true}"></select>
                             </div>
                         </div>
                     </div>
@@ -89,10 +89,10 @@
                             <div class="col-xs-12">
                                 <div>
                                     <label tabindex="0" data-bind="css: { 'active': graph.isactive() }, click: function () { graph.isactive(true) }" class="form-radio form-normal form-text" onkeyup="if(event.which == 13 || event.keyCode == 13){ $(this).trigger('click'); }">
-                                        <input type="radio" name="stat-w-label" data-bind="checked: graph.isactive" value="true"> {% trans "Active" %}
+                                        <input type="radio" name="stat-w-label" data-bind="checked: graph.isactive" value="true" aria-label="Status - active"> {% trans "Active" %}
                                     </label>
                                     <label tabindex="0" data-bind="css: { 'active': !graph.isactive() }, click: function () { graph.isactive(false) }" class="form-radio form-normal form-text"  onkeyup="if(event.which == 13 || event.keyCode == 13){ $(this).trigger('click'); }">
-                                        <input type="radio" name="stat-w-label" data-bind="checked: graph.isactive" value="false"> {% trans "Inactive" %}
+                                        <input type="radio" name="stat-w-label" data-bind="checked: graph.isactive" value="false" aria-label="Status - inactive"> {% trans "Inactive" %}
                                     </label>
                                 </div>
                             </div>
@@ -103,13 +103,13 @@
                     <div class="row widget-container data-type">
                         <div class="form-group">
                             <div class="relative">
-                                <label class="col-xs-12 control-label widget-input-label">
+                                <label class="col-xs-12 control-label widget-input-label" for="rootnodedatatype">
                                     {% trans "Root Node Data Type" %}
                                 </label>
                             </div>
 
                             <div class="col-xs-12 crm-selector">
-                                <select class="design" data-bind="value: graphSettingsViewModel.graph.root.datatype, options: datatypes, optionsCaption: '{% trans 'Choose a data type' %}', chosen: {disable_search_threshold: 10, width: '500px'}"></select>
+                                <select id="rootnodedatatype" class="design" data-bind="value: graphSettingsViewModel.graph.root.datatype, options: datatypes, optionsCaption: '{% trans 'Choose a data type' %}', chosen: {disable_search_threshold: 10, width: '500px'}"></select>
                             </div>
                         </div>
                     </div>
@@ -180,11 +180,11 @@
                     <div class="row widget-container">
                         <div class="form-group">
                             <div class="relative">
-                                <label class="col-xs-12 control-label widget-input-label"> {% trans "Author" %}</label>
+                                <label class="col-xs-12 control-label widget-input-label" for="resourceauthorname"> {% trans "Author" %}</label>
                             </div>
 
                             <div class="col-xs-12">
-                                <input placeholder="{% trans "Author name" %}" class="form-control input-md widget-input" data-bind="value:graph.author, valueUpdate: 'keyup'">
+                                <input id="resourceauthorname" placeholder="{% trans "Author name" %}" class="form-control input-md widget-input" data-bind="value:graph.author, valueUpdate: 'keyup'">
                             </div>
                         </div>
                     </div>
@@ -192,11 +192,11 @@
                     <div class="row widget-container">
                         <div class="form-group">
                             <div class="relative">
-                                <label class="col-xs-12 control-label widget-input-label"> {% trans "Abstract" %}</label>
+                                <label class="col-xs-12 control-label widget-input-label" for="resourceabstract"> {% trans "Abstract" %}</label>
                             </div>
 
                             <div class="col-xs-12">
-                                <textarea placeholder="{% trans "Abstract/description" %}" rows="6" class="form-control" data-bind="value:graph.description, valueUpdate: 'keyup'"></textarea>
+                                <textarea id="resourceabstract" placeholder="{% trans "Abstract/description" %}" rows="6" class="form-control" data-bind="value:graph.description, valueUpdate: 'keyup'"></textarea>
                             </div>
                         </div>
                     </div>
@@ -204,22 +204,22 @@
                     <div class="row widget-container">
                         <div class="form-group">
                             <div class="relative">
-                                <label class="col-xs-12 control-label widget-input-label"> {% trans "JSON-LD Context" %}</label>
+                                <label class="col-xs-12 control-label widget-input-label" for="resourcejson"> {% trans "JSON-LD Context" %}</label>
                             </div>
 
                             <div class="col-xs-12">
-                                <textarea placeholder="{% trans "URI to a JSON-LD Context Object or a Raw Context Object or Array of Context Objects" %}" class="form-control input-md widget-input" data-bind="textInput:graph.jsonldcontext"></textarea>
+                                <textarea id="resourcejson" placeholder="{% trans "URI to a JSON-LD Context Object or a Raw Context Object or Array of Context Objects" %}" class="form-control input-md widget-input" data-bind="textInput:graph.jsonldcontext"></textarea>
                             </div>
                         </div>
                     </div>
                     <div class="row widget-container">
                         <div class="form-group">
                             <div class="relative">
-                                <label class="col-xs-12 control-label widget-input-label"> {% trans "URI Slug for API Access" %} </label>
+                                <label class="col-xs-12 control-label widget-input-label" for="resourceurislug"> {% trans "URI Slug for API Access" %} </label>
                             </div>
 
                             <div class="col-xs-12">
-                                <input placeholder="{% trans "Slug" %}" class="form-control input-md widget-input" data-bind="textInput:graph.slug">
+                                <input id="resourceurislug" placeholder="{% trans "Slug" %}" class="form-control input-md widget-input" data-bind="textInput:graph.slug">
                             </div>
                         </div>
                     </div>
@@ -236,11 +236,11 @@
                         <div class="form-group">
 
                             <div class="relative">
-                                <label class="col-xs-12 control-label widget-input-label"> {% trans "Color" %} </label>
+                                <label class="col-xs-12 control-label widget-input-label" for="resourcecolour"> {% trans "Color" %} </label>
                             </div>
 
                             <div class="colorpicker-component input-group" id="cp1">
-                                <input placeholder="{% trans " Map Feature Color " %}" class="form-control input-md widget-input" data-bind="colorPicker: {color: graph.color, format:'rgba', container: '#cp1'}">
+                                <input id="resourcecolour" placeholder="{% trans " Map Feature Color " %}" class="form-control input-md widget-input" data-bind="colorPicker: {color: graph.color, format:'rgba', container: '#cp1'}">
                                 <span class="input-group-addon"><i class="ion-stop resource-color-swatch" data-bind="style: {color: graph.color}"></i></span>
                             </div>
 
@@ -251,27 +251,23 @@
                         <div class="form-group">
 
                             <!-- Icon search -->
-                            <div style="padding-left: 5px;">
-                                <div class="relative" style="padding: 10px 0px;">
+                            <div class="icon-search-container relative">
+                                <!-- Currently selected icon -->
+                                <div>
+                                    {% trans "Selected icon:" %}
+                                    <button data-bind="css: 'btn btn-default btn-icon icon-lg ' + graph.iconclass(), click: function() {}"></button>
+                                </div>
 
-                                    <!-- Currently selected icon -->
-                                    <div>
-                                        {% trans "Selected icon:" %}
-                                        <button data-bind="css: 'btn btn-default btn-icon icon-lg ' + graph.iconclass(), click: function() {}" style="height: 35px; width: 35px;"></button>
-                                    </div>
+                                <div class="icon-search-field">
+                                    <input type="text" class="form-control" placeholder="{% trans "Find an icon" %}" aria-label="{% trans "Find an icon" %}" data-bind="value: graphSettingsViewModel.iconFilter, valueUpdate: 'keyup'">
 
-                                    <div style="position: absolute; left: 130px; top: 9px;">
-                                        <input type="text" class="form-control" style="width: 500px; height: 36px;" placeholder="{% trans "Find an icon" %}" data-bind="value: graphSettingsViewModel.iconFilter, valueUpdate: 'keyup'">
-
-                                        <!-- Remove Search -->
-                                        <span class="clear-search" style="position: absolute; left: 480px; top: 5px; color: #123; font-size: 17px;"><i class="fa fa-times-circle"></i></span>
-                                    </div>
+                                    <!-- Remove Search -->
+                                    <span class="clear-search"><i class="fa fa-times-circle"></i></span>
                                 </div>
                             </div>
 
                             <!-- Icon List -->
-                            <div style="height: 300px; overflow-y: scroll; padding-top: 15px; padding-left: 20px; border: 1px solid #e9e9e9; margin-left: 5px; margin-right: 30px;">
-
+                            <div class="icon-list">
                                 <div class="row">
 
                                     <!-- ko foreach: graphSettingsViewModel.icons() -->
