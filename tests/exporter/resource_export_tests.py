@@ -20,6 +20,7 @@ import os
 import json
 import csv
 from io import BytesIO
+from arches.app.utils.data_management.resources.formats.csvfile import CsvWriter, MissingConfigException
 from tests import test_settings
 from operator import itemgetter
 from django.core import management
@@ -58,10 +59,16 @@ class BusinessDataExportTests(ArchesTestCase):
     def tearDownClass(cls):
         pass
 
+    def test_invalid_writer_config(self):
+        with self.assertRaises(MissingConfigException):
+            CsvWriter()
+
     def test_csv_export(self):
         BusinessDataImporter("tests/fixtures/data/csv/resource_export_test.csv").import_business_data()
 
-        export = BusinessDataExporter("csv", configs="tests/fixtures/data/csv/resource_export_test.mapping", single_file=True).export()
+        export = BusinessDataExporter("csv", configs="tests/fixtures/data/csv/resource_export_test.mapping", single_file=True).export(
+            languages="en"
+        )
 
         csv_output = list(csv.DictReader(export[0]["outputfile"].getvalue().split("\r\n")))[0]
         csvinputfile = "tests/fixtures/data/csv/resource_export_test.csv"
@@ -102,5 +109,10 @@ class BusinessDataExportTests(ArchesTestCase):
         json_export = deep_sort(json.loads(export[0]["outputfile"].getvalue()))
 
         json_truth = deep_sort(json.load(open("tests/fixtures/data/json/resource_export_business_data_truth.json")))
+
+        # removes generated graph_publication_id
+        for resource_data in json_export["business_data"]["resources"]:
+            if resource_data["resourceinstance"]["graph_publication_id"]:
+                del resource_data["resourceinstance"]["graph_publication_id"]
 
         self.assertDictEqual(json_export, json_truth)

@@ -189,6 +189,7 @@
                 from_sparql_endpoint: "{% url 'from_sparql_endpoint' 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa' %}",
                 search_sparql_endpoint: "{% url 'search_sparql_endpoint' %}",
                 confirm_delete: "{% url 'confirm_delete' 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa' %}",
+                search_home: "{% url 'search_home' %}",
                 search_terms: "{% url 'search_terms' %}",
                 search_results: "{% url 'search_results' %}",
                 export_results: "{% url 'export_results' %}",
@@ -240,6 +241,8 @@
                 get_domain_connections: function(graphid){return "{% url 'get_domain_connections' 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa' %}".replace('aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa', graphid)},
                 clone_graph: function(graphid){return "{% url 'clone_graph' 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa' %}".replace('aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa', graphid)},
                 export_graph: function(graphid){return "{% url 'export_graph' 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa' %}".replace('aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa', graphid)},
+                publish_graph: function(graphid){return "{% url 'publish_graph' 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa' %}".replace('aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa', graphid)},
+                unpublish_graph: function(graphid){return "{% url 'unpublish_graph' 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa' %}".replace('aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa', graphid)},
                 delete_graph: function(graphid){return "{% url 'delete_graph' 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa' %}".replace('aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa', graphid)},
                 delete_instances: function(graphid){return "{% url 'delete_instances' 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa' %}".replace('aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa', graphid)},
                 export_mapping_file: function(graphid){return "{% url 'export_mapping_file' 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa' %}".replace('aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa', graphid)},
@@ -256,6 +259,9 @@
                 api_card: "{% url 'api_card' 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa' %}".replace('aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa', ''),
                 api_tiles: function (tileid) {
                     return "{% url 'api_tiles' 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa' %}".replace('aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa', tileid)
+                },
+                api_nodegroup: function (nodegroupid) {
+                    return "{% url 'api_nodegroup' 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa' %}".replace('aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa', nodegroupid)
                 },
                 api_nodes: function (nodeid) {
                     return "{% url 'api_nodes' 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa' %}".replace('aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa', nodeid)
@@ -275,6 +281,7 @@
                 iiifannotationnodes: "{% url 'iiifannotationnodes' %}",
                 validatejson: "{% url 'validatejson' 'aaaa'%}".replace('aaaa', ''),
                 get_dsl: "{% url 'get_dsl' %}",
+                transform_edtf_for_tile: "{% url 'transform_edtf_for_tile' %}",
                 {% block urls %}{% endblock urls %}
             },
             geocoderPlaceHolder: "{% trans 'Find an address...' %}",
@@ -316,8 +323,13 @@
                 title: "{% trans 'Resource Copy Failed...'%}",
                 text: "{% trans 'Sorry! The copy request failed. Please try again.  Contact your system administrator if the problem persists.' %}"
             },
+            resourceHasUnpublishedGraph: {
+                title: "{% trans 'This resource is based on an unpublished graph.' %}",
+                text: "{% trans 'To continue, please ensure the graph is published.' %}"
+            },
             mapboxApiKey: '{{ map_info.mapbox_api_key }}',
-            defaultLanguage: '{{ app_settings.DEFAULT_LANGUAGE }}',
+            activeLanguage: '{{ app_settings.ACTIVE_LANGUAGE }}',
+            activeLanguageDir: '{{ app_settings.ACTIVE_LANGUAGE_DIR }}',
             languages: {% autoescape off %}{{ app_settings.LANGUAGES }}{% endautoescape %},
             hexBinSize: {{ map_info.hex_bin_size | unlocalize }},
             mapboxSprites: '{{ map_info.mapbox_sprites }}',
@@ -527,53 +539,53 @@
         'leaflet',
         'leaflet-draw'
     ], function (L) {
-        L.drawLocal.draw.toolbar.actions.title = '{% trans "Cancel drawing" %}';
-        L.drawLocal.draw.toolbar.actions.text = '{% trans "Cancel" %}';
+        L.drawLocal.draw.toolbar.actions.title = "{% trans "Cancel drawing" %}";
+        L.drawLocal.draw.toolbar.actions.text = "{% trans "Cancel" %}";
 
-        L.drawLocal.draw.toolbar.finish.title = '{% trans "Finish drawing" %}';
-        L.drawLocal.draw.toolbar.finish.text = '{% trans "Finish" %}';
+        L.drawLocal.draw.toolbar.finish.title = "{% trans "Finish drawing" %}";
+        L.drawLocal.draw.toolbar.finish.text = "{% trans "Finish" %}";
 
-        L.drawLocal.draw.toolbar.undo.title = '{% trans "Delete last point drawn" %}';
-        L.drawLocal.draw.toolbar.undo.text = '{% trans "Delete last point" %}';
+        L.drawLocal.draw.toolbar.undo.title = "{% trans "Delete last point drawn" %}";
+        L.drawLocal.draw.toolbar.undo.text = "{% trans "Delete last point" %}";
 
-        L.drawLocal.draw.toolbar.buttons.polyline = '{% trans "Draw a polyline" %}';
-        L.drawLocal.draw.toolbar.buttons.polygon = '{% trans "Draw a polygon" %}';
-        L.drawLocal.draw.toolbar.buttons.rectangle = '{% trans "Draw a rectangle" %}';
-        L.drawLocal.draw.toolbar.buttons.circle = '{% trans "Draw a circle" %}';
-        L.drawLocal.draw.toolbar.buttons.marker = '{% trans "Draw a marker" %}';
+        L.drawLocal.draw.toolbar.buttons.polyline = "{% trans "Draw a polyline" %}";
+        L.drawLocal.draw.toolbar.buttons.polygon = "{% trans "Draw a polygon" %}";
+        L.drawLocal.draw.toolbar.buttons.rectangle = "{% trans "Draw a rectangle" %}";
+        L.drawLocal.draw.toolbar.buttons.circle = "{% trans "Draw a circle" %}";
+        L.drawLocal.draw.toolbar.buttons.marker = "{% trans "Draw a marker" %}";
 
-        L.drawLocal.draw.handlers.circle.tooltip.start = '{% trans "Click and drag to draw circle." %}';
-        L.drawLocal.draw.handlers.circle.radius = '{% trans "Radius" %}';
+        L.drawLocal.draw.handlers.circle.tooltip.start = "{% trans "Click and drag to draw circle." %}";
+        L.drawLocal.draw.handlers.circle.radius = "{% trans "Radius" %}";
 
-        L.drawLocal.draw.handlers.marker.tooltip.start = '{% trans "Click map to place marker." %}';
+        L.drawLocal.draw.handlers.marker.tooltip.start = "{% trans "Click map to place marker." %}";
 
-        L.drawLocal.draw.handlers.polygon.tooltip.start = '{% trans "Click to start drawing shape." %}';
-        L.drawLocal.draw.handlers.polygon.tooltip.cont = '{% trans "Click to continue drawing shape." %}';
-        L.drawLocal.draw.handlers.polygon.tooltip.end = '{% trans "Click first point to close this shape." %}';
+        L.drawLocal.draw.handlers.polygon.tooltip.start = "{% trans "Click to start drawing shape." %}";
+        L.drawLocal.draw.handlers.polygon.tooltip.cont = "{% trans "Click to continue drawing shape." %}";
+        L.drawLocal.draw.handlers.polygon.tooltip.end = "{% trans "Click first point to close this shape." %}";
 
-        L.drawLocal.draw.handlers.polyline.error = '{% trans "<strong>Error:</strong> shape edges cannot cross!" %}';
-        L.drawLocal.draw.handlers.polyline.tooltip.start = '{% trans "Click to start drawing line." %}';
-        L.drawLocal.draw.handlers.polyline.tooltip.cont = '{% trans "Click to continue drawing line." %}';
-        L.drawLocal.draw.handlers.polyline.tooltip.end = '{% trans "Click last point to finish line." %}';
+        L.drawLocal.draw.handlers.polyline.error = "{% trans "<strong>Error:</strong> shape edges cannot cross!" %}";
+        L.drawLocal.draw.handlers.polyline.tooltip.start = "{% trans "Click to start drawing line." %}";
+        L.drawLocal.draw.handlers.polyline.tooltip.cont = "{% trans "Click to continue drawing line." %}";
+        L.drawLocal.draw.handlers.polyline.tooltip.end = "{% trans "Click last point to finish line." %}";
 
-        L.drawLocal.draw.handlers.rectangle.tooltip.start = '{% trans "Click and drag to draw rectangle." %}';
-        L.drawLocal.draw.handlers.simpleshape.tooltip.end = '{% trans "Release mouse to finish drawing." %}';
+        L.drawLocal.draw.handlers.rectangle.tooltip.start = "{% trans "Click and drag to draw rectangle." %}";
+        L.drawLocal.draw.handlers.simpleshape.tooltip.end = "{% trans "Release mouse to finish drawing." %}";
 
-        L.drawLocal.edit.toolbar.actions.save.title = '{% trans "Apply changes." %}';
-        L.drawLocal.edit.toolbar.actions.save.text = '{% trans "Apply" %}';
+        L.drawLocal.edit.toolbar.actions.save.title = "{% trans "Apply changes." %}";
+        L.drawLocal.edit.toolbar.actions.save.text = "{% trans "Apply" %}";
 
-        L.drawLocal.edit.toolbar.actions.cancel.title = '{% trans "Undo edits, discards all changes." %}';
-        L.drawLocal.edit.toolbar.actions.cancel.text = '{% trans "Undo" %}';
+        L.drawLocal.edit.toolbar.actions.cancel.title = "{% trans "Undo edits, discards all changes." %}";
+        L.drawLocal.edit.toolbar.actions.cancel.text = "{% trans "Undo" %}";
 
-        L.drawLocal.edit.toolbar.buttons.edit = '{% trans "Edit drawings." %}';
-        L.drawLocal.edit.toolbar.buttons.editDisabled = '{% trans "No drawings to edit." %}';
-        L.drawLocal.edit.toolbar.buttons.remove = '{% trans "Delete drawings." %}';
-        L.drawLocal.edit.toolbar.buttons.removeDisabled = '{% trans "No drawings to delete." %}';
+        L.drawLocal.edit.toolbar.buttons.edit = "{% trans "Edit drawings." %}";
+        L.drawLocal.edit.toolbar.buttons.editDisabled = "{% trans "No drawings to edit." %}";
+        L.drawLocal.edit.toolbar.buttons.remove = "{% trans "Delete drawings." %}";
+        L.drawLocal.edit.toolbar.buttons.removeDisabled = "{% trans "No drawings to delete." %}";
 
-        L.drawLocal.edit.handlers.edit.tooltip.text = '{% trans "Drag handles, or marker to edit feature." %}';
-        L.drawLocal.edit.handlers.edit.tooltip.subtext = '{% trans "Click undo to cancel changes." %}';
+        L.drawLocal.edit.handlers.edit.tooltip.text = "{% trans "Drag handles, or marker to edit feature." %}";
+        L.drawLocal.edit.handlers.edit.tooltip.subtext = "{% trans "Click undo to cancel changes." %}";
 
-        L.drawLocal.edit.handlers.remove.tooltip.text = '{% trans "Click on a feature to remove" %}';
+        L.drawLocal.edit.handlers.remove.tooltip.text = "{% trans "Click on a feature to remove" %}";
     });
 </script>
 {% endblock arches_modules %}

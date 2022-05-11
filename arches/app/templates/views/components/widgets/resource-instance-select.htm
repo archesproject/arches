@@ -1,4 +1,5 @@
 {% extends "views/components/widgets/base.htm" %}
+{% load template_tags %}
 {% load i18n %}
 
 {% block form %}
@@ -68,7 +69,8 @@
                             </button>
                         </div>
                         <div class="rr-table-column" style="flex-grow: 1; cursor: pointer;" data-bind="click: function() { self.toggleSelectedResourceRelationship($data); }, clickBubble: false">
-                            <div class="rr-table-instance-label" style="padding-left: 10px;" data-bind="text: $data.resourceName()">
+                            <div class="rr-table-instance-label" style="padding-left: 10px;">
+                                <i class="sm-icon-wrap" data-bind="css: $data.iconClass()"></i><span data-bind="text: $data.resourceName()"></span>
                             </div>
                         </div>
                     </div>
@@ -90,7 +92,7 @@
                                     <span class="col-xs-12">
                                         <input style="max-width:100%; display:inline-block; margin: 3px 0px;" data-bind="
                                         select2Query: {
-                                            select2Config: self.getSelect2ConfigForOntologyProperties($data.ontologyProperty, self.rootOntologyClass, $data.ontologyClass(), '{% trans 'Select an Ontology Property' %}')}">
+                                            select2Config: self.getSelect2ConfigForOntologyProperties($data.ontologyProperty, self.rootOntologyClass, $data.ontologyClass(), {% quoted_trans 'Select an Ontology Property' %})}">
                                     </span>
 
                                     <!-- rr name -->
@@ -112,7 +114,7 @@
                                     <span class="col-xs-12">
                                         <input style="width:100%; display:inline-block; margin: 3px 0px;" data-bind="
                                         select2Query: {
-                                            select2Config: self.getSelect2ConfigForOntologyProperties($data.inverseOntologyProperty, $data.ontologyClass(), self.rootOntologyClass, '{% trans 'Select an Ontology Property' %}')}">
+                                            select2Config: self.getSelect2ConfigForOntologyProperties($data.inverseOntologyProperty, $data.ontologyClass(), self.rootOntologyClass, {% quoted_trans 'Select an Ontology Property' %})}">
                                     </span>
 
                                     <!-- Instance name -->
@@ -150,7 +152,7 @@
     data-bind="style: {transform: !!reportResourceId() ? 'translate(0,0)' : 'translate(100%,0)'}">
     <div class="create-instance-header" style="display: flex; justify-content: space-between;">{% trans "Related Resource Summary" %}
         <div data-bind="click: function(){reportResourceId(null)}, clickBubble: false" class="close-new-step">
-            <button class="btn btn-labeled btn-lg fa fa-arrow-right btn-primary">{% trans "Return" %}</button>
+            <button class="btn btn-labeled btn-lg fa fa-arrow-right btn-primary"><span>{% trans "Return" %}</span></button>
         </div>
     </div>
     <div class="create-instance-panel" data-bind="component: {
@@ -266,7 +268,7 @@
                                             <input style="max-width:100%; display:inline-block; margin: 3px 0px;"
                                                 data-bind="
                                             select2Query: {
-                                                select2Config: self.getSelect2ConfigForOntologyProperties($data.ontologyProperty, self.rootOntologyClass, $data.ontologyClass(), '{% trans 'Select an Ontology Property' %}')}">
+                                                select2Config: self.getSelect2ConfigForOntologyProperties($data.ontologyProperty, self.rootOntologyClass, $data.ontologyClass(), {% quoted_trans 'Select an Ontology Property' %})}">
                                         </span>
     
                                         <!-- rr name -->
@@ -291,7 +293,7 @@
                                             <input style="width:100%; display:inline-block; margin: 3px 0px;"
                                                 data-bind="
                                             select2Query: {
-                                                select2Config: self.getSelect2ConfigForOntologyProperties($data.inverseOntologyProperty, $data.ontologyClass(), self.rootOntologyClass, '{% trans 'Select an Ontology Property' %}')}">
+                                                select2Config: self.getSelect2ConfigForOntologyProperties($data.inverseOntologyProperty, $data.ontologyClass(), self.rootOntologyClass, {% quoted_trans 'Select an Ontology Property' %})}">
                                         </span>
     
                                         <!-- Instance name -->

@@ -14,6 +14,6 @@
     <select data-bind="options: languages, optionsText: function(item){return item.name + ' (' + item.code + ')'}, value: language, chosen:{width:'100%'}"></select>
 </div>
 <div class="col-md-9 col-lg-8" data-bind="visible: op() !== 'null' && op() !== 'not_null'">
-    <input type="text" placeholder='{% trans "Name" %}' class="form-control input-lg" style="height: 36px;" data-bind="value: searchValue, valueUpdate: 'keyup'">
+    <input type="text" placeholder="{% trans "Name" %}" class="form-control input-lg" style="height: 36px;" data-bind="value: searchValue, valueUpdate: 'keyup'">
 </div>
 <!-- /ko -->

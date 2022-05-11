@@ -7,7 +7,12 @@ from arches.app.datatypes.datatypes import DataTypeFactory
 from django.utils.translation import ugettext as _
 
 
-class PrimaryDescriptorsFunction(BaseFunction):
+class AbstractPrimaryDescriptorsFunction(BaseFunction):
+    def get_primary_descriptor_from_nodes(self, resource, config):
+        pass
+
+
+class PrimaryDescriptorsFunction(AbstractPrimaryDescriptorsFunction):
     def get_primary_descriptor_from_nodes(self, resource, config):
         datatype_factory = None
         try:
@@ -34,12 +39,7 @@ class PrimaryDescriptorsFunction(BaseFunction):
                             value = datatype.get_display_value(tile, node)
                             if value is None:
                                 value = ""
-                            if node.datatype == "string":
-                                config["string_template"] = config["string_template"].replace(
-                                    "<%s>" % node.name, JSONSerializer().serialize(value)
-                                )
-                            else:
-                                config["string_template"] = config["string_template"].replace("<%s>" % node.name, str(value))
+                            config["string_template"] = config["string_template"].replace("<%s>" % node.name, str(value))
         except ValueError as e:
             print(e, "invalid nodegroupid participating in descriptor function.")
         if config["string_template"].strip() == "":

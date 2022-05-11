@@ -8848,17 +8848,21 @@
             "functions_x_graphs": [
                 {
                     "config": {
-                        "description": {
-                            "nodegroup_id": "5b58f252-943a-11e8-ab05-94659cf754d0",
-                            "string_template": "<Description>"
-                        },
-                        "map_popup": {
-                            "nodegroup_id": "292ae090-943a-11e8-960d-94659cf754d0",
-                            "string_template": "<Name>"
-                        },
-                        "name": {
-                            "nodegroup_id": "292ae090-943a-11e8-960d-94659cf754d0",
-                            "string_template": "<Name>"
+                        "module": "arches.app.functions.primary_descriptors",
+                        "class_name": "PrimaryDescriptorsFunction",
+                        "descriptor_types": {
+                            "description": {
+                                "nodegroup_id": "5b58f252-943a-11e8-ab05-94659cf754d0",
+                                "string_template": "<Description>"
+                            },
+                            "map_popup": {
+                                "nodegroup_id": "292ae090-943a-11e8-960d-94659cf754d0",
+                                "string_template": "<Name>"
+                            },
+                            "name": {
+                                "nodegroup_id": "292ae090-943a-11e8-960d-94659cf754d0",
+                                "string_template": "<Name>"
+                            }
                         },
                         "triggering_nodegroups": []
                     },
@@ -8868,9 +8872,15 @@
                 }
             ],
             "graphid": "243f8689-b8f6-11e6-84a5-026d961c88e6",
+            "publication": {
+                "graph_id": "243f8689-b8f6-11e6-84a5-026d961c88e6",
+                "notes": "Initial migration.",
+                "publicationid": "ffc1edb1-e52d-4c73-99ac-64413912a3fc",
+                "published_time": "2022-03-22T13:29:06.593",
+                "user_id": null
+            },
             "iconclass": "fa fa-tasks",
             "is_editable": false,
-            "isactive": true,
             "isresource": true,
             "jsonldcontext": null,
             "name": "Activity",
@@ -9010,7 +9020,7 @@
                         "addToMap": true,
                         "advancedStyle": "",
                         "advancedStyling": false,
-                        "clusterDistance": 20, 
+                        "clusterDistance": 20,
                         "clusterMaxZoom": 5,
                         "clusterMinPoints": 3,
                         "fillColor": "rgba(109,195,252,0.5)",

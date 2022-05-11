@@ -71,7 +71,7 @@ define([
             return false;
         }, this);
 
-        var downloadGraph = function(graphid){
+        this.downloadGraph = function(graphid){
             if (graphid in self.graphLookup){
                 return Promise.resolve(self.graphLookup[graphid]);
             } else {
@@ -85,6 +85,7 @@ define([
                     .then(function(json){
                         self.graphLookup[graphid] = json.graph;
                         self.graphLookupKeys(Object.keys(self.graphLookup));
+                        self.value.valueHasMutated();
                         return json.graph;
                     });
             }
@@ -97,7 +98,7 @@ define([
                 this.graphIsSemantic = !!this.rootOntologyClass;
             } else {
                 var graphid = params.node.graph_id || params.node.get('graph_id');
-                downloadGraph(graphid)
+                self.downloadGraph(graphid)
                     .then(function(graph){
                         self.rootOntologyClass = graph.root.ontologyclass;
                         self.graphIsSemantic = !!self.rootOntologyClass;
@@ -105,13 +106,13 @@ define([
             }
             if (params.state !== 'report') {
                 ko.unwrap(params.node.config.graphs).forEach(function(graph){
-                    downloadGraph(graph.graphid);
+                    self.downloadGraph(graph.graphid);
                 }, this);
                 this.resourceTypesToDisplayInDropDown(ko.unwrap(params.node.config.graphs).map(function(graph){return graph.graphid;}));
             }
         } else if(this.resourceTypesToDisplayInDropDown().length > 0) {
             this.resourceTypesToDisplayInDropDown().forEach(function(graphid){
-                downloadGraph(graphid);
+                self.downloadGraph(graphid);
             });
         }
     
@@ -177,7 +178,7 @@ define([
         };
         
         
-        var setValue = function(valueObject) {
+        this.setValue = function(valueObject) {
             if (self.multiple) {
                 valueObject = [valueObject];
                 if (self.value() !== null) {
@@ -192,7 +193,7 @@ define([
             }
         };
         
-        var lookupResourceInstanceData = function(resourceid) {
+        this.lookupResourceInstanceData = function(resourceid) {
             if (resourceLookup[resourceid]) {
                 return Promise.resolve(resourceLookup[resourceid]);
             } else {
@@ -225,11 +226,15 @@ define([
                             if(!val.ontologyClass) {
                                 Object.defineProperty(val, 'ontologyClass', {value:ko.observable()});
                             }
-                            lookupResourceInstanceData(ko.unwrap(val.resourceId))
+                            if(!val.iconClass) {
+                                Object.defineProperty(val, 'iconClass', {value: ko.observable()});
+                            }
+                            self.lookupResourceInstanceData(ko.unwrap(val.resourceId))
                                 .then(function(resourceInstance) {
                                     names.push(resourceInstance["_source"].displayname);
                                     self.displayValue(names.join(', '));
-                                    val.resourceName(resourceInstance["_source"].displayname);
+                                    val.resourceName(resourceInstance["_source"].displayname)
+                                    val.iconClass(self.graphLookup[resourceInstance["_source"].graph_id]?.iconclass || 'fa fa-question')
                                     val.ontologyClass(resourceInstance["_source"].root_ontology_class);
                                 });
                         }
@@ -251,8 +256,9 @@ define([
             });
         }
 
-        var makeObject = function(id, esSource){
+        this.makeObject = function(id, esSource){
             var graph = self.graphLookup[esSource.graph_id];
+            var iconClass = graph.iconclass  || 'fa fa-question';
 
             var ontologyProperty;
             var inverseOntologyProperty;
@@ -281,6 +287,7 @@ define([
             };            
             Object.defineProperty(ret, 'resourceName', {value: ko.observable(esSource.displayname)});
             Object.defineProperty(ret, 'ontologyClass', {value: ko.observable(esSource.root_ontology_class)});
+            Object.defineProperty(ret, 'iconClass', {value: ko.observable(iconClass)});
             if (!!params.configForm) {
                 ret.ontologyProperty.subscribe(function(){
                     self.defaultResourceInstance(self.value());
@@ -294,16 +301,15 @@ define([
         };
 
 
-        var url = ko.observable(arches.urls.search_results);
-        this.url = url;
-        var resourceToAdd = ko.observable("");
+        this.url = ko.observable(arches.urls.search_results);
+        this.resourceToAdd = ko.observable("");
 
         this.disabled = ko.computed(function() {
             return ko.unwrap(self.waitingForGraphToDownload) || ko.unwrap(params.disabled) || !!ko.unwrap(params.form?.locked);
         });
         
         this.select2Config = {
-            value: self.renderContext === 'search' ? self.value : resourceToAdd,
+            value: self.renderContext === 'search' ? self.value : self.resourceToAdd,
             clickBubble: true,
             disabled: this.disabled,
             multiple: !self.displayOntologyTable ? params.multiple : false,
@@ -314,11 +320,11 @@ define([
                 self.selectedItem(item);
                 if (self.renderContext !== 'search') {
                     if (item._source) {
-                        var ret = makeObject(item._id, item._source);
-                        setValue(ret);
+                        var ret = self.makeObject(item._id, item._source);
+                        self.setValue(ret);
                         window.setTimeout(function() {
                             if(self.displayOntologyTable){
-                                resourceToAdd("");
+                                self.resourceToAdd("");
                             }
                         }, 250);
                     } else {
@@ -334,7 +340,7 @@ define([
                             var clearNewInstance = function() {
                                 self.newResourceInstance(null);
                                 window.setTimeout(function() {
-                                    resourceToAdd("");
+                                    self.resourceToAdd("");
                                 }, 250);
                             };
                             params.complete.subscribe(function() {
@@ -348,8 +354,8 @@ define([
                                         })
                                         .then(function(json) {
                                             var item = json.results.hits.hits[0];
-                                            var ret = makeObject(params.resourceid(), item._source);
-                                            setValue(ret);
+                                            var ret = self.makeObject(params.resourceid(), item._source);
+                                            self.setValue(ret);
                                         })
                                         .finally(function(){
                                             clearNewInstance();
@@ -364,7 +370,7 @@ define([
             },
             ajax: {
                 url: function() {
-                    return url();
+                    return self.url();
                 },
                 dataType: 'json',
                 quietMillis: 250,
@@ -375,10 +381,10 @@ define([
                     // var isUrl = val.target.value.match(regex)
                     var isUrl = term.startsWith('http');
                     if (isUrl) {
-                        url(term.replace('search', 'search/resources'));
+                        self.url(term.replace('search', 'search/resources'));
                         return {};
                     } else {
-                        url(arches.urls.search_results);
+                        self.url(arches.urls.search_results);
                         var queryString = new URLSearchParams();
                         if (!!params.node && ko.unwrap(params.node.config.searchString) !== ""){
                             var searchUrl = new URL(ko.unwrap(params.node.config.searchString));
@@ -444,7 +450,8 @@ define([
             },
             formatResult: function(item) {
                 if (item._source) {
-                    return item._source.displayname;
+                    iconClass = self.graphLookup[item._source.graph_id]?.iconclass
+                    return `<i class="fa ${iconClass} sm-icon-wrap"></i> ${item._source.displayname}`;
                 } else {
                     if (self.allowInstanceCreation) {
                         return '<b> ' + arches.translations.riSelectCreateNew.replace('${graphName}', item.name) + ' . . . </b>';
@@ -453,7 +460,7 @@ define([
             },
             formatSelection: function(item) {
                 if (item._source) {
-                    return item._source.displayname;
+                    return `<i class="fa ${item._source.iconclass} sm-icon-wrap"></i> ${item._source.displayname}`;
                 } else {
                     return item.name;
                 }
@@ -476,7 +483,7 @@ define([
                             resourceId = ko.unwrap(val.resourceId);
                         }
 
-                        var resourceInstance = lookupResourceInstanceData(resourceId).then(
+                        var resourceInstance = self.lookupResourceInstanceData(resourceId).then(
                             function(resourceInstance) { return resourceInstance; }
                         );
            
@@ -486,7 +493,7 @@ define([
                     Promise.all(lookups).then(function(arr){
                         if (arr.length) {
                             var ret = arr.map(function(item) {
-                                return {"_source":{"displayname": item["_source"].displayname}, "_id":item["_id"]};
+                                return {"_source":{"displayname": item["_source"].displayname, "iconclass": self.graphLookup[item._source.graph_id]?.iconclass || 'fa fa-question'}, "_id":item["_id"]};
                             });
                             if(self.multiple === false) {
                                 ret = ret[0];

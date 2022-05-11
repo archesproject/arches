@@ -72,7 +72,8 @@ ELASTICSEARCH_PREFIX = "arches"
 ELASTICSEARCH_CUSTOM_INDEXES = []
 # [{
 #     'module': 'my_project.search_indexes.sample_index.SampleIndex',
-#     'name': 'my_new_custom_index'
+#     'name': 'my_new_custom_index',
+#     'should_update_asynchronously': False
 # }]
 
 
@@ -161,6 +162,12 @@ EMAIL_HOST_USER = "xxxx@xxx.com"
 
 DEFAULT_FROM_EMAIL = EMAIL_HOST_USER
 
+# If True, allows for user self creation via the signup view. If False, users can only be created via the Django admin view.
+ENABLE_USER_SIGNUP = True
+
+# If True, users must authenticate their accout via email to complete the account creation process.
+FORCE_USER_SIGNUP_EMAIL_AUTHENTICATION = True
+
 POSTGIS_VERSION = (3, 0, 0)
 
 # If you set this to False, Django will make some optimizations so as not
@@ -178,7 +185,7 @@ TIME_ZONE = "America/Chicago"
 USE_TZ = False
 
 
-# see https://docs.djangoproject.com/en/1.9/topics/i18n/translation/#how-django-discovers-language-preference
+# see https://docs.djangoproject.com/en/2.2/topics/i18n/translation/#how-django-discovers-language-preference
 # to see how LocaleMiddleware tries to determine the user's language preference
 # (make sure to check your accept headers as they will override the LANGUAGE_CODE setting!)
 # also see get_language_from_request in django.utils.translation.trans_real.py
@@ -335,8 +342,8 @@ AUTHENTICATION_BACKENDS = (
     "arches.app.utils.email_auth_backend.EmailAuthenticationBackend",
     "oauth2_provider.backends.OAuth2Backend",
     "django.contrib.auth.backends.ModelBackend",  # this is default
-    "guardian.backends.ObjectPermissionBackend",
     "arches.app.utils.permission_backend.PermissionBackend",
+    "guardian.backends.ObjectPermissionBackend",
 )
 
 INSTALLED_APPS = (
@@ -357,11 +364,9 @@ INSTALLED_APPS = (
     "oauth2_provider",
     "django_celery_results",
     "compressor",
-    # 'debug_toolbar'
 )
 
 MIDDLEWARE = [
-    # 'debug_toolbar.middleware.DebugToolbarMiddleware',
     "corsheaders.middleware.CorsMiddleware",
     "django.middleware.security.SecurityMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
@@ -448,7 +453,13 @@ if DEBUG is True:
 # group to assign users who self sign up via the web ui
 USER_SIGNUP_GROUP = "Crowdsource Editor"
 
-CACHES = {"default": {"BACKEND": "django.core.cache.backends.locmem.LocMemCache", "LOCATION": "unique-snowflake"}}
+CACHES = {
+    "default": {"BACKEND": "django.core.cache.backends.locmem.LocMemCache", "LOCATION": "unique-snowflake"},
+    "user_permission": {
+        "BACKEND": "django.core.cache.backends.db.DatabaseCache",
+        "LOCATION": "user_permission_cache",
+    },
+}
 
 DEFAULT_RESOURCE_IMPORT_USER = {"username": "admin", "userid": 1}
 

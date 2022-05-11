@@ -9737,17 +9737,21 @@
             "functions_x_graphs": [
                 {
                     "config": {
-                        "description": {
-                            "nodegroup_id": "b146c041-943d-11e8-ac82-94659cf754d0",
-                            "string_template": "<Description>"
-                        },
-                        "map_popup": {
-                            "nodegroup_id": "b50d3e1e-943d-11e8-811e-94659cf754d0",
-                            "string_template": "<Name>"
-                        },
-                        "name": {
-                            "nodegroup_id": "b50d3e1e-943d-11e8-811e-94659cf754d0",
-                            "string_template": "<Name>"
+                        "module": "arches.app.functions.primary_descriptors",
+                        "class_name": "PrimaryDescriptorsFunction",
+                        "descriptor_types": {
+                            "description": {
+                                "nodegroup_id": "b146c041-943d-11e8-ac82-94659cf754d0",
+                                "string_template": "<Description>"
+                            },
+                            "map_popup": {
+                                "nodegroup_id": "b50d3e1e-943d-11e8-811e-94659cf754d0",
+                                "string_template": "<Name>"
+                            },
+                            "name": {
+                                "nodegroup_id": "b50d3e1e-943d-11e8-811e-94659cf754d0",
+                                "string_template": "<Name>"
+                            }
                         },
                         "triggering_nodegroups": []
                     },
@@ -9757,9 +9761,15 @@
                 }
             ],
             "graphid": "f5624ce7-b66c-11e6-84a5-026d961c88e6",
+            "publication": {
+                "graph_id": "f5624ce7-b66c-11e6-84a5-026d961c88e6",
+                "notes": "Initial migration.",
+                "publicationid": "d7736821-ad32-4d2b-8f17-2dd1b1ec98fc",
+                "published_time": "2022-03-22T13:29:06.593",
+                "user_id": null
+            },
             "iconclass": "fa fa-calendar",
             "is_editable": false,
-            "isactive": true,
             "isresource": true,
             "jsonldcontext": null,
             "name": "Historic Event",
@@ -10012,7 +10022,7 @@
                         "advancedStyle": "",
                         "advancedStyling": false,
                         "clusterDistance": 20,
-                        "clusterMaxZoom": 5, 
+                        "clusterMaxZoom": 5,
                         "clusterMinPoints": 3,
                         "fillColor": "rgba(78,191,65,0.5)",
                         "haloRadius": 4,

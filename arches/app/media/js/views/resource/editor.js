@@ -16,8 +16,6 @@ define([
     'bindings/sortable',
     'widgets',
     'card-components',
-    'views/resource/related-resources-manager',
-    'views/resource/permissions-manager',
     'moment',
 ], function($, _, ko, BaseManagerView, AlertViewModel, JsonErrorAlertViewModel, GraphModel, ReportModel, CardViewModel, ProvisionalTileViewModel, arches, data, reportLookup) {
     var handlers = {
@@ -38,14 +36,15 @@ define([
 
     let displayNameValue = undefined;
     if(parsedDisplayName){
-        const defaultLanguageValue = parsedDisplayName?.[arches.defaultLanguage]?.value;
-        displayNameValue = defaultLanguageValue ? defaultLanguageValue : "(" + parsedDisplayName[Object.keys(parsedDisplayName).filter(languageKey => languageKey != arches.defaultLanguage)?.[0]]?.value + ")";
+        const defaultLanguageValue = parsedDisplayName?.[arches.activeLanguage]?.value;
+        displayNameValue = defaultLanguageValue ? defaultLanguageValue : "(" + parsedDisplayName[Object.keys(parsedDisplayName).filter(languageKey => languageKey != arches.activeLanguage)?.[0]]?.value + ")";
     } else {
         displayNameValue = data.displayname;
     }
     const displayname = ko.observable(displayNameValue);
     var resourceId = ko.observable(data.resourceid);
     var appliedFunctions = ko.observable(data['appliedFunctions']);
+    var primaryDescriptorFunction = ko.observable(data['primaryDescriptorFunction']);
     var userIsCreator = data['useriscreator'];
     var creator = data['creator'];
     var selectedTile = ko.computed(function() {
@@ -110,6 +109,7 @@ define([
             cards: data.cards,
             tiles: tiles,
             appliedFunctions: appliedFunctions(),
+            primaryDescriptorFunction: primaryDescriptorFunction(),
             selection: selection,
             scrollTo: scrollTo,
             loading: loading,
@@ -156,6 +156,7 @@ define([
         graphiconclass: data.graphiconclass,
         relationship_types: data.relationship_types,
         userIsCreator: userIsCreator,
+        showGrid: ko.observable(false),
         creator: creator,
         // appliedFunctions: appliedFunctions(),
         graph: {
@@ -171,6 +172,10 @@ define([
         collapseAll: function() {
             toggleAll(false);
         },
+        toggleGrid: () => {
+            vm.showGrid(!vm.showGrid());
+        },
+        activeLanguageDir: ko.observable(arches.activeLanguageDir),
         rootExpanded: ko.observable(true),
         topCards: topCards,
         selection: selection,
@@ -200,7 +205,10 @@ define([
         resourceId: resourceId,
         reportLookup: reportLookup,
         copyResource: function() {
-            if (resourceId()) {
+            if (data.graph && !data.graph.publication_id) {
+                vm.alert(new AlertViewModel('ep-alert-red', arches.resourceHasUnpublishedGraph.title, arches.resourceHasUnpublishedGraph.text, null, function(){}));
+            }
+            else if (resourceId()) {
                 vm.menuActive(false);
                 loading(true);
                 $.ajax({
@@ -216,6 +224,9 @@ define([
                         loading(false);
                     },
                 });
+            }
+            else {
+                vm.alert(new AlertViewModel('ep-alert-red', arches.resourceCopyFailed.title, arches.resourceCopyFailed.text, null, function(){}));
             }
         },
         deleteResource: function() {
@@ -272,38 +283,42 @@ define([
     });
 
     vm.showRelatedResourcesManager = function(){
-        if (vm.graph.domain_connections == undefined) {
-            $.ajax({
-                url: arches.urls.relatable_resources,
-                data: {graphid: vm.graphid}
-            }).done(function(relatable){
-                vm.graph.relatable_resources = relatable;
+        require(['views/resource/related-resources-manager'], () => {
+            if (vm.graph.domain_connections == undefined) {
                 $.ajax({
-                    url: arches.urls.get_domain_connections(vm.graphid),
-                    data: {"ontology_class": vm.graph.ontologyclass}
-                }).done(function(data){
-                    vm.graph.domain_connections = data;
-                    vm.relatedResourcesManagerObj = {
-                        searchResultsVm: undefined,
-                        resourceEditorContext: true,
-                        editing_instance_id: vm.resourceId(),
-                        relationship_types: vm.relationship_types,
-                        graph: vm.graph,
-                        loading: vm.loading
-                    };
-                    vm.selection('related-resources');
+                    url: arches.urls.relatable_resources,
+                    data: {graphid: vm.graphid}
+                }).done(function(relatable){
+                    vm.graph.relatable_resources = relatable;
+                    $.ajax({
+                        url: arches.urls.get_domain_connections(vm.graphid),
+                        data: {"ontology_class": vm.graph.ontologyclass}
+                    }).done(function(data){
+                        vm.graph.domain_connections = data;
+                        vm.relatedResourcesManagerObj = {
+                            searchResultsVm: undefined,
+                            resourceEditorContext: true,
+                            editing_instance_id: vm.resourceId(),
+                            relationship_types: vm.relationship_types,
+                            graph: vm.graph,
+                            loading: vm.loading
+                        };
+                        vm.selection('related-resources');
+                    });
                 });
-            });
 
-        } else {
-            vm.selection('related-resources');
-        }
+            } else {
+                vm.selection('related-resources');
+            }
+        });
     };
 
     vm.showInstancePermissionsManager = function(){
-        if (vm.userIsCreator === true || vm.userIsCreator === null) {
-            vm.selection('permissions-manager');
-        }
+        require(['views/resource/permissions-manager'], () => {
+            if (vm.userIsCreator === true || vm.userIsCreator === null) {
+                vm.selection('permissions-manager');
+            }
+        });
     };
 
     vm.selectionBreadcrumbs = ko.computed(function() {

@@ -133,6 +133,7 @@ define([
             },
             loading: loading,
             showIds: ko.observable(false),
+            showGrid: ko.observable(false),
             cachedFlatTree: cachedFlatTree,
             widgetLookup: createLookup(data.widgets, 'widgetid'),
             cardComponentLookup: createLookup(data.cardComponents, 'componentid'),
@@ -143,6 +144,7 @@ define([
             graph: params.graph,
             graphModel: params.graphModel,
             appliedFunctions: params.appliedFunctions(),
+            primaryDescriptorFunction: params.primaryDescriptorFunction(),
             toggleIds: function() {
                 self.showIds(!self.showIds());
             },
@@ -151,6 +153,9 @@ define([
             },
             collapseAll: function() {
                 toggleAll(false);
+            },
+            toggleGrid: function() {
+                self.showGrid(!this.showGrid());
             },
             selectAllCards: function() {
                 selectAll(true);
@@ -230,7 +235,7 @@ define([
             },
             updateCards: function(selectedNodegroupId, data) {
                 self.updateNode(self.topCards(), data.updated_values.node);
-                
+
                 if (data.updated_values.card) {
                     var card = data.updated_values.card;
                     var defaultCardName = data.default_card_name;
@@ -361,26 +366,25 @@ define([
             selection: selection,
             filter: filter,
             isFuncNode: function() {
-                var appFuncs = null, appFuncDesc = false, appFuncName = false, nodegroupId = null;
-                if(params.card && this.appliedFunctions()) {
+                var nodegroupId = null, pdFunction = this.primaryDescriptorFunction;
+
+                // params.card always seems to be undefined...
+                if (params.card && pdFunction) {
                     // console.log(ko.unwrap(params));
-                    appFuncs = this.appliedFunctions();
                     nodegroupId = params.card.nodegroup_id;
-                    for(var i = 0; i < appFuncs.length; i++) {
-                        if(appFuncs[i]['function_id'] == "60000000-0000-0000-0000-000000000001") {
-                            if(appFuncs[i]['config']['description']['nodegroup_id']) {
-                                appFuncDesc = appFuncs[i]['config']['description']['nodegroup_id'];
-                            }
-                            if(appFuncs[i]['config']['name']['nodegroup_id']) {
-                                appFuncName = appFuncs[i]['config']['name']['nodegroup_id'];
-                            }
-                            if(nodegroupId === appFuncDesc || nodegroupId === appFuncName) {
+
+                    for (var descriptor in ['name', 'description'])
+                    {
+                        try {
+                            if (nodegroupId === pdFunction['config']['descriptor_types'][descriptor]['nodegroup_id'])
                                 return true;
-                            }
+                        } catch (e) {
+                            // Descriptor doesn't exist so ignore the exception
+                            console.log("No descriptor configuration for "+descriptor);
                         }
                     }
+                    return false;
                 }
-                return false;
             }
         });
 
@@ -400,6 +404,7 @@ define([
             return new CardViewModel({
                 card: card,
                 appliedFunctions: params.appliedFunctions(),
+                primaryDescriptorFunction: params.primaryDescriptorFunction(),
                 graphModel: params.graphModel,
                 tile: null,
                 resourceId: ko.observable(),

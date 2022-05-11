@@ -18,7 +18,7 @@ define(['knockout', 'underscore', 'viewmodels/widget', 'arches', 'bindings/chose
             const self = this;
 
             self.card = params.card;
-            self.currentLanguage = ko.observable({code: arches.defaultLanguage});
+            self.currentLanguage = ko.observable({code: arches.activeLanguage});
             self.languages = ko.observableArray();
             self.currentText = ko.observable();
             self.currentDirection = ko.observable();
@@ -26,12 +26,12 @@ define(['knockout', 'underscore', 'viewmodels/widget', 'arches', 'bindings/chose
 
             self.currentDefaultText = ko.observable();
             self.currentDefaultDirection = ko.observable();
-            self.currentDefaultLanguage = ko.observable({code: arches.defaultLanguage})
+            self.currentDefaultLanguage = ko.observable({code: arches.activeLanguage})
 
             const initialCurrent = {};
             const initialDefault = {};
-            initialDefault[arches.defaultLanguage] = {value: '', direction: 'ltr'};
-            initialCurrent[arches.defaultLanguage] = {value: '', direction: 'ltr'};
+            initialDefault[arches.activeLanguage] = {value: '', direction: 'ltr'};
+            initialCurrent[arches.activeLanguage] = {value: '', direction: 'ltr'};
             let currentValue = ko.unwrap(self.value) || initialCurrent;
             let currentDefaultValue = ko.unwrap(self.defaultValue) || initialDefault;
 
@@ -46,7 +46,7 @@ define(['knockout', 'underscore', 'viewmodels/widget', 'arches', 'bindings/chose
 
             const init = async() => {
                 const languages = arches.languages;
-                const currentLanguage = languages?.find(element => element.code == arches.defaultLanguage);
+                const currentLanguage = languages?.find(element => element.code == arches.activeLanguage);
                 self.languages(languages);
                 self.currentLanguage(currentLanguage);
                 self.currentDefaultLanguage(currentLanguage);

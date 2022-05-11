@@ -1,4 +1,5 @@
 {% extends "views/components/workbench.htm" %}
+{% load template_tags %}
 {% load i18n %}
 
 {% block tabs %}
@@ -21,9 +22,9 @@
     <span class="map-sidebar-text">{% trans "Edit" %}</span>
 </div>
 <!--ko foreach: fileFormatRenderers-->
-        <!--ko if: ko.unwrap($parent.displayContent) && $parent.displayContent().renderer && ($parent.displayContent().renderer.id === $data.id) -->
+        <!--ko if: ko.unwrap($parent.displayContent) && $parent.displayContent().renderer && ($parent.displayContent().renderer.id === $data.id) && $parent.rendererComponentName -->
             <!-- ko component: {
-                name: $data.name,
+                name: $parent.rendererComponentName,
                 params: {
                     fileViewer: $parent,
                     card: $parent.card,
@@ -47,9 +48,9 @@
             <div id="hidden-dz-previews" style="display:none"></div>
             <!--ko if: displayContent() -->
                         <!--ko foreach: fileFormatRenderers-->
-                            <!--ko if: $data.id && $parent.displayContent().renderer && $parent.displayContent().renderer.id === $data.id -->
+                            <!--ko if: $data.id && $parent.displayContent().renderer && $parent.displayContent().renderer.id === $data.id && $parent.rendererComponentName -->
                                 <!-- ko component: {
-                                    name: $data.name,
+                                    name: $parent.rendererComponentName,
                                     params: {
                                         fileViewer: $parent,
                                         card: $parent.card,
@@ -136,7 +137,7 @@
                                     <br>  
                                 </div>
                                 <div class="file-upload-footer">
-                                    <span class="loader-selector" data-bind="component: { name: 'views/components/simple-switch', params: {value: applyToAll, config:{label: '{% trans "Apply the same loader to all selected files in the dataset" %}'}}}"></span>
+                                    <span class="loader-selector" data-bind="component: { name: 'views/components/simple-switch', params: {value: applyToAll, config:{label: {% quoted_trans "Apply the same loader to all selected files in the dataset" %}}}}"></span>
                                 </div>
                                 <!--/ko-->
                                </div>
@@ -197,11 +198,12 @@
 
 {% block sidepanel %}
 <!--ko if: activeTab() === 'manage' -->
-<div class="workbench-header-buffer">
-    <div class="workbench-card-sidepanel-header-container">
-        <h4 class="workbench-card-sidepanel-header" data-bind="click: hideSidePanel, text: 'Manage Files/Loaders'"></h4>
-    </div>
+<div class="workbench-card-sidepanel-header-container">
+    <h4 class="workbench-card-sidepanel-header" data-bind="click: hideSidePanel, text: 'Manage Files/Loaders'"></h4>
 </div>
+<div class="workbench-card-sidepanel-border"></div>
+<div class="workbench-card-sidepanel-body">
+
 <div class="file-workbench-filter">
     <h2 class="file-workbench-filter-header">{% trans "File Filter" %}</h2>
     <input type="text" class="form-control" style="width: 100%; height:initial" placeholder="{% trans 'e.g.: .txt' %}" data-bind="textInput: filter"></input>
@@ -259,14 +261,16 @@
         <button style="margin-right: 3px;" class="btn btn-lg btn-workbench btn-primary" data-bind="click: function(){$parent.applyRendererToStaged($parent.getFileFormatRenderer(managerRenderer()))}"><i class="fa fa-gears"></i> {% trans 'Apply to Selected Files' %}</button>
     </div>
 </div>
+</div>
 <!--/ko-->
 
 <!--ko if: activeTab() === 'edit' -->
-<div class="workbench-header-buffer">
-    <div class="workbench-card-sidepanel-header-container">
-        <h4 class="workbench-card-sidepanel-header" data-bind="click: hideSidePanel, text: card.model.name"></h4>
-    </div>
+<div class="workbench-card-sidepanel-header-container">
+    <h4 class="workbench-card-sidepanel-header" data-bind="click: hideSidePanel, text: card.model.name"></h4>
 </div>
+<div class="workbench-card-sidepanel-border"></div>
+
+<div class="workbench-card-sidepanel-body">
 <div class="file-workbench-filter">
     <h2 class="file-workbench-filter-header">{% trans 'File Filter' %}</h2>
     <input type="text" class="form-control" style="width: 100%; height:initial" placeholder="{% trans 'e.g.: .txt' %}" data-bind="textInput: filter"></input>
@@ -284,8 +288,7 @@
 </div>
 <div class='file-workbench-filecount' data-bind='text: card.tiles().length + "{% trans ' files uploaded' %}"'></div>
 
-<div class="workbench-sidepanel-card-container" data-bind="css: card.model.cssclass">
-
+<div data-bind="css: card.model.cssclass">
     <!-- ko if: reviewer && provisionalTileViewModel.selectedProvisionalEdit() -->
     <div class="edit-message-container">
         <span>{% trans 'Currently showing edits by' %}</span>
@@ -313,7 +316,7 @@
                 <div class='new-provisional-edits-title'>{% trans 'Provisional Edits' %}</div>
                 <div class="btn btn-shim btn-danger btn-labeled btn-xs fa fa-trash new-provisional-edits-delete-all" style="padding: 3px;" data-bind="click: function(){
                         provisionalTileViewModel.deleteAllProvisionalEdits();
-                    }">{% trans 'Delete all edits' %}</div>
+                    }"><span>{% trans 'Delete all edits' %}</span></div>
             </div>
             <!-- ko foreach: { data: provisionalTileViewModel.provisionaledits(), as: 'pe' } -->
             <div class='new-provisional-edit-entry' data-bind="css: {
@@ -408,24 +411,24 @@
                 <button class="btn btn-shim btn-labeled btn-lg fa fa-trash" data-bind="click: $parent.removeTile, css: {
                     disabled: (!$parent.card.isWritable && !self.preview),
                     'btn-warning': $parent.card.isWritable
-                }">{% trans 'Delete' %}</button>
+                }"><span>{% trans 'Delete' %}</span></button>
                 <!-- /ko -->
                 <!-- ko if: tile.dirty() -->
                     <!-- ko if: $parent.provisionalTileViewModel && !$parent.provisionalTileViewModel.tileIsFullyProvisional() && $parent.card.isWritable -->
-                    <button class="btn btn-shim btn-danger btn-labeled btn-lg fa fa-times" data-bind="click: function(){tile.reset()}">{% trans 'Cancel' %}</button>
+                    <button class="btn btn-shim btn-danger btn-labeled btn-lg fa fa-times" data-bind="click: function(){tile.reset()}"><span>{% trans 'Cancel' %}</span></button>
                     <!-- /ko -->
                     <!-- ko if: tile.tileid -->
                     <button class="btn btn-shim btn-labeled btn-lg fa fa-plus" data-bind="click: tile.save, css: {
                         disabled: (!$parent.card.isWritable && !self.preview),
                         'btn-mint': $parent.card.isWritable
-                    }">{% trans 'Save' %}</button>
+                    }"><span>{% trans 'Save' %}</span></button>
                     <!-- /ko -->
                 <!-- /ko -->
                 <!-- ko if: !tile.tileid -->
                 <button class="btn btn-shim btn-labeled btn-lg fa fa-plus" data-bind="click: self.saveTile, css: {
                     disabled: (!$parent.card.isWritable && !self.preview),
                     'btn-mint': $parent.card.isWritable
-                }">{% trans 'Add'  %}</button>
+                }"><span>{% trans 'Add'  %}</span></button>
                 <!-- /ko -->
             </div>
                 <!--/ko-->
@@ -454,13 +457,14 @@
         </div>
     </div>
 </div>
+</div>
 
 <!--/ko-->
 
 <!--ko foreach: fileFormatRenderers-->
-        <!--ko if: ko.unwrap($parent.displayContent) && $parent.displayContent().renderer && ($parent.displayContent().renderer.id === $data.id) -->
+        <!--ko if: ko.unwrap($parent.displayContent) && $parent.displayContent().renderer && ($parent.displayContent().renderer.id === $data.id) && $parent.rendererComponentName -->
     <!-- ko component: {
-        name: $data.name,
+        name: $parent.rendererComponentName,
         params: {
             fileViewer: $parent,
             card: $parent.card,

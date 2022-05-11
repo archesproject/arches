@@ -43,7 +43,6 @@ from django.utils.translation import get_language, ugettext as _
 
 from elasticsearch import Elasticsearch
 from elasticsearch.exceptions import NotFoundError
-from edtf import parse_edtf
 
 
 # One benefit of shifting to python3.x would be to use
@@ -221,7 +220,8 @@ class StringDataType(BaseDataType):
                     return {language: {"value": value, "direction": language_objects[0].default_direction}}
 
             return {get_language(): {"value": value, "direction": "ltr"}}
-        return value
+        elif type(value) is dict:
+            return value
 
     def from_rdf(self, json_ld_node):
         transformed_value = None
@@ -235,10 +235,16 @@ class StringDataType(BaseDataType):
 
     def get_display_value(self, tile, node):
         data = self.get_tile_data(tile)
+        current_language = get_language()
+        if not current_language:
+            current_language = settings.LANGUAGE_CODE
         if data:
             raw_value = data.get(str(node.nodeid))
             if raw_value is not None:
-                return raw_value
+                try:
+                    return raw_value[current_language]["value"]
+                except KeyError:
+                    pass
 
     def default_es_mapping(self):
         """
@@ -251,7 +257,29 @@ class StringDataType(BaseDataType):
         text_mapping = {"properties": {}}
         return text_mapping
 
+    def get_first_language_value_from_node(self, tile, nodeid):
+        return tile.data[str(nodeid)][list(tile.data[str(nodeid)].keys())[0]]["value"]
 
+    def is_multilingual_rdf(self, rdf):
+        if len(rdf) > 1 and len(set(val["language"] for val in rdf)) > 1:
+            return True
+        else:
+            return False
+
+    def has_multicolumn_data(self):
+        return True
+
+    def get_column_header(self, node, **kwargs):
+        """
+        Returns a CSV column header or headers for a given node ID of this type
+        """
+        language_codes = kwargs.pop("language_codes")
+        return ["{column} ({code})".format(column=node["file_field_name"], code=code) for code in language_codes]
+
+    def to_json(self, tile, node):
+        data = self.get_tile_data(tile)
+        if data:
+            return self.compile_json(tile, node, **data.get(str(node.nodeid)))
 
 class NumberDataType(BaseDataType):
     def validate(self, value, row_number=None, source="", node=None, nodeid=None, strict=False):
@@ -571,11 +599,20 @@ class DateDataType(BaseDataType):
 
 
 class EDTFDataType(BaseDataType):
+    def transform_value_for_tile(self, value, **kwargs):
+        transformed_value = ExtendedDateFormat(value)
+        if transformed_value.edtf is None:
+            return value, False
+        return str(transformed_value.edtf), True
+
+    def pre_tile_save(self, tile, nodeid):
+        tile.data[nodeid], valid = self.transform_value_for_tile(tile.data[nodeid])
+
     def validate(self, value, row_number=None, source="", node=None, nodeid=None, strict=False):
         errors = []
         if value is not None:
             if not ExtendedDateFormat(value).is_valid():
-                message = _("Incorrect Extended Date Time Format. See http://www.loc.gov/standards/datetime/ for supported formats.")
+                message = _("Incorrect Extended Date Time Format. See http://www.loc.gov/standards/datetime/ for supported formats")
                 error_message = self.create_error_message(value, source, row_number, message)
                 errors.append(error_message)
         return errors
@@ -1780,29 +1817,57 @@ class DomainDataType(BaseDomainDataType):
         value = get_value_from_jsonld(json_ld_node)
         return self.get_option_id_from_text(value[0])
 
-    def i18n_as_sql(self, i81n_json_field, compiler, connection):
-        sql = i81n_json_field.attname
-        for prop, value in i81n_json_field.raw_value.items():
+    def i18n_as_sql(self, i18n_json_field, compiler, connection):
+        """
+        Creates a sql snippet that can be used to update the
+        config object associated with this datatype.
+        This snippet will be used in a SQL UPDATE statement.
+        """
+
+        sql = i18n_json_field.attname
+        for prop, value in i18n_json_field.raw_value.items():
             escaped_value = json.dumps(value).replace("%", "%%")
             if prop == "options":
                 sql = f"""
-                    __arches_i18n_update_jsonb_array('options.text', '{{"options": {escaped_value}}}', {sql}, '{i81n_json_field.lang}')
+                    __arches_i18n_update_jsonb_array('options.text', '{{"options": {escaped_value}}}', {sql}, '{i18n_json_field.lang}')
                 """
             else:
                 sql = f"jsonb_set({sql}, array['{prop}'], '{escaped_value}')"
         return sql
 
-    def i18n_serialize(self, i81n_json_field: I18n_JSONField):
-        ret = copy.deepcopy(i81n_json_field.raw_value)
+    def i18n_serialize(self, i18n_json_field: I18n_JSONField):
+        """
+        Takes a localized list of options eg:
+        {"options": [{"text":{"en": "blue", "es": "azul"}}, {"text":{"en": "red", "es": "rojo"}}]}
+        and returns the value as a string based on the active language
+        Eg: if the active language is Spanish then the above returned
+        object would be {"options": [{"text":"azul"},{"text":"rojo"}]}
+
+        Arguments:
+        i18n_json_field -- the I18n_JSONField being serialized
+        """
+
+        ret = copy.deepcopy(i18n_json_field.raw_value)
         for option in ret["options"]:
             option["text"] = str(I18n_String(option["text"]))
         return ret
 
-    def i18n_localize(self, i81n_json_field: I18n_JSONField):
-        ret = copy.deepcopy(i81n_json_field.raw_value)
+    def i18n_to_localized_object(self, i18n_json_field: I18n_JSONField):
+        """
+        Takes a list of optione that is assumed to hold a localized value
+        eg: {"options": [{"text":"azul"},{"text":"rojo"}]}
+        and returns the value as an object keyed to the active language
+        Eg: if the active language is Spanish then the above returned
+        object would be {"options": [{"text":{"es":"azul"}},{"text":{"es":"rojo"}}]}
+
+        Arguments:
+        i18n_json_field -- the I18n_JSONField being localized
+        """
+
+        ret = copy.deepcopy(i18n_json_field.raw_value)
         for option in ret["options"]:
             if not isinstance(option["text"], dict):
-                option["text"] = {i81n_json_field.lang: option["text"]}
+                option["text"] = {i18n_json_field.lang: option["text"]}
         return ret
 
 

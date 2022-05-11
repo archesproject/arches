@@ -85,6 +85,7 @@ class SystemSettings(LazySettings):
         Updates the settings the Arches System Settings graph tile instances stored in the database
 
         """
+        from arches.app.datatypes.datatypes import DataTypeFactory
 
         # get all the possible settings defined by the Arches System Settings Graph
         for node in models.Node.objects.filter(graph_id=self.SYSTEM_SETTINGS_RESOURCE_MODEL_ID):
@@ -119,13 +120,10 @@ class SystemSettings(LazySettings):
                 for node in tile.nodegroup.node_set.all():
                     if node.datatype != "semantic":
                         try:
-                            if node.datatype == "string":
-                                # with i18n, only one value matters for system settings, regardless of language.  Pick first available
-                                val = tile.data[str(node.nodeid)][list(tile.data[str(node.nodeid)].keys())[0]]["value"]
-                                setattr(self, node.name, val)
-                            else:
-                                val = tile.data[str(node.nodeid)]
-                                setattr(self, node.name, val)
+                            datatype_factory = DataTypeFactory()
+                            datatype = datatype_factory.get_instance(node.datatype)
+                            val = datatype.get_first_language_value_from_node(tile, node.nodeid)
+                            setattr(self, node.name, val)
                         except:
                             pass
 

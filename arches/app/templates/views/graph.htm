@@ -17,6 +17,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 -->
 {% extends "base-manager.htm" %}
 {% load staticfiles %}
+{% load template_tags %}
 {% load i18n %}
 
 {% block title %}
@@ -30,45 +31,46 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
     <div class="graph-list-header" data-bind="css: {'alert-active': (alert() && alert().active())}">
 
         <!-- Toolbar -->
-        <div class="relative resource-toolbar" style="">
+        <div class="resource-toolbar">
+            <div>
+                <!-- Search -->
+                <div class="edit-panel-search-bar">
 
-            <!-- Search -->
-            <div class="edit-panel-search-bar">
+                    <!-- Find Button -->
+                    <div class="">
+                        <a class="page-header text-overflow graph-find" href="#" data-bind="click: function () { showFind(!showFind()) }"> {% trans "Find" %} </a>
+                    </div>
 
-                <!-- Find Button -->
-                <div class="">
-                    <a class="page-header text-overflow graph-find" href="#" data-bind="click: function () { showFind(!showFind()) }"> {% trans "Find" %} </a>
-                </div>
-
-                <!-- Find widget -->
-                <div class="find-widget" style="display: none;" data-bind="visible: showFind()">
-                    <div>
-                        <!-- ko if: groupedGraphs -->
-                        <select data-bind="template: { name: 'selectGraphTemplate', data: groupedGraphs }, chosen: {width: '100%'}, value: graphId"></select>
-                        <!-- /ko -->
-                        <script type="text/html" id="selectGraphTemplate">
-                            <option disabled selected value>{% trans "Find a Resource Model/Branch..." %}</option>
-                            <!-- ko foreach: groups -->
-                                <optgroup data-bind="attr: { 'label': (name==='Resource Models')?'{% trans "Resource Models" %}':'{% trans "Branches" %}' }, foreach: items">
-                                    <option data-bind="value: graphid, text: name"></option>
-                                </optgroup>
+                    <!-- Find widget -->
+                    <div class="find-widget" style="display: none;" data-bind="visible: showFind()">
+                        <div>
+                            <!-- ko if: groupedGraphs -->
+                            <select data-bind="template: { name: 'selectGraphTemplate', data: groupedGraphs }, chosen: {width: '100%'}, value: graphId"></select>
                             <!-- /ko -->
-                        </script>
+                            <script type="text/html" id="selectGraphTemplate">
+                                <option disabled selected value>{% trans "Find a Resource Model/Branch..." %}</option>
+                                <!-- ko foreach: groups -->
+                                    <optgroup data-bind="attr: { 'label': (name==='Resource Models')?{% quoted_trans "Resource Models" %}:{% quoted_trans "Branches" %}}, foreach: items">
+                                        <option data-bind="value: graphid, text: name"></option>
+                                    </optgroup>
+                                <!-- /ko -->
+                            </script>
+                        </div>
                     </div>
                 </div>
+
+                <!-- Resource/Graph Toggle -->
+                <div class="resource-tools" data-bind="visible: !showFind()">
+                    <a class="resource-grid-title" href="javascript:void(0);" data-bind="css: {'active': showResources()}, click: function () { showResources(true) }">{% trans "Resource Models" %}</a>
+                    <a class="resource-grid-title" href="javascript:void(0);" data-bind="css: {'active': !showResources()}, click: function () { showResources(false) }">{% trans "Branches" %}</a>
+                </div>
             </div>
 
-            <!-- Resource/Graph Toggle -->
-            <div class="resource-tools relative" data-bind="visible: !showFind()">
-                <a class="resource-grid-title" href="javascript:void(0);" data-bind="css: {'active': showResources()}, click: function () { showResources(true) }">{% trans "Resource Models" %}</a>
-                <a class="resource-grid-title" href="javascript:void(0);" data-bind="css: {'active': !showResources()}, click: function () { showResources(false) }">{% trans "Branches" %}</a>
-            </div>
-
-            <div class="btn-group" style="position: absolute; right: 70px; top: 12px;">
+            <div class="btn-group">
                 <button class="btn btn-primary dropdown-toggle" data-toggle="dropdown" type="button" aria-expanded="false">
                     {% trans "Add" %} <i class="ion-more"></i>
                 </button>
-                <ul class="dropdown-menu dropdown-menu-right" data-bind="event: {mouseleave: leaveDropdown}">
+                <ul class="dropdown-menu" data-bind="event: {mouseleave: leaveDropdown}">
                     <li><a href="#" data-bind="click: newResource">{% trans "New Resource Model" %}</a></li>
                     <li><a href="#" data-bind="click: newGraph">{% trans "New Branch" %}</a></li>
                     <li class="file-upload upload">
@@ -91,9 +93,9 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
         <div id="report-image-grid" class="report-image-grid">
 
             <!-- ko foreach: currentList -->
-            <div class="resource-grid-item relative">
+            <div class="resource-grid-item" style="display: flex;">
                 <!-- Resource Type -->
-                <a href="#" data-bind="click:function(){ $parent.navigate($parent.arches.urls.graph_designer(graphid)) }, attr: { href: $parent.arches.urls.graph_designer(graphid) }">
+                <a style="flex: 1" href="#" data-bind="click:function(){ $parent.navigate($parent.arches.urls.graph_designer(graphid)) }, attr: { href: $parent.arches.urls.graph_designer(graphid) }">
                     <div class="resource-grid-main-container" data-bind="hover: hover, css: {active: hover}, event: {mouseleave: $parent.leaveDropdown}">
                         <div class="resource-grid-main">
                             <h1 class="page-header text-overflow resource-grid-title"><i data-bind="css: (iconclass() || 'fa fa-question') + ' icon-wrap resource-grid-icon' + (hover() ? ' resource-grid-icon-highlight':'')"></i> <span data-bind="text:name"></span></h1>
@@ -103,9 +105,9 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                 </a>
 
                 <div class="resource-grid-tools-container" data-bind="clickBubble: false, hover: hover">
-                    <div class="btn-group" style="float:right;">
+                    <div class="btn-group">
                         <button class="btn btn-sm btn-mint dropdown-toggle graph-btn" data-toggle="dropdown" type="button" aria-expanded="false"> {% trans "Manage" %} <i class="ion-ios-more"></i></button>
-                        <ul class="dropdown-menu dropdown-menu-right manage-menu" data-bind="event: {mouseleave: $parent.leaveDropdown}">
+                        <ul class="dropdown-menu manage-menu" data-bind="event: {mouseleave: $parent.leaveDropdown}">
                             <li>
                                 <a href="#" data-bind="click:function() { $parent.navigate($parent.arches.urls.graph_designer(graphid)) }, attr: { href: $parent.arches.urls.graph_designer(graphid) }"><i class="fa fa-sitemap"></i> {% trans "Manage Graph" %}</a>
                             </li>
@@ -130,9 +132,6 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                             </li>
                             <!--/ko-->
                         </ul>
-                    </div>
-                    <div>
-                        <p class="resource-status-label">{% trans "Status" %}: <span class="resource-status" data-bind="text:isactive?'{% trans "Active" %}':'{% trans "Inactive" %}'"></span></p>
                     </div>
                 </div>
             </div>

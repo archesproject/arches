@@ -1,4 +1,6 @@
+{% load template_tags %}
 {% load i18n %}
+
 <!-- ko if: !$data.search && $data.graph -->
 <div class="node-widget-label pad-btm">
     <div class="control-label">
@@ -7,7 +9,7 @@
     <div>
         <select data-bind="
             disable: isEditable === false,
-            placeholder: '{% trans "Select a node" %}',
+            placeholder: {% quoted_trans "Select a node" %},
             value: config.nodeid,
             options: nodes,
             optionsText: 'name',
@@ -25,7 +27,7 @@
     <div data-bind="if: properties().length > 0">
         <select data-bind="
             disable: isEditable === false,
-            placeholder: '{% trans "Select a property" %}',
+            placeholder: {% quoted_trans "Select a property" %},
             value: config.property,
             options: properties,
             optionsText: 'name',

@@ -1,4 +1,5 @@
 {% extends "views/components/workbench.htm" %}
+{% load template_tags %}
 {% load i18n %}
 
 {% block tabs %}
@@ -33,7 +34,7 @@
 
     <div style="position: absolute; bottom: 0px; width: 100%;" data-bind="style: {display: !!self.displayContent() ? 'inherit' : 'none'}">
         <div class="thumbnail-gallery-container" data-bind="slide: showThumbnails, duration: 100, direction: {direction: 'down'}, easing: 'slide'">
-            <div class='show-thumbnails-btn open' data-bind="click: function(){showThumbnails(!showThumbnails())}, text: '{% trans "Close" %}'"></div>
+            <div class='show-thumbnails-btn open' data-bind="click: function(){showThumbnails(!showThumbnails())}, text: {% quoted_trans "Close" %}"></div>
             <div class="thumbnail-container" data-bind="gallery: photoGallery.pan, duration: 400, scrolldistance: 100, thumbnailclass: 'gallery-thumbnails'">
                 <div class="thumbnail-gallery-controls right" data-bind="click: function(){photoGallery.updatePan('left')}"><i class="fa fa-angle-left"></i></div>
                 <div class="gallery-thumbnails">
@@ -58,7 +59,7 @@
             </div>
         </div>
 
-        <div class='show-thumbnails-btn closed' data-bind="click: function(){showThumbnails(!showThumbnails())}, text: '{% trans "View Gallery" %}', fadeVisible: showThumbnails, delay:400, fade: 200"></div>
+        <div class='show-thumbnails-btn closed' data-bind="click: function(){showThumbnails(!showThumbnails())}, text: {% quoted_trans "View Gallery" %}, fadeVisible: showThumbnails, delay:400, fade: 200"></div>
     </div>
 
     <!--ko if: self.displayContent() === undefined -->
@@ -145,6 +146,9 @@
 <div class="workbench-card-sidepanel-header-container">
     <h4 class="workbench-card-sidepanel-header" data-bind="click: hideSidePanel, text: card.model.name"></h4>
 </div>
+<div class="workbench-card-sidepanel-border"></div>
+
+<div class="workbench-card-sidepanel-body">
 <h5 class="workbench-tile-picker-label">{% trans 'Image List' %}</h5>
 <div class='photo-workbench-photos'>
 <!-- ko foreach: { data: card.tiles(), as: 'tile'} -->
@@ -183,7 +187,7 @@
                 <div class='new-provisional-edits-title'>{% trans 'Provisional Edits' %}</div>
                 <div class="btn btn-shim btn-danger btn-labeled btn-xs fa fa-trash new-provisional-edits-delete-all" style="padding: 3px;" data-bind="click: function(){
                         provisionalTileViewModel.deleteAllProvisionalEdits();
-                    }">{% trans 'Delete all edits' %}</div>
+                    }"><span>{% trans 'Delete all edits' %}</span></div>
             </div>
             <!-- ko foreach: { data: provisionalTileViewModel.provisionaledits(), as: 'pe' } -->
             <div class='new-provisional-edit-entry' data-bind="css: {
@@ -270,60 +274,60 @@
 
             {% endblock form_widgets %}
             <!-- /ko -->
+
+                    <aside id="card-help-panel" class="card-help-panel" style="display: none;" data-bind="visible: card.model.get('helpactive')">
+                        <div class="relative">
+                            <a id="add-basemap-wizard-help-close" href="#" class="help-close fa fa-times fa-lg" style="" data-bind="click: function () {
+                                card.model.get('helpactive')(false);
+                            }"></a>
+                        </div>
+                        <div id="add-basemap-wizard-help-content">
+                            <div>
+                                <div class="panel-heading">
+                                    <h3 class="panel-title help-panel-title" style="">
+                                        <span data-bind="html: card.model.get('helptitle')"></span>
+                                    </h3>
+                                </div>
+                                <div class="panel-body" style="padding: 10px 10px 15px 10px;" data-bind="html: card.model.get('helptext')">
+                                </div>
+                            </div>
+                        </div>
+                    </aside>
+                </div>
+            </div>
+        </div>
+    </div>
             {% block form_buttons %}
             <!-- ko foreach: { data: card.tiles(), as: 'tile'} -->
                 <!--ko if: $parent.getUrl(tile) && tile.selected()-->
-            <div class="display-in-workflow-step install-buttons">
+            <div class="display-in-workflow-step">
                 <!-- ko if: tile && self.deleteTile -->
                 <button class="btn btn-shim btn-labeled btn-lg fa fa-trash" data-bind="click: $parent.removeTile, css: {
                     disabled: (!$parent.card.isWritable && !self.preview),
                     'btn-warning': $parent.card.isWritable
-                }">{% trans 'Delete' %}</button>
+                }"><span>{% trans 'Delete' %}</span></button>
                 <!-- /ko -->
                 <!-- ko if: tile.dirty() -->
                     <!-- ko if: $parent.provisionalTileViewModel && !$parent.provisionalTileViewModel.tileIsFullyProvisional() && $parent.card.isWritable -->
-                    <button class="btn btn-shim btn-danger btn-labeled btn-lg fa fa-times" data-bind="click: selected().reset">{% trans 'Cancel' %}</button>
+                    <button class="btn btn-shim btn-danger btn-labeled btn-lg fa fa-times" data-bind="click: selected().reset"><span>{% trans 'Cancel' %}</span></button>
                     <!-- /ko -->
                     <!-- ko if: tile.tileid -->
                     <button class="btn btn-shim btn-labeled btn-lg fa fa-plus" data-bind="click: tile.save, css: {
                         disabled: (!$parent.card.isWritable && !self.preview),
                         'btn-mint': $parent.card.isWritable
-                    }">{% trans 'Save' %}</button>
+                    }"><span>{% trans 'Save' %}</span></button>
                     <!-- /ko -->
                 <!-- /ko -->
                 <!-- ko if: !tile.tileid -->
                 <button class="btn btn-shim btn-labeled btn-lg fa fa-plus" data-bind="click: self.saveTile, css: {
                     disabled: (!$parent.card.isWritable && !self.preview),
                     'btn-mint': $parent.card.isWritable
-                }">{% trans 'Add'  %}</button>
+                }"><span>{% trans 'Add'  %}</span></button>
                 <!-- /ko -->
             </div>
                 <!--/ko-->
             <!-- /ko -->
-
             {% endblock form_buttons %}
-
-            <aside id="card-help-panel" class="card-help-panel" style="display: none;" data-bind="visible: card.model.get('helpactive')">
-                <div class="relative">
-                    <a id="add-basemap-wizard-help-close" href="#" class="help-close fa fa-times fa-lg" style="" data-bind="click: function () {
-                        card.model.get('helpactive')(false);
-                    }"></a>
-                </div>
-                <div id="add-basemap-wizard-help-content">
-                    <div>
-                        <div class="panel-heading">
-                            <h3 class="panel-title help-panel-title" style="">
-                                <span data-bind="html: card.model.get('helptitle')"></span>
-                            </h3>
-                        </div>
-                        <div class="panel-body" style="padding: 10px 10px 15px 10px;" data-bind="html: card.model.get('helptext')">
-                        </div>
-                    </div>
-                </div>
-            </aside>
-        </div>
-    </div>
-</div>
 <!--/ko-->
 
 {{ block.super }}
