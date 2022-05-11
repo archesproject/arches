@@ -183,15 +183,15 @@
 
 {% block main_menu %}
 <div>
-    <ul class="nav nav-tabs">
-            <li data-bind="if: shouldShowCreateService">
-                <div class='manifest-manager-nav-tab' data-bind="click: function(){createService(true); editService(false)}, css: { active: createService }">
-                    <div class='tab-label'>
-                        {% trans 'Create New Service' %}
-                    </div>
+    <ul class="nav nav-tabs flex pad-no">
+        <li data-bind="if: shouldShowCreateService">
+            <div class='manifest-manager-nav-tab' data-bind="click: function(){createService(true); editService(false)}, css: { active: createService }">
+                <div class='tab-label'>
+                    {% trans 'Create New Service' %}
                 </div>
-            </li>
-            <li data-bind="if: shouldShowEditService">
+            </div>
+        </li>
+        <li data-bind="if: shouldShowEditService">
             <div class='manifest-manager-nav-tab' data-bind=
                 "click: function(){createService(false); editService(true)}, css: { active: editService }">
                 <div class='tab-label'>

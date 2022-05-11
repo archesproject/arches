@@ -281,8 +281,8 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                 {% if nav.menu %}
                 <a id="menu-control" href="" class="ep-tools ep-tool-title"
                     data-bind="click:function() { menuActive(!menuActive()); }, clickBubble: false">
-                    <div class="">{% trans "Manage" %}
-                        <i class="ion-more"></i>
+                    <div class="flex">{% trans "Manage" %}
+                        <i class="ion-more" style="padding: 0px 5px;"></i>
                     </div>
                 </a>
                 {% if main_script == 'views/resource/editor' %}
