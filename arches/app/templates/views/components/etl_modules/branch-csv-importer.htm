@@ -70,36 +70,14 @@
             </div>
         </div>
         <!-- /ko -->
-
-         <!-- ko if: response -->
-        <div  class="tabbed-workflow-footer, etl-module-footer">
-        <!-- ko if: validationError()?.length == 0 && loadStatus() == "ready" -->
-        <button class="btn btn-shim btn-labeled btn-lg fa fa-check btn-primary"  data-bind="click: function(){ write(); }">{% trans "Submit" %}</button>
-        <button class="btn btn-shim btn-labeled btn-lg fa fa-times btn-danger" data-bind="click: function(){response(null);}">{% trans "Cancel" %}</button>
-        <!-- /ko -->
-        <!-- ko if: loadStatus() == "successful" -->
-        <button class="btn btn-shim btn-labeled btn-lg fa fa-check btn-primary"  data-bind="click: function(){
-             response(null);
-             loadStatus('ready');
-            }">{% trans "OK" %}</button>
-        <!-- /ko -->
-        <!-- ko if: validationError()?.length > 0 || loadStatus() == "failed" -->
-         <button class="btn btn-shim btn-labeled btn-lg fa fa-undo btn-danger" data-bind="click: function(){
-             alert()?.close();
-             response(null);
-             loadStatus('ready');
-            }">{% trans "Reload" %}</button>
-        <!-- /ko -->
-        </div>
-        <!-- /ko -->
     </div>
 <!--/ko-->
 {% endblock task_details %}
 
 {% block etl_status %}
-<!-- ko if: load_details -->
 <div style="display: grid; row-gap: 2px; height:fit-content;">
     <h4 class="summary-title">{% trans "Import Branch CSV" %}</h4>
+    <!-- ko if: load_details -->
     <div style="padding:15px 20px;">
         <h4 class="summary-title">{% trans "File Summary" %}</h4>
         <div style="display: inline-grid; grid-template-columns: auto auto; column-gap: 10px;">
@@ -127,6 +105,6 @@
             <!-- /ko -->
         </div>
     </div>
+    <!--/ko-->
 </div>
-<!--/ko-->
 {% endblock etl_status %}

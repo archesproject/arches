@@ -21,8 +21,11 @@ define(['jquery', 'knockout', 'uuid', 'arches', 'js-cookie'], function($, ko, uu
 
         this.submit = function(action) {
             self.formData.append('action', action);
-            if (action === 'read') {
+            if (action === 'start') {
                 self.loadId = uuid.generate();
+            }
+            if (action === 'read') {
+                self.formData.append('async', true);
             }
             self.formData.append('load_id', self.loadId);
             self.formData.append('module', this.moduleId);

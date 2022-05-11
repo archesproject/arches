@@ -92,22 +92,21 @@ define([
                 self.loading(true);
                 self.fileInfo({name: file.name, size: file.size});
                 self.formData.append('file', file, file.name);
-                self.submit('read').then(function(response){
-                    self.fileAdded(true);
-                    self.loading(false);
+
+                self.submit('start').then(function(response){
                     if (response.ok) {
                         return response.json();
                     }
-                }).then(function(response) {
-                    console.log(response);
-                    self.write();
+                }).then(function() {
                     params.activeTab("import");
-                    // self.response(response);
-                    // self.validationError(response.result.validation.data);
+                    self.submit('read').then(function(response){
+                        self.fileAdded(true);
+                        self.loading(false);
+                    })
                 }).catch(function(err) {    
-                    // eslint-disable-next-line no-console
-                    console.log(err);
-                    self.loading(false);
+                        // eslint-disable-next-line no-console
+                        console.log(err);
+                        self.loading(false);
                 });
             };
         

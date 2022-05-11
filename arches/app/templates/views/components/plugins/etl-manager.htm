@@ -87,14 +87,14 @@
                                                 <div data-bind="text: $parent.formatTime(event.load_start_time)"></div>
                                             </div>
                                             <div>
-                                                <!-- ko if: event.complete && event.successful -->
-                                                <button class="btn btn-success" style="width:150px;">{% trans "Finished" %}</button>
+                                                <!-- ko if: event.status == "completed" -->
+                                                <button class="btn btn-success" style="width:150px;">{% trans "completed" %}</button>
                                                 <!-- /ko -->
-                                                <!-- ko if: (event.complete && !event.successful) || !event.load_start_time -->
-                                                <button class="btn btn-danger" style="width:150px;">{% trans "Failed" %}</button>
+                                                <!-- ko if: event.status == "failed" -->
+                                                <button class="btn btn-danger" style="width:150px;">{% trans "failed" %}</button>
                                                 <!-- /ko -->
-                                                <!-- ko if: !event.complete && event.load_start_time -->
-                                                <button class="btn btn-warning" style="width:150px;">{% trans "Running" %}</button>
+                                                <!-- ko if: event.status == "running" -->
+                                                <button class="btn btn-warning" style="width:150px;">{% trans "running" %}</button>
                                                 <!-- /ko -->
                                             </div>
                                         </div>
