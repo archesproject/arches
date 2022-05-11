@@ -184,14 +184,16 @@ class BranchCsvImporter:
                     except KeyError:
                         with connection.cursor() as cursor:
                             cursor.execute(
-                                """UPDATE load_event SET status = %s WHERE loadid = %s""", ("failed",self.loadid),
+                                """UPDATE load_event SET status = %s WHERE loadid = %s""",
+                                ("failed", self.loadid),
                             )
                         raise ValueError("A graphid is not available in the metadata worksheet")
                     nodegroup_lookup, nodes = self.get_graph_tree(graphid)
                     node_lookup = self.get_node_lookup(nodes)
                     with connection.cursor() as cursor:
                         cursor.execute(
-                            """UPDATE load_event SET load_details = %s WHERE loadid = %s""", (json.dumps(summary),self.loadid),
+                            """UPDATE load_event SET load_details = %s WHERE loadid = %s""",
+                            (json.dumps(summary), self.loadid),
                         )
                         for worksheet in workbook.worksheets:
                             if worksheet.title.lower() != "metadata":
@@ -233,7 +235,8 @@ class BranchCsvImporter:
         else:
             with connection.cursor() as cursor:
                 cursor.execute(
-                    """UPDATE load_event SET status = %s WHERE loadid = %s""", ("failed",self.loadid),
+                    """UPDATE load_event SET status = %s WHERE loadid = %s""",
+                    ("failed", self.loadid),
                 )
         shutil.rmtree(self.temp_dir)
         return {"success": result["validation"]["success"], "data": result}
@@ -256,7 +259,8 @@ class BranchCsvImporter:
             logger.error(e)
             with connection.cursor() as cursor:
                 cursor.execute(
-                    """UPDATE load_event SET status = %s WHERE loadid = %s""", ("failed", self.loadid),
+                    """UPDATE load_event SET status = %s WHERE loadid = %s""",
+                    ("failed", self.loadid),
                 )
             return {
                 "status": 400,
@@ -270,13 +274,15 @@ class BranchCsvImporter:
 
             with connection.cursor() as cursor:
                 cursor.execute(
-                    """UPDATE load_event SET status = %s WHERE loadid = %s""", ("completed", self.loadid),
+                    """UPDATE load_event SET status = %s WHERE loadid = %s""",
+                    ("completed", self.loadid),
                 )
             return {"success": True, "data": "success"}
         else:
             with connection.cursor() as cursor:
                 cursor.execute(
-                    """UPDATE load_event SET status = %s WHERE loadid = %s""", ("failed", self.loadid),
+                    """UPDATE load_event SET status = %s WHERE loadid = %s""",
+                    ("failed", self.loadid),
                 )
             return {"success": False, "data": "failed"}
 
