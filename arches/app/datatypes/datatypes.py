@@ -1915,7 +1915,7 @@ class ResourceInstanceDataType(BaseDataType):
             try:
                 resourceid = resourceXresource["resourceId"]
                 related_resource = Resource.objects.get(pk=resourceid)
-                displayname = related_resource.displayname
+                displayname = related_resource.displayname()
                 if displayname is not None:
                     items.append(displayname)
             except (TypeError, KeyError):
@@ -2064,7 +2064,7 @@ class ResourceInstanceListDataType(ResourceInstanceDataType):
                 try:
                     resourceid = resourceXresource["resourceId"]
                     related_resource = Resource.objects.get(pk=resourceid)
-                    displayname = related_resource.displayname
+                    displayname = related_resource.displayname()
                     resourceXresource["display_value"] = displayname
                     items.append(resourceXresource)
                 except (TypeError, KeyError):
