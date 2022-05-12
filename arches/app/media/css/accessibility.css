@@ -83,7 +83,8 @@ a:focus,
     border: 3px solid #fff;
 }
 
-.down-button-icon {
+.down-button-icon,
+.tab-base .nav-tabs>li:not(.active)>a {
     opacity: 1;
 }
 
@@ -104,7 +105,8 @@ a:focus,
 .arches-signin .panel-footer,
 .password-rule,
 .rp-no-data,
-.graph-designer-tab-container .nav-tabs > li:not(.active) > a {
+.graph-designer-tab-container .nav-tabs > li:not(.active) > a,
+.crud-card-subtitle {
     color: #494949;
 }
 
@@ -153,7 +155,12 @@ a:focus,
 .search-export .instruction h4,
 .report-print-date,
 .resource-tools a.resource-grid-title,
-.graph-find {
+.graph-find,
+.map-manager-container .category-title,
+.map-manager-container .service-url,
+.map-service-nav-tabs .nav-tabs>li.active>a,
+.map-service-nav-tabs .nav-tabs>li.active>a:focus,
+.map-service-nav-tabs .nav-tabs>li.active>a:hover {
     color: #000 !important;
 }
 
@@ -527,6 +534,38 @@ div.search-facet-item:focus {
     overflow-x: hidden;
 }
 
+.map-manager-container .left-column-crud-container {
+    flex: 0 0 37vw;
+}
+
+.map-manager-container .grid {
+    overflow-y: auto;
+    overflow-x: hidden;
+}
+
+.map-manager-container .library-card {
+    height: auto;
+    min-height: 60px;
+}
+
+.map-manager-container .crud-card-main {
+    position: relative;
+    left: auto;
+    top: auto;
+    height: auto;
+    white-space: normal;
+    margin-left: 55px;
+    margin-top: 7px;
+    width: auto;
+}
+
+.map-manager-container .crud-card-subtitle {
+    position: relative;
+    left: auto;
+    top: auto;
+    margin-left: 55px;
+}
+
 /******************************************************************/
 /* Media queries                                                  */
 /******************************************************************/
@@ -565,7 +604,7 @@ div.search-facet-item:focus {
         overflow-y: auto;
     }
 
-    .card-form-preview-container {
+    .card-form-preview-container:not(.map-manager-container .card-form-preview-container) {
         height: calc(70vh - 155px);
         overflow-y: auto;
     }
@@ -723,8 +762,10 @@ div.search-facet-item:focus {
 
     .resource-editor-container,
     .graph-designer-panels-container,
-    .function-manager-container {
+    .function-manager-container,
+    .map-manager-container {
         flex-direction: column;
+        overflow-y: auto;
     }
 
     .resource-editor-container .left-panel,
@@ -733,7 +774,8 @@ div.search-facet-item:focus {
         overflow-y: auto;
     }
 
-    .resource-editor-container .left-panel .resource-editor-tree{
+    .resource-editor-container .left-panel .resource-editor-tree,
+    .map-manager-container .layer-list {
         height: auto;
     }
 
@@ -840,5 +882,13 @@ div.search-facet-item:focus {
 
     .settings-panel-body .graph-designer {
         height: calc(70vh - 205px);
+    }
+
+    .map-manager-container .panel-heading span {
+        font-size: 2.8vw;
+    }
+
+    .map-manager-container .category-title {
+        padding: 9px 5px;
     }
 }
