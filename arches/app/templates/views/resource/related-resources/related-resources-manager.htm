@@ -86,10 +86,10 @@
         <div data-bind="hidden: showGraph()">
             <!--ko if: resourceRelationships().length > 0 -->
             <div class="rr-table-border" style="padding: 3px; display: flex; border-bottom: none; background: #f2f2f2; height: 40px; padding-top: 5px; padding-left: 5px;">
-                <div class="relative">
+                <div class="list-filter">
                     <input type="text" class="form-control" style="width: 300px; height: 28px" placeholder="{% trans 'e.g.: .txt' %}"
                         data-bind="textInput: filter"></input>
-                    <span class="clear-node-search" style="top: 5px;" data-bind="visible: filter().length > 0, click: function() { filter('');}"><i class="fa fa-times-circle"></i></span>
+                    <span class="clear-node-search" data-bind="visible: filter().length > 0, click: function() { filter('');}"><i class="fa fa-times-circle"></i></span>
                 </div>
                 <span style="padding: 4px;" data-bind="if: totalRelationships() > 1">
                     <span style="font-size: 13px;" class='file-workbench-filecount' data-bind='text: totalRelationships() + "{% trans ' resource relations' %}"'></span>

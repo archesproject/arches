@@ -3110,12 +3110,6 @@ a.select2-search-choice-close {
         padding: 15px;
         border: 1px solid #e9e9e9;
     }
-    
-    .list-filter {
-        position: relative;
-        margin-bottom: 8px;
-        margin-right: 0px;
-    }
 
     .demo-icon-font {
         font-size: 14px;
@@ -3647,12 +3641,6 @@ a.select2-search-choice-close {
     flex-direction: row;
     margin-top: 5px;
     padding: 10px 0px 15px;
-}
-
-.permission-filter {
-    display: inline-flex;
-    justify-content: space-between;
-    width: 250px;
 }
 
 .permissions-list-table {
@@ -7578,11 +7566,18 @@ ul div .card-tree-list span .card-tree-list-item .card-tree-list-icon {
     margin-top: 3px;
 }
 
-.clear-node-search {
-    position: absolute;
-    top: 6px;
-    right: 10px;
-    font-size: 14px;
+.list-filter {
+    margin-bottom: 8px;
+    margin-right: 0px;
+    display: flex;
+
+    .clear-node-search {
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        margin: 5px -20px;
+        font-size: 14px;
+    }
 }
 
 .new-card.disabled {
@@ -10097,12 +10092,6 @@ a.clear-geojson-button:hover {
     padding-left: 15px;
     width: 350px;
     height: 35px;
-    position: relative;
-}
-
-.msm-list-filter-input .clear-node-search {
-    top: 8px;
-    right: 10px;
 }
 
 .msm-summary-panel {
