@@ -525,15 +525,24 @@ define([
             self.greyscale(false);
         };
 
+        const zoomToBounds = (map, layer) => {
+            var initialZoom = layer._getInitialZoom(map.getSize());
+            var imageSize = layer._imageSizes[initialZoom];
+            var sw = map.options.crs.pointToLatLng(L.point(0, imageSize.y), initialZoom);
+            var ne = map.options.crs.pointToLatLng(L.point(imageSize.x, 0), initialZoom);
+            var bounds = L.latLngBounds(sw, ne);
+            map.fitBounds(bounds);
+        }
 
         const loadComparison = () => {
             const map = self.map();
-            if(map && self.primaryLayerLoaded && self.secondaryLayerLoaded){
-                // remove the control if it's been added to the map already
-                /*if(sideBySideControl){
-                    map.removeControl(sideBySideControl);
-                }*/
-
+            if(map && canvasLayer.getContainer() && secondaryCanvasLayer?.getContainer() /*self.primaryLayerLoaded && self.secondaryLayerLoaded*/){
+                // remove the control if it's been added to the map already  
+                if(self.zoomToCanvas){
+                    zoomToBounds(map, canvasLayer);
+                    //map.fitBounds(canvasLayer.getBounds())
+                    self.zoomToCanvas = false;
+                }
                 // add the control back, comparing the appropriate layers
                 if(!sideBySideControl){
                     sideBySideControl = L.control.sideBySide(canvasLayer, secondaryCanvasLayer);
@@ -544,12 +553,6 @@ define([
 
                 if(!sideBySideControl?._map) {
                     sideBySideControl.addTo(map);
-                }
-
-                try {
-                    map.fitBounds(map.getBounds());
-                } catch {
-                    ; // smother when bounds failure
                 }
             }
         };
@@ -577,31 +580,27 @@ define([
     
                     if(!canvasLayer){
                         canvasLayer = L.tileLayer.iiif(layerInfoUrl, {
-                            fitBounds: self.zoomToCanvas,
+                            fitBounds: false,
                             className: "iiif-layer-primary"
                         });
+
+                        canvasLayer.on('load', () => {
+                            if(self.compareMode()){
+                                loadComparison();
+                            } else if (!self.compareMode() && self.zoomToCanvas && canvasLayer){
+                                zoomToBounds(map, canvasLayer);
+                                self.zoomToCanvas = false;
+                            }
+                        });
+
                         layers.push(canvasLayer);
                     }
                     canvasLayer.addTo(map);
-
-                    if(self.compareMode()){
-                        self.primaryLayerLoaded = false;
-                        if(canvasLayer.loading) {
-                            canvasLayer.on('load', primaryLayerLoaded)
-                        } else {
-                            primaryLayerLoaded();
-                        }
-                    }
                     updateCanvasLayerFilter();
+
                 }
             }
-            self.zoomToCanvas = false;
         };
-
-        const primaryLayerLoaded = function() {
-            self.primaryLayerLoaded = true;
-            loadComparison();
-        }
 
         const getLayer = (url, layers) => {
             const match = layers.filter(layer => layer._infoUrl == url);
@@ -637,26 +636,20 @@ define([
                         fitBounds: false,
                         className: "iiif-layer-secondary"
                     });
+
+                    secondaryCanvasLayer.on('load', () => {
+                        if(self.compareMode()){
+                            loadComparison();
+                        }
+                    });
+
                     secondaryLayers.push(secondaryCanvasLayer);
                 }
                 secondaryCanvasLayer.addTo(map);
-
-                self.secondaryLayerLoaded = false;
-                if(secondaryCanvasLayer.loading) {
-                    secondaryCanvasLayer.on('load', secondaryLayerLoaded)
-                } else {
-                    secondaryLayerLoaded();
-                }
                 
                 updateCanvasLayerFilter();
             }
         };
-
-        const secondaryLayerLoaded = function() {
-            self.secondaryLayerLoaded = true;
-            self.canvas.valueHasMutated();
-            loadComparison();
-        }
 
         this.map.subscribe(function(map) {
             L.control.fullscreen({
@@ -676,7 +669,6 @@ define([
         }
 
         this.selectCanvas = function(canvas) {
-            self.zoomToCanvas = true;
             
             const service = self.getCanvasService(canvas);
 
@@ -712,8 +704,8 @@ define([
                         }
                         var canvas = sequence.canvases[canvasIndex];
 
-                        self.primaryLayerLoaded = false;
-                        self.secondaryLayerLoaded = false;
+                        self.secondaryCanvasLayer = undefined;
+                        self.canvasLayer = undefined;
                         const service = self.getCanvasService(canvas);
                         self.zoomToCanvas = true;
                         self.canvas(service);
