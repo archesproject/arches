@@ -10,12 +10,12 @@
         <div
             class='permission-modal'
             style="
-                position: fixed; 
-                z-index: 1; 
+                position: fixed;
+                z-index: 1;
                 left: 0;
                 top: 0;
                 width: 100%;
-                height: 100%; 
+                height: 100%;
                 background-color: rgba(221, 217, 217, 0.5);
             "
         >
@@ -31,7 +31,7 @@
                     align-items: center;
                     justify-content: center;
                 "
-            > 
+            >
                 <div
                     style="
                         width: 100%;
@@ -54,7 +54,7 @@
                 <p style="text-align: center; margin-top: 20px;">{% csrf_token %}<button style="cursor: pointer;" onclick="clearUserPermissionCache(this)">Clear User Permission cache</button></p>
             </div>
         </div>
-        <script type="text/javascript"> 
+        <script type="text/javascript">
             function clearUserPermissionCache(self) {
                 var request = new XMLHttpRequest();
 
@@ -70,10 +70,10 @@
                     }
                 };
 
-                request.open("POST", "/clear-user-permission-cache/", true);
+                request.open("POST", window.location.pathname.replace(/\/admin.*/,'')+"/clear-user-permission-cache/", true);
 
                 var csrftoken=self.parentElement.firstChild.value;
-                request.setRequestHeader("X-CSRFToken", csrftoken ); 
+                request.setRequestHeader("X-CSRFToken", csrftoken );
 
                 request.send();
             }

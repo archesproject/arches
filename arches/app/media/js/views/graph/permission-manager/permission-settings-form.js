@@ -141,7 +141,7 @@ define([
         clearUserPermissionCache: function() {
             return $.ajax({
                 type: 'POST',
-                url: '/clear-user-permission-cache/',
+                url: arches.urls.root + 'clear-user-permission-cache/',
             });
         }
     });
