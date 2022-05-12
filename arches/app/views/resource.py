@@ -192,12 +192,11 @@ class ResourceEditorView(MapBaseManagerView):
         datatypes = models.DDataType.objects.all()
         user_is_reviewer = user_is_resource_reviewer(request.user)
         is_system_settings = False
-
         if resource_instance is None:
             tiles = []
             displayname = _("New Resource")
         else:
-            displayname = resource_instance.displayname
+            displayname = resource_instance.displayname()
             if displayname == "undefined":
                 displayname = _("Unnamed Resource")
             if str(resource_instance.graph_id) == settings.SYSTEM_SETTINGS_RESOURCE_MODEL_ID:
@@ -314,7 +313,8 @@ class ResourceEditorView(MapBaseManagerView):
 
     def copy(self, request, resourceid=None):
         resource_instance = Resource.objects.get(pk=resourceid)
-        return JSONResponse(resource_instance.copy())
+        resource = resource_instance.copy()
+        return JSONResponse({"resourceid": resource.resourceinstanceid})
 
 
 @method_decorator(group_required("Resource Editor"), name="dispatch")
@@ -522,22 +522,19 @@ class ResourceEditLogView(BaseManagerView):
                     permitted_edits.append(edit)
 
             resource = Resource.objects.get(pk=resourceid)
-            displayname = resource.displayname
-            displaydescription = resource.displaydescription
+            displayname = resource.displayname()
             cards = Card.objects.filter(nodegroup__parentnodegroup=None, graph=resource_instance.graph)
             graph_name = resource_instance.graph.name
-            if displayname == "undefined":
-                displayname = _("Unnamed Resource")
 
             context = self.get_context_data(
                 main_script="views/resource/edit-log",
                 cards=JSONSerializer().serialize(cards),
                 resource_type=graph_name,
-                resource_description=displaydescription,
+                resource_description=resource.displaydescription(),
                 iconclass=resource_instance.graph.iconclass,
                 edits=JSONSerializer().serialize(permitted_edits),
                 resourceid=resourceid,
-                displayname=displayname,
+                displayname=_("Unnamed Resource") if displayname == "undefined" else displayname,
             )
 
             context["nav"]["res_edit"] = True
@@ -545,8 +542,6 @@ class ResourceEditLogView(BaseManagerView):
             context["nav"]["title"] = graph_name
 
             return render(request, view_template, context)
-
-        return HttpResponseNotFound()
 
 
 @method_decorator(can_edit_resource_instance, name="dispatch")
@@ -796,7 +791,6 @@ class RelatedResourcesView(BaseManagerView):
             lang = request.GET.get("lang", settings.LANGUAGE_CODE)
             resourceinstance_graphid = request.GET.get("resourceinstance_graphid")
             paginate = strtobool(request.GET.get("paginate", "true"))  # default to true
-
             resource = Resource.objects.get(pk=resourceid)
 
             if paginate:
