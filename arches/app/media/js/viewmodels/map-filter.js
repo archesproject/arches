@@ -172,9 +172,9 @@ define(['underscore', 'knockout'], function(_, ko) {
             active: ko.observable(false)
         }];
 
-        this.drawMode = ko.observable();
+        this.selectedTool = ko.observable();
         this.drawModes = _.pluck(this.spatialFilterTypes, 'drawMode');
-        this.drawMode.subscribe(function(selectedDrawTool){
+        this.selectedTool.subscribe(function(selectedDrawTool){
             if(!!selectedDrawTool){
                 if(selectedDrawTool === 'extent'){
                     this.searchByExtent();
@@ -183,7 +183,7 @@ define(['underscore', 'knockout'], function(_, ko) {
                 }
             }
         }, this);
-        
+
         this.useMaxBuffer = function(unit, buffer, maxBuffer) {
             var res = false;
             if (unit === 'ft') {
@@ -224,7 +224,7 @@ define(['underscore', 'knockout'], function(_, ko) {
                         });
                         self.searchGeometries(e.features);
                         self.updateFilter();
-                        self.drawMode(undefined);
+                        self.selectedTool(undefined);
                     }
                 });
                 this.map().on('draw.update', function(e) {
@@ -234,7 +234,7 @@ define(['underscore', 'knockout'], function(_, ko) {
                     }
                 });
             });
-            
+
         };
 
         this.makeSearchFeature = function(feature) {
@@ -280,7 +280,7 @@ define(['underscore', 'knockout'], function(_, ko) {
             this.updateFilter();
         }, this);
         //----------------- End search buffer values from map-filter
-        
+
     };
     return MapFilterViewModel;
 });
