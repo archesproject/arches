@@ -2143,7 +2143,7 @@ div.final-cons-step-separator>h4 {
 
 .workbench-card-sidebar-tab {
     color: #787878;
-    height: 65px;
+    min-height: 65px;
     padding: 16px;
     text-align: center;
     font-size: 1.1em;
@@ -11699,20 +11699,17 @@ table.table.dataTable {
 }
 
 .facets-container {
-    position: absolute;
     width: 275px;
-    right: 0px;
-    border-left: 1px solid #ddd;
+    border-inline-start: 1px solid #ddd;
 }
 
 .facets-search-container {
-    position: absolute;
     width: calc(100% - 275px);
     height: calc(100vh - 115px);
     overflow-y: auto;
     padding: 2px;
     background: white;
-    border-right: 0.5px #e0e0e0 solid;
+    border-inline-start: 1px #e0e0e0 solid;
 }
 
 .faceted-search-card-container {
@@ -11726,7 +11723,6 @@ table.table.dataTable {
     height: calc(100vh - 115px);
     overflow-y: auto;
     background: #fbfbfb;
-    border-right: 1px solid #ddd;
 }
 
 .list-group.search-facets {

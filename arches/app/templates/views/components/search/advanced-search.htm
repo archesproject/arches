@@ -2,39 +2,7 @@
 {% load staticfiles %}
 
 <!--ko let: { self: $data }-->
-<div class="search-container advanced-search-container relative">
-
-    <!-- Advanced Search Panel -->
-    <div class="facets-container" style="">
-        <div class="list-group search-facets">
-            <div class="search-facet-item header">
-                <h4 class="search-facet-item-heading">{% trans "Search Facets" %}</h4>
-                <div class="list-filter relative">
-                    <input type="text" class="form-control" style="" placeholder="{% trans "Find ..." %}" data-bind="value: facetFilterText, valueUpdate: 'keyup'">
-                    <!-- Clear Filter -->
-                    <span class="clear-node-search" data-bind="click: function () { facetFilterText(''); }"><i class="fa fa-times-circle"></i></span>
-                </div>
-            </div>
-            <!-- ko foreach: searchableGraphs -->
-                <!-- ko if: cards().length > 0  -->
-                <div tabindex="0" class="search-facet-item disabled" data-bind="click: function () { collapsed(!collapsed()) }">
-                    <h4 class="search-facet-item-heading">
-                        <strong data-bind="text: name"></strong>
-                        <span><i class="fa report-expander print-hide" data-bind="css: {'fa-angle-down': !collapsed(), 'fa-angle-right': collapsed()}"></i></span>
-                    </h4>
-                </div>
-                <div data-bind="visible: !collapsed()">
-                    <!-- ko foreach: cards -->
-                    <a href="#" class="search-facet-item" data-bind="click: addFacet">
-                        <h4 class="search-facet-item-heading" data-bind="text: name"></h4>
-                        <p class="list-group-item-text"></p>
-                    </a>
-                    <!-- /ko -->
-                </div>
-                <!-- /ko -->
-            <!-- /ko -->
-        </div>
-    </div>
+<div class="flex">
 
     <div class="facets-search-container" style="">
 
@@ -91,6 +59,38 @@
             </div>
         </div>
         <!-- /ko -->
+    </div>
+
+    <!-- Advanced Search Panel -->
+    <div class="facets-container" style="">
+        <div class="list-group search-facets">
+            <div class="search-facet-item header">
+                <h4 class="search-facet-item-heading">{% trans "Search Facets" %}</h4>
+                <div class="list-filter relative">
+                    <input type="text" class="form-control" style="" placeholder="{% trans "Find ..." %}" data-bind="value: facetFilterText, valueUpdate: 'keyup'">
+                    <!-- Clear Filter -->
+                    <span class="clear-node-search" data-bind="click: function () { facetFilterText(''); }"><i class="fa fa-times-circle"></i></span>
+                </div>
+            </div>
+            <!-- ko foreach: searchableGraphs -->
+                <!-- ko if: cards().length > 0  -->
+                <div tabindex="0" class="search-facet-item disabled" data-bind="click: function () { collapsed(!collapsed()) }">
+                    <h4 class="search-facet-item-heading">
+                        <strong data-bind="text: name"></strong>
+                        <span><i class="fa report-expander print-hide" data-bind="css: {'fa-angle-down': !collapsed(), 'fa-angle-right': collapsed()}"></i></span>
+                    </h4>
+                </div>
+                <div data-bind="visible: !collapsed()">
+                    <!-- ko foreach: cards -->
+                    <a href="#" class="search-facet-item" data-bind="click: addFacet">
+                        <h4 class="search-facet-item-heading" data-bind="text: name"></h4>
+                        <p class="list-group-item-text"></p>
+                    </a>
+                    <!-- /ko -->
+                </div>
+                <!-- /ko -->
+            <!-- /ko -->
+        </div>
     </div>
 </div>
 <!-- /ko -->
