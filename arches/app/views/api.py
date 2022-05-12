@@ -607,11 +607,11 @@ class Resources(APIBase):
                             version=version,
                             hide_hidden_nodes=hide_hidden_nodes,
                         ),
-                        "displaydescription": resource.displaydescription,
-                        "displayname": resource.displayname,
+                        "displaydescription": resource.displaydescription(),
+                        "displayname": resource.displayname(),
                         "graph_id": resource.graph_id,
                         "legacyid": resource.legacyid,
-                        "map_popup": resource.map_popup,
+                        "map_popup": resource.map_popup(),
                         "resourceinstanceid": resource.resourceinstanceid,
                     }
 
@@ -987,7 +987,7 @@ class Card(APIBase):
             tiles = []
             displayname = _("New Resource")
         else:
-            displayname = resource_instance.displayname
+            displayname = resource_instance.displayname()
             if displayname == "undefined":
                 displayname = _("Unnamed Resource")
             if str(resource_instance.graph_id) == settings.SYSTEM_SETTINGS_RESOURCE_MODEL_ID:
@@ -1245,7 +1245,7 @@ class ResourceReport(APIBase):
 
         resp = {
             "datatypes": models.DDataType.objects.all(),
-            "displayname": resource.displayname,
+            "displayname": resource.displayname(),
             "resourceid": resourceid,
             "graph": graph,
             "hide_empty_nodes": settings.HIDE_EMPTY_NODES_IN_REPORT,
