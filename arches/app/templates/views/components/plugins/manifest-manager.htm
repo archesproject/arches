@@ -124,14 +124,10 @@
     <label class="control-label">{% trans "Images" %}</label>
     <div>{% trans "Select image to delete from the image service" %}</div>
     <div class="file-workbench-files" data-bind="foreach: canvases">
-        <div class='file-workbench-file' style="display: inline-flex;" data-bind="css: {staged: ko.unwrap($parent.canvas) === $data.images[0].resource.service['@id']}">
+        <div class='file-workbench-file' style="display: inline-flex;" data-bind="css: {staged: (($parent.selectPrimaryPanel() && ko.unwrap($parent.canvas) === $data.images[0].resource.service['@id']) || !$parent.selectPrimaryPanel() && ko.unwrap($parent.secondaryCanvas) === $data.images[0].resource.service['@id'])}">
             <input type="checkbox" style="width:15px; height:15px;" data-bind="value: $data, checked: $parent.canvasesForDeletion">
-            <!--ko if: ko.unwrap($parent.canvas) === $data.images[0].resource.service['@id'] -->
-            <span class='file-name manifest-manager-canvas-name' data-bind="text: $parent.canvasLabel, click: $parent.canvasClick, clickBubble: false"></span>
-            <!--/ko-->
-            <!--ko ifnot: ko.unwrap($parent.canvas) === $data.images[0].resource.service['@id'] -->
+            <span data-bind="text: console.log($parent.canvasLabel(), $parent.canvas(), $data.images[0])"></span>
             <span class='file-name manifest-manager-canvas-name' data-bind="text: label, click: $parent.canvasClick, clickBubble: false"></span>
-            <!--/ko-->
         </div>
     </div>
 

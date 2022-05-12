@@ -428,7 +428,7 @@ define([
         };
 
         this.onFeatureClick = function(features, lngLat, MapboxGl) {
-            var popupTemplate = mapPopupProvider.getPopupTemplate(features);
+            const popupTemplate = this.popupTemplate ? this.popupTemplate : mapPopupProvider.getPopupTemplate(features);
             const map = self.map();
             const mapStyle = map.getStyle();
             self.popup = new MapboxGl.Popup()
