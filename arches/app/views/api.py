@@ -529,7 +529,7 @@ class Graphs(APIBase):
                 return JSONResponse({"datatypes": datatypes, "cards": permitted_cards, "graph": graph, "cardwidgets": cardwidgets})
             else:
                 return JSONResponse({"graph": graph})
-        elif self.action == 'get_graph_models':
+        elif self.action == "get_graph_models":
             graphs = models.GraphModel.objects.all()
             return JSONResponse(JSONSerializer().serializeToPython(graphs))
 
