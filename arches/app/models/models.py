@@ -448,7 +448,13 @@ class Language(models.Model):
     isdefault = models.BooleanField(default=False, blank=True)
 
     def __str__(self):
-        return self.name
+        return f"{self.name} ({self.code})"
+
+    def save(self):
+        for lang in Language.objects.all():
+            if lang.code.replace("_", "-").lower() == self.code.replace("_", "-").lower():
+                raise Exception(f"The language you're saving ({self.code}) is the same as one that already exists in the system: '{lang.code}'")
+        super(Language, self).save()
 
     class Meta:
         managed = True
