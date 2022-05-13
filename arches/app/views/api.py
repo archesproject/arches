@@ -490,6 +490,7 @@ class MVT(APIBase):
 
 @method_decorator(csrf_exempt, name="dispatch")
 class Graphs(APIBase):
+    action = None
     def get(self, request, graph_id=None):
         cards_querystring = request.GET.get("cards", None)
         exclusions_querystring = request.GET.get("exclude", None)
@@ -505,8 +506,7 @@ class Graphs(APIBase):
 
         perm = "read_nodegroup"
         user = request.user
-
-        if graph_id:
+        if graph_id and not self.action:
             graph = Graph.objects.get(graphid=graph_id)
             graph = JSONSerializer().serializeToPython(graph, sort_keys=False, exclude=["is_editable", "functions"] + exclusions)
 
@@ -529,7 +529,7 @@ class Graphs(APIBase):
                 return JSONResponse({"datatypes": datatypes, "cards": permitted_cards, "graph": graph, "cardwidgets": cardwidgets})
             else:
                 return JSONResponse({"graph": graph})
-        else:
+        elif self.action == 'get_graph_models':
             graphs = models.GraphModel.objects.all()
             return JSONResponse(JSONSerializer().serializeToPython(graphs))
 
