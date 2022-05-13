@@ -35,9 +35,9 @@
                 <h5>{% trans 'By default only you have access to this record. You can set permissions for specific people or groups by selecting to whom you will grant access' %}</h5>
             </div>
             <div class="permission-control">
-                <div class="permission-filter">
-                <input type="text" class="form-control" style="display:inline-block;" placeholder="filter table" data-bind="textInput: filter">
-                <div class="clear-filter" data-bind="visible: filter().length > 0, click: function() { filter(''); }"><i class="fa fa-times-circle"></i></div>
+                <div class="list-filter">
+                    <input type="text" class="form-control" style="width: 250px;" placeholder="filter table" data-bind="textInput: filter">
+                    <div class="clear-node-search" data-bind="visible: filter().length > 0, click: function() { filter(''); }"><i class="fa fa-times-circle"></i></div>
                 </div>
             </div>
             <div class="permission-list">

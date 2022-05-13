@@ -51,16 +51,16 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
     <!--ko if: mobilesurveys().length > 0 -->
         <div data-bind="visible: mobilesurveys().length > 0" style="width: 100%;">
                 <!-- Layer Filter -->
-                <div class="list-filter mpm" data-bind="">
+                <div class="mpm" data-bind="">
                     <div class="msm-list-filter">
                     <div>
                         <button id="" class="btn btn-lg btn-mint btn-active-dark btn-labeled ion-plus-round" data-bind="click: newMobileSurvey"><span>{% trans "New Project" %}</span></button>
                     </div>
-                    <div class="msm-list-filter-input">
-                    <input type="text" class="form-control" placeholder="{% trans 'Find a project...' %}" data-bind="value: mobileSurveyFilter, valueUpdate: 'keyup'">
-                    <!-- Clear Search -->
-                    <span class="clear-node-search" data-bind="visible: mobileSurveyFilter().length > 0, click: function() { mobileSurveyFilter(''); }"><i class="fa fa-times-circle"></i></span>
-                </div>
+                    <div class="list-filter msm-list-filter-input">
+                        <input type="text" class="form-control" placeholder="{% trans 'Find a project...' %}" data-bind="value: mobileSurveyFilter, valueUpdate: 'keyup'">
+                        <!-- Clear Search -->
+                        <span class="clear-node-search" data-bind="visible: mobileSurveyFilter().length > 0, click: function() { mobileSurveyFilter(''); }"><i class="fa fa-times-circle"></i></span>
+                    </div>
                </div>
           </div>
 
