@@ -222,6 +222,14 @@ add_staging_to_tile_function = """
             _file jsonb;
             _key text;
             _value text;
+            tile_data_value jsonb; 
+            resource_object jsonb;
+            resource_x_id uuid;
+            x_resource_id text;
+            ontology_property text;
+            inverse_ontology_property text;
+            x_graph_id uuid;
+            resource_object_array jsonb;
         BEGIN
             FOR staged_value, instance_id, legacy_id, tile_id, parent_id, group_id, passed, graph_id IN
                     (
@@ -247,7 +255,53 @@ add_staging_to_tile_function = """
                         tile_data := '{}'::jsonb;
                         FOR _key, _value IN SELECT * FROM jsonb_each_text(staged_value)
                             LOOP
-                                tile_data = tile_data || FORMAT('{"%s": %s}', _key, _value::jsonb -> 'value')::jsonb;
+                                tile_data_value = _value::jsonb -> 'value';
+                                --if resource-instance, create resource_x_resource record
+                                IF (_value::jsonb ->> 'datatype') in ('resource-instance-list', 'resource-instance') THEN
+                                    resource_object_array = '[]'::jsonb;
+                                    FOR resource_object IN SELECT * FROM jsonb_array_elements(_value::jsonb -> 'value') LOOP
+                                        resource_x_id = uuid_generate_v1mc();
+                                        x_resource_id = resource_object ->> 'resourceId';
+                                        ontology_property = resource_object ->> 'ontologyProperty';
+                                        inverse_ontology_property = resource_object ->> 'inverseOntologyProperty';
+                                        SELECT graphid FROM resource_instances INTO x_graph_id WHERE resourceinstanceid = x_resource_id::uuid;
+
+                                        INSERT INTO resource_x_resource(
+                                            resourcexid,
+                                            resourceinstanceidfrom,
+                                            resourceinstanceidto,
+                                            relationshiptype,
+                                            inverserelationshiptype,
+                                            modified,
+                                            created,
+                                            tileid,
+                                            nodeid,
+                                            resourceinstancefrom_graphid,
+                                            resourceinstanceto_graphid
+                                        )
+                                        VALUES (
+                                            resource_x_id,
+                                            instance_id::uuid,
+                                            x_resource_id::uuid,
+                                            ontology_property,
+                                            inverse_ontology_property,
+                                            now(),
+                                            now(),
+                                            tile_id::uuid,
+                                            _key::uuid,
+                                            graph_id,
+                                            x_graph_id
+                                        );
+                                        RAISE NOTICE '%, %, %', resource_object_array, resource_object, resource_x_id;
+                                        resource_object = jsonb_set(resource_object, '{resourceXresourceId}', to_jsonb(resource_x_id::text));
+                                        resource_object_array = resource_object_array || resource_object;
+                                        RAISE NOTICE '%', resource_object;
+                                        RAISE NOTICE '%', resource_object_array;
+                                    END LOOP;
+                                    tile_data_value = resource_object_array;
+                                END IF;
+                                
+                                tile_data = tile_data || FORMAT('{"%s": %s}', _key, tile_data_value)::jsonb;							
                             END LOOP;
 
                         IF tile_id IS null THEN
@@ -258,7 +312,7 @@ add_staging_to_tile_function = """
                         IF NOT FOUND THEN
                             old_data = null;
                         END IF;
-
+                        
                         INSERT INTO tiles(tileid, tiledata, nodegroupid, parenttileid, resourceinstanceid)
                             VALUES (tile_id::uuid, tile_data, group_id::uuid, parent_id::uuid, instance_id::uuid);
                         INSERT INTO edit_log (resourceclassid, resourceinstanceid, nodegroupid, tileinstanceid, edittype, newvalue, oldvalue, timestamp, note, transactionid)
