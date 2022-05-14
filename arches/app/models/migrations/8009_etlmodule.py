@@ -222,7 +222,7 @@ add_staging_to_tile_function = """
             _file jsonb;
             _key text;
             _value text;
-            tile_data_value jsonb; 
+            tile_data_value jsonb;
             resource_object jsonb;
             resource_x_id uuid;
             x_resource_id text;
@@ -300,8 +300,8 @@ add_staging_to_tile_function = """
                                     END LOOP;
                                     tile_data_value = resource_object_array;
                                 END IF;
-                                
-                                tile_data = tile_data || FORMAT('{"%s": %s}', _key, tile_data_value)::jsonb;							
+
+                                tile_data = tile_data || FORMAT('{"%s": %s}', _key, tile_data_value)::jsonb;
                             END LOOP;
 
                         IF tile_id IS null THEN
@@ -312,7 +312,7 @@ add_staging_to_tile_function = """
                         IF NOT FOUND THEN
                             old_data = null;
                         END IF;
-                        
+
                         INSERT INTO tiles(tileid, tiledata, nodegroupid, parenttileid, resourceinstanceid)
                             VALUES (tile_id::uuid, tile_data, group_id::uuid, parent_id::uuid, instance_id::uuid);
                         INSERT INTO edit_log (resourceclassid, resourceinstanceid, nodegroupid, tileinstanceid, edittype, newvalue, oldvalue, timestamp, note, transactionid)
