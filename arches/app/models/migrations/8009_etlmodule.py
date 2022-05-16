@@ -202,6 +202,66 @@ remove_functions_to_get_nodegroup_tree = [
     """
 ]
 
+add_create_resource_x_record = """
+    CREATE OR REPLACE FUNCTION public.__arches_create_resource_x_record(tile_data_value jsonb, instance_id uuid, tile_id uuid, node_id uuid, graph_id uuid)
+    RETURNS JSONB AS $$
+        DECLARE
+            resource_object jsonb;
+            resource_x_id uuid;
+            x_resource_id text;
+            ontology_property text;
+            inverse_ontology_property text;
+            x_graph_id uuid;
+            resource_object_array jsonb;
+        BEGIN
+            --if resource-instance datatype is created without resource_x_resource, create resource_x_resource record
+            resource_object_array = '[]'::jsonb;
+            FOR resource_object IN SELECT * FROM jsonb_array_elements(tile_data_value) LOOP
+                resource_x_id = uuid_generate_v1mc();
+                x_resource_id = resource_object ->> 'resourceId';
+                ontology_property = resource_object ->> 'ontologyProperty';
+                inverse_ontology_property = resource_object ->> 'inverseOntologyProperty';
+                SELECT graphid FROM resource_instances INTO x_graph_id WHERE resourceinstanceid = x_resource_id::uuid;
+
+                INSERT INTO resource_x_resource(
+                    resourcexid,
+                    resourceinstanceidfrom,
+                    resourceinstanceidto,
+                    relationshiptype,
+                    inverserelationshiptype,
+                    modified,
+                    created,
+                    tileid,
+                    nodeid,
+                    resourceinstancefrom_graphid,
+                    resourceinstanceto_graphid
+                )
+                VALUES (
+                    resource_x_id,
+                    instance_id,
+                    x_resource_id::uuid,
+                    ontology_property,
+                    inverse_ontology_property,
+                    now(),
+                    now(),
+                    tile_id,
+                    node_id,
+                    graph_id,
+                    x_graph_id
+                );
+                resource_object = jsonb_set(resource_object, '{resourceXresourceId}', to_jsonb(resource_x_id::text));
+                resource_object_array = resource_object_array || resource_object;
+            END LOOP;
+            RETURN resource_object_array;
+        END;
+    $$
+    LANGUAGE plpgsql
+    """
+
+remove_create_resource_x_record = """
+    DROP FUNCTION public.__arches_create_resource_x_record(tile_data_value jsonb, instance_id uuid, tile_id uuid, node_id uuid, graph_id uuid);
+    """
+
 add_staging_to_tile_function = """
     CREATE OR REPLACE FUNCTION public.__arches_staging_to_tile(load_id uuid)
     RETURNS BOOLEAN AS $$
@@ -223,13 +283,6 @@ add_staging_to_tile_function = """
             _key text;
             _value text;
             tile_data_value jsonb;
-            resource_object jsonb;
-            resource_x_id uuid;
-            x_resource_id text;
-            ontology_property text;
-            inverse_ontology_property text;
-            x_graph_id uuid;
-            resource_object_array jsonb;
         BEGIN
             FOR staged_value, instance_id, legacy_id, tile_id, parent_id, group_id, passed, graph_id IN
                     (
@@ -258,47 +311,8 @@ add_staging_to_tile_function = """
                                 tile_data_value = _value::jsonb -> 'value';
                                 --if resource-instance, create resource_x_resource record
                                 IF (_value::jsonb ->> 'datatype') in ('resource-instance-list', 'resource-instance') THEN
-                                    resource_object_array = '[]'::jsonb;
-                                    FOR resource_object IN SELECT * FROM jsonb_array_elements(_value::jsonb -> 'value') LOOP
-                                        resource_x_id = uuid_generate_v1mc();
-                                        x_resource_id = resource_object ->> 'resourceId';
-                                        ontology_property = resource_object ->> 'ontologyProperty';
-                                        inverse_ontology_property = resource_object ->> 'inverseOntologyProperty';
-                                        SELECT graphid FROM resource_instances INTO x_graph_id WHERE resourceinstanceid = x_resource_id::uuid;
-
-                                        INSERT INTO resource_x_resource(
-                                            resourcexid,
-                                            resourceinstanceidfrom,
-                                            resourceinstanceidto,
-                                            relationshiptype,
-                                            inverserelationshiptype,
-                                            modified,
-                                            created,
-                                            tileid,
-                                            nodeid,
-                                            resourceinstancefrom_graphid,
-                                            resourceinstanceto_graphid
-                                        )
-                                        VALUES (
-                                            resource_x_id,
-                                            instance_id::uuid,
-                                            x_resource_id::uuid,
-                                            ontology_property,
-                                            inverse_ontology_property,
-                                            now(),
-                                            now(),
-                                            tile_id::uuid,
-                                            _key::uuid,
-                                            graph_id,
-                                            x_graph_id
-                                        );
-                                        RAISE NOTICE '%, %, %', resource_object_array, resource_object, resource_x_id;
-                                        resource_object = jsonb_set(resource_object, '{resourceXresourceId}', to_jsonb(resource_x_id::text));
-                                        resource_object_array = resource_object_array || resource_object;
-                                        RAISE NOTICE '%', resource_object;
-                                        RAISE NOTICE '%', resource_object_array;
-                                    END LOOP;
-                                    tile_data_value = resource_object_array;
+                                    SELECT __arches_create_resource_x_record(tile_data_value, instance_id::uuid, tile_id::uuid, _key::uuid, graph_id)
+                                    INTO tile_data_value;
                                 END IF;
 
                                 tile_data = tile_data || FORMAT('{"%s": %s}', _key, tile_data_value)::jsonb;
@@ -450,5 +464,6 @@ class Migration(migrations.Migration):
         ),
         migrations.RunSQL(add_validation_reporting_functions, remove_validation_reporting_functions),
         migrations.RunSQL(add_functions_to_get_nodegroup_tree, remove_functions_to_get_nodegroup_tree),
+        migrations.RunSQL(add_create_resource_x_record, remove_create_resource_x_record),
         migrations.RunSQL(add_staging_to_tile_function, remove_staging_to_tile_function),
     ]
