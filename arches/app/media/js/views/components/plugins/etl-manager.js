@@ -1,8 +1,9 @@
 define([
     'jquery',
     'knockout',
+    'js-cookie',
     'arches',
-], function($, ko, arches) {
+], function($, ko, Cookies, arches) {
     return ko.components.register('etl-manager', {
         viewModel: function(params) {
             const self = this;
@@ -71,7 +72,7 @@ define([
                     method: 'POST',
                     credentials: 'include',
                     headers: {
-                        'Content-Type': 'application/json'
+                        "X-CSRFToken": Cookies.get('csrftoken')
                     },
                 }).then(function(response) {
                     return response.json();
