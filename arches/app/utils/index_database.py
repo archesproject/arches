@@ -234,7 +234,7 @@ def start_index_resources(resources, batch_size=settings.BULK_IMPORT_BATCH_SIZE,
         with se.BulkIndexer(batch_size=batch_size, refresh=True, timeout=30, max_retries=10, retry_on_timeout=True) as term_indexer:
             if quiet is False:
                 bar = pyprind.ProgBar(len(resources), bar_char="█", title=progress_bar_title) if len(resources) > 1 else None
-            print(resources)
+
             for resource in resources:
                 if quiet is False and bar is not None:
                     bar.update(item_id=resource)
