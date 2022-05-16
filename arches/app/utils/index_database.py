@@ -122,20 +122,21 @@ def index_resources_by_type(
             for nodegroup in [card.nodegroup for card in cards]:
                 term = Term(field="nodegroupid", term=str(nodegroup.nodegroupid))
                 tq.add_query(term)
-            tq.delete(index=TERMS_INDEX, refresh=True) 
+            tq.delete(index=TERMS_INDEX, refresh=True)
 
             rq = Query(se=se)
             term = Term(field="graph_id", term=str(resource_type))
             rq.add_query(term)
             rq.delete(index=RESOURCES_INDEX, refresh=True)
 
-        if(use_multiprocessing):
+        if use_multiprocessing:
             resources = [
-                    str(rid) for rid in Resource.objects.filter(graph_id=str(resource_type)).values_list("resourceinstanceid", flat=True)
+                str(rid) for rid in Resource.objects.filter(graph_id=str(resource_type)).values_list("resourceinstanceid", flat=True)
             ]
             bulk_index(resources, batch_size, quiet, max_subprocesses)
         else:
             from arches.app.search.search_engine_factory import SearchEngineInstance as _se
+
             resources = Resource.objects.filter(graph_id=str(resource_type))
             start_index_resources(resources, batch_size, quiet, progress_bar_title=graph_name)
 
@@ -151,6 +152,7 @@ def index_resources_by_type(
         )
     return status
 
+
 def bulk_index(resources, batch_size=settings.BULK_IMPORT_BATCH_SIZE, quiet=False, max_subprocesses=0, callback=None):
     try:
         multiprocessing.set_start_method("spawn")
@@ -158,7 +160,7 @@ def bulk_index(resources, batch_size=settings.BULK_IMPORT_BATCH_SIZE, quiet=Fals
         pass
 
     logger.debug(f"... multiprocessing method: {multiprocessing.get_start_method()}")
-    
+
     resource_batches = []
     resource_count = 0
     batch_number = 0
@@ -217,15 +219,21 @@ def bulk_index(resources, batch_size=settings.BULK_IMPORT_BATCH_SIZE, quiet=Fals
         pool.close()
         pool.join()
 
+
 def _index_resource_batch(resourceids):
     from arches.app.search.search_engine_factory import SearchEngineInstance as _se
+
     resources = Resource.objects.filter(resourceinstanceid__in=resourceids)
     batch_size = int(len(resourceids) / 2)
     return start_index_resources(resources, batch_size, quiet=True, se=_se)
 
-def start_index_resources(resources, batch_size=settings.BULK_IMPORT_BATCH_SIZE, quiet=False, progress_bar_title="", se:SearchEngineInstance=None):
-    if(se is None):
+
+def start_index_resources(
+    resources, batch_size=settings.BULK_IMPORT_BATCH_SIZE, quiet=False, progress_bar_title="", se: SearchEngineInstance = None
+):
+    if se is None:
         from arches.app.search.search_engine_factory import SearchEngineInstance as _se
+
         se = _se
     datatype_factory = DataTypeFactory()
     node_datatypes = {str(nodeid): datatype for nodeid, datatype in models.Node.objects.values_list("nodeid", "datatype")}
@@ -238,7 +246,7 @@ def start_index_resources(resources, batch_size=settings.BULK_IMPORT_BATCH_SIZE,
             for resource in resources:
                 if quiet is False and bar is not None:
                     bar.update(item_id=resource)
-                document, terms = resource.get_documents_to_index( 
+                document, terms = resource.get_documents_to_index(
                     fetchTiles=True, datatype_factory=datatype_factory, node_datatypes=node_datatypes
                 )
                 doc_indexer.add(index=RESOURCES_INDEX, id=document["resourceinstanceid"], data=document)

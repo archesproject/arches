@@ -42,14 +42,10 @@ import arches.app.utils.index_database as index_database_util
 
 from arches.app.models.models import BulkIndexQueue, ResourceInstance, TileModel
 
+
 class Command(BaseCommand):
     def add_arguments(self, parser):
-        parser.add_argument(
-            "-operation",
-            action="store",
-            dest="operation",
-            default=""
-        )
+        parser.add_argument("-operation", action="store", dest="operation", default="")
 
     def handle(self, *args: Any, **options: Any) -> Optional[str]:
         bulk_index_queue = BulkIndexQueue.objects.all()
@@ -59,14 +55,15 @@ class Command(BaseCommand):
 
         # This is for testing delete operations; it deletes a random resource (the first inside the bulk index queue)
         # without indexing the delete.  Do not use this on production systems.
-        if(options["operation"] == "test_delete"):
+        if options["operation"] == "test_delete":
             instances = ResourceInstance.objects.filter(resourceinstanceid__in=queued_ids)
             print(instances[0].resourceinstanceid)
             instances[0].delete()
             return
-        
-        if(len(delete_ids) > 0):
+
+        if len(delete_ids) > 0:
             from arches.app.search.search_engine_factory import SearchEngineInstance as _se
+
             deleteq = Query(se=_se)
             for resource_id in delete_ids:
                 term = Term(field="resourceinstanceid", term=str(resource_id))
@@ -75,8 +72,6 @@ class Command(BaseCommand):
             deleteq.delete(index=RESOURCES_INDEX, refresh=True)
             deleteq.delete(index=RESOURCE_RELATIONS_INDEX, refresh=True)
             bulk_index_queue.filter(resourceinstanceid__in=delete_ids).delete()
-        
+
         index_database_util.start_index_resources(resources, progress_bar_title="Processing Indexing Queue")
         bulk_index_queue.delete()
-
-        

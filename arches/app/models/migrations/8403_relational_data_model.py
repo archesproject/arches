@@ -10,7 +10,8 @@ class Migration(migrations.Migration):
     ]
 
     operations = [
-        migrations.RunSQL("""
+        migrations.RunSQL(
+            """
             create or replace function __arches_tile_view_update() returns trigger as $$
                 declare
                     view_namespace text;
@@ -211,8 +212,8 @@ class Migration(migrations.Migration):
                     end if;
                 end;
             $$ language plpgsql;
-        """, 
-        """
+        """,
+            """
             create or replace function __arches_tile_view_update() returns trigger as $$
                 declare
                     view_namespace text;
@@ -409,5 +410,6 @@ class Migration(migrations.Migration):
                     end if;
                 end;
             $$ language plpgsql;
-        """)
+        """,
+        )
     ]

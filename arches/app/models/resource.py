@@ -75,7 +75,7 @@ class Resource(models.ResourceInstance):
             graph_id=self.graph_id, function__functiontype="primarydescriptors"
         ).select_related("function")
 
-        if(self.descriptors is None):
+        if self.descriptors is None:
             self.descriptors = {}
 
         if len(graph_function) == 1:
@@ -86,7 +86,7 @@ class Resource(models.ResourceInstance):
             )
         else:
             self.descriptors[descriptor] = "undefined"
-        
+
         return self.descriptors[descriptor]
 
     def displaydescription(self, context=None):
@@ -266,7 +266,7 @@ class Resource(models.ResourceInstance):
                     es_index = import_class_from_string(index["module"])(index["name"])
                     doc, doc_id = es_index.get_documents_to_index(self, document["tiles"])
                     es_index.index_document(document=doc, id=doc_id)
-            
+
             super(Resource, self).save()
 
     def get_documents_to_index(self, fetchTiles=True, datatype_factory=None, node_datatypes=None, context=None):

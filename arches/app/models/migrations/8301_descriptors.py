@@ -12,13 +12,13 @@ class Migration(migrations.Migration):
 
     operations = [
         migrations.AddField(
-            model_name='resourceinstance',
-            name='descriptors',
+            model_name="resourceinstance",
+            name="descriptors",
             field=django.contrib.postgres.fields.jsonb.JSONField(blank=True, null=True),
         ),
         migrations.AddField(
-            model_name='resourceinstance',
-            name='namedescriptor',
+            model_name="resourceinstance",
+            name="namedescriptor",
             field=models.TextField(blank=True, null=True),
         ),
     ]

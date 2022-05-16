@@ -11,14 +11,14 @@ class Migration(migrations.Migration):
 
     operations = [
         migrations.CreateModel(
-            name='BulkIndexQueue',
+            name="BulkIndexQueue",
             fields=[
-                ('resourceinstanceid', models.UUIDField(primary_key=True, serialize=False, unique=True)),
-                ('createddate', models.DateTimeField(auto_now_add=True)),
+                ("resourceinstanceid", models.UUIDField(primary_key=True, serialize=False, unique=True)),
+                ("createddate", models.DateTimeField(auto_now_add=True)),
             ],
             options={
-                'db_table': 'bulk_index_queue',
-                'managed': True,
+                "db_table": "bulk_index_queue",
+                "managed": True,
             },
         )
     ]
