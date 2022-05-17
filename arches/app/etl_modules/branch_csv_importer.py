@@ -107,7 +107,10 @@ class BranchCsvImporter:
                     config["nodeid"] = nodeid
                 except TypeError:
                     config = {}
-                value = datatype_instance.transform_value_for_tile(source_value, **config) if source_value is not None else None
+                if datatype == "edtf":
+                    value, valid = datatype_instance.transform_value_for_tile(source_value, **config) if source_value is not None else None
+                else:
+                    value = datatype_instance.transform_value_for_tile(source_value, **config) if source_value is not None else None
                 if datatype == "file-list":
                     validation_errors = datatype_instance.validate(value, nodeid=nodeid, path=self.temp_dir)
                 else:
@@ -268,7 +271,7 @@ class BranchCsvImporter:
                 "title": _("Failed to complete load"),
                 "message": _("Be sure any resources you are loading do not have resource ids that already exist in the system"),
             }
-        print(row[0][0])
+
         if row[0][0]:
             index_resources_by_transaction(self.loadid, quiet=True, use_multiprocessing=True)
 
