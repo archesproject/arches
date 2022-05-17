@@ -654,7 +654,10 @@ class Tile(models.TileModel):
         try:
             for function in self._getFunctionClassInstances():
                 try:
-                    function.save(self, request, context=context)
+                    if context:
+                        function.save(self, request, context=context)
+                    else:
+                        function.save(self, request) # support functions without context TODO: remove if/else block in 7.0 release. All fns to require context
                 except NotImplementedError:
                     pass
         except TypeError:
@@ -680,7 +683,10 @@ class Tile(models.TileModel):
         try:
             for function in self._getFunctionClassInstances():
                 try:
-                    function.post_save(self, request, context=context)
+                    if context:
+                        function.post_save(self, request, context=context)
+                    else:
+                        function.post_save(self, request) # support functions without context TODO: remove if/else block in 7.0 release. All fns to require context
                 except NotImplementedError:
                     pass
         except TypeError as e:
