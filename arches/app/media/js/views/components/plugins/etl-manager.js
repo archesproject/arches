@@ -19,6 +19,7 @@ define([
             this.validationError = ko.observableArray();
 
             this.selectedLoadEvent.subscribe(function(val){
+                self.selectedModule(val.etl_module);
                 self.fetchValidation(val.loadid);
             });
             this.moduleSearchString = ko.observable('');
