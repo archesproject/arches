@@ -183,7 +183,7 @@ class NumberDataType(BaseDataType):
                 value = int(value)
             else:
                 value = float(value)
-        except AttributeError:
+        except (AttributeError, ValueError):
             pass
         return value
 
