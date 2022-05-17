@@ -118,13 +118,14 @@ define([
             };
 
             this.getGraphName = function(graphId){
+                let graph;
                 if (self.graphs()) {
                     graph = self.graphs().find(function(graph){
                         return graph.graphid == graphId;
-                    })
+                    });
                 }
                 return graph.name;
-            }
+            };
 
             this.selectedGraph.subscribe(function(graph){
                 if (graph){
