@@ -65,7 +65,7 @@ define([
                 const a = document.createElement('a');
                 document.body.appendChild(a);
                 a.href = urlObject;
-                a.download = `${this.templates().filter(x => x.id == this.selectedTemplate())[0].text}%20-%20Template.xls`;
+                a.download = `${this.templates().filter(x => x.id == this.selectedTemplate())[0].text}.xlsx`;
                 a.click();
 
                 setTimeout(() => {
