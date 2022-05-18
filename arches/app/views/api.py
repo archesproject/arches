@@ -1719,7 +1719,7 @@ class TransformEdtfForTile(APIBase):
         try:
             value = request.GET.get("value")
             datatype_factory = DataTypeFactory()
-            edtf_datatype = datatype_factory.get_instance('edtf')
+            edtf_datatype = datatype_factory.get_instance("edtf")
             transformed_value = edtf_datatype.transform_value_for_tile(value)
             is_valid = len(edtf_datatype.validate(transformed_value)) == 0
             result = (transformed_value, is_valid)
