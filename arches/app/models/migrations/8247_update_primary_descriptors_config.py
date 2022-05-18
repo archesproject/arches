@@ -8,10 +8,9 @@ class Migration(migrations.Migration):
         migrations.RunSQL(
             sql="""
             update functions
-                set defaultconfig = jsonb_build_object('descriptor_types',
-                                        jsonb_build_object('name', defaultconfig -> 'name',
-                                                           'description', defaultconfig -> 'description',
-                                                           'map_popup', defaultconfig -> 'map_popup'))
+                set defaultconfig = ('{"descriptor_types": {"name": {"nodegroup_id": "", "string_template": ""}, '||
+                                    '"map_popup": {"nodegroup_id": "", "string_template": ""}, '||
+                                    '"description": {"nodegroup_id": "", "string_template": ""}}}')::jsonb
                 where functionid = '60000000-0000-0000-0000-000000000001';
 
             update functions_x_graphs
