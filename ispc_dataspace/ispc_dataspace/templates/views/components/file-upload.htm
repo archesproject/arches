@@ -1,0 +1,41 @@
+{% load staticfiles %}
+{% load template_tags %}
+{% load i18n %}
+
+<div class="file-chart-upload-panel">
+    <div class="gallery-controls new-tile">
+        <div class="dropzone-photo-upload" data-bind="dropzone: dropzoneOptions">
+            <div class="file-select-window">
+                <div class="bord-top pad-ver file-select">
+                    <div class="" style="padding: 5px">
+                        <h2>{% trans 'Upload Files' %}</h2>
+                        <h4>{% trans 'Drag & Drop your files onto this panel to upload' %}</h4>
+                    </div>
+                    <button type="button" class="btn btn-lg btn-file-select fileinput-button dz-clickable" data-bind="css: uniqueidClass">
+                        <i class="fa fa-file"></i>
+                        <span>{% trans "Select Files" %}</span>
+                    </button>
+                    <br>
+                    <div style="padding: 10px">{% trans "Adding files to this record is " %}
+                        <span><strong>{% trans "optional." %}</strong></span>
+                        <br>
+                        {% trans "You may upload as many files as you wish; check with the site admin on the maximum file size." %}
+                    </div>
+
+                </div>
+                <div class="file-upload-footer">
+                    <!-- ko if: acceptedFiles() !== null -->
+                    <span data-bind="text: ('The following file formats may be uploaded: ' + acceptedFiles())"></span>
+                    <!-- /ko -->
+                    <!-- ko if: !acceptedFiles() -->
+                    <span>{% trans 'Images formatted as .jpg, .png files may be uploaded. Other formats may require a loader to view.' %}</span>
+                    <!-- /ko -->
+                </div>
+            </div>
+
+        </div>
+        <div style="min-height: 100%;">
+            <div id="hidden-dz-previews" style="display:none"></div>
+        </div>
+    </div>
+</div>

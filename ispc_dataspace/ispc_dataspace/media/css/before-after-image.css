@@ -1,0 +1,15 @@
+.twentytwenty-container {
+    margin: 0 auto;
+}
+
+.twentytwenty-container img {
+    width: 100%;
+}
+
+.twentytwenty-overlay {
+    background: none !important;
+}
+
+.twentytwenty-before-label::before, .twentytwenty-after-label::before {
+    background-color: rgba(0, 0, 0, 0.2);
+}

@@ -1,0 +1,57 @@
+{% extends "views/report-templates/default.htm" %} 
+{% load i18n %} 
+{% block report %}
+
+{% block body %}
+<div class="afs-report-section">
+    <h2 class="afs-report-section-title"><i data-bind="click: function() {toggleVisibility(visible.statements)}, css: {'fa-angle-double-right': visible.statements(), 'fa-angle-double-up': !visible.statements()}" class="fa toggle"></i> {% trans "Statements" %}</h2>
+    <span data-bind="if: cards.statement && (!statements().length || cards.statement.cardinality == 'n')">
+        <a class="afs-report-a" data-bind="click: function(){add(cards.statement)}"><i class="fa fa-mail-reply"></i> {% trans "Add Statement" %}</a>
+    </span>
+
+    <!-- Collapsible content -->
+    <div data-bind="visible: visible.statements" class="afs-report-collapsible-container pad-lft">
+
+        <!-- ko ifnot: statements().length -->
+        <div class="afs-nodata-note">No statements for this resource</div>
+        <!-- /ko -->
+        
+        <!-- ko if: statements().length -->
+        <div class="afs-report-subsection" >
+            <div class="firstchild-container">
+                <div class="afs-table pad-btm">
+                    <table class="table table-striped" cellspacing="0" width="100%">
+                        <thead>
+                            <tr class="afs-table-header">
+                                <th>{% trans "Content" %}</th>
+                                <th class="none">{% trans "Type" %}</th>
+                                <th class="none">{% trans "Language" %}</th>
+                                <th class="afs-table-control all"></th>
+                            </tr>
+                        </thead>
+                        <tbody data-bind="dataTablesForEach: { data: statements, dataTableOptions: statementTableConfig }">
+                            <tr>
+                                <td data-bind="text: content"></td>
+                                <td data-bind="text: type"></td>
+                                <td data-bind="text: language"></td>
+                                <td class="afs-table-control">
+                                    <div data-bind="if: $parent.cards && $parent.cards.statement">
+                                        <a data-bind="click: function() {$parent.edit(tileid, $parent.cards.statement)}">
+                                            <i class="fa fa-mail-reply"></i>
+                                        </a>
+                                        <a data-bind="click: $parent.delete.bind($data, tileid, $parent.cards.statement)">
+                                            <i class="fa fa-trash"></i>
+                                        </a>
+                                    </div>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+        <!-- /ko -->
+    </div>
+</div>
+{% endblock body %}
+{% endblock report %}

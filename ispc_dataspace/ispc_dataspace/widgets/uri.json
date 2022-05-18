@@ -1,0 +1,7 @@
+{
+    "name": "uri-widget",
+    "component": "views/components/widgets/uri",
+    "defaultconfig": null,
+    "helptext": null,
+    "datatype": "string"
+}

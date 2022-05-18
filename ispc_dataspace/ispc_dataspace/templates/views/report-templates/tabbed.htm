@@ -1,0 +1,152 @@
+
+{% extends "views/report-templates/default.htm" %}
+{% load i18n %}
+
+{% block header %}
+<!-- ko if: tabs()[activeTabIndex()]  -->
+<div>
+    <ul class="tabbed-report-tab-list">
+    <!-- ko foreach: {data: tabs, as: 'tab'}  -->
+    <li data-bind="click: function(){ $parent.setActiveTab($index()) }, css: { 'active': ko.unwrap($parent.activeTabIndex) === $index() }" class="report-tab">
+        <a><span><i data-bind="attr: {class: ('fa '+ ko.unwrap(tab.icon))}"></i></span></a>
+    </li>
+    <!-- /ko -->
+</ul>
+</div>
+<div class="tab-banner">
+    <div style="display: flex; flex-direction: row">
+        <span><i data-bind="class: report.get('iconclass') || 'fa fa-file-o'"></i></span>
+        <!--ko if: report.get('displayname')-->
+        <span style="padding-left: 5px" data-bind="text: report.get('displayname') || '(Resource Instance Name)'"></span>
+        <!--/ko-->
+        <!--ko ifnot: report.get('displayname')-->
+        <span style="padding-left: 5px">{% trans "(Resource Instance Name)" %}</span>
+        <!--/ko-->
+    </div>
+    <div><span data-bind="text: tabs()[activeTabIndex()].name"></span></div>
+</div>
+<!-- ko if: tabs()[activeTabIndex()].header_component  -->
+<div class="tabbed-report-header" data-bind="component: {
+    name: tabs()[activeTabIndex()].header_component,
+    params: $data
+}"></div>
+<!-- /ko -->
+<!-- /ko -->
+{% endblock header %}
+
+
+{% block header_form %}
+<div style="display: flex; flex-direction: row">
+<div id="card-save-tile-btn" class="install-buttons">
+    <button id="" class="btn btn-shim btn-mint btn-labeled btn-md fa fa-plus" data-bind="click: addTab">{% trans "Add Tab" %}</button>
+</div>
+</div>
+<div data-bind="sortable: {
+    data: tabs,
+    as: 'tab',
+    afterMove: moveTab
+}">
+<div class="report-tab-form" data-bind="click: function(){$parent.setActiveTab($index())}, css: {'active': ko.unwrap($parent.activeTabIndex) === $index()}">
+    <div style="display: flex; flex-direction: column">
+        <div class="report-tab-form-title">
+        <div data-bind="text: tab.name"></div>
+        <span data-bind="click: function(){$parent.removeTab(tab)}"><i class="fa fa-close"></i></span>
+        </div>
+        <div>
+            <div class="col-xs-12 pad-nor" style="padding: 5px">
+                <input type="" placeholder="{% trans "Tab Name" %}" id="" class="form-control input-md widget-input" data-bind="textInput: tab.name" />
+            </div>
+            <div class="col-xs-12 pad-nor" style="padding: 5px">
+                <!--ko if: $parent.icons().length > 0 -->
+                <select class="design" data-placeholder="{% trans "Select tab icon" %}" data-bind="value: tab.icon, options: $parent.icons(), optionsText: 'name', optionsValue: 'cssclass', chosen: {disable_search_threshold: 10, width: '100%'}"></select>
+                <!-- <div class="design">
+                    <input class=""
+                    data-bind="select2Query: {
+                        select2Config: {
+                            clickBubble: true,
+                            disabled: false,
+                            data: {results: $parent.icons()},
+                            value: tab.icon,
+                            multiple: false,
+                            placeholder: 'Select tab icon',
+                            allowClear: true
+                        }}">
+                    </div> -->
+                <!--/ko-->
+            </div>
+            <div class="col-xs-12 pad-nor" style="padding: 5px">
+                <select class="design" data-placeholder="{% trans "Select cards in this tab" %}" multiple data-bind="selectedOptions: tab.nodegroup_ids, options: $parent.topcards, optionsText: 'name', optionsValue: 'nodegroupid', chosen: {disable_search_threshold: 10, width: '100%'}"></select>
+            </div>
+        </div>
+    </div>
+</div>
+</div>
+{% endblock header_form %}
+
+
+{% block body %}
+
+    <!--ko if: hasProvisionalData() && (editorContext === false) -->
+    <div class="report-provisional-flag">{% trans 'This resource has provisional edits (not displayed in this report) that are pending review' %}</div>
+    <!--/ko-->
+    <!--ko if: hasProvisionalData() && (editorContext === true && report.userisreviewer === true) -->
+    <div class="report-provisional-flag">{% trans 'This resource has provisional edits (not displayed in this report) that are pending review' %}</div>
+    <!--/ko-->
+    <!--ko if: hasProvisionalData() && (editorContext === true && report.userisreviewer === false) -->
+    <div class="report-provisional-flag">{% trans 'This resource has provisional edits that are pending review' %}</div>
+    <!--/ko-->
+
+
+    <!-- ko if: activeTabEmpty() && tabs()[activeTabIndex()].empty_component  -->
+    <div class="tabbed-report-emptypanel" data-bind="component: {
+        name: tabs()[activeTabIndex()].empty_component,
+        params: $data
+    }"></div>
+    <!--/ko-->
+    <!-- ko if: !tabs()[activeTabIndex()].empty_component || !activeTabEmpty()  -->
+    <div class="rp-report-section relative rp-report-section-root">
+        <!-- ko if: tabs()[activeTabIndex()].side_component  -->
+        <div class="tabbed-report-sidepanel-wrapper">
+            <div class="tabbed-report-sidepanel" data-bind="component: {
+                name: tabs()[activeTabIndex()].side_component,
+                params: $data
+            }"></div>
+        </div>
+        <!-- /ko -->
+        <div class="rp-report-section-title", data-bind="css: {'tabbed-report-sidepanel-active': tabs()[activeTabIndex()].side_component}">
+            <!-- ko if: tabs()[activeTabIndex()].main_component  -->
+            <div class="tabbed-report-sidepanel-wrapper">
+                <div class="tabbed-report-mainpanel" data-bind="component: {
+                    name: tabs()[activeTabIndex()].main_component,
+                    params: $data
+                }"></div>
+            </div>
+            <!-- /ko -->
+            <!-- ko ifnot: tabs()[activeTabIndex()].main_component  -->
+            <!-- ko foreach: { data: activeCards(), as: 'card' } -->
+            <!-- ko if: $parent.hideEmptyNodes() === false || card.tiles().length > 0 -->
+                <!-- ko if: $index() !== 0 --><hr class="rp-tile-separator"><!-- /ko -->
+                <div class="rp-card-section">
+                    <!--ko if: card && card.alternateReportComponent -->
+                    <!--/ko -->
+                    <!--ko ifnot: card.model && card.alternateReportComponent -->
+                        <!-- ko component: {
+                            name: card.model.cardComponentLookup[card.model.component_id()].componentname,
+                            params: {
+                                state: 'report',
+                                card: card,
+                                pageVm: {...$root, report: $parent.report},
+                                hideEmptyNodes: $parent.hideEmptyNodes
+                            }
+                        } -->
+                        <!-- /ko -->
+                    <!-- /ko -->
+                </div>
+            <!-- /ko -->
+            <!-- /ko -->
+            <!-- /ko -->
+        </div>
+    </div>
+    <!--/ko-->
+
+{% endblock body %}

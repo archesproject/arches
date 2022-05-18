@@ -1,0 +1,8 @@
+{
+    "name": "Sketchfab Report ",
+    "componentid": "f05e4d3a-53c1-11e8-b0ea-784f435179ea",
+    "component": "reports/sketchfab/sketchfab",
+    "componentname": "sketchfab-report",
+    "description": "A sk report.",
+    "defaultconfig": {}
+}					

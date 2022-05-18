@@ -1,0 +1,42 @@
+{% extends "base-front.htm" %}
+{% load i18n %}
+{% load staticfiles %}
+
+{% block title %} {% endblock title %}
+
+{% block main_content %}
+
+  <div class="clearfix">
+
+    {% block header %}
+      {% if header_title != none %}
+          {% include 'partials/shared/header.html' with header_title=header_title %}
+      {% endif %}
+    {% endblock header %}
+    
+    {% block mini_nav %}
+      {% if categories != none %}
+        {% include "partials/overview-pages/mininav.htm" with categories=categories %}
+      {% endif %}
+    {% endblock mini_nav %}
+
+    <!-- Cube Portfolio Blocks - Content -->
+    <div class="cbp" data-controls="#filterControls" data-animation="quicksand" data-x-gap="0" data-y-gap="0"
+        data-media-queries='[
+                        {"width": 1500, "cols": 6},
+                        {"width": 1100, "cols": 6},
+                        {"width": 800, "cols": 4},
+                        {"width": 480, "cols": 2},
+                        {"width": 300, "cols": 2},
+                        {"width": 0, "cols": 1}
+                      ]'>
+
+      {% block portfolio_tiles %}
+      {% endblock portfolio_tiles %}
+    </div>
+    <!-- End Cube Portfolio Blocks - Content -->
+
+  </div>
+
+{% endblock main_content %}
+

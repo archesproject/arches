@@ -1,0 +1,23 @@
+{% load static %}
+{% load compress %}
+
+<link rel='stylesheet' type='text/css' href='//fonts.googleapis.com/css?family=Open+Sans:300,400,600,700,800'>
+
+{% compress css %}
+
+<!-- CSS Global Icons -->
+<link rel="stylesheet" href="{% static 'vendor/icon-line/css/simple-line-icons.css' %}">
+<link rel="stylesheet" href="{% static 'vendor/icon-etlinefont/style.css' %}">
+<link rel="stylesheet" href="{% static 'vendor/icon-line-pro/style.css' %}">
+<link rel="stylesheet" href="{% static 'vendor/icon-hs/style.css' %}">
+
+<link rel="stylesheet" href="{% static 'vendor/hs-megamenu/src/hs.megamenu.css' %}">
+<link rel="stylesheet" href="{% static 'vendor/hamburgers/hamburgers.min.css' %}">
+
+<!-- CSS Unify -->
+<link rel="stylesheet" href="{% static 'css/unify/unify.css' %}">
+<link rel="stylesheet" href="{% static 'css/unify/unify-core.css' %}">
+<link rel="stylesheet" href="{% static 'css/unify/unify-components.css' %}">
+<link rel="stylesheet" href="{% static 'css/unify/unify-globals.css' %}">
+
+{% endcompress %}

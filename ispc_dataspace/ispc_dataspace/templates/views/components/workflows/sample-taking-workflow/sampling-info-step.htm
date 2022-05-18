@@ -1,0 +1,75 @@
+{% load i18n %}
+<div style="height: 100%; padding: 10px 24px;">
+    <div style="padding: 5px">
+        <div class="widget-input-label">{% trans "Samplers" %}</div>
+        <div data-bind="component: {
+            name: 'views/components/resource-instance-nodevalue',
+            params: {
+                graphids: [
+                    'f71f7b9c-b25b-11e9-901e-a4d18cec433a',
+                ],
+                renderContext: 'workflow', 
+                multiple: true,
+                value: samplers,
+                relatedResourceId: projectValue,
+                relatedNodeId: 'dbaa2022-9ae7-11ea-ab62-dca90488358a'
+            }
+        }"></div>
+    </div>
+    <div style="padding: 5px; margin-top: 25px;">
+        <div class="widget-input-label">{% trans "Sampling Date" %}</div>
+        <div style="margin: -25px 0px 0px 0px;" data-bind="component: {
+            name: 'datepicker-widget',
+            params: {
+                node: {'config': {'dateFormat': 'YYYY-MM-DD'}},
+                renderContext: 'workflow', 
+                value: samplingDate,
+            }
+        }"></div>
+    </div>
+    <div style="padding: 5px; margin-top: 0px;">
+        <div class="widget-input-label">{% trans "Sampling Activity Type" %}</div>
+        <div style="margin: -25px 0px 0px 0px;" data-bind="component: {
+            name: 'concept-select-widget',
+            params: {
+                node: {'config': {'rdmCollection': '6e3bd268-68bc-4464-aad0-82eabfd5a78f'}},
+                renderContext: 'workflow', 
+                value: samplingType,
+            }
+        }"></div>
+    </div>
+    <div style="padding: 5px">
+        <div class="widget-input-label">{% trans "Sampling Motivation (applies to this entire sampling activity)" %}</div>
+        <div style="margin: -25px 0px 10px 0px;" data-bind="component: {
+            name: 'rich-text-widget',
+            params: {
+                renderContext: 'workflow', 
+                value: samplingMotivation,
+            }
+        }"></div>
+    </div>
+    <div style="padding: 5px">
+        <div class="widget-input-label">{% trans "Sampling Technique" %}</div>
+        <div style="margin: -25px 0px 10px 0px;" data-bind="component: {
+            name: 'rich-text-widget',
+            params: {
+                renderContext: 'workflow', 
+                value: samplingTechnique,
+            }
+        }"></div>
+    </div>
+    <div class="afs-experiment-name-block">
+        <div class="afs-experiment-name" data-bind="click: function(){showName(!showName())}, text: showName() ? 'Hide sampling activity name' : 'Show sampling activity name'"></div>
+        <div data-bind="visible: showName">
+            <div class="widget-input-label">{% trans "Sampling Activity Name" %}</div>
+            <div style="margin: -10px -5px;" data-bind="component: {
+                name: 'text-widget',
+                params: {
+                    renderContext: 'workflow', 
+                    value: samplingName,
+                }
+            }"></div>
+        </div>
+    </div>
+    <div style="height: 50px;"></div>
+</div>

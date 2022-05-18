@@ -1,0 +1,69 @@
+.report-media-wrapper {
+    border-bottom: 1px solid #ddd;
+}
+
+.report-render-area {
+    height: 685px;
+    width: 100%;
+}
+
+.fullscreen-button {
+    margin: 8px 8px;
+    background: none;
+    width: 2.5em;
+    height: 2.5em;
+    z-index: 100;
+    cursor: pointer;
+}
+
+.report-metadata-section {
+    margin-top: 100px;
+    margin-bottom: 100px;
+}
+
+#report-body-toggle-button {
+    cursor: pointer;
+    text-align: center;
+    display: block;
+    margin: 0 auto;
+}
+
+#report-related-resources-section {
+    margin-top: 50px;
+}
+
+.report-related-resources .rp-card-section {
+    display: inline-block;
+    position: relative;
+}
+
+.rp-report-related-resource-item {
+    display: inline-block;
+    position: relative;
+    border-radius: 5px;
+    margin-top: 3px;
+}
+
+.rp-report-related-resource-item dt {
+    position: absolute;
+    display: inline-block;
+    top: 10px;
+    left: 10px;
+    background: rgba(19, 20, 37, 0.61);
+    border-radius: 5px;
+}
+
+.rp-report-related-resource-item dt a {
+    display: inherit;
+    color: white;
+    font-weight: 500;
+    max-width: 160px;
+    padding: 3px;
+}
+
+.report-related-resource-thumbnail {
+    width: 200px;
+    height: 200px;
+    border: 1px solid rgba(46, 89, 132, 1);
+    border-radius: 5px;
+}

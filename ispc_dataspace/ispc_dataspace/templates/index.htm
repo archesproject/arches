@@ -1,0 +1,399 @@
+<!--
+   ARCHES - a program developed to inventory and manage immovable cultural heritage.
+   Copyright (C) 2013 J. Paul Getty Trust and World Monuments Fund
+
+   This program is free software: you can redistribute it and/or modify
+   it under the terms of the GNU Affero General Public License as
+   published by the Free Software Foundation, either version 3 of the
+   License, or (at your option) any later version.
+
+   This program is distributed in the hope that it will be useful,
+   but WITHOUT ANY WARRANTY; without even the implied warranty of
+   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+   GNU Affero General Public License for more details.
+
+   You should have received a copy of the GNU Affero General Public License
+   along with this program. If not, see <http://www.gnu.org/licenses/>.
+   -->
+
+{% extends 'base-front.htm' %}
+
+{% block main_content %}
+
+    {% include 'partials/index/slider.html' %}
+    {% include 'partials/index/about.html' %}
+    {% include 'partials/index/sketchfab_gallery.html' %}
+    {% include 'partials/index/background_slider_1.html' %}
+    {% include 'partials/index/services.html' %}
+    {% include 'partials/index/gdh_in_numbers.html' %}
+    {% include 'partials/index/about_team_equipment.html' %}
+    {% include 'partials/index/sponsors.html' %}
+    
+{% endblock main_content %}
+{% load staticfiles %}
+{% load template_tags %}
+{% load i18n %}
+<!DOCTYPE html>
+<!--[if IE 8]> <!--> <html lang="en" class="ie8"> <!-- <![endif]-->
+<!--[if IE 9]> <!--> <html lang="en" class="ie9"> <!-- <![endif]-->
+<!--[if !IE]> <!--> <html lang="en"> <!--<![endif]-->
+   <head>
+      <title>{{app_title}}</title>
+
+      <!-- Meta -->
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      <meta name="description" content="ISPC Arches for Science">
+      <meta name="author" content="Enzo & Gerardo">
+      <link rel="shortcut icon" href="{% static 'img/favicon.png' %}" />
+
+      <!-- Bootstrap core CSS -->
+      <link rel="stylesheet" href="{% static 'afsbootstrap/css/bootstrap.css' %}"> <!-- di Gerry nuovo -->
+      <style>
+         .bd-placeholder-img {
+         font-size: 1.125rem;
+         text-anchor: middle;
+         -webkit-user-select: none;
+         -moz-user-select: none;
+         user-select: none;
+         }
+         @media (min-width: 768px) {
+         .bd-placeholder-img-lg {
+         font-size: 3.5rem;
+         }
+         }
+      </style>
+
+      <!--
+         <link rel='stylesheet' type='text/css' href='//fonts.googleapis.com/css?family=Open+Sans:400,300,600&amp;subset=cyrillic,latin'>
+         <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.2/css/bootstrap.min.css">
+         <link rel="stylesheet" href="{% static 'css/unify.css' %}">
+         <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/font-awesome/4.2.0/css/font-awesome.min.css">
+         <link rel="stylesheet" href="{% static 'css/index.css' %}">
+         <link rel="stylesheet" href="{% static 'css/project.css' %}">
+         -->
+   </head>
+
+   <!--
+      The #page-top ID is part of the scrolling feature.
+      The data-spy and data-target are part of the built-in Bootstrap scrollspy function.
+      -->
+
+   <body id="body" data-spy="scroll" data-target=".splash-nav" class="demo-lightbox-gallery">
+      <header>
+         <nav class="navbar navbar-expand-md navbar-light fixed-top bg-light">
+            <div class="container-fluid">
+               <a class="navbar-brand" href="#">
+               <img src="{% static 'img/landing/ispc.png' %}" class="align-text-center" width="260" alt="ISPC Logo">
+               Arches | DISCO
+               </a>
+               <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse" aria-controls="navbarCollapse" aria-expanded="false" aria-label="Toggle navigation">
+               <span class="navbar-toggler-icon"></span>
+               </button>
+               <div class="collapse navbar-collapse" id="navbarCollapse">
+                  <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                     <li class="nav-item">
+                        <a class="nav-link active" aria-current="page" href="#info-block-1">
+                        {% trans "Arches Features" %}
+                        </a>
+                     </li>
+                     <li class="nav-item">
+                        <a class="nav-link" href="{% url 'search_home' %}">
+                        {% trans "Search" %}
+                        </a>
+                     </li>
+                     {% if user|can_create_resource_instance and user.username != 'anonymous' %}
+                     <li class="nav-item">
+                        <a class="nav-link" href="{% url 'resource' %}" tabindex="-1" aria-disabled="true">
+                        Manage
+                        </a>
+                     </li>
+                     {% endif %}
+                  </ul>
+                  <ul class="navbar-nav">
+                     <li>
+                        {% if user.username == 'anonymous' %}
+                        <a class="navbar-brand" id="auth-link" href="{% url 'auth' %}?next={% url 'home' %}{% if user.username != 'anonymous' %}&logout=true{% endif %}" tabindex="-1" aria-disabled="true">
+                        {% trans "Sign in" %}
+                        </a>
+                        {% else %}
+                        <a class="navbar-brand" href="{% url 'user_profile_manager' %}">
+                        {% trans "Welcome, " %} {{ user.first_name|default:user.username }}
+                        </a>
+                     </li>
+                     <li>
+                        <span class="navbar-brand mb-0 h1">|</span>
+                     </li>
+                     <li>
+                        <a class="navbar-brand" href="{% url 'auth' %}?next={% url 'home' %}{% if user.username != 'anonymous' %}&logout=true{% endif %}">
+                        {% trans 'Log off' %}
+                        </a>
+                        {% endif %}
+                     </li>
+                  </ul>
+               </div>
+            </div>
+         </nav>
+      </header>
+
+      <main>
+         <div id="myCarousel" class="carousel slide" data-bs-ride="carousel">
+            <div class="carousel-indicators">
+               <button type="button" data-bs-target="#myCarousel" data-bs-slide-to="0" class="active" aria-current="true" aria-label="Slide 1"></button>
+               <button type="button" data-bs-target="#myCarousel" data-bs-slide-to="1" aria-label="Slide 2"></button>
+               <button type="button" data-bs-target="#myCarousel" data-bs-slide-to="2" aria-label="Slide 3"></button>
+            </div>
+
+            <div class="carousel-inner">
+               <div style="height: 750px;" class="carousel-item active">
+                  <img src="{% static 'img/landing/irises.jpg' %}" class="d-block w-100" alt="irises paiting">
+                  <div class="container">
+                     <div class="carousel-caption text-start bg-dark px-4" style="--bs-bg-opacity: .5;">
+                        <h1>{% trans "ISPC Dataspace | Arches Project" %}</h1>
+                        <p>{% trans "A web and mobile platform for managing your most important conservation information." %}</p>
+                     </div>
+                  </div>
+               </div>
+
+               <div style="height: 750px;" class="carousel-item">
+                  <img src="{% static 'img/landing/imac_designer.png' %}" class="d-block w-100" alt="Mac computer photo">
+                  <div class="container">
+                     <div class="carousel-caption bg-dark px-4" style="--bs-bg-opacity: .5;">
+                        <h1>{% trans "Deploy Applications Rapidly" %}</h1>
+                        <p>{% trans "Design custom information management applications in hours. Build your databases with Arches Designer, then configure your interface all without having to write any code." %}</p>
+                        <p><a class="btn btn-lg btn-primary" href="https://www.archesproject.org/what-is-arches/#:~:text=Arches%20for%20Science%20will%20extend,manage%20tasks%20in%20the%20lab.">{% trans "Learn more" %}</a></p>
+                     </div>
+                  </div>
+               </div>
+
+               <div style="height: 750px;" class="carousel-item">
+                  <img src="{% static 'img/landing/card_manager.png' %}" class="d-block w-100" alt="Example screenshot">
+                  <div class="container">
+                     <div class="carousel-caption text-end bg-dark px-4" style="--bs-bg-opacity: .5;">
+                        <h1>{% trans "Interface Manager" %}</h1>
+                        <p>{% trans "Arches automatically creates data entry forms based on your data models.  Use Arches' Card Manager to configure the look and feel of your data entry UI." %}</p>
+                     </div>
+                  </div>
+               </div>
+            </div>
+
+            <button class="carousel-control-prev" type="button" data-bs-target="#myCarousel" data-bs-slide="prev">
+            <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+            <span class="visually-hidden">Previous</span>
+            </button>
+
+            <button class="carousel-control-next" type="button" data-bs-target="#myCarousel" data-bs-slide="next">
+            <span class="carousel-control-next-icon" aria-hidden="true"></span>
+            <span class="visually-hidden">Next</span>
+            </button>
+         </div>
+
+         <!-- Marketing messaging and featurettes
+            ================================================== -->
+         <!-- Wrap the rest of the page in another container to center all the content. -->
+         <div class="container marketing">
+
+           <hr class="featurette-divider">
+
+           <h1 class="text-center mt-3">{% trans "Some of our projects" %}:</h1>
+
+           <!-- Three columns of text below the carousel -->
+           <div class="row my-4">
+             <div class="col-lg-4">
+               <!-- <svg class="bd-placeholder-img rounded-circle" width="140" height="140" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Placeholder: 140x140" preserveAspectRatio="xMidYMid slice" focusable="false"><title>Placeholder</title><rect width="100%" height="100%" fill="#777"/><text x="50%" y="50%" fill="#777" dy=".3em">140x140</text></svg> -->
+               <img src="{% static 'img/landing/bhutan_tigersnest_lr.jpg' %}" class="img-thumbnail rounded-circle" alt="bhutan_tigersnest_lr">
+
+               <h2>{% trans "Tutti i progetti (TestAStatico)" %}</h2>
+               <p>{% trans "Alcuni contenuti rappresentativi sul progetto per la colonna. Questa è la prima colonna." %}</p>
+               <p><a class="btn btn-secondary" href="{% url 'search_home' %}?showProject">{% trans "Scopri più." %} &raquo;</a></p>
+             </div><!-- /.col-lg-4 -->
+             <div class="col-lg-4">
+               <img src="{% static 'img/landing/irises.jpg' %}" class="img-thumbnail rounded-circle" alt="irises">
+
+               <h2>{% trans "Modelli 2D e 3D (TestBStatico)" %}</h2>
+               <p>{% trans "Più contenuti rappresentativi sul progetto per la colonna. Questa è la seconda colonna." %}</p>
+               <p>
+                 <form action="{% url 'search_home' %}" method="GET">
+                   <input type="hidden" name="showProject" value="showProject" />
+                   <input type="submit" class="btn btn-secondary" value="{% trans 'Scopri più.' %} &raquo;" />
+                 </form>
+               </p>
+             </div><!-- /.col-lg-4 -->
+             <div class="col-lg-4">
+               <img src="{% static 'img/landing/landing2.jpg' %}" class="img-thumbnail rounded-circle" alt="landing2">
+
+               <h2>{% trans "Progetti per luogo (statico)" %}</h2>
+               <p id="info-block-1">{% trans "Alcuni contenuti rappresentativi sul progetto per la colonna. Questa è la terza colonna." %}</p>
+               <p><a class="btn btn-secondary" href="#">{% trans "Scopri più." %} &raquo;</a></p>
+             </div><!-- /.col-lg-4 -->
+           </div><!-- /.row -->
+
+            <!-- START THE FEATURETTES -->
+            <hr class="featurette-divider">
+
+            <div class="row featurette">
+               <div class="col-md-7">
+                  <h2 class="featurette-heading">{% trans "Data Security." %} <span class="text-muted">{% trans "Define read/write/delete & no-access permisions." %}</span></h2>
+                  <p class="lead">{% trans "Use Arches' Permissions Manager to set up data access rules for all your user groups and individual accounts." %}</p>
+               </div>
+               <div class="col-md-5">
+                  <img src="{% static 'img/landing/permissions_manager.png' %}" class="w-100" alt="Permission screenshot">
+               </div>
+            </div>
+
+            <hr class="featurette-divider">
+
+            <div class="row featurette">
+               <div class="col-md-7 order-md-2">
+                  <h2 class="featurette-heading">{% trans "Workflows." %} <span class="text-muted">{% trans "Orchestrate your data entry." %} </span></h2>
+                  <p class="lead">{% trans "Design step-wise data management interfaces that simplify complex editing tasks. Ensure that everyone enters data completely and consistently." %} </p>
+               </div>
+               <div class="col-md-5 order-md-1">
+                  <img src="{% static 'img/landing/consultation_workflow.jpg' %}" class="w-100" alt="Consultation workflow screenshot">
+               </div>
+            </div>
+
+            <hr class="featurette-divider">
+
+            <div class="row featurette">
+               <div class="col-md-7">
+                  <h2 class="featurette-heading">{% trans "Arches Search Tools." %} <span class="text-muted">{% trans "Find what you're looking for." %} </span></h2>
+                  <p class="lead">{% trans "Arches comes with powerful built-in search tools.  Quickly filter large databases with term, geospatial, and time-based search components." %} </p>
+                  <h3>{% trans "Search Options" %}</h3>
+                  <ol class="list-group list-group-flush list-group-numbered">
+                     <li class="list-group-item text-justify">
+                        {% trans "Arches gives you many ways to find precisely the information you need, even if your Arches application contains 10's of millions of records.  In addition to term, thesaurus, geospatial, and temporal filters, Arches provides you with advanced filtering options that support boolean logic, inverses, and many other filtering options." %}
+                     </li>
+                     <li class="list-group-item">
+                        {% trans "Arches' search capabilities also provide for sophisticated data visualizations, including interactive displays of the connections between your data objects using a Force Directed Graph." %}
+                     </li>
+                     <li class="list-group-item">
+                        {% trans "If you're a software developer, you can build on Arches modular search services and create your own filters, reports, and visualizations to best show off your particular dataset." %}
+                     </li>
+                  </ol>
+               </div>
+               <div class="col-md-5">
+                  <img src="{% static 'img/landing/arches_search.png' %}" class="w-100" alt="Consultation workflow screenshot">
+               </div>
+            </div>
+
+            <hr class="featurette-divider">
+
+            <div class="row featurette">
+               <div class="col-md-7">
+                  <h2 class="featurette-heading">{% trans "Mobile." %} <span class="text-muted">{% trans "Work on the go." %} </span></h2>
+                  <p class="lead">{% trans "Arches Collector allows you to create new data and edit existing records when you're away from your computer.  Don't worry if you're out of cell or Wi-Fi range.  Create new records, update information, even add new map locations.  Then synch your changes to your Arches application when you re-establish a network connection." %} </p>
+               </div>
+               <div class="col-md-5">
+                  <img src="{% static 'img/landing/iPhone_8_map.png' %}" class="w-50" alt="Mobile Screenshot">
+               </div>
+            </div>
+            <!-- /END THE FEATURETTES -->
+
+         </div>
+         <!-- /.container -->
+         <!-- FOOTER -->
+         <footer class="container">
+            <ul class="list-group list-group-flush">
+               <li class="list-group-item">
+                  <a href="https://www.archesproject.org/what-is-arches/">{% trans "What is Arches" %}</a>
+               </li>
+               <li class="list-group-item">
+                  <a href="https://www.archesproject.org/collector/">{% trans "Arches Collector" %}</a>
+               </li>
+               <li class="list-group-item">
+                  <a href="https://www.archesproject.org/implementation-considerations/">{% trans "Implementation Considerations" %}</a>
+               </li>
+               <li class="list-group-item">
+                  <a href="https://www.archesproject.org/development/">{% trans "Information For Developers" %}</a>
+               </li>
+            </ul>
+            <p class="float-end"><a href="#">{% trans "Back to top" %}</a></p>
+            <p>&copy; 2022 J. Paul Getty Trust and World Monuments Fund. &middot; <a href="#">Privacy</a> &middot; <a href="#">Terms</a></p>
+            <p>{% trans "Arches, Arches Project, and the Arches logo are trademarks of the J. Paul Getty Trust and World Monuments Fund." %}</p>
+         </footer>
+      </main>
+
+
+      <script src="{% static 'afsbootstrap/js/bootstrap.bundle.js' %}"></script>  <!-- di Gerry nuovo -->
+      <script type='text/javascript' src='https://cdnjs.cloudflare.com/ajax/libs/knockout/3.5.0/knockout-min.js'></script>
+
+      <!--
+         <script src="//cdnjs.cloudflare.com/ajax/libs/jquery/2.2.3/jquery.min.js"></script>
+         <script src="//cdnjs.cloudflare.com/ajax/libs/jquery-migrate/1.4.0/jquery-migrate.min.js"></script>
+         <script src="//cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.2/js/bootstrap.min.js"></script>
+         <script src="//cdnjs.cloudflare.com/ajax/libs/smoothscroll/1.3.8/SmoothScroll.min.js"></script>
+         <script src="//cdnjs.cloudflare.com/ajax/libs/jquery-easing/1.3/jquery.easing.min.js"></script>
+         <script src="//cdnjs.cloudflare.com/ajax/libs/pace/1.0.2/pace.min.js"></script>
+         <script src="//cdnjs.cloudflare.com/ajax/libs/jquery-parallax/1.1.3/jquery-parallax-min.js"></script>
+         <script src="//cdnjs.cloudflare.com/ajax/libs/waypoints/4.0.0/jquery.waypoints.min.js"></script>
+         <script src="//cdnjs.cloudflare.com/ajax/libs/Counter-Up/1.0.0/jquery.counterup.min.js"></script>
+         <script src="//cdnjs.cloudflare.com/ajax/libs/owl-carousel/1.3.3/owl.carousel.min.js"></script>
+         <script src="//cdnjs.cloudflare.com/ajax/libs/jquery.form/3.51/jquery.form.min.js"></script>
+         <script src="//cdnjs.cloudflare.com/ajax/libs/jquery-validate/1.15.0/jquery.validate.min.js"></script>
+         <script src="{% static 'plugins/revolution-slider/rs-plugin/js/jquery.themepunch.tools.min.js' %}"></script>
+         <script src="{% static 'plugins/revolution-slider/rs-plugin/js/jquery.themepunch.revolution.min.js' %}"></script>
+         <script src="{% static 'plugins/cube-portfolio/cubeportfolio/js/jquery.cubeportfolio.min.js' %}"></script>
+         <script src="{% static 'plugins/one.app.js' %}"></script>
+         <script src="{% static 'plugins/pace-loader.js' %}"></script>
+         <script src="{% static 'plugins/owl-carousel.js' %}"></script>
+         <script src="{% static 'plugins/style-switcher.js' %}"></script>
+         <script src="{% static 'plugins/revolution-slider.js' %}"></script>
+         <script src="{% static 'plugins/cube-portfolio-lightbox.js' %}"></script>
+         <script src="{% static 'packages/knockout/build/output/knockout-latest.js' %}"></script>
+       -->
+
+      <!-- <script>
+         jQuery(document).ready(function() {
+             App.init();
+             App.initCounter();
+             App.initParallaxBg();
+             OwlCarousel.initOwlCarousel();
+             StyleSwitcher.initStyleSwitcher();
+             RevolutionSlider.initRSfullScreen();
+
+             var contentSections = $('.app-info-block'),
+                 navigationItems = $('#cd-vertical-nav a');
+
+             updateNavigation();
+             $(window).on('scroll', function(){
+                 updateNavigation();
+             });
+
+             //smooth scroll to the section
+             navigationItems.on('click', function(event){
+                 event.preventDefault();
+                 smoothScroll($(this.hash));
+             });
+
+
+             function updateNavigation() {
+                 contentSections.each(function(){
+                     $this = $(this);
+                     var activeSection = $('#cd-vertical-nav a[href="#'+$this.attr('id')+'"]').data('number') - 1;
+                     if ( ( $this.offset().top - $(window).height()/2 < $(window).scrollTop() ) && ( $this.offset().top + $this.height() - $(window).height()/2 > $(window).scrollTop() ) ) {
+                         navigationItems.eq(activeSection).addClass('is-selected');
+                     }else {
+                         navigationItems.eq(activeSection).removeClass('is-selected');
+                     }
+                 });
+             }
+
+             function smoothScroll(target) {
+                 $('body,html').animate(
+                     {'scrollTop':target.offset().top},
+                     600
+                 );
+             }
+
+
+         });
+
+         var ViewModel = function(first, last) {
+             this.showAuthMenu = ko.observable(false);
+         };
+         ko.applyBindings(new ViewModel());
+
+      </script> -->
+   </body>
+</html>

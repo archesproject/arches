@@ -1,0 +1,38 @@
+{% load static %}
+{% load template_tags %}
+{% load i18n %}
+<section class="container g-pt-100" id="sponsors">
+  <div class="text-center g-mb-50">
+    <h2 class="g-color-black g-font-weight-600 mb-3">Sponsors</h2>
+    <h4>Global Digital Heritage is sponsored by generous awards from private foundations and corporations</h4>
+  </div>
+
+  <div class="row g-mb-20">
+    <div class="col-lg-6 g-mb-80 sponsor">
+      <!-- Blog Minimal Blocks -->
+      <article>
+        <img class="img-fluid g-rounded-5 g-mb-25 sponsor" src="{% static 'img/sponsors/hitz.jpg' %}" alt="Logo for the Hitz Foundation"> 
+      </article>
+      <!-- End Blog Minimal Blocks -->
+    </div>
+
+    <div class="col-lg-6 g-mb-80 sponsor">
+      <!-- Blog Minimal Blocks -->
+      <article>
+        <a href="https://www.capturingreality.com" target="_blank"><img class="img-fluid g-rounded-5 g-mb-25 sponsor" src="{% static 'img/sponsors/capturing_reality.jpg' %}" alt="Logo for Capturing Reality"></a>
+      </article>
+      <!-- End Blog Minimal Blocks -->
+    </div>
+  </div>
+  <div class="text-center g-mb-50">
+    <h4>and generous (tax deductible) donations from the public for the preservation of global heritage and culture. You can donate now using the button below.</h4>
+<form action="https://www.paypal.com/cgi-bin/webscr" method="post" target="_top">
+  <input type="hidden" name="cmd" value="_s-xclick" />
+  <input type="hidden" name="hosted_button_id" value="8ZW2HWS4R3GHE" />
+  <input type="image" src="https://www.paypalobjects.com/en_US/i/btn/btn_donateCC_LG.gif" border="0" name="submit"
+    title="PayPal - The safer, easier way to pay online!" alt="Donate with PayPal button" />
+  <img alt="" border="0" src="https://www.paypal.com/en_US/i/scr/pixel.gif" width="1" height="1" />
+</form>
+
+  </div>
+</section>

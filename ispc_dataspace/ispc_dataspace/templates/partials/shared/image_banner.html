@@ -1,0 +1,21 @@
+{% load static %}
+{% load template_tags %}
+{% load i18n %}
+
+<!-- Quotes -->
+<section class="dzsparallaxer auto-init height-is-based-on-content use-loading mode-scroll">
+  
+  <!-- Parallax Image -->
+  <div class="divimage dzsparallaxer--target w-100 u-bg-overlay g-bg-white-gradient-opacity-v2--after"
+    style="height: 160%; background-image: url({% static image_url %}); background-position: 50% 40%;">
+  </div>
+  <!-- End Parallax Image -->
+
+  <div class="container u-bg-overlay__inner g-color-white text-center g-py-200">
+    <h2 class="g-font-size-40 g-font-size-70--md text-uppercase g-font-weight-700 ">{{ banner_text }}
+      <span class="u-text-animation u-text-animation--typing"></span>
+    </h2>
+  </div>
+
+</section>
+<!-- End Quotes -->

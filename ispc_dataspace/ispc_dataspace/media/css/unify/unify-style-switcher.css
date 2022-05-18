@@ -1,0 +1,44 @@
+/*------------------------------------
+  Style Switcher
+------------------------------------*/
+/* Style Switcher Icon Styles */
+.u-icons-demo__item {
+  border: solid 1px #eee;
+  margin: 0 -1px -1px 0;
+  padding: 20px 15px; }
+
+.u-icons-demo-item__value, .u-icons-demo-item__value:focus {
+  width: 100%;
+  text-align: center;
+  border: none;
+  outline: none; }
+
+/* Style Switcher */
+.u-styleswitcher {
+  position: fixed;
+  right: 0;
+  z-index: 30;
+  top: 3.57143rem;
+  width: 16.78571rem;
+  color: #fff; }
+
+.u-styleswitcher__header {
+  font-size: 1.14286rem;
+  text-transform: uppercase;
+  padding: 0.64286rem 1.07143rem 0.42857rem;
+  color: #fff;
+  background-color: #111;
+  border-radius: 3px 0 0 0; }
+
+.u-styleswitcher__body {
+  background-color: #333;
+  padding: 1.07143rem; }
+
+.u-styleswitcher__toggler {
+  position: absolute;
+  right: 100%;
+  top: 3px; }
+
+.u-styleswitcher [class*="u-select-v"] {
+  color: #bbb;
+  background-color: #fff; }

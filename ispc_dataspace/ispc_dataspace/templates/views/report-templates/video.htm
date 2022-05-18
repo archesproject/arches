@@ -1,0 +1,12 @@
+{% extends "views/report-templates/default.htm" %}
+{% load i18n %}
+
+{% block header %}
+
+<link type="text/css" rel="stylesheet" href="{{ STATIC_URL }}css/video.css" />
+
+
+<div class="report-media-wrapper">
+{% include 'views/components/video/video-canvas.htm' %}
+</div>
+{% endblock header %}

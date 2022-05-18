@@ -1,0 +1,166 @@
+{% extends "views/report-templates/default.htm" %}
+{% load i18n %}
+
+{% block report %}
+    {% block report_title_bar %}
+    <!-- Custom Template Report Title Bar -->
+    <div class="relative">
+
+        <!-- Title Block -->
+        <div class="afs-report-toolbar">
+            <h1 class="afs-report-toolbar-title"><span class="afs-report-name">{% trans "Sampling Activity" %}:</span><span data-bind="text: displayname" class="afs-report-instance-name"></span></h1>
+        </div>
+
+    </div>
+    {% endblock report_title_bar %}
+
+    
+    {% block body %}
+    <!-- Link nav -->
+    <div class="afs-report-anchor-container">
+        <ol class="afs-report-anchors breadcrumb">
+            <!-- ko foreach: {data: sections, as: 'section'} -->
+            <li data-bind="click: function(){$parent.activeSection(section.id)}, css: {active: $parent.activeSection() === section.id}, text: section.title" class="afs-report-a"></li>
+            <!-- /ko -->
+        </ol>
+    </div>
+    <div class="afs-tabbed-report">
+        <div class="afs-tabbed-report-content">
+            <!-- Names Tab -->
+            <div class="afs-report-page" data-bind="if: activeSection() === 'name'">
+                <div data-bind="component: {
+                    name: 'views/components/reports/scenes/name',
+                    params: {
+                        data: resource,
+                        cards: nameCards,
+                        dataConfig: nameDataConfig
+                    }
+                }"></div>
+            </div>
+            <!-- Description Tab -->
+            <div class="afs-report-page" data-bind="if: activeSection() === 'description'">
+                <div data-bind="component: {
+                    name: 'views/components/reports/scenes/description',
+                    params: {
+                        data: resource,
+                        cards: descriptionCards,
+
+                    }
+                }"></div>
+            </div>
+            <!-- documentation Tab -->
+            <div class="afs-report-page" data-bind="if: activeSection() === 'documentation'">
+                <div data-bind="component: {
+                    name: 'views/components/reports/scenes/documentation',
+                    params: {
+                        data: resource,
+                        cards: documentationCards,
+                        dataConfig: documentationDataConfig
+                    }
+                }"></div>
+            </div>
+            <!-- Temportal Relationship Tab -->
+            <div class="afs-report-page" data-bind="if: activeSection() === 'temporal'">
+                <div data-bind="component: {
+                    name: 'views/components/reports/scenes/default',
+                    params: {
+                        data: temporalData,
+                    }
+                }"></div>
+            </div>
+            <!-- Parthood Tab -->
+            <div class="afs-report-page" data-bind="if: activeSection() === 'parthood'">
+                <div data-bind="component: {
+                    name: 'views/components/reports/scenes/default',
+                    params: {
+                        data: parthoodData,
+                    }
+                }"></div>
+            </div>
+            <!-- Substance Tab -->
+            <div class="afs-report-page" data-bind="if: activeSection() === 'substance'">
+                <div data-bind="component: {
+                    name: 'views/components/reports/scenes/substance',
+                    params: {
+                        data: resource,
+                        cards: substanceCards,
+                        dataConfig: substanceDataConfig
+                    }
+                }"></div>
+            </div>
+            <!-- Parameters & Outcomes Tab -->
+            <div class="afs-report-page" data-bind="if: activeSection() === 'parameters'">
+                <div data-bind="component: {
+                    name: 'views/components/reports/scenes/default',
+                    params: {
+                        data: parameterData,
+                    }
+                }"></div>
+                <div class="afs-report-section">
+                    <h2 class="afs-report-section-title"><i data-bind="click: function() {toggleVisibility(visible.parts)}, css: {'fa-angle-double-right': visible.parts(), 'fa-angle-double-up': !visible.parts()}" class="fa toggle"></i> {% trans "Parts" %}</h2>
+                    <span data-bind="if: cards.parts">
+                        <a class="afs-report-a" data-bind="click: function(){addNewTile(cards.parts)}"><i class="fa fa-mail-reply"></i> {% trans "Add Part" %}</a>
+                    </span>
+
+                    <div data-bind="visible: visible.parts" class="afs-report-collapsible-container pad-lft">
+                        
+                        <!-- ko ifnot: Array.isArray(annotation.info) -->
+                        <div class="afs-nodata-note">No parts for this resource</div>
+                        <!-- /ko -->
+                        
+                        <!-- ko if: Array.isArray(annotation.info) -->
+                        <div data-bind="with: annotation, as: 'annotation', noChildContext: true">
+                            <div data-bind="component: {
+                                name: 'views/components/reports/scenes/annotation-parts',
+                                params: {
+                                    annotation: annotation,
+                                    selectedAnnotationTileId: selectedAnnotationTileId,
+                                    annotationTableHeader: annotationTableHeader,
+                                    annotationTableConfig: annotationTableConfig,
+                                }}"></div>
+                        </div>
+                        <!-- /ko -->
+                    </div>
+                </div>
+            </div>
+            <!-- JSON Tab -->
+            <div class="afs-report-page afs-flex-col" data-bind="if: activeSection() === 'json'">
+                <div class="afs-flex-col" data-bind="component: {
+                    name: 'views/components/reports/scenes/json',
+                    params: {
+                        resourceInstanceId: reportMetadata().resourceinstanceid,
+                    }
+                }"></div>
+            </div>
+        </div>
+    </div>            
+    {% endblock body %}
+{% endblock report %}
+
+{% block summary %}
+<div class="afs-summary-report-header">
+    <h1 class="afs-summary-report-title"><span data-bind="text: displayname" class="afs-report-instance-name"></span><span class="afs-report-name pad-lft-sm">{% trans "(Sampling Activity)" %}</span></h1>
+</div>
+<div class="model-summary-report">
+    <div class="afs-report-page">
+        <!-- Names -->
+        <div data-bind="component: {
+            name: 'views/components/reports/scenes/name',
+            params: {
+                data: resource,
+                cards: nameCards,
+                dataConfig: nameDataConfig
+            }
+        }"></div>
+        <!-- Description -->
+        <div data-bind="component: {
+            name: 'views/components/reports/scenes/description',
+            params: {
+                data: resource,
+                cards: descriptionCards,
+            }
+        }"></div>
+    </div>
+</div>
+
+{% endblock summary %}

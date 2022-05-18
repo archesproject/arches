@@ -1,0 +1,25 @@
+{% extends "base-front.htm" %}
+
+{% block main_content %}
+
+    {% include 'partials/shared/header.html' with header_subtitle="Meet our toolkit" %}
+    {% include 'partials/shared/image_banner.html' with image_url="img/equipment/faro_banner.jpg" banner_text="Scanners" %}
+    {% include 'partials/equipment/scanners.html' %}
+    {% include 'partials/equipment/arm.html' %}
+    {% include 'partials/shared/image_banner.html' with image_url="img/equipment/drone_banner.jpg" banner_text="Aerial Photogrammetry and Imaging" %}
+    {% include 'partials/equipment/drone.html' %}
+    {% include 'partials/equipment/balloon.html' %}
+    {% include 'partials/equipment/gps.html' %}
+    {% include 'partials/shared/image_banner.html' with image_url="img/equipment/photography_banner.jpg" banner_text="Photography"%}
+    {% include 'partials/equipment/canon.html' %}
+    {% include 'partials/equipment/sony.html' %}
+    {% include 'partials/equipment/lenses.html' %}
+    {% include 'partials/equipment/pano.html' %}
+    {% include 'partials/equipment/gopro.html' %}
+    {% include 'partials/equipment/phototent.html' %}
+    {% include 'partials/equipment/3dprinter.html' %}
+    {% include 'partials/equipment/printer.html' %}
+    {% include 'partials/equipment/computing.html' %}
+    {% include 'partials/equipment/software.html' %}
+    
+{% endblock main_content %}

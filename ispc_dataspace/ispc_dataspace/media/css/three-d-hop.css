@@ -1,0 +1,52 @@
+.output-box {
+    top: 80px !important;
+    left: 80px !important;
+}
+
+#sections-box {
+    left: 80px;
+    top: 50px;
+}
+
+#toolbar {
+    margin-top: 20px;
+}
+
+#measure-box {
+    z-index: 9999;
+}
+
+#pickpoint-box {
+    z-index: 9999;
+}
+
+#sections-box {
+    z-index: 9999;
+}
+
+#tdhop_render_area.fullscreen {
+    z-index: 9996;
+    width: 100%;
+    height: 100%;
+    position: fixed;
+    top: 0;
+    left: 0;
+    background-color: white;
+}
+
+#3dhop.fullscreen {
+    width: 100%;
+    height: 100%;
+    position: relative;
+}
+
+#draw-canvas.fullscreen {
+    width: 100%;
+    height: 100%;
+    position: relative;
+    z-index: 9997;
+}
+
+#toolbar.fullscreen {
+    z-index: 9998;
+}

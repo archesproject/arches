@@ -1,0 +1,10 @@
+{
+    "componentid": "10ae2f00-cbda-4a0d-8ca2-5af3b46b37ad",
+    "name": "Physical Thing IIIF Card",
+    "description": "",
+    "component": "views/components/cards/physical-thing-iiif-card",
+    "componentname": "physical-thing-iiif-card",
+    "defaultconfig": {
+        "defaultManifest": ""
+    }
+}

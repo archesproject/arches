@@ -1,0 +1,36 @@
+{% extends "views/report-templates/default.htm" %} 
+{% load i18n %} 
+{% block report %}
+
+{% block body %}
+<div class="afs-report-section" data-bind="foreach: {data: data().sections, as: 'section', noChildContext: true}">
+    <h2 class="afs-report-section-title"><i data-bind="click: function() {toggleVisibility(visible[section.title])}, css: {'fa-angle-double-right': visible[section.title](), 'fa-angle-double-up': !visible[section.title]()}" class="fa toggle"></i> <span data-bind="text: section.title"></span></h2>
+    <!-- Collapsible content -->
+    <div data-bind="visible: visible[section.title]" class="afs-report-collapsible-container pad-lft">
+
+         <!-- ko ifnot: section.data.length -->
+         <div class="afs-nodata-note">No data for this section</div>
+         <!-- /ko -->
+         
+         <!-- ko if: section.data.length -->
+         <div class="afs-report-subsection" >
+             <div>
+                 <div data-bind="foreach: {data: section.data, as: 'item', noChildContext: true}" class="afs-report-subsection-item">
+                     <div class="afs-block-attributes pad-btm">
+                        <div data-bind="component: {
+                            name: 'views/components/reports/scenes/keyvalue',
+                            params: {
+                                data: item,
+                                inline: true
+                            }
+                        }"></div>
+                         
+                     </div>
+                 </div>
+             </div>
+         </div>
+         <!-- /ko -->
+    </div>
+</div>
+{% endblock body %}
+{% endblock report %}

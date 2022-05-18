@@ -1,0 +1,10 @@
+{
+    "pluginid": "a1667717-b7bd-4570-b27a-ec352c767e0e",
+    "name": "New Project",
+    "icon": "fa fa-file",
+    "component": "views/components/plugins/create-project-workflow",
+    "componentname": "create-project-workflow",
+    "config": {"show":false},
+    "slug": "create-project-workflow",
+    "sortorder": 0
+}

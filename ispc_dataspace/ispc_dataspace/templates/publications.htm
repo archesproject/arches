@@ -1,0 +1,32 @@
+{% extends "base-front.htm" %}
+
+{% block main_content %}
+
+  {% include 'partials/shared/header.html' with header_subtitle="Publications" %}
+
+  <section class="container g-pt-100 g-pb-70">
+    <h3>Publications and presentations by GDH team members on digital heritage documentation</h3>
+    <nav>
+      <div class="nav nav-tabs" id="nav-tab" role="tablist">
+        <a class="nav-item nav-link active" id="nav-post-tab" data-toggle="tab" href="#nav-post" role="tab"
+          aria-controls="nav-post" aria-selected="true">Since 2016</a>
+        <a class="nav-item nav-link" id="nav-pre-tab" data-toggle="tab" href="#nav-pre" role="tab" aria-controls="nav-pre"
+          aria-selected="false">Before 2016</a>
+        <a class="nav-item nav-link" id="nav-conference-tab" data-toggle="tab" href="#nav-conference" role="tab"
+          aria-controls="nav-conference" aria-selected="false">Conference Presentations</a>
+      </div>
+    </nav>
+    <div class="tab-content g-pt-30" id="nav-tabContent">
+      <div class="tab-pane fade show active" id="nav-post" role="tabpanel" aria-labelledby="nav-post-tab">
+        {% include 'partials/publications/post.html' %}
+      </div>
+      <div class="tab-pane fade" id="nav-pre" role="tabpanel" aria-labelledby="nav-pre-tab">
+        {% include 'partials/publications/pre.html' %}
+      </div>
+      <div class="tab-pane fade" id="nav-conference" role="tabpanel" aria-labelledby="nav-conference-tab">
+        {% include 'partials/publications/conference.html' %}
+      </div>
+    </div>
+  </section>
+
+{% endblock main_content %}

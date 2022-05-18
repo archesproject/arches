@@ -1,0 +1,13 @@
+{% extends 'partials/nav/nav-base.htm' %}
+
+{% load static %}
+{% load staticfiles %}
+{% load template_tags %}
+{% load i18n %}
+
+
+{% block nav_container %}
+  <div class="nav-container nav-integrated-container" style="margin-left: 0px;">
+    {% include 'partials/nav/container.htm' %}
+  </div>
+{% endblock %}

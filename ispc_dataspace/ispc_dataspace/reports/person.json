@@ -1,0 +1,11 @@
+{
+    "name": "Person Template",
+    "component": "views/components/reports/person",
+    "defaultconfig": {
+        "uncompacted_reporting": true
+    },
+    "description": "Person report",
+    "componentname": "person-report",
+    "templateid": "15d3ab75-1191-41f0-a766-e7e8ce7b9ca9",
+    "preload_resource_data": false
+}

@@ -1,0 +1,15 @@
+{% extends "views/report-templates/default.htm" %}
+{% load i18n %}
+
+{% block header %}
+
+<link type="text/css" rel="stylesheet" href="{{ STATIC_URL }}packages/three-d-hop/minimal/stylesheet/3dhop.css"/>
+<link type="text/css" rel="stylesheet" href="{{ STATIC_URL }}css/three-d-hop.css" />
+
+
+<!-- ko if: threeDHopFileCount() > 0 -->
+<div class="report-media-wrapper">
+    {% include 'views/components/three-d-hop/three-d-hop-canvas.htm' %}
+</div>
+<!-- /ko -->
+{% endblock header %}

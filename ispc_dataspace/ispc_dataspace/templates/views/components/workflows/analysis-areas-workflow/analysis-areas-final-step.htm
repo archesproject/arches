@@ -1,0 +1,61 @@
+{% load i18n %}
+<!-- ko if: loading() === false -->
+<div class="final-step">
+    <div class="afs-final-step-section">
+        <h5 class="summary-value">{% trans 'Related Project/Object' %}</h5>
+        <div class="afs-final-step-block">
+            <div style="display: flex; flex-direction: column;">
+                <div style="display: inline-flex;">
+                    <div class="summary-label" data-bind="text: reportVals.projectName.name + ':'"></div>
+                    <a data-bind="attr: { href: urls.resource + '/' + reportVals.projectName.resourceid}" target="_blank">
+                        <div class="summary-value" 
+                            data-bind = "text: reportVals.projectName.value">
+                        </div>
+                    </a>
+                </div>
+                <div style="display: inline-flex;">
+                    <div class="summary-label" data-bind="text: reportVals.parentObject.name + ':'"></div>
+                    <a data-bind="attr: { href: urls.resource + '/' + resourceid}" target="_blank">
+                        <div class="summary-value" 
+                            data-bind = "text: displayName">
+                        </div>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="afs-final-step-section" style="display: none;">
+        <h5 class="summary-value">{% trans 'Regions' %}</h5>
+        <!-- ko foreach: regionInstances -->
+        <div class="afs-final-step-block">
+            <div style="display: flex; flex-direction: column;">
+                <a data-bind="attr: { href: $root.urls.resource + '/' + regionResource}" target="_blank">
+                    <div class="summary-value" 
+                        data-bind = "text: regionName">
+                    </div>
+                </a>
+            </div>
+        </div>
+        <!-- /ko -->
+    </div>
+
+    <div class="afs-final-step-section">
+        <h5 class="summary-value">{% trans 'Region(s) of Interest' %}</h5>
+        <div class="afs-final-step-block">
+            <div style="display: flex; flex-direction: column;">
+                <div style="display: inline-flex;">
+                    <div class="summary-label" data-bind="text: reportVals.digitalReference.name + ':'"></div>
+                    <div class="summary-value" data-bind="text: reportVals.digitalReference.value"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="afs-final-step-section">
+        <!-- ko foreach: {data: objectAnnotations, as: 'annotation'} -->
+        <div style="margin: -20px 0px 60px 0px;" data-bind="component: { name: 'views/components/annotation-summary', params: {annotation: annotation}}"></div>
+        <!-- /ko -->
+    </div>
+</div>
+<!-- /ko -->

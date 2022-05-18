@@ -1,0 +1,216 @@
+{% extends "views/components/workbench.htm" %}
+{% load i18n %}
+
+{% block tabs %}
+<div class="workbench-card-sidebar-tab" data-bind="click: function(){ if (digitalResources().length) {
+    toggleTab('edit');
+}
+}, css: {'disabled': digitalResources().length === 0, 
+    'active': activeTab() === 'edit'
+}">
+    <i class="fa fa-pencil"></i>
+    <span class="map-sidebar-text">{% trans "Dataset" %}</span>
+</div>
+
+{{ block.super }}
+{% endblock tabs %}
+
+
+{% block content_management %}
+<!-- ko if: selectedFile -->
+<div>
+    <div class="card-display-panel">
+        <div>
+            <div id="hidden-dz-previews"></div>
+            <!-- ko if: selectedRenderer -->
+            <!-- ko component: {
+                    name: selectedRenderer().name,
+                    params: {
+                        // fileViewer: $data,
+                        //card: $parent.card,
+                        selected: selected,
+                        state: selectedRenderer().state,
+                        displayContent: displayContent,
+                        context: 'render',
+                        params: $data,
+                        loading: $parent.loading
+                    }
+                } -->
+            <!-- /ko -->
+            <!-- /ko -->
+            <!--ko if: !displayContent.renderer || displayContent.validRenderer === false -->
+            <div class="file-chart-upload-panel">
+                <div class="gallery-controls new-tile">
+                    <div class="dropzone-photo-upload">
+                        <div class="file-select-window">
+                            <!--ko if: displayContent.availableRenderers.length === 0 -->
+                            <div class="bord-top file-select" style="padding-bottom: 90px;">
+
+                                <!-- Image -->
+                                <div class="img-lg img-circle rr-splash-img-container">
+                                    <img class="rr-splash-img" src="/media/img/answers.png" alt="Resource Editor">
+                                </div>
+
+                                <!-- Splash Title -->
+                                <h2 class="rr-splash-title">{% trans 'Unable to display the selected file' %}</h2>
+
+                                <!-- Splash Instructions -->
+                                <h3 class="rr-splash-description">{% trans "This file can't be displayed." %}</h3>
+
+                                <!-- Splash Instructions -->
+                                <h3 class="rr-splash-description">{% trans "It may be a proprietary format or there isn't a loader available yet " %}</h3>
+
+                                <!-- Splash Instructions -->
+                                <h3 class="rr-splash-description">{% trans "to present it in this webpage." %}</h3>
+                            </div>
+                            <!--/ko-->
+
+                            <!--ko if: displayContent.availableRenderers.length > 0 -->
+                            <div class="bord-top file-select loader-select">
+                                <div class="">
+                                    <!--ko if: displayContent.validRenderer === false -->
+                                    <h4 class="loader-error-message">{% trans 'Unable to parse your file with the '%}
+                                        <span data-bind="text:displayContent.renderer.title"></span>{% trans 'loader'%}
+                                    </h4>
+                                    <!--/ko-->
+
+                                    <h2>{% trans 'Select File Loader' %}</h2>
+                                    <h4>{% trans 'Select the loader best suited for processing and visualizing the selected file' %}</h4>
+                                    <div style="display: flex; flex-flow: wrap; padding: 15px 25px;">
+
+                                        <!--ko foreach: displayContent.availableRenderers -->
+                                        <div>
+                                            <div class="r-grid-item relative" style="border: 1px solid #c4c4c4">
+                                                <div class=""
+                                                    style="display:flex; flex-direction: column; background-color: #fdfdfd">
+                                                    <h4 class="r-select-title" data-bind="text: $data.title"></h4>
+                                                </div>
+                                                <div>
+                                                    <div class="r-select-card"
+                                                        style="color: #30517a; background-color: #fdfdfd">
+                                                        <div class="r-select-circle loader-button" style="top: 55px">
+                                                            <span><i data-bind="attr:{class: ($data.iconclass +' r-select-icon')}"
+                                                                    class="fa fa fa-user r-select-icon"></i></span>
+                                                        </div>
+                                                        <div class="r-desc-container">
+                                                            <p data-bind="text: $data.description"
+                                                                style="color: #30517a; background-color: #fdfdfd"
+                                                                class="r-select-desc"></p>
+                                                        </div>
+                                                    </div>
+                                                </div>
+
+                                                <!-- card Tools -->
+                                                <div class="r-select-card-footer">
+                                                    <div class="">
+                                                        <div data-bind="click: function(){$parent.applyRendererToSelected($data)}"
+                                                            style="border-top: 1px solid #c4c4c4;"
+                                                            class="btn btn-primary btn-resource-select" role="button">
+                                                            {% trans 'Select' %}
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <!--/ko-->
+                                    </div>
+                                </div>
+                                <br>
+                            </div>
+                            <div class="file-upload-footer">
+                                <span class="loader-selector"
+                                    data-bind="component: {
+                                        name: 'views/components/simple-switch',
+                                        params: {value: applyToAll, config:{label: '{% trans "Apply the same loader to all selected files in the dataset" %}'}}
+                                    }"
+                                ></span>
+                            </div>
+                            <!--/ko-->
+                        </div>
+
+                    </div>
+                </div>
+
+            </div>
+            <!--/ko-->
+
+        </div>
+    </div>
+
+
+</div>
+<!-- /ko -->
+{% endblock content_management %}
+
+
+{% block sidepanel %}
+
+<!--ko if: activeTab() === 'edit' -->
+<div class="workbench-header-buffer">
+    <div class="workbench-card-sidepanel-header-container">
+        <h4 class="workbench-card-sidepanel-header" data-bind="click: hideSidePanel, text: 'Dataset Details'"></h4>
+    </div>
+</div>
+<div class="workbench-content-container">
+    <div class="file-workbench-filter">
+        <h2 class="file-workbench-filter-header">{% trans 'Datasets' %}</h2>
+        <input type="text" class="form-control" style="width: 100%; height:initial" placeholder="{% trans 'e.g.: .txt' %}"
+            data-bind="textInput: digitalResourceFilter"></input>
+        <span class="clear-node-search" data-bind="visible: digitalResourceFilter().length > 0, click: function() { digitalResourceFilter(''); }"><i
+                class="fa fa-times-circle"></i></span>
+    </div>
+    <div class='file-workbench-files'>
+        <!-- ko foreach: { data: filteredDigitalResources, as:'digitalResource'} -->
+        <div class='file-workbench-file' style="display: inline-flex;"
+            data-bind="css: {'selected-photo': ko.unwrap($parent.selectedDigitalResource) === digitalResource}, click: function(ri){
+                $parent.selectedDigitalResource(ri);
+            }, container: '.file-workbench-files'">
+            <i role="presentation" data-bind="class: 'fa fa-file'"></i>
+            <div class='file-name' data-bind="text: digitalResource.resource.Name.Name_content['@display_value']"></div>
+        </div>
+        <!-- /ko -->
+    </div>
+
+    <div class="file-workbench-filter">
+        <h2 class="file-workbench-filter-header">{% trans 'Data Files' %}</h2>
+        <input type="text" class="form-control" style="width: 100%; height:initial" placeholder="{% trans 'e.g.: .txt' %}"
+            data-bind="textInput: fileFilter"></input>
+        <span class="clear-node-search"
+            data-bind="visible: fileFilter().length > 0, click: function() { fileFilter(''); }"><i
+                class="fa fa-times-circle"></i></span>
+    </div>
+    <div class='file-workbench-files'>
+        <!-- ko foreach: { data: filteredFiles, as:'file'} -->
+        <div class='file-workbench-file' style="display: inline-flex;" data-bind="css: {'selected-photo': ko.unwrap($parent.selectedFile) === file}, click: function(f){
+                $parent.selectedFile(f);
+            }, container: '.file-workbench-files'">
+            <i role="presentation" data-bind="class: 'fa fa-file'"></i>
+            <div class='file-name' data-bind="text: file.file_details[0].name"></div>
+        </div>
+        <!-- /ko -->
+    </div>
+
+    <div style="display: flex; flex-direction: column;">
+        <div style="display: flex; flex-direction: row; justify-content: space-between; align-items: flex-end;">
+            <h2 class="file-workbench-filter-header">{% trans 'File Parameters' %}</h2>
+        </div>
+        <textarea data-bind="textInput: fileStatementParameter" rows="4" class="form-control" style="width: 100%; height:initial" 
+        placeholder="{% trans 'e.g.: .txt' %}"></textarea>
+    </div>
+
+    <div>
+        <h2 class="file-workbench-filter-header">{% trans 'File Interpretation' %}</h2>
+        <textarea data-bind="textInput: fileStatementInterpretation" rows="4" class="form-control" style="width: 100%; height:initial"
+        placeholder="{% trans 'e.g.: .txt' %}"></textarea>
+    </div>
+</div>
+<div class="workbench-button-panel">
+    <button class="btn btn-success" data-bind="click: save, css: {disabled: !dirty()}"><i class="ion-android-cloud-done"></i> {% trans 'Save'%}</button>
+    <button class="btn btn-danger" data-bind="click: reset, css: {disabled: !dirty()}"><i class="ion-android-cancel"></i> {% trans 'Cancel' %}</button>
+</div>
+
+<!-- /ko -->
+
+
+{{ block.super }}
+{% endblock sidepanel %}

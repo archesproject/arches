@@ -1,0 +1,11 @@
+{
+    "name": "Collection or Set Template",
+    "component": "views/components/reports/collection-set",
+    "defaultconfig": {
+        "uncompacted_reporting": true
+    },
+    "description": "Collection or Set report",
+    "componentname": "collection-set-report",
+    "templateid": "b5380d34-15ef-4a38-95c0-df228068916d",
+    "preload_resource_data": false
+}

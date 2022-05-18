@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<rdf:RDF
+  xmlns:skos="http://www.w3.org/2004/02/skos/core#"
+  xmlns:dcterms="http://purl.org/dc/terms/"
+  xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+>
+  <skos:Concept rdf:about="http://localhost:8000/b15eb30e-aa0b-4102-b4fb-18242f376fc3">
+    <skos:narrower>
+      <skos:Concept rdf:about="http://localhost:8000/6b031c2a-888a-4637-b853-2c01dc38c132">
+        <skos:prefLabel xml:lang="en-us">{"id": "187beb4a-c999-47ba-9cb6-0b5e1293529d", "value": "p1_is_identified_by"}</skos:prefLabel>
+        <dcterms:identifier xml:lang="en-us">{"id": "f66ecd3d-fbe5-49ab-ac0d-93c9167abfdf", "value": "http://www.cidoc-crm.org/cidoc-crm/P1_is_identified_by"}</dcterms:identifier>
+        <skos:inScheme rdf:resource="http://localhost:8000/9fc3f45d-b70e-401e-943d-f95d006bd5bb"/>
+      </skos:Concept>
+    </skos:narrower>
+    <skos:prefLabel xml:lang="en-us">{"id": "59f65c43-e526-4018-a05a-6c967d4e5b1b", "value": "Properties"}</skos:prefLabel>
+    <skos:inScheme>
+      <skos:ConceptScheme rdf:about="http://localhost:8000/9fc3f45d-b70e-401e-943d-f95d006bd5bb">
+        <dcterms:title xml:lang="en-us">{"id": "9b7b5386-f408-4074-82f6-94b1c09740b4", "value": "CRM Property"}</dcterms:title>
+        <skos:hasTopConcept rdf:resource="http://localhost:8000/b15eb30e-aa0b-4102-b4fb-18242f376fc3"/>
+      </skos:ConceptScheme>
+    </skos:inScheme>
+  </skos:Concept>
+</rdf:RDF>

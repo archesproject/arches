@@ -1,0 +1,2 @@
+update cards_x_nodes_x_widgets set config = jsonb_set(config, '{multiFeature}', 'false') where widgetid = 'aae743b8-4c48-11ea-988b-2bc775672c81';
+update widgets set defaultconfig = jsonb_set(defaultconfig, '{multiFeature}', 'false') where widgetid = 'aae743b8-4c48-11ea-988b-2bc775672c81';

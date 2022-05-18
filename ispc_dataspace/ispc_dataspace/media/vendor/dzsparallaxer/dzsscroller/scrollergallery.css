@@ -1,0 +1,207 @@
+/* --- functional styling
+*/
+.scroller-gallery-con {
+  position: relative;
+  margin-bottom: 30px; }
+
+.scroller-gallery {
+  position: relative;
+  margin: 0;
+  font-family: Arial, sans-serif;
+  font-size: 12px;
+  line-height: 14px;
+  width: 100%; }
+  .scroller-gallery .inners .inner {
+    position: absolute !important; }
+  .scroller-gallery > .clip-bg {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    overflow: hidden;
+    height: 100%; }
+
+.scroller-gallery .desc {
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: black;
+  background: rgba(0, 0, 0, 0.8);
+  -moz-box-sizing: border-box;
+  -webkit-box-sizing: border-box;
+  box-sizing: border-box;
+  padding: 10px 15px; }
+
+.masonry > * {
+  overflow: hidden; }
+
+.sgitem {
+  display: block;
+  margin-right: 0px;
+  margin-bottom: 0px;
+  overflow: hidden; }
+
+.scroller-gallery.itemmargin10 .sgitem {
+  display: block;
+  margin-right: 10px;
+  margin-bottom: 10px; }
+
+.scroller-gallery a {
+  text-decoration: none;
+  color: #fff; }
+
+.scroller-gallery .desc .fake-link {
+  cursor: pointer; }
+
+.scroller-gallery h5 {
+  padding: 10px 0;
+  margin: 0; }
+
+.scroller-gallery .sgitem > img {
+  display: block; }
+
+.scroller-gallery .sgitem > a > img {
+  display: block; }
+
+.icon {
+  width: 9px;
+  height: 9px;
+  position: absolute;
+  top: 20px;
+  right: 15px;
+  background-repeat: no-repeat;
+  background-position: 50% 50%; }
+
+.icon.page {
+  background-image: url("styleimg/page.png"); }
+
+.icon.image {
+  background-image: url("styleimg/image.png"); }
+
+.icon.video {
+  background-image: url("styleimg/video.png"); }
+
+.scroller-gallery > .clip-bg > .the-bg {
+  position: absolute;
+  top: -3%;
+  left: -3%;
+  width: 112%;
+  height: 112%;
+  -webkit-transform-style: preserve-3d;
+  perspective: 150;
+  perspective-origin: 0% 0%;
+  -webkit-perspective: 150;
+  /* Safari and Chrome */
+  -webkit-perspective-origin: 0% 0%;
+  /* Safari and Chrome */
+  background-size: cover;
+  transition-property: transform;
+  transition-duration: 0.1s;
+  transition-timing-function: linear;
+  -moz-transition-property: transform;
+  -moz-transition-duration: 0.1s;
+  -moz-transition-timing-function: linear;
+  -webkit-transition-property: transform;
+  -webkit-transition-duration: 0.1s;
+  -webkit-transition-timing-function: linear;
+  -o-transition-property: transform;
+  -o-transition-duration: 0.1s;
+  -o-transition-timing-function: linear;
+  -ms-transition-property: transform;
+  -ms-transition-duration: 0.1s;
+  -ms-transition-timing-function: linear; }
+
+/* -- arrow styling */
+.scroller-gallery .con-items {
+  position: absolute;
+  top: 0;
+  left: 0; }
+.scroller-gallery .inners {
+  position: absolute;
+  top: 0;
+  left: 0; }
+
+/* --- estethic styling 
+*/
+.scroller-gallery .arrowleft-con {
+  width: 50px;
+  height: 100%;
+  border-right: 1px solid rgba(0, 0, 0, 0.3);
+  background: rgba(0, 0, 0, 0.5);
+  position: absolute;
+  top: 0;
+  left: 0;
+  opacity: 0.7;
+  cursor: pointer;
+  -webkit-transition: all 0.3s ease-out;
+  -moz-transition: all 0.3s ease-out;
+  -o-transition: all 0.3s ease-out;
+  z-index: 2; }
+
+.scroller-gallery .arrowleft {
+  width: 25px;
+  height: 25px;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  margin-left: -12px;
+  margin-top: -12px;
+  background: url(styleimg/arrowleft.png) no-repeat center center; }
+
+.scroller-gallery .arrowleft-con:hover {
+  opacity: 1; }
+
+.scroller-gallery .arrowright-con {
+  width: 50px;
+  height: 100%;
+  border-left: 1px solid rgba(0, 0, 0, 0.3);
+  background: rgba(0, 0, 0, 0.5);
+  position: absolute;
+  top: 0;
+  right: 0;
+  opacity: 0.7;
+  cursor: pointer;
+  -webkit-transition: all 0.3s ease-out;
+  -moz-transition: all 0.3s ease-out;
+  -o-transition: all 0.3s ease-out;
+  z-index: 3; }
+
+.scroller-gallery .arrowright {
+  width: 25px;
+  height: 25px;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  margin-left: -12px;
+  margin-top: -12px;
+  background: url(styleimg/arrowright.png) no-repeat center center; }
+
+.scroller-gallery .arrowright-con:hover {
+  opacity: 1; }
+
+.scroller-gallery .desc {
+  color: #fff; }
+
+.scroller-gallery .desc .fake-link {
+  color: #09F; }
+
+/*misc*/
+.preloader {
+  width: 50px;
+  height: 50px;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  border-radius: 10px;
+  background: white url(./styleimg/preloader.gif) center no-repeat; }
+
+.fullwidth {
+  width: 100%; }
+
+.fullheight {
+  height: 100%; }
+
+.imgtobg {
+  background-size: cover; }

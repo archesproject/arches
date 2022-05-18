@@ -1,0 +1,108 @@
+{% load staticfiles %}
+{% load i18n %}
+
+{% block tabs %}
+{% endblock tabs %}
+
+{% block sidepanel %}
+{% endblock sidepanel %}
+
+{% block main_menu %}
+
+
+<div class="file-workbench-filter" style="padding-left: 46px;  padding-right: 46px; display:flex; align-items: flex-end;">
+    <div class="dataset-name" style="flex-grow: 1;">
+        <label class="control-label">{% trans "Dataset Name" %}</label>
+        <input type="text" class="form-control" style="width: 50%; height:initial"
+            data-bind="textInput: datasetName"></input>
+        <div>
+            <input class="afs-calculated-datasetname" disabled type="text" style="width: 50%;" data-bind="textInput: calcDatasetName"></input>
+        </div>
+
+    </div>
+    <div style="padding-left: 20px;">
+        <!-- ko if: dirty -->
+        <button class="btn btn-shim btn-danger btn-labeled btn-sm fa fa-times" data-bind="click: reset">{% trans 'Cancel'%}</button>
+        <button class="btn btn-shim btn-labeled btn-sm fa fa-plus btn-mint" data-bind="click: save">{% trans 'Save'%}</button>
+        <!-- /ko -->
+    </div>
+</div>
+
+<div class="file-chart-upload-panel">
+    <!-- ko if: files().length === 0 -->
+    <div class="gallery-controls new-tile">
+        <div class="dropzone-photo-upload" data-bind="dropzone: dropzoneOptions">
+            <div class="file-select-window">
+                <div class="bord-top pad-ver file-select">
+                    <div class="" style="padding: 5px">
+                        <h2>{% trans 'Upload Files' %}</h2>
+                        <h4>{% trans 'Drag & Drop your files onto this panel to upload' %}</h4>
+                    </div>
+                    <button type="button" class="btn btn-lg btn-file-select upload-dataset-files dz-clickable" data-bind="css: uniqueidClass">
+                        <i class="fa fa-file"></i>
+                        <span>{% trans "Select Files" %}</span>
+                    </button>
+                    <br>
+                    <div style="padding: 10px">{% trans "Adding files to this record is " %}
+                        <span><strong>{% trans "optional." %}</strong></span>
+                        <br>
+                        {% trans "You may upload as many files as you wish; check with the site admin on the maximum file size." %}
+                    </div>
+
+                </div>
+                <div class="file-upload-footer">
+                    <span data-bind="text: ('The following file formats may be uploaded: csv')"></span>
+                </div>
+            </div>
+
+        </div>
+        <div class="dropzone" style="min-height: 100%; display:none;">
+            <div id="hidden-dz-previews" class="dropzone-previews" data-bind="css: uniqueidClass"></div>
+        </div>
+    </div>
+    <!-- /ko -->
+      
+    <!-- ko if: files().length > 0 -->
+    <div style="background-color: white; padding: 45px;">
+        <div class="file-workbench-files" style="display: flex; flex-direction: column; height: 485px; border: solid 1px lightgrey; padding: 20px;">
+            <div class="dropzone-photo-upload" style="background: #fafafa; border: dashed 1px purple; padding: 40px; text-align: center;" data-bind="dropzone: dropzoneOptions">
+                <div class="file-workbench-links">
+                    <a class="upload-dataset-files dz-clickable" data-bind="css: uniqueidClass">
+                        <span>{% trans "Drag or " %}</span><span class="text-bold">{% trans "click here " %}</span>
+                        <span>{% trans "to upload more files" %}</span>
+                    </a>
+                </div>
+                <div style="min-height: 100%;">
+                    <div id="hidden-dz-previews" style="display:none"></div>
+                </div>
+            </div>
+            <!-- ko foreach: {data: files, as: 'file'} -->
+                <div class="file-workbench-file">
+                    <div style="display: flex; flex-direction: row; min-width: 500px; padding: 5px;">
+                        <span><i class="fa fa-file fa-lg"></i></span>
+                        <span class="text-main mar-no text-overflow" style="flex-grow: 1;" data-bind="text: file.fileInfo.name"></span>
+                        <!-- ko if: file.fileInfo.error -->
+                        <span class="dz-error text-danger text-sm"  data-bind="text: '{% trans " error" %}'"></span>
+                        <!-- /ko -->
+                        <div class="file-size-label">
+                            <span class="text-sm" data-bind="html: $parent.formatSize(file.fileInfo)"></span>
+                        </div>
+                        <!-- ko if: file.fileInfo.uploaded -->
+                        <div class="media-right">
+                            <button class="btn btn-xs btn-danger btn-file-cancel"><i class="ion ion-cloud"></i></button>
+                        </div>
+                        <!-- /ko -->
+                        <!-- ko ifnot: file.fileInfo.uploaded -->
+                        <div class="media-right" data-bind="click: $parent.removeFile">
+                            <button class="btn btn-xs btn-danger btn-file-cancel"><i
+                                    class="ion ion-close"></i></button>
+                        </div>
+                        <!-- /ko -->
+                    </div>
+                </div>
+            <!-- /ko -->
+        </div>
+    </div>
+    <!-- /ko -->
+</div>
+{% endblock main_menu %}

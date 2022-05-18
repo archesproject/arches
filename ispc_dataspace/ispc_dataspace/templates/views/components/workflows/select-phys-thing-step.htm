@@ -1,0 +1,41 @@
+{% load i18n %}
+<div style="height: 100%; padding: 10px 24px;">
+    <div style="padding: 5px">
+        <div class="widget-input-label">Project</div>
+        <div data-bind="component: {
+            name: 'resource-instance-select-widget',
+            params: {
+                graphids: [
+                    projectGraphId,
+                ],
+                renderContext: 'workflow', 
+                value: projectValue,
+                disabled: locked,
+            }
+        }"></div>
+    </div>
+    <!--ko if: termFilter() -->
+    <div style="padding: 5px; margin-top: 15px;">
+        <div class="widget-input-label">Analyzed Object or Sample</div>
+        <div data-bind="component: {
+            name: 'resource-instance-select-widget',
+            params: {
+                termFilter: termFilter(),
+                renderContext: 'workflow', 
+                value: physicalThingValue,
+                disabled: locked,
+            }
+        }"></div>
+    </div>
+    <!--/ko-->
+    <!-- ko if: hasSetWithPhysicalThing() === false -->
+    <div class="tabbed-workflow-step-information-box widget-input-label" style="text-align: center; margin-top: 16px; height:fit-content; background-color: #fde9ad;">
+        This project has no associated Objects. Your project must have an associated Object Collection with an Object before proceeding.
+    </div>
+    <!-- /ko -->
+    <!-- ko if: validateThing && isPhysicalThingValid() === false -->
+    <div class="tabbed-workflow-step-information-box widget-input-label" style="text-align: center; margin-top: 16px; height:fit-content; background-color: #fde9ad;">
+        The selected physical thing is invalid.  Complete the Analysis Area or Sample Taking workflow before proceeding.
+    </div>
+    <!-- /ko -->
+</div>

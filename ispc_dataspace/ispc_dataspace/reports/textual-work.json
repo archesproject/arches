@@ -1,0 +1,11 @@
+{
+    "name": "Textual Work Template",
+    "component": "views/components/reports/textual-work",
+    "defaultconfig": {
+        "uncompacted_reporting": true
+    },
+    "description": "Textual Work report",
+    "componentname": "textual-work-report",
+    "templateid": "590a02ad-7d47-4b29-90a3-2e29aada677d",
+    "preload_resource_data": false
+}

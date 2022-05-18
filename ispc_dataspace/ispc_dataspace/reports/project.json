@@ -1,0 +1,11 @@
+{
+    "name": "Project Template",
+    "component": "views/components/reports/project",
+    "defaultconfig": {
+        "uncompacted_reporting": true
+    },
+    "description": "Project report",
+    "componentname": "project-report",
+    "templateid": "2b124304-6e42-4c0c-8161-14c010dcef71",
+    "preload_resource_data": false
+}

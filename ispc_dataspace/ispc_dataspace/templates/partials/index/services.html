@@ -1,0 +1,105 @@
+{% load static %}
+{% load staticfiles %}
+{% load template_tags %}
+{% load i18n %}
+<!-- Icon Blocks -->
+<section class="container g-pt-100 g-pb-70">
+  <!-- Heading -->
+  <div class="row justify-content-center text-center g-mb-50" id="data">
+    <div class="col-lg-9">
+      <h2 class="h3 g-color-black g-font-weight-600 text-uppercase mb-2">Data</h2>
+      <div class="d-inline-block g-width-35 g-height-2 g-bg-primary mb-2"></div>
+      <p class="lead mb-0">Here you can find links to our data, broken up into relevant categories.</p>
+    </div>
+  </div>
+  <!-- End Heading -->
+
+  <div class="row">
+    <div class="col-md-4 g-mb-30">
+      <!-- Icon Blocks -->
+      <div class="g-brd-around--md g-brd-gray-light-v4 text-center g-pa-10 g-px-30--lg g-py-40--lg">
+        <span class="d-block g-color-gray-dark-v4 g-font-size-40 g-mb-15">
+          <i class="icon-education-074 u-line-icon-pro"></i>
+        </span>
+        <h3 class="h5 g-color-black g-mb-10">Sites &amp; Projects</h3>
+        <p class="g-color-gray-dark-v4">Start here for a global overview of the various projects we have worked on.</p>
+        <div class="d-inline-block g-width-40 g-brd-bottom g-brd-gray-dark-v5 g-my-15"></div>
+        <ul class="list-unstyled g-px-30 g-mb-0">
+          <li class="g-brd-bottom g-brd-gray-light-v3 g-py-10"><a href='{% url "projects" %}'>{% trans "Projects" %}</a></li>
+<li class="g-py-8">
+<a href='{% url "sites" %}'>{% trans "Heritage Sites" %}</a></li>
+        </ul>
+      </div>
+      <!-- End Icon Blocks -->
+    </div>
+    <div class="col-md-4 g-mb-30">
+      <!-- Icon Blocks -->
+      <div class="g-brd-around--md g-brd-gray-light-v4 text-center g-pa-10 g-px-30--lg g-py-40--lg">
+        <span class="d-block g-color-gray-dark-v4 g-font-size-40 g-mb-15">
+          <i class="icon-science-052 u-line-icon-pro"></i>
+        </span>
+        <h3 class="h5 g-color-black g-mb-10">3D</h3>
+        <p class="g-color-gray-dark-v4">Access 3D data like meshed models and point clouds.</p>
+        <div class="d-inline-block g-width-40 g-brd-bottom g-brd-gray-dark-v5 g-my-15"></div>
+        <ul class="list-unstyled g-px-30 g-mb-0">
+
+          <li class="g-brd-bottom g-brd-gray-light-v3 g-py-10">
+            <a target="_blank" href='{% url "search_home" %}?typeFilter=%5B%7B%22graphid%22%3A%229b591814-c0f2-11e8-9c8c-0242ac120004%22%2C%22name%22%3A%22Potree%20Pointcloud%22%2C%22inverted%22%3Afalse%7D%5D&no_filters=false&page=1' >
+              {% trans "Point Clouds" %}
+            </a>
+          </li>
+
+          <li class="g-py-8">
+            <a target="_blank" href='{% url "search_home" %}?typeFilter=%5B%7B"graphid"%3A"36bcaff4-b82f-11e8-8598-0242ac120004"%2C"name"%3A"3D%20HOP%20Model"%2C"inverted"%3Afalse%7D%5D&advanced=%5B%7B"op"%3A"and"%2C"a7fb9944-bfed-11e8-a478-0242ac160004"%3A%7B"op"%3A""%2C"val"%3A""%7D%2C"a7fb9de0-bfed-11e8-a478-0242ac160004"%3A%7B"op"%3A""%2C"val"%3A""%7D%7D%5D&no_filters=false&page=1'>
+              {% trans "Meshed Models" %}
+            </a>
+          </li>
+
+        </ul>
+      </div>
+      <!-- End Icon Blocks -->
+    </div>
+    <div class="col-md-4 g-mb-30">
+      <!-- Icon Blocks -->
+      <div class="g-brd-around--md g-brd-gray-light-v4 text-center g-pa-10 g-px-30--lg g-py-40--lg">
+        <span class="d-block g-color-gray-dark-v4 g-font-size-40 g-mb-15">
+          <i class="icon-finance-256 u-line-icon-pro"></i>
+        </span>
+        <h3 class="h5 g-color-black g-mb-10">2D</h3>
+        <p class="g-color-gray-dark-v4">Photographs, orthophotos, videos, and other related material.</p>
+        <div class="d-inline-block g-width-40 g-brd-bottom g-brd-gray-dark-v5 g-my-15"></div>
+        <ul class="list-unstyled g-px-30 g-mb-0">
+
+          <li class="g-brd-bottom g-brd-gray-light-v3 g-py-10">
+            <a target="_blank" href='{% url "search_home" %}?typeFilter=%5B%7B"graphid"%3A"ddf1c942-d145-11e8-897e-0242ac1a0004"%2C"name"%3A"Virtual%20Tours"%2C"inverted"%3Afalse%7D%5D&no_filters=false&page=1'>
+              {% trans "Virtual Tours" %}
+            </a>
+          </li>
+          
+          <li class="g-brd-bottom g-brd-gray-light-v3 g-py-10">
+            <a target="_blank" href='{% url "search_home" %}?typeFilter=%5B%7B"graphid"%3A"601c830e-d780-11e8-918f-0242ac120004"%2C"name"%3A"CAD%20Section%20%2F%20Plan"%2C"inverted"%3Afalse%7D%5D&advanced=%5B%7B"op"%3A"and"%2C"a7fb9944-bfed-11e8-a478-0242ac160004"%3A%7B"op"%3A""%2C"val"%3A""%7D%2C"a7fb9de0-bfed-11e8-a478-0242ac160004"%3A%7B"op"%3A""%2C"val"%3A""%7D%7D%5D&no_filters=false&page=1'>
+              {% trans "CAD Sections & Plans" %}
+            </a>
+          </li>
+
+          <li class="g-brd-bottom g-brd-gray-light-v3 g-py-10">
+            <a target="_blank" href='{% url "search_home" %}?typeFilter=%5B%7B"graphid"%3A"2995daea-d6d3-11e8-9eb1-0242ac150004"%2C"name"%3A"Image"%2C"inverted"%3Afalse%7D%5D&advanced=%5B%7B"op"%3A"and"%2C"a7fb9944-bfed-11e8-a478-0242ac160004"%3A%7B"op"%3A""%2C"val"%3A""%7D%2C"a7fb9de0-bfed-11e8-a478-0242ac160004"%3A%7B"op"%3A""%2C"val"%3A""%7D%7D%5D&no_filters=false&page=1'>
+              {% trans "Photos & Images" %}
+            </a>
+          </li>
+
+          <li class="g-py-8">
+            <a target="_blank" href='{% url "search_home" %}?typeFilter=%5B%7B"graphid"%3A"32a83794-f60f-11e8-8d50-0242ac120004"%2C"name"%3A"Video"%2C"inverted"%3Afalse%7D%5D&advanced=%5B%7B"op"%3A"and"%2C"a7fb9944-bfed-11e8-a478-0242ac160004"%3A%7B"op"%3A""%2C"val"%3A""%7D%2C"a7fb9de0-bfed-11e8-a478-0242ac160004"%3A%7B"op"%3A""%2C"val"%3A""%7D%7D%5D&no_filters=false&page=1'>
+              {% trans "Videos" %}
+            </a>
+          </li>
+
+        </ul>
+      </div>
+      <!-- End Icon Blocks -->
+    </div>
+  </div>
+</section>
+<!-- End Icon Blocks -->
+
+

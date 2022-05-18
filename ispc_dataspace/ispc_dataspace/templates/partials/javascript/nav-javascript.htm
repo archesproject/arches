@@ -1,0 +1,23 @@
+{% load static %}
+
+<script src="{% static 'vendor/hs-megamenu/src/hs.megamenu.js' %}"></script>
+
+<!-- JS Unify -->
+<script src="{% static 'js/unify/hs.core.js' %}"></script>
+<script src="{% static 'js/unify/components/hs.header.js' %}"></script>
+<script src="{% static 'js/unify/helpers/hs.hamburgers.js' %}"></script>
+
+<script>
+    $(document).on('ready', function () {
+        // initialization of header
+        $.HSCore.components.HSHeader.init($('#js-header'));
+        $.HSCore.helpers.HSHamburgers.init('.hamburger');
+
+        // initialization of HSMegaMenu component
+        $('.js-mega-menu').HSMegaMenu({
+            event: 'hover',
+            pageContainer: $('.container'),
+            breakpoint: 991
+        });
+    });
+</script>

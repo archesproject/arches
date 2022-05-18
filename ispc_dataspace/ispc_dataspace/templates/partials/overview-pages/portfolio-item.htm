@@ -1,0 +1,20 @@
+{% if portfolio_item.thumbnail_url %}
+
+  <div class="cbp-item {{ portfolio_item.category }}">
+    <div class="u-block-hover g-parent">
+      <a href="{% url 'resource_report' resourceid=portfolio_item.resource_instance_id %}">
+        <img class="img-fluid g-transform-scale-1_1--parent-hover g-transition-0_5 g-transition--ease-in-out"
+          src="{{ portfolio_item.thumbnail_url }}" alt="{{ portfolio_item.displayname }}">
+      </a>
+    </div>
+    <div class="g-bg-white text-center g-pa-15 site-block">
+      <h5 class="h5 g-color-black g-font-weight-700 mb-1">
+        <a href="{% url 'resource_report' resourceid=portfolio_item.resource_instance_id %}">
+          {{ portfolio_item.display_name }}
+        </a>
+      </h5>
+      <p class="mb-0">{{ portfolio_item.category_display_name }}</p>
+    </div>
+  </div>
+
+{% endif %}

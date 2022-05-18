@@ -1,0 +1,22 @@
+{% load static %}
+{% load staticfiles %}
+{% load template_tags %}
+{% load i18n %}
+<!-- Revolution Slider -->
+<div class="g-overflow-hidden">
+  <div id="rev_slider_24_1_wrapper" class="rev_slider_wrapper fullscreen-container" data-alias="website-intro"
+    data-source="gallery" style="background:#000000;padding:0px;">
+    <!-- START REVOLUTION SLIDER 5.4.1 fullscreen mode -->
+    <div id="rev_slider_24_1" class="rev_slider fullscreenbanner tiny_bullet_slider" style="display:none;" data-version="5.4.1">
+      <ul>
+        {% include 'partials/slides/slide_1.html' %}
+        {% include 'partials/slides/slide_2.html' %}
+        {% include 'partials/slides/slide_3.html' %}
+        {% include 'partials/slides/slide_4.html' %}
+        {% include 'partials/slides/slide_5.html' %}
+      </ul>
+      <div class="tp-bannertimer tp-bottom" style="height: 5px; background: #fff;"></div>
+    </div>
+  </div>
+</div>
+<!-- End Revolution Slider -->

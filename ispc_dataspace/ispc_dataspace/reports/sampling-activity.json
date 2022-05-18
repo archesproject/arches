@@ -1,0 +1,11 @@
+{
+    "name": "Sampling Activity Template",
+    "component": "views/components/reports/sampling-activity",
+    "defaultconfig": {
+        "uncompacted_reporting": true
+    },
+    "description": "Sampling Activity report",
+    "componentname": "sampling-activity-report",
+    "templateid": "4c864659-fc0d-45ec-a4da-c8fb8a7ec24e",
+    "preload_resource_data": false
+}
