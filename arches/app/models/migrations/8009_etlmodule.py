@@ -202,66 +202,6 @@ remove_functions_to_get_nodegroup_tree = [
     """
 ]
 
-add_create_resource_x_record = """
-    CREATE OR REPLACE FUNCTION public.__arches_create_resource_x_record(tile_data_value jsonb, instance_id uuid, tile_id uuid, node_id uuid, graph_id uuid)
-    RETURNS JSONB AS $$
-        DECLARE
-            resource_object jsonb;
-            resource_x_id uuid;
-            x_resource_id text;
-            ontology_property text;
-            inverse_ontology_property text;
-            x_graph_id uuid;
-            resource_object_array jsonb;
-        BEGIN
-            --if resource-instance datatype is created without resource_x_resource, create resource_x_resource record
-            resource_object_array = '[]'::jsonb;
-            FOR resource_object IN SELECT * FROM jsonb_array_elements(tile_data_value) LOOP
-                resource_x_id = uuid_generate_v1mc();
-                x_resource_id = resource_object ->> 'resourceId';
-                ontology_property = resource_object ->> 'ontologyProperty';
-                inverse_ontology_property = resource_object ->> 'inverseOntologyProperty';
-                SELECT graphid FROM resource_instances INTO x_graph_id WHERE resourceinstanceid = x_resource_id::uuid;
-
-                INSERT INTO resource_x_resource(
-                    resourcexid,
-                    resourceinstanceidfrom,
-                    resourceinstanceidto,
-                    relationshiptype,
-                    inverserelationshiptype,
-                    modified,
-                    created,
-                    tileid,
-                    nodeid,
-                    resourceinstancefrom_graphid,
-                    resourceinstanceto_graphid
-                )
-                VALUES (
-                    resource_x_id,
-                    instance_id,
-                    x_resource_id::uuid,
-                    ontology_property,
-                    inverse_ontology_property,
-                    now(),
-                    now(),
-                    tile_id,
-                    node_id,
-                    graph_id,
-                    x_graph_id
-                );
-                resource_object = jsonb_set(resource_object, '{resourceXresourceId}', to_jsonb(resource_x_id::text));
-                resource_object_array = resource_object_array || resource_object;
-            END LOOP;
-            RETURN resource_object_array;
-        END;
-    $$
-    LANGUAGE plpgsql
-    """
-
-remove_create_resource_x_record = """
-    DROP FUNCTION public.__arches_create_resource_x_record(tile_data_value jsonb, instance_id uuid, tile_id uuid, node_id uuid, graph_id uuid);
-    """
-
 add_staging_to_tile_function = """
     CREATE OR REPLACE FUNCTION public.__arches_staging_to_tile(load_id uuid)
     RETURNS BOOLEAN AS $$
@@ -273,18 +213,20 @@ add_staging_to_tile_function = """
             passed boolean;
             selected_resource text;
             graph_id uuid;
-            instance_id text;
+            instance_id uuid;
             legacy_id text;
-            file_id text;
-            tile_id text;
-            parent_id text;
-            group_id text;
+            file_id uuid;
+            tile_id uuid;
+            parent_id uuid;
+            nodegroup_id uuid;
             _file jsonb;
             _key text;
             _value text;
             tile_data_value jsonb;
+            resource_object jsonb;
+            resource_obejct_array jsonb;
         BEGIN
-            FOR staged_value, instance_id, legacy_id, tile_id, parent_id, group_id, passed, graph_id IN
+            FOR staged_value, instance_id, legacy_id, tile_id, parent_id, nodegroup_id, passed, graph_id IN
                     (
                         SELECT value, resourceid, legacyid, tileid, parenttileid, ls.nodegroupid, passes_validation, n.graphid
                         FROM load_staging ls INNER JOIN (SELECT DISTINCT nodegroupid, graphid FROM nodes) n
@@ -294,11 +236,11 @@ add_staging_to_tile_function = """
                     )
                 LOOP
                     IF passed THEN
-                        SELECT resourceinstanceid FROM resource_instances INTO selected_resource WHERE resourceinstanceid = instance_id::uuid;
+                        SELECT resourceinstanceid FROM resource_instances INTO selected_resource WHERE resourceinstanceid = instance_id;
                         -- create a resource first if the rsource is not yet created
                         IF NOT FOUND THEN
                             INSERT INTO resource_instances(resourceinstanceid, graphid, legacyid, createdtime)
-                                VALUES (instance_id::uuid, graph_id, legacy_id, now());
+                                VALUES (instance_id, graph_id, legacy_id, now());
                             -- create resource instance edit log
                             INSERT INTO edit_log (resourceclassid, resourceinstanceid, edittype, timestamp, note, transactionid)
                                 VALUES (graph_id, instance_id, 'create', now(), 'loaded from staging_table', load_id);
@@ -309,28 +251,29 @@ add_staging_to_tile_function = """
                         FOR _key, _value IN SELECT * FROM jsonb_each_text(staged_value)
                             LOOP
                                 tile_data_value = _value::jsonb -> 'value';
-                                --if resource-instance, create resource_x_resource record
                                 IF (_value::jsonb ->> 'datatype') in ('resource-instance-list', 'resource-instance') THEN
-                                    SELECT __arches_create_resource_x_record(tile_data_value, instance_id::uuid, tile_id::uuid, _key::uuid, graph_id)
-                                    INTO tile_data_value;
+                                    resource_obejct_array = '[]'::jsonb;
+                                    FOR resource_object IN SELECT * FROM jsonb_array_elements(tile_data_value) LOOP
+                                        resource_object = jsonb_set(resource_object, '{resourceXresourceId}', to_jsonb(uuid_generate_v1mc()));
+                                        resource_obejct_array = resource_obejct_array || resource_object;
+                                    END LOOP;
+                                    tile_data_value = resource_obejct_array;
                                 END IF;
-
                                 tile_data = tile_data || FORMAT('{"%s": %s}', _key, tile_data_value)::jsonb;
                             END LOOP;
-
                         IF tile_id IS null THEN
                             tile_id = uuid_generate_v1mc();
                         END IF;
 
-                        SELECT tiledata FROM tiles INTO old_data WHERE resourceinstanceid = instance_id::uuid;
+                        SELECT tiledata FROM tiles INTO old_data WHERE resourceinstanceid = instance_id;
                         IF NOT FOUND THEN
                             old_data = null;
                         END IF;
 
                         INSERT INTO tiles(tileid, tiledata, nodegroupid, parenttileid, resourceinstanceid)
-                            VALUES (tile_id::uuid, tile_data, group_id::uuid, parent_id::uuid, instance_id::uuid);
+                            VALUES (tile_id, tile_data, nodegroup_id, parent_id, instance_id);
                         INSERT INTO edit_log (resourceclassid, resourceinstanceid, nodegroupid, tileinstanceid, edittype, newvalue, oldvalue, timestamp, note, transactionid)
-                            VALUES (graph_id, instance_id, group_id, tile_id, 'tile create', tile_data::jsonb, old_data, now(), 'loaded from staging_table', load_id);
+                            VALUES (graph_id, instance_id, nodegroup_id, tile_id, 'tile create', tile_data::jsonb, old_data, now(), 'loaded from staging_table', load_id);
                     END IF;
                 END LOOP;
             FOR staged_value, tile_id IN
@@ -342,12 +285,18 @@ add_staging_to_tile_function = """
                 LOOP
                     FOR _key, _value IN SELECT * FROM jsonb_each_text(staged_value)
                         LOOP
-                            IF (_value::jsonb ->> 'datatype') = 'file-list' THEN
-                                FOR _file IN SELECT * FROM jsonb_array_elements(_value::jsonb -> 'value') LOOP
-                                    file_id = _file ->> 'file_id';
-                                    UPDATE files SET tileid = tile_id::uuid WHERE fileid::text = file_id;
-                                END LOOP;
-                            END IF;
+                            CASE
+                                WHEN (_value::jsonb ->> 'datatype') = 'file-list' THEN
+                                    FOR _file IN SELECT * FROM jsonb_array_elements(_value::jsonb -> 'value') LOOP
+                                        file_id = _file ->> 'file_id';
+                                        UPDATE files SET tileid = tile_id WHERE fileid::text = file_id;
+                                    END LOOP;
+                                WHEN (_value::jsonb ->> 'datatype') in ('resource-instance-list', 'resource-instance') THEN
+                                    PERFORM __arches_refresh_tile_resource_relationships(tile_id);
+                                WHEN (_value::jsonb ->> 'datatype') = 'geojson-feature-collection' THEN
+                                    PERFORM refresh_tile_geojson_geometries(tile_id);
+                                ELSE
+                            END CASE;
                         END LOOP;
                 END LOOP;
             UPDATE load_event SET (load_end_time, complete, successful) = (now(), true, true) WHERE loadid = load_id;
@@ -464,6 +413,5 @@ class Migration(migrations.Migration):
         ),
         migrations.RunSQL(add_validation_reporting_functions, remove_validation_reporting_functions),
         migrations.RunSQL(add_functions_to_get_nodegroup_tree, remove_functions_to_get_nodegroup_tree),
-        migrations.RunSQL(add_create_resource_x_record, remove_create_resource_x_record),
         migrations.RunSQL(add_staging_to_tile_function, remove_staging_to_tile_function),
     ]
