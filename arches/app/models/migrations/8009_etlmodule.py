@@ -213,17 +213,20 @@ add_staging_to_tile_function = """
             passed boolean;
             selected_resource text;
             graph_id uuid;
-            instance_id text;
+            instance_id uuid;
             legacy_id text;
-            file_id text;
-            tile_id text;
-            parent_id text;
-            group_id text;
+            file_id uuid;
+            tile_id uuid;
+            parent_id uuid;
+            nodegroup_id uuid;
             _file jsonb;
             _key text;
             _value text;
+            tile_data_value jsonb;
+            resource_object jsonb;
+            resource_obejct_array jsonb;
         BEGIN
-            FOR staged_value, instance_id, legacy_id, tile_id, parent_id, group_id, passed, graph_id IN
+            FOR staged_value, instance_id, legacy_id, tile_id, parent_id, nodegroup_id, passed, graph_id IN
                     (
                         SELECT value, resourceid, legacyid, tileid, parenttileid, ls.nodegroupid, passes_validation, n.graphid
                         FROM load_staging ls INNER JOIN (SELECT DISTINCT nodegroupid, graphid FROM nodes) n
@@ -233,11 +236,11 @@ add_staging_to_tile_function = """
                     )
                 LOOP
                     IF passed THEN
-                        SELECT resourceinstanceid FROM resource_instances INTO selected_resource WHERE resourceinstanceid = instance_id::uuid;
+                        SELECT resourceinstanceid FROM resource_instances INTO selected_resource WHERE resourceinstanceid = instance_id;
                         -- create a resource first if the rsource is not yet created
                         IF NOT FOUND THEN
                             INSERT INTO resource_instances(resourceinstanceid, graphid, legacyid, createdtime)
-                                VALUES (instance_id::uuid, graph_id, legacy_id, now());
+                                VALUES (instance_id, graph_id, legacy_id, now());
                             -- create resource instance edit log
                             INSERT INTO edit_log (resourceclassid, resourceinstanceid, edittype, timestamp, note, transactionid)
                                 VALUES (graph_id, instance_id, 'create', now(), 'loaded from staging_table', load_id);
@@ -247,22 +250,30 @@ add_staging_to_tile_function = """
                         tile_data := '{}'::jsonb;
                         FOR _key, _value IN SELECT * FROM jsonb_each_text(staged_value)
                             LOOP
-                                tile_data = tile_data || FORMAT('{"%s": %s}', _key, _value::jsonb -> 'value')::jsonb;
+                                tile_data_value = _value::jsonb -> 'value';
+                                IF (_value::jsonb ->> 'datatype') in ('resource-instance-list', 'resource-instance') THEN
+                                    resource_obejct_array = '[]'::jsonb;
+                                    FOR resource_object IN SELECT * FROM jsonb_array_elements(tile_data_value) LOOP
+                                        resource_object = jsonb_set(resource_object, '{resourceXresourceId}', to_jsonb(uuid_generate_v1mc()));
+                                        resource_obejct_array = resource_obejct_array || resource_object;
+                                    END LOOP;
+                                    tile_data_value = resource_obejct_array;
+                                END IF;
+                                tile_data = tile_data || FORMAT('{"%s": %s}', _key, tile_data_value)::jsonb;
                             END LOOP;
-
                         IF tile_id IS null THEN
                             tile_id = uuid_generate_v1mc();
                         END IF;
 
-                        SELECT tiledata FROM tiles INTO old_data WHERE resourceinstanceid = instance_id::uuid;
+                        SELECT tiledata FROM tiles INTO old_data WHERE resourceinstanceid = instance_id;
                         IF NOT FOUND THEN
                             old_data = null;
                         END IF;
 
                         INSERT INTO tiles(tileid, tiledata, nodegroupid, parenttileid, resourceinstanceid)
-                            VALUES (tile_id::uuid, tile_data, group_id::uuid, parent_id::uuid, instance_id::uuid);
+                            VALUES (tile_id, tile_data, nodegroup_id, parent_id, instance_id);
                         INSERT INTO edit_log (resourceclassid, resourceinstanceid, nodegroupid, tileinstanceid, edittype, newvalue, oldvalue, timestamp, note, transactionid)
-                            VALUES (graph_id, instance_id, group_id, tile_id, 'tile create', tile_data::jsonb, old_data, now(), 'loaded from staging_table', load_id);
+                            VALUES (graph_id, instance_id, nodegroup_id, tile_id, 'tile create', tile_data::jsonb, old_data, now(), 'loaded from staging_table', load_id);
                     END IF;
                 END LOOP;
             FOR staged_value, tile_id IN
@@ -274,12 +285,18 @@ add_staging_to_tile_function = """
                 LOOP
                     FOR _key, _value IN SELECT * FROM jsonb_each_text(staged_value)
                         LOOP
-                            IF (_value::jsonb ->> 'datatype') = 'file-list' THEN
-                                FOR _file IN SELECT * FROM jsonb_array_elements(_value::jsonb -> 'value') LOOP
-                                    file_id = _file ->> 'file_id';
-                                    UPDATE files SET tileid = tile_id::uuid WHERE fileid::text = file_id;
-                                END LOOP;
-                            END IF;
+                            CASE
+                                WHEN (_value::jsonb ->> 'datatype') = 'file-list' THEN
+                                    FOR _file IN SELECT * FROM jsonb_array_elements(_value::jsonb -> 'value') LOOP
+                                        file_id = _file ->> 'file_id';
+                                        UPDATE files SET tileid = tile_id WHERE fileid::text = file_id;
+                                    END LOOP;
+                                WHEN (_value::jsonb ->> 'datatype') in ('resource-instance-list', 'resource-instance') THEN
+                                    PERFORM __arches_refresh_tile_resource_relationships(tile_id);
+                                WHEN (_value::jsonb ->> 'datatype') = 'geojson-feature-collection' THEN
+                                    PERFORM refresh_tile_geojson_geometries(tile_id);
+                                ELSE
+                            END CASE;
                         END LOOP;
                 END LOOP;
             UPDATE load_event SET (load_end_time, complete, successful) = (now(), true, true) WHERE loadid = load_id;
