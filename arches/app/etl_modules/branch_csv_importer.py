@@ -208,7 +208,7 @@ class BranchCsvImporter:
         content = request.FILES["file"]
         self.temp_dir = os.path.join(settings.APP_ROOT, "tmp", self.loadid)
         try:
-            shutil.rmtree(self.temp_dir) #Remove dir if it already exists. os.mkdir won't overwrite
+            shutil.rmtree(self.temp_dir)  # Remove dir if it already exists. os.mkdir won't overwrite
         except (FileNotFoundError):
             pass
         os.mkdir(self.temp_dir, 0o770)
@@ -229,8 +229,8 @@ class BranchCsvImporter:
         result = {}
         if self.file_details:
             details = json.loads(self.file_details)
-            files = details['result']['summary']['files']
-            summary = details['result']['summary']
+            files = details["result"]["summary"]["files"]
+            summary = details["result"]["summary"]
             with connection.cursor() as cursor:
                 cursor.execute(
                     """INSERT INTO load_event (loadid, etl_module_id, complete, status, load_start_time, user_id) VALUES (%s, %s, %s, %s, %s, %s)""",
@@ -247,7 +247,7 @@ class BranchCsvImporter:
                         ("failed", datetime.now(), self.loadid),
                     )
             shutil.rmtree(self.temp_dir)
-            result['summary'] = summary
+            result["summary"] = summary
         return {"success": result["validation"]["success"], "data": result}
 
     def validate(self, request):
