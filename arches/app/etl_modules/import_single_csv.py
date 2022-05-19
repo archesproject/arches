@@ -100,8 +100,8 @@ class ImportSingleCsv:
         if len(column_names) == 0:
             with connection.cursor() as cursor:
                 cursor.execute(
-                    """UPDATE load_event SET status = %s WHERE loadid = %s""",
-                    ("failed", self.loadid),
+                    """UPDATE load_event SET status = %s, load_end_time = %s WHERE loadid = %s""",
+                    ("failed", datetime.now(), self.loadid),
                 )
             message = "No valid node is selected"
             return {"success": False, "data": message}
@@ -112,8 +112,8 @@ class ImportSingleCsv:
         if len(validation["data"]) != 0:
             with connection.cursor() as cursor:
                 cursor.execute(
-                    """UPDATE load_event SET status = %s WHERE loadid = %s""",
-                    ("failed", self.loadid),
+                    """UPDATE load_event SET status = %s, load_end_time = %s WHERE loadid = %s""",
+                    ("failed", datetime.now(), self.loadid),
                 )
             return {"success": False, "data": "failed"}
         else:

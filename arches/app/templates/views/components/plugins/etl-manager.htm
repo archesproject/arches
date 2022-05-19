@@ -100,15 +100,14 @@
                                         </div>
                                     </td>
                                     <td style="background: #eee; display: block; height: 35px; padding: 10px 15px; border-top: 1px solid rgba(0,0,0,0.14)">
-                                        <!-- ko if: event.complete && event.successful -->
-                                        <a style="color: steelblue; text-decoration: underline; padding-right: 10px; cursor: pointer;" data-bind="click: function() { $parent.cleanLoadEvent(event.loadid) }">{% trans "clean up" %}</a>
+                                        <!-- ko if: event.status == "completed" -->
                                         <a style="color: steelblue; text-decoration: underline; padding-right: 10px; cursor: pointer;" data-bind="click: function() { $parent.reverseTransactions(event.loadid) }">{% trans "undo import" %}</a>
                                         <!-- /ko -->
-                                        <!-- ko if: (event.complete && !event.successful) || !event.load_start_time -->
+                                        <!-- ko if: event.status == "failed" -->
                                         <a style="color: steelblue; text-decoration: underline; padding-right: 10px; cursor: pointer;" data-bind="click: function() { $parent.cleanLoadEvent(event.loadid) }">{% trans "clean up" %}</a>
                                         <!-- /ko -->
-                                        <!-- ko if: !event.complete && event.load_start_time -->
-                                        <a style="color: steelblue; text-decoration: underline; padding-right: 10px; cursor: pointer;" data-bind="click: function() { $parent.cleanLoadEvent(event.loadid) }">{% trans "stop task" %}</a>
+                                        <!-- ko if: event.status == "running" -->
+                                        <a style="color: steelblue; text-decoration: underline; padding-right: 10px; cursor: pointer;" data-bind="click: function() { }">{% trans "stop task" %}</a>
                                         <!-- /ko -->
                                     </td>
                                 </tr>
@@ -162,7 +161,7 @@
                             <h4>{% trans "Loading data" %}</h4>
                             <div>
                                 <span style="font-size: 15px; padding-right: 3px;">{% trans 'Loading status:' %}</span>
-                                <span data-bind="text: selectedLoadEvent().successful ? '{% trans "Finished" %}' : selectedLoadEvent().complete || !selectedLoadEvent().load_start_time ? '{% trans "Failed" %}' : '{% trans "Running" %}'"></span>  
+                                <span data-bind="text: selectedLoadEvent().status == 'completed' ? '{% trans "Completed" %}' : selectedLoadEvent().status == 'failed' ? '{% trans "Failed" %}' : '{% trans "Running" %}'"></span>  
                             </div>
                             <div>
                                 <span style="font-size: 15px; padding-right: 3px;">{% trans 'Loading start:' %}</span>

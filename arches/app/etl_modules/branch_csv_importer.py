@@ -184,8 +184,8 @@ class BranchCsvImporter:
                     except KeyError:
                         with connection.cursor() as cursor:
                             cursor.execute(
-                                """UPDATE load_event SET status = %s WHERE loadid = %s""",
-                                ("failed", self.loadid),
+                                """UPDATE load_event SET status = %s, load_end_time = %s WHERE loadid = %s""",
+                                ("failed", datetime.now(), self.loadid),
                             )
                         raise ValueError("A graphid is not available in the metadata worksheet")
                     nodegroup_lookup, nodes = self.get_graph_tree(graphid)
@@ -235,8 +235,8 @@ class BranchCsvImporter:
         else:
             with connection.cursor() as cursor:
                 cursor.execute(
-                    """UPDATE load_event SET status = %s WHERE loadid = %s""",
-                    ("failed", self.loadid),
+                    """UPDATE load_event SET status = %s, load_end_time = %s WHERE loadid = %s""",
+                    ("failed", datetime.now(), self.loadid),
                 )
         shutil.rmtree(self.temp_dir)
         return {"success": result["validation"]["success"], "data": result}
@@ -259,8 +259,8 @@ class BranchCsvImporter:
             logger.error(e)
             with connection.cursor() as cursor:
                 cursor.execute(
-                    """UPDATE load_event SET status = %s WHERE loadid = %s""",
-                    ("failed", self.loadid),
+                    """UPDATE load_event SET status = %s, load_end_time = %s WHERE loadid = %s""",
+                    ("failed", datetime.now(), self.loadid),
                 )
             return {
                 "status": 400,
@@ -281,8 +281,8 @@ class BranchCsvImporter:
         else:
             with connection.cursor() as cursor:
                 cursor.execute(
-                    """UPDATE load_event SET status = %s WHERE loadid = %s""",
-                    ("failed", self.loadid),
+                    """UPDATE load_event SET status = %s, load_end_time = %s WHERE loadid = %s""",
+                    ("failed", datetime.now(), self.loadid),
                 )
             return {"success": False, "data": "failed"}
 
