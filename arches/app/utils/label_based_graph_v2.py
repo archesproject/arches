@@ -204,11 +204,11 @@ class LabelBasedGraph(object):
 
             # adds metadata that was previously only accessible via API
             return {
-                "displaydescription": resource.displaydescription,
-                "displayname": resource.displayname,
+                "displaydescription": resource.displaydescription(),
+                "displayname": resource.displayname(),
                 "graph_id": resource.graph_id,
                 "legacyid": resource.legacyid,
-                "map_popup": resource.map_popup,
+                "map_popup": resource.map_popup(),
                 "resourceinstanceid": resource.resourceinstanceid,
                 "resource": resource_graph,
             }

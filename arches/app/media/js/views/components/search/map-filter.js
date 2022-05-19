@@ -107,7 +107,7 @@ define([
 
                 this.searchGeometries = ko.observableArray(null);
                 this.searchAggregations = ko.observable();
-                this.drawMode = ko.observable();
+                this.selectedTool = ko.observable();
                 this.geoJSONString = ko.observable(undefined);
                 this.geoJSONErrors = ko.observableArray();
                 this.pageLoaded = false;
@@ -249,7 +249,7 @@ define([
 
                 this.drawModes = _.pluck(this.spatialFilterTypes, 'drawMode');
 
-                this.drawMode.subscribe(function(selectedDrawTool){
+                this.selectedTool.subscribe(function(selectedDrawTool){
                     if(!!selectedDrawTool){
                         if(selectedDrawTool === 'extent'){
                             this.searchByExtent();
@@ -271,7 +271,7 @@ define([
                     var agg = ko.unwrap(self.searchAggregations);
                     var features = [];
                     var mouseoverInstanceId = self.mouseoverInstanceId();
-                    
+
                     if (agg) {
                         _.each(agg.results, function(result) {
                             _.each(result._source.points, function(point) {
@@ -384,7 +384,7 @@ define([
                     })
                     self.searchGeometries(e.features);
                     self.updateFilter();
-                    self.drawMode(undefined);
+                    self.selectedTool(undefined);
                 });
                 this.map().on('draw.update', function(e) {
                     self.searchGeometries(e.features);
@@ -396,7 +396,7 @@ define([
             },
 
             searchByExtent: function() {
-                if (_.contains(this.drawModes, this.drawMode())) {
+                if (_.contains(this.drawModes, this.selectedTool())) {
                     this.draw.deleteAll();
                 }
                 var bounds = this.map().getBounds();
@@ -420,7 +420,7 @@ define([
                 });
                 this.searchGeometries([boundsFeature]);
                 this.updateFilter();
-                this.drawMode(undefined);
+                this.selectedTool(undefined);
             },
 
             useMaxBuffer: function (unit, buffer, maxBuffer) {
@@ -481,7 +481,7 @@ define([
                             this.filter.inverted(feature.properties.inverted);
                         }
                     }, this);
-                    this.drawMode(undefined);
+                    this.selectedTool(undefined);
                     this.geoJSONString(undefined);
                 }
             },
