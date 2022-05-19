@@ -268,7 +268,7 @@ class BranchCsvImporter:
                 "title": _("Failed to complete load"),
                 "message": _("Be sure any resources you are loading do not have resource ids that already exist in the system"),
             }
-        print(row[0][0])
+
         if row[0][0]:
             index_resources_by_transaction(self.loadid, quiet=True, use_multiprocessing=True)
 
