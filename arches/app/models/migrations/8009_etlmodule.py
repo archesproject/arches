@@ -332,6 +332,8 @@ remove_get_resourceid_from_legacyid_trigger = """
     DROP TRIGGER IF EXISTS __arches_get_resourceid_from_legacyid_trigger ON load_staging;
     DROP FUNCTION IF EXISTS __arches_get_resourceid_from_legacyid_trigger_function();
     """
+
+
 class Migration(migrations.Migration):
 
     dependencies = [
@@ -434,5 +436,5 @@ class Migration(migrations.Migration):
         migrations.RunSQL(add_validation_reporting_functions, remove_validation_reporting_functions),
         migrations.RunSQL(add_functions_to_get_nodegroup_tree, remove_functions_to_get_nodegroup_tree),
         migrations.RunSQL(add_staging_to_tile_function, remove_staging_to_tile_function),
-        migrations.RunSQL(add_get_resourceid_from_legacyid_trigger, remove_get_resourceid_from_legacyid_trigger),        
+        migrations.RunSQL(add_get_resourceid_from_legacyid_trigger, remove_get_resourceid_from_legacyid_trigger),
     ]
