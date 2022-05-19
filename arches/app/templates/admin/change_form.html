@@ -70,7 +70,7 @@
                     }
                 };
 
-                request.open("POST", window.location.pathname.replace(/\/admin.*/,'')+"/clear-user-permission-cache/", true);
+                request.open("POST", "{% url 'clear_user_permission_cache' %}", true);
 
                 var csrftoken=self.parentElement.firstChild.value;
                 request.setRequestHeader("X-CSRFToken", csrftoken );
