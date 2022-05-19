@@ -228,9 +228,7 @@ def _index_resource_batch(resourceids):
     return start_index_resources(resources, batch_size, quiet=True, se=_se)
 
 
-def start_index_resources(
-    resources: Iterable[Resource], batch_size=settings.BULK_IMPORT_BATCH_SIZE, quiet=False, progress_bar_title=""
-):
+def start_index_resources(resources: Iterable[Resource], batch_size=settings.BULK_IMPORT_BATCH_SIZE, quiet=False, progress_bar_title=""):
     datatype_factory = DataTypeFactory()
     node_datatypes = {str(nodeid): datatype for nodeid, datatype in models.Node.objects.values_list("nodeid", "datatype")}
     with se.BulkIndexer(batch_size=batch_size, refresh=True, timeout=30, max_retries=10, retry_on_timeout=True) as doc_indexer:
@@ -249,7 +247,6 @@ def start_index_resources(
                 doc_indexer.add(index=RESOURCES_INDEX, id=document["resourceinstanceid"], data=document)
                 for term in terms:
                     term_indexer.add(index=TERMS_INDEX, id=term["_id"], data=term["_source"])
-            
 
     return os.getpid()
 
