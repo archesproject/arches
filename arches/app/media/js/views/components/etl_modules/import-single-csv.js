@@ -124,7 +124,7 @@ define([
                         return graph.graphid == graphId;
                     });
                 }
-                return graph.name;
+                return graph?.name;
             };
 
             this.selectedGraph.subscribe(function(graph){
