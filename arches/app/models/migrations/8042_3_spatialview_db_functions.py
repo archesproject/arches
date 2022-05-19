@@ -491,7 +491,7 @@ class Migration(migrations.Migration):
                         
                         %s
 
-                        create unique index on %s (resourceinstanceid);
+                        create index on %s (resourceinstanceid);
                         
                         ',
                         att_table_name,
