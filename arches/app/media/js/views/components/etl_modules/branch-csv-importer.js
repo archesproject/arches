@@ -2,19 +2,19 @@ define([
     'underscore',
     'knockout',
     'viewmodels/base-import-view-model',
-    'viewmodels/alert',
     'arches',
+    'viewmodels/alert',
     'dropzone',
     'bindings/select2-query',
     'bindings/dropzone',
-], function(_, ko, ImporterViewModel, AlertViewModel, arches, dropzone) {
+], function(_, ko, ImporterViewModel, arches, AlertViewModel) {
     return ko.components.register('branch-csv-importer', {
         viewModel: function(params) {
             const self = this;
-
-            this.load_details = params.load_details;
+            this.loadDetails = params.load_details || ko.observable();
             this.state = params.state;
             this.loading = params.loading || ko.observable();
+            this.data2 = ko.observable(false);
 
             this.moduleId = params.etlmoduleid;
             ImporterViewModel.apply(this, arguments);
@@ -25,13 +25,12 @@ define([
 
             this.toggleDownloadMode = () => {
                 this.downloadMode(!this.downloadMode());
-            } 
+            };
 
             function getCookie(name) {
                 if (!document.cookie) {
                     return null;
                 }
-                
                 const xsrfCookies = document.cookie.split(';')
                     .map(c => c.trim())
                     .filter(c => c.startsWith(name + '='));
@@ -43,8 +42,8 @@ define([
             }
 
             this.downloadTemplate = async () => {
-                const url = `/etl-manager`
-                const formData = new FormData();
+                const url = `/etl-manager`;
+                const formData = new window.FormData();
                 formData.append("id", ko.unwrap(this.selectedTemplate));
                 formData.append("format", "xls");
                 formData.append("module", ko.unwrap(self.moduleId));;
@@ -62,21 +61,21 @@ define([
 
                 const blob = await response.blob();
                 const urlObject = window.URL.createObjectURL(blob);
-                const a = document.createElement('a');
-                document.body.appendChild(a);
+                const a = window.document.createElement('a');
+                window.document.body.appendChild(a);
                 a.href = urlObject;
-                a.download = `${this.templates().filter(x => x.id == this.selectedTemplate())[0].text}%20-%20Template.xls`;
+                a.download = `${this.templates().filter(x => x.id == this.selectedTemplate())[0].text}.xls`;
                 a.click();
 
                 setTimeout(() => {
                     window.URL.revokeObjectURL(urlObject);
-                    document.body.removeChild(a);
+                    window.document.body.removeChild(a);
                 }, 0);
                 this.loading(false);
             };
 
             const getGraphs = async function() {
-                let response = await fetch(arches.urls.graphs_api);
+                const response = await fetch(arches.urls.graphs_api);
                 if (response.ok) {
                     let graphs = await response.json();
                     let templates = graphs.map(function(graph){
@@ -84,51 +83,63 @@ define([
                     });
                     self.templates(templates);
                 }
-              }
+            };
 
             getGraphs();
 
-            this.addFile = function(file){
+            this.addFile = async function(file){
                 self.loading(true);
                 self.fileInfo({name: file.name, size: file.size});
-                self.formData.append('file', file, file.name);
+                const formData = new window.FormData();
+                formData.append('file', file, file.name);
+                const response = await self.submit('read', formData);
+                if (response.ok) {
+                    const data = await response.json();
+                    self.loading(false);
+                    self.response(data);
+                    self.loadDetails(data);
+                } else {
+                    // eslint-disable-next-line no-console
+                    console.log('error');
+                    self.loading(false);
+                }
+            };
 
-                self.submit('start').then(function(response){
-                    if (response.ok) {
-                        return response.json();
-                    }
-                }).then(function() {
-                    params.activeTab("import");
-                    self.submit('read').then(function(response){
-                        self.fileAdded(true);
-                        self.loading(false);
-                    })
-                }).catch(function(err) {    
-                        // eslint-disable-next-line no-console
-                        console.log(err);
-                        self.loading(false);
-                });
+            this.start = async function(){
+                self.loading(true);
+                const formData = new window.FormData();
+                formData.append('load_details', JSON.stringify(self.loadDetails()));
+                const response = await self.submit('start', formData);
+                params.activeTab("import");
+                if (response.ok) {
+                    const data = await response.json();
+                    self.loading(false);
+                    self.response(data); 
+                } else {
+                    self.loading(false);
+                }
+            
             };
         
-            this.write = function(){
-                self.loading(true);
-                self.loadStatus("loading");
-                self.submit('write').then(function(response){
-                    self.loading(false);
-                    return response.json();
-                }).then(function(response) {
-                    if (response?.result === "success"){
-                        self.loadStatus('successful');
-                    } else {
-                        self.alert(new AlertViewModel('ep-alert-red', response.title, response.message));
-                        self.loadStatus('failed');
-                    }
-                }).catch(function(err) {    
-                    // eslint-disable-next-line no-console
-                    console.log(err);
-                    self.loadStatus('failed');
-                });
-            };    
+            // this.write = function(){
+            //     self.loading(true);
+            //     self.loadStatus("loading");
+            //     self.submit('write').then(function(response){
+            //         self.loading(false);
+            //         return response.json();
+            //     }).then(function(response) {
+            //         if (response?.result === "success"){
+            //             self.loadStatus('successful');
+            //         } else {
+            //             self.alert(new AlertViewModel('ep-alert-red', response.title, response.message));
+            //             self.loadStatus('failed');
+            //         }
+            //     }).catch(function(err) {    
+            //         // eslint-disable-next-line no-console
+            //         console.log(err);
+            //         self.loadStatus('failed');
+            //     });
+            // };    
         },
         template: { require: 'text!templates/views/components/etl_modules/branch-csv-importer.htm' }
     });
