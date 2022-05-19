@@ -121,9 +121,10 @@
 <div>
     <h4>{% trans "Import Single CSV" %}</h4>
     <!-- ko if: load_details -->
+    <!-- ko ifnot: loading() -->
     <div>
         <span style="font-size: 15px; padding-right: 3px;">{% trans 'Target Resource:' %}</span>
-        <span data-bind="text: load_details.graph"></span>    
+        <span data-bind="text: getGraphName(load_details.graph)"></span>
     </div>
     <div>
         <span style="font-size: 15px; padding-right: 3px;">{% trans 'Target Fields:' %}</span>
@@ -131,6 +132,7 @@
         <span data-bind="text: $data.node"></span><span>;</span>
         <!-- /ko -->
     </div>
+    <!-- /ko -->
     <!-- /ko -->
 </div>
 {% endblock etl_status %}

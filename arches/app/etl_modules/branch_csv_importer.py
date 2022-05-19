@@ -182,8 +182,8 @@ class BranchCsvImporter:
                 graphid = workbook.get_sheet_by_name("metadata")["B1"].value
             except KeyError:
                 cursor.execute(
-                    """UPDATE load_event SET status = %s WHERE loadid = %s""",
-                    ("failed", self.loadid),
+                    """UPDATE load_event SET status = %s, load_end_time = %s WHERE loadid = %s""",
+                    ("failed", datetime.now(), self.loadid),
                 )
                 raise ValueError("A graphid is not available in the metadata worksheet")
             nodegroup_lookup, nodes = self.get_graph_tree(graphid)
@@ -243,8 +243,8 @@ class BranchCsvImporter:
                     self.write(request)
                 else:
                     cursor.execute(
-                        """UPDATE load_event SET status = %s WHERE loadid = %s""",
-                        ("failed", self.loadid),
+                        """UPDATE load_event SET status = %s, load_end_time = %s WHERE loadid = %s""",
+                        ("failed", datetime.now(), self.loadid),
                     )
             shutil.rmtree(self.temp_dir)
             result['summary'] = summary
@@ -268,8 +268,8 @@ class BranchCsvImporter:
             logger.error(e)
             with connection.cursor() as cursor:
                 cursor.execute(
-                    """UPDATE load_event SET status = %s WHERE loadid = %s""",
-                    ("failed", self.loadid),
+                    """UPDATE load_event SET status = %s, load_end_time = %s WHERE loadid = %s""",
+                    ("failed", datetime.now(), self.loadid),
                 )
             return {
                 "status": 400,
@@ -277,7 +277,7 @@ class BranchCsvImporter:
                 "title": _("Failed to complete load"),
                 "message": _("Be sure any resources you are loading do not have resource ids that already exist in the system"),
             }
-        print(row[0][0])
+
         if row[0][0]:
             index_resources_by_transaction(self.loadid, quiet=True, use_multiprocessing=True)
 
@@ -290,8 +290,8 @@ class BranchCsvImporter:
         else:
             with connection.cursor() as cursor:
                 cursor.execute(
-                    """UPDATE load_event SET status = %s WHERE loadid = %s""",
-                    ("failed", self.loadid),
+                    """UPDATE load_event SET status = %s, load_end_time = %s WHERE loadid = %s""",
+                    ("failed", datetime.now(), self.loadid),
                 )
             return {"success": False, "data": "failed"}
 
