@@ -1,3 +1,4 @@
+from typing import Iterable
 import django
 
 django.setup()
@@ -17,7 +18,6 @@ from arches.app.search.mappings import TERMS_INDEX, CONCEPTS_INDEX, RESOURCE_REL
 from arches.app.datatypes.datatypes import DataTypeFactory
 from arches.app.utils import import_class_from_string
 from datetime import datetime
-from arches.app.search.search_engine_factory import SearchEngineInstance
 
 
 import multiprocessing
@@ -229,15 +229,10 @@ def _index_resource_batch(resourceids):
 
 
 def start_index_resources(
-    resources, batch_size=settings.BULK_IMPORT_BATCH_SIZE, quiet=False, progress_bar_title="", se: SearchEngineInstance = None
+    resources: Iterable[Resource], batch_size=settings.BULK_IMPORT_BATCH_SIZE, quiet=False, progress_bar_title=""
 ):
-    if se is None:
-        from arches.app.search.search_engine_factory import SearchEngineInstance as _se
-
-        se = _se
     datatype_factory = DataTypeFactory()
     node_datatypes = {str(nodeid): datatype for nodeid, datatype in models.Node.objects.values_list("nodeid", "datatype")}
-    print("starting update")
     with se.BulkIndexer(batch_size=batch_size, refresh=True, timeout=30, max_retries=10, retry_on_timeout=True) as doc_indexer:
         with se.BulkIndexer(batch_size=batch_size, refresh=True, timeout=30, max_retries=10, retry_on_timeout=True) as term_indexer:
             if quiet is False:
@@ -249,9 +244,12 @@ def start_index_resources(
                 document, terms = resource.get_documents_to_index(
                     fetchTiles=True, datatype_factory=datatype_factory, node_datatypes=node_datatypes
                 )
+
+                resource.save()
                 doc_indexer.add(index=RESOURCES_INDEX, id=document["resourceinstanceid"], data=document)
                 for term in terms:
                     term_indexer.add(index=TERMS_INDEX, id=term["_id"], data=term["_source"])
+            
 
     return os.getpid()
 
