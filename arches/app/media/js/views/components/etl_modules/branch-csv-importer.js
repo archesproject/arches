@@ -118,28 +118,7 @@ define([
                 } else {
                     self.loading(false);
                 }
-            
             };
-        
-            // this.write = function(){
-            //     self.loading(true);
-            //     self.loadStatus("loading");
-            //     self.submit('write').then(function(response){
-            //         self.loading(false);
-            //         return response.json();
-            //     }).then(function(response) {
-            //         if (response?.result === "success"){
-            //             self.loadStatus('successful');
-            //         } else {
-            //             self.alert(new AlertViewModel('ep-alert-red', response.title, response.message));
-            //             self.loadStatus('failed');
-            //         }
-            //     }).catch(function(err) {    
-            //         // eslint-disable-next-line no-console
-            //         console.log(err);
-            //         self.loadStatus('failed');
-            //     });
-            // };    
         },
         template: { require: 'text!templates/views/components/etl_modules/branch-csv-importer.htm' }
     });
