@@ -316,7 +316,7 @@ add_get_resourceid_from_legacyid_trigger = """
     RETURNS trigger AS $$
     BEGIN
         IF NEW.legacyid IN (SELECT legacyid FROM resource_instances WHERE legacyid = NEW.legacyid) THEN
-            NEW.resourceid = (SELECT resourceinstanceid FROM resource_instances WHERE legacyid = NEW.legacyid);
+            SELECT resourceinstanceid FROM resource_instances INTO NEW.resourceid WHERE legacyid = NEW.legacyid;
         END IF;
         RETURN NEW;
     END;
