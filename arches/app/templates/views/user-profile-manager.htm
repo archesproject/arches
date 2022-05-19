@@ -271,176 +271,185 @@
 
                 <!-- Notification Settings -->
                 <section class="profile-list">
-                    <div class="col-sm-3">
-                        <h3 class="profile-header">
-                            {% trans 'Notification Settings' %}
-                        </h3>
-                    </div>
+                    <div class="row">
+                        <div class="col-sm-3">
+                            <h3 class="profile-header">
+                                {% trans 'Notification Settings' %}
+                            </h3>
+                        </div>
 
-                    <div class="col-sm-9 profile-notif-settings">
-                        <div class="row">
-                            <table class="notif-table table-striped">
-                                <thead>
-                                    <tr>
-                                        <th>{% trans 'Trigger' %}</th>
-                                        <th class="notif-type">{% trans 'Email Notification' %}</th>
-                                        <th class="notif-type">{% trans 'Web Notification' %}</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    <!-- ko foreach: notifTypeObservables -->
-                                    <tr>
-                                        <td data-bind="text:name"></td>
-                                        <td>
-                                            <label class="control-label widget-input-label-notif">
-                                                <span class="switch switch-small arches-switch" data-bind="css: {'on': emailnotify()}, click: function(){emailnotify(!emailnotify())}" tabindex="0" onkeyup="if(event.which == 13 || event.keyCode == 13){ $(this).trigger('click'); }" aria-label="Notify by email"><small></small></span>{% trans 'Enable' %}
-                                            </label>
-                                        </td>
-                                        <td>
-                                            <label class="control-label widget-input-label-notif">
-                                                <span class="switch switch-small arches-switch" data-bind="css: {'on': webnotify()}, click: function(){webnotify(!webnotify())}" tabindex="0" onkeyup="if(event.which == 13 || event.keyCode == 13){ $(this).trigger('click'); }" aria-label="Notify by web"><small></small></span>{% trans 'Enable' %}
-                                            </label>
-                                        </td>
-                                    </tr>
-                                    <!-- <tr>
-                                        <td>{% trans 'Exporting Search Results' %}</td>
-                                        <td>
-                                            <label class="control-label widget-input-label">
-                                                <span class="switch switch-small arches-switch" data-bind="css: {'on': toggleSearchExportEmailNotifs()}, click: function(){toggleSearchExportEmailNotifs(!toggleSearchExportEmailNotifs())}"><small></small></span>
-                                            </label>
-                                        </td>
-                                        <td>
-                                            <label class="control-label widget-input-label">
-                                                <span class="switch switch-small arches-switch" data-bind="css: {'on': toggleSearchExportWebNotifs()}, click: function(){toggleSearchExportWebNotifs(!toggleSearchExportWebNotifs())}"><small></small></span>
-                                            </label>
-                                        </td>
-                                    </tr> -->
-                                    <!-- /ko -->
-                                </tbody>
-                            </table>
+                        <div class="col-sm-9 profile-notif-settings">
+                            <div class="row">
+                                <table class="notif-table table-striped">
+                                    <thead>
+                                        <tr>
+                                            <th>{% trans 'Trigger' %}</th>
+                                            <th class="notif-type">{% trans 'Email Notification' %}</th>
+                                            <th class="notif-type">{% trans 'Web Notification' %}</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <!-- ko foreach: notifTypeObservables -->
+                                        <tr>
+                                            <td data-bind="text:name"></td>
+                                            <td>
+                                                <label class="control-label widget-input-label-notif">
+                                                    <span class="switch switch-small arches-switch" data-bind="css: {'on': emailnotify()}, click: function(){emailnotify(!emailnotify())}" tabindex="0" onkeyup="if(event.which == 13 || event.keyCode == 13){ $(this).trigger('click'); }" aria-label="Notify by email"><small></small></span>{% trans 'Enable' %}
+                                                </label>
+                                            </td>
+                                            <td>
+                                                <label class="control-label widget-input-label-notif">
+                                                    <span class="switch switch-small arches-switch" data-bind="css: {'on': webnotify()}, click: function(){webnotify(!webnotify())}" tabindex="0" onkeyup="if(event.which == 13 || event.keyCode == 13){ $(this).trigger('click'); }" aria-label="Notify by web"><small></small></span>{% trans 'Enable' %}
+                                                </label>
+                                            </td>
+                                        </tr>
+                                        <!-- <tr>
+                                            <td>{% trans 'Exporting Search Results' %}</td>
+                                            <td>
+                                                <label class="control-label widget-input-label">
+                                                    <span class="switch switch-small arches-switch" data-bind="css: {'on': toggleSearchExportEmailNotifs()}, click: function(){toggleSearchExportEmailNotifs(!toggleSearchExportEmailNotifs())}"><small></small></span>
+                                                </label>
+                                            </td>
+                                            <td>
+                                                <label class="control-label widget-input-label">
+                                                    <span class="switch switch-small arches-switch" data-bind="css: {'on': toggleSearchExportWebNotifs()}, click: function(){toggleSearchExportWebNotifs(!toggleSearchExportWebNotifs())}"><small></small></span>
+                                                </label>
+                                            </td>
+                                        </tr> -->
+                                        <!-- /ko -->
+                                    </tbody>
+                                </table>
+                            </div>
                         </div>
                     </div>
                 </section>
 
                 <section class="profile-list">
-                    <h3 class="profile-header">
-                        {% trans 'Arches Collector Projects' %}
-                    </h3>
-                    <!--ko if: mobilesurveys.length === 0 -->
-                    <div id="default-mobile-projects" class="profile-default-message-panel">
-                        {% trans "Sorry, but you haven't been invited to a project yet..." %}
-                    </div>
-                    <!--/ko-->
-
-                    <!--ko if: mobilesurveys.length > 0 -->
-                    <!-- Survey Invitations List -->
-                    <div id="mobile-projects-list" class="profile-default-message-panel">
-                        <div class="row">
-
-                            <!-- Find a survey -->
-                            <div class="col-sm-9 col-sm-offset-3 relative">
-                                <div class="project-search-widget">
-                                    <input type="text" class="form-control" placeholder="{% trans 'Find a project...' %}" aria-label="{% trans 'Find a project...' %}" data-bind="value: mobileSurveyFilter, valueUpdate: 'keyup'">
-                                    <span class="clear-node-search" data-bind="visible: mobileSurveyFilter().length > 0, click: function() { mobileSurveyFilter(''); }" tabindex="0" onkeyup="if(event.which == 13 || event.keyCode == 13){ $(this).trigger('click'); }" aria-label="Mobile survey filter"><i class="fa fa-times-circle"></i></span>
-                                </div>
-                            </div>
+                    <div class="row">
+                    
+                        <div class="col-sm-3">
+                            <h3 class="profile-header">
+                                {% trans 'Arches Collector Projects' %}
+                            </h3>
                         </div>
+                        
+                        <!--ko if: mobilesurveys.length === 0 -->
+                        <div id="default-mobile-projects" class="profile-default-message-panel">
+                            {% trans "Sorry, but you haven't been invited to a project yet..." %}
+                        </div>
+                        <!--/ko-->
 
-                        <!-- Survey List -->
-                        <div class="row">
-                            <div class="col-sm-9 col-sm-offset-3 mar-top">
-                                <div>
-                                    <!--ko foreach: {data: filteredMobileSurveys(), as: 'vm'} -->
-                                    <div class="project-panel">
-
-                                        <div class="project-panel-header">
-                                            <div class="user-survey">
-                                                <div class="project-status" data-bind="text:vm.mobilesurvey.active() ? '{% trans "Active" %}' : '{% trans "Inactive" %}', css: {active: vm.mobilesurvey.active()}"></div>
-                                                <ul class="project-metadata">
-                                                    <li class="project-metadata-item">
-                                                        <span data-bind="text: vm.mobilesurvey.startdate() || '?'"></span>
-                                                        {% trans 'to' %}
-                                                        <span data-bind="text: vm.mobilesurvey.enddate() || '?'"></span>
-                                                    </li>
-                                                </ul>
-                                            </div>
-                                            <h3 class="project-panel-title" data-bind="text: vm.mobilesurvey.name() === '' ? '{% trans "Unnamed Survey" %}' : vm.mobilesurvey.name()"></h3>
-
-                                            <div>
-                                                <div class="project-details">
-                                                    <a href="#" id="view-project-details-btn" class="text-primary text-semibold" data-bind="click: function(val){val.mobilesurvey.toggleShowDetails();}" tabindex="0" onkeyup="if(event.which == 13 || event.keyCode == 13){ $(this).trigger('click'); }">{% trans 'View Details' %}</a>
-                                                </div>
-                                            </div>
-                                        </div>
-
-                                        <div class='profile-mpm-panel' data-bind="css: {'show-details': vm.mobilesurvey.showDetails}">
-                                            <div>
-                                                <p class="mpm-item-listing-header" style="margin-bottom: 0px;">
-                                                    {% trans 'Project Summary' %}
-                                                </p>
-                                                <ul class="mpm-node-detail-metadata">
-                                                    <li>
-                                                        {% trans "Number of edits:" %} 0
-                                                    </li>
-                                                    <li>
-                                                        {% trans "Contributors:" %} 0
-                                                    </li>
-                                                    <li>
-                                                        {% trans "Offline Basemap:" %} {% trans "Streets-Grey" %}
-                                                    </li>
-                                                </ul>
-                                            </div>
-
-                                            <div>
-                                                <p class="mpm-item-listing-header" style="margin-bottom: 0px;">
-                                                    {% trans 'Groups/Users' %}
-                                                </p>
-                                                <ul class="mpm-node-detail-metadata">
-                                                    <li>
-
-                                                        {% trans 'Groups' %} (<span data-bind="text: vm.mobilesurvey.groups().length"></span>)
-                                                        <ul class="mpm-node-detail-metadata" data-bind="foreach: _.filter(vm.mobilesurvey.identities, function(id){return (id.type === 'group' && _.contains(mobilesurvey.groups(), id.id))})">
-                                                            <li data-bind="text: $data.name"></li>
-                                                        </ul>
-                                                    </li>
-                                                </ul>
-                                                <ul class="mpm-node-detail-metadata">
-                                                    <li>
-                                                        {% trans 'Users' %} (<span data-bind="text: vm.mobilesurvey.users().length"></span>)
-                                                        <ul class="mpm-node-detail-metadata" data-bind="foreach: _.filter(vm.mobilesurvey.identities, function(id){return (id.type === 'user' && _.contains(vm.mobilesurvey.users(), id.id))})">
-                                                            <li data-bind="text: $data.name"></li>
-                                                        </ul>
-                                                    </li>
-                                                </ul>
-                                            </div>
-
-                                            <div>
-                                                <p class="mpm-item-listing-header" style="margin-bottom: 0px;">
-                                                    {% trans 'Models and Data Entry Cards' %}
-                                                </p>
-
-                                                <ul class="mpm-node-detail-metadata">
-                                                    <!--ko foreach: {data: vm.resources, as: 'resource'} -->
-                                                    <li>
-                                                        <div data-bind="text: resource.name + ' (' + resource.cards.length + ' data entry cards)'"></div>
-                                                        <!--ko foreach: {data: resource.cards, as: 'card'} -->
-                                                        <ul class="mpm-node-detail-metadata">
-                                                            <li data-bind="text: card.name"></li>
-                                                        </ul>
-                                                        <!--/ko-->
-                                                    </li>
-                                                    <!--/ko-->
-                                                </ul>
-                                            </div>
-
+                        <!--ko if: mobilesurveys.length > 0 -->
+                        <!-- Survey Invitations List -->
+                        <div class="col-sm-9">
+                            <div id="mobile-projects-list" class="profile-default-message-panel">
+                                <div class="row">
+                                    <!-- Find a survey -->
+                                    <div class="relative">
+                                        <div class="project-search-widget">
+                                            <input type="text" class="form-control" placeholder="{% trans 'Find a project...' %}" aria-label="{% trans 'Find a project...' %}" data-bind="value: mobileSurveyFilter, valueUpdate: 'keyup'">
+                                            <span class="clear-node-search" data-bind="visible: mobileSurveyFilter().length > 0, click: function() { mobileSurveyFilter(''); }" tabindex="0" onkeyup="if(event.which == 13 || event.keyCode == 13){ $(this).trigger('click'); }" aria-label="Mobile survey filter"><i class="fa fa-times-circle"></i></span>
                                         </div>
                                     </div>
-                                    <!-- /ko -->
+                                </div>
+
+                                <!-- Survey List -->
+                                <div class="row">
+                                    <div class="mar-top">
+                                        <div>
+                                            <!--ko foreach: {data: filteredMobileSurveys(), as: 'vm'} -->
+                                            <div class="project-panel">
+
+                                                <div class="project-panel-header">
+                                                    <div class="user-survey">
+                                                        <div class="project-status" data-bind="text:vm.mobilesurvey.active() ? '{% trans "Active" %}' : '{% trans "Inactive" %}', css: {active: vm.mobilesurvey.active()}"></div>
+                                                        <ul class="project-metadata">
+                                                            <li class="project-metadata-item">
+                                                                <span data-bind="text: vm.mobilesurvey.startdate() || '?'"></span>
+                                                                {% trans 'to' %}
+                                                                <span data-bind="text: vm.mobilesurvey.enddate() || '?'"></span>
+                                                            </li>
+                                                        </ul>
+                                                    </div>
+                                                    <h3 class="project-panel-title" data-bind="text: vm.mobilesurvey.name() === '' ? '{% trans "Unnamed Survey" %}' : vm.mobilesurvey.name()"></h3>
+
+                                                    <div>
+                                                        <div class="project-details">
+                                                            <a href="#" id="view-project-details-btn" class="text-primary text-semibold" data-bind="click: function(val){val.mobilesurvey.toggleShowDetails();}" tabindex="0" onkeyup="if(event.which == 13 || event.keyCode == 13){ $(this).trigger('click'); }">{% trans 'View Details' %}</a>
+                                                        </div>
+                                                    </div>
+                                                </div>
+
+                                                <div class='profile-mpm-panel' data-bind="css: {'show-details': vm.mobilesurvey.showDetails}">
+                                                    <div>
+                                                        <p class="mpm-item-listing-header" style="margin-bottom: 0px;">
+                                                            {% trans 'Project Summary' %}
+                                                        </p>
+                                                        <ul class="mpm-node-detail-metadata">
+                                                            <li>
+                                                                {% trans "Number of edits:" %} 0
+                                                            </li>
+                                                            <li>
+                                                                {% trans "Contributors:" %} 0
+                                                            </li>
+                                                            <li>
+                                                                {% trans "Offline Basemap:" %} {% trans "Streets-Grey" %}
+                                                            </li>
+                                                        </ul>
+                                                    </div>
+
+                                                    <div>
+                                                        <p class="mpm-item-listing-header" style="margin-bottom: 0px;">
+                                                            {% trans 'Groups/Users' %}
+                                                        </p>
+                                                        <ul class="mpm-node-detail-metadata">
+                                                            <li>
+
+                                                                {% trans 'Groups' %} (<span data-bind="text: vm.mobilesurvey.groups().length"></span>)
+                                                                <ul class="mpm-node-detail-metadata" data-bind="foreach: _.filter(vm.mobilesurvey.identities, function(id){return (id.type === 'group' && _.contains(mobilesurvey.groups(), id.id))})">
+                                                                    <li data-bind="text: $data.name"></li>
+                                                                </ul>
+                                                            </li>
+                                                        </ul>
+                                                        <ul class="mpm-node-detail-metadata">
+                                                            <li>
+                                                                {% trans 'Users' %} (<span data-bind="text: vm.mobilesurvey.users().length"></span>)
+                                                                <ul class="mpm-node-detail-metadata" data-bind="foreach: _.filter(vm.mobilesurvey.identities, function(id){return (id.type === 'user' && _.contains(vm.mobilesurvey.users(), id.id))})">
+                                                                    <li data-bind="text: $data.name"></li>
+                                                                </ul>
+                                                            </li>
+                                                        </ul>
+                                                    </div>
+
+                                                    <div>
+                                                        <p class="mpm-item-listing-header" style="margin-bottom: 0px;">
+                                                            {% trans 'Models and Data Entry Cards' %}
+                                                        </p>
+
+                                                        <ul class="mpm-node-detail-metadata">
+                                                            <!--ko foreach: {data: vm.resources, as: 'resource'} -->
+                                                            <li>
+                                                                <div data-bind="text: resource.name + ' (' + resource.cards.length + ' data entry cards)'"></div>
+                                                                <!--ko foreach: {data: resource.cards, as: 'card'} -->
+                                                                <ul class="mpm-node-detail-metadata">
+                                                                    <li data-bind="text: card.name"></li>
+                                                                </ul>
+                                                                <!--/ko-->
+                                                            </li>
+                                                            <!--/ko-->
+                                                        </ul>
+                                                    </div>
+
+                                                </div>
+                                            </div>
+                                            <!-- /ko -->
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
                         </div>
+                        <!--/ko-->
                     </div>
-                    <!--/ko-->
                 </section>
             </div>
 

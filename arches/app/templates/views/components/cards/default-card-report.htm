@@ -12,7 +12,7 @@
 
         <div class="rp-card-section" data-bind="event : { dblclick: function(){tile.selected(true) }}, css: {'provisional': ko.unwrap(tile.provisionaledits) !== null && tile.userisreviewer === false, 'fullyprovisional': tile.isfullyprovisional()}, attr: {id: tile.tileid}">
             <!-- ko if: $index() !== 0 --><hr class="rp-tile-separator"><!-- /ko -->
-            <div style="display: inline-flex; width: 100%; justify-content: space-between;">
+            <div class="rp-card-section-contents">
                 <span data-bind="visible: tile.parent.model.get('widgets')().length === 0"></span>
                     {% block report_widgets %}
                     <!-- ko if: tile.parent.model.get('widgets')().length > 0 -->
@@ -45,7 +45,13 @@
                         <!-- ko if: tile.parent.selected() && tile.parent.cardinality == 'n' -->
                         <i class="fa fa-copy" tabindex="0" data-bind="click: function(){tile.parent.copyTile(tile)}" aria-label="Copy" onkeyup="if(event.which == 13 || event.keyCode == 13){ $(this).trigger('click'); }"></i>
                         <!-- /ko -->
-                        <i class="fa fa-pencil" tabindex="0" data-bind="click: function(){tile.selected(true)}" aria-label="Edit" onkeyup="if(event.which == 13 || event.keyCode == 13){ $(this).trigger('click'); }"></i>
+                        <i 
+                            class="fa fa-pencil"
+                            tabindex="0" 
+                            data-bind="
+                            	click: function(){if ($parent?.form?.workflowId) { $parent.selectWorkflowTile(tile); } else { tile.selected(true); } }
+                            " aria-label="Edit" onkeyup="if(event.which == 13 || event.keyCode == 13){ $(this).trigger('click'); }"
+                        ></i>
                         <i class="fa fa-trash" tabindex="0" data-bind="click: function(){console.log(tile); tile.deleteTile()}" aria-label="Delete" onkeyup="if(event.which == 13 || event.keyCode == 13){ $(this).trigger('click'); }"></i>
                     </div>
                     <!-- /ko -->

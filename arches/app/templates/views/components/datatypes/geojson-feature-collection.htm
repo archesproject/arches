@@ -10,35 +10,26 @@
     </div>
     <!-- /ko -->
 
-    <h3 class="config-title" style="margin-top: -10px; margin-bottom: 0px;"><i class="fa fa-binoculars"></i> {% trans "Layer Preview" %} <span class="service-url text-semibold" data-bind="text: serviceURL"></span></h3>
-
-    <div class="map-service-manage-buttons">
-        <div class="form-group">
-            <label class="control-label text-semibold">{% trans "Activated:" %}</label>
-            <span tabindex="0" class="switch switch-small" data-bind="css: {
-                    'on': config.layerActivated()
-                }, click: function () {
-                    config.layerActivated(!config.layerActivated());
-                }" onkeyup="if(event.which == 13 || event.keyCode == 13){ $(this).trigger('click'); }">
-                <small></small>
-            </span>
+    <div class="row">
+        <div class="col-xs-6 col-sm-6 col-md-8 col-lg-9" style="padding-left: 15px;">
+            <h3 class="config-title" style="margin-top: -10px; margin-bottom: 0px;">
+                <i class="fa fa-binoculars"></i> {% trans "Layer Preview" %}
+                <span class="hidden-xs hidden-sm service-url text-semibold" data-bind="text: serviceURL"></span>
+            </h3>
         </div>
-        
-        <div class="col-xs-12 col-sm-6 col-md-4 col-lg-3" style="top: -10px; left: -2px;">
-        
+        <div class="col-xs-6 col-sm-6 col-md-4 col-lg-3" style="top: -10px; left: -2px;">
             <div class="map-service-manage-buttons">
                 <div class="form-group">
                     <label class="control-label text-semibold">{% trans "Activated:" %}</label>
-                    <span tabindex="0" class="switch switch-small" data-bind="css: {
+                    <span class="switch switch-small" data-bind="css: {
                             'on': config.layerActivated()
                         }, click: function () {
                             config.layerActivated(!config.layerActivated());
-                        }" onkeyup="if(event.which == 13 || event.keyCode == 13){ $(this).trigger('click'); }">
+                        }">
                         <small></small>
                     </span>
                 </div>
             </div>
-            
             <div class="btn-group map-server-basemap-button">
                 <button class="dropdown-toggle btn" data-toggle="dropdown" aria-expanded="false"><i class="fa fa-globe"></i></button>
                 <ul class="dropdown-menu dropdown-menu-right">
@@ -47,9 +38,7 @@
                     <!-- /ko -->
                 </ul>
             </div>
-
         </div>
-
     </div>
 
     <!-- ko if: !loading() -->
@@ -131,7 +120,7 @@
                                                 </div>
 
                                                 <div style="position: absolute; left: 110px; top: 10px;">
-                                                    <input type="text" class="form-control" style="width: 366px; height: 36px;" placeholder="{% trans "Find an icon" %}" aria-label="{% trans "Find an icon" %}" data-bind="value:iconFilter, valueUpdate: 'keyup'">
+                                                    <input type="text" class="form-control" style="height: 36px;" placeholder="{% trans "Find an icon" %}" aria-label="{% trans "Find an icon" %}" data-bind="value:iconFilter, valueUpdate: 'keyup'">
 
                                                     <!-- ko if: iconFilter() !== '' -->
                                                     <span tabindex="0" class="clear-search" style="position: absolute; left: 345px; top: 5px; color: #123; font-size: 17px;" data-bind="click: function () { iconFilter(''); }" onkeyup="if(event.which == 13 || event.keyCode == 13){ $(this).trigger('click'); }"><i class="fa fa-times-circle"></i></span>
