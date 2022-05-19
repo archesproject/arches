@@ -428,7 +428,7 @@ define([
         };
 
         this.onFeatureClick = function(features, lngLat, MapboxGl) {
-            var popupTemplate = mapPopupProvider.getPopupTemplate(features);
+            const popupTemplate = this.popupTemplate ? this.popupTemplate : mapPopupProvider.getPopupTemplate(features);
             const map = self.map();
             const mapStyle = map.getStyle();
             self.popup = new MapboxGl.Popup()
@@ -478,7 +478,7 @@ define([
                         if (hoverFeature && hoverFeature.id && style) map.setFeatureState(hoverFeature, { hover: false });
                         hoverFeature = _.find(
                             map.queryRenderedFeatures(e.point),
-                            mapPopupProvider.isFeatureClickable
+                            feature => mapPopupProvider.isFeatureClickable(feature, self.selectedTool())
                         );
                         if (hoverFeature && hoverFeature.id && style) map.setFeatureState(hoverFeature, { hover: true });
 
@@ -499,7 +499,7 @@ define([
                     map.on('click', function(e) {
                         const popupFeatures = _.filter(
                             map.queryRenderedFeatures(e.point),
-                            mapPopupProvider.isFeatureClickable
+                            feature => mapPopupProvider.isFeatureClickable(feature, self.selectedTool())
                         );
                         if (popupFeatures.length) {
                             self.onFeatureClick(popupFeatures, e.lngLat, MapboxGl);

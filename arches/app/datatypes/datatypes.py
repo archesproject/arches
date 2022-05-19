@@ -490,11 +490,11 @@ class EDTFDataType(BaseDataType):
     def transform_value_for_tile(self, value, **kwargs):
         transformed_value = ExtendedDateFormat(value)
         if transformed_value.edtf is None:
-            return value, False
-        return str(transformed_value.edtf), True
+            return value
+        return str(transformed_value.edtf)
 
     def pre_tile_save(self, tile, nodeid):
-        tile.data[nodeid], valid = self.transform_value_for_tile(tile.data[nodeid])
+        tile.data[nodeid] = self.transform_value_for_tile(tile.data[nodeid])
 
     def validate(self, value, row_number=None, source="", node=None, nodeid=None, strict=False):
         errors = []
@@ -1970,7 +1970,7 @@ class ResourceInstanceDataType(BaseDataType):
             try:
                 resourceid = resourceXresource["resourceId"]
                 related_resource = Resource.objects.get(pk=resourceid)
-                displayname = related_resource.displayname
+                displayname = related_resource.displayname()
                 if displayname is not None:
                     items.append(displayname)
             except (TypeError, KeyError):
@@ -2119,7 +2119,7 @@ class ResourceInstanceListDataType(ResourceInstanceDataType):
                 try:
                     resourceid = resourceXresource["resourceId"]
                     related_resource = Resource.objects.get(pk=resourceid)
-                    displayname = related_resource.displayname
+                    displayname = related_resource.displayname()
                     resourceXresource["display_value"] = displayname
                     items.append(resourceXresource)
                 except (TypeError, KeyError):
