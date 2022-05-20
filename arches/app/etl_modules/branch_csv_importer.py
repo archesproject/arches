@@ -202,7 +202,7 @@ class BranchCsvImporter:
         for node in nodes:
             lookup[node.alias] = {"nodeid": str(node.nodeid), "datatype": node.datatype, "config": node.config}
         return lookup
-    
+
     def validate(self, request):
         """Validation is actually done - we're just getting the report here"""
         success = True
@@ -246,7 +246,7 @@ class BranchCsvImporter:
                     ("failed", datetime.now(), self.loadid),
                 )
             return {"success": False, "data": "failed"}
-    
+
     def read(self, request):
         self.loadid = request.POST.get("load_id")
         content = request.FILES["file"]
@@ -270,7 +270,7 @@ class BranchCsvImporter:
     def start(self, request):
         self.loadid = request.POST.get("load_id")
         self.temp_dir = os.path.join(settings.APP_ROOT, "tmp", self.loadid)
-        result = {"started": False, "message":""}
+        result = {"started": False, "message": ""}
         with connection.cursor() as cursor:
             try:
                 cursor.execute(
@@ -281,7 +281,7 @@ class BranchCsvImporter:
             except Exception:
                 result["message"] = _("Unable to initialize load")
         return {"success": result["started"], "data": result}
-    
+
     def write(self, request):
         self.loadid = request.POST.get("load_id")
         self.temp_dir = os.path.join(settings.APP_ROOT, "tmp", self.loadid)
