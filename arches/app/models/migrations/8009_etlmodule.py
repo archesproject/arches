@@ -251,7 +251,7 @@ add_staging_to_tile_function = """
                         FOR _key, _value IN SELECT * FROM jsonb_each_text(staged_value)
                             LOOP
                                 tile_data_value = _value::jsonb -> 'value';
-                                IF (_value::jsonb ->> 'datatype') in ('resource-instance-list', 'resource-instance') THEN
+                                IF (_value::jsonb ->> 'datatype') in ('resource-instance-list', 'resource-instance') AND tile_data_value <> null THEN
                                     resource_obejct_array = '[]'::jsonb;
                                     FOR resource_object IN SELECT * FROM jsonb_array_elements(tile_data_value) LOOP
                                         resource_object = jsonb_set(resource_object, '{resourceXresourceId}', to_jsonb(uuid_generate_v1mc()));
@@ -309,6 +309,28 @@ add_staging_to_tile_function = """
 
 remove_staging_to_tile_function = """
     DROP FUNCTION public.__arches_staging_to_tile(load_id uuid);
+    """
+
+add_get_resourceid_from_legacyid_trigger = """
+    CREATE OR REPLACE FUNCTION __arches_get_resourceid_from_legacyid_trigger_function()
+    RETURNS trigger AS $$
+    BEGIN
+        IF NEW.legacyid IN (SELECT legacyid FROM resource_instances WHERE legacyid = NEW.legacyid) THEN
+            SELECT resourceinstanceid FROM resource_instances INTO NEW.resourceid WHERE legacyid = NEW.legacyid;
+        END IF;
+        RETURN NEW;
+    END;
+    $$ LANGUAGE plpgsql;
+
+    CREATE TRIGGER __arches_get_resourceid_from_legacyid_trigger
+        BEFORE INSERT ON load_staging
+        FOR EACH ROW
+        EXECUTE PROCEDURE __arches_get_resourceid_from_legacyid_trigger_function();
+    """
+
+remove_get_resourceid_from_legacyid_trigger = """
+    DROP TRIGGER IF EXISTS __arches_get_resourceid_from_legacyid_trigger ON load_staging;
+    DROP FUNCTION IF EXISTS __arches_get_resourceid_from_legacyid_trigger_function();
     """
 
 
@@ -414,4 +436,5 @@ class Migration(migrations.Migration):
         migrations.RunSQL(add_validation_reporting_functions, remove_validation_reporting_functions),
         migrations.RunSQL(add_functions_to_get_nodegroup_tree, remove_functions_to_get_nodegroup_tree),
         migrations.RunSQL(add_staging_to_tile_function, remove_staging_to_tile_function),
+        migrations.RunSQL(add_get_resourceid_from_legacyid_trigger, remove_get_resourceid_from_legacyid_trigger),
     ]
