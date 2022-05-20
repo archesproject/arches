@@ -251,7 +251,7 @@ add_staging_to_tile_function = """
                         FOR _key, _value IN SELECT * FROM jsonb_each_text(staged_value)
                             LOOP
                                 tile_data_value = _value::jsonb -> 'value';
-                                IF (_value::jsonb ->> 'datatype') in ('resource-instance-list', 'resource-instance') THEN
+                                IF (_value::jsonb ->> 'datatype') in ('resource-instance-list', 'resource-instance') AND tile_data_value <> null THEN
                                     resource_obejct_array = '[]'::jsonb;
                                     FOR resource_object IN SELECT * FROM jsonb_array_elements(tile_data_value) LOOP
                                         resource_object = jsonb_set(resource_object, '{resourceXresourceId}', to_jsonb(uuid_generate_v1mc()));
