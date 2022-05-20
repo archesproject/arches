@@ -286,7 +286,12 @@ def search_results(request, returnDsl=False):
     from time import time
 
     start = time()
-    for_export = request.GET.get("export")
+    for_export = request.GET.get("export", False)
+    if for_export:
+        try:
+            for_export = json.loads(for_export)
+        except TypeError:
+            pass
     pages = request.GET.get("pages", None)
     total = int(request.GET.get("total", "0"))
     resourceinstanceid = request.GET.get("id", None)
@@ -318,23 +323,24 @@ def search_results(request, returnDsl=False):
     dsl = search_results_object.pop("query", None)
     if returnDsl:
         return dsl
-    dsl.include("points")
-    dsl.include("permissions.users_with_no_access")
     dsl.include("permissions.users_without_edit_perm")
+    dsl.include("permissions.users_without_read_perm")
     dsl.include("displayname")
     dsl.include("displaydescription")
-    dsl.include("map_popup")
-    if not points_only:
+    dsl.include("points")
+    if for_export or not points_only:
         dsl.include("graph_id")
+    if not points_only:
         dsl.include("root_ontology_class")
-        dsl.include("resourceinstanceid")
-        dsl.include("permissions.users_without_read_perm")
         dsl.include("permissions.users_without_delete_perm")
         dsl.include("geometries")
         dsl.include("provisional_resource")
-        if load_tiles:
-            dsl.include("tiles")
-    if for_export or pages or points_only:
+        dsl.include("permissions.users_with_no_access")
+        dsl.include("map_popup")
+        dsl.include("resourceinstanceid") # this is the same as the document _id
+    if load_tiles:
+        dsl.include("tiles")
+    if resourceinstanceid is None:
         results = dsl.search(index=RESOURCES_INDEX, limit=10000, scroll="1m")
         scroll_id = results["_scroll_id"]
         scroll_size = results["hits"]["total"]["value"]
@@ -360,7 +366,11 @@ def search_results(request, returnDsl=False):
         for filter_type, querystring in list(request.GET.items()) + [("search-results", "")]:
             search_filter = search_filter_factory.get_filter(filter_type)
             if search_filter:
-                search_filter.post_search_hook(search_results_object, results, permitted_nodegroups)
+                try:
+                    search_filter.post_search_hook(search_results_object, results, permitted_nodegroups)
+                except KeyError as e:
+                    print(f"could not apply search_filter: {filter_type}")
+                    print(f"\'{e}\' not present in results")
 
         ret["results"] = results
 
