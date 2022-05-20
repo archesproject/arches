@@ -362,7 +362,7 @@ class CsvReader(Reader):
         save_count,
         row_number,
         prevent_indexing,
-        transaction_id=None
+        transaction_id=None,
     ):
         # create a resource instance only if there are populated_tiles
         errors = []
@@ -1263,7 +1263,7 @@ class CsvReader(Reader):
                             save_count,
                             row_number,
                             prevent_indexing,
-                            transaction_id=transaction_id
+                            transaction_id=transaction_id,
                         )
 
                         # reset values for next resource instance
@@ -1626,7 +1626,7 @@ class CsvReader(Reader):
                         save_count,
                         row_number,
                         prevent_indexing,
-                        transaction_id=transaction_id
+                        transaction_id=transaction_id,
                     )
 
                 if bulk:

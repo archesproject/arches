@@ -1340,6 +1340,7 @@ class IIIFManifest(models.Model):
         managed = True
         db_table = "iiif_manifests"
 
+
 class ManifestImage(models.Model):
     imageid = models.UUIDField(primary_key=True, default=uuid.uuid1)
     image = models.ImageField(upload_to="cantaloupe")
