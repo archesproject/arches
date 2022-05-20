@@ -22,13 +22,7 @@ define(['jquery', 'knockout', 'uuid', 'arches', 'js-cookie'], function($, ko, uu
         this.submit = async function(action, formData) {
             let payload = formData || self.formData;
             payload.append('action', action);
-            if (action === 'start') {
-                if (!self.loadId) {
-                    self.loadId = uuid.generate();
-                }
-            }
-            if (action === 'read') {
-                payload.append('async', true);
+            if (['start', 'read'].includes(action)) {
                 if (!self.loadId) {
                     self.loadId = uuid.generate();
                 }
@@ -50,7 +44,6 @@ define(['jquery', 'knockout', 'uuid', 'arches', 'js-cookie'], function($, ko, uu
             dictDefaultMessage: '',
             autoProcessQueue: false,
             uploadMultiple: false,
-            // acceptedFiles: ["text/csv"],
             autoQueue: false,
             clickable: ".fileinput-button." + this.uniqueidClass(),
             previewsContainer: '#hidden-dz-previews',
