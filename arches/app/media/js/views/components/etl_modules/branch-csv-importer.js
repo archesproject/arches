@@ -107,16 +107,25 @@ define([
 
             this.start = async function(){
                 self.loading(true);
-                const formData = new window.FormData();
-                formData.append('load_details', JSON.stringify(self.loadDetails()));
-                const response = await self.submit('start', formData);
+                const response = await self.submit('start');
+                self.loading(false);
                 params.activeTab("import");
                 if (response.ok) {
                     const data = await response.json();
-                    self.loading(false);
                     self.response(data); 
-                } else {
-                    self.loading(false);
+                    self.write();
+                }
+            };
+
+            this.write = async function(){
+                self.loading(true);
+                const formData = new window.FormData();
+                formData.append('load_details', JSON.stringify(self.loadDetails()));
+                const response = await self.submit('write', formData);
+                self.loading(false);
+                if (response.ok) {
+                    const data = await response.json();
+                    self.response(data); 
                 }
             };
         },

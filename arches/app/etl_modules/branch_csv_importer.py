@@ -202,7 +202,51 @@ class BranchCsvImporter:
         for node in nodes:
             lookup[node.alias] = {"nodeid": str(node.nodeid), "datatype": node.datatype, "config": node.config}
         return lookup
+    
+    def validate(self, request):
+        """Validation is actually done - we're just getting the report here"""
+        success = True
+        with connection.cursor() as cursor:
+            cursor.execute("""SELECT * FROM __arches_load_staging_report_errors(%s)""", (self.loadid,))
+            row = cursor.fetchall()
+        return {"success": success, "data": row}
 
+    def complete_load(self, request):
+        self.loadid = request.POST.get("load_id")
+        try:
+            with connection.cursor() as cursor:
+                cursor.execute("""SELECT * FROM __arches_staging_to_tile(%s)""", [self.loadid])
+                row = cursor.fetchall()
+        except IntegrityError as e:
+            logger.error(e)
+            with connection.cursor() as cursor:
+                cursor.execute(
+                    """UPDATE load_event SET status = %s, load_end_time = %s WHERE loadid = %s""",
+                    ("failed", datetime.now(), self.loadid),
+                )
+            return {
+                "status": 400,
+                "success": False,
+                "title": _("Failed to complete load"),
+                "message": _("Unable to insert record into staging table"),
+            }
+
+        if row[0][0]:
+            index_resources_by_transaction(self.loadid, quiet=True, use_multiprocessing=True)
+            with connection.cursor() as cursor:
+                cursor.execute(
+                    """UPDATE load_event SET status = %s WHERE loadid = %s""",
+                    ("completed", self.loadid),
+                )
+            return {"success": True, "data": "success"}
+        else:
+            with connection.cursor() as cursor:
+                cursor.execute(
+                    """UPDATE load_event SET status = %s, load_end_time = %s WHERE loadid = %s""",
+                    ("failed", datetime.now(), self.loadid),
+                )
+            return {"success": False, "data": "failed"}
+    
     def read(self, request):
         self.loadid = request.POST.get("load_id")
         content = request.FILES["file"]
@@ -225,6 +269,21 @@ class BranchCsvImporter:
     def start(self, request):
         self.loadid = request.POST.get("load_id")
         self.temp_dir = os.path.join(settings.APP_ROOT, "tmp", self.loadid)
+        result = {"started": False, "message":""}
+        with connection.cursor() as cursor:
+            try:
+                cursor.execute(
+                    """INSERT INTO load_event (loadid, etl_module_id, complete, status, load_start_time, user_id) VALUES (%s, %s, %s, %s, %s, %s)""",
+                    (self.loadid, self.moduleid, False, "running", datetime.now(), self.userid),
+                )
+                result["started"] = True
+            except Exception:
+                result["message"] = _("Unable to initialize load")
+        return {"success": result["started"], "data": result}
+    
+    def write(self, request):
+        self.loadid = request.POST.get("load_id")
+        self.temp_dir = os.path.join(settings.APP_ROOT, "tmp", self.loadid)
         self.file_details = request.POST.get("load_details", None)
         result = {}
         if self.file_details:
@@ -232,15 +291,11 @@ class BranchCsvImporter:
             files = details["result"]["summary"]["files"]
             summary = details["result"]["summary"]
             with connection.cursor() as cursor:
-                cursor.execute(
-                    """INSERT INTO load_event (loadid, etl_module_id, complete, status, load_start_time, user_id) VALUES (%s, %s, %s, %s, %s, %s)""",
-                    (self.loadid, self.moduleid, False, "running", datetime.now(), self.userid),
-                )
                 for file in files.keys():
                     self.stage_excel_file(file, summary, cursor)
                 result["validation"] = self.validate(request)
                 if len(result["validation"]["data"]) == 0:
-                    self.write(request)
+                    self.complete_load(request)
                 else:
                     cursor.execute(
                         """UPDATE load_event SET status = %s, load_end_time = %s WHERE loadid = %s""",
@@ -249,51 +304,6 @@ class BranchCsvImporter:
             shutil.rmtree(self.temp_dir)
             result["summary"] = summary
         return {"success": result["validation"]["success"], "data": result}
-
-    def validate(self, request):
-        """Validation is actually done - we're just getting the report here"""
-        success = True
-        with connection.cursor() as cursor:
-            cursor.execute("""SELECT * FROM __arches_load_staging_report_errors(%s)""", (self.loadid,))
-            row = cursor.fetchall()
-        return {"success": success, "data": row}
-
-    def write(self, request):
-        self.loadid = request.POST.get("load_id")
-        try:
-            with connection.cursor() as cursor:
-                cursor.execute("""SELECT * FROM __arches_staging_to_tile(%s)""", [self.loadid])
-                row = cursor.fetchall()
-        except IntegrityError as e:
-            logger.error(e)
-            with connection.cursor() as cursor:
-                cursor.execute(
-                    """UPDATE load_event SET status = %s, load_end_time = %s WHERE loadid = %s""",
-                    ("failed", datetime.now(), self.loadid),
-                )
-            return {
-                "status": 400,
-                "success": False,
-                "title": _("Failed to complete load"),
-                "message": _("Be sure any resources you are loading do not have resource ids that already exist in the system"),
-            }
-
-        if row[0][0]:
-            index_resources_by_transaction(self.loadid, quiet=True, use_multiprocessing=True)
-
-            with connection.cursor() as cursor:
-                cursor.execute(
-                    """UPDATE load_event SET status = %s WHERE loadid = %s""",
-                    ("completed", self.loadid),
-                )
-            return {"success": True, "data": "success"}
-        else:
-            with connection.cursor() as cursor:
-                cursor.execute(
-                    """UPDATE load_event SET status = %s, load_end_time = %s WHERE loadid = %s""",
-                    ("failed", datetime.now(), self.loadid),
-                )
-            return {"success": False, "data": "failed"}
 
     def download(self, request):
         format = request.POST.get("format")
