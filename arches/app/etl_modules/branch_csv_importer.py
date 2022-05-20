@@ -257,7 +257,7 @@ class BranchCsvImporter:
             pass
         os.mkdir(self.temp_dir, 0o770)
         result = {"summary": {"name": content.name, "size": self.filesize_format(content.size), "files": {}}}
-        if content.content_type == 'application/zip':
+        if content.content_type == "application/zip":
             with zipfile.ZipFile(content, "r") as zip_ref:
                 files = zip_ref.infolist()
                 for file in files:
