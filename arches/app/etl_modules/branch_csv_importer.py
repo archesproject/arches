@@ -257,13 +257,14 @@ class BranchCsvImporter:
             pass
         os.mkdir(self.temp_dir, 0o770)
         result = {"summary": {"name": content.name, "size": self.filesize_format(content.size), "files": {}}}
-        with zipfile.ZipFile(content, "r") as zip_ref:
-            files = zip_ref.infolist()
-            for file in files:
-                if not file.filename.startswith("__MACOSX"):
-                    if not file.is_dir():
-                        result["summary"]["files"][file.filename] = {"size": (self.filesize_format(file.file_size))}
-                    zip_ref.extract(file, self.temp_dir)
+        if content.content_type == 'application/zip':
+            with zipfile.ZipFile(content, "r") as zip_ref:
+                files = zip_ref.infolist()
+                for file in files:
+                    if not file.filename.startswith("__MACOSX"):
+                        if not file.is_dir():
+                            result["summary"]["files"][file.filename] = {"size": (self.filesize_format(file.file_size))}
+                        zip_ref.extract(file, self.temp_dir)
         return {"success": result, "data": result}
 
     def start(self, request):
