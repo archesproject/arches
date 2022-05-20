@@ -49,9 +49,9 @@
     </div>
     <div data-bind="if: activeTab() === 'details'">
         <!-- ko if: selectedModule() -->
-        <div style="flex: 1 1 auto;">
+        <div flex: 1 1 auto;">
             <div class="content-panel">
-                <div class="" data-bind="component: {
+                <div style="height:100%" data-bind="component: {
                     name: selectedModule().componentname,
                     loading: loading,
                     params: {
