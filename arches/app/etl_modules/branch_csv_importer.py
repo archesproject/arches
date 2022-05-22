@@ -1,4 +1,5 @@
 from datetime import datetime
+import glob
 import json
 import logging
 import math
@@ -173,73 +174,34 @@ class BranchCsvImporter:
                     pass
         return {"name": worksheet.title, "rows": row_count}
 
-    def stage_excel_file(self, dir, summary):
-        for (dirpath, dirnames, filenames) in os.walk(dir):
-            for filename in filenames:
-                if filename.endswith("xlsx"):
-                    summary["files"][filename]["worksheets"] = []
-                    workbook = load_workbook(filename=os.path.join(dirpath, filename))
-                    try:
-                        graphid = workbook.get_sheet_by_name("metadata")["B1"].value
-                    except KeyError:
-                        with connection.cursor() as cursor:
-                            cursor.execute(
-                                """UPDATE load_event SET status = %s, load_end_time = %s WHERE loadid = %s""",
-                                ("failed", datetime.now(), self.loadid),
-                            )
-                        raise ValueError("A graphid is not available in the metadata worksheet")
-                    nodegroup_lookup, nodes = self.get_graph_tree(graphid)
-                    node_lookup = self.get_node_lookup(nodes)
-                    with connection.cursor() as cursor:
-                        cursor.execute(
-                            """UPDATE load_event SET load_details = %s WHERE loadid = %s""",
-                            (json.dumps(summary), self.loadid),
-                        )
-                        for worksheet in workbook.worksheets:
-                            if worksheet.title.lower() != "metadata":
-                                details = self.process_worksheet(worksheet, cursor, node_lookup, nodegroup_lookup)
-                                summary["files"][filename]["worksheets"].append(details)
+    def stage_excel_file(self, file, summary, cursor):
+        if file.endswith("xlsx"):
+            summary["files"][file]["worksheets"] = []
+            workbook = load_workbook(filename=os.path.join(self.temp_dir, file))
+            try:
+                graphid = workbook.get_sheet_by_name("metadata")["B1"].value
+            except KeyError:
+                cursor.execute(
+                    """UPDATE load_event SET status = %s, load_end_time = %s WHERE loadid = %s""",
+                    ("failed", datetime.now(), self.loadid),
+                )
+                raise ValueError("A graphid is not available in the metadata worksheet")
+            nodegroup_lookup, nodes = self.get_graph_tree(graphid)
+            node_lookup = self.get_node_lookup(nodes)
+            for worksheet in workbook.worksheets:
+                if worksheet.title.lower() != "metadata":
+                    details = self.process_worksheet(worksheet, cursor, node_lookup, nodegroup_lookup)
+                    summary["files"][file]["worksheets"].append(details)
+            cursor.execute(
+                """UPDATE load_event SET load_details = %s WHERE loadid = %s""",
+                (json.dumps(summary), self.loadid),
+            )
 
     def get_node_lookup(self, nodes):
         lookup = {}
         for node in nodes:
             lookup[node.alias] = {"nodeid": str(node.nodeid), "datatype": node.datatype, "config": node.config}
         return lookup
-
-    def start(self, request):
-        self.loadid = request.POST.get("load_id")
-        with connection.cursor() as cursor:
-            cursor.execute(
-                """INSERT INTO load_event (loadid, etl_module_id, complete, status, load_start_time, user_id) VALUES (%s, %s, %s, %s, %s, %s)""",
-                (self.loadid, self.moduleid, False, "running", datetime.now(), self.userid),
-            )
-        return {"success": True, "data": "event created"}
-
-    def read(self, request):
-        self.loadid = request.POST.get("load_id")
-        content = request.FILES["file"]
-        self.temp_dir = os.path.join(settings.APP_ROOT, "tmp", self.loadid)
-        os.mkdir(self.temp_dir, 0o770)
-        result = {"summary": {"name": content.name, "size": self.filesize_format(content.size), "files": {}}}
-        with zipfile.ZipFile(content, "r") as zip_ref:
-            files = zip_ref.infolist()
-            for file in files:
-                if not file.filename.startswith("__MACOSX"):
-                    if not file.is_dir():
-                        result["summary"]["files"][file.filename] = {"size": (self.filesize_format(file.file_size))}
-                    zip_ref.extract(file, self.temp_dir)
-        self.stage_excel_file(self.temp_dir, result["summary"])
-        result["validation"] = self.validate(request)
-        if len(result["validation"]["data"]) == 0:
-            self.write(request)
-        else:
-            with connection.cursor() as cursor:
-                cursor.execute(
-                    """UPDATE load_event SET status = %s, load_end_time = %s WHERE loadid = %s""",
-                    ("failed", datetime.now(), self.loadid),
-                )
-        shutil.rmtree(self.temp_dir)
-        return {"success": result["validation"]["success"], "data": result}
 
     def validate(self, request):
         """Validation is actually done - we're just getting the report here"""
@@ -249,7 +211,7 @@ class BranchCsvImporter:
             row = cursor.fetchall()
         return {"success": success, "data": row}
 
-    def write(self, request):
+    def complete_load(self, request):
         self.loadid = request.POST.get("load_id")
         try:
             with connection.cursor() as cursor:
@@ -266,12 +228,11 @@ class BranchCsvImporter:
                 "status": 400,
                 "success": False,
                 "title": _("Failed to complete load"),
-                "message": _("Be sure any resources you are loading do not have resource ids that already exist in the system"),
+                "message": _("Unable to insert record into staging table"),
             }
 
         if row[0][0]:
             index_resources_by_transaction(self.loadid, quiet=True, use_multiprocessing=True)
-
             with connection.cursor() as cursor:
                 cursor.execute(
                     """UPDATE load_event SET status = %s WHERE loadid = %s""",
@@ -286,9 +247,67 @@ class BranchCsvImporter:
                 )
             return {"success": False, "data": "failed"}
 
+    def read(self, request):
+        self.loadid = request.POST.get("load_id")
+        content = request.FILES["file"]
+        self.temp_dir = os.path.join(settings.APP_ROOT, "tmp", self.loadid)
+        try:
+            shutil.rmtree(self.temp_dir)  # Remove dir if it already exists. os.mkdir won't overwrite
+        except (FileNotFoundError):
+            pass
+        os.mkdir(self.temp_dir, 0o770)
+        result = {"summary": {"name": content.name, "size": self.filesize_format(content.size), "files": {}}}
+        if content.content_type == "application/zip":
+            with zipfile.ZipFile(content, "r") as zip_ref:
+                files = zip_ref.infolist()
+                for file in files:
+                    if not file.filename.startswith("__MACOSX"):
+                        if not file.is_dir():
+                            result["summary"]["files"][file.filename] = {"size": (self.filesize_format(file.file_size))}
+                        zip_ref.extract(file, self.temp_dir)
+        return {"success": result, "data": result}
+
+    def start(self, request):
+        self.loadid = request.POST.get("load_id")
+        self.temp_dir = os.path.join(settings.APP_ROOT, "tmp", self.loadid)
+        result = {"started": False, "message": ""}
+        with connection.cursor() as cursor:
+            try:
+                cursor.execute(
+                    """INSERT INTO load_event (loadid, etl_module_id, complete, status, load_start_time, user_id) VALUES (%s, %s, %s, %s, %s, %s)""",
+                    (self.loadid, self.moduleid, False, "running", datetime.now(), self.userid),
+                )
+                result["started"] = True
+            except Exception:
+                result["message"] = _("Unable to initialize load")
+        return {"success": result["started"], "data": result}
+
+    def write(self, request):
+        self.loadid = request.POST.get("load_id")
+        self.temp_dir = os.path.join(settings.APP_ROOT, "tmp", self.loadid)
+        self.file_details = request.POST.get("load_details", None)
+        result = {}
+        if self.file_details:
+            details = json.loads(self.file_details)
+            files = details["result"]["summary"]["files"]
+            summary = details["result"]["summary"]
+            with connection.cursor() as cursor:
+                for file in files.keys():
+                    self.stage_excel_file(file, summary, cursor)
+                result["validation"] = self.validate(request)
+                if len(result["validation"]["data"]) == 0:
+                    self.complete_load(request)
+                else:
+                    cursor.execute(
+                        """UPDATE load_event SET status = %s, load_end_time = %s WHERE loadid = %s""",
+                        ("failed", datetime.now(), self.loadid),
+                    )
+            shutil.rmtree(self.temp_dir)
+            result["summary"] = summary
+        return {"success": result["validation"]["success"], "data": result}
+
     def download(self, request):
         format = request.POST.get("format")
-        filename = request.POST.get("filename")
         if format == "xls":
             wb = create_workbook(request.POST.get("id"))
             response = HttpResponse(save_virtual_workbook(wb), content_type="application/vnd.ms-excel")

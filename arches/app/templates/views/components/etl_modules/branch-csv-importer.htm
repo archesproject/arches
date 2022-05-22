@@ -70,35 +70,61 @@
             </div>
         </div>
         <!-- /ko -->
+
+        <!-- ko if: response() -->
+        <div style="display: grid; row-gap: 2px; height:fit-content; padding:15px 20px; color: steelblue;">
+            <div class="summary-title">{% trans "Format: Branch CSV" %}</div>
+            <div class="summary-title">{% trans "The following files are ready for import" %}</div>
+            <div>
+                <div style="display: inline-grid; grid-template-columns: auto auto; column-gap: 10px;">
+                    <div class="summary-header">{% trans "File" %}</div>
+                    <div class="summary-header">{% trans "Size" %}</div>            
+                    <div data-bind="text: response().result.summary.name"></div>
+                    <div data-bind="text: response().result.summary.size"></div>
+                    <!--ko foreach: {data: Object.keys(response().result.summary.files), as: 'file'}-->
+                        <div data-bind="text: file"></div>
+                        <!-- ko foreach: {data: $parent.response().result.summary.files[file], as: 'details'} -->
+                        <div data-bind="text: details.size"></div>
+                        <!-- /ko -->
+                    <!-- /ko -->
+                </div>
+            </div>
+        </div>
+
+        <div  class="tabbed-workflow-footer, etl-module-footer">
+           <button class="btn btn-shim btn-labeled btn-lg fa fa-check btn-primary"  data-bind="click: function(){ start(); }">{% trans "Submit" %}</button>
+           <button class="btn btn-shim btn-labeled btn-lg fa fa-times btn-danger" data-bind="click: function(){ response(null); }">{% trans "Cancel" %}</button>
+        </div>
+        <!-- /ko -->
     </div>
 <!--/ko-->
 {% endblock task_details %}
 
 {% block etl_status %}
-<div style="display: grid; row-gap: 2px; height:fit-content;">
+<div class="branch-csv-etl" style="display: grid; row-gap: 2px; height:fit-content;">
     <h4 class="summary-title">{% trans "Import Branch CSV" %}</h4>
-    <!-- ko if: load_details -->
+    <!-- ko if: ko.unwrap(loadDetails) -->
     <div style="padding:15px 20px;">
         <h4 class="summary-title">{% trans "File Summary" %}</h4>
         <div style="display: inline-grid; grid-template-columns: auto auto; column-gap: 10px;">
             <div class="summary-header">{% trans "File" %}</div>
             <div class="summary-header">{% trans "Size" %}</div>            
-            <div data-bind="text: load_details.name"></div>
-            <div data-bind="text: load_details.size"></div>
-            <!--ko foreach: {data: Object.keys(load_details.files).filter(n => !n.endsWith('.xlsx')), as: 'file'}-->
+            <div data-bind="text: loadDetails.name"></div>
+            <div data-bind="text: loadDetails.size"></div>
+            <!--ko foreach: {data: Object.keys(loadDetails.files).filter(n => !n.endsWith('.xlsx')), as: 'file'}-->
                 <div data-bind="text: file"></div>
-                <!-- ko foreach: {data: $parent.load_details.files[file], as: 'details'} -->
+                <!-- ko foreach: {data: $parent.loadDetails.files[file], as: 'details'} -->
                 <div data-bind="text: details.size"></div>
                 <!-- /ko -->
             <!-- /ko -->
-            <!--ko foreach: {data: Object.keys(load_details.files).filter(n => n.endsWith('.xlsx')), as: 'file'}-->
+            <!--ko foreach: {data: Object.keys(loadDetails.files).filter(n => n.endsWith('.xlsx')), as: 'file'}-->
             <div data-bind="text: file"></div>
-                <!-- ko foreach: {data: $parent.load_details.files[file], as: 'details'} -->
+                <!-- ko foreach: {data: $parent.loadDetails.files[file], as: 'details'} -->
                 <div data-bind="text: details.size"></div>
                 <div class="summary-header">{% trans "Worksheets" %}</div>
-                <div class="summary-header">{% trans "Rows" %}</div>
+                <div class="summary-header">{% trans "Tiles" %}</div>
                 <!--ko foreach: $data.worksheets-->
-                <div data-bind="text: $data.name"></div>
+                <div style="padding-left:5px" data-bind="text: $data.name"></div>
                 <div data-bind="text: $data.rows"></div>
                 <!-- /ko -->
                 <!-- /ko -->

@@ -49,9 +49,9 @@
     </div>
     <div data-bind="if: activeTab() === 'details'">
         <!-- ko if: selectedModule() -->
-        <div style="flex: 1 1 auto;">
+        <div flex: 1 1 auto;">
             <div class="content-panel">
-                <div class="" data-bind="component: {
+                <div style="height:100%" data-bind="component: {
                     name: selectedModule().componentname,
                     loading: loading,
                     params: {
@@ -70,7 +70,7 @@
                 <div class="etl-module-status" style="height: calc(100vh - 95px); width: auto; border-right: 1px solid rgba(0,0,0,0.14);padding-bottom:25px; overflow: scroll;">
                     <div class="etl-manager-status-filter-container">
                         <input class="etl-manager-filter-input" type="text" placeholder = "Filter Tasks..." data-bind="textInput: taskSearchString">
-                        <button class="btn fa fa-refresh" data-bind="click: fetchLoadEvent()"></button>
+                        <button class="btn fa fa-refresh" data-bind="click: function(){fetchLoadEvent();}"></button>
                     </div>
                     <div class="etl-status-table">
                         <table class="" style="min-width: 50px;">

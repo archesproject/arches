@@ -19,19 +19,19 @@ define(['jquery', 'knockout', 'uuid', 'arches', 'js-cookie'], function($, ko, uu
         this.response = ko.observable();
         this.validationError = ko.observable();
 
-        this.submit = function(action) {
-            self.formData.append('action', action);
-            if (action === 'start') {
-                self.loadId = uuid.generate();
+        this.submit = async function(action, formData) {
+            let payload = formData || self.formData;
+            payload.append('action', action);
+            if (['start', 'read'].includes(action)) {
+                if (!self.loadId) {
+                    self.loadId = uuid.generate();
+                }
             }
-            if (action === 'read') {
-                self.formData.append('async', true);
-            }
-            self.formData.append('load_id', self.loadId);
-            self.formData.append('module', this.moduleId);
+            payload.append('load_id', self.loadId);
+            payload.append('module', this.moduleId);
             return fetch(arches.urls.etl_manager, {
                 method: 'POST',
-                body: self.formData,
+                body: payload,
                 credentials: 'include',
                 headers: {
                     "X-CSRFToken": Cookies.get('csrftoken')
@@ -44,7 +44,6 @@ define(['jquery', 'knockout', 'uuid', 'arches', 'js-cookie'], function($, ko, uu
             dictDefaultMessage: '',
             autoProcessQueue: false,
             uploadMultiple: false,
-            // acceptedFiles: ["text/csv"],
             autoQueue: false,
             clickable: ".fileinput-button." + this.uniqueidClass(),
             previewsContainer: '#hidden-dz-previews',
