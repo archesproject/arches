@@ -128,10 +128,18 @@ add_validation_reporting_functions = """
     CREATE OR REPLACE FUNCTION public.__arches_load_staging_report_errors(load_id uuid)
     RETURNS TABLE(source text, message text, loadid uuid)
     AS $$
-    SELECT source_description, public.__arches_load_staging_get_tile_errors(value) AS message, loadid
-    FROM load_staging
-    WHERE passes_validation IS NOT true
-    AND loadid = load_id;
+        UPDATE load_staging
+            SET error_message = 'excess tile error', passes_validation = false
+            WHERE (resourceid, nodegroupid) IN (
+                SELECT t.resourceinstanceid, t.nodegroupid
+                FROM tiles t, node_groups ng
+                WHERE t.nodegroupid = ng.nodegroupid
+                AND ng.cardinality = '1'
+    		);
+        SELECT source_description, public.__arches_load_staging_get_tile_errors(value) AS message, loadid
+        FROM load_staging
+        WHERE passes_validation IS NOT true
+        AND loadid = load_id;
     $$
     LANGUAGE SQL;
     """
