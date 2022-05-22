@@ -22,7 +22,7 @@ define(['knockout', 'viewmodels/widget'], function(ko, WidgetViewModel) {
                 if (this.url()) {
                     if (ko.unwrap(this.url_label)) {
                         return ko.unwrap(this.url_label);
-                    } else if (this.url && this.url()) {
+                    } else {
                         return this.url();
                     }
                 }
