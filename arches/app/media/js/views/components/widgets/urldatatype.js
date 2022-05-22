@@ -6,10 +6,22 @@ define(['knockout', 'viewmodels/widget'], function(ko, WidgetViewModel) {
             params.valueProperties = ['url', 'url_label'];
             WidgetViewModel.apply(this, [params]);
 
+            this.url.subscribe(val => {
+                if (val && !ko.unwrap(this.url_label)) {
+                    this.url_label("");
+                }
+            });
+
+            this.url_label.subscribe(val => {
+                if (val && !ko.unwrap(this.url)) {
+                    this.url("");
+                }
+            });
+
             this.urlPreviewText = ko.pureComputed(function() {
                 if (this.url()) {
-                    if (this.url_label && this.url_label()) {
-                        return this.url_label();
+                    if (ko.unwrap(this.url_label)) {
+                        return ko.unwrap(this.url_label);
                     } else if (this.url && this.url()) {
                         return this.url();
                     }
