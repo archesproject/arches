@@ -7,6 +7,7 @@ import logging
 import uuid
 from django.db import connection
 from django.db.models.functions import Lower
+from django.db.utils import IntegrityError, InternalError
 from arches.app.datatypes.datatypes import DataTypeFactory
 from arches.app.models.models import GraphModel, Node, NodeGroup, ResourceInstance
 from arches.app.models.graph import Graph
@@ -117,9 +118,24 @@ class ImportSingleCsv:
                 )
             return {"success": False, "data": "failed"}
         else:
-            with connection.cursor() as cursor:
-                cursor.execute("""SELECT * FROM __arches_staging_to_tile(%s)""", [self.loadid])
-                row = cursor.fetchall()
+            try:
+                with connection.cursor() as cursor:
+                    cursor.execute("""SELECT * FROM __arches_staging_to_tile(%s)""", [self.loadid])
+                    row = cursor.fetchall()
+            except IntegrityError as e:
+                logger.error(e)
+                with connection.cursor() as cursor:
+                    cursor.execute(
+                        """UPDATE load_event SET status = %s, load_end_time = %s WHERE loadid = %s""",
+                        ("failed", datetime.now(), self.loadid),
+                    )
+                return {
+                    "status": 400,
+                    "success": False,
+                    "title": _("Failed to complete load"),
+                    "message": _("Unable to insert record into staging table"),
+                }
+
         if row[0][0]:
             index_resources_by_transaction(self.loadid, quiet=True, use_multiprocessing=True)
             with connection.cursor() as cursor:
@@ -165,9 +181,9 @@ class ImportSingleCsv:
                 datatype = self.node_lookup[graphid].get(nodeid=node).datatype
                 datatype_instance = self.datatype_factory.get_instance(datatype)
                 source_value = row[key]
-                errors = datatype_instance.validate(source_value)
+                value = datatype_instance.transform_value_for_tile(source_value) if source_value is not None else None
+                errors = datatype_instance.validate(value)
                 valid = True if len(errors) == 0 else False
-                value = datatype_instance.transform_value_for_tile(source_value) if source_value is not None and valid else None
                 error_message = ""
                 for error in errors:
                     error_message = "{0}|{1}".format(error_message, error["message"]) if error_message != "" else error["message"]

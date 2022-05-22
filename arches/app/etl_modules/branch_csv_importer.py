@@ -10,7 +10,7 @@ import zipfile
 from django.http import HttpResponse
 from openpyxl import load_workbook
 from django.db import connection
-from django.db.utils import IntegrityError
+from django.db.utils import IntegrityError, InternalError
 from django.utils.translation import ugettext as _
 from arches.app.datatypes.datatypes import DataTypeFactory
 from arches.app.models.models import Node
@@ -217,7 +217,7 @@ class BranchCsvImporter:
             with connection.cursor() as cursor:
                 cursor.execute("""SELECT * FROM __arches_staging_to_tile(%s)""", [self.loadid])
                 row = cursor.fetchall()
-        except IntegrityError as e:
+        except (IntegrityError, InternalError) as e:
             logger.error(e)
             with connection.cursor() as cursor:
                 cursor.execute(
