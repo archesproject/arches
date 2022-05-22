@@ -340,6 +340,32 @@ remove_get_resourceid_from_legacyid_trigger = """
     DROP FUNCTION IF EXISTS __arches_get_resourceid_from_legacyid_trigger_function();
     """
 
+add_check_excess_tiles_trigger = """
+    CREATE OR REPLACE FUNCTION __arches_check_excess_tiles_trigger_function()
+    RETURNS trigger AS $$
+    BEGIN
+        IF (NEW.resourceinstanceid, NEW.nodegroupid) IN (
+                SELECT t.resourceinstanceid, t.nodegroupid
+                FROM tiles t, node_groups ng
+                WHERE t.nodegroupid = ng.nodegroupid
+                AND ng.cardinality = '1'
+            ) THEN
+            RAISE EXCEPTION 'Multiple Tiles for Cardinality-1 Nodegroup' USING ERRCODE = '21000';
+        END IF;
+        RETURN NEW;
+    END;
+    $$ LANGUAGE plpgsql;
+
+    CREATE TRIGGER __arches_check_excess_tiles_trigger
+        BEFORE INSERT ON tiles
+        FOR EACH ROW
+        EXECUTE PROCEDURE __arches_check_excess_tiles_trigger_function();
+    """
+
+remove_check_excess_tiles_trigger = """
+    DROP TRIGGER IF EXISTS __arches_check_excess_tiles_trigger ON tiles;
+    DROP FUNCTION IF EXISTS __arches_check_excess_tiles_trigger_function()
+    """
 
 class Migration(migrations.Migration):
 
@@ -444,4 +470,5 @@ class Migration(migrations.Migration):
         migrations.RunSQL(add_functions_to_get_nodegroup_tree, remove_functions_to_get_nodegroup_tree),
         migrations.RunSQL(add_staging_to_tile_function, remove_staging_to_tile_function),
         migrations.RunSQL(add_get_resourceid_from_legacyid_trigger, remove_get_resourceid_from_legacyid_trigger),
+        migrations.RunSQL(add_check_excess_tiles_trigger, remove_check_excess_tiles_trigger),
     ]
