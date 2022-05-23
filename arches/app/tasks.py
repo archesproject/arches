@@ -205,6 +205,7 @@ def on_chord_error(request, exc, traceback):
     user = User.objects.get(id=1)
     notify_completion(msg, user)
 
+
 @shared_task
 def load_files(files, summary, result, temp_dir, loadid):
     from arches.app.etl_modules import branch_csv_importer
