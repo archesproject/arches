@@ -343,6 +343,8 @@ remove_get_resourceid_from_legacyid_trigger = """
 add_check_excess_tiles_trigger = """
     CREATE OR REPLACE FUNCTION __arches_check_excess_tiles_trigger_function()
     RETURNS trigger AS $$
+    DECLARE
+        parent_tile uuid;
     BEGIN
         IF (NEW.resourceinstanceid, NEW.nodegroupid) IN (
                 SELECT t.resourceinstanceid, t.nodegroupid
@@ -350,7 +352,13 @@ add_check_excess_tiles_trigger = """
                 WHERE t.nodegroupid = ng.nodegroupid
                 AND ng.cardinality = '1'
             ) THEN
-            RAISE EXCEPTION 'Multiple Tiles for Cardinality-1 Nodegroup' USING ERRCODE = '21000';
+            SELECT parenttileid INTO parent_tile FROM tiles
+                WHERE resourceinstanceid = NEW.resourceinstanceid AND nodegroupid = NEW.nodegroupid;
+            IF parent_tile is null AND NEW.parenttileid is null THEN
+                RAISE EXCEPTION 'Multiple Tiles for Cardinality-1 Nodegroup' USING ERRCODE = '21000';
+            ELSIF parent_tile = NEW.parenttileid THEN
+                RAISE EXCEPTION 'Multiple Tiles for Cardinality-1 Nodegroup' USING ERRCODE = '21000';
+            END IF;
         END IF;
         RETURN NEW;
     END;
