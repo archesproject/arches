@@ -126,7 +126,7 @@ add_validation_reporting_functions = """
     $func$;
 
     CREATE OR REPLACE FUNCTION public.__arches_load_staging_report_errors(load_id uuid)
-    RETURNS TABLE(source text, message text, loadid uuid) 
+    RETURNS TABLE(source text, message text, loadid uuid)
     AS $$
         UPDATE load_staging
             SET error_message = 'excess tile error', passes_validation = false
