@@ -43,11 +43,10 @@ class ResourceTypeFilter(BaseSearchFilter):
             terms = Terms(field="graph_id", terms=list(permitted_graphids))
         else:
             terms = Terms(field="graph_id", terms=graph_ids)
-        
+
         search_query.filter(terms)
 
         search_results_object["query"].add_query(search_query)
 
-
     def view_data(self):
-        return  {"resources": get_resource_types_by_perm(self.request.user, 'read_nodegroup')}
+        return {"resources": get_resource_types_by_perm(self.request.user, "read_nodegroup")}
