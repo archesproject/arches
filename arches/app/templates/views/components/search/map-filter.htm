@@ -18,10 +18,12 @@
     <div class="workbench-card-sidepanel-header-container">
         <h4 class="workbench-card-sidepanel-header" data-bind="click: hideSidePanel">{% trans "Map Search" %}</h4>
     </div>
+    <div class="workbench-card-sidepanel-border"></div>
 
+    <div class="workbench-card-sidepanel-body">
     <!-- ko if: geoJSONString() === undefined -->
     <div class="spatial-filter-container">
-        
+
         <!-- Buffer Definition -->
         <div class="buffer-control form-control">
             <h5 class="">{% trans "Buffer" %}</h5>
@@ -36,7 +38,7 @@
         <div class="add-new-feature buffer-control" style="">
             <h5 class="">{% trans "Select a filter" %}</h5>
             <select data-placeholder="{% trans "Draw a..." %}" data-bind="
-                value: drawMode,
+                value: selectedTool,
                 valueAllowUnset: true,
                 options: spatialFilterTypes,
                 optionsText: 'title',
@@ -48,7 +50,7 @@
                 }
             "></select>
         </div>
-        
+
     </div>
     <!-- /ko-->
 
@@ -96,6 +98,7 @@
             {% trans "Clear filter" %}
         </a>
 
+    </div>
     </div>
 
 

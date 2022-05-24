@@ -233,6 +233,7 @@
                 permission_data: "{% url 'permission_data' %}",
                 resource_permission_data: "{% url 'resource_permission_data' %}",
                 permission_manager_data: "{% url 'permission_manager_data' %}",
+                clear_user_permission_cache: "{% url 'clear_user_permission_cache' %}",
                 get_user_names: "{% url 'get_user_names' %}",
                 feature_popup_content: "{% url 'feature_popup_content' %}",
                 related_resource_candidates: "{% url 'related_resource_candidates' %}",
@@ -257,6 +258,9 @@
                 api_tiles: function (tileid) {
                     return "{% url 'api_tiles' 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa' %}".replace('aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa', tileid)
                 },
+                api_nodegroup: function (nodegroupid) {
+                    return "{% url 'api_nodegroup' 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa' %}".replace('aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa', nodegroupid)
+                },
                 api_nodes: function (nodeid) {
                     return "{% url 'api_nodes' 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa' %}".replace('aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa', nodeid)
                 },
@@ -275,6 +279,7 @@
                 iiifannotationnodes: "{% url 'iiifannotationnodes' %}",
                 validatejson: "{% url 'validatejson' 'aaaa'%}".replace('aaaa', ''),
                 get_dsl: "{% url 'get_dsl' %}",
+                transform_edtf_for_tile: "{% url 'transform_edtf_for_tile' %}",
                 {% block urls %}{% endblock urls %}
             },
             geocoderPlaceHolder: "{% trans 'Find an address...' %}",
@@ -310,7 +315,8 @@
                 text: "{% trans 'Sorry! The request failed. Please try again.  Contact your system administrator if the problem persists.' %}"
             },
             resourceCopySuccess: {
-                title: "{% trans 'Resource Successfully Copied.'%}"
+                title: "{% trans 'Resource Successfully Copied.'%}",
+                text: "{% trans 'Click here to edit copy' %}"
             },
             resourceCopyFailed: {
                 title: "{% trans 'Resource Copy Failed...'%}",

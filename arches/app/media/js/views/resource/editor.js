@@ -30,6 +30,7 @@ define([
     var displayname = ko.observable(data.displayname);
     var resourceId = ko.observable(data.resourceid);
     var appliedFunctions = ko.observable(data['appliedFunctions']);
+    var primaryDescriptorFunction = ko.observable(data['primaryDescriptorFunction']);
     var userIsCreator = data['useriscreator'];
     var creator = data['creator'];
     var selectedTile = ko.computed(function() {
@@ -94,6 +95,7 @@ define([
             cards: data.cards,
             tiles: tiles,
             appliedFunctions: appliedFunctions(),
+            primaryDescriptorFunction: primaryDescriptorFunction(),
             selection: selection,
             scrollTo: scrollTo,
             loading: loading,
@@ -190,8 +192,8 @@ define([
                 $.ajax({
                     type: "GET",
                     url: arches.urls.resource_copy.replace('//', '/' + resourceId() + '/'),
-                    success: function() {
-                        vm.alert(new AlertViewModel('ep-alert-blue', arches.resourceCopySuccess.title, '', null, function(){}));
+                    success: function(data) {
+                        vm.alert(new AlertViewModel('ep-alert-blue', arches.resourceCopySuccess.title, "<a style='color: #fff; font-weight: 700;' target='_blank' href=" + arches.urls.resource_editor + data.resourceid + ">" + arches.resourceCopySuccess.text + "</a>", null, function(){}));
                     },
                     error: function() {
                         vm.alert(new AlertViewModel('ep-alert-red', arches.resourceCopyFailed.title, arches.resourceCopyFailed.text, null, function(){}));
