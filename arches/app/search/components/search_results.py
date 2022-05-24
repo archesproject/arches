@@ -48,12 +48,9 @@ class SearchResultsFilter(BaseSearchFilter):
         geojson_nodes = get_nodegroups_by_datatype_and_perm(self.request, "geojson-feature-collection", "read_nodegroup")
 
         for result in results["hits"]["hits"]:
-            result["_source"]["points"] = select_geoms_for_results(result["_source"]["points"], geojson_nodes, user_is_reviewer)
             try:
+                result["_source"]["points"] = select_geoms_for_results(result["_source"]["points"], geojson_nodes, user_is_reviewer)
                 result["_source"]["geometries"] = select_geoms_for_results(result["_source"]["geometries"], geojson_nodes, user_is_reviewer)
-            except KeyError:
-                pass
-            try:
                 permitted_tiles = []
                 for tile in result["_source"]["tiles"]:
                     if tile["nodegroup_id"] in permitted_nodegroups:

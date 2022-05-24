@@ -301,9 +301,9 @@ def search_results(request, returnDsl=False):
             load_tiles = json.loads(load_tiles)
         except TypeError:
             pass
-    points_only = request.GET.get("points_only", False)
-    if points_only:
-        points_only = json.loads(points_only)
+    lite_query = request.GET.get("lite_query", False)
+    if lite_query:
+        lite_query = json.loads(lite_query)
     se = SearchEngineFactory().create()
     permitted_nodegroups = get_permitted_nodegroups(request.user)
     include_provisional = get_provisional_type(request)
@@ -327,10 +327,10 @@ def search_results(request, returnDsl=False):
     dsl.include("permissions.users_without_read_perm")
     dsl.include("displayname")
     dsl.include("displaydescription")
-    dsl.include("points")
-    if for_export or not points_only:
+    if for_export or not lite_query:
         dsl.include("graph_id")
-    if not points_only:
+    if not lite_query:
+        dsl.include("points")
         dsl.include("root_ontology_class")
         dsl.include("permissions.users_without_delete_perm")
         dsl.include("geometries")
