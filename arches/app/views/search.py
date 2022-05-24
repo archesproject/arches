@@ -337,7 +337,7 @@ def search_results(request, returnDsl=False):
         dsl.include("provisional_resource")
         dsl.include("permissions.users_with_no_access")
         dsl.include("map_popup")
-        dsl.include("resourceinstanceid") # this is the same as the document _id
+        dsl.include("resourceinstanceid")  # this is the same as the document _id
     if load_tiles:
         dsl.include("tiles")
     if resourceinstanceid is None:
@@ -370,7 +370,7 @@ def search_results(request, returnDsl=False):
                     search_filter.post_search_hook(search_results_object, results, permitted_nodegroups)
                 except KeyError as e:
                     print(f"could not apply search_filter: {filter_type}")
-                    print(f"\'{e}\' not present in results")
+                    print(f"'{e}' not present in results")
 
         ret["results"] = results
 

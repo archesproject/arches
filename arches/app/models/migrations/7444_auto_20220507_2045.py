@@ -7,17 +7,17 @@ import uuid
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('models', '7443_auto_20210813_1942'),
+        ("models", "7443_auto_20210813_1942"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='editlog',
-            name='transactionid',
+            model_name="editlog",
+            name="transactionid",
             field=models.UUIDField(default=uuid.uuid1),
         ),
         migrations.AddConstraint(
-            model_name='node',
-            constraint=models.UniqueConstraint(fields=('name', 'nodegroup'), name='unique_nodename_nodegroup'),
+            model_name="node",
+            constraint=models.UniqueConstraint(fields=("name", "nodegroup"), name="unique_nodename_nodegroup"),
         ),
     ]
