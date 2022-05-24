@@ -133,7 +133,9 @@ define([
         this.updateTiles = function() {
             var featureCollection = self.draw.getAll();
             _.each(self.featureLookup, function(value) {
-                value.selectedTool(null);
+                setTimeout(function(){
+                    value.selectedTool(null);
+                });
             });
             self.geojsonWidgets.forEach(function(widget) {
                 var id = ko.unwrap(widget.node_id);
@@ -429,7 +431,9 @@ define([
                     }));
                     if (e.features.length > 0) {
                         _.each(self.featureLookup, function(value) {
-                            value.selectedTool(null);
+                            setTimeout(function(){
+                                value.selectedTool(null);
+                            });
                         });
                     }
                     self.setSelectLayersVisibility(false);
