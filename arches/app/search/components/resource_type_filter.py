@@ -1,7 +1,7 @@
 from arches.app.utils.betterJSONSerializer import JSONDeserializer
 from arches.app.search.elasticsearch_dsl_builder import Bool, Terms
 from arches.app.search.components.base import BaseSearchFilter
-from arches.app.models.models import GraphModel
+from arches.app.models.models import Node
 from arches.app.utils.permission_backend import get_resource_types_by_perm
 
 details = {
@@ -23,18 +23,28 @@ class ResourceTypeFilter(BaseSearchFilter):
         search_query = Bool()
         querystring_params = self.request.GET.get(details["componentname"], "")
         graph_ids = []
+        permitted_graphids = set()
+
+        for node in Node.objects.filter(nodegroup__in=permitted_nodegroups).select_related("graph"):
+            permitted_graphids.add(str(node.graph_id))
+
         for resourceTypeFilter in JSONDeserializer().deserialize(querystring_params):
             graphid = str(resourceTypeFilter["graphid"])
-            graph = GraphModel.objects.get(pk=graphid)
-            graph_nodegroups = {str(val[0]) for val in graph.cardmodel_set.values_list('nodegroup_id')}
-            if len(set(permitted_nodegroups).intersection(graph_nodegroups)) > 0:
-                graph_ids.append(graphid)
+            if resourceTypeFilter["inverted"] is True:
+                try:
+                    permitted_graphids.remove(graphid)
+                except KeyError:
+                    pass
+            else:
+                if graphid in permitted_graphids:
+                    graph_ids.append(graphid)
 
-        terms = Terms(field="graph_id", terms=graph_ids)
         if resourceTypeFilter["inverted"] is True:
-            search_query.must_not(terms)
+            terms = Terms(field="graph_id", terms=list(permitted_graphids))
         else:
-            search_query.filter(terms)
+            terms = Terms(field="graph_id", terms=graph_ids)
+        
+        search_query.filter(terms)
 
         search_results_object["query"].add_query(search_query)
 
