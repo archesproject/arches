@@ -11,21 +11,17 @@ define([
                 this.requiredFilters = ['term-filter'];
                 BaseFilter.prototype.initialize.call(this, options);
                 this.resourceModels = ko.observableArray();
+                this.filter = ko.observableArray();
                 const self = this;
 
-                const getData = async function() {
-                    const response = await fetch(arches.urls.api_search_component_data + componentName);
-                    if (response.ok) {
-                        const data = await response.json();
-                        self.resourceModels(data.resources);
-                    } else {
-                        // eslint-disable-next-line no-console
-                        console.log('Failed to fetch resource instance list');
-                    }
-                };
-                
-                await getData();
-                this.filter = ko.observableArray();
+                const response = await fetch(arches.urls.api_search_component_data + componentName);
+                if (response.ok) {
+                    const data = await response.json();
+                    self.resourceModels(data.resources);
+                } else {
+                    // eslint-disable-next-line no-console
+                    console.log('Failed to fetch resource instance list');
+                }
 
                 var filterUpdated = ko.computed(function() {
                     return JSON.stringify(ko.toJS(this.filter()));
