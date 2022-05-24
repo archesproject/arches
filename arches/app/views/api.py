@@ -397,6 +397,11 @@ class MVT(APIBase):
         resource_query = []
         if 'HTTP_SEARCHQUERYRESOURCEIDS' in request.META and request.META['HTTP_SEARCHQUERYRESOURCEIDS'] != '':
             resource_query = json.loads(request.META['HTTP_SEARCHQUERYRESOURCEIDS'])
+            if len(resource_query) > 0:
+                resource_query.sort()
+                # resource_query_cache_key_hash = str(request.META['HTTP_SEARCHQUERYSTRING']).strip() + str(len(resource_query))
+                resource_query_cache_key_hash = [resourceid[:1] for resourceid in resource_query]
+                resource_query_cache_key_hash = "".join(resource_query_cache_key_hash) + str(len(resource_query))
             
         from datetime import timedelta
         from time import time
@@ -405,8 +410,12 @@ class MVT(APIBase):
             node = models.Node.objects.get(nodeid=nodeid, nodegroup_id__in=viewable_nodegroups)
         except models.Node.DoesNotExist:
             raise Http404()
+        if len(models.ResourceInstance.objects.filter(graph_id=str(node.graph.pk))) == len(resource_query):
+            resource_query = []
         config = node.config
         cache_key = f"mvt_{nodeid}_{zoom}_{x}_{y}"
+        if len(resource_query) > 0:
+            cache_key = f"mvt_{nodeid}_{zoom}_{x}_{y}_{resource_query_cache_key_hash}"
         tile = cache.get(cache_key)
         if tile is None:
             resource_ids = get_restricted_instances(request.user, allresources=True)
@@ -540,9 +549,9 @@ class MVT(APIBase):
                 tile = bytes(cursor.fetchone()[0])
                 cache.set(cache_key, tile, settings.TILE_CACHE_TIMEOUT)
         elapsed = time() - start
-        print("_______Time to render MVT = {0}".format(timedelta(seconds=elapsed)))
         if not len(tile):
             raise Http404()
+        print("_______Time to render MVT = {0}".format(timedelta(seconds=elapsed)))
         return HttpResponse(tile, content_type="application/x-protobuf")
 
 
