@@ -126,21 +126,28 @@ add_validation_reporting_functions = """
     $func$;
 
     CREATE OR REPLACE FUNCTION public.__arches_load_staging_report_errors(load_id uuid)
-    RETURNS TABLE(source text, message text, loadid uuid)
+    RETURNS TABLE(source text, message text, loadid uuid) 
     AS $$
         UPDATE load_staging
             SET error_message = 'excess tile error', passes_validation = false
-            WHERE (resourceid, nodegroupid) IN (
-                SELECT t.resourceinstanceid, t.nodegroupid
-                FROM tiles t, node_groups ng
-                WHERE t.nodegroupid = ng.nodegroupid
-                AND ng.cardinality = '1'
-    		);
-        SELECT source_description, CONCAT_WS (' | ', public.__arches_load_staging_get_tile_errors(value), error_message) AS message, loadid        FROM load_staging
+            WHERE (resourceid, nodegroupid, COALESCE(parenttileid::text, '')) IN (
+                SELECT t.resourceinstanceid, t.tileid, COALESCE(t.parenttileid::text, '')
+                    FROM tiles t, node_groups ng1
+                    WHERE t.nodegroupid = ng1.nodegroupid
+                    AND ng1.cardinality = '1'
+                UNION
+                SELECT ls.resourceid, ls.tileid, COALESCE(ls.parenttileid::text, '')
+                    FROM load_staging ls, node_groups ng2
+                    WHERE ls.nodegroupid = ng2.nodegroupid
+                    AND ng2.cardinality = '1'
+                    AND ls.loadid = load_id
+            );
+
+        SELECT source_description, CONCAT_WS (' | ', public.__arches_load_staging_get_tile_errors(value), error_message) AS message, loadid
+        FROM load_staging
         WHERE passes_validation IS NOT true
         AND loadid = load_id;
-    $$
-    LANGUAGE SQL;
+    $$ LANGUAGE SQL;
     """
 
 remove_validation_reporting_functions = """
@@ -343,22 +350,14 @@ remove_get_resourceid_from_legacyid_trigger = """
 add_check_excess_tiles_trigger = """
     CREATE OR REPLACE FUNCTION __arches_check_excess_tiles_trigger_function()
     RETURNS trigger AS $$
-    DECLARE
-        parent_tile uuid;
     BEGIN
-        IF (NEW.resourceinstanceid, NEW.nodegroupid) IN (
-                SELECT t.resourceinstanceid, t.nodegroupid
+        IF (NEW.resourceinstanceid, NEW.nodegroupid, COALESCE(NEW.parenttileid::text, '')) IN (
+                SELECT t.resourceinstanceid, t.nodegroupid, COALESCE(t.parenttileid::text, '')
                 FROM tiles t, node_groups ng
                 WHERE t.nodegroupid = ng.nodegroupid
                 AND ng.cardinality = '1'
             ) THEN
-            SELECT parenttileid INTO parent_tile FROM tiles
-                WHERE resourceinstanceid = NEW.resourceinstanceid AND nodegroupid = NEW.nodegroupid;
-            IF parent_tile is null AND NEW.parenttileid is null THEN
                 RAISE EXCEPTION 'Multiple Tiles for Cardinality-1 Nodegroup' USING ERRCODE = '21000';
-            ELSIF parent_tile = NEW.parenttileid THEN
-                RAISE EXCEPTION 'Multiple Tiles for Cardinality-1 Nodegroup' USING ERRCODE = '21000';
-            END IF;
         END IF;
         RETURN NEW;
     END;
