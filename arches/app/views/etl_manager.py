@@ -41,7 +41,7 @@ class ETLManagerView(View):
             response = ETLModule.objects.all()
         elif action == "loadEvent":
             item_per_page = 5
-            all_events = LoadEvent.objects.all().order_by(('-load_start_time')).prefetch_related("user", "etl_module")
+            all_events = LoadEvent.objects.all().order_by(("-load_start_time")).prefetch_related("user", "etl_module")
             events = Paginator(all_events, item_per_page).page(page).object_list
             total = len(all_events)
             paginator, pages = get_paginator(request, all_events, total, page, item_per_page)
