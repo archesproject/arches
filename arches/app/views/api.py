@@ -394,34 +394,35 @@ class MVT(APIBase):
         if hasattr(request.user, "userprofile") is not True:
             models.UserProfile.objects.create(user=request.user)
         viewable_nodegroups = request.user.userprofile.viewable_nodegroups
-        resource_query = []
-        if 'HTTP_SEARCHQUERYRESOURCEIDS' in request.META and request.META['HTTP_SEARCHQUERYRESOURCEIDS'] != '':
-            resource_query = json.loads(request.META['HTTP_SEARCHQUERYRESOURCEIDS'])
-            if len(resource_query) > 0:
-                resource_query.sort()
-                # resource_query_cache_key_hash = str(request.META['HTTP_SEARCHQUERYSTRING']).strip() + str(len(resource_query))
-                resource_query_cache_key_hash = [resourceid[:1] for resourceid in resource_query]
-                resource_query_cache_key_hash = "".join(resource_query_cache_key_hash) + str(len(resource_query))
-            
-        from datetime import timedelta
-        from time import time
-        start = time()
         try:
             node = models.Node.objects.get(nodeid=nodeid, nodegroup_id__in=viewable_nodegroups)
         except models.Node.DoesNotExist:
             raise Http404()
-        if len(models.ResourceInstance.objects.filter(graph_id=str(node.graph.pk))) == len(resource_query):
-            resource_query = []
+        resource_query = []
+        if 'HTTP_SEARCHQUERYRESOURCEIDS' in request.META and request.META['HTTP_SEARCHQUERYRESOURCEIDS'] != '':
+            resource_query = json.loads(request.META['HTTP_SEARCHQUERYRESOURCEIDS'])
+            if len(resource_query) > 0 and models.ResourceInstance.objects.filter(graph_id=str(node.graph.pk)).count() != len(resource_query):
+                query_string = str(request.META['HTTP_SEARCHQUERYSTRING']).strip() + str(len(resource_query))
+                b = bytearray()
+                b.extend(query_string.encode())
+                resource_query_cache_key_hash = hashlib.sha1(b)
+                resource_query_cache_key_hash = resource_query_cache_key_hash.hexdigest()
+            else:
+                resource_query = []
+            
+        from datetime import timedelta
+        from time import time
+        start = time()
         config = node.config
         cache_key = f"mvt_{nodeid}_{zoom}_{x}_{y}"
         if len(resource_query) > 0:
             cache_key = f"mvt_{nodeid}_{zoom}_{x}_{y}_{resource_query_cache_key_hash}"
         tile = cache.get(cache_key)
-        if tile is None:
-            resource_ids = get_restricted_instances(request.user, allresources=True)
-            if len(resource_ids) == 0:
-                resource_ids.append("10000000-0000-0000-0000-000000000001")  # This must have a uuid that will never be a resource id.
-            resource_ids = tuple(resource_ids)
+        if tile is None or not len(tile):
+            restricted_resource_ids = get_restricted_instances(request.user, allresources=True)
+            if len(restricted_resource_ids) == 0:
+                restricted_resource_ids.append("10000000-0000-0000-0000-000000000001")  # This must have a uuid that will never be a resource id.
+            restricted_resource_ids = tuple(restricted_resource_ids)
             resource_query = tuple(resource_query)
             with connection.cursor() as cursor:
                 if int(zoom) <= int(config["clusterMaxZoom"]):
@@ -478,7 +479,7 @@ class MVT(APIBase):
                                 WHERE cid IS NOT NULL
                                 GROUP BY cid
                             ) as tile;""",
-                            [distance, min_points, nodeid, resource_ids, nodeid, zoom, x, y, zoom, x, y],
+                            [distance, min_points, nodeid, restricted_resource_ids, nodeid, zoom, x, y, zoom, x, y],
                         )
                     else:
                         cursor.execute(
@@ -529,9 +530,9 @@ class MVT(APIBase):
                                 WHERE cid IS NOT NULL
                                 GROUP BY cid
                             ) as tile;""",
-                            [distance, min_points, nodeid, resource_ids, resource_query, nodeid, zoom, x, y, zoom, x, y],
+                            [distance, min_points, nodeid, restricted_resource_ids, resource_query, nodeid, zoom, x, y, zoom, x, y],
                         )
-                else:
+                elif len(resource_query) == 0:
                     cursor.execute(
                         """SELECT ST_AsMVT(tile, %s, 4096, 'geom', 'id') FROM (SELECT tileid,
                             id,
@@ -544,7 +545,22 @@ class MVT(APIBase):
                             1 AS total
                         FROM geojson_geometries
                         WHERE nodeid = %s and resourceinstanceid not in %s) AS tile;""",
-                        [nodeid, zoom, x, y, nodeid, resource_ids],
+                        [nodeid, zoom, x, y, nodeid, restricted_resource_ids],
+                    )
+                else:
+                    cursor.execute(
+                        """SELECT ST_AsMVT(tile, %s, 4096, 'geom', 'id') FROM (SELECT tileid,
+                            id,
+                            resourceinstanceid,
+                            nodeid,
+                            ST_AsMVTGeom(
+                                geom,
+                                TileBBox(%s, %s, %s, 3857)
+                            ) AS geom,
+                            1 AS total
+                        FROM geojson_geometries
+                        WHERE nodeid = %s and resourceinstanceid not in %s and resourceinstanceid in %s) AS tile;""",
+                        [nodeid, zoom, x, y, nodeid, restricted_resource_ids, resource_query],
                     )
                 tile = bytes(cursor.fetchone()[0])
                 cache.set(cache_key, tile, settings.TILE_CACHE_TIMEOUT)
