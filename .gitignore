@@ -40,15 +40,9 @@ pip-wheel-metadata
 .eggs
 *.code-workspace
 coverage.xml
-ispc_dataspace/ispc_dataspace/settings.py
-ispc_dataspace/CACHE
-ispc_dataspace/arm
-ispc_dataspace/afs
-ispc_dataspace/arches3d
-ispc_dataspace/static
-ispc_dataspace/v6_demo
-ispc_dataspace/locale
-ispc_dataspace/ispc_dataspace/Cantaloupe
-ispc_dataspace/ispc_dataspace/uploadedfiles
-ispc_dataspace/maptiler-osm-2017-07-03-v3.6.1-europe_italy.mbtiles?usage=personal
+dataspace/CACHE
+ispc_dataspace_old
+
+
+
 

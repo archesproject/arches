@@ -1,8 +1,0 @@
-{
-    "name": "My Custom Report Name",
-    "componentid": "aee56c3a-44cf-4ab2-a5fb-6c51cda7b760",
-    "component": "reports/custom_report",
-    "componentname": "custom_report",
-    "description": "A custom report.",
-    "defaultconfig": {}
-}

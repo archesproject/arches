@@ -1302,6 +1302,13 @@ commander@2:
   resolved "https://registry.yarnpkg.com/commander/-/commander-2.20.3.tgz#fd485e84c03eb4881c20722ba48035e8531aeb33"
   integrity sha512-GpVkmM8vF2vQUkj2LvZmD35JxeJOLCwJ9cUkugyk2nuhbv3+mJvpLYYt+0+USMxE+oj+ey/lJEnhZw75x/OMcQ==
 
+compress-brotli@1.2:
+  version "1.2.2"
+  resolved "https://registry.yarnpkg.com/compress-brotli/-/compress-brotli-1.2.2.tgz#69770c223440f32e839ab774e5a87252d24c1a6c"
+  integrity sha512-lT7wgpZ/WNkvzeciuHkPj2pDB+fhrzZ9ImxwQZhrVbyKI6MuFwcogrKvBNgpc/O099mBbOYFiG3O4ZiZZe+1QA==
+  dependencies:
+    json-buffer "~3.0.1"
+
 concat-stream@^1.6.1:
   version "1.6.2"
   resolved "https://registry.yarnpkg.com/concat-stream/-/concat-stream-1.6.2.tgz#904bdf194cd3122fc675c77fc4ac3d4ff0fd1a34"
@@ -1698,10 +1705,17 @@ datatables.net-responsive@~2.1.0:
     datatables.net ">=1.10.9"
     jquery ">=1.7"
 
-datatables.net@1.10.21, datatables.net@>=1.10.9, datatables.net@^1.10.15, datatables.net@~1.10.12:
+datatables.net@1.10.21, datatables.net@>=1.10.9, datatables.net@^1.10.15:
   version "1.10.21"
   resolved "https://registry.yarnpkg.com/datatables.net/-/datatables.net-1.10.21.tgz#f1d35c8e5c3eb7f5caef39e80cd5b836a8c77103"
   integrity sha512-/bSZtxmf3GTpYcvEmwZ8q26I1yhSx8qklR2B+s1K8+/51UW/zc2zTYwJMqr/Z+iCYixAc00ildj4g2x0Qamolw==
+  dependencies:
+    jquery ">=1.7"
+
+datatables.net@~1.10.22:
+  version "1.10.25"
+  resolved "https://registry.yarnpkg.com/datatables.net/-/datatables.net-1.10.25.tgz#fc03a239e08f91d1d64ba101aa54daf4086d162c"
+  integrity sha512-y0+C7all+MC/h1acwnjErhaJPjYGKpWTvbXrfEUbR8+P+nnhgjNn5nL1udgsTwBObMhlj1KITNBRrM/ZLSoj+Q==
   dependencies:
     jquery ">=1.7"
 
@@ -2239,6 +2253,11 @@ json-buffer@3.0.0:
   resolved "https://registry.yarnpkg.com/json-buffer/-/json-buffer-3.0.0.tgz#5b1f397afc75d677bde8bcfc0e47e1f9a3d9a898"
   integrity sha1-Wx85evx11ne96Lz8Dkfh+aPZqJg=
 
+json-buffer@~3.0.1:
+  version "3.0.1"
+  resolved "https://registry.yarnpkg.com/json-buffer/-/json-buffer-3.0.1.tgz#9338802a30d3b6605fbe0613e094008ca8c05a13"
+  integrity sha512-4bV5BfR2mqfQTJm+V5tPPdf+ZpuhiIvTuAB5g8kcrXOZpTT/QwwVRWBywX1ozr6lEuPdbHxwaJlm9G6mI2sfSQ==
+
 json-parse-even-better-errors@^2.3.0:
   version "2.3.1"
   resolved "https://registry.yarnpkg.com/json-parse-even-better-errors/-/json-parse-even-better-errors-2.3.1.tgz#7c47805a94319928e05777405dc12e1f7a4ee02d"
@@ -2667,6 +2686,11 @@ pify@^3.0.0:
   resolved "https://registry.yarnpkg.com/pify/-/pify-3.0.0.tgz#e5a4acd2c101fdf3d9a4d07f0dbc4db49dd28176"
   integrity sha1-5aSs0sEB/fPZpNB/DbxNtJ3SgXY=
 
+plotly.js-dist@^2.12.1:
+  version "2.12.1"
+  resolved "https://registry.yarnpkg.com/plotly.js-dist/-/plotly.js-dist-2.12.1.tgz#ebdf9f63985d07debe245561998cce00f4791e30"
+  integrity sha512-u3NumBhoNQw5fyr5sfK0jTIa4v1WwruAs0y5bSk055rKklFtyUgwwVZ8VEKCiWqfuPX7OPS3mE4PqvgP4mATOA==
+
 polygonize@1.0.1:
   version "1.0.1"
   resolved "https://registry.yarnpkg.com/polygonize/-/polygonize-1.0.1.tgz#51fb7040914be0fbc43b0bd54d421d75fc2ae7a6"
@@ -3044,12 +3068,22 @@ supercluster@^7.1.0:
   dependencies:
     kdbush "^3.0.0"
 
+supervisor@^0.12.0:
+  version "0.12.0"
+  resolved "https://registry.yarnpkg.com/supervisor/-/supervisor-0.12.0.tgz#de7e6337015b291851c10f3538c4a7f04917ecc1"
+  integrity sha1-3n5jNwFbKRhRwQ81OMSn8EkX7ME=
+
 supports-color@^5.0.0, supports-color@^5.3.0:
   version "5.5.0"
   resolved "https://registry.yarnpkg.com/supports-color/-/supports-color-5.5.0.tgz#e2e69a44ac8772f78a1ec0b35b689df6530efc8f"
   integrity sha512-QjVjwdXIt408MIiAqCX4oUKsgU2EqAGzs2Ppkm4aQYbjm+ZEWEcW4SfFNTr4uMNZma0ey4f5lgLrkB0aX0QMow==
   dependencies:
     has-flag "^3.0.0"
+
+three@^0.140.2:
+  version "0.140.2"
+  resolved "https://registry.yarnpkg.com/three/-/three-0.140.2.tgz#ca0b7390d1ce4f7f2850e80afd00ef48fc244491"
+  integrity sha512-DdT/AHm/TbZXEhQKQpGt5/iSgBrmXpjU26FNtj1KhllVPTKj1eG4X/ShyD5W2fngE+I1s1wa4ttC4C3oCJt7Ag==
 
 timed-out@^4.0.1:
   version "4.0.1"
