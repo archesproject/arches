@@ -17,6 +17,7 @@ define([
             this.selectedLoadEvent = ko.observable();
             this.validated = ko.observable();
             this.validationError = ko.observableArray();
+            this.paginator = ko.observable();
 
             this.selectedLoadEvent.subscribe(function(val){
                 self.selectedModule(val.etl_module);
@@ -41,17 +42,26 @@ define([
                 }
             });
 
-            this.fetchLoadEvent = function(){
-                const url = arches.urls.etl_manager + "?action=loadEvent";
+            this.fetchLoadEvent = function(page){
+                self.loading(true);
+                if (!page) page = 1;
+                const url = arches.urls.etl_manager + "?action=loadEvent&page=" + page;
                 window.fetch(url).then(function(response){
                     if(response.ok){
                         return response.json();
                     }
                 }).then(function(data){
-                    data.sort((a,b) => Date.parse(b.load_start_time) - Date.parse(a.load_start_time));
-                    self.loadEvents(data);
-                    self.selectedLoadEvent(data[0]);
+                    self.loadEvents(data.events);
+                    self.selectedLoadEvent(data.events[0]);
+                    self.paginator(data.paginator);
+                    self.loading(false);
                 });
+            };
+
+            this.newPage = function(page) {
+                if (page) {
+                    self.fetchLoadEvent(page);
+                }
             };
 
             this.cleanLoadEvent = function(loadid) {
