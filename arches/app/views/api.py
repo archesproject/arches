@@ -1,4 +1,5 @@
 from base64 import b64decode
+import hashlib
 import importlib
 import json
 import logging
