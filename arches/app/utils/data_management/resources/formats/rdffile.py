@@ -274,14 +274,16 @@ class JsonLdWriter(RdfWriter):
 
 
 class JsonLdReader(Reader):
-    def __init__(self):
-        super(JsonLdReader, self).__init__()
+    def __init__(self, *args, **kwargs):
+        super(JsonLdReader, self).__init__(*args, **kwargs)
         self.tiles = {}
         self.resources = []
         self.resource = None
         self.use_ids = False
         self.root_ontologyclass_lookup = {}
         self.graphtree = None
+        self.print_buf = []
+        self.verbosity = kwargs.get("verbosity", 1)
         self.logger = logging.getLogger(__name__)
         for graph in models.GraphModel.objects.filter(isresource=True):
             node = models.Node.objects.get(graph_id=graph.pk, istopnode=True)
@@ -419,7 +421,14 @@ class JsonLdReader(Reader):
             else:
                 result = {"data": [None]}
             self.root_json_document = jsonld_document
-            self.data_walk(jsonld_document, self.graphtree, result)
+            try:
+                self.data_walk(jsonld_document, self.graphtree, result)
+            except:
+                if self.verbosity > 1:
+                    for line in self.print_buf:
+                        # print(line) # uncomment this line to print errors directly to the screen
+                        self.logger.debug(line)
+
 
     def is_semantic_node(self, graph_node):
         return self.datatype_factory.datatypes[graph_node["datatype_type"]].defaultwidget is None
@@ -456,28 +465,26 @@ class JsonLdReader(Reader):
                 raise ("Local reference not found")
 
     def printline(self, text, indent=0, newline=False):
-        # return
-        # print(text)
         prefix = ""
         if newline:
             prefix = "\n"
         if indent and indent > 0:
-            prefix = prefix + "\t" * int(indent)
-        print(prefix + text)
+            prefix = prefix + "   " * int(indent)
+        self.print_buf.append(prefix + text)
 
     def data_walk(self, data_node, tree_node, result, tile=None, indent=0):
         my_tiles = []
         self.printline(f"---" * 20, indent)
-        self.printline(tree_node["name"])
-        self.printline(f"tile={tile}")
+        self.printline(tree_node["name"], indent)
+        self.printline(f"tile={tile}", indent)
 
         # pre-seed as much of the cache as we can during the data-walk
         if "@id" in data_node and "@type" in data_node:
             dataType = data_node["@type"][0] if isinstance(data_node["@type"], list) else data_node["@type"]
             self.idcache[data_node["@id"]] = dataType
         for k, v in data_node.items():
-            self.printline(f"k: {k}", indent + 1)
-            self.printline(f"v: {v}", indent + 1)
+            # self.printline(f"k: {k}", indent + 1)
+            # self.printline(f"v: {v}", indent + 1)
             # k is a ontology property like
             # "http://www.cidoc-crm.org/cidoc-crm/P1_is_identified_by"
             # or "http://www.w3.org/2000/01/rdf-schema#label"
@@ -547,10 +554,10 @@ class JsonLdReader(Reader):
                     self.printline(f"Considering match to node: '{o['name']}'", indent + 1, newline=True)
                     self.printline(f"Incoming value we're testing:  '{value or uri}'", indent + 1)
                     self.printline(f"New Nodegroup = {o['nodegroup_id'] == o['node_id']}", indent + 1)
-                    self.printline(f"parent tile id = {result['tile'].tileid if 'tile' in result else None}", indent + 1)
+                    self.printline(f"Parent tile id = {result['tile'].tileid if 'tile' in result else None}", indent + 1)
                     potential_tile = None
                     if o["node_id"] == o["nodegroup_id"]:
-                        self.printline("--- getting potential tile  ---?", indent + 1)
+                        # self.printline("--- getting potential tile  ---?", indent + 1)
                         # Used to pick the previous tile in loop which MIGHT be the parent (but might not)
                         parenttile_id = result["tile"].tileid if "tile" in result else None
                         potential_tile = Tile(
@@ -601,11 +608,9 @@ class JsonLdReader(Reader):
                     # descend into data to check if there are further clarifying features
                     possible2 = []
                     for p in possible:
-                        self.printline(f"\n---SECOND TIER: {p[0]['name']}", indent + 1)
+                        # self.printline(f"\n---SECOND TIER: {p[0]['name']}", indent + 1)
                         try:
-                            self.printline("Don't really create data, so pass anonymous result dict", indent + 1)
-                            # self.printline(f"{models.CardModel.objects.get(nodegroup_id=tile.nodegroup_id).name} TILE with id {tile.tileid}")
-
+                            # self.printline("Don't really create data, so pass anonymous result dict", indent + 1)
                             if p[2] is not None:
                                 tile = p[2]
                             self.data_walk(vi, p[0], {}, tile, indent + 1)
@@ -655,7 +660,7 @@ class JsonLdReader(Reader):
                     # Might get checked in a cardinality n branch that shouldn't be repeated
                     node_value = None
 
-                self.printline(f"Node value being saved: '{node_value}'", indent + 1)
+                self.printline(f"A matching branch has been found and the value can be saved.", indent + 1)
 
                 # We know now that it can go into the branch
                 # Determine if we can collapse the data into a -list or not
@@ -664,13 +669,10 @@ class JsonLdReader(Reader):
                 # This is going to be the result passed down if we recurse
                 bnode = {"data": [], "nodegroup_id": branch[0]["nodegroup_id"], "cardinality": branch[0]["cardinality"]}
 
-                self.printline(f"--- Could we use this tile?{branch[2]}", indent + 1)
                 if branch[0]["datatype"].collects_multiple_values() and tile and str(tile.nodegroup.pk) == branch[0]["nodegroup_id"]:
                     # iterating through a root node *-list type
-                    self.printline("--- are we here  ---?", indent + 1)
                     pass
                 elif bnodeid == branch[0]["nodegroup_id"]:
-                    self.printline("--- not here either  ---?", indent + 1)
                     # Used to pick the previous tile in loop which MIGHT be the parent (but might not)
                     parenttile_id = result["tile"].tileid if "tile" in result else None
                     tile = Tile(
@@ -683,7 +685,6 @@ class JsonLdReader(Reader):
                     self.resource.tiles.append(tile)
                     my_tiles.append(tile)
                 elif "tile" in result and result["tile"]:
-                    self.printline("--- NOR are we here  ---?", indent + 1)
                     tile = result["tile"]
 
                 if not hasattr(tile, "_json_ld"):
@@ -716,7 +717,6 @@ class JsonLdReader(Reader):
                     else:
                         bnode["data"].append(branch[1])
                         if not self.is_semantic_node(branch[0]):
-                            # self.printline(f"Adding to existing (n): {node_value}")
                             tile.data[bnodeid] = node_value
                         result[bnodeid].append(bnode)
                 else:
@@ -725,13 +725,9 @@ class JsonLdReader(Reader):
                     bnode["data"].append(branch[1])
                     result[bnodeid] = [bnode]
 
-                self.printline(
-                    f"{models.CardModel.objects.get(nodegroup_id=tile.nodegroup_id).name} TILE with id {tile.tileid}", indent + 1
-                )
-                self.printline(f"{tile.data}", indent + 1)
-                # self.printline(f" result.tile = {JSONSerializer().serialize(result, indent=4)}")
+                self.printline(f"Tile.data = {tile.data}", indent + 1)
                 if not is_literal:
-                    self.printline("Walk down non-literal branches in the data", indent + 1)
+                    self.printline("Walk down non-literal branches in the data", indent + 1, newline=True)
                     self.data_walk(vi, branch[0], bnode, tile, indent + 1)
 
         if self.shouldSortTiles:
