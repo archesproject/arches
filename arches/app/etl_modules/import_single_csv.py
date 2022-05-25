@@ -7,7 +7,7 @@ import logging
 import uuid
 from django.db import connection
 from django.db.models.functions import Lower
-from django.db.utils import IntegrityError, InternalError
+from django.db.utils import IntegrityError, ProgrammingError
 from arches.app.datatypes.datatypes import DataTypeFactory
 from arches.app.models.models import GraphModel, Node, NodeGroup, ResourceInstance
 from arches.app.models.graph import Graph
@@ -122,7 +122,7 @@ class ImportSingleCsv:
                 with connection.cursor() as cursor:
                     cursor.execute("""SELECT * FROM __arches_staging_to_tile(%s)""", [self.loadid])
                     row = cursor.fetchall()
-            except IntegrityError as e:
+            except (IntegrityError, ProgrammingError) as e:
                 logger.error(e)
                 with connection.cursor() as cursor:
                     cursor.execute(
@@ -170,46 +170,46 @@ class ImportSingleCsv:
         if has_headers:
             next(reader)
 
-        for row in reader:
-            resourceid = uuid.uuid4()
-            dict_by_nodegroup = {}
+        with connection.cursor() as cursor:
+            for row in reader:
+                resourceid = uuid.uuid4()
+                dict_by_nodegroup = {}
 
-            for key in row:
-                current_node = self.get_node_lookup(graphid).get(alias=key)
-                nodegroupid = str(current_node.nodegroup_id)
-                node = str(current_node.nodeid)
-                datatype = self.node_lookup[graphid].get(nodeid=node).datatype
-                datatype_instance = self.datatype_factory.get_instance(datatype)
-                source_value = row[key]
-                value = datatype_instance.transform_value_for_tile(source_value) if source_value is not None else None
-                errors = datatype_instance.validate(value)
-                valid = True if len(errors) == 0 else False
-                error_message = ""
-                for error in errors:
-                    error_message = "{0}|{1}".format(error_message, error["message"]) if error_message != "" else error["message"]
+                for key in row:
+                    current_node = self.get_node_lookup(graphid).get(alias=key)
+                    nodegroupid = str(current_node.nodegroup_id)
+                    node = str(current_node.nodeid)
+                    datatype = self.node_lookup[graphid].get(nodeid=node).datatype
+                    datatype_instance = self.datatype_factory.get_instance(datatype)
+                    source_value = row[key]
+                    value = datatype_instance.transform_value_for_tile(source_value) if source_value is not None else None
+                    errors = datatype_instance.validate(value)
+                    valid = True if len(errors) == 0 else False
+                    error_message = ""
+                    for error in errors:
+                        error_message = "{0}|{1}".format(error_message, error["message"]) if error_message != "" else error["message"]
 
-                if nodegroupid in dict_by_nodegroup:
-                    dict_by_nodegroup[nodegroupid].append(
-                        {node: {"value": value, "valid": valid, "source": source_value, "notes": error_message, "datatype": datatype}}
-                    )
-                else:
-                    dict_by_nodegroup[nodegroupid] = [
-                        {node: {"value": value, "valid": valid, "source": source_value, "notes": error_message, "datatype": datatype}}
-                    ]
+                    if nodegroupid in dict_by_nodegroup:
+                        dict_by_nodegroup[nodegroupid].append(
+                            {node: {"value": value, "valid": valid, "source": source_value, "notes": error_message, "datatype": datatype}}
+                        )
+                    else:
+                        dict_by_nodegroup[nodegroupid] = [
+                            {node: {"value": value, "valid": valid, "source": source_value, "notes": error_message, "datatype": datatype}}
+                        ]
 
-            for nodegroup in dict_by_nodegroup:
-                tile_data = self.get_blank_tile_lookup(nodegroup)
-                passes_validation = True
-                for node in dict_by_nodegroup[nodegroup]:
-                    for key in node:
-                        tile_data[key] = node[key]
-                        if node[key]["valid"] is False:
-                            passes_validation = False
+                for nodegroup in dict_by_nodegroup:
+                    tile_data = self.get_blank_tile_lookup(nodegroup)
+                    passes_validation = True
+                    for node in dict_by_nodegroup[nodegroup]:
+                        for key in node:
+                            tile_data[key] = node[key]
+                            if node[key]["valid"] is False:
+                                passes_validation = False
 
-                tile_value_json = JSONSerializer().serialize(tile_data)
-                node_depth = 0
+                    tile_value_json = JSONSerializer().serialize(tile_data)
+                    node_depth = 0
 
-                with connection.cursor() as cursor:
                     cursor.execute(
                         """
                         INSERT INTO load_staging (
@@ -218,6 +218,10 @@ class ImportSingleCsv:
                         (nodegroup, resourceid, tile_value_json, self.loadid, node_depth, file.name, passes_validation),
                     )
 
+            cursor.execute(
+                """CALL __arches_check_tile_cardinality_violation_for_load(%s)""", [self.loadid]
+            )
+        
         message = "staging table populated"
         return {"success": True, "data": message}
 

@@ -128,31 +128,35 @@ add_validation_reporting_functions = """
     CREATE OR REPLACE FUNCTION public.__arches_load_staging_report_errors(load_id uuid)
     RETURNS TABLE(source text, message text, loadid uuid)
     AS $$
-        UPDATE load_staging
-            SET error_message = 'excess tile error', passes_validation = false
-            WHERE (resourceid, nodegroupid, COALESCE(parenttileid::text, '')) IN (
-                SELECT t.resourceinstanceid, t.tileid, COALESCE(t.parenttileid::text, '')
-                    FROM tiles t, node_groups ng1
-                    WHERE t.nodegroupid = ng1.nodegroupid
-                    AND ng1.cardinality = '1'
-                UNION
-                SELECT ls.resourceid, ls.tileid, COALESCE(ls.parenttileid::text, '')
-                    FROM load_staging ls, node_groups ng2
-                    WHERE ls.nodegroupid = ng2.nodegroupid
-                    AND ng2.cardinality = '1'
-                    AND ls.loadid = load_id
-            );
-
         SELECT source_description, CONCAT_WS (' | ', public.__arches_load_staging_get_tile_errors(value), error_message) AS message, loadid
         FROM load_staging
         WHERE passes_validation IS NOT true
         AND loadid = load_id;
+    $$ LANGUAGE SQL;
+
+    CREATE OR REPLACE PROCEDURE public.__arches_check_tile_cardinality_violation_for_load(load_id uuid)
+    AS $$
+        UPDATE load_staging
+            SET error_message = 'excess tile error', passes_validation = false
+            WHERE (resourceid, nodegroupid, COALESCE(parenttileid::text, '')) IN (
+                SELECT t.resourceinstanceid, t.nodegroupid, COALESCE(t.parenttileid::text, '')
+                    FROM tiles t, node_groups ng1
+                    WHERE t.nodegroupid = ng1.nodegroupid
+                    AND ng1.cardinality = '1'
+                UNION
+				SELECT resourceid, nodegroupid, COALESCE(parenttileid::text, '')
+					FROM load_staging 
+					GROUP BY resourceid, nodegroupid, COALESCE(parenttileid::text, ''), loadid
+					HAVING count(*) > 1
+                    AND loadid = load_id
+            );
     $$ LANGUAGE SQL;
     """
 
 remove_validation_reporting_functions = """
     DROP FUNCTION public.__arches_load_staging_get_tile_errors(json_obj jsonb);
     DROP FUNCTION public.__arches_load_staging_report_errors(load_id uuid);
+    DROP PROCEDURE public.__arches_check_tile_cardinality_violation_for_load(load_id uuid)
     """
 
 add_functions_to_get_nodegroup_tree = """

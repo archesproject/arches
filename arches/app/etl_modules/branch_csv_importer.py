@@ -10,7 +10,7 @@ import zipfile
 from django.http import HttpResponse
 from openpyxl import load_workbook
 from django.db import connection
-from django.db.utils import IntegrityError, InternalError
+from django.db.utils import IntegrityError, ProgrammingError
 from django.utils.translation import ugettext as _
 from arches.app.datatypes.datatypes import DataTypeFactory
 from arches.app.models.models import Node
@@ -217,7 +217,7 @@ class BranchCsvImporter:
             with connection.cursor() as cursor:
                 cursor.execute("""SELECT * FROM __arches_staging_to_tile(%s)""", [self.loadid])
                 row = cursor.fetchall()
-        except (IntegrityError, InternalError) as e:
+        except (IntegrityError, ProgrammingError) as e:
             logger.error(e)
             with connection.cursor() as cursor:
                 cursor.execute(
@@ -294,6 +294,9 @@ class BranchCsvImporter:
             with connection.cursor() as cursor:
                 for file in files.keys():
                     self.stage_excel_file(file, summary, cursor)
+                cursor.execute(
+                    """CALL __arches_check_tile_cardinality_violation_for_load(%s)""", [self.loadid]
+                )
                 result["validation"] = self.validate(request)
                 if len(result["validation"]["data"]) == 0:
                     self.complete_load(request)
