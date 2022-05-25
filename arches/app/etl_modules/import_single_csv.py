@@ -218,10 +218,8 @@ class ImportSingleCsv:
                         (nodegroup, resourceid, tile_value_json, self.loadid, node_depth, file.name, passes_validation),
                     )
 
-            cursor.execute(
-                """CALL __arches_check_tile_cardinality_violation_for_load(%s)""", [self.loadid]
-            )
-        
+            cursor.execute("""CALL __arches_check_tile_cardinality_violation_for_load(%s)""", [self.loadid])
+
         message = "staging table populated"
         return {"success": True, "data": message}
 

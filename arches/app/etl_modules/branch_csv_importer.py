@@ -294,9 +294,7 @@ class BranchCsvImporter:
             with connection.cursor() as cursor:
                 for file in files.keys():
                     self.stage_excel_file(file, summary, cursor)
-                cursor.execute(
-                    """CALL __arches_check_tile_cardinality_violation_for_load(%s)""", [self.loadid]
-                )
+                cursor.execute("""CALL __arches_check_tile_cardinality_violation_for_load(%s)""", [self.loadid])
                 result["validation"] = self.validate(request)
                 if len(result["validation"]["data"]) == 0:
                     self.complete_load(request)
