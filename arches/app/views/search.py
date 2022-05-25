@@ -327,8 +327,7 @@ def search_results(request, returnDsl=False):
     dsl.include("permissions.users_without_read_perm")
     dsl.include("displayname")
     dsl.include("displaydescription")
-    if for_export or not lite_query:
-        dsl.include("graph_id")
+    dsl.include("graph_id")
     if not lite_query:
         dsl.include("points")
         dsl.include("root_ontology_class")
