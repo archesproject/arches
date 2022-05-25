@@ -1,0 +1,10 @@
+{
+    "pluginid": "29512c4e-ed06-4a6b-ae2d-e423817b3f6e",
+    "name": "Analysis Areas",
+    "icon": "fa fa-pie-chart",
+    "component": "views/components/plugins/analysis-areas-workflow",
+    "componentname": "analysis-areas-workflow",
+    "config": {"show":false},
+    "slug": "analysis-areas-workflow",
+    "sortorder": 1
+}

@@ -1,0 +1,115 @@
+{% extends "views/report-templates/default.htm" %} 
+{% load i18n %} 
+{% block report %}
+
+{% block body %}
+<div data-bind="if: dataConfig.label" class="afs-report-section">
+    <h2 class="afs-report-section-title"><i data-bind="click: function() {toggleVisibility(visible.label)}, css: {'fa-angle-double-right': visible.label(), 'fa-angle-double-up': !visible.label()}" class="fa toggle"></i> {% trans "Metadata" %}</h2>
+    
+    <!-- Collapsible content -->
+    <div data-bind="visible: visible.label" class="afs-report-collapsible-container pad-lft">
+
+        <!-- ko ifnot: label() -->
+        <div class="afs-nodata-note">No label for this resource</div>
+        <!-- /ko -->
+
+        <!-- ko if: label() -->
+        <div class="afs-report-subsection" >
+            <div class="firstchild-container">
+                <div class="afs-report-subsection-ite pad-top-sm">
+                    <div class="afs-block-attributes pad-btm">
+                        <h4 class="afs-block-key">Label: </h4>
+                        <div class="afs-block-value" data-bind="text: label"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- /ko -->
+    </div>
+</div>
+
+<div data-bind="if: digitalReferenceDisplay" class="afs-report-section">
+    <h2 class="afs-report-section-title"><i data-bind="click: function() {toggleVisibility(visible.digitalReference)}, css: {'fa-angle-double-right': visible.digitalReference(), 'fa-angle-double-up': !visible.digitalReference()}" class="fa toggle"></i> {% trans "Digital Reference" %}</h2>
+    <span data-bind="if: cards.digitalReference && (!digitalReference().length || cards.digitalReference.cardinality == 'n')">
+        <a class="afs-report-a" data-bind="click: function(){add(cards.digitalReference)}"><i class="fa fa-mail-reply"></i> {% trans "Add Digital Reference" %}</a>
+    </span>
+
+    <!-- Collapsible content -->
+    <div data-bind="visible: visible.digitalReference" class="afs-report-collapsible-container pad-lft">
+
+        <!-- ko ifnot: digitalReference().length -->
+        <div class="afs-nodata-note">No digital references for this resource</div>
+        <!-- /ko -->
+        
+        <!-- ko if: digitalReference().length -->
+        <div class="afs-report-subsection" >
+            <div class="firstchild-container">
+                <div class="afs-table pad-btm">
+                    <table class="table table-striped" cells pacing="0" width="100%">
+                        <thead>
+                            <tr class="afs-table-header">
+                                <th class="min-tabletl">{% trans "Type" %}</th>
+                                <th>{% trans "Source" %}</th>
+                                <th class="afs-table-control all"></th>
+                            </tr>
+                        </thead>
+                        <tbody data-bind="dataTablesForEach: { data: digitalReference, dataTableOptions: digitalReferenceTableConfig }">
+                            <tr>
+                                <td data-bind="text: type"></td>
+                                <td><a class="afs-block-value-url" data-bind="text: source, attr: {href: link}"></a></td>
+                                <td class="afs-table-control">
+                                    <div data-bind="if: $parent.cards && $parent.cards.digitalReference">
+                                        <a data-bind="click: function() {$parent.edit(tileid, $parent.cards.digitalReference)}">
+                                            <i class="fa fa-mail-reply"></i>
+                                        </a>
+                                        <a data-bind="click: $parent.delete.bind($data, tileid, $parent.cards.digitalReference)">
+                                            <i class="fa fa-trash"></i>
+                                        </a>
+                                    </div>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+        <!-- /ko -->
+    </div>
+</div>
+<div data-bind="if: subjectOfDisplay" class="afs-report-section">
+    <h2 class="afs-report-section-title"><i data-bind="click: function() {toggleVisibility(visible.subjectOf)}, css: {'fa-angle-double-right': visible.subjectOf(), 'fa-angle-double-up': !visible.subjectOf()}" class="fa toggle"></i> {% trans "Subject Of" %}</h2>
+    <span data-bind="if: cards.subjectOf">
+        <a class="afs-report-a" data-bind="click: function(){add(cards.subjectOf)}"><i class="fa fa-mail-reply"></i> {% trans "Modify Subject Of" %}</a>
+    </span>
+
+    <!-- Collapsible content -->
+    <div data-bind="visible: visible.subjectOf" class="afs-report-collapsible-container pad-lft">
+
+        <!-- ko ifnot: subjectOf().length -->
+        <div class="afs-nodata-note">No digital references for this resource</div>
+        <!-- /ko -->
+        
+        <!-- ko if: subjectOf().length -->
+        <div class="afs-report-subsection" >
+            <div class="firstchild-container">
+                <div class="afs-table pad-btm">
+                    <table class="table table-striped" cells pacing="0" width="100%">
+                        <thead>
+                            <tr class="afs-table-header">
+                                <th class="min-tabletl">{% trans "Name" %}</th>
+                            </tr>
+                        </thead>
+                        <tbody data-bind="dataTablesForEach: { data: subjectOf, dataTableOptions: subjectOfTableConfig }">
+                            <tr>
+                                <td><a class="afs-block-value-url" data-bind="text: display, attr: {href: link}"></a></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+        <!-- /ko -->
+    </div>
+</div>
+{% endblock body %}
+{% endblock report %}

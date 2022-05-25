@@ -1,0 +1,509 @@
+{% extends "views/report-templates/default.htm" %} 
+{% load i18n %} 
+{% block report %}
+
+{% block body %}
+<div data-bind="foreach: {data: events, as: 'eventName', noChildContext: true}" class="afs-report-section">
+    <div>
+        <i data-bind="click: function() {toggleVisibility(visible[eventName])}, css: {'fa-angle-double-right': visible[eventName](), 'fa-angle-double-up': !visible[eventName]()}" class="fa toggle"></i>
+        <h2 class="afs-report-section-title" data-bind="text: eventName + ' Event'" class="afs-report-section-title"></h2>
+        <span data-bind="if: cards[eventName] && cards[eventName].card && !cards[eventName].card.tiles().length,">
+            <a data-bind="{click:function(){addNewTile(cards[eventName].card)}}" class="afs-report-a">
+                <i class="fa fa-mail-reply"></i> {% trans "Add Event" %}
+            </a>
+        </span>
+        <span data-bind="if: cards[eventName] && cards[eventName].card && cards[eventName].card.tiles().length">
+            <a data-bind="{click:function(){addNewTile(cards[eventName].card)}}" class="afs-report-a">
+                <i class="fa fa-mail-reply"></i> {% trans "Edit Event" %}
+            </a>
+        </span>
+
+        <div data-bind="visible: visible[eventName]">
+            <!-- ko if: eventDataArray[eventName].length === 0 || !eventDataArray[eventName].some(x => x !== undefined) -->
+            <div class="afs-nodata-note">No events</div>
+            <!-- /ko -->
+
+            <!-- Show this div if there are event data -->
+            <!-- Event Block (one for each event) -->
+            <!-- ko if: eventDataArray[eventName].length > 0 && eventDataArray[eventName].some(x => x !== undefined) -->
+            
+            <!-- ko foreach: { data: eventDataArray[eventName], as: "eventData", noChildContext: true} -->
+            <!-- ko if: !!eventData && eventData.tileid -->
+            <div class="afs-report-subsection">
+                <h2 class="afs-report-section-subtitle" style="display: block; margin-bottom: 5px;"><i data-bind="click: function() {toggleVisibility(eventData.visible)}, css: {'fa-angle-double-right': eventData.visible(), 'fa-angle-double-up': !eventData.visible()}" class="fa toggle"></i> {% trans "Event Summary " %}<span data-bind="if: eventData.title">:</span> <span data-bind="text: eventData.title"></span><span></span></h2>
+
+                <div data-bind="visible: eventData.visible" class="afs-report-collapsible-container">
+                    
+                    <div class="afs-report-event-section afs-report-subsection-container">
+                        <div style="width:95%" data-bind="foreach: {data: eventData.metadata, as: 'item'}" class="afs-report-subsection-two-column">
+                            <div class="afs-keyvalue" data-bind="component: {
+                                name: 'views/components/reports/scenes/keyvalue',
+                                params: {
+                                    data: item,
+                                    inline: true
+                                }
+                            }"></div>
+                        </div>
+                    </div>
+                
+                    <!-- Event First Generation Cards -->
+                    <!-- ko if: eventData.children.names -->
+                    <div class="afs-report-subsection-firstchild">
+                        <h5>Event Names</h5>
+                        <span data-bind="if: eventData.cards && eventData.cards.name">
+                            <a data-bind="click: function(){addNewTile(eventData.cards.name)}" class="afs-report-a">
+                                <i class="fa fa-mail-reply"></i> {% trans "Add Event Name" %}
+                            </a>
+                        </span>
+
+
+                        <!-- ko ifnot: eventData.names().length -->
+                        <div class="afs-nodata-note">No names for this event</div>
+                        <!--/ko-->
+
+                        <!-- ko if: eventData.names().length -->
+                        <div class="firstchild-container">
+                            <!-- Names Table -->
+                            <div class="afs-table" style="max-width: 100%">
+                                <table class="table table-striped" cellspacing="0" width="100%">
+                                    <thead>
+                                        <tr class="afs-table-header">
+                                            <th>{% trans "Name" %}</th>
+                                            <th class="min-tabletl">{% trans "Type" %}</th>
+                                            <th class="none">{% trans "Language" %}</th>
+                                            <th class="afs-table-control all"></th>
+                                        </tr>
+                                    </thead>
+                                    <tbody data-bind="dataTablesForEach: { data: eventData.names, dataTableOptions: nameTableConfig }">
+                                        <tr>
+                                            <td data-bind="text: name"></td>
+                                            <td data-bind="text: type"></td>
+                                            <td data-bind="text: language"></td>
+                                            <td class="afs-table-control">
+                                                <div data-bind="if: eventData.cards && eventData.cards.name && eventData.cards.name.tiles().length">
+                                                    <a data-bind="click: function() {$parent.editTile(tileid, eventData.cards.name)}">
+                                                        <i class="fa fa-mail-reply"></i>
+                                                    </a>
+                                                    <a data-bind="click: $parent.deleteTile.bind($data, tileid, eventData.cards.name)">
+                                                        <i class="fa fa-trash"></i>
+                                                    </a>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                        <!--/ko-->
+                    </div>
+                    <!-- /ko -->
+                    
+                    <!-- ko if: eventData.children.statements -->
+                    <!-- Event First Generation Cards -->
+                    <div class="afs-report-subsection-firstchild">
+                        <h5>Event Statements</h5>
+                        <a data-bind="if: eventData.cards && eventData.cards.statement, click: function(){addNewTile(eventData.cards.statement)}" class="afs-report-a"><i class="fa fa-mail-reply"></i> {% trans "Add Event Statement" %}</a>
+                        <!-- ko ifnot: eventData.statements().length -->
+                        <div class="afs-nodata-note">No statements for this event</div>
+                        <!-- /ko -->
+
+                        <!-- ko if: eventData.statements().length -->
+                        <div class="firstchild-container">
+                            <!-- Statements Table -->
+                            <div class="afs-table">
+                                <table class="table table-striped" cellspacing="0" width="100%">
+                                    <thead>
+                                        <tr class="afs-table-header">
+                                            <th>{% trans "Statement" %}</th>
+                                            <th class="none">{% trans "Type" %}</th>
+                                            <th class="none">{% trans "Language" %}</th>
+                                            <th class="none">{% trans "Name of Statement" %}</th>
+                                            <th class="afs-table-control all"></th>
+                                        </tr>
+                                    </thead>
+                                    <tbody  data-bind="dataTablesForEach: { data: eventData.statements, dataTableOptions: statementsTableConfig}">
+                                        <tr>
+                                            <td data-bind="text: content" class="line-clamp-1" style="vertical-align: unset; padding-top: 7px;"></td>
+                                            <td data-bind="text: type"></td>
+                                            <td data-bind="text: language"></td>
+                                            <td data-bind="text: name"></td>
+                                            <td class="afs-table-control">
+                                                <div data-bind="if: eventData.cards && eventData.cards.statement && eventData.cards.statement.tiles().length">
+                                                    <a data-bind="click: function() {$parent.editTile(tileid, eventData.cards.statement)}">
+                                                        <i class="fa fa-mail-reply"></i>
+                                                    </a>
+                                                    <a data-bind="click:$parent.deleteTile.bind($data, tileid, eventData.cards.statement)">
+                                                        <i class="fa fa-trash"></i>
+                                                    </a>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                        <!-- /ko -->
+                    </div>
+                    <!-- /ko -->
+
+                    <!-- ko if: eventData.children.identifiers -->
+                    <!-- Event First Generation Cards -->
+                    <div class="afs-report-subsection-firstchild">
+                        <h5>Event Identifiers</h5>
+                        <a data-bind="if: eventData.cards && eventData.cards.identifier, click: function(){addNewTile(eventData.cards.identifier)}" class="afs-report-a"><i class="fa fa-mail-reply"></i> {% trans "Add Event Identifier" %}</a>
+                        <!-- ko ifnot: eventData.identifiers().length -->
+                        <div class="afs-nodata-note">No identifiers for this event</div>
+                        <!-- /ko -->
+
+                        <!-- ko if: eventData.identifiers().length -->
+                        <div class="firstchild-container">
+                            <!-- Identifiers Table -->
+                            <div class="afs-table">
+                                <table class="table table-striped" cellspacing="0" width="100%">
+                                    <thead>
+                                        <tr class="afs-table-header">
+                                            <th>{% trans "Identifier" %}</th>
+                                            <th>{% trans "Type" %}</th>
+                                            <th class="afs-table-control all"></th>
+                                        </tr>
+                                    </thead>
+                                    <tbody  data-bind="dataTablesForEach: { data: eventData.identifiers, dataTableOptions: identifierTableConfig}">
+                                        <tr>
+                                            <td data-bind="text: name"></td>
+                                            <td data-bind="text: type"></td>
+                                            <td class="afs-table-control">
+                                                <div data-bind="if: eventData.cards && eventData.cards.identifier && eventData.cards.identifier.tiles().length">
+                                                    <a data-bind="click: function() {$parent.editTile(tileid, eventData.cards.identifier)}">
+                                                        <i class="fa fa-mail-reply"></i>
+                                                    </a>
+                                                    <a data-bind="click: $parent.deleteTile.bind($data, tileid, eventData.cards.identifier)">
+                                                        <i class="fa fa-trash"></i>
+                                                    </a>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                        <!-- /ko -->
+                    </div>
+                    <!-- /ko -->
+
+                    <!-- ko if: eventData.children.timespan -->
+                    <!-- Event First Generation Cards -->
+                    <div class="afs-report-subsection-firstchild">
+                        <h5>Event Timespan</h5>
+                        <span data-bind="if: eventData.cards && eventData.cards.timespan">
+                            <a data-bind="click: function(){addNewTile(eventData.cards.timespan)}" class="afs-report-a">
+                                <i class="fa fa-mail-reply"></i> 
+                                <!-- ko if: eventData.timespan() -->
+                                {% trans "Edit Event Timespan" %}
+                                <!--/ko-->
+                                <!-- ko if: !eventData.timespan() -->
+                                {% trans "Add Event Timespan" %}
+                                <!--/ko-->
+                            </a>
+                        </span>
+                        <!-- Show this block if there's data -->
+                        <div data-bind="component: {
+                            name: 'views/components/reports/scenes/keyvalue',
+                            params: {
+                                data: {key: undefined, type: 'timespan', value: eventData.timespan()},
+                            }
+                        }"></div>
+                    </div>
+                    <!--/ko-->
+
+                    <!-- ko if: eventData.children.location -->
+                    <!-- Event First Generation Cards -->
+                    <div class="afs-report-subsection-firstchild">
+                        <h5>Event Location</h5>
+                        <span data-bind="if: eventData.cards && eventData.cards.location">
+                            <a data-bind="click: function(){addNewTile(eventData.cards.location)}" class="afs-report-a">
+                                <i class="fa fa-mail-reply"></i> {% trans "Edit Event Location" %}
+                            </a>
+                        </span>
+                        <!-- Show this block if there's NO data -->
+                        <div class="afs-nodata-note" style="display: none;">No timespan for this event</div>
+
+                        <!-- Show this block if there's data -->
+                        <div data-bind="component: {
+                            name: 'views/components/reports/scenes/keyvalue',
+                            params: {
+                                data: {key: undefined, type: 'resource', value: eventData.location()},
+                            }
+                        }"></div>
+                    </div>
+                    <!--/ko-->
+                </div>
+            </div>
+            <div data-bind="if: eventData.parts" class="afs-report-subsection">
+                <i data-bind="click: function() {toggleVisibility(visible[eventName].parts)}, css: {'fa-angle-double-right': visible[eventName].parts(), 'fa-angle-double-up': !visible[eventName].parts()}" class="fa toggle"></i>
+                <h2 class="afs-report-section-subtitle">{% trans "Event Parts" %}</h2>
+                <a data-bind="if: cards[eventName] && cards[eventName].parts, click: function(){addNewTile(cards[eventName].parts)}" class="afs-report-a"><i class="fa fa-mail-reply"></i> {% trans "Add Part" %}</a>
+                <div data-bind="if: visible[eventName].parts">
+                <!-- ko ifnot: eventData.parts().length -->
+                <div class="afs-nodata-note afs-top-card">No parts for this event</div>
+                <!-- /ko -->
+
+                <!-- Event Part -->
+                <!-- ko if: eventData.parts().length -->
+                <div data-bind="foreach:{ data: eventData.parts, as: 'part' }" class="part">
+                    <div>
+                        <h3><i data-bind="click: function(){$parent.toggleVisibility(visible)}" class="fa fa-angle-double-right"></i> {% trans "Event Part " %}<span data-bind="if: title">:</span> <span data-bind="text: title"></span></h3>
+                        <div class="afs-part-expanded" data-bind="visible: visible">
+                            <a data-bind="if: eventData.cards && eventData.cards.part, click: function(){$parent.editTile(tileid, eventData.cards.part)}" class="afs-report-a"><i class="fa fa-mail-reply"></i> {% trans "Edit this Part" %}</a>
+            
+                            <div class="afs-report-event-section afs-report-collapsible-container">
+                                <div class="afs-report-subsection-container">
+                                    <div  style="width:95%;" data-bind="foreach: {data: $data.metadata, as: 'item' }" class="afs-report-subsection-two-column">
+                                        <div afs-report-subsection-two-column>  
+                                            <div class="afs-keyvalue" data-bind="component: {
+                                                name: 'views/components/reports/scenes/keyvalue',
+                                                params: {
+                                                    data: item,
+                                                    inline: true
+                                                }
+                                            }">
+                                            </div>
+                                        </div>  
+                                    </div>
+                                </div>
+                            
+                                <!-- Event First Generation Cards -->
+                                <div class="afs-report-subsection-firstchild">
+                                    <h5>Event Part Names</h5>
+                                    <a data-bind="if: $data.cards && $data.cards.name, click: function(){$parent.addNewTile(cards.name)}" class="afs-report-a">
+                                        <i class="fa fa-mail-reply"></i>
+                                        <!-- ko if: $data.names().length -->
+                                        {% trans "Edit Part Names" %}
+                                        <!--/ko-->
+                                        <!-- ko if: !$data.names().length -->
+                                        {% trans "Add Part Names" %}
+                                        <!--/ko-->
+                                    </a>
+                                    <!-- ko ifnot: $data.names().length -->
+                                    <div class="afs-nodata-note">No names for this part</div>
+                                    <!-- /ko -->
+            
+                                    <!-- ko if: $data.names().length -->
+                                    <div class="firstchild-container">
+                                        
+                                        <!-- Names Table -->
+                                        <div class="afs-table" style="max-width: 100%;">
+                                            <table class="table table-striped" cellspacing="0" width="100%">
+                                                <thead>
+                                                    <tr class="afs-table-header">
+                                                        <th>{% trans "Name" %}</th>
+                                                        <th class="min-tabletl">{% trans "Type" %}</th>
+                                                        <th class="none">{% trans "Language" %}</th>
+                                                        <th class="afs-table-control all"></th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody data-bind="dataTablesForEach: { data: $data.names, dataTableOptions: $parent.nameTableConfig }">
+                                                    <tr>
+                                                        <td data-bind="text: name"></td>
+                                                        <td data-bind="text: type"></td>
+                                                        <td data-bind="text: language"></td>
+                                                        <td class="afs-table-control">
+                                                            <div data-bind="if: $parent.cards && $parent.cards.name && $parent.cards.name.tiles().length">
+                                                                <a data-bind="click: function() {$parents[1].editTile(tileid, $parent.cards.name)}">
+                                                                    <i class="fa fa-mail-reply"></i>
+                                                                </a>
+                                                                <a data-bind="click: $parents[1].deleteTile.bind($data, tileid, $parent.cards.name)">
+                                                                    <i class="fa fa-trash"></i>
+                                                                </a>
+                                                            </div>
+                                                        </td>
+                                                    </tr>
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    </div>
+                                    <!-- /ko -->
+                                </div>
+                                
+                                <!-- Event First Generation Cards -->
+                                <div class="afs-report-subsection-firstchild">
+                                    <h5>Event Part Statements</h5>
+                                    <a data-bind="if: $data.cards && $data.cards.statement, click: function(){$parent.addNewTile($data.cards.statement)}" class="afs-report-a">
+                                        <i class="fa fa-mail-reply"></i> 
+                                        <!-- ko if: $data.statements().length -->
+                                        {% trans "Edit Part Statement" %}
+                                        <!--/ko-->
+                                        <!-- ko if: !$data.statements().length -->
+                                        {% trans "Add Part Statement" %}
+                                        <!--/ko-->
+                                    </a>
+                                    
+                                    <!-- ko ifnot: $data.statements().length -->
+                                    <div class="afs-nodata-note">No statements for this part</div>
+                                    <!-- /ko -->
+            
+                                    <!-- ko if: $data.statements().length -->
+                                    <div class="firstchild-container">
+                                        <!-- Statements Table -->
+                                        <div class="afs-table">
+                                            <table class="table table-striped" cellspacing="0" width="100%">
+                                                <thead>
+                                                    <tr class="afs-table-header">
+                                                        <th>{% trans "Statement" %}</th>
+                                                        <th class="none">{% trans "Type" %}</th>
+                                                        <th class="none">{% trans "Language" %}</th>
+                                                        <th class="none">{% trans "Name of Statement" %}</th>
+                                                        <th class="afs-table-control all"></th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody  data-bind="dataTablesForEach: { data: statements, dataTableOptions: $parent.statementsTableConfig}">
+                                                    <tr>
+                                                        <td data-bind="text: content" class="line-clamp-1" style="vertical-align: unset; padding-top: 7px;"></td>
+                                                        <td data-bind="text: type"></td>
+                                                        <td data-bind="text: language"></td>
+                                                        <td data-bind="text: name"></td>
+                                                        <td class="afs-table-control">
+                                                            <div data-bind="if: $parent.cards && $parent.cards.statement && $parent.cards.statement.tiles().length">
+                                                                <a data-bind="click: function() {$parents[1].editTile(tileid, $parent.cards.statement)}">
+                                                                    <i class="fa fa-mail-reply"></i>
+                                                                </a>
+                                                                <a data-bind="click: $parents[1].deleteTile.bind($data, tileid, $parent.cards.statement)">
+                                                                    <i class="fa fa-trash"></i>
+                                                                </a>
+                                                            </div>
+                                                        </td>
+                                                    </tr>
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    </div>
+                                    <!-- /ko -->
+                                </div>
+            
+                                <!-- Event First Generation Cards -->
+                                <div class="afs-report-subsection-firstchild">
+                                    <h5>Event Part Identifiers</h5>
+                                    <a data-bind="if: $data.cards && $data.cards.identifier, click: function(){$parent.addNewTile($data.cards.identifier)}" class="afs-report-a">
+                                        <i class="fa fa-mail-reply"></i>
+                                        <!-- ko if: identifiers().length -->
+                                        {% trans "Edit Part Identifier" %}
+                                        <!--/ko-->
+                                        <!-- ko if: !identifiers().length -->
+                                        {% trans "Add Part Identifier" %}
+                                        <!--/ko-->
+                                    </a>
+                                    
+                                    <!-- ko ifnot: identifiers().length -->
+                                    <div class="afs-nodata-note">No identifiers for this part</div>
+                                    <!-- /ko-->
+                                    
+                                    <!-- ko if: identifiers().length -->
+                                    <div class="firstchild-container">
+                                        <!-- Identifiers Table -->
+                                        <div class="afs-table">
+                                            <table class="table table-striped" cellspacing="0" width="100%">
+                                                <thead>
+                                                    <tr class="afs-table-header">
+                                                        <th>{% trans "Identifier" %}</th>
+                                                        <th>{% trans "Type" %}</th>
+                                                        <th class="afs-table-control all"></th>
+                                                    </tr>
+                                                </thead>
+                                                
+                                                <tbody  data-bind="dataTablesForEach: { data: identifiers, dataTableOptions: $parent.identifierTableConfig}">
+                                                    <tr>
+                                                        <td data-bind="text: name"></td>
+                                                        <td data-bind="text: type"></td>
+                                                        <td class="afs-table-control">
+                                                            <div data-bind="if: $parent.cards && $parent.cards.identifier && $parent.cards.identifier.tiles().length">
+                                                                <a data-bind="click: function() {$parents[1].editTile(tileid, $parent.cards.identifier)}">
+                                                                    <i class="fa fa-mail-reply"></i>
+                                                                </a>
+                                                                <a data-bind="click: $parents[1].deleteTile.bind($data, tileid, $parent.cards.identifier)">
+                                                                    <i class="fa fa-trash"></i>
+                                                                </a>
+                                                            </div>
+                                                        </td>
+                                                    </tr>
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    </div>
+                                    <!-- /ko -->
+                                </div>
+            
+                                <!-- Event First Generation Cards -->
+                                <div class="afs-report-subsection-firstchild">
+                                    <h5>Event Part Timespan</h5>
+                                    <a data-bind="if: $data.cards && $data.cards.timespan, click: function(){$parent.addNewTile(cards.timespan)}" class="afs-report-a">
+                                        <i class="fa fa-mail-reply"></i>
+                                        <!-- ko if: timespan() -->
+                                        {% trans "Edit Part Timespan" %}
+                                        <!--/ko-->
+                                        <!-- ko if: !timespan() -->
+                                        {% trans "Add Part Timespan" %}
+                                        <!--/ko-->
+                                    </a>
+                                    <!-- ko ifnot: timespan() -->
+                                    <div class="afs-nodata-note">No timespan for this event</div>
+                                    <!-- /ko -->
+                                    
+                                    <!-- ko if: timespan() -->
+                                    <!-- Show this block if there's data -->
+                                    <div class="firstchild-container pad-top-sm">
+                                        <div class="afs-report-subsection-item flex">
+                                            <div class="afs-block-attributes timespan">
+                                                <h6 class="afs-block-key">Beginning of the beginning: </h6>
+                                                <div data-bind="text: timespan().beginningStart" class="afs-block-value"></div>
+                                            </div>
+                                            <div class="afs-block-attributes timespan">
+                                                <h6 class="afs-block-key">End of the beginning: </h6>
+                                                <div data-bind="text: timespan().beginningComplete" class="afs-block-value"></div>
+                                            </div>
+                                        </div>
+                                        <div class="afs-report-subsection-item flex" style="margin-top: -5px;">
+                                            <div class="afs-block-attributes timespan">
+                                                <h6 class="afs-block-key">Beginning of the end: </h6>
+                                                <div data-bind="text: timespan().endingStart" class="afs-block-value"></div>
+                                            </div>
+                                            <div class="afs-block-attributes timespan">
+                                                <h6 class="afs-block-key">End of the end: </h6>
+                                                <div data-bind="text: timespan().endingComplete" class="afs-block-value"></div>
+                                            </div>
+                                        </div>
+                                        <div class="afs-report-subsection-item flex column-order pad-top pad-btm">
+                                            <div class="afs-block-attributes">
+                                                <h6 class="afs-block-key">Name of event timespan: </h6>
+                                                <div data-bind="text: timespan().name" class="afs-block-value"></div>
+                                            </div>
+                                            <div class="afs-block-attributes">
+                                                <h6 class="afs-block-key">Duration: </h6>
+                                                <div data-bind="text: timespan().duration" class="afs-block-value"></div>
+                                            </div>
+                                            <div class="afs-block-attributes">
+                                                <h6 class="afs-block-key">Name of event duration: </h6>
+                                                <div data-bind="text: timespan().durationEventName" class="afs-block-value"></div>
+                                            </div>
+                                        </div>
+                                    </div> 
+                                    <!--/ko-->
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!-- /ko -->
+                </div>
+            </div>
+            <!-- /ko -->
+            <!-- /ko -->
+            <!-- /ko -->
+        </div>
+    </div>
+</div>
+
+{% endblock body %}
+{% endblock report %}
+{%block isolation%}
+
+
+{%endblock isolation%}

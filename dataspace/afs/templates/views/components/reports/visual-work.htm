@@ -1,0 +1,65 @@
+{% extends "views/report-templates/tabbed.htm" %} {% load i18n %} {% block summary %}
+
+<div class="model-summary-report">
+    <div>
+        <h2 class="summary-report-title">
+            <span data-bind="text: report.get('displayname') "></span>
+            <a class="summary-report-link" href="javascript(void);" data-bind="text: TypeOfWorkName"></a>
+        </h2>
+    </div>
+
+    <!-- Header -->
+    <div class="summary-report-subtitle">
+        <!--span>
+            <span class="subtitle-category">{% trans "Created By:" %}</span>
+            <span class="subtitle-value" data-bind="if: CreatedBy().length > 0">
+                <span data-bind="foreach: CreatedBy">
+                    <span data-bind="if: $index() > 0">, </span>
+                    <a target="_blank" data-bind="text: name, attr: { href: link }, click: function() { return true;}, clickBubble: false"></a>
+                </span>
+            </span>
+            <span class="subtitle-value-blank" data-bind="if: CreatedBy().length === 0">
+                {% trans "No information" %}
+            </span>
+        </span-->
+        <span style="float: right; font-size: 13px;">{% trans "Visual Work Type" %}</span>
+    </div>
+
+    <!-- Description -->
+    <div class="summary-report-description">
+        <span class="subtitle-category">{% trans "Visual Work Description:" %}</span>
+        <span class="subtitle-value">
+            <span data-bind="if: description.length > 0">
+                <div data-bind="html: description"></div>
+            </span>
+            <span data-bind="if: description.length === 0">
+                {% trans "No description available" %}
+            </span>
+        </span>
+    </div>
+
+    <!-- Related Activities -->
+    <div class="summary-report-related-panel">
+        <div class="summary-report-related">
+            {% trans "Depicts" %}
+        </div>
+        <div data-bind="if: depictsPhysicalName().length > 0">
+            <div class="subtitle-value" data-bind="foreach: depictsPhysicalName">
+                <a class="summary-report-related-list" target="_blank" data-bind="text: name, attr: { href: link }, click: function() { return true;}, clickBubble: false"></a>
+            </div>
+        </div>
+        <span data-bind="if: depictsPhysicalName().length === 0">
+            {% trans "No Physical Things Depicted" %}
+        </span>
+    </div>
+
+    <!-- Edit Button -->
+    <div class="summary-report-editor-button">
+        <a class="btn btn-mint btn-labeled fa fa-edit text-right" target="_blank"
+            data-bind="attr: { href: editorLink }, click: function() { return true;}, clickBubble: false">
+            {% trans "Edit Resource" %}
+        </a>
+    </div>
+</div>
+
+{% endblock summary %}

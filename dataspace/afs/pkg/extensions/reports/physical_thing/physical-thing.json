@@ -1,0 +1,11 @@
+{
+    "name": "Physical Thing Template",
+    "component": "views/components/reports/physical-thing",
+    "defaultconfig": {
+        "uncompacted_reporting": true
+    },
+    "description": "Physical Thing report",
+    "componentname": "physical-thing-report",
+    "templateid": "b3056c21-33c4-4055-b064-ea9296c1c13a",
+    "preload_resource_data": false
+}

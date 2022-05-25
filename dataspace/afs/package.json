@@ -1,0 +1,12 @@
+{
+    "name": "arches",
+    "repository": {
+        "url": "git@github.com:archesproject/arches.git",
+        "type": "git"
+    },
+    "dependencies": {
+        "arches": "archesproject/arches#master",
+        "plotly.js-dist": "^1.52.2",
+        "three": "^0.113.2"
+    }
+}

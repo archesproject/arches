@@ -1,0 +1,10 @@
+{
+    "pluginid": "ef3a374c-f795-4317-aaee-83e1493eabb6",
+    "name": "Update Project Collection",
+    "icon": "fa fa-file",
+    "component": "views/components/plugins/project-collection-workflow",
+    "componentname": "project-collection-workflow",
+    "config": {"show":false},
+    "slug": "project-collection-workflow",
+    "sortorder": 0
+}

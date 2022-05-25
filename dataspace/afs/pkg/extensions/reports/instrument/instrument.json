@@ -1,0 +1,11 @@
+{
+    "name": "Instrument Template",
+    "component": "views/components/reports/instrument",
+    "defaultconfig": { 
+        "uncompacted_reporting": true
+    },
+    "description": "Instrument report",
+    "componentname": "instrument-report",
+    "templateid": "c2edf720-9db0-4029-a102-48e6762ded79",
+    "preload_resource_data": false
+}

@@ -1,0 +1,55 @@
+{% extends "views/report-templates/default.htm" %} 
+{% load i18n %} 
+{% block report %}
+
+{% block body %}
+<div class="afs-report-section">
+    <h2 class="afs-report-section-title"><i data-bind="click: function() {toggleVisibility(visible.contactPoints)}, css: {'fa-angle-double-right': visible.contactPoints(), 'fa-angle-double-up': !visible.contactPoints()}" class="fa toggle"></i> {% trans "Contact Points" %}</h2>
+    <span data-bind="if: cards && cards.contactPoints && (!Array.isArray(contactPoints())|| cards.contactPoints.cardinality == 'n')">
+        <a class="afs-report-a" data-bind="click: function(){addNewTile(cards.contactPoints)}"><i class="fa fa-mail-reply"></i> {% trans "Add Contact Point" %}</a>
+    </span>
+
+    <!-- Collapsible content -->
+    <div data-bind="visible: visible.contactPoints" class="afs-report-collapsible-container pad-lft">
+
+        <!-- ko ifnot: Array.isArray(contactPoints()) && contactPoints().length -->
+        <div class="afs-nodata-note">No contact points for this resource</div>
+        <!-- /ko -->
+        
+        <!-- ko if: Array.isArray(contactPoints()) && contactPoints().length -->
+        <div class="afs-report-subsection" >
+            <div>
+                <div class="afs-table pad-btm">
+                    <table class="table table-striped" cellspacing="0" width="100%">
+                        <thead>
+                            <tr class="afs-table-header">
+                                <th>{% trans "Contact Information" %}</th>
+                                <th class="min-tabletl">{% trans "Contact Information Type" %}</th>
+                                <th class="afs-table-control all"></th>
+                            </tr>
+                        </thead>
+                        <tbody data-bind="dataTablesForEach: { data: contactPoints, dataTableOptions: contactPointsTableConfig }">
+                            <tr>
+                                <td data-bind="text: content"></td>
+                                <td data-bind="text: type"></td>
+                                <td class="afs-table-control">
+                                    <div data-bind="if: $parent.cards && $parent.cards.contactPoints">
+                                        <a data-bind="click: function() {$parent.editTile(tileid, $parent.cards.contactPoints)}">
+                                            <i class="fa fa-mail-reply"></i>
+                                        </a>
+                                        <a data-bind="click: $parent.deleteTile.bind($data, tileid, $parent.cards.contactPoints)">
+                                            <i class="fa fa-trash"></i>
+                                        </a>
+                                    </div>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+        <!-- /ko -->
+    </div>
+</div>
+{% endblock body %}
+{% endblock report %}

@@ -1,0 +1,11 @@
+{
+    "name": "Place Template",
+    "component": "views/components/reports/place",
+    "defaultconfig": {
+        "uncompacted_reporting": true
+    },
+    "description": "Place report",
+    "componentname": "place-report",
+    "templateid": "34b7109d-2c0a-47fa-a307-4e361e142bfe",
+    "preload_resource_data": false
+}

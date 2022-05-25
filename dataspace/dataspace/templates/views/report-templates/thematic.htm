@@ -1,0 +1,189 @@
+{% extends "views/report-templates/default.htm" %}
+{% load i18n %}
+
+<!-- hack to adjust height of report preview container -->
+{% block report %}
+<div class="thematic-report-container">
+    {{ block.super }}
+</div>
+{% endblock report %}
+
+
+{% block report_title_bar %}
+{% endblock report_title_bar %}
+
+{% block header %}
+<div class="thematic-nav-tab-container">
+    <ul class="nav nav-tabs thematic-nav-tab-list">
+        <!-- ko foreach: TAB_DATA -->
+            <li 
+                class="thematic-nav-tab-list-item" 
+                data-bind="
+                    container: '.thematic-nav-tab-container',
+                    scrollDirection: 'horizontal',
+                    scrollTo: $index() === $parent.activeTabIndex(),
+                "
+            >
+                <div
+                    class='thematic-nav-tab'
+                    data-bind="{
+                        css: { active: $index() === $parent.activeTabIndex() },
+                        click: function() { 
+                            if (
+                                $index() !== $parent.activeTabIndex() 
+                            ) { 
+                                $parent.activeTabIndex($index()); 
+                            }
+                        },
+                    }" 
+                >
+                    <div 
+                        style="
+                            display: flex; 
+                            flex-direction: row; 
+                            justify-content: center; 
+                            align-items: center;
+                        "
+                    >
+                        <span 
+                            style="font-size: 14px;"
+                            data-bind="text: $data.title"
+                        ></span>
+                    </div>
+                </div>
+            </li>
+        <!-- /ko -->
+    </ul>
+</div>
+{% endblock header %}
+
+{% block body %}
+<div class="thematic-report-body-container">
+    <!-- ko if: !loading() -->
+    <div class="thematic-report-body">
+        <!-- ko if: activeTab() -->
+            <!-- ko with: activeTab() -->
+                <!-- ko foreach: sections() -->
+                    <!-- ko if: $data.resourceInstanceData.length || !$parents[1].emptyReportSectionsHidden() -->
+                        <div 
+                            class="thematic-report-section"
+                            data-bind="style: { 'border-bottom': $data.resourceInstanceData.length ? '1px solid #ddd' : 'none' }" 
+                        >
+                            <div class="thematic-report-section-title-container">
+                                <!-- ko if: $data['hasPlusSign'] -->
+                                <button style="border: none;">
+                                    <i class="fa fa-plus"></i>
+                                </button>
+                                <!-- /ko -->
+
+                                <div class="thematic-report-section-title">
+                                    <h5 data-bind="text: sectionTitle"></h5>
+                                </div>
+                            </div>
+
+                            <!-- ko if: $data.resourceInstanceData.length -->
+
+                                <!-- ko if: $data.childNodeInformation -->
+                                <table style="margin: 12px 0;">
+                                    <thead class="thematic-report-table-head">
+                                        <tr>
+                                            <th style="border-right: 1px solid #ddd;">
+                                                <!-- dummy <th> for button heading -->
+                                            </th>
+                                            
+                                            <!-- ko foreach: $data.childNodeInformation -->
+                                                <th data-bind="text: columnName"></th>
+                                            <!-- /ko -->
+                                        </tr>
+                                    </thead>
+                                    <tbody class="thematic-report-table-body">
+                                        <!-- ko foreach: $data.resourceInstanceData -->
+                                        <tr>
+                                            <td class="thematic-report-table-body-button-container">
+                                                <button>
+                                                    <i class="fa fa-wrench"></i>
+                                                </button>
+                                                <button>
+                                                    <i class="fa fa-trash"></i>
+                                                </button>
+                                            </td>
+                                            <!-- ko foreach: $parent.childNodeInformation -->
+                                                <td data-bind="text: $parents[2].getResourceInstanceNodeData($data.nodeId, $parent)[VALUE]"></td>
+                                            <!-- /ko -->
+                                        </tr>
+                                        <!-- /ko -->
+                                    </tbody>
+                                </table>
+                                <!-- /ko -->
+                                <!-- ko ifnot: $data.childNodeInformation -->
+                                <table style="margin: 12px 0; width: fit-content;">
+                                    <tbody class="thematic-report-table-body">
+                                        <!-- ko foreach: $data.resourceInstanceData -->
+                                            <tr>
+                                                <td class="thematic-report-table-body-button-container">
+                                                    <button>
+                                                        <i class="fa fa-wrench"></i>
+                                                    </button>
+                                                    <button>
+                                                        <i class="fa fa-trash"></i>
+                                                    </button>
+                                                </td>
+                                                <td data-bind="text: $data[VALUE]"></td>
+                                            </tr>
+                                        <!-- /ko -->
+                                    </tbody>
+                                </table>
+                                <!-- /ko -->
+
+                            <!-- /ko -->
+                            <!-- ko ifnot: $data.resourceInstanceData.length -->
+                            <div style="padding: 8px 0px">
+                                <span>{% trans 'No data has been added yet.' %}</span>
+                            </div>
+                            <!-- /ko -->
+                        </div>
+                    <!-- /ko -->
+                <!-- /ko -->
+            <!-- /ko -->
+        <!-- /ko -->
+    </div>
+    <!-- /ko -->
+</div>
+{% endblock body %}
+
+{% block related_resources %}
+{% endblock related_resources %}
+
+{% block footer %}
+<div 
+    class="thematic-report-footer"
+>
+    <div style="display: flex;">
+        <div class="tab-counter">
+            <span 
+                style="padding-right: 2px;"
+                data-bind="text: activeTabIndex() + 1"
+            ></span>
+            <span data-bind="text:`/ ${TAB_DATA.length}`"></span>
+            
+        </div>
+
+        <div
+            data-bind="{
+                component: { 
+                    name: 'views/components/simple-switch', 
+                    params: {
+                        value:  emptyReportSectionsHidden, 
+                        config:{
+                            label: '{% trans "Hide empty report sections" %}',
+                            setvalue: toggleEmptyReportSections,
+                            getvalue: emptyReportSectionsHidden,
+                        }
+                    }
+                }
+            }"
+        ></div>
+    </div>
+
+</div>
+{% endblock footer %}

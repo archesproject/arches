@@ -1,0 +1,25 @@
+{% load i18n %}
+<div>
+    <div style="padding: 35px 60px 0px;">
+        <div class="widget-input-label">Project Name*</div>
+        <div style="margin-top: -20px;" data-bind="component: {
+            name: 'text-widget',
+            params: {
+                renderContext: 'workflow', 
+                value: nameValue,
+            }
+        }"></div>
+        </div>
+    </div>
+    <div style="padding: 25px 60px 0px;">
+        <div class="widget-input-label">Project Activity Type</div>
+        <div style="margin-top: -20px;" data-bind="component: {
+            name: 'concept-multiselect-widget',
+            params: {
+                node: {config: {rdmCollection: '3a8e8388-0bb9-42f2-bc77-fc5a1c640589'}},
+                renderContext: 'workflow', 
+                value: typeValue,
+            }
+        }"></div>
+    </div>
+</div>

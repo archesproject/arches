@@ -1,0 +1,23 @@
+{% load i18n %}
+
+<div style="height:0px">
+  <div class="row widget-container">
+    <div>
+      <h4>{% trans "How does this function work?" %}</h4>
+      <p>{% trans "In the widget below, select a card/node that is of File-list datatype. When a tile is created for that card, this function will create a IIIF Manifest record in the database and a corresponding json file. Created IIIF Manifests will be selectable in a IIIF Annotation card. Ensure that Cantaloupe is running for this function to be successful." %}</p>
+    </div>
+    <div class="form-group">
+      <div class="relative">
+          <label class="col-xs-12 control-label widget-input-label"> {% trans "Card Name" %}</label>
+      </div>
+
+      <div class="col-xs-12">
+          <!-- <select data-placeholder="{% trans "Choose a card." %}" multiple
+          data-bind="value: triggering_nodegroups, options: cards, optionsText: 'name', optionsValue: 'nodegroup_id', chosen: {width: '100%', allow_single_deselect: true, disable_search_threshold: 15},"></select> -->
+
+          <select data-placeholder="{% trans "Select a nodegroup" %}" multiple data-bind="chosen: {width: '100%'}, selectedOptions: triggering_nodegroups, options: cards, optionsText: 'name', optionsValue: 'nodegroup_id'"></select>
+
+      </div>
+    </div>
+  </div>
+</div>

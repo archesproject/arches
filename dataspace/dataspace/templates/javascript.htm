@@ -1,0 +1,37 @@
+{% extends "javascript.htm" %}
+
+{% load staticfiles %}
+{% load l10n %}
+{% load i18n %}
+
+{% block paths %}
+    'three': '{{ STATIC_URL }}packages/three/build/three.min',
+    'CSS2DRenderer': '{{ STATIC_URL }}packages/three/examples/js/renderers/CSS2DRenderer',
+    'TrackballControls': '{{ STATIC_URL }}packages/three/examples/js/controls/TrackballControls',
+    'PDBLoader': '{{ STATIC_URL }}packages/three/examples/js/loaders/PDBLoader',
+    'PCDLoader': '{{ STATIC_URL }}packages/three/examples/js/loaders/PCDLoader',
+    'ColladaLoader': '{{ STATIC_URL }}packages/three/examples/js/loaders/ColladaLoader',
+    'Plotly': '{{ STATIC_URL }}packages/plotly.js-dist/plotly'
+{% endblock paths %}
+
+{% block shim %}
+    'CSS2DRenderer': {deps: ['register-three']},
+    'TrackballControls': {deps: ['register-three']},
+    'PDBLoader': {deps: ['register-three']},
+    'PCDLoader': {deps: ['register-three']},
+    'ColladaLoader': {deps: ['register-three']}
+{% endblock shim %}
+
+{% block urls %}
+    physical_thing_search_results: "{% url 'physical-thing-search-results' %}",
+    physical_things_set: "{% url 'physical_things_set' %}",
+{% endblock urls %}
+
+
+{% block project_modules %}
+<script>
+define('register-three', ['three'], function (THREE) {
+    window.THREE = THREE;
+    });
+</script>
+{% endblock project_modules %}

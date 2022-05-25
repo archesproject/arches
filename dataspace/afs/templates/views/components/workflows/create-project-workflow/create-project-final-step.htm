@@ -1,0 +1,67 @@
+{% load i18n %}
+<!-- ko if: loading() === false -->
+<div class="final-step">
+    <div class="afs-final-step-section">
+        <h5 class="summary-value">{% trans 'Created Resource Instance(s)' %}</h5>
+        <div class="afs-final-step-block">
+            <div style="display: flex; flex-direction: column;">
+                <a data-bind="attr: { href: urls.resource + '/' + resourceid}" target="_blank">
+                    <div class="summary-value" 
+                        data-bind = "text: displayName + ' ({% trans 'Project Resource Instance' %})'">
+                    </div>
+                </a>
+                <a data-bind="attr: { href: urls.resource + '/' + collectionResourceId}" target="_blank">
+                    <div class="summary-value" 
+                        data-bind = "text: reportVals.collection.value + ' ({% trans 'Collection Resource Instance' %})'">
+                    </div>
+                </a>
+            </div>
+        </div>
+    </div>
+    <div class="afs-final-step-section">
+        <h5 class="summary-value">{% trans 'Project Details' %}</h5>
+        <div class="afs-final-step-block">
+            <div style="display: flex; flex-direction: column;">
+                <div style="display: inline-flex;">
+                    <div class="summary-label" data-bind="text: reportVals.projectName.name + ':'"></div>
+                    <div class="summary-value" data-bind="text: reportVals.projectName.value"></div>
+                </div>
+                <div style="display: inline-flex;">
+                    <div class="summary-label" data-bind="text: reportVals.projectStatement.name + ':'"></div>
+                    <div class="summary-value" data-bind="html: reportVals.projectStatement.value"></div>
+                </div>
+                <div style="display: inline-flex;">
+                    <div class="summary-label" data-bind="text: reportVals.projectTimespan.name + ':'"></div>
+                    <div class="summary-value" data-bind="text: reportVals.projectTimespan.value"></div>
+                </div>
+                <div style="display: inline-flex;">
+                    <div class="summary-label" data-bind="text: reportVals.projectTeam.name + ':'"></div>
+                    <div class="summary-value" data-bind="text: reportVals.projectTeam.value"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="afs-final-step-section">
+        <h5 class="summary-value">{% trans 'Used Physical Things' %}</h5>
+        <div class="afs-final-step-block">
+            <div style="display: flex; flex-direction: column;">
+                <!-- ko foreach: collectionOfPhysThings -->
+                <a class="summary-value" data-bind="clickBubble: false, attr: {href: $parent.urls.resource + '/' + resourceid}, text: name"></a>
+                <!-- /ko -->
+            </div>
+        </div>
+    </div>
+
+    <div class="afs-final-step-section">
+        <h5 class="summary-value">{% trans 'Related Resource' %}</h5>
+        <div class="afs-final-step-block">
+            <div style="display: flex; flex-direction: column;">
+                <div style="display: inline-flex;">
+                    <div class="summary-value" data-bind="text: reportVals.collection.value"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- /ko -->

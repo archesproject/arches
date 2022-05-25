@@ -1,0 +1,10 @@
+{
+    "pluginid": "1132c953-8af4-4acb-87c5-39c5b996799e",
+    "name": "Sample Taking",
+    "icon": "fa fa-file",
+    "component": "views/components/plugins/sample-taking-workflow",
+    "componentname": "sample-taking-workflow",
+    "config": {"show":false},
+    "slug": "sample-taking-workflow",
+    "sortorder": 1
+}

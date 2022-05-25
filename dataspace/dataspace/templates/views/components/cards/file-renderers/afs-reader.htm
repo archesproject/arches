@@ -1,0 +1,145 @@
+{% load i18n %}
+
+<!--ko if: params.context === 'render' -->
+<div class="file-viewer chart-header">
+    <h3 data-bind="text: displayContent.name"></h3>
+</div>
+<div class="">
+    <!--ko if: params.selected() -->
+    <div class="preview file-viewer" style="position: relative;">
+        <div class='loading-mask' data-bind="visible: loading()"></div>
+        <!--ko if: chartData -->
+        <div class="chart" data-bind='plotly: {
+            data: chartData, 
+            title: chartTitle, 
+            titleSize: titleSize,
+            xAxisLabel: xAxisLabel,
+            xAxisLabelSize: xAxisLabelSize,
+            yAxisLabel: yAxisLabel,
+            yAxisLabelSize: yAxisLabelSize,
+            options: chartOptions,
+            seriesStyles: seriesStyles,
+            primarySeriesColor: primarySeriesColor,
+            seriesData: seriesData,
+            loading: loading
+        }'></div>
+        <!--/ko-->
+    </div>
+    <!--/ko-->
+</div>
+<!--/ko-->
+<!--ko if: params.context === 'tab' -->
+<div class="workbench-card-sidebar-tab" data-bind="click: function() {
+    fileViewer.toggleTab('file-context');
+}, css: {
+    'active': fileViewer.activeTab() === 'file-context'
+}">
+    <i class="fa fa-cog"></i>
+    <span class="map-sidebar-text">{% trans "Config" %}</span>
+</div>
+
+<div class="workbench-card-sidebar-tab" data-bind="click: function() {
+        fileViewer.toggleTab('other-tab');
+    }, css: {
+        'active': fileViewer.activeTab() === 'other-tab'
+    }">
+    <i class="fa fa-bar-chart-o"></i>
+    <span class="map-sidebar-text">{% trans "Data" %}</span>
+</div>
+<!--/ko-->
+
+
+<!--ko if: params.context === 'tab-contents' -->
+    <!--ko if: fileViewer.activeTab() === 'file-context' -->
+    <div class="workbench-card-sidepanel-header-container file-workbench">
+        <h4 class="workbench-card-sidepanel-header" data-bind="click: fileViewer.hideSidePanel, text: 'Chart Configuration'"></h4>
+    </div>
+    <div class="col-xs-12 pad-no crud-widget-container chart-config-panel">
+        <div class="row form-group widget-wrapper">
+            <div style="padding-top: 3px" class="control-label widget-input-label">{% trans "Title Text and Font Size" %}</div>
+            <div style="display: inline-flex">
+                <input style="margin-left: 5px" class="form-control input-lg widget-input" data-bind="textInput: chartTitle">
+                <input style="margin-left: 5px; width: 20%; padding-right: 5px;" class="form-control input-lg widget-input" type="number" data-bind="textInput: titleSize">
+            </div>
+        </div>
+        <div class="row form-group widget-wrapper">
+            <div style="padding-top: 3px" class="control-label widget-input-label">{% trans "X Axis Label and Font Size" %}</div>
+            <div style="display: inline-flex">
+                <input style="margin-left: 5px" class="form-control input-lg widget-input" data-bind="textInput: xAxisLabel">
+                <input style="margin-left: 5px; width: 20%; padding-right: 5px;" class="form-control input-lg widget-input" type="number" data-bind="textInput: xAxisLabelSize">
+            </div>
+        </div>
+        <div class="row form-group widget-wrapper">
+            <div style="padding-top: 3px" class="control-label widget-input-label">{% trans "Y Axis Label and Font Size" %}</div>
+            <div style="display: inline-flex">
+                <input style="margin-left: 5px" class="form-control input-lg widget-input" data-bind="textInput: yAxisLabel">
+                <input style="margin-left: 5px; width: 20%; padding-right: 5px;" class="form-control input-lg widget-input" type="number" data-bind="textInput: yAxisLabelSize">
+            </div>
+        </div>
+    </div>
+    <!--/ko-->
+
+    <!--ko if: fileViewer.activeTab() === 'other-tab' -->
+    <div class="workbench-card-sidepanel-header-container file-workbench">
+        <h4 class="workbench-card-sidepanel-header" data-bind="click: fileViewer.hideSidePanel, text: 'Manage Series Data'"></h4>
+    </div>
+    
+    <!-- ko if: fileViewer -->
+    <input style="display:inline-block; margin-top: 70px;"
+    data-bind="select2Query: {
+        select2Config: {
+            clickBubble: false,
+            disabled: false,
+            data: compatibleSeries(),
+            value: stagedSeries,
+            closeOnSlect: false,
+            allowClear: true,
+            multiple: true,
+            placeholder: {% trans "'Available Series'" %}}}">
+    <div style="padding-top: 10px">
+        <button style="margin-right: 3px;" class="btn btn-lg btn-workbench btn-primary" data-bind="click: function(){addAllToChart()}, css: {'disabled':stagedSeries().length === 0}"><i class="fa fa-line-chart"></i> {% trans 'Add Series to Chart' %}</button>
+    </div>
+    <!-- /ko -->
+
+    <!-- <div class="file-workbench-filter series-data">
+        <h2 class="file-workbench-filter-header">{% trans "File Filter" %}</h2>
+        <input type="text" class="form-control" style="width: 100%; height:initial" placeholder="{% trans 'e.g.: .txt' %}" data-bind="textInput: filter"></input>
+        <span class="clear-node-search" data-bind="visible: filter().length > 0, click: function() { filter(''); }"><i class="fa fa-times-circle"></i></span>
+    </div> -->
+
+    <div class="file-workbench-files" data-bind="visible: seriesData().length > 0">
+        <!--ko foreach: fileViewer.card.tiles -->
+            <!--ko if: $parent.seriesData().filter(function(t){return t.tileid === $data.tileid}).length === 1; -->
+            <div class="file-workbench-file chart-series-selector" data-bind="click: function(){$parent.toggleSelected($data)}, css: {'selected-photo': $parent.selectedSeriesTile() === $data}">
+                <div class="add-data-series">
+                    <i class="fa fa-times-circle" data-bind="click: function(){$parent.removeData(tileid)}"></i>
+                </div>
+                <div data-bind="text: $parent.fileViewer.getUrl($data).name"></div>
+            </div>
+            <!--/ko-->
+        <!--/ko-->
+    </div>
+    <!--/ko-->
+        
+    <div>
+        <!-- ko if: seriesData().length >= 1 && selectedSeriesTile && fileViewer.activeTab() === 'other-tab' -->
+        <div class="chart-style-panel">
+            <h2>{% trans "Style" %}</h2>
+            <div class="row widget-container">
+
+                <div class="form-group">
+                    <div class="relative">
+                        <label class="col-xs-12 control-label widget-input-label"> {% trans "Color" %} </label>
+                    </div>
+
+                    <div class="colorpicker-component input-group">
+                        <input placeholder="{% trans  'Data Series Line Color'  %}" class="form-control input-lg widget-input" data-bind="colorPicker: {color: colorHolder, format:'hex'}">
+                        <span class="input-group-addon" data-bind="style: {background: colorHolder}"></span>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- /ko -->
+    </div>
+<!--/ko-->
+

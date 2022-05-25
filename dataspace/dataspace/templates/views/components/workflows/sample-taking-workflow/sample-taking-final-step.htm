@@ -1,0 +1,101 @@
+{% load i18n %}
+<!-- ko if: loading() === false -->
+<div class="final-step">
+    <div class="afs-final-step-section">
+        <h5 class="summary-value">{% trans 'Created or Modified Resource Instance' %}</h5>
+        <div class="afs-final-step-block">
+            <div style="display: flex; flex-direction: column;">
+                <a data-bind="attr: { href: urls.resource + '/' + resourceid}" target="_blank">
+                    <div class="summary-value" 
+                        data-bind = "text: displayName + ' ({% trans 'Sampling Activity Resource Instance' %})'">
+                    </div>
+                </a>
+            </div>
+        </div>
+    </div>
+    <div class="afs-final-step-section">
+        <h5 class="summary-value">{% trans 'Related Project/Object' %}</h5>
+        <div class="afs-final-step-block">
+            <div style="display: flex; flex-direction: column;">
+                <div style="display: inline-flex;">
+                    <div class="summary-label" data-bind="text: reportVals.projectName.name + ':'"></div>
+                    <div class="summary-value" data-bind="text: reportVals.projectName.value"></div>
+                </div>
+                <div style="display: inline-flex;">
+                    <div class="summary-label" data-bind="text: reportVals.sampledObjectName.name + ':'"></div>
+                    <div class="summary-value" data-bind="text: reportVals.sampledObjectName.value"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="afs-final-step-section">
+        <h5 class="summary-value" style="margin-bottom: 10px;">{% trans 'Sampling Activity' %}</h5>
+        <div class="afs-final-step-block">
+            <div style="display: flex; flex-direction: column;">
+                <div style="display: inline-flex;">
+                    <div class="summary-label" data-bind="text: reportVals.samplingActivityName.name + ':'"></div>
+                    <div class="summary-value" data-bind="text: reportVals.samplingActivityName.value"></div>
+                </div>
+                <div style="display: inline-flex;">
+                    <div class="summary-label" data-bind="text: reportVals.samplers.name + ':'"></div>
+                    <div class="summary-value" data-bind="text: reportVals.samplers.value"></div>
+                </div>
+                <div style="display: inline-flex;">
+                    <div class="summary-label" data-bind="text: reportVals.samplingDate.name + ':'"></div>
+                    <div class="summary-value" data-bind="text: reportVals.samplingDate.value"></div>
+                </div>
+                <div class="pad-top" style="display: inline-flex;">
+                    <div class="summary-label" data-bind="text: reportVals.technique.name + ':'"></div>
+                </div>
+                <div style="display: inline-flex;">
+                    <div class="summary-value" data-bind="html: reportVals.technique.value"></div>
+                </div>
+                <div class="pad-top" style="display: inline-flex;">
+                    <div class="summary-label" data-bind="text: reportVals.motivation.name + ':'"></div>
+                </div>
+                <div style="display: inline-flex;"></div>
+                    <div class="summary-value" data-bind="html: reportVals.motivation.value"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="afs-final-step-section">
+        <h5 class="summary-value">{% trans 'Sampling Locations' %}</h5>
+        <!-- ko foreach: sampleAnnotations -->
+        <div style="display: inline-flex; flex-direction: column; padding-bottom: 25px;">
+            <div style="border: solid 1px #ddd">
+                <div class="iiif-leaflet" data-bind="leaflet: leafletConfig, click: function(){if ($parent.switchMap){$parent.switchMap($parent.map)}}" style="height: 500px; width: 100%;"></div>
+            </div>
+            <div style="width: 100%; padding-top: 10px;">
+                <table data-bind="datatable: $parent.tableConfig" class="table table-striped" width="100%" style="border-bottom: 1px solid #ddd; margin-bottom: 8px;">
+                    <thead>
+                        <tr>
+                            <th class="afs-worfklow-summary-table-header">{% trans "Sample Name:" %}</th>
+                            <th class="afs-worfklow-summary-table-header">{% trans "Description" %}</th>
+                            <th class="afs-worfklow-summary-table-header">{% trans "Sampling Motivation" %}</th>
+                        </tr>
+                    </thead>
+                    <tbody data-bind="foreach: {data: samplingLocations, as: 'location'}">
+                        <tr style="cursor: pointer"
+                            data-bind="
+                                css: {'selected': $parents[1].selectedAnnotationTileId() === location.tileId }, 
+                                click: function() { $parents[1].highlightAnnotation(location.tileId); }
+                            ">
+                            <td><div class="summary-value" data-bind="text: location.samplingLocationName"></div></td>
+                            <td><div class="summary-value" data-bind="text: location.sampleDescription"></div></td>
+                            <td><div class="summary-value" data-bind="text: location.sampleMotivation"></div></td>
+                        </tr>
+                    <tbody>
+                </table>
+                <div class="final-step-section-block-item">
+                    <div style="display: inline-flex; padding-left: 5px; color: #777;">
+                        <div class="summary-label" style="font-size: 13px; padding-right: 3px;">{% trans 'Sampled locations:' %}</div>
+                        <div class="summary-value" style="font-size: 13px;" data-bind='text: samplingLocations().length'></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- /ko -->
+    </div>
+</div>
+<!-- /ko -->

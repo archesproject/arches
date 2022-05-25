@@ -1,0 +1,10 @@
+{
+    "pluginid": "1132c953-5d8w-4acb-87c5-39c5b996799e",
+    "name": "Review Dataset",
+    "icon": "fa fa-files-o",
+    "component": "views/components/plugins/review-dataset-workflow",
+    "componentname": "review-dataset-workflow",
+    "config": {"show":false},
+    "slug": "review-dataset-workflow",
+    "sortorder": 1
+}

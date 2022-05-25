@@ -1,0 +1,54 @@
+{% extends "views/report-templates/default.htm" %} 
+{% load i18n %} 
+{% block report %}
+
+{% block body %}
+<!-- JSON section -->
+<div class="afs-report-section afs-flex-col">
+    <h2 class="afs-report-section-title"><i data-bind="click: function() {toggleVisibility(visible.json)}, css: {'fa-angle-double-right': visible.json(), 'fa-angle-double-up': !visible.json()}" class="fa toggle"></i> {% trans "Resource JSON" %}</h2>
+    
+
+    <!-- Collapsible content -->
+    <div data-bind="visible: visible.json" class="afs-report-collapsible-container pad-lft">
+        <a href="#" class="afs-report-a" data-bind="click: function(){setSelectedJson('json')}">
+            <!-- ko if: selectedFormat() == 'json' -->
+            <i class="fa fa-arrow-down"></i> 
+            <!-- /ko -->
+            <!-- ko ifnot: selectedFormat() == 'json' -->
+            <i style="display:inline-block;width: 12px"></i> 
+            <!-- /ko -->
+            {% trans "JSON" %}
+        </a>
+        <a href="#" class="afs-report-a" data-bind="click: function(){setSelectedJson('arches-json')}">
+            <!-- ko if: selectedFormat() == 'arches-json' -->
+            <i class="fa fa-arrow-down"></i> 
+            <!-- /ko -->
+            <!-- ko ifnot: selectedFormat() == 'arches-json' -->
+            <i style="display:inline-block;width: 12px"></i> 
+            <!-- /ko -->
+            {% trans "Arches JSON" %}
+        </a>
+        <a href="#" class="afs-report-a" data-bind="click: function(){setSelectedJson('json-ld')}">
+            <!-- ko if: selectedFormat() == 'json-ld' -->
+            <i data-bind="if: (selectedFormat() == 'json-ld')" class="fa fa-arrow-down"></i> 
+            <!-- /ko -->
+            <!-- ko ifnot: selectedFormat() == 'json-ld' -->
+            <i style="display:inline-block;width: 12px"></i> 
+            <!-- /ko -->
+            {% trans "JSON-LD" %}
+        </a>
+    </div>
+    <!-- Show this block if there is resource tile content -->
+    <div data-bind="visible: visible.json" class="afs-report-subsection afs-flex-col">
+        <div class="afs-codemirror afs-flex-col">
+            <div style="overflow:auto; height:100%;" class="geojson-editor" data-bind="codemirror: {
+                value: selectedJSON,
+                viewportMargin: Infinity,
+                mode: { name: 'javascript', json: codeMirrorJsonMode, jsonld: codeMirrorJsonLDMode },
+                lineNumbers: true
+            }"></div>
+        </div>
+    </div>
+</div>
+{% endblock body %}
+{% endblock report %}

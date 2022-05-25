@@ -1,0 +1,11 @@
+{
+    "name": "Observation Template",
+    "component": "views/components/reports/observation",
+    "defaultconfig": {
+        "uncompacted_reporting": true
+    },
+    "description": "Observation report",
+    "componentname": "observation-report",
+    "templateid": "e581f911-185b-4456-873d-f83b46fd89ec",
+    "preload_resource_data": false
+}

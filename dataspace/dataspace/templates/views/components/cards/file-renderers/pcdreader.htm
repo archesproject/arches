@@ -1,0 +1,28 @@
+{% load i18n %}
+
+<!--ko if: params.context === 'render' -->
+<div class="">
+    <!--ko if: params.selected() -->
+    <div class="preview file-viewer" style="position: relative">
+        <!--ko if: ko.unwrap(renderers).length && ko.unwrap(displayContent)-->
+        <div class='loading-mask' data-bind="visible: loading()"></div>
+        <div data-bind='threePCD: {
+            clickBubble: true,
+            renderers: renderers,
+            scene: scene,
+            controls: controls,
+            displayContent: displayContent,
+            loader: loader,
+            loading: loading,
+            camera: camera}'>
+        </div>
+        <!--/ko-->
+    </div>
+    <!--/ko-->
+</div>
+<!--/ko-->
+<!--ko if: params.context === 'tab' -->
+<!--/ko-->
+<!--ko if: params.context === 'tab-contents' -->
+<!--/ko-->
+

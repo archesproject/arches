@@ -1,0 +1,10 @@
+*.pyc
+*.log
+dataspace/logs
+dataspace/export_deliverables
+dataspace/cantaloupe/*
+dataspace/media/packages
+dataspace/uploadedfiles/*
+dataspace/settings_local.py
+.vscode/
+CACHE
