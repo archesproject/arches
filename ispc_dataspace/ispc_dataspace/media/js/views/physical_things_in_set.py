@@ -5,6 +5,7 @@ from arches.app.views.search import search_results
 from django.http import HttpRequest
 import json
 
+
 class PhysicalThingSetView(View):
     def get(self, request):
         # via an id for a set, returns list of phys things and stuff necessary

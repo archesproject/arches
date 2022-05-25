@@ -225,7 +225,10 @@ class Command(BaseCommand):
         print(f"Exporting Documentation Fields to {options['dest']}")
 
         with open(options["dest"], "w") as cfh:
-            writer = csv.writer(cfh, delimiter="\t",)
+            writer = csv.writer(
+                cfh,
+                delimiter="\t",
+            )
             writer.writerow(
                 (
                     "Graph",
