@@ -609,11 +609,11 @@ class Resources(APIBase):
                             version=version,
                             hide_hidden_nodes=hide_hidden_nodes,
                         ),
-                        "displaydescription": resource.displaydescription,
-                        "displayname": resource.displayname,
+                        "displaydescription": resource.displaydescription(),
+                        "displayname": resource.displayname(),
                         "graph_id": resource.graph_id,
                         "legacyid": resource.legacyid,
-                        "map_popup": resource.map_popup,
+                        "map_popup": resource.map_popup(),
                         "resourceinstanceid": resource.resourceinstanceid,
                     }
 
@@ -997,7 +997,7 @@ class Card(APIBase):
             tiles = []
             displayname = _("New Resource")
         else:
-            displayname = resource_instance.displayname
+            displayname = resource_instance.displayname()
             if displayname == "undefined":
                 displayname = _("Unnamed Resource")
             if str(resource_instance.graph_id) == settings.SYSTEM_SETTINGS_RESOURCE_MODEL_ID:
@@ -1239,7 +1239,7 @@ class ResourceReport(APIBase):
 
         resp = {
             "datatypes": models.DDataType.objects.all(),
-            "displayname": resource.displayname,
+            "displayname": resource.displayname(),
             "resourceid": resourceid,
             "graph": graph,
             "hide_empty_nodes": settings.HIDE_EMPTY_NODES_IN_REPORT,
@@ -1718,7 +1718,11 @@ class TransformEdtfForTile(APIBase):
     def get(self, request):
         try:
             value = request.GET.get("value")
-            transformed_value = EDTFDataType().transform_value_for_tile(value)
+            datatype_factory = DataTypeFactory()
+            edtf_datatype = datatype_factory.get_instance("edtf")
+            transformed_value = edtf_datatype.transform_value_for_tile(value)
+            is_valid = len(edtf_datatype.validate(transformed_value)) == 0
+            result = (transformed_value, is_valid)
 
         except TypeError as e:
             return JSONResponse({"data": (str(e), False)})
@@ -1726,4 +1730,4 @@ class TransformEdtfForTile(APIBase):
         except Exception as e:
             return JSONResponse(str(e), status=500)
 
-        return JSONResponse({"data": transformed_value})
+        return JSONResponse({"data": result})

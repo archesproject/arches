@@ -233,6 +233,7 @@
                 permission_data: "{% url 'permission_data' %}",
                 resource_permission_data: "{% url 'resource_permission_data' %}",
                 permission_manager_data: "{% url 'permission_manager_data' %}",
+                clear_user_permission_cache: "{% url 'clear_user_permission_cache' %}",
                 get_user_names: "{% url 'get_user_names' %}",
                 feature_popup_content: "{% url 'feature_popup_content' %}",
                 related_resource_candidates: "{% url 'related_resource_candidates' %}",
@@ -314,7 +315,8 @@
                 text: "{% trans 'Sorry! The request failed. Please try again.  Contact your system administrator if the problem persists.' %}"
             },
             resourceCopySuccess: {
-                title: "{% trans 'Resource Successfully Copied.'%}"
+                title: "{% trans 'Resource Successfully Copied.'%}",
+                text: "{% trans 'Click here to edit copy' %}"
             },
             resourceCopyFailed: {
                 title: "{% trans 'Resource Copy Failed...'%}",
