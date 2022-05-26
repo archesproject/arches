@@ -66,26 +66,26 @@ class Resource(models.ResourceInstance):
         # end from models.ResourceInstance
         self.tiles = []
 
-    def get_descriptor(self, descriptor):
-        module = importlib.import_module("arches.app.functions.primary_descriptors")
-        PrimaryDescriptorsFunction = getattr(module, "PrimaryDescriptorsFunction")()
-        functionConfig = models.FunctionXGraph.objects.filter(graph_id=self.graph_id, function__functiontype="primarydescriptors")
-        if len(functionConfig) == 1:
-            return PrimaryDescriptorsFunction.get_primary_descriptor_from_nodes(self, functionConfig[0].config[descriptor])
+    def get_descriptor(self, descriptor, context):
+        graph_function = models.FunctionXGraph.objects.filter(
+            graph_id=self.graph_id, function__functiontype="primarydescriptors"
+        ).select_related("function")
+        if len(graph_function) == 1:
+            module = graph_function[0].function.get_class_module()()
+            return module.get_primary_descriptor_from_nodes(
+                self, graph_function[0].config["descriptor_types"][descriptor], context
+            )
         else:
             return "undefined"
 
-    @property
-    def displaydescription(self):
-        return self.get_descriptor("description")
+    def displaydescription(self, context=None):
+        return self.get_descriptor("description", context)
 
-    @property
-    def map_popup(self):
-        return self.get_descriptor("map_popup")
+    def map_popup(self, context=None):
+        return self.get_descriptor("map_popup", context)
 
-    @property
-    def displayname(self):
-        return self.get_descriptor("name")
+    def displayname(self, context=None):
+        return self.get_descriptor("name", context)
 
     def save_edit(self, user={}, note="", edit_type="", transaction_id=None):
         timestamp = datetime.datetime.now()

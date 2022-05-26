@@ -1410,12 +1410,7 @@ def get_valueids_from_concept_label(label, conceptid=None, lang=None):
         else:
             return {
                 "query": {
-                    "bool": {
-                        "filter": [
-                            {"match_phrase": {"value": val}},
-                            {"term": {"conceptid": conceptid}},
-                        ]
-                    }
+                    "bool": {"filter": [{"match_phrase": {"value": val}}, {"term": {"conceptid": conceptid}}, ]}
                 }
             }
 
