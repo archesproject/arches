@@ -638,7 +638,12 @@ class Tile(models.TileModel):
                     nodegroupid = models.Node.objects.get(pk=nodeid).nodegroup_id
                 if nodegroupid and resourceinstanceid:
                     tile = Tile.update_node_value(
-                        nodeid, value, nodegroupid=nodegroupid, request=request, resourceinstanceid=resourceinstanceid, transaction_id=transaction_id
+                        nodeid,
+                        value,
+                        nodegroupid=nodegroupid,
+                        request=request,
+                        resourceinstanceid=resourceinstanceid,
+                        transaction_id=transaction_id,
                     )
 
         tile.after_update_all()
