@@ -1,10 +1,15 @@
-####DIPENDENZE software
-per windows
+####DIPENDENZE software per windows
+
 postgres e postgis
+
 yarn
+
 nodejs
+
 elastichserach
+
 python
+
 osgeo
     
 step by step
