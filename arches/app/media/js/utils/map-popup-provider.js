@@ -10,8 +10,10 @@ define(['arches',
          * @param feature Map feature to check
          * @returns <code>true</code> if the feature can be clicked, otherwise <code>false</code>
          */
-        isFeatureClickable: function(feature)
+        isFeatureClickable: function(feature, drawMode)
         {
+            if (typeof drawMode !== 'undefined' && drawMode !== null)
+                return false;
             return feature.properties.resourceinstanceid;
         },
 
