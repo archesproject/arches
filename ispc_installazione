@@ -1,5 +1,5 @@
-DIPENDENZE software
-_*per windows*_
+####DIPENDENZE software
+per windows
     postgres e postgis
     yarn
     nodejs
@@ -9,7 +9,7 @@ _*per windows*_
     
 step by step
 
-1 -  installare postgres e postgis tramite lo stack https://www.enterprisedb.com/downloads/postgres-postgresql-downloads
+1 -  installare postgres e postgis tramite lo stack (https://www.enterprisedb.com/downloads/postgres-postgresql-downloads)
 2 -  quando vi chiede la password usate il nome postgres
 3 -  quando installate postgis fate creare il template (dovete spuntare la casella crea template postgis)
 4 -  installa node js e assicuratevi di aggiungerla alla variabile d'ambiente https://nodejs.org/  (installando nodejs si installerà anche python)
