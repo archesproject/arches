@@ -252,7 +252,7 @@ class BranchCsvImporter:
 
     def read(self, request):
         self.loadid = request.POST.get("load_id")
-        self.cum_excel_files_size = 0
+        self.cumulative_excel_files_size = 0
         content = request.FILES["file"]
         self.temp_dir = os.path.join(settings.APP_ROOT, "tmp", self.loadid)
         try:
@@ -266,11 +266,11 @@ class BranchCsvImporter:
                 files = zip_ref.infolist()
                 for file in files:
                     if file.filename.split(".")[-1] == "xlsx":
-                        self.cum_excel_files_size += file.file_size
+                        self.cumulative_excel_files_size += file.file_size
                     if not file.filename.startswith("__MACOSX"):
                         if not file.is_dir():
                             result["summary"]["files"][file.filename] = {"size": (self.filesize_format(file.file_size))}
-                            result["summary"]["files"]["cum_excel_files_size"] = self.cum_excel_files_size
+                            result["summary"]["cumulative_excel_files_size"] = self.cumulative_excel_files_size
                         zip_ref.extract(file, self.temp_dir)
         return {"success": result, "data": result}
 
@@ -298,8 +298,9 @@ class BranchCsvImporter:
             details = json.loads(self.file_details)
             files = details["result"]["summary"]["files"]
             summary = details["result"]["summary"]
-            # set cum excel file size below that determines whether celery will be used
-            if summary["files"]["cum_excel_files_size"] / 1000000 > 5:
+            use_celery_file_size_threshold_in_MB = 0.1
+            if summary["cumulative_excel_files_size"] / 1000000 > use_celery_file_size_threshold_in_MB:
+                logger.info("Delegating load to Celery task")
                 tasks.load_files.apply_async(
                     (files, summary, result, self.temp_dir, self.loadid),
                     # link=tasks.update_user_task_record.s(),
