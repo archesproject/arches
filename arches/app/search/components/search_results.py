@@ -26,7 +26,9 @@ class SearchResultsFilter(BaseSearchFilter):
         geo_agg_filter = Bool()
 
         try:
-            search_results_object["query"].dsl["query"]["bool"]["filter"][0]["terms"]["graph_id"] # check if resource_type filter is already applied
+            search_results_object["query"].dsl["query"]["bool"]["filter"][0]["terms"][
+                "graph_id"
+            ]  # check if resource_type filter is already applied
         except (KeyError, IndexError):
             resource_model_filter = Bool()
             permitted_graphids = get_permitted_graphids(permitted_nodegroups)
