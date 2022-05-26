@@ -7,6 +7,7 @@ import os
 import shutil
 import uuid
 import zipfile
+import arches.app.tasks as tasks
 from django.http import HttpResponse
 from openpyxl import load_workbook
 from django.db import connection
@@ -24,13 +25,15 @@ logger = logging.getLogger(__name__)
 
 
 class BranchCsvImporter:
-    def __init__(self, request=None):
-        self.request = request
-        self.userid = request.user.id
-        self.moduleid = request.POST.get("module")
+    def __init__(self, request=None, loadid=None, temp_dir=None):
+        self.request = request if request else None
+        self.userid = request.user.id if request else None
+        self.moduleid = request.POST.get("module") if request else None
         self.datatype_factory = DataTypeFactory()
         self.legacyid_lookup = {}
         self.temp_path = ""
+        self.loadid = loadid if loadid else None
+        self.temp_dir = temp_dir if temp_dir else None
 
     def filesize_format(self, bytes):
         """Convert bytes to readable units"""
@@ -203,7 +206,7 @@ class BranchCsvImporter:
             lookup[node.alias] = {"nodeid": str(node.nodeid), "datatype": node.datatype, "config": node.config}
         return lookup
 
-    def validate(self, request):
+    def validate(self):
         """Validation is actually done - we're just getting the report here"""
         success = True
         with connection.cursor() as cursor:
@@ -211,8 +214,8 @@ class BranchCsvImporter:
             row = cursor.fetchall()
         return {"success": success, "data": row}
 
-    def complete_load(self, request):
-        self.loadid = request.POST.get("load_id")
+    def complete_load(self, loadid, multiprocessing=True):
+        self.loadid = loadid
         try:
             with connection.cursor() as cursor:
                 cursor.execute("""SELECT * FROM __arches_staging_to_tile(%s)""", [self.loadid])
@@ -232,7 +235,7 @@ class BranchCsvImporter:
             }
 
         if row[0][0]:
-            index_resources_by_transaction(self.loadid, quiet=True, use_multiprocessing=True)
+            index_resources_by_transaction(self.loadid, quiet=True, use_multiprocessing=multiprocessing)
             with connection.cursor() as cursor:
                 cursor.execute(
                     """UPDATE load_event SET status = %s WHERE loadid = %s""",
@@ -249,6 +252,7 @@ class BranchCsvImporter:
 
     def read(self, request):
         self.loadid = request.POST.get("load_id")
+        self.cumulative_excel_files_size = 0
         content = request.FILES["file"]
         self.temp_dir = os.path.join(settings.APP_ROOT, "tmp", self.loadid)
         try:
@@ -261,9 +265,12 @@ class BranchCsvImporter:
             with zipfile.ZipFile(content, "r") as zip_ref:
                 files = zip_ref.infolist()
                 for file in files:
+                    if file.filename.split(".")[-1] == "xlsx":
+                        self.cumulative_excel_files_size += file.file_size
                     if not file.filename.startswith("__MACOSX"):
                         if not file.is_dir():
                             result["summary"]["files"][file.filename] = {"size": (self.filesize_format(file.file_size))}
+                            result["summary"]["cumulative_excel_files_size"] = self.cumulative_excel_files_size
                         zip_ref.extract(file, self.temp_dir)
         return {"success": result, "data": result}
 
@@ -291,21 +298,31 @@ class BranchCsvImporter:
             details = json.loads(self.file_details)
             files = details["result"]["summary"]["files"]
             summary = details["result"]["summary"]
-            with connection.cursor() as cursor:
-                for file in files.keys():
-                    self.stage_excel_file(file, summary, cursor)
-                cursor.execute("""CALL __arches_check_tile_cardinality_violation_for_load(%s)""", [self.loadid])
-                result["validation"] = self.validate(request)
-                if len(result["validation"]["data"]) == 0:
-                    self.complete_load(request)
-                else:
-                    cursor.execute(
-                        """UPDATE load_event SET status = %s, load_end_time = %s WHERE loadid = %s""",
-                        ("failed", datetime.now(), self.loadid),
-                    )
-            shutil.rmtree(self.temp_dir)
-            result["summary"] = summary
-        return {"success": result["validation"]["success"], "data": result}
+            use_celery_file_size_threshold_in_MB = 0.1
+            if summary["cumulative_excel_files_size"] / 1000000 > use_celery_file_size_threshold_in_MB:
+                logger.info("Delegating load to Celery task")
+                tasks.load_files.apply_async(
+                    (files, summary, result, self.temp_dir, self.loadid),
+                    # link=tasks.update_user_task_record.s(),
+                    # link_error=tasks.log_error.s(),
+                )
+                result["delegated_to_celery"] = True
+                return {"success": True, "data": result}
+            else:
+                with connection.cursor() as cursor:
+                    for file in files.keys():
+                        self.stage_excel_file(file, summary, cursor)
+                    result["validation"] = self.validate()
+                    if len(result["validation"]["data"]) == 0:
+                        self.complete_load(self.loadid)
+                    else:
+                        cursor.execute(
+                            """UPDATE load_event SET status = %s, load_end_time = %s WHERE loadid = %s""",
+                            ("failed", datetime.now(), self.loadid),
+                        )
+                shutil.rmtree(self.temp_dir)
+                result["summary"] = summary
+                return {"success": result["validation"]["success"], "data": result}
 
     def download(self, request):
         format = request.POST.get("format")
