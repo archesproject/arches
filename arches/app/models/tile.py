@@ -494,7 +494,7 @@ class Tile(models.TileModel):
         se = SearchEngineFactory().create()
         request = kwargs.pop("request", None)
         index = kwargs.pop("index", True)
-        transaction_id = kwargs.pop("index", None)
+        transaction_id = kwargs.pop("transaction_id", None)
         provisional_edit_log_details = kwargs.pop("provisional_edit_log_details", None)
         for tile in self.tiles:
             tile.delete(*args, request=request, **kwargs)
