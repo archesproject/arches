@@ -1,11 +1,21 @@
 {
-    "name": "Group Template",
-    "component": "views/components/reports/group",
+    "name": "Visual Work Template",
+    "component": "views/components/reports/visual-work",
     "defaultconfig": {
-        "uncompacted_reporting": true
+        "tabs": [{
+                "icon": "fa fa-info",
+                "name": "Identity",
+                "nodegroup_ids": []
+            },
+            {
+                "icon": "fa fa-chain",
+                "name": "Links",
+                "nodegroup_ids": []
+            }
+        ],
+        "activeTabIndex": 1
     },
-    "description": "Group report",
-    "componentname": "group-report",
-    "templateid": "3a9fd7d1-f065-4777-b664-3fda0eb39ffe",
-    "preload_resource_data": false
+    "description": "Visual Work report",
+    "componentname": "visual-work-report",
+    "templateid": "c4167d32-33c4-4055-b064-ea9296c1c13a"
 }

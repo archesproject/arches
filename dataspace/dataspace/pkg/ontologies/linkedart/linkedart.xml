@@ -1,0 +1,348 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<rdf:RDF xml:lang="en" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#" xml:base="http://www.cidoc-crm.org/cidoc-crm/" xmlns:dcterms="http://purl.org/dc/terms/" xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:owl="http://www.w3.org/2002/07/owl#" xmlns:la="https://linked.art/ns/" xmlns:schema="http://schema.org/" xmlns:skos="http://www.w3.org/2004/02/skos/core#" xmlns:ore="http://www.openarchives.org/ore/terms/">
+
+<!-- Many of these will go to CRM SOC in the future -->
+
+<rdfs:Class rdf:about="https://linked.art/ns/terms/Payment">
+    <rdfs:label xml:lang="en">Payment</rdfs:label>
+    <rdfs:comment>Payment of Money</rdfs:comment>
+    <rdfs:subClassOf rdf:resource="E7_Activity"/>
+</rdfs:Class>
+
+<rdf:Property rdf:about="https://linked.art/ns/terms/paid_amount">
+        <rdfs:label xml:lang="en">Paid Amount</rdfs:label>
+        <rdfs:comment xml:lang="en">The amount paid.</rdfs:comment>
+        <rdfs:domain rdf:resource="https://linked.art/ns/terms/Payment"/>
+        <rdfs:range rdf:resource="E97_Monetary_Amount"/>
+</rdf:Property>
+
+<rdf:Property rdf:about="https://linked.art/ns/terms/paid_from">
+        <rdfs:label xml:lang="en">Paid From</rdfs:label>
+        <rdfs:comment xml:lang="en">Who the payment came from</rdfs:comment>
+        <rdfs:domain rdf:resource="https://linked.art/ns/terms/Payment"/>
+        <rdfs:range rdf:resource="E39_Actor"/>
+</rdf:Property>
+
+<rdf:Property rdf:about="https://linked.art/ns/terms/paid_to">
+        <rdfs:label xml:lang="en">Paid To</rdfs:label>
+        <rdfs:comment xml:lang="en">Who the payment went to</rdfs:comment>
+        <rdfs:domain rdf:resource="https://linked.art/ns/terms/Payment"/>
+        <rdfs:range rdf:resource="E39_Actor"/>
+</rdf:Property>
+
+<!-- Legal Claim / Property Interest -->
+<!-- This might go to a reformulation of Right -->
+
+<rdfs:Class rdf:about="https://linked.art/ns/terms/PropertyInterest">
+    <rdfs:label xml:lang="en">Property Interest</rdfs:label>
+    <rdfs:comment>A particular property interest, be it ownership or security, of intellectual or physical property </rdfs:comment>
+    <rdfs:subClassOf rdf:resource="E71_Human-Made_Thing"/>
+</rdfs:Class>
+
+<rdf:Property rdf:about="https://linked.art/ns/terms/claimed_by">
+        <rdfs:label xml:lang="en">Claimed By</rdfs:label>
+        <rdfs:comment xml:lang="en">The actor that is claiming the property interest</rdfs:comment>
+        <rdfs:domain rdf:resource="https://linked.art/ns/terms/PropertyInterest"/>
+        <rdfs:range rdf:resource="E39_Actor"/>
+</rdf:Property>
+
+<rdf:Property rdf:about="https://linked.art/ns/terms/jurisdiction">
+        <rdfs:label xml:lang="en">Jurisdiction</rdfs:label>
+        <rdfs:comment xml:lang="en">The jurisdiction under which the property interest is potentially enforceable</rdfs:comment>
+        <rdfs:domain rdf:resource="https://linked.art/ns/terms/PropertyInterest"/>
+        <rdfs:range rdf:resource="E53_Place"/>
+</rdf:Property>
+
+<rdf:Property rdf:about="https://linked.art/ns/terms/interest_for">
+    <rdfs:label xml:lang="en">interest for</rdfs:label>
+    <rdfs:comment xml:lang="en">The object that the property interest is for</rdfs:comment>
+    <rdfs:domain rdf:resource="https://linked.art/ns/terms/PropertyInterest"/>
+    <rdfs:range rdf:resource="E72_Legal_Object"/>
+</rdf:Property>
+
+<rdf:Property rdf:about="https://linked.art/ns/terms/interest_part">
+    <rdfs:label xml:lang="en">Interest Part</rdfs:label>
+    <rdfs:comment xml:lang="en">The object property interest is part of the subject property interest</rdfs:comment>
+    <rdfs:domain rdf:resource="https://linked.art/ns/terms/PropertyInterest"/>
+    <rdfs:range rdf:resource="https://linked.art/ns/terms/PropertyInterest"/>
+    <owl:inverseOf rdf:resource="https://linked.art/ns/terms/interest_part_of"/>
+</rdf:Property>
+
+<rdf:Property rdf:about="https://linked.art/ns/terms/interest_part_of">
+    <rdfs:label xml:lang="en">Interest Part Of</rdfs:label>
+    <rdfs:comment xml:lang="en">The subject property interest is part of the object property interest</rdfs:comment>
+    <rdfs:domain rdf:resource="https://linked.art/ns/terms/PropertyInterest"/>
+    <rdfs:range rdf:resource="https://linked.art/ns/terms/PropertyInterest"/>
+    <owl:inverseOf rdf:resource="https://linked.art/ns/terms/interest_part"/>
+</rdf:Property>
+
+
+<!-- Phase -->
+<!-- This looks like S16 State, but state is only for physical states not social ones like ownership. State is deprecated in latest CRMsci, per G.B. -->
+
+<rdfs:Class rdf:about="https://linked.art/ns/terms/Phase">
+    <rdfs:label xml:lang="en">Phase</rdfs:label>
+    <rdfs:comment> The period of time during which an entity is in a certain phase or state of its existence.  The phase can be physical (the box is open, the painting is 14 ft wide) or social (the sculpture is owned by some Actor, the building is used as a castle).</rdfs:comment>
+    <rdfs:subClassOf rdf:resource="E4_Period"/>
+</rdfs:Class>
+
+<rdf:Property rdf:about="https://linked.art/ns/terms/initiated">
+    <rdfs:label xml:lang="en">initiated</rdfs:label>
+    <rdfs:comment xml:lang="en"> Events can start or initiate Phases, such as the Modification of a painting to trim it from 16 feet to 14 ft would initiate a 14 feet phase, or the Acquisition of a sculpture by some Actor would initiate that Actor's ownership phase. This relationship links the initiating Event to the Phase.</rdfs:comment>
+    <rdfs:domain rdf:resource="E5_Event"/>
+    <rdfs:range rdf:resource="https://linked.art/ns/terms/Phase"/>
+    <owl:inverseOf rdf:resource="https://linked.art/ns/terms/initiated_by"/>
+</rdf:Property>
+
+<rdf:Property rdf:about="https://linked.art/ns/terms/initiated_by">
+    <rdfs:label xml:lang="en">initiated by</rdfs:label>
+    <rdfs:comment xml:lang="en"> The inverse of la:initiated.</rdfs:comment>
+    <rdfs:domain rdf:resource="https://linked.art/ns/terms/Phase"/>
+    <rdfs:range rdf:resource="E5_Event"/>
+    <owl:inverseOf rdf:resource="https://linked.art/ns/terms/initiated"/>
+</rdf:Property>
+
+<rdf:Property rdf:about="https://linked.art/ns/terms/terminated">
+    <rdfs:label xml:lang="en">terminated</rdfs:label>
+    <rdfs:comment xml:lang="en"> Events can end or terminate Phases, such as the Modification of a painting to trim it from 16 feet to 14 ft would end the 16 feet phase, or the Acquisition of a sculpture by some Actor would end the seller's ownership. This relationship links the terminating Event to the Phase.</rdfs:comment>
+    <rdfs:domain rdf:resource="E5_Event"/>
+    <rdfs:range rdf:resource="https://linked.art/ns/terms/Phase"/>
+    <owl:inverseOf rdf:resource="https://linked.art/ns/terms/terminated_by"/>
+</rdf:Property>
+
+<rdf:Property rdf:about="https://linked.art/ns/terms/terminated_by">
+    <rdfs:label xml:lang="en">terminated by</rdfs:label>
+    <rdfs:comment xml:lang="en"> The inverse of la:terminated.</rdfs:comment>
+    <rdfs:domain rdf:resource="https://linked.art/ns/terms/Phase"/>
+    <rdfs:range rdf:resource="E5_Event"/>
+    <owl:inverseOf rdf:resource="https://linked.art/ns/terms/terminated"/>
+</rdf:Property>
+
+<rdf:Property rdf:about="https://linked.art/ns/terms/has_phase">
+    <rdfs:label xml:lang="en">has phase</rdfs:label>
+    <rdfs:comment xml:lang="en"> The relationship between an E1 Entity and one of its Phases. A painting that had two sizes, 16 feet and 14 feet wide, would have two Phases, one for each width. </rdfs:comment>
+    <rdfs:domain rdf:resource="E1_CRM_Entity"/>
+    <rdfs:range rdf:resource="https://linked.art/ns/terms/Phase"/>
+    <owl:inverseOf rdf:resource="https://linked.art/ns/terms/phase_of"/>
+</rdf:Property>
+
+<rdf:Property rdf:about="https://linked.art/ns/terms/phase_of">
+    <rdfs:label xml:lang="en">phase of</rdfs:label>
+    <rdfs:comment xml:lang="en"> The inverse of la:has_phase.</rdfs:comment>
+    <rdfs:domain rdf:resource="https://linked.art/ns/terms/Phase"/>
+    <rdfs:range rdf:resource="E1_CRM_Entity"/>
+    <owl:inverseOf rdf:resource="https://linked.art/ns/terms/has_state"/>
+</rdf:Property>
+
+<rdf:Property rdf:about="https://linked.art/ns/terms/related_entity">
+    <rdfs:label xml:lang="en">related entity</rdfs:label>
+    <rdfs:comment xml:lang="en"> An E1 Entity that defines the nature of the Phase. For an ownership phase, this would be the owning E39 Actor. For the size of painting phase, this would be the E54 Dimension that describes the size.</rdfs:comment>
+    <rdfs:domain rdf:resource="https://linked.art/ns/terms/Phase"/>
+    <rdfs:range rdf:resource="E1_CRM_Entity"/>
+    <owl:inverseOf rdf:resource="https://linked.art/ns/terms/terminated"/>
+</rdf:Property>
+
+<rdf:Property rdf:about="https://linked.art/ns/terms/related_entity_of">
+    <rdfs:label xml:lang="en">related entity of</rdfs:label>
+    <rdfs:comment xml:lang="en"> The inverse of la:related_entity.</rdfs:comment>
+    <rdfs:domain rdf:resource="E1_CRM_Entity"/>
+    <rdfs:range rdf:resource="https://linked.art/ns/terms/Phase"/>
+    <owl:inverseOf rdf:resource="https://linked.art/ns/terms/related_entity"/>
+</rdf:Property>
+
+<rdf:Property rdf:about="https://linked.art/ns/terms/relationship">
+    <rdfs:label xml:lang="en">related by</rdfs:label>
+    <rdfs:comment xml:lang="en"> The relationship between the Entity that the phase is of, and the defining entity. For an ownership phase, this would be P52 has current owner. For the size of painting phase, this would be P43 has dimension.</rdfs:comment>
+    <rdfs:domain rdf:resource="https://linked.art/ns/terms/Phase"/>
+    <rdfs:range rdf:resource="E55_Type"/>
+    <rdfs:subPropertyOf rdf:resource="P2_has_type"/>
+</rdf:Property>
+
+<!-- caused / caused_by is O13_triggered / O13i_triggered_by -->
+
+
+
+<!-- Set of Things, as potential superclass of Group and Collection -->
+<!-- e.g. an auction lot is not a curated holding, but we need a class for its membership -->
+<!-- Sets can have rights (right to add /remove) and be about subjects (e.g. exhibition) -->
+
+<rdfs:Class rdf:about="https://linked.art/ns/terms/Set">
+    <rdfs:label xml:lang="en">Set</rdfs:label>
+    <rdfs:comment></rdfs:comment>
+    <rdfs:subClassOf rdf:resource="E89_Propositional_Object"/>
+    <rdfs:subClassOf rdf:resource="E72_Legal_Object"/>
+</rdfs:Class>
+
+<rdf:Property rdf:about="https://linked.art/ns/terms/has_member">
+    <rdfs:label xml:lang="en">has member</rdfs:label>
+    <rdfs:comment xml:lang="en"></rdfs:comment>
+    <rdfs:domain rdf:resource="https://linked.art/ns/terms/Set"/>
+    <rdfs:range rdf:resource="E1_CRM_Entity"/>
+    <owl:inverseOf rdf:resource="https://linked.art/ns/terms/member_of"/>
+</rdf:Property>
+
+<rdf:Property rdf:about="https://linked.art/ns/terms/member_of">
+    <rdfs:label xml:lang="en">member of</rdfs:label>
+    <rdfs:comment xml:lang="en"></rdfs:comment>
+    <rdfs:domain rdf:resource="E1_CRM_Entity"/>
+    <rdfs:range rdf:resource="https://linked.art/ns/terms/Set"/>
+    <owl:inverseOf rdf:resource="https://linked.art/ns/terms/has_member"/>
+</rdf:Property>
+
+<rdfs:Class rdf:about="https://linked.art/ns/terms/Addition">
+    <rdfs:label xml:lang="en">Addition</rdfs:label>
+    <rdfs:comment>The addition of some entity to a Set</rdfs:comment>
+    <rdfs:subClassOf rdf:resource="E7_Activity"/>
+</rdfs:Class>
+
+<rdf:Property rdf:about="https://linked.art/ns/terms/added_to">
+    <rdfs:label xml:lang="en">added to</rdfs:label>
+    <rdfs:comment xml:lang="en"></rdfs:comment>
+    <rdfs:domain rdf:resource="https://linked.art/ns/terms/Addition"/>
+    <rdfs:range rdf:resource="https://linked.art/ns/terms/Set"/>
+    <owl:inverseOf rdf:resource="https://linked.art/ns/terms/added_to_by"/>
+</rdf:Property>
+
+<rdf:Property rdf:about="https://linked.art/ns/terms/added_to_by">
+    <rdfs:label xml:lang="en">added to by</rdfs:label>
+    <rdfs:comment xml:lang="en"></rdfs:comment>
+    <rdfs:domain rdf:resource="https://linked.art/ns/terms/Set"/>
+    <rdfs:range rdf:resource="https://linked.art/ns/terms/Addition"/>
+    <owl:inverseOf rdf:resource="https://linked.art/ns/terms/added_to"/>
+</rdf:Property>
+
+<rdf:Property rdf:about="https://linked.art/ns/terms/added_member">
+    <rdfs:label xml:lang="en">added</rdfs:label>
+    <rdfs:comment xml:lang="en"></rdfs:comment>
+    <rdfs:domain rdf:resource="https://linked.art/ns/terms/Addition"/>
+    <rdfs:range rdf:resource="E1_CRM_Entity"/>
+    <owl:inverseOf rdf:resource="https://linked.art/ns/terms/added_member_by"/>
+</rdf:Property>
+
+<rdf:Property rdf:about="https://linked.art/ns/terms/added_member_by">
+    <rdfs:label xml:lang="en">added by</rdfs:label>
+    <rdfs:comment xml:lang="en"></rdfs:comment>
+    <rdfs:domain rdf:resource="E1_CRM_Entity"/>
+    <rdfs:range rdf:resource="https://linked.art/ns/terms/Addition"/>
+    <owl:inverseOf rdf:resource="https://linked.art/ns/terms/added_member"/>
+</rdf:Property>
+
+<rdfs:Class rdf:about="https://linked.art/ns/terms/Removal">
+    <rdfs:label xml:lang="en">Removal</rdfs:label>
+    <rdfs:comment>The removal of some entity from a Set</rdfs:comment>
+    <rdfs:subClassOf rdf:resource="E7_Activity"/>
+</rdfs:Class>
+
+<rdf:Property rdf:about="https://linked.art/ns/terms/removed_from">
+    <rdfs:label xml:lang="en">removed from</rdfs:label>
+    <rdfs:comment xml:lang="en"></rdfs:comment>
+    <rdfs:domain rdf:resource="https://linked.art/ns/terms/Removal"/>
+    <rdfs:range rdf:resource="https://linked.art/ns/terms/Set"/>
+    <owl:inverseOf rdf:resource="https://linked.art/ns/terms/removed_from_by"/>
+</rdf:Property>
+
+<rdf:Property rdf:about="https://linked.art/ns/terms/removed_from_by">
+    <rdfs:label xml:lang="en">removed from by</rdfs:label>
+    <rdfs:comment xml:lang="en"></rdfs:comment>
+    <rdfs:domain rdf:resource="https://linked.art/ns/terms/Set"/>
+    <rdfs:range rdf:resource="https://linked.art/ns/terms/Removal"/>
+    <owl:inverseOf rdf:resource="https://linked.art/ns/terms/removed_from"/>
+</rdf:Property>
+
+<rdf:Property rdf:about="https://linked.art/ns/terms/removed_member">
+    <rdfs:label xml:lang="en">removed</rdfs:label>
+    <rdfs:comment xml:lang="en"></rdfs:comment>
+    <rdfs:domain rdf:resource="https://linked.art/ns/terms/Removal"/>
+    <rdfs:range rdf:resource="E1_CRM_Entity"/>
+    <owl:inverseOf rdf:resource="https://linked.art/ns/terms/removed_member_by"/>
+</rdf:Property>
+
+<rdf:Property rdf:about="https://linked.art/ns/terms/removed_member_by">
+    <rdfs:label xml:lang="en">removed by</rdfs:label>
+    <rdfs:comment xml:lang="en"></rdfs:comment>
+    <rdfs:domain rdf:resource="E1_CRM_Entity"/>
+    <rdfs:range rdf:resource="https://linked.art/ns/terms/Removal"/>
+    <owl:inverseOf rdf:resource="https://linked.art/ns/terms/removed_member"/>
+</rdf:Property>
+
+
+<!-- Reified Relationship class -->
+
+<rdfs:Class rdf:about="https://linked.art/ns/terms/Relationship">
+    <rdfs:label xml:lang="en">Relationship</rdfs:label>
+    <rdfs:comment></rdfs:comment>
+    <rdfs:subClassOf rdf:resource="E28_Conceptual_Object"/>
+</rdfs:Class>
+
+<rdf:Property rdf:about="https://linked.art/ns/terms/related_to">
+        <rdfs:label xml:lang="en">related to</rdfs:label>
+        <rdfs:comment xml:lang="en"></rdfs:comment>
+        <rdfs:domain rdf:resource="https://linked.art/ns/terms/Relationship"/>
+        <rdfs:range rdf:resource="E1_CRM_Entity"/>
+</rdf:Property>
+
+<rdf:Property rdf:about="https://linked.art/ns/terms/related_from">
+        <rdfs:label xml:lang="en">related from</rdfs:label>
+        <rdfs:comment xml:lang="en"></rdfs:comment>
+        <rdfs:domain rdf:resource="https://linked.art/ns/terms/Relationship"/>
+        <rdfs:range rdf:resource="E1_CRM_Entity"/>
+</rdf:Property>
+
+<!-- Temporary (ish) digital relationships until update of CRMDig -->
+
+<rdf:Property rdf:about="https://linked.art/ns/terms/digitally_carries">
+        <rdfs:label xml:lang="en">digitally carries</rdfs:label>
+        <rdfs:comment xml:lang="en"></rdfs:comment>
+        <rdfs:domain rdf:resource="E73_Information_Object"/>
+        <rdfs:range rdf:resource="E90_Symbolic_Object"/>
+        <owl:inverseOf rdf:resource="https://linked.art/ns/terms/digitally_carried_by"/>
+</rdf:Property>
+
+<rdf:Property rdf:about="https://linked.art/ns/terms/digitally_carried_by">
+        <rdfs:label xml:lang="en">digitally carried by</rdfs:label>
+        <rdfs:comment xml:lang="en"></rdfs:comment>
+        <rdfs:domain rdf:resource="E90_Symbolic_Object"/>
+        <rdfs:range rdf:resource="E73_Information_Object"/>
+        <owl:inverseOf rdf:resource="https://linked.art/ns/terms/digitally_carries"/>
+</rdf:Property>
+
+<rdf:Property rdf:about="https://linked.art/ns/terms/digitally_shows">
+        <rdfs:label xml:lang="en">digitally shows</rdfs:label>
+        <rdfs:comment xml:lang="en"></rdfs:comment>
+        <rdfs:domain rdf:resource="E73_Information_Object"/>
+        <rdfs:range rdf:resource="E36_Visual_Item"/>
+        <owl:inverseOf rdf:resource="https://linked.art/ns/terms/digitally_shown_by"/>        
+</rdf:Property>
+
+<rdf:Property rdf:about="https://linked.art/ns/terms/digitally_shown_by">
+        <rdfs:label xml:lang="en">digitally shown by</rdfs:label>
+        <rdfs:comment xml:lang="en"></rdfs:comment>
+        <rdfs:range rdf:resource="E73_Information_Object"/>
+        <rdfs:domain rdf:resource="E36_Visual_Item"/>
+        <owl:inverseOf rdf:resource="https://linked.art/ns/terms/digitally_shows"/>        
+</rdf:Property>
+
+<rdfs:Class rdf:about="https://linked.art/ns/terms/DigitalService">
+    <rdfs:label xml:lang="en">Digital Service</rdfs:label>
+    <rdfs:comment></rdfs:comment>
+    <rdfs:subClassOf rdf:resource="E73_Information_Object"/>
+</rdfs:Class>
+
+<rdf:Property rdf:about="https://linked.art/ns/terms/digitally_available_via">
+        <rdfs:label xml:lang="en">digitally shows</rdfs:label>
+        <rdfs:comment xml:lang="en"></rdfs:comment>
+        <rdfs:domain rdf:resource="E73_Information_Object"/>
+        <rdfs:range rdf:resource="https://linked.art/ns/terms/DigitalService"/>
+        <owl:inverseOf rdf:resource="https://linked.art/ns/terms/digitally_makes_available"/>        
+</rdf:Property>
+
+<rdf:Property rdf:about="https://linked.art/ns/terms/digitally_makes_available">
+        <rdfs:label xml:lang="en">digitally shown by</rdfs:label>
+        <rdfs:comment xml:lang="en"></rdfs:comment>
+        <rdfs:range rdf:resource="https://linked.art/ns/terms/DigitalService"/>
+        <rdfs:domain rdf:resource="E73_Information_Object"/>
+        <owl:inverseOf rdf:resource="https://linked.art/ns/terms/digitally_available_via"/>        
+</rdf:Property>
+
+</rdf:RDF>

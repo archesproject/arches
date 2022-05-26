@@ -80,7 +80,7 @@ DATABASES = {
         "HOST": "localhost",
         "NAME": "dataspace",
         "OPTIONS": {},
-        "PASSWORD": "ispc@2022",
+        "PASSWORD": "postgres",
         "PORT": "5432",
         "POSTGIS_TEMPLATE": "template_postgis",
         "TEST": {
@@ -115,7 +115,7 @@ INSTALLED_APPS = (
     'dataspace',
 )
 
-ALLOWED_HOSTS = ["90.147.185.61", "localhost"]
+ALLOWED_HOSTS = []
 
 SYSTEM_SETTINGS_LOCAL_PATH = os.path.join(APP_ROOT, 'system_settings', 'System_Settings.json')
 WSGI_APPLICATION = 'dataspace.wsgi.application'

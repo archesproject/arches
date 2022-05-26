@@ -1,0 +1,21 @@
+{
+    "name": "Visual Work Template",
+    "component": "views/components/reports/visual-work",
+    "defaultconfig": {
+        "tabs": [{
+                "icon": "fa fa-info",
+                "name": "Identity",
+                "nodegroup_ids": []
+            },
+            {
+                "icon": "fa fa-chain",
+                "name": "Links",
+                "nodegroup_ids": []
+            }
+        ],
+        "activeTabIndex": 1
+    },
+    "description": "Visual Work report",
+    "componentname": "visual-work-report",
+    "templateid": "c4167d32-33c4-4055-b064-ea9296c1c13a"
+}

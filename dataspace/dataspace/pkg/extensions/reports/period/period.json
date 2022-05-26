@@ -1,0 +1,11 @@
+{
+    "name": "Period Template",
+    "component": "views/components/reports/period",
+    "defaultconfig": {
+        "uncompacted_reporting": true
+    },
+    "description": "Period report",
+    "componentname": "period-report",
+    "templateid": "9f6b087b-12f4-4436-8bfc-257d1665ba40",
+    "preload_resource_data": false
+}
