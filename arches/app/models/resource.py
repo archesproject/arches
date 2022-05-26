@@ -97,7 +97,7 @@ class Resource(models.ResourceInstance):
 
     def displayname(self, context=None):
         descriptor = self.get_descriptor("name", context)
-        self.namedescriptor = descriptor
+        self.name = descriptor
         return descriptor
 
     def save_edit(self, user={}, note="", edit_type="", transaction_id=None):

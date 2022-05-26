@@ -6,7 +6,7 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ("models", "8247_update_primary_descriptors_config"),
+        ("models", "8042_3_spatialview_db_functions"),
     ]
 
     operations = [

@@ -18,7 +18,7 @@ class Migration(migrations.Migration):
         ),
         migrations.AddField(
             model_name="resourceinstance",
-            name="namedescriptor",
+            name="name",
             field=models.TextField(blank=True, null=True),
         ),
     ]
