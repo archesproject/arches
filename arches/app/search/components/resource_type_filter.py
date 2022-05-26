@@ -17,11 +17,13 @@ details = {
     "enabled": True,
 }
 
+
 def get_permitted_graphids(permitted_nodegroups):
     permitted_graphids = set()
     for node in Node.objects.filter(nodegroup__in=permitted_nodegroups):
         permitted_graphids.add(str(node.graph_id))
     return permitted_graphids
+
 
 class ResourceTypeFilter(BaseSearchFilter):
     def append_dsl(self, search_results_object, permitted_nodegroups, include_provisional):
