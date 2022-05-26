@@ -46,7 +46,9 @@ step by step
    15 - posizionati nella directory di progetto arches/dataspace e fail setup del db: python manage.py setup_db
     
    16 - ora ripristina il pacchetto con i dati: python manage.py packages -o load_package -s dataspace/pkg
+   
+   17 - installa le dipendenze js:  yarn install
     
-   17 - avvia il servizio python manage.py runserver
+   18 - avvia il servizio python manage.py runserver
     
    ora se vai dal tuo browser in localhost:8000 vedrai il servizio. per loggarti username: admin password:admin
