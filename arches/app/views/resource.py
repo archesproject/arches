@@ -174,17 +174,13 @@ class ResourceEditorView(MapBaseManagerView):
         widgets = models.Widget.objects.all()
         card_components = models.CardComponent.objects.all()
 
-        primary_descriptor_functions = models.FunctionXGraph.objects.filter(graph=graph).filter(
-            function__functiontype="primarydescriptors"
-        )
+        primary_descriptor_functions = models.FunctionXGraph.objects.filter(graph=graph).filter(function__functiontype="primarydescriptors")
 
         primary_descriptor_function = JSONSerializer().serialize(
             primary_descriptor_functions[0] if len(primary_descriptor_functions) > 0 else None
         )
 
-        applied_functions = JSONSerializer().serialize(
-            models.FunctionXGraph.objects.filter(graph=graph)
-        )
+        applied_functions = JSONSerializer().serialize(models.FunctionXGraph.objects.filter(graph=graph))
 
         datatypes = models.DDataType.objects.all()
         user_is_reviewer = user_is_resource_reviewer(request.user)

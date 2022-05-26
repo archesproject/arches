@@ -172,9 +172,9 @@ class GraphDesignerView(GraphBaseView):
         datatypes_json = JSONSerializer().serialize(datatypes, exclude=["modulename", "isgeometric"])
         branch_graphs = Graph.objects.exclude(pk=graphid).exclude(isresource=True)
 
-        primary_descriptor_functions = models.FunctionXGraph.objects.filter(
-            graph=self.graph
-        ).filter(function__functiontype="primarydescriptors")
+        primary_descriptor_functions = models.FunctionXGraph.objects.filter(graph=self.graph).filter(
+            function__functiontype="primarydescriptors"
+        )
         primary_descriptor_function = JSONSerializer().serialize(
             primary_descriptor_functions[0] if len(primary_descriptor_functions) > 0 else None
         )

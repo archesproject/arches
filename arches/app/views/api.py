@@ -268,9 +268,7 @@ class GeoJSON(APIBase):
         ).select_related("function")
         if len(graph_function) == 1:
             module = graph_function[0].function.get_class_module()()
-            return module.get_primary_descriptor_from_nodes(
-                self, graph_function[0].config["descriptor_types"]["name"]
-            )
+            return module.get_primary_descriptor_from_nodes(self, graph_function[0].config["descriptor_types"]["name"])
         else:
             return _("Unnamed Resource")
 
