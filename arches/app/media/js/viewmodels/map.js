@@ -478,7 +478,7 @@ define([
                         if (hoverFeature && hoverFeature.id && style) map.setFeatureState(hoverFeature, { hover: false });
                         hoverFeature = _.find(
                             map.queryRenderedFeatures(e.point),
-                            feature => mapPopupProvider.isFeatureClickable(feature, self.selectedTool())
+                            feature => mapPopupProvider.isFeatureClickable(feature, self)
                         );
                         if (hoverFeature && hoverFeature.id && style) map.setFeatureState(hoverFeature, { hover: true });
 
@@ -499,7 +499,7 @@ define([
                     map.on('click', function(e) {
                         const popupFeatures = _.filter(
                             map.queryRenderedFeatures(e.point),
-                            feature => mapPopupProvider.isFeatureClickable(feature, self.selectedTool())
+                            feature => mapPopupProvider.isFeatureClickable(feature, self)
                         );
                         if (popupFeatures.length) {
                             self.onFeatureClick(popupFeatures, e.lngLat, MapboxGl);
