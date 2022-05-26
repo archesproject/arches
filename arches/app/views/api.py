@@ -1606,7 +1606,7 @@ class NodeValue(APIBase):
                 data = datatype.update(tile, data, nodeid, action=operation)
 
             # update/create tile
-            new_tile = TileProxyModel.update_node_value(nodeid, data, tileid, resourceinstanceid=resourceid, transaction_id=transaction_id)
+            new_tile = TileProxyModel.update_node_value(nodeid, data, tileid, request=request, resourceinstanceid=resourceid, transaction_id=transaction_id)
 
             response = JSONResponse(new_tile, status=200)
         else:
