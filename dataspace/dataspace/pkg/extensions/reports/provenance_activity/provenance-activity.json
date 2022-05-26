@@ -1,0 +1,11 @@
+{
+    "name": "Provenance Activity Template",
+    "component": "views/components/reports/provenance-activity",
+    "defaultconfig": {
+        "uncompacted_reporting": true
+    },
+    "description": "provenance Activity report",
+    "componentname": "provenance-activity-report",
+    "templateid": "1a51566c-4ba0-4633-b717-18f629350c9c",
+    "preload_resource_data": false
+}

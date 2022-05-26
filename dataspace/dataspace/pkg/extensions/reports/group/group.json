@@ -1,0 +1,11 @@
+{
+    "name": "Group Template",
+    "component": "views/components/reports/group",
+    "defaultconfig": {
+        "uncompacted_reporting": true
+    },
+    "description": "Group report",
+    "componentname": "group-report",
+    "templateid": "3a9fd7d1-f065-4777-b664-3fda0eb39ffe",
+    "preload_resource_data": false
+}

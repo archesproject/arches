@@ -1,0 +1,11 @@
+{
+    "name": "Modification Template",
+    "component": "views/components/reports/modification",
+    "defaultconfig": {
+        "uncompacted_reporting": true
+    },
+    "description": "Modification report",
+    "componentname": "modification-report",
+    "templateid": "f02f4b69-08d9-49fa-a4d1-94ef8178fbce",
+    "preload_resource_data": false
+}

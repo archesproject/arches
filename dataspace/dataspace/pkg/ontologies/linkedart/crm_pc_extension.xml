@@ -1,0 +1,200 @@
+<?xml version="1.0"?>
+<!--
+CRMpc 1.1 Encoded in RDFS modified August 10, 2016
+
+RDFS created by FORTH-ICS November 19, 2014
+
+Introducing class PC0_Typed_CRM_Property  and properties P01 has domain and P02 has range
+in order to encode links on links in RDF
+All XX.1 properties of CIDOC-CRM are introduced as subclasses of PC0 CRM_Property
+
+changes from 1.0:
+renamed PC0_CRM_Property to PC0_Typed_CRM_Property
+
+-->
+
+<rdf:RDF xml:lang="en" 
+			xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" 
+			xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#"
+			xml:base="http://www.cidoc-crm.org/cidoc-crm/">
+
+<rdfs:Class rdf:about="PC0_Typed_CRM_Property">
+<rdfs:comment></rdfs:comment>
+</rdfs:Class>
+
+<rdf:Property rdf:about="P01_has_domain">
+	<rdfs:domain rdf:resource="PC0_Typed_CRM_Property"/>
+	<rdfs:range rdf:resource="E1_CRM_Entity"/>	
+</rdf:Property>
+<rdf:Property rdf:about="P01i_is_domain_of">
+	<rdfs:domain rdf:resource="E1_CRM_Entity"/>
+	<rdfs:range rdf:resource="PC0_Typed_CRM_Property"/>	
+</rdf:Property>
+
+<rdf:Property rdf:about="P02_has_range">
+	<rdfs:domain rdf:resource="PC0_Typed_CRM_Property"/>
+	<rdfs:range rdf:resource="E1_CRM_Entity"/>	
+</rdf:Property>
+<rdf:Property rdf:about="P02i_is_range_of">
+	<rdfs:domain rdf:resource="E1_CRM_Entity"/>
+	<rdfs:range rdf:resource="PC0_Typed_CRM_Property"/>	
+</rdf:Property>
+
+<rdf:Property rdf:about="P03_has_range_literal">
+	<rdfs:domain rdf:resource="PC0_Typed_CRM_Property"/>
+	<rdfs:range rdf:resource="http://www.w3.org/2000/01/rdf-schema#Literal"/>	
+</rdf:Property>
+
+
+
+<rdfs:Class rdf:about="PC3_has_note"> 
+	<rdfs:subClassOf rdf:resource="PC0_Typed_CRM_Property"/>
+<rdfs:comment></rdfs:comment>
+</rdfs:Class>
+
+<rdf:Property rdf:about="P3.1_has_type">
+	<rdfs:domain rdf:resource="PC3_has_note"/>
+	<rdfs:range rdf:resource="E55_Type"/>	
+</rdf:Property>
+
+<rdfs:Class rdf:about="PC14_carried_out_by"> 
+	<rdfs:subClassOf rdf:resource="PC0_Typed_CRM_Property"/>
+<rdfs:comment></rdfs:comment>
+</rdfs:Class>
+
+<rdf:Property rdf:about="P14.1_in_the_role_of">
+	<rdfs:domain rdf:resource="PC14_carried_out_by"/>
+	<rdfs:range rdf:resource="E55_Type"/>	
+</rdf:Property>
+
+<rdfs:Class rdf:about="PC16_used_specific_object"> 
+	<rdfs:subClassOf rdf:resource="PC0_Typed_CRM_Property"/>
+<rdfs:comment></rdfs:comment>
+</rdfs:Class>
+
+<rdf:Property rdf:about="P16.1_mode_of_use">
+	<rdfs:domain rdf:resource="PC16_used_specific_object"/>
+	<rdfs:range rdf:resource="E55_Type"/>	
+</rdf:Property>
+
+<rdfs:Class rdf:about="PC19_was_intended_use_of"> 
+	<rdfs:subClassOf rdf:resource="PC0_Typed_CRM_Property"/>
+<rdfs:comment></rdfs:comment>
+</rdfs:Class>
+
+<rdf:Property rdf:about="P19.1_mode_of_use">
+	<rdfs:domain rdf:resource="PC19_was_intended_use_of"/>
+	<rdfs:range rdf:resource="E55_Type"/>	
+</rdf:Property>
+
+<rdfs:Class rdf:about="PC62_depicts"> 
+	<rdfs:subClassOf rdf:resource="PC0_Typed_CRM_Property"/>
+<rdfs:comment></rdfs:comment>
+</rdfs:Class>
+
+<rdf:Property rdf:about="P62.1_mode_of_depiction">
+	<rdfs:domain rdf:resource="PC62_depicts"/>
+	<rdfs:range rdf:resource="E55_Type"/>	
+</rdf:Property>
+
+<rdfs:Class rdf:about="PC67_refers_to"> 
+	<rdfs:subClassOf rdf:resource="PC0_Typed_CRM_Property"/>
+<rdfs:comment></rdfs:comment>
+</rdfs:Class>
+
+<rdf:Property rdf:about="P67.1_has_type">
+	<rdfs:domain rdf:resource="PC67_refers_to"/>
+	<rdfs:range rdf:resource="E55_Type"/>	
+</rdf:Property>
+
+<rdfs:Class rdf:about="PC69_is_associated_with"> 
+	<rdfs:subClassOf rdf:resource="PC0_Typed_CRM_Property"/>
+<rdfs:comment></rdfs:comment>
+</rdfs:Class>
+
+<rdf:Property rdf:about="P69.1_has_type">
+	<rdfs:domain rdf:resource="PC69_is_associated_with"/>
+	<rdfs:range rdf:resource="E55_Type"/>	
+</rdf:Property>
+
+<rdfs:Class rdf:about="PC102_has_title"> 
+	<rdfs:subClassOf rdf:resource="PC0_Typed_CRM_Property"/>
+<rdfs:comment></rdfs:comment>
+</rdfs:Class>
+
+<rdf:Property rdf:about="P102.1_has_type">
+	<rdfs:domain rdf:resource="PC102_has_title"/>
+	<rdfs:range rdf:resource="E55_Type"/>	
+</rdf:Property>
+
+<rdfs:Class rdf:about="PC107_has_current_or_former_member"> 
+	<rdfs:subClassOf rdf:resource="PC0_Typed_CRM_Property"/>
+<rdfs:comment></rdfs:comment>
+</rdfs:Class>
+
+<rdf:Property rdf:about="P107.1_kind_of_member">
+	<rdfs:domain rdf:resource="PC107_has_current_or_former_member"/>
+	<rdfs:range rdf:resource="E55_Type"/>	
+</rdf:Property>
+
+<rdfs:Class rdf:about="PC130_shows_features_of"> 
+	<rdfs:subClassOf rdf:resource="PC0_Typed_CRM_Property"/>
+<rdfs:comment></rdfs:comment>
+</rdfs:Class>
+
+<rdf:Property rdf:about="P130.1_kind_of_similarity">
+	<rdfs:domain rdf:resource="PC130_shows_features_of"/>
+	<rdfs:range rdf:resource="E55_Type"/>	
+</rdf:Property>
+
+<rdfs:Class rdf:about="PC136_was_based_on"> 
+	<rdfs:subClassOf rdf:resource="PC0_Typed_CRM_Property"/>
+<rdfs:comment></rdfs:comment>
+</rdfs:Class>
+
+<rdf:Property rdf:about="P136.1_in_the_taxonomic_role">
+	<rdfs:domain rdf:resource="PC136_was_based_on"/>
+	<rdfs:range rdf:resource="E55_Type"/>	
+</rdf:Property>
+
+<rdfs:Class rdf:about="PC137_exemplifies"> 
+	<rdfs:subClassOf rdf:resource="PC0_Typed_CRM_Property"/>
+<rdfs:comment></rdfs:comment>
+</rdfs:Class>
+
+<rdf:Property rdf:about="P137.1_in_the_taxonomic_role">
+	<rdfs:domain rdf:resource="PC137_exemplifies"/>
+	<rdfs:range rdf:resource="E55_Type"/>	
+</rdf:Property>
+
+<rdfs:Class rdf:about="PC138_represents"> 
+	<rdfs:subClassOf rdf:resource="PC0_Typed_CRM_Property"/>
+<rdfs:comment></rdfs:comment>
+</rdfs:Class>
+
+<rdf:Property rdf:about="P138.1_mode_of_representation">
+	<rdfs:domain rdf:resource="PC138_represents"/>
+	<rdfs:range rdf:resource="E55_Type"/>	
+</rdf:Property>
+
+<rdfs:Class rdf:about="PC139_has_alternative_form"> 
+	<rdfs:subClassOf rdf:resource="PC0_Typed_CRM_Property"/>
+<rdfs:comment></rdfs:comment>
+</rdfs:Class>
+
+<rdf:Property rdf:about="P139.1_has_type">
+	<rdfs:domain rdf:resource="PC139_has_alternative_form"/>
+	<rdfs:range rdf:resource="E55_Type"/>	
+</rdf:Property>
+
+<rdfs:Class rdf:about="PC144_joined_with"> 
+	<rdfs:subClassOf rdf:resource="PC0_Typed_CRM_Property"/>
+<rdfs:comment></rdfs:comment>
+</rdfs:Class>
+
+<rdf:Property rdf:about="P144.1_kind_of_member">
+	<rdfs:domain rdf:resource="PC144_joined_with"/>
+	<rdfs:range rdf:resource="E55_Type"/>	
+</rdf:Property>
+		
+</rdf:RDF>
