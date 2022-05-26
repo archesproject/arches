@@ -1,6 +1,7 @@
 from __future__ import absolute_import, unicode_literals
 import os
 import logging
+import shutil
 from celery import shared_task
 from datetime import datetime
 from datetime import timedelta
@@ -204,6 +205,25 @@ def on_chord_error(request, exc, traceback):
     user = User.objects.get(id=1)
     notify_completion(msg, user)
 
+
+@shared_task
+def load_files(files, summary, result, temp_dir, loadid):
+    from arches.app.etl_modules import branch_csv_importer
+
+    BranchCsvImporter = branch_csv_importer.BranchCsvImporter(request=None, loadid=loadid, temp_dir=temp_dir)
+    with connection.cursor() as cursor:
+        for file in files.keys():
+            BranchCsvImporter.stage_excel_file(file, summary, cursor)
+        result["validation"] = BranchCsvImporter.validate()
+        if len(result["validation"]["data"]) == 0:
+            BranchCsvImporter.complete_load(loadid, multiprocessing=False)
+        else:
+            cursor.execute(
+                """UPDATE load_event SET status = %s, load_end_time = %s WHERE loadid = %s""",
+                ("failed", datetime.now(), self.loadid),
+            )
+    shutil.rmtree(temp_dir)
+    result["summary"] = summary
 
 def create_user_task_record(taskid, taskname, userid):
     try:
