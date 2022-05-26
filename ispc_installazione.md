@@ -63,7 +63,11 @@ step by step
    
    17 - installa le dipendenze js:  
    
-        yarn install
+        yarn install --manage-folder dataspace/media/packages
+        
+        yarn add three
+        
+        yarn add plotly.js-dist
     
    18 - avvia il servizio 
    
