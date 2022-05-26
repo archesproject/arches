@@ -144,10 +144,10 @@ add_validation_reporting_functions = """
                     WHERE t.nodegroupid = ng1.nodegroupid
                     AND ng1.cardinality = '1'
                 UNION
-				SELECT resourceid, nodegroupid, COALESCE(parenttileid::text, '')
-					FROM load_staging 
-					GROUP BY resourceid, nodegroupid, COALESCE(parenttileid::text, ''), loadid
-					HAVING count(*) > 1
+                SELECT resourceid, nodegroupid, COALESCE(parenttileid::text, '')
+                    FROM load_staging
+                    GROUP BY resourceid, nodegroupid, COALESCE(parenttileid::text, ''), loadid
+                    HAVING count(*) > 1
                     AND loadid = load_id
             );
     $$ LANGUAGE SQL;
