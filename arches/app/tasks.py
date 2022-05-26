@@ -216,7 +216,7 @@ def load_files(files, summary, result, temp_dir, loadid):
             BranchCsvImporter.stage_excel_file(file, summary, cursor)
         result["validation"] = BranchCsvImporter.validate()
         if len(result["validation"]["data"]) == 0:
-            BranchCsvImporter.complete_load(loadid)
+            BranchCsvImporter.complete_load(loadid, multiprocessing=False)
         else:
             cursor.execute(
                 """UPDATE load_event SET status = %s, load_end_time = %s WHERE loadid = %s""",

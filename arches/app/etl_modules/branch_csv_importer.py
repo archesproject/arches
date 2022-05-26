@@ -214,7 +214,7 @@ class BranchCsvImporter:
             row = cursor.fetchall()
         return {"success": success, "data": row}
 
-    def complete_load(self, loadid):
+    def complete_load(self, loadid, multiprocessing=True):
         self.loadid = loadid
         try:
             with connection.cursor() as cursor:
@@ -235,7 +235,7 @@ class BranchCsvImporter:
             }
 
         if row[0][0]:
-            index_resources_by_transaction(self.loadid, quiet=True, use_multiprocessing=True)
+            index_resources_by_transaction(self.loadid, quiet=True, use_multiprocessing=multiprocessing)
             with connection.cursor() as cursor:
                 cursor.execute(
                     """UPDATE load_event SET status = %s WHERE loadid = %s""",
