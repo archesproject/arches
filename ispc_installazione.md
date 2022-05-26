@@ -22,7 +22,9 @@ step by step
     
    4 -  installa node js e assicuratevi di aggiungerla alla variabile d'ambiente https://nodejs.org/  (installando nodejs si installerà anche python)
     
-   5 -  installa yarn tramite riga di comando npm install --global yarn
+   5 -  installa yarn tramite riga di comando 
+                                                
+        npm install --global yarn
     
    6 -  scarica  elastichsearch da https://www.elastic.co/downloads/past-releases/elasticsearch-7-4-1
      dezzippalo in qualsiasi posizione tu voglia  vai in elasticsearch\bin e avvia elastichsearch.bat (avviandolo via terminale aggiungete la -d per farlo girare in background)
@@ -33,22 +35,38 @@ step by step
      
    9 - posizionati nella cartella di arches (roo principale) con il terminale
  
-   10 - crea ambiente virtuale :  python -m venv ENV
+   10 - crea ambiente virtuale :  
+   
+        python -m venv ENV
     
-   11 - attiva l'ambiente virtuale : ENV\Scripts\activate.bat
+   11 - attiva l'ambiente virtuale : 
+   
+        ENV\Scripts\activate.bat
     
-   12 - upgrade pip :  python -m pip install --upgrade pip
+   12 - upgrade pip :  
+   
+        python -m pip install --upgrade pip
     
-   13 - Installa pacchetto python arches : pip install arches
+   13 - Installa pacchetto python arches : 
+   
+        pip install arches
     
    14 - in dataspace/dataspace/settings_local.py cambiare se necessario le path per le librerie gdal (sono nella cartella bin/ di osgeoW4)
     
-   15 - posizionati nella directory di progetto arches/dataspace e fail setup del db: python manage.py setup_db
-    
-   16 - ora ripristina il pacchetto con i dati: python manage.py packages -o load_package -s dataspace/pkg
+   15 - posizionati nella directory di progetto arches/dataspace e fail setup del db: 
    
-   17 - installa le dipendenze js:  yarn install
+        python manage.py setup_db
     
-   18 - avvia il servizio python manage.py runserver
+   16 - ora ripristina il pacchetto con i dati: 
+   
+        python manage.py packages -o load_package -s dataspace/pkg
+   
+   17 - installa le dipendenze js:  
+   
+        yarn install
+    
+   18 - avvia il servizio 
+   
+        python manage.py runserver
     
    ora se vai dal tuo browser in localhost:8000 vedrai il servizio. per loggarti username: admin password:admin
