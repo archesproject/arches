@@ -2,6 +2,7 @@ from arches.app.models import models
 from arches.app.models.system_settings import settings
 from arches.app.search.elasticsearch_dsl_builder import Bool, Terms, NestedAgg, FiltersAgg, GeoHashGridAgg, GeoBoundsAgg
 from arches.app.search.components.base import BaseSearchFilter
+from arches.app.search.components.resource_type_filter import get_permitted_graphids
 from arches.app.utils.permission_backend import user_is_resource_reviewer
 
 details = {
@@ -23,6 +24,15 @@ class SearchResultsFilter(BaseSearchFilter):
         nested_agg = NestedAgg(path="points", name="geo_aggs")
         nested_agg_filter = FiltersAgg(name="inner")
         geo_agg_filter = Bool()
+
+        try:
+            search_results_object["query"].dsl["query"]["bool"]["filter"][0]["terms"]["graph_id"]
+        except (KeyError, IndexError):
+            resource_model_filter = Bool()
+            permitted_graphids = get_permitted_graphids(permitted_nodegroups)
+            terms = Terms(field="graph_id", terms=list(permitted_graphids))
+            resource_model_filter.filter(terms)
+            search_results_object["query"].add_query(resource_model_filter)
 
         if include_provisional is True:
             geo_agg_filter.filter(Terms(field="points.provisional", terms=["false", "true"]))

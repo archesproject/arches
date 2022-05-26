@@ -17,16 +17,18 @@ details = {
     "enabled": True,
 }
 
+def get_permitted_graphids(permitted_nodegroups):
+    permitted_graphids = set()
+    for node in Node.objects.filter(nodegroup__in=permitted_nodegroups):
+        permitted_graphids.add(str(node.graph_id))
+    return permitted_graphids
 
 class ResourceTypeFilter(BaseSearchFilter):
     def append_dsl(self, search_results_object, permitted_nodegroups, include_provisional):
         search_query = Bool()
         querystring_params = self.request.GET.get(details["componentname"], "")
         graph_ids = []
-        permitted_graphids = set()
-
-        for node in Node.objects.filter(nodegroup__in=permitted_nodegroups).select_related("graph"):
-            permitted_graphids.add(str(node.graph_id))
+        permitted_graphids = get_permitted_graphids(permitted_nodegroups)
 
         for resourceTypeFilter in JSONDeserializer().deserialize(querystring_params):
             graphid = str(resourceTypeFilter["graphid"])
