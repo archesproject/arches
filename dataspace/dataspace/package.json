@@ -1,6 +1,9 @@
 {
     "name": "dataspace",
     "dependencies": {
-        "arches": "archesproject/arches#stable/6.0.1"
+        "arches": "archesproject/arches#stable/6.0.1",
+        "plotly.js-dist": "^2.12.1",
+        "theejs": "^0.0.0",
+        "three": "^0.141.0"
     }
 }
