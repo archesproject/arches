@@ -470,8 +470,13 @@ div.search-facet-item:focus {
 }
 
 .ep-notifs,
-.search-popup-panel {
+.ep-help {
     width: 50vw;
+}
+
+.search-popup-panel {
+    width: auto;
+    max-width: 400px;
 }
 
 .rp-report-section-title {
