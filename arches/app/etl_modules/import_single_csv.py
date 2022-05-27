@@ -160,7 +160,7 @@ class ImportSingleCsv:
                 dict_by_nodegroup = {}
 
                 for key in row:
-                    if key != '':
+                    if key != "":
                         current_node = self.get_node_lookup(graphid).get(alias=key)
                         nodegroupid = str(current_node.nodegroup_id)
                         node = str(current_node.nodeid)
@@ -176,11 +176,27 @@ class ImportSingleCsv:
 
                         if nodegroupid in dict_by_nodegroup:
                             dict_by_nodegroup[nodegroupid].append(
-                                {node: {"value": value, "valid": valid, "source": source_value, "notes": error_message, "datatype": datatype}}
+                                {
+                                    node: {
+                                        "value": value,
+                                        "valid": valid,
+                                        "source": source_value,
+                                        "notes": error_message,
+                                        "datatype": datatype,
+                                    }
+                                }
                             )
                         else:
                             dict_by_nodegroup[nodegroupid] = [
-                                {node: {"value": value, "valid": valid, "source": source_value, "notes": error_message, "datatype": datatype}}
+                                {
+                                    node: {
+                                        "value": value,
+                                        "valid": valid,
+                                        "source": source_value,
+                                        "notes": error_message,
+                                        "datatype": datatype,
+                                    }
+                                }
                             ]
 
                 for nodegroup in dict_by_nodegroup:
