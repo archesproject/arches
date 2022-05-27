@@ -40,6 +40,7 @@ admin.site.register(
         models.IIIFManifest,
         models.GroupMapSettings,
         models.NodeGroup,
+        models.SpatialView,
     ]
 )
 
