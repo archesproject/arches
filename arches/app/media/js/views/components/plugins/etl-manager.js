@@ -54,7 +54,9 @@ define([
                     }
                 }).then(function(data){
                     self.loadEvents(data.events);
-                    self.selectedLoadEvent(data.events[0]);
+                    if (!self.selectedLoadEvent()) {
+                        self.selectedLoadEvent(data.events[0]);
+                    }
                     self.paginator(data.paginator);
                     self.loading(false);
                 });

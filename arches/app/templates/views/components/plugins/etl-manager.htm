@@ -76,7 +76,7 @@
                         <table class="" style="min-width: 50px;">
                             <tbody data-bind="foreach: {data: loadEvents, as: 'event'}">
                                 <!-- ko if: !$parent.taskSearchString() || event.etl_module.name.toLowerCase().includes($parent.taskSearchString().toLowerCase()) || $parent.formatUserName(event.user).toLowerCase().includes($parent.taskSearchString().toLowerCase()) -->
-                                <tr data-bind="css: {'selected': event == $parent.selectedLoadEvent()}">
+                                <tr data-bind="css: {'selected': event.loadid == $parent.selectedLoadEvent()?.loadid}">
                                     <td data-bind="click: function(){$parent.selectedLoadEvent(event)}" style="display: block; border-top: 1px solid rgba(0,0,0,0.14); padding: 10px 15px; flex-direction: column; justify-content: space-between; cursor: pointer; height: 80px; width: 400px;">
                                         <div>
                                             <div data-bind="text: event.etl_module.name" style="font-size: 13pt; color: rgb(4, 4, 45)"></div>
