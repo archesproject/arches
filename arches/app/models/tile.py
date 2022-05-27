@@ -657,7 +657,7 @@ class Tile(models.TileModel):
                     if context:
                         function.save(self, request, context=context)
                     else:
-                        function.save(self, request) # support functions without context TODO: remove if/else block in 7.0 release. All fns to require context
+                        function.save(self, request) # support functions without context TODO: remove if/else block in 7.0 release. All fns will need to get context from **kwargs
                 except NotImplementedError:
                     pass
         except TypeError:
@@ -686,7 +686,7 @@ class Tile(models.TileModel):
                     if context:
                         function.post_save(self, request, context=context)
                     else:
-                        function.post_save(self, request) # support functions without context TODO: remove if/else block in 7.0 release. All fns to require context
+                        function.post_save(self, request) # support functions without context TODO: remove if/else block in 7.0 release. All fns will need to get context from **kwargs
                 except NotImplementedError:
                     pass
         except TypeError as e:
