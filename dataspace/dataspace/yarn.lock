@@ -2780,6 +2780,11 @@ pbf@^3.2.1:
     ieee754 "^1.1.12"
     resolve-protobuf-schema "^2.1.0"
 
+plotly.js-dist@^2.12.1:
+  version "2.12.1"
+  resolved "https://registry.yarnpkg.com/plotly.js-dist/-/plotly.js-dist-2.12.1.tgz#ebdf9f63985d07debe245561998cce00f4791e30"
+  integrity sha512-u3NumBhoNQw5fyr5sfK0jTIa4v1WwruAs0y5bSk055rKklFtyUgwwVZ8VEKCiWqfuPX7OPS3mE4PqvgP4mATOA==
+
 polygonize@1.0.1:
   version "1.0.1"
   resolved "https://registry.yarnpkg.com/polygonize/-/polygonize-1.0.1.tgz#51fb7040914be0fbc43b0bd54d421d75fc2ae7a6"
@@ -3111,6 +3116,23 @@ supports-preserve-symlinks-flag@^1.0.0:
   version "1.0.0"
   resolved "https://registry.yarnpkg.com/supports-preserve-symlinks-flag/-/supports-preserve-symlinks-flag-1.0.0.tgz#6eda4bd344a3c94aea376d4cc31bc77311039e09"
   integrity sha512-ot0WnXS9fgdkgIcePe6RHNk1WA8+muPa6cSjeR3V8K27q9BB1rTE3R1p7Hv0z1ZyAc8s6Vvv8DIyWf681MAt0w==
+
+thee@^1.1.2:
+  version "1.1.2"
+  resolved "https://registry.yarnpkg.com/thee/-/thee-1.1.2.tgz#5cd93ebc8fb90b2b3fcc7b8761db126460be0484"
+  integrity sha1-XNk+vI+5Cys/zHuHYdsSZGC+BIQ=
+
+theejs@^0.0.0:
+  version "0.0.0"
+  resolved "https://registry.yarnpkg.com/theejs/-/theejs-0.0.0.tgz#1c7faa2d180577ee75ed4666f1d72915be1b825b"
+  integrity sha512-Boa8wxydb/X3ZPk2Nu44cVL1biIsyWOst+1TY/pf9FRvNy/WEWNsbt91mRouFWDDrgXvTv7QCWBss19zkfSblw==
+  dependencies:
+    thee "^1.1.2"
+
+three@^0.141.0:
+  version "0.141.0"
+  resolved "https://registry.yarnpkg.com/three/-/three-0.141.0.tgz#16677a12b9dd0c3e1568ebad0fd09de15d5a8216"
+  integrity sha512-JaSDAPWuk4RTzG5BYRQm8YZbERUxTfTDVouWgHMisS2to4E5fotMS9F2zPFNOIJyEFTTQDDKPpsgZVThKU3pXA==
 
 tinyqueue@^2.0.3:
   version "2.0.3"

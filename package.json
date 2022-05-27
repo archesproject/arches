@@ -62,7 +62,7 @@
         "requirejs-text": "2.0.12",
         "select2": "3.5.1",
         "supervisor": "^0.12.0",
-        "three": "^0.140.2",
+        "three": "^0.141.0",
         "underscore": "1.9.1",
         "uuidjs": "^3.3.0"
     }

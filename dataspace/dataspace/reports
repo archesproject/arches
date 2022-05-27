@@ -1,11 +1,11 @@
 {
-    "name": "Group Template",
-    "component": "views/components/reports/group",
+    "name": "Observation Template",
+    "component": "views/components/reports/observation",
     "defaultconfig": {
         "uncompacted_reporting": true
     },
-    "description": "Group report",
-    "componentname": "group-report",
-    "templateid": "3a9fd7d1-f065-4777-b664-3fda0eb39ffe",
+    "description": "Observation report",
+    "componentname": "observation-report",
+    "templateid": "e581f911-185b-4456-873d-f83b46fd89ec",
     "preload_resource_data": false
 }

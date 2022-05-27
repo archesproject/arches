@@ -9,7 +9,6 @@ build
 arches.egg*
 arches/elasticsearch
 arches/uploadedfiles
-arches/settings_local.py
 tests/settings_local.py
 arches/logs/authority_file_errors.txt
 .coverage
