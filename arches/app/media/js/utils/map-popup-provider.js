@@ -10,9 +10,11 @@ define(['arches',
          * @param feature Map feature to check
          * @returns <code>true</code> if the feature can be clicked, otherwise <code>false</code>
          */
-        isFeatureClickable: function(feature, drawMode)
+        isFeatureClickable: function(feature, map)
         {
-            if (typeof drawMode !== 'undefined' && drawMode !== null)
+            const selectedFeatureIds = ko.unwrap(map.selectedFeatureIds);
+            const selectedTool = ko.unwrap(map.selectedTool);
+            if ((typeof selectedTool !== 'undefined' && selectedTool !== null) || selectedFeatureIds && selectedFeatureIds.length)
                 return false;
             return feature.properties.resourceinstanceid;
         },
