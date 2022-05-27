@@ -53,12 +53,16 @@ define([
                     }
                 }).then(function(data){
                     self.loadEvents(data.events);
-                    if (!self.selectedLoadEvent()) {
-                        self.selectedLoadEvent(data.events[0]);
-                    }
                     self.paginator(data.paginator);
                 });
             };
+
+            this.loadEvents.subscribe(function(loadEvents) {
+                const loadEventIds = loadEvents.map(loadEvent => loadEvent.loadid);
+                if (!loadEventIds.includes(self.selectedLoadEvent()?.loadid)) {
+                    self.selectedLoadEvent(loadEvents[0]);
+                }
+            });
 
             this.newPage = function(page) {
                 if (page) {
