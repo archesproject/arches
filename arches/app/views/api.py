@@ -268,9 +268,7 @@ class GeoJSON(APIBase):
         ).select_related("function")
         if len(graph_function) == 1:
             module = graph_function[0].function.get_class_module()()
-            return module.get_primary_descriptor_from_nodes(
-                self, graph_function[0].config["descriptor_types"]["name"]
-            )
+            return module.get_primary_descriptor_from_nodes(self, graph_function[0].config["descriptor_types"]["name"])
         else:
             return _("Unnamed Resource")
 
@@ -1606,7 +1604,9 @@ class NodeValue(APIBase):
                 data = datatype.update(tile, data, nodeid, action=operation)
 
             # update/create tile
-            new_tile = TileProxyModel.update_node_value(nodeid, data, tileid, resourceinstanceid=resourceid, transaction_id=transaction_id)
+            new_tile = TileProxyModel.update_node_value(
+                nodeid, data, tileid, request=request, resourceinstanceid=resourceid, transaction_id=transaction_id
+            )
 
             response = JSONResponse(new_tile, status=200)
         else:
