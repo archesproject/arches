@@ -44,7 +44,9 @@ define([
 
             this.fetchLoadEvent = function(page){
                 self.loading(true);
-                if (!page) page = 1;
+                if (!page) {
+                    page = self.paginator()?.current_page ? self.paginator().current_page : 1;
+                }
                 const url = arches.urls.etl_manager + "?action=loadEvent&page=" + page;
                 window.fetch(url).then(function(response){
                     if(response.ok){
