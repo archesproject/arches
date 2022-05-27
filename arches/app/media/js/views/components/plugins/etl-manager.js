@@ -43,7 +43,6 @@ define([
             });
 
             this.fetchLoadEvent = function(page){
-                self.loading(true);
                 if (!page) {
                     page = self.paginator()?.current_page ? self.paginator().current_page : 1;
                 }
@@ -58,7 +57,6 @@ define([
                         self.selectedLoadEvent(data.events[0]);
                     }
                     self.paginator(data.paginator);
-                    self.loading(false);
                 });
             };
 
@@ -163,6 +161,7 @@ define([
                 this.activeTab("start");
             };
             this.init();
+            setInterval(this.fetchLoadEvent, 5000)
         },
         template: { require: 'text!templates/views/components/plugins/etl-manager.htm' }
     });
