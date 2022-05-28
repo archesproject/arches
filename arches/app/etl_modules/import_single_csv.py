@@ -163,6 +163,10 @@ class ImportSingleCsv:
                     except (AttributeError, ValueError):
                         legacyid = row["id"]
                         resourceid = uuid.uuid4()
+                else:
+                    resourceid = uuid.uuid4()
+                    legacyid = None
+
                 dict_by_nodegroup = {}
 
                 for key in row:
