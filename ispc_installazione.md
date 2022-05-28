@@ -31,14 +31,15 @@
   - Mac: Se hai una versione maggiore di 16.10, fai `corepack enable`
 
 
-6. Scarica [Elasticsearch](https://www.elastic.co/downloads/past-releases/elasticsearch-8-2-2) da https://www.elastic.co/downloads/past-releases/elasticsearch-7-4-1  
-  - Dezzippalo in qualsiasi posizione tu voglia
-  - Vai in `elasticsearch\bin`
-    - Windows: Avvia `elasticsearch.bat`   
+6. Scarica [Elasticsearch](https://www.elastic.co/downloads/past-releases/elasticsearch-7-17-3) da https://www.elastic.co/downloads/past-releases/elasticsearch-7-4-1  
+    - (Scegli MACOSX X86_64 se hai Intel, altrimenti con M1 Silicon scegli MACOSX_AARCH64)  
+  - Dezzippalo in qualsiasi posizione tu voglia  
+  - Vai in `elasticsearch\bin`  
+    - Windows: Avvia `elasticsearch.bat`  
     - Mac: Avvia `elasticsearch`  
   - Avviandolo via terminale aggiungete la `-d` per farlo girare in background  
-
-
+  
+  
 7. Installa GDAL
   - Windows: Installa [OSGeoW4](https://trac.osgeo.org/osgeo4w/)
     - Se avete installato già QGIS potete saltare questo passaggio
