@@ -65,13 +65,13 @@
         <!-- /ko -->
     </div>
     <div data-bind="if: activeTab() === 'import'">
-        <div class="etl-module-status-container" style="display: flex; flex-direction: column;">
+        <div class="etl-module-status-container">
             <div class="etl-module-preview-container" style="display: inline-flex; flex-direction: row;">
-                <div class="etl-module-status" style="height: calc(100vh - 95px); width: auto; border-right: 1px solid rgba(0,0,0,0.14);padding-bottom:25px; overflow: scroll;">
+                <div class="etl-module-status" style="  display: flex; flex-direction: column; align-content: space-around; width: auto; border-right: 1px solid rgba(0,0,0,0.14);">
                     <div class="etl-manager-status-filter-container">
                         <input class="etl-manager-filter-input" type="text" placeholder = "Filter Tasks..." data-bind="textInput: taskSearchString">
                     </div>
-                    <div class="etl-status-table">
+                    <div class="etl-status-table" style="height: calc(100vh - 245px); overflow: scroll; padding-bottom:25px;">
                         <table class="" style="min-width: 50px;">
                             <tbody data-bind="foreach: {data: loadEvents, as: 'event'}">
                                 <!-- ko if: !$parent.taskSearchString() || event.etl_module.name.toLowerCase().includes($parent.taskSearchString().toLowerCase()) || $parent.formatUserName(event.user).toLowerCase().includes($parent.taskSearchString().toLowerCase()) -->
@@ -114,24 +114,26 @@
                             </tbody>
                         </table>
                     </div>
-                    <div id="paginator" data-bind="with: paginator">
-                        <div class="text-center">
-                            <ul class="pagination">
-                                <li><a data-bind="css: {'disabled': !has_previous}, click: $parent.newPage.bind($parent, previous_page_number)" href="#">«</a></li>
-                                <!-- ko foreach: { data: pages, as: 'page' } -->
-                                    <!-- ko if: page -->
-                                    <li class="page" data-bind="click: $parents[1].newPage.bind($parents[1]), css: {'current active': (page == $parent.current_page)}">
-                                        <a href="#" data-bind="text: page, attr:{'data-page':page}"></a>
-                                    </li>
+                    <div style="height:75px; background: #f4f4f4; border-top: 1px solid #ddd;">
+                        <div id="paginator" data-bind="with: paginator">
+                            <div class="text-center">
+                                <ul class="pagination">
+                                    <li><a data-bind="css: {'disabled': !has_previous}, click: $parent.newPage.bind($parent, previous_page_number)" href="#">«</a></li>
+                                    <!-- ko foreach: { data: pages, as: 'page' } -->
+                                        <!-- ko if: page -->
+                                        <li class="page" data-bind="click: $parents[1].newPage.bind($parents[1]), css: {'current active': (page == $parent.current_page)}">
+                                            <a href="#" data-bind="text: page, attr:{'data-page':page}"></a>
+                                        </li>
+                                        <!-- /ko -->
+                                        <!-- ko ifnot: page -->
+                                        <li class="disabled"><a href="#">...</a></li>
+                                        <!-- /ko -->
                                     <!-- /ko -->
-                                    <!-- ko ifnot: page -->
-                                    <li class="disabled"><a href="#">...</a></li>
-                                    <!-- /ko -->
-                                <!-- /ko -->
-                                <li><a data-bind="css: { 'disabled': !has_next}, click: $parent.newPage.bind($parent, next_page_number)" href="#">»</a></li>
-                            </ul>
+                                    <li><a data-bind="css: { 'disabled': !has_next}, click: $parent.newPage.bind($parent, next_page_number)" href="#">»</a></li>
+                                </ul>
+                            </div>
                         </div>
-                    </div>                    
+                    </div>
                 </div>
                 <div class="etl-module-preview" style="height: calc(100vh - 95px); width: calc(100vw - 450px); padding: 25px; overflow: scroll;">
                     <div class="etl-module-info" data-bind="if: selectedLoadEvent()">
