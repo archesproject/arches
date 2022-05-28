@@ -259,7 +259,7 @@ add_staging_to_tile_function = """
                                     END LOOP;
                                     tile_data_value = resource_obejct_array;
                                 END IF;
-                                tile_data = tile_data || FORMAT('{"%s": %s}', _key, tile_data_value)::jsonb;
+								tile_data = jsonb_set(tile_data, format('{"%s"}', _key)::text[], coalesce(tile_data_value, 'null'));
                             END LOOP;
                         IF tile_id IS null THEN
                             tile_id = uuid_generate_v1mc();

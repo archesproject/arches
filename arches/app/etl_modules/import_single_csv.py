@@ -154,44 +154,62 @@ class ImportSingleCsv:
         if has_headers:
             next(reader)
 
-        for row in reader:
-            resourceid = uuid.uuid4()
-            dict_by_nodegroup = {}
+        with connection.cursor() as cursor:
+            for row in reader:
+                resourceid = uuid.uuid4()
+                dict_by_nodegroup = {}
 
-            for key in row:
-                current_node = self.get_node_lookup(graphid).get(alias=key)
-                nodegroupid = str(current_node.nodegroup_id)
-                node = str(current_node.nodeid)
-                datatype = self.node_lookup[graphid].get(nodeid=node).datatype
-                datatype_instance = self.datatype_factory.get_instance(datatype)
-                source_value = row[key]
-                errors = datatype_instance.validate(source_value)
-                valid = True if len(errors) == 0 else False
-                value = datatype_instance.transform_value_for_tile(source_value) if source_value is not None and valid else None
-                error_message = ""
-                for error in errors:
-                    error_message = "{0}|{1}".format(error_message, error["message"]) if error_message != "" else error["message"]
+                for key in row:
+                    if key != "":
+                        current_node = self.get_node_lookup(graphid).get(alias=key)
+                        nodegroupid = str(current_node.nodegroup_id)
+                        node = str(current_node.nodeid)
+                        datatype = self.node_lookup[graphid].get(nodeid=node).datatype
+                        datatype_instance = self.datatype_factory.get_instance(datatype)
+                        source_value = row[key]
+                        value = datatype_instance.transform_value_for_tile(source_value) if source_value is not None else None
+                        errors = datatype_instance.validate(value)
+                        valid = True if len(errors) == 0 else False
+                        error_message = ""
+                        for error in errors:
+                            error_message = "{0}|{1}".format(error_message, error["message"]) if error_message != "" else error["message"]
 
-                if nodegroupid in dict_by_nodegroup:
-                    dict_by_nodegroup[nodegroupid].append(
-                        {node: {"value": value, "valid": valid, "source": source_value, "notes": error_message, "datatype": datatype}}
-                    )
-                else:
-                    dict_by_nodegroup[nodegroupid] = [
-                        {node: {"value": value, "valid": valid, "source": source_value, "notes": error_message, "datatype": datatype}}
-                    ]
+                        if nodegroupid in dict_by_nodegroup:
+                            dict_by_nodegroup[nodegroupid].append(
+                                {
+                                    node: {
+                                        "value": value,
+                                        "valid": valid,
+                                        "source": source_value,
+                                        "notes": error_message,
+                                        "datatype": datatype,
+                                    }
+                                }
+                            )
+                        else:
+                            dict_by_nodegroup[nodegroupid] = [
+                                {
+                                    node: {
+                                        "value": value,
+                                        "valid": valid,
+                                        "source": source_value,
+                                        "notes": error_message,
+                                        "datatype": datatype,
+                                    }
+                                }
+                            ]
 
-            for nodegroup in dict_by_nodegroup:
-                tile_data = self.get_blank_tile_lookup(nodegroup)
-                passes_validation = True
-                for node in dict_by_nodegroup[nodegroup]:
-                    for key in node:
-                        tile_data[key] = node[key]
-                        if node[key]["valid"] is False:
-                            passes_validation = False
+                for nodegroup in dict_by_nodegroup:
+                    tile_data = self.get_blank_tile_lookup(nodegroup)
+                    passes_validation = True
+                    for node in dict_by_nodegroup[nodegroup]:
+                        for key in node:
+                            tile_data[key] = node[key]
+                            if node[key]["valid"] is False:
+                                passes_validation = False
 
-                tile_value_json = JSONSerializer().serialize(tile_data)
-                node_depth = 0
+                    tile_value_json = JSONSerializer().serialize(tile_data)
+                    node_depth = 0
 
                 with connection.cursor() as cursor:
                     cursor.execute(

@@ -53,7 +53,7 @@
             optionsValue: 'graphid',
             optionsCaption: '{% trans "Select a Resource Model..." %}',
             valueAllowUnset: true,
-            chosen: {width: '100%'}"
+            chosen: {width: '500px'}"
         ></select>
     </div>
     <div class="etl-module-component">
@@ -129,7 +129,9 @@
     <div>
         <span style="font-size: 15px; padding-right: 3px;">{% trans 'Target Fields:' %}</span>
         <!-- ko foreach: load_details.mapping -->
+        <!-- ko if:  $data.node -->
         <span data-bind="text: $data.node"></span><span>;</span>
+        <!-- /ko -->
         <!-- /ko -->
     </div>
     <!-- /ko -->
