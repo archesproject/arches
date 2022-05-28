@@ -43,8 +43,9 @@ define([
             });
 
             this.fetchLoadEvent = function(page){
-                self.loading(true);
-                if (!page) page = 1;
+                if (!page) {
+                    page = self.paginator()?.current_page ? self.paginator().current_page : 1;
+                }
                 const url = arches.urls.etl_manager + "?action=loadEvent&page=" + page;
                 window.fetch(url).then(function(response){
                     if(response.ok){
@@ -52,11 +53,16 @@ define([
                     }
                 }).then(function(data){
                     self.loadEvents(data.events);
-                    self.selectedLoadEvent(data.events[0]);
                     self.paginator(data.paginator);
-                    self.loading(false);
                 });
             };
+
+            this.loadEvents.subscribe(function(loadEvents) {
+                const loadEventIds = loadEvents.map(loadEvent => loadEvent.loadid);
+                if (!loadEventIds.includes(self.selectedLoadEvent()?.loadid)) {
+                    self.selectedLoadEvent(loadEvents[0]);
+                }
+            });
 
             this.newPage = function(page) {
                 if (page) {
@@ -159,6 +165,7 @@ define([
                 this.activeTab("start");
             };
             this.init();
+            setInterval(this.fetchLoadEvent, 5000)
         },
         template: { require: 'text!templates/views/components/plugins/etl-manager.htm' }
     });
