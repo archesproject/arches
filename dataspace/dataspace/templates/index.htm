@@ -65,20 +65,20 @@ The data-spy and data-target are part of the built-in Bootstrap scrollspy functi
                         <span class="icon-bar"></span>
                     </button>
 
-                    <div class="relative" style="padding-left: 85px; width: 300px;">
-                        <div class="navbar-brand-v5-icon-container" style="top: 4px; height: 45px; width: 45px; background: #f9f9f9; border-radius: 50%; border: 1px solid #000;">
-                            <img class="navbar-brand-v5-icon" style="margin-top: -2px;" src="{% static 'img/landing/arches_logo_dark.png' %}" alt="Arches Logo">
+                    <div class="relative" style="padding-left: 115px; width: 255px;">
+                        <div class="navbar-brand-v5-icon-container" style="top: 4px; height: 45px; width: 125px; background: #f9f9f9; border-radius: 25%; border: 1px solid #000;">
+                            <img class="navbar-brand-v5-icon" style="margin-top: -2px;" src="{% static 'img/logos/cnr_ispc.png' %}" alt="CNR ISPC Logo">
                         </div>
-                        <div class="application-name" style="position: absolute; top: 5px; left: 150px;">
-                            <h2 style="color: #f4f4f4;">{% trans "Arches/DISCO" %}</h2>
-                        </div>
+                        <!-- <div class="application-name" style="position: absolute; top: 5px; left: 150px;">
+                            <h2 style="color: #f4f4f4;">{% trans "CNR | ISPC" %}</h2>
+                        </div> -->
                     </div>
                 </div>
 
                 <div class="collapse navbar-collapse" id="myNavbar">
                     <ul class="nav navbar-nav">
                         <li>
-                            <a href="#info-block-1">{% trans "Arches Features" %}</a>
+                            <a href="#info-block-1">{% trans "Who we are" %}</a>
                         </li>
 
                         <li>
@@ -127,22 +127,17 @@ The data-spy and data-target are part of the built-in Bootstrap scrollspy functi
                 </li>
                 <li>
                     <a class="vertical-nav-list-link" href="#info-block-1" data-number="2">
-                        <span class="vertical-nav-list-ref">{% trans "Fast" %}</span>
+                        <span class="vertical-nav-list-ref">{% trans "Who we are" %}</span>
                     </a>
                 </li>
                 <li>
                     <a class="vertical-nav-list-link" href="#info-block-2" data-number="3">
-                        <span class="vertical-nav-list-ref">{% trans "Workflows" %}</span>
+                        <span class="vertical-nav-list-ref">{% trans "Technologies" %}</span>
                     </a>
                 </li>
                 <li>
                     <a class="vertical-nav-list-link" href="#info-block-3" data-number="4">
-                        <span class="vertical-nav-list-ref">{% trans "Search Tools" %}</span>
-                    </a>
-                </li>
-                <li>
-                    <a class="vertical-nav-list-link" href="#info-block-4" data-number="5">
-                        <span class="vertical-nav-list-ref">{% trans "Mobile" %}</span>
+                        <span class="vertical-nav-list-ref">{% trans "Sites" %}</span>
                     </a>
                 </li>
             </ul>
@@ -155,14 +150,14 @@ The data-spy and data-target are part of the built-in Bootstrap scrollspy functi
                     <!-- SLIDE 1 -->
                     <li data-transition="fade" data-slotamount="9" data-masterspeed="0" data-title="Slide 1">
                         <!-- MAIN IMAGE -->
-                        <img src="{% static 'img/landing/irises.jpg' %}" alt="slidebg1" data-bgfit="cover" data-bgposition="center center" data-bgrepeat="no-repeat">
+                        <img src="{% static 'img/landing/1_Musei_Vaticani.jpeg' %}" alt="slidebg1" data-bgfit="cover" data-bgposition="center center" data-bgrepeat="no-repeat">
 
                         <!-- LAYERS -->
                         <!-- NEW LAYER -->
                         <div class="tp-caption sft start text-bold v5-splash-caption" style="left: 150px;" delay="4500"  data-hoffset="0" data-y="400" data-speed="800" data-start="100" data-easing="Back.easeInOut" data-endspeed="300">
-                            <h2>{% trans "Arches for Science" %}</h2>
-                            <p>{% trans "A web and mobile platform for" %}</p>
-                            <p>{% trans "managing your most important conservation information" %}</p>
+                            <h2>{% trans "ISPC Dataspace" %}</h2>
+                            <p>{% trans "Digital Heritage Documentation" %}</p>
+                            <p>{% trans "from Italy, for the World." %}</p>
                         </div>
 
                         <!-- Gradient -->
@@ -170,7 +165,7 @@ The data-spy and data-target are part of the built-in Bootstrap scrollspy functi
 
                         <!-- Attribution -->
                         <div class="image-attribution">
-                            <span>{% trans "Imaging of Irises | Getty Conservation Institute | (CC BY-NC-ND 2.0)" %}</span>
+                            <span>{% trans "Musei Vaticani | ISPC" %}</span>
                         </div>
                     </li>
 
@@ -194,10 +189,16 @@ The data-spy and data-target are part of the built-in Bootstrap scrollspy functi
             <div class="sub-section">
                 <div class="col-lg-7">
                     <div class="app-info-block-intro text-center">
-                        <h3 class="app-info-block-header">{% trans "Fast" %}</h3>
-                        <h2 class="app-info-block-title">{% trans "Deploy Applications Rapidly" %}</h2>
+                        <h3 class="app-info-block-header">{% trans "Mission" %}</h3>
+                        <h2 class="app-info-block-title">{% trans "What we do" %}</h2>
                         <p class="app-info-block-text">
-                            {% trans "Design custom information management applications in hours.  Build your databases with Arches Designer, then configure your interface all without having to write any code." %}
+                            {% trans "Something about the value the projects done at ISPC have for the cultural heritage." %}
+                        </p>
+                        <p>
+                            Lorem ipsum dolor sit amet, consectetur adipiscing elit.
+                            Mauris tristique dapibus nulla, quis sodales risus sollicitudin non.
+                            Class aptent taciti sociosqu ad litora torquent per conubia nostra, per inceptos himenaeos.
+                            Praesent sit amet tempus arcu, ut auctor massa.
                         </p>
                     </div>
                 </div>
@@ -205,7 +206,7 @@ The data-spy and data-target are part of the built-in Bootstrap scrollspy functi
 
             <!-- Content -->
             <div class="splash-img">
-                <img src="{% static 'img/landing/imac_designer.png' %}" alt="Arches Designer">
+                <img src="{% static 'img/landing/2_Turchia_Ninfeo.JPG' %}" alt="Arches Designer">
             </div>
 
             <!-- Sub-section -->
@@ -218,7 +219,7 @@ The data-spy and data-target are part of the built-in Bootstrap scrollspy functi
                         <p class="sub-block-description">
                             {% trans "Arches automatically creates data entry forms based on your data models.  Use Arches' Card Manager to configure the look and feel of your data entry UI." %}
                         </p>
-                        <img class="sub-block-image" src="{% static 'img/landing/card_manager.png' %}" alt="Card Manager">
+                        <img class="sub-block-image" src="{% static 'img/landing/3_DHiLab_ISPC_enhancement.jpg' %}" alt="Card Manager">
                     </div>
                 </div>
 
@@ -229,13 +230,12 @@ The data-spy and data-target are part of the built-in Bootstrap scrollspy functi
                         <p class="sub-block-description">
                             {% trans "Use Arches' Permissions Manager to set up data access rules for all your user groups and individual accounts.  You can define read/write/delete and no-access permissions." %}
                         </p>
-                        <img class="sub-block-image" src="{% static 'img/landing/permissions_manager.png' %}" alt="Permissions Manager">
+                        <img class="sub-block-image" src="{% static 'img/landing/4_MOLAB_Umbria_David_Buti.jpeg' %}" alt="Permissions Manager">
                     </div>
                 </div>
 
             </div>
             <!-- End Sub-section -->
-
 
         </div>
     </section>
@@ -248,23 +248,31 @@ The data-spy and data-target are part of the built-in Bootstrap scrollspy functi
 
             <!-- Heading Info -->
             <div class="sub-section">
-                <div class="col-lg-7">
-                    <div class="app-info-block-intro text-center">
-                        <h3 class="app-info-block-header">{% trans "Workflows" %}</h3>
-                        <h2 class="app-info-block-title">{% trans "Orchestrate your data entry" %}</h2>
-                        <p class="app-info-block-text">
-                            {% trans "Design step-wise data management interfaces that simplify complex editing tasks.  Ensure that everyone enters data completely and consistently" %}
-                        </p>
-                    </div>
-                </div>
+
             </div>
 
             <!-- Content -->
-            <div class="splash-img">
-                <img class="search-screen" src="{% static 'img/landing/consultation_workflow.jpg' %}" alt="Arches Workflows">
+            <div class="row">
+                <div class="col-md-6 col-lg-4">
+                    <img class="iphone" src="{% static 'img/landing/6_Modello_3d_superficie.png' %}" alt="Arches Designer">
+                </div>
+                <div class="col-md-6 col-lg-8">
+                    <div class="mobile-description-container">
+                        <div class="box-highlight">
+                            <h2>{% trans "Technology" %}</h2>
+                            <p>
+                                {% trans "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Mauris tristique dapibus nulla, quis sodales risus sollicitudin non. Class aptent taciti sociosqu ad litora torquent per conubia nostra, per inceptos himenaeos. Praesent sit amet tempus arcu, ut auctor massa." %}
+                            </p>
+                            <br>
+                            <p>
+                                {% trans "Curabitur laoreet erat ante, at varius ipsum posuere accumsan." %}
+                            </p>
+                        </div>
+                    </div>
+                </div>
             </div>
-
         </div>
+
     </section>
     <!-- End Info Block 2 -->
 
@@ -277,10 +285,10 @@ The data-spy and data-target are part of the built-in Bootstrap scrollspy functi
             <div class="sub-section">
                 <div class="col-lg-7">
                     <div class="app-info-block-intro text-center">
-                        <h3 class="app-info-block-header">{% trans "Arches Search Tools" %}</h3>
+                        <h3 class="app-info-block-header">{% trans "ISPC Sites" %}</h3>
                         <h2 class="app-info-block-title">{% trans "Find what you're looking for" %}</h2>
                         <p class="app-info-block-text">
-                            {% trans "Arches comes with powerful built-in search tools.  Quickly filter large databases with term, geospatial, and time-based search components" %}
+                            {% trans "Duis tincidunt magna sed eros dictum varius. Suspendisse potenti. Nunc ultricies dignissim arcu eu sollicitudin. Cras ut nulla lacus." %}
                         </p>
                     </div>
                 </div>
@@ -288,7 +296,7 @@ The data-spy and data-target are part of the built-in Bootstrap scrollspy functi
 
             <!-- Content -->
             <div class="splash-img">
-                <img class="search-screen" src="{% static 'img/landing/arches_search.png' %}" alt="Arches Search">
+                <img class="search-screen" src="{% static 'img/landing/5_Alghero_2017.jpeg' %}" alt="Arches Search">
             </div>
 
             <!-- Sub-section -->
@@ -313,41 +321,6 @@ The data-spy and data-target are part of the built-in Bootstrap scrollspy functi
         </div>
     </section>
     <!-- End Info Block 3 -->
-
-
-    <!-- Info Block 4 -->
-    <section id="info-block-4" class="app-info-block relative">
-        <div>
-
-            <!-- Heading Info -->
-            <div class="sub-section">
-
-            </div>
-
-            <!-- Content -->
-            <div class="row">
-                <div class="col-md-6 col-lg-4">
-                    <img class="iphone" src="{% static 'img/landing/iPhone_8_map.png' %}" alt="Arches Designer">
-                </div>
-                <div class="col-md-6 col-lg-8">
-                    <div class="mobile-description-container">
-                        <div class="box-highlight">
-                            <h2>{% trans "Work on the go..." %}</h2>
-                            <p>
-                                {% trans "Arches Collector allows you to create new data and edit existing records when you're away from your computer.  Don't worry if you're out of cell or Wi-Fi range.  Create new records, update information, even add new map locations.  Then synch your changes to your Arches application when you re-establish a network connection." %}
-                            </p>
-                            <br>
-                            <p>
-                                {% trans "Arches Collector is available for iOS and Android devices.  Download the app from your favorite marketplace." %}
-                            </p>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-    </section>
-    <!-- End Info Block 4 -->
 
 
     <!-- Footer -->
