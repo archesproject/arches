@@ -133,6 +133,9 @@ define([
                     self.formData.append('graphid', graph);
                     self.submit('get_nodes').then(function(response){
                         self.nodes(response.result);
+                        self.nodes().unshift({
+                            alias: "id"
+                        })
                         self.loading(false);
                     });    
                 }

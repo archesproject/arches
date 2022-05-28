@@ -156,11 +156,17 @@ class ImportSingleCsv:
 
         with connection.cursor() as cursor:
             for row in reader:
-                resourceid = uuid.uuid4()
+                if "id" in row:
+                    try:
+                        uuid.UUID(row["id"])
+                        legacyid = None
+                    except (AttributeError, ValueError):
+                        legacyid = row["id"]
+                        resourceid = uuid.uuid4()
                 dict_by_nodegroup = {}
 
                 for key in row:
-                    if key != "":
+                    if key != "" and key != "id":
                         current_node = self.get_node_lookup(graphid).get(alias=key)
                         nodegroupid = str(current_node.nodegroup_id)
                         node = str(current_node.nodeid)
@@ -211,14 +217,14 @@ class ImportSingleCsv:
                     tile_value_json = JSONSerializer().serialize(tile_data)
                     node_depth = 0
 
-                with connection.cursor() as cursor:
-                    cursor.execute(
-                        """
-                        INSERT INTO load_staging (
-                            nodegroupid, resourceid, value, loadid, nodegroup_depth, source_description, passes_validation
-                        ) VALUES (%s,%s,%s,%s,%s,%s,%s)""",
-                        (nodegroup, resourceid, tile_value_json, self.loadid, node_depth, file.name, passes_validation),
-                    )
+                    with connection.cursor() as cursor:
+                        cursor.execute(
+                            """
+                            INSERT INTO load_staging (
+                                nodegroupid, legacyid, resourceid, value, loadid, nodegroup_depth, source_description, passes_validation
+                            ) VALUES (%s,%s,%s,%s,%s,%s,%s,%s)""",
+                            (nodegroup, legacyid, resourceid, tile_value_json, self.loadid, node_depth, file.name, passes_validation),
+                        )
 
         message = "staging table populated"
         return {"success": True, "data": message}
