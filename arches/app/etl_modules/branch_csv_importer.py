@@ -1,5 +1,4 @@
 from datetime import datetime
-import glob
 import json
 import logging
 import math
@@ -139,12 +138,12 @@ class BranchCsvImporter:
             cell_values = [cell.value for cell in row]
             if len(cell_values) == 0:
                 continue
-            node_values = cell_values[2:]
             resourceid = cell_values[0]
             if str(resourceid).strip() in ("--", "resource_id"):
                 nodegroup_alias = cell_values[1][0:-4].strip()
-                data_node_lookup[nodegroup_alias] = node_values
+                data_node_lookup[nodegroup_alias] = [val for val in cell_values[2:] if val]
             elif cell_values[1] is not None:
+                node_values = cell_values[2:]
                 try:
                     row_count += 1
                     nodegroup_alias = cell_values[1].strip()
