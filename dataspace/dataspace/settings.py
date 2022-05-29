@@ -28,9 +28,10 @@ def get_optional_env_variable(var_name):
     except KeyError:
         return None
 
+
 APP_NAME = 'dataspace'
 APP_ROOT = os.path.dirname(os.path.abspath(inspect.getfile(inspect.currentframe())))
-STATICFILES_DIRS =  (os.path.join(APP_ROOT, 'media'),) + STATICFILES_DIRS
+STATICFILES_DIRS = (os.path.join(APP_ROOT, 'media'),) + STATICFILES_DIRS
 
 DATATYPE_LOCATIONS.append('dataspace.datatypes')
 FUNCTION_LOCATIONS.append('dataspace.functions')
@@ -299,12 +300,12 @@ LANGUAGE_CODE = "en"
 # {langcode}-{regioncode} eg: en, en-gb ....
 # a list of language codes can be found here http://www.i18nguy.com/unicode/language-identifiers.html
 LANGUAGES = [
-#   ('de', _('German')),
-#   ('en', _('English')),
-#   ('en-gb', _('British English')),
-#   ('es', _('Spanish')),
+  # ('de', _('German')),
+  ('it', _('Italian')),
+  ('en', _('English')),
+  # ('en-gb', _('British English')),
+  ('es', _('Spanish')),
 ]
-
 
 
 ONTOLOGY_NAMESPACES = {
@@ -345,7 +346,7 @@ RENDERERS += [
         "iconclass": "fa fa-bar-chart-o",
         "component": "views/components/cards/file-renderers/mir-reader",
         "ext": "csv",
-        "type": "text/csv",#//"text/csv",
+        "type": "text/csv",  # //"text/csv",
         "exclude": "",
     },
 
@@ -409,13 +410,13 @@ RENDERERS += [
         "exclude": "",
     },
     # {
-        # "name": "colladareader",
-        # "id": "3732bdf0-74b1-412f-955a-9ca038e7db31",
-        # "iconclass": "fa fa-spoon",
-        # "component": "views/components/cards/file-renderers/colladareader",
-        # "ext": "dae",
-        # "type": "",
-       # "exclude": [],
+    #     "name": "colladareader",
+    #     "id": "3732bdf0-74b1-412f-955a-9ca038e7db31",
+    #     "iconclass": "fa fa-spoon",
+    #     "component": "views/components/cards/file-renderers/colladareader",
+    #     "ext": "dae",
+    #     "type": "",
+    #     "exclude": [],
     # },
 ]
 
