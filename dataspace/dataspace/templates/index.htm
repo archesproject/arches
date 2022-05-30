@@ -45,8 +45,8 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 
     <style media="screen">
         /* Added Style for horizontal lines */
-        hr.inline-separator {
-          border: 2px solid #6A7D10;
+        hr.card-inline-separator {
+          border: 1.5px solid #6A7D10;
           border-radius: 5px;
           margin-top: 0px;
           margin-bottom: 16px;
@@ -125,9 +125,9 @@ The data-spy and data-target are part of the built-in Bootstrap scrollspy functi
     <!-- Intro Section -->
     <section id="info-block-0" class="app-info-block intro-section relative">
         <!-- Vertical Nav -->
-        <div class="vertical-nav-container-background"></div>
+        <div class="vertical-nav-container-background" style="top: 100px;"></div>
 
-        <div id="cd-vertical-nav" class="vertical-nav-container">
+        <div id="cd-vertical-nav" class="vertical-nav-container" style="top: 120px;">
             <ul class="vertical-nav-list">
                 <li class="active">
                     <a class="vertical-nav-list-link" href="#info-block-0" data-number="1">
@@ -158,8 +158,8 @@ The data-spy and data-target are part of the built-in Bootstrap scrollspy functi
         </div>
 
         <!-- Splash Screen -->
-        <div class="fullscreenbanner-container">
-            <div class="fullscreenbanner">
+        <div class="fullscreenbanner-container" style="max-height: 350px">
+            <div class="fullscreenbanner" style="max-height: 350px">
                 <ul>
                     <!-- SLIDE 1 -->
                     <li data-transition="fade" data-slotamount="9" data-masterspeed="0" data-title="ISPC Dataspace">
@@ -263,12 +263,14 @@ The data-spy and data-target are part of the built-in Bootstrap scrollspy functi
             </div>
 
         </div>
+
     </section>
     <!-- End Info Block 1 -->
 
 
     <!-- Info Block 2 -->
     <section id="info-block-2" class="app-info-block relative">
+
         <div>
 
             <!-- Heading Info -->
@@ -342,7 +344,7 @@ The data-spy and data-target are part of the built-in Bootstrap scrollspy functi
                         <p class="sub-block-description" style="padding: 20px 0px 8px;">
                             {% trans "A global overview of the. Etiam vitae elementum orci" %}
                         </p>
-                        <hr class=inline-separator>
+                        <hr class=card-inline-separator>
                         <a class="link-spacing" target="_blank" href='https://www.ispc.cnr.it/it_it/ricerca/gruppi_e_labs/'>
                             {% trans "ISPC Research Groups and Labs" %}
                         </a>
@@ -361,7 +363,7 @@ The data-spy and data-target are part of the built-in Bootstrap scrollspy functi
                         <p class="sub-block-description" style="padding: 20px 0px 8px;">
                             {% trans "Educational resources in the broad field of the Heritage Science domain." %}
                         </p>
-                        <hr class=inline-separator>
+                        <hr class=card-inline-separator>
                         <a class="link-spacing" target="_blank" href='https://www.ispc.cnr.it/it_it/ricerca/gruppi_e_labs/'>
                             {% trans "ISPC Research Groups and Labs" %}
                         </a>
@@ -380,7 +382,7 @@ The data-spy and data-target are part of the built-in Bootstrap scrollspy functi
                         <p class="sub-block-description" style="padding: 20px 0px 8px;">
                             {% trans "Innovative Virtual Research Environments developed to serve modern Heritage Science needs." %}
                         </p>
-                        <hr class=inline-separator>
+                        <hr class=card-inline-separator>
                         <a class="link-spacing" target="_blank" href='https://www.ispc.cnr.it/it_it/ricerca/gruppi_e_labs/'>
                             {% trans "ISPC Research Groups and Labs" %}
                         </a>
@@ -405,7 +407,7 @@ The data-spy and data-target are part of the built-in Bootstrap scrollspy functi
                         <p class="sub-block-description" style="padding: 20px 0px 8px;">
                             {% trans "Main point of access for searching and browsing datasets" %}
                         </p>
-                        <hr class=inline-separator>
+                        <hr class=card-inline-separator>
                         <a class="link-spacing" href='https://www.ispc.cnr.it/it_it/ricerca/gruppi_e_labs/'>
                             {% trans "ISPC Research Groups and Labs same tab" %}
                         </a>
@@ -424,7 +426,7 @@ The data-spy and data-target are part of the built-in Bootstrap scrollspy functi
                         <p class="sub-block-description" style="padding: 20px 0px 8px;">
                             {% trans "Main point of access for innovative services in Heritage Science discipline." %}
                         </p>
-                        <hr class=inline-separator>
+                        <hr class=card-inline-separator>
                         <a class="link-spacing" href='https://www.ispc.cnr.it/it_it/ricerca/gruppi_e_labs/'>
                             {% trans "ISPC Research Groups and Labs same tab" %}
                         </a>
@@ -443,7 +445,7 @@ The data-spy and data-target are part of the built-in Bootstrap scrollspy functi
                         <p class="sub-block-description" style="padding: 20px 0px 8px;">
                             {% trans "Practical solutions for the formalization and description of research workflows" %}
                         </p>
-                        <hr class=inline-separator>
+                        <hr class=card-inline-separator>
                         <a class="link-spacing" href='https://www.ispc.cnr.it/it_it/ricerca/gruppi_e_labs/'>
                             {% trans "ISPC Research Groups and Labs same tab" %}
                         </a>
@@ -481,7 +483,7 @@ The data-spy and data-target are part of the built-in Bootstrap scrollspy functi
 
             <!-- Content -->
             <div class="splash-img">
-                <img class="search-screen" src="{% static 'img/landing/Turchia_Ninfeo.JPG' %}" alt="ISPC Site">
+                <img src="{% static 'img/landing/Turchia_Ninfeo.JPG' %}" alt="ISPC Site">
             </div>
 
             <!-- Sub-section -->
