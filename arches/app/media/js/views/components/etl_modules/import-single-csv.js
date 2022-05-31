@@ -134,7 +134,7 @@ define([
                     self.submit('get_nodes').then(function(response){
                         self.nodes(response.result);
                         self.nodes().unshift({
-                            alias: "id"
+                            alias: "Use as an id..."
                         })
                         self.loading(false);
                     });    
@@ -156,6 +156,7 @@ define([
                         self.fieldMapping(response.result.config.mapping);
                         self.selectedGraph(response.result.config.graph);
                     }
+                    console.log(self.fieldMapping());
                     self.fileAdded(true);
                     self.loading(false);
                 }).catch(function(err) {

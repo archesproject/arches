@@ -155,14 +155,15 @@ class ImportSingleCsv:
             next(reader)
 
         with connection.cursor() as cursor:
+            id_label = "Use as an id..."
             for row in reader:
-                if "id" in row:
+                if id_label in row:
                     try:
-                        resourceid = uuid.UUID(row["id"])
+                        resourceid = uuid.UUID(row[id_label])
                         legacyid = None
                     except (AttributeError, ValueError):
                         resourceid = uuid.uuid4()
-                        legacyid = row["id"]
+                        legacyid = row[id_label]
                 else:
                     resourceid = uuid.uuid4()
                     legacyid = None
@@ -170,7 +171,7 @@ class ImportSingleCsv:
                 dict_by_nodegroup = {}
 
                 for key in row:
-                    if key != "" and key != "id":
+                    if key != "" and key != id_label:
                         current_node = self.get_node_lookup(graphid).get(alias=key)
                         nodegroupid = str(current_node.nodegroup_id)
                         node = str(current_node.nodeid)
