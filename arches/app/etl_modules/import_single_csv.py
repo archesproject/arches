@@ -7,6 +7,7 @@ import logging
 import uuid
 from django.db import connection
 from django.db.models.functions import Lower
+from django.utils.translation import ugettext as _
 from arches.app.datatypes.datatypes import DataTypeFactory
 from arches.app.models.models import GraphModel, Node, NodeGroup, ResourceInstance
 from arches.app.models.graph import Graph
@@ -97,14 +98,19 @@ class ImportSingleCsv:
 
         fieldnames = request.POST.get("fieldnames").split(",")
         column_names = [fieldname for fieldname in fieldnames if fieldname != ""]
+        id_label = "Use as an id"
+        error_message = None
         if len(column_names) == 0:
+            error_message = _("No valid node is selected")
+        if column_names.count(id_label) > 1:
+            error_message = _("Only one column should be selected for id")
+        if error_message:
             with connection.cursor() as cursor:
                 cursor.execute(
                     """UPDATE load_event SET status = %s, load_end_time = %s WHERE loadid = %s""",
                     ("failed", datetime.now(), self.loadid),
                 )
-            message = "No valid node is selected"
-            return {"success": False, "data": message}
+            return {"success": False, "data": error_message}
 
         self.populate_staging_table(request)
 
