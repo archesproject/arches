@@ -158,11 +158,11 @@ class ImportSingleCsv:
             for row in reader:
                 if "id" in row:
                     try:
-                        uuid.UUID(row["id"])
+                        resourceid = uuid.UUID(row["id"])
                         legacyid = None
                     except (AttributeError, ValueError):
-                        legacyid = row["id"]
                         resourceid = uuid.uuid4()
+                        legacyid = row["id"]
                 else:
                     resourceid = uuid.uuid4()
                     legacyid = None
