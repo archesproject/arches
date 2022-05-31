@@ -11,7 +11,6 @@ define([
     'proj4',
     'views/components/map',
     'views/components/cards/select-feature-layers',
-    'templates/views/components/cards/map-popup.htm',
     'views/components/datatypes/geojson-feature-collection',
 ], function($, _, ko, koMapping, arches, uuid, geojsonExtent, geojsonhint, toGeoJSON, proj4, MapComponentViewModel, selectFeatureLayersFactory) {
     var viewModel = function(params) {
@@ -537,15 +536,6 @@ define([
             if (tool && tool !== 'select_feature') return false;
             return feature.properties.resourceinstanceid || self.isSelectable(feature);
         };
-
-        this.renderedpopupTemplate = null;
-        $.ajax({
-            type: 'GET',
-            url: arches.urls.root + 'templates/views/components/map-popup.htm',
-            complete: function(e) {
-                self.renderedPopupTemplate = e.responseText;
-            }
-        });
 
         self.isSelectable = function(feature) {
             var selectLayerIds = selectFeatureLayers.map(function(layer) {

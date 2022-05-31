@@ -442,7 +442,7 @@ define([
             const mapStyle = map.getStyle();
             self.popup = new MapboxGl.Popup()
                 .setLngLat(lngLat)
-                .setHTML(popupTemplate)
+                .setHTML(self.renderedPopupTemplate)
                 .addTo(map);
             ko.applyBindingsToDescendants(
                 mapPopupProvider.processData(self.getPopupData(features)),
