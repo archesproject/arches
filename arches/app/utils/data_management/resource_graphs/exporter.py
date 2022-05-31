@@ -6,6 +6,7 @@ import uuid
 import csv
 import zipfile
 from io import StringIO
+from io import BytesIO
 
 from arches.app.models.graph import Graph
 from arches.app.models.concept import Concept
@@ -264,11 +265,8 @@ def create_mapping_configuration_file(graphid, include_concepts=True, data_dir=N
     files_for_export.append({"name": file_name, "outputfile": dest})
 
     if data_dir is not None:
-        with open(os.path.join(data_dir), "w") as config_file:
-            json.dump(export_json, config_file, indent=4)
-
         file_name = Graph.objects.get(graphid=graphid).name
-        buffer = StringIO()
+        buffer = BytesIO()
         with zipfile.ZipFile(buffer, "w", zipfile.ZIP_DEFLATED) as zip:
             for f in files_for_export:
                 f["outputfile"].seek(0)
@@ -278,7 +276,7 @@ def create_mapping_configuration_file(graphid, include_concepts=True, data_dir=N
         buffer.flush()
         zip_stream = buffer.getvalue()
         buffer.close()
-        with open(os.path.join(data_dir), "w") as archive:
+        with open(os.path.join(data_dir, file_name + ".zip"), "wb") as archive:
             archive.write(zip_stream)
     else:
         return files_for_export

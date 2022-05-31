@@ -1,11 +1,12 @@
 define([
     'jquery',
     'underscore',
+    'arches',
     'knockout',
     'knockout-mapping',
-    'arches',
+    'utils/map-popup-provider',
     'templates/views/components/map-popup.htm'
-], function($, _, ko, koMapping, arches) {
+], function($, _, arches, ko, koMapping, mapPopupProvider) {
     const viewModel = function(params) {
         var self = this;
 
@@ -40,13 +41,13 @@ define([
 
             if (ko.unwrap(params.x) && ko.unwrap(params.y)) {
                 var center = map.getCenter();
-            
+
                 lng = parseFloat(params.x());
                 lat = parseFloat(params.y());
-                
+
                 if (lng) { center.lng = lng; }
                 if (lat) { center.lat = lat; }
-    
+
                 map.setCenter(center);
             }
 
@@ -76,7 +77,7 @@ define([
             if (lng && self.map()) {
                 var center = self.map().getCenter();
                 center.lng = lng;
-            
+
                 self.map().setCenter(center);
             }
             if (ko.isObservable(params.x) && params.x() !== lng) {
@@ -89,14 +90,14 @@ define([
             if (lat && self.map()) {
                 var center = self.map().getCenter();
                 center.lat = lat;
-            
+
                 self.map().setCenter(center);
             }
             if (ko.isObservable(params.y) && params.y() !== lat) {
                 params.y(lat);
             }
         });
-        
+
         this.zoom = ko.observable(ko.unwrap(params.zoom) || arches.mapDefaultZoom);
         this.zoom.subscribe(function(level) {
             if (level && self.map()) { self.map().setZoom(level); }
@@ -126,10 +127,10 @@ define([
             "search-results-hashes": geojsonSourceFactory(),
             "search-results-points": geojsonSourceFactory()
         }, arches.mapSources, params.sources);
-        
+
         this.basemaps = params.basemaps || [];
         this.overlays = params.overlaysObservable || ko.observableArray();
-        
+
         var mapLayers = params.mapLayers || arches.mapLayers;
         mapLayers.forEach(function(layer) {
             if (!layer.isoverlay) {
@@ -144,7 +145,7 @@ define([
                         layer.opacity(value ? 100 : 0);
                     }
                 });
-                
+
                 layer.updateParent = function(parent) {
                     if (self.overlayConfigs.indexOf(layer.maplayerid) === -1) {
                         self.overlayConfigs.push(layer.maplayerid);
@@ -153,7 +154,7 @@ define([
                         self.overlayConfigs.remove(layer.maplayerid);
                         layer.opacity(0);
                     }
-                    
+
                     if (parent !== self) {
                         parent.overlayConfigs(self.overlayConfigs());
 
@@ -170,7 +171,7 @@ define([
                 self.overlays.push(layer);
             }
         });
-        
+
         if (!self.activeBasemap()) {
             var basemap = ko.unwrap(self.basemaps).find(function(basemap) {
                 return ko.unwrap(params.basemap) === basemap.name;
@@ -326,10 +327,6 @@ define([
             }
         };
 
-        this.isFeatureClickable = function(feature) {
-            return feature.properties.resourceinstanceid;
-        };
-
         this.expandSidePanel = function() {
             return false;
         };
@@ -440,14 +437,15 @@ define([
         });
 
         this.onFeatureClick = function(features, lngLat, MapboxGl) {
+            const popupTemplate = this.popupTemplate ? this.popupTemplate : mapPopupProvider.getPopupTemplate(features);
             const map = self.map();
             const mapStyle = map.getStyle();
             self.popup = new MapboxGl.Popup()
                 .setLngLat(lngLat)
-                .setHTML(self.renderedPopupTemplate)
+                .setHTML(popupTemplate)
                 .addTo(map);
             ko.applyBindingsToDescendants(
-                self.getPopupData(features),
+                mapPopupProvider.processData(self.getPopupData(features)),
                 self.popup._content
             );
             features.forEach(feature=>{
@@ -489,7 +487,7 @@ define([
                         if (hoverFeature && hoverFeature.id && style) map.setFeatureState(hoverFeature, { hover: false });
                         hoverFeature = _.find(
                             map.queryRenderedFeatures(e.point),
-                            self.isFeatureClickable
+                            feature => mapPopupProvider.isFeatureClickable(feature, self)
                         );
                         if (hoverFeature && hoverFeature.id && style) map.setFeatureState(hoverFeature, { hover: true });
 
@@ -510,7 +508,7 @@ define([
                     map.on('click', function(e) {
                         const popupFeatures = _.filter(
                             map.queryRenderedFeatures(e.point),
-                            self.isFeatureClickable
+                            feature => mapPopupProvider.isFeatureClickable(feature, self)
                         );
                         if (popupFeatures.length) {
                             self.onFeatureClick(popupFeatures, e.lngLat, MapboxGl);
@@ -526,7 +524,7 @@ define([
 
                     map.on('dragend', function() {
                         var center = map.getCenter();
-                        
+
                         self.centerX(parseFloat(center.lng));
                         self.centerY(parseFloat(center.lat));
                     });

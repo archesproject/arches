@@ -35,11 +35,11 @@
     <div data-bind="if: showModeSelector" class="layout">
         <div>Panel Layout</div>
         <div class="mode-selector">
-            <div data-bind="click: function(){ compareMode(false) }, css: { selected: !compareMode() }">
+            <div data-bind="click: function(){ compareMode(false); return true; }, css: { selected: !compareMode() }">
                 <div class="selector-button"></div>
                 <input name="panelGroup" value="single" type="radio" data-bind="checked: panelRadio"> Single Panel
             </div>
-            <div data-bind="click: function(){ compareMode(true) }, css: { selected: compareMode() }">
+            <div data-bind="click: function(){ compareMode(true); return true; }, css: { selected: compareMode() }">
                 <div>
                     <div class="selector-button"></div>
                     <div class="selector-button"></div>
@@ -257,6 +257,8 @@
     }">
     <!--ko if: showGallery() -->
     <div class="iiif-gallery-content">
+
+        <!--ko if: manifestData() -->
         <div class="panel-controls">
             <div class="hide-gallery-control" data-bind="click: toggleGallery">
                 <span>{% trans "Hide Gallery" %}</span>
@@ -278,6 +280,7 @@
                 </div>
             </div>
         </div>
+        <!--/ko -->
         <!--ko if: expandGallery() && manifestData() -->
         <div class="manifest-details">
             <h3>
@@ -326,6 +329,7 @@
                 </span>
                 <!--/ko -->
                 <!--ko if: manifestError() -->
+                <span data-bind="text: console.log(manifestError())"></span>
                 <span class="manifest-editor-error">
                     {% trans "Error loading manifest..." %}
                 </span>
@@ -392,15 +396,7 @@
                                     <img data-bind="attr: { src: $data.thumbnail || '{% webpack_static 'img/photo_missing.png' %}', title: $data.label}">
                                 </div>
                                 <div style="text-align:center;" class="iiif-gallery-canvas-label">
-                                    <!--ko if: getCanvasService($data) === selectedCanvas() && $parent.selectPrimaryPanel()  -->
-                                    <span data-bind="text: $parent.canvasLabel"></span>
-                                    <!--/ko -->
-                                    <!--ko if: getCanvasService($data) === selectedCanvas() && !$parent.selectPrimaryPanel() -->
-                                    <span data-bind="text: $parent.secondaryLabel"></span>
-                                    <!--/ko -->   
-                                    <!--ko ifnot: getCanvasService($data) === selectedCanvas() -->
                                     <span data-bind="text: label"></span>
-                                    <!--/ko -->                                
                                     <span class="annotation-count">
                                         <!--ko if: getAnnotationCount(getCanvasService($data)) -->
                                         <span data-bind="text: getAnnotationCount(getCanvasService($data))"></span> {% trans "Annotation(s)" %}
