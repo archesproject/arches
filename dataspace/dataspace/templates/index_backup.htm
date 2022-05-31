@@ -152,9 +152,9 @@ The data-spy and data-target are part of the built-in Bootstrap scrollspy functi
     <!-- Intro Section -->
     <section id="info-block-0" class="app-info-block intro-section relative">
         <!-- Vertical Nav -->
-        <div class="vertical-nav-container-background" style="height: 110px;"></div>
+        <div class="vertical-nav-container-background" style="top: 100px;"></div>
 
-        <div id="cd-vertical-nav" class="vertical-nav-container">
+        <div id="cd-vertical-nav" class="vertical-nav-container" style="top: 120px;">
             <ul class="vertical-nav-list">
                 <li class="active">
                     <a class="vertical-nav-list-link" href="#info-block-0" data-number="1">
@@ -171,7 +171,7 @@ The data-spy and data-target are part of the built-in Bootstrap scrollspy functi
                         <span class="vertical-nav-list-ref" style="width: 95px">{% trans "Resources" %}</span>
                     </a>
                 </li>
-                <!-- <li>
+                <li>
                     <a class="vertical-nav-list-link" href="#info-block-3" data-number="4">
                         <span class="vertical-nav-list-ref" style="width: 95px">{% trans "Sites" %}</span>
                     </a>
@@ -180,13 +180,13 @@ The data-spy and data-target are part of the built-in Bootstrap scrollspy functi
                     <a class="vertical-nav-list-link" href="#info-block-4" data-number="5">
                         <span class="vertical-nav-list-ref" style="width: 95px">{% trans "Technologies" %}</span>
                     </a>
-                </li> -->
+                </li>
             </ul>
         </div>
 
         <!-- Splash Screen -->
-        <div class="fullscreenbanner-container">
-            <div class="fullscreenbanner">
+        <div class="fullscreenbanner-container" style="max-height: 350px">
+            <div class="fullscreenbanner" style="max-height: 350px">
                 <ul>
                     <!-- SLIDE 1 -->
                     <li data-transition="fade" data-slotamount="9" data-masterspeed="0" data-title="ISPC Dataspace">
@@ -327,7 +327,7 @@ The data-spy and data-target are part of the built-in Bootstrap scrollspy functi
             </div>
 
             <!-- Content -->
-            <div class="splash-img" style="padding-bottom: 150px">
+            <div class="splash-img">
                 <img src="{% static 'img/landing/DHiLab_ISPC_enhancement.jpg' %}" alt="Arches Designer">
             </div>
 
@@ -339,8 +339,8 @@ The data-spy and data-target are part of the built-in Bootstrap scrollspy functi
     <!-- Info Block 2 -->
     <section id="info-block-2" class="app-info-block relative">
 
-            <div class="row" style="margin: -150px 0px 50px; display: flex; justify-content: space-evenly;">
-              <div class="col-4">
+            <div class="row" style="margin: -150px 0px 50px; display: flex; justify-content: center">
+              <div class="col-lg-2">
                   <div class="resource-icon-container">
                     <lord-icon
                         src="https://cdn.lordicon.com/pvbutfdk.json"
@@ -352,7 +352,7 @@ The data-spy and data-target are part of the built-in Bootstrap scrollspy functi
                   </div>
               </div>
 
-              <div class="col-4">
+              <div class="col-lg-2">
                     <div class="resource-icon-container" style="background-color: #6A7D10">
                         <lord-icon
                             src="https://cdn.lordicon.com/sygggnra.json"
@@ -365,7 +365,7 @@ The data-spy and data-target are part of the built-in Bootstrap scrollspy functi
                 </div>
 
 
-                <div class="col-4">
+                <div class="col-lg-2">
                     <div class="resource-icon-container" style="background-color: #7D5100">
                         <lord-icon
                             src="https://cdn.lordicon.com/stxtcyyo.json"
@@ -528,6 +528,96 @@ The data-spy and data-target are part of the built-in Bootstrap scrollspy functi
         </div>
     </section>
     <!-- End Info Block 2 -->
+
+
+    <!-- Info Block 3 -->
+    <section id="info-block-3" class="app-info-block relative">
+        <div>
+
+            <!-- Heading Info -->
+            <div class="sub-section">
+                <div class="col-lg-7">
+                    <div class="app-info-block-intro text-center">
+                        <h3 class="app-info-block-header">{% trans "ISPC Sites" %}</h3>
+                        <h2 class="app-info-block-title">{% trans "Find what you're looking for" %}</h2>
+                        <!-- <p class="app-info-block-text">
+                            {% trans "Duis tincidunt magna sed eros dictum varius. Suspendisse potenti. Nunc ultricies dignissim arcu eu sollicitudin. Cras ut nulla lacus." %}
+                        </p> -->
+                    </div>
+                </div>
+            </div>
+
+            <!-- Content -->
+            <div class="splash-img">
+                <img src="{% static 'img/landing/Turchia_Ninfeo.JPG' %}" alt="ISPC Site">
+            </div>
+
+            <!-- Sub-section -->
+            <div class="wide-box">
+                <div class="box-highlight">
+
+                    <h3>{% trans "Our research sites" %}</h3>
+                    <p>
+                        {% trans "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Fusce auctor ligula velit, quis facilisis dui elementum a. Proin malesuada metus sem, eu pharetra elit pulvinar quis. Proin mollis dictum purus, non eleifend turpis pretium ut. Suspendisse imperdiet enim risus, tempor consequat tortor rutrum id. Donec id lorem diam. Suspendisse potenti." %}
+                    </p>
+                    <br>
+                    <p>
+                        {% trans "Sed congue sollicitudin quam porttitor pharetra. Duis varius imperdiet fringilla. Sed commodo purus at urna maximus tempus. Vestibulum ullamcorper hendrerit enim, vitae porta lacus placerat in. Etiam at placerat erat, et malesuada ipsum. Nulla facilisi." %}
+                    </p>
+                    <br>
+                    <p>
+                        {% trans "Suspendisse vitae est fermentum, convallis risus at, ornare nisl. Nullam suscipit vulputate lorem, nec facilisis eros laoreet non. Vestibulum ante ipsum primis in faucibus orci luctus et ultrices posuere cubilia curae." %}
+                    </p>
+
+                </div>
+            </div>
+
+        </div>
+    </section>
+    <!-- End Info Block 3 -->
+
+    <!-- Info Block 4 -->
+    <section id="info-block-4" class="app-info-block relative">
+
+        <div>
+
+            <!-- Heading Info -->
+            <div class="sub-section">
+
+            </div>
+
+            <!-- Content -->
+            <div class="row">
+                <div class="col-md-6 col-lg-4">
+                    <img class="iphone" src="{% static 'img/landing/Modello_3d_superficie.png' %}" alt="ISPC Technologies">
+                </div>
+                <div class="col-md-6 col-lg-8">
+                    <div class="app-info-block-intro text-center">
+                        <!-- <h3 class="app-info-block-header">{% trans "ISPC Sites" %}</h3> -->
+                        <h2 class="app-info-block-title">{% trans "Our tools at ISPC" %}</h2>
+                        <!-- <p class="app-info-block-text">
+                            {% trans "Duis tincidunt magna sed eros dictum varius. Suspendisse potenti. Nunc ultricies dignissim arcu eu sollicitudin. Cras ut nulla lacus." %}
+                        </p> -->
+                    </div>
+                    <div class="mobile-description-container">
+                        <div class="box-highlight">
+                            <h2>{% trans "Technology" %}</h2>
+                            <p>
+                                {% trans "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Mauris tristique dapibus nulla, quis sodales risus sollicitudin non. Class aptent taciti sociosqu ad litora torquent per conubia nostra, per inceptos himenaeos. Praesent sit amet tempus arcu, ut auctor massa." %}
+                            </p>
+                            <br>
+                            <p>
+                                {% trans "Curabitur laoreet erat ante, at varius ipsum posuere accumsan." %}
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </section>
+    <!-- End Info Block 4 -->
+
 
     <!-- Footer -->
     <div class="afs-app-footer">
