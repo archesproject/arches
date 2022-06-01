@@ -132,10 +132,12 @@ define([
                     self.loading(true);
                     self.formData.append('graphid', graph);
                     self.submit('get_nodes').then(function(response){
-                        self.nodes(response.result);
-                        self.nodes().unshift({
-                            alias: "Use as an id"
-                        })
+                        const nodes = response.result.map(node => ({ ...node, label: node.alias }))
+                        nodes.unshift({
+                            alias: "resourceid",
+                            label: "Use as an id"
+                        });
+                        self.nodes(nodes);
                         self.loading(false);
                     });    
                 }

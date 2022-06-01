@@ -161,7 +161,7 @@ class ImportSingleCsv:
             next(reader)
 
         with connection.cursor() as cursor:
-            id_label = "Use as an id"
+            id_label = "resourceid"
             for row in reader:
                 if id_label in row:
                     try:
