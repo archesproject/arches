@@ -23,7 +23,7 @@ add_etl_manager = """
         'fa fa-database',
         'views/components/plugins/etl-manager',
         'etl-manager',
-        '{"show": true}',
+        '{"show": false}',
         'etl-manager',
         2);
     """
