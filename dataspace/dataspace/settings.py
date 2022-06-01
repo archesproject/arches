@@ -116,7 +116,7 @@ INSTALLED_APPS = (
     'dataspace',
 )
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['150.145.56.48', 'localhost']
 
 SYSTEM_SETTINGS_LOCAL_PATH = os.path.join(APP_ROOT, 'system_settings', 'System_Settings.json')
 WSGI_APPLICATION = 'dataspace.wsgi.application'
@@ -277,6 +277,23 @@ RESTRICT_CELERY_EXPORT_FOR_ANONYMOUS_USER = False
 # (make sure to check your accept headers as they will override the LANGUAGE_CODE setting!)
 # also see get_language_from_request in django.utils.translation.trans_real.py
 # to see how the language code is derived in the actual code
+MIDDLEWARE = [
+    # 'debug_toolbar.middleware.DebugToolbarMiddleware',
+    "corsheaders.middleware.CorsMiddleware",
+    "django.middleware.security.SecurityMiddleware",
+    "django.contrib.sessions.middleware.SessionMiddleware",
+    #'arches.app.utils.middleware.TokenMiddleware',
+    "django.middleware.locale.LocaleMiddleware",
+    "django.middleware.common.CommonMiddleware",
+    "django.middleware.csrf.CsrfViewMiddleware",
+    "arches.app.utils.middleware.ModifyAuthorizationHeader",
+    "oauth2_provider.middleware.OAuth2TokenMiddleware",
+    "django.contrib.auth.middleware.AuthenticationMiddleware",
+    "django.contrib.messages.middleware.MessageMiddleware",
+    # "django.middleware.clickjacking.XFrameOptionsMiddleware",
+    "arches.app.utils.middleware.SetAnonymousUser",
+]
+
 
 ####### TO GENERATE .PO FILES DO THE FOLLOWING ########
 # run the following commands
