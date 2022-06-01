@@ -381,6 +381,7 @@ remove_check_excess_tiles_trigger = """
     DROP FUNCTION IF EXISTS __arches_check_excess_tiles_trigger_function()
     """
 
+
 class Migration(migrations.Migration):
 
     dependencies = [
