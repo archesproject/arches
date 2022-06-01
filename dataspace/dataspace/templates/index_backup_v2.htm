@@ -309,37 +309,31 @@ The data-spy and data-target are part of the built-in Bootstrap scrollspy functi
     </section>
     <!-- End Intro Section -->
 
-
     <!-- Info Block 1 -->
     <section id="info-block-1" class="app-info-block relative">
 
         <div>
-            <!-- Content -->
-            <div class="row">
 
-                <div class="col-md-6 col-lg-6">
-                    <div class="app-info-block-text">
-                        <div class="box-highlight">
-                            <p class="app-info-block-text">
-                                {% trans "DATA SPACE è una piattaforma per la condivisione, l’accesso, la conservazione a lungo termine dei dati prodotti dall’Istituto di Scienze del Patrimonio Culturale, che consente l’accesso a strumenti e servizi digitali innovativi per accrescere la conoscenza, la conservazione e la valorizzazione del Patrimonio Culturale, in un’ottica interdisciplinare." %}
-                            </p>
-                            <br>
-                            <p>
-                                {% trans "Curabitur laoreet erat ante, at varius ipsum posuere accumsan." %}
-                            </p>
-                        </div>
+            <div class="sub-section">
+                <div class="col-lg-7">
+                    <div class="app-info-block-intro text-center">
+                        <h3 class="app-info-block-header">{% trans "Mission" %}</h3>
+                        <h2 class="app-info-block-title">{% trans "Who we are" %}</h2>
+                        <p class="app-info-block-text">
+                            {% trans "Il DATA SPACE è una piattaforma per la condivisione, l’accesso, la conservazione a lungo termine dei dati prodotti dall’Istituto di Scienze del Patrimonio Culturale, che consente l’accesso a strumenti e servizi digitali innovativi per accrescere la conoscenza, la conservazione e la valorizzazione del Patrimonio Culturale, in un’ottica interdisciplinare." %}
+                        </p>
                     </div>
                 </div>
-
-                <div class="col-md-6 col-lg-6">
-                    <video autoplay muted poster="{% static 'img/landing/bozza_cover.png' %}" controls style="max-width:100%;">
-                        <source src="{% static 'img/landing/bozza_video.mp4' %}" type="video/mp4">
-                    </video>
-                    <hr class=card-inline-separator style="margin-top: 20px">
-                    <h4 style="text-align: center;">ISPC Data Space</h4>
-                </div>
-
             </div>
+
+            <!-- Content -->
+            <div style="padding-bottom: 150px;">
+              <video autoplay muted poster="{% static 'img/landing/bozza_cover.png' %}" controls style="max-width:100%;">
+                  <source src="{% static 'img/landing/bozza_video.mp4' %}" type="video/mp4">
+
+                </video>
+            </div>
+
         </div>
 
     </section>
@@ -348,9 +342,9 @@ The data-spy and data-target are part of the built-in Bootstrap scrollspy functi
     <!-- Info Block 2 -->
     <section id="info-block-2" class="app-info-block relative">
 
-        <div class="row" style="margin: -150px 0px 50px; display: flex; justify-content: space-evenly;">
-            <div class="col-4">
-                <div class="resource-icon-container">
+            <div class="row" style="margin: -150px 0px 50px; display: flex; justify-content: space-evenly;">
+              <div class="col-4">
+                  <div class="resource-icon-container">
                     <lord-icon
                         src="https://cdn.lordicon.com/pvbutfdk.json"
                         trigger="morph"
@@ -358,41 +352,43 @@ The data-spy and data-target are part of the built-in Bootstrap scrollspy functi
                         class="resource-icon">
                     </lord-icon>
                     <p class="resource-text">{% trans "Researchers" %}</p>
+                  </div>
+              </div>
+
+              <div class="col-4">
+                    <div class="resource-icon-container" style="background-color: #6A7D10">
+                        <lord-icon
+                            src="https://cdn.lordicon.com/sygggnra.json"
+                            trigger="morph"
+                            colors="primary:#ffffff"
+                            class="resource-icon">
+                        </lord-icon>
+                        <p class="resource-text">{% trans "Institutions" %}</p>
+                    </div>
+                </div>
+
+
+                <div class="col-4">
+                    <div class="resource-icon-container" style="background-color: #7D5100">
+                        <lord-icon
+                            src="https://cdn.lordicon.com/stxtcyyo.json"
+                            trigger="morph"
+                            colors="primary:#ffffff"
+                            class="resource-icon">
+                        </lord-icon>
+                        <p class="resource-text">{% trans "Students" %}</p>
+                    </div>
                 </div>
             </div>
 
-            <div class="col-4">
-                  <div class="resource-icon-container" style="background-color: #6A7D10">
-                      <lord-icon
-                          src="https://cdn.lordicon.com/sygggnra.json"
-                          trigger="morph"
-                          colors="primary:#ffffff"
-                          class="resource-icon">
-                      </lord-icon>
-                      <p class="resource-text">{% trans "Institutions" %}</p>
-                  </div>
-              </div>
+            <div>
 
 
-              <div class="col-4">
-                  <div class="resource-icon-container" style="background-color: #7D5100">
-                      <lord-icon
-                          src="https://cdn.lordicon.com/stxtcyyo.json"
-                          trigger="morph"
-                          colors="primary:#ffffff"
-                          class="resource-icon">
-                      </lord-icon>
-                      <p class="resource-text">{% trans "Students" %}</p>
-                  </div>
-              </div>
-        </div>
-
-
-        <div>
             <!-- Heading Info -->
             <div class="sub-section">
                 <div class="col-lg-7">
                     <div class="app-info-block-intro text-center">
+                        <!-- <h3 class="app-info-block-header">{% trans "Mission" %}</h3> -->
                         <h2 class="app-info-block-title">{% trans "Resources and Services" %}</h2>
                         <p class="app-info-block-text">
                             {% trans "Access and use the resources and services for heritage science researchers made available through our catalogues." %}
@@ -400,6 +396,11 @@ The data-spy and data-target are part of the built-in Bootstrap scrollspy functi
                     </div>
                 </div>
             </div>
+
+            <!-- Content -->
+            <!-- <div class="splash-img">
+                <img src="{% static 'img/landing/DHiLab_ISPC_enhancement.jpg' %}" alt="Arches Designer">
+            </div> -->
 
             <!-- Sub-section -->
             <div class="row app-info-sub-block" style="padding-top: 0px;">
@@ -537,6 +538,94 @@ The data-spy and data-target are part of the built-in Bootstrap scrollspy functi
     </section>
     <!-- End Info Block 2 -->
 
+
+    <!-- Info Block 3 -->
+    <section id="info-block-3" class="app-info-block relative">
+        <div>
+
+            <!-- Heading Info -->
+            <div class="sub-section">
+                <div class="col-lg-7">
+                    <div class="app-info-block-intro text-center">
+                        <h3 class="app-info-block-header">{% trans "ISPC Sites" %}</h3>
+                        <h2 class="app-info-block-title">{% trans "Find what you're looking for" %}</h2>
+                        <!-- <p class="app-info-block-text">
+                            {% trans "Duis tincidunt magna sed eros dictum varius. Suspendisse potenti. Nunc ultricies dignissim arcu eu sollicitudin. Cras ut nulla lacus." %}
+                        </p> -->
+                    </div>
+                </div>
+            </div>
+
+            <!-- Content -->
+            <div class="splash-img">
+                <img src="{% static 'img/landing/Turchia_Ninfeo.JPG' %}" alt="ISPC Site">
+            </div>
+
+            <!-- Sub-section -->
+            <div class="wide-box">
+                <div class="box-highlight">
+
+                    <h3>{% trans "Our research sites" %}</h3>
+                    <p>
+                        {% trans "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Fusce auctor ligula velit, quis facilisis dui elementum a. Proin malesuada metus sem, eu pharetra elit pulvinar quis. Proin mollis dictum purus, non eleifend turpis pretium ut. Suspendisse imperdiet enim risus, tempor consequat tortor rutrum id. Donec id lorem diam. Suspendisse potenti." %}
+                    </p>
+                    <br>
+                    <p>
+                        {% trans "Sed congue sollicitudin quam porttitor pharetra. Duis varius imperdiet fringilla. Sed commodo purus at urna maximus tempus. Vestibulum ullamcorper hendrerit enim, vitae porta lacus placerat in. Etiam at placerat erat, et malesuada ipsum. Nulla facilisi." %}
+                    </p>
+                    <br>
+                    <p>
+                        {% trans "Suspendisse vitae est fermentum, convallis risus at, ornare nisl. Nullam suscipit vulputate lorem, nec facilisis eros laoreet non. Vestibulum ante ipsum primis in faucibus orci luctus et ultrices posuere cubilia curae." %}
+                    </p>
+
+                </div>
+            </div>
+
+        </div>
+    </section>
+    <!-- End Info Block 3 -->
+
+    <!-- Info Block 4 -->
+    <section id="info-block-4" class="app-info-block relative">
+
+        <div>
+
+            <!-- Heading Info -->
+            <div class="sub-section">
+
+            </div>
+
+            <!-- Content -->
+            <div class="row">
+                <div class="col-md-6 col-lg-4">
+                    <img class="iphone" src="{% static 'img/landing/Modello_3d_superficie.png' %}" alt="ISPC Technologies">
+                </div>
+                <div class="col-md-6 col-lg-8">
+                    <div class="app-info-block-intro text-center">
+                        <!-- <h3 class="app-info-block-header">{% trans "ISPC Sites" %}</h3> -->
+                        <h2 class="app-info-block-title">{% trans "Our tools at ISPC" %}</h2>
+                        <!-- <p class="app-info-block-text">
+                            {% trans "Duis tincidunt magna sed eros dictum varius. Suspendisse potenti. Nunc ultricies dignissim arcu eu sollicitudin. Cras ut nulla lacus." %}
+                        </p> -->
+                    </div>
+                    <div class="mobile-description-container">
+                        <div class="box-highlight">
+                            <h2>{% trans "Technology" %}</h2>
+                            <p>
+                                {% trans "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Mauris tristique dapibus nulla, quis sodales risus sollicitudin non. Class aptent taciti sociosqu ad litora torquent per conubia nostra, per inceptos himenaeos. Praesent sit amet tempus arcu, ut auctor massa." %}
+                            </p>
+                            <br>
+                            <p>
+                                {% trans "Curabitur laoreet erat ante, at varius ipsum posuere accumsan." %}
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </section>
+    <!-- End Info Block 4 -->
 
     <!-- Footer -->
     <div class="afs-app-footer">
