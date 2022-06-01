@@ -7,6 +7,7 @@ import logging
 import uuid
 from django.db import connection
 from django.db.models.functions import Lower
+from django.db.utils import IntegrityError, ProgrammingError
 from django.utils.translation import ugettext as _
 from arches.app.datatypes.datatypes import DataTypeFactory
 from arches.app.models.models import GraphModel, Node, NodeGroup, ResourceInstance
@@ -123,9 +124,24 @@ class ImportSingleCsv:
                 )
             return {"success": False, "data": "failed"}
         else:
-            with connection.cursor() as cursor:
-                cursor.execute("""SELECT * FROM __arches_staging_to_tile(%s)""", [self.loadid])
-                row = cursor.fetchall()
+            try:
+                with connection.cursor() as cursor:
+                    cursor.execute("""SELECT * FROM __arches_staging_to_tile(%s)""", [self.loadid])
+                    row = cursor.fetchall()
+            except (IntegrityError, ProgrammingError) as e:
+                logger.error(e)
+                with connection.cursor() as cursor:
+                    cursor.execute(
+                        """UPDATE load_event SET status = %s, load_end_time = %s WHERE loadid = %s""",
+                        ("failed", datetime.now(), self.loadid),
+                    )
+                return {
+                    "status": 400,
+                    "success": False,
+                    "title": _("Failed to complete load"),
+                    "message": _("Unable to insert record into staging table"),
+                }
+
         if row[0][0]:
             index_resources_by_transaction(self.loadid, quiet=True, use_multiprocessing=True)
             with connection.cursor() as cursor:
@@ -227,14 +243,15 @@ class ImportSingleCsv:
                     tile_value_json = JSONSerializer().serialize(tile_data)
                     node_depth = 0
 
-                    with connection.cursor() as cursor:
-                        cursor.execute(
-                            """
-                            INSERT INTO load_staging (
-                                nodegroupid, legacyid, resourceid, value, loadid, nodegroup_depth, source_description, passes_validation
-                            ) VALUES (%s,%s,%s,%s,%s,%s,%s,%s)""",
-                            (nodegroup, legacyid, resourceid, tile_value_json, self.loadid, node_depth, file.name, passes_validation),
-                        )
+                    cursor.execute(
+                        """
+                        INSERT INTO load_staging (
+                            nodegroupid, legacyid, resourceid, value, loadid, nodegroup_depth, source_description, passes_validation
+                        ) VALUES (%s,%s,%s,%s,%s,%s,%s,%s)""",
+                        (nodegroup, legacyid, resourceid, tile_value_json, self.loadid, node_depth, file.name, passes_validation),
+                    )
+
+            cursor.execute("""CALL __arches_check_tile_cardinality_violation_for_load(%s)""", [self.loadid])
 
         message = "staging table populated"
         return {"success": True, "data": message}
