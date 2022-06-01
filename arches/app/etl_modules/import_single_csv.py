@@ -98,7 +98,7 @@ class ImportSingleCsv:
 
         fieldnames = request.POST.get("fieldnames").split(",")
         column_names = [fieldname for fieldname in fieldnames if fieldname != ""]
-        id_label = "Use as an id"
+        id_label = "resourceid"
         error_message = None
         if len(column_names) == 0:
             error_message = _("No valid node is selected")
@@ -112,7 +112,7 @@ class ImportSingleCsv:
                 )
             return {"success": False, "data": error_message}
 
-        self.populate_staging_table(request)
+        self.populate_staging_table(request, id_label)
 
         validation = self.validate(request)
         if len(validation["data"]) != 0:
@@ -149,7 +149,7 @@ class ImportSingleCsv:
         message = "load event created"
         return {"success": True, "data": message}
 
-    def populate_staging_table(self, request):
+    def populate_staging_table(self, request, id_label):
 
         file = request.FILES.get("file")
         graphid = request.POST.get("graphid")
@@ -161,7 +161,6 @@ class ImportSingleCsv:
             next(reader)
 
         with connection.cursor() as cursor:
-            id_label = "resourceid"
             for row in reader:
                 if id_label in row:
                     try:
