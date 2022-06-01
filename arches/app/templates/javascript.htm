@@ -275,6 +275,7 @@
                 ontology_properties: "{% url 'ontology_properties' %}",
                 iiifmanifest: "{% url 'iiifmanifest' %}",
                 manifest_manager: "{% url 'manifest_manager' %}",
+                etl_manager: "{% url 'etl_manager' %}",
                 iiifannotations: "{% url 'iiifannotations' %}",
                 iiifannotationnodes: "{% url 'iiifannotationnodes' %}",
                 validatejson: "{% url 'validatejson' 'aaaa'%}".replace('aaaa', ''),
@@ -418,6 +419,7 @@
                 'groupingErrorTitle': '{% trans "Settings Conflict: Remove this card from grouped card?" %}',
                 'groupingErrorMessage': "{% trans 'The cardinality of this card can\'t be changed until you remove it from being grouped with the ${cardName} card.  Do you want to remove this card from being grouped with the ${cardName} card' %}",
                 'modelDoesNotExist': '{% trans "!! Referenced model does not exist -- Delete and select a new model !!" %}',
+                'idColumnSelection': '{% trans "Use as an id" %}',
             },
             version: '{{ app_settings.VERSION }}'
         };
