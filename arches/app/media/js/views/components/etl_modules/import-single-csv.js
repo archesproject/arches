@@ -135,7 +135,7 @@ define([
                         const nodes = response.result.map(node => ({ ...node, label: node.alias }))
                         nodes.unshift({
                             alias: "resourceid",
-                            label: "Use as an id"
+                            label: arches.translations.idColumnSelection,
                         });
                         self.nodes(nodes);
                         self.loading(false);
