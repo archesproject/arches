@@ -132,7 +132,12 @@ define([
                     self.loading(true);
                     self.formData.append('graphid', graph);
                     self.submit('get_nodes').then(function(response){
-                        self.nodes(response.result);
+                        const nodes = response.result.map(node => ({ ...node, label: node.alias }))
+                        nodes.unshift({
+                            alias: "resourceid",
+                            label: arches.translations.idColumnSelection,
+                        });
+                        self.nodes(nodes);
                         self.loading(false);
                     });    
                 }
@@ -174,8 +179,8 @@ define([
                     self.formData.append('async', true);
                     self.submit('write').then(data => {
                         console.log(data.result);
-                    }).fail(error => console.log(error));
-                }).fail(error => console.log(error));
+                    }).fail(error => console.log(error.responseJSON.data));
+                }).fail(error => console.log(error.responseJSON.data));
             };
 
             this.validate =function(){
