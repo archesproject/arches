@@ -59,6 +59,8 @@ class BranchCsvImporter:
 
     def get_parent_tileid(self, depth, tileid, previous_tile, nodegroup, nodegroup_tile_lookup):
         parenttileid = None
+        if depth == 0:
+            return parenttileid
         if len(previous_tile.keys()) == 0:
             previous_tile["tileid"] = tileid
             previous_tile["depth"] = depth
@@ -70,10 +72,7 @@ class BranchCsvImporter:
             nodegroup_tile_lookup[nodegroup] = parenttileid
             previous_tile["parenttile"] = parenttileid
         if previous_tile["depth"] > depth:
-            if depth == 0:
-                parenttileid = None
-            else:
-                parenttileid = nodegroup_tile_lookup[nodegroup]
+            parenttileid = nodegroup_tile_lookup[nodegroup]
         if previous_tile["depth"] == depth:
             parenttileid = previous_tile["parenttile"]
 
