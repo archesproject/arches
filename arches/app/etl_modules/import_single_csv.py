@@ -7,6 +7,8 @@ import logging
 import uuid
 from django.db import connection
 from django.db.models.functions import Lower
+from django.db.utils import IntegrityError, ProgrammingError
+from django.utils.translation import ugettext as _
 from arches.app.datatypes.datatypes import DataTypeFactory
 from arches.app.models.models import GraphModel, Node, NodeGroup, ResourceInstance
 from arches.app.models.graph import Graph
@@ -97,16 +99,21 @@ class ImportSingleCsv:
 
         fieldnames = request.POST.get("fieldnames").split(",")
         column_names = [fieldname for fieldname in fieldnames if fieldname != ""]
+        id_label = "resourceid"
+        error_message = None
         if len(column_names) == 0:
+            error_message = _("No valid node is selected")
+        if column_names.count(id_label) > 1:
+            error_message = _("Only one column should be selected for id")
+        if error_message:
             with connection.cursor() as cursor:
                 cursor.execute(
                     """UPDATE load_event SET status = %s, load_end_time = %s WHERE loadid = %s""",
                     ("failed", datetime.now(), self.loadid),
                 )
-            message = "No valid node is selected"
-            return {"success": False, "data": message}
+            return {"success": False, "data": error_message}
 
-        self.populate_staging_table(request)
+        self.populate_staging_table(request, id_label)
 
         validation = self.validate(request)
         if len(validation["data"]) != 0:
@@ -117,9 +124,24 @@ class ImportSingleCsv:
                 )
             return {"success": False, "data": "failed"}
         else:
-            with connection.cursor() as cursor:
-                cursor.execute("""SELECT * FROM __arches_staging_to_tile(%s)""", [self.loadid])
-                row = cursor.fetchall()
+            try:
+                with connection.cursor() as cursor:
+                    cursor.execute("""SELECT * FROM __arches_staging_to_tile(%s)""", [self.loadid])
+                    row = cursor.fetchall()
+            except (IntegrityError, ProgrammingError) as e:
+                logger.error(e)
+                with connection.cursor() as cursor:
+                    cursor.execute(
+                        """UPDATE load_event SET status = %s, load_end_time = %s WHERE loadid = %s""",
+                        ("failed", datetime.now(), self.loadid),
+                    )
+                return {
+                    "status": 400,
+                    "success": False,
+                    "title": _("Failed to complete load"),
+                    "message": _("Unable to insert record into staging table"),
+                }
+
         if row[0][0]:
             index_resources_by_transaction(self.loadid, quiet=True, use_multiprocessing=True)
             with connection.cursor() as cursor:
@@ -143,7 +165,7 @@ class ImportSingleCsv:
         message = "load event created"
         return {"success": True, "data": message}
 
-    def populate_staging_table(self, request):
+    def populate_staging_table(self, request, id_label):
 
         file = request.FILES.get("file")
         graphid = request.POST.get("graphid")
@@ -156,11 +178,21 @@ class ImportSingleCsv:
 
         with connection.cursor() as cursor:
             for row in reader:
-                resourceid = uuid.uuid4()
+                if id_label in row:
+                    try:
+                        resourceid = uuid.UUID(row[id_label])
+                        legacyid = None
+                    except (AttributeError, ValueError):
+                        resourceid = uuid.uuid4()
+                        legacyid = row[id_label]
+                else:
+                    resourceid = uuid.uuid4()
+                    legacyid = None
+
                 dict_by_nodegroup = {}
 
                 for key in row:
-                    if key != "":
+                    if key != "" and key != id_label:
                         current_node = self.get_node_lookup(graphid).get(alias=key)
                         nodegroupid = str(current_node.nodegroup_id)
                         node = str(current_node.nodeid)
@@ -211,14 +243,15 @@ class ImportSingleCsv:
                     tile_value_json = JSONSerializer().serialize(tile_data)
                     node_depth = 0
 
-                with connection.cursor() as cursor:
                     cursor.execute(
                         """
                         INSERT INTO load_staging (
-                            nodegroupid, resourceid, value, loadid, nodegroup_depth, source_description, passes_validation
-                        ) VALUES (%s,%s,%s,%s,%s,%s,%s)""",
-                        (nodegroup, resourceid, tile_value_json, self.loadid, node_depth, file.name, passes_validation),
+                            nodegroupid, legacyid, resourceid, value, loadid, nodegroup_depth, source_description, passes_validation
+                        ) VALUES (%s,%s,%s,%s,%s,%s,%s,%s)""",
+                        (nodegroup, legacyid, resourceid, tile_value_json, self.loadid, node_depth, file.name, passes_validation),
                     )
+
+            cursor.execute("""CALL __arches_check_tile_cardinality_violation_for_load(%s)""", [self.loadid])
 
         message = "staging table populated"
         return {"success": True, "data": message}

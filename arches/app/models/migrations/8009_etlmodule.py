@@ -23,7 +23,7 @@ add_etl_manager = """
         'fa fa-database',
         'views/components/plugins/etl-manager',
         'etl-manager',
-        '{"show": true}',
+        '{"show": false}',
         'etl-manager',
         2);
     """
@@ -128,17 +128,38 @@ add_validation_reporting_functions = """
     CREATE OR REPLACE FUNCTION public.__arches_load_staging_report_errors(load_id uuid)
     RETURNS TABLE(source text, message text, loadid uuid)
     AS $$
-    SELECT source_description, public.__arches_load_staging_get_tile_errors(value) AS message, loadid
-    FROM load_staging
-    WHERE passes_validation IS NOT true
-    AND loadid = load_id;
-    $$
-    LANGUAGE SQL;
+        SELECT source_description, CONCAT_WS (' | ', public.__arches_load_staging_get_tile_errors(value), error_message) AS message, loadid
+        FROM load_staging
+        WHERE passes_validation IS NOT true
+        AND loadid = load_id;
+    $$ LANGUAGE SQL;
+
+    CREATE OR REPLACE PROCEDURE public.__arches_check_tile_cardinality_violation_for_load(load_id uuid)
+    AS $$
+        UPDATE load_staging
+            SET error_message = 'excess tile error', passes_validation = false
+            WHERE loadid = load_id
+			AND (resourceid, nodegroupid, COALESCE(parenttileid::text, '')) IN (
+                SELECT t.resourceinstanceid, t.nodegroupid, COALESCE(t.parenttileid::text, '')
+                    FROM tiles t, node_groups ng
+                    WHERE t.nodegroupid = ng.nodegroupid
+                    AND ng.cardinality = '1'
+                UNION
+                SELECT ls.resourceid, ls.nodegroupid, COALESCE(ls.parenttileid::text, '')
+                    FROM load_staging ls, node_groups ng
+                    WHERE ls.nodegroupid = ng.nodegroupid
+                    AND ng.cardinality = '1'
+                    GROUP BY ls.resourceid, ls.nodegroupid, COALESCE(ls.parenttileid::text, ''), ls.loadid
+                    HAVING count(*) > 1
+                    AND ls.loadid = load_id
+            );
+    $$ LANGUAGE SQL;
     """
 
 remove_validation_reporting_functions = """
     DROP FUNCTION public.__arches_load_staging_get_tile_errors(json_obj jsonb);
     DROP FUNCTION public.__arches_load_staging_report_errors(load_id uuid);
+    DROP PROCEDURE public.__arches_check_tile_cardinality_violation_for_load(load_id uuid)
     """
 
 add_functions_to_get_nodegroup_tree = """
@@ -259,7 +280,7 @@ add_staging_to_tile_function = """
                                     END LOOP;
                                     tile_data_value = resource_obejct_array;
                                 END IF;
-								tile_data = jsonb_set(tile_data, format('{"%s"}', _key)::text[], coalesce(tile_data_value, 'null'));
+                                tile_data = jsonb_set(tile_data, format('{"%s"}', _key)::text[], coalesce(tile_data_value, 'null'));
                             END LOOP;
                         IF tile_id IS null THEN
                             tile_id = uuid_generate_v1mc();
@@ -331,6 +352,33 @@ add_get_resourceid_from_legacyid_trigger = """
 remove_get_resourceid_from_legacyid_trigger = """
     DROP TRIGGER IF EXISTS __arches_get_resourceid_from_legacyid_trigger ON load_staging;
     DROP FUNCTION IF EXISTS __arches_get_resourceid_from_legacyid_trigger_function();
+    """
+
+add_check_excess_tiles_trigger = """
+    CREATE OR REPLACE FUNCTION __arches_check_excess_tiles_trigger_function()
+    RETURNS trigger AS $$
+    BEGIN
+        IF (NEW.resourceinstanceid, NEW.nodegroupid, COALESCE(NEW.parenttileid::text, '')) IN (
+                SELECT t.resourceinstanceid, t.nodegroupid, COALESCE(t.parenttileid::text, '')
+                FROM tiles t, node_groups ng
+                WHERE t.nodegroupid = ng.nodegroupid
+                AND ng.cardinality = '1'
+            ) THEN
+                RAISE EXCEPTION 'Multiple Tiles for Cardinality-1 Nodegroup' USING ERRCODE = '21000';
+        END IF;
+        RETURN NEW;
+    END;
+    $$ LANGUAGE plpgsql;
+
+    CREATE TRIGGER __arches_check_excess_tiles_trigger
+        BEFORE INSERT ON tiles
+        FOR EACH ROW
+        EXECUTE PROCEDURE __arches_check_excess_tiles_trigger_function();
+    """
+
+remove_check_excess_tiles_trigger = """
+    DROP TRIGGER IF EXISTS __arches_check_excess_tiles_trigger ON tiles;
+    DROP FUNCTION IF EXISTS __arches_check_excess_tiles_trigger_function()
     """
 
 
@@ -437,4 +485,5 @@ class Migration(migrations.Migration):
         migrations.RunSQL(add_functions_to_get_nodegroup_tree, remove_functions_to_get_nodegroup_tree),
         migrations.RunSQL(add_staging_to_tile_function, remove_staging_to_tile_function),
         migrations.RunSQL(add_get_resourceid_from_legacyid_trigger, remove_get_resourceid_from_legacyid_trigger),
+        migrations.RunSQL(add_check_excess_tiles_trigger, remove_check_excess_tiles_trigger),
     ]

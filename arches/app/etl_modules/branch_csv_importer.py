@@ -1,5 +1,4 @@
 from datetime import datetime
-import glob
 import json
 import logging
 import math
@@ -11,7 +10,7 @@ import arches.app.tasks as tasks
 from django.http import HttpResponse
 from openpyxl import load_workbook
 from django.db import connection
-from django.db.utils import IntegrityError
+from django.db.utils import IntegrityError, ProgrammingError
 from django.utils.translation import ugettext as _
 from arches.app.datatypes.datatypes import DataTypeFactory
 from arches.app.models.models import Node
@@ -60,6 +59,8 @@ class BranchCsvImporter:
 
     def get_parent_tileid(self, depth, tileid, previous_tile, nodegroup, nodegroup_tile_lookup):
         parenttileid = None
+        if depth == 0:
+            return parenttileid
         if len(previous_tile.keys()) == 0:
             previous_tile["tileid"] = tileid
             previous_tile["depth"] = depth
@@ -71,10 +72,7 @@ class BranchCsvImporter:
             nodegroup_tile_lookup[nodegroup] = parenttileid
             previous_tile["parenttile"] = parenttileid
         if previous_tile["depth"] > depth:
-            if depth == 0:
-                parenttileid = None
-            else:
-                parenttileid = nodegroup_tile_lookup[nodegroup]
+            parenttileid = nodegroup_tile_lookup[nodegroup]
         if previous_tile["depth"] == depth:
             parenttileid = previous_tile["parenttile"]
 
@@ -140,12 +138,12 @@ class BranchCsvImporter:
             cell_values = [cell.value for cell in row]
             if len(cell_values) == 0:
                 continue
-            node_values = cell_values[2:]
             resourceid = cell_values[0]
             if str(resourceid).strip() in ("--", "resource_id"):
                 nodegroup_alias = cell_values[1][0:-4].strip()
-                data_node_lookup[nodegroup_alias] = node_values
+                data_node_lookup[nodegroup_alias] = [val for val in cell_values[2:] if val]
             elif cell_values[1] is not None:
+                node_values = cell_values[2:]
                 try:
                     row_count += 1
                     nodegroup_alias = cell_values[1].strip()
@@ -221,7 +219,7 @@ class BranchCsvImporter:
             with connection.cursor() as cursor:
                 cursor.execute("""SELECT * FROM __arches_staging_to_tile(%s)""", [self.loadid])
                 row = cursor.fetchall()
-        except IntegrityError as e:
+        except (IntegrityError, ProgrammingError) as e:
             logger.error(e)
             with connection.cursor() as cursor:
                 cursor.execute(
@@ -316,6 +314,7 @@ class BranchCsvImporter:
                 with connection.cursor() as cursor:
                     for file in files.keys():
                         self.stage_excel_file(file, summary, cursor)
+                    cursor.execute("""CALL __arches_check_tile_cardinality_violation_for_load(%s)""", [self.loadid])
                     result["validation"] = self.validate()
                     if len(result["validation"]["data"]) == 0:
                         self.complete_load(self.loadid)
