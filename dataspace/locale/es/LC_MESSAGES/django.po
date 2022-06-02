@@ -1,0 +1,1284 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2022-06-02 16:17+0200\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"Language: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+#: afs/templates/index.htm:73
+msgid "Arches/DISCO"
+msgstr ""
+
+#: afs/templates/index.htm:81
+msgid "Arches Features"
+msgstr ""
+
+#: afs/templates/index.htm:85
+msgid "Search"
+msgstr ""
+
+#: afs/templates/index.htm:90
+msgid "Manage"
+msgstr ""
+
+#: afs/templates/index.htm:98
+msgid "Sign in"
+msgstr ""
+
+#: afs/templates/index.htm:101
+msgid "Welcome, "
+msgstr "Bienvenido,"
+
+#: afs/templates/index.htm:105
+msgid "Log off"
+msgstr ""
+
+#: afs/templates/index.htm:125
+msgid "Home"
+msgstr ""
+
+#: afs/templates/index.htm:130 afs/templates/index.htm:197
+msgid "Fast"
+msgstr ""
+
+#: afs/templates/index.htm:135 afs/templates/index.htm:253
+msgid "Workflows"
+msgstr ""
+
+#: afs/templates/index.htm:140
+msgid "Search Tools"
+msgstr ""
+
+#: afs/templates/index.htm:145
+msgid "Mobile"
+msgstr ""
+
+#: afs/templates/index.htm:163
+msgid "Arches for Science"
+msgstr ""
+
+#: afs/templates/index.htm:164
+msgid "A web and mobile platform for"
+msgstr ""
+
+#: afs/templates/index.htm:165
+msgid "managing your most important conservation information"
+msgstr ""
+
+#: afs/templates/index.htm:173
+msgid "Imaging of Irises | Getty Conservation Institute | (CC BY-NC-ND 2.0)"
+msgstr ""
+
+#: afs/templates/index.htm:198
+msgid "Deploy Applications Rapidly"
+msgstr ""
+
+#: afs/templates/index.htm:200
+msgid ""
+"Design custom information management applications in hours.  Build your "
+"databases with Arches Designer, then configure your interface all without "
+"having to write any code."
+msgstr ""
+
+#: afs/templates/index.htm:217
+msgid "Interface Manager"
+msgstr ""
+
+#: afs/templates/index.htm:219
+msgid ""
+"Arches automatically creates data entry forms based on your data models.  "
+"Use Arches' Card Manager to configure the look and feel of your data entry "
+"UI."
+msgstr ""
+
+#: afs/templates/index.htm:228
+msgid "Data Security"
+msgstr ""
+
+#: afs/templates/index.htm:230
+msgid ""
+"Use Arches' Permissions Manager to set up data access rules for all your "
+"user groups and individual accounts.  You can define read/write/delete and "
+"no-access permissions."
+msgstr ""
+
+#: afs/templates/index.htm:254
+msgid "Orchestrate your data entry"
+msgstr ""
+
+#: afs/templates/index.htm:256
+msgid ""
+"Design step-wise data management interfaces that simplify complex editing "
+"tasks.  Ensure that everyone enters data completely and consistently"
+msgstr ""
+
+#: afs/templates/index.htm:280
+msgid "Arches Search Tools"
+msgstr ""
+
+#: afs/templates/index.htm:281
+msgid "Find what you're looking for"
+msgstr ""
+
+#: afs/templates/index.htm:283
+msgid ""
+"Arches comes with powerful built-in search tools.  Quickly filter large "
+"databases with term, geospatial, and time-based search components"
+msgstr ""
+
+#: afs/templates/index.htm:297
+msgid "Search Options"
+msgstr ""
+
+#: afs/templates/index.htm:299
+msgid ""
+"Arches gives you many ways to find precisely the information you need, even "
+"if your Arches application contains 10's of millions of records.  In "
+"addition to term, thesaurus, geospatial, and temporal filters, Arches "
+"provides you with advanced filtering options that support boolean logic, "
+"inverses, and many other filtering options."
+msgstr ""
+
+#: afs/templates/index.htm:303
+msgid ""
+"Arches' search capabilities also provide for sophisticated data "
+"visualizations, including interactive displays of the connections between "
+"your data objects using a Force Directed Graph."
+msgstr ""
+
+#: afs/templates/index.htm:307
+msgid ""
+"If you're a software developer, you can build on Arches modular search "
+"services and create your own filters, reports, and visualizations to best "
+"show off your particular dataset."
+msgstr ""
+
+#: afs/templates/index.htm:335
+msgid "Work on the go..."
+msgstr ""
+
+#: afs/templates/index.htm:337
+msgid ""
+"Arches Collector allows you to create new data and edit existing records "
+"when you're away from your computer.  Don't worry if you're out of cell or "
+"Wi-Fi range.  Create new records, update information, even add new map "
+"locations.  Then synch your changes to your Arches application when you re-"
+"establish a network connection."
+msgstr ""
+
+#: afs/templates/index.htm:341
+msgid ""
+"Arches Collector is available for iOS and Android devices.  Download the app "
+"from your favorite marketplace."
+msgstr ""
+
+#: afs/templates/index.htm:362
+msgid "Sample Institution Name"
+msgstr ""
+
+#: afs/templates/index.htm:374
+msgid "Guides and Documentation"
+msgstr ""
+
+#: afs/templates/index.htm:382
+msgid "What is Arches"
+msgstr ""
+
+#: afs/templates/index.htm:385
+msgid "Arches Collector"
+msgstr ""
+
+#: afs/templates/index.htm:388
+msgid "Implementation Considerations"
+msgstr ""
+
+#: afs/templates/index.htm:391
+msgid "Information For Developers"
+msgstr ""
+
+#: afs/templates/index.htm:401
+msgid "FAQ"
+msgstr ""
+
+#: afs/templates/index.htm:404
+msgid "Standards and Interoperability"
+msgstr ""
+
+#: afs/templates/index.htm:407
+msgid "Installation Guide"
+msgstr ""
+
+#: afs/templates/index.htm:415
+msgid "Arches Project Background"
+msgstr ""
+
+#: afs/templates/index.htm:418
+msgid "Arches Webinars/Presentations"
+msgstr ""
+
+#: afs/templates/index.htm:421
+msgid "Resource Models"
+msgstr ""
+
+#: afs/templates/index.htm:438
+msgid "Terms & Conditions"
+msgstr ""
+
+#: afs/templates/index.htm:439
+msgid "Privacy Policy"
+msgstr ""
+
+#: afs/templates/views/components/annotation-summary.htm:13
+msgid "Region Name:"
+msgstr ""
+
+#: afs/templates/views/components/annotation-summary.htm:14
+#: afs/templates/views/components/workflows/analysis-areas-workflow/analysis-areas-annotation-step.htm:351
+msgid "Annotator"
+msgstr ""
+
+#: afs/templates/views/components/annotation-summary.htm:32
+#: afs/templates/views/components/reports/scenes/annotation-parts.htm:52
+msgid "Regions of Interest: "
+msgstr ""
+
+#: afs/templates/views/components/cards/file-renderers/afs-reader.htm:38
+msgid "Config"
+msgstr ""
+
+#: afs/templates/views/components/cards/file-renderers/afs-reader.htm:47
+#: afs/templates/views/components/cards/file-renderers/colladareader.htm:14
+msgid "Data"
+msgstr ""
+
+#: afs/templates/views/components/cards/file-renderers/afs-reader.htm:59
+msgid "Title Text and Font Size"
+msgstr ""
+
+#: afs/templates/views/components/cards/file-renderers/afs-reader.htm:66
+msgid "X Axis Label and Font Size"
+msgstr ""
+
+#: afs/templates/views/components/cards/file-renderers/afs-reader.htm:73
+msgid "Y Axis Label and Font Size"
+msgstr ""
+
+#: afs/templates/views/components/cards/file-renderers/afs-reader.htm:98
+msgid "'Available Series'"
+msgstr ""
+
+#: afs/templates/views/components/cards/file-renderers/afs-reader.htm:100
+msgid "Add Series to Chart"
+msgstr ""
+
+#: afs/templates/views/components/cards/file-renderers/afs-reader.htm:105
+msgid "File Filter"
+msgstr ""
+
+#: afs/templates/views/components/cards/file-renderers/afs-reader.htm:106
+#: afs/templates/views/components/workflows/upload-dataset/file-interpretation-step.htm:156
+#: afs/templates/views/components/workflows/upload-dataset/file-interpretation-step.htm:175
+#: afs/templates/views/components/workflows/upload-dataset/file-interpretation-step.htm:197
+#: afs/templates/views/components/workflows/upload-dataset/file-interpretation-step.htm:203
+msgid "e.g.: .txt"
+msgstr ""
+
+#: afs/templates/views/components/cards/file-renderers/afs-reader.htm:127
+msgid "Style"
+msgstr ""
+
+#: afs/templates/views/components/cards/file-renderers/afs-reader.htm:132
+msgid "Color"
+msgstr ""
+
+#: afs/templates/views/components/cards/file-renderers/afs-reader.htm:136
+msgid "Data Series Line Color"
+msgstr ""
+
+#: afs/templates/views/components/file-upload.htm:11
+#: afs/templates/views/components/workflows/upload-dataset/select-dataset-files-step.htm:128
+#: afs/templates/views/components/workflows/upload-dataset/upload-files-step.htm:38
+msgid "Upload Files"
+msgstr ""
+
+#: afs/templates/views/components/file-upload.htm:12
+#: afs/templates/views/components/workflows/upload-dataset/select-dataset-files-step.htm:129
+#: afs/templates/views/components/workflows/upload-dataset/upload-files-step.htm:39
+msgid "Drag & Drop your files onto this panel to upload"
+msgstr ""
+
+#: afs/templates/views/components/file-upload.htm:16
+#: afs/templates/views/components/workflows/upload-dataset/select-dataset-files-step.htm:133
+#: afs/templates/views/components/workflows/upload-dataset/upload-files-step.htm:43
+msgid "Select Files"
+msgstr ""
+
+#: afs/templates/views/components/file-upload.htm:19
+#: afs/templates/views/components/workflows/upload-dataset/select-dataset-files-step.htm:136
+#: afs/templates/views/components/workflows/upload-dataset/upload-files-step.htm:46
+msgid "Adding files to this record is "
+msgstr ""
+
+#: afs/templates/views/components/file-upload.htm:20
+#: afs/templates/views/components/workflows/upload-dataset/select-dataset-files-step.htm:137
+#: afs/templates/views/components/workflows/upload-dataset/upload-files-step.htm:47
+msgid "optional."
+msgstr ""
+
+#: afs/templates/views/components/file-upload.htm:22
+#: afs/templates/views/components/workflows/upload-dataset/select-dataset-files-step.htm:139
+#: afs/templates/views/components/workflows/upload-dataset/upload-files-step.htm:49
+msgid ""
+"You may upload as many files as you wish; check with the site admin on the "
+"maximum file size."
+msgstr ""
+
+#: afs/templates/views/components/file-upload.htm:31
+msgid ""
+"Images formatted as .jpg, .png files may be uploaded. Other formats may "
+"require a loader to view."
+msgstr ""
+
+#: afs/templates/views/components/functions/file-to-iiif.htm:6
+msgid "How does this function work?"
+msgstr ""
+
+#: afs/templates/views/components/functions/file-to-iiif.htm:7
+msgid ""
+"In the widget below, select a card/node that is of File-list datatype. When "
+"a tile is created for that card, this function will create a IIIF Manifest "
+"record in the database and a corresponding json file. Created IIIF Manifests "
+"will be selectable in a IIIF Annotation card. Ensure that Cantaloupe is "
+"running for this function to be successful."
+msgstr ""
+
+#: afs/templates/views/components/functions/file-to-iiif.htm:11
+#: afs/templates/views/components/functions/sample-function.htm:7
+msgid "Card Name"
+msgstr ""
+
+#: afs/templates/views/components/functions/file-to-iiif.htm:15
+#: afs/templates/views/components/functions/sample-function.htm:11
+msgid "Choose a card."
+msgstr ""
+
+#: afs/templates/views/components/functions/file-to-iiif.htm:18
+msgid "Select a nodegroup"
+msgstr ""
+
+#: afs/templates/views/components/reports/collection-set.htm:11
+msgid "Collection or Set"
+msgstr ""
+
+#: afs/templates/views/components/reports/collection-set.htm:107
+msgid "(Collection/Set)"
+msgstr ""
+
+#: afs/templates/views/components/reports/digital-resource.htm:10
+msgid "Digital Resource"
+msgstr ""
+
+#: afs/templates/views/components/reports/digital-resource.htm:89
+msgid "Files"
+msgstr ""
+
+#: afs/templates/views/components/reports/digital-resource.htm:91
+msgid "Add File"
+msgstr ""
+
+#: afs/templates/views/components/reports/digital-resource.htm:108
+#: afs/templates/views/components/reports/scenes/documentation.htm:99
+#: afs/templates/views/components/reports/scenes/existence.htm:71
+#: afs/templates/views/components/reports/scenes/existence.htm:298
+#: afs/templates/views/components/reports/scenes/name.htm:26
+#: afs/templates/views/components/reports/scenes/name.htm:77
+msgid "Name"
+msgstr ""
+
+#: afs/templates/views/components/reports/digital-resource.htm:109
+msgid "Metadata Exists"
+msgstr ""
+
+#: afs/templates/views/components/reports/digital-resource.htm:194
+msgid "(Digital Resource)"
+msgstr ""
+
+#: afs/templates/views/components/reports/group.htm:11
+msgid "Group"
+msgstr ""
+
+#: afs/templates/views/components/reports/group.htm:136
+msgid "(Group)"
+msgstr ""
+
+#: afs/templates/views/components/reports/instrument.htm:10
+msgid "Instrument"
+msgstr ""
+
+#: afs/templates/views/components/reports/instrument.htm:139
+msgid "(Instrument)"
+msgstr ""
+
+#: afs/templates/views/components/reports/modification.htm:11
+msgid "Modification"
+msgstr ""
+
+#: afs/templates/views/components/reports/modification.htm:124
+msgid "(Modification)"
+msgstr ""
+
+#: afs/templates/views/components/reports/observation.htm:11
+msgid "Observation"
+msgstr ""
+
+#: afs/templates/views/components/reports/observation.htm:115
+msgid "(Observation)"
+msgstr ""
+
+#: afs/templates/views/components/reports/period.htm:11
+msgid "Period"
+msgstr ""
+
+#: afs/templates/views/components/reports/period.htm:68
+msgid "(Period)"
+msgstr ""
+
+#: afs/templates/views/components/reports/person.htm:11
+msgid "Person"
+msgstr ""
+
+#: afs/templates/views/components/reports/person.htm:120
+msgid "(Person)"
+msgstr ""
+
+#: afs/templates/views/components/reports/physical-thing.htm:10
+msgid "Physical Thing"
+msgstr ""
+
+#: afs/templates/views/components/reports/physical-thing.htm:119
+#: afs/templates/views/components/reports/sampling-activity.htm:100
+msgid "Parts"
+msgstr ""
+
+#: afs/templates/views/components/reports/physical-thing.htm:121
+#: afs/templates/views/components/reports/sampling-activity.htm:102
+#: afs/templates/views/components/reports/scenes/existence.htm:244
+msgid "Add Part"
+msgstr ""
+
+#: afs/templates/views/components/reports/physical-thing.htm:182
+msgid "(Physical Thing)"
+msgstr ""
+
+#: afs/templates/views/components/reports/place.htm:11
+msgid "Place"
+msgstr ""
+
+#: afs/templates/views/components/reports/place.htm:98
+msgid "(Place)"
+msgstr ""
+
+#: afs/templates/views/components/reports/project.htm:11
+#: afs/templates/views/components/workflows/project-collection-workflow/project-collection-final-step.htm:5
+msgid "Project"
+msgstr ""
+
+#: afs/templates/views/components/reports/project.htm:115
+msgid "(Project)"
+msgstr ""
+
+#: afs/templates/views/components/reports/provenance-activity.htm:11
+msgid "Provenance Activity"
+msgstr ""
+
+#: afs/templates/views/components/reports/sampling-activity.htm:11
+#: afs/templates/views/components/workflows/sample-taking-workflow/sample-taking-final-step.htm:32
+msgid "Sampling Activity"
+msgstr ""
+
+#: afs/templates/views/components/reports/sampling-activity.htm:142
+msgid "(Sampling Activity)"
+msgstr ""
+
+#: afs/templates/views/components/reports/scenes/communication.htm:7
+msgid "Contact Points"
+msgstr ""
+
+#: afs/templates/views/components/reports/scenes/communication.htm:9
+msgid "Add Contact Point"
+msgstr ""
+
+#: afs/templates/views/components/reports/scenes/communication.htm:26
+msgid "Contact Information"
+msgstr ""
+
+#: afs/templates/views/components/reports/scenes/communication.htm:27
+msgid "Contact Information Type"
+msgstr ""
+
+#: afs/templates/views/components/reports/scenes/description.htm:7
+msgid "Statements"
+msgstr ""
+
+#: afs/templates/views/components/reports/scenes/description.htm:9
+msgid "Add Statement"
+msgstr ""
+
+#: afs/templates/views/components/reports/scenes/description.htm:26
+msgid "Content"
+msgstr ""
+
+#: afs/templates/views/components/reports/scenes/description.htm:27
+#: afs/templates/views/components/reports/scenes/documentation.htm:51
+#: afs/templates/views/components/reports/scenes/existence.htm:72
+#: afs/templates/views/components/reports/scenes/existence.htm:118
+#: afs/templates/views/components/reports/scenes/existence.htm:166
+#: afs/templates/views/components/reports/scenes/existence.htm:299
+#: afs/templates/views/components/reports/scenes/existence.htm:352
+#: afs/templates/views/components/reports/scenes/existence.htm:407
+#: afs/templates/views/components/reports/scenes/name.htm:27
+#: afs/templates/views/components/reports/scenes/name.htm:78
+#: afs/templates/views/components/reports/scenes/substance.htm:27
+msgid "Type"
+msgstr ""
+
+#: afs/templates/views/components/reports/scenes/description.htm:28
+#: afs/templates/views/components/reports/scenes/existence.htm:73
+#: afs/templates/views/components/reports/scenes/existence.htm:119
+#: afs/templates/views/components/reports/scenes/existence.htm:300
+#: afs/templates/views/components/reports/scenes/existence.htm:353
+#: afs/templates/views/components/reports/scenes/name.htm:28
+msgid "Language"
+msgstr ""
+
+#: afs/templates/views/components/reports/scenes/documentation.htm:7
+msgid "Metadata"
+msgstr ""
+
+#: afs/templates/views/components/reports/scenes/documentation.htm:32
+msgid "Digital Reference"
+msgstr ""
+
+#: afs/templates/views/components/reports/scenes/documentation.htm:34
+msgid "Add Digital Reference"
+msgstr ""
+
+#: afs/templates/views/components/reports/scenes/documentation.htm:52
+msgid "Source"
+msgstr ""
+
+#: afs/templates/views/components/reports/scenes/documentation.htm:80
+msgid "Subject Of"
+msgstr ""
+
+#: afs/templates/views/components/reports/scenes/documentation.htm:82
+msgid "Modify Subject Of"
+msgstr ""
+
+#: afs/templates/views/components/reports/scenes/existence.htm:12
+msgid "Add Event"
+msgstr ""
+
+#: afs/templates/views/components/reports/scenes/existence.htm:17
+msgid "Edit Event"
+msgstr ""
+
+#: afs/templates/views/components/reports/scenes/existence.htm:33
+msgid "Event Summary "
+msgstr ""
+
+#: afs/templates/views/components/reports/scenes/existence.htm:55
+msgid "Add Event Name"
+msgstr ""
+
+#: afs/templates/views/components/reports/scenes/existence.htm:105
+msgid "Add Event Statement"
+msgstr ""
+
+#: afs/templates/views/components/reports/scenes/existence.htm:117
+#: afs/templates/views/components/reports/scenes/existence.htm:351
+msgid "Statement"
+msgstr ""
+
+#: afs/templates/views/components/reports/scenes/existence.htm:120
+#: afs/templates/views/components/reports/scenes/existence.htm:354
+msgid "Name of Statement"
+msgstr ""
+
+#: afs/templates/views/components/reports/scenes/existence.htm:153
+msgid "Add Event Identifier"
+msgstr ""
+
+#: afs/templates/views/components/reports/scenes/existence.htm:165
+#: afs/templates/views/components/reports/scenes/existence.htm:406
+msgid "Identifier"
+msgstr ""
+
+#: afs/templates/views/components/reports/scenes/existence.htm:201
+msgid "Edit Event Timespan"
+msgstr ""
+
+#: afs/templates/views/components/reports/scenes/existence.htm:204
+msgid "Add Event Timespan"
+msgstr ""
+
+#: afs/templates/views/components/reports/scenes/existence.htm:224
+msgid "Edit Event Location"
+msgstr ""
+
+#: afs/templates/views/components/reports/scenes/existence.htm:243
+msgid "Event Parts"
+msgstr ""
+
+#: afs/templates/views/components/reports/scenes/existence.htm:254
+msgid "Event Part "
+msgstr ""
+
+#: afs/templates/views/components/reports/scenes/existence.htm:256
+msgid "Edit this Part"
+msgstr ""
+
+#: afs/templates/views/components/reports/scenes/existence.htm:280
+msgid "Edit Part Names"
+msgstr ""
+
+#: afs/templates/views/components/reports/scenes/existence.htm:283
+msgid "Add Part Names"
+msgstr ""
+
+#: afs/templates/views/components/reports/scenes/existence.htm:333
+msgid "Edit Part Statement"
+msgstr ""
+
+#: afs/templates/views/components/reports/scenes/existence.htm:336
+msgid "Add Part Statement"
+msgstr ""
+
+#: afs/templates/views/components/reports/scenes/existence.htm:388
+msgid "Edit Part Identifier"
+msgstr ""
+
+#: afs/templates/views/components/reports/scenes/existence.htm:391
+msgid "Add Part Identifier"
+msgstr ""
+
+#: afs/templates/views/components/reports/scenes/existence.htm:440
+msgid "Edit Part Timespan"
+msgstr ""
+
+#: afs/templates/views/components/reports/scenes/existence.htm:443
+msgid "Add Part Timespan"
+msgstr ""
+
+#: afs/templates/views/components/reports/scenes/json.htm:8
+msgid "Resource JSON"
+msgstr ""
+
+#: afs/templates/views/components/reports/scenes/json.htm:20
+msgid "JSON"
+msgstr ""
+
+#: afs/templates/views/components/reports/scenes/json.htm:29
+msgid "Arches JSON"
+msgstr ""
+
+#: afs/templates/views/components/reports/scenes/json.htm:38
+msgid "JSON-LD"
+msgstr ""
+
+#: afs/templates/views/components/reports/scenes/keyvalue.htm:10
+#: afs/templates/views/components/reports/scenes/keyvalue.htm:132
+#: afs/templates/views/components/workflows/analysis-areas-workflow/analysis-areas-annotation-step.htm:285
+#: afs/templates/views/components/workflows/sample-taking-workflow/sample-taking-sample-location-step.htm:286
+msgid "Edit"
+msgstr ""
+
+#: afs/templates/views/components/reports/scenes/location.htm:8
+msgid "Geospatial Coordinates"
+msgstr ""
+
+#: afs/templates/views/components/reports/scenes/location.htm:10
+msgid "Add Geometry"
+msgstr ""
+
+#: afs/templates/views/components/reports/scenes/location.htm:17
+msgid "Geometry"
+msgstr ""
+
+#: afs/templates/views/components/reports/scenes/location.htm:18
+msgid "Edit location"
+msgstr ""
+
+#: afs/templates/views/components/reports/scenes/location.htm:45
+msgid "Geometry Metadata"
+msgstr ""
+
+#: afs/templates/views/components/reports/scenes/location.htm:139
+#: afs/templates/views/components/workflows/sample-taking-workflow/sample-taking-final-step.htm:74
+msgid "Description"
+msgstr ""
+
+#: afs/templates/views/components/reports/scenes/name.htm:7
+msgid "Names"
+msgstr ""
+
+#: afs/templates/views/components/reports/scenes/name.htm:9
+msgid "Add Name"
+msgstr ""
+
+#: afs/templates/views/components/reports/scenes/name.htm:57
+msgid "Identifiers"
+msgstr ""
+
+#: afs/templates/views/components/reports/scenes/name.htm:59
+msgid "Add Identifier"
+msgstr ""
+
+#: afs/templates/views/components/reports/scenes/name.htm:107
+msgid "Classification"
+msgstr ""
+
+#: afs/templates/views/components/reports/scenes/name.htm:123
+msgid "Edit Type"
+msgstr ""
+
+#: afs/templates/views/components/reports/scenes/name.htm:126
+msgid "Add Type"
+msgstr ""
+
+#: afs/templates/views/components/reports/scenes/name.htm:149
+msgid "Add Exact Match"
+msgstr ""
+
+#: afs/templates/views/components/reports/scenes/name.htm:152
+msgid "Edit Exact Match"
+msgstr ""
+
+#: afs/templates/views/components/reports/scenes/substance.htm:8
+msgid "Dimensions"
+msgstr ""
+
+#: afs/templates/views/components/reports/scenes/substance.htm:10
+msgid "Add Dimension"
+msgstr ""
+
+#: afs/templates/views/components/reports/scenes/substance.htm:28
+msgid "Unit"
+msgstr ""
+
+#: afs/templates/views/components/reports/scenes/substance.htm:29
+msgid "Value"
+msgstr ""
+
+#: afs/templates/views/components/reports/scenes/substance.htm:30
+msgid "Highest Possible Value"
+msgstr ""
+
+#: afs/templates/views/components/reports/scenes/substance.htm:31
+msgid "Lowest Possible Value"
+msgstr ""
+
+#: afs/templates/views/components/reports/scenes/substance.htm:62
+msgid "Additional Data"
+msgstr ""
+
+#: afs/templates/views/components/reports/scenes/substance.htm:64
+msgid "Add Material"
+msgstr ""
+
+#: afs/templates/views/components/reports/textual-work.htm:11
+msgid "Textual Work"
+msgstr ""
+
+#: afs/templates/views/components/reports/textual-work.htm:132
+msgid "(Textual Work)"
+msgstr ""
+
+#: afs/templates/views/components/reports/visual-work.htm:14
+msgid "Created By:"
+msgstr ""
+
+#: afs/templates/views/components/reports/visual-work.htm:22
+msgid "No information"
+msgstr ""
+
+#: afs/templates/views/components/reports/visual-work.htm:25
+msgid "Visual Work Type"
+msgstr ""
+
+#: afs/templates/views/components/reports/visual-work.htm:30
+msgid "Visual Work Description:"
+msgstr ""
+
+#: afs/templates/views/components/reports/visual-work.htm:36
+msgid "No description available"
+msgstr ""
+
+#: afs/templates/views/components/reports/visual-work.htm:44
+msgid "Depicts"
+msgstr ""
+
+#: afs/templates/views/components/reports/visual-work.htm:52
+msgid "No Physical Things Depicted"
+msgstr ""
+
+#: afs/templates/views/components/reports/visual-work.htm:60
+msgid "Edit Resource"
+msgstr ""
+
+#: afs/templates/views/components/widgets/sample-widget.htm:27
+msgid "X Coordinate Placeholder"
+msgstr ""
+
+#: afs/templates/views/components/widgets/sample-widget.htm:30
+#: afs/templates/views/components/widgets/sample-widget.htm:36
+msgid "Placeholder"
+msgstr ""
+
+#: afs/templates/views/components/widgets/sample-widget.htm:33
+msgid "Y Coordinate Placeholder"
+msgstr ""
+
+#: afs/templates/views/components/workflows/analysis-areas-workflow/analysis-areas-annotation-step.htm:21
+#: afs/templates/views/components/workflows/sample-taking-workflow/sample-taking-sample-location-step.htm:21
+#: afs/templates/views/components/workflows/upload-dataset/file-interpretation-step.htm:12
+#: afs/templates/views/components/workflows/upload-dataset/select-dataset-files-step.htm:20
+msgid "Dataset"
+msgstr ""
+
+#: afs/templates/views/components/workflows/analysis-areas-workflow/analysis-areas-annotation-step.htm:42
+msgid "Region locations"
+msgstr ""
+
+#: afs/templates/views/components/workflows/analysis-areas-workflow/analysis-areas-annotation-step.htm:47
+#: afs/templates/views/components/workflows/sample-taking-workflow/sample-taking-sample-location-step.htm:45
+msgid "filter..."
+msgstr ""
+
+#: afs/templates/views/components/workflows/analysis-areas-workflow/analysis-areas-annotation-step.htm:122
+msgid "Add New Analysis Area"
+msgstr ""
+
+#: afs/templates/views/components/workflows/analysis-areas-workflow/analysis-areas-annotation-step.htm:139
+msgid "Location"
+msgstr ""
+
+#: afs/templates/views/components/workflows/analysis-areas-workflow/analysis-areas-annotation-step.htm:139
+#: afs/templates/views/components/workflows/analysis-areas-workflow/analysis-areas-annotation-step.htm:304
+#: afs/templates/views/components/workflows/sample-taking-workflow/sample-taking-sample-location-step.htm:138
+#: afs/templates/views/components/workflows/sample-taking-workflow/sample-taking-sample-location-step.htm:306
+msgid "required"
+msgstr ""
+
+#: afs/templates/views/components/workflows/analysis-areas-workflow/analysis-areas-annotation-step.htm:146
+#: afs/templates/views/components/workflows/sample-taking-workflow/sample-taking-sample-location-step.htm:147
+msgid "Hide Style Tools"
+msgstr ""
+
+#: afs/templates/views/components/workflows/analysis-areas-workflow/analysis-areas-annotation-step.htm:146
+#: afs/templates/views/components/workflows/sample-taking-workflow/sample-taking-sample-location-step.htm:147
+msgid "Show Style Tools"
+msgstr ""
+
+#: afs/templates/views/components/workflows/analysis-areas-workflow/analysis-areas-annotation-step.htm:157
+#: afs/templates/views/components/workflows/sample-taking-workflow/sample-taking-sample-location-step.htm:158
+msgid "Line Color"
+msgstr ""
+
+#: afs/templates/views/components/workflows/analysis-areas-workflow/analysis-areas-annotation-step.htm:160
+#: afs/templates/views/components/workflows/sample-taking-workflow/sample-taking-sample-location-step.htm:161
+msgid "Line Color "
+msgstr ""
+
+#: afs/templates/views/components/workflows/analysis-areas-workflow/analysis-areas-annotation-step.htm:166
+#: afs/templates/views/components/workflows/sample-taking-workflow/sample-taking-sample-location-step.htm:167
+msgid "Fill color"
+msgstr ""
+
+#: afs/templates/views/components/workflows/analysis-areas-workflow/analysis-areas-annotation-step.htm:169
+#: afs/templates/views/components/workflows/sample-taking-workflow/sample-taking-sample-location-step.htm:170
+msgid "Fill Color "
+msgstr ""
+
+#: afs/templates/views/components/workflows/analysis-areas-workflow/analysis-areas-annotation-step.htm:175
+#: afs/templates/views/components/workflows/sample-taking-workflow/sample-taking-sample-location-step.htm:176
+msgid "Line Width"
+msgstr ""
+
+#: afs/templates/views/components/workflows/analysis-areas-workflow/analysis-areas-annotation-step.htm:181
+#: afs/templates/views/components/workflows/sample-taking-workflow/sample-taking-sample-location-step.htm:182
+msgid "Line Opacity"
+msgstr ""
+
+#: afs/templates/views/components/workflows/analysis-areas-workflow/analysis-areas-annotation-step.htm:187
+#: afs/templates/views/components/workflows/sample-taking-workflow/sample-taking-sample-location-step.htm:188
+msgid "Point Radius"
+msgstr ""
+
+#: afs/templates/views/components/workflows/analysis-areas-workflow/analysis-areas-annotation-step.htm:193
+#: afs/templates/views/components/workflows/sample-taking-workflow/sample-taking-sample-location-step.htm:194
+msgid "Fill Opacity"
+msgstr ""
+
+#: afs/templates/views/components/workflows/analysis-areas-workflow/analysis-areas-annotation-step.htm:212
+#: afs/templates/views/components/workflows/analysis-areas-workflow/analysis-areas-annotation-step.htm:243
+#: afs/templates/views/components/workflows/sample-taking-workflow/sample-taking-sample-location-step.htm:213
+#: afs/templates/views/components/workflows/sample-taking-workflow/sample-taking-sample-location-step.htm:244
+msgid "Add a new feature..."
+msgstr ""
+
+#: afs/templates/views/components/workflows/analysis-areas-workflow/analysis-areas-annotation-step.htm:291
+#: afs/templates/views/components/workflows/sample-taking-workflow/sample-taking-sample-location-step.htm:292
+msgid "Delete"
+msgstr ""
+
+#: afs/templates/views/components/workflows/analysis-areas-workflow/analysis-areas-annotation-step.htm:304
+msgid "Name for Region (Part)"
+msgstr ""
+
+#: afs/templates/views/components/workflows/analysis-areas-workflow/analysis-areas-annotation-step.htm:408
+#: afs/templates/views/components/workflows/sample-taking-workflow/sample-taking-sample-location-step.htm:400
+#: afs/templates/views/components/workflows/upload-dataset/file-interpretation-step.htm:207
+#: afs/templates/views/components/workflows/upload-dataset/select-dataset-files-step.htm:105
+#: afs/templates/views/components/workflows/upload-dataset/upload-files-step.htm:26
+msgid "Save"
+msgstr ""
+
+#: afs/templates/views/components/workflows/analysis-areas-workflow/analysis-areas-annotation-step.htm:415
+#: afs/templates/views/components/workflows/sample-taking-workflow/sample-taking-sample-location-step.htm:407
+#: afs/templates/views/components/workflows/upload-dataset/file-interpretation-step.htm:208
+#: afs/templates/views/components/workflows/upload-dataset/select-dataset-files-step.htm:109
+#: afs/templates/views/components/workflows/upload-dataset/upload-files-step.htm:25
+msgid "Cancel"
+msgstr ""
+
+#: afs/templates/views/components/workflows/analysis-areas-workflow/analysis-areas-final-step.htm:5
+#: afs/templates/views/components/workflows/sample-taking-workflow/sample-taking-final-step.htm:17
+#: afs/templates/views/components/workflows/upload-dataset/upload-dataset-final-step.htm:17
+msgid "Related Project/Object"
+msgstr ""
+
+#: afs/templates/views/components/workflows/analysis-areas-workflow/analysis-areas-final-step.htm:29
+msgid "Regions"
+msgstr ""
+
+#: afs/templates/views/components/workflows/analysis-areas-workflow/analysis-areas-final-step.htm:44
+msgid "Region(s) of Interest"
+msgstr ""
+
+#: afs/templates/views/components/workflows/create-project-workflow/create-project-final-step.htm:5
+msgid "Created Resource Instance(s)"
+msgstr ""
+
+#: afs/templates/views/components/workflows/create-project-workflow/create-project-final-step.htm:10
+msgid "Project Resource Instance"
+msgstr ""
+
+#: afs/templates/views/components/workflows/create-project-workflow/create-project-final-step.htm:15
+msgid "Collection Resource Instance"
+msgstr ""
+
+#: afs/templates/views/components/workflows/create-project-workflow/create-project-final-step.htm:22
+msgid "Project Details"
+msgstr ""
+
+#: afs/templates/views/components/workflows/create-project-workflow/create-project-final-step.htm:46
+#: afs/templates/views/components/workflows/project-collection-workflow/project-collection-final-step.htm:31
+msgid "Used Physical Things"
+msgstr ""
+
+#: afs/templates/views/components/workflows/create-project-workflow/create-project-final-step.htm:57
+msgid "Related Resource"
+msgstr ""
+
+#: afs/templates/views/components/workflows/project-collection-workflow/project-collection-final-step.htm:18
+msgid "Related Collection"
+msgstr ""
+
+#: afs/templates/views/components/workflows/project-collection-workflow/project-collection-final-step.htm:39
+msgid "Child Physical Things"
+msgstr ""
+
+#: afs/templates/views/components/workflows/review-dataset/review-dataset-final-step.htm:5
+msgid "Selected Resource Instance"
+msgstr ""
+
+#: afs/templates/views/components/workflows/review-dataset/review-dataset-final-step.htm:10
+msgid "Physical Thing Instance"
+msgstr ""
+
+#: afs/templates/views/components/workflows/review-dataset/review-dataset-final-step.htm:18
+msgid "Object"
+msgstr ""
+
+#: afs/templates/views/components/workflows/review-dataset/review-dataset-final-step.htm:34
+#: afs/templates/views/components/workflows/upload-dataset/upload-dataset-final-step.htm:56
+msgid "Files for Upload"
+msgstr ""
+
+#: afs/templates/views/components/workflows/review-dataset/review-dataset-final-step.htm:48
+#: afs/templates/views/components/workflows/upload-dataset/upload-dataset-final-step.htm:70
+msgid "File Name:"
+msgstr ""
+
+#: afs/templates/views/components/workflows/review-dataset/review-dataset-final-step.htm:49
+#: afs/templates/views/components/workflows/upload-dataset/upload-dataset-final-step.htm:71
+msgid "Interpretation"
+msgstr ""
+
+#: afs/templates/views/components/workflows/review-dataset/review-dataset-final-step.htm:50
+#: afs/templates/views/components/workflows/upload-dataset/file-interpretation-step.htm:194
+#: afs/templates/views/components/workflows/upload-dataset/upload-dataset-final-step.htm:72
+msgid "File Parameters"
+msgstr ""
+
+#: afs/templates/views/components/workflows/review-dataset/review-dataset-final-step.htm:63
+#: afs/templates/views/components/workflows/upload-dataset/upload-dataset-final-step.htm:85
+msgid "Files: "
+msgstr ""
+
+#: afs/templates/views/components/workflows/review-dataset/review-dataset-final-step.htm:64
+#: afs/templates/views/components/workflows/upload-dataset/upload-dataset-final-step.htm:86
+msgid " files uploaded"
+msgstr ""
+
+#: afs/templates/views/components/workflows/sample-taking-workflow/sample-taking-final-step.htm:5
+#: afs/templates/views/components/workflows/upload-dataset/upload-dataset-final-step.htm:5
+msgid "Created or Modified Resource Instance"
+msgstr ""
+
+#: afs/templates/views/components/workflows/sample-taking-workflow/sample-taking-final-step.htm:10
+msgid "Sampling Activity Resource Instance"
+msgstr ""
+
+#: afs/templates/views/components/workflows/sample-taking-workflow/sample-taking-final-step.htm:63
+msgid "Sampling Locations"
+msgstr ""
+
+#: afs/templates/views/components/workflows/sample-taking-workflow/sample-taking-final-step.htm:73
+msgid "Sample Name:"
+msgstr ""
+
+#: afs/templates/views/components/workflows/sample-taking-workflow/sample-taking-final-step.htm:75
+msgid "Sampling Motivation"
+msgstr ""
+
+#: afs/templates/views/components/workflows/sample-taking-workflow/sample-taking-final-step.htm:92
+msgid "Sampled locations:"
+msgstr ""
+
+#: afs/templates/views/components/workflows/sample-taking-workflow/sample-taking-sample-location-step.htm:40
+msgid "Sample locations"
+msgstr ""
+
+#: afs/templates/views/components/workflows/sample-taking-workflow/sample-taking-sample-location-step.htm:123
+msgid "Add New Sample"
+msgstr ""
+
+#: afs/templates/views/components/workflows/sample-taking-workflow/sample-taking-sample-location-step.htm:138
+msgid "Sample Location"
+msgstr ""
+
+#: afs/templates/views/components/workflows/sample-taking-workflow/sample-taking-sample-location-step.htm:306
+msgid "Sample Name"
+msgstr ""
+
+#: afs/templates/views/components/workflows/sample-taking-workflow/sample-taking-sample-location-step.htm:352
+msgid "Sample Description"
+msgstr ""
+
+#: afs/templates/views/components/workflows/sample-taking-workflow/sample-taking-sample-location-step.htm:370
+msgid "Motivation for taking this sample"
+msgstr ""
+
+#: afs/templates/views/components/workflows/sample-taking-workflow/sampling-info-step.htm:4
+msgid "Samplers"
+msgstr ""
+
+#: afs/templates/views/components/workflows/sample-taking-workflow/sampling-info-step.htm:20
+msgid "Sampling Date"
+msgstr ""
+
+#: afs/templates/views/components/workflows/sample-taking-workflow/sampling-info-step.htm:31
+msgid "Sampling Activity Type"
+msgstr ""
+
+#: afs/templates/views/components/workflows/sample-taking-workflow/sampling-info-step.htm:42
+msgid "Sampling Motivation (applies to this entire sampling activity)"
+msgstr ""
+
+#: afs/templates/views/components/workflows/sample-taking-workflow/sampling-info-step.htm:52
+msgid "Sampling Technique"
+msgstr ""
+
+#: afs/templates/views/components/workflows/sample-taking-workflow/sampling-info-step.htm:64
+msgid "Sampling Activity Name"
+msgstr ""
+
+#: afs/templates/views/components/workflows/upload-dataset/dataset-step.htm:6
+msgid "Select the option that describes your dataset:"
+msgstr ""
+
+#: afs/templates/views/components/workflows/upload-dataset/dataset-step.htm:26
+msgid "Data from a discrete area/region of interest"
+msgstr ""
+
+#: afs/templates/views/components/workflows/upload-dataset/dataset-step.htm:28
+msgid ""
+"Choose this dataset type for any data resulting from a non-invasive "
+"technique and/or a minimally-invasive/minimally-destructive technique "
+"performed on a larger object but which does not consume the entire object/"
+"sample. This includes datasets from non-invasive techniques performed on "
+"removed samples."
+msgstr ""
+
+#: afs/templates/views/components/workflows/upload-dataset/dataset-step.htm:50
+msgid "Data from the consumption of the sample or object"
+msgstr ""
+
+#: afs/templates/views/components/workflows/upload-dataset/dataset-step.htm:52
+msgid ""
+"Choose this dataset type for any data resulting from the full destruction of "
+"a sample or object."
+msgstr ""
+
+#: afs/templates/views/components/workflows/upload-dataset/file-interpretation-step.htm:55
+msgid "Unable to display the selected file"
+msgstr ""
+
+#: afs/templates/views/components/workflows/upload-dataset/file-interpretation-step.htm:58
+msgid "This file can't be displayed."
+msgstr ""
+
+#: afs/templates/views/components/workflows/upload-dataset/file-interpretation-step.htm:61
+msgid "It may be a proprietary format or there isn't a loader available yet "
+msgstr ""
+
+#: afs/templates/views/components/workflows/upload-dataset/file-interpretation-step.htm:64
+msgid "to present it in this webpage."
+msgstr ""
+
+#: afs/templates/views/components/workflows/upload-dataset/file-interpretation-step.htm:72
+msgid "Unable to parse your file with the "
+msgstr ""
+
+#: afs/templates/views/components/workflows/upload-dataset/file-interpretation-step.htm:73
+msgid "loader"
+msgstr ""
+
+#: afs/templates/views/components/workflows/upload-dataset/file-interpretation-step.htm:77
+msgid "Select File Loader"
+msgstr ""
+
+#: afs/templates/views/components/workflows/upload-dataset/file-interpretation-step.htm:78
+msgid ""
+"Select the loader best suited for processing and visualizing the selected "
+"file"
+msgstr ""
+
+#: afs/templates/views/components/workflows/upload-dataset/file-interpretation-step.htm:109
+msgid "Select"
+msgstr ""
+
+#: afs/templates/views/components/workflows/upload-dataset/file-interpretation-step.htm:124
+msgid "Apply the same loader to all selected files in the dataset"
+msgstr ""
+
+#: afs/templates/views/components/workflows/upload-dataset/file-interpretation-step.htm:155
+msgid "Datasets"
+msgstr ""
+
+#: afs/templates/views/components/workflows/upload-dataset/file-interpretation-step.htm:174
+msgid "Data Files"
+msgstr ""
+
+#: afs/templates/views/components/workflows/upload-dataset/file-interpretation-step.htm:201
+msgid "File Interpretation"
+msgstr ""
+
+#: afs/templates/views/components/workflows/upload-dataset/select-dataset-files-step.htm:29
+msgid "Manage Dataset"
+msgstr ""
+
+#: afs/templates/views/components/workflows/upload-dataset/select-dataset-files-step.htm:36
+msgid "Sampled Locations"
+msgstr ""
+
+#: afs/templates/views/components/workflows/upload-dataset/select-dataset-files-step.htm:51
+msgid "Dataset Name*"
+msgstr ""
+
+#: afs/templates/views/components/workflows/upload-dataset/select-dataset-files-step.htm:57
+msgid "Files in Dataset"
+msgstr ""
+
+#: afs/templates/views/components/workflows/upload-dataset/select-dataset-files-step.htm:80
+msgid "Available Files"
+msgstr ""
+
+#: afs/templates/views/components/workflows/upload-dataset/select-dataset-files-step.htm:92
+#: afs/templates/views/components/workflows/upload-dataset/upload-files-step.htm:71
+msgid "Drag or "
+msgstr ""
+
+#: afs/templates/views/components/workflows/upload-dataset/select-dataset-files-step.htm:92
+#: afs/templates/views/components/workflows/upload-dataset/upload-files-step.htm:71
+msgid "click here "
+msgstr ""
+
+#: afs/templates/views/components/workflows/upload-dataset/select-dataset-files-step.htm:92
+msgid "to upload files"
+msgstr ""
+
+#: afs/templates/views/components/workflows/upload-dataset/upload-dataset-final-step.htm:10
+msgid "Observation Resource Instance"
+msgstr ""
+
+#: afs/templates/views/components/workflows/upload-dataset/upload-dataset-final-step.htm:32
+msgid "Observation Details"
+msgstr ""
+
+#: afs/templates/views/components/workflows/upload-dataset/upload-files-step.htm:15
+msgid "Dataset Name"
+msgstr ""
+
+#: afs/templates/views/components/workflows/upload-dataset/upload-files-step.htm:72
+msgid "to upload more files"
+msgstr ""
+
+#: afs/templates/views/components/workflows/upload-dataset/upload-files-step.htm:85
+msgid " error"
+msgstr ""
+
+#: afs/templates/views/report-templates/thematic.htm:141
+msgid "No data has been added yet."
+msgstr ""
+
+#: afs/templates/views/report-templates/thematic.htm:178
+msgid "Hide empty report sections"
+msgstr ""
+
+#: afs/views/physical_thing_search.py:121
+msgid "There was an error retrieving the search results"
+msgstr ""
+
+#: afs/views/update_resource_list.py:81
+msgid "Request Failed"
+msgstr ""
+
+#: afs/views/update_resource_list.py:81
+msgid "Unable to save"
+msgstr ""
