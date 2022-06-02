@@ -214,13 +214,14 @@ def load_files(files, summary, result, temp_dir, loadid):
     with connection.cursor() as cursor:
         for file in files.keys():
             BranchCsvImporter.stage_excel_file(file, summary, cursor)
+        cursor.execute("""CALL __arches_check_tile_cardinality_violation_for_load(%s)""", [loadid])
         result["validation"] = BranchCsvImporter.validate()
         if len(result["validation"]["data"]) == 0:
             BranchCsvImporter.complete_load(loadid, multiprocessing=False)
         else:
             cursor.execute(
                 """UPDATE load_event SET status = %s, load_end_time = %s WHERE loadid = %s""",
-                ("failed", datetime.now(), self.loadid),
+                ("failed", datetime.now(), loadid),
             )
     shutil.rmtree(temp_dir)
     result["summary"] = summary
