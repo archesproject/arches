@@ -85,6 +85,7 @@ INSTALLED_APPS = (
     "django_celery_results",
     "afs",
     "compressor",
+    "autotranslate",
     # "debug_toolbar"
 )
 
@@ -224,7 +225,7 @@ RENDERERS += [
         "iconclass": "fa fa-bolt",
         "component": "views/components/cards/file-renderers/raman-reader",
         "ext": "txt",
-        "type": "text/plain",   
+        "type": "text/plain",
         "exclude": "",
     },
     {

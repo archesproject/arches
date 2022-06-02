@@ -114,6 +114,7 @@ INSTALLED_APPS = (
     'django_celery_results',
     'compressor',
     'dataspace',
+    'autotranslate',
 )
 
 ALLOWED_HOSTS = ['150.145.56.48', 'localhost']
@@ -317,7 +318,7 @@ LANGUAGE_CODE = "en"
 # {langcode}-{regioncode} eg: en, en-gb ....
 # a list of language codes can be found here http://www.i18nguy.com/unicode/language-identifiers.html
 LANGUAGES = [
-  # ('de', _('German')),
+  ('de', _('German')),
   ('it', _('Italian')),
   ('en', _('English')),
   # ('en-gb', _('British English')),
