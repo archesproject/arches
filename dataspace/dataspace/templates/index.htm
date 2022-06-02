@@ -15,9 +15,9 @@ GNU Affero General Public License for more details.
 You should have received a copy of the GNU Affero General Public License
 along with this program. If not, see <http://www.gnu.org/licenses/>.
 -->
+{% load i18n %}
 {% load staticfiles %}
 {% load template_tags %}
-{% load i18n %}
 <!DOCTYPE html>
 <!--[if IE 8]> <html lang="en" class="ie8"> <![endif]-->
 <!--[if IE 9]> <html lang="en" class="ie9"> <![endif]-->
@@ -106,7 +106,7 @@ The data-spy and data-target are part of the built-in Bootstrap scrollspy functi
                             <img class="navbar-brand-v5-icon" style="margin-top: -2px; height: 40px;" src="{% static 'img/logos/cnr_ispc_compact_white.png' %}" alt="CNR ISPC Logo">
                         </div>
                         <!-- <div class="application-name" style="position: absolute; top: 5px; left: 150px;">
-                            <h2 style="color: #f4f4f4;">{% trans "CNR | ISPC" %}</h2>
+                            <h2 style="color: #f4f4f4;">CNR | ISPC</h2>
                         </div> -->
                     </div>
                 </div>
@@ -114,7 +114,7 @@ The data-spy and data-target are part of the built-in Bootstrap scrollspy functi
                 <div class="collapse navbar-collapse" id="myNavbar">
                     <ul class="nav navbar-nav">
                         <li>
-                            <a href="#info-block-1">{% trans "Who we are" %}</a>
+                            <a href="#info-block-1">{% trans "What is it?" %}</a>
                         </li>
 
                         <li>
@@ -123,7 +123,7 @@ The data-spy and data-target are part of the built-in Bootstrap scrollspy functi
 
                         {% if user|can_create_resource_instance and user.username != 'anonymous' %}
                         <li>
-                            <a href="{% url 'resource' %}" target="_blank">{% trans "Manage" %}</a>
+                            <a href="{% url 'resource' %}" target="_blank">{% trans "Resource Manager" %}</a>
                         </li>
                         {% endif %}
                     </ul>
@@ -134,7 +134,7 @@ The data-spy and data-target are part of the built-in Bootstrap scrollspy functi
                                 <a class="application-login" id="auth-link" href="{% url 'auth' %}?next={% url 'home' %}{% if user.username != 'anonymous' %}&logout=true{% endif %}">{% trans "Sign in" %}</a>
                             {% else %}
                                 <a class="auth-welcome" href="{% url 'user_profile_manager' %}">
-                                    {% trans "Welcome, " %} {{ user.first_name|default:user.username }}
+                                    {% trans "Welcome" %}, {{ user.first_name|default:user.username }}
                                 </a>
                             </li>
                             <li>
@@ -163,7 +163,7 @@ The data-spy and data-target are part of the built-in Bootstrap scrollspy functi
                 </li>
                 <li>
                     <a class="vertical-nav-list-link" href="#info-block-1" data-number="2">
-                        <span class="vertical-nav-list-ref" style="width: 95px">{% trans "Who we are" %}</span>
+                        <span class="vertical-nav-list-ref" style="width: 95px">{% trans "What is it?" %}</span>
                     </a>
                 </li>
                 <li>
@@ -174,11 +174,6 @@ The data-spy and data-target are part of the built-in Bootstrap scrollspy functi
                 <!-- <li>
                     <a class="vertical-nav-list-link" href="#info-block-3" data-number="4">
                         <span class="vertical-nav-list-ref" style="width: 95px">{% trans "Sites" %}</span>
-                    </a>
-                </li>
-                <li>
-                    <a class="vertical-nav-list-link" href="#info-block-4" data-number="5">
-                        <span class="vertical-nav-list-ref" style="width: 95px">{% trans "Technologies" %}</span>
                     </a>
                 </li> -->
             </ul>
@@ -206,7 +201,7 @@ The data-spy and data-target are part of the built-in Bootstrap scrollspy functi
 
                         <!-- Attribution -->
                         <div class="image-attribution">
-                            <span>{% trans "Musei Vaticani | ISPC" %}</span>
+                            <span>{% trans "Vatican Museums" %} | ISPC</span>
                         </div>
                     </li>
 
@@ -229,7 +224,7 @@ The data-spy and data-target are part of the built-in Bootstrap scrollspy functi
 
                         <!-- Attribution -->
                         <div class="image-attribution">
-                            <span>{% trans "Vista Aerea | ISPC" %}</span>
+                            <span>{% trans "Aerial View of " %} | ISPC</span>
                         </div>
                     </li>
 
@@ -251,7 +246,7 @@ The data-spy and data-target are part of the built-in Bootstrap scrollspy functi
 
                         <!-- Attribution -->
                         <div class="image-attribution">
-                            <span>{% trans "Enviq Tool | ISPC" %}</span>
+                            <span>{% trans "Enviq Tool" %} | ISPC</span>
                         </div>
                     </li>
 
@@ -272,7 +267,7 @@ The data-spy and data-target are part of the built-in Bootstrap scrollspy functi
 
                         <!-- Attribution -->
                         <div class="image-attribution">
-                            <span>{% trans "DHiLab ISPC enhancement | ISPC" %}</span>
+                            <span>{% trans "DHiLab ISPC enhancement" %} | ISPC</span>
                         </div>
                     </li>
 
@@ -293,7 +288,7 @@ The data-spy and data-target are part of the built-in Bootstrap scrollspy functi
 
                         <!-- Attribution -->
                         <div class="image-attribution">
-                            <span>{% trans "Alghero (2017) | ISPC" %}</span>
+                            <span>{% trans "Alghero (2017)" %} | ISPC</span>
                         </div>
                     </li>
 
@@ -321,7 +316,7 @@ The data-spy and data-target are part of the built-in Bootstrap scrollspy functi
                     <div class="app-info-block-text">
                         <div class="box-highlight">
                             <p class="app-info-block-text">
-                                {% trans "DATA SPACE è una piattaforma per la condivisione, l’accesso, la conservazione a lungo termine dei dati prodotti dall’Istituto di Scienze del Patrimonio Culturale, che consente l’accesso a strumenti e servizi digitali innovativi per accrescere la conoscenza, la conservazione e la valorizzazione del Patrimonio Culturale, in un’ottica interdisciplinare." %}
+                                {% trans "DATA SPACE is a platform for the sharing, accessing, and long-term conservation of data produced by the Institute of Cultural Heritage Sciences. It allows access to innovative digital tools & services to increase the knowledge and enhance the conservation of the Cultural Heritage in an interdisciplinary perspective." %}
                             </p>
                             <br>
                             <p>
@@ -626,10 +621,10 @@ The data-spy and data-target are part of the built-in Bootstrap scrollspy functi
             <a class="link-spacing" style="margin-right: 115px;" href="https://www.ispc.cnr.it/en/privacy-policy/">{% trans "Privacy Policy" %}</a>
             <p style="color: #91A5CF; display: inline; ">
               Copyright © –
-              <a class="link-spacing" style="margin-right: 0px;" href="http://www.cnr.it/">Consiglio Nazionale delle Ricerche</a> –
-              <a class="link-spacing" style="margin-right: 0px;" href="https://www.ispc.cnr.it/">Istituto di Scienze del Patrimonio Culturale</a> – 2022
+              <a class="link-spacing" style="margin-right: 0px;" href="http://www.cnr.it/">{% trans "National Research Council" %}</a> –
+              <a class="link-spacing" style="margin-right: 0px;" href="https://www.ispc.cnr.it/">{% trans "Cultural Heritgae Sciences Institute" %}</a> – 2022
             </p>
-            <a class="afs-app-footer-arches-link" href="http://www.archesproject.org" target="_blank">Powered by Arches</a>
+            <a class="afs-app-footer-arches-link" href="http://www.archesproject.org" target="_blank">{% trans "Powered by Arches" %}</a>
         </div>
     </div>
     <!-- End Copyright Container -->
