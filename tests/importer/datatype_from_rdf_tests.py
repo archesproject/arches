@@ -221,9 +221,6 @@ class RDFImportUnitTests(ArchesTestCase):
         resp = dt.from_rdf(jf)
         self.assertEqual(resp, "d75977c1-635b-41d5-b53d-1c82d2237b67")
 
-        
-
-
 
 def append_domain_config_to_node(node):
     node.config = {

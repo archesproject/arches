@@ -189,13 +189,18 @@ class ConceptDataType(BaseConceptDataType):
         concept_uri = json_ld_node.get("@id")
         label_node = json_ld_node.get(str(RDFS.label))
         label = None
-        lang = get_language() 
-        if label_node: 
+        lang = get_language()
+        if label_node:
             label, lang = get_value_from_jsonld(label_node)
 
         sql = """
             SELECT * FROM __arches_get_concept_value_from_id_or_label('%s', '%s', '%s', '%s') as t;
-        """ % (concept_uri, lang, label, settings.LANGUAGE_CODE)
+        """ % (
+            concept_uri,
+            lang,
+            label,
+            settings.LANGUAGE_CODE,
+        )
 
         with connection.cursor() as cursor:
             cursor.execute(sql)
