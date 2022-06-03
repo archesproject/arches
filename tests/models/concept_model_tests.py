@@ -19,7 +19,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 from tests import test_settings
 from tests.base_test import ArchesTestCase
 from arches.app.models import models
-from arches.app.models.concept import Concept
+from arches.app.models.concept import Concept, get_preflabel_from_conceptid, get_preflabel_from_valueid
 from arches.app.models.concept import ConceptValue
 
 # these tests can be run from the command line via
@@ -163,3 +163,39 @@ class ConceptModelTests(ArchesTestCase):
         self.assertEqual(pl.type, "prefLabel")
         self.assertEqual(pl.value, "bier" or "beer")
         self.assertEqual(pl.language, "nl" or "es-SP")
+
+    def test_get_preflabel_methods_via_elasticsearch(self):
+        """
+        Test the two methods that rely on Elasticsearch to get the results
+        
+        """
+
+        lang = models.DLanguage()
+        lang.pk = "es-SP"
+        lang.languagename = "Spanish"
+        lang.isdefault = False
+        lang.save()
+
+        concept = Concept()
+        concept.nodetype = "Concept"
+        cv1 = ConceptValue({"type": "prefLabel", "category": "label", "value": "test pref label en-US", "language": "en-US"})
+        cv2 = ConceptValue({"type": "prefLabel", "category": "label", "value": "test pref label es", "language": "es-SP"})
+        cv3 = ConceptValue({"type": "altLabel", "category": "label", "value": "test alt label en-US", "language": "en-US"})
+        concept.values = [cv1, cv2, cv3]
+        concept.save()
+        concept.index()    
+        
+        # I don't like doing this, but it seems ES needs a moment to index the documents before accessing them
+        import time; time.sleep(1)  
+
+        ret = get_preflabel_from_conceptid(concept.id, "es")
+        self.assertEqual(ret["value"], "test pref label es")
+
+        ret = get_preflabel_from_conceptid(concept.id, "en")
+        self.assertEqual(ret["value"], "test pref label en-US")
+
+        ret = get_preflabel_from_valueid(cv2.id, "es")
+        self.assertEqual(ret["value"], "test pref label es")            
+
+        ret = get_preflabel_from_valueid(cv1.id, "en")
+        self.assertEqual(ret["value"], "test pref label en-US")

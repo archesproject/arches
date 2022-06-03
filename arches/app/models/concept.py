@@ -1403,8 +1403,8 @@ def get_preflabel_from_conceptid(conceptid, lang):
     }
     query = Query(se)
     bool_query = Bool()
-    bool_query.filter(Term(field="type.keyword", term="prefLabel"))
-    bool_query.filter(Term(field="conceptid.keyword", term=conceptid))
+    bool_query.filter(Term(field="type", term="prefLabel"))
+    bool_query.filter(Term(field="conceptid", term=conceptid))
     query.add_query(bool_query)
     preflabels = query.search(index=CONCEPTS_INDEX)["hits"]["hits"]
     for preflabel in preflabels:
