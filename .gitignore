@@ -53,3 +53,5 @@ update commit
 pip-wheel-metadata
 
 ispc_dataspace_old
+dataspace/dataspace/reports
+dataspace/dataspace/settings.py
