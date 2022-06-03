@@ -181,7 +181,6 @@ class BranchCsvImporter:
     def stage_excel_file(self, file, summary, cursor):
         if file.endswith("xlsx"):
             summary["files"][file]["worksheets"] = []
-            # workbook = load_workbook(filename=os.path.join(self.temp_dir, file))
             workbook = load_workbook(filename=default_storage.open(os.path.join("uploadedfiles", "tmp", self.loadid, file)))
             try:
                 graphid = workbook.get_sheet_by_name("metadata")["B1"].value
@@ -261,7 +260,6 @@ class BranchCsvImporter:
             shutil.rmtree(self.temp_dir)  # Remove dir if it already exists. os.mkdir won't overwrite
         except (FileNotFoundError):
             pass
-        # os.mkdir(self.temp_dir, 0o770)
         result = {"summary": {"name": content.name, "size": self.filesize_format(content.size), "files": {}}}
         if content.content_type == "application/zip":
             with zipfile.ZipFile(content, "r") as zip_ref:
@@ -323,7 +321,6 @@ class BranchCsvImporter:
                             """UPDATE load_event SET status = %s, load_end_time = %s WHERE loadid = %s""",
                             ("failed", datetime.now(), self.loadid),
                         )
-                # shutil.rmtree(self.temp_dir)
                 result["summary"] = summary
                 return {"success": result["validation"]["success"], "data": result}
 
