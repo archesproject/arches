@@ -295,15 +295,16 @@ class ImportSingleCsv:
                                 if node[key]["valid"] is False:
                                     passes_validation = False
 
+                        tileid = uuid.uuid4()
                         tile_value_json = JSONSerializer().serialize(tile_data)
                         node_depth = 0
 
                         cursor.execute(
                             """
                             INSERT INTO load_staging (
-                                nodegroupid, legacyid, resourceid, value, loadid, nodegroup_depth, source_description, passes_validation
-                            ) VALUES (%s,%s,%s,%s,%s,%s,%s,%s)""",
-                            (nodegroup, legacyid, resourceid, tile_value_json, self.loadid, node_depth, csv_file_name, passes_validation),
+                                nodegroupid, legacyid, resourceid, tileid, value, loadid, nodegroup_depth, source_description, passes_validation
+                            ) VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s)""",
+                            (nodegroup, legacyid, resourceid, tileid, tile_value_json, self.loadid, node_depth, csv_file_name, passes_validation),
                         )
 
                 cursor.execute("""CALL __arches_check_tile_cardinality_violation_for_load(%s)""", [self.loadid])
