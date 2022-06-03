@@ -4,7 +4,7 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ("models", "8042_3_spatialview_db_functions"), 
+        ("models", "8042_3_spatialview_db_functions"),
     ]
 
     operations = [
@@ -65,6 +65,6 @@ class Migration(migrations.Migration):
             """,
             reverse_sql="""
             DROP FUNCTION __arches_get_concept_value_from_id_or_label(text, text, text, text); 
-            """
+            """,
         )
     ]
