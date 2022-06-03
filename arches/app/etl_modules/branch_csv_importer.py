@@ -106,7 +106,7 @@ class BranchCsvImporter:
                 source_value = row_details[key]
                 config = node_details["config"]
                 if datatype == "file-list":
-                    config["path"] = os.path.join('uploadedfiles', 'tmp', self.loadid)
+                    config["path"] = os.path.join("uploadedfiles", "tmp", self.loadid)
                     config["loadid"] = self.loadid
                 try:
                     config["nodeid"] = nodeid
