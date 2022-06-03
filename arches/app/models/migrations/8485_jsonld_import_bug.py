@@ -4,7 +4,7 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ("models", "8042_3_spatialview_db_functions"),
+        ("models", "8009_etlmodule"),
     ]
 
     operations = [
