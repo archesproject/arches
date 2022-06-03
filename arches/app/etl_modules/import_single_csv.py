@@ -143,14 +143,24 @@ class ImportSingleCsv:
                 }
 
         if row[0][0]:
-            index_resources_by_transaction(self.loadid, quiet=True, use_multiprocessing=True)
             with connection.cursor() as cursor:
                 cursor.execute(
                     """UPDATE load_event SET status = %s WHERE loadid = %s""",
                     ("completed", self.loadid),
                 )
+            index_resources_by_transaction(self.loadid, quiet=True, use_multiprocessing=True)
+            with connection.cursor() as cursor:
+                cursor.execute(
+                    """UPDATE load_event SET (status, load_end_time, complete, successful) = (%s, %s, %s, %s) WHERE loadid = %s""",
+                    ("indexed", datetime.now(), True, True, self.loadid),
+                )
             return {"success": True, "data": "success"}
         else:
+            with connection.cursor() as cursor:
+                cursor.execute(
+                    """UPDATE load_event SET status = %s, load_end_time = %s WHERE loadid = %s""",
+                    ("failed", datetime.now(), self.loadid),
+                )
             return {"success": False, "data": "failed"}
 
     def start(self, request):
@@ -240,15 +250,16 @@ class ImportSingleCsv:
                             if node[key]["valid"] is False:
                                 passes_validation = False
 
+                    tileid = uuid.uuid4()
                     tile_value_json = JSONSerializer().serialize(tile_data)
                     node_depth = 0
 
                     cursor.execute(
                         """
                         INSERT INTO load_staging (
-                            nodegroupid, legacyid, resourceid, value, loadid, nodegroup_depth, source_description, passes_validation
-                        ) VALUES (%s,%s,%s,%s,%s,%s,%s,%s)""",
-                        (nodegroup, legacyid, resourceid, tile_value_json, self.loadid, node_depth, file.name, passes_validation),
+                            nodegroupid, legacyid, resourceid, tileid, value, loadid, nodegroup_depth, source_description, passes_validation
+                        ) VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s)""",
+                        (nodegroup, legacyid, resourceid, tileid, tile_value_json, self.loadid, node_depth, file.name, passes_validation),
                     )
 
             cursor.execute("""CALL __arches_check_tile_cardinality_violation_for_load(%s)""", [self.loadid])
