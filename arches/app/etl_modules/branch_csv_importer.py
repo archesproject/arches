@@ -7,11 +7,13 @@ import shutil
 import uuid
 import zipfile
 import arches.app.tasks as tasks
+from django.core.files import File
 from django.http import HttpResponse
 from openpyxl import load_workbook
 from django.db import connection
 from django.db.utils import IntegrityError, ProgrammingError
 from django.utils.translation import ugettext as _
+from django.core.files.storage import default_storage
 from arches.app.datatypes.datatypes import DataTypeFactory
 from arches.app.models.models import Node
 from arches.app.models.system_settings import settings
@@ -104,7 +106,8 @@ class BranchCsvImporter:
                 source_value = row_details[key]
                 config = node_details["config"]
                 if datatype == "file-list":
-                    config["path"] = self.temp_dir
+                    config["path"] = os.path.join("uploadedfiles", "tmp", self.loadid)
+                    config["loadid"] = self.loadid
                 try:
                     config["nodeid"] = nodeid
                 except TypeError:
@@ -178,7 +181,7 @@ class BranchCsvImporter:
     def stage_excel_file(self, file, summary, cursor):
         if file.endswith("xlsx"):
             summary["files"][file]["worksheets"] = []
-            workbook = load_workbook(filename=os.path.join(self.temp_dir, file))
+            workbook = load_workbook(filename=default_storage.open(os.path.join("uploadedfiles", "tmp", self.loadid, file)))
             try:
                 graphid = workbook.get_sheet_by_name("metadata")["B1"].value
             except KeyError:
@@ -252,12 +255,11 @@ class BranchCsvImporter:
         self.loadid = request.POST.get("load_id")
         self.cumulative_excel_files_size = 0
         content = request.FILES["file"]
-        self.temp_dir = os.path.join(settings.APP_ROOT, "tmp", self.loadid)
+        self.temp_dir = os.path.join("uploadedfiles", "tmp", self.loadid)
         try:
             shutil.rmtree(self.temp_dir)  # Remove dir if it already exists. os.mkdir won't overwrite
         except (FileNotFoundError):
             pass
-        os.mkdir(self.temp_dir, 0o770)
         result = {"summary": {"name": content.name, "size": self.filesize_format(content.size), "files": {}}}
         if content.content_type == "application/zip":
             with zipfile.ZipFile(content, "r") as zip_ref:
@@ -269,12 +271,12 @@ class BranchCsvImporter:
                         if not file.is_dir():
                             result["summary"]["files"][file.filename] = {"size": (self.filesize_format(file.file_size))}
                             result["summary"]["cumulative_excel_files_size"] = self.cumulative_excel_files_size
-                        zip_ref.extract(file, self.temp_dir)
+                        default_storage.save(os.path.join(self.temp_dir, file.filename), File(zip_ref.open(file)))
         return {"success": result, "data": result}
 
     def start(self, request):
         self.loadid = request.POST.get("load_id")
-        self.temp_dir = os.path.join(settings.APP_ROOT, "tmp", self.loadid)
+        self.temp_dir = os.path.join("tmp", self.loadid)
         result = {"started": False, "message": ""}
         with connection.cursor() as cursor:
             try:
@@ -289,7 +291,7 @@ class BranchCsvImporter:
 
     def write(self, request):
         self.loadid = request.POST.get("load_id")
-        self.temp_dir = os.path.join(settings.APP_ROOT, "tmp", self.loadid)
+        self.temp_dir = os.path.join("tmp", self.loadid)
         self.file_details = request.POST.get("load_details", None)
         result = {}
         if self.file_details:
@@ -319,7 +321,6 @@ class BranchCsvImporter:
                             """UPDATE load_event SET status = %s, load_end_time = %s WHERE loadid = %s""",
                             ("failed", datetime.now(), self.loadid),
                         )
-                shutil.rmtree(self.temp_dir)
                 result["summary"] = summary
                 return {"success": result["validation"]["success"], "data": result}
 
