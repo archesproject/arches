@@ -304,7 +304,17 @@ class ImportSingleCsv:
                             INSERT INTO load_staging (
                                 nodegroupid, legacyid, resourceid, tileid, value, loadid, nodegroup_depth, source_description, passes_validation
                             ) VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s)""",
-                            (nodegroup, legacyid, resourceid, tileid, tile_value_json, self.loadid, node_depth, csv_file_name, passes_validation),
+                            (
+                                nodegroup,
+                                legacyid,
+                                resourceid,
+                                tileid,
+                                tile_value_json,
+                                self.loadid,
+                                node_depth,
+                                csv_file_name,
+                                passes_validation,
+                            ),
                         )
 
                 cursor.execute("""CALL __arches_check_tile_cardinality_violation_for_load(%s)""", [self.loadid])
