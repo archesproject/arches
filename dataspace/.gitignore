@@ -8,3 +8,5 @@ dataspace/uploadedfiles/*
 dataspace/settings_local.py
 .vscode/
 CACHE
+
+gerry.py
