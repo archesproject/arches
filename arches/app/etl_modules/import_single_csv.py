@@ -86,7 +86,7 @@ class ImportSingleCsv:
             csv_file_name = content.name
             # maybe we can do this:
             # default_storage.save(temp_dir, content)
-            with open(csv_file_path, 'wb+') as destination:
+            with open(csv_file_path, "wb+") as destination:
                 for chunk in content.chunks():
                     destination.write(chunk)
         elif content.content_type == "application/zip":
@@ -210,8 +210,8 @@ class ImportSingleCsv:
         temp_dir = os.path.join(settings.APP_ROOT, "tmp", self.loadid)
         csv_file_path = os.path.join(temp_dir, csv_file_name)
 
-        #read csv file from the default storage
-        #default_storage.open(filename)
+        # read csv file from the default storage
+        # default_storage.open(filename)
         with open(csv_file_path) as csvfile:
             reader = csv.DictReader(csvfile, fieldnames=fieldnames)
 
@@ -245,7 +245,9 @@ class ImportSingleCsv:
                             if datatype == "file-list":
                                 config = current_node.config
                                 config["path"] = temp_dir
-                                value = datatype_instance.transform_value_for_tile(source_value, **config) if source_value is not None else None
+                                value = (
+                                    datatype_instance.transform_value_for_tile(source_value, **config) if source_value is not None else None
+                                )
                                 errors = datatype_instance.validate(value, nodeid=node, path=temp_dir)
                             else:
                                 value = datatype_instance.transform_value_for_tile(source_value) if source_value is not None else None
@@ -253,7 +255,9 @@ class ImportSingleCsv:
                             valid = True if len(errors) == 0 else False
                             error_message = ""
                             for error in errors:
-                                error_message = "{0}|{1}".format(error_message, error["message"]) if error_message != "" else error["message"]
+                                error_message = (
+                                    "{0}|{1}".format(error_message, error["message"]) if error_message != "" else error["message"]
+                                )
 
                             if nodegroupid in dict_by_nodegroup:
                                 dict_by_nodegroup[nodegroupid].append(
