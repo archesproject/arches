@@ -117,7 +117,7 @@ INSTALLED_APPS = (
     'autotranslate',
 )
 
-ALLOWED_HOSTS = ['150.145.56.48', 'localhost']
+ALLOWED_HOSTS = ['150.145.56.88']
 
 SYSTEM_SETTINGS_LOCAL_PATH = os.path.join(APP_ROOT, 'system_settings', 'System_Settings.json')
 WSGI_APPLICATION = 'dataspace.wsgi.application'
