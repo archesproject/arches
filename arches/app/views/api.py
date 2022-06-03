@@ -268,9 +268,7 @@ class GeoJSON(APIBase):
         ).select_related("function")
         if len(graph_function) == 1:
             module = graph_function[0].function.get_class_module()()
-            return module.get_primary_descriptor_from_nodes(
-                self, graph_function[0].config["descriptor_types"]["name"]
-            )
+            return module.get_primary_descriptor_from_nodes(self, graph_function[0].config["descriptor_types"]["name"])
         else:
             return _("Unnamed Resource")
 
@@ -490,6 +488,7 @@ class MVT(APIBase):
 
 @method_decorator(csrf_exempt, name="dispatch")
 class Graphs(APIBase):
+    action = None
     def get(self, request, graph_id=None):
         cards_querystring = request.GET.get("cards", None)
         exclusions_querystring = request.GET.get("exclude", None)
@@ -504,32 +503,33 @@ class Graphs(APIBase):
             exclusions = []
 
         perm = "read_nodegroup"
-        graph = cache.get(f"graph_{graph_id}")
         user = request.user
-
-        if graph is None:
+        if graph_id and not self.action:
             graph = Graph.objects.get(graphid=graph_id)
-        graph = JSONSerializer().serializeToPython(graph, sort_keys=False, exclude=["is_editable", "functions"] + exclusions)
+            graph = JSONSerializer().serializeToPython(graph, sort_keys=False, exclude=["is_editable", "functions"] + exclusions)
 
-        if get_cards:
-            datatypes = models.DDataType.objects.all()
-            cards = CardProxyModel.objects.filter(graph_id=graph_id).order_by("sortorder")
-            permitted_cards = []
-            for card in cards:
-                if user.has_perm(perm, card.nodegroup):
-                    card.filter_by_perm(user, perm)
-                    permitted_cards.append(card)
-            cardwidgets = [
-                widget
-                for widgets in [card.cardxnodexwidget_set.order_by("sortorder").all() for card in permitted_cards]
-                for widget in widgets
-            ]
+            if get_cards:
+                datatypes = models.DDataType.objects.all()
+                cards = CardProxyModel.objects.filter(graph_id=graph_id).order_by("sortorder")
+                permitted_cards = []
+                for card in cards:
+                    if user.has_perm(perm, card.nodegroup):
+                        card.filter_by_perm(user, perm)
+                        permitted_cards.append(card)
+                cardwidgets = [
+                    widget
+                    for widgets in [card.cardxnodexwidget_set.order_by("sortorder").all() for card in permitted_cards]
+                    for widget in widgets
+                ]
 
-            permitted_cards = JSONSerializer().serializeToPython(permitted_cards, sort_keys=False, exclude=["is_editable"])
+                permitted_cards = JSONSerializer().serializeToPython(permitted_cards, sort_keys=False, exclude=["is_editable"])
 
-            return JSONResponse({"datatypes": datatypes, "cards": permitted_cards, "graph": graph, "cardwidgets": cardwidgets})
-        else:
-            return JSONResponse({"graph": graph})
+                return JSONResponse({"datatypes": datatypes, "cards": permitted_cards, "graph": graph, "cardwidgets": cardwidgets})
+            else:
+                return JSONResponse({"graph": graph})
+        elif self.action == "get_graph_models":
+            graphs = models.GraphModel.objects.all()
+            return JSONResponse(JSONSerializer().serializeToPython(graphs))
 
 
 @method_decorator(csrf_exempt, name="dispatch")
@@ -1606,7 +1606,9 @@ class NodeValue(APIBase):
                 data = datatype.update(tile, data, nodeid, action=operation)
 
             # update/create tile
-            new_tile = TileProxyModel.update_node_value(nodeid, data, tileid, resourceinstanceid=resourceid, transaction_id=transaction_id)
+            new_tile = TileProxyModel.update_node_value(
+                nodeid, data, tileid, request=request, resourceinstanceid=resourceid, transaction_id=transaction_id
+            )
 
             response = JSONResponse(new_tile, status=200)
         else:
