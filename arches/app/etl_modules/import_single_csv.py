@@ -84,6 +84,7 @@ class ImportSingleCsv:
         csv_file_name = None
         if content.content_type == "text/csv":
             csv_file_name = content.name
+            csv_file_path = os.path.join(temp_dir, csv_file_name)
             # maybe we can do this:
             # default_storage.save(temp_dir, content)
             with open(csv_file_path, "wb+") as destination:
@@ -96,10 +97,11 @@ class ImportSingleCsv:
                 for file in files:
                     if not file.filename.startswith("__MACOSX") and file.filename.endswith(".csv"):
                         csv_file_name = file.filename
+            csv_file_path = os.path.join(temp_dir, csv_file_name)
+
         if csv_file_name is None:
             return {"success": False, "data": "Csv file not found"}
 
-        csv_file_path = os.path.join(temp_dir, csv_file_name)
         with open(csv_file_path) as csvfile:
             print(csv_file_path)
             reader = csv.reader(csvfile)
