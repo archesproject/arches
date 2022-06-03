@@ -167,7 +167,7 @@ class ConceptModelTests(ArchesTestCase):
     def test_get_preflabel_methods_via_elasticsearch(self):
         """
         Test the two methods that rely on Elasticsearch to get the results
-        
+
         """
 
         lang = models.DLanguage()
@@ -183,10 +183,12 @@ class ConceptModelTests(ArchesTestCase):
         cv3 = ConceptValue({"type": "altLabel", "category": "label", "value": "test alt label en-US", "language": "en-US"})
         concept.values = [cv1, cv2, cv3]
         concept.save()
-        concept.index()    
-        
+        concept.index()
+
         # I don't like doing this, but it seems ES needs a moment to index the documents before accessing them
-        import time; time.sleep(1)  
+        import time
+
+        time.sleep(1)
 
         ret = get_preflabel_from_conceptid(concept.id, "es")
         self.assertEqual(ret["value"], "test pref label es")
@@ -195,7 +197,7 @@ class ConceptModelTests(ArchesTestCase):
         self.assertEqual(ret["value"], "test pref label en-US")
 
         ret = get_preflabel_from_valueid(cv2.id, "es")
-        self.assertEqual(ret["value"], "test pref label es")            
+        self.assertEqual(ret["value"], "test pref label es")
 
         ret = get_preflabel_from_valueid(cv1.id, "en")
         self.assertEqual(ret["value"], "test pref label en-US")
