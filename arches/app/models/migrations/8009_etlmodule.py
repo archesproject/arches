@@ -310,7 +310,7 @@ add_staging_to_tile_function = """
                                 WHEN (_value::jsonb ->> 'datatype') = 'file-list' THEN
                                     FOR _file IN SELECT * FROM jsonb_array_elements(_value::jsonb -> 'value') LOOP
                                         file_id = _file ->> 'file_id';
-                                        UPDATE files SET tileid = tile_id WHERE fileid::text = file_id;
+                                        UPDATE files SET tileid = tile_id WHERE fileid = file_id::uuid;
                                     END LOOP;
                                 WHEN (_value::jsonb ->> 'datatype') in ('resource-instance-list', 'resource-instance') THEN
                                     PERFORM __arches_refresh_tile_resource_relationships(tile_id);

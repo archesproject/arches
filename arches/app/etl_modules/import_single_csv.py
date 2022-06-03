@@ -4,7 +4,10 @@ import io
 from importlib import import_module
 import json
 import logging
+import os
+import shutil
 import uuid
+import zipfile
 from django.db import connection
 from django.db.models.functions import Lower
 from django.db.utils import IntegrityError, ProgrammingError
@@ -70,15 +73,42 @@ class ImportSingleCsv:
         If the loadid already exsists also returns the load_details
         """
 
-        file = request.FILES.get("file")
-        csvfile = file.read().decode("utf-8")
-        reader = csv.reader(io.StringIO(csvfile))
-        data = {"csv": [line for line in reader]}
-        with connection.cursor() as cursor:
-            cursor.execute("""SELECT load_details FROM load_event WHERE loadid = %s""", [self.loadid])
-            row = cursor.fetchall()
-        if len(row) > 0:
-            data["config"] = row[0][0]
+        content = request.FILES.get("file")
+        temp_dir = os.path.join(settings.APP_ROOT, "tmp", self.loadid)
+        try:
+            shutil.rmtree(temp_dir)
+        except (FileNotFoundError):
+            pass
+        os.mkdir(temp_dir, 0o770)
+
+        csv_file_name = None
+        if content.content_type == "text/csv":
+            csv_file_name = content.name
+            # maybe we can do this:
+            # default_storage.save(temp_dir, content)
+            with open(csv_file_path, 'wb+') as destination:
+                for chunk in content.chunks():
+                    destination.write(chunk)
+        elif content.content_type == "application/zip":
+            with zipfile.ZipFile(content, "r") as zip_ref:
+                zip_ref.extractall(temp_dir)
+                files = zip_ref.infolist()
+                for file in files:
+                    if not file.filename.startswith("__MACOSX") and file.filename.endswith(".csv"):
+                        csv_file_name = file.filename
+        if csv_file_name is None:
+            return {"success": False, "data": "Csv file not found"}
+
+        csv_file_path = os.path.join(temp_dir, csv_file_name)
+        with open(csv_file_path) as csvfile:
+            print(csv_file_path)
+            reader = csv.reader(csvfile)
+            data = {"csv": [line for line in reader], "csv_file": csv_file_name}
+            with connection.cursor() as cursor:
+                cursor.execute("""SELECT load_details FROM load_event WHERE loadid = %s""", [self.loadid])
+                row = cursor.fetchall()
+            if len(row) > 0:
+                data["config"] = row[0][0]
         return {"success": True, "data": data}
 
     def validate(self, request):
@@ -151,6 +181,11 @@ class ImportSingleCsv:
                 )
             return {"success": True, "data": "success"}
         else:
+            with connection.cursor() as cursor:
+                cursor.execute(
+                    """UPDATE load_event SET status = %s, load_end_time = %s WHERE loadid = %s""",
+                    ("failed", datetime.now(), self.loadid),
+                )
             return {"success": False, "data": "failed"}
 
     def start(self, request):
@@ -167,92 +202,107 @@ class ImportSingleCsv:
 
     def populate_staging_table(self, request, id_label):
 
-        file = request.FILES.get("file")
         graphid = request.POST.get("graphid")
         has_headers = request.POST.get("hasHeaders")
         fieldnames = request.POST.get("fieldnames").split(",")
-        csvfile = file.read().decode("utf-8")
-        reader = csv.DictReader(io.StringIO(csvfile), fieldnames=fieldnames)
-        if has_headers:
-            next(reader)
+        csv_file_name = request.POST.get("csvFileName")
 
-        with connection.cursor() as cursor:
-            for row in reader:
-                if id_label in row:
-                    try:
-                        resourceid = uuid.UUID(row[id_label])
-                        legacyid = None
-                    except (AttributeError, ValueError):
+        temp_dir = os.path.join(settings.APP_ROOT, "tmp", self.loadid)
+        csv_file_path = os.path.join(temp_dir, csv_file_name)
+
+        #read csv file from the default storage
+        #default_storage.open(filename)
+        with open(csv_file_path) as csvfile:
+            reader = csv.DictReader(csvfile, fieldnames=fieldnames)
+
+            if has_headers:
+                next(reader)
+
+            with connection.cursor() as cursor:
+                for row in reader:
+                    print(row)
+                    if id_label in row:
+                        try:
+                            resourceid = uuid.UUID(row[id_label])
+                            legacyid = None
+                        except (AttributeError, ValueError):
+                            resourceid = uuid.uuid4()
+                            legacyid = row[id_label]
+                    else:
                         resourceid = uuid.uuid4()
-                        legacyid = row[id_label]
-                else:
-                    resourceid = uuid.uuid4()
-                    legacyid = None
+                        legacyid = None
 
-                dict_by_nodegroup = {}
+                    dict_by_nodegroup = {}
 
-                for key in row:
-                    if key != "" and key != id_label:
-                        current_node = self.get_node_lookup(graphid).get(alias=key)
-                        nodegroupid = str(current_node.nodegroup_id)
-                        node = str(current_node.nodeid)
-                        datatype = self.node_lookup[graphid].get(nodeid=node).datatype
-                        datatype_instance = self.datatype_factory.get_instance(datatype)
-                        source_value = row[key]
-                        value = datatype_instance.transform_value_for_tile(source_value) if source_value is not None else None
-                        errors = datatype_instance.validate(value)
-                        valid = True if len(errors) == 0 else False
-                        error_message = ""
-                        for error in errors:
-                            error_message = "{0}|{1}".format(error_message, error["message"]) if error_message != "" else error["message"]
+                    for key in row:
+                        if key != "" and key != id_label:
+                            current_node = self.get_node_lookup(graphid).get(alias=key)
+                            nodegroupid = str(current_node.nodegroup_id)
+                            node = str(current_node.nodeid)
+                            datatype = self.node_lookup[graphid].get(nodeid=node).datatype
+                            datatype_instance = self.datatype_factory.get_instance(datatype)
+                            source_value = row[key]
+                            if datatype == "file-list":
+                                config = current_node.config
+                                config["path"] = temp_dir
+                                value = datatype_instance.transform_value_for_tile(source_value, **config) if source_value is not None else None
+                                errors = datatype_instance.validate(value, nodeid=node, path=temp_dir)
+                            else:
+                                value = datatype_instance.transform_value_for_tile(source_value) if source_value is not None else None
+                                errors = datatype_instance.validate(value)
+                            valid = True if len(errors) == 0 else False
+                            error_message = ""
+                            for error in errors:
+                                error_message = "{0}|{1}".format(error_message, error["message"]) if error_message != "" else error["message"]
 
-                        if nodegroupid in dict_by_nodegroup:
-                            dict_by_nodegroup[nodegroupid].append(
-                                {
-                                    node: {
-                                        "value": value,
-                                        "valid": valid,
-                                        "source": source_value,
-                                        "notes": error_message,
-                                        "datatype": datatype,
+                            if nodegroupid in dict_by_nodegroup:
+                                dict_by_nodegroup[nodegroupid].append(
+                                    {
+                                        node: {
+                                            "value": value,
+                                            "valid": valid,
+                                            "source": source_value,
+                                            "notes": error_message,
+                                            "datatype": datatype,
+                                        }
                                     }
-                                }
-                            )
-                        else:
-                            dict_by_nodegroup[nodegroupid] = [
-                                {
-                                    node: {
-                                        "value": value,
-                                        "valid": valid,
-                                        "source": source_value,
-                                        "notes": error_message,
-                                        "datatype": datatype,
+                                )
+                            else:
+                                dict_by_nodegroup[nodegroupid] = [
+                                    {
+                                        node: {
+                                            "value": value,
+                                            "valid": valid,
+                                            "source": source_value,
+                                            "notes": error_message,
+                                            "datatype": datatype,
+                                        }
                                     }
-                                }
-                            ]
+                                ]
 
-                for nodegroup in dict_by_nodegroup:
-                    tile_data = self.get_blank_tile_lookup(nodegroup)
-                    passes_validation = True
-                    for node in dict_by_nodegroup[nodegroup]:
-                        for key in node:
-                            tile_data[key] = node[key]
-                            if node[key]["valid"] is False:
-                                passes_validation = False
+                    for nodegroup in dict_by_nodegroup:
+                        tile_data = self.get_blank_tile_lookup(nodegroup)
+                        passes_validation = True
+                        for node in dict_by_nodegroup[nodegroup]:
+                            for key in node:
+                                tile_data[key] = node[key]
+                                if node[key]["valid"] is False:
+                                    passes_validation = False
 
-                    tile_value_json = JSONSerializer().serialize(tile_data)
-                    node_depth = 0
+                        tile_value_json = JSONSerializer().serialize(tile_data)
+                        node_depth = 0
 
-                    cursor.execute(
-                        """
-                        INSERT INTO load_staging (
-                            nodegroupid, legacyid, resourceid, value, loadid, nodegroup_depth, source_description, passes_validation
-                        ) VALUES (%s,%s,%s,%s,%s,%s,%s,%s)""",
-                        (nodegroup, legacyid, resourceid, tile_value_json, self.loadid, node_depth, file.name, passes_validation),
-                    )
+                        cursor.execute(
+                            """
+                            INSERT INTO load_staging (
+                                nodegroupid, legacyid, resourceid, value, loadid, nodegroup_depth, source_description, passes_validation
+                            ) VALUES (%s,%s,%s,%s,%s,%s,%s,%s)""",
+                            (nodegroup, legacyid, resourceid, tile_value_json, self.loadid, node_depth, csv_file_name, passes_validation),
+                        )
 
-            cursor.execute("""CALL __arches_check_tile_cardinality_violation_for_load(%s)""", [self.loadid])
+                cursor.execute("""CALL __arches_check_tile_cardinality_violation_for_load(%s)""", [self.loadid])
 
+        shutil.rmtree(temp_dir)
         message = "staging table populated"
         return {"success": True, "data": message}
 
