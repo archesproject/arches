@@ -95,7 +95,7 @@ NOSE_ARGS = ["--with-coverage", "--nologcapture", "--cover-package=arches", "--v
 
 INSTALLED_APPS = INSTALLED_APPS + ("django_nose",)
 
-DATATYPE_LOCATIONS.append('tests.fixtures.datatypes')
+DATATYPE_LOCATIONS.append("tests.fixtures.datatypes")
 
 try:
     from settings_local import *

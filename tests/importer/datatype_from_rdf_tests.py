@@ -23,12 +23,10 @@ from arches.app.utils.data_management.resource_graphs.importer import import_gra
 from arches.app.models.models import ResourceInstance
 from tests.base_test import ArchesTestCase
 from arches.app.utils.skos import SKOSReader
-from arches.app.models.concept import Concept
 from arches.app.datatypes.datatypes import DataTypeFactory
-from rdflib import Namespace, URIRef, Literal, Graph
-from rdflib.namespace import RDF, RDFS, XSD
-from arches.app.utils.data_management.resources.formats.rdffile import RdfWriter
+from rdflib import Namespace
 from mock import Mock
+from django.utils.translation import activate, deactivate
 
 # these tests can be run from the command line via
 # python manage.py test tests/importer/datatype_from_rdf_tests.py --settings="tests.test_settings"
@@ -44,6 +42,7 @@ class RDFImportUnitTests(ArchesTestCase):
 
     @classmethod
     def setUpClass(cls):
+        cls.loadOntology()
         ResourceInstance.objects.all().delete()
 
         for skospath in ["tests/fixtures/data/rdf_export_thesaurus.xml", "tests/fixtures/data/rdf_export_collections.xml"]:
@@ -134,7 +133,7 @@ class RDFImportUnitTests(ArchesTestCase):
             }
         ]
         resp = dt.from_rdf(jf)
-        self.assertTrue(resp == "4beb7055-8a6e-45a3-9bfb-32984b6f82e0")
+        self.assertEqual(resp, "4beb7055-8a6e-45a3-9bfb-32984b6f82e0")
 
     def test_jsonld_concept_external(self):
         dt = self.DT.get_instance("concept")
@@ -146,7 +145,84 @@ class RDFImportUnitTests(ArchesTestCase):
             }
         ]
         resp = dt.from_rdf(jf)
-        self.assertTrue(resp == "d75977c1-635b-41d5-b53d-1c82d2237b67")
+        self.assertEqual(resp, "d75977c1-635b-41d5-b53d-1c82d2237b67")
+
+    def test_jsonld_concept_external_no_label(self):
+        dt = self.DT.get_instance("concept")
+        jf = [
+            {
+                "@id": "http://vocab.getty.edu/aat/300047196",
+                "@type": ["http://www.cidoc-crm.org/cidoc-crm/E55_Type"],
+            }
+        ]
+        activate("en")
+        resp = dt.from_rdf(jf)
+        deactivate()
+        self.assertEqual(resp, "d75977c1-635b-41d5-b53d-1c82d2237b67")
+
+    def test_jsonld_concept_external_no_label_de(self):
+        dt = self.DT.get_instance("concept")
+        jf = [
+            {
+                "@id": "http://vocab.getty.edu/aat/300047196",
+                "@type": ["http://www.cidoc-crm.org/cidoc-crm/E55_Type"],
+            }
+        ]
+        activate("de")
+        resp = dt.from_rdf(jf)
+        deactivate()
+        self.assertEqual(resp, "cf96dd59-b652-4c5e-8d54-9ba044281c87")
+
+    def test_jsonld_unresolveable_conceptid(self):
+        dt = self.DT.get_instance("concept")
+        jf = [
+            {
+                "@id": "http://invalid_conceptid/1234512345",
+                "http://www.w3.org/2000/01/rdf-schema#label": [{"@language": "en", "@value": "junk sculpture"}],
+                "@type": ["http://www.cidoc-crm.org/cidoc-crm/E55_Type"],
+            }
+        ]
+        resp = dt.from_rdf(jf)
+        self.assertEqual(resp, "d75977c1-635b-41d5-b53d-1c82d2237b67")
+
+    def test_jsonld_unresolveable_conceptid_de(self):
+        dt = self.DT.get_instance("concept")
+        jf = [
+            {
+                "@id": "http://invalid_conceptid/1234512345",
+                "http://www.w3.org/2000/01/rdf-schema#label": [{"@language": "de", "@value": "Ger\u00fcmpelplastik"}],
+                "@type": ["http://www.cidoc-crm.org/cidoc-crm/E55_Type"],
+            }
+        ]
+        resp = dt.from_rdf(jf)
+        self.assertEqual(resp, "cf96dd59-b652-4c5e-8d54-9ba044281c87")
+
+    def test_jsonld_unresolveable_conceptid_alt_label(self):
+        dt = self.DT.get_instance("concept")
+        jf = [
+            {
+                "@id": "http://invalid_conceptid/1234512345",
+                "http://www.w3.org/2000/01/rdf-schema#label": [{"@language": "en", "@value": "alt label for junk sculpture"}],
+                "@type": ["http://www.cidoc-crm.org/cidoc-crm/E55_Type"],
+            }
+        ]
+        resp = dt.from_rdf(jf)
+        self.assertEqual(resp, "1fd278d0-f1c1-46d5-a3ee-a8f48b25237b")
+
+    def test_jsonld_concept_invalid_label_but_valid_id(self):
+        dt = self.DT.get_instance("concept")
+        jf = [
+            {
+                "@id": "http://vocab.getty.edu/aat/300047196",
+                "http://www.w3.org/2000/01/rdf-schema#label": [{"@language": "en", "@value": "unmatching label"}],
+                "@type": ["http://www.cidoc-crm.org/cidoc-crm/E55_Type"],
+            }
+        ]
+        resp = dt.from_rdf(jf)
+        self.assertEqual(resp, "d75977c1-635b-41d5-b53d-1c82d2237b67")
+
+        
+
 
 
 def append_domain_config_to_node(node):

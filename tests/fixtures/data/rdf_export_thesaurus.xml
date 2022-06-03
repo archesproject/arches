@@ -17,6 +17,7 @@
     <skos:scopeNote xml:lang="en">{"id": "8324d8bd-25ea-4cca-aa4b-ab7a4cc54300", "value": "Works composed primarily of industrial and modern consumer-culture waste, usually presented as assemblages of found objects."}</skos:scopeNote>
     <skos:prefLabel xml:lang="de">{"id": "cf96dd59-b652-4c5e-8d54-9ba044281c87", "value": "Ger\u00fcmpelplastik"}</skos:prefLabel>
     <skos:prefLabel xml:lang="en">{"id": "d75977c1-635b-41d5-b53d-1c82d2237b67", "value": "junk sculpture"}</skos:prefLabel>
+    <skos:altLabel xml:lang="en">{"id": "1fd278d0-f1c1-46d5-a3ee-a8f48b25237b", "value": "alt label for junk sculpture"}</skos:altLabel>
     <skos:scopeNote xml:lang="de">{"id": "da9e2e6f-2de6-4022-bb81-528be3a05329", "value": "Arbeit, die \u00fcberwiegend aus industriellem und zur modernen Konsumkultur geh\u00f6renden M\u00fcll komponiert ist, meist pr\u00e4sentiert in Verbindung mit Fundobjekten."}</skos:scopeNote>
     <dcterms:identifier xml:lang="en-us">{"id": "ab7e709a-30c4-487f-a061-a5b40cf47f2f", "value": "http://vocab.getty.edu/aat/300047196"}</dcterms:identifier>
     <skos:inScheme rdf:resource="http://localhost:8000/4a10134e-d594-4102-8edf-2f63e18d3b04"/>

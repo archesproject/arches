@@ -1,13 +1,11 @@
 import uuid
 import json
 import decimal
-import base64
 import re
 import logging
 import os
 from pathlib import Path
 import ast
-import time
 from distutils import util
 from datetime import datetime
 from mimetypes import MimeTypes
@@ -20,24 +18,17 @@ from arches.app.utils.date_utils import ExtendedDateFormat
 from arches.app.utils.module_importer import get_class_from_modulename
 from arches.app.utils.permission_backend import user_is_resource_reviewer
 from arches.app.utils.geo_utils import GeoUtils
-import arches.app.utils.task_management as task_management
-from arches.app.search.elasticsearch_dsl_builder import Query, Dsl, Bool, Match, Range, Term, Terms, Nested, Exists, RangeDSLException
+from arches.app.search.elasticsearch_dsl_builder import Query, Dsl, Bool, Match, Range, Term, Terms, Exists, RangeDSLException
 from arches.app.search.search_engine_factory import SearchEngineInstance as se
 from arches.app.search.mappings import RESOURCES_INDEX, RESOURCE_RELATIONS_INDEX
 from django.core.cache import cache
 from django.core.files.base import ContentFile
-from django.utils.translation import ugettext as _
+from django.utils.translation import ugettext as _, get_language
 from django.contrib.gis.geos import GEOSGeometry
 from django.contrib.gis.geos import GeometryCollection
-from django.contrib.gis.geos import fromstr
 from django.contrib.gis.geos import Polygon
 from django.core.exceptions import ObjectDoesNotExist
-from django.core.exceptions import ValidationError
-from django.db import connection, transaction
-
-from elasticsearch import Elasticsearch
-from elasticsearch.exceptions import NotFoundError
-
+from django.db import connection
 
 # One benefit of shifting to python3.x would be to use
 # importlib.util.LazyLoader to load rdflib (and other lesser
@@ -2155,10 +2146,12 @@ class AnnotationDataType(BaseDataType):
 
 def get_value_from_jsonld(json_ld_node):
     try:
-        return (json_ld_node[0].get("@value"), json_ld_node[0].get("@language"))
+        language = json_ld_node[0].get("@language", get_language())
+        return (json_ld_node[0].get("@value"), language)
     except KeyError as e:
         try:
-            return (json_ld_node.get("@value"), json_ld_node.get("@language"))
+            language = json_ld_node.get("@language", get_language())
+            return (json_ld_node.get("@value"), language)
         except AttributeError as e:
             return
     except IndexError as e:
