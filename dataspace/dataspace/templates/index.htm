@@ -102,8 +102,8 @@ The data-spy and data-target are part of the built-in Bootstrap scrollspy functi
                     </button>
 
                     <div class="relative" style="padding-left: 115px; width: 255px;">
-                        <div class="navbar-brand-v5-icon-container" style="top: 4px; height: 45px; width: 130px; background: #091B31; border-radius: 25%; border: 0px solid #000;">
-                            <img class="navbar-brand-v5-icon" style="margin-top: -2px; height: 40px;" src="{% static 'img/logos/cnr_ispc_compact_white.png' %}" alt="CNR ISPC Logo">
+                        <div class="navbar-brand-v5-icon-container">
+                            <img class="navbar-brand-v5-icon" src="{% static 'img/logos/cnr_ispc_compact_white.png' %}" alt="CNR ISPC Logo">
                         </div>
                         <!-- <div class="application-name" style="position: absolute; top: 5px; left: 150px;">
                             <h2 style="color: #f4f4f4;">CNR | ISPC</h2>
@@ -138,7 +138,7 @@ The data-spy and data-target are part of the built-in Bootstrap scrollspy functi
                                 </a>
                             </li>
                             <li>
-                                <a class="application-login" href="{% url 'auth' %}?next={% url 'home' %}{% if user.username != 'anonymous' %}&logout=true{% endif %}">{% trans 'Log off' %}</a>
+                                <a class="application-login" href="{% url 'auth' %}?next={% url 'home' %}{% if user.username != 'anonymous' %}&logout=true{% endif %}">{% trans 'Log out' %}</a>
                             {% endif %}
                         </li>
                     </ul>
@@ -152,23 +152,23 @@ The data-spy and data-target are part of the built-in Bootstrap scrollspy functi
     <!-- Intro Section -->
     <section id="info-block-0" class="app-info-block intro-section relative">
         <!-- Vertical Nav -->
-        <div class="vertical-nav-container-background" style="height: 110px;"></div>
+        <div class="vertical-nav-container-background"></div>
 
         <div id="cd-vertical-nav" class="vertical-nav-container">
             <ul class="vertical-nav-list">
                 <li class="active">
                     <a class="vertical-nav-list-link" href="#info-block-0" data-number="1">
-                        <span class="vertical-nav-list-ref" style="width: 95px">{% trans "Home" %}</span>
+                        <span class="vertical-nav-list-ref">{% trans "Home" %}</span>
                     </a>
                 </li>
                 <li>
                     <a class="vertical-nav-list-link" href="#info-block-1" data-number="2">
-                        <span class="vertical-nav-list-ref" style="width: 95px">{% trans "What is it?" %}</span>
+                        <span class="vertical-nav-list-ref">{% trans "What is it?" %}</span>
                     </a>
                 </li>
                 <li>
                     <a class="vertical-nav-list-link" href="#info-block-2" data-number="3">
-                        <span class="vertical-nav-list-ref" style="width: 95px">{% trans "Resources" %}</span>
+                        <span class="vertical-nav-list-ref">{% trans "Resources" %}</span>
                     </a>
                 </li>
                 <!-- <li>
@@ -209,7 +209,7 @@ The data-spy and data-target are part of the built-in Bootstrap scrollspy functi
                     <!-- SLIDE 2 -->
                     <li data-transition="fade" data-slotamount="9" data-masterspeed="0" data-title="Sky View">
                         <!-- MAIN IMAGE -->
-                        <img src="{% static 'img/landing/QB2006_falso colore.tiff' %}" alt="slidebg2" data-bgfit="cover" data-bgposition="center center" data-bgrepeat="repeat">
+                        <img src="{% static 'img/landing/QB2006_falso colore.jpg' %}" alt="slidebg2" data-bgfit="cover" data-bgposition="center center" data-bgrepeat="repeat">
 
                         <!-- LAYERS -->
                         <!-- NEW LAYER -->
@@ -327,7 +327,7 @@ The data-spy and data-target are part of the built-in Bootstrap scrollspy functi
                 </div>
 
                 <div class="col-md-6 col-lg-6">
-                    <video autoplay muted poster="{% static 'img/landing/bozza_cover.png' %}" controls style="max-width:100%;">
+                    <video poster="{% static 'img/landing/bozza_cover.jpg' %}" controls style="max-width:100%;">
                         <source src="{% static 'img/landing/bozza_video.mp4' %}" type="video/mp4">
                     </video>
                     <hr class=card-inline-separator style="margin-top: 20px">
@@ -397,15 +397,15 @@ The data-spy and data-target are part of the built-in Bootstrap scrollspy functi
             </div>
 
             <!-- Sub-section -->
-            <div class="row app-info-sub-block" style="padding-top: 0px;">
+            <div class="row app-info-sub-block">
 
                 <!-- Arches Data Type Block -->
                 <div class="col-lg-4">
-                    <div class="sub-block-container" style="min-height: 350px; padding: 30px 40px 30px;">
-                        <img class="sub-block-image" style="border: 0px;" src="{% static 'img/icons/research_icon.svg' %}" alt="Research Icon">
+                    <div class="sub-block-container">
+                        <img class="sub-block-image" src="{% static 'img/icons/research_icon.svg' %}" alt="Research Icon">
                         <h2>{% trans "Research Areas" %}</h2>
                         <h1>11</h1>
-                        <p class="sub-block-description" style="padding: 8px 0px 8px;">
+                        <p class="sub-block-description">
                             {% trans "A global overview of the. Etiam vitae elementum orci" %}
                         </p>
                         <hr class=card-inline-separator>
@@ -421,11 +421,11 @@ The data-spy and data-target are part of the built-in Bootstrap scrollspy functi
 
                 <!-- Arches Data Type Block -->
                 <div class="col-lg-4">
-                    <div class="sub-block-container" style="min-height: 350px; padding: 30px 40px 30px;">
-                        <img class="sub-block-image" style="border: 0px;" src="{% static 'img/icons/training_icon.svg' %}" alt="Training Icon">
+                    <div class="sub-block-container">
+                        <img class="sub-block-image" src="{% static 'img/icons/training_icon.svg' %}" alt="Training Icon">
                         <h2>{% trans "Training Resources" %}</h2>
                         <h1>8</h1>
-                        <p class="sub-block-description" style="padding: 20px 0px 8px;">
+                        <p class="sub-block-description">
                             {% trans "Educational resources in the broad field of the Heritage Science domain." %}
                         </p>
                         <hr class=card-inline-separator>
@@ -441,11 +441,11 @@ The data-spy and data-target are part of the built-in Bootstrap scrollspy functi
 
                 <!-- Arches Data Type Block -->
                 <div class="col-lg-4">
-                    <div class="sub-block-container" style="min-height: 350px; padding: 30px 40px 30px;">
-                        <img class="sub-block-image" style="border: 0px;" src="{% static 'img/icons/vres_icon.svg' %}" alt="VREs Icon">
+                    <div class="sub-block-container">
+                        <img class="sub-block-image" src="{% static 'img/icons/vres_icon.svg' %}" alt="VREs Icon">
                         <h2>{% trans "VREs" %}</h2>
                         <h1>4</h1>
-                        <p class="sub-block-description" style="padding: 20px 0px 8px;">
+                        <p class="sub-block-description">
                             {% trans "Innovative Virtual Research Environments developed to serve modern Heritage Science needs." %}
                         </p>
                         <hr class=card-inline-separator>
@@ -463,15 +463,15 @@ The data-spy and data-target are part of the built-in Bootstrap scrollspy functi
             <!-- End Sub-section -->
 
             <!-- Sub-section 2-->
-            <div class="row app-info-sub-block" style="padding-top: 0px;">
+            <div class="row app-info-sub-block">
 
                 <!-- Arches Data Type Block -->
                 <div class="col-lg-4">
-                    <div class="sub-block-container" style="min-height: 350px; padding: 30px 40px 30px;">
-                        <img class="sub-block-image" style="border: 0px;" src="{% static 'img/icons/datasets_icon.svg' %}" alt="Research Icon">
+                    <div class="sub-block-container">
+                        <img class="sub-block-image" src="{% static 'img/icons/datasets_icon.svg' %}" alt="Research Icon">
                         <h2>{% trans "Datasets" %}</h2>
                         <h1>13</h1>
-                        <p class="sub-block-description" style="padding: 20px 0px 8px;">
+                        <p class="sub-block-description">
                             {% trans "Main point of access for searching and browsing datasets" %}
                         </p>
                         <hr class=card-inline-separator>
@@ -487,11 +487,11 @@ The data-spy and data-target are part of the built-in Bootstrap scrollspy functi
 
                 <!-- Arches Data Type Block -->
                 <div class="col-lg-4">
-                    <div class="sub-block-container" style="min-height: 350px; padding: 30px 40px 30px;">
-                        <img class="sub-block-image" style="border: 0px;" src="{% static 'img/icons/services_icon.svg' %}" alt="Training Icon">
+                    <div class="sub-block-container">
+                        <img class="sub-block-image" src="{% static 'img/icons/services_icon.svg' %}" alt="Training Icon">
                         <h2>{% trans "Services" %}</h2>
                         <h1>6</h1>
-                        <p class="sub-block-description" style="padding: 20px 0px 8px;">
+                        <p class="sub-block-description">
                             {% trans "Main point of access for innovative services in Heritage Science discipline." %}
                         </p>
                         <hr class=card-inline-separator>
@@ -507,11 +507,11 @@ The data-spy and data-target are part of the built-in Bootstrap scrollspy functi
 
                 <!-- Arches Data Type Block -->
                 <div class="col-lg-4">
-                    <div class="sub-block-container" style="min-height: 350px; padding: 30px 40px 30px;">
-                        <img class="sub-block-image" style="border: 0px;" src="{% static 'img/icons/workflows_icon.svg' %}" alt="VREs Icon">
+                    <div class="sub-block-container">
+                        <img class="sub-block-image" src="{% static 'img/icons/workflows_icon.svg' %}" alt="VREs Icon">
                         <h2>{% trans "Workflows" %}</h2>
                         <h1>12</h1>
-                        <p class="sub-block-description" style="padding: 20px 0px 8px;">
+                        <p class="sub-block-description">
                             {% trans "Practical solutions for the formalization and description of research workflows" %}
                         </p>
                         <hr class=card-inline-separator>
