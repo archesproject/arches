@@ -282,11 +282,8 @@ add_staging_to_tile_function = """
                                 END IF;
                                 tile_data = jsonb_set(tile_data, format('{"%s"}', _key)::text[], coalesce(tile_data_value, 'null'));
                             END LOOP;
-                        IF tile_id IS null THEN
-                            tile_id = uuid_generate_v1mc();
-                        END IF;
 
-                        SELECT tiledata FROM tiles INTO old_data WHERE resourceinstanceid = instance_id;
+                        SELECT tiledata FROM tiles INTO old_data WHERE resourceinstanceid = instance_id AND tileid = tile_id;
                         IF NOT FOUND THEN
                             old_data = null;
                         END IF;
