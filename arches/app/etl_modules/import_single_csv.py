@@ -100,7 +100,7 @@ class ImportSingleCsv:
         if csv_file_name is None:
             return {"success": False, "data": "Csv file not found"}
 
-        with default_storage.open(csv_file_path, mode='r') as csvfile:
+        with default_storage.open(csv_file_path, mode="r") as csvfile:
             reader = csv.reader(csvfile)
             data = {"csv": [line for line in reader], "csv_file": csv_file_name}
             with connection.cursor() as cursor:
@@ -209,7 +209,7 @@ class ImportSingleCsv:
         temp_dir = os.path.join("uploadedfiles", "tmp", self.loadid)
         csv_file_path = os.path.join(temp_dir, csv_file_name)
 
-        with default_storage.open(csv_file_path, mode='r') as csvfile:
+        with default_storage.open(csv_file_path, mode="r") as csvfile:
             reader = csv.DictReader(csvfile, fieldnames=fieldnames)
 
             if has_headers:
@@ -313,7 +313,7 @@ class ImportSingleCsv:
 
                 cursor.execute("""CALL __arches_check_tile_cardinality_violation_for_load(%s)""", [self.loadid])
 
-        #default_storage.delete(temp_dir)
+        # default_storage.delete(temp_dir)
         message = "staging table populated"
         return {"success": True, "data": message}
 
