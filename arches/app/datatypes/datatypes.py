@@ -24,9 +24,9 @@ from arches.app.search.mappings import RESOURCES_INDEX, RESOURCE_RELATIONS_INDEX
 from django.core.cache import cache
 from django.core.files import File
 from django.core.files.base import ContentFile
-from django.core.files.storage import FileSystemStorage
 from django.utils.translation import ugettext as _, get_language
 from django.contrib.gis.geos import GEOSGeometry, GeometryCollection, Polygon
+from django.core.files.storage import default_storage
 from django.core.exceptions import ObjectDoesNotExist
 from django.db import connection
 
@@ -1249,8 +1249,7 @@ class FileListDataType(BaseDataType):
                         errors.append({"type": "ERROR", "message": message})
             if path:
                 for file in value:
-                    if not os.path.exists(os.path.join(settings.APP_ROOT, path, file["name"])):
-                        print(os.path.join(settings.APP_ROOT, path, file["name"]))
+                    if not default_storage.exists(os.path.join("uploadedfiles", path, file["name"])):
                         message = _('The file "{0}" does not exist in "{1}"'.format(file["name"], os.path.join(settings.APP_ROOT, path)))
                         errors.append({"type": "ERROR", "message": message})
         except Exception as e:
@@ -1391,13 +1390,13 @@ class FileListDataType(BaseDataType):
             file_path = "uploadedfiles/" + str(tile_file["name"])
             tile_file["file_id"] = str(uuid.uuid4())
             if source_path:
-                source_file = os.path.join(settings.APP_ROOT, source_path, tile_file["name"])
-                fs = FileSystemStorage(location=os.path.join(settings.MEDIA_ROOT, "uploadedfiles"))
+                source_file = os.path.join(source_path, tile_file["name"])
+                fs = default_storage
                 try:
-                    with open(source_file, "rb") as f:
+                    with default_storage.open(source_file) as f:
                         current_file, created = models.File.objects.get_or_create(fileid=tile_file["file_id"])
-                        filename = fs.save(os.path.basename(f.name), File(f))
-                        current_file.path = os.path.join("uploadedfiles", filename)
+                        filename = fs.save(os.path.join("uploadedfiles", os.path.basename(f.name)), File(f))
+                        current_file.path = os.path.join(filename)
                         current_file.save()
                 except FileNotFoundError:
                     logger.exception(_("File does not exist"))
