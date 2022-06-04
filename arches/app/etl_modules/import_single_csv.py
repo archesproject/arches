@@ -8,6 +8,8 @@ import os
 import shutil
 import uuid
 import zipfile
+from django.core.files import File
+from django.core.files.storage import default_storage
 from django.db import connection
 from django.db.models.functions import Lower
 from django.db.utils import IntegrityError, ProgrammingError
@@ -74,36 +76,31 @@ class ImportSingleCsv:
         """
 
         content = request.FILES.get("file")
-        temp_dir = os.path.join(settings.APP_ROOT, "tmp", self.loadid)
+        temp_dir = os.path.join("uploadedfiles", "tmp", self.loadid)
         try:
             shutil.rmtree(temp_dir)
         except (FileNotFoundError):
             pass
-        os.mkdir(temp_dir, 0o770)
 
         csv_file_name = None
         if content.content_type == "text/csv":
             csv_file_name = content.name
             csv_file_path = os.path.join(temp_dir, csv_file_name)
-            # maybe we can do this:
-            # default_storage.save(temp_dir, content)
-            with open(csv_file_path, "wb+") as destination:
-                for chunk in content.chunks():
-                    destination.write(chunk)
+            default_storage.save(csv_file_path, content)
         elif content.content_type == "application/zip":
             with zipfile.ZipFile(content, "r") as zip_ref:
-                zip_ref.extractall(temp_dir)
                 files = zip_ref.infolist()
                 for file in files:
-                    if not file.filename.startswith("__MACOSX") and file.filename.endswith(".csv"):
-                        csv_file_name = file.filename
+                    if not file.filename.startswith("__MACOSX"):
+                        default_storage.save(os.path.join(temp_dir, file.filename), File(zip_ref.open(file)))
+                        if file.filename.endswith(".csv"):
+                            csv_file_name = file.filename
             csv_file_path = os.path.join(temp_dir, csv_file_name)
 
         if csv_file_name is None:
             return {"success": False, "data": "Csv file not found"}
 
-        with open(csv_file_path) as csvfile:
-            print(csv_file_path)
+        with default_storage.open(csv_file_path, mode='r') as csvfile:
             reader = csv.reader(csvfile)
             data = {"csv": [line for line in reader], "csv_file": csv_file_name}
             with connection.cursor() as cursor:
@@ -209,12 +206,10 @@ class ImportSingleCsv:
         fieldnames = request.POST.get("fieldnames").split(",")
         csv_file_name = request.POST.get("csvFileName")
 
-        temp_dir = os.path.join(settings.APP_ROOT, "tmp", self.loadid)
+        temp_dir = os.path.join("uploadedfiles", "tmp", self.loadid)
         csv_file_path = os.path.join(temp_dir, csv_file_name)
 
-        # read csv file from the default storage
-        # default_storage.open(filename)
-        with open(csv_file_path) as csvfile:
+        with default_storage.open(csv_file_path, mode='r') as csvfile:
             reader = csv.DictReader(csvfile, fieldnames=fieldnames)
 
             if has_headers:
@@ -222,7 +217,6 @@ class ImportSingleCsv:
 
             with connection.cursor() as cursor:
                 for row in reader:
-                    print(row)
                     if id_label in row:
                         try:
                             resourceid = uuid.UUID(row[id_label])
@@ -319,7 +313,7 @@ class ImportSingleCsv:
 
                 cursor.execute("""CALL __arches_check_tile_cardinality_violation_for_load(%s)""", [self.loadid])
 
-        shutil.rmtree(temp_dir)
+        #default_storage.delete(temp_dir)
         message = "staging table populated"
         return {"success": True, "data": message}
 

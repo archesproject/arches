@@ -1260,7 +1260,7 @@ class FileListDataType(BaseDataType):
                         errors.append({"type": "ERROR", "message": message})
             if path:
                 for file in value:
-                    if not default_storage.exists(os.path.join("uploadedfiles", path, file["name"])):
+                    if not default_storage.exists(os.path.join(path, file["name"])):
                         message = _('The file "{0}" does not exist in "{1}"'.format(file["name"], os.path.join(settings.APP_ROOT, path)))
                         errors.append({"type": "ERROR", "message": message})
         except Exception as e:
