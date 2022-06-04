@@ -4,7 +4,10 @@ import io
 from importlib import import_module
 import json
 import logging
+import os
+import shutil
 import uuid
+import zipfile
 from django.db import connection
 from django.db.models.functions import Lower
 from django.db.utils import IntegrityError, ProgrammingError
@@ -15,20 +18,22 @@ from arches.app.models.graph import Graph
 from arches.app.models.resource import Resource
 from arches.app.models.tile import Tile
 from arches.app.models.system_settings import settings
+import arches.app.tasks as tasks
 from arches.app.utils.response import JSONResponse
 from arches.app.utils.betterJSONSerializer import JSONSerializer
 from arches.app.utils.index_database import index_resources_by_type
 from arches.app.utils.index_database import index_resources_by_transaction
+import arches.app.utils.task_management as task_management
 
 logger = logging.getLogger(__name__)
 
 
 class ImportSingleCsv:
     def __init__(self, request=None):
-        self.request = request
-        self.userid = request.user.id
-        self.loadid = request.POST.get("load_id")
-        self.moduleid = request.POST.get("module")
+        self.request = request if request else None
+        self.userid = request.user.id if request else None
+        self.loadid = request.POST.get("load_id") if request else None
+        self.moduleid = request.POST.get("module") if request else None
         self.datatype_factory = DataTypeFactory()
         self.node_lookup = {}
         self.blank_tile_lookup = {}
@@ -70,18 +75,47 @@ class ImportSingleCsv:
         If the loadid already exsists also returns the load_details
         """
 
-        file = request.FILES.get("file")
-        csvfile = file.read().decode("utf-8")
-        reader = csv.reader(io.StringIO(csvfile))
-        data = {"csv": [line for line in reader]}
-        with connection.cursor() as cursor:
-            cursor.execute("""SELECT load_details FROM load_event WHERE loadid = %s""", [self.loadid])
-            row = cursor.fetchall()
-        if len(row) > 0:
-            data["config"] = row[0][0]
+        content = request.FILES.get("file")
+        temp_dir = os.path.join(settings.APP_ROOT, "tmp", self.loadid)
+        try:
+            shutil.rmtree(temp_dir)
+        except (FileNotFoundError):
+            pass
+        os.mkdir(temp_dir, 0o770)
+
+        csv_file_name = None
+        if content.content_type == "text/csv":
+            csv_file_name = content.name
+            csv_file_path = os.path.join(temp_dir, csv_file_name)
+            # maybe we can do this:
+            # default_storage.save(temp_dir, content)
+            with open(csv_file_path, "wb+") as destination:
+                for chunk in content.chunks():
+                    destination.write(chunk)
+        elif content.content_type == "application/zip":
+            with zipfile.ZipFile(content, "r") as zip_ref:
+                zip_ref.extractall(temp_dir)
+                files = zip_ref.infolist()
+                for file in files:
+                    if not file.filename.startswith("__MACOSX") and file.filename.endswith(".csv"):
+                        csv_file_name = file.filename
+            csv_file_path = os.path.join(temp_dir, csv_file_name)
+
+        if csv_file_name is None:
+            return {"success": False, "data": "Csv file not found"}
+
+        with open(csv_file_path) as csvfile:
+            print(csv_file_path)
+            reader = csv.reader(csvfile)
+            data = {"csv": [line for line in reader], "csv_file": csv_file_name}
+            with connection.cursor() as cursor:
+                cursor.execute("""SELECT load_details FROM load_event WHERE loadid = %s""", [self.loadid])
+                row = cursor.fetchall()
+            if len(row) > 0:
+                data["config"] = row[0][0]
         return {"success": True, "data": data}
 
-    def validate(self, request):
+    def validate(self):
         """
         Creates records in the load_staging table (validated before poulating the load_staging table with error message)
         Collects error messages if any and returns table of error messages
@@ -97,9 +131,13 @@ class ImportSingleCsv:
         Move the records from load_staging to tiles table using db function
         """
 
+        graphid = request.POST.get("graphid")
+        has_headers = request.POST.get("hasHeaders")
         fieldnames = request.POST.get("fieldnames").split(",")
+        csv_file_name = request.POST.get("csvFileName")
         column_names = [fieldname for fieldname in fieldnames if fieldname != ""]
         id_label = "resourceid"
+
         error_message = None
         if len(column_names) == 0:
             error_message = _("No valid node is selected")
@@ -113,27 +151,53 @@ class ImportSingleCsv:
                 )
             return {"success": False, "data": error_message}
 
-        self.populate_staging_table(request, id_label)
+        number_of_row = 100
+        use_celery_threshold = 10
+        if number_of_row > use_celery_threshold:
+            if task_management.check_if_celery_available():
+                logger.info("Delegating load to Celery task")
+                tasks.load_single_csv.apply_async(
+                    (self.loadid, graphid, has_headers, fieldnames, csv_file_name, id_label),
+                )
+                result = _("delegated_to_celery")
+                return {"success": True, "data": result}
+            else:
+                err = _("Celery appears not to be running, you need to have celery running in order to immport large csv.")
+                with connection.cursor() as cursor:
+                    cursor.execute(
+                        """UPDATE load_event SET status = %s, load_end_time = %s WHERE loadid = %s""",
+                        ("failed", datetime.now(), self.loadid),
+                    )
+                return {"success": False, "data": err}
 
-        validation = self.validate(request)
+        else:
+            response = self.run_load_task(self.loadid, graphid, has_headers, fieldnames, csv_file_name, id_label)
+
+        return response
+
+    def run_load_task(self, loadid, graphid, has_headers, fieldnames, csv_file_name, id_label):
+
+        self.populate_staging_table(loadid, graphid, has_headers, fieldnames, csv_file_name, id_label)
+
+        validation = self.validate()
         if len(validation["data"]) != 0:
             with connection.cursor() as cursor:
                 cursor.execute(
                     """UPDATE load_event SET status = %s, load_end_time = %s WHERE loadid = %s""",
-                    ("failed", datetime.now(), self.loadid),
+                    ("failed", datetime.now(), loadid),
                 )
             return {"success": False, "data": "failed"}
         else:
             try:
                 with connection.cursor() as cursor:
-                    cursor.execute("""SELECT * FROM __arches_staging_to_tile(%s)""", [self.loadid])
+                    cursor.execute("""SELECT * FROM __arches_staging_to_tile(%s)""", [loadid])
                     row = cursor.fetchall()
             except (IntegrityError, ProgrammingError) as e:
                 logger.error(e)
                 with connection.cursor() as cursor:
                     cursor.execute(
                         """UPDATE load_event SET status = %s, load_end_time = %s WHERE loadid = %s""",
-                        ("failed", datetime.now(), self.loadid),
+                        ("failed", datetime.now(), loadid),
                     )
                 return {
                     "status": 400,
@@ -143,14 +207,19 @@ class ImportSingleCsv:
                 }
 
         if row[0][0]:
-            index_resources_by_transaction(self.loadid, quiet=True, use_multiprocessing=True)
+            index_resources_by_transaction(loadid, quiet=True, use_multiprocessing=False)
             with connection.cursor() as cursor:
                 cursor.execute(
                     """UPDATE load_event SET status = %s WHERE loadid = %s""",
-                    ("completed", self.loadid),
+                    ("completed", loadid),
                 )
             return {"success": True, "data": "success"}
         else:
+            with connection.cursor() as cursor:
+                cursor.execute(
+                    """UPDATE load_event SET status = %s, load_end_time = %s WHERE loadid = %s""",
+                    ("failed", datetime.now(), loadid),
+                )
             return {"success": False, "data": "failed"}
 
     def start(self, request):
@@ -165,94 +234,118 @@ class ImportSingleCsv:
         message = "load event created"
         return {"success": True, "data": message}
 
-    def populate_staging_table(self, request, id_label):
+    def populate_staging_table(self, loadid, graphid, has_headers, fieldnames, csv_file_name, id_label):
 
-        file = request.FILES.get("file")
-        graphid = request.POST.get("graphid")
-        has_headers = request.POST.get("hasHeaders")
-        fieldnames = request.POST.get("fieldnames").split(",")
-        csvfile = file.read().decode("utf-8")
-        reader = csv.DictReader(io.StringIO(csvfile), fieldnames=fieldnames)
-        if has_headers:
-            next(reader)
+        temp_dir = os.path.join(settings.APP_ROOT, "tmp", loadid)
+        csv_file_path = os.path.join(temp_dir, csv_file_name)
 
-        with connection.cursor() as cursor:
-            for row in reader:
-                if id_label in row:
-                    try:
-                        resourceid = uuid.UUID(row[id_label])
-                        legacyid = None
-                    except (AttributeError, ValueError):
+        # read csv file from the default storage
+        # default_storage.open(filename)
+        with open(csv_file_path) as csvfile:
+            reader = csv.DictReader(csvfile, fieldnames=fieldnames)
+
+            if has_headers:
+                next(reader)
+
+            with connection.cursor() as cursor:
+                for row in reader:
+                    if id_label in row:
+                        try:
+                            resourceid = uuid.UUID(row[id_label])
+                            legacyid = None
+                        except (AttributeError, ValueError):
+                            resourceid = uuid.uuid4()
+                            legacyid = row[id_label]
+                    else:
                         resourceid = uuid.uuid4()
-                        legacyid = row[id_label]
-                else:
-                    resourceid = uuid.uuid4()
-                    legacyid = None
+                        legacyid = None
 
-                dict_by_nodegroup = {}
+                    dict_by_nodegroup = {}
 
-                for key in row:
-                    if key != "" and key != id_label:
-                        current_node = self.get_node_lookup(graphid).get(alias=key)
-                        nodegroupid = str(current_node.nodegroup_id)
-                        node = str(current_node.nodeid)
-                        datatype = self.node_lookup[graphid].get(nodeid=node).datatype
-                        datatype_instance = self.datatype_factory.get_instance(datatype)
-                        source_value = row[key]
-                        value = datatype_instance.transform_value_for_tile(source_value) if source_value is not None else None
-                        errors = datatype_instance.validate(value)
-                        valid = True if len(errors) == 0 else False
-                        error_message = ""
-                        for error in errors:
-                            error_message = "{0}|{1}".format(error_message, error["message"]) if error_message != "" else error["message"]
+                    for key in row:
+                        if key != "" and key != id_label:
+                            current_node = self.get_node_lookup(graphid).get(alias=key)
+                            nodegroupid = str(current_node.nodegroup_id)
+                            node = str(current_node.nodeid)
+                            datatype = self.node_lookup[graphid].get(nodeid=node).datatype
+                            datatype_instance = self.datatype_factory.get_instance(datatype)
+                            source_value = row[key]
+                            if datatype == "file-list":
+                                config = current_node.config
+                                config["path"] = temp_dir
+                                value = (
+                                    datatype_instance.transform_value_for_tile(source_value, **config) if source_value is not None else None
+                                )
+                                errors = datatype_instance.validate(value, nodeid=node, path=temp_dir)
+                            else:
+                                value = datatype_instance.transform_value_for_tile(source_value) if source_value is not None else None
+                                errors = datatype_instance.validate(value)
+                            valid = True if len(errors) == 0 else False
+                            error_message = ""
+                            for error in errors:
+                                error_message = (
+                                    "{0}|{1}".format(error_message, error["message"]) if error_message != "" else error["message"]
+                                )
 
-                        if nodegroupid in dict_by_nodegroup:
-                            dict_by_nodegroup[nodegroupid].append(
-                                {
-                                    node: {
-                                        "value": value,
-                                        "valid": valid,
-                                        "source": source_value,
-                                        "notes": error_message,
-                                        "datatype": datatype,
+                            if nodegroupid in dict_by_nodegroup:
+                                dict_by_nodegroup[nodegroupid].append(
+                                    {
+                                        node: {
+                                            "value": value,
+                                            "valid": valid,
+                                            "source": source_value,
+                                            "notes": error_message,
+                                            "datatype": datatype,
+                                        }
                                     }
-                                }
-                            )
-                        else:
-                            dict_by_nodegroup[nodegroupid] = [
-                                {
-                                    node: {
-                                        "value": value,
-                                        "valid": valid,
-                                        "source": source_value,
-                                        "notes": error_message,
-                                        "datatype": datatype,
+                                )
+                            else:
+                                dict_by_nodegroup[nodegroupid] = [
+                                    {
+                                        node: {
+                                            "value": value,
+                                            "valid": valid,
+                                            "source": source_value,
+                                            "notes": error_message,
+                                            "datatype": datatype,
+                                        }
                                     }
-                                }
-                            ]
+                                ]
 
-                for nodegroup in dict_by_nodegroup:
-                    tile_data = self.get_blank_tile_lookup(nodegroup)
-                    passes_validation = True
-                    for node in dict_by_nodegroup[nodegroup]:
-                        for key in node:
-                            tile_data[key] = node[key]
-                            if node[key]["valid"] is False:
-                                passes_validation = False
+                    for nodegroup in dict_by_nodegroup:
+                        tile_data = self.get_blank_tile_lookup(nodegroup)
+                        passes_validation = True
+                        for node in dict_by_nodegroup[nodegroup]:
+                            for key in node:
+                                tile_data[key] = node[key]
+                                if node[key]["valid"] is False:
+                                    passes_validation = False
 
-                    tile_value_json = JSONSerializer().serialize(tile_data)
-                    node_depth = 0
+                        tileid = uuid.uuid4()
+                        tile_value_json = JSONSerializer().serialize(tile_data)
+                        node_depth = 0
 
-                    cursor.execute(
-                        """
-                        INSERT INTO load_staging (
-                            nodegroupid, legacyid, resourceid, value, loadid, nodegroup_depth, source_description, passes_validation
-                        ) VALUES (%s,%s,%s,%s,%s,%s,%s,%s)""",
-                        (nodegroup, legacyid, resourceid, tile_value_json, self.loadid, node_depth, file.name, passes_validation),
-                    )
+                        cursor.execute(
+                            """
+                            INSERT INTO load_staging (
+                                nodegroupid, legacyid, resourceid, tileid, value, loadid, nodegroup_depth, source_description, passes_validation
+                            ) VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s)""",
+                            (
+                                nodegroup,
+                                legacyid,
+                                resourceid,
+                                tileid,
+                                tile_value_json,
+                                loadid,
+                                node_depth,
+                                csv_file_name,
+                                passes_validation,
+                            ),
+                        )
 
-            cursor.execute("""CALL __arches_check_tile_cardinality_violation_for_load(%s)""", [self.loadid])
+                cursor.execute("""CALL __arches_check_tile_cardinality_violation_for_load(%s)""", [loadid])
 
+        shutil.rmtree(temp_dir)
         message = "staging table populated"
         return {"success": True, "data": message}
 
