@@ -13,12 +13,12 @@ html, body {
     padding-top: 5px;
     font-size: 14px;
     font-weight: 300;
-    background: #0B2152;
+    background: #213B55;
 }
 
 .lang-switch .chosen-single {
     border: none;
-    color: #0B2152;
+    color: #213B55;
     margin-top: 8px;
     box-shadow: none;
     border-radius: 3px;
@@ -31,7 +31,7 @@ html, body {
 }
 
 .lang-switch .chosen-drop {
-    background: #0B2152;
+    background: #213B55;
 }
 
 .lang-switch b {
@@ -69,7 +69,7 @@ div.collapse.navbar-collapse.navbar-ex1-collapse > div > ul {
 }
 
 .v5-splash-navbar .navbar-nav>li>a:hover {
-    background: #000;
+    background: #1E2D40;
     color: #13ce67;
 }
 
@@ -124,7 +124,7 @@ div.collapse.navbar-collapse.navbar-ex1-collapse > div > ul {
 }
 
 .disco-caption a:hover {
-    color: #0B2152;
+    color: #213B55;
 }
 
 .splash-nav {
@@ -139,7 +139,7 @@ div.collapse.navbar-collapse.navbar-ex1-collapse > div > ul {
     top: 0px;
     width: 100%;
     z-index: 500;
-    background-color: #0B2152;
+    background-color: #213B55;
     border: none;
     border-radius: 0px;
 }
@@ -149,7 +149,7 @@ div.collapse.navbar-collapse.navbar-ex1-collapse > div > ul {
     top: 0px;
     width: 100%;
     z-index: 500;
-    background-color: #0B2152;
+    background-color: #213B55;
     border: none;
     padding: 12px 120px 12px 120px;
     border-radius: 0px;
@@ -261,12 +261,19 @@ ul.cons-splash-list > li > a:focus, ul.cons-splash-list > li > a:hover {
 .application-name {
     display: inline-flex;
     position: relative;
-    left: 15px;
+    left: 10px;
+    top: -5px;
 }
 
 .application-name h1 {
     color: #fff;
     font-size: 24px;
+}
+
+.application-name h2 {
+    color: #f4f4f4;
+    font-size: 24px;
+    font-weight: 550;
 }
 
 .navbar-brand-disco h2 {
@@ -287,12 +294,9 @@ ul.cons-splash-list > li > a:focus, ul.cons-splash-list > li > a:hover {
 }
 
 .navbar-brand-v5-icon-container {
-    top: 4px;
+    top: 5px;
     height: 45px;
-    width: 130px;
-    background: #0B2152;
     border-radius: 25%;
-    border: 0px solid #000;
     position: relative;
     display: inline-flex;
     align-items: center;
@@ -353,7 +357,7 @@ ul.cons-splash-list > li > a:focus, ul.cons-splash-list > li > a:hover {
 .cons-splash-nav ul > li > .application-login {
     color: #fff;
     background: #25476A;
-    border: 1px solid #0B2152;
+    border: 1px solid #213B55;
     padding: 15px 30px;
     height: 50px;
 }
@@ -450,7 +454,7 @@ ul.cons-splash-list > li > a:focus, ul.cons-splash-list > li > a:hover {
 .sub-block-container {
     background: #fff;
     border: 1px solid #ddd;
-    min-height: 350px;
+    min-height: 390px;
     padding: 30px 40px 30px;
     margin: 10px -5px;
     text-align: center;
@@ -513,14 +517,14 @@ footer .footer-links {
 }
 
 .copyright-container {
-    background: #0B2152;
+    background: #213B55;
     color: #fff;
     padding: 30px 70px;
 }
 
 .app-footer-links {
     font-size: 15px;
-    color: #0B2152;
+    color: #213B55;
 }
 
 .link-spacing {
@@ -553,10 +557,10 @@ footer .footer-links {
 .vertical-nav-container-background {
     position: fixed;
     right: 21px;
-    top: 325px;
+    top: 250px;
     z-index: 2500;
     width: 22px;
-    background: #0B2152;
+    background: #213B55;
     border: 1px solid #000;
     border-radius: 5px;
     height: 110px;
@@ -566,7 +570,7 @@ footer .footer-links {
 .vertical-nav-container {
     position: fixed;
     right: 25px;
-    top: 345px;
+    top: 270px;
     z-index: 3000;
     padding: 5px;
 }
@@ -613,7 +617,7 @@ footer .footer-links {
     padding: 0px 5px;
     font-size: 13px;
     font-weight: 400;
-    color: #0B2152;
+    color: #213B55;
     float: right;
     width: 95px;
     justify-content: flex-end;
@@ -631,7 +635,7 @@ footer .footer-links {
     left: calc(50% - 20px);
     z-index: 100;
     color: #fff;
-    background: #2a2a2a;
+    background: #1E2D40;
     border: 1px solid #fff;
     border-radius: 50%;
 }
@@ -651,7 +655,7 @@ footer .footer-links {
     margin-top: 10px;
     margin-bottom: 10px;
     color: #fff;
-    background: #0B2152;
+    background: #213B55;
     font-size: 31px;
     padding-top: 12px;
     padding-left: 3px;

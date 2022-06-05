@@ -144,11 +144,11 @@ dl.inline-flex dd {
 }
 
 .brand-icon {
-    height: 20px !important;
-    width: 20px !important;
-    margin-top: 14px !important;
-    margin-left: 15px !important;
-    margin-right: 15px !important;
+    height: 35px !important;
+    width: 35px !important;
+    margin-top: 5px !important;
+    margin-left: 5px !important;
+    margin-right: 10px !important;
 }
 
 .brand-title {
@@ -159,7 +159,7 @@ dl.inline-flex dd {
 
 #mainnav-container {
     padding-top: 50px;
-    background-color: #0B2152;
+    background-color: #213B55;
 }
 
 #mainnav-menu .arches {
@@ -399,7 +399,7 @@ input[type="checkbox"] {
 .gsheets-title {
     font-size: 15px;
     font-weight: 600;
-    color: #0B2152;
+    color: #213B55;
 }
 
 .gsheets-descr {
@@ -628,7 +628,7 @@ input[type="checkbox"] {
     padding-right: 6px;
     margin-top: 3px;
     cursor: pointer;
-    color: #0B2152;
+    color: #213B55;
 }
 
 .tabbed-workflow-information-box-marker.seen {
@@ -668,7 +668,7 @@ input[type="checkbox"] {
 }
 
 .workflow-information-box-toggle:hover {
-    color: #0B2152;
+    color: #213B55;
 }
 
 .btn-workflow-tile {
@@ -1958,7 +1958,7 @@ div.final-cons-step-separator>h4 {
 
 .workbench-card-sidebar-tab:hover {
     background: #fbfbfb;
-    color: #0B2152;
+    color: #213B55;
 }
 
 .workbench-card-sidebar-tab.disabled:hover {
@@ -1971,7 +1971,7 @@ div.final-cons-step-separator>h4 {
     background-color: white;
     border-left: solid 1px white;
     margin-left: -1px;
-    color: #0B2152;
+    color: #213B55;
 }
 
 .workbench-card-sidepanel.expanded {
@@ -3350,7 +3350,7 @@ a.select2-search-choice-close {
     padding-right: 10px;
     font-size: 11px;
     font-weight: 600;
-    color: #0B2152;
+    color: #213B55;
     padding-top: 10px;
     margin-top: -10px;
     margin-bottom: -10px;
@@ -4125,7 +4125,7 @@ div.dropdown-menu.open {
 
 .loading-mask:after {
     position: fixed;
-    color: #0B2152;
+    color: #213B55;
     content: '\f110';
     -webkit-animation: fa-spin 2s infinite linear;
     animation: fa-spin 2s infinite linear;
@@ -4439,7 +4439,7 @@ div.dropdown-menu.open {
 }
 
 .ep-edits-body a {
-    color: #4765a0;
+    color: #2F4867;
 }
 
 .ep-edits-toggle div .ion-help {
@@ -5374,7 +5374,7 @@ ul.jqtree-tree li.jqtree-ghost span.jqtree-line {
 }
 
 .node-current {
-    stroke: #0B2152;
+    stroke: #213B55;
     stroke-width: 2px;
     fill: #dcecfa;
     opacity: 1;
@@ -5383,13 +5383,13 @@ ul.jqtree-tree li.jqtree-ghost span.jqtree-line {
 
 .node-current-selected {
     fill: #dcecfa;
-    stroke: #0B2152;
+    stroke: #213B55;
     stroke-width: 2px;
 }
 
 .node-current-neighbor {
     fill: #dcecfa;
-    stroke: #0B2152;
+    stroke: #213B55;
     stroke-width: 4px;
 }
 
@@ -5422,7 +5422,7 @@ ul.jqtree-tree li.jqtree-ghost span.jqtree-line {
 
 .node-ancestor {
     /* Nodes that are unselected or not highlighted as neighbors during mousover */
-    stroke: #0B2152;
+    stroke: #213B55;
     fill: #dcecfa;
     opacity: 1;
     stroke-width: 1px;
@@ -5431,7 +5431,7 @@ ul.jqtree-tree li.jqtree-ghost span.jqtree-line {
 
 .node-ancestor-neighbor {
     stroke-width: 4px;
-    stroke: #0B2152;
+    stroke: #213B55;
     fill: #dcecfa;
 }
 
@@ -5469,7 +5469,7 @@ ul.jqtree-tree li.jqtree-ghost span.jqtree-line {
 
 .nodeLabels {
     font-size: 14px;
-    fill: #0B2152;
+    fill: #213B55;
     text-anchor: middle;
     font-weight: 600;
 }
@@ -5769,7 +5769,7 @@ span.editable-card i.fa.fa-align-justify:hover {
     padding: 18px;
     border-radius: 50%;
     background: #BFE0F7;
-    border: 1px solid #0B2152;
+    border: 1px solid #213B55;
 }
 
 .r-select-circle.loader-button {
@@ -6157,7 +6157,7 @@ th.notif-type {
     align-items: center;
     width: 100%;
     height: 50px;
-    background: #0B2152;
+    background: #213B55;
     border-bottom: 1px solid #ddd;
     z-index: 3000;
 }
@@ -6544,8 +6544,8 @@ th.notif-type {
 
 .ep-graph-title {
     font-size: 1.6em;
-    padding-left: 5px;
-    padding-top: 5px;
+    padding-left: 0px;
+    padding-top: 4px;
 }
 
 .ep-graph-title-icon {
@@ -6682,7 +6682,7 @@ th.notif-type {
 }
 
 .ep-help-body a {
-    color: #4765a0;
+    color: #2F4867;
 }
 
 .ep-help-topic-content {
@@ -7066,7 +7066,7 @@ ul div .card-tree-list span .card-tree-list-item .card-tree-list-icon {
 
 .notification-message span {
     font-weight: 600;
-    color: #0B2152;
+    color: #213B55;
 }
 
 .entry .time-label {
@@ -7112,7 +7112,7 @@ ul div .card-tree-list span .card-tree-list-item .card-tree-list-icon {
 
 .new-provisional-edit-history.selected-card,
 .notifications-container.selected-card {
-    color: #0B2152;
+    color: #213B55;
     background-color: #f0f0f0;
 }
 
@@ -7142,7 +7142,7 @@ ul div .card-tree-list span .card-tree-list-item .card-tree-list-icon {
     padding-right: 5px;
     font-weight: 600;
     font-size: 15px;
-    color: #0B2152;
+    color: #213B55;
     text-overflow: ellipsis;
     white-space: nowrap;
     overflow: hidden;
@@ -7307,7 +7307,7 @@ ul div .card-tree-list span .card-tree-list-item .card-tree-list-icon {
     border-right: transparent;
     border-left: 1px solid #ddd;
     background: #f4f4f4;
-    color: #0B2152;
+    color: #213B55;
 }
 
 .panel-config .toggle-container {
@@ -7357,7 +7357,7 @@ ul div .card-tree-list span .card-tree-list-item .card-tree-list-icon {
 }
 
 
-/* Color changes if you want to use a dark (#0B2152) background panel color
+/* Color changes if you want to use a dark (#213B55) background panel color
     for the .panel-config .middle-column-container classes
 
     .panel-config .panel-section-title {
@@ -7373,19 +7373,19 @@ ul div .card-tree-list span .card-tree-list-item .card-tree-list-icon {
     }
 
     .panel-config .tertiary-panel-content .control-label {
-        color: #0B2152;
+        color: #213B55;
     }
 
     .panel-config .accordion-body .control-label {
-        color: #0B2152;
+        color: #213B55;
     }
 
     .panel-config .accordion .panel-title a:focus {
-        color: #0B2152;
+        color: #213B55;
     }
 
     .panel-config .accordion .panel-title a:hover {
-        color: #0B2152;
+        color: #213B55;
     }
 
     .panel-config .input-group-addon {
@@ -7393,10 +7393,10 @@ ul div .card-tree-list span .card-tree-list-item .card-tree-list-icon {
     }
 
     .panel-config .bootstrap-datetimepicker-widget {
-        color: #0B2152;
+        color: #213B55;
     }
 
-    End color changes if you want to use a dark (#0B2152) background panel color */
+    End color changes if you want to use a dark (#213B55) background panel color */
 
 
 /*End card/widget manager Classes*/
@@ -9481,7 +9481,7 @@ a#close-map-tools.map-widget-icon:hover {
 }
 
 .map-widget-overlay-item:hover div a span {
-    color: #0B2152;
+    color: #213B55;
 }
 
 .map-overlay-item-tools {
@@ -10198,7 +10198,7 @@ a.clear-geojson-button:hover {
 .mapboxgl-popup-close-button:hover {
     cursor: pointer;
     background-color: #f4f4f4;
-    color: #0B2152;
+    color: #213B55;
     font-size: 23px;
     font-weight: 600;
 }
@@ -11818,7 +11818,7 @@ a.search-facet-item.disabled {
 
 .msm-group-label {
     font-size: 15px;
-    color: #0B2152;
+    color: #213B55;
     font-weight: 600;
 }
 
@@ -12001,7 +12001,7 @@ a.filter-tools {
 a.filter-tools:hover {
     cursor: pointer;
     background: #ddd;
-    color: #0B2152;
+    color: #213B55;
 }
 
 .mpm-card-content .description {
@@ -12096,7 +12096,7 @@ a.filter-tools:hover {
 
 .resource-grid-main.mpm-manager .mpm-title {
     font-weight: 400;
-    color: #0B2152;
+    color: #213B55;
     font-size: 1.416em;
     position: relative;
     left: 55px;
@@ -12307,14 +12307,14 @@ a.filter-tools:hover {
     font-size: 15px;
     padding-left: 10px;
     margin-top: 0px;
-    color: #0B2152;
+    color: #213B55;
     font-weight: 500;
 }
 
 .mpm-survey-status-header {
     padding-left: 10px;
     margin-top: 0px;
-    color: #0B2152;
+    color: #213B55;
     font-size: 24px;
     font-weight: 500;
     text-align: center;
@@ -12402,7 +12402,7 @@ a.filter-tools:hover {
     font-size: 15px;
     padding-left: 0px;
     margin-top: 30px;
-    color: #0B2152;
+    color: #213B55;
     font-weight: 500;
 }
 
@@ -12456,7 +12456,7 @@ a.filter-tools:hover {
 }
 
 .msm-stat {
-    color: #0B2152;
+    color: #213B55;
     font-size: 36px;
     margin-top: 2px;
 }
@@ -12468,7 +12468,7 @@ a.filter-tools:hover {
 }
 
 .msm-stat-user {
-    color: #0B2152;
+    color: #213B55;
     font-size: 18px;
     margin-top: 2px;
 }
@@ -14155,13 +14155,13 @@ a.jstree-anchor.permissions-widget {
 .lang-switch .chosen-single {
     border: none;
     font-size: 12px;
-    color: #0B2152;
+    color: #213B55;
     padding-top: 8px;
 }
 
 .lang-switch .chosen-drop {
     font-size: 12px;
-    color: #0B2152;
+    color: #213B55;
 }
 
 .leaflet-popup-content-wrapper {

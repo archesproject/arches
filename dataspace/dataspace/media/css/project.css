@@ -417,7 +417,7 @@
 
 
 .final-step .summary-label {
-    padding-right: 5px; 
+    padding-right: 5px;
     color: #777;
 }
 
@@ -468,7 +468,7 @@
 }
 
 .upload-dataset-select-dataset-files .file-workbench-files {
-    margin-top: 0; 
+    margin-top: 0;
     overflow-y: auto;
     background: #fff;
 }
@@ -478,7 +478,7 @@
 }
 
 .upload-dataset-select-dataset-files .panel {
-    box-shadow: none; 
+    box-shadow: none;
     -webkit-box-shadow:none;
 }
 
@@ -490,9 +490,9 @@
 }
 
 .upload-dataset-select-dataset-files #parts-panel .panel {
-    margin-bottom:0px; 
-    border-right: 1px solid #ddd; 
-    border-left: 1px solid #ddd; 
+    margin-bottom:0px;
+    border-right: 1px solid #ddd;
+    border-left: 1px solid #ddd;
     border-bottom: 1px solid #ddd;
 }
 
@@ -559,18 +559,18 @@
     height: inherit;
     width: 100%;
 }
-.analysis-areas-workflow-regions-step .cke_top, 
+.analysis-areas-workflow-regions-step .cke_top,
 .analysis-areas-workflow-regions-step .cke_bottom {
     display: none;
 }
 
 .analysis-areas-workflow-regions-step .cke_contents {
     height: 120px !important;
-} 
+}
 
 .afs-final-step-section {
-    padding: 15px 40px; 
-    display: flex; 
+    padding: 15px 40px;
+    display: flex;
     flex-direction: column
 }
 
@@ -591,8 +591,8 @@
 }
 
 .afs-final-step-block {
-    display: inline-flex; 
-    width: inherit; 
+    display: inline-flex;
+    width: inherit;
     justify-content: space-between;
     margin-top: -5px;
 }
@@ -687,11 +687,11 @@
 }
 
 .afs-calculated-name {
-    padding-left: 5px; 
-    margin-left: 5px; 
-    width: 338px; 
-    height: 36px; 
-    margin-top: -5px; 
+    padding-left: 5px;
+    margin-left: 5px;
+    width: 338px;
+    height: 36px;
+    margin-top: -5px;
     margin-bottom: 15px;
     white-space: nowrap;
     overflow: hidden;
@@ -701,7 +701,7 @@
 .afs-calculated-datasetname {
     margin: 5px 0px 15px 0px;
     padding-left: 15px;
-    height: 36px; 
+    height: 36px;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
@@ -793,7 +793,7 @@
 }
 
 .afs-app-footer {
-    background:#112E4C;
+    background:#2F4867;
     padding: 10px 70px 30px 70px;
     border-top: 1px solid #000;
 }
