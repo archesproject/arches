@@ -1,0 +1,154 @@
+
+<!--
+ARCHES - a program developed to inventory and manage immovable cultural heritage.
+Copyright (C) 2013 J. Paul Getty Trust and World Monuments Fund
+
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU Affero General Public License as
+published by the Free Software Foundation, either version 3 of the
+License, or (at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+GNU Affero General Public License for more details.
+
+You should have received a copy of the GNU Affero General Public License
+along with this program. If not, see <http://www.gnu.org/licenses/>.
+-->
+{% extends "base-manager.htm" %}
+{% load i18n %}
+{% load template_tags %}
+{% load staticfiles %}
+
+{% block title %} {{ block.super }} {% trans "Search" %} {% endblock title %}
+
+
+{% block main_content %}
+    <div class="content-panel flexrow" data-bind="click:function() { menuActive(false); }, visible: true", style="display:none;">
+
+        <div class="flex search-results-panel">
+            <div class="search-attribute-widget">
+                <div class="search-dropdown" data-bind="component: {
+                    name: 'term-filter',
+                    params: sharedStateObject
+                }"></div>
+
+                <!-- Inline Filters (for QA and Resource Type) -->
+                <div class="search-inline-filters">
+
+                    <div class="resource-filter" data-bind="component: {
+                            name: 'resource-type-filter',
+                            params: sharedStateObject
+                    }"></div>
+
+                    <!--ko if: sharedStateObject.userIsReviewer-->
+                    <div class="qa-filter" data-bind="component: {
+                        name: 'provisional-filter',
+                        params: sharedStateObject
+                    }"></div>
+                    <!--/ko-->
+
+                </div>
+            </div>
+            <div class="search-tools-container">
+                <!-- Result Count and ordering Block -->
+                <div class="search-count-container">
+                    <h3 class="search-title" data-bind="text: '{% trans 'Results: ' %}' + total()"></h3>
+                </div>
+                <div class="search-controls-container">
+                    <!--ko if: ko.unwrap(sharedStateObject.filterApplied) -->
+                    <button class="btn-sm btn btn-mint btn-labeled clear-filter" data-bind="click: function() {sharedStateObject.clearQuery();}">{% trans "Clear Filters" %}</button>
+                    <!--/ko-->
+                    <span style="width:125px">
+                        <div data-bind="component: {
+                            name: 'sort-results',
+                            params: sharedStateObject
+                        }"></div>
+                    </span>
+                </div>
+            </div>
+
+            <div class="search-control-container" data-bind="css: { 'slide': !sharedStateObject.resultsExpanded() }">
+                <!-- Results Block -->
+                <div class="search-results-container">
+                    <div data-bind="component: {
+                        name: 'search-results',
+                        params: sharedStateObject
+                    }"></div>
+                </div>
+
+                <div class="search-footer" data-bind="component: {
+                        name: 'paging-filter',
+                        params: sharedStateObject
+                    }"></div>
+
+            </div>
+        </div>
+
+
+        <div class="flex" style="flex-direction: column">
+            <!-- Title Block -->
+            <div class="search-toolbar" style="">
+                <div class="search-type-btn-panel" data-bind="foreach: {data: sharedStateObject.filtersList, as: 'filter'}">
+                    <!-- ko if: filter.type === 'filter' && filter.enabled -->
+                    {% if user_can_read %}
+                    <button class="search-type-btn relative" style="" data-bind="css: {'active': $parent.sharedStateObject.selectedTab() === filter.componentname}, click: function(){$parent.sharedStateObject.selectedTab(filter.componentname)}">
+                        <i data-bind="css: filter.icon"></i>
+                        <span data-bind="text: filter.name"></span>
+                    </button>
+                    {% endif %}
+                    <!-- /ko -->
+                </div>
+
+                <div class="search-type-btn-popup-panel">
+                    <div class="popup-panel-row" data-bind="foreach: {data: sharedStateObject.filtersList, as: 'filter'}">
+                        <!-- ko if: filter.type === 'popup' && filter.enabled -->
+                        {% if user_can_read %}
+                        <button class="saved-search-container search-type-btn-popup relative" style="" data-bind="css: {'active': $parent.sharedStateObject.selectedPopup() === filter.componentname}, click: function(){$parent.sharedStateObject.selectPopup(filter.componentname); setTimeout(function() {$(window).trigger('resize');}, 100);}">
+                            <i data-bind="css: filter.icon"></i>
+                            <!-- <p data-bind="text: filter.name"></p> -->
+                        </button>
+                        {% endif %}
+                        <!-- /ko -->
+                    </div>
+                </div>
+            </div>
+
+            <div class="flex">
+
+
+                <!-- Card Container -->
+                <div class="card-form-preview-container relative">
+                    <div class="tab-content relative" data-bind="foreach: {data: sharedStateObject.filtersList, as: 'filter'}">
+                        <!-- ko if: filter.type === 'filter' && filter.enabled -->
+                        <div class="tab-pane" data-bind="css: {'active': $parent.sharedStateObject.selectedTab() === filter.componentname}">
+                            <div style="height: calc(100vh - 100px)" data-bind="component: {
+                                name: filter.componentname,
+                                params: $parent.sharedStateObject
+                            }"></div>
+                        </div>
+                        <!-- /ko -->
+                    </div>
+
+                    <div class="tab-content search-popup-panel" data-bind="foreach: {data: sharedStateObject.filtersList, as: 'filter'}, visible: sharedStateObject.selectedPopup() !== ''">
+                        <!-- ko if: filter.type === 'popup' && filter.enabled -->
+                        <div class="tab-pane" data-bind="css: {'active': $parent.sharedStateObject.selectedPopup() === filter.componentname}">
+                            <div data-bind="component: {
+                                name: filter.componentname,
+                                params: $parent.sharedStateObject
+                            }"></div>
+                        </div>
+                        <!-- /ko -->
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock main_content %}
+
+{% block tabs %}{% endblock tabs %}
+
+{% block pre_require_js %}
+{{block.super}}
+{% endblock pre_require_js %}

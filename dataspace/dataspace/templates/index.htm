@@ -33,7 +33,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="description" content="">
     <meta name="author" content="">
-    <link rel="shortcut icon" href="{% static 'img/logos/favicon_cnr_alt.png' %}" />
+    <link rel="shortcut icon" href="{% static 'img/logos/favicon_dataspace.svg' %}" />
 
     <link rel='stylesheet' type='text/css' href='//fonts.googleapis.com/css?family=Open+Sans:400,300,600&amp;subset=cyrillic,latin'>
     <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.2/css/bootstrap.min.css">
@@ -101,13 +101,13 @@ The data-spy and data-target are part of the built-in Bootstrap scrollspy functi
                         <span class="icon-bar"></span>
                     </button>
 
-                    <div class="relative" style="padding-left: 115px; width: 255px;">
+                    <div class="relative" style="margin: 0px 35px 0px 15px;">
                         <div class="navbar-brand-v5-icon-container">
-                            <img class="navbar-brand-v5-icon" src="{% static 'img/logos/cnr_ispc_compact_white.png' %}" alt="CNR ISPC Logo">
+                            <img class="navbar-brand-v5-icon" src="{% static 'img/logos/dataspace_icon.svg' %}" alt="ISPC Data Space Logo">
                         </div>
-                        <!-- <div class="application-name" style="position: absolute; top: 5px; left: 150px;">
-                            <h2 style="color: #f4f4f4;">CNR | ISPC</h2>
-                        </div> -->
+                        <div class="application-name">
+                            <h2>Data Space</h2>
+                        </div>
                     </div>
                 </div>
 
@@ -316,7 +316,7 @@ The data-spy and data-target are part of the built-in Bootstrap scrollspy functi
                     <div class="app-info-block-text">
                         <div class="box-highlight">
                             <p class="app-info-block-text">
-                                {% trans "DATA SPACE is a platform for the sharing, accessing, and long-term conservation of data produced by the Institute of Cultural Heritage Sciences. It allows access to innovative digital tools & services to increase the knowledge and enhance the conservation of the Cultural Heritage in an interdisciplinary perspective." %}
+                                {% trans "Data Space is a platform for the sharing, accessing, and long-term conservation of data produced by the Institute of Cultural Heritage Sciences. It allows access to innovative digital tools & services to increase the knowledge and enhance the conservation of the Cultural Heritage in an interdisciplinary perspective." %}
                             </p>
                             <br>
                             <p>
@@ -331,7 +331,7 @@ The data-spy and data-target are part of the built-in Bootstrap scrollspy functi
                         <source src="{% static 'img/landing/bozza_video.mp4' %}" type="video/mp4">
                     </video>
                     <hr class=card-inline-separator style="margin-top: 20px">
-                    <h4 style="text-align: center;">ISPC Data Space</h4>
+                    <h4 style="text-align: center;">ISPC Data Space | Presentation Video</h4>
                 </div>
 
             </div>
@@ -624,7 +624,7 @@ The data-spy and data-target are part of the built-in Bootstrap scrollspy functi
               <a class="link-spacing" style="margin-right: 0px;" href="http://www.cnr.it/">{% trans "National Research Council" %}</a> –
               <a class="link-spacing" style="margin-right: 0px;" href="https://www.ispc.cnr.it/">{% trans "Cultural Heritgae Sciences Institute" %}</a> – 2022
             </p>
-            <a class="afs-app-footer-arches-link" href="http://www.archesproject.org" target="_blank">{% trans "Powered by Arches" %}</a>
+            <a class="link-spacing afs-app-footer-arches-link" href="http://www.archesproject.org" target="_blank">{% trans "Powered by Arches" %}</a>
         </div>
     </div>
     <!-- End Copyright Container -->

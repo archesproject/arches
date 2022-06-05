@@ -36,9 +36,9 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                 <div id="navbar-container" class="boxed" style="background-color: inherit; padding-right: 0px">
                     <div class="navbar-header">
                         <a href="#" class="navbar-brand" data-bind="click: function () { navExpanded(!navExpanded()) }">
-                            <img src="{{ STATIC_URL }}img/arches_logo_light.png" alt="Nifty Logo" class="brand-icon">
+                            <img src="{% static 'img/logos/dataspace_icon.svg' %}" alt="Data Space Icon" class="brand-icon">
                             <div class="brand-title">
-                                <span class="brand-text">{{ app_name }}</span>
+                                <span class="brand-text">Data Space</span>
                             </div>
                         </a>
                     </div>
@@ -97,11 +97,6 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                         {% block graph_title %}
                         <!-- Page Title and Icon -->
                         <div class="ep-tools-title" style="color: white; display: flex;">
-                            <div class="navbar-brand-v5-icon-container">
-                              <a href="{% url 'home' %}">
-                                  <img class="navbar-brand-v5-icon" src="{% static 'img/logos/cnr_ispc_compact_white.png' %}" alt="CNR ISPC Logo">
-                              </a>
-                            </div>
                             <h1 class="page-header text-overflow ep-graph-title">
                                 <span>{% trans nav.title %}</span>
                                 <i style="margin-left: 10px;" class="fa {{graph.iconclass|default:nav.icon}} text-center icon-wrap bg-gray ep-graph-title-icon"></i>
@@ -132,6 +127,15 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                                 }
                             }'></div>
                         {% endif %}
+
+                        <!-- Home Button -->
+                        <a href="{% url 'home' %}" class="ep-tools ep-tools-right">
+                            <div class="" data-placement="bottom" data-toggle="tooltip" aria-expanded="true" data-original-title="{% trans 'Home' %}">
+                                <div >
+                                    <i class="fa fa-home"></i>
+                                </div>
+                            </div>
+                        </a>
 
                         <!-- Notifications -->
                         {% if nav.notifs %}
@@ -265,6 +269,17 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                             <div class="nano">
                                 <div class="nano-content" tabindex="0">
                                     <ul id="mainnav-menu" class="list-group">
+
+                                      <!-- Home Button -->
+                                      <li class="list-header">{% trans "Home" %}</li>
+                                      <li>
+                                          <a href="{% url 'home' %}">
+                                              <i class="fa fa-home"></i>
+                                              <span class="menu-title">
+                                                  <strong>{% trans "Go Home" %}</strong>
+                                              </span>
+                                          </a>
+                                      </li>
 
                                         <!-- Tools -->
                                         <li class="list-header">{% trans "Tools" %}</li>
