@@ -549,11 +549,11 @@ DEFAULT_GEOCODER = "10000000-0000-0000-0000-010000000000"
 
 SPARQL_ENDPOINT_PROVIDERS = ({"SPARQL_ENDPOINT_PROVIDER": "arches.app.utils.data_management.sparql_providers.aat_provider.AAT_Provider"},)
 
-APP_NAME = "Arches"
+APP_NAME = "ISPC Data Space"
 
-APP_TITLE = "Arches | Heritage Data Management"
+APP_TITLE = "ISPCC Data Space | Heritage Data Management"
 COPYRIGHT_TEXT = "All Rights Reserved."
-COPYRIGHT_YEAR = "2016"
+COPYRIGHT_YEAR = "2022"
 
 # Bounding box for geometry data validation. By default set to coordinate system bounding box.
 # NOTE: This is not used by the front end of the application.
