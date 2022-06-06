@@ -78,7 +78,7 @@ class ImportSingleCsv:
         content = request.FILES.get("file")
         temp_dir = os.path.join("uploadedfiles", "tmp", self.loadid)
         try:
-            shutil.rmtree(temp_dir)
+            self.delete_default_storage_directory(temp_dir)
         except (FileNotFoundError):
             pass
 
@@ -321,9 +321,19 @@ class ImportSingleCsv:
 
                 cursor.execute("""CALL __arches_check_tile_cardinality_violation_for_load(%s)""", [self.loadid])
 
-        # default_storage.delete(temp_dir)
+        self.delete_default_storage_directory(temp_dir)
         message = "staging table populated"
         return {"success": True, "data": message}
+
+    def delete_default_storage_directory(self, directory):
+        dirs, files = default_storage.listdir(directory)
+        for dir in dirs:
+            dir_path = os.path.join(directory, dir)
+            self.delete_default_storage_directory(dir_path)
+        for file in files:
+            file_path = os.path.join(directory, file)
+            default_storage.delete(file_path)            
+        default_storage.delete(directory)
 
     def get_blank_tile_lookup(self, nodegroupid):
         if nodegroupid not in self.blank_tile_lookup.keys():
