@@ -1,5 +1,8 @@
 {
     "name": "{{ project_name }}",
+    "devDependencies": {
+        "arches-dev-dependencies": "archesproject/arches-dev-dependencies#stable/{{ arches_version }}"
+    },
     "dependencies": {
         "arches": "archesproject/arches#{{ arches_version }}"
     }
