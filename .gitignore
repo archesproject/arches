@@ -53,4 +53,7 @@ update commit
 pip-wheel-metadata
 
 ispc_dataspace_old
+
 dataspace/dataspace/media/img/landing/bozza_video.mp4
+dataspace/dataspace/reports
+dataspace/dataspace/settings.py
