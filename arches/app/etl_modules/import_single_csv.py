@@ -78,7 +78,7 @@ class ImportSingleCsv:
         content = request.FILES.get("file")
         temp_dir = os.path.join("uploadedfiles", "tmp", self.loadid)
         try:
-            self.delete_default_storage_directory(temp_dir)
+            self.delete_from_default_storage(temp_dir)
         except (FileNotFoundError):
             pass
 
@@ -321,7 +321,7 @@ class ImportSingleCsv:
 
                 cursor.execute("""CALL __arches_check_tile_cardinality_violation_for_load(%s)""", [self.loadid])
 
-        self.delete_default_storage_directory(temp_dir)
+        self.delete_from_default_storage(temp_dir)
         message = "staging table populated"
         return {"success": True, "data": message}
 
@@ -329,7 +329,7 @@ class ImportSingleCsv:
         dirs, files = default_storage.listdir(directory)
         for dir in dirs:
             dir_path = os.path.join(directory, dir)
-            self.delete_default_storage_directory(dir_path)
+            self.delete_from_default_storage(dir_path)
         for file in files:
             file_path = os.path.join(directory, file)
             default_storage.delete(file_path)
