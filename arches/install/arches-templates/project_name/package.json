@@ -1,5 +1,10 @@
 {
     "name": "{{ project_name }}",
+    "scripts": {
+        "build": "NODE_PATH=./media/node_modules NODE_ENV=production ./media/node_modules/.bin/webpack --config webpack/webpack.config.prod.js",
+        "test": "NODE_PATH=./media/node_modules ./media/node_modules/.bin/webpack --config webpack/webpack.config.dev.js",
+        "start": "NODE_PATH=./media/node_modules ./media/node_modules/.bin/webpack --watch --config webpack/webpack.config.dev.js"
+    },
     "devDependencies": {
         "arches-dev-dependencies": "archesproject/arches-dev-dependencies#{{ arches_version }}"
     },
