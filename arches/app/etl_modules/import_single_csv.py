@@ -325,7 +325,7 @@ class ImportSingleCsv:
         message = "staging table populated"
         return {"success": True, "data": message}
 
-    def delete_default_storage_directory(self, directory):
+    def delete_from_default_storage(self, directory):
         dirs, files = default_storage.listdir(directory)
         for dir in dirs:
             dir_path = os.path.join(directory, dir)
