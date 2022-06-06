@@ -1,5 +1,3 @@
-const {map} = require("jquery");
-
 define([
     'jquery',
     'knockout',
@@ -7,7 +5,7 @@ define([
     'leaflet',
     'arches',
     'views/components/workbench',
-    'text!templates/views/components/iiif-popup.htm',
+    'templates/views/components/iiif-popup.htm',
     'leaflet-iiif',
     'leaflet-fullscreen',
     'leaflet-side-by-side',
