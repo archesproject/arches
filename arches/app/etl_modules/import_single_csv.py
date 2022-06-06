@@ -296,7 +296,15 @@ class ImportSingleCsv:
                         cursor.execute(
                             """
                             INSERT INTO load_staging (
-                                nodegroupid, legacyid, resourceid, tileid, value, loadid, nodegroup_depth, source_description, passes_validation
+                                nodegroupid,
+                                legacyid,
+                                resourceid,
+                                tileid,
+                                value,
+                                loadid,
+                                nodegroup_depth,
+                                source_description,
+                                passes_validation
                             ) VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s)""",
                             (
                                 nodegroup,
