@@ -332,7 +332,7 @@ class ImportSingleCsv:
             self.delete_default_storage_directory(dir_path)
         for file in files:
             file_path = os.path.join(directory, file)
-            default_storage.delete(file_path)            
+            default_storage.delete(file_path)
         default_storage.delete(directory)
 
     def get_blank_tile_lookup(self, nodegroupid):
