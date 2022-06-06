@@ -48,7 +48,7 @@ define([
         //dynamically require the renderer - since these can be quite large/cumbersome
         const renderer = fileRenderers[this.fileRenderer.id];
         if(renderer) {
-            require([renderer.component], function(component){
+            require([`${renderer.component}`], function(component){
                 self.rendererComponentName(renderer.name);
             });
         }
