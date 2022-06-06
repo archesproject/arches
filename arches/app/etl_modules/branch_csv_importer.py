@@ -276,7 +276,7 @@ class BranchCsvImporter:
 
     def start(self, request):
         self.loadid = request.POST.get("load_id")
-        self.temp_dir = os.path.join("tmp", self.loadid)
+        self.temp_dir = os.path.join("uploadedfiles", "tmp", self.loadid)
         result = {"started": False, "message": ""}
         with connection.cursor() as cursor:
             try:
@@ -291,7 +291,7 @@ class BranchCsvImporter:
 
     def write(self, request):
         self.loadid = request.POST.get("load_id")
-        self.temp_dir = os.path.join("tmp", self.loadid)
+        self.temp_dir = os.path.join("uploadedfiles", "tmp", self.loadid)
         self.file_details = request.POST.get("load_details", None)
         result = {}
         if self.file_details:
