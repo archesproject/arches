@@ -44,6 +44,14 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
     <link href="{% static 'css/project.css' %}" rel="stylesheet">
 
     <style media="screen">
+        img.models-image {
+          border-radius: 10%;
+          width: 100%;
+          max-width: 300px;
+          height: auto;
+          margin: 5px;
+        }
+
         /* Added Style for horizontal lines */
         hr.card-inline-separator {
           border: 1.5px solid #6A7D10;
@@ -106,7 +114,7 @@ The data-spy and data-target are part of the built-in Bootstrap scrollspy functi
                             <img class="navbar-brand-v5-icon" src="{% static 'img/logos/dataspace_icon.svg' %}" alt="ISPC Data Space Logo">
                         </div>
                         <div class="application-name">
-                            <h2>Data Space</h2>
+                            <h2>Data Space | ISPC</h2>
                         </div>
                     </div>
                 </div>
@@ -171,11 +179,11 @@ The data-spy and data-target are part of the built-in Bootstrap scrollspy functi
                         <span class="vertical-nav-list-ref">{% trans "Resources" %}</span>
                     </a>
                 </li>
-                <!-- <li>
+                <li>
                     <a class="vertical-nav-list-link" href="#info-block-3" data-number="4">
-                        <span class="vertical-nav-list-ref" style="width: 95px">{% trans "Sites" %}</span>
+                        <span class="vertical-nav-list-ref">{% trans "Latest Published" %}</span>
                     </a>
-                </li> -->
+                </li>
             </ul>
         </div>
 
@@ -184,14 +192,14 @@ The data-spy and data-target are part of the built-in Bootstrap scrollspy functi
             <div class="fullscreenbanner">
                 <ul>
                     <!-- SLIDE 1 -->
-                    <li data-transition="fade" data-slotamount="9" data-masterspeed="0" data-title="ISPC Dataspace">
+                    <li data-transition="fade" data-slotamount="9" data-masterspeed="0" data-title="ISPC Data Space">
                         <!-- MAIN IMAGE -->
                         <img src="{% static 'img/landing/Musei_Vaticani.jpeg' %}" alt="slidebg1" data-bgfit="cover" data-bgposition="center center" data-bgrepeat="repeat">
 
                         <!-- LAYERS -->
                         <!-- NEW LAYER -->
                         <div class="tp-caption sft start text-bold v5-splash-caption" style="left: 150px;" delay="4500"  data-hoffset="0" data-y="400" data-speed="800" data-start="100" data-easing="Back.easeInOut" data-endspeed="300">
-                            <h2>{% trans "ISPC Dataspace" %}</h2>
+                            <h2>{% trans "ISPC Data Space" %}</h2>
                             <p>{% trans "Digital Heritage Documentation" %}</p>
                             <p>{% trans "from Italy, for the World." %}</p>
                         </div>
@@ -214,7 +222,7 @@ The data-spy and data-target are part of the built-in Bootstrap scrollspy functi
                         <!-- LAYERS -->
                         <!-- NEW LAYER -->
                         <div class="tp-caption sft start text-bold v5-splash-caption" style="left: 150px;" delay="4500"  data-hoffset="0" data-y="400" data-speed="800" data-start="100" data-easing="Back.easeInOut" data-endspeed="300">
-                            <h2>{% trans "ISPC Dataspace" %}</h2>
+                            <h2>{% trans "ISPC Data Space" %}</h2>
                             <p>{% trans "Digital Heritage Documentation" %}</p>
                             <p>{% trans "from Italy, for the World." %}</p>
                         </div>
@@ -232,7 +240,7 @@ The data-spy and data-target are part of the built-in Bootstrap scrollspy functi
                     <!-- SLIDE 3 -->
                     <li data-transition="fade" data-slotamount="9" data-masterspeed="0" data-title="Engagement">
                         <!-- MAIN IMAGE -->
-                        <img src="{% static 'img/landing/Enviq_tool.jpg' %}" alt="slidebg3" data-bgfit="cover" data-bgposition="center center" data-bgrepeat="repeat">
+                        <img src="{% static 'img/landing/Epigrafe.jpg' %}" alt="slidebg3" data-bgfit="cover" data-bgposition="center center" data-bgrepeat="repeat">
 
                         <!-- LAYERS -->
                         <!-- NEW LAYER -->
@@ -306,7 +314,7 @@ The data-spy and data-target are part of the built-in Bootstrap scrollspy functi
 
 
     <!-- Info Block 1 -->
-    <section id="info-block-1" class="app-info-block relative">
+    <section id="info-block-1" class="app-info-block relative" style="padding-bottom: 140px;">
 
         <div>
             <!-- Content -->
@@ -327,58 +335,14 @@ The data-spy and data-target are part of the built-in Bootstrap scrollspy functi
                 </div>
 
                 <div class="col-md-6 col-lg-6">
-                    <video poster="{% static 'img/landing/bozza_cover.jpg' %}" controls style="max-width:100%;">
+                    <video poster="{% static 'img/landing/Bozza_cover.jpg' %}" controls style="max-width:100%;">
                         <source src="{% static 'img/landing/bozza_video.mp4' %}" type="video/mp4">
                     </video>
-                    <hr class=card-inline-separator style="margin-top: 20px">
+                    <hr class="card-inline-separator" style="margin-top: 20px">
                     <h4 style="text-align: center;">ISPC Data Space | Presentation Video</h4>
                 </div>
 
             </div>
-
-            <!-- 3D samples -->
-            <div class="row align-items-center" id="gallery" style="text-align:center">
-                <h3 class="app-info-block-header">{% trans "3D Models" %}</h3>
-                <p class="app-info-block-text">{% trans "A selection of interactive 3D models and scenes by CNR ISPC." %}
-                </p>
-                <div class="col-md-4">
-                    <a href='https://aton.ispc.cnr.it/s/vhlab/sid-ac9lddw5w'><img src='https://aton.ispc.cnr.it/scenes/vhlab/sid-ac9lddw5w/cover.png' style="border-radius:10%;width:100%;max-width:256px;height:auto;margin:5px"><br>
-                    Tomb of Reliefs, Cerveteri (CNR ISPC)</a><br>
-                </div>
-
-                <div class="col-md-4">
-                    <a href='https://aton.ispc.cnr.it/s/vhlab/demo/faug'><img src='https://aton.ispc.cnr.it/scenes/vhlab/demo/faug/cover.png' style="border-radius:10%;width:100%;max-width:256px;height:auto;margin:5px"><br>
-                    Forum of Augustus (CNR ISPC)</a><br>
-                </div>
-
-                <div class="col-md-4">
-                    <a href='https://aton.ispc.cnr.it/s/vhlab/20220406-sjno9j84k'><img src='https://aton.ispc.cnr.it/scenes/vhlab/20220406-sjno9j84k/cover.png' style="border-radius:10%;width:100%;max-width:256px;height:auto;margin:5px"><br>
-                    Nuraghe La Prisgiona (CNR ISPC)</a><br>
-                </div>
-
-                <div class="col-md-4">
-                    <a href='https://aton.ispc.cnr.it/s/vhlab/demo/skyphos'><img src='https://aton.ispc.cnr.it/scenes/vhlab/demo/skyphos/cover.png' style="border-radius:10%;width:100%;max-width:256px;height:auto;margin:5px"><br>
-                    Skyphos (CNR ISPC)</a><br>
-                </div>
-
-                <div class="col-md-4">
-                    <a href='https://aton.ispc.cnr.it/s/vhlab/20220225-waruy7328'><img src='https://aton.ispc.cnr.it/scenes/vhlab/20220225-waruy7328/cover.png' style="border-radius:10%;width:100%;max-width:256px;height:auto;margin:5px"><br>
-                    Terza Torre San Marino (CNR ISPC)</a><br>
-                </div>
-
-                <div class="col-md-4">
-                    <a href='https://aton.ispc.cnr.it/s/vhlab/20220605-jsdyyi50z'><img src='https://aton.ispc.cnr.it/scenes/vhlab/20220605-jsdyyi50z/cover.png' style="border-radius:10%;width:100%;max-width:256px;height:auto;margin:5px"><br>
-                    Chrysippus head (CNR ISPC)</a><br>
-                </div>
-
-<!--
-                <div class="col-md-4">
-                    <iframe style='height:256px; margin:0;' src='https://aton.ispc.cnr.it/s/vhlab/20220225-waruy7328?uip=expo' width='100%' height='256px' frameborder='0' allow='autoplay; fullscreen; xr-spatial-tracking' xr-spatial-tracking execution-while-out-of-viewport execution-while-not-rendered web-share allowfullscreen mozallowfullscreen='true' webkitallowfullscreen='true'></iframe>
-                </div>
--->
-
-            </div>
-            <!-- End 3D samples -->
 
         </div>
 
@@ -446,61 +410,37 @@ The data-spy and data-target are part of the built-in Bootstrap scrollspy functi
 
                 <!-- Arches Data Type Block -->
                 <div class="col-lg-4">
-                    <div class="sub-block-container">
+                    <div class="sub-block-container-alt">
                         <img class="sub-block-image" src="{% static 'img/icons/research_icon.svg' %}" alt="Research Icon">
                         <h2>{% trans "Research Areas" %}</h2>
-                        <h1>11</h1>
+                        <h1>21</h1>
                         <p class="sub-block-description">
                             {% trans "A global overview of the. Etiam vitae elementum orci" %}
                         </p>
-                        <hr class=card-inline-separator>
-                        <a class="link-spacing" target="_blank" href='https://www.ispc.cnr.it/it_it/ricerca/gruppi_e_labs/'>
-                            {% trans "ISPC Research Groups and Labs" %}
-                        </a>
-                        <br>
-                        <a class="link-spacing" <a target="_blank" href='{% url "search_home" %}?tiles=true&paging-filter=1&format=tilecsv&reportlink=false&precision=6&total=0&resource-type-filter=%5B%7B%22graphid%22%3A%22f71f7b9c-b25b-11e9-901e-a4d18cec433a%22%2C%22name%22%3A%22Person%22%2C%22inverted%22%3Afalse%7D%5D'>
-                          {% trans "Search w/ Person Filter active" %}
-                        </a>
                     </div>
                 </div>
 
                 <!-- Arches Data Type Block -->
                 <div class="col-lg-4">
-                    <div class="sub-block-container">
+                    <div class="sub-block-container-alt">
                         <img class="sub-block-image" src="{% static 'img/icons/training_icon.svg' %}" alt="Training Icon">
                         <h2>{% trans "Training Resources" %}</h2>
-                        <h1>8</h1>
+                        <h1>48</h1>
                         <p class="sub-block-description">
                             {% trans "Educational resources in the broad field of the Heritage Science domain." %}
                         </p>
-                        <hr class=card-inline-separator>
-                        <a class="link-spacing" target="_blank" href='https://www.ispc.cnr.it/it_it/ricerca/gruppi_e_labs/'>
-                            {% trans "ISPC Research Groups and Labs" %}
-                        </a>
-                        <br>
-                        <a class="link-spacing" target="_blank" <a href='{% url "search_home" %}?paging-filter=1&tiles=true&format=tilecsv&reportlink=false&precision=6&total=2&resource-type-filter=%5B%7B%22graphid%22%3A%220b9235d9-ca85-11e9-9fa2-a4d18cec433a%22%2C%22name%22%3A%22Project%22%2C%22inverted%22%3Afalse%7D%5D'>
-                          {% trans "Search w/ Project Filter active" %}
-                        </a>
                     </div>
                 </div>
 
                 <!-- Arches Data Type Block -->
                 <div class="col-lg-4">
-                    <div class="sub-block-container">
+                    <div class="sub-block-container-alt">
                         <img class="sub-block-image" src="{% static 'img/icons/vres_icon.svg' %}" alt="VREs Icon">
                         <h2>{% trans "VREs" %}</h2>
-                        <h1>4</h1>
+                        <h1>84</h1>
                         <p class="sub-block-description">
                             {% trans "Innovative Virtual Research Environments developed to serve modern Heritage Science needs." %}
                         </p>
-                        <hr class=card-inline-separator>
-                        <a class="link-spacing" target="_blank" href='https://www.ispc.cnr.it/it_it/ricerca/gruppi_e_labs/'>
-                            {% trans "ISPC Research Groups and Labs" %}
-                        </a>
-                        <br>
-                        <a class="link-spacing" <a target="_blank" href='{% url "search_home" %}?tiles=true&paging-filter=1&format=tilecsv&reportlink=false&precision=6&total=0&resource-type-filter=%5B%7B%22graphid%22%3A%22f71f7b9c-b25b-11e9-901e-a4d18cec433a%22%2C%22name%22%3A%22Person%22%2C%22inverted%22%3Afalse%7D%5D'>
-                          {% trans "Search w/ Person Filter active" %}
-                        </a>
                     </div>
                 </div>
 
@@ -512,61 +452,37 @@ The data-spy and data-target are part of the built-in Bootstrap scrollspy functi
 
                 <!-- Arches Data Type Block -->
                 <div class="col-lg-4">
-                    <div class="sub-block-container">
+                    <div class="sub-block-container-alt">
                         <img class="sub-block-image" src="{% static 'img/icons/datasets_icon.svg' %}" alt="Research Icon">
                         <h2>{% trans "Datasets" %}</h2>
-                        <h1>13</h1>
+                        <h1>213</h1>
                         <p class="sub-block-description">
                             {% trans "Main point of access for searching and browsing datasets" %}
                         </p>
-                        <hr class=card-inline-separator>
-                        <a class="link-spacing" href='https://www.ispc.cnr.it/it_it/ricerca/gruppi_e_labs/'>
-                            {% trans "ISPC Research Groups and Labs same tab" %}
-                        </a>
-                        <br>
-                        <a class="link-spacing" <a href='{% url "search_home" %}?tiles=true&paging-filter=1&format=tilecsv&reportlink=false&precision=6&total=0&resource-type-filter=%5B%7B%22graphid%22%3A%22f71f7b9c-b25b-11e9-901e-a4d18cec433a%22%2C%22name%22%3A%22Person%22%2C%22inverted%22%3Afalse%7D%5D'>
-                            {% trans "Search w/ Person Filter active same tab" %}
-                        </a>
                     </div>
                 </div>
 
                 <!-- Arches Data Type Block -->
                 <div class="col-lg-4">
-                    <div class="sub-block-container">
+                    <div class="sub-block-container-alt">
                         <img class="sub-block-image" src="{% static 'img/icons/services_icon.svg' %}" alt="Training Icon">
                         <h2>{% trans "Services" %}</h2>
-                        <h1>6</h1>
+                        <h1>36</h1>
                         <p class="sub-block-description">
                             {% trans "Main point of access for innovative services in Heritage Science discipline." %}
                         </p>
-                        <hr class=card-inline-separator>
-                        <a class="link-spacing" href='https://www.ispc.cnr.it/it_it/ricerca/gruppi_e_labs/'>
-                            {% trans "ISPC Research Groups and Labs same tab" %}
-                        </a>
-                        <br>
-                        <a class="link-spacing" <a href='{% url "search_home" %}?paging-filter=1&tiles=true&format=tilecsv&reportlink=false&precision=6&total=2&resource-type-filter=%5B%7B%22graphid%22%3A%220b9235d9-ca85-11e9-9fa2-a4d18cec433a%22%2C%22name%22%3A%22Project%22%2C%22inverted%22%3Afalse%7D%5D'>
-                          {% trans "Search w/ Project Filter active same tab" %}
-                        </a>
                     </div>
                 </div>
 
                 <!-- Arches Data Type Block -->
                 <div class="col-lg-4">
-                    <div class="sub-block-container">
+                    <div class="sub-block-container-alt">
                         <img class="sub-block-image" src="{% static 'img/icons/workflows_icon.svg' %}" alt="VREs Icon">
                         <h2>{% trans "Workflows" %}</h2>
-                        <h1>12</h1>
+                        <h1>112</h1>
                         <p class="sub-block-description">
                             {% trans "Practical solutions for the formalization and description of research workflows" %}
                         </p>
-                        <hr class=card-inline-separator>
-                        <a class="link-spacing" href='https://www.ispc.cnr.it/it_it/ricerca/gruppi_e_labs/'>
-                            {% trans "ISPC Research Groups and Labs same tab" %}
-                        </a>
-                        <br>
-                        <a class="link-spacing" <a href='{% url "search_home" %}?paging-filter=1&tiles=true&format=tilecsv&reportlink=false&precision=6&total=5&advanced-search=%5B%7B%22op%22%3A%22and%22%2C%220b92b8c0-ca85-11e9-adef-a4d18cec433a%22%3A%7B%22op%22%3A%22%22%2C%22val%22%3A%229eae4a70-545e-4cc5-b593-19fef69074c8%22%7D%7D%5D'>
-                          {% trans "Search w/ activity type of project 'Roman spectroscopy' same tab" %}
-                        </a>
                     </div>
                 </div>
 
@@ -576,96 +492,195 @@ The data-spy and data-target are part of the built-in Bootstrap scrollspy functi
         </div>
     </section>
     <!-- End Info Block 2 -->
-    <div class="">
-        {% get_current_language as LANGUAGE_CODE %}
-            <div class="lang-switch"
-            data-bind='component: {
-                name: "views/components/language-switcher",
-                params: {
-                    current_language: "{{LANGUAGE_CODE}}"
-                }
-            }'>
-          </div>
-        Today's message is: <span data-bind="text: 'Heeewwelo'"></span>
-    </div>
 
+    <!-- Info Block 3 -->
+    <section id="info-block-3" class="app-info-block relative">
+        <div>
+
+            <!-- Heading Info -->
+            <div class="sub-section">
+                <div class="col-lg-7">
+                    <div class="app-info-block-intro text-center">
+                      <h2 class="app-info-block-title">{% trans "Latest Published Resources" %}</h2>
+                        <!-- <h3 class="app-info-block-header">{% trans "Immerse Yourself" %}</h3> -->
+                        <!-- <p class="app-info-block-text">
+                            {% trans "A selection of interactive 3D models and scenes by CNR ISPC." %}
+                        </p> -->
+                    </div>
+                </div>
+            </div>
+
+            <!-- 3D samples -->
+            <div class="sub-section" id="gallery">
+                <div class="row">
+
+                    <div class="col-sm-6 col-lg-4">
+                        <div class="sub-block-container" style="min-height: 385px;">
+                            <a href='https://aton.ispc.cnr.it/s/vhlab/sid-ac9lddw5w' target="_blank">
+                                <img class="models-image" src='https://aton.ispc.cnr.it/scenes/vhlab/sid-ac9lddw5w/cover.png'>
+                            </a>
+                            <hr class="card-inline-separator" style="margin-top: 20px;">
+                            <h5>{% trans "Tomb of Reliefs, Cerveteri (CNR ISPC)" %}</h5>
+                            <!-- <p class="sub-block-description">
+                              {% trans "Practical solutions for the formalization and description of research workflows" %}
+                            </p> -->
+                        </div>
+                    </div>
+
+                    <div class="col-sm-6 col-lg-4">
+                        <div class="sub-block-container" style="min-height: 385px;">
+                            <a href='https://aton.ispc.cnr.it/s/vhlab/demo/faug' target="_blank">
+                                <img class="models-image" src='https://aton.ispc.cnr.it/scenes/vhlab/demo/faug/cover.png'>
+                            </a>
+                            <hr class="card-inline-separator" style="margin-top: 20px;">
+                            <h5>{% trans "Forum of Augustus (CNR ISPC)" %}</h5>
+                            <!-- <p class="sub-block-description">
+                              {% trans "Practical solutions for the formalization and description of research workflows" %}
+                            </p> -->
+                        </div>
+                    </div>
+
+                    <div class="col-sm-6 col-lg-4">
+                        <div class="sub-block-container"  style="min-height: 385px;">
+                            <a href='https://aton.ispc.cnr.it/s/vhlab/20220406-sjno9j84k' target="_blank">
+                                <img class="models-image" src='https://aton.ispc.cnr.it/scenes/vhlab/20220406-sjno9j84k/cover.png'>
+                            </a>
+                            <hr class="card-inline-separator" style="margin-top: 20px;">
+                            <h5>{% trans "Nuraghe La Prisgiona (CNR ISPC)" %}</h5>
+                            <!-- <p class="sub-block-description">
+                              {% trans "Practical solutions for the formalization and description of research workflows" %}
+                            </p> -->
+                        </div>
+                    </div>
+
+                    <div class="col-sm-6 col-lg-4">
+                        <div class="sub-block-container"  style="min-height: 385px;">
+                            <a href='https://aton.ispc.cnr.it/s/vhlab/demo/skyphos' target="_blank">
+                                <img class="models-image" src='https://aton.ispc.cnr.it/scenes/vhlab/demo/skyphos/cover.png'>
+                            </a>
+                            <hr class="card-inline-separator" style="margin-top: 20px;">
+                            <h5>{% trans "Skyphos (CNR ISPC)" %}</h5>
+                            <!-- <p class="sub-block-description">
+                              {% trans "Practical solutions for the formalization and description of research workflows" %}
+                            </p> -->
+                        </div>
+                    </div>
+
+                    <div class="col-sm-6 col-lg-4">
+                        <div class="sub-block-container"  style="min-height: 385px;">
+                            <a href='https://aton.ispc.cnr.it/s/vhlab/20220225-waruy7328' target="_blank">
+                                <img class="models-image" src='https://aton.ispc.cnr.it/scenes/vhlab/20220225-waruy7328/cover.png'>
+                            </a>
+                            <hr class="card-inline-separator" style="margin-top: 20px;">
+                            <h5>{% trans "Terza Torre San Marino (CNR ISPC)" %}</h5>
+                            <!-- <p class="sub-block-description">
+                              {% trans "Practical solutions for the formalization and description of research workflows" %}
+                            </p> -->
+                        </div>
+                    </div>
+
+                    <div class="col-sm-6 col-lg-4">
+                        <div class="sub-block-container"  style="min-height: 385px;">
+                            <a href='https://aton.ispc.cnr.it/s/vhlab/20220605-jsdyyi50z' target="_blank">
+                                <img class="models-image" src='https://aton.ispc.cnr.it/scenes/vhlab/20220605-jsdyyi50z/cover.png'>
+                            </a>
+                            <hr class="card-inline-separator" style="margin-top: 20px;">
+                            <h5>{% trans "Chrysippus Head (CNR ISPC)" %}</h5>
+                            <!-- <p class="sub-block-description">
+                              {% trans "Practical solutions for the formalization and description of research workflows" %}
+                            </p> -->
+                        </div>
+                    </div>
+
+                    <!-- <div class="col-md-4">
+                        <iframe style='height:256px; margin:0;' src='https://aton.ispc.cnr.it/s/vhlab/20220225-waruy7328?uip=expo' width='100%' height='256px' frameborder='0' allow='autoplay; fullscreen; xr-spatial-tracking' xr-spatial-tracking execution-while-out-of-viewport execution-while-not-rendered web-share allowfullscreen mozallowfullscreen='true' webkitallowfullscreen='true'></iframe>
+                    </div> -->
+
+                </div>
+
+            </div>
+            <!-- End 3D samples -->
+
+
+            <!-- Sub-section -->
+            <!-- <div class="wide-box">
+                <div class="box-highlight">
+
+                    <h3>{% trans "Our research sites" %}</h3>
+                    <p>
+                        {% trans "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Fusce auctor ligula velit, quis facilisis dui elementum a. Proin malesuada metus sem, eu pharetra elit pulvinar quis. Proin mollis dictum purus, non eleifend turpis pretium ut. Suspendisse imperdiet enim risus, tempor consequat tortor rutrum id. Donec id lorem diam. Suspendisse potenti." %}
+                    </p>
+                    <br>
+                    <p>
+                        {% trans "Sed congue sollicitudin quam porttitor pharetra. Duis varius imperdiet fringilla. Sed commodo purus at urna maximus tempus. Vestibulum ullamcorper hendrerit enim, vitae porta lacus placerat in. Etiam at placerat erat, et malesuada ipsum. Nulla facilisi." %}
+                    </p>
+                    <br>
+                    <p>
+                        {% trans "Suspendisse vitae est fermentum, convallis risus at, ornare nisl. Nullam suscipit vulputate lorem, nec facilisis eros laoreet non. Vestibulum ante ipsum primis in faucibus orci luctus et ultrices posuere cubilia curae." %}
+                    </p>
+
+                </div>
+            </div> -->
+            <!-- End Sub-section -->
+
+        </div>
+    </section>
+    <!-- End Info Block 3 -->
 
     <!-- Footer -->
     <div class="afs-app-footer">
 
         <!-- footer content container -->
+        <h2 class="app-footer-heading" style="margin-top: 15px;">Istituto di Scienze del Patrimonio Culturale</h2>
         <div class="row">
 
             <!-- branding column -->
-            <div class="col-lg-4">
+            <div class="col-lg-6">
 
-                <h2 class="app-footer-heading">Istituto di Scienze del Patrimonio Culturale</h2>
+                <h2 class="app-footer-heading">{% trans "Find Us" %}</h2>
 
                 <div class="organization-address">
-                  Consiglio Nazionale delle Ricerche<br>
-                  Piazzale Aldo Moro, 7<br>
-                  00185 Roma, Italia<br>
+                  Via Cardinale Guglielmo Sanfelice 8,
+                  80134 Napoli (NA), IT<br>
+                  Tell: 0812470966<br>
                 </div>
             </div>
 
             <!-- Info Column -->
-            <div class="col-lg-8">
-                <h2 class="app-footer-heading">{% trans "Guides and Documentation" %}</h2>
+            <div class="col-lg-3">
+                <h2 class="app-footer-heading">{% trans "Useful Links" %}</h2>
 
                 <!-- Links -->
                 <div class="afs-splash-links">
-                    <div class="row" style="padding-left: 0px;">
-                        <div class="col-lg-4">
-                            <ul class="splash-link-container">
-                                <li>
-                                    <a class="splash-link-address" href="http://https://www.archesproject.org/what-is-arches/" target="_blank">{% trans "What is Arches" %}</a>
-                                </li>
-                                <li>
-                                    <a class="splash-link-address" href="https://www.archesproject.org/collector/" target="_blank">{% trans "Arches Collector" %}</a>
-                                </li>
-                                <li>
-                                    <a class="splash-link-address" href="https://www.archesproject.org/implementation-considerations/" target="_blank">{% trans "Implementation Considerations" %}</a>
-                                </li>
-                                <li>
-                                    <a class="splash-link-address" href="https://www.archesproject.org/development/" target="_blank">{% trans "Information For Developers" %}</a>
-                                </li>
-
-
-                            </ul>
-                        </div>
-
-                        <div class="col-lg-4">
-                            <ul class="splash-link-container">
-                                <li>
-                                    <a class="splash-link-address" href="https://www.archesproject.org/faq/" target="_blank">{% trans "FAQ" %}</a>
-                                </li>
-                                <li>
-                                    <a class="splash-link-address" href="https://www.archesproject.org/standards/" target="_blank">{% trans "Standards and Interoperability" %}</a>
-                                </li>
-                                <li>
-                                    <a class="splash-link-address" href="https://arches.readthedocs.io/en/stable/requirements-and-dependencies/" target="_blank">{% trans "Installation Guide" %}</a>
-                                </li>
-                            </ul>
-                        </div>
-
-                        <div class="col-lg-4">
-                            <ul class="splash-link-container">
-                                <li>
-                                    <a class="splash-link-address" href="https://www.archesproject.org/project-background/" target="_blank">{% trans "Arches Project Background" %}</a>
-                                </li>
-                                <li>
-                                    <a class="splash-link-address" href="https://www.archesproject.org/videos/" target="_blank">{% trans "Arches Webinars/Presentations" %}</a>
-                                </li>
-                                <li>
-                                    <a class="splash-link-address" href="https://www.archesproject.org/resource-models/" target="_blank">{% trans "Resource Models" %}</a>
-                                </li>
-                            </ul>
-                        </div>
-
-                    </div>
+                    <ul class="splash-link-container">
+                        <li>
+                            <a class="splash-link-address" href="https://openportal.ispc.cnr.it/about" target="_blank">{% trans "About ISPC Open Portal" %}</a>
+                        </li>
+                        <li>
+                            <a class="splash-link-address" href="https://openportal.ispc.cnr.it/contact-us" target="_blank">{% trans "Contact Us" %}</a>
+                        </li>
+                    </ul>
                 </div>
 
             </div>
+
+            <div class="col-lg-3">
+                <h2 class="app-footer-heading">{% trans "Disclaimers & Agreements" %}</h2>
+
+                <!-- Links -->
+                <div class="afs-splash-links">
+                    <ul class="splash-link-container">
+                        <li>
+                            <a class="splash-link-address" href="https://openportal.ispc.cnr.it/cookies-policy" target="_blank">{% trans "Cookies Policy" %}</a>
+                        </li>
+                        <li>
+                            <a class="splash-link-address" href="https://openportal.ispc.cnr.it/privacy-policy" target="_blank">{% trans "Privacy Policy" %}</a>
+                        </li>
+                    </ul>
+                </div>
+
+            </div>
+
         </div>
     </div>
     <!-- End Footer -->
@@ -674,9 +689,7 @@ The data-spy and data-target are part of the built-in Bootstrap scrollspy functi
     <div class="copyright-container">
         <!-- Arches link -->
         <div class="app-footer-links">
-            <a class="link-spacing" href="http://trasparenza.ispc.cnr.it">{% trans "Transparency" %}</a>
-            <a class="link-spacing" style="margin-right: 115px;" href="https://www.ispc.cnr.it/en/privacy-policy/">{% trans "Privacy Policy" %}</a>
-            <p style="color: #91A5CF; display: inline; ">
+            <p style="color: #91A5CF; display: inline;">
               Copyright © –
               <a class="link-spacing" style="margin-right: 0px;" href="http://www.cnr.it/">{% trans "National Research Council" %}</a> –
               <a class="link-spacing" style="margin-right: 0px;" href="https://www.ispc.cnr.it/">{% trans "Cultural Heritgae Sciences Institute" %}</a> – 2022
@@ -686,6 +699,29 @@ The data-spy and data-target are part of the built-in Bootstrap scrollspy functi
     </div>
     <!-- End Copyright Container -->
 
+    <!-- <div class="container">
+      <div class="row">
+        <div class="col-lg-6">
+
+          Test: <span data-bind="text: 'Works'"></span>
+
+        </div>
+
+        <div class="col-lg-6">
+
+          {% get_current_language as LANGUAGE_CODE %}
+          <div class="lang-switch"
+            data-bind='component: {
+              name: "/views/components/language-switcher",
+              params: {
+                current_language: "{{LANGUAGE_CODE}}"
+              }
+            }'>
+          </div>
+
+        </div>
+      </div>
+    </div> -->
 
 
     <script src="//cdnjs.cloudflare.com/ajax/libs/jquery/2.2.3/jquery.min.js"></script>
@@ -697,7 +733,6 @@ The data-spy and data-target are part of the built-in Bootstrap scrollspy functi
     <script src="//cdnjs.cloudflare.com/ajax/libs/jquery-parallax/1.1.3/jquery-parallax-min.js"></script>
     <script src="//cdnjs.cloudflare.com/ajax/libs/waypoints/4.0.0/jquery.waypoints.min.js"></script>
     <script src="//cdnjs.cloudflare.com/ajax/libs/Counter-Up/1.0.0/jquery.counterup.min.js"></script>
-    <script src="//cdnjs.cloudflare.com/ajax/libs/owl-carousel/1.3.3/owl.carousel.min.js"></script>
     <script src="//cdnjs.cloudflare.com/ajax/libs/jquery.form/3.51/jquery.form.min.js"></script>
     <script src="//cdnjs.cloudflare.com/ajax/libs/jquery-validate/1.15.0/jquery.validate.min.js"></script>
     <script src="{% static 'plugins/revolution-slider/rs-plugin/js/jquery.themepunch.tools.min.js' %}"></script>

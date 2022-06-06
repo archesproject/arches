@@ -261,8 +261,8 @@ ul.cons-splash-list > li > a:focus, ul.cons-splash-list > li > a:hover {
 .application-name {
     display: inline-flex;
     position: relative;
-    left: 10px;
-    top: -5px;
+    left: 0px;
+    top: -4px;
 }
 
 .application-name h1 {
@@ -408,7 +408,7 @@ ul.cons-splash-list > li > a:focus, ul.cons-splash-list > li > a:hover {
 
 .app-info-block {
     min-height: 600px;
-    padding: 80px 150px 140px 150px;
+    padding: 80px 150px;
     background: #fff;
     border-top: 1px solid #ddd;
 }
@@ -454,8 +454,17 @@ ul.cons-splash-list > li > a:focus, ul.cons-splash-list > li > a:hover {
 .sub-block-container {
     background: #fff;
     border: 1px solid #ddd;
-    min-height: 390px;
-    padding: 30px 40px 30px;
+    min-height: 305px;
+    padding: 30px 36px 30px;
+    margin: 10px -5px;
+    text-align: center;
+}
+
+.sub-block-container-alt {
+    /* background: #f8f8f8; */
+    border: 1px solid #ddd;
+    min-height: 305px;
+    padding: 30px 36px 30px;
     margin: 10px -5px;
     text-align: center;
 }
@@ -468,7 +477,7 @@ ul.cons-splash-list > li > a:focus, ul.cons-splash-list > li > a:hover {
 .sub-block-description {
     font-size: 15px;
     color: #555;
-    padding: 10px 0px;
+    padding: 0px;
 }
 
 footer .footer-links {
@@ -501,7 +510,7 @@ footer .footer-links {
     font-size: 23px;
     font-weight: 200;
     color: #dcdcdc;
-    margin-top: 27px;
+    margin-top: 15px;
 }
 
 .app-footer-image {
@@ -563,7 +572,7 @@ footer .footer-links {
     background: #213B55;
     border: 1px solid #000;
     border-radius: 5px;
-    height: 110px;
+    height: 130px;
     opacity: .85
 }
 
@@ -606,7 +615,7 @@ footer .footer-links {
 }
 
 .vertical-nav-list-link:focus {
-    background: #13ce67;
+    /* background: #13ce67; */
 }
 
 .vertical-nav-list-link:hover .vertical-nav-list-ref {
