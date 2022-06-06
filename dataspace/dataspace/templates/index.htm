@@ -531,6 +531,18 @@ The data-spy and data-target are part of the built-in Bootstrap scrollspy functi
         </div>
     </section>
     <!-- End Info Block 2 -->
+    <div class="">
+        {% get_current_language as LANGUAGE_CODE %}
+            <div class="lang-switch"
+            data-bind='component: {
+                name: "views/components/language-switcher",
+                params: {
+                    current_language: "{{LANGUAGE_CODE}}"
+                }
+            }'>
+          </div>
+        Today's message is: <span data-bind="text: 'Heeewwelo'"></span>
+    </div>
 
 
     <!-- Footer -->
