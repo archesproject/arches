@@ -22,7 +22,6 @@ from arches.app.models.tile import Tile
 from arches.app.models.system_settings import settings
 from arches.app.utils.response import JSONResponse
 from arches.app.utils.betterJSONSerializer import JSONSerializer
-from arches.app.utils.index_database import index_resources_by_type
 from arches.app.utils.index_database import index_resources_by_transaction
 
 logger = logging.getLogger(__name__)
@@ -174,13 +173,13 @@ class ImportSingleCsv:
         if row[0][0]:
             with connection.cursor() as cursor:
                 cursor.execute(
-                    """UPDATE load_event SET status = %s WHERE loadid = %s""",
-                    ("completed", self.loadid),
+                    """UPDATE load_event SET (status, load_end_time) = (%s, %s) WHERE loadid = %s""",
+                    ("completed", datetime.now(), self.loadid),
                 )
             index_resources_by_transaction(self.loadid, quiet=True, use_multiprocessing=True)
             with connection.cursor() as cursor:
                 cursor.execute(
-                    """UPDATE load_event SET (status, load_end_time, complete, successful) = (%s, %s, %s, %s) WHERE loadid = %s""",
+                    """UPDATE load_event SET (status, indexed_time, complete, successful) = (%s, %s, %s, %s) WHERE loadid = %s""",
                     ("indexed", datetime.now(), True, True, self.loadid),
                 )
             return {"success": True, "data": "success"}
