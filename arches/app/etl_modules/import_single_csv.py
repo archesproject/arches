@@ -13,11 +13,12 @@ from arches.app.models.models import GraphModel, Node, NodeGroup
 from arches.app.models.system_settings import settings
 from arches.app.utils.betterJSONSerializer import JSONSerializer
 from arches.app.utils.index_database import index_resources_by_transaction
+from arches.app.etl_modules.base_import_module import BaseImportModule
 
 logger = logging.getLogger(__name__)
 
 
-class ImportSingleCsv:
+class ImportSingleCsv(BaseImportModule):
     def __init__(self, request=None):
         self.request = request
         self.userid = request.user.id

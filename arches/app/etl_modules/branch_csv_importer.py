@@ -21,11 +21,12 @@ from arches.app.utils.index_database import index_resources_by_transaction
 from arches.management.commands.etl_template import create_workbook
 from openpyxl.writer.excel import save_virtual_workbook
 import arches.app.utils.task_management as task_management
+from arches.app.etl_modules.base_import_module import BaseImportModule
 
 logger = logging.getLogger(__name__)
 
 
-class BranchCsvImporter:
+class BranchCsvImporter(BaseImportModule):
     def __init__(self, request=None, loadid=None, temp_dir=None):
         self.request = request if request else None
         self.userid = request.user.id if request else None

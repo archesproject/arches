@@ -71,7 +71,7 @@ define([
             };
 
             this.cleanLoadEvent = function(loadid) {
-                const url = arches.urls.etl_manager + "?action=cleanEvent&loadid="+loadid;
+                const url = `${arches.urls.etl_manager}?action=cleanEvent&loadid=${loadid}`;
                 window.fetch(url).then(function(response){
                     if(response.ok){
                         return response.json();
@@ -83,10 +83,16 @@ define([
                 });
             };
 
-            this.reverseTransactions = function(loadid) {
+            this.reverseTransactions = function(event) {
+                const formData = new FormData();
+                formData.append('loadid', event.loadid);
+                formData.append('module', event.etl_module.etlmoduleid);
+                formData.append('action', 'reverse');
+                const url = `${arches.urls.etl_manager}?action=reverse&loadid=${event.loadid}`;
                 self.loading(true);
-                window.fetch(arches.urls.transaction_reverse(loadid),{
+                window.fetch(url,{
                     method: 'POST',
+                    body: formData,
                     credentials: 'include',
                     headers: {
                         "X-CSRFToken": Cookies.get('csrftoken')
@@ -165,7 +171,7 @@ define([
                 this.activeTab("start");
             };
             this.init();
-            setInterval(this.fetchLoadEvent, 5000)
+            // setInterval(this.fetchLoadEvent, 5000)
         },
         template: { require: 'text!templates/views/components/plugins/etl-manager.htm' }
     });
