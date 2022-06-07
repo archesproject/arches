@@ -85,10 +85,10 @@ define([
 
             this.reverseTransactions = function(event) {
                 const formData = new FormData();
+                const url = arches.urls.etl_manager;
                 formData.append('loadid', event.loadid);
                 formData.append('module', event.etl_module.etlmoduleid);
                 formData.append('action', 'reverse');
-                const url = `${arches.urls.etl_manager}?action=reverse&loadid=${event.loadid}`;
                 self.loading(true);
                 window.fetch(url,{
                     method: 'POST',
