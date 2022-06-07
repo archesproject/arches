@@ -8,6 +8,8 @@ import os
 import shutil
 import uuid
 import zipfile
+from django.core.files import File
+from django.core.files.storage import default_storage
 from django.db import connection
 from django.db.models.functions import Lower
 from django.db.utils import IntegrityError, ProgrammingError
@@ -76,36 +78,31 @@ class ImportSingleCsv:
         """
 
         content = request.FILES.get("file")
-        temp_dir = os.path.join(settings.APP_ROOT, "tmp", self.loadid)
+        temp_dir = os.path.join("uploadedfiles", "tmp", self.loadid)
         try:
-            shutil.rmtree(temp_dir)
+            self.delete_from_default_storage(temp_dir)
         except (FileNotFoundError):
             pass
-        os.mkdir(temp_dir, 0o770)
 
         csv_file_name = None
         if content.content_type == "text/csv":
             csv_file_name = content.name
             csv_file_path = os.path.join(temp_dir, csv_file_name)
-            # maybe we can do this:
-            # default_storage.save(temp_dir, content)
-            with open(csv_file_path, "wb+") as destination:
-                for chunk in content.chunks():
-                    destination.write(chunk)
+            default_storage.save(csv_file_path, content)
         elif content.content_type == "application/zip":
             with zipfile.ZipFile(content, "r") as zip_ref:
-                zip_ref.extractall(temp_dir)
                 files = zip_ref.infolist()
                 for file in files:
-                    if not file.filename.startswith("__MACOSX") and file.filename.endswith(".csv"):
-                        csv_file_name = file.filename
+                    if not file.filename.startswith("__MACOSX"):
+                        default_storage.save(os.path.join(temp_dir, file.filename), File(zip_ref.open(file)))
+                        if file.filename.endswith(".csv"):
+                            csv_file_name = file.filename
             csv_file_path = os.path.join(temp_dir, csv_file_name)
 
         if csv_file_name is None:
             return {"success": False, "data": "Csv file not found"}
 
-        with open(csv_file_path) as csvfile:
-            print(csv_file_path)
+        with default_storage.open(csv_file_path, mode="r") as csvfile:
             reader = csv.reader(csvfile)
             data = {"csv": [line for line in reader], "csv_file": csv_file_name}
             with connection.cursor() as cursor:
@@ -236,12 +233,10 @@ class ImportSingleCsv:
 
     def populate_staging_table(self, loadid, graphid, has_headers, fieldnames, csv_file_name, id_label):
 
-        temp_dir = os.path.join(settings.APP_ROOT, "tmp", loadid)
+        temp_dir = os.path.join("uploadedfiles", "tmp", self.loadid)
         csv_file_path = os.path.join(temp_dir, csv_file_name)
 
-        # read csv file from the default storage
-        # default_storage.open(filename)
-        with open(csv_file_path) as csvfile:
+        with default_storage.open(csv_file_path, mode="r") as csvfile:
             reader = csv.DictReader(csvfile, fieldnames=fieldnames)
 
             if has_headers:
@@ -328,7 +323,15 @@ class ImportSingleCsv:
                         cursor.execute(
                             """
                             INSERT INTO load_staging (
-                                nodegroupid, legacyid, resourceid, tileid, value, loadid, nodegroup_depth, source_description, passes_validation
+                                nodegroupid,
+                                legacyid,
+                                resourceid,
+                                tileid,
+                                value,
+                                loadid,
+                                nodegroup_depth,
+                                source_description,
+                                passes_validation
                             ) VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s)""",
                             (
                                 nodegroup,
@@ -345,9 +348,20 @@ class ImportSingleCsv:
 
                 cursor.execute("""CALL __arches_check_tile_cardinality_violation_for_load(%s)""", [loadid])
 
-        shutil.rmtree(temp_dir)
+        self.delete_from_default_storage(temp_dir)
+
         message = "staging table populated"
         return {"success": True, "data": message}
+
+    def delete_from_default_storage(self, directory):
+        dirs, files = default_storage.listdir(directory)
+        for dir in dirs:
+            dir_path = os.path.join(directory, dir)
+            self.delete_from_default_storage(dir_path)
+        for file in files:
+            file_path = os.path.join(directory, file)
+            default_storage.delete(file_path)
+        default_storage.delete(directory)
 
     def get_blank_tile_lookup(self, nodegroupid):
         if nodegroupid not in self.blank_tile_lookup.keys():

@@ -282,11 +282,8 @@ add_staging_to_tile_function = """
                                 END IF;
                                 tile_data = jsonb_set(tile_data, format('{"%s"}', _key)::text[], coalesce(tile_data_value, 'null'));
                             END LOOP;
-                        IF tile_id IS null THEN
-                            tile_id = uuid_generate_v1mc();
-                        END IF;
 
-                        SELECT tiledata FROM tiles INTO old_data WHERE resourceinstanceid = instance_id;
+                        SELECT tiledata FROM tiles INTO old_data WHERE resourceinstanceid = instance_id AND tileid = tile_id;
                         IF NOT FOUND THEN
                             old_data = null;
                         END IF;
@@ -310,7 +307,7 @@ add_staging_to_tile_function = """
                                 WHEN (_value::jsonb ->> 'datatype') = 'file-list' THEN
                                     FOR _file IN SELECT * FROM jsonb_array_elements(_value::jsonb -> 'value') LOOP
                                         file_id = _file ->> 'file_id';
-                                        UPDATE files SET tileid = tile_id WHERE fileid::text = file_id;
+                                        UPDATE files SET tileid = tile_id WHERE fileid = file_id::uuid;
                                     END LOOP;
                                 WHEN (_value::jsonb ->> 'datatype') in ('resource-instance-list', 'resource-instance') THEN
                                     PERFORM __arches_refresh_tile_resource_relationships(tile_id);
