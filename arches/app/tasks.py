@@ -226,6 +226,14 @@ def load_files(files, summary, result, temp_dir, loadid):
     shutil.rmtree(temp_dir)
     result["summary"] = summary
 
+
+@shared_task
+def load_single_csv(loadid, graphid, has_headers, fieldnames, csv_file_name, id_label):
+    from arches.app.etl_modules import import_single_csv
+
+    ImportSingleCsv = import_single_csv.ImportSingleCsv()
+    ImportSingleCsv.run_load_task(loadid, graphid, has_headers, fieldnames, csv_file_name, id_label)
+
 def create_user_task_record(taskid, taskname, userid):
     try:
         user = User.objects.get(id=userid)

@@ -54,6 +54,10 @@ define([
                 }).then(function(data){
                     self.loadEvents(data.events);
                     self.paginator(data.paginator);
+                    const newSelectedEventData = data.events.find(item => item.loadid === self.selectedLoadEvent().loadid);
+                    if (newSelectedEventData.status != self.selectedLoadEvent().status) {
+                        self.selectedLoadEvent(newSelectedEventData);
+                    } 
                 });
             };
 
