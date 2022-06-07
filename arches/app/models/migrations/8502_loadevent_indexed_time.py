@@ -6,13 +6,13 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('models', '8009_etlmodule'),
+        ("models", "8009_etlmodule"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='loadevent',
-            name='indexed_time',
+            model_name="loadevent",
+            name="indexed_time",
             field=models.DateTimeField(blank=True, null=True),
         ),
     ]
