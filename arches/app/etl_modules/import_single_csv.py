@@ -154,7 +154,7 @@ class ImportSingleCsv:
 
         if csv_size > use_celery_threshold:
             if task_management.check_if_celery_available():
-                logger.info("Delegating load to Celery task")
+                logger.info(_("Delegating load to Celery task"))
                 tasks.load_single_csv.apply_async(
                     (self.loadid, graphid, has_headers, fieldnames, csv_file_name, id_label),
                 )
