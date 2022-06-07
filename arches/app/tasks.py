@@ -207,25 +207,11 @@ def on_chord_error(request, exc, traceback):
 
 
 @shared_task
-def load_files(files, summary, result, temp_dir, loadid):
+def load_branch_csv(files, summary, result, temp_dir, loadid):
     from arches.app.etl_modules import branch_csv_importer
 
     BranchCsvImporter = branch_csv_importer.BranchCsvImporter(request=None, loadid=loadid, temp_dir=temp_dir)
-    with connection.cursor() as cursor:
-        for file in files.keys():
-            BranchCsvImporter.stage_excel_file(file, summary, cursor)
-        cursor.execute("""CALL __arches_check_tile_cardinality_violation_for_load(%s)""", [loadid])
-        result["validation"] = BranchCsvImporter.validate()
-        if len(result["validation"]["data"]) == 0:
-            BranchCsvImporter.complete_load(loadid, multiprocessing=False)
-        else:
-            cursor.execute(
-                """UPDATE load_event SET status = %s, load_end_time = %s WHERE loadid = %s""",
-                ("failed", datetime.now(), loadid),
-            )
-    shutil.rmtree(temp_dir)
-    result["summary"] = summary
-
+    BranchCsvImporter.run_load_task(files, summary, result, temp_dir, loadid)
 
 @shared_task
 def load_single_csv(loadid, graphid, has_headers, fieldnames, csv_file_name, id_label):
