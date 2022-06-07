@@ -195,22 +195,22 @@
                                 "></span>  
                             </div>
                             <div>
-                                <span style="font-size: 15px; padding-right: 3px;">{% trans 'Loading start:' %}</span>
+                                <span style="font-size: 15px; padding-right: 3px;">{% trans 'Loading started:' %}</span>
                                 <span data-bind="text: formatTime(selectedLoadEvent().load_start_time)"></span>    
                             </div>
-                            <div>
-                                <span style="font-size: 15px; padding-right: 3px;">{% trans 'Loading end:' %}</span>
+                            <div data-bind="if: selectedLoadEvent().load_end_time">
+                                <span style="font-size: 15px; padding-right: 3px;">{% trans 'Loading ended:' %}</span>
                                 <span data-bind="text: formatTime(selectedLoadEvent().load_end_time)"></span>    
                             </div>
                             <div data-bind="if: selectedLoadEvent().load_end_time">
                                 <span style="font-size: 15px; padding-right: 3px;">{% trans 'Load duration:' %}</span>
                                 <span data-bind="text: timeDifference(selectedLoadEvent().load_end_time, selectedLoadEvent().load_start_time)"></span>    
                             </div>
-                            <div>
-                                <span style="font-size: 15px; padding-right: 3px;">{% trans 'Indexing end:' %}</span>
+                            <div data-bind="if: selectedLoadEvent().indexed_time">
+                                <span style="font-size: 15px; padding-right: 3px;">{% trans 'Indexing ended:' %}</span>
                                 <span data-bind="text: formatTime(selectedLoadEvent().indexed_time)"></span>    
                             </div>
-                            <div data-bind="if: selectedLoadEvent().load_end_time">
+                            <div data-bind="if: selectedLoadEvent().indexed_time">
                                 <span style="font-size: 15px; padding-right: 3px;">{% trans 'Indexing duration:' %}</span>
                                 <span data-bind="text: timeDifference(selectedLoadEvent().indexed_time, selectedLoadEvent().load_end_time)"></span>    
                             </div>
