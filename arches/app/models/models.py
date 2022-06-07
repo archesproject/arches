@@ -1448,6 +1448,7 @@ class LoadEvent(models.Model):
     error_message = models.TextField(blank=True, null=True)
     load_start_time = models.DateTimeField(blank=True, null=True)
     load_end_time = models.DateTimeField(blank=True, null=True)
+    indexed_time = models.DateTimeField(blank=True, null=True)
 
     class Meta:
         managed = True
