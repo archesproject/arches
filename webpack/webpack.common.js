@@ -92,7 +92,7 @@ module.exports = {
             'ckeditor-jquery': Path.resolve(__dirname, `${PROJECT_PATH}/media/node_modules/ckeditor/adapters/jquery`),
             'knockout': Path.resolve(__dirname, `${PROJECT_PATH}/media/node_modules/knockout/build/output/knockout-latest`),
             'knockout-mapping': Path.resolve(__dirname, `${PROJECT_PATH}/media/node_modules/knockout-mapping/dist/knockout.mapping.min`),
-            'moment': Path.resolve(__dirname, `${PROJECT_PATH}/media/node_modules/moment/min/moment.min`),
+            'moment': Path.resolve(__dirname, `${PROJECT_PATH}/media/node_modules/moment/moment.js`),
             'bootstrap-datetimepicker': Path.resolve(__dirname, `${PROJECT_PATH}/media/node_modules/eonasdan-bootstrap-datetimepicker/build/js/bootstrap-datetimepicker.min`),
             'blueimp-gallery': Path.resolve(__dirname, `${PROJECT_PATH}/media/node_modules/blueimp-gallery/js/blueimp-gallery.min`),
             'blueimp-jquery': Path.resolve(__dirname, `${PROJECT_PATH}/media/node_modules/blueimp-gallery/js/jquery.blueimp-gallery.min`),
