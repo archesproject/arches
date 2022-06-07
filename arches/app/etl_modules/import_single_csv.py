@@ -20,19 +20,21 @@ from arches.app.models.graph import Graph
 from arches.app.models.resource import Resource
 from arches.app.models.tile import Tile
 from arches.app.models.system_settings import settings
+import arches.app.tasks as tasks
 from arches.app.utils.response import JSONResponse
 from arches.app.utils.betterJSONSerializer import JSONSerializer
 from arches.app.utils.index_database import index_resources_by_transaction
+import arches.app.utils.task_management as task_management
 
 logger = logging.getLogger(__name__)
 
 
 class ImportSingleCsv:
     def __init__(self, request=None):
-        self.request = request
-        self.userid = request.user.id
-        self.loadid = request.POST.get("load_id")
-        self.moduleid = request.POST.get("module")
+        self.request = request if request else None
+        self.userid = request.user.id if request else None
+        self.loadid = request.POST.get("load_id") if request else None
+        self.moduleid = request.POST.get("module") if request else None
         self.datatype_factory = DataTypeFactory()
         self.node_lookup = {}
         self.blank_tile_lookup = {}
@@ -109,7 +111,7 @@ class ImportSingleCsv:
                 data["config"] = row[0][0]
         return {"success": True, "data": data}
 
-    def validate(self, request):
+    def validate(self):
         """
         Creates records in the load_staging table (validated before poulating the load_staging table with error message)
         Collects error messages if any and returns table of error messages
@@ -125,9 +127,13 @@ class ImportSingleCsv:
         Move the records from load_staging to tiles table using db function
         """
 
+        graphid = request.POST.get("graphid")
+        has_headers = request.POST.get("hasHeaders")
         fieldnames = request.POST.get("fieldnames").split(",")
+        csv_file_name = request.POST.get("csvFileName")
         column_names = [fieldname for fieldname in fieldnames if fieldname != ""]
         id_label = "resourceid"
+
         error_message = None
         if len(column_names) == 0:
             error_message = _("No valid node is selected")
@@ -141,27 +147,56 @@ class ImportSingleCsv:
                 )
             return {"success": False, "data": error_message}
 
-        self.populate_staging_table(request, id_label)
+        temp_dir = os.path.join("uploadedfiles", "tmp", self.loadid)
+        csv_file_path = os.path.join(temp_dir, csv_file_name)
+        csv_size = default_storage.size(csv_file_path)  # file size in byte
+        use_celery_threshold = 500  # 500 bytes
 
-        validation = self.validate(request)
+        if csv_size > use_celery_threshold:
+            if task_management.check_if_celery_available():
+                logger.info("Delegating load to Celery task")
+                tasks.load_single_csv.apply_async(
+                    (self.loadid, graphid, has_headers, fieldnames, csv_file_name, id_label),
+                )
+                result = _("delegated_to_celery")
+                return {"success": True, "data": result}
+            else:
+                err = _("Celery appears not to be running, you need to have celery running in order to immport large csv.")
+                with connection.cursor() as cursor:
+                    cursor.execute(
+                        """UPDATE load_event SET status = %s, load_end_time = %s WHERE loadid = %s""",
+                        ("failed", datetime.now(), self.loadid),
+                    )
+                return {"success": False, "data": err}
+
+        else:
+            response = self.run_load_task(self.loadid, graphid, has_headers, fieldnames, csv_file_name, id_label)
+
+        return response
+
+    def run_load_task(self, loadid, graphid, has_headers, fieldnames, csv_file_name, id_label):
+
+        self.populate_staging_table(loadid, graphid, has_headers, fieldnames, csv_file_name, id_label)
+
+        validation = self.validate()
         if len(validation["data"]) != 0:
             with connection.cursor() as cursor:
                 cursor.execute(
                     """UPDATE load_event SET status = %s, load_end_time = %s WHERE loadid = %s""",
-                    ("failed", datetime.now(), self.loadid),
+                    ("failed", datetime.now(), loadid),
                 )
             return {"success": False, "data": "failed"}
         else:
             try:
                 with connection.cursor() as cursor:
-                    cursor.execute("""SELECT * FROM __arches_staging_to_tile(%s)""", [self.loadid])
+                    cursor.execute("""SELECT * FROM __arches_staging_to_tile(%s)""", [loadid])
                     row = cursor.fetchall()
             except (IntegrityError, ProgrammingError) as e:
                 logger.error(e)
                 with connection.cursor() as cursor:
                     cursor.execute(
                         """UPDATE load_event SET status = %s, load_end_time = %s WHERE loadid = %s""",
-                        ("failed", datetime.now(), self.loadid),
+                        ("failed", datetime.now(), loadid),
                     )
                 return {
                     "status": 400,
@@ -174,20 +209,20 @@ class ImportSingleCsv:
             with connection.cursor() as cursor:
                 cursor.execute(
                     """UPDATE load_event SET (status, load_end_time) = (%s, %s) WHERE loadid = %s""",
-                    ("completed", datetime.now(), self.loadid),
+                    ("completed", datetime.now(), loadid),
                 )
-            index_resources_by_transaction(self.loadid, quiet=True, use_multiprocessing=True)
+            index_resources_by_transaction(loadid, quiet=True, use_multiprocessing=False)
             with connection.cursor() as cursor:
                 cursor.execute(
                     """UPDATE load_event SET (status, indexed_time, complete, successful) = (%s, %s, %s, %s) WHERE loadid = %s""",
-                    ("indexed", datetime.now(), True, True, self.loadid),
+                    ("indexed", datetime.now(), True, True, loadid),
                 )
             return {"success": True, "data": "success"}
         else:
             with connection.cursor() as cursor:
                 cursor.execute(
                     """UPDATE load_event SET status = %s, load_end_time = %s WHERE loadid = %s""",
-                    ("failed", datetime.now(), self.loadid),
+                    ("failed", datetime.now(), loadid),
                 )
             return {"success": False, "data": "failed"}
 
@@ -203,14 +238,9 @@ class ImportSingleCsv:
         message = "load event created"
         return {"success": True, "data": message}
 
-    def populate_staging_table(self, request, id_label):
+    def populate_staging_table(self, loadid, graphid, has_headers, fieldnames, csv_file_name, id_label):
 
-        graphid = request.POST.get("graphid")
-        has_headers = request.POST.get("hasHeaders")
-        fieldnames = request.POST.get("fieldnames").split(",")
-        csv_file_name = request.POST.get("csvFileName")
-
-        temp_dir = os.path.join("uploadedfiles", "tmp", self.loadid)
+        temp_dir = os.path.join("uploadedfiles", "tmp", loadid)
         csv_file_path = os.path.join(temp_dir, csv_file_name)
 
         with default_storage.open(csv_file_path, mode="r") as csvfile:
@@ -316,16 +346,17 @@ class ImportSingleCsv:
                                 resourceid,
                                 tileid,
                                 tile_value_json,
-                                self.loadid,
+                                loadid,
                                 node_depth,
                                 csv_file_name,
                                 passes_validation,
                             ),
                         )
 
-                cursor.execute("""CALL __arches_check_tile_cardinality_violation_for_load(%s)""", [self.loadid])
+                cursor.execute("""CALL __arches_check_tile_cardinality_violation_for_load(%s)""", [loadid])
 
         self.delete_from_default_storage(temp_dir)
+
         message = "staging table populated"
         return {"success": True, "data": message}
 
