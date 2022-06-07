@@ -16,7 +16,6 @@ from django.utils.translation import ugettext as _
 from django.core.files.storage import default_storage
 from arches.app.datatypes.datatypes import DataTypeFactory
 from arches.app.models.models import Node
-from arches.app.models.system_settings import settings
 from arches.app.utils.betterJSONSerializer import JSONSerializer
 from arches.app.utils.index_database import index_resources_by_transaction
 from arches.management.commands.etl_template import create_workbook
