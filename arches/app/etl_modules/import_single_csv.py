@@ -1,10 +1,8 @@
 import csv
 from datetime import datetime
-import io
 import json
 import logging
 import os
-import shutil
 import uuid
 import zipfile
 from django.core.files import File
