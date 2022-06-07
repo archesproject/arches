@@ -148,9 +148,12 @@ class ImportSingleCsv:
                 )
             return {"success": False, "data": error_message}
 
-        number_of_row = 100
-        use_celery_threshold = 10
-        if number_of_row > use_celery_threshold:
+        temp_dir = os.path.join("uploadedfiles", "tmp", self.loadid)
+        csv_file_path = os.path.join(temp_dir, csv_file_name)
+        csv_size = default_storage.size(csv_file_path) # file size in byte
+        use_celery_threshold = 500 # 500 bytes
+
+        if csv_size > use_celery_threshold:
             if task_management.check_if_celery_available():
                 logger.info("Delegating load to Celery task")
                 tasks.load_single_csv.apply_async(
