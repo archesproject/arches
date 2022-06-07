@@ -240,14 +240,14 @@ class BranchCsvImporter:
         if row[0][0]:
             with connection.cursor() as cursor:
                 cursor.execute(
-                    """UPDATE load_event SET status = %s WHERE loadid = %s""",
-                    ("completed", self.loadid),
+                    """UPDATE load_event SET (status, load_end_time) = (%s, %s) WHERE loadid = %s""",
+                    ("completed", datetime.now(), loadid),
                 )
-            index_resources_by_transaction(self.loadid, quiet=True, use_multiprocessing=multiprocessing)
+            index_resources_by_transaction(loadid, quiet=True, use_multiprocessing=False)
             with connection.cursor() as cursor:
                 cursor.execute(
-                    """UPDATE load_event SET (status, load_end_time, complete, successful) = (%s, %s, %s, %s) WHERE loadid = %s""",
-                    ("indexed", datetime.now(), True, True, self.loadid),
+                    """UPDATE load_event SET (status, indexed_time, complete, successful) = (%s, %s, %s, %s) WHERE loadid = %s""",
+                    ("indexed", datetime.now(), True, True, loadid),
                 )
             return {"success": True, "data": "success"}
         else:
@@ -325,7 +325,7 @@ class BranchCsvImporter:
                         )
                     return {"success": False, "data": err}
             else:
-                response = self.run_load_task(self, files, summary, result, self.temp_dir, self.loadid)
+                response = self.run_load_task(files, summary, result, self.temp_dir, self.loadid)
 
             return response
 
