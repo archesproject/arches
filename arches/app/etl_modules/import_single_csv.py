@@ -233,7 +233,7 @@ class ImportSingleCsv:
 
     def populate_staging_table(self, loadid, graphid, has_headers, fieldnames, csv_file_name, id_label):
 
-        temp_dir = os.path.join("uploadedfiles", "tmp", self.loadid)
+        temp_dir = os.path.join("uploadedfiles", "tmp", loadid)
         csv_file_path = os.path.join(temp_dir, csv_file_name)
 
         with default_storage.open(csv_file_path, mode="r") as csvfile:
