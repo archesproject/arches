@@ -234,6 +234,15 @@ def load_single_csv(loadid, graphid, has_headers, fieldnames, csv_file_name, id_
     ImportSingleCsv = import_single_csv.ImportSingleCsv()
     ImportSingleCsv.run_load_task(loadid, graphid, has_headers, fieldnames, csv_file_name, id_label)
 
+
+@shared_task
+def reverse_etl_load(loadid):
+    from arches.app.etl_modules import base_import_module
+
+    module = base_import_module.BaseImportModule()
+    module.reverse_load(loadid)
+
+
 def create_user_task_record(taskid, taskname, userid):
     try:
         user = User.objects.get(id=userid)
