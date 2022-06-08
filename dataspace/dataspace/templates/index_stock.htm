@@ -1,0 +1,555 @@
+<!--
+ARCHES - a program developed to inventory and manage immovable cultural heritage.
+Copyright (C) 2013 J. Paul Getty Trust and World Monuments Fund
+
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU Affero General Public License as
+published by the Free Software Foundation, either version 3 of the
+License, or (at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+GNU Affero General Public License for more details.
+
+You should have received a copy of the GNU Affero General Public License
+along with this program. If not, see <http://www.gnu.org/licenses/>.
+-->
+{% load staticfiles %}
+{% load template_tags %}
+{% load i18n %}
+<!DOCTYPE html>
+<!--[if IE 8]> <html lang="en" class="ie8"> <![endif]-->
+<!--[if IE 9]> <html lang="en" class="ie9"> <![endif]-->
+<!--[if !IE]><!-->
+<html lang="en">
+<!--<![endif]-->
+
+<head>
+    <title>{{app_title}}</title>
+
+    <!-- Meta -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="">
+    <meta name="author" content="">
+
+    <link rel="shortcut icon" href="{% static 'img/favicon.png' %}" />
+
+    <link rel='stylesheet' type='text/css' href='//fonts.googleapis.com/css?family=Open+Sans:400,300,600&amp;subset=cyrillic,latin'>
+    <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.2/css/bootstrap.min.css">
+
+    <link href="{% static 'css/unify.css' %}" rel="stylesheet">
+    <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/font-awesome/4.2.0/css/font-awesome.min.css">
+    <link href="{% static 'css/index.css' %}" rel="stylesheet">
+    {% if app_settings.ACCESSIBILITY_MODE %}
+    <link href="{% static 'css/accessibility.css' %}" rel="stylesheet">
+    {% endif %}
+</head>
+
+<body>
+
+    <!--=== Header ===-->
+    <header>
+        <nav class="v5-splash-navbar navbar" role="navigation">
+            <div class="container-fluid">
+                <div class="navbar-header">
+                    <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#myNavbar" aria-expanded="false" aria-controls="myNavbar">
+                        <span class="sr-only">Toggle navigation</span>
+                        <span class="icon-bar"></span>
+                        <span class="icon-bar"></span>
+                        <span class="icon-bar"></span>
+                    </button>
+
+                    <div class="relative nav-brand-container">
+                        <div class="navbar-brand-v5-icon-container">
+                            <img class="navbar-brand-v5-icon" src="{% static 'img/landing/Arches_logo_white.png' %}" alt="Arches Logo">
+                        </div>
+                        <div class="application-name">
+                            <h1>{% blocktrans %}Arches | {{version}}{% endblocktrans %}</h1>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="myNavbar" class="navbar-collapse collapse">
+                    <ul class="nav navbar-nav navbar-right">
+                        <li>
+                            <a href="#info-block-1">{% trans "Arches Features" %}</a>
+                        </li>
+                        <li>
+                            <a href="{% url 'search_home' %}">{% trans "Search Arches" %}</a>
+                        </li>
+                        {% if user|can_create_resource_instance and user.username != 'anonymous' %}
+                            <li>
+                                <a href="{% url 'resource' %}" target="_blank">{% trans "Manage" %}</a>
+                            </li>
+                        {% endif %}
+                        {% if user.username == 'anonymous' %}
+                            <li>
+                                <a class="application-login" id="auth-link" href="{% url 'auth' %}?next={% url 'home' %}{% if user.username != 'anonymous' %}&logout=true{% endif %}">{% trans "Sign in" %}</a>
+                            </li>
+                        {% else %}
+                            <li>
+                                <a class="auth-welcome" href="{% url 'user_profile_manager' %}">
+                                    {% trans "Welcome, " %} {{ user.first_name|default:user.username }}
+                                </a>
+                            </li>
+                            <li>
+                                <a class="application-login" href="{% url 'auth' %}?next={% url 'home' %}{% if user.username != 'anonymous' %}&logout=true{% endif %}">{% trans 'Log off' %}</a>
+                            </li>
+                        {% endif %}
+                        {% if show_language_swtich %}
+                            <li>
+                                {% get_current_language as LANGUAGE_CODE %}
+                                <div class="lang-switch" style="max-width: none;" data-bind='component: {
+                                    name: "views/components/language-switcher",
+                                    params: {
+                                        current_language: "{{LANGUAGE_CODE}}"
+                                    }
+                                }'></div>
+                            </li>
+                        {% endif %}
+                    </ul>
+                </div>
+            </div>
+        </nav>
+    </header>
+    <!--=== End Header ===-->
+
+    <main>
+        <article>
+            <!-- Intro Section -->
+            <section id="info-block-0" class="app-info-block intro-section relative">
+                <!-- Vertical Nav -->
+                <div class="vertical-nav-container-background"></div>
+
+                <div id="cd-vertical-nav" class="vertical-nav-container">
+                    <ul class="vertical-nav-list">
+                        <li class="active">
+                            <a class="vertical-nav-list-link" href="#info-block-0" data-number="1" aria-label="Go to the top of the page">
+                                <span class="vertical-nav-list-ref">{% trans "Home" %}</span>
+                            </a>
+                        </li>
+                        <li>
+                            <a class="vertical-nav-list-link" href="#info-block-1" data-number="2" aria-label="Go to the fast section">
+                                <span class="vertical-nav-list-ref">{% trans "Fast" %}</span>
+                            </a>
+                        </li>
+                        <li>
+                            <a class="vertical-nav-list-link" href="#info-block-2" data-number="3" aria-label="Go to the workflows section">
+                                <span class="vertical-nav-list-ref">{% trans "Workflows" %}</span>
+                            </a>
+                        </li>
+                        <li>
+                            <a class="vertical-nav-list-link" href="#info-block-3" data-number="4" aria-label="Go to the search tools section">
+                                <span class="vertical-nav-list-ref">{% trans "Search Tools" %}</span>
+                            </a>
+                        </li>
+                        <li>
+                            <a class="vertical-nav-list-link" href="#info-block-4" data-number="5" aria-label="Go to the mobile section">
+                                <span class="vertical-nav-list-ref">{% trans "Mobile" %}</span>
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+
+                <!-- Splash Screen -->
+                <div class="fullscreenbanner-container">
+                    <div class="fullscreenbanner">
+                        <ul>
+                            <!-- SLIDE 1 -->
+                            <li data-transition="fade" data-slotamount="9" data-masterspeed="0" data-title="Slide 1">
+                                <!-- MAIN IMAGE -->
+                                <img src="{% static 'img/landing/landing-primary.jpg' %}" alt="slidebg1" data-bgfit="cover" data-bgposition="center center" data-bgrepeat="no-repeat">
+                                <!-- LAYERS -->
+                                <!-- NEW LAYER -->
+                                <div class="tp-caption sft start text-bold v5-splash-caption" delay="4500" data-hoffset="0" data-y="400" data-speed="800" data-start="100" data-easing="Back.easeInOut" data-endspeed="300" data-x="0">
+                                    <h2>{% blocktrans %}Arches {{version}}{% endblocktrans %}</h2>
+                                    <p>{% trans "A web and mobile platform for" %}</p>
+                                    <p style="padding-bottom: 15px;">{% trans "managing your most important resource information" %}</p>
+                                </div>
+
+                                <!-- Gradient -->
+                                <div class="image-gradient"></div>
+
+                                <!-- Attribution -->
+                                <div class="image-attribution">
+                                    <span>{% trans "Glarus thrust, Tectonic Area Sardona, Switzerland | Jonas Wagner https://www.flickr.com/photos/80225884@N06/ | Attribution 2.0 Generic (CC BY 2.0)" %}</span>
+                                </div>
+                            </li>
+                        </ul>
+                        <div class="tp-bannertimer tp-bottom"></div>
+                    </div>
+
+                    <!-- Down button -->
+                    <a href="#info-block-1" class="down-button" aria-label="Go to content"><i class="fa fa-angle-down down-button-icon"></i></a>
+                </div>
+            </section>
+            <!-- End Intro Section -->
+
+            <!-- Info Block 1 -->
+            <section id="info-block-1" class="app-info-block relative">
+                <div>
+
+                    <!-- Heading Info -->
+                    <div class="sub-section">
+                        <div class="col-lg-7">
+                            <div class="app-info-block-intro text-center">
+                                <h2 class="app-info-block-header">{% trans "Fast" %}</h2>
+                                <h3 class="app-info-block-title">{% trans "Deploy Applications Rapidly" %}</h3>
+                                <p class="app-info-block-text">
+                                    {% trans "Design custom information management applications in hours.  Build your databases with Arches Designer, then configure your interface all without having to write any code." %}
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Content -->
+                    <div class="splash-img">
+                        <img src="{% static 'img/landing/imac_designer.png' %}"  alt="Arches Designer">
+                    </div>
+
+                    <!-- Sub-section -->
+                    <div class="row app-info-sub-block">
+
+                        <!-- Arches Data Type Block -->
+                        <div class="col-lg-6">
+                            <div class="sub-block-container">
+                                <h3 class="app-info-block-title">{% trans "Interface Manager" %}</h3>
+                                <p class="sub-block-description">
+                                    {% trans "Arches automatically creates data entry forms based on your data models.  Use Arches' Card Manager to configure the look and feel of your data entry UI." %}
+                                </p>
+                                <img class="sub-block-image" src="{% static 'img/landing/card_manager.png' %}" alt="Card Manager">
+                            </div>
+                        </div>
+
+                        <!-- Arches Data Type Block -->
+                        <div class="col-lg-6">
+                            <div class="sub-block-container">
+                                <h3 class="app-info-block-title">{% trans "Data Security" %}</h3>
+                                <p class="sub-block-description">
+                                    {% trans "Use Arches' Permissions Manager to set up data access rules for all your user groups and individual accounts.  You can define read/write/delete and no-access permissions." %}
+                                </p>
+                                <img class="sub-block-image" src="{% static 'img/landing/permissions_manager.png' %}" alt="Permissions Manager">
+                            </div>
+                        </div>
+
+                    </div>
+                    <!-- End Sub-section -->
+
+                </div>
+            </section>
+            <!-- End Info Block 1 -->
+
+            <!-- Info Block 2 -->
+            <section id="info-block-2" class="app-info-block relative">
+                <div>
+
+                    <!-- Heading Info -->
+                    <div class="sub-section">
+                        <div class="col-lg-7">
+                            <div class="app-info-block-intro text-center">
+                                <h2 class="app-info-block-header">{% trans "Workflows" %}</h2>
+                                <h3 class="app-info-block-title">{% trans "Orchestrate your data entry" %}</h3>
+                                <p class="app-info-block-text">
+                                    {% trans "Design step-wise data management interfaces that simplify complex editing tasks.  Ensure that everyone enters data completely and consistently" %}
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Content -->
+                    <div class="splash-img">
+                        <img class="sub-block-image" src="{% static 'img/landing/consultation_workflow.jpg' %}" alt="Arches Workflows">
+                    </div>
+
+                </div>
+            </section>
+            <!-- End Info Block 2 -->
+
+            <!-- Info Block 3 -->
+            <section id="info-block-3" class="app-info-block relative">
+                <div>
+
+                    <!-- Heading Info -->
+                    <div class="sub-section">
+                        <div class="col-lg-7">
+                            <div class="app-info-block-intro text-center">
+                                <h2 class="app-info-block-header">{% trans "Arches Search Tools" %}</h2>
+                                <h3 class="app-info-block-title">{% trans "Find what you're looking for" %}</h3>
+                                <p class="app-info-block-text">
+                                    {% trans "Arches comes with powerful built-in search tools.  Quickly filter large databases with term, geospatial, and time-based search components" %}
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="splash-img">
+                        <img class="sub-block-image" src="{% static 'img/landing/arches_search.png' %}" alt="Arches Search">
+                    </div>
+
+                    <!-- Sub-section -->
+                    <div class="wide-box">
+                        <div class="box-highlight">
+                            <h3 class="app-info-block-header">{% trans "Search Options" %}</h3>
+                            <p>
+                                {% trans "Arches gives you many ways to find precisely the information you need, even if your Arches application contains 10's of millions of records.  In addition to term, thesaurus, geospatial, and temporal filters, Arches provides you with advanced filtering options that support boolean logic, inverses, and many other filtering options." %}
+                            </p>
+                            <br>
+                            <p>
+                                {% trans "Arches' search capabilities also provide for sophisticated data visualizations, including interactive displays of the connections between your data objects using a Force Directed Graph." %}
+                            </p>
+                            <br>
+                            <p>
+                                {% trans "If you're a software developer, you can build on Arches modular search services and create your own filters, reports, and visualizations to best show off your particular dataset." %}
+                            </p>
+
+                        </div>
+                    </div>
+
+                </div>
+            </section>
+            <!-- End Info Block 3 -->
+
+            <!-- Info Block 4 -->
+            <section id="info-block-4" class="app-info-block relative">
+                <div>
+                    <!-- Heading Info -->
+                    <div class="sub-section">
+                    </div>
+                    <!-- Content -->
+                    <div class="row">
+                        <div class="col-md-6 col-lg-4 text-center">
+                            <img class="iphone" src="{% static 'img/landing/IPhone_8_map.png' %}" alt="Arches Designer">
+                        </div>
+                        <div class="col-md-6 col-lg-8">
+                            <div class="mobile-description-container">
+                                <div class="box-highlight">
+                                    <h2 class="app-info-block-title">{% trans "Work on the go..." %}</h2>
+                                    <p>
+                                        {% trans "Arches Collector allows you to create new data and edit existing records when you're away from your computer.  Don't worry if you're out of cell or Wi-Fi range.  Create new records, update information, even add new map locations.  Then synch your changes to your Arches application when you re-establish a network connection." %}
+                                    </p>
+                                    <br>
+                                    <p>
+                                        {% trans "Arches Collector is available for iOS and Android devices.  Download the app from your favorite marketplace." %}
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+            <!-- End Info Block 4 -->
+        </article>
+    </main>
+
+
+
+    <!-- Footer -->
+    <footer>
+
+        <!-- footer content container -->
+        <div class="row footer-links">
+
+            <!-- branding column -->
+            <div class="col-lg-4">
+                <h2 class="app-footer-heading">{% trans "Sample Institution Name" %}</h2>
+
+                <div class="organization-address">
+                  {% trans "Sample Address" %}<br>
+                  {% trans "Getty Conservation Institute" %}<br>
+                  {% trans "1200 Getty Center Drive" %}<br>
+                  {% trans "Los Angeles, CA  90049" %}<br>
+                </div>
+            </div>
+
+            <!-- Info Column -->
+            <div class="col-lg-8">
+                <h2 class="app-footer-heading">{% trans "Guides and Documentation" %}</h2>
+
+                <!-- Links -->
+                <div class="splash-links">
+                    <div class="row">
+                        <div class="col-lg-4">
+                            <ul class="splash-link-container">
+                                <li>
+                                    <a class="splash-link-address" href="http://https://www.archesproject.org/what-is-arches/" target="_blank">{% trans "What is Arches" %}</a>
+                                </li>
+                                <li>
+                                    <a class="splash-link-address" href="https://www.archesproject.org/collector/" target="_blank">{% trans "Arches Collector" %}</a>
+                                </li>
+                                <li>
+                                    <a class="splash-link-address" href="https://www.archesproject.org/implementation-considerations/" target="_blank">{% trans "Implementation Considerations" %}</a>
+                                </li>
+                                <li>
+                                    <a class="splash-link-address" href="https://www.archesproject.org/development/" target="_blank">{% trans "Information For Developers" %}</a>
+                                </li>
+
+
+                            </ul>
+                        </div>
+
+                        <div class="col-lg-4">
+                            <ul class="splash-link-container">
+                                <li>
+                                    <a class="splash-link-address" href="https://www.archesproject.org/faq/" target="_blank">{% trans "FAQ" %}</a>
+                                </li>
+                                <li>
+                                    <a class="splash-link-address" href="https://www.archesproject.org/standards/" target="_blank">{% trans "Standards and Interoperability" %}</a>
+                                </li>
+                                <li>
+                                    <a class="splash-link-address" href="https://arches.readthedocs.io/en/stable/requirements-and-dependencies/" target="_blank">{% trans "Installation Guide" %}</a>
+                                </li>
+                            </ul>
+                        </div>
+
+                        <div class="col-lg-4">
+                            <ul class="splash-link-container">
+                                <li>
+                                    <a class="splash-link-address" href="https://www.archesproject.org/project-background/" target="_blank">{% trans "Arches Project Background" %}</a>
+                                </li>
+                                <li>
+                                    <a class="splash-link-address" href="https://www.archesproject.org/videos/" target="_blank">{% trans "Arches Webinars/Presentations" %}</a>
+                                </li>
+                                <li>
+                                    <a class="splash-link-address" href="https://www.archesproject.org/resource-models/" target="_blank">{% trans "Resource Models" %}</a>
+                                </li>
+                            </ul>
+                        </div>
+
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+        <!-- Copyright Panel -->
+        <div class="row copyright-container">
+            <!-- Arches link -->
+            <div class="app-footer-links">
+                <div class="col-sm-8">
+                    <a class="link-spacing" href="#">{% trans "Terms & Conditions" %}</a>
+                    <a class="link-spacing" href="#">{% trans "Privacy Policy" %}</a>
+                </div>
+                <div class="col-sm-4">
+                    <a class="app-footer-arches-link" href="http://www.archesproject.org" target="_blank">{% trans "Powered by Arches" %}</a>
+                </div>
+            </div>
+        </div>
+        <!-- End Copyright Container -->
+
+    </footer>
+    <!-- End Footer -->
+
+<script src="{% static 'packages/requirejs/require.js' %}"></script>
+
+<script>
+
+    require.config({
+        baseUrl: '{{ STATIC_URL }}js',
+        paths: {
+            'templates': '{% url "templates" ""%}'.replace(/\/$/, ""),
+            'text': '{{ STATIC_URL }}packages/requirejs-text/text',
+            'jquery-lib': '{{ STATIC_URL }}packages/jquery/dist/jquery.min',
+            'jquery': '{{ STATIC_URL }}packages/jquery-migrate/dist/jquery-migrate.min',
+            'jquery-ui': '{{ STATIC_URL }}packages/jqueryui/jquery-ui.min',
+            'underscore': '{{ STATIC_URL }}packages/underscore/underscore-min',
+            'chosen': '{{ STATIC_URL }}packages/chosen-js/chosen.jquery.min',
+            'knockout': '{{ STATIC_URL }}packages/knockout/build/output/knockout-latest',
+            'bootstrap': '{{ STATIC_URL }}packages/bootstrap/dist/js/bootstrap.min',
+            'themepunch-tools': '{{ STATIC_URL }}plugins/revolution-slider/rs-plugin/js/jquery.themepunch.tools.min',
+            'themepunch-revolution': '{{ STATIC_URL }}plugins/revolution-slider/rs-plugin/js/jquery.themepunch.revolution',
+            'revolution-slider': '{{ STATIC_URL }}plugins/revolution-slider',
+            'one-app': '{{ STATIC_URL }}plugins/one.app',
+        },
+        shim: {
+            'jquery': {
+                deps: ['jquery-lib'],
+                exports: '$'
+            },
+            'bootstrap': {
+                deps: ['jquery', 'jquery-ui']
+            },
+            'chosen': {
+                deps: ['jquery'],
+            },
+            'themepunch-tools': {
+                deps: ['jquery'],
+            },
+            'themepunch-revolution': {
+                deps: ['jquery'],
+            },
+            'revolution-slider': {
+                deps: ['jquery'],
+            },
+            'one-app': {
+                deps: ['jquery'],
+            }
+        }
+    });
+    require(
+        ['jquery',
+            'knockout',
+            'bootstrap',
+            'themepunch-tools',
+            'themepunch-revolution',
+            'revolution-slider',
+            'one-app',
+            'bindings/chosen',
+            'views/components/language-switcher'
+        ], function ($, ko) {
+            $(document).ready(function () {
+                App.init();
+                RevolutionSlider.initRSfullScreen();
+
+                var contentSections = $('.app-info-block'),
+                    navigationItems = $('#cd-vertical-nav a');
+
+                updateNavigation();
+                $(window).on('scroll', function () {
+                    updateNavigation();
+                });
+
+                //smooth scroll to the section
+                navigationItems.on('click', function (event) {
+                    event.preventDefault();
+                    smoothScroll($(this.hash));
+                });
+
+
+                function updateNavigation() {
+                    contentSections.each(function () {
+                        $this = $(this);
+                        var activeSection = $('#cd-vertical-nav a[href="#' + $this.attr('id') + '"]').data('number') - 1;
+                        if (($this.offset().top - $(window).height() / 2 < $(window).scrollTop()) && ($this.offset().top + $this.height() - $(window).height() / 2 > $(window).scrollTop())) {
+                            navigationItems.eq(activeSection).addClass('is-selected');
+                        } else {
+                            navigationItems.eq(activeSection).removeClass('is-selected');
+                        }
+                    });
+                }
+
+                function smoothScroll(target) {
+                    $('body,html').animate(
+                        { 'scrollTop': target.offset().top },
+                        600
+                    );
+                }
+
+                var ViewModel = function () {
+                     // place observables here
+                };
+
+                // need to have this to prevent mismatched anonymous define error in require.js
+                setTimeout(function () {
+                    ko.applyBindings(new ViewModel());
+                }, 300);
+            });
+
+        }
+    );
+</script>
+
+</body>
+
+</html>

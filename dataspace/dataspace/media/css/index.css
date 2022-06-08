@@ -222,11 +222,12 @@ ul.cons-splash-list > li > a:focus, ul.cons-splash-list > li > a:hover {
 }
 
 .v5-splash-caption p {
-    font-size: 29px;
-    font-weight: 300;
+    font-size: 26px;
+    font-weight: 200;
     color: #fff;
     line-height: 0.7;
     padding: 0px 20px;
+    text-shadow: 0.5px 0.5px 2px #000;
 }
 
 .navbar-brand-v5 {
@@ -428,7 +429,8 @@ ul.cons-splash-list > li > a:focus, ul.cons-splash-list > li > a:hover {
 
 .app-info-block.intro-section h2 {
     color: #fff;
-    font-size: 55px;
+    text-shadow: 0.5px 0.5px 2px #000;
+    font-size: 35px;
     padding: 10px 20px;
 }
 
@@ -455,7 +457,7 @@ ul.cons-splash-list > li > a:focus, ul.cons-splash-list > li > a:hover {
     background: #fff;
     border: 1px solid #ddd;
     min-height: 305px;
-    padding: 30px 36px 30px;
+    padding: 30px 36px 20px;
     margin: 10px -5px;
     text-align: center;
 }
@@ -507,7 +509,7 @@ footer .footer-links {
 }
 
 .app-footer-heading {
-    font-size: 23px;
+    font-size: 18px;
     font-weight: 200;
     color: #dcdcdc;
     margin-top: 15px;
@@ -519,7 +521,7 @@ footer .footer-links {
 }
 
 .organization-address {
-    font-size: 17px;
+    font-size: 14px;
     font-weight: 300;
     line-height: 1.5;
     margin-top: 20px;
@@ -532,7 +534,7 @@ footer .footer-links {
 }
 
 .app-footer-links {
-    font-size: 15px;
+    font-size: 12px;
     color: #213B55;
 }
 
@@ -730,7 +732,7 @@ footer .footer-links {
 }
 
 .splash-link-address {
-    font-size: 17px;
+    font-size: 14px;
     font-weight: 300;
     line-height: 1.5;
     color: #fff;

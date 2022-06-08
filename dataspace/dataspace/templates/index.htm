@@ -37,19 +37,20 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 
     <link rel='stylesheet' type='text/css' href='//fonts.googleapis.com/css?family=Open+Sans:400,300,600&amp;subset=cyrillic,latin'>
     <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.2/css/bootstrap.min.css">
+    <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/font-awesome/4.2.0/css/font-awesome.min.css">
 
     <link href="{% static 'css/unify.css' %}" rel="stylesheet">
-    <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/font-awesome/4.2.0/css/font-awesome.min.css">
     <link href="{% static 'css/index.css' %}" rel="stylesheet">
     <link href="{% static 'css/project.css' %}" rel="stylesheet">
 
     <style media="screen">
         img.models-image {
           border-radius: 10%;
-          width: 100%;
-          max-width: 300px;
-          height: auto;
-          margin: 5px;
+          width: 90%;
+          height: 256px;
+          /* max-height: 300px;
+          min-height: 256px; */
+          object-fit: cover;
         }
 
         /* Added Style for horizontal lines */
@@ -121,7 +122,7 @@ The data-spy and data-target are part of the built-in Bootstrap scrollspy functi
 
                 <div class="collapse navbar-collapse" id="myNavbar">
                     <ul class="nav navbar-nav">
-                        <li>
+                        <li id="">
                             <a href="#info-block-1">{% trans "What is it?" %}</a>
                         </li>
 
@@ -144,11 +145,22 @@ The data-spy and data-target are part of the built-in Bootstrap scrollspy functi
                                 <a class="auth-welcome" href="{% url 'user_profile_manager' %}">
                                     {% trans "Welcome" %}, {{ user.first_name|default:user.username }}
                                 </a>
-                            </li>
-                            <li>
-                                <a class="application-login" href="{% url 'auth' %}?next={% url 'home' %}{% if user.username != 'anonymous' %}&logout=true{% endif %}">{% trans 'Log out' %}</a>
+                                </li>
+                                <li>
+                                    <a class="application-login" href="{% url 'auth' %}?next={% url 'home' %}{% if user.username != 'anonymous' %}&logout=true{% endif %}">{% trans 'Log out' %}</a>
                             {% endif %}
                         </li>
+                        {% if show_language_swtich %}
+                            <li>
+                                {% get_current_language as LANGUAGE_CODE %}
+                                <div class="lang-switch" style="max-width: none;" data-bind='component: {
+                                    name: "views/components/language-switcher",
+                                    params: {
+                                        current_language: "{{LANGUAGE_CODE}}"
+                                    }
+                                }'></div>
+                            </li>
+                        {% endif %}
                     </ul>
                 </div>
             </div>
@@ -192,112 +204,113 @@ The data-spy and data-target are part of the built-in Bootstrap scrollspy functi
             <div class="fullscreenbanner">
                 <ul>
                     <!-- SLIDE 1 -->
-                    <li data-transition="fade" data-slotamount="9" data-masterspeed="0" data-title="ISPC Data Space">
+                    <li data-transition="fade" data-slotamount="9" data-masterspeed="0" data-title="Diagnostic Datasets">
                         <!-- MAIN IMAGE -->
                         <img src="{% static 'img/landing/Musei_Vaticani.jpeg' %}" alt="slidebg1" data-bgfit="cover" data-bgposition="center center" data-bgrepeat="repeat">
 
                         <!-- LAYERS -->
                         <!-- NEW LAYER -->
                         <div class="tp-caption sft start text-bold v5-splash-caption" style="left: 150px;" delay="4500"  data-hoffset="0" data-y="400" data-speed="800" data-start="100" data-easing="Back.easeInOut" data-endspeed="300">
-                            <h2>{% trans "ISPC Data Space" %}</h2>
-                            <p>{% trans "Digital Heritage Documentation" %}</p>
-                            <p>{% trans "from Italy, for the World." %}</p>
+                            <h2>{% trans "Diagnostic Investigation Datasets" %}</h2>
+                            <p>{% trans "The study of a Mesoamerican manuscript" %}</p>
+                            <p>{% trans "of the BAV." %}</p>
                         </div>
 
                         <!-- Gradient -->
                         <div class="image-gradient"></div>
 
                         <!-- Attribution -->
-                        <div class="image-attribution">
+                        <!-- <div class="image-attribution">
                             <span>{% trans "Vatican Museums" %} | ISPC</span>
-                        </div>
+                        </div> -->
                     </li>
 
 
                     <!-- SLIDE 2 -->
-                    <li data-transition="fade" data-slotamount="9" data-masterspeed="0" data-title="Sky View">
+                    <li data-transition="fade" data-slotamount="9" data-masterspeed="0" data-title="Digital Maps">
                         <!-- MAIN IMAGE -->
                         <img src="{% static 'img/landing/QB2006_falso colore.jpg' %}" alt="slidebg2" data-bgfit="cover" data-bgposition="center center" data-bgrepeat="repeat">
 
                         <!-- LAYERS -->
                         <!-- NEW LAYER -->
                         <div class="tp-caption sft start text-bold v5-splash-caption" style="left: 150px;" delay="4500"  data-hoffset="0" data-y="400" data-speed="800" data-start="100" data-easing="Back.easeInOut" data-endspeed="300">
-                            <h2>{% trans "ISPC Data Space" %}</h2>
-                            <p>{% trans "Digital Heritage Documentation" %}</p>
-                            <p>{% trans "from Italy, for the World." %}</p>
+                            <h2>{% trans "Digital Archaeological Maps for Ancient Topography" %}</h2>
+                            <p>{% trans "Hatra (Iraq) in a pan-sharpened false-colored infrared image." %}</p>
+                            <!-- <p>{% trans "from Italy, for the World." %}</p> -->
                         </div>
 
                         <!-- Gradient -->
                         <div class="image-gradient"></div>
 
                         <!-- Attribution -->
-                        <div class="image-attribution">
+                        <!-- <div class="image-attribution">
                             <span>{% trans "Aerial View of " %} | ISPC</span>
-                        </div>
+                        </div> -->
                     </li>
 
 
                     <!-- SLIDE 3 -->
-                    <li data-transition="fade" data-slotamount="9" data-masterspeed="0" data-title="Engagement">
+                    <li data-transition="fade" data-slotamount="9" data-masterspeed="0" data-title="Support Tools">
                         <!-- MAIN IMAGE -->
                         <img src="{% static 'img/landing/Epigrafe.jpg' %}" alt="slidebg3" data-bgfit="cover" data-bgposition="center center" data-bgrepeat="repeat">
 
                         <!-- LAYERS -->
                         <!-- NEW LAYER -->
                         <div class="tp-caption sft start text-bold v5-splash-caption" style="left: 150px;" delay="4500"  data-hoffset="0" data-y="400" data-speed="800" data-start="100" data-easing="Back.easeInOut" data-endspeed="300">
-                            <h2>{% trans "Cutting Edge Technology" %}</h2>
-                            <p>{% trans "used by professionals." %}</p>
+                            <h2>{% trans "Support Tools for Heritage Databases" %}</h2>
+                            <p>{% trans "The Digital Archive for the study of" %}</p>
+                            <p>{% trans "pre-islamic arabian inscriptions." %}</p>
                         </div>
 
                         <!-- Gradient -->
                         <div class="image-gradient"></div>
 
                         <!-- Attribution -->
-                        <div class="image-attribution">
+                        <!-- <div class="image-attribution">
                             <span>{% trans "Enviq Tool" %} | ISPC</span>
-                        </div>
+                        </div> -->
                     </li>
 
                     <!-- SLIDE 4 -->
-                    <li data-transition="fade" data-slotamount="9" data-masterspeed="0" data-title="Engagement">
+                    <li data-transition="fade" data-slotamount="9" data-masterspeed="0" data-title="Innovative Services">
                         <!-- MAIN IMAGE -->
                         <img src="{% static 'img/landing/DHiLab_ISPC_enhancement.jpg' %}" alt="slidebg4" data-bgfit="cover" data-bgposition="center center" data-bgrepeat="repeat">
 
                         <!-- LAYERS -->
                         <!-- NEW LAYER -->
                         <div class="tp-caption sft start text-bold v5-splash-caption" style="left: 150px;" delay="4500"  data-hoffset="0" data-y="400" data-speed="800" data-start="100" data-easing="Back.easeInOut" data-endspeed="300">
-                            <h2>{% trans "Cutting Edge Technology" %}</h2>
-                            <p>{% trans "used by professionals." %}</p>
+                            <h2>{% trans "Innovative Services for the immersive fruition of Heritage" %}</h2>
+                            <p>{% trans "Aton framework example" %}</p>
                         </div>
 
                         <!-- Gradient -->
                         <div class="image-gradient"></div>
 
                         <!-- Attribution -->
-                        <div class="image-attribution">
+                        <!-- <div class="image-attribution">
                             <span>{% trans "DHiLab ISPC enhancement" %} | ISPC</span>
-                        </div>
+                        </div> -->
                     </li>
 
                     <!-- SLIDE 5 -->
-                    <li data-transition="fade" data-slotamount="9" data-masterspeed="0" data-title="Engagement">
+                    <li data-transition="fade" data-slotamount="9" data-masterspeed="0" data-title="Training Resources">
                         <!-- MAIN IMAGE -->
                         <img src="{% static 'img/landing/Alghero_2017.jpeg' %}" alt="slidebg3" data-bgfit="cover" data-bgposition="center center" data-bgrepeat="repeat">
 
                         <!-- LAYERS -->
                         <!-- NEW LAYER -->
                         <div class="tp-caption sft start text-bold v5-splash-caption" style="left: 150px;" delay="4500"  data-hoffset="0" data-y="400" data-speed="800" data-start="100" data-easing="Back.easeInOut" data-endspeed="300">
-                            <h2>{% trans "Promoting Internacional" %}</h2>
-                            <p>{% trans "and Multidisciplinary research." %}</p>
+                            <h2>{% trans "Digital Training Resources for Heritage Sciences" %}</h2>
+                            <p>{% trans "Alghero training camp." %}</p>
                         </div>
 
                         <!-- Gradient -->
                         <div class="image-gradient"></div>
 
                         <!-- Attribution -->
-                        <div class="image-attribution">
+                        <!-- <div class="image-attribution">
                             <span>{% trans "Alghero (2017)" %} | ISPC</span>
-                        </div>
+                        </div> -->
                     </li>
 
                 </ul>
@@ -305,7 +318,7 @@ The data-spy and data-target are part of the built-in Bootstrap scrollspy functi
             </div>
 
             <!-- Down button -->
-            <div class="down-button">
+            <div class="down-button" id="">
                 <a href="#info-block-1"><i class="fa fa-angle-down down-button-icon"></i></a>
             </div>
         </div>
@@ -320,25 +333,25 @@ The data-spy and data-target are part of the built-in Bootstrap scrollspy functi
             <!-- Content -->
             <div class="row">
 
-                <div class="col-md-6 col-lg-6">
+                <div class="col-sm-12 col-md-6 col-lg-4">
                     <div class="app-info-block-text">
                         <div class="box-highlight">
                             <p class="app-info-block-text">
                                 {% trans "Data Space is a platform for the sharing, accessing, and long-term conservation of data produced by the Institute of Cultural Heritage Sciences. It allows access to innovative digital tools & services to increase the knowledge and enhance the conservation of the Cultural Heritage in an interdisciplinary perspective." %}
                             </p>
                             <br>
-                            <p>
+                            <!-- <p>
                                 {% trans "Curabitur laoreet erat ante, at varius ipsum posuere accumsan." %}
-                            </p>
+                            </p> -->
                         </div>
                     </div>
                 </div>
 
-                <div class="col-md-6 col-lg-6">
-                    <video poster="{% static 'img/landing/Bozza_cover.jpg' %}" controls style="max-width:100%;">
+                <div class="col-sm-12 col-md-6 col-lg-8">
+                    <video poster="{% static 'img/landing/Bozza_cover.jpg' %}" controls style="width: 100%; max-width:640px; height:auto; display: block; margin-left: auto; margin-right: auto;">
                         <source src="{% static 'img/landing/bozza_video.mp4' %}" type="video/mp4">
                     </video>
-                    <hr class="card-inline-separator" style="margin-top: 20px">
+                    <hr class="card-inline-separator" style="margin-top: 20px; max-width:760px; margin-left: auto; margin-right: auto;">
                     <h4 style="text-align: center;">{% trans "ISPC Data Space | Presentation Video" %}</h4>
                 </div>
 
@@ -409,7 +422,7 @@ The data-spy and data-target are part of the built-in Bootstrap scrollspy functi
             <div class="row app-info-sub-block">
 
                 <!-- Arches Data Type Block -->
-                <div class="col-lg-4">
+                <div class="col-sm-6 col-lg-4">
                     <div class="sub-block-container-alt">
                         <img class="sub-block-image" src="{% static 'img/icons/research_icon.svg' %}" alt="Research Icon">
                         <h2>{% trans "Research Areas" %}</h2>
@@ -421,7 +434,7 @@ The data-spy and data-target are part of the built-in Bootstrap scrollspy functi
                 </div>
 
                 <!-- Arches Data Type Block -->
-                <div class="col-lg-4">
+                <div class="col-sm-6 col-lg-4">
                     <div class="sub-block-container-alt">
                         <img class="sub-block-image" src="{% static 'img/icons/training_icon.svg' %}" alt="Training Icon">
                         <h2>{% trans "Training Resources" %}</h2>
@@ -433,7 +446,7 @@ The data-spy and data-target are part of the built-in Bootstrap scrollspy functi
                 </div>
 
                 <!-- Arches Data Type Block -->
-                <div class="col-lg-4">
+                <div class="col-sm-6 col-lg-4">
                     <div class="sub-block-container-alt">
                         <img class="sub-block-image" src="{% static 'img/icons/vres_icon.svg' %}" alt="VREs Icon">
                         <h2>{% trans "VREs" %}</h2>
@@ -444,14 +457,8 @@ The data-spy and data-target are part of the built-in Bootstrap scrollspy functi
                     </div>
                 </div>
 
-            </div>
-            <!-- End Sub-section -->
-
-            <!-- Sub-section 2-->
-            <div class="row app-info-sub-block">
-
                 <!-- Arches Data Type Block -->
-                <div class="col-lg-4">
+                <div class="col-sm-6 col-lg-4">
                     <div class="sub-block-container-alt">
                         <img class="sub-block-image" src="{% static 'img/icons/datasets_icon.svg' %}" alt="Research Icon">
                         <h2>{% trans "Datasets" %}</h2>
@@ -463,7 +470,7 @@ The data-spy and data-target are part of the built-in Bootstrap scrollspy functi
                 </div>
 
                 <!-- Arches Data Type Block -->
-                <div class="col-lg-4">
+                <div class="col-sm-6 col-lg-4">
                     <div class="sub-block-container-alt">
                         <img class="sub-block-image" src="{% static 'img/icons/services_icon.svg' %}" alt="Training Icon">
                         <h2>{% trans "Services" %}</h2>
@@ -475,7 +482,7 @@ The data-spy and data-target are part of the built-in Bootstrap scrollspy functi
                 </div>
 
                 <!-- Arches Data Type Block -->
-                <div class="col-lg-4">
+                <div class="col-sm-6 col-lg-4">
                     <div class="sub-block-container-alt">
                         <img class="sub-block-image" src="{% static 'img/icons/workflows_icon.svg' %}" alt="VREs Icon">
                         <h2>{% trans "Workflows" %}</h2>
@@ -487,7 +494,7 @@ The data-spy and data-target are part of the built-in Bootstrap scrollspy functi
                 </div>
 
             </div>
-            <!-- End Sub-section 2-->
+            <!-- End Sub-section-->
 
         </div>
     </section>
@@ -514,8 +521,21 @@ The data-spy and data-target are part of the built-in Bootstrap scrollspy functi
             <div class="sub-section" id="gallery">
                 <div class="row">
 
-                    <div class="col-sm-6 col-lg-4">
-                        <div class="sub-block-container" style="min-height: 385px;">
+                  <div class="col-sm-6 col-lg-4">
+                      <div class="sub-block-container"  style="min-height: 400px;">
+                          <a href='#' target="_blank">
+                              <img class="models-image" src="{% static 'img\landing\MOLAB_Campagna.jpeg' %}">
+                          </a>
+                          <hr class="card-inline-separator" style="margin-top: 20px;">
+                          <h5>{% trans "MOLAB, National Gallery of Umbria (CNR ISPC)" %}</h5>
+                          <!-- <p class="sub-block-description">
+                            {% trans "Practical solutions for the formalization and description of research workflows" %}
+                          </p> -->
+                      </div>
+                  </div>
+
+                  <div class="col-sm-6 col-lg-4">
+                        <div class="sub-block-container" style="min-height: 400px;">
                             <a href='https://aton.ispc.cnr.it/s/vhlab/sid-ac9lddw5w' target="_blank">
                                 <img class="models-image" src='https://aton.ispc.cnr.it/scenes/vhlab/sid-ac9lddw5w/cover.png'>
                             </a>
@@ -528,7 +548,7 @@ The data-spy and data-target are part of the built-in Bootstrap scrollspy functi
                     </div>
 
                     <div class="col-sm-6 col-lg-4">
-                        <div class="sub-block-container" style="min-height: 385px;">
+                        <div class="sub-block-container" style="min-height: 400px;">
                             <a href='https://aton.ispc.cnr.it/s/vhlab/demo/faug' target="_blank">
                                 <img class="models-image" src='https://aton.ispc.cnr.it/scenes/vhlab/demo/faug/cover.png'>
                             </a>
@@ -541,20 +561,7 @@ The data-spy and data-target are part of the built-in Bootstrap scrollspy functi
                     </div>
 
                     <div class="col-sm-6 col-lg-4">
-                        <div class="sub-block-container"  style="min-height: 385px;">
-                            <a href='https://aton.ispc.cnr.it/s/vhlab/20220406-sjno9j84k' target="_blank">
-                                <img class="models-image" src='https://aton.ispc.cnr.it/scenes/vhlab/20220406-sjno9j84k/cover.png'>
-                            </a>
-                            <hr class="card-inline-separator" style="margin-top: 20px;">
-                            <h5>{% trans "Nuraghe La Prisgiona, Sardinia. (CNR ISPC)" %}</h5>
-                            <!-- <p class="sub-block-description">
-                              {% trans "Practical solutions for the formalization and description of research workflows" %}
-                            </p> -->
-                        </div>
-                    </div>
-
-                    <div class="col-sm-6 col-lg-4">
-                        <div class="sub-block-container"  style="min-height: 385px;">
+                        <div class="sub-block-container"  style="min-height: 400px;">
                             <a href='https://aton.ispc.cnr.it/s/vhlab/demo/skyphos' target="_blank">
                                 <img class="models-image" src='https://aton.ispc.cnr.it/scenes/vhlab/demo/skyphos/cover.png'>
                             </a>
@@ -567,12 +574,12 @@ The data-spy and data-target are part of the built-in Bootstrap scrollspy functi
                     </div>
 
                     <div class="col-sm-6 col-lg-4">
-                        <div class="sub-block-container"  style="min-height: 385px;">
-                            <a href='https://aton.ispc.cnr.it/s/vhlab/20220225-waruy7328' target="_blank">
-                                <img class="models-image" src='https://aton.ispc.cnr.it/scenes/vhlab/20220225-waruy7328/cover.png'>
+                        <div class="sub-block-container"  style="min-height: 400px;">
+                            <a href='#' target="_blank">
+                                <img class="models-image" src="{% static 'img\landing\MOLAB_Total_reflection_mid.jpeg' %}">
                             </a>
                             <hr class="card-inline-separator" style="margin-top: 20px;">
-                            <h5>{% trans "Montale (Terza Torre), San Marino. (CNR ISPC)" %}</h5>
+                            <h5>{% trans "MOLAB, Oslo, Total reflection mid FTIR (CNR ISPC)" %}</h5>
                             <!-- <p class="sub-block-description">
                               {% trans "Practical solutions for the formalization and description of research workflows" %}
                             </p> -->
@@ -580,7 +587,7 @@ The data-spy and data-target are part of the built-in Bootstrap scrollspy functi
                     </div>
 
                     <div class="col-sm-6 col-lg-4">
-                        <div class="sub-block-container"  style="min-height: 385px;">
+                        <div class="sub-block-container"  style="min-height: 400px;">
                             <a href='https://aton.ispc.cnr.it/s/vhlab/20220605-jsdyyi50z' target="_blank">
                                 <img class="models-image" src='https://aton.ispc.cnr.it/scenes/vhlab/20220605-jsdyyi50z/cover.png'>
                             </a>
@@ -631,7 +638,7 @@ The data-spy and data-target are part of the built-in Bootstrap scrollspy functi
     <div class="afs-app-footer">
 
         <!-- footer content container -->
-        <h2 class="app-footer-heading" style="margin-top: 15px;">{% trans "Institute of Heritage Science" %}</h2>
+        <h2 class="app-footer-heading" style="margin-bottom: 0px;">{% trans "Institute of Heritage Science" %}</h2>
         <div class="row">
 
             <!-- branding column -->
@@ -690,9 +697,9 @@ The data-spy and data-target are part of the built-in Bootstrap scrollspy functi
         <!-- Arches link -->
         <div class="app-footer-links">
             <p style="color: #91A5CF; display: inline;">
-              Copyright © –
+              2022 © All Rights Reserved -
               <a class="link-spacing" style="margin-right: 0px;" href="http://www.cnr.it/">{% trans "National Research Council" %}</a> –
-              <a class="link-spacing" style="margin-right: 0px;" href="https://www.ispc.cnr.it/">{% trans "Institute of Heritage Science" %}</a> – 2022
+              <a class="link-spacing" style="margin-right: 0px;" href="https://www.ispc.cnr.it/">{% trans "Institute of Heritage Science" %}</a>
             </p>
             <a class="link-spacing afs-app-footer-arches-link" href="http://www.archesproject.org" target="_blank">{% trans "Powered by Arches" %}</a>
         </div>
