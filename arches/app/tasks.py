@@ -22,7 +22,6 @@ def delete_file():
     settings.update_from_db()
 
     logger = logging.getLogger(__name__)
-    now = datetime.timestamp(datetime.now())
     file_list = []
     range = datetime.now() - timedelta(seconds=settings.CELERY_SEARCH_EXPORT_EXPIRES)
     exports = models.SearchExportHistory.objects.filter(exporttime__lt=range).exclude(downloadfile="")
