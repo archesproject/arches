@@ -213,7 +213,6 @@ The data-spy and data-target are part of the built-in Bootstrap scrollspy functi
                         <div class="tp-caption sft start text-bold v5-splash-caption" style="left: 150px;" delay="4500"  data-hoffset="0" data-y="400" data-speed="800" data-start="100" data-easing="Back.easeInOut" data-endspeed="300">
                             <h2>{% trans "Diagnostic Investigation Datasets" %}</h2>
                             <p>{% trans "The study of a Mesoamerican manuscript" %}</p>
-                            <p>{% trans "of the BAV." %}</p>
                         </div>
 
                         <!-- Gradient -->
@@ -235,7 +234,7 @@ The data-spy and data-target are part of the built-in Bootstrap scrollspy functi
                         <!-- NEW LAYER -->
                         <div class="tp-caption sft start text-bold v5-splash-caption" style="left: 150px;" delay="4500"  data-hoffset="0" data-y="400" data-speed="800" data-start="100" data-easing="Back.easeInOut" data-endspeed="300">
                             <h2>{% trans "Digital Archaeological Maps for Ancient Topography" %}</h2>
-                            <p>{% trans "Hatra (Iraq) in a pan-sharpened false-colored infrared image." %}</p>
+                            <p>{% trans "Hatra (Iraq) in a pan-sharpened false-colored infrared image" %}</p>
                             <!-- <p>{% trans "from Italy, for the World." %}</p> -->
                         </div>
 
@@ -259,7 +258,7 @@ The data-spy and data-target are part of the built-in Bootstrap scrollspy functi
                         <div class="tp-caption sft start text-bold v5-splash-caption" style="left: 150px;" delay="4500"  data-hoffset="0" data-y="400" data-speed="800" data-start="100" data-easing="Back.easeInOut" data-endspeed="300">
                             <h2>{% trans "Support Tools for Heritage Databases" %}</h2>
                             <p>{% trans "The Digital Archive for the study of" %}</p>
-                            <p>{% trans "pre-islamic arabian inscriptions." %}</p>
+                            <p>{% trans "pre-islamic arabian inscriptions" %}</p>
                         </div>
 
                         <!-- Gradient -->
@@ -301,7 +300,7 @@ The data-spy and data-target are part of the built-in Bootstrap scrollspy functi
                         <!-- NEW LAYER -->
                         <div class="tp-caption sft start text-bold v5-splash-caption" style="left: 150px;" delay="4500"  data-hoffset="0" data-y="400" data-speed="800" data-start="100" data-easing="Back.easeInOut" data-endspeed="300">
                             <h2>{% trans "Digital Training Resources for Heritage Sciences" %}</h2>
-                            <p>{% trans "Alghero training camp." %}</p>
+                            <p>{% trans "Alghero training camp" %}</p>
                         </div>
 
                         <!-- Gradient -->
@@ -348,7 +347,7 @@ The data-spy and data-target are part of the built-in Bootstrap scrollspy functi
                 </div>
 
                 <div class="col-sm-12 col-md-6 col-lg-8">
-                    <video poster="{% static 'img/landing/Bozza_cover.jpg' %}" controls style="width: 100%; max-width:640px; height:auto; display: block; margin-left: auto; margin-right: auto;">
+                    <video poster="{% static 'img/landing/Bozza_cover.jpg' %}" controls autoplay muted style="width: 100%; max-width:640px; height:auto; display: block; margin-left: auto; margin-right: auto;">
                         <source src="{% static 'img/landing/bozza_video.mp4' %}" type="video/mp4">
                     </video>
                     <hr class="card-inline-separator" style="margin-top: 20px; max-width:760px; margin-left: auto; margin-right: auto;">
@@ -365,8 +364,8 @@ The data-spy and data-target are part of the built-in Bootstrap scrollspy functi
     <!-- Info Block 2 -->
     <section id="info-block-2" class="app-info-block relative">
 
-        <div class="row" style="margin: -150px 0px 50px; display: flex; justify-content: space-evenly;">
-            <div class="col-4">
+        <div class="row" style="margin: -115px 0px 50px; display: flex; justify-content: space-evenly;">
+            <div class="">
                 <div class="resource-icon-container">
                     <lord-icon
                         src="https://cdn.lordicon.com/pvbutfdk.json"
@@ -378,7 +377,7 @@ The data-spy and data-target are part of the built-in Bootstrap scrollspy functi
                 </div>
             </div>
 
-            <div class="col-4">
+            <div class="">
                   <div class="resource-icon-container" style="background-color: #6A7D10">
                       <lord-icon
                           src="https://cdn.lordicon.com/sygggnra.json"
@@ -391,7 +390,7 @@ The data-spy and data-target are part of the built-in Bootstrap scrollspy functi
               </div>
 
 
-              <div class="col-4">
+              <div class="">
                   <div class="resource-icon-container" style="background-color: #7D5100">
                       <lord-icon
                           src="https://cdn.lordicon.com/stxtcyyo.json"
@@ -523,11 +522,11 @@ The data-spy and data-target are part of the built-in Bootstrap scrollspy functi
 
                   <div class="col-sm-6 col-lg-4">
                       <div class="sub-block-container"  style="min-height: 400px;">
-                          <a href='#' target="_blank">
+                          <a href="{% url 'construction' %}" target="_blank">
                               <img class="models-image" src="{% static 'img\landing\MOLAB_Campagna.jpeg' %}">
                           </a>
                           <hr class="card-inline-separator" style="margin-top: 20px;">
-                          <h5>{% trans "MOLAB, National Gallery of Umbria (CNR ISPC)" %}</h5>
+                          <h5>{% trans "MOLAB, National Gallery of Umbria | CNR ISPC" %}</h5>
                           <!-- <p class="sub-block-description">
                             {% trans "Practical solutions for the formalization and description of research workflows" %}
                           </p> -->
@@ -540,7 +539,7 @@ The data-spy and data-target are part of the built-in Bootstrap scrollspy functi
                                 <img class="models-image" src='https://aton.ispc.cnr.it/scenes/vhlab/sid-ac9lddw5w/cover.png'>
                             </a>
                             <hr class="card-inline-separator" style="margin-top: 20px;">
-                            <h5>{% trans "Tomb of the Reliefs, Cerveteri. (CNR ISPC)" %}</h5>
+                            <h5>{% trans "Tomb of the Reliefs, Cerveteri | CNR ISPC" %}</h5>
                             <!-- <p class="sub-block-description">
                               {% trans "Practical solutions for the formalization and description of research workflows" %}
                             </p> -->
@@ -549,11 +548,11 @@ The data-spy and data-target are part of the built-in Bootstrap scrollspy functi
 
                     <div class="col-sm-6 col-lg-4">
                         <div class="sub-block-container" style="min-height: 400px;">
-                            <a href='https://aton.ispc.cnr.it/s/vhlab/demo/faug' target="_blank">
-                                <img class="models-image" src='https://aton.ispc.cnr.it/scenes/vhlab/demo/faug/cover.png'>
+                            <a href="{% url 'construction' %}" target="_blank">
+                                <img class="models-image" src="{% static 'img\landing\IDEHA_favignana.png' %}">
                             </a>
                             <hr class="card-inline-separator" style="margin-top: 20px;">
-                            <h5>{% trans "Forum of Augustus, Rome. (CNR ISPC)" %}</h5>
+                            <h5>{% trans "Florio Ex-Factory of the Tonnare | CNR ISPC" %}</h5>
                             <!-- <p class="sub-block-description">
                               {% trans "Practical solutions for the formalization and description of research workflows" %}
                             </p> -->
@@ -562,11 +561,11 @@ The data-spy and data-target are part of the built-in Bootstrap scrollspy functi
 
                     <div class="col-sm-6 col-lg-4">
                         <div class="sub-block-container"  style="min-height: 400px;">
-                            <a href='https://aton.ispc.cnr.it/s/vhlab/demo/skyphos' target="_blank">
-                                <img class="models-image" src='https://aton.ispc.cnr.it/scenes/vhlab/demo/skyphos/cover.png'>
+                            <a href='http://dasi.cnr.it/index.php?id=dasi_prj_epi&prjId=1&corId=0&colId=0&navId=502577838&recId=742' target="_blank">
+                                <img class="models-image" src="{% static 'img\landing\Epigrafe_MSM149.jpeg' %}">
                             </a>
                             <hr class="card-inline-separator" style="margin-top: 20px;">
-                            <h5>{% trans "Skyphos (CNR ISPC)" %}</h5>
+                            <h5>{% trans "Epigraph MṢM 149 | CNR ISPC" %}</h5>
                             <!-- <p class="sub-block-description">
                               {% trans "Practical solutions for the formalization and description of research workflows" %}
                             </p> -->
@@ -575,11 +574,11 @@ The data-spy and data-target are part of the built-in Bootstrap scrollspy functi
 
                     <div class="col-sm-6 col-lg-4">
                         <div class="sub-block-container"  style="min-height: 400px;">
-                            <a href='#' target="_blank">
+                            <a href="{% url 'construction' %}" target="_blank">
                                 <img class="models-image" src="{% static 'img\landing\MOLAB_Total_reflection_mid.jpeg' %}">
                             </a>
                             <hr class="card-inline-separator" style="margin-top: 20px;">
-                            <h5>{% trans "MOLAB, Oslo, Total reflection mid FTIR (CNR ISPC)" %}</h5>
+                            <h5>{% trans "MOLAB, Oslo, Total reflection mid FTIR | CNR ISPC" %}</h5>
                             <!-- <p class="sub-block-description">
                               {% trans "Practical solutions for the formalization and description of research workflows" %}
                             </p> -->
@@ -592,7 +591,7 @@ The data-spy and data-target are part of the built-in Bootstrap scrollspy functi
                                 <img class="models-image" src='https://aton.ispc.cnr.it/scenes/vhlab/20220605-jsdyyi50z/cover.png'>
                             </a>
                             <hr class="card-inline-separator" style="margin-top: 20px;">
-                            <h5>{% trans "Bust of Chrysippus (CNR ISPC)" %}</h5>
+                            <h5>{% trans "Bust of Chrysippus | CNR ISPC" %}</h5>
                             <!-- <p class="sub-block-description">
                               {% trans "Practical solutions for the formalization and description of research workflows" %}
                             </p> -->
@@ -661,10 +660,10 @@ The data-spy and data-target are part of the built-in Bootstrap scrollspy functi
                 <div class="afs-splash-links">
                     <ul class="splash-link-container">
                         <li>
-                            <a class="splash-link-address" href="#" target="_blank">{% trans "About Data Space" %}</a>
+                            <a class="splash-link-address" href="{% url 'construction' %}"> target="_blank">{% trans "About Data Space" %}</a>
                         </li>
                         <li>
-                            <a class="splash-link-address" href="#" target="_blank">{% trans "Contact Us" %}</a>
+                            <a class="splash-link-address" href="{% url 'construction' %}"> target="_blank">{% trans "Contact Us" %}</a>
                         </li>
                     </ul>
                 </div>
@@ -678,10 +677,10 @@ The data-spy and data-target are part of the built-in Bootstrap scrollspy functi
                 <div class="afs-splash-links">
                     <ul class="splash-link-container">
                         <li>
-                            <a class="splash-link-address" href="#" target="_blank">{% trans "Cookies Policy" %}</a>
+                            <a class="splash-link-address" href="{% url 'construction' %}"> target="_blank">{% trans "Cookies Policy" %}</a>
                         </li>
                         <li>
-                            <a class="splash-link-address" href="#" target="_blank">{% trans "Privacy Policy" %}</a>
+                            <a class="splash-link-address" href="{% url 'construction' %}"> target="_blank">{% trans "Privacy Policy" %}</a>
                         </li>
                     </ul>
                 </div>

@@ -1,0 +1,30 @@
+{% extends "errors/error_base.htm" %}
+{% load i18n %}
+{% load staticfiles %}
+
+{% block body %}
+<div style="text-align: center">
+	<!--===================================================-->
+	<div class="cls-header">
+	    <div class="cls-brand">
+	        <a class="box-inline" href="{% url 'home' %}">
+	            <span class="brand-title"><h4>{% trans "Data Space" %}</h4></span>
+	        </a>
+	    </div>
+	</div>
+
+	<!-- CONTENT -->
+	<!--===================================================-->
+	<div class="cls-content">
+			<img style="width: 300px; height: 300px;" src="{% static 'img/logos/dataspace_icon.png' %}" alt="Arches Search">
+	    <h1 class="error-code text-mint">{% trans "Oops!" %}</h1>
+	    <p class="h3 text-uppercase">{% trans "Page Under Construction!" %}</p>
+	    <div class="pad-btm">
+				{% trans "Sorry, but the page you are looking for has not been yes created." %}
+	    </div>
+
+	    <hr class="new-section-sm bord-no">
+	    <div class="pad-top"><a class="btn-link" href="{% url 'home' %}">{% trans "Back to Homepage" %}</a></div>
+	</div>
+</div>
+{% endblock body %}

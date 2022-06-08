@@ -409,7 +409,7 @@ ul.cons-splash-list > li > a:focus, ul.cons-splash-list > li > a:hover {
 
 .app-info-block {
     min-height: 600px;
-    padding: 80px 150px;
+    padding: 40px 150px 30px;
     background: #fff;
     border-top: 1px solid #ddd;
 }
@@ -562,7 +562,7 @@ footer .footer-links {
 .sub-section {
     display: flex;
     justify-content: center;
-    padding-bottom: 40px;
+    padding-bottom: 20px;
 }
 
 .vertical-nav-container-background {
