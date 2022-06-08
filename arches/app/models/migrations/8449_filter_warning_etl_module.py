@@ -3,7 +3,9 @@ from django.db import migrations, models
 
 class Migration(migrations.Migration):
 
-    dependencies = [("models", "8009_etlmodule"), ]
+    dependencies = [
+        ("models", "8009_etlmodule"),
+    ]
     operations = [
         migrations.RunSQL(
             sql="""
@@ -106,6 +108,6 @@ class Migration(migrations.Migration):
             end;
             $$ language plpgsql;
 
-            """
+            """,
         )
     ]

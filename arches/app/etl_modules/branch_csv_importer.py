@@ -119,7 +119,7 @@ class BranchCsvImporter:
                     validation_errors = datatype_instance.validate(value, nodeid=nodeid, path=self.temp_dir)
                 else:
                     validation_errors = datatype_instance.validate(value, nodeid=nodeid)
-                validation_errors = [message for message in validation_errors if message['type'] != 'WARNING']
+                validation_errors = [message for message in validation_errors if message["type"] != "WARNING"]
                 valid = True if len(validation_errors) == 0 else False
                 if not valid:
                     tile_valid = False
