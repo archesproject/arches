@@ -5,10 +5,11 @@ define([
     'dropzone',
     'uuid',
     'arches',
+    'viewmodels/alert-json',
     'bindings/datatable',
     'bindings/dropzone',
     'bindings/resizable-sidepanel',
-], function(ko, koMapping, $, dropzone, uuid, arches) {
+], function(ko, koMapping, $, dropzone, uuid, arches, JsonErrorAlertViewModel) {
     return ko.components.register('import-single-csv', {
         viewModel: function(params) {
             const self = this;
@@ -164,7 +165,7 @@ define([
                     self.fileAdded(true);
                     self.loading(false);
                 }).catch(function(err) {
-                    console.log(err);
+                    params.alert(new JsonErrorAlertViewModel('ep-alert-red', err.responseJSON, null, function(){}));
                     self.loading(false);
                 });
             };
