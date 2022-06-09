@@ -104,7 +104,7 @@ class ImportSingleCsv:
                 "status": 400,
                 "success": False,
                 "title": _("No csv file found"),
-                "message": _("Upload valid csv file"),
+                "message": _("Upload a valid csv file"),
             }
 
         with default_storage.open(csv_file_path, mode="r") as csvfile:
