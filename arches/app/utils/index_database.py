@@ -84,7 +84,9 @@ def index_resources(
     )
 
 
-def index_resources_using_multiprocessing(resourceids, batch_size=settings.BULK_IMPORT_BATCH_SIZE, quiet=False, max_subprocesses=0, callback=None):
+def index_resources_using_multiprocessing(
+    resourceids, batch_size=settings.BULK_IMPORT_BATCH_SIZE, quiet=False, max_subprocesses=0, callback=None
+):
     try:
         multiprocessing.set_start_method("spawn")
     except:
@@ -150,7 +152,9 @@ def index_resources_using_multiprocessing(resourceids, batch_size=settings.BULK_
         pool.join()
 
 
-def index_resources_using_singleprocessing(resources: Iterable[Resource], batch_size=settings.BULK_IMPORT_BATCH_SIZE, quiet=False, title=None):
+def index_resources_using_singleprocessing(
+    resources: Iterable[Resource], batch_size=settings.BULK_IMPORT_BATCH_SIZE, quiet=False, title=None
+):
     datatype_factory = DataTypeFactory()
     node_datatypes = {str(nodeid): datatype for nodeid, datatype in models.Node.objects.values_list("nodeid", "datatype")}
     with se.BulkIndexer(batch_size=batch_size, refresh=True) as doc_indexer:
