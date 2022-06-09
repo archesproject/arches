@@ -23,7 +23,6 @@ from arches.app.models.system_settings import settings
 import arches.app.tasks as tasks
 from arches.app.utils.response import JSONResponse
 from arches.app.utils.betterJSONSerializer import JSONSerializer
-from arches.app.utils.index_database import index_resources_by_type
 from arches.app.utils.index_database import index_resources_by_transaction
 import arches.app.utils.task_management as task_management
 
@@ -160,7 +159,7 @@ class ImportSingleCsv:
 
         if csv_size > use_celery_threshold:
             if task_management.check_if_celery_available():
-                logger.info("Delegating load to Celery task")
+                logger.info(_("Delegating load to Celery task"))
                 tasks.load_single_csv.apply_async(
                     (self.loadid, graphid, has_headers, fieldnames, csv_file_name, id_label),
                 )
@@ -212,11 +211,16 @@ class ImportSingleCsv:
                 }
 
         if row[0][0]:
+            with connection.cursor() as cursor:
+                cursor.execute(
+                    """UPDATE load_event SET (status, load_end_time) = (%s, %s) WHERE loadid = %s""",
+                    ("completed", datetime.now(), loadid),
+                )
             index_resources_by_transaction(loadid, quiet=True, use_multiprocessing=False)
             with connection.cursor() as cursor:
                 cursor.execute(
-                    """UPDATE load_event SET status = %s WHERE loadid = %s""",
-                    ("completed", loadid),
+                    """UPDATE load_event SET (status, indexed_time, complete, successful) = (%s, %s, %s, %s) WHERE loadid = %s""",
+                    ("indexed", datetime.now(), True, True, loadid),
                 )
             return {"success": True, "data": "success"}
         else:

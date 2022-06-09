@@ -87,6 +87,9 @@
                                             </div>
                                             <div>
                                                 <!-- ko if: event.status == "completed" -->
+                                                <button class="btn btn-warning" style="width:150px;">{% trans "indexing" %}</button>
+                                                <!-- /ko -->
+                                                <!-- ko if: event.status == "indexed" -->
                                                 <button class="btn btn-success" style="width:150px;">{% trans "completed" %}</button>
                                                 <!-- /ko -->
                                                 <!-- ko if: event.status == "failed" -->
@@ -102,11 +105,11 @@
                                         <!-- ko if: event.status == "completed" -->
                                         <a style="color: steelblue; text-decoration: underline; padding-right: 10px; cursor: pointer;" data-bind="click: function() { $parent.reverseTransactions(event.loadid) }">{% trans "undo import" %}</a>
                                         <!-- /ko -->
+                                        <!-- ko if: event.status == "indexed" -->
+                                        <a style="color: steelblue; text-decoration: underline; padding-right: 10px; cursor: pointer;" data-bind="click: function() { $parent.reverseTransactions(event.loadid) }">{% trans "undo import" %}</a>
+                                        <!-- /ko -->
                                         <!-- ko if: event.status == "failed" -->
                                         <a style="color: steelblue; text-decoration: underline; padding-right: 10px; cursor: pointer;" data-bind="click: function() { $parent.cleanLoadEvent(event.loadid) }">{% trans "clean up" %}</a>
-                                        <!-- /ko -->
-                                        <!-- ko if: event.status == "running" -->
-                                        <a style="color: steelblue; text-decoration: underline; padding-right: 10px; cursor: pointer;" data-bind="click: function() { }">{% trans "stop task" %}</a>
                                         <!-- /ko -->
                                     </td>
                                 </tr>
@@ -179,19 +182,33 @@
                             <h4>{% trans "Loading data" %}</h4>
                             <div>
                                 <span style="font-size: 15px; padding-right: 3px;">{% trans 'Loading status:' %}</span>
-                                <span data-bind="text: selectedLoadEvent().status == 'completed' ? '{% trans "Completed" %}' : selectedLoadEvent().status == 'failed' ? '{% trans "Failed" %}' : '{% trans "Running" %}'"></span>  
+                                <span data-bind="
+                                    text:
+                                        selectedLoadEvent().status == 'indexed' ? '{% trans "Completed" %}' 
+                                        : selectedLoadEvent().status == 'completed' ? '{% trans "Indexing" %}' 
+                                        : selectedLoadEvent().status == 'failed' ? '{% trans "Failed" %}' 
+                                        : '{% trans "Running" %}'
+                                "></span>  
                             </div>
                             <div>
-                                <span style="font-size: 15px; padding-right: 3px;">{% trans 'Loading start:' %}</span>
+                                <span style="font-size: 15px; padding-right: 3px;">{% trans 'Loading started:' %}</span>
                                 <span data-bind="text: formatTime(selectedLoadEvent().load_start_time)"></span>    
                             </div>
-                            <div>
-                                <span style="font-size: 15px; padding-right: 3px;">{% trans 'Loading end:' %}</span>
+                            <div data-bind="if: selectedLoadEvent().load_end_time">
+                                <span style="font-size: 15px; padding-right: 3px;">{% trans 'Loading ended:' %}</span>
                                 <span data-bind="text: formatTime(selectedLoadEvent().load_end_time)"></span>    
                             </div>
                             <div data-bind="if: selectedLoadEvent().load_end_time">
                                 <span style="font-size: 15px; padding-right: 3px;">{% trans 'Load duration:' %}</span>
                                 <span data-bind="text: timeDifference(selectedLoadEvent().load_end_time, selectedLoadEvent().load_start_time)"></span>    
+                            </div>
+                            <div data-bind="if: selectedLoadEvent().indexed_time">
+                                <span style="font-size: 15px; padding-right: 3px;">{% trans 'Indexing ended:' %}</span>
+                                <span data-bind="text: formatTime(selectedLoadEvent().indexed_time)"></span>    
+                            </div>
+                            <div data-bind="if: selectedLoadEvent().indexed_time">
+                                <span style="font-size: 15px; padding-right: 3px;">{% trans 'Indexing duration:' %}</span>
+                                <span data-bind="text: timeDifference(selectedLoadEvent().indexed_time, selectedLoadEvent().load_end_time)"></span>    
                             </div>
                         </div>
                     </div>
