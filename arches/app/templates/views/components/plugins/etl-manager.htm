@@ -112,7 +112,7 @@
                                         <a style="color: steelblue; text-decoration: underline; padding-right: 10px; cursor: pointer;" data-bind="click: function() { $parent.reverseTransactions(event) }">{% trans "undo import" %}</a>
                                         <!-- /ko -->
                                         <!-- ko if: event.status == "indexed" -->
-                                        <a style="color: steelblue; text-decoration: underline; padding-right: 10px; cursor: pointer;" data-bind="click: function() { $parent.reverseTransactions(event.loadid) }">{% trans "undo import" %}</a>
+                                        <a style="color: steelblue; text-decoration: underline; padding-right: 10px; cursor: pointer;" data-bind="click: function() { $parent.reverseTransactions(event) }">{% trans "undo import" %}</a>
                                         <!-- /ko -->
                                         <!-- ko if: event.status == "failed" || event.status == "unloaded" -->
                                         <a style="color: steelblue; text-decoration: underline; padding-right: 10px; cursor: pointer;" data-bind="click: function() { $parent.cleanLoadEvent(event.loadid) }">{% trans "remove from history" %}</a>
