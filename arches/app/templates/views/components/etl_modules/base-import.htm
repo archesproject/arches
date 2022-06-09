@@ -1,0 +1,11 @@
+{% load i18n %}
+
+<!-- ko if: state === 'details' -->
+{% block task_details %}
+{% endblock task_details %}
+<!-- /ko -->
+
+<!-- ko if: state === 'status' -->
+{% block etl_status %}
+{% endblock etl_status %}
+<!-- /ko -->

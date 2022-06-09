@@ -1,6 +1,7 @@
 from __future__ import absolute_import, unicode_literals
 import os
 import logging
+import shutil
 from celery import shared_task
 from datetime import datetime
 from datetime import timedelta
@@ -204,6 +205,20 @@ def on_chord_error(request, exc, traceback):
     user = User.objects.get(id=1)
     notify_completion(msg, user)
 
+
+@shared_task
+def load_branch_csv(files, summary, result, temp_dir, loadid):
+    from arches.app.etl_modules import branch_csv_importer
+
+    BranchCsvImporter = branch_csv_importer.BranchCsvImporter(request=None, loadid=loadid, temp_dir=temp_dir)
+    BranchCsvImporter.run_load_task(files, summary, result, temp_dir, loadid)
+
+@shared_task
+def load_single_csv(loadid, graphid, has_headers, fieldnames, csv_file_name, id_label):
+    from arches.app.etl_modules import import_single_csv
+
+    ImportSingleCsv = import_single_csv.ImportSingleCsv()
+    ImportSingleCsv.run_load_task(loadid, graphid, has_headers, fieldnames, csv_file_name, id_label)
 
 def create_user_task_record(taskid, taskname, userid):
     try:
