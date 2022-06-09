@@ -98,18 +98,24 @@
                                                 <!-- ko if: event.status == "running" -->
                                                 <button class="btn btn-warning" style="width:150px;">{% trans "running" %}</button>
                                                 <!-- /ko -->
+                                                <!-- ko if: event.status == "reversing" -->
+                                                <button class="btn btn-warning" style="width:150px;">{% trans "unloading" %}</button>
+                                                <!-- /ko -->
+                                                <!-- ko if: event.status == "unloaded" -->
+                                                <button class="btn btn-success" style="width:150px;">{% trans "unloaded" %}</button>
+                                                <!-- /ko -->
                                             </div>
                                         </div>
                                     </td>
                                     <td style="background: #eee; display: block; height: 35px; padding: 10px 15px; border-top: 1px solid rgba(0,0,0,0.14)">
                                         <!-- ko if: event.status == "completed" -->
-                                        <a style="color: steelblue; text-decoration: underline; padding-right: 10px; cursor: pointer;" data-bind="click: function() { $parent.reverseTransactions(event.loadid) }">{% trans "undo import" %}</a>
+                                        <a style="color: steelblue; text-decoration: underline; padding-right: 10px; cursor: pointer;" data-bind="click: function() { $parent.reverseTransactions(event) }">{% trans "undo import" %}</a>
                                         <!-- /ko -->
                                         <!-- ko if: event.status == "indexed" -->
-                                        <a style="color: steelblue; text-decoration: underline; padding-right: 10px; cursor: pointer;" data-bind="click: function() { $parent.reverseTransactions(event.loadid) }">{% trans "undo import" %}</a>
+                                        <a style="color: steelblue; text-decoration: underline; padding-right: 10px; cursor: pointer;" data-bind="click: function() { $parent.reverseTransactions(event) }">{% trans "undo import" %}</a>
                                         <!-- /ko -->
-                                        <!-- ko if: event.status == "failed" -->
-                                        <a style="color: steelblue; text-decoration: underline; padding-right: 10px; cursor: pointer;" data-bind="click: function() { $parent.cleanLoadEvent(event.loadid) }">{% trans "clean up" %}</a>
+                                        <!-- ko if: event.status == "failed" || event.status == "unloaded" -->
+                                        <a style="color: steelblue; text-decoration: underline; padding-right: 10px; cursor: pointer;" data-bind="click: function() { $parent.cleanLoadEvent(event.loadid) }">{% trans "remove from history" %}</a>
                                         <!-- /ko -->
                                     </td>
                                 </tr>
