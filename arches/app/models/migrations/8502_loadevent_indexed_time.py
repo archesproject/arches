@@ -6,7 +6,7 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ("models", "8009_etlmodule"),
+        ("models", "8449_filter_warning_etl_module"),
     ]
 
     operations = [
