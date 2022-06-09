@@ -211,7 +211,6 @@ class BranchCsvImporter:
         return lookup
 
     def validate(self):
-        """Validation is actually done - we're just getting the report here"""
         success = True
         with connection.cursor() as cursor:
             error_message = _("Legacy id(s) already exist. Legacy ids must be unique")
@@ -269,7 +268,7 @@ class BranchCsvImporter:
         content = request.FILES["file"]
         self.temp_dir = os.path.join("uploadedfiles", "tmp", self.loadid)
         try:
-            self.delete_from_default_storage(self.temp_dir)  # Remove dir if it already exists. os.mkdir won't overwrite
+            self.delete_from_default_storage(self.temp_dir)
         except (FileNotFoundError):
             pass
         result = {"summary": {"name": content.name, "size": self.filesize_format(content.size), "files": {}}}
