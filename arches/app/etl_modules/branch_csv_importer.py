@@ -220,44 +220,40 @@ class BranchCsvImporter(BaseImportModule):
 
     def complete_load(self, loadid, multiprocessing=True):
         self.loadid = loadid
-        try:
-            with connection.cursor() as cursor:
+        with connection.cursor() as cursor:
+            try:
                 cursor.execute("""SELECT * FROM __arches_staging_to_tile(%s)""", [self.loadid])
                 row = cursor.fetchall()
-        except (IntegrityError, ProgrammingError) as e:
-            logger.error(e)
-            with connection.cursor() as cursor:
+            except (IntegrityError, ProgrammingError) as e:
+                logger.error(e)
                 cursor.execute(
                     """UPDATE load_event SET status = %s, load_end_time = %s WHERE loadid = %s""",
                     ("failed", datetime.now(), self.loadid),
                 )
-            return {
-                "status": 400,
-                "success": False,
-                "title": _("Failed to complete load"),
-                "message": _("Unable to insert record into staging table"),
-            }
-
-        if row[0][0]:
-            with connection.cursor() as cursor:
+                return {
+                    "status": 400,
+                    "success": False,
+                    "title": _("Failed to complete load"),
+                    "message": _("Unable to insert record into staging table"),
+                }
+            if row[0][0]:
                 cursor.execute(
                     """UPDATE load_event SET (status, load_end_time) = (%s, %s) WHERE loadid = %s""",
                     ("completed", datetime.now(), loadid),
                 )
-            index_resources_by_transaction(loadid, quiet=True, use_multiprocessing=False)
-            with connection.cursor() as cursor:
+                index_resources_by_transaction(loadid, quiet=True, use_multiprocessing=False)
+                print("setting state to indexed")
                 cursor.execute(
                     """UPDATE load_event SET (status, indexed_time, complete, successful) = (%s, %s, %s, %s) WHERE loadid = %s""",
                     ("indexed", datetime.now(), True, True, loadid),
                 )
-            return {"success": True, "data": "success"}
-        else:
-            with connection.cursor() as cursor:
+                return {"success": True, "data": "success"}
+            else:
                 cursor.execute(
                     """UPDATE load_event SET status = %s, load_end_time = %s WHERE loadid = %s""",
                     ("failed", datetime.now(), self.loadid),
                 )
-            return {"success": False, "data": "failed"}
+                return {"success": False, "data": "failed"}
 
     def read(self, request):
         self.loadid = request.POST.get("load_id")
