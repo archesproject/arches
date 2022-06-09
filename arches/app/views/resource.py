@@ -442,7 +442,7 @@ class ResourcePermissionDataView(View):
                                 for perm in identity["selectedPermissions"]:
                                     assign_perm(perm["codename"], identityModel, resource_instance)
 
-                resource = Resource(str(resource_instance.resourceinstanceid))
+                resource = Resource.objects.get(pk=str(resource_instance.resourceinstanceid))
                 resource.graph_id = resource_instance.graph_id
                 resource.index()
 
