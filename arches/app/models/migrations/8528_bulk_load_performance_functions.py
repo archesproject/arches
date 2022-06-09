@@ -59,15 +59,15 @@ class Migration(migrations.Migration):
     BEGIN
         return query SELECT t.resourceinstanceid,
                             t.nodegroupid,
-                            COALESCE(t.parenttileid::text, '')::uuid parent_tileid,
-                            count(*)                           tilecount
+                            t.parenttileid parent_tileid,
+                            count(*)       tilecount
                      FROM tiles t,
                           node_groups ng
                      WHERE t.nodegroupid = ng.nodegroupid
     --                                       AND ng.nodegroupid in (select n.nodegroupid from nodes n where n.graphid = (select graphid from graphs g where g.name = 'BC Fossil Site'))
                        AND ng.cardinality = '1'
                      group by t.resourceinstanceid, t.nodegroupid,
-                              COALESCE(t.parenttileid::text, '')
+                              t.parenttileid
                      having count(*) > 1
         order by nodegroupid, resourceinstanceid;
     END $$
