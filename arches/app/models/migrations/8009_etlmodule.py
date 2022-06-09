@@ -76,8 +76,8 @@ add_branch_csv_importer = """
         slug)
     values (
         '3b19a76a-0b09-450e-bee1-65accb096eaf',
-        'Import Branch CSV',
-        'Loads resource data in branch csv format',
+        'Import Branch Excel',
+        'Loads resource data in branch excel format',
         'import',
         'views/components/etl_modules/branch-csv-importer',
         'branch-csv-importer',
