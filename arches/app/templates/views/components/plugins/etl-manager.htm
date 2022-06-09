@@ -53,8 +53,8 @@
             <div class="content-panel">
                 <div style="height:100%" data-bind="component: {
                     name: selectedModule().componentname,
-                    loading: loading,
                     params: {
+                                alert: alert,
                                 state: 'details',
                                 activeTab: activeTab,
                                 ...selectedModule()
@@ -139,7 +139,6 @@
                     <div class="etl-module-info" data-bind="if: selectedLoadEvent()">
                         <div class="" data-bind="component: {
                             name: selectedLoadEvent().etl_module.componentname,
-                            loading: loading,
                             params: {
                                         state: 'status',
                                         load_details: selectedLoadEvent().load_details,
