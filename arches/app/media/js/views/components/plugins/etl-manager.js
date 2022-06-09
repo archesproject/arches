@@ -20,8 +20,14 @@ define([
             this.paginator = ko.observable();
 
             this.selectedLoadEvent.subscribe(function(val){
-                self.selectedModule(val.etl_module);
-                self.fetchValidation(val.loadid);
+                if (val) {
+                    self.selectedModule(val.etl_module);
+                    self.fetchValidation(val.loadid);
+                } else {
+                    if (self.loadEvents().length) {
+                        self.selectedLoadEvent(self.loadEvents()[0]);
+                    }
+                }
             });
             this.moduleSearchString = ko.observable('');
             this.taskSearchString = ko.observable('');
@@ -55,7 +61,7 @@ define([
                     self.loadEvents(data.events);
                     self.paginator(data.paginator);
                     const newSelectedEventData = data.events.find(item => item.loadid === self.selectedLoadEvent().loadid);
-                    if (newSelectedEventData.status != self.selectedLoadEvent().status) {
+                    if (newSelectedEventData && newSelectedEventData.status != self.selectedLoadEvent().status) {
                         self.selectedLoadEvent(newSelectedEventData);
                     } 
                 });
