@@ -14898,7 +14898,6 @@ a.jstree-anchor.permissions-widget {
 .etl-manager-tab.active {
     background-color: #fff;
     border-bottom: 1px solid #fff;
-    font-weight: 600;
 }
 
 .etl-manager-filter-container {
@@ -14927,18 +14926,22 @@ a.jstree-anchor.permissions-widget {
 }
 
 .etl-manager-filter-input {
-    min-width: 300px;
+    width: 100%;
     border: 1px solid #BBD1EA;
+    border-radius: 2px;
     font-size: 12px;
-    height: 30px;
+    height: 36px;
     margin-left: 20px;
+    margin-right: 20px;
     padding-left: 20px;
 }
 
 .etl-manager-status-filter-container {
-    margin: 20px 10px;
+    padding: 20px 10px;
     display: flex;
     justify-content: space-between;
+    border-bottom: 1px solid #ddd;
+    margin-bottom: 10px;
 }
 
 .etl-module-component-container {
@@ -14950,6 +14953,7 @@ a.jstree-anchor.permissions-widget {
 
 .etl-module-status {
     border-right: 1px solid rgba(0,0,0,0.14);
+    width: 446px;
 }
 
 .etl-module-status-container {
@@ -14961,15 +14965,41 @@ a.jstree-anchor.permissions-widget {
     width: auto;
 }
 
+.etl-jobs-container {
+    background: #fbfbfb;
+    height: calc(100vh - 245px);
+}
+
+.etl-job {
+    margin: 10px; 
+    border: 1px solid #ddd; 
+    display: block; 
+    background: #fff;
+}
+
+.etl-job.selected {
+    border: 1px solid rgb(56, 110, 178);
+}
+
+
+
 .etl-status-table {
     height: calc(100vh - 245px);
     overflow: scroll;
-    padding-bottom:25px;
+    padding-bottom: 25px;
+    background: #fbfbfb;
 }
 
-.etl-status-table .selected {
-    border: 2px solid rgb(56, 110, 178);
+
+.etl-status-table .selected .etl-job-metadata {
+    border-top: 1px solid rgb(56, 110, 178);
 }
+
+.etl-status-table .selected .etl-job-task-bar {
+    border: 1px solid rgb(56, 110, 178);
+    border-top-color: #ddd;
+}
+
 
 .etl-status-table .btn-success, .btn-success:hover{
     background: #00ca4e;
