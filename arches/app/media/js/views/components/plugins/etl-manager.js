@@ -160,7 +160,6 @@ define([
                     }
                 }).then(function(data){
                     self.etlModules = data.map(function(etl){
-                        etl.alert = self.alert;
                         require([etl.component]);
                         return etl;
                     });
