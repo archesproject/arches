@@ -45,7 +45,8 @@ class Migration(migrations.Migration):
        from cardinality_violations;
 
         if (cardinality_violations > 0) then
-            Raise Exception 'Cardinality violations found. Run `select * from __arches_get_tile_cardinality_violations()` to list violations';
+            Raise Exception 'Cardinality violations found. Run `%` to list violations',
+                'select * from __arches_get_tile_cardinality_violations()';
         else
             Raise Notice 'No cardinality violations found';
         end if;
@@ -64,7 +65,6 @@ class Migration(migrations.Migration):
                      FROM tiles t,
                           node_groups ng
                      WHERE t.nodegroupid = ng.nodegroupid
-    --                                       AND ng.nodegroupid in (select n.nodegroupid from nodes n where n.graphid = (select graphid from graphs g where g.name = 'BC Fossil Site'))
                        AND ng.cardinality = '1'
                      group by t.resourceinstanceid, t.nodegroupid,
                               t.parenttileid
