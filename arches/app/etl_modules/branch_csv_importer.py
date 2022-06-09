@@ -242,7 +242,6 @@ class BranchCsvImporter(BaseImportModule):
                     ("completed", datetime.now(), loadid),
                 )
                 index_resources_by_transaction(loadid, quiet=True, use_multiprocessing=False)
-                print("setting state to indexed")
                 cursor.execute(
                     """UPDATE load_event SET (status, indexed_time, complete, successful) = (%s, %s, %s, %s) WHERE loadid = %s""",
                     ("indexed", datetime.now(), True, True, loadid),
