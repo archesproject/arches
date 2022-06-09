@@ -111,9 +111,6 @@
                                         <!-- ko if: event.status == "failed" -->
                                         <a style="color: steelblue; text-decoration: underline; padding-right: 10px; cursor: pointer;" data-bind="click: function() { $parent.cleanLoadEvent(event.loadid) }">{% trans "clean up" %}</a>
                                         <!-- /ko -->
-                                        <!-- ko if: event.status == "running" -->
-                                        <a style="color: steelblue; text-decoration: underline; padding-right: 10px; cursor: pointer;" data-bind="click: function() { }">{% trans "stop task" %}</a>
-                                        <!-- /ko -->
                                     </td>
                                 </tr>
                                 <!-- /ko -->
