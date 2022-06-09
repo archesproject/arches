@@ -38,7 +38,6 @@ from arches.app.utils.data_management.resource_graphs.importer import import_gra
 
 class BusinessDataExportTests(ArchesTestCase):
     @classmethod
-
     def setUpClass(self):
         self.loadOntology()
         skos = SKOSReader()
