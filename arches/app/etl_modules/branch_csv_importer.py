@@ -215,8 +215,10 @@ class BranchCsvImporter:
         with connection.cursor() as cursor:
             error_message = _("Legacy id(s) already exist. Legacy ids must be unique")
             cursor.execute(
-            """UPDATE load_event SET error_message = %s, status = 'failed' WHERE  loadid = %s::uuid
-            AND EXISTS (SELECT legacyid FROM load_staging where loadid = %s::uuid and legacyid is not null INTERSECT SELECT legacyid from resource_instances);""", (error_message, self.loadid, self.loadid))
+                """UPDATE load_event SET error_message = %s, status = 'failed' WHERE  loadid = %s::uuid
+            AND EXISTS (SELECT legacyid FROM load_staging where loadid = %s::uuid and legacyid is not null INTERSECT SELECT legacyid from resource_instances);""",
+                (error_message, self.loadid, self.loadid),
+            )
             cursor.execute("""SELECT * FROM __arches_load_staging_report_errors(%s)""", (self.loadid,))
             row = cursor.fetchall()
         return {"success": success, "data": row}
