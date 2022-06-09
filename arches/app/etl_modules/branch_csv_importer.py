@@ -238,11 +238,16 @@ class BranchCsvImporter:
             }
 
         if row[0][0]:
-            index_resources_by_transaction(self.loadid, quiet=True, use_multiprocessing=multiprocessing)
             with connection.cursor() as cursor:
                 cursor.execute(
-                    """UPDATE load_event SET status = %s WHERE loadid = %s""",
-                    ("completed", self.loadid),
+                    """UPDATE load_event SET (status, load_end_time) = (%s, %s) WHERE loadid = %s""",
+                    ("completed", datetime.now(), loadid),
+                )
+            index_resources_by_transaction(loadid, quiet=True, use_multiprocessing=False)
+            with connection.cursor() as cursor:
+                cursor.execute(
+                    """UPDATE load_event SET (status, indexed_time, complete, successful) = (%s, %s, %s, %s) WHERE loadid = %s""",
+                    ("indexed", datetime.now(), True, True, loadid),
                 )
             return {"success": True, "data": "success"}
         else:
@@ -259,7 +264,7 @@ class BranchCsvImporter:
         content = request.FILES["file"]
         self.temp_dir = os.path.join("uploadedfiles", "tmp", self.loadid)
         try:
-            shutil.rmtree(self.temp_dir)  # Remove dir if it already exists. os.mkdir won't overwrite
+            self.delete_from_default_storage(self.temp_dir)  # Remove dir if it already exists. os.mkdir won't overwrite
         except (FileNotFoundError):
             pass
         result = {"summary": {"name": content.name, "size": self.filesize_format(content.size), "files": {}}}
@@ -301,33 +306,55 @@ class BranchCsvImporter:
             files = details["result"]["summary"]["files"]
             summary = details["result"]["summary"]
             use_celery_file_size_threshold_in_MB = 0.1
-            if (
-                summary["cumulative_excel_files_size"] / 1000000 > use_celery_file_size_threshold_in_MB
-                and task_management.check_if_celery_available()
-            ):
-                logger.info("Delegating load to Celery task")
-                tasks.load_files.apply_async(
-                    (files, summary, result, self.temp_dir, self.loadid),
-                    # link=tasks.update_user_task_record.s(),
-                    # link_error=tasks.log_error.s(),
-                )
-                result["delegated_to_celery"] = True
-                return {"success": True, "data": result}
-            else:
-                with connection.cursor() as cursor:
-                    for file in files.keys():
-                        self.stage_excel_file(file, summary, cursor)
-                    cursor.execute("""CALL __arches_check_tile_cardinality_violation_for_load(%s)""", [self.loadid])
-                    result["validation"] = self.validate()
-                    if len(result["validation"]["data"]) == 0:
-                        self.complete_load(self.loadid)
-                    else:
+            if summary["cumulative_excel_files_size"] / 1000000 > use_celery_file_size_threshold_in_MB:
+                if task_management.check_if_celery_available():
+                    logger.info(_("Delegating load to Celery task"))
+                    tasks.load_branch_csv.apply_async(
+                        (files, summary, result, self.temp_dir, self.loadid),
+                        # link=tasks.update_user_task_record.s(),
+                        # link_error=tasks.log_error.s(),
+                    )
+                    result = _("delegated_to_celery")
+                    return {"success": True, "data": result}
+                else:
+                    err = _("Celery appears not to be running, you need to have celery running in order to immport large csv.")
+                    with connection.cursor() as cursor:
                         cursor.execute(
                             """UPDATE load_event SET status = %s, load_end_time = %s WHERE loadid = %s""",
                             ("failed", datetime.now(), self.loadid),
                         )
-                result["summary"] = summary
-                return {"success": result["validation"]["success"], "data": result}
+                    return {"success": False, "data": err}
+            else:
+                response = self.run_load_task(files, summary, result, self.temp_dir, self.loadid)
+
+            return response
+
+    def run_load_task(self, files, summary, result, temp_dir, loadid):
+        with connection.cursor() as cursor:
+            for file in files.keys():
+                self.stage_excel_file(file, summary, cursor)
+            cursor.execute("""CALL __arches_check_tile_cardinality_violation_for_load(%s)""", [loadid])
+            result["validation"] = self.validate()
+            if len(result["validation"]["data"]) == 0:
+                self.complete_load(loadid, multiprocessing=False)
+            else:
+                cursor.execute(
+                    """UPDATE load_event SET status = %s, load_end_time = %s WHERE loadid = %s""",
+                    ("failed", datetime.now(), loadid),
+                )
+        self.delete_from_default_storage(temp_dir)
+        result["summary"] = summary
+        return {"success": result["validation"]["success"], "data": result}
+
+    def delete_from_default_storage(self, directory):
+        dirs, files = default_storage.listdir(directory)
+        for dir in dirs:
+            dir_path = os.path.join(directory, dir)
+            self.delete_from_default_storage(dir_path)
+        for file in files:
+            file_path = os.path.join(directory, file)
+            default_storage.delete(file_path)
+        default_storage.delete(directory)
 
     def download(self, request):
         format = request.POST.get("format")
