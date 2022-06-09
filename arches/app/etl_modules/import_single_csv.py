@@ -167,7 +167,7 @@ class ImportSingleCsv:
                 result = _("delegated_to_celery")
                 return {"success": True, "data": result}
             else:
-                err = _("Celery appears not to be running, you need to have celery running in order to import large csv.")
+                err = _("Celery appears not to be running. You need to have celery running in order to import a large csv.")
                 with connection.cursor() as cursor:
                     cursor.execute(
                         """UPDATE load_event SET status = %s, load_end_time = %s WHERE loadid = %s""",
