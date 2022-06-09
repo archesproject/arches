@@ -73,5 +73,5 @@ class Command(BaseCommand):
             deleteq.delete(index=RESOURCE_RELATIONS_INDEX, refresh=True)
             bulk_index_queue.filter(resourceinstanceid__in=delete_ids).delete()
 
-        index_database_util.start_index_resources(resources, progress_bar_title="Processing Indexing Queue")
+        index_database_util.index_resources_using_singleprocessing(resources, title="Processing Indexing Queue")
         bulk_index_queue.delete()
