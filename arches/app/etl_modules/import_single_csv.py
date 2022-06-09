@@ -93,7 +93,12 @@ class ImportSingleCsv(BaseImportModule):
             csv_file_path = os.path.join(temp_dir, csv_file_name)
 
         if csv_file_name is None:
-            return {"success": False, "data": "Csv file not found"}
+            return {
+                "status": 400,
+                "success": False,
+                "title": _("No csv file found"),
+                "message": _("Upload a valid csv file"),
+            }
 
         with default_storage.open(csv_file_path, mode="r") as csvfile:
             reader = csv.reader(csvfile)
@@ -155,7 +160,7 @@ class ImportSingleCsv(BaseImportModule):
                 result = _("delegated_to_celery")
                 return {"success": True, "data": result}
             else:
-                err = _("Celery appears not to be running, you need to have celery running in order to immport large csv.")
+                err = _("Celery appears not to be running. You need to have celery running in order to import a large csv.")
                 with connection.cursor() as cursor:
                     cursor.execute(
                         """UPDATE load_event SET status = %s, load_end_time = %s WHERE loadid = %s""",
