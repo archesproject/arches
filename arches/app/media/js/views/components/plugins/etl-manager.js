@@ -43,22 +43,24 @@ define([
             });
 
             this.fetchLoadEvent = function(page){
-                if (!page) {
-                    page = self.paginator()?.current_page ? self.paginator().current_page : 1;
-                }
-                const url = arches.urls.etl_manager + "?action=loadEvent&page=" + page;
-                window.fetch(url).then(function(response){
-                    if(response.ok){
-                        return response.json();
+                if (self.activeTab() === 'import'){
+                    if (!page) {
+                        page = self.paginator()?.current_page ? self.paginator().current_page : 1;
                     }
-                }).then(function(data){
-                    self.loadEvents(data.events);
-                    self.paginator(data.paginator);
-                    const newSelectedEventData = data.events.find(item => item.loadid === self.selectedLoadEvent().loadid);
-                    if (newSelectedEventData.status != self.selectedLoadEvent().status) {
-                        self.selectedLoadEvent(newSelectedEventData);
-                    } 
-                });
+                    const url = arches.urls.etl_manager + "?action=loadEvent&page=" + page;
+                    window.fetch(url).then(function(response){
+                        if(response.ok){
+                            return response.json();
+                        }
+                    }).then(function(data){
+                        self.loadEvents(data.events);
+                        self.paginator(data.paginator);
+                        const newSelectedEventData = data.events.find(item => item.loadid === self.selectedLoadEvent().loadid);
+                        if (newSelectedEventData.status != self.selectedLoadEvent().status) {
+                            self.selectedLoadEvent(newSelectedEventData);
+                        }
+                    });
+                }
             };
 
             this.loadEvents.subscribe(function(loadEvents) {
