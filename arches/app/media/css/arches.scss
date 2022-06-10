@@ -14871,6 +14871,7 @@ a.jstree-anchor.permissions-widget {
 .etl-manager-tabs {
     background: #F7F9FB;
     height: 45px;
+    border-bottom: 1px solid #ddd;
 }
 
 .etl-manager-tab {
@@ -14889,7 +14890,7 @@ a.jstree-anchor.permissions-widget {
 }
 
 .etl-manager-tab.disabled {
-    background-color: #fff;
+    background-color: #f2f2f2;
     color: grey;
     cursor: default;
     pointer-events: none;
@@ -14901,7 +14902,7 @@ a.jstree-anchor.permissions-widget {
 }
 
 .etl-manager-filter-container {
-    margin: 50px;
+    margin: 50px 50px 0px 50px;
 }
 
 .etl-manager-filter-button {
@@ -14928,7 +14929,7 @@ a.jstree-anchor.permissions-widget {
 .etl-manager-filter-input {
     width: 100%;
     border: 1px solid #BBD1EA;
-    border-radius: 2px;
+    border-radius: 1px;
     font-size: 12px;
     height: 36px;
     margin-left: 20px;
@@ -14936,12 +14937,16 @@ a.jstree-anchor.permissions-widget {
     padding-left: 20px;
 }
 
+.etl-manager-filter-input.etl-model-filter {
+    width: 350px;
+    height: 42px;
+}
+
 .etl-manager-status-filter-container {
     padding: 20px 10px;
     display: flex;
     justify-content: space-between;
     border-bottom: 1px solid #ddd;
-    margin-bottom: 10px;
 }
 
 .etl-module-component-container {
@@ -14958,7 +14963,6 @@ a.jstree-anchor.permissions-widget {
 
 .etl-module-status-container {
     height: calc(100vh - 95px);
-    overflow: scroll;
     display: flex;
     flex-direction: column;
     align-content: space-around;
@@ -14967,37 +14971,20 @@ a.jstree-anchor.permissions-widget {
 
 .etl-jobs-container {
     background: #fbfbfb;
-    height: calc(100vh - 245px);
+    height: calc(100vh - 225px);
+    overflow: scroll;
 }
 
 .etl-job {
     margin: 10px; 
     border: 1px solid #ddd; 
+    border-radius: 2px;
     display: block; 
     background: #fff;
 }
 
 .etl-job.selected {
     border: 1px solid rgb(56, 110, 178);
-}
-
-
-
-.etl-status-table {
-    height: calc(100vh - 245px);
-    overflow: scroll;
-    padding-bottom: 25px;
-    background: #fbfbfb;
-}
-
-
-.etl-status-table .selected .etl-job-metadata {
-    border-top: 1px solid rgb(56, 110, 178);
-}
-
-.etl-status-table .selected .etl-job-task-bar {
-    border: 1px solid rgb(56, 110, 178);
-    border-top-color: #ddd;
 }
 
 

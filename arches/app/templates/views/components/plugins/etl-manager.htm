@@ -14,7 +14,7 @@
         <div class="etl-manager-filter-container">
             <div class="etl-manager-filter-button" data-bind="click: function() { isImport(true); }, css: {active: isImport() }">Import</div>
             <div class="etl-manager-filter-button" data-bind="click: function() { isImport(false); }, css: {active: !isImport() }">Export</div>
-            <input class="etl-manager-filter-input" type="text" placeholder = "Filter Modules..." data-bind="textInput: moduleSearchString">
+            <input class="etl-manager-filter-input etl-model-filter" type="text" placeholder = "Filter Modules..." data-bind="textInput: moduleSearchString">
         </div>
         <!-- ko ifnot: loading() -->
         <div class="workflow-select-plugin">
@@ -49,9 +49,9 @@
     </div>
     <div data-bind="if: activeTab() === 'details'">
         <!-- ko if: selectedModule() -->
-        <div flex: 1 1 auto;">
+        <div style="flex: 1 1 auto;">
             <div class="content-panel">
-                <div style="height:100%" data-bind="component: {
+                <div style="height:100%; margin-top: 1px; padding-top: 65px;" data-bind="component: {
                     name: selectedModule().componentname,
                     params: {
                                 alert: alert,
@@ -75,9 +75,8 @@
                     <div class="etl-jobs-container" data-bind="foreach: {data: loadEvents, as: 'event'}">
                         <!-- ko if: !$parent.taskSearchString() || event.etl_module.name.toLowerCase().includes($parent.taskSearchString().toLowerCase()) || $parent.formatUserName(event.user).toLowerCase().includes($parent.taskSearchString().toLowerCase()) -->
                        
-
                         <div class="etl-job" data-bind="css: {'selected': event.loadid == $parent.selectedLoadEvent()?.loadid}">
-                            <div class="etl-job-metadata" data-bind="click: function(){$parent.selectedLoadEvent(event)}" style="padding: 10px 15px; flex-direction: column; justify-content: space-between; cursor: pointer; height: 80px;">
+                            <div class="etl-job-metadata" data-bind="click: function(){$parent.selectedLoadEvent(event)}" style="padding: 10px 15px; flex-direction: column; justify-content: space-between; cursor: pointer; height: 85px;">
                                 <div>
                                     <div data-bind="text: event.etl_module.name" style="font-size: 13pt; color: rgb(4, 4, 45)"></div>
                                 </div>
@@ -102,7 +101,7 @@
                                     </div>
                                 </div>
                             </div>
-                            <div class="etl-job-task-bar" style="background: #eee; display: block; height: 35px; padding: 10px 0px 10px 15px; border-top: 1px solid #ddd;">
+                            <div class="etl-job-task-bar" style="background: #eee; display: block; height: 40px; padding: 10px 15px; border-top: 1px solid #ddd;">
                                 <!-- ko if: event.status == "completed" -->
                                 <a style="color: steelblue; text-decoration: underline; padding-right: 10px; cursor: pointer;" data-bind="click: function() { $parent.reverseTransactions(event.loadid) }">{% trans "undo import" %}</a>
                                 <!-- /ko -->
@@ -118,65 +117,10 @@
                         <!-- /ko -->
                     </div>
 
-
-                    
-
-
-
-
-
-
-                    <div class="etl-status-table" style="display: none;">
-                        <table class="" style="min-width: 50px; width: 93%; margin-left: 10px;">
-                            <tbody data-bind="foreach: {data: loadEvents, as: 'event'}">
-                                <!-- ko if: !$parent.taskSearchString() || event.etl_module.name.toLowerCase().includes($parent.taskSearchString().toLowerCase()) || $parent.formatUserName(event.user).toLowerCase().includes($parent.taskSearchString().toLowerCase()) -->
-                                <tr style="margin-bottom: 10px;" data-bind="css: {'selected': event.loadid == $parent.selectedLoadEvent()?.loadid}">
-                                    <td class="etl-job-metadata" data-bind="click: function(){$parent.selectedLoadEvent(event)}" style="display: block; border-left: 1px solid #ddd; border-right: 1px solid #ddd; border-top: 1px solid #ddd; background: #fff; padding: 10px 15px; flex-direction: column; justify-content: space-between; cursor: pointer; height: 80px;">
-                                        <div>
-                                            <div data-bind="text: event.etl_module.name" style="font-size: 13pt; color: rgb(4, 4, 45)"></div>
-                                        </div>
-                                        <div style="display: flex; flex-direction: row; justify-content: space-between;">
-                                            <div>
-                                                <div data-bind="text: $parent.formatUserName(event.user)"></div>
-                                                <div data-bind="text: $parent.formatTime(event.load_start_time)"></div>
-                                            </div>
-                                            <div>
-                                                <!-- ko if: event.status == "completed" -->
-                                                <button class="btn btn-warning" style="width:150px;">{% trans "indexing" %}</button>
-                                                <!-- /ko -->
-                                                <!-- ko if: event.status == "indexed" -->
-                                                <button class="btn btn-success" style="width:150px;">{% trans "completed" %}</button>
-                                                <!-- /ko -->
-                                                <!-- ko if: event.status == "failed" -->
-                                                <button class="btn btn-danger" style="width:150px;">{% trans "failed" %}</button>
-                                                <!-- /ko -->
-                                                <!-- ko if: event.status == "running" -->
-                                                <button class="btn btn-warning" style="width:150px;">{% trans "running" %}</button>
-                                                <!-- /ko -->
-                                            </div>
-                                        </div>
-                                    </td>
-                                    <td class="etl-job-task-bar" style="background: #eee; display: block; height: 35px; padding: 10px 0px 10px 15px; border: 1px solid #ddd;">
-                                        <!-- ko if: event.status == "completed" -->
-                                        <a style="color: steelblue; text-decoration: underline; padding-right: 10px; cursor: pointer;" data-bind="click: function() { $parent.reverseTransactions(event.loadid) }">{% trans "undo import" %}</a>
-                                        <!-- /ko -->
-                                        <!-- ko if: event.status == "indexed" -->
-                                        <a style="color: steelblue; text-decoration: underline; padding-right: 10px; cursor: pointer;" data-bind="click: function() { $parent.reverseTransactions(event.loadid) }">{% trans "undo import" %}</a>
-                                        <!-- /ko -->
-                                        <!-- ko if: event.status == "failed" -->
-                                        <a style="color: steelblue; text-decoration: underline; padding-right: 10px; cursor: pointer;" data-bind="click: function() { $parent.cleanLoadEvent(event.loadid) }">{% trans "clean up" %}</a>
-                                        <!-- /ko -->
-                                    </td>
-                                </tr>
-                                <tr style="height: 10px;"></tr>
-                                <!-- /ko -->
-                            </tbody>
-                        </table>
-                    </div>
-                    <div style="height:75px; background: #f4f4f4; border-top: 1px solid #ddd;">
+                    <div style="height:50px; background: #f4f4f4; border-top: 1px solid #ddd;">
                         <div id="paginator" data-bind="with: paginator">
                             <div class="text-center">
-                                <ul class="pagination">
+                                <ul class="pagination" style="margin-top: 8px;">
                                     <li><a data-bind="css: {'disabled': !has_previous}, click: $parent.newPage.bind($parent, previous_page_number)" href="#">«</a></li>
                                     <!-- ko foreach: { data: pages, as: 'page' } -->
                                         <!-- ko if: page -->
