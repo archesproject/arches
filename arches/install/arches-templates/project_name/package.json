@@ -1,8 +1,8 @@
 {
     "name": "{{ project_name }}",
     "scripts": {
-        "build_production": "NODE_PATH=./arches/app/media/node_modules NODE_ENV=production ./arches/app/media/node_modules/.bin/webpack --config webpack/webpack.config.prod.js",
-        "build_development": "NODE_PATH=./arches/app/media/node_modules ./arches/app/media/node_modules/.bin/webpack --config webpack/webpack.config.dev.js",
+        "build_production": "NODE_PATH=./media/node_modules NODE_ENV=production ./media/node_modules/.bin/webpack --config webpack/webpack.config.prod.js",
+        "build_development": "NODE_PATH=./media/node_modules ./media/node_modules/.bin/webpack --config webpack/webpack.config.dev.js",
         "start": "NODE_PATH=./media/node_modules ./media/node_modules/.bin/webpack --watch --config webpack/webpack.config.dev.js"
     },
     "devDependencies": {

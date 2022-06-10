@@ -19,6 +19,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 """This module contains commands for building Arches."""
 
 import subprocess
+import os
 from django.core.management.base import BaseCommand, CommandError
 from django.core import management
 from arches.app.models.system_settings import settings
@@ -42,4 +43,8 @@ class Command(BaseCommand):
         print("operation: " + options["operation"])
         if options["operation"] == "collectstatic":
             if settings.STATIC_ROOT != "":
+                proj_name = settings.APP_NAME
+                yarn_path = os.path.join(os.getcwd(), proj_name)
+                os.chdir(yarn_path)
+                subprocess.call("yarn build_production", shell=True)
                 management.call_command("collectstatic", interactive=False)
