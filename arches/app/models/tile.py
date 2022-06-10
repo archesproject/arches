@@ -578,15 +578,18 @@ class Tile(models.TileModel):
         return child_tiles_are_blank
 
     @staticmethod
-    def get_blank_tile(nodeid, resourceid=None):
+    def get_blank_tile(nodeid, resourceid=None, create_siblings=True):
         node = models.Node.objects.filter(pk=nodeid).select_related("nodegroup")[0]
         parentnodegroup_id = node.nodegroup.parentnodegroup_id
         if parentnodegroup_id is not None:
             parent_tile = Tile.get_blank_tile_from_nodegroup_id(nodegroup_id=parentnodegroup_id, resourceid=resourceid, parenttile=None)
             parent_tile.tileid = None
             parent_tile.tiles = []
-            for nodegroup in models.NodeGroup.objects.filter(parentnodegroup_id=parentnodegroup_id):
-                parent_tile.tiles.append(Tile.get_blank_tile_from_nodegroup_id(nodegroup.pk, resourceid=resourceid, parenttile=parent_tile))
+            if create_siblings:
+                for nodegroup in models.NodeGroup.objects.filter(parentnodegroup_id=parentnodegroup_id):
+                    parent_tile.tiles.append(Tile.get_blank_tile_from_nodegroup_id(nodegroup.pk, resourceid=resourceid, parenttile=parent_tile))
+            else:
+                parent_tile.tiles.append(Tile.get_blank_tile_from_nodegroup_id(node.nodegroup.pk, resourceid=resourceid, parenttile=parent_tile))
             return parent_tile
         else:
             return Tile.get_blank_tile_from_nodegroup_id(node.nodegroup_id, resourceid=resourceid)
@@ -628,7 +631,7 @@ class Tile(models.TileModel):
                 resource_instance.save()
                 resourceinstanceid = str(resource_instance.resourceinstanceid)
                 new_resource_created = True
-            tile = Tile.get_blank_tile(nodeid, resourceinstanceid)
+            tile = Tile.get_blank_tile(nodeid, resourceinstanceid, create_siblings=False)
             if nodeid in tile.data:
                 tile.data[nodeid] = value
                 tile.save(request=request, new_resource_created=new_resource_created, transaction_id=transaction_id)
