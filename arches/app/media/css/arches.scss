@@ -739,13 +739,13 @@ input[type="checkbox"] {
     .loader-select {
         height: calc(100% - 50px);
         text-align: center;
-        background: #f6f6f6;
-        border: 1px solid #cdcdcd;
+        background: #fff;
         justify-content: center;
-        padding-top: 45px;
+        padding-top: 90px;
         height: 100%;
         width: 100%;
         display: flex;
+        margin-top: -66px;
     }
 
     .summary-header {
@@ -765,6 +765,10 @@ input[type="checkbox"] {
         font-size: 15px;
         color: #999;
         font-weight: 500;
+    }
+
+    .dropzone-photo-upload {
+        margin-top: 0px;
     }
 }
 
@@ -14940,7 +14944,7 @@ a.jstree-anchor.permissions-widget {
 
 .etl-manager-filter-input.etl-model-filter {
     width: 350px;
-    height: 42px;
+    height: 45px;
 }
 
 .etl-manager-status-filter-container {
@@ -14971,13 +14975,13 @@ a.jstree-anchor.permissions-widget {
 }
 
 .etl-jobs-container {
-    background: #fbfbfb;
+    background: #f9f9f9;
     height: calc(100vh - 225px);
     overflow: scroll;
 }
 
 .etl-job {
-    margin: 10px; 
+    margin: 10px 15px 10px 10px; 
     border: 1px solid #ddd; 
     border-radius: 2px;
     display: block; 
@@ -15038,7 +15042,7 @@ a.jstree-anchor.permissions-widget {
 .etl-module-preview {
     height: calc(100vh - 95px); 
     width: calc(100vw - 450px); 
-    padding: 25px; 
+    padding: 20px 25px; 
     overflow: scroll;
     background: #fbfbfb;
 }
@@ -15052,7 +15056,9 @@ a.jstree-anchor.permissions-widget {
 }
 
 .etl-module-component {
-    margin-top: 50px;
+    margin-top: 40px;
+    padding-bottom: 5px;
+    width: 95%;
 }
 
 .etl-module-footer .btn {

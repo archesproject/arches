@@ -4,10 +4,10 @@
 <div class="workflow-plugin" style="display: flex; flex-direction: column;">
     <div class="etl-manager-tab-container">
         <div class="etl-manager-tabs" style="height: 50px;">
-            <div class="etl-manager-tab" style="font-size: 13pt;" data-bind="click: function(){activeTab('start')}, css: {active: activeTab() === 'start', 'disabled': false}, text: 'Start'"></div>
-            <div class="etl-manager-tab" style="font-size: 13pt;" data-bind="click: function(){activeTab('details')}, css: {active: activeTab() === 'details', 'disabled': !selectedModule()}, text: 'Task Details'"></div>
-            <div class="etl-manager-tab" style="font-size: 13pt;" data-bind="click: function(){activeTab('import');}, css: {active: activeTab() === 'import', 'disabled': false}, text: 'Import Tasks'"></div>
-            <div class="etl-manager-tab" style="font-size: 13pt;" data-bind="click: function(){activeTab('export')}, css: {active: activeTab() === 'export', 'disabled': true}, text: 'Export Tasks'"></div>
+            <div class="etl-manager-tab" data-bind="click: function(){activeTab('start')}, css: {active: activeTab() === 'start', 'disabled': false}, text: 'Start'"></div>
+            <div class="etl-manager-tab" data-bind="click: function(){activeTab('details')}, css: {active: activeTab() === 'details', 'disabled': !selectedModule()}, text: 'Task Details'"></div>
+            <div class="etl-manager-tab" data-bind="click: function(){activeTab('import');}, css: {active: activeTab() === 'import', 'disabled': false}, text: 'Task Status'"></div>
+            <div class="etl-manager-tab" data-bind="click: function(){activeTab('export')}, css: {active: activeTab() === 'export', 'disabled': true}, text: 'Templates'"></div>
         </div>
     </div>
     <div data-bind="if: activeTab() === 'start'">
@@ -78,7 +78,7 @@
                         <div class="etl-job" data-bind="css: {'selected': event.loadid == $parent.selectedLoadEvent()?.loadid}">
                             <div class="etl-job-metadata" data-bind="click: function(){$parent.selectedLoadEvent(event)}" style="padding: 10px 15px; flex-direction: column; justify-content: space-between; cursor: pointer; height: 85px;">
                                 <div>
-                                    <div data-bind="text: event.etl_module.name" style="font-size: 13pt; color: rgb(4, 4, 45)"></div>
+                                    <div data-bind="text: event.etl_module.name" style="font-size: 15px; color: rgb(4, 4, 45)"></div>
                                 </div>
                                 <div style="display: flex; flex-direction: row; justify-content: space-between;">
                                     <div>
