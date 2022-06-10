@@ -211,6 +211,7 @@ def load_branch_csv(files, summary, result, temp_dir, loadid):
     BranchCsvImporter = branch_csv_importer.BranchCsvImporter(request=None, loadid=loadid, temp_dir=temp_dir)
     BranchCsvImporter.run_load_task(files, summary, result, temp_dir, loadid)
 
+
 @shared_task
 def load_single_csv(loadid, graphid, has_headers, fieldnames, csv_file_name, id_label):
     from arches.app.etl_modules import import_single_csv

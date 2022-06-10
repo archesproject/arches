@@ -164,6 +164,13 @@
                                         <th data-bind="text: 'Source'"></th>
                                     </tr>
                                 </thead>
+                                <!-- ko if: selectedLoadEvent().error_message -->
+                                <tbody>
+                                    <tr>
+                                        <td colspan="3" data-bind="text: selectedLoadEvent().error_message"></td>
+                                    </tr>
+                                </tbody>
+                                <!-- /ko --> 
                                 <!-- ko if: validationError().length -->
                                 <tbody>
                                     <!-- ko foreach: validationError -->
@@ -174,13 +181,13 @@
                                     <!-- /ko -->
                                 </tbody>
                                 <!-- /ko -->
-                                <!-- ko ifnot: validationError().length -->
+                                <!-- ko ifnot: validationError().length || selectedLoadEvent().error_message -->
                                 <tbody>
                                     <tr>
                                         <td colspan="3">{% trans "No Error Found" %}</td>
                                     </tr>
                                 </tbody>
-                                <!-- /ko -->                
+                                <!-- /ko -->            
                             </table>
                             <!-- /ko -->
                         </div>
