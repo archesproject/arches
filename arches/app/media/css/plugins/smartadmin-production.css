@@ -355,7 +355,6 @@
            * WIDGET BODY AJAX LOAD
            */
       .widget-body-ajax-loading::before {
-        content: url('../../img/ajax-loader.gif');
         padding-top: 18%;
         text-align: center;
         font-weight: bold;
@@ -2051,7 +2050,6 @@
         width: 30px;
       }
       .editableform-loading {
-        background: url('../../img/loading.gif') center center no-repeat;
         height: 25px;
         width: auto;
         min-width: 25px;
@@ -2106,7 +2104,6 @@
       }
       /* IOS-style clear button for text inputs */
       .editable-clear-x {
-        background: url('../../img/clear.png') center center no-repeat;
         display: block;
         width: 13px;
         height: 13px;
@@ -2835,7 +2832,6 @@
       .colorpicker-saturation {
         width: 100px;
         height: 100px;
-        background-image: url("../../img/saturation.png");
         cursor: crosshair;
         float: left;
       }
@@ -2877,10 +2873,8 @@
         margin-top: -1px;
       }
       .colorpicker-hue {
-        background-image: url("../../img/hue.png");
       }
       .colorpicker-alpha {
-        background-image: url("../../img/alpha.png");
         display: none;
       }
       .colorpicker {
@@ -2938,7 +2932,6 @@
         height: 10px;
         margin-top: 5px;
         clear: both;
-        background-image: url("../../img/alpha.png");
         background-position: 0 100%;
       }
       .colorpicker-color div {
@@ -7979,16 +7972,13 @@
         background: url('../../img/sort_both.png') no-repeat center right;
       }
       .dataTables_wrapper table.table thead .sorting_asc {
-        background: url('../../img/sort_asc.png') no-repeat center right;
       }
       .dataTables_wrapper table.table thead .sorting_desc {
         background: url('../../img/sort_desc.png') no-repeat center right;
       }
       .dataTables_wrapper table.table thead .sorting_asc_disabled {
-        background: url('../../img/sort_asc_disabled.png') no-repeat center right;
       }
       .dataTables_wrapper table.table thead .sorting_desc_disabled {
-        background: url('../../img/sort_desc_disabled.png') no-repeat center right;
       }
       .dataTables_wrapper table.dataTable th:active {
         outline: none;
@@ -8403,32 +8393,6 @@
       }
       
       
-      button.DTTT_button_csv span { background: url(../../img/csv.png) no-repeat bottom right; }
-      button.DTTT_button_csv:hover span { background: url(../../img/csv_hover.png) no-repeat center right; }
-      
-      button.DTTT_button_xls span { background: url(../../img/xls.png) no-repeat center right; }
-      button.DTTT_button_xls:hover span { background: #f0f0f0 url(../../img/xls_hover.png) no-repeat center right; }
-      
-      button.DTTT_button_copy span { background: url(../../img/copy.png) no-repeat center right; }
-      button.DTTT_button_copy:hover span { background: #f0f0f0 url(../../img/copy_hover.png) no-repeat center right; }
-      
-      button.DTTT_button_pdf span { background: url(../../img/pdf.png) no-repeat center right; }
-      button.DTTT_button_pdf:hover span { background: #f0f0f0 url(../../img/pdf_hover.png) no-repeat center right; }
-      
-      button.DTTT_button_print span { background: url(../../img/print.png) no-repeat center right; }
-      button.DTTT_button_print:hover span { background: #f0f0f0 url(../../img/print_hover.png) no-repeat center right; }
-      
-      
-      
-      button.DTTT_button_collection span {
-          padding-right: 17px;
-          background: url(../../img/collection.png) no-repeat center right;
-      }
-      
-      button.DTTT_button_collection:hover span {
-          padding-right: 17px;
-          background: #f0f0f0 url(../../img/collection_hover.png) no-repeat center right;
-      } */
       /*
        * SELECTING
        * Row selection styles
@@ -8486,7 +8450,6 @@
         box-shadow: 3px 3px 5px rgba(0, 0, 0, 0.3);
       }
       div.DTTT_collection_background {
-        /*background: transparent url(../../img/background.png) repeat top left;*/
         z-index: 2001;
       }
       div.DTTT_collection button.DTTT_button,
@@ -9311,41 +9274,7 @@
       }
       /* Icons
        ----------------------------------*/
-      /* states and images
-      
-      .ui-icon {
-          width: 16px;
-          height: 16px;
-          background-image: url("@{base-url}/jqueryui/ui-icons_222222_256x240.png");
-      }
-      
-      .ui-widget-content .ui-icon {
-          background-image: url("@{base-url}/jqueryui/ui-icons_222222_256x240.png");
-      }
-      
-      .ui-widget-header .ui-icon {
-          background-image: url("@{base-url}/jqueryui/ui-icons_222222_256x240.png");
-      }
-      
-      .ui-state-default .ui-icon {
-          background-image: url("@{base-url}/jqueryui/ui-icons_888888_256x240.png");
-      }
-      
-      .ui-state-hover .ui-icon, .ui-state-focus .ui-icon {
-          background-image: url("@{base-url}/jqueryui/ui-icons_454545_256x240.png");
-      }
-      
-      .ui-state-active .ui-icon {
-          background-image: url("@{base-url}/jqueryui/ui-icons_454545_256x240.png");
-      }
-      
-      .ui-state-highlight .ui-icon {
-          background-image: url("@{base-url}/jqueryui/ui-icons_2e83ff_256x240.png");
-      }
-      
-      .ui-state-error .ui-icon, .ui-state-error-text .ui-icon {
-          background-image: url("@{base-url}/jqueryui/ui-icons_f6cf3b_256x240.png");
-      } */
+
       /* positioning */
       .ui-icon-carat-1-n {
         background-position: 0 0;
@@ -11920,7 +11849,6 @@
       }
       /*
       .MessageIE{
-          background-image: url("@{base-url}/bg.png");
           
       }*/
       .MessageBoxContainer {
@@ -13763,7 +13691,6 @@
         margin: 0;
       }
       #login .hero {
-        background-image: url("../../img/gradient/login.png");
         background-repeat: no-repeat;
         background-position: 0 137px;
         height: 360px;
@@ -14755,7 +14682,6 @@
         font-size: 1px;
         text-decoration: none;
         border: 0;
-        /*background: url('@{base-url}/select2.png') right top no-repeat;*/
         cursor: pointer;
         outline: 0;
       }
@@ -17035,7 +16961,6 @@
         box-shadow: inset 0 -1px 0 rgba(0, 0, 0, 0.15);
         font-weight: bold;
         text-shadow: 0 -1px 0 rgba(0, 0, 0, 0.25);
-        background-image: url('../../img/pattern/overlay-pattern.png');
       }
       .progress-striped .progress-bar {
         background-image: -webkit-gradient(linear, 0 100%, 100% 0, color-stop(0.25, rgba(255, 255, 255, 0.15)), color-stop(0.25, transparent), color-stop(0.5, transparent), color-stop(0.5, rgba(255, 255, 255, 0.15)), color-stop(0.75, rgba(255, 255, 255, 0.15)), color-stop(0.75, transparent), to(transparent));

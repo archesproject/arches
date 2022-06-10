@@ -18,6 +18,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 
 """This module contains commands for building Arches."""
 
+import subprocess
 from django.core.management.base import BaseCommand, CommandError
 from django.core import management
 from arches.app.models.system_settings import settings

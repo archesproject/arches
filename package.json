@@ -17,7 +17,7 @@
         "@babel/polyfill": "^7.12.1",
         "@babel/runtime": "^7.17.2",
         "@mapbox/geojson-extent": "0.3.2",
-        "@mapbox/geojsonhint": "^3.0.0",
+        "@mapbox/geojsonhint": "^3.0.1",
         "@mapbox/mapbox-gl-draw": "1.1.2",
         "@mapbox/mapbox-gl-geocoder": "^4.4.0",
         "@tmcw/togeojson": "^4.3.0",
