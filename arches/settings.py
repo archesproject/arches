@@ -263,8 +263,6 @@ STATIC_ROOT = os.path.join(ROOT_DIR, "staticfiles")
 # Example: "http://media.lawrence.com/static/"
 STATIC_URL = "/static/"
 
-STATICFILES_STORAGE = "django.contrib.staticfiles.storage.ManifestStaticFilesStorage"
-
 # when hosting Arches under a sub path set this value to the sub path eg : "/{sub_path}/"
 FORCE_SCRIPT_NAME = None
 

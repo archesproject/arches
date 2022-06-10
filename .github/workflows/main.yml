@@ -54,7 +54,7 @@ jobs:
 
       - name: Webpack frontend files
         run: |
-          yarn && yarn test
+          yarn && yarn build_development
 
       - name: Run Arches unit tests
         run: |

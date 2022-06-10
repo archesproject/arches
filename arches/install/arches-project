@@ -71,7 +71,7 @@ def command_create_app(args):
     yarn_path = os.path.join(os.getcwd(), proj_name, proj_name)
     os.chdir(yarn_path)
     subprocess.call("yarn install", shell=True)
-    subprocess.call("yarn test", shell=True)  # generates compiled templates
+    subprocess.call("yarn build_development", shell=True)  # generates compiled templates
     if os.path.isdir(os.path.join(os.getcwd(), 'logs')) is not True:
         os.mkdir(os.path.join(os.getcwd(), 'logs'))
     open(os.path.join(os.getcwd(), 'arches.log'), 'w').close()
