@@ -14878,6 +14878,7 @@ a.jstree-anchor.permissions-widget {
     min-width: 150px;
     padding: 12px 20px;
     border: 1px solid #BBD1EA;
+    border-top: none;
     background: #F7F9FB;
     font-size: 13pt;
     display: inline-block;
@@ -14987,20 +14988,63 @@ a.jstree-anchor.permissions-widget {
     border: 1px solid rgb(56, 110, 178);
 }
 
+.etl-job-task-bar {
+    background: #eee; 
+    display: flex;
+    justify-content: space-between;
+    height: 40px; 
+    border-top: 1px solid #ddd;
+}
 
-.etl-status-table .btn-success, .btn-success:hover{
+.etl-job-task-bar .task {
+    padding: 10px; 
+}
+
+.etl-job-task-bar .task a{
+    padding: 7px; 
+    text-decoration: none;
+    color: steelblue; 
+    cursor: pointer;
+}
+
+.etl-job-task-bar .task a:hover{
+    background: rgba(156, 195, 228, 0.35);
+    border: 1px solid #6AA0CC;
+    padding: 6px;
+    border-radius: 1px;
+}
+
+.etl-job-task-bar .status {
+    float: right;
+    padding: 3px;
+}
+
+
+.etl-job .btn-success, .btn-success:hover{
     background: #00ca4e;
     border-color: #00ca4e;
 }
 
-.etl-status-table .btn-warning, .btn-warning:hover{
+.etl-job .btn-warning, .btn-warning:hover{
     background: #ffbd44;
     border-color: #ffbd44;
 }
 
-.etl-status-table .btn-danger, .btn-danger:hover{
+.etl-job .btn-danger, .btn-danger:hover{
     background: #ff605c;
     border-color: #ff605c;
+}
+
+.etl-module-preview {
+    height: calc(100vh - 95px); 
+    width: calc(100vw - 450px); 
+    padding: 25px; 
+    overflow: scroll;
+    background: #fbfbfb;
+}
+
+.etl-module-info h4 {
+    margin-bottom: 5px;
 }
 
 .etl-module-component.etl-module-status {
@@ -15014,4 +15058,16 @@ a.jstree-anchor.permissions-widget {
 .etl-module-footer .btn {
     border-radius: 2px;
     margin-right: 20px;
+}
+
+.etl-loading-metadata-key {
+    font-size: 15px; 
+    padding-right: 3px;
+    color: #777;
+}
+
+.etl-loading-metadata-value {
+    font-size: 15px; 
+    padding-right: 3px;
+    color: rgb(4, 4, 45);
 }

@@ -83,34 +83,36 @@
                                 <div style="display: flex; flex-direction: row; justify-content: space-between;">
                                     <div>
                                         <div data-bind="text: $parent.formatUserName(event.user)"></div>
-                                        <div data-bind="text: $parent.formatTime(event.load_start_time)"></div>
-                                    </div>
-                                    <div>
-                                        <!-- ko if: event.status == "completed" -->
-                                        <button class="btn btn-warning" style="width:150px;">{% trans "indexing" %}</button>
-                                        <!-- /ko -->
-                                        <!-- ko if: event.status == "indexed" -->
-                                        <button class="btn btn-success" style="width:150px;">{% trans "completed" %}</button>
-                                        <!-- /ko -->
-                                        <!-- ko if: event.status == "failed" -->
-                                        <button class="btn btn-danger" style="width:150px;">{% trans "failed" %}</button>
-                                        <!-- /ko -->
-                                        <!-- ko if: event.status == "running" -->
-                                        <button class="btn btn-warning" style="width:150px;">{% trans "running" %}</button>
-                                        <!-- /ko -->
+                                        <div> {% trans "Start: " %} <span data-bind="text: $parent.formatTime(event.load_start_time)"></span></div>
                                     </div>
                                 </div>
                             </div>
-                            <div class="etl-job-task-bar" style="background: #eee; display: block; height: 40px; padding: 10px 15px; border-top: 1px solid #ddd;">
-                                <!-- ko if: event.status == "completed" -->
-                                <a style="color: steelblue; text-decoration: underline; padding-right: 10px; cursor: pointer;" data-bind="click: function() { $parent.reverseTransactions(event.loadid) }">{% trans "undo import" %}</a>
-                                <!-- /ko -->
-                                <!-- ko if: event.status == "indexed" -->
-                                <a style="color: steelblue; text-decoration: underline; padding-right: 10px; cursor: pointer;" data-bind="click: function() { $parent.reverseTransactions(event.loadid) }">{% trans "undo import" %}</a>
-                                <!-- /ko -->
-                                <!-- ko if: event.status == "failed" -->
-                                <a style="color: steelblue; text-decoration: underline; padding-right: 10px; cursor: pointer;" data-bind="click: function() { $parent.cleanLoadEvent(event.loadid) }">{% trans "clean up" %}</a>
-                                <!-- /ko -->
+                            <div class="etl-job-task-bar">
+                                <div class="task">
+                                    <!-- ko if: event.status == "completed" -->
+                                    <a data-bind="click: function() { $parent.reverseTransactions(event.loadid) }">{% trans "undo import" %}</a>
+                                    <!-- /ko -->
+                                    <!-- ko if: event.status == "indexed" -->
+                                    <a data-bind="click: function() { $parent.reverseTransactions(event.loadid) }">{% trans "undo import" %}</a>
+                                    <!-- /ko -->
+                                    <!-- ko if: event.status == "failed" -->
+                                    <a data-bind="click: function() { $parent.cleanLoadEvent(event.loadid) }">{% trans "clean up" %}</a>
+                                    <!-- /ko -->
+                                </div>
+                                <div class="status">
+                                    <!-- ko if: event.status == "completed" -->
+                                    <button class="btn btn-warning" style="width:150px;">{% trans "indexing" %}</button>
+                                    <!-- /ko -->
+                                    <!-- ko if: event.status == "indexed" -->
+                                    <button class="btn btn-success" style="width:150px;">{% trans "completed" %}</button>
+                                    <!-- /ko -->
+                                    <!-- ko if: event.status == "failed" -->
+                                    <button class="btn btn-danger" style="width:150px;">{% trans "failed" %}</button>
+                                    <!-- /ko -->
+                                    <!-- ko if: event.status == "running" -->
+                                    <button class="btn btn-warning" style="width:150px;">{% trans "running" %}</button>
+                                    <!-- /ko -->
+                                </div>
                             </div>
                         </div>
                         
@@ -138,7 +140,7 @@
                         </div>
                     </div>
                 </div>
-                <div class="etl-module-preview" style="height: calc(100vh - 95px); width: calc(100vw - 450px); padding: 25px; overflow: scroll;">
+                <div class="etl-module-preview">
                     <div class="etl-module-info" data-bind="if: selectedLoadEvent()">
                         <div class="" data-bind="component: {
                             name: selectedLoadEvent().etl_module.componentname,
@@ -147,11 +149,12 @@
                                         load_details: selectedLoadEvent().load_details,
                                         ...selectedModule(),
                                     },
-                        }"></div>
+                            }">    
+                        </div>
                         <div class="etl-module-component">
                             <!-- ko if: validated -->
                             <h4>{% trans "Validation Errors" %}</h4>
-                            <table class="table table-striped" style="margin-top: 25px; border: 1px solid rgba(0,0,0,0.14)" width="100%">
+                            <table class="table table-striped" style="margin-top: 5px; border: 1px solid rgba(0,0,0,0.14)" width="100%">
                                 <thead>
                                     <tr>
                                         <th data-bind="text: 'Error'"></th>
@@ -181,8 +184,8 @@
                         <div data-bind="if: selectedLoadEvent()">
                             <h4>{% trans "Loading data" %}</h4>
                             <div>
-                                <span style="font-size: 15px; padding-right: 3px;">{% trans 'Loading status:' %}</span>
-                                <span data-bind="
+                                <span class="etl-loading-metadata-key">{% trans 'Loading status:' %}</span>
+                                <span class="etl-loading-metadata-value" data-bind="
                                     text:
                                         selectedLoadEvent().status == 'indexed' ? '{% trans "Completed" %}' 
                                         : selectedLoadEvent().status == 'completed' ? '{% trans "Indexing" %}' 
@@ -191,24 +194,24 @@
                                 "></span>  
                             </div>
                             <div>
-                                <span style="font-size: 15px; padding-right: 3px;">{% trans 'Loading started:' %}</span>
-                                <span data-bind="text: formatTime(selectedLoadEvent().load_start_time)"></span>    
+                                <span class="etl-loading-metadata-key">{% trans 'Loading started:' %}</span>
+                                <span class="etl-loading-metadata-value" data-bind="text: formatTime(selectedLoadEvent().load_start_time)"></span>    
                             </div>
                             <div data-bind="if: selectedLoadEvent().load_end_time">
-                                <span style="font-size: 15px; padding-right: 3px;">{% trans 'Loading ended:' %}</span>
-                                <span data-bind="text: formatTime(selectedLoadEvent().load_end_time)"></span>    
+                                <span class="etl-loading-metadata-key">{% trans 'Loading ended:' %}</span>
+                                <span class="etl-loading-metadata-value" data-bind="text: formatTime(selectedLoadEvent().load_end_time)"></span>    
                             </div>
                             <div data-bind="if: selectedLoadEvent().load_end_time">
-                                <span style="font-size: 15px; padding-right: 3px;">{% trans 'Load duration:' %}</span>
-                                <span data-bind="text: timeDifference(selectedLoadEvent().load_end_time, selectedLoadEvent().load_start_time)"></span>    
+                                <span class="etl-loading-metadata-key">{% trans 'Load duration:' %}</span>
+                                <span class="etl-loading-metadata-value" data-bind="text: timeDifference(selectedLoadEvent().load_end_time, selectedLoadEvent().load_start_time)"></span>    
                             </div>
                             <div data-bind="if: selectedLoadEvent().indexed_time">
-                                <span style="font-size: 15px; padding-right: 3px;">{% trans 'Indexing ended:' %}</span>
-                                <span data-bind="text: formatTime(selectedLoadEvent().indexed_time)"></span>    
+                                <span class="etl-loading-metadata-key">{% trans 'Indexing ended:' %}</span>
+                                <span class="etl-loading-metadata-value" data-bind="text: formatTime(selectedLoadEvent().indexed_time)"></span>    
                             </div>
                             <div data-bind="if: selectedLoadEvent().indexed_time">
-                                <span style="font-size: 15px; padding-right: 3px;">{% trans 'Indexing duration:' %}</span>
-                                <span data-bind="text: timeDifference(selectedLoadEvent().indexed_time, selectedLoadEvent().load_end_time)"></span>    
+                                <span class="etl-loading-metadata-key">{% trans 'Indexing duration:' %}</span>
+                                <span class="etl-loading-metadata-value" data-bind="text: timeDifference(selectedLoadEvent().indexed_time, selectedLoadEvent().load_end_time)"></span>    
                             </div>
                         </div>
                     </div>
