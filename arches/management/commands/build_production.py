@@ -34,14 +34,14 @@ class Command(BaseCommand):
             "--operation",
             action="store",
             dest="operation",
-            default="collectstatic",
-            choices=["collectstatic"],
-            help="Operation Type; collectstatic=Alias for the collectstatic command provided by django",
+            default="build",
+            choices=["build"],
+            help="Operation Type; build=Alias for `yarn build_production` + `collectstatic`",
         )
 
     def handle(self, *args, **options):
         print("operation: " + options["operation"])
-        if options["operation"] == "collectstatic":
+        if options["operation"] == "build":
             if settings.STATIC_ROOT != "":
                 proj_name = settings.APP_NAME
                 yarn_path = os.path.join(os.getcwd(), proj_name)
