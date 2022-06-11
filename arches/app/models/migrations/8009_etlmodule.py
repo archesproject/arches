@@ -329,28 +329,6 @@ remove_staging_to_tile_function = """
     DROP FUNCTION public.__arches_staging_to_tile(load_id uuid);
     """
 
-add_get_resourceid_from_legacyid_trigger = """
-    CREATE OR REPLACE FUNCTION __arches_get_resourceid_from_legacyid_trigger_function()
-    RETURNS trigger AS $$
-    BEGIN
-        IF NEW.legacyid IN (SELECT legacyid FROM resource_instances WHERE legacyid = NEW.legacyid) THEN
-            SELECT resourceinstanceid FROM resource_instances INTO NEW.resourceid WHERE legacyid = NEW.legacyid;
-        END IF;
-        RETURN NEW;
-    END;
-    $$ LANGUAGE plpgsql;
-
-    CREATE TRIGGER __arches_get_resourceid_from_legacyid_trigger
-        BEFORE INSERT ON load_staging
-        FOR EACH ROW
-        EXECUTE PROCEDURE __arches_get_resourceid_from_legacyid_trigger_function();
-    """
-
-remove_get_resourceid_from_legacyid_trigger = """
-    DROP TRIGGER IF EXISTS __arches_get_resourceid_from_legacyid_trigger ON load_staging;
-    DROP FUNCTION IF EXISTS __arches_get_resourceid_from_legacyid_trigger_function();
-    """
-
 add_check_excess_tiles_trigger = """
     CREATE OR REPLACE FUNCTION __arches_check_excess_tiles_trigger_function()
     RETURNS trigger AS $$
@@ -481,6 +459,5 @@ class Migration(migrations.Migration):
         migrations.RunSQL(add_validation_reporting_functions, remove_validation_reporting_functions),
         migrations.RunSQL(add_functions_to_get_nodegroup_tree, remove_functions_to_get_nodegroup_tree),
         migrations.RunSQL(add_staging_to_tile_function, remove_staging_to_tile_function),
-        migrations.RunSQL(add_get_resourceid_from_legacyid_trigger, remove_get_resourceid_from_legacyid_trigger),
         migrations.RunSQL(add_check_excess_tiles_trigger, remove_check_excess_tiles_trigger),
     ]

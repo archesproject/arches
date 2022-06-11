@@ -1,11 +1,8 @@
 import csv
 from datetime import datetime
-import io
-from importlib import import_module
 import json
 import logging
 import os
-import shutil
 import uuid
 import zipfile
 from django.core.files import File
@@ -15,21 +12,18 @@ from django.db.models.functions import Lower
 from django.db.utils import IntegrityError, ProgrammingError
 from django.utils.translation import ugettext as _
 from arches.app.datatypes.datatypes import DataTypeFactory
-from arches.app.models.models import GraphModel, Node, NodeGroup, ResourceInstance
-from arches.app.models.graph import Graph
-from arches.app.models.resource import Resource
-from arches.app.models.tile import Tile
+from arches.app.models.models import GraphModel, Node, NodeGroup
 from arches.app.models.system_settings import settings
 import arches.app.tasks as tasks
-from arches.app.utils.response import JSONResponse
 from arches.app.utils.betterJSONSerializer import JSONSerializer
 from arches.app.utils.index_database import index_resources_by_transaction
+from arches.app.etl_modules.base_import_module import BaseImportModule
 import arches.app.utils.task_management as task_management
 
 logger = logging.getLogger(__name__)
 
 
-class ImportSingleCsv:
+class ImportSingleCsv(BaseImportModule):
     def __init__(self, request=None):
         self.request = request if request else None
         self.userid = request.user.id if request else None

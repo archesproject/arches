@@ -90,13 +90,16 @@
                             <div class="etl-job-task-bar">
                                 <div class="task">
                                     <!-- ko if: event.status == "completed" -->
-                                    <a data-bind="click: function() { $parent.reverseTransactions(event.loadid) }">{% trans "undo import" %}</a>
+                                    <a data-bind="click: function() { $parent.reverseTransactions(event) }">{% trans "undo import" %}</a>
                                     <!-- /ko -->
                                     <!-- ko if: event.status == "indexed" -->
-                                    <a data-bind="click: function() { $parent.reverseTransactions(event.loadid) }">{% trans "undo import" %}</a>
+                                    <a data-bind="click: function() { $parent.reverseTransactions(event) }">{% trans "undo import" %}</a>
+                                    <!-- /ko -->
+                                    <!-- ko if: event.status == "unloaded" -->
+                                    <a data-bind="click: function() { $parent.cleanLoadEvent(event.loadid) }">{% trans "remove from history" %}</a>
                                     <!-- /ko -->
                                     <!-- ko if: event.status == "failed" -->
-                                    <a data-bind="click: function() { $parent.cleanLoadEvent(event.loadid) }">{% trans "clean up" %}</a>
+                                    <a data-bind="click: function() { $parent.cleanLoadEvent(event.loadid) }">{% trans "remove from history" %}</a>
                                     <!-- /ko -->
                                 </div>
                                 <div class="status">
@@ -111,6 +114,12 @@
                                     <!-- /ko -->
                                     <!-- ko if: event.status == "running" -->
                                     <button class="btn btn-warning" style="width:150px;">{% trans "running" %}</button>
+                                    <!-- /ko -->
+                                    <!-- ko if: event.status == "reversing" -->
+                                    <button class="btn btn-warning" style="width:150px;">{% trans "unloading" %}</button>
+                                    <!-- /ko -->
+                                    <!-- ko if: event.status == "unloaded" -->
+                                    <button class="btn btn-success" style="width:150px;">{% trans "unloaded" %}</button>
                                     <!-- /ko -->
                                 </div>
                             </div>
@@ -161,6 +170,13 @@
                                         <th data-bind="text: 'Source'"></th>
                                     </tr>
                                 </thead>
+                                <!-- ko if: selectedLoadEvent().error_message -->
+                                <tbody>
+                                    <tr>
+                                        <td colspan="3" data-bind="text: selectedLoadEvent().error_message"></td>
+                                    </tr>
+                                </tbody>
+                                <!-- /ko --> 
                                 <!-- ko if: validationError().length -->
                                 <tbody>
                                     <!-- ko foreach: validationError -->
@@ -171,13 +187,13 @@
                                     <!-- /ko -->
                                 </tbody>
                                 <!-- /ko -->
-                                <!-- ko ifnot: validationError().length -->
+                                <!-- ko ifnot: validationError().length || selectedLoadEvent().error_message -->
                                 <tbody>
                                     <tr>
                                         <td colspan="3">{% trans "No Error Found" %}</td>
                                     </tr>
                                 </tbody>
-                                <!-- /ko -->                
+                                <!-- /ko -->            
                             </table>
                             <!-- /ko -->
                         </div>

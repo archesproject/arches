@@ -16,17 +16,17 @@ from django.utils.translation import ugettext as _
 from django.core.files.storage import default_storage
 from arches.app.datatypes.datatypes import DataTypeFactory
 from arches.app.models.models import Node
-from arches.app.models.system_settings import settings
 from arches.app.utils.betterJSONSerializer import JSONSerializer
 from arches.app.utils.index_database import index_resources_by_transaction
 from arches.management.commands.etl_template import create_workbook
 from openpyxl.writer.excel import save_virtual_workbook
 import arches.app.utils.task_management as task_management
+from arches.app.etl_modules.base_import_module import BaseImportModule
 
 logger = logging.getLogger(__name__)
 
 
-class BranchCsvImporter:
+class BranchCsvImporter(BaseImportModule):
     def __init__(self, request=None, loadid=None, temp_dir=None):
         self.request = request if request else None
         self.userid = request.user.id if request else None
@@ -211,53 +211,53 @@ class BranchCsvImporter:
         return lookup
 
     def validate(self):
-        """Validation is actually done - we're just getting the report here"""
         success = True
         with connection.cursor() as cursor:
+            error_message = _("Legacy id(s) already exist. Legacy ids must be unique")
+            cursor.execute(
+                """UPDATE load_event SET error_message = %s, status = 'failed' WHERE  loadid = %s::uuid
+            AND EXISTS (SELECT legacyid FROM load_staging where loadid = %s::uuid and legacyid is not null INTERSECT SELECT legacyid from resource_instances);""",
+                (error_message, self.loadid, self.loadid),
+            )
             cursor.execute("""SELECT * FROM __arches_load_staging_report_errors(%s)""", (self.loadid,))
             row = cursor.fetchall()
         return {"success": success, "data": row}
 
     def complete_load(self, loadid, multiprocessing=True):
         self.loadid = loadid
-        try:
-            with connection.cursor() as cursor:
+        with connection.cursor() as cursor:
+            try:
                 cursor.execute("""SELECT * FROM __arches_staging_to_tile(%s)""", [self.loadid])
                 row = cursor.fetchall()
-        except (IntegrityError, ProgrammingError) as e:
-            logger.error(e)
-            with connection.cursor() as cursor:
+            except (IntegrityError, ProgrammingError) as e:
+                logger.error(e)
                 cursor.execute(
                     """UPDATE load_event SET status = %s, load_end_time = %s WHERE loadid = %s""",
                     ("failed", datetime.now(), self.loadid),
                 )
-            return {
-                "status": 400,
-                "success": False,
-                "title": _("Failed to complete load"),
-                "message": _("Unable to insert record into staging table"),
-            }
-
-        if row[0][0]:
-            with connection.cursor() as cursor:
+                return {
+                    "status": 400,
+                    "success": False,
+                    "title": _("Failed to complete load"),
+                    "message": _("Unable to insert record into staging table"),
+                }
+            if row[0][0]:
                 cursor.execute(
                     """UPDATE load_event SET (status, load_end_time) = (%s, %s) WHERE loadid = %s""",
                     ("completed", datetime.now(), loadid),
                 )
-            index_resources_by_transaction(loadid, quiet=True, use_multiprocessing=False)
-            with connection.cursor() as cursor:
+                index_resources_by_transaction(loadid, quiet=True, use_multiprocessing=False)
                 cursor.execute(
                     """UPDATE load_event SET (status, indexed_time, complete, successful) = (%s, %s, %s, %s) WHERE loadid = %s""",
                     ("indexed", datetime.now(), True, True, loadid),
                 )
-            return {"success": True, "data": "success"}
-        else:
-            with connection.cursor() as cursor:
+                return {"success": True, "data": "success"}
+            else:
                 cursor.execute(
                     """UPDATE load_event SET status = %s, load_end_time = %s WHERE loadid = %s""",
                     ("failed", datetime.now(), self.loadid),
                 )
-            return {"success": False, "data": "failed"}
+                return {"success": False, "data": "failed"}
 
     def read(self, request):
         self.loadid = request.POST.get("load_id")
@@ -265,7 +265,7 @@ class BranchCsvImporter:
         content = request.FILES["file"]
         self.temp_dir = os.path.join("uploadedfiles", "tmp", self.loadid)
         try:
-            self.delete_from_default_storage(self.temp_dir)  # Remove dir if it already exists. os.mkdir won't overwrite
+            self.delete_from_default_storage(self.temp_dir)
         except (FileNotFoundError):
             pass
         result = {"summary": {"name": content.name, "size": self.filesize_format(content.size), "files": {}}}
@@ -312,8 +312,6 @@ class BranchCsvImporter:
                     logger.info(_("Delegating load to Celery task"))
                     tasks.load_branch_csv.apply_async(
                         (files, summary, result, self.temp_dir, self.loadid),
-                        # link=tasks.update_user_task_record.s(),
-                        # link_error=tasks.log_error.s(),
                     )
                     result = _("delegated_to_celery")
                     return {"success": True, "data": result}

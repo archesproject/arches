@@ -1,4 +1,3 @@
-from __future__ import absolute_import, unicode_literals
 import os
 import logging
 import shutil
@@ -23,7 +22,6 @@ def delete_file():
     settings.update_from_db()
 
     logger = logging.getLogger(__name__)
-    now = datetime.timestamp(datetime.now())
     file_list = []
     range = datetime.now() - timedelta(seconds=settings.CELERY_SEARCH_EXPORT_EXPIRES)
     exports = models.SearchExportHistory.objects.filter(exporttime__lt=range).exclude(downloadfile="")
@@ -220,6 +218,15 @@ def load_single_csv(loadid, graphid, has_headers, fieldnames, csv_file_name, id_
 
     ImportSingleCsv = import_single_csv.ImportSingleCsv()
     ImportSingleCsv.run_load_task(loadid, graphid, has_headers, fieldnames, csv_file_name, id_label)
+
+
+@shared_task
+def reverse_etl_load(loadid):
+    from arches.app.etl_modules import base_import_module
+
+    module = base_import_module.BaseImportModule()
+    module.reverse_load(loadid)
+
 
 def create_user_task_record(taskid, taskname, userid):
     try:
