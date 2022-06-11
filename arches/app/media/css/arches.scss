@@ -15056,7 +15056,7 @@ a.jstree-anchor.permissions-widget {
 }
 
 .etl-module-component {
-    margin-top: 40px;
+    margin-top: 30px;
     padding-bottom: 5px;
     width: 95%;
 }
@@ -15076,4 +15076,32 @@ a.jstree-anchor.permissions-widget {
     font-size: 15px; 
     padding-right: 3px;
     color: rgb(4, 4, 45);
+}
+
+table.csv-mapping-table thead tr {
+    background: #f3f3f3;
+    border-bottom: 1px solid #ddd;
+}
+
+table.csv-mapping-table thead {
+    background: #f3f3f3;
+    border-bottom: 1px solid #ddd;
+}
+
+table.csv-mapping-table thead tr.column-names {
+    background: #fff;
+}
+
+table.csv-mapping-table thead th {
+    border-bottom: 1px solid #ddd;
+}
+
+table.csv-mapping-table th {
+    min-width: 200px;
+    border-right: 1px solid #ddd;
+}
+
+table.csv-mapping-table td {
+    vertical-align: text-top;
+    border-right: 1px solid #ddd;
 }

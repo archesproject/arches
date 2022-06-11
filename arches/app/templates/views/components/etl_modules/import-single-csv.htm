@@ -36,13 +36,22 @@
 <!-- /ko -->
 
 <!-- ko if: fileAdded() -->
-<div class="etl-module-component-container">
+<div class="etl-module-component-container" style="margin-top: -65px; padding-top: 5px;">
     <h3>{% trans "Format: Single .csv File Import" %}</h3>
-    <div class="etl-module-component">
-        <h4>{% trans "File Summary" %}</h4>
-        <div data-bind="text: fileInfo().name"></div>
-        <div data-bind="html: '{% trans "File Size: " %}' + formatSize(fileInfo().size)"></div>
-        <div data-bind="text: '{% trans "Number of Row: " %}' + numberOfRow()"></div>
+    <div class="etl-module-component" style="margin-top: 0px;">
+        <h4 style="margin-bottom: 0px;">{% trans "File Summary" %}</h4>
+        <div>
+            <span class="etl-loading-metadata-key">{% trans "File name:" %}</span>
+            <span class="etl-loading-metadata-value" data-bind="text: fileInfo().name"></span>
+        </div>
+        <div>
+            <span class="etl-loading-metadata-key">{% trans "File size:" %}</span>
+            <span class="etl-loading-metadata-value" data-bind="html: formatSize(fileInfo().size)"></span>
+        </div>
+        <div>
+            <span class="etl-loading-metadata-key">{% trans "Number of rows:" %}</span>
+            <span class="etl-loading-metadata-value" data-bind="text: numberOfRow()"></span>
+        </div>
     </div>
     <div class="etl-module-component etl-module-mapping">
         <h4>{% trans "Target Model" %}</h4>
@@ -61,12 +70,12 @@
         <label class="form-checkbox form-normal form-primary" style="padding-left: 25px; padding-top: 3px;">
             <input type="checkbox" data-bind="checked: hasHeaders">{% trans "Column names in the first row" %}
         </label>
-        <table class="table table-striped" style="margin-top: 25px; border: 1px solid rgba(0,0,0,0.14)" width="100%">
+        <table class="table table-striped csv-mapping-table" style="margin-top: 10px; margin-bottom:  5px; border: 1px solid rgba(0,0,0,0.14);" width="100%">
             <thead>
                 <tr>
                 <!-- ko foreach: { data: fieldMapping, as: 'mapping', noChildContext: true } -->
                     <!-- ko if: nodes() -->
-                    <th>
+                    <th style="border-bottom: 1px solid #ddd;">
                         <select data-bind="
                             value: mapping.node,
                             options: nodes,
@@ -81,9 +90,9 @@
                 <!-- /ko -->
             </thead>
             <thead>
-                <tr>
+                <tr class="column-names">
                     <!-- ko foreach: headers -->
-                    <th data-bind="text: $data"></th>
+                    <th style="border-bottom: 1px solid #ddd;" data-bind="text: $data"></th>
                     <!-- /ko -->
                 </tr>
             </thead>
@@ -91,7 +100,7 @@
                 <!-- ko foreach: { data: csvExample, as: "row", noChildContext: true }-->
                 <tr>
                     <!-- ko foreach: { data: row, as: "cell" }  -->
-                    <td data-bind="text: cell"></td>
+                    <td style="vertical-align: text-top;" data-bind="text: cell"></td>
                     <!-- /ko -->
                 </tr>
                 <!-- /ko -->
@@ -106,7 +115,7 @@
     </div>
 </div>
 <div class="etl-module-footer">
-    <button data-bind="click: write" class="btn btn-success">
+    <button style="margin-right: 8px;" data-bind="click: write" class="btn btn-success">
         <span>{% trans "Import data" %}</span>
     </button>
     <button data-bind="click: function () { $parent.selectedModule(null); }" class="btn btn-danger">
