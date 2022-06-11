@@ -36,10 +36,10 @@
 <!-- /ko -->
 
 <!-- ko if: fileAdded() -->
-<div class="etl-module-component-container" style="margin-top: -65px; padding-top: 5px;">
-    <h3>{% trans "Format: Single .csv File Import" %}</h3>
+<div class="etl-module-component-container" style="margin-top: -60px; padding-top: 0px;">
+    <h3 style="margin-top: 15px; margin-bottom: 5px; font-size: 19px;">{% trans "Import Format: Single .csv file" %}</h3>
     <div class="etl-module-component" style="margin-top: 0px;">
-        <h4 style="margin-bottom: 0px;">{% trans "File Summary" %}</h4>
+        <h4 style="margin-top: 5px; margin-bottom: 0px;">{% trans "File Summary" %}</h4>
         <div>
             <span class="etl-loading-metadata-key">{% trans "File name:" %}</span>
             <span class="etl-loading-metadata-value" data-bind="text: fileInfo().name"></span>
