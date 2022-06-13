@@ -14,7 +14,7 @@
         <div style="display: flex; padding: 15px 25px; flex-direction: column; justify-content: center; align-items: center;">
             <div style="display:flex; flex-direction: column;">
                 <div>
-                    <div class="dropzone-photo-upload">
+                    <div class="dropzone-photo-upload" style="margin-top: 0px;">
                         <div style="border-top: 1px solid #c4c4c4; margin-bottom: 15px;" class="btn btn-primary btn-labeled btn-lg fa fa-file fileinput-button dz-clickable" data-bind="css: uniqueidClass" role="button">
                         {% trans 'Select File' %}
                         </div>
@@ -123,14 +123,14 @@
     <!-- ko if: load_details -->
     <!-- ko ifnot: loading() -->
     <div>
-        <span style="font-size: 15px; padding-right: 3px;">{% trans 'Target Resource:' %}</span>
-        <span data-bind="text: getGraphName(load_details.graph)"></span>
+        <span class="etl-loading-metadata-key">{% trans 'Target Resource:' %}</span>
+        <span class="etl-loading-metadata-value" data-bind="text: getGraphName(load_details.graph)"></span>
     </div>
     <div>
-        <span style="font-size: 15px; padding-right: 3px;">{% trans 'Target Fields:' %}</span>
+        <span class="etl-loading-metadata-key">{% trans 'Target Fields:' %}</span>
         <!-- ko foreach: load_details.mapping -->
         <!-- ko if:  $data.node -->
-        <span data-bind="text: $data.node"></span><span>;</span>
+        <span class="etl-loading-metadata-value" data-bind="text: $data.node"></span><span>;</span>
         <!-- /ko -->
         <!-- /ko -->
     </div>
