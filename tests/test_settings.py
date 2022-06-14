@@ -94,6 +94,9 @@ BYPASS_CARDINALITY_TILE_VALIDATION = False
 
 OVERRIDE_RESOURCE_MODEL_LOCK = True
 
+ENABLE_TWO_FACTOR_AUTHENTICATION = False
+FORCE_TWO_FACTOR_AUTHENTICATION = False
+
 # Tell nose to measure coverage on the 'foo' and 'bar' apps
 NOSE_ARGS = ["--with-coverage", "--nologcapture", "--cover-package=arches", "--verbosity=1", "--cover-erase", "--cover-xml", "-s"]
 
