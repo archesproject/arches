@@ -1,6 +1,7 @@
 import uuid
 import json
 import decimal
+import filetype
 import base64
 import re
 import logging
@@ -1217,8 +1218,25 @@ class FileListDataType(BaseDataType):
     def __init__(self, model=None):
         super(FileListDataType, self).__init__(model=model)
         self.node_lookup = {}
+    
+    def validate_file_type(self, request=None, nodeid=None):
+        unknown_files = []
+        files = request.FILES.getlist("file-list_" + nodeid, [])
+        for file in files:
+            file_type = filetype.guess(file.file)
+            if file_type:
+                print('File type detected for', file.name, "::", file_type.mime, file_type.extension)
+            else:
+                unknown_files.append(file.name)
+        print(unknown_files)    
+        return unknown_files
 
-    def validate(self, value, row_number=None, source=None, node=None, nodeid=None, strict=False, path=None):
+    def validate(self, value, row_number=None, source=None, node=None, nodeid=None, strict=False, path=None, request=None):
+        errors = []
+        if request:
+            unknown_files = self.validate_file_type(request, str(node.pk))
+            if len(unknown_files) > 0:
+                errors.append({"type": "ERROR", "message": _("Unable to save unfamiliar file types: {0}".format(",".join(unknown_files)))})
         if node:
             self.node_lookup[str(node.pk)] = node
         elif nodeid:
@@ -1238,7 +1256,6 @@ class FileListDataType(BaseDataType):
                 n += 1
             return size, power_labels[n] + "bytes"
 
-        errors = []
         try:
             config = node.config
             limit = config["maxFiles"]
