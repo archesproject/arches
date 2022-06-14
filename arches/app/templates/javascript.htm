@@ -62,6 +62,7 @@
             'leaflet-iiif': '{{ STATIC_URL }}packages/leaflet-iiif/leaflet-iiif',
             'leaflet-draw': '{{ STATIC_URL }}packages/leaflet-draw/dist/leaflet.draw',
             'leaflet-fullscreen': '{{ STATIC_URL }}packages/leaflet.fullscreen/Control.FullScreen',
+            'leaflet-side-by-side': '{{ STATIC_URL }}plugins/leaflet-side-by-side/index',
             'metismenu': '{{ STATIC_URL }}packages/metismenu/dist/metisMenu.min',
             'knockstrap': '{{ STATIC_URL }}packages/knockstrap/build/knockstrap.min',
             'jqtree': '{{ STATIC_URL }}packages/jqtree/tree.jquery',
@@ -188,6 +189,7 @@
                 from_sparql_endpoint: "{% url 'from_sparql_endpoint' 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa' %}",
                 search_sparql_endpoint: "{% url 'search_sparql_endpoint' %}",
                 confirm_delete: "{% url 'confirm_delete' 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa' %}",
+                search_home: "{% url 'search_home' %}",
                 search_terms: "{% url 'search_terms' %}",
                 search_results: "{% url 'search_results' %}",
                 export_results: "{% url 'export_results' %}",
@@ -232,6 +234,7 @@
                 permission_data: "{% url 'permission_data' %}",
                 resource_permission_data: "{% url 'resource_permission_data' %}",
                 permission_manager_data: "{% url 'permission_manager_data' %}",
+                clear_user_permission_cache: "{% url 'clear_user_permission_cache' %}",
                 get_user_names: "{% url 'get_user_names' %}",
                 feature_popup_content: "{% url 'feature_popup_content' %}",
                 related_resource_candidates: "{% url 'related_resource_candidates' %}",
@@ -239,6 +242,8 @@
                 get_domain_connections: function(graphid){return "{% url 'get_domain_connections' 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa' %}".replace('aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa', graphid)},
                 clone_graph: function(graphid){return "{% url 'clone_graph' 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa' %}".replace('aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa', graphid)},
                 export_graph: function(graphid){return "{% url 'export_graph' 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa' %}".replace('aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa', graphid)},
+                publish_graph: function(graphid){return "{% url 'publish_graph' 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa' %}".replace('aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa', graphid)},
+                unpublish_graph: function(graphid){return "{% url 'unpublish_graph' 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa' %}".replace('aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa', graphid)},
                 delete_graph: function(graphid){return "{% url 'delete_graph' 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa' %}".replace('aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa', graphid)},
                 delete_instances: function(graphid){return "{% url 'delete_instances' 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa' %}".replace('aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa', graphid)},
                 export_mapping_file: function(graphid){return "{% url 'export_mapping_file' 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa' %}".replace('aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa', graphid)},
@@ -255,6 +260,9 @@
                 api_card: "{% url 'api_card' 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa' %}".replace('aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa', ''),
                 api_tiles: function (tileid) {
                     return "{% url 'api_tiles' 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa' %}".replace('aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa', tileid)
+                },
+                api_nodegroup: function (nodegroupid) {
+                    return "{% url 'api_nodegroup' 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa' %}".replace('aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa', nodegroupid)
                 },
                 api_nodes: function (nodeid) {
                     return "{% url 'api_nodes' 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa' %}".replace('aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa', nodeid)
@@ -274,6 +282,7 @@
                 iiifannotationnodes: "{% url 'iiifannotationnodes' %}",
                 validatejson: "{% url 'validatejson' 'aaaa'%}".replace('aaaa', ''),
                 get_dsl: "{% url 'get_dsl' %}",
+                transform_edtf_for_tile: "{% url 'transform_edtf_for_tile' %}",
                 {% block urls %}{% endblock urls %}
             },
             geocoderPlaceHolder: "{% trans 'Find an address...' %}",
@@ -313,7 +322,8 @@
                 text: "{% trans 'Sorry! The request failed. Please try again.  Contact your system administrator if the problem persists.' %}"
             },
             resourceCopySuccess: {
-                title: "{% trans 'Resource Successfully Copied.'%}"
+                title: "{% trans 'Resource Successfully Copied.'%}",
+                text: "{% trans 'Click here to edit copy' %}"
             },
             resourceCopyFailed: {
                 title: "{% trans 'Resource Copy Failed...'%}",
@@ -322,6 +332,10 @@
             twoFactorAuthenticationEmailSuccess: {
                 title: "{% trans 'Success!' %}",
                 text: "{% trans 'An email with instructions to change two-factor authentication settings has been sent to your registered email address.' %}"
+            },
+            resourceHasUnpublishedGraph: {
+                title: "{% trans 'This resource is based on an unpublished graph.' %}",
+                text: "{% trans 'To continue, please ensure the graph is published.' %}"
             },
             mapboxApiKey: '{{ map_info.mapbox_api_key }}',
             hexBinSize: {{ map_info.hex_bin_size | unlocalize }},
@@ -418,6 +432,7 @@
                 'mobileSurveyDesc': '{% trans "Summary of how this model participates in the survey" %}',
                 'groupingErrorTitle': '{% trans "Settings Conflict: Remove this card from grouped card?" %}',
                 'groupingErrorMessage': "{% trans 'The cardinality of this card can\'t be changed until you remove it from being grouped with the ${cardName} card.  Do you want to remove this card from being grouped with the ${cardName} card' %}",
+                'modelDoesNotExist': '{% trans "!! Referenced model does not exist -- Delete and select a new model !!" %}',
             },
             version: '{{ app_settings.VERSION }}'
         };
@@ -492,7 +507,7 @@
          return;
     });
 
-    define('file-renderers', [{% for renderer in app_settings.RENDERERS %}'{{ renderer.component }}',{% endfor %}], function () {
+    define('file-renderers', function () {
         return [{% autoescape off %}{% for renderer in app_settings.RENDERERS %}
                 {'name': '{{ renderer.name }}',
                 'title': '{{ renderer.title }}',

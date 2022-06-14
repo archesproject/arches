@@ -22,7 +22,7 @@ define([
     function viewModel(params) {
         // params.form is the CardTreeViewModel
         var self = this;
-        this.saving = false;
+        this.saving = params.form?.saving || ko.observable(false);
         this.tiles = [];
         this.widgetInstanceDataLookup = {};
 
@@ -131,7 +131,7 @@ define([
         }
 
         this.groupedTiles = ko.computed(function() {
-            if (this.saving) {
+            if (this.saving()) {
                 return this.tiles;
             } else {
                 var tiles = [];
@@ -216,11 +216,10 @@ define([
             var tile = self.groupedTiles()[0];
             tile.resourceinstance_id = ko.unwrap(self.form.resourceId);
             tile.transactionId = params.form?.workflowId;
-            self.saving = true;
+            self.saving(true);
 
             tile.save(function(response) {
                 errors.push(response);
-                self.saving = false;
                 self.groupedCardIds.valueHasMutated();
                 self.selectGroupCard();
             }, function(){
@@ -232,12 +231,12 @@ define([
                     });
                 }, self);
                 Promise.all(requests).finally(function(){
-                    self.saving = false;
                     self.groupedCardIds.valueHasMutated();
                     self.selectGroupCard();
                     if (params.form.onSaveSuccess) {
                         params.form.onSaveSuccess(self.tiles);
                     }
+                    self.saving(false);
                     self.loading(false);
                 });
             });

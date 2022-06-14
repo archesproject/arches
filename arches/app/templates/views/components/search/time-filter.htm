@@ -18,7 +18,7 @@
             <select id="" class="resources" data-placeholder="Date type" tabindex="-1" data-bind="value: filter.dateNodeId, chosen:{ width: '100%' }, attr: {id:dateDropdownEleId} ">
                 <option value="">{% trans "Search all dates" %}</option>
                 <!-- ko foreach: { data: graph_models, as: 'graph' } -->
-                    <optgroup data-bind="if: (graph.isresource && graph.isactive), attr: { label: graph.name }">
+                    <optgroup data-bind="if: (graph.isresource), attr: { label: graph.name }">
                         <!-- ko foreach: { data: $parent.date_nodes, as: 'node' } -->
                             <!-- ko if: graph.graphid === node.graph_id -->
                                 <option data-bind="attr: { value: node.nodeid }, text: node.label"></option>

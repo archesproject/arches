@@ -26,6 +26,7 @@ define([
     var GraphDesignerView = BaseManagerView.extend({
         initialize: function(options) {
             var viewModel = options.viewModel;
+
             viewModel.graphid = ko.observable(data.graphid);
             viewModel.activeTab = ko.observable('graph');
             viewModel.viewState = ko.observable('design');
@@ -36,6 +37,34 @@ define([
             viewModel.ontologyClasses = ko.observable(data['ontologyClasses']);
             viewModel.cardComponents = data.cardComponents;
             viewModel.appliedFunctions = ko.observable(data['appliedFunctions']);
+            viewModel.isGraphPublished = ko.observable(ko.unwrap(data['graph'].publication_id));
+            viewModel.graphPublicationNotes = ko.observable();
+            viewModel.shouldShowGraphPublishButtons = ko.pureComputed(function() {
+                var shouldShowGraphPublishButtons = true;
+
+                if (viewModel.dirty()) {
+                    shouldShowGraphPublishButtons = false;
+                }
+                else if (viewModel.graphSettingsViewModel && viewModel.graphSettingsViewModel.dirty()) {
+                    shouldShowGraphPublishButtons = false;
+                }
+                else if (viewModel.selectedNode() && viewModel.selectedNode().dirty() && viewModel.selectedNode().istopnode == false) {
+                    shouldShowGraphPublishButtons = false;
+                }
+                else if (ko.unwrap(viewModel.cardTree.selection)) {
+                    var selection = ko.unwrap(viewModel.cardTree.selection);
+
+                    if (selection.model && selection.model.dirty()) {
+                        shouldShowGraphPublishButtons = false;
+                    }
+                    else if (selection.card && selection.card.dirty()) {
+                        shouldShowGraphPublishButtons = false;
+                    }
+                }
+                
+                return shouldShowGraphPublishButtons;
+            });
+            viewModel.primaryDescriptorFunction = ko.observable(data['primaryDescriptorFunction']);
 
             var resources = ko.utils.arrayFilter(viewData.graphs, function(graph) {
                 return graph.isresource;
@@ -69,6 +98,53 @@ define([
 
             viewModel.exportMappingFile = function() {
                 window.open(arches.urls.export_mapping_file(viewModel.graph.graphid()), '_blank');
+            };
+
+            viewModel.shouldShowPublishModal = ko.observable(false);
+
+            viewModel.displayUnpublishWarning = function() {
+                viewModel.alert(new AlertViewModel('ep-alert-red', 'Unpublish the graph?', 'This will make the graph inaccessible to other users.', function() {}, viewModel.unpublishGraph));
+            };
+            viewModel.publishGraph = function() {
+                viewModel.loading(true);
+
+                $.ajax({
+                    type: "POST",
+                    data: JSON.stringify({'notes': viewModel.graphPublicationNotes()}),
+                    url: arches.urls.publish_graph(viewModel.graph.graphid()),
+                    complete: function(response, status) {
+                        if (status === 'success') {
+                            viewModel.isGraphPublished(true);
+                            viewModel.alert(new AlertViewModel('ep-alert-blue', response.responseJSON.title, response.responseJSON.message));
+                        }
+                        else {
+                            viewModel.alert(new JsonErrorAlertViewModel('ep-alert-red', response.responseJSON));
+                        }
+                        
+                        viewModel.graphPublicationNotes(null);
+                        viewModel.shouldShowPublishModal(false);
+                        viewModel.loading(false);
+                    }
+                });
+            };
+            viewModel.unpublishGraph = function() {
+                viewModel.loading(true);
+
+                $.ajax({
+                    type: "POST",
+                    url: arches.urls.unpublish_graph(viewModel.graph.graphid()),
+                    complete: function(response, status) {
+                        if (status === 'success') {
+                            viewModel.isGraphPublished(false);
+                        }
+                        else {
+                            viewModel.alert(new JsonErrorAlertViewModel('ep-alert-red', response.responseJSON));
+                        }
+
+                        viewModel.shouldShowPublishModal(false);
+                        viewModel.loading(false);
+                    }
+                });
             };
 
             viewModel.deleteGraph = function() {
@@ -211,6 +287,7 @@ define([
             viewModel.cardTree = new CardTreeViewModel({
                 graph: viewModel.graph,
                 appliedFunctions: viewModel.appliedFunctions,
+                primaryDescriptorFunction: viewModel.primaryDescriptorFunction,
                 graphModel: viewModel.graphModel
             });
 
@@ -218,6 +295,7 @@ define([
                 graph: viewModel.graph,
                 graphModel: viewModel.graphModel,
                 appliedFunctions: viewModel.appliedFunctions,
+                primaryDescriptorFunction: viewModel.primaryDescriptorFunction,
                 multiselect: true
             });
 
@@ -251,6 +329,7 @@ define([
                 loading: viewModel.loading,
                 node: viewModel.selectedNode,
                 appliedFunctions: viewModel.appliedFunctions,
+                primaryDescriptorFunction: viewModel.primaryDescriptorFunction,
                 restrictedNodegroups: data.restrictedNodegroups
             });
 
@@ -319,6 +398,7 @@ define([
                 cardTree: viewModel.cardTree,
                 permissionTree: viewModel.permissionTree,
                 appliedFunctions: viewModel.appliedFunctions,
+                primaryDescriptorFunction: viewModel.primaryDescriptorFunction,
                 restrictedNodegroups: data.restrictedNodegroups
             });
 

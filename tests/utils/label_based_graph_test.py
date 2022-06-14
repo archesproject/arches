@@ -137,14 +137,13 @@ class LabelBasedGraphTests(TestCase):
 class LabelBasedGraph_FromResourceTests(TestCase):
     @classmethod
     def setUp(cls):
-        cls.nodegroup = models.NodeGroup()
+        cls.parent_nodegroup = models.NodeGroup()
+        cls.nodegroup = models.NodeGroup(parentnodegroup=cls.parent_nodegroup)
         cls.grouping_node = models.Node(datatype="semantic", name="Test Node Grouping", nodegroup=cls.nodegroup)
-        cls.string_node = models.Node(datatype="string", name="Test Node")
+        cls.string_node = models.Node(datatype="string", name="Test Node", nodegroup=cls.nodegroup)
         cls.grouping_tile = models.TileModel(data={}, nodegroup_id=str(cls.grouping_node.pk))
         cls.string_tile = models.TileModel(data={str(cls.string_node.pk): "value_1"}, nodegroup_id=str(cls.string_node.pk))
-
-        cls.grouping_node.nodegroupid = cls.grouping_node.nodeid
-        cls.string_node.nodegroupid = cls.string_node.nodeid
+        cls.hidden_card = models.CardModel(nodegroup=cls.nodegroup, visible=False)
 
         # let's mock Resource since it's minimally used
         # and complex to get `displayname`
@@ -204,27 +203,6 @@ class LabelBasedGraph_FromResourceTests(TestCase):
                         VALUE_KEY: duplicate_node_tile.data[str(self.string_node.pk)],
                     },
                 ],
-            },
-        )
-
-    def test_handles_empty_semantic_node(self, mock_Node, mock_NodeGroup):
-        mock_Node.objects.get.return_value = self.grouping_node
-        mock_NodeGroup.objects.filter.return_value.values.return_value = [
-            {"nodegroupid": self.grouping_tile.nodegroup_id, "cardinality": "1"}
-        ]
-
-        self.test_resource.tiles.append(self.grouping_tile)
-
-        label_based_graph = LabelBasedGraph.from_resource(resource=self.test_resource, compact=False, hide_empty_nodes=False)
-
-        self.assertEqual(
-            label_based_graph,
-            {
-                self.grouping_node.name: {
-                    NODE_ID_KEY: str(self.grouping_node.pk),
-                    TILE_ID_KEY: str(self.grouping_tile.pk),
-                    VALUE_KEY: NON_DATA_COLLECTING_NODE,
-                },
             },
         )
 
@@ -289,62 +267,78 @@ class LabelBasedGraph_FromResourceTests(TestCase):
             },
         )
 
-    # def test_handles_node_grouped_in_separate_card_with_cardinality_n(self, mock_Node, mock_NodeGroup):
-    #     mock_Node.objects.get.side_effect = [self.grouping_node, self.string_node]
-    #     mock_NodeGroup.objects.filter.return_value.values.return_value = [
-    #         {"nodegroupid": self.grouping_tile.nodegroup_id, "cardinality": "1"},
-    #         {"nodegroupid": self.string_tile.nodegroup_id, "cardinality": "n"},
-    #     ]
+    def test_handles_node_grouped_in_separate_card_with_cardinality_n(self, mock_Node, mock_NodeGroup):
+        mock_Node.objects.get.side_effect = [self.grouping_node, self.string_node]
+        mock_NodeGroup.objects.filter.return_value.values.return_value = [
+            {"nodegroupid": self.grouping_tile.nodegroup_id, "cardinality": "1"},
+            {"nodegroupid": self.string_tile.nodegroup_id, "cardinality": "n"},
+        ]
 
-    #     self.grouping_node.get_direct_child_nodes = mock.Mock(return_value=[self.string_node])
+        self.grouping_node.get_direct_child_nodes = mock.Mock(return_value=[self.string_node])
 
-    #     self.string_tile.parenttile = self.grouping_tile
+        self.string_tile.parenttile = self.grouping_tile
 
-    #     self.test_resource.tiles.append(self.grouping_tile)
-    #     self.test_resource.tiles.append(self.string_tile)
+        self.test_resource.tiles.append(self.grouping_tile)
+        self.test_resource.tiles.append(self.string_tile)
 
-    #     label_based_graph = LabelBasedGraph.from_resource(resource=self.test_resource, compact=False, hide_empty_nodes=False)
+        label_based_graph = LabelBasedGraph.from_resource(resource=self.test_resource, compact=False, hide_empty_nodes=False)
 
-    #     self.assertEqual(
-    #         label_based_graph,
-    #         {
-    #             self.grouping_node.name: {
-    #                 NODE_ID_KEY: str(self.grouping_node.pk),
-    #                 TILE_ID_KEY: str(self.grouping_tile.pk),
-    #                 VALUE_KEY: NON_DATA_COLLECTING_NODE,
-    #                 self.string_node.name: [
-    #                     {
-    #                         NODE_ID_KEY: str(self.string_node.pk),
-    #                         TILE_ID_KEY: str(self.string_tile.pk),
-    #                         VALUE_KEY: self.string_tile.data[str(self.string_node.pk)],
-    #                     }
-    #                 ],
-    #             },
-    #         },
-    #     )
+        self.assertEqual(
+            label_based_graph,
+            {
+                self.grouping_node.name: {
+                    NODE_ID_KEY: str(self.grouping_node.pk),
+                    TILE_ID_KEY: str(self.grouping_tile.pk),
+                    VALUE_KEY: NON_DATA_COLLECTING_NODE,
+                    self.string_node.name: [
+                        {
+                            NODE_ID_KEY: str(self.string_node.pk),
+                            TILE_ID_KEY: str(self.string_tile.pk),
+                            VALUE_KEY: self.string_tile.data[str(self.string_node.pk)],
+                        }
+                    ],
+                },
+            },
+        )
 
-    # def test_handles_empty_node_grouped_in_separate_card_with_cardinality_n(self, mock_Node, mock_NodeGroup):
-    #     mock_Node.objects.get.side_effect = [self.grouping_node, self.string_node]
-    #     mock_NodeGroup.objects.filter.return_value.values.return_value = [
-    #         {"nodegroupid": self.grouping_tile.nodegroup_id, "cardinality": "1"},
-    #         {"nodegroupid": self.string_tile.nodegroup_id, "cardinality": "n"},
-    #     ]
+    def test_handles_empty_node_grouped_in_separate_card_with_cardinality_n(self, mock_Node, mock_NodeGroup):
+        mock_Node.objects.get.side_effect = [self.grouping_node, self.string_node]
+        mock_NodeGroup.objects.filter.return_value.values.return_value = [
+            {"nodegroupid": self.grouping_tile.nodegroup_id, "cardinality": "1"},
+            {"nodegroupid": self.string_tile.nodegroup_id, "cardinality": "n"},
+        ]
 
-    #     self.grouping_node.get_direct_child_nodes = mock.Mock(return_value=[self.string_node])
+        self.grouping_node.get_direct_child_nodes = mock.Mock(return_value=[self.string_node])
 
-    #     self.string_tile.parenttile = self.grouping_tile
+        self.string_tile.parenttile = self.grouping_tile
 
-    #     self.test_resource.tiles.append(self.grouping_tile)
+        self.test_resource.tiles.append(self.grouping_tile)
 
-    #     label_based_graph = LabelBasedGraph.from_resource(resource=self.test_resource, compact=False, hide_empty_nodes=False)
+        label_based_graph = LabelBasedGraph.from_resource(resource=self.test_resource, compact=False, hide_empty_nodes=False)
 
-    #     self.assertEqual(
-    #         label_based_graph,
-    #         {
-    #             self.grouping_node.name: {
-    #                 NODE_ID_KEY: str(self.grouping_node.pk),
-    #                 TILE_ID_KEY: str(self.grouping_tile.pk),
-    #                 VALUE_KEY: NON_DATA_COLLECTING_NODE,
-    #             },
-    #         },
-    #     )
+        self.assertEqual(
+            label_based_graph,
+            {},
+        )
+
+    @mock.patch("arches.app.utils.label_based_graph.models.CardModel")
+    def test_handle_hidden_nodes(self, mock_CardModel, mock_Node, mock_NodeGroup):
+        filter_mock = mock.MagicMock()
+
+        def filter_side_effect(nodegroup_id=None):
+            if nodegroup_id:
+                return filter_mock
+            return mock.MagicMock()
+
+        mock_CardModel.objects.filter.side_effect = filter_side_effect
+        filter_mock.first.return_value = self.hidden_card
+        mock_Node.objects.get.return_value = self.string_node
+        mock_NodeGroup.objects.filter.return_value.values.return_value = [
+            {"nodegroupid": self.string_tile.nodegroup_id, "cardinality": "1"}
+        ]
+
+        self.test_resource.tiles.append(self.string_tile)
+
+        label_based_graph = LabelBasedGraph.from_resource(self.test_resource, compact=False, hide_empty_nodes=False, hide_hidden_nodes=True)
+
+        self.assertEqual(label_based_graph, {})

@@ -10892,17 +10892,21 @@
             "functions_x_graphs": [
                 {
                     "config": {
-                        "description": {
-                            "nodegroup_id": "3676e3ef-943c-11e8-8654-94659cf754d0",
-                            "string_template": "<Description>"
-                        },
-                        "map_popup": {
-                            "nodegroup_id": "eeaaea81-943b-11e8-8181-94659cf754d0",
-                            "string_template": "<Name>"
-                        },
-                        "name": {
-                            "nodegroup_id": "eeaaea81-943b-11e8-8181-94659cf754d0",
-                            "string_template": "<Name>"
+                        "module": "arches.app.functions.primary_descriptors",
+                        "class_name": "PrimaryDescriptorsFunction",
+                        "descriptor_types": {
+                            "description": {
+                                "nodegroup_id": "3676e3ef-943c-11e8-8654-94659cf754d0",
+                                "string_template": "<Description>"
+                            },
+                            "map_popup": {
+                                "nodegroup_id": "eeaaea81-943b-11e8-8181-94659cf754d0",
+                                "string_template": "<Name>"
+                            },
+                            "name": {
+                                "nodegroup_id": "eeaaea81-943b-11e8-8181-94659cf754d0",
+                                "string_template": "<Name>"
+                            }
                         },
                         "triggering_nodegroups": []
                     },
@@ -10912,9 +10916,15 @@
                 }
             ],
             "graphid": "fad0563b-b8f8-11e6-84a5-026d961c88e6",
+            "publication": {
+                "graph_id": "fad0563b-b8f8-11e6-84a5-026d961c88e6",
+                "notes": "Initial migration.",
+                "publicationid": "4916d678-27fd-4d22-bd13-539e6c798a8e",
+                "published_time": "2022-03-22T13:29:06.593",
+                "user_id": null
+            },
             "iconclass": "fa fa-th",
             "is_editable": false,
-            "isactive": true,
             "isresource": true,
             "jsonldcontext": null,
             "name": "Historic District",

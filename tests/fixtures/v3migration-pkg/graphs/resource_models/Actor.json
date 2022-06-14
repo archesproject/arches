@@ -8865,17 +8865,21 @@
             "functions_x_graphs": [
                 {
                     "config": {
-                        "description": {
-                            "nodegroup_id": "de257192-943a-11e8-87c6-94659cf754d0",
-                            "string_template": "<Description>"
-                        },
-                        "map_popup": {
-                            "nodegroup_id": "1b6d7661-943b-11e8-b811-94659cf754d0",
-                            "string_template": "<Appellation>"
-                        },
-                        "name": {
-                            "nodegroup_id": "1b6d7661-943b-11e8-b811-94659cf754d0",
-                            "string_template": "<Appellation>"
+                        "module": "arches.app.functions.primary_descriptors",
+                        "class_name": "PrimaryDescriptorsFunction",
+                        "descriptor_types": {
+                            "description": {
+                                "nodegroup_id": "de257192-943a-11e8-87c6-94659cf754d0",
+                                "string_template": "<Description>"
+                            },
+                            "map_popup": {
+                                "nodegroup_id": "1b6d7661-943b-11e8-b811-94659cf754d0",
+                                "string_template": "<Appellation>"
+                            },
+                            "name": {
+                                "nodegroup_id": "1b6d7661-943b-11e8-b811-94659cf754d0",
+                                "string_template": "<Appellation>"
+                            }
                         },
                         "triggering_nodegroups": []
                     },
@@ -8885,9 +8889,15 @@
                 }
             ],
             "graphid": "ccbd1537-ac5e-11e6-84a5-026d961c88e6",
+            "publication": {
+                "graph_id": "ccbd1537-ac5e-11e6-84a5-026d961c88e6",
+                "notes": "Initial migration.",
+                "publicationid": "4916d678-27fd-4d22-bd13-539e6c798a8e",
+                "published_time": "2022-03-22T13:29:06.593",
+                "user_id": null
+            },
             "iconclass": "fa fa-users",
             "is_editable": false,
-            "isactive": true,
             "isresource": true,
             "jsonldcontext": null,
             "name": "Actor",
@@ -9361,7 +9371,7 @@
                         "addToMap": true,
                         "advancedStyle": "",
                         "advancedStyling": false,
-                        "clusterDistance": 20, 
+                        "clusterDistance": 20,
                         "clusterMaxZoom": 5,
                         "clusterMinPoints": 3,
                         "fillColor": "rgba(164,75,15,0.5)",

@@ -59,7 +59,7 @@ from arches.app.utils.permission_backend import (
 )
 from arches.app.utils.geo_utils import GeoUtils
 from arches.app.search.components.base import SearchFilterFactory
-from arches.app.datatypes.datatypes import DataTypeFactory
+from arches.app.datatypes.datatypes import DataTypeFactory, EDTFDataType
 from arches.app.search.search_engine_factory import SearchEngineFactory
 from arches.app.search.search_export import SearchResultsExporter
 
@@ -263,11 +263,12 @@ class GeoJSON(APIBase):
     se = SearchEngineFactory().create()
 
     def get_name(self, resource):
-        module = importlib.import_module("arches.app.functions.primary_descriptors")
-        PrimaryDescriptorsFunction = getattr(module, "PrimaryDescriptorsFunction")()
-        functionConfig = models.FunctionXGraph.objects.filter(graph_id=resource.graph_id, function__functiontype="primarydescriptors")
-        if len(functionConfig) == 1:
-            return PrimaryDescriptorsFunction.get_primary_descriptor_from_nodes(resource, functionConfig[0].config["name"])
+        graph_function = models.FunctionXGraph.objects.filter(
+            graph_id=resource.graph_id, function__functiontype="primarydescriptors"
+        ).select_related("function")
+        if len(graph_function) == 1:
+            module = graph_function[0].function.get_class_module()()
+            return module.get_primary_descriptor_from_nodes(self, graph_function[0].config["descriptor_types"]["name"])
         else:
             return _("Unnamed Resource")
 
@@ -566,6 +567,7 @@ class Resources(APIBase):
 
         allowed_formats = ["json", "json-ld", "arches-json"]
         format = request.GET.get("format", "json-ld")
+        hide_hidden_nodes = bool(request.GET.get("hidden", "true").lower() == "false")
         user = request.user
         perm = "read_nodegroup"
 
@@ -587,17 +589,29 @@ class Resources(APIBase):
                 hide_empty_nodes = bool(request.GET.get("hide_empty_nodes", "false").lower() == "true")  # default False
 
                 if version == "beta":
-                    out = resource.to_json(compact=compact, hide_empty_nodes=hide_empty_nodes, user=user, perm=perm, version=version)
+                    out = resource.to_json(
+                        compact=compact,
+                        hide_empty_nodes=hide_empty_nodes,
+                        user=user,
+                        perm=perm,
+                        version=version,
+                        hide_hidden_nodes=hide_hidden_nodes,
+                    )
                 else:
                     out = {
                         "resource": resource.to_json(
-                            compact=compact, hide_empty_nodes=hide_empty_nodes, user=user, perm=perm, version=version
+                            compact=compact,
+                            hide_empty_nodes=hide_empty_nodes,
+                            user=user,
+                            perm=perm,
+                            version=version,
+                            hide_hidden_nodes=hide_hidden_nodes,
                         ),
-                        "displaydescription": resource.displaydescription,
-                        "displayname": resource.displayname,
+                        "displaydescription": resource.displaydescription(),
+                        "displayname": resource.displayname(),
                         "graph_id": resource.graph_id,
                         "legacyid": resource.legacyid,
-                        "map_popup": resource.map_popup,
+                        "map_popup": resource.map_popup(),
                         "resourceinstanceid": resource.resourceinstanceid,
                     }
 
@@ -953,10 +967,10 @@ class Card(APIBase):
             resourceid = None
             resource_instance = None
             pass
-        nodes = graph.node_set.all()
 
         nodegroups = []
         editable_nodegroups = []
+        nodes = graph.node_set.all().select_related("nodegroup")
         for node in nodes:
             if node.is_collector:
                 added = False
@@ -967,21 +981,13 @@ class Card(APIBase):
                 if not added and request.user.has_perm("read_nodegroup", node.nodegroup):
                     nodegroups.append(node.nodegroup)
 
-        nodes = nodes.filter(nodegroup__in=nodegroups)
-        cards = graph.cardmodel_set.order_by("sortorder").filter(nodegroup__in=nodegroups).prefetch_related("cardxnodexwidget_set")
-        cardwidgets = [
-            widget for widgets in [card.cardxnodexwidget_set.order_by("sortorder").all() for card in cards] for widget in widgets
-        ]
-        datatypes = models.DDataType.objects.all()
         user_is_reviewer = user_is_resource_reviewer(request.user)
-        widgets = models.Widget.objects.all()
-        card_components = models.CardComponent.objects.all()
 
         if resource_instance is None:
             tiles = []
             displayname = _("New Resource")
         else:
-            displayname = resource_instance.displayname
+            displayname = resource_instance.displayname()
             if displayname == "undefined":
                 displayname = _("Unnamed Resource")
             if str(resource_instance.graph_id) == settings.SYSTEM_SETTINGS_RESOURCE_MODEL_ID:
@@ -1013,9 +1019,25 @@ class Card(APIBase):
                     provisionaltiles.append(tile)
             tiles = provisionaltiles
 
-        cards = JSONSerializer().serializeToPython(cards)
+        serialized_graph = None
+        if graph.publication and graph.publication.serialized_graph:
+            serialized_graph = graph.publication.serialized_graph
+
+        if serialized_graph:
+            serialized_cards = serialized_graph["cards"]
+            cardwidgets = [
+                widget
+                for widget in models.CardXNodeXWidget.objects.filter(
+                    pk__in=[widget_dict["id"] for widget_dict in serialized_graph["widgets"]]
+                )
+            ]
+        else:
+            cards = graph.cardmodel_set.order_by("sortorder").filter(nodegroup__in=nodegroups).prefetch_related("cardxnodexwidget_set")
+            serialized_cards = JSONSerializer().serializeToPython(cards)
+            cardwidgets = [widget for widget in [card.cardxnodexwidget_set.order_by("sortorder").all() for card in cards]]
+
         editable_nodegroup_ids = [str(nodegroup.pk) for nodegroup in editable_nodegroups]
-        for card in cards:
+        for card in serialized_cards:
             card["is_writable"] = False
             if str(card["nodegroup_id"]) in editable_nodegroup_ids:
                 card["is_writable"] = True
@@ -1024,14 +1046,14 @@ class Card(APIBase):
             "resourceid": resourceid,
             "displayname": displayname,
             "tiles": tiles,
-            "cards": cards,
+            "cards": serialized_cards,
             "nodegroups": nodegroups,
-            "nodes": nodes,
+            "nodes": nodes.filter(nodegroup__in=nodegroups),
             "cardwidgets": cardwidgets,
-            "datatypes": datatypes,
+            "datatypes": models.DDataType.objects.all(),
             "userisreviewer": user_is_reviewer,
-            "widgets": widgets,
-            "card_components": card_components,
+            "widgets": models.Widget.objects.all(),
+            "card_components": models.CardComponent.objects.all(),
         }
 
         return JSONResponse(context, indent=4)
@@ -1223,7 +1245,7 @@ class ResourceReport(APIBase):
 
         resp = {
             "datatypes": models.DDataType.objects.all(),
-            "displayname": resource.displayname,
+            "displayname": resource.displayname(),
             "resourceid": resourceid,
             "graph": graph,
             "hide_empty_nodes": settings.HIDE_EMPTY_NODES_IN_REPORT,
@@ -1236,7 +1258,7 @@ class ResourceReport(APIBase):
         if "related_resources" not in exclude:
             resource_models = (
                 models.GraphModel.objects.filter(isresource=True)
-                .exclude(isactive=False)
+                .exclude(publication=None)
                 .exclude(pk=settings.SYSTEM_SETTINGS_RESOURCE_MODEL_ID)
             )
 
@@ -1422,13 +1444,15 @@ class BulkResourceReport(APIBase):
 class BulkDisambiguatedResourceInstance(APIBase):
     def get(self, request):
         resource_ids = request.GET.get("resource_ids").split(",")
-        uncompacted_value = request.GET.get("uncompacted")
         version = request.GET.get("v")
-        compact = True
-        if uncompacted_value == "true":
-            compact = False
+        hide_hidden_nodes = bool(request.GET.get("hidden", "true").lower() == "false")
+        compact = bool(request.GET.get("uncompacted", "false").lower() == "false")
+
         return JSONResponse(
-            {resource.pk: resource.to_json(compact=compact, version=version) for resource in Resource.objects.filter(pk__in=resource_ids)}
+            {
+                resource.pk: resource.to_json(compact=compact, version=version, hide_hidden_nodes=hide_hidden_nodes)
+                for resource in Resource.objects.filter(pk__in=resource_ids)
+            }
         )
 
 
@@ -1455,6 +1479,31 @@ class Tile(APIBase):
             request.POST = request.POST.copy()
             request.POST["data"] = request.body
         return tileview.post(request)
+
+
+@method_decorator(csrf_exempt, name="dispatch")
+class NodeGroup(APIBase):
+    def get(self, request, nodegroupid=None):
+        params = request.GET.dict()
+        user = request.user
+        perms = "models." + params.pop("perms", "read_nodegroup")
+        params["nodegroupid"] = params.get("nodegroupid", nodegroupid)
+
+        try:
+            uuid.UUID(params["nodegroupid"])
+        except ValueError as e:
+            del params["nodegroupid"]
+
+        try:
+            nodegroup = models.NodeGroup.objects.get(pk=params["nodegroupid"])
+            permitted_nodegroups = [nodegroup.pk for nodegroup in get_nodegroups_by_perm(user, perms)]
+        except Exception as e:
+            return JSONResponse(str(e), status=404)
+
+        if not nodegroup or nodegroup.pk not in permitted_nodegroups:
+            return JSONResponse(_("No nodegroup matching query parameters found."), status=404)
+
+        return JSONResponse(nodegroup, status=200)
 
 
 @method_decorator(csrf_exempt, name="dispatch")
@@ -1669,3 +1718,22 @@ class Validator(APIBase):
             return JSONResponse(self.validate_tile(tile, verbose, strict), indent=indent)
 
         return JSONResponse(status=400)
+
+
+class TransformEdtfForTile(APIBase):
+    def get(self, request):
+        try:
+            value = request.GET.get("value")
+            datatype_factory = DataTypeFactory()
+            edtf_datatype = datatype_factory.get_instance("edtf")
+            transformed_value = edtf_datatype.transform_value_for_tile(value)
+            is_valid = len(edtf_datatype.validate(transformed_value)) == 0
+            result = (transformed_value, is_valid)
+
+        except TypeError as e:
+            return JSONResponse({"data": (str(e), False)})
+
+        except Exception as e:
+            return JSONResponse(str(e), status=500)
+
+        return JSONResponse({"data": result})
