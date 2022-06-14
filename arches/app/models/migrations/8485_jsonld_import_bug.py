@@ -28,11 +28,7 @@ class Migration(migrations.Migration):
                 -- label (optional) -- prefLabel, altLabel, etc..  of concept
                 -- default_lang (optional) -- default language of the system, usually from settings.py LANGUAGE_CODE
                 short_lang text = split_part((split_part(lang, '-', 1)), '_', 1) || '%';
-                dynsql text;
                 concept_id uuid;
-                matches uuid;
-                where_clause text;
-                val record;
             BEGIN
                 concept_id = (regexp_matches(concept_identifier, '([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12})'))[1];
                 IF concept_id IS null THEN
