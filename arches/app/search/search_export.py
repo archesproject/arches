@@ -400,7 +400,8 @@ class SearchResultsExporter(object):
 
         feature_collection = {"type": "FeatureCollection", "features": features}
         return feature_collection
-        
+
+
 def sanitize_csv_value(value):
     return value
-    return re.sub(r'^([@]|[=]|[+]|[-])', '\'\g<1>', value)
+    return re.sub(r"^([@]|[=]|[+]|[-])", "'\g<1>", value)
