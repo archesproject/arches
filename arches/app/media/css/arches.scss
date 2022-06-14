@@ -751,14 +751,14 @@ input[type="checkbox"] {
     .summary-header {
         padding: 5px 0px 3px;
         font-weight: 525;
-        font-size: 13px;
+        font-size: 15px;
         color: #2d5576;
     }
 
     .summary-title {
         padding: 5px 0px 3px;
         font-weight: 550;
-        font-size: 15px;
+        font-size: 16px;
         color: #2d5576;
     }
     h5 {
@@ -770,6 +770,34 @@ input[type="checkbox"] {
     .dropzone-photo-upload {
         margin-top: 0px;
     }
+}
+
+.branch-xl-metadata-container {
+    height: calc(100vh - 50px);
+    margin-top: -65px;
+    padding: 0px 15px;
+}
+
+.branch-csv-etl-load-summmary {
+    margin-top: -10px;
+}
+
+h3.branch-xl-title {
+    margin-top: 15px; 
+    margin-bottom: 0px; 
+    font-size: 19px;
+    color: #454545;
+}
+
+h4.branch-xl-title {
+    margin-top: 0px; 
+    margin-bottom: 0px;
+    font-size: 16px;
+    color: #454545;
+}
+
+.branch-xl-file-contents-container {
+    margin-top: 25px;
 }
 
 .tabbed-workflow-footer, .etl-module-footer {
@@ -15056,7 +15084,7 @@ a.jstree-anchor.permissions-widget {
 }
 
 .etl-module-component {
-    margin-top: 40px;
+    margin-top: 30px;
     padding-bottom: 5px;
     width: 95%;
 }
@@ -15076,4 +15104,32 @@ a.jstree-anchor.permissions-widget {
     font-size: 15px; 
     padding-right: 3px;
     color: rgb(4, 4, 45);
+}
+
+table.csv-mapping-table thead tr {
+    background: #f3f3f3;
+    border-bottom: 1px solid #ddd;
+}
+
+table.csv-mapping-table thead {
+    background: #f3f3f3;
+    border-bottom: 1px solid #ddd;
+}
+
+table.csv-mapping-table thead tr.column-names {
+    background: #fff;
+}
+
+table.csv-mapping-table thead th {
+    border-bottom: 1px solid #ddd;
+}
+
+table.csv-mapping-table th {
+    min-width: 200px;
+    border-right: 1px solid #ddd;
+}
+
+table.csv-mapping-table td {
+    vertical-align: text-top;
+    border-right: 1px solid #ddd;
 }
