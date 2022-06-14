@@ -114,7 +114,7 @@ class LoginView(View):
                 user.password = ""
 
                 return redirect(next)
-                
+
         return render(
             request, "login.htm", {"auth_failed": True, "next": next, "user_signup_enabled": settings.ENABLE_USER_SIGNUP}, status=401
         )
