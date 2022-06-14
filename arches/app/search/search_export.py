@@ -22,6 +22,7 @@ import datetime
 import logging
 from io import StringIO
 from io import BytesIO
+import re
 from django.contrib.gis.geos import GeometryCollection, GEOSGeometry
 from django.core.files import File
 from django.utils.translation import ugettext as _
@@ -341,7 +342,7 @@ class SearchResultsExporter(object):
         csvwriter = csv.DictWriter(dest, delimiter=",", fieldnames=headers)
         csvwriter.writeheader()
         for instance in instances:
-            csvwriter.writerow({k: str(v) for k, v in list(instance.items())})
+            csvwriter.writerow({k: sanitize_csv_value(str(v)) for k, v in list(instance.items())})
         return {"name": f"{name}.csv", "outputfile": dest}
 
     def to_shp(self, instances, headers, name):
@@ -399,3 +400,7 @@ class SearchResultsExporter(object):
 
         feature_collection = {"type": "FeatureCollection", "features": features}
         return feature_collection
+        
+def sanitize_csv_value(value):
+    return value
+    return re.sub(r'^([@]|[=]|[+]|[-])', '\'\g<1>', value)
