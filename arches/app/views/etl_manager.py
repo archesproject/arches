@@ -40,7 +40,7 @@ class ETLManagerView(View):
         if action == "modules" or action is None:
             response = []
             for module in ETLModule.objects.all():
-                show = False if "show" in module.config.keys() and module.config["show"] == False else True
+                show = False if "show" in module.config.keys() and module.config["show"] is False else True
                 if self.request.user.has_perm("view_etlmodule", module) and show:
                     response.append(module)
         elif action == "loadEvent":
