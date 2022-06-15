@@ -53,7 +53,7 @@ add_csv_importer = """
         'import-single-csv',
         'import_single_csv.py',
         'ImportSingleCsv',
-        '{"bgColor": "#9591ef", "circleColor": "#b0adf3"}',
+        '{"bgColor": "#9591ef", "circleColor": "#b0adf3", "show": true}',
         'fa fa-upload',
         'import-single-csv');
     """
@@ -83,7 +83,7 @@ add_branch_csv_importer = """
         'branch-csv-importer',
         'branch_csv_importer.py',
         'BranchCsvImporter',
-        '{"circleColor": "#ff77cc", "bgColor": "#cc2266"}',
+        '{"circleColor": "#ff77cc", "bgColor": "#cc2266", "show": true}',
         'fa fa-upload',
         'branch-csv-importer'
     );
