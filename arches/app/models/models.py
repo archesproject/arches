@@ -463,7 +463,6 @@ class LocalizedSerializedGraph(models.Model):
         db_table = "localized_serialized_graphs"
 
 
-
 class NodeGroup(models.Model):
     nodegroupid = models.UUIDField(primary_key=True, default=uuid.uuid1)  # This field type is a guess.
     legacygroupid = models.TextField(blank=True, null=True)

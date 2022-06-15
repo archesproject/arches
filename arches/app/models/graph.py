@@ -34,6 +34,8 @@ from arches.app.search.search_engine_factory import SearchEngineFactory
 from django.utils.translation import ugettext as _
 from pyld.jsonld import compact, JsonLdError
 from django.db.models.base import Deferred
+from django.utils import translation
+
 
 logger = logging.getLogger(__name__)
 
@@ -1621,30 +1623,23 @@ class Graph(models.GraphModel):
                 for language_tuple in settings.LANGUAGES:
                     language = models.Language.objects.get(code=language_tuple[0])
 
+                    translation.activate(language=language_tuple[0])
+
                     localized_serialized_graph = models.LocalizedSerializedGraph.objects.create(
                         publication=publication,
                         serialized_graph=JSONDeserializer().deserialize(
-                            JSONSerializer().serialize(self, force_recalculation=True, language=language)
+                            JSONSerializer().serialize(self, force_recalculation=True)
                         ),
                         language=language
                     )
 
                     localized_serialized_graph.save()
 
-
-                # import pdb; pdb.set_trace()
-
-                # publication = models.GraphPublication.objects.create(
-                #     graph=self,
-                #     notes=notes,
-                #     user=user,
-                # )
-                # publication.save()
+                translation.deactivate()
 
                 self.publication = publication
                 self.save(validate=False)
             except Exception as e:
-                import pdb; pdb.set_trace()
                 raise UnpublishedModelError(e)
 
     def unpublish(self):
