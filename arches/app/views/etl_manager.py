@@ -38,7 +38,11 @@ class ETLManagerView(View):
         loadid = request.GET.get("loadid", None)
         page = int(request.GET.get("page", 1))
         if action == "modules" or action is None:
-            response = ETLModule.objects.all()
+            response = []
+            for module in ETLModule.objects.all():
+                show = False if "show" in module.config.keys() and module.config["show"] is False else True
+                if self.request.user.has_perm("view_etlmodule", module) and show:
+                    response.append(module)
         elif action == "loadEvent":
             item_per_page = 5
             all_events = LoadEvent.objects.all().order_by(("-load_start_time")).prefetch_related("user", "etl_module")
