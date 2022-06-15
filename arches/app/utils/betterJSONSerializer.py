@@ -16,6 +16,7 @@ from django.core.serializers.json import DjangoJSONEncoder
 from django.forms.models import model_to_dict
 from django.contrib.gis.geos import GEOSGeometry
 from django.core.files import File
+from arches.app.models.system_settings import settings
 
 from arches.app.models.fields.i18n import I18n_JSON, I18n_String
 
@@ -66,6 +67,7 @@ class JSONSerializer(object):
         options.pop("fields", None)
         options.pop("exclude", None)
         options.pop("force_recalculation", False)
+        options.pop("language", settings.LANGUAGE_CODE)
         return json.dumps(obj, cls=DjangoJSONEncoder, sort_keys=sort_keys, **options.copy())
 
     def handle_object(self, object, **kwargs):

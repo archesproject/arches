@@ -111,7 +111,8 @@ class Graph(models.GraphModel):
 
                 self.populate_null_nodegroups()
 
-                if "publication" in args[0]:
+                # if "publication" in args[0]:
+                if False:
                     publication_data = args[0]["publication"]
                     publication_data["serialized_graph"] = JSONDeserializer().deserialize(
                         JSONSerializer().serialize(self, force_recalculation=True)
@@ -130,7 +131,8 @@ class Graph(models.GraphModel):
                         has_deferred_args = True
 
                 #  accessing the graph publication while deferring args results in a recursive loop
-                if not has_deferred_args and self.publication and self.publication.serialized_graph:
+                if not has_deferred_args and self.publication and False:
+                # if not has_deferred_args and self.publication and self.publication.serialized_graph:
                     self.serialized_graph = self.serialize()  # reads from graph_publication table and returns serialized graph as dict
 
                     # filter out keys from the serialized_graph that would cause an error on instantiation
@@ -1315,7 +1317,8 @@ class Graph(models.GraphModel):
         """
         exclude = [] if exclude is None else exclude
 
-        if self.publication and not force_recalculation:
+        if False:
+        # if self.publication and not force_recalculation:
             serialized_graph = self.publication.serialized_graph
 
             for key in exclude:
@@ -1601,7 +1604,7 @@ class Graph(models.GraphModel):
             if graphs_with_matching_slug.exists() and graphs_with_matching_slug[0].graphid != self.graphid:
                 raise GraphValidationError(_("Another resource model already uses the slug '{self.slug}'").format(**locals()), 1007)
 
-    def publish(self, notes=None):
+    def publish(self, user, notes=None):
         """
         Adds a row to the GraphPublication table
         Assigns GraphPublication id to Graph
@@ -1610,17 +1613,38 @@ class Graph(models.GraphModel):
             try:
                 publication = models.GraphPublication.objects.create(
                     graph=self,
-                    serialized_graph=JSONDeserializer().deserialize(JSONSerializer().serialize(self, force_recalculation=True)),
                     notes=notes,
+                    user=user,
                 )
                 publication.save()
-            except Exception as e:
-                raise UnpublishedModelError(e)
 
-            try:
+                for language_tuple in settings.LANGUAGES:
+                    language = models.Language.objects.get(code=language_tuple[0])
+
+                    localized_serialized_graph = models.LocalizedSerializedGraph.objects.create(
+                        publication=publication,
+                        serialized_graph=JSONDeserializer().deserialize(
+                            JSONSerializer().serialize(self, force_recalculation=True, language=language)
+                        ),
+                        language=language
+                    )
+
+                    localized_serialized_graph.save()
+
+
+                # import pdb; pdb.set_trace()
+
+                # publication = models.GraphPublication.objects.create(
+                #     graph=self,
+                #     notes=notes,
+                #     user=user,
+                # )
+                # publication.save()
+
                 self.publication = publication
                 self.save(validate=False)
             except Exception as e:
+                import pdb; pdb.set_trace()
                 raise UnpublishedModelError(e)
 
     def unpublish(self):

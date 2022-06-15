@@ -408,20 +408,6 @@ class GraphModel(models.Model):
         managed = True
         db_table = "graphs"
 
-
-class GraphPublication(models.Model):
-    publicationid = models.UUIDField(primary_key=True, serialize=False, default=uuid.uuid1)
-    notes = models.TextField(blank=True, null=True)
-    graph = models.ForeignKey(GraphModel, db_column="graphid", on_delete=models.CASCADE)
-    serialized_graph = JSONField(blank=True, null=True, db_column="serialized_graph")
-    user = models.ForeignKey(User, db_column="userid", null=True, on_delete=models.CASCADE)
-    published_time = models.DateTimeField(default=datetime.datetime.now, null=False)
-
-    class Meta:
-        managed = True
-        db_table = "graph_publications"
-
-
 class Icon(models.Model):
     id = models.AutoField(primary_key=True)
     name = models.TextField(blank=True, null=True)
@@ -453,6 +439,29 @@ class Language(models.Model):
     class Meta:
         managed = True
         db_table = "languages"
+
+
+class GraphPublication(models.Model):
+    publicationid = models.UUIDField(primary_key=True, serialize=False, default=uuid.uuid1)
+    notes = models.TextField(blank=True, null=True)
+    graph = models.ForeignKey(GraphModel, db_column="graphid", on_delete=models.CASCADE)
+    user = models.ForeignKey(User, db_column="userid", null=True, on_delete=models.CASCADE)
+    published_time = models.DateTimeField(default=datetime.datetime.now, null=False)
+
+    class Meta:
+        managed = True
+        db_table = "graph_publications"
+
+
+class LocalizedSerializedGraph(models.Model):
+    language = models.ForeignKey(Language, db_column="languageid", to_field="code", blank=True, null=True, on_delete=models.CASCADE)
+    publication = models.ForeignKey(GraphPublication, db_column="publicationid", on_delete=models.CASCADE)
+    serialized_graph = JSONField(blank=True, null=True, db_column="serialized_graph")
+
+    class Meta:
+        managed = True
+        db_table = "localized_serialized_graphs"
+
 
 
 class NodeGroup(models.Model):
