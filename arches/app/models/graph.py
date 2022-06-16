@@ -113,13 +113,8 @@ class Graph(models.GraphModel):
 
                 self.populate_null_nodegroups()
 
-                # if "publication" in args[0]:
-                if False:
+                if "publication" in args[0]:
                     publication_data = args[0]["publication"]
-                    publication_data["serialized_graph"] = JSONDeserializer().deserialize(
-                        JSONSerializer().serialize(self, force_recalculation=True)
-                    )
-
                     self.publication = models.GraphPublication(**publication_data)
 
             else:
@@ -133,8 +128,7 @@ class Graph(models.GraphModel):
                         has_deferred_args = True
 
                 #  accessing the graph publication while deferring args results in a recursive loop
-                if not has_deferred_args and self.publication and False:
-                # if not has_deferred_args and self.publication and self.publication.serialized_graph:
+                if not has_deferred_args and self.publication:
                     self.serialized_graph = self.serialize()  # reads from graph_publication table and returns serialized graph as dict
 
                     # filter out keys from the serialized_graph that would cause an error on instantiation
@@ -1319,9 +1313,13 @@ class Graph(models.GraphModel):
         """
         exclude = [] if exclude is None else exclude
 
-        if False:
-        # if self.publication and not force_recalculation:
-            serialized_graph = self.publication.serialized_graph
+        if self.publication and not force_recalculation:
+            user_language = translation.get_language()
+            localized_serialized_graph = models.LocalizedSerializedGraph.objects.get(publication=self.publication, language=user_language)
+
+            serialized_graph = None
+            if localized_serialized_graph:
+                serialized_graph = localized_serialized_graph.serialized_graph
 
             for key in exclude:
                 if serialized_graph.get(key) is not None:  # explicit None comparison so falsey values will still return
@@ -1620,6 +1618,9 @@ class Graph(models.GraphModel):
                 )
                 publication.save()
 
+                self.publication = publication
+                self.save(validate=False)
+
                 for language_tuple in settings.LANGUAGES:
                     language = models.Language.objects.get(code=language_tuple[0])
 
@@ -1636,9 +1637,6 @@ class Graph(models.GraphModel):
                     localized_serialized_graph.save()
 
                 translation.deactivate()
-
-                self.publication = publication
-                self.save(validate=False)
             except Exception as e:
                 raise UnpublishedModelError(e)
 

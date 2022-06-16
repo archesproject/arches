@@ -62,6 +62,7 @@ from arches.app.search.components.base import SearchFilterFactory
 from arches.app.datatypes.datatypes import DataTypeFactory, EDTFDataType
 from arches.app.search.search_engine_factory import SearchEngineFactory
 from arches.app.search.search_export import SearchResultsExporter
+from django.utils import translation
 
 
 from arches.celery import app
@@ -975,8 +976,10 @@ class Card(APIBase):
             tiles = provisionaltiles
 
         serialized_graph = None
-        if graph.publication and graph.publication.serialized_graph:
-            serialized_graph = graph.publication.serialized_graph
+        if graph.publication:
+            user_language = translation.get_language()
+            localized_serialized_graph = models.LocalizedSerializedGraph.objects.get(publication=graph.publication, language=user_language)
+            serialized_graph = localized_serialized_graph.serialized_graph
 
         if serialized_graph:
             serialized_cards = serialized_graph["cards"]

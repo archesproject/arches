@@ -30,10 +30,14 @@ from arches.app.models.models import (
     Ontology,
     OntologyClass,
     GraphPublication,
+    Language,
+    LocalizedSerializedGraph
 )
 from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializer
 from arches.app.models.models import GraphXMapping
 from django.db import transaction
+from django.utils import translation
+from arches.app.models.system_settings import settings
 
 logger = logging.getLogger(__name__)
 
@@ -139,25 +143,39 @@ def import_graph(graphs, overwrite_graphs=True):
                         card_x_node_x_widget["config"] = check_default_configs(default_config, card_x_node_x_widget_config)
                         cardxnodexwidget = CardXNodeXWidget.objects.update_or_create(**card_x_node_x_widget)
 
-                # saves graph publication with serialized graph
-                if publication_data:
-                    publication_data["serialized_graph"] = JSONDeserializer().deserialize(
-                        JSONSerializer().serialize(graph, force_recalculation=True)
-                    )
+                with transaction.atomic():
+                    # saves graph publication with serialized graph
+                    if publication_data:
+                        GraphPublication.objects.update_or_create(
+                            publicationid=publication_data["publicationid"],
+                            defaults={
+                                "notes": publication_data.get("notes"),
+                                "graph_id": publication_data.get("graph_id"),
+                                "user_id": publication_data.get("user_id"),
+                                "published_time": publication_data.get("published_time"),
+                            },
+                        )
 
-                    GraphPublication.objects.update_or_create(
-                        publicationid=publication_data["publicationid"],
-                        defaults={
-                            "notes": publication_data.get("notes"),
-                            "graph_id": publication_data.get("graph_id"),
-                            "user_id": publication_data.get("user_id"),
-                            "published_time": publication_data.get("published_time"),
-                            "serialized_graph": publication_data.get("serialized_graph"),
-                        },
-                    )
+                        graph.publication_id = publication_data["publicationid"]
+                        graph.save()
 
-                    graph.publication_id = publication_data["publicationid"]
-                    graph.save()
+                        for language_tuple in settings.LANGUAGES:
+                            language = Language.objects.get(code=language_tuple[0])
+
+                            translation.activate(language=language_tuple[0])
+
+                            LocalizedSerializedGraph.objects.update_or_create(
+                                publication_id=publication_data["publicationid"],
+                                language=language,
+                                defaults={
+                                    "serialized_graph": JSONDeserializer().deserialize(
+                                        JSONSerializer().serialize(graph, force_recalculation=True)
+                                    )
+                                }
+                            )
+
+                        translation.deactivate()
+
 
             except GraphImportException as ge:
                 logger.exception(ge)
