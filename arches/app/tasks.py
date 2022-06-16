@@ -212,8 +212,8 @@ def load_branch_csv(userid, files, summary, result, temp_dir, loadid):
     BranchCsvImporter.run_load_task(files, summary, result, temp_dir, loadid)
 
     load_event = models.LoadEvent.objects.get(loadid=loadid)
-    status = _('Compeleted') if load_event.status == 'indexed' else _('Failed')
-    msg = _('Branch Excel Import: {} [{}]').format(summary["name"], status)
+    status = _("Compeleted") if load_event.status == "indexed" else _("Failed")
+    msg = _("Branch Excel Import: {} [{}]").format(summary["name"], status)
     user = User.objects.get(id=userid)
     notify_completion(msg, user)
 
@@ -226,8 +226,8 @@ def load_single_csv(userid, loadid, graphid, has_headers, fieldnames, csv_file_n
     ImportSingleCsv.run_load_task(loadid, graphid, has_headers, fieldnames, csv_file_name, id_label)
 
     load_event = models.LoadEvent.objects.get(loadid=loadid)
-    status = _('Compeleted') if load_event.status == 'indexed' else _('Failed')
-    msg = _('Single CSV Import: {} [{}]').format(csv_file_name, status)
+    status = _("Compeleted") if load_event.status == "indexed" else _("Failed")
+    msg = _("Single CSV Import: {} [{}]").format(csv_file_name, status)
     user = User.objects.get(id=userid)
     notify_completion(msg, user)
 
