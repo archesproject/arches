@@ -1230,6 +1230,7 @@ class FileListDataType(BaseDataType):
 
     def validate(self, value, row_number=None, source=None, node=None, nodeid=None, strict=False, path=None, request=None, **kwargs):
         errors = []
+        file_type_errors = []
         if request:
             file_type_errors = errors + self.validate_file_types(request, str(node.pk))
 
