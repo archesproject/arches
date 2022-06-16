@@ -1,10 +1,13 @@
 import logging
-from django.db import connection
+from datetime import datetime
 from django.core.paginator import Paginator
+from django.db import connection
+from django.db.models import Q
 from django.forms.models import model_to_dict
 from django.http import HttpResponse
 from django.views.generic import View
 from arches.app.models.models import ETLModule, LoadEvent, LoadStaging
+from arches.app.models.system_settings import settings
 from arches.app.utils.pagination import get_paginator
 from arches.app.utils.response import JSONResponse, JSONErrorResponse
 
@@ -37,6 +40,7 @@ class ETLManagerView(View):
         action = request.GET.get("action", None)
         loadid = request.GET.get("loadid", None)
         page = int(request.GET.get("page", 1))
+        filter_string = request.GET.get("filter", None)
         if action == "modules" or action is None:
             response = []
             for module in ETLModule.objects.all():
@@ -45,10 +49,29 @@ class ETLManagerView(View):
                     response.append(module)
         elif action == "loadEvent":
             item_per_page = 5
-            all_events = LoadEvent.objects.all().order_by(("-load_start_time")).prefetch_related("user", "etl_module")
-            events = Paginator(all_events, item_per_page).page(page).object_list
-            total = len(all_events)
-            paginator, pages = get_paginator(request, all_events, total, page, item_per_page)
+            status_lookup = {
+                "indexing": "completed",
+                "completed": "indexed",
+                "failed": "failed",
+                "running": "running",
+                "unloading": "reversing",
+                "unloaded": "unloaded"
+            }
+            status_string = status_lookup[filter_string] if filter_string in status_lookup else 'undefined'
+
+            if filter_string:
+                filtered_events = LoadEvent.objects.filter(
+                    Q(status__icontains=status_string) |
+                    Q(etl_module__name__icontains=filter_string) |
+                    Q(user__username__icontains=filter_string) | 
+                    Q(user__first_name__icontains=filter_string) | 
+                    Q(user__last_name__icontains=filter_string)
+                    ).order_by(("-load_start_time")).prefetch_related("user", "etl_module")
+            else:
+                filtered_events = LoadEvent.objects.all().order_by(("-load_start_time")).prefetch_related("user", "etl_module")
+            events = Paginator(filtered_events, item_per_page).page(page).object_list
+            total = len(filtered_events)
+            paginator, pages = get_paginator(request, filtered_events, total, page, item_per_page)
             page = paginator.page(page)
 
             response = {

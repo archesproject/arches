@@ -47,6 +47,10 @@ define([
                 self.activeTab("start");
             };
 
+            this.taskSearchString.subscribe(() => {
+                self.fetchLoadEvent();
+            });
+
             this.activeTab.subscribe(val => {
                 if (val == "import") {
                     self.fetchLoadEvent();
@@ -58,7 +62,7 @@ define([
                     if (!page) {
                         page = self.paginator()?.current_page ? self.paginator().current_page : 1;
                     }
-                    const url = arches.urls.etl_manager + "?action=loadEvent&page=" + page;
+                    const url = arches.urls.etl_manager + "?action=loadEvent&page=" + page + "&filter=" + self.taskSearchString();
                     window.fetch(url).then(function(response){
                         if(response.ok){
                             return response.json();
