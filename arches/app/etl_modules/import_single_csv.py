@@ -16,6 +16,7 @@ from arches.app.models.models import GraphModel, Node, NodeGroup
 from arches.app.models.system_settings import settings
 import arches.app.tasks as tasks
 from arches.app.utils.betterJSONSerializer import JSONSerializer
+from arches.app.utils.file_validator import FileValidator
 from arches.app.utils.index_database import index_resources_by_transaction
 from arches.app.etl_modules.base_import_module import BaseImportModule
 import arches.app.utils.task_management as task_management
@@ -78,7 +79,10 @@ class ImportSingleCsv(BaseImportModule):
             pass
 
         csv_file_name = None
-        if content.content_type == "text/csv":
+        validator = FileValidator()
+        if len(validator.validate_file_type(content, content.name.split(".")[-1])) > 0:
+            pass
+        elif content.content_type == "text/csv":
             csv_file_name = content.name
             csv_file_path = os.path.join(temp_dir, csv_file_name)
             default_storage.save(csv_file_path, content)
