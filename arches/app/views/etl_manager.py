@@ -54,18 +54,22 @@ class ETLManagerView(View):
                 "failed": "failed",
                 "running": "running",
                 "unloading": "reversing",
-                "unloaded": "unloaded"
+                "unloaded": "unloaded",
             }
-            status_string = status_lookup[filter_string] if filter_string in status_lookup else 'undefined'
+            status_string = status_lookup[filter_string] if filter_string in status_lookup else "undefined"
 
             if filter_string:
-                filtered_events = LoadEvent.objects.filter(
-                    Q(status__icontains=status_string) |
-                    Q(etl_module__name__icontains=filter_string) |
-                    Q(user__username__icontains=filter_string) | 
-                    Q(user__first_name__icontains=filter_string) | 
-                    Q(user__last_name__icontains=filter_string)
-                    ).order_by(("-load_start_time")).prefetch_related("user", "etl_module")
+                filtered_events = (
+                    LoadEvent.objects.filter(
+                        Q(status__icontains=status_string)
+                        | Q(etl_module__name__icontains=filter_string)
+                        | Q(user__username__icontains=filter_string)
+                        | Q(user__first_name__icontains=filter_string)
+                        | Q(user__last_name__icontains=filter_string)
+                    )
+                    .order_by(("-load_start_time"))
+                    .prefetch_related("user", "etl_module")
+                )
             else:
                 filtered_events = LoadEvent.objects.all().order_by(("-load_start_time")).prefetch_related("user", "etl_module")
             events = Paginator(filtered_events, settings.ETL_STATUS_PER_PAGE).page(page).object_list
