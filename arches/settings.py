@@ -587,9 +587,7 @@ ETL_MODULE_LOCATIONS = [
 ]
 
 FILE_TYPE_CHECKING = False
-FILE_TYPES = [
-    "bmp", "gif", "jpg", "jpeg", "pdf", "png", "psd", "rtf", "tif", "tiff", "xlsx", "csv", "zip"
-]
+FILE_TYPES = ["bmp", "gif", "jpg", "jpeg", "pdf", "png", "psd", "rtf", "tif", "tiff", "xlsx", "csv", "zip"]
 
 MAPBOX_API_KEY = ""  # Put your Mapbox key here!
 

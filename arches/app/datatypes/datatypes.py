@@ -1219,7 +1219,7 @@ class FileListDataType(BaseDataType):
     def __init__(self, model=None):
         super(FileListDataType, self).__init__(model=model)
         self.node_lookup = {}
-    
+
     def validate_file_types(self, request=None, nodeid=None):
         errors = []
         validator = FileValidator()
@@ -1234,11 +1234,7 @@ class FileListDataType(BaseDataType):
             file_type_errors = errors + self.validate_file_types(request, str(node.pk))
 
         if len(file_type_errors) > 0:
-            errors.append(
-                        {
-                            "type": "ERROR",
-                            "message": "There was an error validating filetypes."
-                        })
+            errors.append({"type": "ERROR", "message": "There was an error validating filetypes."})
         if node:
             self.node_lookup[str(node.pk)] = node
         elif nodeid:
