@@ -6,6 +6,7 @@ define([
     'uuid',
     'arches',
     'viewmodels/alert-json',
+    'views/components/simple-switch',
     'bindings/datatable',
     'bindings/dropzone',
     'bindings/resizable-sidepanel',
