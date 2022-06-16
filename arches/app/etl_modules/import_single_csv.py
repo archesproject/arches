@@ -151,11 +151,11 @@ class ImportSingleCsv(BaseImportModule):
         csv_size = default_storage.size(csv_file_path)  # file size in byte
         use_celery_threshold = 500  # 500 bytes
 
-        if csv_size > use_celery_threshold:
+        if True:
             if task_management.check_if_celery_available():
                 logger.info(_("Delegating load to Celery task"))
                 tasks.load_single_csv.apply_async(
-                    (self.loadid, graphid, has_headers, fieldnames, csv_file_name, id_label),
+                    (self.userid, self.loadid, graphid, has_headers, fieldnames, csv_file_name, id_label),
                 )
                 result = _("delegated_to_celery")
                 return {"success": True, "data": result}
