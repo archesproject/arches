@@ -119,6 +119,8 @@ class Command(BaseCommand):
             print(f"Not loading records > {options['toobig']}kb")
         if options["quiet"]:
             print("Only announcing timing data")
+        if options["verbosity"]:
+            print("Logging detailed error information: set log level to DEBUG to view messages")
 
         if options["strip_search"] and not options["fast"]:
             print("ERROR: stripping fields not exposed to advanced search only works in fast mode")
@@ -129,7 +131,7 @@ class Command(BaseCommand):
 
     def load_resources(self, options):
 
-        self.reader = JsonLdReader()
+        self.reader = JsonLdReader(verbosity=options["verbosity"])
         self.jss = JSONSerializer()
         source = options["source"]
         if options["model"]:

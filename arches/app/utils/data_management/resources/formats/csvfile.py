@@ -45,45 +45,6 @@ class MissingConfigException(Exception):
     def __str__(self):
         return repr(self.value)
 
-
-class ConceptLookup:
-    def __init__(self, create=False):
-        self.lookups = {}
-        self.create = create
-        self.add_domain_values_to_lookups()
-
-    def lookup_label(self, label, collectionid):
-        ret = label
-        collection_values = self.lookups[collectionid]
-        for concept in collection_values:
-            if label == concept[1]:
-                ret = concept[2]
-        return ret
-
-    def lookup_labelid_from_label(self, value, collectionid):
-        ret = []
-        for val in csv.reader([value], delimiter=",", quotechar='"'):
-            for v in val:
-                v = v.strip()
-                try:
-                    ret.append(self.lookup_label(v, collectionid))
-                except:
-                    self.lookups[collectionid] = Concept().get_child_collections(collectionid)
-                    ret.append(self.lookup_label(v, collectionid))
-        output = StringIO()
-        writer = csv.writer(output)
-        writer.writerow(ret)
-        for v in [output.getvalue()]:
-            return v.strip("\r\n")
-
-    def add_domain_values_to_lookups(self):
-        for node in Node.objects.filter(Q(datatype="domain-value") | Q(datatype="domain-value-list")):
-            domain_collection_id = str(node.nodeid)
-            self.lookups[domain_collection_id] = []
-            for val in node.config["options"]:
-                self.lookups[domain_collection_id].append(("0", val["text"], val["id"]))
-
-
 class CsvWriter(Writer):
     def __init__(self, **kwargs):
         super(CsvWriter, self).__init__(**kwargs)
@@ -752,8 +713,6 @@ class CsvReader(Reader):
 
                 if create_concepts == True:
                     create_reference_data(concepts_to_create, create_collections)
-                # if concepts are created on import concept_lookup must be instatiated afterward
-                concept_lookup = ConceptLookup()
 
                 def cache(blank_tile):
                     if blank_tile.data != {}:
@@ -796,18 +755,13 @@ class CsvReader(Reader):
                     if datatype != "":
                         errors = []
                         datatype_instance = datatype_factory.get_instance(datatype)
-                        if datatype in ["concept", "domain-value", "concept-list", "domain-value-list"]:
-                            try:
-                                uuid.UUID(value)
-                            except:
-                                if datatype in ["domain-value", "domain-value-list"]:
-                                    collection_id = nodeid
-                                else:
-                                    collection_id = Node.objects.get(nodeid=nodeid).config["rdmCollection"]
-                                if collection_id is not None:
-                                    value = concept_lookup.lookup_labelid_from_label(value, collection_id)
                         try:
-                            value = datatype_instance.transform_value_for_tile(value)
+                            if datatype in ["concept", "concept-list"]:
+                                config = Node.objects.get(nodeid=nodeid).config
+                                config["nodeid"] = nodeid
+                            else:
+                                config = {}
+                            value = datatype_instance.transform_value_for_tile(value, **config)
                             errors = datatype_instance.validate(value, row_number=row_number, source=source, nodeid=nodeid)
                         except Exception as e:
                             errors.append(
