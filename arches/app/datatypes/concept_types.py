@@ -273,7 +273,7 @@ class ConceptDataType(BaseConceptDataType):
 
 
 class ConceptListDataType(BaseConceptDataType):
-    def validate(self, value, row_number=None, source="", node=None, nodeid=None, strict=False):
+    def validate(self, value, row_number=None, source="", node=None, nodeid=None, strict=False, **kwargs):
         errors = []
 
         # iterate list of values and use the concept validation on each one

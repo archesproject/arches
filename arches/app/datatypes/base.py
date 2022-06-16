@@ -13,7 +13,7 @@ class BaseDataType(object):
     def __init__(self, model=None):
         self.datatype_model = model
 
-    def validate(self, value, row_number=None, source=None, node=None, nodeid=None, strict=False, request=None):
+    def validate(self, value, row_number=None, source=None, node=None, nodeid=None, strict=False, **kwargs):
         """
         Used to validate data in a node of given datatype
 
