@@ -307,7 +307,7 @@ class BranchCsvImporter(BaseImportModule):
             files = details["result"]["summary"]["files"]
             summary = details["result"]["summary"]
             use_celery_file_size_threshold_in_MB = 0.1
-            if True:
+            if summary["cumulative_excel_files_size"] / 1000000 > use_celery_file_size_threshold_in_MB:
                 if task_management.check_if_celery_available():
                     logger.info(_("Delegating load to Celery task"))
                     tasks.load_branch_csv.apply_async(
