@@ -40,7 +40,7 @@ class FileValidator(object):
                 self.logger.log(logging.ERROR, error)
                 errors.append(error)
         else:
-            error = "File type is not whitelisted"
+            error = "File type is not permitted"
             self.logger.log(logging.ERROR, error)
             errors.append(error)
 

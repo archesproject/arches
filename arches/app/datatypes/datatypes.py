@@ -1235,7 +1235,7 @@ class FileListDataType(BaseDataType):
             file_type_errors = errors + self.validate_file_types(request, str(node.pk))
 
         if len(file_type_errors) > 0:
-            errors.append({"type": "ERROR", "message": "There was an error validating filetypes."})
+            errors.append({"type": "ERROR", "message": _("File type not permitted")})
         if node:
             self.node_lookup[str(node.pk)] = node
         elif nodeid:
