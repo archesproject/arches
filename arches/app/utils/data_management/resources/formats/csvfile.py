@@ -400,8 +400,10 @@ class CsvReader(Reader):
                     save_count = save_count - 1
 
         else:
-            logger.warn("No resource created for legacyid: {legacyid}. Make sure there is data to be imported \
-                    for this resource and it is mapped properly in your mapping file.")
+            logger.warn(
+                "No resource created for legacyid: {legacyid}. Make sure there is data to be imported \
+                    for this resource and it is mapped properly in your mapping file."
+            )
 
         if len(errors) > 0:
             self.errors += errors
@@ -450,11 +452,11 @@ class CsvReader(Reader):
                     if "string_template" in v and v["string_template"] != [""]:
                         logger.warn(
                             "The {0} {1} in the {2} display function.".format(
-                                    ", ".join(v["string_template"]),
-                                    "nodes participate" if len(v["string_template"]) > 1 else "node participates",
-                                    k,
-                                )
+                                ", ".join(v["string_template"]),
+                                "nodes participate" if len(v["string_template"]) > 1 else "node participates",
+                                k,
                             )
+                        )
                     else:
                         logger.warn("No nodes participate in the {0} display function.".format(k))
 
@@ -498,8 +500,10 @@ class CsvReader(Reader):
                     resourceinstanceid = process_resourceid(business_data[0]["ResourceID"], overwrite)
                 except KeyError:
                     print("*" * 80)
-                    logger.error("No column 'ResourceID' found in business data file. \
-                        Please add a 'ResourceID' column with a unique resource identifier.")
+                    logger.error(
+                        "No column 'ResourceID' found in business data file. \
+                        Please add a 'ResourceID' column with a unique resource identifier."
+                    )
                     print("*" * 80)
                     if celery_worker_running is False:  # prevents celery chord from breaking on WorkerLostError
                         sys.exit()
@@ -591,8 +595,10 @@ class CsvReader(Reader):
                                 collection_legacyoid = node.name + "_" + str(node.graph_id) + "_import"
                                 # check to see that there is not already a collection for this node
                                 if node.config["rdmCollection"] is not None:
-                                    logger.warn("A collection already exists for the {node.name} node. \
-                                            Use the add option to add concepts to this collection.")
+                                    logger.warn(
+                                        "A collection already exists for the {node.name} node. \
+                                            Use the add option to add concepts to this collection."
+                                    )
                                     # errors.append(
                                     #     {
                                     #         "type": "WARNING",
@@ -716,8 +722,11 @@ class CsvReader(Reader):
                     errors = []
                     new_row = []
                     if "ADDITIONAL" in row or "MISSING" in row:
-                        logger.warn("No resource created for ResourceID {0}. Line {1} has additional or missing columns.".format(
-                                    row["ResourceID"], str(int(row_number.split("on line ")[1]))))
+                        logger.warn(
+                            "No resource created for ResourceID {0}. Line {1} has additional or missing columns.".format(
+                                row["ResourceID"], str(int(row_number.split("on line ")[1]))
+                            )
+                        )
                         # errors.append(
                         #     {
                         #         "type": "WARNING",
@@ -753,12 +762,14 @@ class CsvReader(Reader):
                             value = datatype_instance.transform_value_for_tile(value, **config)
                             errors = datatype_instance.validate(value, row_number=row_number, source=source, nodeid=nodeid)
                         except Exception as e:
-                            logger.warn("datatype: {0} value: {1} {2} - {3}".format(
-                                        datatype_instance.datatype_model.classname,
-                                        value,
-                                        source,
-                                        str(e) + " or is not a prefLabel in the given collection.",
-                                    ))
+                            logger.warn(
+                                "datatype: {0} value: {1} {2} - {3}".format(
+                                    datatype_instance.datatype_model.classname,
+                                    value,
+                                    source,
+                                    str(e) + " or is not a prefLabel in the given collection.",
+                                )
+                            )
                             # errors.append(
                             #     {
                             #         "type": "ERROR",
