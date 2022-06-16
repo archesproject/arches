@@ -20,8 +20,14 @@ define([
             this.paginator = ko.observable();
 
             this.selectedLoadEvent.subscribe(function(val){
-                self.selectedModule(val.etl_module);
-                self.fetchValidation(val.loadid);
+                if (val) {
+                    self.selectedModule(val.etl_module);
+                    self.fetchValidation(val.loadid);
+                } else {
+                    if (self.loadEvents().length) {
+                        self.selectedLoadEvent(self.loadEvents()[0]);
+                    }
+                }
             });
             this.moduleSearchString = ko.observable('');
             this.taskSearchString = ko.observable('');
@@ -43,22 +49,24 @@ define([
             });
 
             this.fetchLoadEvent = function(page){
-                if (!page) {
-                    page = self.paginator()?.current_page ? self.paginator().current_page : 1;
-                }
-                const url = arches.urls.etl_manager + "?action=loadEvent&page=" + page;
-                window.fetch(url).then(function(response){
-                    if(response.ok){
-                        return response.json();
+                if (self.activeTab() === 'import'){
+                    if (!page) {
+                        page = self.paginator()?.current_page ? self.paginator().current_page : 1;
                     }
-                }).then(function(data){
-                    self.loadEvents(data.events);
-                    self.paginator(data.paginator);
-                    const newSelectedEventData = data.events.find(item => item.loadid === self.selectedLoadEvent().loadid);
-                    if (newSelectedEventData.status != self.selectedLoadEvent().status) {
-                        self.selectedLoadEvent(newSelectedEventData);
-                    } 
-                });
+                    const url = arches.urls.etl_manager + "?action=loadEvent&page=" + page;
+                    window.fetch(url).then(function(response){
+                        if(response.ok){
+                            return response.json();
+                        }
+                    }).then(function(data){
+                        self.loadEvents(data.events);
+                        self.paginator(data.paginator);
+                        const newSelectedEventData = data.events.find(item => item.loadid === self.selectedLoadEvent().loadid);
+                        if (newSelectedEventData && newSelectedEventData.status != self.selectedLoadEvent().status) {
+                            self.selectedLoadEvent(newSelectedEventData);
+                        } 
+                    });
+                }
             };
 
             this.loadEvents.subscribe(function(loadEvents) {
@@ -75,7 +83,7 @@ define([
             };
 
             this.cleanLoadEvent = function(loadid) {
-                const url = arches.urls.etl_manager + "?action=cleanEvent&loadid="+loadid;
+                const url = `${arches.urls.etl_manager}?action=cleanEvent&loadid=${loadid}`;
                 window.fetch(url).then(function(response){
                     if(response.ok){
                         return response.json();
@@ -87,10 +95,16 @@ define([
                 });
             };
 
-            this.reverseTransactions = function(loadid) {
+            this.reverseTransactions = function(event) {
+                const formData = new FormData();
+                const url = arches.urls.etl_manager;
+                formData.append('loadid', event.loadid);
+                formData.append('module', event.etl_module.etlmoduleid);
+                formData.append('action', 'reverse');
                 self.loading(true);
-                window.fetch(arches.urls.transaction_reverse(loadid),{
+                window.fetch(url,{
                     method: 'POST',
+                    body: formData,
                     credentials: 'include',
                     headers: {
                         "X-CSRFToken": Cookies.get('csrftoken')
@@ -160,7 +174,6 @@ define([
                     }
                 }).then(function(data){
                     self.etlModules = data.map(function(etl){
-                        etl.alert = self.alert;
                         require([etl.component]);
                         return etl;
                     });
