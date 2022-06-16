@@ -48,7 +48,6 @@ class ETLManagerView(View):
                 if self.request.user.has_perm("view_etlmodule", module) and show:
                     response.append(module)
         elif action == "loadEvent":
-            item_per_page = 5
             status_lookup = {
                 "indexing": "completed",
                 "completed": "indexed",
@@ -69,9 +68,9 @@ class ETLManagerView(View):
                     ).order_by(("-load_start_time")).prefetch_related("user", "etl_module")
             else:
                 filtered_events = LoadEvent.objects.all().order_by(("-load_start_time")).prefetch_related("user", "etl_module")
-            events = Paginator(filtered_events, item_per_page).page(page).object_list
+            events = Paginator(filtered_events, settings.ETL_STATUS_PER_PAGE).page(page).object_list
             total = len(filtered_events)
-            paginator, pages = get_paginator(request, filtered_events, total, page, item_per_page)
+            paginator, pages = get_paginator(request, filtered_events, total, page, settings.ETL_STATUS_PER_PAGE)
             page = paginator.page(page)
 
             response = {

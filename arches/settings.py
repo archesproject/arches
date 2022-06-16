@@ -533,6 +533,8 @@ RELATED_RESOURCES_PER_PAGE = 15
 RELATED_RESOURCES_EXPORT_LIMIT = 10000
 SEARCH_DROPDOWN_LENGTH = 100
 
+ETL_STATUS_PER_PAGE = 5
+
 # a lower number will give more "Fuzzy" matches, recomend between 0-4,
 # see "prefix_length" at https://www.elastic.co/guide/en/elasticsearch/reference/6.7/query-dsl-fuzzy-query.html#_parameters_7
 SEARCH_TERM_SENSITIVITY = 3
