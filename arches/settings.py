@@ -586,6 +586,9 @@ ETL_MODULE_LOCATIONS = [
     "arches.app.etl_modules",
 ]
 
+FILE_TYPE_CHECKING = False
+FILE_TYPES = ["bmp", "gif", "jpg", "jpeg", "pdf", "png", "psd", "rtf", "tif", "tiff", "xlsx", "csv", "zip"]
+
 MAPBOX_API_KEY = ""  # Put your Mapbox key here!
 
 # links to sprites and glyphs for use on map
