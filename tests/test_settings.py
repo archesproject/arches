@@ -104,9 +104,9 @@ DATATYPE_LOCATIONS.append("tests.fixtures.datatypes")
 LANGUAGES = [
     ("de", _("German")),
     ("en", _("English")),
-    # ("en-gb", _("British English")),
-    # ("es", _("Spanish")),
-    # ("ar", _("Arabic")),
+    ("en-gb", _("British English")),
+    ("es", _("Spanish")),
+    ("ar", _("Arabic")),
 ]
 
 try:

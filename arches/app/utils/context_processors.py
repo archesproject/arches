@@ -65,7 +65,7 @@ def map_info(request):
     }
 
 
-def app_settings(request):
+def app_settings(request=None):
     if settings.LANGUAGES:
         for lang in settings.LANGUAGES:
             found_language = Language.objects.filter(code=lang[0]).first()
