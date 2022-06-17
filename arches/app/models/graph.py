@@ -179,6 +179,42 @@ class Graph(models.GraphModel):
 
                 self.populate_null_nodegroups()
 
+    def refresh_from_database(self):
+        """
+            Updates card, edge, and node data from the database, bypassing the
+            cached version of the graph
+        """
+        self.nodes = {}
+        self.edges = {}
+        self.cards = {}
+
+        nodes = self.node_set.all()
+        edges = self.edge_set.all()
+        cards = self.cardmodel_set.all()
+
+        edge_lookup = {edge["edgeid"]: edge for edge in json.loads(JSONSerializer().serialize(edges))}
+
+        for card in cards:
+            widgets = list(card.cardxnodexwidget_set.all())
+            for widget in widgets:
+                self.widgets[widget.pk] = widget
+
+        node_lookup = {}
+        for node in nodes:
+            self.add_node(node)
+            node_lookup[str(node.nodeid)] = node
+
+        for edge in edges:
+            edge_dict = edge_lookup[str(edge.edgeid)]
+            edge.domainnode = node_lookup[edge_dict["domainnode_id"]]
+            edge.rangenode = node_lookup[edge_dict["rangenode_id"]]
+            self.add_edge(edge)
+
+        for card in cards:
+            self.add_card(card)
+
+        self.populate_null_nodegroups()
+
     @staticmethod
     def new(name="", is_resource=False, author=""):
         newid = uuid.uuid1()
