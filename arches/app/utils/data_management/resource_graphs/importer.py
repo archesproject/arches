@@ -156,6 +156,7 @@ def import_graph(graphs, overwrite_graphs=True):
                             },
                         )
 
+                        graph.refresh_from_database()
                         graph.publication_id = publication_data["publicationid"]
                         graph.save()
 
