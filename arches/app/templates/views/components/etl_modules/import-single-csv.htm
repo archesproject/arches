@@ -4,7 +4,7 @@
 {% block task_details %}
 <!-- ko ifnot: loading() -->
 <!-- ko ifnot: fileAdded() -->
-<div data-bind="dropzone: dropzoneOptions" class="file-select loader-select" style="height: 100%; width: 100%; background: white">
+<div data-bind="dropzone: dropzoneOptions" class="file-select loader-select" style="height: 100%; width: 100%; margin-top: 65px; background: white">
     <div>
         <div class="manifest-manager-main-menu-circle loader-button">
             <span><i style="color: #000" class="fa fa-cloud-upload r-select-icon"></i></span>
@@ -36,7 +36,7 @@
 <!-- /ko -->
 
 <!-- ko if: fileAdded() -->
-<div class="etl-module-component-container" style="margin-top: -60px; padding-top: 0px;">
+<div class="etl-module-component-container" style="padding-top: 0px;">
     <h3 style="margin-top: 15px; margin-bottom: 5px; font-size: 19px;">{% trans "Import Format: Single .csv file" %}</h3>
     <div class="etl-module-component" style="margin-top: 0px;">
         <h4 style="margin-top: 5px; margin-bottom: 0px;">{% trans "File Summary" %}</h4>
