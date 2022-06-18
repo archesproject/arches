@@ -1911,7 +1911,21 @@ class ResourceInstanceDataType(BaseDataType):
                     errors.append({"type": error_type, "message": message})
         return errors
 
+    def handle_request(self, tile, request, node):
+        # return
+        ret = False
+
+        sql = """
+            SELECT * FROM __arches_create_resource_x_resource_relationships('%s') as t;
+        """ % (tile.pk)
+
+        with connection.cursor() as cursor:
+            cursor.execute(sql)
+            ret = cursor.fetchone()
+        return ret
+
     def pre_tile_save(self, tile, nodeid):
+        return
         tiledata = tile.data[str(nodeid)]
         # Ensure tiledata is a list (with JSON-LD import it comes in as an object)
         if type(tiledata) != list and tiledata is not None:

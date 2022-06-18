@@ -352,8 +352,8 @@ class Tile(models.TileModel):
         for nodeid, value in list(tile_data.items()):
             node = models.Node.objects.get(nodeid=nodeid)
             datatype = self.datatype_factory.get_instance(node.datatype)
-            if request is not None:
-                datatype.handle_request(self, request, node)
+            # if request is not None:
+            datatype.handle_request(self, request, node)
 
     def save(self, *args, **kwargs):
         request = kwargs.pop("request", None)
