@@ -140,8 +140,10 @@ def get_graphs_for_export(graphids=None):
     for resource_graph in resource_graphs:
         resource_graph.refresh_from_database()
 
-    resource_graph_query = JSONSerializer().serializeToPython(resource_graphs, exclude=["widgets"], force_recalculation=True, use_raw_i18n_json=True)
-    
+    resource_graph_query = JSONSerializer().serializeToPython(
+        resource_graphs, exclude=["widgets"], force_recalculation=True, use_raw_i18n_json=True
+    )
+
     for resource_graph in resource_graph_query:
         function_ids = []
         for function in resource_graph["functions"]:

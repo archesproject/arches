@@ -8,25 +8,38 @@ import django.db.models.deletion
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('models', '8247_update_primary_descriptors_config'),
+        ("models", "8247_update_primary_descriptors_config"),
     ]
 
     operations = [
         migrations.RemoveField(
-            model_name='graphpublication',
-            name='serialized_graph',
+            model_name="graphpublication",
+            name="serialized_graph",
         ),
         migrations.CreateModel(
-            name='LocalizedSerializedGraphs',
+            name="LocalizedSerializedGraphs",
             fields=[
-                ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('serialized_graph', django.contrib.postgres.fields.jsonb.JSONField(blank=True, db_column='serialized_graph', null=True)),
-                ('language', models.ForeignKey(blank=True, db_column='languageid', null=True, on_delete=django.db.models.deletion.CASCADE, to='models.Language', to_field='code')),
-                ('publicationid', models.ForeignKey(db_column='publicationid', on_delete=django.db.models.deletion.CASCADE, to='models.GraphPublication')),
+                ("id", models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name="ID")),
+                ("serialized_graph", django.contrib.postgres.fields.jsonb.JSONField(blank=True, db_column="serialized_graph", null=True)),
+                (
+                    "language",
+                    models.ForeignKey(
+                        blank=True,
+                        db_column="languageid",
+                        null=True,
+                        on_delete=django.db.models.deletion.CASCADE,
+                        to="models.Language",
+                        to_field="code",
+                    ),
+                ),
+                (
+                    "publicationid",
+                    models.ForeignKey(db_column="publicationid", on_delete=django.db.models.deletion.CASCADE, to="models.GraphPublication"),
+                ),
             ],
             options={
-                'db_table': 'localized_serialized_graphs',
-                'managed': True,
+                "db_table": "localized_serialized_graphs",
+                "managed": True,
             },
         ),
     ]

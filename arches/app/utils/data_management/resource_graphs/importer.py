@@ -31,7 +31,7 @@ from arches.app.models.models import (
     OntologyClass,
     GraphPublication,
     Language,
-    LocalizedSerializedGraph
+    LocalizedSerializedGraph,
 )
 from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializer
 from arches.app.models.models import GraphXMapping
@@ -172,11 +172,10 @@ def import_graph(graphs, overwrite_graphs=True):
                                     "serialized_graph": JSONDeserializer().deserialize(
                                         JSONSerializer().serialize(graph, force_recalculation=True)
                                     )
-                                }
+                                },
                             )
 
                         translation.deactivate()
-
 
             except GraphImportException as ge:
                 logger.exception(ge)

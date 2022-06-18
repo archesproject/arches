@@ -181,8 +181,8 @@ class Graph(models.GraphModel):
 
     def refresh_from_database(self):
         """
-            Updates card, edge, and node data from the database, bypassing the
-            cached version of the graph
+        Updates card, edge, and node data from the database, bypassing the
+        cached version of the graph
         """
         self.nodes = {}
         self.edges = {}
@@ -1664,10 +1664,8 @@ class Graph(models.GraphModel):
 
                     localized_serialized_graph = models.LocalizedSerializedGraph.objects.create(
                         publication=publication,
-                        serialized_graph=JSONDeserializer().deserialize(
-                            JSONSerializer().serialize(self, force_recalculation=True)
-                        ),
-                        language=language
+                        serialized_graph=JSONDeserializer().deserialize(JSONSerializer().serialize(self, force_recalculation=True)),
+                        language=language,
                     )
 
                     localized_serialized_graph.save()
