@@ -599,13 +599,6 @@ class CsvReader(Reader):
                                         "A collection already exists for the {node.name} node. \
                                             Use the add option to add concepts to this collection."
                                     )
-                                    # errors.append(
-                                    #     {
-                                    #         "type": "WARNING",
-                                    #         "message": f"A collection already exists for the {node.name} node. \
-                                    #         Use the add option to add concepts to this collection.",
-                                    #     }
-                                    # )
                                     if len(errors) > 0:
                                         self.errors += errors
                                     collection = None
@@ -727,14 +720,6 @@ class CsvReader(Reader):
                                 row["ResourceID"], str(int(row_number.split("on line ")[1]))
                             )
                         )
-                        # errors.append(
-                        #     {
-                        #         "type": "WARNING",
-                        #         "message": "No resource created for ResourceID {0}. Line {1} has additional or missing columns.".format(
-                        #             row["ResourceID"], str(int(row_number.split("on line ")[1]))
-                        #         ),
-                        #     }
-                        # )
                         if len(errors) > 0:
                             self.errors += errors
                     for key, value in row.items():
@@ -770,17 +755,6 @@ class CsvReader(Reader):
                                     str(e) + " or is not a prefLabel in the given collection.",
                                 )
                             )
-                            # errors.append(
-                            #     {
-                            #         "type": "ERROR",
-                            #         "message": "datatype: {0} value: {1} {2} - {3}".format(
-                            #             datatype_instance.datatype_model.classname,
-                            #             value,
-                            #             source,
-                            #             str(e) + " or is not a prefLabel in the given collection.",
-                            #         ),
-                            #     }
-                            # )
                         if len(errors) > 0:
                             error_types = [error["type"] for error in errors]
                             if "ERROR" in error_types:
@@ -1059,17 +1033,6 @@ class CsvReader(Reader):
 
                 # check for missing display value nodes.
                 errors = []
-                # for k, v in missing_display_values.items():
-                #     if len(v) > 0:
-                #         errors.append(
-                #             {
-                #                 "type": "INFO",
-                #                 "message": "{0} is null or not mapped on rows {1} and \
-                #                 participates in a display value function.".format(
-                #                     k, ",".join(v)
-                #                 ),
-                #             }
-                #         )
                 if len(errors) > 0:
                     self.errors += errors
 
