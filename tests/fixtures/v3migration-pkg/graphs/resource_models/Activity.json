@@ -8872,9 +8872,15 @@
                 }
             ],
             "graphid": "243f8689-b8f6-11e6-84a5-026d961c88e6",
+            "publication": {
+                "graph_id": "243f8689-b8f6-11e6-84a5-026d961c88e6",
+                "notes": "Initial migration.",
+                "publicationid": "ffc1edb1-e52d-4c73-99ac-64413912a3fc",
+                "published_time": "2022-03-22T13:29:06.593",
+                "user_id": null
+            },
             "iconclass": "fa fa-tasks",
             "is_editable": false,
-            "isactive": true,
             "isresource": true,
             "jsonldcontext": null,
             "name": "Activity",

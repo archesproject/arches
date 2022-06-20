@@ -241,6 +241,8 @@
                 get_domain_connections: function(graphid){return "{% url 'get_domain_connections' 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa' %}".replace('aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa', graphid)},
                 clone_graph: function(graphid){return "{% url 'clone_graph' 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa' %}".replace('aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa', graphid)},
                 export_graph: function(graphid){return "{% url 'export_graph' 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa' %}".replace('aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa', graphid)},
+                publish_graph: function(graphid){return "{% url 'publish_graph' 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa' %}".replace('aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa', graphid)},
+                unpublish_graph: function(graphid){return "{% url 'unpublish_graph' 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa' %}".replace('aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa', graphid)},
                 delete_graph: function(graphid){return "{% url 'delete_graph' 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa' %}".replace('aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa', graphid)},
                 delete_instances: function(graphid){return "{% url 'delete_instances' 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa' %}".replace('aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa', graphid)},
                 export_mapping_file: function(graphid){return "{% url 'export_mapping_file' 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa' %}".replace('aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa', graphid)},
@@ -322,6 +324,10 @@
             resourceCopyFailed: {
                 title: "{% trans 'Resource Copy Failed...'%}",
                 text: "{% trans 'Sorry! The copy request failed. Please try again.  Contact your system administrator if the problem persists.' %}"
+            },
+            resourceHasUnpublishedGraph: {
+                title: "{% trans 'This resource is based on an unpublished graph.' %}",
+                text: "{% trans 'To continue, please ensure the graph is published.' %}"
             },
             mapboxApiKey: '{{ map_info.mapbox_api_key }}',
             hexBinSize: {{ map_info.hex_bin_size | unlocalize }},

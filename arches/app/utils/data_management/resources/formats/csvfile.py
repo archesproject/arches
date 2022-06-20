@@ -441,9 +441,7 @@ class CsvReader(Reader):
                 for k, v in f["descriptor_types"].items():
                     v["node_ids"] = []
                     v["string_template"] = (
-                        v["string_template"].replace("<", "").replace(">", "").split(", ")
-                        if "string_template" in v
-                        else ""
+                        v["string_template"].replace("<", "").replace(">", "").split(", ") if "string_template" in v else ""
                     )
                     if "nodegroup_id" in v and v["nodegroup_id"] != "":
                         nodes = Node.objects.filter(nodegroup_id=v["nodegroup_id"])

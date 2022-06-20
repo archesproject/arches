@@ -575,9 +575,15 @@
                 }
             ],
             "graphid": "ee72fb1e-fa6c-11e9-b369-3af9d3b32b71",
+            "publication": {
+                "graph_id": "ee72fb1e-fa6c-11e9-b369-3af9d3b32b71",
+                "notes": "Initial migration.",
+                "publicationid": "d91272f0-e619-4509-96b7-481fcb6b1379",
+                "published_time": "2022-03-22T13:29:06.593",
+                "user_id": null
+            },
             "iconclass": "",
             "is_editable": false,
-            "isactive": true,
             "isresource": true,
             "jsonldcontext": null,
             "name": "Test Complex Export",
