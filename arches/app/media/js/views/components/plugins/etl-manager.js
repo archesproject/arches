@@ -4,8 +4,7 @@ define([
     'js-cookie',
     'arches',
     'viewmodels/alert',
-    'viewmodels/alert-json',
-], function($, ko, Cookies, arches, AlertViewModel, JsonErrorAlertViewModel) {
+], function($, ko, Cookies, arches, AlertViewModel) {
     return ko.components.register('etl-manager', {
         viewModel: function(params) {
             const self = this;
