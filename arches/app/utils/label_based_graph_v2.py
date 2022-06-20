@@ -29,26 +29,36 @@ class LabelBasedNode(object):
 
         return is_empty
 
-    def as_json(self, compact=False, include_empty_nodes=True):
+    def as_json(self, compact=False, include_empty_nodes=True, include_hidden_nodes=True):
         display_data = {}
 
+        if not include_hidden_nodes:
+            card = models.CardModel.objects.filter(nodegroup_id=self.node_id).first()
+            try:
+                if not card.visible:
+                    return None
+            except AttributeError:
+                pass
+
         for child_node in self.child_nodes:
-            formatted_node = child_node.as_json(compact=compact, include_empty_nodes=include_empty_nodes)
+            formatted_node = child_node.as_json(
+                compact=compact, include_empty_nodes=include_empty_nodes, include_hidden_nodes=include_hidden_nodes
+            )
+            if formatted_node is not None:
+                formatted_node_name, formatted_node_value = formatted_node.popitem()
 
-            formatted_node_name, formatted_node_value = formatted_node.popitem()
+                if include_empty_nodes or not child_node.is_empty():
+                    previous_val = display_data.get(formatted_node_name)
+                    cardinality = child_node.cardinality
 
-            if include_empty_nodes or not child_node.is_empty():
-                previous_val = display_data.get(formatted_node_name)
-                cardinality = child_node.cardinality
-
-                # let's handle multiple identical node names
-                if not previous_val:
-                    should_create_new_array = cardinality == "n" and self.tile_id != child_node.tile_id
-                    display_data[formatted_node_name] = [formatted_node_value] if should_create_new_array else formatted_node_value
-                elif isinstance(previous_val, list):
-                    display_data[formatted_node_name].append(formatted_node_value)
-                else:
-                    display_data[formatted_node_name] = [previous_val, formatted_node_value]
+                    # let's handle multiple identical node names
+                    if not previous_val:
+                        should_create_new_array = cardinality == "n" and self.tile_id != child_node.tile_id
+                        display_data[formatted_node_name] = [formatted_node_value] if should_create_new_array else formatted_node_value
+                    elif isinstance(previous_val, list):
+                        display_data[formatted_node_name].append(formatted_node_value)
+                    else:
+                        display_data[formatted_node_name] = [previous_val, formatted_node_value]
 
         val = self.value
         if compact and display_data:
@@ -135,7 +145,16 @@ class LabelBasedGraph(object):
 
     @classmethod
     def from_resource(
-        cls, resource, datatype_factory=None, node_cache=None, compact=False, hide_empty_nodes=False, as_json=True, user=None, perm=None
+        cls,
+        resource,
+        datatype_factory=None,
+        node_cache=None,
+        compact=False,
+        hide_empty_nodes=False,
+        as_json=True,
+        user=None,
+        perm=None,
+        hide_hidden_nodes=False,
     ):
         """
         Generates a label-based graph from a given resource
@@ -172,21 +191,24 @@ class LabelBasedGraph(object):
                 root_label_based_node.child_nodes.append(label_based_graph)
 
         if as_json:
-            root_label_based_node_json = root_label_based_node.as_json(compact=compact, include_empty_nodes=bool(not hide_empty_nodes))
+            root_label_based_node_json = root_label_based_node.as_json(
+                compact=compact, include_empty_nodes=bool(not hide_empty_nodes), include_hidden_nodes=bool(not hide_hidden_nodes)
+            )
 
             _dummy_resource_name, resource_graph = root_label_based_node_json.popitem()
 
             # removes unneccesary ( None ) top-node values
-            for key in [NODE_ID_KEY, TILE_ID_KEY]:
-                resource_graph.pop(key, None)
+            if resource_graph:
+                for key in [NODE_ID_KEY, TILE_ID_KEY]:
+                    resource_graph.pop(key, None)
 
             # adds metadata that was previously only accessible via API
             return {
-                "displaydescription": resource.displaydescription,
-                "displayname": resource.displayname,
+                "displaydescription": resource.displaydescription(),
+                "displayname": resource.displayname(),
                 "graph_id": resource.graph_id,
                 "legacyid": resource.legacyid,
-                "map_popup": resource.map_popup,
+                "map_popup": resource.map_popup(),
                 "resourceinstanceid": resource.resourceinstanceid,
                 "resource": resource_graph,
             }
@@ -242,13 +264,29 @@ class LabelBasedGraph(object):
     def _build_graph(
         cls, input_node, input_tile, parent_tree, node_ids_to_tiles_reference, nodegroup_cardinality_reference, node_cache, datatype_factory
     ):
+        def is_valid_semantic_node(node, tile):
+            if node.datatype == "semantic":
+                child_nodes = node.get_direct_child_nodes()
+                semantic_child_nodes = [child_node for child_node in child_nodes if child_node.datatype == "semantic"]
+                non_semantic_child_nodes = [child_node for child_node in child_nodes if child_node.datatype != "semantic"]
+
+                for non_semantic_child_node in non_semantic_child_nodes:
+                    if str(non_semantic_child_node.pk) in tile.data or str(non_semantic_child_node.pk) in node_ids_to_tiles_reference:
+                        return True
+
+                has_valid_child_semantic_node = False
+
+                for semantic_child_node in semantic_child_nodes:
+                    if is_valid_semantic_node(semantic_child_node, tile):
+                        has_valid_child_semantic_node = True
+
+                return has_valid_child_semantic_node
+
         for associated_tile in node_ids_to_tiles_reference.get(str(input_node.pk), [input_tile]):
             parent_tile = associated_tile.parenttile
 
             if associated_tile == input_tile or parent_tile == input_tile:
-                if (  # don't instantiate `LabelBasedNode`s of cardinality `n` unless they are semantic or have value
-                    input_node.datatype == "semantic" or str(input_node.pk) in associated_tile.data
-                ):
+                if is_valid_semantic_node(input_node, associated_tile) or str(input_node.pk) in associated_tile.data:
                     label_based_node = LabelBasedNode(
                         name=input_node.name,
                         node_id=str(input_node.pk),

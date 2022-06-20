@@ -189,6 +189,7 @@
                 from_sparql_endpoint: "{% url 'from_sparql_endpoint' 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa' %}",
                 search_sparql_endpoint: "{% url 'search_sparql_endpoint' %}",
                 confirm_delete: "{% url 'confirm_delete' 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa' %}",
+                search_home: "{% url 'search_home' %}",
                 search_terms: "{% url 'search_terms' %}",
                 search_results: "{% url 'search_results' %}",
                 export_results: "{% url 'export_results' %}",
@@ -232,6 +233,7 @@
                 permission_data: "{% url 'permission_data' %}",
                 resource_permission_data: "{% url 'resource_permission_data' %}",
                 permission_manager_data: "{% url 'permission_manager_data' %}",
+                clear_user_permission_cache: "{% url 'clear_user_permission_cache' %}",
                 get_user_names: "{% url 'get_user_names' %}",
                 feature_popup_content: "{% url 'feature_popup_content' %}",
                 related_resource_candidates: "{% url 'related_resource_candidates' %}",
@@ -256,6 +258,9 @@
                 api_tiles: function (tileid) {
                     return "{% url 'api_tiles' 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa' %}".replace('aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa', tileid)
                 },
+                api_nodegroup: function (nodegroupid) {
+                    return "{% url 'api_nodegroup' 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa' %}".replace('aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa', nodegroupid)
+                },
                 api_nodes: function (nodeid) {
                     return "{% url 'api_nodes' 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa' %}".replace('aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa', nodeid)
                 },
@@ -270,10 +275,12 @@
                 ontology_properties: "{% url 'ontology_properties' %}",
                 iiifmanifest: "{% url 'iiifmanifest' %}",
                 manifest_manager: "{% url 'manifest_manager' %}",
+                etl_manager: "{% url 'etl_manager' %}",
                 iiifannotations: "{% url 'iiifannotations' %}",
                 iiifannotationnodes: "{% url 'iiifannotationnodes' %}",
                 validatejson: "{% url 'validatejson' 'aaaa'%}".replace('aaaa', ''),
                 get_dsl: "{% url 'get_dsl' %}",
+                transform_edtf_for_tile: "{% url 'transform_edtf_for_tile' %}",
                 {% block urls %}{% endblock urls %}
             },
             geocoderPlaceHolder: "{% trans 'Find an address...' %}",
@@ -309,7 +316,8 @@
                 text: "{% trans 'Sorry! The request failed. Please try again.  Contact your system administrator if the problem persists.' %}"
             },
             resourceCopySuccess: {
-                title: "{% trans 'Resource Successfully Copied.'%}"
+                title: "{% trans 'Resource Successfully Copied.'%}",
+                text: "{% trans 'Click here to edit copy' %}"
             },
             resourceCopyFailed: {
                 title: "{% trans 'Resource Copy Failed...'%}",
@@ -410,6 +418,8 @@
                 'mobileSurveyDesc': '{% trans "Summary of how this model participates in the survey" %}',
                 'groupingErrorTitle': '{% trans "Settings Conflict: Remove this card from grouped card?" %}',
                 'groupingErrorMessage': "{% trans 'The cardinality of this card can\'t be changed until you remove it from being grouped with the ${cardName} card.  Do you want to remove this card from being grouped with the ${cardName} card' %}",
+                'modelDoesNotExist': '{% trans "!! Referenced model does not exist -- Delete and select a new model !!" %}',
+                'idColumnSelection': '{% trans "Use as an id" %}',
             },
             version: '{{ app_settings.VERSION }}'
         };
@@ -484,7 +494,7 @@
          return;
     });
 
-    define('file-renderers', [{% for renderer in app_settings.RENDERERS %}'{{ renderer.component }}',{% endfor %}], function () {
+    define('file-renderers', function () {
         return [{% autoescape off %}{% for renderer in app_settings.RENDERERS %}
                 {'name': '{{ renderer.name }}',
                 'title': '{{ renderer.title }}',

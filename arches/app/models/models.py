@@ -19,6 +19,7 @@ from arches.app.utils.module_importer import get_class_from_modulename
 from django.forms.models import model_to_dict
 from django.contrib.gis.db import models
 from django.contrib.postgres.fields import JSONField
+from django.core.cache import caches
 from django.core.files.storage import FileSystemStorage
 from django.core.mail import EmailMultiAlternatives, get_connection
 from django.template.loader import get_template, render_to_string
@@ -471,6 +472,7 @@ class Node(models.Model):
     sortorder = models.IntegerField(blank=True, null=True, default=0)
     fieldname = models.TextField(blank=True, null=True)
     exportable = models.BooleanField(default=False, null=True)
+    alias = models.TextField(blank=True, null=True)
 
     def get_child_nodes_and_edges(self):
         """
@@ -539,7 +541,16 @@ class Node(models.Model):
         db_table = "nodes"
         constraints = [
             models.UniqueConstraint(fields=["name", "nodegroup"], name="unique_nodename_nodegroup"),
+            models.UniqueConstraint(fields=["alias", "graph"], name="unique_alias_graph"),
         ]
+
+
+@receiver(post_save, sender=Node)
+def clear_user_permission_cache(sender, instance, **kwargs):
+    user_permission_cache = caches["user_permission"]
+
+    if user_permission_cache:
+        user_permission_cache.clear()
 
 
 class Ontology(models.Model):
@@ -722,6 +733,7 @@ class ResourceXResource(models.Model):
         if index:
             from arches.app.search.search_engine_factory import SearchEngineInstance as se
             from arches.app.search.mappings import RESOURCE_RELATIONS_INDEX
+
             se.delete(index=RESOURCE_RELATIONS_INDEX, id=self.resourcexid)
 
         # update the resource-instance tile by removing any references to a deleted resource
@@ -1359,6 +1371,7 @@ class IIIFManifest(models.Model):
         managed = True
         db_table = "iiif_manifests"
 
+
 class GroupMapSettings(models.Model):
     group = models.OneToOneField(Group, on_delete=models.CASCADE)
     min_zoom = models.IntegerField(default=0)
@@ -1397,3 +1410,91 @@ class GeoJSONGeometry(models.Model):
     class Meta:
         managed = True
         db_table = "geojson_geometries"
+
+
+class ETLModule(models.Model):
+    etlmoduleid = models.UUIDField(primary_key=True, default=uuid.uuid1)
+    name = models.TextField()
+    icon = models.TextField()
+    etl_type = models.TextField()
+    component = models.TextField()
+    componentname = models.TextField()
+    modulename = models.TextField(blank=True, null=True)
+    classname = models.TextField(blank=True, null=True)
+    config = JSONField(blank=True, null=True, db_column="config")
+    slug = models.TextField(validators=[validate_slug], unique=True, null=True)
+    description = models.TextField(blank=True, null=True)
+
+    def __str__(self):
+        return self.name
+
+    class Meta:
+        managed = True
+        db_table = "etl_modules"
+
+    def get_class_module(self):
+        return get_class_from_modulename(self.modulename, self.classname, settings.ETL_MODULE_LOCATIONS)
+
+
+class LoadEvent(models.Model):
+    loadid = models.UUIDField(primary_key=True, serialize=False, default=uuid.uuid4)
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    complete = models.BooleanField(default=False)
+    successful = models.BooleanField(blank=True, null=True)
+    status = models.TextField(blank=True, null=True)
+    etl_module = models.ForeignKey(ETLModule, on_delete=models.CASCADE)
+    load_description = models.TextField(blank=True, null=True)
+    load_details = JSONField(blank=True, null=True)
+    error_message = models.TextField(blank=True, null=True)
+    load_start_time = models.DateTimeField(blank=True, null=True)
+    load_end_time = models.DateTimeField(blank=True, null=True)
+    indexed_time = models.DateTimeField(blank=True, null=True)
+
+    class Meta:
+        managed = True
+        db_table = "load_event"
+
+
+class LoadStaging(models.Model):
+    nodegroup = models.ForeignKey(NodeGroup, db_column="nodegroupid", on_delete=models.CASCADE)
+    load_event = models.ForeignKey(LoadEvent, db_column="loadid", on_delete=models.CASCADE)
+    value = JSONField(blank=True, null=True, db_column="value")
+    legacyid = models.TextField(blank=True, null=True)
+    resourceid = models.UUIDField(serialize=False, blank=True, null=True)
+    tileid = models.UUIDField(serialize=False, blank=True, null=True)
+    parenttileid = models.UUIDField(serialize=False, blank=True, null=True)
+    passes_validation = models.BooleanField(blank=True, null=True)
+    nodegroup_depth = models.IntegerField(default=1)
+    source_description = models.TextField(blank=True, null=True)
+    error_message = models.TextField(blank=True, null=True)
+
+    class Meta:
+        managed = True
+        db_table = "load_staging"
+
+
+class SpatialView(models.Model):
+    spatialviewid = models.UUIDField(primary_key=True, default=uuid.uuid1)
+    schema = models.TextField(default="public")
+    slug = models.TextField(
+        validators=[
+            RegexValidator(
+                regex=r"^[a-zA-Z_]([a-zA-Z0-9_]+)$",
+                message="Slug must contain only letters, numbers and hyphens, but not begin with a number.",
+                code="nomatch",
+            )
+        ],
+        unique=True,
+    )
+    description = models.TextField(default="arches spatial view")  # provide a description of the spatial view
+    geometrynodeid = models.ForeignKey(Node, on_delete=models.CASCADE, db_column="geometrynodeid")
+    ismixedgeometrytypes = models.BooleanField(default=False)
+    attributenodes = JSONField(blank=True, null=True, db_column="attributenodes")
+    isactive = models.BooleanField(default=True)  # the view is not created in the DB until set to active.
+
+    def __str__(self):
+        return f"{self.schema}.{self.slug}"
+
+    class Meta:
+        managed = True
+        db_table = "spatial_views"

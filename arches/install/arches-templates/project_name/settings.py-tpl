@@ -18,6 +18,7 @@ STATICFILES_DIRS =  (os.path.join(APP_ROOT, 'media'),) + STATICFILES_DIRS
 
 DATATYPE_LOCATIONS.append('{{ project_name }}.datatypes')
 FUNCTION_LOCATIONS.append('{{ project_name }}.functions')
+ETL_MODULE_LOCATIONS.append('{{ project_name }}.etl_modules')
 SEARCH_COMPONENT_LOCATIONS.append('{{ project_name }}.search_components')
 TEMPLATES[0]['DIRS'].append(os.path.join(APP_ROOT, 'functions', 'templates'))
 TEMPLATES[0]['DIRS'].append(os.path.join(APP_ROOT, 'widgets', 'templates'))
@@ -39,7 +40,8 @@ ELASTICSEARCH_PREFIX = '{{ project_name }}'
 ELASTICSEARCH_CUSTOM_INDEXES = []
 # [{
 #     'module': '{{ project_name }}.search_indexes.sample_index.SampleIndex',
-#     'name': 'my_new_custom_index' <-- follow ES index naming rules
+#     'name': 'my_new_custom_index', <-- follow ES index naming rules
+#     'should_update_asynchronously': False  <-- denotes if asynchronously updating the index would affect custom functionality within the project.
 # }]
 
 KIBANA_URL = "http://localhost:5601/"
@@ -73,25 +75,43 @@ DATABASES = {
 }
 
 INSTALLED_APPS = (
-    'django.contrib.admin',
-    'django.contrib.auth',
-    'django.contrib.contenttypes',
-    'django.contrib.sessions',
-    'django.contrib.messages',
-    'django.contrib.staticfiles',
-    'django.contrib.gis',
-    'arches',
-    'arches.app.models',
-    'arches.management',
-    'guardian',
-    'captcha',
-    'revproxy',
-    'corsheaders',
-    'oauth2_provider',
-    'django_celery_results',
-    'compressor',
-    '{{ project_name }}',
+    "django.contrib.admin",
+    "django.contrib.auth",
+    "django.contrib.contenttypes",
+    "django.contrib.sessions",
+    "django.contrib.messages",
+    "django.contrib.staticfiles",
+    "django.contrib.gis",
+    "arches",
+    "arches.app.models",
+    "arches.management",
+    "guardian",
+    "captcha",
+    "revproxy",
+    "corsheaders",
+    "oauth2_provider",
+    "django_celery_results",
+    "compressor",
+    # "silk",
+    "{{ project_name }}",
 )
+
+MIDDLEWARE = [
+    "corsheaders.middleware.CorsMiddleware",
+    "django.middleware.security.SecurityMiddleware",
+    "django.contrib.sessions.middleware.SessionMiddleware",
+    #'arches.app.utils.middleware.TokenMiddleware',
+    "django.middleware.locale.LocaleMiddleware",
+    "django.middleware.common.CommonMiddleware",
+    "django.middleware.csrf.CsrfViewMiddleware",
+    "arches.app.utils.middleware.ModifyAuthorizationHeader",
+    "oauth2_provider.middleware.OAuth2TokenMiddleware",
+    "django.contrib.auth.middleware.AuthenticationMiddleware",
+    "django.contrib.messages.middleware.MessageMiddleware",
+    # "django.middleware.clickjacking.XFrameOptionsMiddleware",
+    "arches.app.utils.middleware.SetAnonymousUser",
+    # "silk.middleware.SilkyMiddleware",
+]
 
 ALLOWED_HOSTS = []
 
@@ -162,13 +182,16 @@ SESSION_COOKIE_NAME = '{{ project_name }}'
 CACHES = {
     'default': {
         'BACKEND': 'django.core.cache.backends.dummy.DummyCache',
-    }
+    },
+    'user_permission': {
+        'BACKEND': 'django.core.cache.backends.db.DatabaseCache',
+        'LOCATION': 'user_permission_cache',
+    },
 }
 
 # Hide nodes and cards in a report that have no data
 HIDE_EMPTY_NODES_IN_REPORT = False
 
-BYPASS_CARDINALITY_TILE_VALIDATION = False
 BYPASS_UNIQUE_CONSTRAINT_TILE_VALIDATION = False
 BYPASS_REQUIRED_VALUE_TILE_VALIDATION = False
 

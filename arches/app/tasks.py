@@ -1,6 +1,6 @@
-from __future__ import absolute_import, unicode_literals
 import os
 import logging
+import shutil
 from celery import shared_task
 from datetime import datetime
 from datetime import timedelta
@@ -11,6 +11,7 @@ from django.db import connection
 from django.http import HttpRequest
 from django.utils.translation import ugettext as _
 from arches.app.models import models
+from arches.app.utils import import_class_from_string
 from tempfile import NamedTemporaryFile
 
 
@@ -21,7 +22,6 @@ def delete_file():
     settings.update_from_db()
 
     logger = logging.getLogger(__name__)
-    now = datetime.timestamp(datetime.now())
     file_list = []
     range = datetime.now() - timedelta(seconds=settings.CELERY_SEARCH_EXPORT_EXPIRES)
     exports = models.SearchExportHistory.objects.filter(exporttime__lt=range).exclude(downloadfile="")
@@ -125,6 +125,19 @@ def import_business_data(
     )
 
 
+@shared_task(bind=True)
+def index_resource(self, module, index_name, resource_id, tile_ids):
+    from arches.app.models.resource import Resource  # avoids circular import
+
+    resource = Resource.objects.get(pk=resource_id)
+    tiles = [models.TileModel.objects.get(pk=tile_id) for tile_id in tile_ids]
+
+    es_index = import_class_from_string(module)(index_name)
+    document, document_id = es_index.get_documents_to_index(resource, tiles)
+
+    return es_index.index_document(document=document, id=document_id)
+
+
 @shared_task
 def package_load_complete(*args, **kwargs):
     valid_resource_paths = kwargs.get("valid_resource_paths")
@@ -189,6 +202,30 @@ def on_chord_error(request, exc, traceback):
     msg = f"Package Load erred on import_business_data. Exception: {exc}. See logs for details."
     user = User.objects.get(id=1)
     notify_completion(msg, user)
+
+
+@shared_task
+def load_branch_csv(files, summary, result, temp_dir, loadid):
+    from arches.app.etl_modules import branch_csv_importer
+
+    BranchCsvImporter = branch_csv_importer.BranchCsvImporter(request=None, loadid=loadid, temp_dir=temp_dir)
+    BranchCsvImporter.run_load_task(files, summary, result, temp_dir, loadid)
+
+
+@shared_task
+def load_single_csv(loadid, graphid, has_headers, fieldnames, csv_file_name, id_label):
+    from arches.app.etl_modules import import_single_csv
+
+    ImportSingleCsv = import_single_csv.ImportSingleCsv()
+    ImportSingleCsv.run_load_task(loadid, graphid, has_headers, fieldnames, csv_file_name, id_label)
+
+
+@shared_task
+def reverse_etl_load(loadid):
+    from arches.app.etl_modules import base_import_module
+
+    module = base_import_module.BaseImportModule()
+    module.reverse_load(loadid)
 
 
 def create_user_task_record(taskid, taskname, userid):
