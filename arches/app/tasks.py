@@ -40,17 +40,6 @@ def message(arg):
 
 
 @shared_task(bind=True)
-def sync(self, surveyid=None, userid=None, synclogid=None):
-    from arches.app.models.mobile_survey import MobileSurvey
-
-    create_user_task_record(self.request.id, self.name, userid)
-    survey = MobileSurvey.objects.get(id=surveyid)
-    survey._sync(synclogid, userid)
-    response = {"taskid": self.request.id}
-    return response
-
-
-@shared_task(bind=True)
 def export_search_results(self, userid, request_values, format, report_link):
     from arches.app.search.search_export import SearchResultsExporter
     from arches.app.models.system_settings import settings

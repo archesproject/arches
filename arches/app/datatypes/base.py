@@ -82,12 +82,6 @@ class BaseDataType(object):
         """
         return None
 
-    def process_mobile_data(self, tile, node, db, couch_doc, node_value):
-        """
-        Transforms data from a mobile device to an Arches friendly format
-        """
-        return None
-
     def get_map_layer(self, node=None):
         """
         Gets the array of map layers to add to the map for a given node

@@ -34,7 +34,6 @@ from arches.app.models import models
 from arches.app.models.concept import Concept
 from arches.app.models.card import Card as CardProxyModel
 from arches.app.models.graph import Graph
-from arches.app.models.mobile_survey import MobileSurvey
 from arches.app.models.resource import Resource
 from arches.app.models.system_settings import settings
 from arches.app.models.tile import Tile as TileProxyModel, TileValidationError
@@ -67,52 +66,6 @@ from arches.app.search.search_export import SearchResultsExporter
 from arches.celery import app
 
 logger = logging.getLogger(__name__)
-
-
-def userCanAccessMobileSurvey(request, surveyid=None):
-    ms = MobileSurvey.objects.get(pk=surveyid)
-    user = request.user
-    allowed = False
-    if user in ms.users.all():
-        allowed = True
-    else:
-        users_groups = {group.id for group in user.groups.all()}
-        ms_groups = {group.id for group in ms.groups.all()}
-        if len(ms_groups.intersection(users_groups)) > 0:
-            allowed = True
-
-    return allowed
-
-
-class CouchdbProxy(ProtectedResourceView, ProxyView):
-    upstream = settings.COUCHDB_URL
-    p = re.compile(r"project_(?P<surveyid>[\w-]{36})")
-
-    def dispatch(self, request, path):
-        try:
-            if path is None or path == "":
-                return super(CouchdbProxy, self).dispatch(request, path)
-            else:
-                m = self.p.match(path)
-                surveyid = ""
-                if m is not None:
-                    surveyid = m.groupdict().get("surveyid")
-                    if MobileSurvey.objects.filter(pk=surveyid).exists() is False:
-                        message = _("The survey you are attempting to sync is no longer available on the server")
-                        return JSONResponse({"notification": message}, status=500)
-                    else:
-                        try:
-                            if userCanAccessMobileSurvey(request, surveyid):
-                                return super(CouchdbProxy, self).dispatch(request, path)
-                            else:
-                                return JSONResponse(_("Sync Failed. User unauthorized to sync project"), status=403)
-                        except Exception:
-                            logger.exception(_("Unable to determine user access to collector project"))
-                            pass
-        except Exception:
-            logger.exception(_("Failed to dispatch Couch proxy"))
-
-        return JSONResponse(_("Sync failed"), status=500)
 
 
 class KibanaProxy(ProxyView):
@@ -152,111 +105,6 @@ class APIBase(View):
             logger.exception(_("Failed to create API request"))
 
         return super(APIBase, self).dispatch(request, *args, **kwargs)
-
-
-class Sync(APIBase):
-    def get(self, request, surveyid=None):
-
-        can_sync = userCanAccessMobileSurvey(request, surveyid)
-        if can_sync:
-            synclog = models.MobileSyncLog(logid=None, survey_id=surveyid, userid=request.user.id)
-            try:
-                survey = MobileSurvey.objects.get(id=surveyid)
-                synclog = survey.sync(userid=request.user.id, use_celery=True)
-            except Exception:
-                logger.exception(_("Sync Failed"))
-            status = 200
-            if synclog.status == "FAILED":
-                status = 500
-
-            return JSONResponse(synclog, status=status)
-        else:
-            return JSONResponse(_("Sync Failed"), status=403)
-
-
-class CheckSyncStatus(APIBase):
-    def get(self, request, synclogid=None):
-        synclog = models.MobileSyncLog.objects.get(pk=synclogid)
-        return JSONResponse(synclog)
-
-
-class Surveys(APIBase):
-    def get(self, request, surveyid=None):
-
-        auth_header = request.META.get("HTTP_AUTHORIZATION", None)
-        logger.info("Requesting projects for user: {0}".format(request.user.username))
-        try:
-            if hasattr(request.user, "userprofile") is not True:
-                models.UserProfile.objects.create(user=request.user)
-
-            def get_child_cardids(card, cardset):
-                for child_card in models.CardModel.objects.filter(nodegroup__parentnodegroup_id=card.nodegroup_id):
-                    cardset.add(str(child_card.cardid))
-                    get_child_cardids(child_card, cardset)
-
-            group_ids = list(request.user.groups.values_list("id", flat=True))
-            if request.GET.get("status", None) is not None:
-                ret = {}
-                surveys = MobileSurvey.objects.filter(users__in=[request.user]).distinct()
-                for survey in surveys:
-                    survey.deactivate_expired_survey()
-                    survey = survey.serialize_for_mobile()
-                    ret[survey["id"]] = {}
-                    for key in [
-                        "active",
-                        "name",
-                        "description",
-                        "startdate",
-                        "enddate",
-                        "onlinebasemaps",
-                        "bounds",
-                        "tilecache",
-                        "image_size_limits",
-                    ]:
-                        ret[survey["id"]][key] = survey[key]
-                response = JSONResponse(ret, indent=4)
-            else:
-                viewable_nodegroups = request.user.userprofile.viewable_nodegroups
-                editable_nodegroups = request.user.userprofile.editable_nodegroups
-                permitted_nodegroups = viewable_nodegroups.union(editable_nodegroups)
-                projects = MobileSurvey.objects.filter(users__in=[request.user], active=True).distinct()
-                if surveyid:
-                    projects = projects.filter(pk=surveyid)
-
-                projects_for_couch = []
-                for project in projects:
-                    project.deactivate_expired_survey()
-                    projects_for_couch.append(project.serialize_for_mobile())
-
-                for project in projects_for_couch:
-                    project["mapboxkey"] = settings.MAPBOX_API_KEY
-                    permitted_cards = set()
-                    ordered_project_cards = project["cards"]
-                    for rootcardid in project["cards"]:
-                        card = models.CardModel.objects.get(cardid=rootcardid)
-                        if str(card.nodegroup_id) in permitted_nodegroups:
-                            permitted_cards.add(str(card.cardid))
-                            get_child_cardids(card, permitted_cards)
-                    project["cards"] = list(permitted_cards)
-                    for graph in project["graphs"]:
-                        cards = []
-                        for card in graph["cards"]:
-                            if card["cardid"] in project["cards"]:
-                                card["relative_position"] = (
-                                    ordered_project_cards.index(card["cardid"]) if card["cardid"] in ordered_project_cards else None
-                                )
-                                cards.append(card)
-                        unordered_cards = [card for card in cards if card["relative_position"] is None]
-                        ordered_cards = [card for card in cards if card["relative_position"] is not None]
-                        sorted_cards = sorted(ordered_cards, key=lambda x: x["relative_position"])
-                        graph["cards"] = unordered_cards + sorted_cards
-                response = JSONResponse(projects_for_couch, indent=4)
-        except Exception:
-            logger.exception(_("Unable to fetch collector projects"))
-            response = JSONResponse(_("Unable to fetch collector projects"), indent=4)
-
-        logger.info("Returning projects for user: {0}".format(request.user.username))
-        return response
 
 
 class GeoJSON(APIBase):
@@ -1121,12 +969,6 @@ class Images(APIBase):
             # with open("foo.jpg", "w+b") as f:
             #     f.write(base64.b64decode(request.POST.get('data')))
 
-        except TileProxyModel.DoesNotExist:
-            # it's ok if the TileProxyModel doesn't exist, that just means that there is some
-            # latency in the updating of the db from couch
-            # see process_mobile_data in the FileListDatatype for how image thumbnails get
-            # pushed to the db and files saved
-            pass
         except Exception as e:
             return JSONResponse(status=500)
 

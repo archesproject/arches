@@ -15,10 +15,6 @@ services:
         - PGDBNAME=arches
         - PGHOST=sut_db
         - PGPORT=5432
-        - COUCHDB_HOST=sut_couchdb
-        - COUCHDB_PORT=5984
-        - COUCHDB_USER=admin
-        - COUCHDB_PASS=password
         - ESHOST=sut_es
         - ESPORT=9200
         # - ELASTICSEARCH_PREFIX=insert_project_name
@@ -32,7 +28,6 @@ services:
       depends_on:
         - sut_db
         - sut_es
-        - sut_couchdb
 
     sut_db:
       container_name: sut_db
@@ -53,11 +48,3 @@ services:
         - discovery.type=single-node
         - TZ=PST
 
-    sut_couchdb:
-      container_name: sut_couchdb
-      image: couchdb:2.1.1
-      ports:
-        - "5984:5984"
-      environment:
-        COUCHDB_USER: admin
-        COUCHDB_PASSWORD: password

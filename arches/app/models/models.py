@@ -244,47 +244,16 @@ class EditLog(models.Model):
         db_table = "edit_log"
 
 
-class MobileSyncLog(models.Model):
-    logid = models.UUIDField(primary_key=True, default=uuid.uuid1)
-    survey = models.ForeignKey("MobileSurveyModel", on_delete=models.CASCADE, related_name="surveyid")
-    userid = models.IntegerField(null=True)  # not a ForeignKey so we can track deletions
-    started = models.DateTimeField(auto_now_add=True, null=True)
-    finished = models.DateTimeField(auto_now=True, null=True)
-    message = models.TextField(blank=True, null=True)
-    status = models.TextField(blank=True, null=True)
-
-    class Meta:
-        managed = True
-        db_table = "mobile_sync_log"
-
-
 class ResourceRevisionLog(models.Model):
     logid = models.UUIDField(primary_key=True, default=uuid.uuid1)
     resourceid = models.UUIDField(default=uuid.uuid1)
     revisionid = models.TextField(null=False)  # not a ForeignKey so we can track deletions
-    survey = models.ForeignKey("MobileSurveyModel", on_delete=models.CASCADE, related_name="mobile_survey_id")
-    synclog = models.ForeignKey("MobileSyncLog", on_delete=models.CASCADE, related_name="sync_log")
     synctimestamp = models.DateTimeField(auto_now_add=True, null=False)
     action = models.TextField(blank=True, null=True)
 
     class Meta:
         managed = True
         db_table = "resource_revision_log"
-
-
-class TileRevisionLog(models.Model):
-    logid = models.UUIDField(primary_key=True, default=uuid.uuid1)
-    tileid = models.UUIDField(default=uuid.uuid1)  # not a ForeignKey so we can track deletions
-    resourceid = models.UUIDField(default=uuid.uuid1)
-    revisionid = models.TextField(null=False)  # not a ForeignKey so we can track deletions
-    survey = models.ForeignKey("MobileSurveyModel", on_delete=models.CASCADE, related_name="survey_id")
-    synclog = models.ForeignKey("MobileSyncLog", on_delete=models.CASCADE, related_name="mobile_sync_log")
-    synctimestamp = models.DateTimeField(auto_now_add=True, null=False)
-    action = models.TextField(blank=True, null=True)
-
-    class Meta:
-        managed = True
-        db_table = "tile_revision_log"
 
 
 class File(models.Model):
@@ -1272,78 +1241,6 @@ def send_email_on_save(sender, instance, **kwargs):
 
 def getDataDownloadConfigDefaults():
     return dict(download=False, count=100, resources=[], custom=None)
-
-
-class MobileSurveyModel(models.Model):
-    id = models.UUIDField(primary_key=True, default=uuid.uuid1)
-    name = models.TextField(null=True)
-    active = models.BooleanField(default=False)
-    createdby = models.ForeignKey(User, related_name="createdby", on_delete=models.CASCADE)
-    lasteditedby = models.ForeignKey(User, related_name="lasteditedby", on_delete=models.CASCADE)
-    users = models.ManyToManyField(to=User, through="MobileSurveyXUser")
-    groups = models.ManyToManyField(to=Group, through="MobileSurveyXGroup")
-    cards = models.ManyToManyField(to=CardModel, through="MobileSurveyXCard")
-    startdate = models.DateField(blank=True, null=True)
-    enddate = models.DateField(blank=True, null=True)
-    description = models.TextField(null=True)
-    bounds = models.MultiPolygonField(null=True)
-    tilecache = models.TextField(null=True)
-    onlinebasemaps = JSONField(blank=True, null=True, db_column="onlinebasemaps")
-    datadownloadconfig = JSONField(blank=True, null=True, default=getDataDownloadConfigDefaults)
-
-    def __str__(self):
-        return self.name
-
-    class Meta:
-        managed = True
-        db_table = "mobile_surveys"
-
-    @property
-    def expired(self):
-        result = False
-        if self.enddate is not None:
-            enddate = datetime.datetime.strftime(self.enddate, "%Y-%m-%d")
-            result = (datetime.datetime.strptime(enddate, "%Y-%m-%d") - datetime.datetime.now() + timedelta(hours=24)).days < 0
-        return result
-
-    def deactivate_expired_survey(self):
-        if self.expired:
-            self.active = False
-            self.save()
-
-
-class MobileSurveyXUser(models.Model):
-    mobile_survey_x_user_id = models.UUIDField(primary_key=True, serialize=False, default=uuid.uuid1)
-    user = models.ForeignKey(User, on_delete=models.CASCADE)
-    mobile_survey = models.ForeignKey(MobileSurveyModel, on_delete=models.CASCADE, null=True)
-
-    class Meta:
-        managed = True
-        db_table = "mobile_surveys_x_users"
-        unique_together = ("mobile_survey", "user")
-
-
-class MobileSurveyXGroup(models.Model):
-    mobile_survey_x_group_id = models.UUIDField(primary_key=True, serialize=False, default=uuid.uuid1)
-    group = models.ForeignKey(Group, on_delete=models.CASCADE)
-    mobile_survey = models.ForeignKey(MobileSurveyModel, on_delete=models.CASCADE, null=True)
-
-    class Meta:
-        managed = True
-        db_table = "mobile_surveys_x_groups"
-        unique_together = ("mobile_survey", "group")
-
-
-class MobileSurveyXCard(models.Model):
-    mobile_survey_x_card_id = models.UUIDField(primary_key=True, serialize=False, default=uuid.uuid1)
-    card = models.ForeignKey(CardModel, on_delete=models.CASCADE)
-    mobile_survey = models.ForeignKey(MobileSurveyModel, on_delete=models.CASCADE, null=True)
-    sortorder = models.IntegerField(default=0)
-
-    class Meta:
-        managed = True
-        db_table = "mobile_surveys_x_cards"
-        unique_together = ("mobile_survey", "card")
 
 
 class MapMarker(models.Model):

@@ -4,12 +4,9 @@ define([
     'knockout',
     'knockout-mapping',
     'arches',
-    'viewmodels/mobile-survey',
-    'models/mobile-survey',
     'views/base-manager',
-    'views/mobile-survey-manager/identity-list',
     'profile-manager-data'
-], function($, _, ko, koMapping, arches, MobileSurveyViewModel, MobileSurveyModel, BaseManagerView, IdentityList, data) {
+], function($, _, ko, koMapping, arches, BaseManagerView, data) {
 
     var UserProfileManager = BaseManagerView.extend({
         initialize: function(options) {
@@ -73,60 +70,6 @@ define([
                     self.viewModel.updateNotifTypes();
                 }
             });
-
-            this.identityList = new IdentityList({
-                items: ko.observableArray(data.identities)
-            });
-
-            this.viewModel.mobilesurveys = data.mobilesurveys.map(function(mobilesurvey) {
-                return new MobileSurveyViewModel({
-                    resources: data.resources,
-                    mobilesurvey: mobilesurvey,
-                    identities: data.identities,
-                    context: 'userprofile'
-                });
-            });
-
-            this.viewModel.mobileSurveyFilter = ko.observable('');
-
-            this.viewModel.filteredMobileSurveys = ko.computed(function() {
-                var filter = self.viewModel.mobileSurveyFilter();
-                var list = self.viewModel.mobilesurveys;
-                if (filter.length === 0) {
-                    return list;
-                }
-                return _.filter(list, function(mobilesurvey) {
-                    return mobilesurvey.mobilesurvey.name().toLowerCase().indexOf(filter.toLowerCase()) >= 0;
-                });
-            });
-
-            _.each(self.viewModel.mobilesurveys, function(mobilesurvey) {
-                mobilesurvey.resources = ko.computed(function() {
-                    var resources = [];
-                    var resourceLookup = {};
-                    _.each(mobilesurvey.allResources, function(resource) {
-                        _.each(resource.cards(), function(card) {
-                            if (_.contains(mobilesurvey.mobilesurvey.cards(), card.cardid)) {
-                                if (resourceLookup[resource.id]) {
-                                    resourceLookup[resource.id].cards.push(card);
-                                } else {
-                                    resourceLookup[resource.id] = {
-                                        name: resource.name,
-                                        cards: [card]
-                                    };
-                                }
-                            }
-                        });
-                    });
-                    _.each(resourceLookup, function(resource) {
-                        resources.push(resource);
-                    });
-                    resources.sort(function(a, b) {
-                        return a.name - b.name;
-                    });
-                    return resources;
-                });
-            }, self);
 
             self.viewModel.credentials = koMapping.fromJS({
                 old_password: '',

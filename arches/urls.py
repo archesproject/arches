@@ -54,7 +54,6 @@ from arches.app.views.tile import TileData
 from arches.app.views.transaction import ReverseTransaction
 from arches.app.views.notifications import NotificationView
 from arches.app.views.map import MapLayerManagerView, TileserverProxyView
-from arches.app.views.mobile_survey import MobileSurveyManagerView, MobileSurveyResources, MobileSurveyDesignerView
 from arches.app.views.manifest_manager import ManifestManagerView
 from arches.app.views.manifest_manager import IIIFServerProxyView
 from arches.app.views.auth import (
@@ -223,18 +222,7 @@ urlpatterns = [
     url(r"^notifications/dismiss$", NotificationView.as_view(action="dismiss"), name="dismiss_notifications"),
     url(r"^notifications/get_types$", NotificationView.as_view(action="get_types"), name="get_notification_types"),
     url(r"^notifications/update_types$", NotificationView.as_view(action="update_types"), name="update_notification_types"),
-    url(r"^collector_manager/*", MobileSurveyManagerView.as_view(), name="collector_manager"),
-    url(r"^collector_designer/(?P<surveyid>%s)$" % uuid_regex, MobileSurveyDesignerView.as_view(), name="collector_designer"),
-    url(
-        r"^mobile_survey_resources/(?P<surveyid>%s)/resources$" % uuid_regex,
-        MobileSurveyResources.as_view(),
-        name="mobile_survey_resources",
-    ),
-    url(r"^couchdb/(?P<path>.*)$", api.CouchdbProxy.as_view()),
     url(r"^%s/(?P<path>.*)$" % settings.KIBANA_CONFIG_BASEPATH, api.KibanaProxy.as_view()),
-    url(r"^mobileprojects/(?:(?P<surveyid>%s))?$" % uuid_regex, api.Surveys.as_view(), name="mobileprojects"),
-    url(r"^sync/(?P<surveyid>%s|())$" % uuid_regex, api.Sync.as_view(), name="sync"),
-    url(r"^checksyncstatus/(?P<synclogid>%s|())$" % uuid_regex, api.CheckSyncStatus.as_view(), name="checksyncstatus"),
     url(r"^graphs/(?P<graph_id>%s)$" % (uuid_regex), api.Graphs.as_view(), name="graphs_api"),
     url(r"^resources/(?P<graphid>%s)/(?P<resourceid>%s|())$" % (uuid_regex, uuid_regex), api.Resources.as_view(), name="resources_graphid"),
     url(r"^resources/(?P<slug>[-\w]+)/(?P<resourceid>%s|())$" % uuid_regex, api.Resources.as_view(), name="resources_slug"),
