@@ -107,4 +107,20 @@
     <skos:inScheme rdf:resource="http://localhost:8000/85995139-74c9-4133-8d42-c74f09d678c2"/>
     <skos:prefLabel xml:lang="en-us">{"id": "fa7dcb78-cd32-4902-bc6d-798fa38a99f0", "value": "material b"}</skos:prefLabel>
   </skos:Concept>
+  <skos:Concept rdf:about="http://localhost:8000/832eacc2-f7c9-449c-a6d0-8d938ab74bd8">
+    <skos:inScheme rdf:resource="http://localhost:8000/85995139-74c9-4133-8d42-c74f09d678c2"/>
+    <skos:prefLabel xml:lang="en-us">{"id": "ccb0eaee-a4de-4d0a-8be8-a387799f55df", "value": "Personal Activity Types"}</skos:prefLabel>
+    <skos:narrower rdf:resource="http://localhost:8000/524eed3f-ef74-42d7-8e7b-00e02ffb4cda"/>
+    <skos:narrower rdf:resource="http://localhost:8000/19900458-92d4-4b57-a08a-d7fdc9fa1acc"/>
+  </skos:Concept>
+  <skos:Concept rdf:about="http://localhost:8000/19900458-92d4-4b57-a08a-d7fdc9fa1acc">
+    <skos:prefLabel xml:lang="en">{"id": "b83cab06-1cfe-4aeb-9653-cb9f0cc45595", "value": "collecting"}</skos:prefLabel>
+    <dcterms:identifier xml:lang="en">{"id": "bbfd8ed9-b639-498c-b6ad-80fe72522f77", "value": "http://vocab.getty.edu/aat/300077121"}</dcterms:identifier>
+    <skos:inScheme rdf:resource="http://localhost:8000/85995139-74c9-4133-8d42-c74f09d678c2"/>
+  </skos:Concept>
+  <skos:Concept rdf:about="http://localhost:8000/524eed3f-ef74-42d7-8e7b-00e02ffb4cda">
+    <skos:prefLabel xml:lang="en">{"id": "fc3559c4-03c4-428c-a48e-0f480c8a3751", "value": "creating (artistic activity)"}</skos:prefLabel>
+    <dcterms:identifier xml:lang="en">{"id": "21826444-3647-4a48-9d62-b0ed1af0b2fc", "value": "http://vocab.getty.edu/aat/300404387"}</dcterms:identifier>
+    <skos:inScheme rdf:resource="http://localhost:8000/85995139-74c9-4133-8d42-c74f09d678c2"/>
+  </skos:Concept>
 </rdf:RDF>
