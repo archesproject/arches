@@ -107,10 +107,10 @@ define([
                 }, function() {
                     const formData = new FormData();
                     const url = arches.urls.etl_manager;
+                    event.status = 'reversing';
                     formData.append('loadid', event.loadid);
                     formData.append('module', event.etl_module.etlmoduleid);
                     formData.append('action', 'reverse');
-                    self.loading(true);
                     window.fetch(url,{
                         method: 'POST',
                         body: formData,
@@ -121,7 +121,7 @@ define([
                     }).then(function(response) {
                         return response.json();
                     }).then(function() {
-                        self.loading(false);
+                        //pass
                     });
                     }
                 ));
