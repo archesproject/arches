@@ -316,7 +316,7 @@ class BranchCsvImporter(BaseImportModule):
             details = json.loads(self.file_details)
             files = details["result"]["summary"]["files"]
             summary = details["result"]["summary"]
-            use_celery_file_size_threshold_in_MB = 0.1
+            use_celery_file_size_threshold_in_MB = 0.00000001
             if summary["cumulative_excel_files_size"] / 1000000 > use_celery_file_size_threshold_in_MB:
                 if task_management.check_if_celery_available():
                     logger.info(_("Delegating load to Celery task"))
@@ -326,13 +326,13 @@ class BranchCsvImporter(BaseImportModule):
                     result = _("delegated_to_celery")
                     return {"success": True, "data": result}
                 else:
-                    err = _("Celery appears not to be running, you need to have celery running in order to immport large csv.")
+                    err = _("Cannot start process. Unable to run process as a background task at this time.")
                     with connection.cursor() as cursor:
                         cursor.execute(
                             """UPDATE load_event SET status = %s, load_end_time = %s WHERE loadid = %s""",
                             ("failed", datetime.now(), self.loadid),
                         )
-                    return {"success": False, "data": err}
+                    return {"success": False, "data": {"title": _("Error"), "message": err}}
             else:
                 response = self.run_load_task(files, summary, result, self.temp_dir, self.loadid)
 
