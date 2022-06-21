@@ -53,7 +53,7 @@ add_csv_importer = """
         'import-single-csv',
         'import_single_csv.py',
         'ImportSingleCsv',
-        '{"bgColor": "#9591ef", "circleColor": "#b0adf3"}',
+        '{"bgColor": "#9591ef", "circleColor": "#b0adf3", "show": true}',
         'fa fa-upload',
         'import-single-csv');
     """
@@ -76,14 +76,14 @@ add_branch_csv_importer = """
         slug)
     values (
         '3b19a76a-0b09-450e-bee1-65accb096eaf',
-        'Import Branch CSV',
-        'Loads resource data in branch csv format',
+        'Import Branch Excel',
+        'Loads resource data in branch excel format',
         'import',
         'views/components/etl_modules/branch-csv-importer',
         'branch-csv-importer',
         'branch_csv_importer.py',
         'BranchCsvImporter',
-        '{"circleColor": "#ff77cc", "bgColor": "#cc2266"}',
+        '{"circleColor": "#ff77cc", "bgColor": "#cc2266", "show": true}',
         'fa fa-upload',
         'branch-csv-importer'
     );
@@ -282,11 +282,8 @@ add_staging_to_tile_function = """
                                 END IF;
                                 tile_data = jsonb_set(tile_data, format('{"%s"}', _key)::text[], coalesce(tile_data_value, 'null'));
                             END LOOP;
-                        IF tile_id IS null THEN
-                            tile_id = uuid_generate_v1mc();
-                        END IF;
 
-                        SELECT tiledata FROM tiles INTO old_data WHERE resourceinstanceid = instance_id;
+                        SELECT tiledata FROM tiles INTO old_data WHERE resourceinstanceid = instance_id AND tileid = tile_id;
                         IF NOT FOUND THEN
                             old_data = null;
                         END IF;
@@ -310,7 +307,7 @@ add_staging_to_tile_function = """
                                 WHEN (_value::jsonb ->> 'datatype') = 'file-list' THEN
                                     FOR _file IN SELECT * FROM jsonb_array_elements(_value::jsonb -> 'value') LOOP
                                         file_id = _file ->> 'file_id';
-                                        UPDATE files SET tileid = tile_id WHERE fileid::text = file_id;
+                                        UPDATE files SET tileid = tile_id WHERE fileid = file_id::uuid;
                                     END LOOP;
                                 WHEN (_value::jsonb ->> 'datatype') in ('resource-instance-list', 'resource-instance') THEN
                                     PERFORM __arches_refresh_tile_resource_relationships(tile_id);
@@ -330,28 +327,6 @@ add_staging_to_tile_function = """
 
 remove_staging_to_tile_function = """
     DROP FUNCTION public.__arches_staging_to_tile(load_id uuid);
-    """
-
-add_get_resourceid_from_legacyid_trigger = """
-    CREATE OR REPLACE FUNCTION __arches_get_resourceid_from_legacyid_trigger_function()
-    RETURNS trigger AS $$
-    BEGIN
-        IF NEW.legacyid IN (SELECT legacyid FROM resource_instances WHERE legacyid = NEW.legacyid) THEN
-            SELECT resourceinstanceid FROM resource_instances INTO NEW.resourceid WHERE legacyid = NEW.legacyid;
-        END IF;
-        RETURN NEW;
-    END;
-    $$ LANGUAGE plpgsql;
-
-    CREATE TRIGGER __arches_get_resourceid_from_legacyid_trigger
-        BEFORE INSERT ON load_staging
-        FOR EACH ROW
-        EXECUTE PROCEDURE __arches_get_resourceid_from_legacyid_trigger_function();
-    """
-
-remove_get_resourceid_from_legacyid_trigger = """
-    DROP TRIGGER IF EXISTS __arches_get_resourceid_from_legacyid_trigger ON load_staging;
-    DROP FUNCTION IF EXISTS __arches_get_resourceid_from_legacyid_trigger_function();
     """
 
 add_check_excess_tiles_trigger = """
@@ -484,6 +459,5 @@ class Migration(migrations.Migration):
         migrations.RunSQL(add_validation_reporting_functions, remove_validation_reporting_functions),
         migrations.RunSQL(add_functions_to_get_nodegroup_tree, remove_functions_to_get_nodegroup_tree),
         migrations.RunSQL(add_staging_to_tile_function, remove_staging_to_tile_function),
-        migrations.RunSQL(add_get_resourceid_from_legacyid_trigger, remove_get_resourceid_from_legacyid_trigger),
         migrations.RunSQL(add_check_excess_tiles_trigger, remove_check_excess_tiles_trigger),
     ]

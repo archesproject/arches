@@ -303,7 +303,7 @@ class Tile(models.TileModel):
             message += (", ").join(missing_nodes)
             raise TileValidationError(message)
 
-    def validate(self, errors=None, raise_early=True, strict=False):
+    def validate(self, errors=None, raise_early=True, strict=False, request=None):
         """
         Keyword Arguments:
         errors -- supply and list to have errors appened on to
@@ -318,7 +318,7 @@ class Tile(models.TileModel):
         for nodeid, value in self.data.items():
             node = models.Node.objects.get(nodeid=nodeid)
             datatype = self.datatype_factory.get_instance(node.datatype)
-            error = datatype.validate(value, node=node, strict=strict)
+            error = datatype.validate(value, node=node, strict=strict, request=request)
             tile_errors += error
             for error_instance in error:
                 if error_instance["type"] == "ERROR":
@@ -418,7 +418,7 @@ class Tile(models.TileModel):
                     }
 
             if user is not None:
-                self.validate([])
+                self.validate([], request=request)
 
             super(Tile, self).save(*args, **kwargs)
             # We have to save the edit log record after calling save so that the

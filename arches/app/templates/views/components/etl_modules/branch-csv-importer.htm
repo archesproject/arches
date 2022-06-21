@@ -51,7 +51,7 @@
                                 <div style="border-top: 1px solid #c4c4c4; margin-bottom: 15px;" class="btn btn-primary btn-labeled btn-lg fa fa-file fileinput-button dz-clickable" data-bind="css: uniqueidClass" role="button">
                                 {% trans 'Select File' %}
                                 </div>
-                                <div style="border-top: 1px solid #c4c4c4; margin-bottom: 15px;" class="btn btn-danger btn-labeled btn-lg fa fa-times-circle" data-bind="click: function() { $parent.selectedModule(null) }" role="button">
+                                <div style="border-top: 1px solid #c4c4c4; margin-bottom: 15px;" class="btn btn-danger btn-labeled btn-lg fa fa-times-circle" data-bind="click: function() { $parent.cancel() }" role="button">
                                     {% trans 'Cancel File Import' %}
                                 </div>
                                 <div style="min-height: 100%;">
@@ -72,27 +72,35 @@
         <!-- /ko -->
 
         <!-- ko if: response() -->
-        <div style="display: grid; row-gap: 2px; height:fit-content; padding:15px 20px; color: steelblue;">
-            <div class="summary-title">{% trans "Format: Branch CSV" %}</div>
-            <div class="summary-title">{% trans "The following files are ready for import" %}</div>
-            <div>
-                <div style="display: inline-grid; grid-template-columns: auto auto; column-gap: 10px;">
-                    <div class="summary-header">{% trans "File" %}</div>
-                    <div class="summary-header">{% trans "Size" %}</div>            
-                    <div data-bind="text: response().result.summary.name"></div>
-                    <div data-bind="text: response().result.summary.size"></div>
+        <div class="branch-xl-metadata-container">
+            <div style="display: grid; row-gap: 2px; height:fit-content; padding:15px 20px;">
+                <h3 class="branch-xl-title" style="">{% trans "Format: Branch Excel" %}</h3>
+                <div class="etl-module-component" style="margin-top: 0px;">
+                    <h4 class="branch-xl-title">{% trans "File Upload Summary" %}</h4>
+                    <div style="display: inline-grid; grid-template-columns: auto auto; column-gap: 10px;">
+                        <div class="etl-loading-metadata-key">{% trans "File:" %}</div>
+                        <div class="etl-loading-metadata-value" data-bind="text: response().result.summary.name"></div>
+                        <div class="etl-loading-metadata-key">{% trans "Size:" %}</div>            
+                        <div class="etl-loading-metadata-value" data-bind="text: response().result.summary.size"></div>
+                    </div>
+                </div>
+
+                <div class="branch-xl-file-contents-container">
+                    <h4 class="branch-xl-title">{% trans "File contents" %}</h4> 
+                    <div style="display: inline-grid; grid-template-columns: auto auto; column-gap: 10px;">
                     <!--ko foreach: {data: Object.keys(response().result.summary.files), as: 'file'}-->
-                        <div data-bind="text: file"></div>
+                        <div class="etl-loading-metadata-value" data-bind="text: file"></div>
                         <!-- ko foreach: {data: $parent.response().result.summary.files[file], as: 'details'} -->
-                        <div data-bind="text: details.size"></div>
+                        <div class="etl-loading-metadata-key" data-bind="text: details.size"></div>
                         <!-- /ko -->
                     <!-- /ko -->
+                    </div>
                 </div>
             </div>
         </div>
 
         <div  class="tabbed-workflow-footer, etl-module-footer">
-           <button class="btn btn-shim btn-labeled btn-lg fa fa-check btn-primary"  data-bind="click: function(){ start(); }">{% trans "Submit" %}</button>
+           <button class="btn btn-shim btn-labeled btn-lg fa fa-check btn-primary" style="margin-right: 8px;" data-bind="click: function(){ start(); }">{% trans "Submit" %}</button>
            <button class="btn btn-shim btn-labeled btn-lg fa fa-times btn-danger" data-bind="click: function(){ response(null); }">{% trans "Cancel" %}</button>
         </div>
         <!-- /ko -->
@@ -101,34 +109,39 @@
 {% endblock task_details %}
 
 {% block etl_status %}
-<div class="branch-csv-etl" style="display: grid; row-gap: 2px; height:fit-content;">
-    <h4 class="summary-title">{% trans "Import Branch CSV" %}</h4>
+<div class="branch-csv-etl" style="display: grid; row-gap: 2px; height:fit-content; margin-top: -5px;">
+    <h4 class="summary-title">{% trans "Import Branch Excel Summary" %}</h4>
     <!-- ko if: ko.unwrap(loadDetails) -->
-    <div style="padding:15px 20px;">
-        <h4 class="summary-title">{% trans "File Summary" %}</h4>
+    <div class="branch-csv-etl-load-summmary">
         <div style="display: inline-grid; grid-template-columns: auto auto; column-gap: 10px;">
-            <div class="summary-header">{% trans "File" %}</div>
-            <div class="summary-header">{% trans "Size" %}</div>            
-            <div data-bind="text: loadDetails.name"></div>
-            <div data-bind="text: loadDetails.size"></div>
-            <!--ko foreach: {data: Object.keys(loadDetails.files).filter(n => !n.endsWith('.xlsx')), as: 'file'}-->
-                <div data-bind="text: file"></div>
-                <!-- ko foreach: {data: $parent.loadDetails.files[file], as: 'details'} -->
-                <div data-bind="text: details.size"></div>
-                <!-- /ko -->
-            <!-- /ko -->
+            <div class="summary-header">{% trans "Excel File" %}</div>
+            <div class="summary-header">{% trans "Size" %}</div>   
+
             <!--ko foreach: {data: Object.keys(loadDetails.files).filter(n => n.endsWith('.xlsx')), as: 'file'}-->
-            <div data-bind="text: file"></div>
+            <div class="etl-loading-metadata-value" data-bind="text: file"></div>
                 <!-- ko foreach: {data: $parent.loadDetails.files[file], as: 'details'} -->
-                <div data-bind="text: details.size"></div>
-                <div class="summary-header">{% trans "Worksheets" %}</div>
-                <div class="summary-header">{% trans "Tiles" %}</div>
-                <!--ko foreach: $data.worksheets-->
-                <div style="padding-left:5px" data-bind="text: $data.name"></div>
-                <div data-bind="text: $data.rows"></div>
+                <div class="etl-loading-metadata-key" data-bind="text: details.size"></div>
+                <div class="summary-header" style="margin-top: 10px;">{% trans "Worksheets" %}</div>
+                <div class="summary-header" style="margin-top: 10px;">{% trans "Tiles" %}</div>
+                    <!--ko foreach: $data.worksheets-->
+                    <div class="etl-loading-metadata-value" style="font-size: 14px; line-height: 1.25;" data-bind="text: $data.name"></div>
+                    <div class="etl-loading-metadata-key" style="font-size: 14px; line-height: 1.25;" data-bind="text: $data.rows"></div>
+                    <!-- /ko -->
                 <!-- /ko -->
-                <!-- /ko -->
+                    
             <!-- /ko -->
+
+            <div class="branch-csv-etl-load-files" style="margin-top: 25px; display: inline-grid; grid-template-columns: auto auto; column-gap: 10px;">
+                <div class="etl-loading-metadata-value" data-bind="text: loadDetails.name"></div>
+                <div class="etl-loading-metadata-key" data-bind="text: loadDetails.size"></div>
+                <!--ko foreach: {data: Object.keys(loadDetails.files).filter(n => !n.endsWith('.xlsx')), as: 'file'}-->
+                    <div class="etl-loading-metadata-value" data-bind="text: file"></div>
+                    <!-- ko foreach: {data: $parent.loadDetails.files[file], as: 'details'} -->
+                    <div class="etl-loading-metadata-key" data-bind="text: details.size"></div>
+                    <!-- /ko -->
+                <!-- /ko -->
+            </div>
+            
         </div>
     </div>
     <!--/ko-->

@@ -5,10 +5,12 @@ define([
     'dropzone',
     'uuid',
     'arches',
+    'viewmodels/alert-json',
+    'views/components/simple-switch',
     'bindings/datatable',
     'bindings/dropzone',
     'bindings/resizable-sidepanel',
-], function(ko, koMapping, $, dropzone, uuid, arches) {
+], function(ko, koMapping, $, dropzone, uuid, arches, JsonErrorAlertViewModel) {
     return ko.components.register('import-single-csv', {
         viewModel: function(params) {
             const self = this;
@@ -16,7 +18,7 @@ define([
             this.load_details = params.load_details;
             this.state = params.state;
             this.loading = params.loading || ko.observable();
-
+            this.alert = params.alert;
             this.moduleId = params.etlmoduleid;
             this.loading(true);
             this.graphs = ko.observable();
@@ -29,6 +31,7 @@ define([
             this.fieldMapping = ko.observableArray();
             this.csvBody = ko.observable();
             this.csvExample = ko.observable();
+            this.csvFileName = ko.observable();
             this.numberOfCol = ko.observable();
             this.numberOfRow = ko.observable();
             this.numberOfExampleRow = ko.observable();
@@ -154,14 +157,16 @@ define([
                 //     }
                 // }).then(function(response){
                     self.csvArray(response.result.csv);
+                    self.csvFileName(response.result.csv_file)
                     if (response.result.config) {
                         self.fieldMapping(response.result.config.mapping);
                         self.selectedGraph(response.result.config.graph);
                     }
+                    self.formData.delete('file');
                     self.fileAdded(true);
                     self.loading(false);
-                }).catch(function(err) {
-                    console.log(err);
+                }).fail(function(err) {
+                    self.alert(new JsonErrorAlertViewModel('ep-alert-red', err.responseJSON, null, function(){}));
                     self.loading(false);
                 });
             };
@@ -173,6 +178,7 @@ define([
                 self.formData.append('fieldMapping', JSON.stringify(fieldMapping));
                 self.formData.append('hasHeaders', self.hasHeaders());
                 self.formData.append('graphid', self.selectedGraph());
+                self.formData.append('csvFileName', self.csvFileName());
                 self.loading(true);
                 self.submit('start').then(data => {
                     params.activeTab("import");

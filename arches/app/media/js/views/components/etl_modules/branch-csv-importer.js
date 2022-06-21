@@ -25,6 +25,9 @@ define([
 
             this.toggleDownloadMode = () => {
                 this.downloadMode(!this.downloadMode());
+                if (this.downloadMode() && !ko.unwrap(this.templates).length) {
+                    getGraphs();
+                }
             };
 
             function getCookie(name) {
@@ -84,8 +87,6 @@ define([
                     self.templates(templates);
                 }
             };
-
-            getGraphs();
 
             this.addFile = async function(file){
                 self.loading(true);
