@@ -40,15 +40,22 @@ define([
         this.graphLookupKeys = ko.observable(Object.keys(this.graphLookup)); // used for informing the widget when to disable/enable the dropdown
         params.configKeys = ['placeholder', 'defaultResourceInstance'];
         this.preview = arches.graphs.length > 0;
-        this.allowInstanceCreation = params.allowInstanceCreation === false ? false : true;
-        if (!!params.configForm) {
-            this.allowInstanceCreation = false;
-        }
         this.renderContext = params.renderContext;
         /* 
             shoehorn logic to piggyback off of search context functionality. 
             Should be refactored when we get the chance for better component clarity.
         */ 
+        if (params.renderContext === 'workflow') {
+            self.renderContext = 'search';
+        }
+
+        this.allowInstanceCreation = params.allowInstanceCreation === false ? false : true;
+        if (self.renderContext === 'search') {
+            this.allowInstanceCreation = params.allowInstanceCreation === true ? true : false;
+        }
+        if (!!params.configForm) {
+            this.allowInstanceCreation = false;
+        }
 
         this.multiple = params.multiple || false;
         this.value = params.value || undefined;
@@ -56,7 +63,7 @@ define([
         this.rootOntologyClass = '';
         this.graphIsSemantic = false;
         this.resourceTypesToDisplayInDropDown = ko.observableArray(!!params.graphids ? ko.toJS(params.graphids) : []);
-        this.displayOntologyTable = !['search','workflow'].includes(self.renderContext) && !!params.node;
+        this.displayOntologyTable = self.renderContext !== 'search' && !!params.node;
         this.graphIds = ko.observableArray();
         this.searchString = params.searchString || ko.unwrap(params.node?.config.searchString);
 
@@ -209,7 +216,7 @@ define([
             }
         };
         
-        if(!['search','workflow'].includes(self.renderContext)){
+        if(self.renderContext !== 'search'){
             var updateNameAndOntologyClass = function(values) {
                 var names = [];
                 var value = ko.unwrap(values);
@@ -308,18 +315,18 @@ define([
         });
         
         this.select2Config = {
-            value: ['search', 'workflow'].includes(self.renderContext) ? self.value : self.resourceToAdd,
+            value: self.renderContext === 'search' ? self.value : self.resourceToAdd,
             clickBubble: true,
             disabled: this.disabled,
             multiple: !self.displayOntologyTable ? params.multiple : false,
             placeholder: this.placeholder() || arches.translations.riSelectPlaceholder,
             closeOnSelect: false,
-            allowClear: ['search','workflow'].includes(self.renderContext) ? true : false,
+            allowClear: self.renderContext === 'search' ? true : false,
             onSelect: function(item) {
                 self.selectedItem(item);
-                if (!['search'].includes(self.renderContext)) {
+                if (self.allowInstanceCreation) {
                     if (item._source) {
-                        if (self.renderContext === 'workflow'){
+                        if (self.renderContext === 'search' && self.allowInstanceCreation){
                             self.value(item._id);
                         } else {
                             var ret = makeObject(item._id, item._source);
@@ -348,7 +355,7 @@ define([
                             };
                             params.complete.subscribe(function() {
                                 if (params.resourceid()) {
-                                    if (self.renderContext === 'workflow'){
+                                    if (self.renderContext === 'search' && self.allowInstanceCreation){
                                         self.value(params.resourceid());
                                         clearNewInstance();
                                     } else {
@@ -436,7 +443,7 @@ define([
                     }
                 },
                 results: function(data, page) {
-                    if (!data['paging-filter'].paginator.has_next && !['search'].includes(self.renderContext)) {
+                    if (!data['paging-filter'].paginator.has_next && self.allowInstanceCreation) {
                         self.resourceTypesToDisplayInDropDown().forEach(function(graphid) {
                             var graph = self.graphLookup[graphid];
                             var val = {
@@ -477,7 +484,7 @@ define([
                 }
             },
             initSelection: function(ele, callback) {
-                if(['search','workflow'].includes(self.renderContext) && self.value() !== "" && !self.graphIds().includes(self.value())) {
+                if(self.renderContext === "search" && self.value() !== "" && !self.graphIds().includes(self.value())) {
                     var values = self.value();
                     if(!Array.isArray(self.value())){
                         values = [self.value()];
