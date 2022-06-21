@@ -10,14 +10,15 @@
             <ul class="list-group ep-menu-list editor-tools">
 
                 <!-- Menu Item -->
-                <li id="settings-manager" class="edit-menu-item" data-bind="css: {'disabled': !resourceId()}">
+                <!-- TODO: Reenable once #8352 is resolved -->
+                <!-- <li id="settings-manager" class="edit-menu-item" data-bind="css: {'disabled': !resourceId()}">
                     <a href="" target="" class="" data-bind="click: copyResource">
                         <div class="media-body">
                             <div class="menu-item-title"><i class="fa fa-copy"></i> {% trans "Copy Resource" %} </div>
                             <span class="text-muted menu-item-subtitle">{% trans "Make a copy and start editing" %}</span>
                         </div>
                     </a>
-                </li>
+                </li> -->
 
                 <!-- Menu Item -->
                 {% if user_can_delete_resource %}

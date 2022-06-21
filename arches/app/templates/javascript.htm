@@ -233,6 +233,7 @@
                 permission_data: "{% url 'permission_data' %}",
                 resource_permission_data: "{% url 'resource_permission_data' %}",
                 permission_manager_data: "{% url 'permission_manager_data' %}",
+                clear_user_permission_cache: "{% url 'clear_user_permission_cache' %}",
                 get_user_names: "{% url 'get_user_names' %}",
                 feature_popup_content: "{% url 'feature_popup_content' %}",
                 related_resource_candidates: "{% url 'related_resource_candidates' %}",
@@ -274,10 +275,12 @@
                 ontology_properties: "{% url 'ontology_properties' %}",
                 iiifmanifest: "{% url 'iiifmanifest' %}",
                 manifest_manager: "{% url 'manifest_manager' %}",
+                etl_manager: "{% url 'etl_manager' %}",
                 iiifannotations: "{% url 'iiifannotations' %}",
                 iiifannotationnodes: "{% url 'iiifannotationnodes' %}",
                 validatejson: "{% url 'validatejson' 'aaaa'%}".replace('aaaa', ''),
                 get_dsl: "{% url 'get_dsl' %}",
+                transform_edtf_for_tile: "{% url 'transform_edtf_for_tile' %}",
                 {% block urls %}{% endblock urls %}
             },
             geocoderPlaceHolder: "{% trans 'Find an address...' %}",
@@ -313,7 +316,8 @@
                 text: "{% trans 'Sorry! The request failed. Please try again.  Contact your system administrator if the problem persists.' %}"
             },
             resourceCopySuccess: {
-                title: "{% trans 'Resource Successfully Copied.'%}"
+                title: "{% trans 'Resource Successfully Copied.'%}",
+                text: "{% trans 'Click here to edit copy' %}"
             },
             resourceCopyFailed: {
                 title: "{% trans 'Resource Copy Failed...'%}",
@@ -415,6 +419,7 @@
                 'groupingErrorTitle': '{% trans "Settings Conflict: Remove this card from grouped card?" %}',
                 'groupingErrorMessage': "{% trans 'The cardinality of this card can\'t be changed until you remove it from being grouped with the ${cardName} card.  Do you want to remove this card from being grouped with the ${cardName} card' %}",
                 'modelDoesNotExist': '{% trans "!! Referenced model does not exist -- Delete and select a new model !!" %}',
+                'idColumnSelection': '{% trans "Use as an id" %}',
             },
             version: '{{ app_settings.VERSION }}'
         };

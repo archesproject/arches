@@ -1,6 +1,8 @@
 import uuid
 import json
 import decimal
+from arches.app.utils.file_validator import FileValidator
+import filetype
 import base64
 import re
 import logging
@@ -25,7 +27,9 @@ from arches.app.search.elasticsearch_dsl_builder import Query, Dsl, Bool, Match,
 from arches.app.search.search_engine_factory import SearchEngineInstance as se
 from arches.app.search.mappings import RESOURCES_INDEX, RESOURCE_RELATIONS_INDEX
 from django.core.cache import cache
+from django.core.files import File
 from django.core.files.base import ContentFile
+from django.core.files.storage import FileSystemStorage, default_storage
 from django.utils.translation import ugettext as _
 from django.contrib.gis.geos import GEOSGeometry
 from django.contrib.gis.geos import GeometryCollection
@@ -37,7 +41,6 @@ from django.db import connection, transaction
 
 from elasticsearch import Elasticsearch
 from elasticsearch.exceptions import NotFoundError
-from edtf import parse_edtf
 
 
 # One benefit of shifting to python3.x would be to use
@@ -84,7 +87,7 @@ class DataTypeFactory(object):
 
 
 class StringDataType(BaseDataType):
-    def validate(self, value, row_number=None, source=None, node=None, nodeid=None, strict=False):
+    def validate(self, value, row_number=None, source=None, node=None, nodeid=None, strict=False, **kwargs):
         errors = []
         try:
             if value is not None:
@@ -152,7 +155,7 @@ class StringDataType(BaseDataType):
 
 
 class NumberDataType(BaseDataType):
-    def validate(self, value, row_number=None, source="", node=None, nodeid=None, strict=False):
+    def validate(self, value, row_number=None, source="", node=None, nodeid=None, strict=False, **kwargs):
         errors = []
 
         try:
@@ -182,7 +185,7 @@ class NumberDataType(BaseDataType):
                 value = int(value)
             else:
                 value = float(value)
-        except AttributeError:
+        except (AttributeError, ValueError):
             pass
         return value
 
@@ -247,7 +250,7 @@ class NumberDataType(BaseDataType):
 
 
 class BooleanDataType(BaseDataType):
-    def validate(self, value, row_number=None, source="", node=None, nodeid=None, strict=False):
+    def validate(self, value, row_number=None, source="", node=None, nodeid=None, strict=False, **kwargs):
         errors = []
         try:
             if value is not None:
@@ -328,7 +331,7 @@ class BooleanDataType(BaseDataType):
 
 
 class DateDataType(BaseDataType):
-    def validate(self, value, row_number=None, source="", node=None, nodeid=None, strict=False):
+    def validate(self, value, row_number=None, source="", node=None, nodeid=None, strict=False, **kwargs):
         errors = []
         if value is not None:
             valid_date_format, valid = self.get_valid_date_format(value)
@@ -401,6 +404,23 @@ class DateDataType(BaseDataType):
             logger.warning(_("{value} is an invalid date format").format(**locals()))
         return value
 
+    def add_missing_colon_to_timezone(self, value):
+        """
+        Python will parse a timezone with a colon (-07:00) but will not add a colon to a timezone using strftime.
+        Elastic will not index a time with a timezone without a colon, so this method ensures the colon is added
+        if it is missing.
+        """
+
+        format = self.get_valid_date_format(value)[0]
+        if format.endswith("z") and value[-5] in ("-", "+"):
+            return "{0}:{1}".format(value[:-2], value[-2:])
+        else:
+            return value
+
+    def pre_tile_save(self, tile, nodeid):
+        if tile.data[nodeid]:
+            tile.data[nodeid] = self.add_missing_colon_to_timezone(tile.data[nodeid])
+
     def append_to_document(self, document, nodevalue, nodeid, tile, provisional=False):
         document["dates"].append(
             {"date": ExtendedDateFormat(nodevalue).lower, "nodegroup_id": tile.nodegroup_id, "nodeid": nodeid, "provisional": provisional}
@@ -469,11 +489,20 @@ class DateDataType(BaseDataType):
 
 
 class EDTFDataType(BaseDataType):
-    def validate(self, value, row_number=None, source="", node=None, nodeid=None, strict=False):
+    def transform_value_for_tile(self, value, **kwargs):
+        transformed_value = ExtendedDateFormat(value)
+        if transformed_value.edtf is None:
+            return value
+        return str(transformed_value.edtf)
+
+    def pre_tile_save(self, tile, nodeid):
+        tile.data[nodeid] = self.transform_value_for_tile(tile.data[nodeid])
+
+    def validate(self, value, row_number=None, source="", node=None, nodeid=None, strict=False, **kwargs):
         errors = []
         if value is not None:
             if not ExtendedDateFormat(value).is_valid():
-                message = _("Incorrect Extended Date Time Format. See http://www.loc.gov/standards/datetime/ for supported formats.")
+                message = _("Incorrect Extended Date Time Format. See http://www.loc.gov/standards/datetime/ for supported formats")
                 error_message = self.create_error_message(value, source, row_number, message)
                 errors.append(error_message)
         return errors
@@ -565,7 +594,7 @@ class EDTFDataType(BaseDataType):
 
 
 class GeojsonFeatureCollectionDataType(BaseDataType):
-    def validate(self, value, row_number=None, source=None, node=None, nodeid=None, strict=False):
+    def validate(self, value, row_number=None, source=None, node=None, nodeid=None, strict=False, **kwargs):
         errors = []
         coord_limit = 1500
         coordinate_count = 0
@@ -633,25 +662,34 @@ class GeojsonFeatureCollectionDataType(BaseDataType):
         if "format" in kwargs and kwargs["format"] == "esrijson":
             arches_geojson = GeoUtils().arcgisjson_to_geojson(value)
         else:
-            arches_geojson = {}
-            arches_geojson["type"] = "FeatureCollection"
-            arches_geojson["features"] = []
-            geometry = GEOSGeometry(value, srid=4326)
-            if geometry.geom_type == "GeometryCollection":
-                for geom in geometry:
+            try:
+                geojson = json.loads(value)
+                if geojson["type"] == "FeatureCollection":
+                    for feature in geojson["features"]:
+                        feature["id"] = str(uuid.uuid4())
+                    arches_geojson = geojson
+                else:
+                    raise TypeError
+            except (json.JSONDecodeError, KeyError, TypeError):
+                arches_geojson = {}
+                arches_geojson["type"] = "FeatureCollection"
+                arches_geojson["features"] = []
+                geometry = GEOSGeometry(value, srid=4326)
+                if geometry.geom_type == "GeometryCollection":
+                    for geom in geometry:
+                        arches_json_geometry = {}
+                        arches_json_geometry["geometry"] = JSONDeserializer().deserialize(GEOSGeometry(geom, srid=4326).json)
+                        arches_json_geometry["type"] = "Feature"
+                        arches_json_geometry["id"] = str(uuid.uuid4())
+                        arches_json_geometry["properties"] = {}
+                        arches_geojson["features"].append(arches_json_geometry)
+                else:
                     arches_json_geometry = {}
-                    arches_json_geometry["geometry"] = JSONDeserializer().deserialize(GEOSGeometry(geom, srid=4326).json)
+                    arches_json_geometry["geometry"] = JSONDeserializer().deserialize(geometry.json)
                     arches_json_geometry["type"] = "Feature"
                     arches_json_geometry["id"] = str(uuid.uuid4())
                     arches_json_geometry["properties"] = {}
                     arches_geojson["features"].append(arches_json_geometry)
-            else:
-                arches_json_geometry = {}
-                arches_json_geometry["geometry"] = JSONDeserializer().deserialize(geometry.json)
-                arches_json_geometry["type"] = "Feature"
-                arches_json_geometry["id"] = str(uuid.uuid4())
-                arches_json_geometry["properties"] = {}
-                arches_geojson["features"].append(arches_json_geometry)
 
         return arches_geojson
 
@@ -1182,7 +1220,22 @@ class FileListDataType(BaseDataType):
         super(FileListDataType, self).__init__(model=model)
         self.node_lookup = {}
 
-    def validate(self, value, row_number=None, source=None, node=None, nodeid=None, strict=False):
+    def validate_file_types(self, request=None, nodeid=None):
+        errors = []
+        validator = FileValidator()
+        files = request.FILES.getlist("file-list_" + nodeid, [])
+        for file in files:
+            errors = errors + validator.validate_file_type(file.file, file.name.split(".")[-1])
+        return errors
+
+    def validate(self, value, row_number=None, source=None, node=None, nodeid=None, strict=False, path=None, request=None, **kwargs):
+        errors = []
+        file_type_errors = []
+        if request:
+            file_type_errors = errors + self.validate_file_types(request, str(node.pk))
+
+        if len(file_type_errors) > 0:
+            errors.append({"type": "ERROR", "message": _("File type not permitted")})
         if node:
             self.node_lookup[str(node.pk)] = node
         elif nodeid:
@@ -1202,7 +1255,6 @@ class FileListDataType(BaseDataType):
                 n += 1
             return size, power_labels[n] + "bytes"
 
-        errors = []
         try:
             config = node.config
             limit = config["maxFiles"]
@@ -1221,6 +1273,11 @@ class FileListDataType(BaseDataType):
                                 formatted_max_size
                             )
                         )
+                        errors.append({"type": "ERROR", "message": message})
+            if path:
+                for file in value:
+                    if not default_storage.exists(os.path.join(path, file["name"])):
+                        message = _('The file "{0}" does not exist in "{1}"'.format(file["name"], default_storage.path(path)))
                         errors.append({"type": "ERROR", "message": message})
         except Exception as e:
             dt = self.datatype_model.datatype
@@ -1344,7 +1401,8 @@ class FileListDataType(BaseDataType):
 
         mime = MimeTypes()
         tile_data = []
-        for file_path in value.split(","):
+        source_path = kwargs.get("path")
+        for file_path in [filename.strip() for filename in value.split(",")]:
             tile_file = {}
             try:
                 file_stats = os.stat(file_path)
@@ -1358,7 +1416,21 @@ class FileListDataType(BaseDataType):
             tile_file["type"] = "" if tile_file["type"] is None else tile_file["type"]
             file_path = "uploadedfiles/" + str(tile_file["name"])
             tile_file["file_id"] = str(uuid.uuid4())
-            models.File.objects.get_or_create(fileid=tile_file["file_id"], path=file_path)
+            if source_path:
+                source_file = os.path.join(source_path, tile_file["name"])
+                fs = default_storage
+                try:
+                    with default_storage.open(source_file) as f:
+                        current_file, created = models.File.objects.get_or_create(fileid=tile_file["file_id"])
+                        filename = fs.save(os.path.join("uploadedfiles", os.path.basename(f.name)), File(f))
+                        current_file.path = os.path.join(filename)
+                        current_file.save()
+                except FileNotFoundError:
+                    logger.exception(_("File does not exist"))
+
+            else:
+                models.File.objects.get_or_create(fileid=tile_file["file_id"], path=file_path)
+
             tile_file["url"] = "/files/" + tile_file["file_id"]
             tile_file["accepted"] = True
             compatible_renderers = self.get_compatible_renderers(tile_file)
@@ -1539,6 +1611,10 @@ class FileListDataType(BaseDataType):
 
 
 class BaseDomainDataType(BaseDataType):
+    def __init__(self, model=None):
+        super(BaseDomainDataType, self).__init__(model=model)
+        self.value_lookup = {}
+
     def get_option_text(self, node, option_id):
         for option in node.config["options"]:
             if option["id"] == option_id:
@@ -1555,9 +1631,17 @@ class BaseDomainDataType(BaseDataType):
     def is_a_literal_in_rdf(self):
         return True
 
+    def lookup_domainid_by_value(self, value, nodeid, config):
+        if nodeid not in self.value_lookup:
+            options = {}
+            for val in config["options"]:
+                options[val["text"]] = val["id"]
+            self.value_lookup[nodeid] = options
+        return self.value_lookup[nodeid][value]
+
 
 class DomainDataType(BaseDomainDataType):
-    def validate(self, value, row_number=None, source="", node=None, nodeid=None, strict=False):
+    def validate(self, value, row_number=None, source="", node=None, nodeid=None, strict=False, **kwargs):
         errors = []
         key = "id"
         if value is not None:
@@ -1575,6 +1659,16 @@ class DomainDataType(BaseDomainDataType):
                     error_message = self.create_error_message(value, source, row_number, message)
                     errors.append(error_message)
         return errors
+
+    def transform_value_for_tile(self, value, **kwargs):
+        if value is not None:
+            value = value.strip()
+            try:
+                uuid.UUID(value)
+            except ValueError:
+                if "nodeid" in kwargs and "config" in kwargs:
+                    self.lookup_domainid_by_value(self, value, kwargs["nodeid"], kwargs["config"])
+        return value
 
     def get_search_terms(self, nodevalue, nodeid=None):
         terms = []
@@ -1658,12 +1752,22 @@ class DomainDataType(BaseDomainDataType):
 
 class DomainListDataType(BaseDomainDataType):
     def transform_value_for_tile(self, value, **kwargs):
+        result = []
         if value is not None:
             if not isinstance(value, list):
                 value = value.split(",")
+            for v in value:
+                try:
+                    stripped = v.strip()
+                    uuid.UUID(stripped)
+                    v = stripped
+                except ValueError:
+                    if "nodeid" in kwargs and "config" in kwargs:
+                        v = self.lookup_domainid_by_value(self, v, kwargs["nodeid"], kwargs["config"])
+                result.append(v)
         return value
 
-    def validate(self, values, row_number=None, source="", node=None, nodeid=None, strict=False):
+    def validate(self, values, row_number=None, source="", node=None, nodeid=None, strict=False, **kwargs):
         domainDataType = DomainDataType()
         errors = []
         if values is not None:
@@ -1770,7 +1874,7 @@ class ResourceInstanceDataType(BaseDataType):
             nodevalue = [nodevalue]
         return nodevalue
 
-    def validate(self, value, row_number=None, source="", node=None, nodeid=None, strict=False):
+    def validate(self, value, row_number=None, source="", node=None, nodeid=None, strict=False, **kwargs):
         errors = []
         if value is not None:
             resourceXresourceIds = self.get_id_list(value)
@@ -1890,7 +1994,7 @@ class ResourceInstanceDataType(BaseDataType):
             try:
                 resourceid = resourceXresource["resourceId"]
                 related_resource = Resource.objects.get(pk=resourceid)
-                displayname = related_resource.displayname
+                displayname = related_resource.displayname()
                 if displayname is not None:
                     items.append(displayname)
             except (TypeError, KeyError):
@@ -2039,7 +2143,7 @@ class ResourceInstanceListDataType(ResourceInstanceDataType):
                 try:
                     resourceid = resourceXresource["resourceId"]
                     related_resource = Resource.objects.get(pk=resourceid)
-                    displayname = related_resource.displayname
+                    displayname = related_resource.displayname()
                     resourceXresource["display_value"] = displayname
                     items.append(resourceXresource)
                 except (TypeError, KeyError):
@@ -2053,7 +2157,7 @@ class ResourceInstanceListDataType(ResourceInstanceDataType):
 
 
 class NodeValueDataType(BaseDataType):
-    def validate(self, value, row_number=None, source="", node=None, nodeid=None, strict=False):
+    def validate(self, value, row_number=None, source="", node=None, nodeid=None, strict=False, **kwargs):
         errors = []
         if value:
             try:
@@ -2084,7 +2188,7 @@ class NodeValueDataType(BaseDataType):
 
 
 class AnnotationDataType(BaseDataType):
-    def validate(self, value, row_number=None, source=None, node=None, nodeid=None, strict=False):
+    def validate(self, value, row_number=None, source=None, node=None, nodeid=None, strict=False, **kwargs):
         errors = []
         return errors
 

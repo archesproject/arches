@@ -40,7 +40,8 @@ admin.site.register(
         models.IIIFManifest,
         models.GroupMapSettings,
         models.NodeGroup,
+        models.SpatialView,
     ]
 )
 
-admin.site.register([models.Plugin], GuardedAdmin)
+admin.site.register([models.Plugin, models.ETLModule], GuardedAdmin)
