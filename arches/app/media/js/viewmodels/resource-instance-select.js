@@ -63,7 +63,7 @@ define([
         this.rootOntologyClass = '';
         this.graphIsSemantic = false;
         this.resourceTypesToDisplayInDropDown = ko.observableArray(!!params.graphids ? ko.toJS(params.graphids) : []);
-        this.displayOntologyTable = self.renderContext !== 'search' && !!params.node;
+        this.displayOntologyTable = this.renderContext !== 'search' && !!params.node;
         this.graphIds = ko.observableArray();
         this.searchString = params.searchString || ko.unwrap(params.node?.config.searchString);
 
