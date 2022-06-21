@@ -136,7 +136,7 @@ define([
                         data["data"]["message"],
                         null,
                         function(){}
-                    ))
+                    ));
                 }
             };
         },
