@@ -324,9 +324,9 @@ define([
             allowClear: self.renderContext === 'search' ? true : false,
             onSelect: function(item) {
                 self.selectedItem(item);
-                if (self.allowInstanceCreation) {
+                if (!(self.renderContext === 'search') || self.allowInstanceCreation) {
                     if (item._source) {
-                        if (self.renderContext === 'search' && self.allowInstanceCreation){
+                        if (self.renderContext === 'search'){
                             self.value(item._id);
                         } else {
                             var ret = self.makeObject(item._id, item._source);
@@ -355,7 +355,7 @@ define([
                             };
                             params.complete.subscribe(function() {
                                 if (params.resourceid()) {
-                                    if (self.renderContext === 'search' && self.allowInstanceCreation){
+                                    if (self.renderContext === 'search'){
                                         self.value(params.resourceid());
                                         clearNewInstance();
                                     } else {
