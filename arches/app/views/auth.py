@@ -93,7 +93,7 @@ class LoginView(View):
 @method_decorator(never_cache, name="dispatch")
 class SignupView(View):
     def get(self, request):
-        form = ArchesUserCreationForm(enable_captcha=settings.ENABLE_CAPTCHA)
+        form = ArchesUserCreationForm(enable_captcha=False)
         postdata = {"first_name": "", "last_name": "", "email": ""}
         showform = True
         confirmation_message = ""
