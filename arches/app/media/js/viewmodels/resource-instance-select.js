@@ -320,7 +320,7 @@ define([
             disabled: this.disabled,
             multiple: !self.displayOntologyTable ? params.multiple : false,
             placeholder: this.placeholder() || arches.translations.riSelectPlaceholder,
-            closeOnSelect: false,
+            closeOnSelect: true,
             allowClear: self.renderContext === 'search' ? true : false,
             onSelect: function(item) {
                 self.selectedItem(item);
@@ -329,8 +329,8 @@ define([
                         if (self.renderContext === 'search' && self.allowInstanceCreation){
                             self.value(item._id);
                         } else {
-                            var ret = makeObject(item._id, item._source);
-                            setValue(ret);
+                            var ret = self.makeObject(item._id, item._source);
+                            self.setValue(ret);
                             window.setTimeout(function() {
                                 if(self.displayOntologyTable){
                                     self.resourceToAdd("");
