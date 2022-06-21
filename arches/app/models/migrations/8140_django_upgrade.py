@@ -9,7 +9,7 @@ import re
 class Migration(migrations.Migration):
 
     dependencies = [
-        ("models", "8247_update_primary_descriptors_config"),
+        ("models", "8528_bulk_load_performance_functions"),
     ]
 
     operations = [
