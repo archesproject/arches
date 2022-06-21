@@ -83,3 +83,12 @@ label.form-checkbox.form-normal{
 .form-checkbox.form-normal:before{
     right: 1px;
 }
+
+.card-help-panel{
+    left: 0;
+    right: auto;
+    .help-close {
+        left: 10px;
+        right: auto;
+    }
+}

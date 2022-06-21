@@ -274,13 +274,15 @@
 
         <div class="card">
             {% block form_header %}
-            <h4 class="card-title" data-bind="text: card.model.name()"></h4>
+            <div class="card-title-container">
+                <h4 style="flex: 1; margin: 0;" class="card-title" data-bind="text: card.model.name()"></h4>
 
-            <!-- ko if: card.model.helpenabled -->
-            <span>
-                <a class="pull-right card-help help editable-help" data-bind="click: function () {card.model.get('helpactive')(true) }" style="cursor:pointer;"> {% trans "Help" %} <i class="fa fa-question-circle"></i></a>
-            </span>
-            <!-- /ko -->
+                <!-- ko if: card.model.helpenabled -->
+                <span>
+                    <a class="card-help help editable-help" data-bind="click: function () {card.model.get('helpactive')(true) }" style="cursor:pointer;"> {% trans "Help" %} <i class="fa fa-question-circle"></i></a>
+                </span>
+                <!-- /ko -->
+            </div>
             <h5 class="card-instructions" data-bind="text: card.model.instructions"></h5>
 
             <!-- ko if: card.isFuncNode && card.isFuncNode()  -->

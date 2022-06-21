@@ -71,21 +71,18 @@
             </div>
 
             <div class="form-divider">
-                <!-- Card Visibility -->
-                <div class="pad-top" data-bind="component: { name: 'views/components/simple-switch', params: {value: model.visible, config:{label: {% quoted_trans "Make Card Visible" %}, subtitle: {% quoted_trans "Show this card by default" %}}}}"></div>
+                <div style="margin: 15px 0px;">
+                    <!-- Card Visibility -->
+                    <div data-bind="component: { name: 'views/components/simple-switch', params: {value: model.visible, config:{label: {% quoted_trans "Make Card Visible" %}, subtitle: {% quoted_trans "Show this card by default" %}}}}"></div>
 
-                <!-- Set Cardinaltiy -->
-                <div class="pad-top" data-bind="component: { name: 'views/components/simple-switch', params: {value: model.cardinality, config:{on: 'n', off: '1', label: {% quoted_trans "Allow multiple values" %}, subtitle: {% quoted_trans "Let users enter multiple values for this data entry card" %}}}}"></div>
+                    <!-- Set Cardinaltiy -->
+                    <div data-bind="component: { name: 'views/components/simple-switch', params: {value: model.cardinality, config:{on: 'n', off: '1', label: {% quoted_trans "Allow multiple values" %}, subtitle: {% quoted_trans "Let users enter multiple values for this data entry card" %}}}}"></div>
 
-                <!-- Multiple values tools -->
-                <div class="cardinality-form" data-bind="visible: model.cardinality() === 'n'" style="display: none;">
+                    <!-- Enable help -->
+                    <div data-bind="component: { name: 'views/components/simple-switch', params: {value: model.helpenabled, config:{label: {% quoted_trans "Enable Card-level help" %}, subtitle: {% quoted_trans "Provide specific user guidance for this card" %}}}}"></div>
                 </div>
-
-                <!-- Enable help -->
-                <div data-bind="component: { name: 'views/components/simple-switch', params: {value: model.helpenabled, config:{label: {% quoted_trans "Enable Card-level help" %}, subtitle: {% quoted_trans "Provide specific user guidance for this card" %}}}}"></div>
-
                 <!-- Tertiary Panel For Card Help Text-->
-                <div class="" style="display: none;" data-bind="visible: model.helpenabled">
+                <div style="display: none;" data-bind="visible: model.helpenabled">
                     <div class="tertiary-panel-content">
 
                         <!-- Help CRUD -->

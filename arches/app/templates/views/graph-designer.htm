@@ -31,7 +31,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 <div class="ep-tools-title">
     <h1 class="page-header text-overflow ep-graph-title">
         <i class="text-center icon-wrap bg-gray ep-graph-title-icon" data-bind="css: (graph.iconclass() || 'fa fa-question')" ></i>
-        <span data-bind="text: graph.name()"></span><span class="graph-type" data-bind="text: graph.isresource() ? &quot;({% trans "Resource Model" %})&quot; : &quot;({% trans "Branch" %})&quot;"></span>
+        <span class="graph-name" data-bind="text: graph.name()"></span><span class="graph-type" data-bind="text: graph.isresource() ? &quot;({% trans "Resource Model" %})&quot; : &quot;({% trans "Branch" %})&quot;"></span>
     </h1>
 </div>
 {% endblock graph_title %}

@@ -1025,12 +1025,25 @@ div.wf-multi-tile-card-info div {
     color: #007799;
 }
 
-.card .install-buttons .btn-labeled {
-    font-weight: 600;
-}
-
-.card .install-buttons {
-    display: flex;
+.card {
+    .card-title-container {
+        display: flex; 
+        align-items: center;
+        h4 {
+            flex: 1;
+            margin: 0;
+        }
+        span a.card-help {
+            padding: 0;
+            margin: 0;
+        }
+    }
+    .install-buttons{ 
+        display: flex;
+        .btn-labeled {
+            font-weight: 600;
+        }
+    }
 }
 
 /*.workflow-nav-controls.left {
@@ -4004,7 +4017,7 @@ ul.nav.nav-tabs.nav-justified {
 .graph-type {
     font-size: 15px;
     color: #777;
-    padding-left: 10px;
+    padding: 0px 5px;
 }
 
 .graph-designer {
@@ -6657,6 +6670,10 @@ th.notif-type {
     flex-wrap: wrap; 
     align-items: center; 
     margin: 0 15px;
+    display: flex;
+    .graph-name {
+        margin: 0px 5px;
+    }
 }
 
 .ep-graph-title-icon {
@@ -7765,10 +7782,23 @@ ul .card-tree-list a .node-subname {
 }
 
 .toggle-container {
-    padding-bottom: 15px;
-    padding-right: 15px;
-    padding-top: 0px;
-    padding-left: 5px;
+    padding: 0 5px;
+    &>div>div {
+        justify-content:center;
+        align-items:center;
+        margin: 0px 5px;
+        display:flex; 
+        flex-direction:row
+    }
+    .arches-toggle-sm{
+        margin: 0;
+    }
+    .switch-small{
+        margin: 6px 4px;
+    }
+    .arches-toggle-subtitle {
+        margin: 0;
+    }
 }
 
 .arches-toggle-sm {
@@ -7793,10 +7823,6 @@ ul .card-tree-list a .node-subname {
 .note-editor .note-editable {
     background: #fff;
     color: #666;
-}
-
-.cardinality-form {
-    padding: 7px;
 }
 
 .card-tree-list-icon {
@@ -8267,7 +8293,9 @@ div.row.widget-wrapper {
     width: 100%;
     margin-bottom: 0;
 }
-
+.input-group-addon:last-child{
+    border-left: 1px solid #e1e5ea;
+}
 .input-group.date {
     max-width: 300px;
 }
@@ -14204,18 +14232,20 @@ ul.select2-choices:after {
     cursor: pointer;
     padding: 5px;
     font-size: 0.9em;
-    left: 510px;
-    position: absolute;
-    top: 6px;
 }
 
-.i18n-style-tools-collapser {
-    cursor: pointer;
-    font-size: 0.9em;
-    position: absolute;
-    padding: 0px 12px;
-    right: 0px;
-    z-index: 1;
+.i18n-tools {
+    display: flex;
+    margin-bottom: 15px;
+    &> div {
+        flex: 1;
+    }
+    .i18n-style-tools-collapser {
+        cursor: pointer;
+        font-size: 0.9em;
+        padding: 0px 12px;
+        z-index: 1;
+    }
 }
 
 .workbench-card-sidepanel .edtf-style-tools-collapser {
@@ -14241,7 +14271,7 @@ ul.select2-choices:after {
 .edtf-style-tools-panel{
     overflow-y: scroll;
     height: 200px;
-    width: 600px;
+    width: 100%;
     padding: 10px 15px 5px 5px;
 }
 
@@ -14249,7 +14279,7 @@ ul.select2-choices:after {
     padding: 10px;
     height: 140px;
     position: relative;
-    top: -10px;
+    top: 10px;
     width: 100%;
 }
 

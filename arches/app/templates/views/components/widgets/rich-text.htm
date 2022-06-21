@@ -4,41 +4,45 @@
 
 {% block form %}
 <div class="row widget-wrapper">
-    <div class="form-group">        
-        <div class="i18n-style-tools-collapser" data-bind=" click: function() {
-            showi18nOptions(!showi18nOptions());
-        }">
-            <i class="fa" data-bind="{
-                css: {
-                    'fa-caret-down' : !showi18nOptions(),
-                    'fa-caret-up' : showi18nOptions(),
-                }
-            }"></i>
-            <span data-bind="text: {% quoted_trans "Languages" %}"></span>
-        </div>
-        <div class="form-horizontal" data-bind="if: showi18nOptions">
-            <div class="i18n-style-tools-panel">
-                <div style="display: flex; flex-direction: column; max-width:600px">
-                    <label class="widget-input-label i18n-style-tools-label" for="lang_dd">{% trans "Language" %}</label>
-                    <select id="lang_dd" style="flex:1" name="language" data-bind="options: languages, optionsText: function(item){return item.name + ' (' + item.code + ')'}, value: currentLanguage, chosen: {width:'100%'}">
-                    </select>
-                    <label class="widget-input-label i18n-style-tools-label" for="lang_dir">{% trans "Direction" %}</label>
-                    <select id="lang_dir" style="flex:1" name="language" data-bind="value: currentDirection, chosen: {
-                        'width':'100%'}">
-                        <option value="ltr">
-                            Left-to-Right
-                        </option>
-                        <option value="rtl">
-                            Right-to-Left
-                        </option>
-                    </select>
+    <div class="form-group">
+        <div class="i18n-tools">
+            <div>
+                <div class="i18n-style-tools-collapser" data-bind=" click: function() {
+                    showi18nOptions(!showi18nOptions());
+                }">
+                    <i class="fa" data-bind="{
+                        css: {
+                            'fa-caret-down' : !showi18nOptions(),
+                            'fa-caret-up' : showi18nOptions(),
+                        }
+                    }"></i>
+                    <span data-bind="text: {% quoted_trans "Languages" %}"></span>
+                </div>
+                <div class="form-horizontal" data-bind="if: showi18nOptions">
+                    <div class="i18n-style-tools-panel">
+                        <div style="display: flex; flex-direction: column; max-width:600px">
+                            <label class="widget-input-label i18n-style-tools-label" for="lang_dd">{% trans "Language" %}</label>
+                            <select id="lang_dd" style="flex:1" name="language" data-bind="options: languages, optionsText: function(item){return item.name + ' (' + item.code + ')'}, value: currentLanguage, chosen: {width:'100%'}">
+                            </select>
+                            <label class="widget-input-label i18n-style-tools-label" for="lang_dir">{% trans "Direction" %}</label>
+                            <select id="lang_dir" style="flex:1" name="language" data-bind="value: currentDirection, chosen: {
+                                'width':'100%'}">
+                                <option value="ltr">
+                                    Left-to-Right
+                                </option>
+                                <option value="rtl">
+                                    Right-to-Left
+                                </option>
+                            </select>
+                        </div>
+                    </div>
                 </div>
             </div>
+            <label class="control-label widget-input-label" for="" data-bind="text:label"></label>
+            <!-- ko if: node -->
+            <i data-bind="css: {'ion-asterisk widget-label-required': node.isrequired}"></i>
+            <!-- /ko -->
         </div>
-        <label class="control-label widget-input-label" for="" data-bind="text:label"></label>
-        <!-- ko if: node -->
-        <i data-bind="css: {'ion-asterisk widget-label-required': node.isrequired}"></i>
-        <!-- /ko -->
         <div class="col-xs-12">
             <textarea rows="10" cols="80" data-bind="ckeditor: currentText, language: currentLanguage.code, direction: currentDirection, ckeditorOptions: {},  valueUpdate: 'afterkeydown', attr: {disabled: disabled}"></textarea>
         </div>
