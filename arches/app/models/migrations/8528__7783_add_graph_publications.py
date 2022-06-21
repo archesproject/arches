@@ -9,7 +9,7 @@ from django.contrib.postgres.fields import JSONField
 class Migration(migrations.Migration):
 
     dependencies = [
-        ("models", "7783_make_settings_active"),
+        ("models", "8528__7783_make_settings_active"),
     ]
 
     def forwards_add_graph_column_data(apps, schema_editor):

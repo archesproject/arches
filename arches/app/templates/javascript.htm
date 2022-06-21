@@ -304,10 +304,6 @@
                 title: "{% trans 'Delete map layer?' %}",
                 text: "{% trans 'Deleting this map layer will remove it entirely.  You cannot undo this action.  Are you sure you would like to proceed?' %}"
             },
-            confirmSurveyDelete: {
-                title: "{% trans 'Delete survey?' %}",
-                text: "{% trans 'Deleting this survey will remove it entirely.  You cannot undo this action.  Are you sure you would like to proceed?' %}"
-            },
             graphImportFailed: {
                 title: "{% trans 'Graph import failed.'%}"
             },
@@ -398,10 +394,6 @@
             {% endfor %}{% endautoescape %}],
             graphs: {% autoescape off %}{{graphs|default:"[]"}}{% endautoescape %},
             translations: {
-                'deactivateSurveyTitle': '{% trans "You are deactivating an active survey" %}',
-                'deactivateSurveyMessage': '{% trans "Users will not be able to download this survey to their device" %}',
-                'activateSurveyTitle': '{% trans "You are activating this survey" %}',
-                'activateSurveyMessage': '{% trans "Users will immediately be able to download this survey and begin collecting data" %}',
                 'mapAddPoint': '{% trans "Add point" %}',
                 'mapAddLine': '{% trans "Add line" %}',
                 'mapAddPolygon': '{% trans "Add polygon" %}',

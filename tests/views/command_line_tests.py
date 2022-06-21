@@ -39,13 +39,11 @@ from django.test.client import Client
 
 class CommandLineTests(TestCase):
     def setUp(self):
-        self.survey_id = "d309d38e-29b9-45c0-b0f5-542f34a4576a"
         self.expected_resource_count = 2
         self.data_type_graphid = "330802c5-95bd-11e8-b7ac-acde48001122"
         self.client = Client()
 
     def tearDown(self):
-        management.call_command("mobile", operation="delete_surveys", id=self.survey_id)
         models.ResourceInstance.objects.filter(graph_id=self.data_type_graphid).delete()
 
     @classmethod
