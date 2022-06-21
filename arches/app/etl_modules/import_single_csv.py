@@ -164,13 +164,13 @@ class ImportSingleCsv(BaseImportModule):
                 result = _("delegated_to_celery")
                 return {"success": True, "data": result}
             else:
-                err = _("Celery appears not to be running. You need to have celery running in order to import a large csv.")
+                err = _("Cannot start process. Unable to run process as a background task at this time.")
                 with connection.cursor() as cursor:
                     cursor.execute(
                         """UPDATE load_event SET status = %s, load_end_time = %s WHERE loadid = %s""",
                         ("failed", datetime.now(), self.loadid),
                     )
-                return {"success": False, "data": err}
+                return {"success": False, "data": {"title": _("Error"), "message": err}}
 
         else:
             response = self.run_load_task(self.loadid, graphid, has_headers, fieldnames, csv_file_name, id_label)
