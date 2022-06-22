@@ -321,7 +321,7 @@ class BranchCsvImporter(BaseImportModule):
                 if task_management.check_if_celery_available():
                     logger.info(_("Delegating load to Celery task"))
                     tasks.load_branch_csv.apply_async(
-                        (files, summary, result, self.temp_dir, self.loadid),
+                        (self.userid, files, summary, result, self.temp_dir, self.loadid),
                     )
                     result = _("delegated_to_celery")
                     return {"success": True, "data": result}

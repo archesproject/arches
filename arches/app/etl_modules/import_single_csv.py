@@ -159,7 +159,7 @@ class ImportSingleCsv(BaseImportModule):
             if task_management.check_if_celery_available():
                 logger.info(_("Delegating load to Celery task"))
                 tasks.load_single_csv.apply_async(
-                    (self.loadid, graphid, has_headers, fieldnames, csv_file_name, id_label),
+                    (self.userid, self.loadid, graphid, has_headers, fieldnames, csv_file_name, id_label),
                 )
                 result = _("delegated_to_celery")
                 return {"success": True, "data": result}
