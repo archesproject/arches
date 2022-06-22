@@ -68,9 +68,7 @@
     </div>
     <div class="etl-module-component">
         <h4>{% trans "Import Details" %}</h4>
-        <label class="form-checkbox form-normal form-primary" style="padding-left: 25px; padding-top: 3px;">
-            <input type="checkbox" data-bind="checked: hasHeaders">{% trans "Column names in the first row" %}
-        </label>
+        <div data-bind="component: { name: 'views/components/simple-switch', params: {value: hasHeaders, config:{ label: '{% trans "Column names in the first row" %}', subtitle: ''}}}"></div>
         <div class="csv-mapping-table-container">
         <table class="table table-striped csv-mapping-table">
             <thead>

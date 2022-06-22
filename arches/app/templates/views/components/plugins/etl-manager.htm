@@ -90,10 +90,10 @@
                             <div class="etl-job-task-bar">
                                 <div class="task">
                                     <!-- ko if: event.status == "completed" -->
-                                    <a data-bind="click: function() { $parent.reverseTransactions(event) }">{% trans "undo import" %}</a>
+                                    <a data-bind="click: function() { $parent.reverseTransactions(event, '{% trans "Warning" %}', '{% trans "Are you sure you want to delete this load?" %}')}">{% trans "undo import" %}</a>
                                     <!-- /ko -->
                                     <!-- ko if: event.status == "indexed" -->
-                                    <a data-bind="click: function() { $parent.reverseTransactions(event) }">{% trans "undo import" %}</a>
+                                    <a data-bind="click: function() { $parent.reverseTransactions(event, '{% trans "Warning" %}', '{% trans "Are you sure you want to delete this load?" %}')}">{% trans "undo import" %}</a>
                                     <!-- /ko -->
                                     <!-- ko if: event.status == "unloaded" -->
                                     <a data-bind="click: function() { $parent.cleanLoadEvent(event.loadid) }">{% trans "remove from history" %}</a>
