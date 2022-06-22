@@ -43,25 +43,29 @@
                     elements with its class name must exist at time of init -->
                 <h4>{% trans "Uploaded Files" %}</h4>
                 <div class="file-upload-options">
-                    <!--ko if: filesJSON().length > 1-->
-                    <input data-bind="textInput: filter" type="text" placeholder="{% trans 'find a file...' %}" class="file-upload-filter">
-                    <!-- /ko -->
+                    <div class="file-information">
+                        <!--ko if: filesJSON().length > 1-->
+                        <input data-bind="textInput: filter" type="text" placeholder="{% trans 'find a file...' %}" class="file-upload-filter">
+                        <!-- /ko -->
 
-                    <!-- Clear Search -->
-                    <span class="file-upload-clear-filter" data-bind="visible: filter().length > 0, click: function() { filter(''); }"><i class="fa fa-times-circle"></i></span>
+                        <!-- Clear Search -->
+                        <span class="file-upload-clear-filter" data-bind="visible: filter().length > 0, click: function() { filter(''); }"><i class="fa fa-times-circle"></i></span>
 
-                    <!-- ko if: filter() -->
-                    <span data-bind="text: filteredList().length+' out of '+filesJSON().length+' files match filter'"></span>
-                    <!-- /ko -->
-                    <!-- ko if: (!filter() || filter() == "") -->
-                    <span data-bind="text: filesJSON().length + {% quoted_trans " file(s) uploaded" %}"></span>
-                    <!-- /ko -->
-                    <button type="button" class="btn btn-file-upload-reset" data-bind="click: reset">
-                        <span>{% trans "delete all files" %}</span>
-                    </button>
-                    <button type="button" class="btn btn-file-upload-reset dropzone fileinput-button dz-clickable" data-bind="css: uniqueidClass">
-                        <span>{% trans "add more files" %}</span>
-                    </button>
+                        <!-- ko if: filter() -->
+                        <span data-bind="text: filteredList().length+' out of '+filesJSON().length+' files match filter'"></span>
+                        <!-- /ko -->
+                        <!-- ko if: (!filter() || filter() == "") -->
+                        <span data-bind="text: filesJSON().length + '{% trans " file(s) uploaded" %}'"></span>
+                        <!-- /ko -->
+                    </div>
+                    <div class="file-controls">
+                        <button type="button" class="btn btn-file-upload-reset" data-bind="click: reset">
+                            <span>{% trans "delete all files" %}</span>
+                        </button>
+                        <button type="button" class="btn btn-file-upload-reset dropzone fileinput-button dz-clickable" data-bind="css: uniqueidClass">
+                            <span>{% trans "add more files" %}</span>
+                        </button>
+                    </div>
                 </div>
             </div>
             <div class="dz-previews" data-bind="css: uniqueidClass">

@@ -2,12 +2,6 @@
 
 {% block workbench %}
 <div class="workbench-card-wrapper {% block workbench_wrapper_classes %}{% endblock workbench_wrapper_classes %}" data-bind="class: ko.unwrap($data.workbenchWrapperClass)">
-    <!-- ko if: showTabs -->
-    <div class="workbench-card-sidebar">
-        {% block tabs %}
-        {% endblock tabs %}
-    </div>
-    <!-- /ko -->
     <!--ko if: activeTab() -->
     <div class="workbench-card-sidepanel" data-bind="css:{'expanded': expandSidePanel()}">
         {% block sidepanel %}
@@ -17,10 +11,16 @@
     <div class="workbench-card-container-wrapper" data-bind="css: {
         'workbench-card-container-sidepanel-active': activeTab(), 'wide': showTabs() === false
     }">
-    {% block content_management %}
-    <div class="workbench-card-container">
+        {% block content_management %}
+        <div class="workbench-card-container">
+        </div>
+        {% endblock content_management %}
     </div>
-    {% endblock content_management %}
-</div>
+    <!-- ko if: showTabs -->
+    <div class="workbench-card-sidebar">
+        {% block tabs %}
+        {% endblock tabs %}
+    </div>
+    <!-- /ko -->
 </div>
 {% endblock workbench %}
