@@ -728,6 +728,13 @@ input[type="checkbox"] {
     display: unset;
 }
 
+.etl-manager-container {
+    display: flex; 
+    flex-direction: column;
+    background-color: #fff;
+    width:100%;
+}
+
 .branch-csv-etl {
     background-color: white;
     width: 100%;
@@ -772,7 +779,6 @@ input[type="checkbox"] {
 }
 
 .branch-xl-metadata-container {
-    height: calc(100vh - 50px);
     padding: 0px 15px;
 }
 
@@ -14980,10 +14986,11 @@ a.jstree-anchor.permissions-widget {
 }
 
 .etl-module-component-container {
-    height: calc(100vh - 154px);
-    width: calc(100vw - 50px);
-    padding: 25px;
-    overflow: scroll;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    height: 100%;
+    width: initial;
 }
 
 .etl-module-status {
@@ -15083,7 +15090,6 @@ a.jstree-anchor.permissions-widget {
 .etl-module-component {
     margin-top: 30px;
     padding-bottom: 5px;
-    width: 95%;
 }
 
 .etl-module-footer .btn {
@@ -15101,6 +15107,18 @@ a.jstree-anchor.permissions-widget {
     font-size: 15px; 
     padding-right: 3px;
     color: rgb(4, 4, 45);
+}
+
+.csv-mapping-table-container {
+    overflow: auto;
+    width: inherit;
+    margin-top: 10px;
+    margin-bottom: 5px;
+    border: 1px solid rgba(0,0,0,0.14);
+}
+
+.csv-mapping-table {
+    margin-bottom: 0;
 }
 
 table.csv-mapping-table thead tr {
