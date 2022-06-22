@@ -1,23 +1,21 @@
-from arches.app.utils.betterJSONSerializer import JSONSerializer
 import uuid
 import csv
 from django.core.exceptions import ObjectDoesNotExist
-from django.utils.translation import ugettext as _
+from django.db import connection
+from django.utils.translation import ugettext as _, get_language
 from arches.app.models import models
-from arches.app.models import concept
+from arches.app.models.concept import ConceptValue, Concept
 from arches.app.models.system_settings import settings
 from arches.app.datatypes.base import BaseDataType
 from arches.app.datatypes.datatypes import DataTypeFactory, get_value_from_jsonld
-from arches.app.models.concept import get_preflabel_from_valueid, get_preflabel_from_conceptid, get_valueids_from_concept_label
-from arches.app.search.elasticsearch_dsl_builder import Bool, Match, Range, Term, Nested, Exists, Terms
+from arches.app.models.concept import get_preflabel_from_valueid
+from arches.app.search.elasticsearch_dsl_builder import Match, Exists
 from arches.app.utils.date_utils import ExtendedDateFormat
+from arches.app.utils.betterJSONSerializer import JSONSerializer
 # for the RDF graph export helper functions
-from rdflib import Namespace, URIRef, Literal, BNode
+from rdflib import Namespace, URIRef, Literal
 from rdflib import ConjunctiveGraph as Graph
-from rdflib.namespace import RDF, RDFS, XSD, DC, DCTERMS, SKOS
-from arches.app.models.concept import ConceptValue
-from arches.app.models.concept import Concept
-from io import StringIO
+from rdflib.namespace import RDF, RDFS
 
 archesproject = Namespace(settings.ARCHES_NAMESPACE_FOR_DATA_EXPORT)
 cidoc_nm = Namespace("http://www.cidoc-crm.org/cidoc-crm/")
@@ -206,7 +204,6 @@ class ConceptDataType(BaseConceptDataType):
 
     def from_rdf(self, json_ld_node):
         # Expects a label and a concept URI within the json_ld_node, might not always get them both
-
         try:
             # assume a list, and as this is a ConceptDataType, assume a single entry
             json_ld_node = json_ld_node[0]
@@ -215,58 +212,26 @@ class ConceptDataType(BaseConceptDataType):
 
         concept_uri = json_ld_node.get("@id")
         label_node = json_ld_node.get(str(RDFS.label))
-        concept_id = lang = None
-        import re
-
-        # FIXME: This should use settings for host and check for UUID
-        p = re.compile(r"(http|https)://(?P<host>[^/]*)/concepts/(?P<concept_id>[A-Fa-f0-9\-]*)/?$")
-        m = p.match(concept_uri)
-        if m is not None:
-            concept_id = m.groupdict().get("concept_id")
-        else:
-            # could be an external id, rather than an Arches only URI
-            hits = [ident for ident in models.Value.objects.all().filter(value__exact=str(concept_uri), valuetype__category="identifiers")]
-            if len(hits) == 1:
-                concept_id = hits[0].concept_id
-            else:
-                print("ERROR: Multiple hits for {0} external identifier in RDM:".format(concept_uri))
-                for hit in hits:
-                    print("ConceptValue {0}, Concept {1} - '{2}'".format(hit.valueid, hit.conceptid, hit.value))
-                # Just try the first one and hope
-                concept_id = hits[0].concept_id
-
+        label = None
+        lang = get_language()
         if label_node:
             label, lang = get_value_from_jsonld(label_node)
-            if label:
-                values = get_valueids_from_concept_label(label, concept_id, lang)
-                if values:
-                    return values[0]["id"]
-                else:
-                    if concept_id:
-                        hits = [ident for ident in models.Value.objects.all().filter(value__exact=label)]
-                        if hits and len(hits) == 1:
-                            return str(hits[0].pk)
-                        label = None
-                    else:
-                        print("No Concept ID URI supplied for rdf")
-        else:
-            label = None
 
-        if concept_id and label is None:
-            value = get_preflabel_from_conceptid(concept_id, lang=lang)
-            if value["id"]:
-                return value["id"]
-            else:
-                hits = [ident for ident in models.Value.objects.all()]
-                if hits:
-                    return str(hits[0].pk)
-                else:
-                    print(f"No labels for concept: {concept_id}!")
-                    return None
-        else:
-            # No concept_id means not in RDM at all
-            return None
+        sql = """
+            SELECT * FROM __arches_get_concept_value_from_id_or_label('%s', '%s', '%s', '%s') as t;
+        """ % (
+            concept_uri,
+            lang,
+            label,
+            settings.LANGUAGE_CODE,
+        )
 
+        with connection.cursor() as cursor:
+            cursor.execute(sql)
+            ret = cursor.fetchone()
+            if ret:
+                return str(ret[1])
+            return ret
 
     def ignore_keys(self):
         return ["http://www.w3.org/2000/01/rdf-schema#label http://www.w3.org/2000/01/rdf-schema#Literal"]

@@ -1403,8 +1403,8 @@ def get_preflabel_from_conceptid(conceptid, lang):
     }
     query = Query(se)
     bool_query = Bool()
-    bool_query.must(Match(field="type", query="prefLabel", type="phrase"))
-    bool_query.filter(Terms(field="conceptid", terms=[conceptid]))
+    bool_query.filter(Term(field="type", term="prefLabel"))
+    bool_query.filter(Term(field="conceptid", term=conceptid))
     query.add_query(bool_query)
     preflabels = query.search(index=CONCEPTS_INDEX)["hits"]["hits"]
     for preflabel in preflabels:
@@ -1418,33 +1418,6 @@ def get_preflabel_from_conceptid(conceptid, lang):
             if preflabel["_source"]["language"] == settings.LANGUAGE_CODE and ret is None:
                 ret = preflabel["_source"]
     return default if ret is None else ret
-
-
-def get_valueids_from_concept_label(label, conceptid=None, lang=None):
-
-    def exact_val_match(val, conceptid=None):
-        # exact term match, don't care about relevance ordering.
-        # due to language formating issues, and with (hopefully) small result sets
-        # easier to have filter logic in python than to craft it in dsl
-        if conceptid is None:
-            return {"query": {"bool": {"filter": {"match_phrase": {"value": val}}}}}
-        else:
-            return {
-                "query": {
-                    "bool": {"filter": [{"match_phrase": {"value": val}}, {"term": {"conceptid": conceptid}}, ]}
-                }
-            }
-
-    concept_label_results = se.search(index=CONCEPTS_INDEX, body=exact_val_match(label, conceptid))
-    if concept_label_results is None:
-        print("Found no matches for label:'{0}' and concept_id: '{1}'".format(label, conceptid))
-        return
-    return [
-        res["_source"]
-        for res in concept_label_results["hits"]["hits"]
-        if lang is None or res["_source"]["language"].lower() == lang.lower()
-    ]
-
 
 def get_preflabel_from_valueid(valueid, lang):
     concept_label = se.search(index=CONCEPTS_INDEX, id=valueid)

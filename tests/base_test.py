@@ -73,6 +73,11 @@ def setUpTestPackage():
     sql = sql.format(user_id=1, oauth_client_id=OAUTH_CLIENT_ID, oauth_client_secret=OAUTH_CLIENT_SECRET)
     cursor.execute(sql)
 
+    delete_terms_index()
+    delete_concepts_index()
+    delete_search_index()
+    delete_resource_relations_index()
+
     prepare_terms_index(create=True)
     prepare_concepts_index(create=True)
     prepare_search_index(create=True)
