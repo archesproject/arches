@@ -14993,6 +14993,13 @@ a.jstree-anchor.permissions-widget {
     width: initial;
 }
 
+.etl-module-body {
+    padding: 15px 25px;
+    width: 100%;
+    flex: 1 1 0px;
+    overflow: auto;
+}
+
 .etl-module-status {
     border-right: 1px solid rgba(0,0,0,0.14);
     width: 446px;
