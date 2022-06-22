@@ -15124,6 +15124,10 @@ a.jstree-anchor.permissions-widget {
     border: 1px solid rgba(0,0,0,0.14);
 }
 
+.csv-mapping-table-container .chosen-drop .chosen-results {
+    max-height: 180px;
+}
+
 .csv-mapping-table {
     margin-bottom: 0;
 }
