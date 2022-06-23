@@ -1733,3 +1733,22 @@ class TransformEdtfForTile(APIBase):
             return JSONResponse(str(e), status=500)
 
         return JSONResponse({"data": result})
+
+
+class CreateNodeAlias(APIBase):
+    def get(self, request):
+        try:
+            value = request.GET.get("value")
+            graph_id = request.GET.get("graph")
+            alias = request.GET.get("alias")
+
+            graph = Graph.objects.get(graphid=graph_id)
+            result = graph.create_node_alias_2(value, alias)
+
+        except TypeError as e:
+            return JSONResponse({"data": (str(e), False)})
+
+        except Exception as e:
+            return JSONResponse(str(e), status=500)
+
+        return JSONResponse({"data": result})

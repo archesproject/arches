@@ -54,9 +54,16 @@
                                 </label>
                             </div>
 
+                            <!-- node alias customization -->
                             <div class="col-xs-12">
-                                <input type="text" disabled placeholder="{% trans 'Unique alias generated from this node\'s name' %}"class="form-control" data-bind="textInput: node().alias">
+                                <input type="text" placeholder="{% trans 'Unique alias generated from this node\'s name' %}" data-bind="textInput: node().alias" class="form-control input-lg widget-input">
                             </div>
+                            <div class="col-xs-12" data-bind="if: !!suggestedAlias()">
+                                <label class="control-label widget-input-label" for="">{% trans "Formatted Alias: " %}</label>
+                                <span data-bind="text: suggestedAlias"></span>
+                            </div>
+                            <!-- end of node alias customization -->
+
                         </div>
                     </div>
 

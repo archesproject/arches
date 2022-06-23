@@ -137,6 +137,42 @@ define([
                     (isCollector && groupHasNonSemanticNodes && (isInParentGroup || isNodeInChildGroup)) ||
                     (self.graphModel.get('nodes')().length > 1 && node && node.istopnode);
             });
+
+            this.suggestedAlias = ko.observable();
+
+            this.newAlias = ko.pureComputed(function(){
+                if (self.node()?.alias()) {
+                    return self.node().alias();
+                } else if (self.node()?.name()) {
+                    return self.node().name();
+                }
+            });
+
+            this.newAlias.subscribe(function(val) {
+                if (val) {
+                    self.createNodeAlias(val);
+                }
+            });
+
+            this.createNodeAlias = (val) => {
+                window.fetch(
+                    `${arches.urls.create_node_alias}?value=${val}&graph=${this.graph.graphid()}&alias=${this.node().alias()}`
+                )
+                .then(response => {
+                    if(response.ok) {
+                        return response.json();
+                    } else {
+                        self.suggestedAlias(null);
+                    }
+                })
+                .then(json => {
+                    if (json?.data) {
+                        self.suggestedAlias(json.data);
+                    } else {
+                        self.suggestedAlias(null);
+                    }
+                });
+            };
         },
 
         /**
