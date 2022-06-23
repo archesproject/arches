@@ -251,7 +251,6 @@
                 plugin: function(pluginid){return "{% url 'plugins' 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa' %}".replace('aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa', pluginid)},
                 transaction_reverse: function(transactionid) {return "{% url 'transaction_reverse' 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa' %}".replace('aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa', transactionid)},
                 mvt: function(nodeid){return decodeURI("{% url 'mvt' 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa' '{z}' '{x}' '{y}' %}").replace('aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa', nodeid)},
-                collector_manager: "{% url 'collector_manager' %}",
                 help_template: "{% url 'help_templates' %}",
                 graphs_api: "{% url 'graphs_api' 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa' %}".replace('aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa', ''),
                 api_card: "{% url 'api_card' 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa' %}".replace('aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa', ''),
