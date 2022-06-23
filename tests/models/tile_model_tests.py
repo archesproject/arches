@@ -28,6 +28,7 @@ from tests.base_test import ArchesTestCase
 from django.db import connection
 from django.core import management
 from django.contrib.auth.models import User
+from django.db.utils import ProgrammingError
 from django.http import HttpRequest
 from arches.app.models.tile import Tile, TileCardinalityError
 from django.utils.translation import get_language
@@ -327,7 +328,7 @@ class TileTests(ArchesTestCase):
         }
         second_tile = Tile(second_json)
 
-        with self.assertRaises(TileCardinalityError):
+        with self.assertRaises(ProgrammingError):
             second_tile.save(index=False, request=request)
 
     def test_apply_provisional_edit(self):
