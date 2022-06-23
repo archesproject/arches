@@ -425,7 +425,8 @@ class CsvReader(Reader):
                         cause,
                     )
                     errors.append({"type": "WARNING", "message": msg})
-                    newresourceinstance.delete()
+                    if not ResourceInstance.objects.filter(pk=newresourceinstance.resourceinstanceid).exists:
+                        newresourceinstance.delete()
                     save_count = save_count - 1
                 except Exception as e:
                     msg = "%s: WARNING: failed to save document in resource: %s %s. Exception detail:\n%s\n" % (
@@ -435,7 +436,8 @@ class CsvReader(Reader):
                         e,
                     )
                     errors.append({"type": "WARNING", "message": msg})
-                    newresourceinstance.delete()
+                    if not ResourceInstance.objects.filter(pk=newresourceinstance.resourceinstanceid).exists:
+                        newresourceinstance.delete()
                     save_count = save_count - 1
 
         else:
