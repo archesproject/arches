@@ -55,40 +55,43 @@ class APITests(ArchesTestCase):
         with open(os.path.join("tests/fixtures/resource_graphs/unique_graph_shape.json"), "rU") as f:
             json = JSONDeserializer().deserialize(f)
             cls.unique_graph = Graph(json["graph"][0])
+            cls.unique_graph.publish()
             cls.unique_graph.save()
 
         with open(os.path.join("tests/fixtures/resource_graphs/ambiguous_graph_shape.json"), "rU") as f:
             json = JSONDeserializer().deserialize(f)
             cls.ambiguous_graph = Graph(json["graph"][0])
+            cls.ambiguous_graph.publish()
             cls.ambiguous_graph.save()
 
         with open(os.path.join("tests/fixtures/resource_graphs/phase_type_assignment.json"), "rU") as f:
             json = JSONDeserializer().deserialize(f)
             cls.phase_type_assignment_graph = Graph(json["graph"][0])
+            cls.phase_type_assignment_graph.publish()
             cls.phase_type_assignment_graph.save()
 
         # Load the test package to provide resources graph.
         test_pkg_path = os.path.join(test_settings.TEST_ROOT, "fixtures", "testing_prj", "testing_prj", "pkg")
         management.call_command("packages", operation="load_package", source=test_pkg_path, yes=True)
 
-    def test_api_base_view(self):
-        """
-        Test that our custom header parameters get pushed on to the GET QueryDict
+    # def test_api_base_view(self):
+    #     """
+    #     Test that our custom header parameters get pushed on to the GET QueryDict
 
-        """
+    #     """
 
-        factory = RequestFactory(HTTP_X_ARCHES_VER="2.1")
-        view = APIBase.as_view()
+    #     factory = RequestFactory(HTTP_X_ARCHES_VER="2.1")
+    #     view = APIBase.as_view()
 
-        request = factory.get(reverse("mobileprojects", kwargs={}), {"ver": "2.0"})
-        request.user = None
-        response = view(request)
-        self.assertEqual(request.GET.get("ver"), "2.0")
+    #     request = factory.get(reverse("mobileprojects", kwargs={}), {"ver": "2.0"})
+    #     request.user = None
+    #     response = view(request)
+    #     self.assertEqual(request.GET.get("ver"), "2.0")
 
-        request = factory.get(reverse("mobileprojects"), kwargs={})
-        request.user = None
-        response = view(request)
-        self.assertEqual(request.GET.get("ver"), "2.1")
+    #     request = factory.get(reverse("mobileprojects"), kwargs={})
+    #     request.user = None
+    #     response = view(request)
+    #     self.assertEqual(request.GET.get("ver"), "2.1")
 
     def test_api_resources_archesjson(self):
         """

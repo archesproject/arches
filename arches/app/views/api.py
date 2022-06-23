@@ -60,7 +60,6 @@ from arches.app.utils.geo_utils import GeoUtils
 from arches.app.search.components.base import SearchFilterFactory
 from arches.app.datatypes.datatypes import DataTypeFactory, EDTFDataType
 from arches.app.search.search_engine_factory import SearchEngineFactory
-from arches.app.search.search_export import SearchResultsExporter
 
 
 from arches.celery import app
@@ -911,6 +910,8 @@ class Card(APIBase):
 
 class SearchExport(View):
     def get(self, request):
+        from arches.app.search.search_export import SearchResultsExporter  # avoids circular import
+
         total = int(request.GET.get("total", 0))
         download_limit = settings.SEARCH_EXPORT_IMMEDIATE_DOWNLOAD_THRESHOLD
         format = request.GET.get("format", "tilecsv")
