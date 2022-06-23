@@ -1,7 +1,7 @@
 {% load i18n %}
 
 <!-- ko if: !loading() -->
-<div class="workflow-plugin" style="display: flex; flex-direction: column;">
+<div class="etl-manager-container">
     <div class="etl-manager-tab-container">
         <div class="etl-manager-tabs" style="height: 50px;">
             <div class="etl-manager-tab" data-bind="click: function(){activeTab('start')}, css: {active: activeTab() === 'start', 'disabled': false}, text: 'Start'"></div>
@@ -47,11 +47,11 @@
         </div>
         <!-- /ko -->
     </div>
-    <div data-bind="if: activeTab() === 'details'">
+    <div style="height:100%" data-bind="if: activeTab() === 'details'">
         <!-- ko if: selectedModule() -->
-        <div style="flex: 1 1 auto;">
-            <div class="content-panel">
-                <div style="height:100%; margin-top: 1px; padding-top: 65px;" data-bind="component: {
+        <div style="width: 100%; height: inherit">
+            <div style="height: inherit;">
+                <div style="height: inherit;" data-bind="component: {
                     name: selectedModule().componentname,
                     params: {
                                 alert: alert,

@@ -321,18 +321,18 @@ class BranchCsvImporter(BaseImportModule):
                 if task_management.check_if_celery_available():
                     logger.info(_("Delegating load to Celery task"))
                     tasks.load_branch_csv.apply_async(
-                        (files, summary, result, self.temp_dir, self.loadid),
+                        (self.userid, files, summary, result, self.temp_dir, self.loadid),
                     )
                     result = _("delegated_to_celery")
                     return {"success": True, "data": result}
                 else:
-                    err = _("Celery appears not to be running, you need to have celery running in order to immport large csv.")
+                    err = _("Cannot start process. Unable to run process as a background task at this time.")
                     with connection.cursor() as cursor:
                         cursor.execute(
                             """UPDATE load_event SET status = %s, load_end_time = %s WHERE loadid = %s""",
                             ("failed", datetime.now(), self.loadid),
                         )
-                    return {"success": False, "data": err}
+                    return {"success": False, "data": {"title": _("Error"), "message": err}}
             else:
                 response = self.run_load_task(files, summary, result, self.temp_dir, self.loadid)
 
