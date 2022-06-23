@@ -830,10 +830,10 @@ class CsvReader(Reader):
                         if datatype in ["concept", "concept-list"]:
                             config = Node.objects.get(nodeid=nodeid).config
                             value = datatype_instance.transform_value_for_tile(value, **config)
-                            
+
                         # the below is needed for Domain Datatype transform_for_tile method
                         # config["nodeid"] = nodeid
-                        
+
                         try:
                             language = None
                             try:

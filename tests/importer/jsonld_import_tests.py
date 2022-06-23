@@ -124,7 +124,6 @@ class JsonLDImportTests(ArchesTestCase):
         # Add Spanish language for testing
         cls.spanish = Language(code="es", name="Spanish", default_direction="ltr", scope="data", isdefault=True)
         cls.spanish.save()
-        
 
     def setUp(self):
         pass
@@ -199,7 +198,6 @@ class JsonLDImportTests(ArchesTestCase):
             reader.read_resource(data, resourceid=resource_id, graphid=graph_id)
 
             print(reader)
-            
 
     def test_1_basic_import(self):
         """Plain string should import and be automatically converted to i18n string of default language"""
@@ -1092,10 +1090,7 @@ class JsonLDImportTests(ArchesTestCase):
             # else:
             #     self.assertDictEqual(result, {'@language': 'en', '@value': 'babo pour la russie'})
         #     results.append(note["http://www.cidoc-crm.org/cidoc-crm/P3_has_note"])
-        self.assertCountEqual([
-            {"@language": "en", "@value": "remy"}, 
-            {"@language": "en", "@value": "babo pour la russie"}
-        ], results)
+        self.assertCountEqual([{"@language": "en", "@value": "remy"}, {"@language": "en", "@value": "babo pour la russie"}], results)
 
     def test_d_path_with_array_2(self):
         data = """
