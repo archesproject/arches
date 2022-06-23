@@ -1375,7 +1375,11 @@ class Graph(models.GraphModel):
 
             check_if_editable = "is_editable" not in exclude
             ret["is_editable"] = self.is_editable() if check_if_editable else ret.pop("is_editable", None)
-            ret["cards"] = self.get_cards(check_if_editable=check_if_editable, use_raw_i18n_json=use_raw_i18n_json) if "cards" not in exclude else ret.pop("cards", None)
+            ret["cards"] = (
+                self.get_cards(check_if_editable=check_if_editable, use_raw_i18n_json=use_raw_i18n_json)
+                if "cards" not in exclude
+                else ret.pop("cards", None)
+            )
 
             if "widgets" not in exclude:
                 ret["widgets"] = self.get_widgets(use_raw_i18n_json=use_raw_i18n_json)

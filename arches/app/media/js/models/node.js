@@ -315,7 +315,7 @@ define([
                     userCallback.call(this, request, status, model);
                 }
                 if (status==='success') {
-                    this.alias(request.responseJSON.updated_values.node.alias);
+                    this.alias(request.responseJSON.updated_values?.node.alias);
                     this._node(this.json());
                 }
             };

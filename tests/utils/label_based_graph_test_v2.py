@@ -173,7 +173,7 @@ class LabelBasedGraph_FromResourceTests(TestCase):
 
         # let's mock Resource since it's minimally used
         # and complex to get `displayname`
-        cls.test_resource = mock.Mock(displayname="Test Resource", tiles=[])
+        cls.test_resource = mock.Mock(tiles=[])
 
     def test_smoke(self, mock_Node, mock_NodeGroup):
         label_based_graph = LabelBasedGraph.from_resource(resource=self.test_resource, compact=False, hide_empty_nodes=False)

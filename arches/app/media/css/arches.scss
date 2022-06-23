@@ -708,13 +708,87 @@ dl.inline-flex dd {
     display: unset;
 }
 
-.tabbed-workflow-footer {
+.branch-csv-etl {
+    background-color: white;
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    height: inherit;
+
+    .loader-select {
+        height: calc(100% - 50px);
+        text-align: center;
+        background: #fff;
+        justify-content: center;
+        padding-top: 90px;
+        height: 100%;
+        width: 100%;
+        display: flex;
+        margin-top: -66px;
+    }
+
+    .summary-header {
+        padding: 5px 0px 3px;
+        font-weight: 525;
+        font-size: 15px;
+        color: #2d5576;
+    }
+
+    .summary-title {
+        padding: 5px 0px 3px;
+        font-weight: 550;
+        font-size: 16px;
+        color: #2d5576;
+    }
+    h5 {
+        font-size: 15px;
+        color: #999;
+        font-weight: 500;
+    }
+
+    .dropzone-photo-upload {
+        margin-top: 0px;
+    }
+}
+
+.branch-xl-metadata-container {
+    height: calc(100vh - 50px);
+    margin-top: -65px;
+    padding: 0px 15px;
+}
+
+.branch-csv-etl-load-summmary {
+    margin-top: -10px;
+}
+
+h3.branch-xl-title {
+    margin-top: 15px; 
+    margin-bottom: 0px; 
+    font-size: 19px;
+    color: #454545;
+}
+
+h4.branch-xl-title {
+    margin-top: 0px; 
+    margin-bottom: 0px;
+    font-size: 16px;
+    color: #454545;
+}
+
+.branch-xl-file-contents-container {
+    margin-top: 25px;
+}
+
+.tabbed-workflow-footer, .etl-module-footer {
     background-color: #445769;
     border-top: 1px solid #0E2031;
     color: #f9f9f9;
     padding: 10px 12px;
     display: flex;
-    justify-content: space-between;
+    position: fixed;
+    bottom: 0;
+    width: 100%;
 }
 
 .tabbed-workflow-footer .step-counter {
@@ -15092,4 +15166,238 @@ ul.select2-choices:after {
             text-align: start;
         }
     }
+}
+
+.etl-manager-tabs {
+    background: #F7F9FB;
+    height: 45px;
+    border-bottom: 1px solid #ddd;
+}
+
+.etl-manager-tab {
+    min-width: 150px;
+    padding: 12px 20px;
+    border: 1px solid #BBD1EA;
+    border-top: none;
+    background: #F7F9FB;
+    font-size: 13pt;
+    display: inline-block;
+    text-align: center;
+    margin-right: -5px;
+}
+
+.etl-manager-tab:hover {
+    cursor: pointer;
+}
+
+.etl-manager-tab.disabled {
+    background-color: #f2f2f2;
+    color: grey;
+    cursor: default;
+    pointer-events: none;
+}
+
+.etl-manager-tab.active {
+    background-color: #fff;
+    border-bottom: 1px solid #fff;
+}
+
+.etl-manager-filter-container {
+    margin: 50px 50px 0px 50px;
+}
+
+.etl-manager-filter-button {
+    min-width: 150px;
+    padding: 12px 20px;
+    border: 1px solid #BBD1EA;
+    background: #F7F9FB;
+    font-size: 14px;
+    height: 45px;
+    display: inline-block;
+    text-align: center;
+    margin-right: -5px;
+}
+
+.etl-manager-filter-button:hover {
+    cursor: pointer;
+}
+
+.etl-manager-filter-button.active {
+    background-color: #fff;
+    font-weight: 600;
+}
+
+.etl-manager-filter-input {
+    width: 100%;
+    border: 1px solid #BBD1EA;
+    border-radius: 1px;
+    font-size: 12px;
+    height: 36px;
+    margin-left: 20px;
+    margin-right: 20px;
+    padding-left: 20px;
+}
+
+.etl-manager-filter-input.etl-model-filter {
+    width: 350px;
+    height: 45px;
+}
+
+.etl-manager-status-filter-container {
+    padding: 20px 10px;
+    display: flex;
+    justify-content: space-between;
+    border-bottom: 1px solid #ddd;
+}
+
+.etl-module-component-container {
+    height: calc(100vh - 160px);
+    width: calc(100vw - 50px);
+    padding: 25px;
+    overflow: scroll;
+}
+
+.etl-module-status {
+    border-right: 1px solid rgba(0,0,0,0.14);
+    width: 446px;
+}
+
+.etl-module-status-container {
+    height: calc(100vh - 95px);
+    display: flex;
+    flex-direction: column;
+    align-content: space-around;
+    width: auto;
+}
+
+.etl-jobs-container {
+    background: #f9f9f9;
+    height: calc(100vh - 225px);
+    overflow: scroll;
+}
+
+.etl-job {
+    margin: 10px 15px 10px 10px; 
+    border: 1px solid #ddd; 
+    border-radius: 2px;
+    display: block; 
+    background: #fff;
+}
+
+.etl-job.selected {
+    border: 1px solid rgb(56, 110, 178);
+}
+
+.etl-job-task-bar {
+    background: #eee; 
+    display: flex;
+    justify-content: space-between;
+    height: 40px; 
+    border-top: 1px solid #ddd;
+}
+
+.etl-job-task-bar .task {
+    padding: 10px; 
+}
+
+.etl-job-task-bar .task a{
+    padding: 7px; 
+    text-decoration: none;
+    color: steelblue; 
+    cursor: pointer;
+}
+
+.etl-job-task-bar .task a:hover{
+    background: rgba(156, 195, 228, 0.35);
+    border: 1px solid #6AA0CC;
+    padding: 6px;
+    border-radius: 1px;
+}
+
+.etl-job-task-bar .status {
+    float: right;
+    padding: 3px;
+}
+
+
+.etl-job .btn-success, .btn-success:hover{
+    background: #00ca4e;
+    border-color: #00ca4e;
+}
+
+.etl-job .btn-warning, .btn-warning:hover{
+    background: #ffbd44;
+    border-color: #ffbd44;
+}
+
+.etl-job .btn-danger, .btn-danger:hover{
+    background: #ff605c;
+    border-color: #ff605c;
+}
+
+.etl-module-preview {
+    height: calc(100vh - 95px); 
+    width: calc(100vw - 450px); 
+    padding: 20px 25px; 
+    overflow: scroll;
+    background: #fbfbfb;
+}
+
+.etl-module-info h4 {
+    margin-bottom: 5px;
+}
+
+.etl-module-component.etl-module-status {
+    width: 400px;
+}
+
+.etl-module-component {
+    margin-top: 30px;
+    padding-bottom: 5px;
+    width: 95%;
+}
+
+.etl-module-footer .btn {
+    border-radius: 2px;
+    margin-right: 20px;
+}
+
+.etl-loading-metadata-key {
+    font-size: 15px; 
+    padding-right: 3px;
+    color: #777;
+}
+
+.etl-loading-metadata-value {
+    font-size: 15px; 
+    padding-right: 3px;
+    color: rgb(4, 4, 45);
+}
+
+table.csv-mapping-table thead tr {
+    background: #f3f3f3;
+    border-bottom: 1px solid #ddd;
+}
+
+table.csv-mapping-table thead {
+    background: #f3f3f3;
+    border-bottom: 1px solid #ddd;
+}
+
+table.csv-mapping-table thead tr.column-names {
+    background: #fff;
+}
+
+table.csv-mapping-table thead th {
+    border-bottom: 1px solid #ddd;
+}
+
+table.csv-mapping-table th {
+    min-width: 200px;
+    border-right: 1px solid #ddd;
+}
+
+table.csv-mapping-table td {
+    vertical-align: text-top;
+    border-right: 1px solid #ddd;
 }

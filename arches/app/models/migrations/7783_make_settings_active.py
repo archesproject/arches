@@ -9,7 +9,7 @@ import django.db.models.deletion
 class Migration(migrations.Migration):
 
     dependencies = [
-        ("models", "8130_consolidate_languages"),
+        ("models", "8528_bulk_load_performance_functions"),
     ]
 
     operations = [

@@ -71,27 +71,26 @@ class Resource(models.ResourceInstance):
         # end from models.ResourceInstance
         self.tiles = []
 
-    def get_descriptor(self, descriptor):
+    def get_descriptor(self, descriptor, context):
         graph_function = models.FunctionXGraph.objects.filter(
             graph_id=self.graph_id, function__functiontype="primarydescriptors"
         ).select_related("function")
         if len(graph_function) == 1:
             module = graph_function[0].function.get_class_module()()
-            return module.get_primary_descriptor_from_nodes(self, graph_function[0].config["descriptor_types"][descriptor])
+            return module.get_primary_descriptor_from_nodes(
+                self, graph_function[0].config["descriptor_types"][descriptor], context
+            )
         else:
             return "undefined"
 
-    @property
-    def displaydescription(self):
-        return self.get_descriptor("description")
+    def displaydescription(self, context=None):
+        return self.get_descriptor("description", context)
 
-    @property
-    def map_popup(self):
-        return self.get_descriptor("map_popup")
+    def map_popup(self, context=None):
+        return self.get_descriptor("map_popup", context)
 
-    @property
-    def displayname(self):
-        return self.get_descriptor("name")
+    def displayname(self, context=None):
+        return self.get_descriptor("name", context)
 
     def save_edit(self, user={}, note="", edit_type="", transaction_id=None):
         timestamp = datetime.datetime.now()
@@ -123,11 +122,12 @@ class Resource(models.ResourceInstance):
         request = kwargs.pop("request", None)
         user = kwargs.pop("user", None)
         index = kwargs.pop("index", True)
+        context = kwargs.pop("context", None)
         transaction_id = kwargs.pop("transaction_id", None)
         super(Resource, self).save(*args, **kwargs)
         for tile in self.tiles:
             tile.resourceinstance_id = self.resourceinstanceid
-            saved_tile = tile.save(request=request, index=False, transaction_id=transaction_id)
+            tile.save(request=request, index=False, transaction_id=transaction_id, context=context)
         if request is None:
             if user is None:
                 user = {}
@@ -142,8 +142,7 @@ class Resource(models.ResourceInstance):
 
         self.save_edit(user=user, edit_type="create", transaction_id=transaction_id)
         if index is True:
-            self.index()
-            pass
+            self.index(context)
 
     def get_root_ontology(self):
         """
@@ -181,6 +180,9 @@ class Resource(models.ResourceInstance):
 
         Arguments:
         resources -- a list of resource models
+
+        Keyword Arguments:
+        transaction_id -- a uuid identifing the save of these instances as belonging to a collective load or process
 
         """
 
@@ -225,16 +227,19 @@ class Resource(models.ResourceInstance):
         se.bulk_index(documents)
         se.bulk_index(term_list)
 
-    def index(self):
+    def index(self, context=None):
         """
         Indexes all the nessesary items values of a resource to support search
+
+        Keyword Arguments:
+        context -- a string such as "copy" to indicate conditions under which a document is indexed
 
         """
 
         if str(self.graph_id) != str(settings.SYSTEM_SETTINGS_RESOURCE_MODEL_ID):
             datatype_factory = DataTypeFactory()
             node_datatypes = {str(nodeid): datatype for nodeid, datatype in models.Node.objects.values_list("nodeid", "datatype")}
-            document, terms = self.get_documents_to_index(datatype_factory=datatype_factory, node_datatypes=node_datatypes)
+            document, terms = self.get_documents_to_index(datatype_factory=datatype_factory, node_datatypes=node_datatypes, context=context)
             document["root_ontology_class"] = self.get_root_ontology()
             doc = JSONSerializer().serializeToPython(document)
             se.index_data(index=RESOURCES_INDEX, body=doc, id=self.pk)
@@ -251,7 +256,7 @@ class Resource(models.ResourceInstance):
                     doc, doc_id = es_index.get_documents_to_index(self, document["tiles"])
                     es_index.index_document(document=doc, id=doc_id)
 
-    def get_documents_to_index(self, fetchTiles=True, datatype_factory=None, node_datatypes=None):
+    def get_documents_to_index(self, fetchTiles=True, datatype_factory=None, node_datatypes=None, context=None):
         """
         Gets all the documents nessesary to index a single resource
         returns a tuple of a document and list of terms
@@ -260,6 +265,7 @@ class Resource(models.ResourceInstance):
         fetchTiles -- instead of fetching the tiles from the database get them off the model itself
         datatype_factory -- refernce to the DataTypeFactory instance
         node_datatypes -- a dictionary of datatypes keyed to node ids
+        context -- a string such as "copy" to indicate conditions under which a document is indexed
 
         """
 
@@ -273,26 +279,28 @@ class Resource(models.ResourceInstance):
         document["legacyid"] = self.legacyid
 
         document["displayname"] = []
-        if self.displayname is not None:
+        displayname = self.displayname(context)
+        if displayname is not None:
             try:
-                display_name = JSONDeserializer().deserialize(self.displayname)
+                display_name = JSONDeserializer().deserialize(displayname)
                 for key in display_name.keys():
                     document["displayname"].append({"value": display_name[key]["value"], "language": key})
             except:
-                display_name = {"value": self.displayname, "language": get_language()}
+                display_name = {"value": displayname, "language": get_language()}
                 document["displayname"].append(display_name)
 
         document["displaydescription"] = []
-        if self.displaydescription is not None:
+        displaydescription = self.displaydescription(context)
+        if displaydescription is not None:
             try:
-                display_description = JSONDeserializer().deserialize(self.displaydescription)
+                display_description = JSONDeserializer().deserialize(displaydescription)
                 for key in display_description.keys():
                     document["displaydescription"].append({"value": display_description[key]["value"], "language": key})
             except:
-                display_description = {"value": self.displaydescription, "language": get_language()}
+                display_description = {"value": displaydescription, "language": get_language()}
                 document["displaydescription"].append(display_description)
 
-        document["map_popup"] = self.map_popup
+        document["map_popup"] = self.map_popup(context)
 
         tiles = list(models.TileModel.objects.filter(resourceinstance=self)) if fetchTiles else self.tiles
 
@@ -403,7 +411,7 @@ class Resource(models.ResourceInstance):
                 self.delete_index()
 
             try:
-                self.save_edit(edit_type="delete", user=user, note=self.displayname, transaction_id=transaction_id)
+                self.save_edit(edit_type="delete", user=user, note=self.displayname(), transaction_id=transaction_id)
             except:
                 pass
             super(Resource, self).delete()
@@ -611,7 +619,7 @@ class Resource(models.ResourceInstance):
                 tile.parenttile = id_map[tile.parenttile_id]
 
         with transaction.atomic():
-            new_resource.save()
+            new_resource.save(context="copy")
 
         return new_resource
 
@@ -625,6 +633,7 @@ class Resource(models.ResourceInstance):
         """
 
         ret = JSONSerializer().handle_model(self)
+        ret["displayname"] = self.displayname()
         ret["tiles"] = self.tiles
 
         return JSONSerializer().serializeToPython(ret)
