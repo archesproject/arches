@@ -8,105 +8,105 @@ import django.db.models.deletion
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('models', '8528__7783_add_graph_publications'),
+        ("models", "8528__7783_add_graph_publications"),
     ]
 
     operations = [
         migrations.RemoveField(
-            model_name='mobilesurveymodel',
-            name='cards',
+            model_name="mobilesurveymodel",
+            name="cards",
         ),
         migrations.RemoveField(
-            model_name='mobilesurveymodel',
-            name='createdby',
+            model_name="mobilesurveymodel",
+            name="createdby",
         ),
         migrations.RemoveField(
-            model_name='mobilesurveymodel',
-            name='groups',
+            model_name="mobilesurveymodel",
+            name="groups",
         ),
         migrations.RemoveField(
-            model_name='mobilesurveymodel',
-            name='lasteditedby',
+            model_name="mobilesurveymodel",
+            name="lasteditedby",
         ),
         migrations.RemoveField(
-            model_name='mobilesurveymodel',
-            name='users',
+            model_name="mobilesurveymodel",
+            name="users",
         ),
         migrations.AlterUniqueTogether(
-            name='mobilesurveyxcard',
+            name="mobilesurveyxcard",
             unique_together=None,
         ),
         migrations.RemoveField(
-            model_name='mobilesurveyxcard',
-            name='card',
+            model_name="mobilesurveyxcard",
+            name="card",
         ),
         migrations.RemoveField(
-            model_name='mobilesurveyxcard',
-            name='mobile_survey',
+            model_name="mobilesurveyxcard",
+            name="mobile_survey",
         ),
         migrations.AlterUniqueTogether(
-            name='mobilesurveyxgroup',
+            name="mobilesurveyxgroup",
             unique_together=None,
         ),
         migrations.RemoveField(
-            model_name='mobilesurveyxgroup',
-            name='group',
+            model_name="mobilesurveyxgroup",
+            name="group",
         ),
         migrations.RemoveField(
-            model_name='mobilesurveyxgroup',
-            name='mobile_survey',
+            model_name="mobilesurveyxgroup",
+            name="mobile_survey",
         ),
         migrations.AlterUniqueTogether(
-            name='mobilesurveyxuser',
+            name="mobilesurveyxuser",
             unique_together=None,
         ),
         migrations.RemoveField(
-            model_name='mobilesurveyxuser',
-            name='mobile_survey',
+            model_name="mobilesurveyxuser",
+            name="mobile_survey",
         ),
         migrations.RemoveField(
-            model_name='mobilesurveyxuser',
-            name='user',
+            model_name="mobilesurveyxuser",
+            name="user",
         ),
         migrations.RemoveField(
-            model_name='mobilesynclog',
-            name='survey',
+            model_name="mobilesynclog",
+            name="survey",
         ),
         migrations.RemoveField(
-            model_name='tilerevisionlog',
-            name='survey',
+            model_name="tilerevisionlog",
+            name="survey",
         ),
         migrations.RemoveField(
-            model_name='tilerevisionlog',
-            name='synclog',
+            model_name="tilerevisionlog",
+            name="synclog",
         ),
         migrations.DeleteModel(
-            name='MobileSurvey',
+            name="MobileSurvey",
         ),
         migrations.RemoveField(
-            model_name='resourcerevisionlog',
-            name='survey',
+            model_name="resourcerevisionlog",
+            name="survey",
         ),
         migrations.RemoveField(
-            model_name='resourcerevisionlog',
-            name='synclog',
+            model_name="resourcerevisionlog",
+            name="synclog",
         ),
         migrations.DeleteModel(
-            name='MobileSurveyModel',
+            name="MobileSurveyModel",
         ),
         migrations.DeleteModel(
-            name='MobileSurveyXCard',
+            name="MobileSurveyXCard",
         ),
         migrations.DeleteModel(
-            name='MobileSurveyXGroup',
+            name="MobileSurveyXGroup",
         ),
         migrations.DeleteModel(
-            name='MobileSurveyXUser',
+            name="MobileSurveyXUser",
         ),
         migrations.DeleteModel(
-            name='MobileSyncLog',
+            name="MobileSyncLog",
         ),
         migrations.DeleteModel(
-            name='TileRevisionLog',
+            name="TileRevisionLog",
         ),
     ]
