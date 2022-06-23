@@ -427,9 +427,8 @@ class JsonLdReader(Reader):
                 if self.verbosity > 1:
                     for line in self.print_buf:
                         # print(line) # uncomment this line to print errors directly to the screen
-                        self.logger.debug(line)    
+                        self.logger.debug(line)
                 raise
-
 
     def is_semantic_node(self, graph_node):
         return self.datatype_factory.datatypes[graph_node["datatype_type"]].defaultwidget is None
