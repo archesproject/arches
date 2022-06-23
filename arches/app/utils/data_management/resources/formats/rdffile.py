@@ -715,8 +715,6 @@ class JsonLdReader(Reader):
 
                 bnode["tile"] = tile
                 if bnodeid in result:
-                    import ipdb; ipdb.sset_trace()
-                    
                     if branch[0]["datatype"].collects_multiple_values():
                         # append to previous tile
                         if type(node_value) != list:
