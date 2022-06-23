@@ -388,4 +388,64 @@ class Migration(migrations.Migration):
             name="widgetid",
             field=models.UUIDField(primary_key=True, serialize=False),
         ),
+        migrations.AlterField(
+            model_name='etlmodule',
+            name='config',
+            field=models.JSONField(blank=True, db_column='config', null=True),
+        ),
+        migrations.AlterField(
+            model_name='etlmodule',
+            name='slug',
+            field=models.TextField(null=True, unique=True, validators=[django.core.validators.RegexValidator(re.compile('^[-a-zA-Z0-9_]+\\Z'), 'Enter a valid “slug” consisting of letters, numbers, underscores or hyphens.', 'invalid')]),
+        ),
+        migrations.AlterField(
+            model_name='geojsongeometry',
+            name='id',
+            field=models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID'),
+        ),
+        migrations.AlterField(
+            model_name='groupmapsettings',
+            name='id',
+            field=models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID'),
+        ),
+        migrations.AlterField(
+            model_name='iiifmanifest',
+            name='id',
+            field=models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID'),
+        ),
+        migrations.AlterField(
+            model_name='loadevent',
+            name='load_details',
+            field=models.JSONField(blank=True, null=True),
+        ),
+        migrations.AlterField(
+            model_name='loadstaging',
+            name='id',
+            field=models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID'),
+        ),
+        migrations.AlterField(
+            model_name='loadstaging',
+            name='value',
+            field=models.JSONField(blank=True, db_column='value', null=True),
+        ),
+        migrations.AlterField(
+            model_name='mapmarker',
+            name='id',
+            field=models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID'),
+        ),
+        migrations.AlterField(
+            model_name='mapsource',
+            name='id',
+            field=models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID'),
+        ),
+        migrations.AlterField(
+            model_name='spatialview',
+            name='attributenodes',
+            field=models.JSONField(blank=True, db_column='attributenodes', null=True),
+        ),
+        migrations.AlterField(
+            model_name='userprofile',
+            name='id',
+            field=models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID'),
+        ),
     ]
