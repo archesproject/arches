@@ -1,6 +1,6 @@
 {
     "name": "arches",
-    "version": "6.0.1",
+    "version": "6.1.0",
     "scripts": {
         "build_production": "NODE_PATH=./arches/app/media/node_modules NODE_ENV=production ./arches/app/media/node_modules/.bin/webpack --config webpack/webpack.config.prod.js",
         "build_development": "NODE_PATH=./arches/app/media/node_modules ./arches/app/media/node_modules/.bin/webpack --config webpack/webpack.config.dev.js",

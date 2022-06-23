@@ -492,7 +492,6 @@ TIMEWHEEL_DATE_TIERS = None
 # Identify the usernames and duration (seconds) for which you want to cache the timewheel
 CACHE_BY_USER = {"anonymous": 3600 * 24}
 
-BYPASS_CARDINALITY_TILE_VALIDATION = True
 BYPASS_UNIQUE_CONSTRAINT_TILE_VALIDATION = False
 BYPASS_REQUIRED_VALUE_TILE_VALIDATION = False
 
@@ -591,7 +590,14 @@ SEARCH_COMPONENT_LOCATIONS = [
     "arches.app.search.components",
 ]
 
-MAPBOX_API_KEY = "pk.eyJ1IjoiY2hpYXR0IiwiYSI6ImZRLTZDbVkifQ.2ZLLC1kInvxJ7isk_0_OMw"  # Put your Mapbox key here!
+ETL_MODULE_LOCATIONS = [
+    "arches.app.etl_modules",
+]
+
+FILE_TYPE_CHECKING = False
+FILE_TYPES = ["bmp", "gif", "jpg", "jpeg", "pdf", "png", "psd", "rtf", "tif", "tiff", "xlsx", "csv", "zip"]
+
+MAPBOX_API_KEY = ""  # Put your Mapbox key here!
 
 # links to sprites and glyphs for use on map
 MAPBOX_SPRITES = "mapbox://sprites/mapbox/basic-v9"

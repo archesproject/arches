@@ -9,6 +9,18 @@ define([
             options.name = 'Resource Type Filter';
             this.requiredFilters = ['term-filter'];
             BaseFilter.prototype.initialize.call(this, options);
+            this.resourceModels = ko.observableArray();
+            this.filter = ko.observableArray();
+            const self = this;
+
+            const response = await fetch(arches.urls.api_search_component_data + componentName);
+            if (response.ok) {
+                const data = await response.json();
+                self.resourceModels(data.resources);
+            } else {
+                // eslint-disable-next-line no-console
+                console.log('Failed to fetch resource instance list');
+            }
 
             this.filter = ko.observableArray();
 
@@ -64,8 +76,8 @@ define([
             }, this);
             if(!!item){
                 var inverted = ko.observable(false);
-                this.getFilter('term-filter').addTag(item.name(), this.name, inverted);
-                this.filter([{graphid:item.graphid, name: item.name(), inverted: inverted}]);
+                this.getFilter('term-filter').addTag(item.name, this.name, inverted);
+                this.filter([{graphid:item.graphid, name: item.name, inverted: inverted}]);
             }else{
                 this.clear();
             }

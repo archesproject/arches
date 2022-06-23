@@ -44,4 +44,4 @@ admin.site.register(
     ]
 )
 
-admin.site.register([models.Plugin], GuardedAdmin)
+admin.site.register([models.Plugin, models.ETLModule], GuardedAdmin)
