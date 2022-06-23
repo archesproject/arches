@@ -162,37 +162,37 @@ class Resource(models.ResourceInstance):
 
         """
 
-        self.tiles = list(models.TileModel.objects.filter(resourceinstance=self))
         if user:
             self.tiles = [tile for tile in self.tiles if tile.nodegroup_id is not None and user.has_perm(perm, tile.nodegroup)]
+        else:
+            self.tiles = list(models.TileModel.objects.filter(resourceinstance=self))
 
     # # flatten out the nested tiles into a single array
     def get_flattened_tiles(self):
-        tiles = []
-        for tile in self.tiles:
-            tiles.extend(tile.get_flattened_tiles())
-        return tiles
+        return [flat_tile for tile in self.tiles for flat_tile in tile.get_flattened_tiles()]
 
     @staticmethod
-    def bulk_save(resources, transaction_id=None):
+    def bulk_save(resources, transaction_id=None, flat=False):
         """
         Saves and indexes a list of resources
 
         Arguments:
         resources -- a list of resource models
+        flat -- boolean value whether incoming resource.tiles list already flat or instead nested
 
         """
 
         datatype_factory = DataTypeFactory()
         node_datatypes = {str(nodeid): datatype for nodeid, datatype in models.Node.objects.values_list("nodeid", "datatype")}
-        tiles = []
         documents = []
         term_list = []
 
-        for resource in resources:
-            resource.tiles = resource.get_flattened_tiles()
-            tiles.extend(resource.tiles)
+        if flat:
+            tiles = (tile for resource in resources for tile in resource.tiles)
+        else:
+            tiles = (tile for resource in resources for tile in resource.get_flattened_tiles())
 
+        tile_count = sum(1 for t in tiles)
         # need to save the models first before getting the documents for index
         start = time()
         Resource.objects.bulk_create(resources)
@@ -205,7 +205,7 @@ class Resource(models.ResourceInstance):
             resource.save_edit(edit_type="create", transaction_id=transaction_id)
 
         resources[0].tiles[0].save_edit(
-            note=f"Bulk created: {len(tiles)} for {len(resources)} resources.", edit_type="bulk_create", transaction_id=transaction_id
+            note=f"Bulk created: {tile_count} for {len(resources)} resources.", edit_type="bulk_create", transaction_id=transaction_id
         )
 
         print("Time to save resource edits: %s" % datetime.timedelta(seconds=time() - start))
