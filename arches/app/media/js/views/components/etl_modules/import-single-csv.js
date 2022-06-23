@@ -185,7 +185,17 @@ define([
                     self.formData.append('async', true);
                     self.submit('write').then(data => {
                         console.log(data.result);
-                    }).fail(error => console.log(error.responseJSON.data));
+                    }).fail( function (err) {
+                        self.alert(
+                                new JsonErrorAlertViewModel(
+                                    'ep-alert-red', 
+                                    err.responseJSON["data"], 
+                                    null, 
+                                    function(){}
+                                )
+                            )                    
+                        }
+                    );
                 }).fail(error => console.log(error.responseJSON.data));
             };
 
