@@ -1689,7 +1689,7 @@ div.workflow-panel {
 .workflow-select-card-container-title {
     font-size: 1.5em;
     font-weight: 500;
-    padding-left: 30px;
+    padding: 0 30px;
     margin-top: 5px;
     margin-bottom: -15px;
 }
@@ -4344,10 +4344,12 @@ div.dropdown-menu.open {
     left: 0;
     right: 0;
     z-index: 100000000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
 .loading-mask:after {
-    position: fixed;
     color: #454545;
     content: '\f110';
     -webkit-animation: fa-spin 2s infinite linear;
@@ -4355,8 +4357,6 @@ div.dropdown-menu.open {
     display: inline-block;
     font: normal normal normal 14px/1 FontAwesome;
     font-size: 10vw;
-    margin-top: 42vh;
-    margin-left: 45vw;
     text-rendering: auto;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
@@ -8042,7 +8042,24 @@ div .switch label:hover,
     background: #fff;
     color: #666;
     height: 50px;
-    .media-block .media-left {
+    .media-block {
+        display: flex;
+    
+        .media-body{
+            display: flex;
+            flex: 1;
+            .media-left{
+                flex: 1;
+            }
+            &.file-upload-card-detail-right {
+                display: flex;
+                &>div{
+                    margin: 0 5px;
+                }
+            }
+        }
+    }
+    .media-left, .media-right, .file-size-label, .file-upload-card-detail-right {
         float: none;
     }
 }
