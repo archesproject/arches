@@ -22,7 +22,6 @@ from django.core.exceptions import ObjectDoesNotExist
 from django.forms import ModelForm
 from arches.app.models import models
 from arches.app.utils.betterJSONSerializer import JSONSerializer
-from django.core.cache import cache
 
 
 class Card(models.CardModel):
