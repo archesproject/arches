@@ -3,7 +3,8 @@ define([
     'knockout',
     'js-cookie',
     'arches',
-], function($, ko, Cookies, arches) {
+    'templates/views/components/plugins/etl-manager.htm'
+], function($, ko, Cookies, arches, ETLManagerTemplate) {
     return ko.components.register('etl-manager', {
         viewModel: function(params) {
             const self = this;
@@ -179,7 +180,7 @@ define([
                     }
                 }).then(function(data){
                     self.etlModules = data.map(function(etl){
-                        require([etl.component]);
+                        require([`${etl.component}`]);
                         return etl;
                     });
                     self.loading(false);
@@ -189,6 +190,6 @@ define([
             this.init();
             setInterval(this.fetchLoadEvent, 5000)
         },
-        template: { require: 'text!templates/views/components/plugins/etl-manager.htm' }
+        template: ETLManagerTemplate,
     });
 });

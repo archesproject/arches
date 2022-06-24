@@ -6,4 +6,5 @@ const projectPath =  Path.parse(__dirname)['dir'];
 module.exports = {
     ARCHES_CORE_PATH: Path.resolve(projectPath, '../../arches/arches/app'),
     PROJECT_PATH: projectPath,
+    SERVER_ADDRESS: "http://localhost:8000/",
 }

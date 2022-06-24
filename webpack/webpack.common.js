@@ -1,3 +1,4 @@
+const fetch = require('cross-fetch');
 const Path = require('path');
 const webpack = require('webpack');
 const { CleanWebpackPlugin } = require('clean-webpack-plugin');
@@ -141,7 +142,21 @@ module.exports = {
             },
             {
                 test: /\.html?$/i,
-                use: [`${PROJECT_PATH}/media/node_modules/html-loader`],
+                loader: `${PROJECT_PATH}/media/node_modules/html-loader`,
+                options: {
+                    esModule: false,
+                    preprocessor: async (_content, loaderContext) => {
+                        const resourcePath = loaderContext['resourcePath'];
+                        const projectResourcePathData = resourcePath.split(`${PROJECT_PATH}/`);
+
+                        const templatePath = projectResourcePathData.length > 1 ? projectResourcePathData[1] : resourcePath.split(`${ARCHES_CORE_PATH}/`)[1]; 
+
+                        const resp = await fetch(SERVER_ADDRESS + templatePath)
+                        const responseText = await resp.text()
+
+                        return responseText;
+                    }
+                }
             },
             {
                 test: /\.txt$/i,
