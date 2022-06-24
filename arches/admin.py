@@ -40,7 +40,8 @@ admin.site.register(
         models.GroupMapSettings,
         models.Language,
         models.NodeGroup,
+        models.SpatialView,
     ]
 )
 
-admin.site.register([models.Plugin], GuardedAdmin)
+admin.site.register([models.Plugin, models.ETLModule], GuardedAdmin)

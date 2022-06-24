@@ -1,19 +1,39 @@
+import logging
 import uuid
 from arches.app.utils.betterJSONSerializer import JSONSerializer
 from arches.app.functions.base import BaseFunction
 from arches.app.models import models
-from arches.app.models.tile import Tile
 from arches.app.datatypes.datatypes import DataTypeFactory
 from django.utils.translation import ugettext as _
 
+logger = logging.getLogger(__name__)
+
 
 class AbstractPrimaryDescriptorsFunction(BaseFunction):
-    def get_primary_descriptor_from_nodes(self, resource, config):
+    def get_primary_descriptor_from_nodes(self, resource, config, context=None):
+        """
+        Arguments:
+        resource -- the resource instance to which the primary decriptor will be assigned
+        config -- the descriptor config which indicates how and what will define the descriptor
+
+        Keyword Arguments:
+        context -- string such as "copy" to indicate conditions under which a resource participates in a function.
+        """
+
         pass
 
 
 class PrimaryDescriptorsFunction(AbstractPrimaryDescriptorsFunction):
-    def get_primary_descriptor_from_nodes(self, resource, config):
+    def get_primary_descriptor_from_nodes(self, resource, config, context=None):
+        """
+        Arguments:
+        resource -- the resource instance to which the primary decriptor will be assigned
+        config -- the descriptor config which indicates how and what will define the descriptor
+
+        Keyword Arguments:
+        context -- string such as "copy" to indicate conditions under which a resource participates in a function.
+        """
+
         datatype_factory = None
         try:
             if "nodegroup_id" in config and config["nodegroup_id"] != "" and config["nodegroup_id"] is not None:
@@ -40,8 +60,8 @@ class PrimaryDescriptorsFunction(AbstractPrimaryDescriptorsFunction):
                             if value is None:
                                 value = ""
                             config["string_template"] = config["string_template"].replace("<%s>" % node.name, str(value))
-        except ValueError as e:
-            print(e, "invalid nodegroupid participating in descriptor function.")
+        except ValueError:
+            logger.error(_("Invalid nodegroupid, {0}, participating in descriptor function.").format(config["nodegroup_id"]))
         if config["string_template"].strip() == "":
             config["string_template"] = _("Undefined")
         return config["string_template"]

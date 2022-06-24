@@ -66,6 +66,7 @@ class Command(BaseCommand):
         self.register("plugins", "plugin")
         self.register("reports", "report")
         self.register("datatypes", "datatype")
+        self.register("etl_modules", "etl_module")
 
     def update_project_templates(self):
         """

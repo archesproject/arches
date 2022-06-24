@@ -214,8 +214,8 @@ define([
                 $.ajax({
                     type: "GET",
                     url: arches.urls.resource_copy.replace('//', '/' + resourceId() + '/'),
-                    success: function() {
-                        vm.alert(new AlertViewModel('ep-alert-blue', arches.resourceCopySuccess.title, '', null, function(){}));
+                    success: function(data) {
+                        vm.alert(new AlertViewModel('ep-alert-blue', arches.resourceCopySuccess.title, "<a style='color: #fff; font-weight: 700;' target='_blank' href=" + arches.urls.resource_editor + data.resourceid + ">" + arches.resourceCopySuccess.text + "</a>", null, function(){}));
                     },
                     error: function() {
                         vm.alert(new AlertViewModel('ep-alert-red', arches.resourceCopyFailed.title, arches.resourceCopyFailed.text, null, function(){}));
