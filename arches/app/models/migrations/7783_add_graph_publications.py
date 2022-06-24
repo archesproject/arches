@@ -78,47 +78,58 @@ class Migration(migrations.Migration):
         #     },
         # ),
         migrations.CreateModel(
-            name='GraphXPublishedGraph',
+            name="GraphXPublishedGraph",
             fields=[
-                ('publicationid', models.UUIDField(default=uuid.uuid1, primary_key=True, serialize=False)),
-                ('notes', models.TextField(blank=True, null=True)),
-                ('published_time', models.DateTimeField(default=datetime.datetime.now)),
+                ("publicationid", models.UUIDField(default=uuid.uuid1, primary_key=True, serialize=False)),
+                ("notes", models.TextField(blank=True, null=True)),
+                ("published_time", models.DateTimeField(default=datetime.datetime.now)),
             ],
             options={
-                'db_table': 'graphs_x_published_graphs',
-                'managed': True,
+                "db_table": "graphs_x_published_graphs",
+                "managed": True,
             },
         ),
         migrations.CreateModel(
-            name='PublishedGraph',
+            name="PublishedGraph",
             fields=[
-                ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('serialized_graph', django.contrib.postgres.fields.jsonb.JSONField(blank=True, db_column='serialized_graph', null=True)),
+                ("id", models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name="ID")),
+                ("serialized_graph", django.contrib.postgres.fields.jsonb.JSONField(blank=True, db_column="serialized_graph", null=True)),
             ],
             options={
-                'db_table': 'published_graphs',
-                'managed': True,
+                "db_table": "published_graphs",
+                "managed": True,
             },
         ),
         migrations.AddField(
-            model_name='publishedgraph',
-            name='language',
-            field=models.ForeignKey(blank=True, db_column='languageid', null=True, on_delete=django.db.models.deletion.CASCADE, to='models.Language', to_field='code'),
+            model_name="publishedgraph",
+            name="language",
+            field=models.ForeignKey(
+                blank=True,
+                db_column="languageid",
+                null=True,
+                on_delete=django.db.models.deletion.CASCADE,
+                to="models.Language",
+                to_field="code",
+            ),
         ),
         migrations.AddField(
-            model_name='publishedgraph',
-            name='publication',
-            field=models.ForeignKey(db_column='publicationid', on_delete=django.db.models.deletion.CASCADE, to='models.GraphXPublishedGraph'),
+            model_name="publishedgraph",
+            name="publication",
+            field=models.ForeignKey(
+                db_column="publicationid", on_delete=django.db.models.deletion.CASCADE, to="models.GraphXPublishedGraph"
+            ),
         ),
         migrations.AddField(
-            model_name='graphxpublishedgraph',
-            name='graph',
-            field=models.ForeignKey(db_column='graphid', on_delete=django.db.models.deletion.CASCADE, to='models.GraphModel'),
+            model_name="graphxpublishedgraph",
+            name="graph",
+            field=models.ForeignKey(db_column="graphid", on_delete=django.db.models.deletion.CASCADE, to="models.GraphModel"),
         ),
         migrations.AddField(
-            model_name='graphxpublishedgraph',
-            name='user',
-            field=models.ForeignKey(db_column='userid', null=True, on_delete=django.db.models.deletion.CASCADE, to=settings.AUTH_USER_MODEL),
+            model_name="graphxpublishedgraph",
+            name="user",
+            field=models.ForeignKey(
+                db_column="userid", null=True, on_delete=django.db.models.deletion.CASCADE, to=settings.AUTH_USER_MODEL
+            ),
         ),
         migrations.AddField(
             model_name="graphmodel",

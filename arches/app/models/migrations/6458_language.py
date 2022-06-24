@@ -16,7 +16,6 @@ class Migration(migrations.Migration):
 
     language_info = translation.get_language_info(language)
 
-
     def forward_migration(apps, schema_editor=None):
         dlanguage_model = apps.get_model("models", "DLanguage")
         language_model = apps.get_model("models", "Language")
