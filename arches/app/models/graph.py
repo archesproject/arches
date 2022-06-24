@@ -34,6 +34,8 @@ from arches.app.search.search_engine_factory import SearchEngineFactory
 from django.utils.translation import ugettext as _
 from pyld.jsonld import compact, JsonLdError
 from django.db.models.base import Deferred
+from django.utils import translation
+
 
 logger = logging.getLogger(__name__)
 
@@ -111,13 +113,9 @@ class Graph(models.GraphModel):
 
                 self.populate_null_nodegroups()
 
-                if "publication" in args[0]:
+                if "publication" in args[0] and args[0]["publication"] is not None:
                     publication_data = args[0]["publication"]
-                    publication_data["serialized_graph"] = JSONDeserializer().deserialize(
-                        JSONSerializer().serialize(self, force_recalculation=True)
-                    )
-
-                    self.publication = models.GraphPublication(**publication_data)
+                    self.publication = models.GraphXPublishedGraph(**publication_data)
 
             else:
                 if len(args) == 1 and (isinstance(args[0], str) or isinstance(args[0], uuid.UUID)):
@@ -130,7 +128,7 @@ class Graph(models.GraphModel):
                         has_deferred_args = True
 
                 #  accessing the graph publication while deferring args results in a recursive loop
-                if not has_deferred_args and self.publication and self.publication.serialized_graph:
+                if not has_deferred_args and self.publication:
                     self.serialized_graph = self.serialize()  # reads from graph_publication table and returns serialized graph as dict
 
                     # filter out keys from the serialized_graph that would cause an error on instantiation
@@ -180,6 +178,42 @@ class Graph(models.GraphModel):
                     self.add_card(card)
 
                 self.populate_null_nodegroups()
+
+    def refresh_from_database(self):
+        """
+        Updates card, edge, and node data from the database, bypassing the
+        cached version of the graph
+        """
+        self.nodes = {}
+        self.edges = {}
+        self.cards = {}
+
+        nodes = self.node_set.all()
+        edges = self.edge_set.all()
+        cards = self.cardmodel_set.all()
+
+        edge_lookup = {edge["edgeid"]: edge for edge in json.loads(JSONSerializer().serialize(edges))}
+
+        for card in cards:
+            widgets = list(card.cardxnodexwidget_set.all())
+            for widget in widgets:
+                self.widgets[widget.pk] = widget
+
+        node_lookup = {}
+        for node in nodes:
+            self.add_node(node)
+            node_lookup[str(node.nodeid)] = node
+
+        for edge in edges:
+            edge_dict = edge_lookup[str(edge.edgeid)]
+            edge.domainnode = node_lookup[edge_dict["domainnode_id"]]
+            edge.rangenode = node_lookup[edge_dict["rangenode_id"]]
+            self.add_edge(edge)
+
+        for card in cards:
+            self.add_card(card)
+
+        self.populate_null_nodegroups()
 
     @staticmethod
     def new(name="", is_resource=False, author=""):
@@ -1316,7 +1350,12 @@ class Graph(models.GraphModel):
         exclude = [] if exclude is None else exclude
 
         if self.publication and not force_recalculation:
-            serialized_graph = self.publication.serialized_graph
+            user_language = translation.get_language()
+            published_graph = models.PublishedGraph.objects.get(publication=self.publication, language=user_language)
+
+            serialized_graph = None
+            if published_graph:
+                serialized_graph = published_graph.serialized_graph
 
             for key in exclude:
                 if serialized_graph.get(key) is not None:  # explicit None comparison so falsey values will still return
@@ -1605,31 +1644,43 @@ class Graph(models.GraphModel):
             if graphs_with_matching_slug.exists() and graphs_with_matching_slug[0].graphid != self.graphid:
                 raise GraphValidationError(_("Another resource model already uses the slug '{self.slug}'").format(**locals()), 1007)
 
-    def publish(self, notes=None):
+    def publish(self, user, notes=None):
         """
-        Adds a row to the GraphPublication table
-        Assigns GraphPublication id to Graph
+        Adds a row to the GraphXPublishedGraph table
+        Assigns GraphXPublishedGraph id to Graph
         """
         with transaction.atomic():
             try:
-                publication = models.GraphPublication.objects.create(
+                publication = models.GraphXPublishedGraph.objects.create(
                     graph=self,
-                    serialized_graph=JSONDeserializer().deserialize(JSONSerializer().serialize(self, force_recalculation=True)),
                     notes=notes,
+                    user=user,
                 )
                 publication.save()
-            except Exception as e:
-                raise UnpublishedModelError(e)
 
-            try:
                 self.publication = publication
                 self.save(validate=False)
+
+                for language_tuple in settings.LANGUAGES:
+                    language = models.Language.objects.get(code=language_tuple[0])
+
+                    translation.activate(language=language_tuple[0])
+
+                    published_graph = models.PublishedGraph.objects.create(
+                        publication=publication,
+                        serialized_graph=JSONDeserializer().deserialize(JSONSerializer().serialize(self, force_recalculation=True)),
+                        language=language,
+                    )
+
+                    published_graph.save()
+
+                translation.deactivate()
             except Exception as e:
                 raise UnpublishedModelError(e)
 
     def unpublish(self):
         """
-        Unassigns GraphPublication id from Graph
+        Unassigns GraphXPublishedGraph id from Graph
         """
         self.publication = None
         self.save(validate=False)

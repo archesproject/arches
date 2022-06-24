@@ -473,7 +473,7 @@ class GraphPublicationView(View):
 
             if self.action == "publish":
                 try:
-                    graph.publish(notes)
+                    graph.publish(notes=notes, user=request.user)
                 except UnpublishedModelError as e:
                     return JSONErrorResponse(e.title, e.message)
             elif self.action == "unpublish":

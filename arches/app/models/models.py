@@ -383,7 +383,7 @@ class GraphModel(models.Model):
     )
     config = JSONField(db_column="config", default=dict)
     slug = models.TextField(validators=[validate_slug], unique=True, null=True)
-    publication = models.ForeignKey("GraphPublication", db_column="publicationid", null=True, on_delete=models.SET_NULL)
+    publication = models.ForeignKey("GraphXPublishedGraph", db_column="publicationid", null=True, on_delete=models.SET_NULL)
 
     @property
     def disable_instance_creation(self):
@@ -409,17 +409,16 @@ class GraphModel(models.Model):
         db_table = "graphs"
 
 
-class GraphPublication(models.Model):
+class GraphXPublishedGraph(models.Model):
     publicationid = models.UUIDField(primary_key=True, serialize=False, default=uuid.uuid1)
     notes = models.TextField(blank=True, null=True)
     graph = models.ForeignKey(GraphModel, db_column="graphid", on_delete=models.CASCADE)
-    serialized_graph = JSONField(blank=True, null=True, db_column="serialized_graph")
     user = models.ForeignKey(User, db_column="userid", null=True, on_delete=models.CASCADE)
     published_time = models.DateTimeField(default=datetime.datetime.now, null=False)
 
     class Meta:
         managed = True
-        db_table = "graph_publications"
+        db_table = "graphs_x_published_graphs"
 
 
 class Icon(models.Model):
@@ -640,6 +639,16 @@ class OntologyClass(models.Model):
         unique_together = (("source", "ontology"),)
 
 
+class PublishedGraph(models.Model):
+    language = models.ForeignKey(Language, db_column="languageid", to_field="code", blank=True, null=True, on_delete=models.CASCADE)
+    publication = models.ForeignKey(GraphXPublishedGraph, db_column="publicationid", on_delete=models.CASCADE)
+    serialized_graph = JSONField(blank=True, null=True, db_column="serialized_graph")
+
+    class Meta:
+        managed = True
+        db_table = "published_graphs"
+
+
 class Relation(models.Model):
     conceptfrom = models.ForeignKey(Concept, db_column="conceptidfrom", related_name="relation_concepts_from", on_delete=models.CASCADE)
     conceptto = models.ForeignKey(Concept, db_column="conceptidto", related_name="relation_concepts_to", on_delete=models.CASCADE)
@@ -808,7 +817,7 @@ class ResourceXResource(models.Model):
 class ResourceInstance(models.Model):
     resourceinstanceid = models.UUIDField(primary_key=True, default=uuid.uuid1)  # This field type is a guess.
     graph = models.ForeignKey(GraphModel, db_column="graphid", on_delete=models.CASCADE)
-    graph_publication = models.ForeignKey(GraphPublication, db_column="graphpublicationid", on_delete=models.PROTECT)
+    graph_publication = models.ForeignKey(GraphXPublishedGraph, null=True, db_column="graphpublicationid", on_delete=models.PROTECT)
     legacyid = models.TextField(blank=True, unique=True, null=True)
     createdtime = models.DateTimeField(auto_now_add=True)
 

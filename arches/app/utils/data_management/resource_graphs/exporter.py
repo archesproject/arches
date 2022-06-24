@@ -11,7 +11,7 @@ from io import BytesIO
 from arches.app.models.graph import Graph
 from arches.app.models.concept import Concept
 from arches.app.models.system_settings import settings
-from arches.app.models.models import CardXNodeXWidget, Node, Resource2ResourceConstraint, FunctionXGraph, Value, GraphPublication
+from arches.app.models.models import CardXNodeXWidget, Node, Resource2ResourceConstraint, FunctionXGraph, Value, GraphXPublishedGraph
 from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializer
 from collections import OrderedDict
 from operator import itemgetter
@@ -138,6 +138,8 @@ def get_graphs_for_export(graphids=None):
             print('"{0}" contains/is not a valid graphid or option for this command.'.format(",".join(graphids)))
             print("*" * 80)
             sys.exit()
+    for resource_graph in resource_graphs:
+        resource_graph.refresh_from_database()
 
     resource_graph_query = JSONSerializer().serializeToPython(
         resource_graphs, exclude=["widgets"], force_recalculation=True, use_raw_i18n_json=True
@@ -161,8 +163,7 @@ def get_graphs_for_export(graphids=None):
         publication = None
 
         if publication_id:
-            publication = JSONDeserializer().deserialize(JSONSerializer().serialize(GraphPublication.objects.get(pk=publication_id)))
-            del publication["serialized_graph"]
+            publication = JSONDeserializer().deserialize(JSONSerializer().serialize(GraphXPublishedGraph.objects.get(pk=publication_id)))
 
         resource_graph["publication"] = publication
         del resource_graph["publication_id"]

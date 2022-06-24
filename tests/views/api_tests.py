@@ -55,16 +55,19 @@ class APITests(ArchesTestCase):
         with open(os.path.join("tests/fixtures/resource_graphs/unique_graph_shape.json"), "rU") as f:
             json = JSONDeserializer().deserialize(f)
             cls.unique_graph = Graph(json["graph"][0])
+            cls.unique_graph.publish(user=None)
             cls.unique_graph.save()
 
         with open(os.path.join("tests/fixtures/resource_graphs/ambiguous_graph_shape.json"), "rU") as f:
             json = JSONDeserializer().deserialize(f)
             cls.ambiguous_graph = Graph(json["graph"][0])
+            cls.ambiguous_graph.publish(user=None)
             cls.ambiguous_graph.save()
 
         with open(os.path.join("tests/fixtures/resource_graphs/phase_type_assignment.json"), "rU") as f:
             json = JSONDeserializer().deserialize(f)
             cls.phase_type_assignment_graph = Graph(json["graph"][0])
+            cls.phase_type_assignment_graph.publish(user=None)
             cls.phase_type_assignment_graph.save()
 
         # Load the test package to provide resources graph.
