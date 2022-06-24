@@ -16,6 +16,7 @@ You should have received a copy of the GNU Affero General Public License
 along with this program. If not, see <http://www.gnu.org/licenses/>.
 """
 
+import uuid
 from django.db import transaction
 from django.db.models import Q
 from django.core.exceptions import ObjectDoesNotExist
@@ -154,6 +155,7 @@ class Card(models.CardModel):
                         widget_model.visible = widget.get("visible", None)
                         widget_model.sortorder = widget.get("sortorder", None)
                         if widget_model.pk is None:
+                            widget_model.pk = uuid.uuid4()
                             widget_model.save()
                         self.widgets.append(widget_model)
 
