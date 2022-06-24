@@ -28,7 +28,7 @@ jobs:
       - name: Install python packages
         run: |
           python -m pip install --upgrade pip
-          pip install .
+          pip install -e .
           pip install -r arches/install/requirements.txt
           pip install -r arches/install/requirements_dev.txt
           echo Python packages installed
