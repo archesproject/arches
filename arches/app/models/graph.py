@@ -113,9 +113,9 @@ class Graph(models.GraphModel):
 
                 self.populate_null_nodegroups()
 
-                if "publication" in args[0]:
+                if "publication" in args[0] and args[0]["publication"] is not None:
                     publication_data = args[0]["publication"]
-                    self.publication = models.GraphPublication(**publication_data)
+                    self.publication = models.GraphXPublishedGraph(**publication_data)
 
             else:
                 if len(args) == 1 and (isinstance(args[0], str) or isinstance(args[0], uuid.UUID)):
@@ -1351,11 +1351,11 @@ class Graph(models.GraphModel):
 
         if self.publication and not force_recalculation:
             user_language = translation.get_language()
-            localized_serialized_graph = models.LocalizedSerializedGraph.objects.get(publication=self.publication, language=user_language)
+            published_graph = models.PublishedGraph.objects.get(publication=self.publication, language=user_language)
 
             serialized_graph = None
-            if localized_serialized_graph:
-                serialized_graph = localized_serialized_graph.serialized_graph
+            if published_graph:
+                serialized_graph = published_graph.serialized_graph
 
             for key in exclude:
                 if serialized_graph.get(key) is not None:  # explicit None comparison so falsey values will still return
@@ -1646,12 +1646,12 @@ class Graph(models.GraphModel):
 
     def publish(self, user, notes=None):
         """
-        Adds a row to the GraphPublication table
-        Assigns GraphPublication id to Graph
+        Adds a row to the GraphXPublishedGraph table
+        Assigns GraphXPublishedGraph id to Graph
         """
         with transaction.atomic():
             try:
-                publication = models.GraphPublication.objects.create(
+                publication = models.GraphXPublishedGraph.objects.create(
                     graph=self,
                     notes=notes,
                     user=user,
@@ -1666,13 +1666,13 @@ class Graph(models.GraphModel):
 
                     translation.activate(language=language_tuple[0])
 
-                    localized_serialized_graph = models.LocalizedSerializedGraph.objects.create(
+                    published_graph = models.PublishedGraph.objects.create(
                         publication=publication,
                         serialized_graph=JSONDeserializer().deserialize(JSONSerializer().serialize(self, force_recalculation=True)),
                         language=language,
                     )
 
-                    localized_serialized_graph.save()
+                    published_graph.save()
 
                 translation.deactivate()
             except Exception as e:
@@ -1680,7 +1680,7 @@ class Graph(models.GraphModel):
 
     def unpublish(self):
         """
-        Unassigns GraphPublication id from Graph
+        Unassigns GraphXPublishedGraph id from Graph
         """
         self.publication = None
         self.save(validate=False)

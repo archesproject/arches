@@ -217,8 +217,8 @@ class ResourceEditorView(MapBaseManagerView):
         serialized_graph = None
         if graph.publication:
             user_language = translation.get_language()
-            localized_serialized_graph = models.LocalizedSerializedGraph.objects.get(publication=graph.publication, language=user_language)
-            serialized_graph = localized_serialized_graph.serialized_graph
+            published_graph = models.PublishedGraph.objects.get(publication=graph.publication, language=user_language)
+            serialized_graph = published_graph.serialized_graph
 
         if serialized_graph:
             serialized_cards = serialized_graph["cards"]

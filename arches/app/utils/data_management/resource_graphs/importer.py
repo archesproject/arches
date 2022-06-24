@@ -29,9 +29,9 @@ from arches.app.models.models import (
     Function,
     Ontology,
     OntologyClass,
-    GraphPublication,
+    GraphXPublishedGraph,
     Language,
-    LocalizedSerializedGraph,
+    PublishedGraph,
 )
 from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializer
 from arches.app.models.models import GraphXMapping
@@ -146,7 +146,7 @@ def import_graph(graphs, overwrite_graphs=True):
                 with transaction.atomic():
                     # saves graph publication with serialized graph
                     if publication_data:
-                        GraphPublication.objects.update_or_create(
+                        GraphXPublishedGraph.objects.update_or_create(
                             publicationid=publication_data["publicationid"],
                             defaults={
                                 "notes": publication_data.get("notes"),
@@ -165,7 +165,7 @@ def import_graph(graphs, overwrite_graphs=True):
 
                             translation.activate(language=language_tuple[0])
 
-                            LocalizedSerializedGraph.objects.update_or_create(
+                            PublishedGraph.objects.update_or_create(
                                 publication_id=publication_data["publicationid"],
                                 language=language,
                                 defaults={

@@ -11,7 +11,7 @@ from io import BytesIO
 from arches.app.models.graph import Graph
 from arches.app.models.concept import Concept
 from arches.app.models.system_settings import settings
-from arches.app.models.models import CardXNodeXWidget, Node, Resource2ResourceConstraint, FunctionXGraph, Value, GraphPublication
+from arches.app.models.models import CardXNodeXWidget, Node, Resource2ResourceConstraint, FunctionXGraph, Value, GraphXPublishedGraph
 from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializer
 from collections import OrderedDict
 from operator import itemgetter
@@ -163,7 +163,7 @@ def get_graphs_for_export(graphids=None):
         publication = None
 
         if publication_id:
-            publication = JSONDeserializer().deserialize(JSONSerializer().serialize(GraphPublication.objects.get(pk=publication_id)))
+            publication = JSONDeserializer().deserialize(JSONSerializer().serialize(GraphXPublishedGraph.objects.get(pk=publication_id)))
 
         resource_graph["publication"] = publication
         del resource_graph["publication_id"]
