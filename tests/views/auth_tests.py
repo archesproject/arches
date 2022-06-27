@@ -150,7 +150,7 @@ class AuthTests(ArchesTestCase):
 
     def test_login_redirect_with_force_two_factor_authentication_enabled(self):
         """
-        Tests that a user can login and is redirected to the two-factor authentication page 
+        Tests that a user can login and is redirected to the two-factor authentication page
         if the administrator has forced two-factor authentication
 
         """
