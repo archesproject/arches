@@ -3,6 +3,7 @@
 from django.conf import settings
 from django.db import migrations, models
 import django.db.models.deletion
+from django.db.models import JSONField
 import uuid
 
 
@@ -56,7 +57,7 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name="notification",
             name="context",
-            field=django.contrib.postgres.fields.jsonb.JSONField(blank=True, default=dict, null=True),
+            field=JSONField(blank=True, default=dict, null=True),
         ),
         migrations.RunSQL(
             """
