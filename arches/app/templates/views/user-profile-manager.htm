@@ -228,35 +228,37 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                                         </div>
                                     </div>
 
-                                    <hr style="border-color: #eee;">
-
-                                    <!-- Two-Factor Authentication -->
-                                    <div class="row">
-                                        <div class="col-sm-5">
-                                            <div class="form-group">
-                                                <label class="control-label account-label">{% trans 'Two-Factor Authentication' %}</label>
-                                                <input 
-                                                    disabled
-                                                    type="text" 
-                                                    class="form-control input-lg account-input" 
-                                                    name="two-factor-authentication-status" 
-                                                    data-bind="value: hasUserEnabledTwoFactorAuthentication() ? 'ENABLED' : 'DISABLED'"
-                                                >
+                                    <!-- ko if: isTwoFactorAuthenticationEnabled || isTwoFactorAuthenticationForced -->
+                                        <hr style="border-color: #eee;">
+                                        
+                                        <!-- Two-Factor Authentication -->
+                                        <div class="row">
+                                            <div class="col-sm-5">
+                                                <div class="form-group">
+                                                    <label class="control-label account-label">{% trans 'Two-Factor Authentication' %}</label>
+                                                    <input 
+                                                        disabled
+                                                        type="text" 
+                                                        class="form-control input-lg account-input" 
+                                                        name="two-factor-authentication-status" 
+                                                        data-bind="value: hasUserEnabledTwoFactorAuthentication() ? 'ENABLED' : 'DISABLED'"
+                                                    >
+                                                </div>
+                                            </div>
+                                            <div class="col-sm-5">
+                                                <p class="account-tips">
+                                                    <button 
+                                                        class="btn btn-link" 
+                                                        type='button' 
+                                                        style="color: #579ddb; padding-top: 24px;"
+                                                        data-bind="click: function() { alertTwoFactorAuthenticationChange('{{ user.email }}'); }"
+                                                    >
+                                                        {% trans 'Click here to update Two-Factor Authentication settings via email' %}
+                                                    </button>
+                                                </p>
                                             </div>
                                         </div>
-                                        <div class="col-sm-5">
-                                            <p class="account-tips">
-                                                <button 
-                                                    class="btn btn-link" 
-                                                    type='button' 
-                                                    style="color: #579ddb; padding-top: 24px;"
-                                                    data-bind="click: alertTwoFactorAuthenticationChange"
-                                                >
-                                                    {% trans 'Click here to update Two-Factor Authentication settings via email' %}
-                                                </button>
-                                            </p>
-                                        </div>
-                                    </div>
+                                    <!-- /ko -->
                                 </form>
                                 <!-- /ko -->
                             </div>

@@ -361,30 +361,33 @@ class TwoFactorAuthenticationResetView(View):
                 pass
 
         if user:
-            AES = AESCipher(settings.SECRET_KEY)
+            try:
+                AES = AESCipher(settings.SECRET_KEY)
 
-            serialized_data = JSONSerializer().serialize({"ts": int(time.time()), "user": user})
-            encrypted_url = urlencode({"link": AES.encrypt(serialized_data)})
+                serialized_data = JSONSerializer().serialize({"ts": int(time.time()), "user": user})
+                encrypted_url = urlencode({"link": AES.encrypt(serialized_data)})
 
-            admin_email = settings.ADMINS[0][1] if settings.ADMINS else ""
-            email_context = {
-                "button_text": _("Update Two-Factor Authentication Settings"),
-                "link": request.build_absolute_uri(reverse("two-factor-authentication-settings") + "?" + encrypted_url),
-                "greeting": _("Click on link below to update your two-factor authentication settings."),
-                "closing": _(
-                    "This link expires in 15 minutes. If you did not request this change, \
-                    contact your Administrator immediately."
-                ),
-            }
+                admin_email = settings.ADMINS[0][1] if settings.ADMINS else ""
+                email_context = {
+                    "button_text": _("Update Two-Factor Authentication Settings"),
+                    "link": request.build_absolute_uri(reverse("two-factor-authentication-settings") + "?" + encrypted_url),
+                    "greeting": _("Click on link below to update your two-factor authentication settings."),
+                    "closing": _(
+                        "This link expires in 15 minutes. If you did not request this change, \
+                        contact your Administrator immediately."
+                    ),
+                }
 
-            html_content = render_to_string("email/general_notification.htm", email_context)  # ...
-            text_content = strip_tags(html_content)  # this strips the html, so people will have the text as well.
+                html_content = render_to_string("email/general_notification.htm", email_context)  # ...
+                text_content = strip_tags(html_content)  # this strips the html, so people will have the text as well.
 
-            # create the email, and attach the HTML version as well.
-            msg = EmailMultiAlternatives(_("Arches Two-Factor Authentication"), text_content, admin_email, [user.email])
-            msg.attach_alternative(html_content, "text/html")
+                # create the email, and attach the HTML version as well.
+                msg = EmailMultiAlternatives(_("Arches Two-Factor Authentication"), text_content, admin_email, [user.email])
+                msg.attach_alternative(html_content, "text/html")
 
-            msg.send()
+                msg.send()
+            except:
+                raise Exception("There has been error sending an email to this address. Please contact your system administrator.") 
 
         return render(
             request,

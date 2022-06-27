@@ -153,7 +153,7 @@ RESOURCE_EDITOR_GROUPS = ("Resource Editor", "Crowdsource Editor")
 # Unique session cookie ensures that logins are treated separately for each app
 SESSION_COOKIE_NAME = "arches"
 
-# EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'  #<-- Only need to uncomment this for testing without an actual email server
+EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'  #<-- Only need to uncomment this for testing without an actual email server
 # EMAIL_USE_TLS = True
 # EMAIL_HOST = 'smtp.gmail.com'
 EMAIL_HOST_USER = "xxxx@xxx.com"
@@ -166,7 +166,7 @@ DEFAULT_FROM_EMAIL = EMAIL_HOST_USER
 ENABLE_USER_SIGNUP = True
 
 # If True, users must authenticate their accout via email to complete the account creation process.
-FORCE_USER_SIGNUP_EMAIL_AUTHENTICATION = True
+FORCE_USER_SIGNUP_EMAIL_AUTHENTICATION = False
 
 POSTGIS_VERSION = (3, 0, 0)
 

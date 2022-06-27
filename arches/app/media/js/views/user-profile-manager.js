@@ -156,18 +156,32 @@ define([
                 });
             };
 
-            self.viewModel.alertTwoFactorAuthenticationChange = function() {
+            self.viewModel.alertTwoFactorAuthenticationChange = function(userEmail) {
                 var sendTwoFactorAuthenticationEmail = function() {
                     $.ajax({
                         url: arches.urls.two_factor_authentication_reset,
                         method: "POST",
-                        
-                    }).done(function() {
+                        data: {
+                            email: userEmail
+                        }
+                    })
+                    .done(function() {
                         self.viewModel.alert(
                             new AlertViewModel(
                                 'ep-alert-blue',
                                 arches.twoFactorAuthenticationEmailSuccess.title,
                                 arches.twoFactorAuthenticationEmailSuccess.text,
+                                null,
+                                function(){}
+                            )
+                        );
+                    })
+                    .error(function(e) {
+                        self.viewModel.alert(
+                            new AlertViewModel(
+                                'ep-alert-red',
+                                e.statusText,
+                                e.responseText,
                             )
                         );
                     });
