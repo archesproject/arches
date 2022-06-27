@@ -139,24 +139,24 @@ define([
             });
 
             this.suggestedAlias = ko.observable();
+            this.hasCustomAlias = ko.observable(false);
+            this.aliasValid = ko.observable();
 
-            this.newAlias = ko.pureComputed(function(){
-                if (self.node()?.alias()) {
-                    return self.node().alias();
-                } else if (self.node()?.name()) {
-                    return self.node().name();
+            this.node.subscribe((node) => {
+                if (node) {
+                    if (self.hasCustomAlias()){
+                        node.alias.subscribe((alias) => {
+                            if(alias){
+                                self.checkNodeAlias(alias);
+                            }
+                        });
+                    }
                 }
             });
 
-            this.newAlias.subscribe(function(val) {
-                if (val) {
-                    self.createNodeAlias(val);
-                }
-            });
-
-            this.createNodeAlias = (val) => {
+            this.checkNodeAlias = (alias) => {
                 window.fetch(
-                    `${arches.urls.create_node_alias}?value=${val}&graph=${this.graph.graphid()}&alias=${this.node().alias()}`
+                    `${arches.urls.check_node_alias}?graph=${this.graph.graphid()}&alias=${alias}`
                 )
                 .then(response => {
                     if(response.ok) {
@@ -166,10 +166,10 @@ define([
                     }
                 })
                 .then(json => {
-                    if (json?.data) {
-                        self.suggestedAlias(json.data);
+                    if (json?.data.valid) {
+                        self.aliasValid(true);
                     } else {
-                        self.suggestedAlias(null);
+                        self.aliasValid(false);
                     }
                 });
             };

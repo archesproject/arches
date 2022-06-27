@@ -189,6 +189,8 @@ class Graph(models.GraphModel):
             node.exportable = nodeobj.get("exportable", False)
             node.fieldname = nodeobj.get("fieldname", "")
             node.alias = nodeobj.get("alias", "")
+            if node.alias is None:
+                self.create_node_alias(node)
 
             node.nodeid = uuid.UUID(str(node.nodeid))
 
@@ -372,7 +374,8 @@ class Graph(models.GraphModel):
             if nodeid is not None:
                 node = self.nodes[nodeid]
                 self.update_es_node_mapping(node, datatype_factory, se)
-                # self.create_node_alias(node)
+                if node.alias is None:
+                    self.create_node_alias(node)
                 node.save()
             else:
                 for node in self.nodes.values():
@@ -1395,20 +1398,16 @@ class Graph(models.GraphModel):
             node.alias = self.make_name_unique(row[0], aliases, "_n")
         return node.alias
 
-    def create_node_alias_2(self, new_alias, old_alias):
+    def check_duplicate_node_alias(self, new_alias):
         """
-        Assigns a unique, slugified version of a node's name as that node's alias.
+        check if user defined alias is already used in the graph.
         """
 
         with connection.cursor() as cursor:
             cursor.callproc("__arches_slugify", [new_alias])
-            row = cursor.fetchone()
+            alias = cursor.fetchone()[0]
             all_aliases = [n.alias for n in self.nodes.values()]
-            aliases = [n.alias for n in self.nodes.values() if old_alias != n.alias]
-            print(all_aliases)
-            print(aliases)
-            alias = self.make_name_unique(row[0], aliases, "_n")
-        return alias
+        return alias in all_aliases
 
     def validate(self):
         """

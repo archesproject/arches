@@ -56,11 +56,13 @@
 
                             <!-- node alias customization -->
                             <div class="col-xs-12">
-                                <input type="text" placeholder="{% trans 'Unique alias generated from this node\'s name' %}" data-bind="textInput: node().alias" class="form-control input-lg widget-input">
+                                <input type="text" placeholder="{% trans 'Unique alias generated from this node\'s name' %}" data-bind="textInput: node().alias, disabled: !hasCustomAlias" class="form-control input-lg widget-input">
+                                <label class="form-checkbox form-normal form-primary" style="padding-left: 25px; padding-top: 3px;">
+                                    <input type="checkbox" data-bind="checked: hasCustomAlias">{% trans "Use a custom node alias" %}
+                                </label>
                             </div>
-                            <div class="col-xs-12" data-bind="if: !!suggestedAlias()">
-                                <label class="control-label widget-input-label" for="">{% trans "Formatted Alias: " %}</label>
-                                <span data-bind="text: suggestedAlias"></span>
+                            <div class="col-xs-12" data-bind="if: hasCustomAlias && !aliasValid()">
+                                <label class="control-label widget-input-label" data-bind="text: node().alias">{% trans " is already used" %}</label>
                             </div>
                             <!-- end of node alias customization -->
 

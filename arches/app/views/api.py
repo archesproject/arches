@@ -1735,15 +1735,19 @@ class TransformEdtfForTile(APIBase):
         return JSONResponse({"data": result})
 
 
-class CreateNodeAlias(APIBase):
+class CheckNodeAlias(APIBase):
     def get(self, request):
         try:
-            value = request.GET.get("value")
+            name = request.GET.get("name")
             graph_id = request.GET.get("graph")
             alias = request.GET.get("alias")
-
+            result = {}
             graph = Graph.objects.get(graphid=graph_id)
-            result = graph.create_node_alias_2(value, alias)
+            if alias:
+                result = {"alias" : None, "valid" : graph.check_duplicate_node_alias(alias)}
+            elif name:
+                node = {"name" : name, "alias": None}
+                result = {"alias" : graph.create_node_alias(node), "valid" : True}
 
         except TypeError as e:
             return JSONResponse({"data": (str(e), False)})
