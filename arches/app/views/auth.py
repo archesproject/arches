@@ -387,7 +387,7 @@ class TwoFactorAuthenticationResetView(View):
 
                 msg.send()
             except:
-                raise Exception("There has been error sending an email to this address. Please contact your system administrator.") 
+                raise Exception(_("There has been error sending an email to this address. Please contact your system administrator."))
 
         return render(
             request,
