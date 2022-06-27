@@ -43,7 +43,7 @@ class RDMView(BaseManagerView):
     def get(self, request, conceptid):
         lang = request.GET.get("lang", request.LANGUAGE_CODE)
 
-        languages = sort_languages(models.DLanguage.objects.all(), lang)
+        languages = sort_languages(models.Language.objects.all(), lang)
 
         concept_schemes = []
         for concept in models.Concept.objects.filter(nodetype="ConceptScheme"):
@@ -73,7 +73,8 @@ class RDMView(BaseManagerView):
 def get_sparql_providers(endpoint=None):
     sparql_providers = {}
     for provider in settings.SPARQL_ENDPOINT_PROVIDERS:
-        Provider = import_string(provider["SPARQL_ENDPOINT_PROVIDER"])()
+        provider_class = provider["SPARQL_ENDPOINT_PROVIDER"][settings.LANGUAGE_CODE]["value"]
+        Provider = import_string(provider_class)()
         sparql_providers[Provider.endpoint] = Provider
 
     if endpoint:
@@ -90,12 +91,12 @@ def sort_languages(languages, lang):
 
     if len([l for l in languages if l.isdefault == True]) != 1:
         for l in languages:
-            if l.languageid == lang:
+            if l.code == lang:
                 l.isdefault = True
             else:
                 l.isdefault = False
 
-    return sorted(languages, key=lambda x: x.languagename)
+    return sorted(languages, key=lambda x: x.name)
 
 
 @group_required("RDM Administrator")
@@ -140,7 +141,7 @@ def concept(request, conceptid):
             semantic=(mode == "semantic" or mode == ""),
         )
 
-        languages = sort_languages(models.DLanguage.objects.all(), lang)
+        languages = sort_languages(models.Language.objects.all(), lang)
 
         valuetypes = models.DValueType.objects.all()
         relationtypes = models.DRelationType.objects.all()

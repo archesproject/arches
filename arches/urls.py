@@ -16,6 +16,7 @@ You should have received a copy of the GNU Affero General Public License
 along with this program. If not, see <http://www.gnu.org/licenses/>.
 """
 
+from arches.app.views.language import LanguageView
 from django.views.decorators.cache import cache_page
 from django.contrib.auth import views as auth_views
 from django.conf.urls import include, url
@@ -203,6 +204,7 @@ urlpatterns = [
     url(r"^reorder_cards/", CardView.as_view(action="reorder_cards"), name="reorder_cards"),
     url(r"^node/(?P<graphid>%s)$" % uuid_regex, GraphDataView.as_view(action="update_node"), name="node"),
     url(r"^nodegroup/", NodegroupView.as_view(action="exportable"), name="nodegroup"),
+    url(r"^language/", LanguageView.as_view(), name="language"),
     url(r"^node_layer/(?P<graphid>%s)$" % uuid_regex, GraphDataView.as_view(action="update_node_layer"), name="node_layer"),
     url(r"^widgets/(?P<template>[a-zA-Z_-]*)", main.widget, name="widgets"),
     url(r"^report-templates/(?P<template>[a-zA-Z_-]*)", main.report_templates, name="report-templates"),

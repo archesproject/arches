@@ -238,6 +238,7 @@
                 feature_popup_content: "{% url 'feature_popup_content' %}",
                 related_resource_candidates: "{% url 'related_resource_candidates' %}",
                 relatable_resources: "{% url 'relatable_resources' %}",
+                languages: "{% url 'language' %}",
                 get_domain_connections: function(graphid){return "{% url 'get_domain_connections' 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa' %}".replace('aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa', graphid)},
                 clone_graph: function(graphid){return "{% url 'clone_graph' 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa' %}".replace('aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa', graphid)},
                 export_graph: function(graphid){return "{% url 'export_graph' 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa' %}".replace('aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa', graphid)},
@@ -323,6 +324,9 @@
                 text: "{% trans 'To continue, please ensure the graph is published.' %}"
             },
             mapboxApiKey: '{{ map_info.mapbox_api_key }}',
+            activeLanguage: '{{ app_settings.ACTIVE_LANGUAGE }}',
+            activeLanguageDir: '{{ app_settings.ACTIVE_LANGUAGE_DIR }}',
+            languages: {% autoescape off %}{{ app_settings.LANGUAGES }}{% endautoescape %},
             hexBinSize: {{ map_info.hex_bin_size | unlocalize }},
             mapboxSprites: '{{ map_info.mapbox_sprites }}',
             mapboxGlyphs: '{{ map_info.mapbox_glyphs }}',
@@ -336,20 +340,20 @@
             useSemanticRelationships: {{ app_settings.USE_SEMANTIC_RESOURCE_RELATIONSHIPS|lower }},
             geocoderDefault: '{{ map_info.geocoder_default }}',
             mapMarkers: [{% autoescape off %}{% for map_marker in map_markers %}{
-                'name': '{{ map_marker.name }}',
-                'url': '{{ map_marker.url }}',
+                'name': '{{ map_marker.name | escapejs }}',
+                'url': '{{ map_marker.url | escapejs }}',
             },{% endfor %}{% endautoescape %}],
             mapSources: {{% autoescape off %}{% for map_source in map_sources %}
-                '{{ map_source.name }}': {{ map_source.source_json }},
+                '{{ map_source.name | escapejs }}': {{ map_source.source_json }},
             {% endfor %}{% for resource_map_source in resource_map_sources %}
-                '{{ resource_map_source.name }}': {{ resource_map_source.source }},
+                '{{ resource_map_source.name | escapejs }}': {{ resource_map_source.source }},
             {% endfor %}{% endautoescape %}},
             mapLayers: [{% autoescape off %}{% for map_layer in map_layers %}{
                 'maplayerid': '{{ map_layer.maplayerid }}',
-                'name': '{{ map_layer.name }}',
+                'name': '{{ map_layer.name | escapejs}}',
                 'layer_definitions': {{ map_layer.layer_json }},
                 'isoverlay': {{ map_layer.isoverlay|lower }},
-                'icon': '{{ map_layer.icon }}',
+                'icon': '{{ map_layer.icon | escapejs }}',
                 'legend': '{{ map_layer.legend | default_if_none:"" | escapejs  }}',
                 'searchonly': {{ map_layer.searchonly|lower }},
                 'activated': {{ map_layer.activated|lower }},
@@ -360,11 +364,11 @@
                 'zoom': {{ map_layer.zoom|default_if_none:"null"|unlocalize }}
             },{% endfor %}{% for resource_map_layer in resource_map_layers %}{
                 'maplayerid': '{{ resource_map_layer.nodeid }}',
-                'name': '{{ resource_map_layer.name }}',
+                'name': '{{ resource_map_layer.name | escapejs }}',
                 'layer_definitions': {{ resource_map_layer.layer_definitions }},
                 'searchonly': false,
                 'isoverlay': true,
-                'icon': '{{ resource_map_layer.icon }}',
+                'icon': '{{ resource_map_layer.icon | escapejs }}',
                 'legend': '{{ resource_map_layer.legend | escapejs  }}',
                 'activated': true,
                 'addtomap': {{ resource_map_layer.addtomap|lower }},
@@ -375,10 +379,10 @@
                 'id': '{{ concept_collection.id }}',
             },{% endfor %}{% endautoescape %}],
             geocodingProviders: [{% autoescape off %}{% for provider in geocoding_providers %}{
-                'name': '{{ provider.name }}',
+                'name': '{{ provider.name | escapejs }}',
                 'geocoderid': '{{ provider.geocoderid }}',
                 'api_key': {% if provider.api_key != None %} '{{ provider.api_key }}' {% elif provider.api_key == None %} null {% endif %},
-                'component': '{{ provider.component }}'
+                'component': '{{ provider.component | escapejs }}'
             },{% endfor %}{% endautoescape %}],
             resources: [{% autoescape off %}{% for resource in resource_graphs %}{
               'maplayerid': '{{resource.graphid}}',
@@ -393,26 +397,25 @@
             {% endfor %}{% endautoescape %}],
             graphs: {% autoescape off %}{{graphs|default:"[]"}}{% endautoescape %},
             translations: {
-                'mapAddPoint': '{% trans "Add point" %}',
-                'mapAddLine': '{% trans "Add line" %}',
-                'mapAddPolygon': '{% trans "Add polygon" %}',
-                'mapSelectDrawing': '{% trans "Select drawing" %}',
-                'riSelectCreateNew': '{% trans "Create a new ${graphName}" %}',
-                'riSelectPlaceholder': '{% trans "Add new Relationship" %}',
-                'reNetworkReponseError': '{% trans "Network response was not ok" %}',
-                'workflowWastbinWarning': '{% trans "You are about to delete ${val}." %}',
-                'workflowWastbinWarning2': '{% trans "Are you sure you want to continue?" %}',
-                'workflowWastbinWarning3': '{% trans "You are about to quit the workflow." %}',
-                'termSearchConcept': '{% trans "Concepts" %}',
-                'termSearchTerm': '{% trans "Term Matches" %}',
-                'timeWheelDateMatches': '{% trans "${total} date values" %}',
-                'cardConstraintsPlaceholder': '{% trans "Select Widgets" %}',
-                'cardFunctionNodeDesc': '{% trans "(This card data will define the resource description.)" %}',
-                'cardFunctionNodeName': '{% trans "(This card data will define the resource name.)" %}',
-                'groupingErrorTitle': '{% trans "Settings Conflict: Remove this card from grouped card?" %}',
-                'groupingErrorMessage': "{% trans 'The cardinality of this card can\'t be changed until you remove it from being grouped with the ${cardName} card.  Do you want to remove this card from being grouped with the ${cardName} card' %}",
-                'modelDoesNotExist': '{% trans "!! Referenced model does not exist -- Delete and select a new model !!" %}',
-                'idColumnSelection': '{% trans "Use as an id" %}',
+                'mapAddPoint': {% trans "Add point" as mapAddPoint %} '{{ mapAddPoint|escapejs }}',
+                'mapAddLine': {% trans "Add line" as mapAddLine %} '{{ mapAddLine|escapejs }}',
+                'mapAddPolygon': {% trans "Add polygon" as mapAddPolygon %} '{{ mapAddPolygon|escapejs }}',
+                'mapSelectDrawing': {% trans "Select drawing" as mapSelectDrawing %} '{{ mapSelectDrawing|escapejs }}',
+                'riSelectCreateNew': {% trans "Create a new ${graphName}" as riSelectCreateNew %} '{{ riSelectCreateNew|escapejs }}',
+                'riSelectPlaceholder': {% trans "Add new Relationship" as riSelectPlaceholder %} '{{ riSelectPlaceholder|escapejs }}',
+                'reNetworkReponseError': {% trans "Network response was not ok" as reNetworkReponseError %} '{{ reNetworkReponseError|escapejs }}',
+                'workflowWastbinWarning': {% trans "You are about to delete ${val}." as workflowWastbinWarning %} '{{ workflowWastbinWarning|escapejs }}',
+                'workflowWastbinWarning2': {% trans "Are you sure you want to continue?" as workflowWastbinWarning2 %} '{{ workflowWastbinWarning2|escapejs }}',
+                'workflowWastbinWarning3': {% trans "You are about to quit the workflow." as workflowWastbinWarning3 %} '{{ workflowWastbinWarning3|escapejs }}',
+                'termSearchConcept': {% trans "Concepts" as termSearchConcept %} '{{ termSearchConcept|escapejs }}',
+                'termSearchTerm': {% trans "Term Matches" as termSearchTerm %} '{{ termSearchTerm|escapejs }}',
+                'timeWheelDateMatches': {% trans "${total} date values" as timeWheelDateMatches %} '{{ timeWheelDateMatches|escapejs }}',
+                'cardConstraintsPlaceholder': {% trans "Select Widgets" as cardConstraintsPlaceholder %} '{{ cardConstraintsPlaceholder|escapejs }}',
+                'cardFunctionNodeDesc': {% trans "(This card data will define the resource description.)" as cardFunctionNodeDesc %} '{{ cardFunctionNodeDesc|escapejs }}',
+                'cardFunctionNodeName': {% trans "(This card data will define the resource name.)" as cardFunctionNodeName %} '{{ cardFunctionNodeName|escapejs }}',
+                'groupingErrorTitle': {% trans "Settings Conflict: Remove this card from grouped card?" as groupingErrorTitle %} '{{ groupingErrorTitle|escapejs }}',
+                'groupingErrorMessage': {% trans "The cardinality of this card can't be changed until you remove it from being grouped with the ${cardName} card.  Do you want to remove this card from being grouped with the ${cardName} card" as groupingErrorMessage %} '{{ groupingErrorMessage|escapejs }}',
+                'modelDoesNotExist': {% trans "!! Referenced model does not exist -- Delete and select a new model !!" as modelDoesNotExist %} '{{ modelDoesNotExist|escapejs }}',
             },
             version: '{{ app_settings.VERSION }}'
         };
@@ -424,17 +427,17 @@
             "{{type}}": {
                 id: "{{type_data.resourcetypeid}}",
                 icon: "{{type_data.icon_class}}",
-                name: "{{type_data.name}}",
-                defaultDescription: "{{type_data.default_description}}",
-                descriptionNode: "{{type_data.description_node}}",
+                name: "{{type_data.name | escapejs}}",
+                defaultDescription: "{{type_data.default_description | escapejs}}",
+                descriptionNode: "{{type_data.description_node | escapejs}}",
                 categories: [
                     {% for category in type_data.categories %}
-                    "{{category}}"
+                    "{{category | escapejs}}"
                     {% endfor %}
                 ],
-                color: "{{type_data.marker_color}}",
-                strokeColor: "{{type_data.stroke_color}}",
-                fillColor: "{{type_data.fill_color}}"
+                color: "{{type_data.marker_color | escapejs}}",
+                strokeColor: "{{type_data.stroke_color | escapejs}}",
+                fillColor: "{{type_data.fill_color | escapejs}}"
             },
             {% endfor %}
         };
@@ -442,24 +445,24 @@
         return resourceTypes;
     });
 
-    define('widgets', [{% for widget in widgets %}'{{ widget.component }}',{% endfor %}], function () {
+    define('widgets', [{% for widget in widgets %}'{{ widget.component | escapejs }}',{% endfor %}], function () {
         return {{% autoescape off %}{% for widget in widgets %}
             '{{ widget.pk }}': {
-                'name': '{{ widget.name }}',
-                'component': '{{ widget.component }}',
-                'datatype': '{{ widget.datatype }}',
+                'name': '{{ widget.name | escapejs }}',
+                'component': '{{ widget.component | escapejs }}',
+                'datatype': '{{ widget.datatype | escapejs }}',
                 'defaultconfig': '{{ widget.defaultconfig_json }}'
             },
         {% endfor %}{% endautoescape %}};
     });
 
-    define('report-templates', [{% for template in report_templates %}'{{ template.component }}',{% endfor %}], function () {
+    define('report-templates', [{% for template in report_templates %}'{{ template.component | escapejs }}',{% endfor %}], function () {
         return {{% autoescape off %}{% for template in report_templates %}
             '{{ template.pk }}': {
-                'componentname': '{{ template.componentname }}',
-                'component': '{{ template.component }}',
+                'componentname': '{{ template.componentname | escapejs }}',
+                'component': '{{ template.component | escapejs }}',
                 'defaultconfig': '{{ template.defaultconfig_json }}',
-                'name': '{{ template.name }}',
+                'name': '{{ template.name | escapejs }}',
                 'preload_resource_data': '{{ template.preload_resource_data }}'
             },
         {% endfor %}{% endautoescape %}};
@@ -468,14 +471,14 @@
     define('card-components', [{% for component in card_components %}'{{ component.component }}',{% endfor %}], function () {
         return {{% autoescape off %}{% for component in card_components %}
             '{{ component.pk }}': {
-                'componentname': '{{ component.componentname }}',
-                'component': '{{ component.component }}',
+                'componentname': '{{ component.componentname | escapejs }}',
+                'component': '{{ component.component | escapejs }}',
                 'defaultconfig': '{{ component.defaultconfig_json }}'
             },
         {% endfor %}{% endautoescape %}};
     });
 
-    define('function-templates', [{% for template in function_templates %}'{{ template.component }}',{% endfor %}], function () {
+    define('function-templates', [{% for template in function_templates %}'{{ template.component | escapejs }}',{% endfor %}], function () {
          return;
     });
 
@@ -483,20 +486,20 @@
          return;
     });
 
-    define('geocoder-templates', [{% for provider in geocoding_providers %}'{{ provider.component }}',{% endfor %}], function () {
+    define('geocoder-templates', [{% for provider in geocoding_providers %}'{{ provider.component | escapejs }}',{% endfor %}], function () {
          return;
     });
 
-    define('file-renderers', function () {
+    define('file-renderers', [{% for renderer in app_settings.RENDERERS %}'{{ renderer.component | escapejs }}',{% endfor %}], function () {
         return [{% autoescape off %}{% for renderer in app_settings.RENDERERS %}
-                {'name': '{{ renderer.name }}',
-                'title': '{{ renderer.title }}',
-                'description': '{{ renderer.description }}',
-                'component': '{{ renderer.component }}',
+                {'name': '{{ renderer.name | escapejs }}',
+                'title': '{{ renderer.title | escapejs }}',
+                'description': '{{ renderer.description | escapejs }}',
+                'component': '{{ renderer.component | escapejs }}',
                 'id': '{{ renderer.id }}',
                 'iconclass': '{{ renderer.iconclass }}',
-                'text': '{{ renderer.title }}',
-                'type': '{{ renderer.type }}',
+                'text': '{{ renderer.title | escapejs }}',
+                'type': '{{ renderer.type | escapejs }}',
                 'ext': '{{ renderer.ext }}',
                 'exclude': '{{ renderer.exclude }}',
                  },
@@ -506,7 +509,7 @@
     define('datatype-config-components',
         [{% for datatype in datatypes %}
             {% if datatype.configcomponent != None %}
-            "{{ datatype.configcomponent }}",
+            "{{ datatype.configcomponent | escapejs }}",
             {% endif %}
         {% endfor %}
         ],
@@ -516,7 +519,7 @@
         {% autoescape off %}return {{geoms}};{% endautoescape %}
     });
 
-    define('search-components', [{% for component in search_components %}'{{ component.componentpath }}',{% endfor %}], function () {
+    define('search-components', [{% for component in search_components %}'{{ component.componentpath | escapejs }}',{% endfor %}], function () {
             return {% autoescape off %}[{% for component in search_components %}
                 {{component.toJSON}},
             {% endfor %}]{% endautoescape %};
@@ -526,53 +529,53 @@
         'leaflet',
         'leaflet-draw'
     ], function (L) {
-        L.drawLocal.draw.toolbar.actions.title = '{% trans "Cancel drawing" %}';
-        L.drawLocal.draw.toolbar.actions.text = '{% trans "Cancel" %}';
+        L.drawLocal.draw.toolbar.actions.title = "{% trans "Cancel drawing" %}";
+        L.drawLocal.draw.toolbar.actions.text = "{% trans "Cancel" %}";
 
-        L.drawLocal.draw.toolbar.finish.title = '{% trans "Finish drawing" %}';
-        L.drawLocal.draw.toolbar.finish.text = '{% trans "Finish" %}';
+        L.drawLocal.draw.toolbar.finish.title = "{% trans "Finish drawing" %}";
+        L.drawLocal.draw.toolbar.finish.text = "{% trans "Finish" %}";
 
-        L.drawLocal.draw.toolbar.undo.title = '{% trans "Delete last point drawn" %}';
-        L.drawLocal.draw.toolbar.undo.text = '{% trans "Delete last point" %}';
+        L.drawLocal.draw.toolbar.undo.title = "{% trans "Delete last point drawn" %}";
+        L.drawLocal.draw.toolbar.undo.text = "{% trans "Delete last point" %}";
 
-        L.drawLocal.draw.toolbar.buttons.polyline = '{% trans "Draw a polyline" %}';
-        L.drawLocal.draw.toolbar.buttons.polygon = '{% trans "Draw a polygon" %}';
-        L.drawLocal.draw.toolbar.buttons.rectangle = '{% trans "Draw a rectangle" %}';
-        L.drawLocal.draw.toolbar.buttons.circle = '{% trans "Draw a circle" %}';
-        L.drawLocal.draw.toolbar.buttons.marker = '{% trans "Draw a marker" %}';
+        L.drawLocal.draw.toolbar.buttons.polyline = "{% trans "Draw a polyline" %}";
+        L.drawLocal.draw.toolbar.buttons.polygon = "{% trans "Draw a polygon" %}";
+        L.drawLocal.draw.toolbar.buttons.rectangle = "{% trans "Draw a rectangle" %}";
+        L.drawLocal.draw.toolbar.buttons.circle = "{% trans "Draw a circle" %}";
+        L.drawLocal.draw.toolbar.buttons.marker = "{% trans "Draw a marker" %}";
 
-        L.drawLocal.draw.handlers.circle.tooltip.start = '{% trans "Click and drag to draw circle." %}';
-        L.drawLocal.draw.handlers.circle.radius = '{% trans "Radius" %}';
+        L.drawLocal.draw.handlers.circle.tooltip.start = "{% trans "Click and drag to draw circle." %}";
+        L.drawLocal.draw.handlers.circle.radius = "{% trans "Radius" %}";
 
-        L.drawLocal.draw.handlers.marker.tooltip.start = '{% trans "Click map to place marker." %}';
+        L.drawLocal.draw.handlers.marker.tooltip.start = "{% trans "Click map to place marker." %}";
 
-        L.drawLocal.draw.handlers.polygon.tooltip.start = '{% trans "Click to start drawing shape." %}';
-        L.drawLocal.draw.handlers.polygon.tooltip.cont = '{% trans "Click to continue drawing shape." %}';
-        L.drawLocal.draw.handlers.polygon.tooltip.end = '{% trans "Click first point to close this shape." %}';
+        L.drawLocal.draw.handlers.polygon.tooltip.start = "{% trans "Click to start drawing shape." %}";
+        L.drawLocal.draw.handlers.polygon.tooltip.cont = "{% trans "Click to continue drawing shape." %}";
+        L.drawLocal.draw.handlers.polygon.tooltip.end = "{% trans "Click first point to close this shape." %}";
 
-        L.drawLocal.draw.handlers.polyline.error = '{% trans "<strong>Error:</strong> shape edges cannot cross!" %}';
-        L.drawLocal.draw.handlers.polyline.tooltip.start = '{% trans "Click to start drawing line." %}';
-        L.drawLocal.draw.handlers.polyline.tooltip.cont = '{% trans "Click to continue drawing line." %}';
-        L.drawLocal.draw.handlers.polyline.tooltip.end = '{% trans "Click last point to finish line." %}';
+        L.drawLocal.draw.handlers.polyline.error = "{% trans "<strong>Error:</strong> shape edges cannot cross!" %}";
+        L.drawLocal.draw.handlers.polyline.tooltip.start = "{% trans "Click to start drawing line." %}";
+        L.drawLocal.draw.handlers.polyline.tooltip.cont = "{% trans "Click to continue drawing line." %}";
+        L.drawLocal.draw.handlers.polyline.tooltip.end = "{% trans "Click last point to finish line." %}";
 
-        L.drawLocal.draw.handlers.rectangle.tooltip.start = '{% trans "Click and drag to draw rectangle." %}';
-        L.drawLocal.draw.handlers.simpleshape.tooltip.end = '{% trans "Release mouse to finish drawing." %}';
+        L.drawLocal.draw.handlers.rectangle.tooltip.start = "{% trans "Click and drag to draw rectangle." %}";
+        L.drawLocal.draw.handlers.simpleshape.tooltip.end = "{% trans "Release mouse to finish drawing." %}";
 
-        L.drawLocal.edit.toolbar.actions.save.title = '{% trans "Apply changes." %}';
-        L.drawLocal.edit.toolbar.actions.save.text = '{% trans "Apply" %}';
+        L.drawLocal.edit.toolbar.actions.save.title = "{% trans "Apply changes." %}";
+        L.drawLocal.edit.toolbar.actions.save.text = "{% trans "Apply" %}";
 
-        L.drawLocal.edit.toolbar.actions.cancel.title = '{% trans "Undo edits, discards all changes." %}';
-        L.drawLocal.edit.toolbar.actions.cancel.text = '{% trans "Undo" %}';
+        L.drawLocal.edit.toolbar.actions.cancel.title = "{% trans "Undo edits, discards all changes." %}";
+        L.drawLocal.edit.toolbar.actions.cancel.text = "{% trans "Undo" %}";
 
-        L.drawLocal.edit.toolbar.buttons.edit = '{% trans "Edit drawings." %}';
-        L.drawLocal.edit.toolbar.buttons.editDisabled = '{% trans "No drawings to edit." %}';
-        L.drawLocal.edit.toolbar.buttons.remove = '{% trans "Delete drawings." %}';
-        L.drawLocal.edit.toolbar.buttons.removeDisabled = '{% trans "No drawings to delete." %}';
+        L.drawLocal.edit.toolbar.buttons.edit = "{% trans "Edit drawings." %}";
+        L.drawLocal.edit.toolbar.buttons.editDisabled = "{% trans "No drawings to edit." %}";
+        L.drawLocal.edit.toolbar.buttons.remove = "{% trans "Delete drawings." %}";
+        L.drawLocal.edit.toolbar.buttons.removeDisabled = "{% trans "No drawings to delete." %}";
 
-        L.drawLocal.edit.handlers.edit.tooltip.text = '{% trans "Drag handles, or marker to edit feature." %}';
-        L.drawLocal.edit.handlers.edit.tooltip.subtext = '{% trans "Click undo to cancel changes." %}';
+        L.drawLocal.edit.handlers.edit.tooltip.text = "{% trans "Drag handles, or marker to edit feature." %}";
+        L.drawLocal.edit.handlers.edit.tooltip.subtext = "{% trans "Click undo to cancel changes." %}";
 
-        L.drawLocal.edit.handlers.remove.tooltip.text = '{% trans "Click on a feature to remove" %}';
+        L.drawLocal.edit.handlers.remove.tooltip.text = "{% trans "Click on a feature to remove" %}";
     });
 </script>
 {% endblock arches_modules %}

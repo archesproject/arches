@@ -10,7 +10,7 @@
                 "tiles": [
                     {
                         "data": {
-                            "385b4286-bfa8-11e9-bd39-0242ac160002": "This is a Group"
+                            "385b4286-bfa8-11e9-bd39-0242ac160002": {"en": {"value": "This is a Group", "direction": "ltr"}}
                         },
                         "nodegroup_id": "385b4286-bfa8-11e9-bd39-0242ac160002",
                         "parenttile_id": null,

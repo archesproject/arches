@@ -25,6 +25,7 @@ from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializ
 from arches.app.utils.data_management.resource_graphs.importer import import_graph as ResourceGraphImporter
 from arches.app.utils.data_management.resources.importer import BusinessDataImporter
 from tests import test_settings
+from arches.app.utils.context_processors import app_settings
 from django.db import connection
 from django.contrib.auth.models import User
 from django.core import management
@@ -73,6 +74,7 @@ def setUpTestPackage():
     sql = sql.format(user_id=1, oauth_client_id=OAUTH_CLIENT_ID, oauth_client_secret=OAUTH_CLIENT_SECRET)
     cursor.execute(sql)
 
+    app_settings()  # adds languages to system
     prepare_terms_index(create=True)
     prepare_concepts_index(create=True)
     prepare_search_index(create=True)

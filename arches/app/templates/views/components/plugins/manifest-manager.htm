@@ -1,5 +1,6 @@
 {% extends "views/components/iiif-viewer.htm" %}
 {% load staticfiles %}
+{% load template_tags %}
 {% load i18n %}
 
 {% block tabs %}
@@ -101,8 +102,8 @@
     
     <div class="install-buttons" style="display: inline-flex; justify-content: space-between;">
         <div style="display: flex;">
-        <button class="btn btn-mint btn-md btn-labeled fa fa-pencil" style="width: auto; margin-right: 10px;" data-bind="click: updateManifest, clickBubble: false, disable: !isManifestDirty()">{% trans "Save" %}</button>
-        <button class="btn btn-warning btn-md btn-labeled fa fa-refresh" style="width: auto; margin-right: 10px;" data-bind="click: reset, clickBubble: false, disable: !isManifestDirty()">{% trans "Cancel" %}</button>
+        <button class="btn btn-mint btn-md btn-labeled fa fa-pencil" style="width: auto; margin-right: 10px;" data-bind="click: updateManifest, clickBubble: false, disable: !isManifestDirty()"><span>{% trans "Save" %}</span></button>
+        <button class="btn btn-warning btn-md btn-labeled fa fa-refresh" style="width: auto; margin-right: 10px;" data-bind="click: reset, clickBubble: false, disable: !isManifestDirty()"><span>{% trans "Cancel" %}</span></button>
         </div>
         <!--ko if: manifest-->
         <button class="btn btn-danger btn-md btn-block btn-labeled btn-workbench fa fa-trash" style="width: auto" data-bind="click: deleteManifest"><span>{% trans "Delete" %}</span></button>
@@ -165,8 +166,8 @@
     
     <div class="install-buttons" style="display: inline-flex; justify-content: space-between;">
         <div class="file-workbench-buttons">
-            <button class="btn btn-mint btn-md btn-labeled fa fa-pencil" data-bind="click: updateManifest, clickBubble: false, disable: !isCanvasDirty()">{% trans "Save" %}</button>
-            <button class="btn btn-warning btn-md btn-labeled fa fa-refresh" data-bind="click: reset, clickBubble: false, disable: !isCanvasDirty()">{% trans "Cancel" %}</button>
+            <button class="btn btn-mint btn-md btn-labeled fa fa-pencil" data-bind="click: updateManifest, clickBubble: false, disable: !isCanvasDirty()"><span>{% trans "Save" %}</span></button>
+            <button class="btn btn-warning btn-md btn-labeled fa fa-refresh" data-bind="click: reset, clickBubble: false, disable: !isCanvasDirty()"><span>{% trans "Cancel" %}</span></button>
         </div>
     </div>
 </div>
@@ -178,15 +179,15 @@
 
 {% block main_menu %}
 <div>
-    <ul class="nav nav-tabs">
-            <li data-bind="if: shouldShowCreateService">
-                <div class='manifest-manager-nav-tab' data-bind="click: function(){createService(true); editService(false)}, css: { active: createService }">
-                    <div class='tab-label'>
-                        {% trans 'Create New Service' %}
-                    </div>
+    <ul class="nav nav-tabs flex pad-no">
+        <li data-bind="if: shouldShowCreateService">
+            <div class='manifest-manager-nav-tab' data-bind="click: function(){createService(true); editService(false)}, css: { active: createService }">
+                <div class='tab-label'>
+                    {% trans 'Create New Service' %}
                 </div>
-            </li>
-            <li data-bind="if: shouldShowEditService">
+            </div>
+        </li>
+        <li data-bind="if: shouldShowEditService">
             <div class='manifest-manager-nav-tab' data-bind=
                 "click: function(){createService(false); editService(true)}, css: { active: editService }">
                 <div class='tab-label'>
@@ -219,7 +220,7 @@
             <div>
                 <div class="dropzone-photo-upload">
                     <div style="border-top: 1px solid #c4c4c4; margin-bottom: 15px;" class="btn btn-rr btn-labeled btn-lg fa fa-image fileinput-create-button dz-clickable" data-bind="css: uniqueidClass" role="button">
-                    {% trans 'Select Images' %}
+                        <span>{% trans 'Select Images' %}</span>
                     </div>
                     <div style="min-height: 100%;">
                         <div id="hidden-dz-create-previews" style="display:none"></div>
@@ -260,7 +261,7 @@
 
 {% block gallery_header %}
     <div>
-        <span class="iiif-gallery-manifest-label" data-bind="text: manifestData() ? manifestName() : '{% trans "No manifest selected..." %}'"></span>
+        <span class="iiif-gallery-manifest-label" data-bind="text: manifestData() ? manifestName() : {% quoted_trans "No manifest selected..." %}"></span>
     </div>                 
     <div>
         <span class="iiif-gallery-sequence-label" data-bind="click: function(){expandGallery(!expandGallery())}">

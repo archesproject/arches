@@ -13,6 +13,7 @@ edtf==4.0.1
 django-revproxy==0.9.15
 django-cors-headers==3.1.1
 django-oauth-toolkit==1.2.0
+polib==1.1.1
 python-docx==0.8.10
 PyLD[requests]==1.0.5
 pyprind==2.11.3

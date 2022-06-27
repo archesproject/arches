@@ -71,7 +71,7 @@
                     <div class='new-provisional-edits-title'>{% trans 'Provisional Edits' %}</div>
                     <div class="btn btn-shim btn-danger btn-labeled btn-xs fa fa-trash new-provisional-edits-delete-all" style="padding: 3px;" data-bind="click: function(){
                             provisionalTileViewModel.deleteAllProvisionalEdits();
-                        }">{% trans 'Delete all edits' %}</div>
+                        }"><span>{% trans 'Delete all edits' %}</span></div>
                 </div>
                 <!-- ko foreach: { data: provisionalTileViewModel.provisionaledits(), as: 'pe' } -->
                 <div class='new-provisional-edit-entry' data-bind="css: {
@@ -104,6 +104,14 @@
                     mode: { name: 'javascript', json: true },
                     lineNumbers: true
                 }"></div>
+                <div class="display-in-workflow-step install-buttons">
+                    <button class="btn btn-shim btn-danger btn-labeled btn-lg fa fa-times" data-bind="click: function () {
+                        geoJSONString(undefined);
+                    }"><span>{% trans 'Cancel' %}</span></button>
+                    <button class="btn btn-shim btn-labeled btn-lg fa fa-plus btn-mint" data-bind="css: {
+                        disabled: geoJSONErrors().length !== 0
+                    }, click: updateGeoJSON"><span>{% trans 'Update Features' %}</span></button>
+                </div>
                 <!-- ko if: geoJSONErrors().length !== 0 -->
                 <div class="geojson-error-list">
                     {% trans "GeoJSON has the following errors that must be resolved:" %}
@@ -323,24 +331,24 @@
                     <button class="btn btn-shim btn-labeled btn-lg fa fa-trash" data-bind="click: self.deleteTile, css: {
                         disabled: (!card.isWritable && !self.preview),
                         'btn-warning': card.isWritable
-                    }">{% trans 'Delete' %}</button>
+                    }"><span>{% trans 'Delete' %}</span></button>
                     <!-- /ko -->
                     <!-- ko if: tile.dirty() -->
                         <!-- ko if: provisionalTileViewModel && !provisionalTileViewModel.tileIsFullyProvisional() && card.isWritable -->
-                        <button class="btn btn-shim btn-danger btn-labeled btn-lg fa fa-times" data-bind="click: tile.reset">{% trans 'Cancel' %}</button>
+                        <button class="btn btn-shim btn-danger btn-labeled btn-lg fa fa-times" data-bind="click: tile.reset"><span>{% trans 'Cancel' %}</span></button>
                         <!-- /ko -->
                         <!-- ko if: tile.tileid -->
                         <button class="btn btn-shim btn-labeled btn-lg fa fa-plus" data-bind="click: self.saveTile, css: {
                             disabled: (!card.isWritable && !self.preview),
                             'btn-mint': card.isWritable
-                        }">{% trans 'Save' %}</button>
+                        }"><span>{% trans 'Save' %}</span></button>
                         <!-- /ko -->
                     <!-- /ko -->
                     <!-- ko if: !tile.tileid -->
                     <button class="btn btn-shim btn-labeled btn-lg fa fa-plus" data-bind="click: self.saveTile, css: {
                         disabled: (!card.isWritable && !self.preview),
                         'btn-mint': card.isWritable
-                    }">{% trans 'Add'  %}</button>
+                    }"><span>{% trans 'Add'  %}</span></button>
                     <!-- /ko -->
                 </div>
                 {% endblock form_buttons %}
@@ -374,16 +382,6 @@
     }">{% trans 'Done' %}</button>
 </div>
 <!--/ko -->
-<!-- ko if: geoJSONString() -->
-<div class="display-in-workflow-step">
-    <button class="btn btn-shim btn-danger btn-labeled btn-lg fa fa-times" data-bind="click: function () {
-        geoJSONString(undefined);
-    }">{% trans 'Cancel' %}</button>
-    <button class="btn btn-shim btn-labeled btn-lg fa fa-plus btn-mint" data-bind="css: {
-        disabled: geoJSONErrors().length !== 0
-    }, click: updateGeoJSON">{% trans 'Update Features' %}</button>
-</div>
-<!-- /ko -->
 <!--/ko -->
 {{ block.super }}
 {% endblock sidepanel %}

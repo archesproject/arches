@@ -1,3 +1,4 @@
+{% load template_tags %}
 {% load i18n %}
 
 <!-- Title Block -->
@@ -35,7 +36,7 @@
                 {% trans "Visibility" %}
             </div>
             <div class="pad-no">
-                <div data-bind="component: { name: 'views/components/simple-switch', params: {value: visible, config:{label: '{% trans "Make Widget Visible" %}', subtitle: '{% trans "Show this widget by default" %}'}}}"></div>
+                <div data-bind="component: { name: 'views/components/simple-switch', params: {value: visible, config:{label: {% quoted_trans "Make Widget Visible" %}, subtitle: {% quoted_trans "Show this widget by default" %}}}}"></div>
             </div>
         </div>
 
@@ -45,7 +46,8 @@
                 config: configJSON,
                 configForm: true,
                 value: ko.observable(null),
-                node: node
+                node: node,
+                card: card
             }
         }'></div>
 

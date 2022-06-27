@@ -27,7 +27,21 @@ define([
     var loading = ko.observable(false);
     var selection = ko.observable('root');
     var scrollTo = ko.observable();
-    var displayname = ko.observable(data.displayname);
+    let parsedDisplayName = undefined;
+    try { 
+        if(typeof data.displayname == 'string') {
+            parsedDisplayName = JSON.parse(data.displayname)
+        }
+    } catch(e){}
+
+    let displayNameValue = undefined;
+    if(parsedDisplayName){
+        const defaultLanguageValue = parsedDisplayName?.[arches.activeLanguage]?.value;
+        displayNameValue = defaultLanguageValue ? defaultLanguageValue : "(" + parsedDisplayName[Object.keys(parsedDisplayName).filter(languageKey => languageKey != arches.activeLanguage)?.[0]]?.value + ")";
+    } else {
+        displayNameValue = data.displayname;
+    }
+    const displayname = ko.observable(displayNameValue);
     var resourceId = ko.observable(data.resourceid);
     var appliedFunctions = ko.observable(data['appliedFunctions']);
     var primaryDescriptorFunction = ko.observable(data['primaryDescriptorFunction']);
@@ -142,6 +156,7 @@ define([
         graphiconclass: data.graphiconclass,
         relationship_types: data.relationship_types,
         userIsCreator: userIsCreator,
+        showGrid: ko.observable(false),
         creator: creator,
         // appliedFunctions: appliedFunctions(),
         graph: {
@@ -157,6 +172,10 @@ define([
         collapseAll: function() {
             toggleAll(false);
         },
+        toggleGrid: () => {
+            vm.showGrid(!vm.showGrid());
+        },
+        activeLanguageDir: ko.observable(arches.activeLanguageDir),
         rootExpanded: ko.observable(true),
         topCards: topCards,
         selection: selection,

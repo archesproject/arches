@@ -1,5 +1,6 @@
 import logging
 import uuid
+from arches.app.utils.betterJSONSerializer import JSONSerializer
 from arches.app.functions.base import BaseFunction
 from arches.app.models import models
 from arches.app.datatypes.datatypes import DataTypeFactory

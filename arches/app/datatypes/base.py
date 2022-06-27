@@ -216,7 +216,7 @@ class BaseDataType(object):
 
     def get_search_terms(self, nodevalue, nodeid=None):
         """
-        Returns a nodevalue if it qualifies as a search term
+        Returns an array of arches.app.search_term.SearchTerm objects
         """
         return []
 
@@ -289,6 +289,12 @@ class BaseDataType(object):
         """
         pass
 
+    def get_first_language_value_from_node(self, tile, nodeid):
+        """
+        If value is internationalized, return only the first value in the i18n object
+        """
+        return tile.data[str(nodeid)]
+
     def pre_tile_save(self, tile, nodeid):
         """
         Called during tile.save operation but before the tile is actually saved to the database
@@ -302,6 +308,12 @@ class BaseDataType(object):
 
         """
         pass
+
+    def is_multilingual_rdf(self, rdf):
+        """
+        Determines if the rdf snippet contains multiple languages that can be processed by a given datatype
+        """
+        return False
 
     def is_a_literal_in_rdf(self):
         """
@@ -428,3 +440,16 @@ class BaseDataType(object):
         ret = {"@display_value": self.get_display_value(tile, node)}
         ret.update(kwargs)
         return ret
+
+    def has_multicolumn_data(self):
+        """
+        Used primarily for csv exports - true if data
+        for a node can span multiple columns
+        """
+        return False
+
+    def get_column_header(self, node, **kwargs):
+        """
+        Returns a CSV column header or headers for a given node ID of this type
+        """
+        return node["file_field_name"]

@@ -21,6 +21,7 @@ from arches.app.models.system_settings import settings
 from arches.app.datatypes.base import BaseDataType
 from arches.app.models.models import Widget
 from arches.app.search.elasticsearch_dsl_builder import Match, Exists, Term
+from arches.app.search.search_term import SearchTerm
 
 from rdflib import ConjunctiveGraph as Graph
 from rdflib import URIRef, Literal, Namespace
@@ -147,7 +148,7 @@ class URLDataType(BaseDataType):
         if nodevalue.get("url") is not None:
             if nodevalue.get("url_label") is not None:
                 if settings.WORDS_PER_SEARCH_TERM is None or (len(nodevalue["url_label"].split(" ")) < settings.WORDS_PER_SEARCH_TERM):
-                    terms.append(nodevalue["url_label"])
+                    terms.append(SearchTerm(value=nodevalue["url_label"]))
             # terms.append(nodevalue['url'])       FIXME: URLs searchable?
         return terms
 

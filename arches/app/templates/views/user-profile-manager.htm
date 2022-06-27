@@ -15,11 +15,21 @@ GNU Affero General Public License for more details.
 You should have received a copy of the GNU Affero General Public License
 along with this program. If not, see <http://www.gnu.org/licenses/>.
 -->
-{% extends "base-manager.htm" %} {% load staticfiles %} {% load i18n %} {% block title %} {{ block.super }} {% trans "Account Settings" %} {% endblock title %} {% block main_content %}
+{% extends "base-manager.htm" %} 
+{% load staticfiles %} 
+{% load template_tags %}
+{% load i18n %} 
+
+{% block title %} 
+{{ block.super }} 
+{% trans "Account Settings" %} 
+{% endblock title %} 
+
+{% block main_content %}
 <div class="scroll-y">
 
     <!-- Main Editor -->
-    <div id="">
+    <div id="user-profile">
 
         <!-- Profile Summary -->
         <div class="profile-summary-page">
@@ -50,14 +60,14 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 
                             <!-- Section Title -->
                             <div class="col-sm-3">
-                                <div class="profile-header">
+                                <div class="profile-header" style="margin: 0 10px">
                                     {% trans 'Account' %}
                                 </div>
                             </div>
 
-                            <div class="col-sm-9">
+                            <div class="row-content col-sm-9" style="flex: 1; ">
                                 <!-- ko if: showEditUserForm() === false -->
-                                <div class="row">
+                                <div class="row" style="display: flex">
                                     <div class="col-sm-5">
                                         <div class="relative">
                                             <h4 class="text-main" style="font-weight: 500;">{{ user.username }}</h4>
