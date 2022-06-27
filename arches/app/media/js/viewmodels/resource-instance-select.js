@@ -404,7 +404,6 @@ define([
                         if (self.searchString) {
                             const searchUrl = new URL(self.searchString);
                             queryString = new URLSearchParams(searchUrl.search);
-                            //self.allowInstanceCreation = false;
                         } 
                         queryString.set('paging-filter', page);
 
