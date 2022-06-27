@@ -6,7 +6,9 @@ define([
     'bindings/color-picker',
     'bindings/mapbox-gl',
     'bindings/codemirror',
-    'bindings/ckeditor'
+    'codemirror/mode/javascript/javascript',
+    'bindings/ckeditor',
+    'views/components/icon-selector'
 ], function($, arches, ko, _) {
     var name = 'geojson-feature-collection-datatype-config';
     ko.components.register(name, {
@@ -24,6 +26,9 @@ define([
                         return icon.name.indexOf(self.iconFilter()) >= 0;
                     });
                 });
+                if (!this.config.layerIcon()){
+                    this.config.layerIcon(this.layer.icon);
+                }
                 this.count = params.mapSource.count;
                 this.loading = params.loading || ko.observable(false);
                 var overlays = JSON.parse(this.layer.layer_definitions);

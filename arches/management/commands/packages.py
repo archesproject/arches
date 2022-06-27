@@ -29,6 +29,7 @@ from arches.app.utils.data_management.resources.formats.format import Reader as 
 from arches.app.utils.data_management.resources.exporter import ResourceExporter
 from arches.app.models.system_settings import settings
 from arches.app.models import models
+from arches.app.models.fields.i18n import I18n_String
 import arches.app.utils.data_management.resource_graphs.importer as graph_importer
 import arches.app.utils.data_management.resource_graphs.exporter as graph_exporter
 import arches.app.utils.data_management.resources.remover as resource_remover
@@ -240,6 +241,8 @@ class Command(BaseCommand):
 
         parser.add_argument("--use_multiprocessing", action="store_true", help="enables multiprocessing during data import")
 
+        parser.add_argument("--languages", action="store", dest="languages", help="languages desired as a comma separated list")
+
     def handle(self, *args, **options):
         print("operation: " + options["operation"])
         package_name = settings.PACKAGE_NAME
@@ -262,7 +265,12 @@ class Command(BaseCommand):
 
         if options["operation"] == "export_business_data":
             self.export_business_data(
-                options["dest_dir"], options["format"], options["config_file"], options["graphs"], options["single_file"]
+                options["dest_dir"],
+                options["format"],
+                options["config_file"],
+                options["graphs"],
+                options["single_file"],
+                options["languages"],
             )
 
         if options["operation"] == "import_reference_data":
@@ -394,24 +402,21 @@ class Command(BaseCommand):
                 output_graph = {"graph": [graph], "metadata": system_metadata()}
                 graph_json = JSONSerializer().serialize(output_graph, indent=4)
                 if graph["graphid"] not in existing_resource_graphs:
-                    output_file = os.path.join(dest_dir, graph["name"] + ".json")
+                    output_file = os.path.join(dest_dir, str(I18n_String(graph["name"])) + ".json")
                     with open(output_file, "w") as f:
                         print("writing", output_file)
                         f.write(graph_json)
                 else:
                     output_file = existing_resource_graphs[graph["graphid"]]["path"]
                     if force is False:
-                        overwrite = input(
-                            '"{0}" already exists in this directory. \
-                        Overwrite? (Y/N): '.format(
-                                existing_resource_graphs[graph["graphid"]]["name"]
-                            )
-                        )
+                        graph_name = I18n_String(existing_resource_graphs[graph["graphid"]]["name"])
+                        msg = f'The "{graph_name}" graph already exists in this directory. Overwrite? (Y/N): '
+                        overwrite = input(msg)
                     else:
                         overwrite = "true"
                     if overwrite.lower() in ("t", "true", "y", "yes"):
                         with open(output_file, "w") as f:
-                            print("writing", output_file)
+                            print("   writing", output_file)
                             f.write(graph_json)
 
     def export_package_settings(self, dest_dir, force=False):
@@ -487,6 +492,7 @@ class Command(BaseCommand):
                 "extensions/datatypes",
                 "extensions/functions",
                 "extensions/widgets",
+                "extensions/etl_modules",
                 "extensions/css",
                 "extensions/bindings",
                 "extensions/card_components",
@@ -828,6 +834,9 @@ class Command(BaseCommand):
         def load_card_components(package_dir):
             load_extensions(package_dir, "card_components", "card_component")
 
+        def load_card_components(package_dir):
+            load_extensions(package_dir, "cards", "card_component")
+
         def load_search_components(package_dir):
             load_extensions(package_dir, "search", "search")
 
@@ -839,6 +848,9 @@ class Command(BaseCommand):
 
         def load_functions(package_dir):
             load_extensions(package_dir, "functions", "fn")
+
+        def load_etl_modules(package_dir):
+            load_extensions(package_dir, "etl_modules", "etl_module")
 
         def cache_graphs():
             management.call_command("cache", operation="graphs")
@@ -919,6 +931,8 @@ class Command(BaseCommand):
         load_functions(package_location)
         print("loading datatypes")
         load_datatypes(package_location)
+        print("loading etl modules")
+        load_etl_modules(package_location)
         print("loading concepts")
         load_concepts(package_location, overwrite_concepts, stage_concepts, defer_indexing)
         print("loading resource models and branches")
@@ -990,7 +1004,7 @@ class Command(BaseCommand):
         management.call_command("es", operation="delete_indexes")
 
     def export_business_data(
-        self, data_dest=None, file_format=None, config_file=None, graphid=None, single_file=False,
+        self, data_dest=None, file_format=None, config_file=None, graphid=None, single_file=False, languages: str = None
     ):
         graphids = []
         if graphid is False and file_format == "json":
@@ -1012,7 +1026,7 @@ class Command(BaseCommand):
                     resource_exporter = ResourceExporter(
                         file_format, configs=config_file, single_file=single_file
                     )  # New exporter needed for each graphid, else previous data is appended with each subsequent graph
-                    data = resource_exporter.export(graph_id=graphid, resourceinstanceids=None)
+                    data = resource_exporter.export(graph_id=graphid, resourceinstanceids=None, languages=languages)
                     for file in data:
                         with open(
                             os.path.join(
@@ -1110,7 +1124,32 @@ class Command(BaseCommand):
                 path = utils.get_valid_path(source)
                 if path is not None:
                     print("Importing {0}. . .".format(path))
-                    BusinessDataImporter(path, config_file).import_business_data(
+                    importer = BusinessDataImporter(path, config_file)
+
+                    new_languages = importer.scan_for_new_languages()
+
+                    if new_languages is not None and len(new_languages) > 0:
+                        print("\nFound possible new languages while attempting import.")
+                        for language in new_languages:
+                            print('Do you wish to add the language with code "{language}" to Arches? (y or n):'.format(language=language))
+                            create_new_language = input()
+                            if create_new_language.lower() == "y":
+                                print("\nEnter the human-readable language name:")
+                                language_name = input()
+                                print("\nIs this language primarily read Left-To-Right (y or n):")
+                                lang_is_ltr = input()
+                                default_direction = "ltr" if lang_is_ltr.lower() == "y" else "rtl"
+                                scope = "data"
+                                new_language = models.Language(
+                                    code=language, name=language_name, default_direction=default_direction, scope=scope
+                                )
+                                try:
+                                    new_language.save()
+
+                                except Exception as e:
+                                    raise Exception("Couldn't save new entry for {language}.".format(language=language)) from e
+
+                    importer.import_business_data(
                         overwrite=overwrite,
                         bulk=bulk_load,
                         create_concepts=create_concepts,
@@ -1230,7 +1269,7 @@ class Command(BaseCommand):
             else:
                 graphs = [graph.strip() for graph in graphs.split(",")]
             for graph in ResourceGraphExporter.get_graphs_for_export(graphids=graphs)["graph"]:
-                graph_name = graph["name"].replace("/", "-")
+                graph_name = I18n_String(graph["name"]).replace("/", "-")
                 with open(os.path.join(data_dest, graph_name + ".json"), "wb") as f:
                     f.write(JSONSerializer().serialize({"graph": [graph]}, indent=4).encode("utf-8"))
         else:

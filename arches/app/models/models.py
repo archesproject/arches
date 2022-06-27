@@ -19,6 +19,7 @@ import pyotp
 from datetime import timedelta
 
 from arches.app.utils.module_importer import get_class_from_modulename
+from arches.app.models.fields.i18n import I18n_TextField, I18n_JSONField
 from django.forms.models import model_to_dict
 from django.contrib.gis.db import models
 from django.contrib.postgres.fields import JSONField
@@ -45,13 +46,13 @@ from django.conf import settings
 
 class CardModel(models.Model):
     cardid = models.UUIDField(primary_key=True, default=uuid.uuid1)  # This field type is a guess.
-    name = models.TextField(blank=True, null=True)
-    description = models.TextField(blank=True, null=True)
-    instructions = models.TextField(blank=True, null=True)
+    name = I18n_TextField(blank=True, null=True)
+    description = I18n_TextField(blank=True, null=True)
+    instructions = I18n_TextField(blank=True, null=True)
     cssclass = models.TextField(blank=True, null=True)
     helpenabled = models.BooleanField(default=False)
-    helptitle = models.TextField(blank=True, null=True)
-    helptext = models.TextField(blank=True, null=True)
+    helptitle = I18n_TextField(blank=True, null=True)
+    helptext = I18n_TextField(blank=True, null=True)
     nodegroup = models.ForeignKey("NodeGroup", db_column="nodegroupid", on_delete=models.CASCADE)
     graph = models.ForeignKey("GraphModel", db_column="graphid", on_delete=models.CASCADE)
     active = models.BooleanField(default=True)
@@ -117,8 +118,8 @@ class CardXNodeXWidget(models.Model):
     node = models.ForeignKey("Node", db_column="nodeid", on_delete=models.CASCADE)
     card = models.ForeignKey("CardModel", db_column="cardid", on_delete=models.CASCADE)
     widget = models.ForeignKey("Widget", db_column="widgetid", on_delete=models.CASCADE)
-    config = JSONField(blank=True, null=True, db_column="config")
-    label = models.TextField(blank=True, null=True)
+    config = I18n_JSONField(blank=True, null=True, db_column="config")
+    label = I18n_TextField(blank=True, null=True)
     visible = models.BooleanField(default=True)
     sortorder = models.IntegerField(blank=True, null=True, default=None)
 
@@ -144,7 +145,7 @@ class DDataType(models.Model):
     modulename = models.TextField(blank=True, null=True)
     classname = models.TextField(blank=True, null=True)
     defaultwidget = models.ForeignKey(db_column="defaultwidget", to="models.Widget", null=True, on_delete=models.SET_NULL)
-    defaultconfig = JSONField(blank=True, null=True, db_column="defaultconfig")
+    defaultconfig = I18n_JSONField(blank=True, null=True, db_column="defaultconfig")
     configcomponent = models.TextField(blank=True, null=True)
     configname = models.TextField(blank=True, null=True)
     issearchable = models.NullBooleanField(default=False)
@@ -156,19 +157,6 @@ class DDataType(models.Model):
     class Meta:
         managed = True
         db_table = "d_data_types"
-
-
-class DLanguage(models.Model):
-    languageid = models.TextField(primary_key=True)
-    languagename = models.TextField()
-    isdefault = models.BooleanField()
-
-    class Meta:
-        managed = True
-        db_table = "d_languages"
-
-    def __str__(self):
-        return f"{self.languageid} ({self.languagename})"
 
 
 class DNodeType(models.Model):
@@ -377,8 +365,8 @@ class FunctionXGraph(models.Model):
 
 class GraphModel(models.Model):
     graphid = models.UUIDField(primary_key=True, default=uuid.uuid1)  # This field type is a guess.
-    name = models.TextField(blank=True, null=True)
-    description = models.TextField(blank=True, null=True)
+    name = I18n_TextField(blank=True, null=True)
+    description = I18n_TextField(blank=True, null=True)
     deploymentfile = models.TextField(blank=True, null=True)
     author = models.TextField(blank=True, null=True)
     deploymentdate = models.DateTimeField(blank=True, null=True)
@@ -386,7 +374,7 @@ class GraphModel(models.Model):
     isresource = models.BooleanField()
     iconclass = models.TextField(blank=True, null=True)
     color = models.TextField(blank=True, null=True)
-    subtitle = models.TextField(blank=True, null=True)
+    subtitle = I18n_TextField(blank=True, null=True)
     ontology = models.ForeignKey(
         "Ontology", db_column="ontologyid", related_name="graphs", null=True, blank=True, on_delete=models.SET_NULL
     )
@@ -397,7 +385,7 @@ class GraphModel(models.Model):
     )
     config = JSONField(db_column="config", default=dict)
     slug = models.TextField(validators=[validate_slug], unique=True, null=True)
-    publication = models.ForeignKey("GraphPublication", db_column="publicationid", null=True, on_delete=models.SET_NULL)
+    publication = models.ForeignKey("GraphXPublishedGraph", db_column="publicationid", null=True, on_delete=models.SET_NULL)
 
     @property
     def disable_instance_creation(self):
@@ -416,24 +404,23 @@ class GraphModel(models.Model):
             return True
 
     def __str__(self):
-        return self.name
+        return str(self.name)
 
     class Meta:
         managed = True
         db_table = "graphs"
 
 
-class GraphPublication(models.Model):
+class GraphXPublishedGraph(models.Model):
     publicationid = models.UUIDField(primary_key=True, serialize=False, default=uuid.uuid1)
     notes = models.TextField(blank=True, null=True)
     graph = models.ForeignKey(GraphModel, db_column="graphid", on_delete=models.CASCADE)
-    serialized_graph = JSONField(blank=True, null=True, db_column="serialized_graph")
     user = models.ForeignKey(User, db_column="userid", null=True, on_delete=models.CASCADE)
     published_time = models.DateTimeField(default=datetime.datetime.now, null=False)
 
     class Meta:
         managed = True
-        db_table = "graph_publications"
+        db_table = "graphs_x_published_graphs"
 
 
 class Icon(models.Model):
@@ -444,6 +431,29 @@ class Icon(models.Model):
     class Meta:
         managed = True
         db_table = "icons"
+
+
+class Language(models.Model):
+    LEFT_TO_RIGHT = "ltr"
+    RIGHT_TO_LEFT = "rtl"
+    LANGUAGE_DIRECTION_CHOICES = [(LEFT_TO_RIGHT, "Left to Right"), (RIGHT_TO_LEFT, "Right to Left")]
+
+    SYSTEM_SCOPE = "system"
+    DATA_SCOPE = "data"
+    SCOPE_CHOICES = [(SYSTEM_SCOPE, "System Scope"), (DATA_SCOPE, "Data Scope")]
+    id = models.AutoField(primary_key=True)
+    code = models.TextField(unique=True)  # ISO639 code
+    name = models.TextField()
+    default_direction = models.TextField(choices=LANGUAGE_DIRECTION_CHOICES, default=LEFT_TO_RIGHT)
+    scope = models.TextField(choices=SCOPE_CHOICES, default=SYSTEM_SCOPE)
+    isdefault = models.BooleanField(default=False, blank=True)
+
+    def __str__(self):
+        return self.name
+
+    class Meta:
+        managed = True
+        db_table = "languages"
 
 
 class NodeGroup(models.Model):
@@ -481,7 +491,7 @@ class Node(models.Model):
     datatype = models.TextField()
     nodegroup = models.ForeignKey(NodeGroup, db_column="nodegroupid", blank=True, null=True, on_delete=models.CASCADE)
     graph = models.ForeignKey(GraphModel, db_column="graphid", blank=True, null=True, on_delete=models.CASCADE)
-    config = JSONField(blank=True, null=True, db_column="config")
+    config = I18n_JSONField(blank=True, null=True, db_column="config")
     issearchable = models.BooleanField(default=True)
     isrequired = models.BooleanField(default=False)
     sortorder = models.IntegerField(blank=True, null=True, default=0)
@@ -629,6 +639,16 @@ class OntologyClass(models.Model):
         managed = True
         db_table = "ontologyclasses"
         unique_together = (("source", "ontology"),)
+
+
+class PublishedGraph(models.Model):
+    language = models.ForeignKey(Language, db_column="languageid", to_field="code", blank=True, null=True, on_delete=models.CASCADE)
+    publication = models.ForeignKey(GraphXPublishedGraph, db_column="publicationid", on_delete=models.CASCADE)
+    serialized_graph = JSONField(blank=True, null=True, db_column="serialized_graph")
+
+    class Meta:
+        managed = True
+        db_table = "published_graphs"
 
 
 class Relation(models.Model):
@@ -799,7 +819,7 @@ class ResourceXResource(models.Model):
 class ResourceInstance(models.Model):
     resourceinstanceid = models.UUIDField(primary_key=True, default=uuid.uuid1)  # This field type is a guess.
     graph = models.ForeignKey(GraphModel, db_column="graphid", on_delete=models.CASCADE)
-    graph_publication = models.ForeignKey(GraphPublication, db_column="graphpublicationid", on_delete=models.PROTECT)
+    graph_publication = models.ForeignKey(GraphXPublishedGraph, null=True, db_column="graphpublicationid", on_delete=models.PROTECT)
     legacyid = models.TextField(blank=True, unique=True, null=True)
     createdtime = models.DateTimeField(auto_now_add=True)
 
@@ -943,7 +963,7 @@ class Value(models.Model):
     concept = models.ForeignKey("Concept", db_column="conceptid", on_delete=models.CASCADE)
     valuetype = models.ForeignKey(DValueType, db_column="valuetype", on_delete=models.CASCADE)
     value = models.TextField()
-    language = models.ForeignKey(DLanguage, db_column="languageid", blank=True, null=True, on_delete=models.CASCADE)
+    language = models.ForeignKey(Language, db_column="languageid", to_field="code", blank=True, null=True, on_delete=models.CASCADE)
 
     class Meta:
         managed = True
@@ -955,7 +975,7 @@ class FileValue(models.Model):
     concept = models.ForeignKey("Concept", db_column="conceptid", on_delete=models.CASCADE)
     valuetype = models.ForeignKey("DValueType", db_column="valuetype", on_delete=models.CASCADE)
     value = models.FileField(upload_to="concepts")
-    language = models.ForeignKey("DLanguage", db_column="languageid", blank=True, null=True, on_delete=models.CASCADE)
+    language = models.ForeignKey(Language, db_column="languageid", to_field="code", blank=True, null=True, on_delete=models.CASCADE)
 
     class Meta:
         managed = False
@@ -1436,6 +1456,67 @@ class GeoJSONGeometry(models.Model):
     class Meta:
         managed = True
         db_table = "geojson_geometries"
+
+
+class ETLModule(models.Model):
+    etlmoduleid = models.UUIDField(primary_key=True, default=uuid.uuid1)
+    name = models.TextField()
+    icon = models.TextField()
+    etl_type = models.TextField()
+    component = models.TextField()
+    componentname = models.TextField()
+    modulename = models.TextField(blank=True, null=True)
+    classname = models.TextField(blank=True, null=True)
+    config = JSONField(blank=True, null=True, db_column="config")
+    slug = models.TextField(validators=[validate_slug], unique=True, null=True)
+    description = models.TextField(blank=True, null=True)
+
+    def __str__(self):
+        return self.name
+
+    class Meta:
+        managed = True
+        db_table = "etl_modules"
+
+    def get_class_module(self):
+        return get_class_from_modulename(self.modulename, self.classname, settings.ETL_MODULE_LOCATIONS)
+
+
+class LoadEvent(models.Model):
+    loadid = models.UUIDField(primary_key=True, serialize=False, default=uuid.uuid4)
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    complete = models.BooleanField(default=False)
+    successful = models.BooleanField(blank=True, null=True)
+    status = models.TextField(blank=True, null=True)
+    etl_module = models.ForeignKey(ETLModule, on_delete=models.CASCADE)
+    load_description = models.TextField(blank=True, null=True)
+    load_details = JSONField(blank=True, null=True)
+    error_message = models.TextField(blank=True, null=True)
+    load_start_time = models.DateTimeField(blank=True, null=True)
+    load_end_time = models.DateTimeField(blank=True, null=True)
+    indexed_time = models.DateTimeField(blank=True, null=True)
+
+    class Meta:
+        managed = True
+        db_table = "load_event"
+
+
+class LoadStaging(models.Model):
+    nodegroup = models.ForeignKey(NodeGroup, db_column="nodegroupid", on_delete=models.CASCADE)
+    load_event = models.ForeignKey(LoadEvent, db_column="loadid", on_delete=models.CASCADE)
+    value = JSONField(blank=True, null=True, db_column="value")
+    legacyid = models.TextField(blank=True, null=True)
+    resourceid = models.UUIDField(serialize=False, blank=True, null=True)
+    tileid = models.UUIDField(serialize=False, blank=True, null=True)
+    parenttileid = models.UUIDField(serialize=False, blank=True, null=True)
+    passes_validation = models.BooleanField(blank=True, null=True)
+    nodegroup_depth = models.IntegerField(default=1)
+    source_description = models.TextField(blank=True, null=True)
+    error_message = models.TextField(blank=True, null=True)
+
+    class Meta:
+        managed = True
+        db_table = "load_staging"
 
 
 class SpatialView(models.Model):

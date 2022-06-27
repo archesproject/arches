@@ -17,12 +17,13 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 -->
 {% extends "base-manager.htm" %}
 {% load staticfiles %}
+{% load template_tags %}
 {% load i18n %}
 
 {% block graph_title %}
 <div class="ep-tools-title">
     <h1 class="page-header text-overflow mobile-designer-title">
-        <span data-bind="text: mobilesurvey.name() || '{% trans 'Unnamed' %}'"></span>
+        <span data-bind="text: mobilesurvey.name() || {% quoted_trans 'Unnamed' %}"></span>
     </h1>
 </div>
 {% endblock graph_title %}
@@ -55,8 +56,8 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                         <!--/ko-->
                     </ul>
                     <ul class="msm-edit-buttons">
-                        <button class="btn btn-mint btn-labeled btn-active-dark fa fa-undo" data-bind="click: discardEdits, css: {'disabled': mobilesurvey.dirty()==false}">{% trans 'Discard Edits' %}</button>
-                        <button id="btn-save-edits" class="btn btn-primary btn-labeled btn-active-dark fa fa-check" data-bind="click: saveMobileSurvey, css: {'disabled': mobilesurvey.dirty()==false}">{% trans 'Save Edits' %}</button>
+                        <button class="btn btn-mint btn-labeled btn-active-dark fa fa-undo" data-bind="click: discardEdits, css: {'disabled': mobilesurvey.dirty()==false}"><span>{% trans 'Discard Edits' %}</span></button>
+                        <button id="btn-save-edits" class="btn btn-primary btn-labeled btn-active-dark fa fa-check" data-bind="click: saveMobileSurvey, css: {'disabled': mobilesurvey.dirty()==false}"><span>{% trans 'Save Edits' %}</span></button>
                     </ul>
                     <!--/ko-->
                 </div>
@@ -88,7 +89,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                                     <div class="msm-survey-requirements-text">
                                         {% trans 'Project Requirements: Complete' %}
                                     </div>
-                                    <div class="msm-survey-status-text" data-bind="text: mobilesurvey.activatedOnServer() === true ? '{% trans "Project Status: Active" %}' : '{% trans " Project Status: Inactive" %}'"></div>
+                                    <div class="msm-survey-status-text" data-bind="text: mobilesurvey.activatedOnServer() === true ? {% quoted_trans "Project Status: Active" %} : {% quoted_trans " Project Status: Inactive" %}"></div>
 
                                     <div class="msm-survey-message" data-bind="visible: mobilesurvey.activatedOnServer() === false">
                                         {% trans "This project is ready, and only requires <br> you to activate it to allow your field team to collect data." %}
@@ -121,7 +122,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                                 <div class="mpm-survey-status-header">
                                     <i class="msm-icon-wrap fa fa-exclamation-triangle"></i>
                                     <div class="msm-survey-requirements-text">{% trans 'Project Requirements: Incomplete' %}</div>
-                                    <div class="msm-survey-status-text" data-bind="text: mobilesurvey.activatedOnServer() === true ? '{% trans "Project Status: Active" %}' : '{% trans " Project Status: Inactive" %}'"></div>
+                                    <div class="msm-survey-status-text" data-bind="text: mobilesurvey.activatedOnServer() === true ? {% quoted_trans "Project Status: Active" %} : {% quoted_trans " Project Status: Inactive" %}"></div>
                                 </div>
 
                                 <!--ko if: mobilesurvey.activatedOnServer() === true && mobilesurvey.active() === false -->
@@ -380,7 +381,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                                     widget: {
                                         node_id: ko.observable('surveyextent'),
                                         config:{
-                                            geometryTypes: [{'id':'Polygon','text':'{% trans "Polygon" %}'}]
+                                            geometryTypes: [{'id':'Polygon','text':"{% trans "Polygon" %}"}]
                                         },
                                         datatype: {
                                             datatype: 'geojson-feature-collection'
@@ -398,11 +399,11 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                                         geocodePlaceholder: "Locate a Place or Address",
                                         geocodeProvider: geocoderDefault,
                                         geocoderVisible: true,
-                                        geometryTypes: [{'id':'Polygon','text':'{% trans "Polygon" %}'}],
+                                        geometryTypes: [{'id':'Polygon','text':"{% trans "Polygon" %}"}],
                                         mapControlsHidden: false,
                                         maxZoom: mapDefaultMaxZoom,
                                         minZoom: mapDefaultMinZoom,
-                                        label: '{% trans "Project extent" %}',
+                                        label: "{% trans "Project extent" %}",
                                         overlayConfigs: [],
                                         overlayOpacity: 0,
                                         pitch: 0,
@@ -732,8 +733,6 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
     </div>
 </div>
 {% endblock main_content %}
-
-{% block tabs %}{% endblock tabs %}
 
 {% block pre_require_js %}
 {{block.super}}

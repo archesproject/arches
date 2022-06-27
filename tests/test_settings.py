@@ -90,7 +90,6 @@ REMOTE_BROWSERS = [
     #  "version": "45"}
 ]
 
-BYPASS_CARDINALITY_TILE_VALIDATION = False
 
 OVERRIDE_RESOURCE_MODEL_LOCK = True
 
@@ -115,4 +114,7 @@ LANGUAGES = [
 try:
     from settings_local import *
 except ImportError:
-    pass
+    try:
+        from settings_docker import *
+    except ImportError:
+        pass

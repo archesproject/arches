@@ -762,12 +762,12 @@
                             {
                                 "id": "55d230bf-4083-477e-aea8-a5752f3012b8",
                                 "selected": false,
-                                "text": "example"
+                                "text": {"en": "example", "es": "ejemplo"}
                             },
                             {
                                 "id": "854fb486-ac0d-410c-b306-ba34712b4a8c",
                                 "selected": false,
-                                "text": "example 2"
+                                "text": {"en": "example 2", "es": "ejemplo 2"}
                             }
                         ]
                     },

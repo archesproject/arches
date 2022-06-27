@@ -231,31 +231,6 @@ class Tile(models.TileModel):
                 edit = edits[str(user.id)]
         return edit
 
-    def check_tile_cardinality_violation(self):
-        if settings.BYPASS_CARDINALITY_TILE_VALIDATION:
-            return
-        if self.nodegroup.cardinality == "1":
-            kwargs = {"nodegroup": self.nodegroup, "resourceinstance_id": self.resourceinstance_id}
-            try:
-                uuid.UUID(str(self.parenttile_id))
-                kwargs["parenttile_id"] = self.parenttile_id
-            except ValueError:
-                pass
-
-            existing_tiles = list(models.TileModel.objects.filter(**kwargs).values_list("tileid", flat=True))
-
-            # this should only ever return at most one tile
-            if len(existing_tiles) > 0 and uuid.UUID(str(self.tileid)) not in existing_tiles:
-                card = models.CardModel.objects.get(nodegroup=self.nodegroup)
-                message = _("Unable to save a tile to a card with cardinality 1 where a tile has previously been saved.")
-                details = _(
-                    "Details: card: {0}, graph: {1}, resource: {2}, tile: {3}, nodegroup: {4}".format(
-                        card.name, self.resourceinstance.graph.name, self.resourceinstance_id, self.tileid, self.nodegroup_id
-                    )
-                )
-                message += " " + details
-                raise TileCardinalityError(message)
-
     def check_for_constraint_violation(self):
         if settings.BYPASS_UNIQUE_CONSTRAINT_TILE_VALIDATION:
             return
@@ -328,7 +303,7 @@ class Tile(models.TileModel):
             message += (", ").join(missing_nodes)
             raise TileValidationError(message)
 
-    def validate(self, errors=None, raise_early=True, strict=False):
+    def validate(self, errors=None, raise_early=True, strict=False, request=None):
         """
         Keyword Arguments:
         errors -- supply and list to have errors appened on to
@@ -339,11 +314,10 @@ class Tile(models.TileModel):
         """
 
         tile_errors = []
-
         for nodeid, value in self.data.items():
             node = models.Node.objects.get(nodeid=nodeid)
             datatype = self.datatype_factory.get_instance(node.datatype)
-            error = datatype.validate(value, node=node, strict=strict)
+            error = datatype.validate(value, node=node, strict=strict, request=request)
             tile_errors += error
             for error_instance in error:
                 if error_instance["type"] == "ERROR":
@@ -408,7 +382,6 @@ class Tile(models.TileModel):
             self.__preSave(request, context=context)
             self.check_for_missing_nodes()
             self.check_for_constraint_violation()
-            self.check_tile_cardinality_violation()
 
             creating_new_tile = models.TileModel.objects.filter(pk=self.tileid).exists() is False
             edit_type = "tile create" if (creating_new_tile is True) else "tile edit"
@@ -444,7 +417,7 @@ class Tile(models.TileModel):
                     }
 
             if user is not None:
-                self.validate([])
+                self.validate([], request=request)
 
             super(Tile, self).save(*args, **kwargs)
             # We have to save the edit log record after calling save so that the
@@ -494,7 +467,7 @@ class Tile(models.TileModel):
         se = SearchEngineFactory().create()
         request = kwargs.pop("request", None)
         index = kwargs.pop("index", True)
-        transaction_id = kwargs.pop("index", None)
+        transaction_id = kwargs.pop("transaction_id", None)
         provisional_edit_log_details = kwargs.pop("provisional_edit_log_details", None)
         for tile in self.tiles:
             tile.delete(*args, request=request, **kwargs)
@@ -541,7 +514,6 @@ class Tile(models.TileModel):
         Indexes all the nessesary documents related to resources to support the map, search, and reports
 
         """
-
         Resource.objects.get(pk=self.resourceinstance_id).index()
 
     # # flatten out the nested tiles into a single array
@@ -606,7 +578,7 @@ class Tile(models.TileModel):
         return tile
 
     @staticmethod
-    def update_node_value(nodeid, value, tileid=None, nodegroupid=None, resourceinstanceid=None, transaction_id=None):
+    def update_node_value(nodeid, value, tileid=None, nodegroupid=None, request=None, resourceinstanceid=None, transaction_id=None):
         """
         Updates the value of a node in a tile. Creates the tile and parent tiles if they do not yet
         exist.
@@ -615,11 +587,11 @@ class Tile(models.TileModel):
         if tileid and models.TileModel.objects.filter(pk=tileid).exists():
             tile = Tile.objects.get(pk=tileid)
             tile.data[nodeid] = value
-            tile.save(transaction_id=transaction_id)
+            tile.save(request=request, transaction_id=transaction_id)
         elif models.TileModel.objects.filter(Q(resourceinstance_id=resourceinstanceid), Q(nodegroup_id=nodegroupid)).count() == 1:
             tile = Tile.objects.filter(Q(resourceinstance_id=resourceinstanceid), Q(nodegroup_id=nodegroupid))[0]
             tile.data[nodeid] = value
-            tile.save(transaction_id=transaction_id)
+            tile.save(request=request, transaction_id=transaction_id)
         else:
             new_resource_created = False
             if not resourceinstanceid:
@@ -631,14 +603,19 @@ class Tile(models.TileModel):
             tile = Tile.get_blank_tile(nodeid, resourceinstanceid)
             if nodeid in tile.data:
                 tile.data[nodeid] = value
-                tile.save(new_resource_created=new_resource_created, transaction_id=transaction_id)
+                tile.save(request=request, new_resource_created=new_resource_created, transaction_id=transaction_id)
             else:
-                tile.save(new_resource_created=new_resource_created, transaction_id=transaction_id)
+                tile.save(request=request, new_resource_created=new_resource_created, transaction_id=transaction_id)
                 if not nodegroupid:
                     nodegroupid = models.Node.objects.get(pk=nodeid).nodegroup_id
                 if nodegroupid and resourceinstanceid:
                     tile = Tile.update_node_value(
-                        nodeid, value, nodegroupid=nodegroupid, resourceinstanceid=resourceinstanceid, transaction_id=transaction_id
+                        nodeid,
+                        value,
+                        nodegroupid=nodegroupid,
+                        request=request,
+                        resourceinstanceid=resourceinstanceid,
+                        transaction_id=transaction_id,
                     )
 
         tile.after_update_all()
@@ -657,8 +634,9 @@ class Tile(models.TileModel):
                     function.save(self, request, context=context)
                 except NotImplementedError:
                     pass
-        except TypeError:
-            logger.info(_("No associated functions or other TypeError raised by a function"))
+        except TypeError as e:
+            logger.warning(_("No associated functions or other TypeError raised by a function"))
+            logger.warning(e)
 
     def __preDelete(self, request):
         try:
@@ -667,8 +645,9 @@ class Tile(models.TileModel):
                     function.delete(self, request)
                 except NotImplementedError:
                     pass
-        except TypeError:
-            logger.info(_("No associated functions or other TypeError raised by a function"))
+        except TypeError as e:
+            logger.warning(_("No associated functions or other TypeError raised by a function"))
+            logger.warning(e)
 
     def __postSave(self, request=None, context=None):
         """
@@ -708,7 +687,7 @@ class Tile(models.TileModel):
                 return None
         return self
 
-    def serialize(self, fields=None, exclude=None):
+    def serialize(self, fields=None, exclude=None, **kwargs):
         """
         serialize to a different form then used by the internal class structure
 

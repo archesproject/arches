@@ -12,7 +12,9 @@ define([
     'arches',
     'bindings/mapbox-gl',
     'bindings/codemirror',
-    'datatype-config-components'
+    'codemirror/mode/javascript/javascript',
+    'datatype-config-components',
+    'views/components/icon-selector'
 ], function($, ko, _, turf, geohash, BaseManagerView, NodeModel, AlertViewModel, binFeatureCollection, data, arches) {
     var vm = {
         map: null,

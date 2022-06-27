@@ -17,6 +17,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 -->
 {% extends "base-manager.htm" %}
 {% load staticfiles %}
+{% load template_tags %}
 {% load i18n %}
 
 {% block main_content %}
@@ -35,7 +36,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
             <div class="rr-splash-title">{% trans "Mobile Data Collection" %}</div>
 
             <!-- Splash Button -->
-            <button class="btn btn-shim btn-rr btn-labeled btn-lg fa fa-globe" data-bind="click: newMobileSurvey">{% trans 'Create a Project' %}</button>
+            <button class="btn btn-shim btn-rr btn-labeled btn-lg fa fa-globe" data-bind="click: newMobileSurvey"><span>{% trans 'Create a Project' %}</span></button>
 
             <!-- Splash Instructions -->
             <div class="rr-splash-description">{% trans "Arches allows you to create and edit data in the field using mobile devices such as" %}</div>
@@ -50,16 +51,16 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
     <!--ko if: mobilesurveys().length > 0 -->
         <div data-bind="visible: mobilesurveys().length > 0" style="width: 100%;">
                 <!-- Layer Filter -->
-                <div class="list-filter mpm" data-bind="">
+                <div class="mpm" data-bind="">
                     <div class="msm-list-filter">
                     <div>
-                        <button id="" class="btn btn-lg btn-mint btn-active-dark btn-labeled ion-plus-round" data-bind="click: newMobileSurvey">{% trans "New Project" %}</button>
+                        <button id="" class="btn btn-lg btn-mint btn-active-dark btn-labeled ion-plus-round" data-bind="click: newMobileSurvey"><span>{% trans "New Project" %}</span></button>
                     </div>
-                    <div class="msm-list-filter-input">
-                    <input type="text" class="form-control" placeholder="{% trans 'Find a project...' %}" data-bind="value: mobileSurveyFilter, valueUpdate: 'keyup'">
-                    <!-- Clear Search -->
-                    <span class="clear-node-search" data-bind="visible: mobileSurveyFilter().length > 0, click: function() { mobileSurveyFilter(''); }"><i class="fa fa-times-circle"></i></span>
-                </div>
+                    <div class="list-filter msm-list-filter-input">
+                        <input type="text" class="form-control" placeholder="{% trans 'Find a project...' %}" data-bind="value: mobileSurveyFilter, valueUpdate: 'keyup'">
+                        <!-- Clear Search -->
+                        <span class="clear-node-search" data-bind="visible: mobileSurveyFilter().length > 0, click: function() { mobileSurveyFilter(''); }"><i class="fa fa-times-circle"></i></span>
+                    </div>
                </div>
           </div>
 
@@ -78,29 +79,29 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                                         <i class="icon-wrap resource-grid-icon fa fa-globe"></i>
 
 
-                                        <div class="mpm-title"><span data-bind="text: name() === '' ? '{% trans "Unnamed Project" %}' : name()"></span></div>
+                                        <div class="mpm-title"><span data-bind="text: name() === '' ? {% quoted_trans "Unnamed Project" %} : name()"></span></div>
 
                                         <!--ko if: enddate && startdate -->
                                         <div class="mpm-subtitle">
-                                            <span data-bind="text: starts + '{% trans " to " %}' + ends"> </span>
+                                            <span data-bind="text: starts + {% quoted_trans " to " %} + ends"> </span>
                                             <!--ko if: expired -->
                                             <span style="color: red; font-weight: 300">{% trans '(expired)' %}</span>
                                             <!--/ko -->
                                         </div>
                                         <!--/ko -->
                                         <!--ko ifnot: enddate && startdate -->
-                                        <div class="mpm-subtitle" data-bind="text: '{% trans "Date range unspecified" %}'"></div>
+                                        <div class="mpm-subtitle" data-bind="text: {% quoted_trans "Date range unspecified" %}"></div>
                                         <!--/ko -->
                                     </div>
                                 </div>
                             </div>
                             <div class="resource-grid-tools-container mpm-manager">
 
-                                <button class="btn btn-shim btn-rr graph-btn btn-labeled btn-sm fa fa-trash" data-bind="click: function(val){$parent.deleteMobileSurvey(val)}, clickBubble: false, css: {'disabled': active()}" aria-expanded="true">{% trans 'delete' %}</button>
+                                <button class="btn btn-shim btn-rr graph-btn btn-labeled btn-sm fa fa-trash" data-bind="click: function(val){$parent.deleteMobileSurvey(val)}, clickBubble: false, css: {'disabled': active()}" aria-expanded="true"><span>{% trans 'delete' %}</span></button>
 
                                 <div>
                                     <p class="resource-status-label">
-                                    {% trans "Status" %}: <span class="resource-status" data-bind="text:active()?'{% trans "Active" %}':'{% trans "Inactive" %}'"></span>
+                                    {% trans "Status" %}: <span class="resource-status" data-bind="text:active()?{% quoted_trans "Active" %}:{% quoted_trans "Inactive" %}"></span>
                                     </p>
                                 </div>
 
@@ -117,8 +118,6 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 </div>
 
 {% endblock main_content %}
-
-{% block tabs %}{% endblock tabs %}
 
 {% block pre_require_js %}
 {{block.super}}

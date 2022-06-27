@@ -16,12 +16,14 @@ You should have received a copy of the GNU Affero General Public License
 along with this program. If not, see <http://www.gnu.org/licenses/>.
 """
 
+from arches.app.views.language import LanguageView
 from django.views.decorators.cache import cache_page
 from django.contrib.auth import views as auth_views
 from django.conf.urls import include, url
 from django.contrib.staticfiles.urls import staticfiles_urlpatterns
 from arches.app.views import concept, main, map, search, graph, api
 from arches.app.views.admin import ReIndexResources, FileView, ClearUserPermissionCache
+from arches.app.views.etl_manager import ETLManagerView
 from arches.app.views.graph import (
     GraphDesignerView,
     GraphSettingsView,
@@ -207,6 +209,7 @@ urlpatterns = [
     url(r"^reorder_cards/", CardView.as_view(action="reorder_cards"), name="reorder_cards"),
     url(r"^node/(?P<graphid>%s)$" % uuid_regex, GraphDataView.as_view(action="update_node"), name="node"),
     url(r"^nodegroup/", NodegroupView.as_view(action="exportable"), name="nodegroup"),
+    url(r"^language/", LanguageView.as_view(), name="language"),
     url(r"^node_layer/(?P<graphid>%s)$" % uuid_regex, GraphDataView.as_view(action="update_node_layer"), name="node_layer"),
     url(r"^widgets/(?P<template>[a-zA-Z_-]*)", main.widget, name="widgets"),
     url(r"^report-templates/(?P<template>[a-zA-Z_-]*)", main.report_templates, name="report-templates"),
@@ -240,6 +243,7 @@ urlpatterns = [
     url(r"^sync/(?P<surveyid>%s|())$" % uuid_regex, api.Sync.as_view(), name="sync"),
     url(r"^checksyncstatus/(?P<synclogid>%s|())$" % uuid_regex, api.CheckSyncStatus.as_view(), name="checksyncstatus"),
     url(r"^graphs/(?P<graph_id>%s)$" % (uuid_regex), api.Graphs.as_view(), name="graphs_api"),
+    url(r"^graphs", api.Graphs.as_view(action="get_graph_models"), name="get_graph_models_api"),
     url(r"^resources/(?P<graphid>%s)/(?P<resourceid>%s|())$" % (uuid_regex, uuid_regex), api.Resources.as_view(), name="resources_graphid"),
     url(r"^resources/(?P<slug>[-\w]+)/(?P<resourceid>%s|())$" % uuid_regex, api.Resources.as_view(), name="resources_slug"),
     url(r"^resources/(?P<resourceid>%s|())$" % uuid_regex, api.Resources.as_view(), name="resources"),
@@ -302,6 +306,7 @@ urlpatterns = [
     url(r"^two-factor-authentication-settings", TwoFactorAuthenticationSettingsView.as_view(), name="two-factor-authentication-settings"),
     url(r"^two-factor-authentication-login", TwoFactorAuthenticationLoginView.as_view(), name="two-factor-authentication-login"),
     url(r"^two-factor-authentication-reset", TwoFactorAuthenticationResetView.as_view(), name="two-factor-authentication-reset"),
+    url(r"^etl-manager$", ETLManagerView.as_view(), name="etl_manager"),
     url(r"^clear-user-permission-cache", ClearUserPermissionCache.as_view(), name="clear_user_permission_cache"),
     url(r"^transform-edtf-for-tile", api.TransformEdtfForTile.as_view(), name="transform_edtf_for_tile"),
 ]

@@ -2505,10 +2505,6 @@ ul.labels-demo li {
     padding-left: 5px;
 }
 
-.padding-left-10 {
-    padding-left: 10px;
-}
-
 .padding-left-20 {
     padding-left: 20px;
 }
@@ -3407,6 +3403,7 @@ a.disabled {
     margin-bottom: 5px;
     font-weight: 300;
     color: #555;
+    display: flex;
 }
 
 .arches-modal-form-group {
