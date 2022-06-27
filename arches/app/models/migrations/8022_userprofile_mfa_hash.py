@@ -5,8 +5,7 @@ from django.db import migrations, models
 
 class Migration(migrations.Migration):
     dependencies = [
-        ("models", "7787_relational_data_model"),
-        ("models", "8042_3_spatialview_db_functions"),
+        ('models', '7783_add_graph_publications'),
     ]
 
     def generate_user_profile_for_all_users(apps, schema_editor):
