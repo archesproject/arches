@@ -42,6 +42,11 @@ define([
                 self.activeTab("details");
             };
 
+            this.cancel = function() {
+                self.selectedModule(null);
+                self.activeTab("start");
+            };
+
             this.activeTab.subscribe(val => {
                 if (val == "import") {
                     self.fetchLoadEvent();

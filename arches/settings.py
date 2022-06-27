@@ -185,7 +185,7 @@ TIME_ZONE = "America/Chicago"
 USE_TZ = False
 
 
-# see https://docs.djangoproject.com/en/1.9/topics/i18n/translation/#how-django-discovers-language-preference
+# see https://docs.djangoproject.com/en/2.2/topics/i18n/translation/#how-django-discovers-language-preference
 # to see how LocaleMiddleware tries to determine the user's language preference
 # (make sure to check your accept headers as they will override the LANGUAGE_CODE setting!)
 # also see get_language_from_request in django.utils.translation.trans_real.py
@@ -585,6 +585,9 @@ SEARCH_COMPONENT_LOCATIONS = [
 ETL_MODULE_LOCATIONS = [
     "arches.app.etl_modules",
 ]
+
+FILE_TYPE_CHECKING = False
+FILE_TYPES = ["bmp", "gif", "jpg", "jpeg", "pdf", "png", "psd", "rtf", "tif", "tiff", "xlsx", "csv", "zip"]
 
 MAPBOX_API_KEY = ""  # Put your Mapbox key here!
 

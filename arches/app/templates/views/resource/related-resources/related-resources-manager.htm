@@ -13,7 +13,7 @@
     <div class="rr-splash-title">{% trans "Related Resources Editor" %}</div>
 
 
-    <button class="btn btn-shim btn-rr btn-labeled btn-lg fa fa-link" data-bind="click: function(){displaySplash(false)}">{% trans 'Add Related Resources' %}</button>
+    <button class="btn btn-shim btn-rr btn-labeled btn-lg fa fa-link" data-bind="click: function(){displaySplash(false)}"><span>{% trans 'Add Related Resources' %}</span></button>
 
     <!-- Splash Instructions -->
     <div class="rr-splash-description">{% trans "Arches allows you to define relationships between resources so you can better understand the context and interplay" %}</div>
@@ -30,7 +30,7 @@
     data-bind="style: {transform: !!reportResourceId() ? 'translate(0,0)' : 'translate(100%,0)'}">
     <div class="create-instance-header" style="display: flex; justify-content: space-between;">{% trans "Related Resource Summary" %}
         <div data-bind="click: function(){reportResourceId(null)}, clickBubble: false" class="close-new-step">
-            <button class="btn btn-labeled btn-lg fa fa-arrow-right btn-primary">{% trans "Return" %}</button>
+            <button class="btn btn-labeled btn-lg fa fa-arrow-right btn-primary"><span>{% trans "Return" %}</span></button>
         </div>
     </div>
     <div class="create-instance-panel" data-bind="component: {
@@ -86,10 +86,10 @@
         <div data-bind="hidden: showGraph()">
             <!--ko if: resourceRelationships().length > 0 -->
             <div class="rr-table-border" style="padding: 3px; display: flex; border-bottom: none; background: #f2f2f2; height: 40px; padding-top: 5px; padding-left: 5px;">
-                <div class="relative">
+                <div class="list-filter">
                     <input type="text" class="form-control" style="width: 300px; height: 28px" placeholder="{% trans 'e.g.: .txt' %}"
                         data-bind="textInput: filter"></input>
-                    <span class="clear-node-search" style="top: 5px;" data-bind="visible: filter().length > 0, click: function() { filter('');}"><i class="fa fa-times-circle"></i></span>
+                    <span class="clear-node-search" data-bind="visible: filter().length > 0, click: function() { filter('');}"><i class="fa fa-times-circle"></i></span>
                 </div>
                 <span style="padding: 4px;" data-bind="if: totalRelationships() > 1">
                     <span style="font-size: 13px;" class='file-workbench-filecount' data-bind='text: totalRelationships() + "{% trans ' resource relations' %}"'></span>
@@ -135,7 +135,7 @@
                                         <span class="col-sm-4">
                                             <input style="width:30%; display:inline-block;" data-bind="
                                                 select2Query: {
-                                                    select2Config: self.getSelect2ConfigForOntologyProperties(relationship.relationshiptype, self.rootOntologyClass, relationship.resource.root_ontology_class, '{% trans 'Select an Ontology Property' %}')
+                                                    select2Config: self.getSelect2ConfigForOntologyProperties(relationship.relationshiptype, self.rootOntologyClass, relationship.resource.root_ontology_class, {% quoted_trans 'Select an Ontology Property' %})
                                                 }
                                             ">
                                         </span>
@@ -152,7 +152,7 @@
                                         <span class="col-sm-4">
                                             <input style="width:30%; display:inline-block;" data-bind="
                                                 select2Query: {
-                                                    select2Config: self.getSelect2ConfigForOntologyProperties(relationship.inverserelationshiptype, relationship.resource.root_ontology_class, self.rootOntologyClass, '{% trans 'Select an Ontology Property' %}')
+                                                    select2Config: self.getSelect2ConfigForOntologyProperties(relationship.inverserelationshiptype, relationship.resource.root_ontology_class, self.rootOntologyClass, {% quoted_trans 'Select an Ontology Property' %})
                                                 }
                                             ">
                                         </span>
@@ -171,7 +171,7 @@
                                         <span class="col-sm-4">
                                             <input style="width:30%; display:inline-block;" data-bind="
                                                 select2Query: {
-                                                    select2Config: self.getSelect2ConfigForOntologyProperties(relationship.inverserelationshiptype, self.rootOntologyClass, relationship.resource.root_ontology_class, '{% trans 'Select an Ontology Property' %}')
+                                                    select2Config: self.getSelect2ConfigForOntologyProperties(relationship.inverserelationshiptype, self.rootOntologyClass, relationship.resource.root_ontology_class, {% quoted_trans 'Select an Ontology Property' %})
                                                 }
                                             ">
                                         </span>
@@ -188,7 +188,7 @@
                                             <span class="col-sm-4">
                                                 <input style="width:30%; display:inline-block;" data-bind="
                                                     select2Query: {
-                                                        select2Config: self.getSelect2ConfigForOntologyProperties(relationship.relationshiptype, relationship.resource.root_ontology_class, self.rootOntologyClass, '{% trans 'Select an Ontology Property' %}')
+                                                        select2Config: self.getSelect2ConfigForOntologyProperties(relationship.relationshiptype, relationship.resource.root_ontology_class, self.rootOntologyClass, {% quoted_trans 'Select an Ontology Property' %})
                                                     }
                                                 ">
                                             </span>
@@ -200,12 +200,12 @@
                                 </div>
                                 <div class="relation-properties-button">
                                     <button class="btn btn-danger btn-labeled btn-lg fa fa-trash"
-                                        data-bind="click:self.updateTile.bind(self, {'delete':true})">{% trans "Delete this entry" %}</button>
+                                        data-bind="click:self.updateTile.bind(self, {'delete':true})"><span>{% trans "Delete this entry" %}</span></button>
                                     <!--ko if: self.graphIsSemantic -->
                                     <button class="btn btn-danger btn-labeled btn-lg fa fa-times"
-                                        data-bind="click:relationship.reset, visible: relationship.dirty">{% trans "Cancel Edit" %}</button>
+                                        data-bind="click:relationship.reset, visible: relationship.dirty"><span>{% trans "Cancel Edit" %}</span></button>
                                     <button class="btn btn-mint btn-labeled btn-lg fa fa-cloud"
-                                        data-bind="click:self.updateTile.bind(self, {'delete':false}), visible: relationship.dirty">{% trans "Save" %}</button>
+                                        data-bind="click:self.updateTile.bind(self, {'delete':false}), visible: relationship.dirty"><span>{% trans "Save" %}</span></button>
                                     <!-- /ko -->
                                 </div>
                             </div>
@@ -271,11 +271,11 @@
 
                                 <div class="relation-properties-button">
                                     <button class="btn btn-danger btn-labeled btn-lg fa fa-trash"
-                                        data-bind="click:self.deleteRelationships.bind(self)">{% trans "Delete this entry" %}</button>
+                                        data-bind="click:self.deleteRelationships.bind(self)"><span>{% trans "Delete this entry" %}</span></button>
                                     <button class="btn btn-danger btn-labeled btn-lg fa fa-times"
-                                        data-bind="click:relationship.reset, visible: relationship.dirty">{% trans "Cancel Edit" %}</button>
+                                        data-bind="click:relationship.reset, visible: relationship.dirty"><span>{% trans "Cancel Edit" %}</span></button>
                                     <button class="btn btn-mint btn-labeled btn-lg fa fa-cloud"
-                                        data-bind="click:self.saveRelationship.bind(self), visible: relationship.dirty">{% trans "Save" %}</button>
+                                        data-bind="click:self.saveRelationship.bind(self), visible: relationship.dirty"><span>{% trans "Save" %}</span></button>
                                 </div>
                             </div>
                         </div>

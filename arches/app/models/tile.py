@@ -303,7 +303,7 @@ class Tile(models.TileModel):
             message += (", ").join(missing_nodes)
             raise TileValidationError(message)
 
-    def validate(self, errors=None, raise_early=True, strict=False):
+    def validate(self, errors=None, raise_early=True, strict=False, request=None):
         """
         Keyword Arguments:
         errors -- supply and list to have errors appened on to
@@ -314,11 +314,10 @@ class Tile(models.TileModel):
         """
 
         tile_errors = []
-
         for nodeid, value in self.data.items():
             node = models.Node.objects.get(nodeid=nodeid)
             datatype = self.datatype_factory.get_instance(node.datatype)
-            error = datatype.validate(value, node=node, strict=strict)
+            error = datatype.validate(value, node=node, strict=strict, request=request)
             tile_errors += error
             for error_instance in error:
                 if error_instance["type"] == "ERROR":
@@ -418,7 +417,7 @@ class Tile(models.TileModel):
                     }
 
             if user is not None:
-                self.validate([])
+                self.validate([], request=request)
 
             super(Tile, self).save(*args, **kwargs)
             # We have to save the edit log record after calling save so that the
@@ -515,7 +514,6 @@ class Tile(models.TileModel):
         Indexes all the nessesary documents related to resources to support the map, search, and reports
 
         """
-
         Resource.objects.get(pk=self.resourceinstance_id).index()
 
     # # flatten out the nested tiles into a single array
@@ -689,7 +687,7 @@ class Tile(models.TileModel):
                 return None
         return self
 
-    def serialize(self, fields=None, exclude=None):
+    def serialize(self, fields=None, exclude=None, **kwargs):
         """
         serialize to a different form then used by the internal class structure
 

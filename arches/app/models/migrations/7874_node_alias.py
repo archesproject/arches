@@ -6,7 +6,7 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ("models", "7783_add_graph_publications"),
+        ("models", "8085_relational_data_model_handle_dates"),
     ]
 
     operations = [

@@ -17,6 +17,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 -->
 {% extends "base-manager.htm" %}
 {% load staticfiles %}
+{% load template_tags %}
 {% load i18n %}
 
 {% block title %}
@@ -31,28 +32,27 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 
         <!-- Toolbar -->
         <div class="relative resource-toolbar" style="">
+            <div>
+                <!-- Search -->
+                <div class="edit-panel-search-bar">
 
-            <!-- Search -->
-            <div class="edit-panel-search-bar">
-
-                <!-- Find Button -->
-                <div class="">
-                    <a class="page-header text-overflow graph-find" href="#" data-bind="click: function () { showFind(!showFind()) }"> {% trans "Find" %} </a>
-                </div>
+                    <!-- Find Button -->
+                    <div class="">
+                        <a class="page-header text-overflow graph-find" href="#" data-bind="click: function () { showFind(!showFind()) }"> {% trans "Find" %} </a>
+                    </div>
 
                 <!-- Find resource -->
                 <div class="find-widget" style="display: none;" data-bind="visible: showFind()">
                     <div>
-                        <select data-bind="chosen: {width: '100%'}, value: graphId, options: resources, optionsText: 'name', optionsValue: 'graphid', optionsCaption: '{% trans "Select a resource..." %}', optionsAfterRender: setResourceOptionDisable"></select>
+                        <select data-bind="chosen: {width: '100%'}, value: graphId, options: resources, optionsText: 'name', optionsValue: 'graphid', optionsCaption: {% quoted_trans "Select a resource..." %}, optionsAfterRender: setResourceOptionDisable"></select>
                     </div>
                 </div>
-            </div>
 
-            <!-- Resource/Graph Toggle -->
-            <div class="resource-tools relative" data-bind="visible: !showFind()">
-                <span class="resource-grid-title">{% trans "Resources" %}</span>
+                <!-- Resource/Graph Toggle -->
+                <div class="resource-tools relative" data-bind="visible: !showFind()">
+                    <span class="resource-grid-title">{% trans "Resources" %}</span>
+                </div>
             </div>
-
         </div>
 
     </div>
@@ -60,7 +60,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 
     <!-- Default Page content-->
     <div id="page-content" style="padding: 0 50px 160px; margin-top: 30px;">
-        <div id="resource-list" class="report-image-grid" style="margin-top: 5px;">
+        <div id="resource-list" class="report-image-grid flex" style="margin-top: 5px; flex-wrap: wrap;">
             
             <!-- ko foreach: createableResources -->
             <div class="r-grid-item relative" data-bind="css: { 'disabled': disable_instance_creation}">

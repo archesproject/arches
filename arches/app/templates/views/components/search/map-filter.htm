@@ -61,14 +61,6 @@
             mode: { name: 'javascript', json: true },
             lineNumbers: true
         }"></div>
-        <div class="install-buttons">
-            <button class="btn btn-shim btn-danger btn-labeled btn-lg fa fa-times" data-bind="click: function () {
-                geoJSONString(undefined);
-            }">{% trans 'Cancel' %}</button>
-            <button class="btn btn-shim btn-labeled btn-lg fa fa-plus btn-mint" data-bind="css: {
-                disabled: geoJSONErrors().length !== 0
-            }, click: updateGeoJSON">{% trans 'Accept GeoJSON' %}</button>
-        </div>
         <!-- ko if: geoJSONErrors().length !== 0 -->
         <div class="geojson-error-list">
             {% trans "GeoJSON has the following errors that must be resolved:" %}
@@ -79,6 +71,7 @@
             </ul>
         </div>
         <!-- /ko-->
+        
     </div>
     <!-- /ko-->
     <div class="map-card-zoom-tool">
@@ -101,6 +94,16 @@
     </div>
     </div>
 
+    <!-- ko if: geoJSONString() !== undefined -->
+    <div class="install-buttons">
+        <button class="btn btn-shim btn-danger btn-labeled btn-lg fa fa-times" data-bind="click: function () {
+            geoJSONString(undefined);
+        }"><span>{% trans 'Cancel' %}</span></button>
+        <button class="btn btn-shim btn-labeled btn-lg fa fa-plus btn-mint" data-bind="css: {
+            disabled: geoJSONErrors().length !== 0
+        }, click: updateGeoJSON"><span>{% trans 'Accept GeoJSON' %}</span></button>
+    </div>
+    <!-- /ko -->
 
 <!--/ko -->
 {{ block.super }}

@@ -35,6 +35,8 @@ from django.urls import reverse
 from django.utils.decorators import method_decorator
 from django.utils.translation import ugettext as _
 from django.views.generic import View
+from django.utils import translation
+
 from arches.app.models import models
 from arches.app.models.card import Card
 from arches.app.models.graph import Graph
@@ -213,8 +215,10 @@ class ResourceEditorView(MapBaseManagerView):
             tiles = provisionaltiles
 
         serialized_graph = None
-        if graph.publication and graph.publication.serialized_graph:
-            serialized_graph = graph.publication.serialized_graph
+        if graph.publication:
+            user_language = translation.get_language()
+            published_graph = models.PublishedGraph.objects.get(publication=graph.publication, language=user_language)
+            serialized_graph = published_graph.serialized_graph
 
         if serialized_graph:
             serialized_cards = serialized_graph["cards"]

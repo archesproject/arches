@@ -225,7 +225,7 @@ class Command(BaseCommand):
                         jsdata = fix_js_data(data, jsdata, m)
                         if len(uu) != 36 or uu[8] != "-":
                             # extract uuid from data if filename is not a UUID
-                            uu = jsdata["id"][-36:]
+                            uu = jsdata["@id"][-36:]
                         if jsdata:
                             try:
                                 if options["fast"]:
@@ -387,10 +387,11 @@ def monkey_get_documents_to_index(self, node_info):
                         {
                             "_id": f"{nodeid}{tile.tileid}{index}",
                             "_source": {
-                                "value": term,
+                                "value": term.value,
                                 "nodeid": nodeid,
                                 "nodegroupid": tile.nodegroup_id,
                                 "tileid": tile.tileid,
+                                "language": term.lang,
                                 "resourceinstanceid": tile.resourceinstance_id,
                                 "provisional": False,
                             },

@@ -18,6 +18,8 @@ define([
         this.preview = params.preview;
         this.loading = params.loading || ko.observable(false);
         this.card = params.card;
+        this.showGrid = params?.form?.showGrid;
+        this.toggleGrid = params?.form?.toggleGrid;
         this.card.hideEmptyNodes = params.hideEmptyNodes;
         this.card.showIds = this.showIds;
         this.tile = params.tile;

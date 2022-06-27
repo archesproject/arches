@@ -206,6 +206,14 @@ class MobileSurvey(models.MobileSurveyModel):
 
             graphs.append(serializer.serializeToPython(graph_obj))
 
+        for graph in graphs:
+            for function in graph["functions"]:
+                if function["function_id"] == "60000000-0000-0000-0000-000000000001":
+                    config = function["config"].pop("descriptor_types")
+                    triggering_nodegroups = function["config"].pop("triggering_nodegroups")
+                    function["config"] = config
+                    function["triggering_nodegroups"] = triggering_nodegroups
+
         ret["graphs"] = graphs
         ret["cards"] = ordered_cards
         ret["image_size_limits"] = settings.MOBILE_IMAGE_SIZE_LIMITS
@@ -219,7 +227,7 @@ class MobileSurvey(models.MobileSurveyModel):
             logger.error("Could not parse {0}, {1}".format(ret["bounds"], e))
         return ret
 
-    def serialize(self, fields=None, exclude=None):
+    def serialize(self, fields=None, exclude=None, **kwargs):
         """
         serialize to a different form than used by the internal class structure
         used to append additional values (like parent ontology properties) that
