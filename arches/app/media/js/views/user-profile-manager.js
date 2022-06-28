@@ -4,12 +4,13 @@ define([
     'knockout',
     'knockout-mapping',
     'arches',
+    'viewmodels/alert',
     'viewmodels/mobile-survey',
     'models/mobile-survey',
     'views/base-manager',
     'views/mobile-survey-manager/identity-list',
     'profile-manager-data'
-], function($, _, ko, koMapping, arches, MobileSurveyViewModel, MobileSurveyModel, BaseManagerView, IdentityList, data) {
+], function($, _, ko, koMapping, arches, AlertViewModel, MobileSurveyViewModel, MobileSurveyModel, BaseManagerView, IdentityList, data) {
 
     var UserProfileManager = BaseManagerView.extend({
         initialize: function(options) {
@@ -22,6 +23,10 @@ define([
             self.viewModel.mismatchedPasswords = ko.observable();
             self.viewModel.changePasswordSuccess = ko.observable();
             self.viewModel.notifTypeObservables = ko.observableArray();
+
+            self.viewModel.isTwoFactorAuthenticationEnabled = data.two_factor_authentication_settings['ENABLE_TWO_FACTOR_AUTHENTICATION'];
+            self.viewModel.isTwoFactorAuthenticationForced = data.two_factor_authentication_settings['FORCE_TWO_FACTOR_AUTHENTICATION'];
+            self.viewModel.hasUserEnabledTwoFactorAuthentication = ko.observable(data.two_factor_authentication_settings['user_has_enabled_two_factor_authentication']);
 
             self.viewModel.toggleChangePasswordForm = function() {
                 this.showChangePasswordForm(!this.showChangePasswordForm());
@@ -149,6 +154,48 @@ define([
                         self.viewModel.toggleChangePasswordForm();
                     }
                 });
+            };
+
+            self.viewModel.alertTwoFactorAuthenticationChange = function(userEmail) {
+                var sendTwoFactorAuthenticationEmail = function() {
+                    $.ajax({
+                        url: arches.urls.two_factor_authentication_reset,
+                        method: "POST",
+                        data: {
+                            email: userEmail
+                        }
+                    })
+                    .done(function() {
+                        self.viewModel.alert(
+                            new AlertViewModel(
+                                'ep-alert-blue',
+                                arches.twoFactorAuthenticationEmailSuccess.title,
+                                arches.twoFactorAuthenticationEmailSuccess.text,
+                                null,
+                                function(){}
+                            )
+                        );
+                    })
+                    .error(function(e) {
+                        self.viewModel.alert(
+                            new AlertViewModel(
+                                'ep-alert-red',
+                                e.statusText,
+                                e.responseText,
+                            )
+                        );
+                    });
+                };
+
+                self.viewModel.alert(
+                    new AlertViewModel(
+                        'ep-alert-blue',
+                        arches.confirmSendTwoFactorAuthenticationEmail.title,
+                        arches.confirmSendTwoFactorAuthenticationEmail.text,
+                        function(){},
+                        sendTwoFactorAuthenticationEmail,
+                    )
+                );
             };
 
             BaseManagerView.prototype.initialize.call(this, options);

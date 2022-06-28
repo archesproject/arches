@@ -229,6 +229,7 @@
                 apply_functions: "{% url 'apply_functions' 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa' %}".replace('aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa', ''),
                 remove_functions: "{% url 'remove_functions' 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa' %}".replace('aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa', ''),
                 time_wheel_config: "{% url 'time_wheel_config' %}",
+                two_factor_authentication_reset:"{% url 'two-factor-authentication-reset' %}",
                 reindex: "{% url 'reindex' %}",
                 permission_data: "{% url 'permission_data' %}",
                 resource_permission_data: "{% url 'resource_permission_data' %}",
@@ -307,6 +308,10 @@
                 title: "{% trans 'Delete map layer?' %}",
                 text: "{% trans 'Deleting this map layer will remove it entirely.  You cannot undo this action.  Are you sure you would like to proceed?' %}"
             },
+            confirmSendTwoFactorAuthenticationEmail: {
+                title: "{% trans 'Send Two-Factor Authentication email?' %}",
+                text: "{% trans 'This will send an email containing instructions to change two-factor authentication settings to your registered email address.  Are you sure you would like to proceed?' %}"
+            },
             confirmSurveyDelete: {
                 title: "{% trans 'Delete survey?' %}",
                 text: "{% trans 'Deleting this survey will remove it entirely.  You cannot undo this action.  Are you sure you would like to proceed?' %}"
@@ -325,6 +330,10 @@
             resourceCopyFailed: {
                 title: "{% trans 'Resource Copy Failed...'%}",
                 text: "{% trans 'Sorry! The copy request failed. Please try again.  Contact your system administrator if the problem persists.' %}"
+            },
+            twoFactorAuthenticationEmailSuccess: {
+                title: "{% trans 'Success!' %}",
+                text: "{% trans 'An email with instructions to change two-factor authentication settings has been sent to your registered email address.' %}"
             },
             resourceHasUnpublishedGraph: {
                 title: "{% trans 'This resource is based on an unpublished graph.' %}",

@@ -70,6 +70,9 @@ from arches.app.views.auth import (
     PasswordResetView,
     PasswordResetConfirmView,
     Token,
+    TwoFactorAuthenticationLoginView,
+    TwoFactorAuthenticationSettingsView,
+    TwoFactorAuthenticationResetView,
 )
 from arches.app.models.system_settings import settings
 from django.views.decorators.cache import cache_page
@@ -78,6 +81,7 @@ from django.views.decorators.cache import cache_page
 from django.contrib import admin
 
 admin.autodiscover()
+admin.site.login = LoginView.as_view()
 
 uuid_regex = settings.UUID_REGEX
 
@@ -299,6 +303,9 @@ urlpatterns = [
     url(r"^iiifannotationnodes$", api.IIIFAnnotationNodes.as_view(), name="iiifannotationnodes"),
     url(r"^manifest/(?P<id>[0-9]+)$", api.Manifest.as_view(), name="manifest"),
     url(r"^image-service-manager", ManifestManagerView.as_view(), name="manifest_manager"),
+    url(r"^two-factor-authentication-settings", TwoFactorAuthenticationSettingsView.as_view(), name="two-factor-authentication-settings"),
+    url(r"^two-factor-authentication-login", TwoFactorAuthenticationLoginView.as_view(), name="two-factor-authentication-login"),
+    url(r"^two-factor-authentication-reset", TwoFactorAuthenticationResetView.as_view(), name="two-factor-authentication-reset"),
     url(r"^etl-manager$", ETLManagerView.as_view(), name="etl_manager"),
     url(r"^clear-user-permission-cache", ClearUserPermissionCache.as_view(), name="clear_user_permission_cache"),
     url(r"^transform-edtf-for-tile", api.TransformEdtfForTile.as_view(), name="transform_edtf_for_tile"),
