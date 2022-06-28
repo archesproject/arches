@@ -143,11 +143,13 @@ define([
                     data.deleteTile();
                     break;
                 case "select tile":
-                    if (additionalParam[0]?.form?.workflowId) {
-                        additionalParam[0].selectWorkflowTile(additionalParam[1]);
+                    var select_parent = additionalParam[0]
+                    var select_tile = additionalParam[1]
+                    if (select_parent?.form?.workflowId) {
+                        select_parent.selectWorkflowTile(select_tile);
                     }
                     else{
-                        additionalParam[1].selected(true);
+                        select_tile.selected(true);
                     }
                     break;
                 case "reset parameter":
