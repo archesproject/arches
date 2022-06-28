@@ -14,6 +14,8 @@ import json
 import uuid
 import datetime
 import logging
+import pyotp
+
 from datetime import timedelta
 
 from arches.app.utils.module_importer import get_class_from_modulename
@@ -1290,6 +1292,7 @@ class GraphXMapping(models.Model):
 class UserProfile(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
     phone = models.CharField(max_length=16, blank=True)
+    encrypted_mfa_hash = models.CharField(max_length=128, null=True, blank=True)
 
     def is_reviewer(self):
         """DEPRECATED Use new pattern:
@@ -1320,6 +1323,11 @@ class UserProfile(models.Model):
     class Meta:
         managed = True
         db_table = "user_profile"
+
+
+@receiver(post_save, sender=User)
+def save_profile(sender, instance, **kwargs):
+    UserProfile.objects.get_or_create(user=instance)
 
 
 @receiver(post_save, sender=User)

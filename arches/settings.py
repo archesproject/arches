@@ -607,6 +607,12 @@ MAP_MAX_ZOOM = 20
 # causing your application to break.
 OVERRIDE_RESOURCE_MODEL_LOCK = False
 
+# If True, allows users to selectively enable two-factor authentication
+ENABLE_TWO_FACTOR_AUTHENTICATION = False
+
+# If True, users cannot log in unless they have enabled two-factor authentication
+FORCE_TWO_FACTOR_AUTHENTICATION = False
+
 # bounds for search results hex binning fabric (search grid).
 # a smaller bbox will give you less distortion in hexes and better performance
 DEFAULT_BOUNDS = {

@@ -255,8 +255,6 @@ class MobileSurvey(models.MobileSurveyModel):
         return ordered_card_ids
 
     def handle_reviewer_edits(self, user, tile):
-        if hasattr(user, "userprofile") is not True:
-            models.UserProfile.objects.create(user=user)
         if user_is_resource_reviewer(user):
             user_id = str(user.id)
             if tile.provisionaledits:
