@@ -40,7 +40,7 @@ class Command(BaseCommand):
               'publish' publishes resource models indicated using the --graphs arg.
               'unpublish' unpublishes resource models indicated using the --graphs arg.
                Both publish and unpublish apply to all resource models if a --graphs value is not provided",
-            """
+            """,
         )
         parser.add_argument(
             "-g",
