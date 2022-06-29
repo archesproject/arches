@@ -1631,8 +1631,9 @@ class BaseDomainDataType(BaseDataType):
     def is_a_literal_in_rdf(self):
         return True
 
-    def lookup_domainid_by_value(self, value, nodeid, config):
+    def lookup_domainid_by_value(self, value, nodeid):
         if nodeid not in self.value_lookup:
+            config = models.Node.objects.get(pk=nodeid).config
             options = {}
             for val in config["options"]:
                 options[val["text"]] = val["id"]
@@ -1666,8 +1667,7 @@ class DomainDataType(BaseDomainDataType):
             try:
                 uuid.UUID(value)
             except ValueError:
-                if "nodeid" in kwargs and "config" in kwargs:
-                    self.lookup_domainid_by_value(self, value, kwargs["nodeid"], kwargs["config"])
+                value = self.lookup_domainid_by_value(value, kwargs["nodeid"])
         return value
 
     def get_search_terms(self, nodevalue, nodeid=None):
@@ -1762,10 +1762,9 @@ class DomainListDataType(BaseDomainDataType):
                     uuid.UUID(stripped)
                     v = stripped
                 except ValueError:
-                    if "nodeid" in kwargs and "config" in kwargs:
-                        v = self.lookup_domainid_by_value(self, v, kwargs["nodeid"], kwargs["config"])
+                    v = self.lookup_domainid_by_value(v, kwargs["nodeid"])
                 result.append(v)
-        return value
+        return result
 
     def validate(self, values, row_number=None, source="", node=None, nodeid=None, strict=False, **kwargs):
         domainDataType = DomainDataType()
