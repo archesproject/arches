@@ -11,18 +11,53 @@
 <!-- ko if: !loading() -->
 <!-- ko foreach: popupFeatures -->
     <!-- ko if: active -->
-        <!-- ko if: displayname -->
-        <div class="hover-feature-title-bar">
-            {% block title %}
-            <div style="display: flex; justify-content: space-between;">
-                <!-- Add nav to support accessing content for multiple features with overlapping geometry -->
-                <div data-bind="visible: $parent.popupFeatures.length > 1, click: function(){$parent.advanceFeature('left')}" class="hover-feature-nav-left"><i class="fa fa-angle-left" aria-label="Select previous feature"></i></div>
-                <div data-bind="visible: $parent.popupFeatures.length > 1, click: function(){$parent.advanceFeature('right')}" class="hover-feature-nav-right"><i class="fa fa-angle-right" aria-label="Select next feature"></i></div>
-                <div class="hover-feature-title" data-bind="text: displayname"></div>
-
+    <!-- ko if: displayname -->
+    <div class="hover-feature-title-bar">
+        {% block title %}
+        <div style="display: flex;">
+            <div data-bind="visible: $parent.popupFeatures.length > 1, click: function(){$parent.advanceFeature('left')}" class="hover-feature-nav-left"><i class="fa fa-angle-left" aria-label="Select previous feature"></i></div>
+            <div data-bind="visible: $parent.popupFeatures.length > 1, click: function(){$parent.advanceFeature('right')}" class="hover-feature-nav-right"><i class="fa fa-angle-right" aria-label="Select next feature"></i></div>
+            <div class="hover-feature-title" data-bind="text: displayname"></div>
+        </div>
+        {% endblock title %}
+    </div>
+    <!--/ko-->
+    <div class="hover-feature-body">
+        {% block body %}
+        <div class="hover-feature" data-bind="html: map_popup"></div>
+        <!-- ko if: resourceinstanceid -->
+        <div class="hover-feature-metadata-block">
+            <div class="hover-feature-metadata">
+                {% trans "Resource Model:" %}
+                <span data-bind="text: graph_name"></span>
+            </div>
+            <div class="hover-feature-metadata">
+                {% trans "ID:" %}
+                <span data-bind="text: resourceinstanceid"></span>
             </div>
             {% endblock title %}
         </div>
+        <!--/ko-->
+        {% endblock body %}
+    </div>
+    <div class="hover-feature-footer">
+        <div>
+        {% block footer %}
+        <!-- ko if: resourceinstanceid -->
+        <a data-bind="click: function () {
+            window.open(reportURL + ko.unwrap(resourceinstanceid));
+        }" href="javascript:void(0)">
+            <i class="ion-document-text"></i>
+            {% trans "Report" %}
+        </a>
+        <!--/ko-->
+        <!-- ko if: showEditButton -->
+        <a data-bind="click: function () {
+            window.open(editURL + ko.unwrap(resourceinstanceid));
+        }" href="javascript:void(0)">
+            <i class="ion-ios-refresh-empty"></i>
+            {% trans "Edit" %}
+        </a>
         <!--/ko-->
         <!-- ko if: resourceinstanceid -->
         <div class="hover-feature-body">

@@ -552,6 +552,7 @@ def clear_user_permission_cache(sender, instance, **kwargs):
     if user_permission_cache:
         user_permission_cache.clear()
 
+
 class Ontology(models.Model):
     ontologyid = models.UUIDField(default=uuid.uuid1, primary_key=True)
     name = models.TextField()
@@ -732,6 +733,7 @@ class ResourceXResource(models.Model):
         if index:
             from arches.app.search.search_engine_factory import SearchEngineInstance as se
             from arches.app.search.mappings import RESOURCE_RELATIONS_INDEX
+
             se.delete(index=RESOURCE_RELATIONS_INDEX, id=self.resourcexid)
 
         # update the resource-instance tile by removing any references to a deleted resource
@@ -1369,6 +1371,7 @@ class IIIFManifest(models.Model):
         managed = True
         db_table = "iiif_manifests"
 
+
 class GroupMapSettings(models.Model):
     group = models.OneToOneField(Group, on_delete=models.CASCADE)
     min_zoom = models.IntegerField(default=0)
@@ -1407,3 +1410,30 @@ class GeoJSONGeometry(models.Model):
     class Meta:
         managed = True
         db_table = "geojson_geometries"
+
+
+class SpatialView(models.Model):
+    spatialviewid = models.UUIDField(primary_key=True, default=uuid.uuid1)
+    schema = models.TextField(default="public")
+    slug = models.TextField(
+        validators=[
+            RegexValidator(
+                regex=r"^[a-zA-Z_]([a-zA-Z0-9_]+)$",
+                message="Slug must contain only letters, numbers and hyphens, but not begin with a number.",
+                code="nomatch",
+            )
+        ],
+        unique=True,
+    )
+    description = models.TextField(default="arches spatial view")  # provide a description of the spatial view
+    geometrynodeid = models.ForeignKey(Node, on_delete=models.CASCADE, db_column="geometrynodeid")
+    ismixedgeometrytypes = models.BooleanField(default=False)
+    attributenodes = JSONField(blank=True, null=True, db_column="attributenodes")
+    isactive = models.BooleanField(default=True)  # the view is not created in the DB until set to active.
+
+    def __str__(self):
+        return f"{self.schema}.{self.slug}"
+
+    class Meta:
+        managed = True
+        db_table = "spatial_views"

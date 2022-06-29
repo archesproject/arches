@@ -37,7 +37,6 @@ from django.db import connection, transaction
 
 from elasticsearch import Elasticsearch
 from elasticsearch.exceptions import NotFoundError
-from edtf import parse_edtf
 
 
 # One benefit of shifting to python3.x would be to use
@@ -401,6 +400,23 @@ class DateDataType(BaseDataType):
             logger.warning(_("{value} is an invalid date format").format(**locals()))
         return value
 
+    def add_missing_colon_to_timezone(self, value):
+        """
+        Python will parse a timezone with a colon (-07:00) but will not add a colon to a timezone using strftime.
+        Elastic will not index a time with a timezone without a colon, so this method ensures the colon is added
+        if it is missing.
+        """
+
+        format = self.get_valid_date_format(value)[0]
+        if format.endswith("z") and value[-5] in ("-", "+"):
+            return "{0}:{1}".format(value[:-2], value[-2:])
+        else:
+            return value
+
+    def pre_tile_save(self, tile, nodeid):
+        if tile.data[nodeid]:
+            tile.data[nodeid] = self.add_missing_colon_to_timezone(tile.data[nodeid])
+
     def append_to_document(self, document, nodevalue, nodeid, tile, provisional=False):
         document["dates"].append(
             {"date": ExtendedDateFormat(nodevalue).lower, "nodegroup_id": tile.nodegroup_id, "nodeid": nodeid, "provisional": provisional}
@@ -469,11 +485,20 @@ class DateDataType(BaseDataType):
 
 
 class EDTFDataType(BaseDataType):
+    def transform_value_for_tile(self, value, **kwargs):
+        transformed_value = ExtendedDateFormat(value)
+        if transformed_value.edtf is None:
+            return value
+        return str(transformed_value.edtf)
+
+    def pre_tile_save(self, tile, nodeid):
+        tile.data[nodeid] = self.transform_value_for_tile(tile.data[nodeid])
+
     def validate(self, value, row_number=None, source="", node=None, nodeid=None, strict=False):
         errors = []
         if value is not None:
             if not ExtendedDateFormat(value).is_valid():
-                message = _("Incorrect Extended Date Time Format. See http://www.loc.gov/standards/datetime/ for supported formats.")
+                message = _("Incorrect Extended Date Time Format. See http://www.loc.gov/standards/datetime/ for supported formats")
                 error_message = self.create_error_message(value, source, row_number, message)
                 errors.append(error_message)
         return errors
@@ -1890,7 +1915,7 @@ class ResourceInstanceDataType(BaseDataType):
             try:
                 resourceid = resourceXresource["resourceId"]
                 related_resource = Resource.objects.get(pk=resourceid)
-                displayname = related_resource.displayname
+                displayname = related_resource.displayname()
                 if displayname is not None:
                     items.append(displayname)
             except (TypeError, KeyError):
@@ -2039,7 +2064,7 @@ class ResourceInstanceListDataType(ResourceInstanceDataType):
                 try:
                     resourceid = resourceXresource["resourceId"]
                     related_resource = Resource.objects.get(pk=resourceid)
-                    displayname = related_resource.displayname
+                    displayname = related_resource.displayname()
                     resourceXresource["display_value"] = displayname
                     items.append(resourceXresource)
                 except (TypeError, KeyError):

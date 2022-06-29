@@ -98,10 +98,16 @@ define([
         return this
       }
       if (this._leftLayer) {
-        this._leftLayer.getContainer().style.clip = ''
+        let container = this._leftLayer.getContainer()
+        if(container?.style){
+          container.style.clip = ''
+        }
       }
       if (this._rightLayer) {
-        this._rightLayer.getContainer().style.clip = ''
+        let container = this._rightLayer.getContainer()
+        if(container?.style){
+          container.style.clip = ''
+        }
       }
       this._removeEvents()
       L.DomUtil.remove(this._container)
@@ -135,10 +141,16 @@ define([
       var clipLeft = 'rect(' + [nw.y, clipX, se.y, nw.x].join('px,') + 'px)'
       var clipRight = 'rect(' + [nw.y, se.x, se.y, clipX].join('px,') + 'px)'
       if (this._leftLayer) {
-        this._leftLayer.getContainer().style.clip = clipLeft
+        let container = this._leftLayer.getContainer()
+        if(container?.style){
+          container.style.clip = clipLeft
+        }
       }
       if (this._rightLayer) {
-        this._rightLayer.getContainer().style.clip = clipRight
+        let container = this._rightLayer.getContainer()
+        if(container?.style){
+          container.style.clip = clipRight
+        }
       }
     },
   

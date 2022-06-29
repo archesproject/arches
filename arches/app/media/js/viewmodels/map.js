@@ -4,8 +4,8 @@ define([
     'arches',
     'knockout',
     'knockout-mapping',
-    'text!templates/views/components/map-popup.htm'
-], function($, _, arches, ko, koMapping, popupTemplate) {
+    'utils/map-popup-provider'
+], function($, _, arches, ko, koMapping, mapPopupProvider) {
     const viewModel = function(params) {
 
         var self = this;
@@ -426,10 +426,6 @@ define([
             }
         };
 
-        this.isFeatureClickable = function(feature) {
-            return feature.properties.resourceinstanceid;
-        };
-
         this.expandSidePanel = function() {
             return false;
         };
@@ -530,17 +526,16 @@ define([
             };
         };
 
-        this.popupTemplate = popupTemplate;
-
         this.onFeatureClick = function(features, lngLat, MapboxGl) {
+            const popupTemplate = this.popupTemplate ? this.popupTemplate : mapPopupProvider.getPopupTemplate(features);
             const map = self.map();
             const mapStyle = map.getStyle();
             self.popup = new MapboxGl.Popup()
                 .setLngLat(lngLat)
-                .setHTML(self.popupTemplate)
+                .setHTML(popupTemplate)
                 .addTo(map);
             ko.applyBindingsToDescendants(
-                self.getPopupData(features),
+                mapPopupProvider.processData(self.getPopupData(features)),
                 self.popup._content
             );
             features.forEach(feature=>{
@@ -582,7 +577,7 @@ define([
                         if (hoverFeature && hoverFeature.id && style) map.setFeatureState(hoverFeature, { hover: false });
                         hoverFeature = _.find(
                             map.queryRenderedFeatures(e.point),
-                            self.isFeatureClickable
+                            feature => mapPopupProvider.isFeatureClickable(feature, self)
                         );
                         if (hoverFeature && hoverFeature.id && style) map.setFeatureState(hoverFeature, { hover: true });
 
@@ -603,7 +598,7 @@ define([
                     map.on('click', function(e) {
                         const popupFeatures = _.filter(
                             map.queryRenderedFeatures(e.point),
-                            self.isFeatureClickable
+                            feature => mapPopupProvider.isFeatureClickable(feature, self)
                         );
                         if (popupFeatures.length) {
                             self.onFeatureClick(popupFeatures, e.lngLat, MapboxGl);
