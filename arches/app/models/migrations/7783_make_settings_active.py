@@ -15,10 +15,12 @@ class Migration(migrations.Migration):
     operations = [
         migrations.RunSQL(
             """
-            UPDATE graphs set isactive = true where graphid = 'ff623370-fa12-11e6-b98b-6c4008b05c4c'
+            update graphs set isactive = true where graphid = 'ff623370-fa12-11e6-b98b-6c4008b05c4c';
+            create table if not exists temp_graph_status as (select graphid, isactive from graphs where isactive = true);
             """,
             """
-            UPDATE graphs set isactive = false where graphid = 'ff623370-fa12-11e6-b98b-6c4008b05c4c'
+            update graphs set isactive = false where graphid = 'ff623370-fa12-11e6-b98b-6c4008b05c4c';
+            drop table if exists temp_graph_status;
             """,
         ),
     ]
