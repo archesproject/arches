@@ -739,12 +739,7 @@ class CsvReader(Reader):
                         errors = []
                         datatype_instance = datatype_factory.get_instance(datatype)
                         try:
-                            if datatype in ["concept", "concept-list"]:
-                                config = Node.objects.get(nodeid=nodeid).config
-                                config["nodeid"] = nodeid
-                            else:
-                                config = {}
-                            value = datatype_instance.transform_value_for_tile(value, **config)
+                            value = datatype_instance.transform_value_for_tile(value, nodeid=nodeid)
                             errors = datatype_instance.validate(value, row_number=row_number, source=source, nodeid=nodeid)
                         except Exception as e:
                             logger.warn(
