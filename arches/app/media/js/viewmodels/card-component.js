@@ -145,7 +145,7 @@ define([
                 case "select tile":
                     var select_parent = additionalParam[0]
                     var select_tile = additionalParam[1]
-                    if (select_parent.form?.workflowId) {
+                    if (select_parent?.form?.workflowId) {
                         select_parent.selectWorkflowTile(select_tile);
                     }
                     else{
