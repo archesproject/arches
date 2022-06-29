@@ -743,11 +743,9 @@ class CsvReader(Reader):
                             errors = datatype_instance.validate(value, row_number=row_number, source=source, nodeid=nodeid)
                         except Exception as e:
                             logger.warn(
-                                "datatype: {0} value: {1} {2} - {3}".format(
+                                "The following value could not be interpreted as a {0} value: {1}".format(
                                     datatype_instance.datatype_model.classname,
-                                    value,
-                                    source,
-                                    str(e) + " or is not a prefLabel in the given collection.",
+                                    value
                                 )
                             )
                         if len(errors) > 0:
