@@ -71,9 +71,8 @@ define([
                             'template': responseJson.template,
                             'report_json': responseJson.report_json,
                         });
+                        self.loading(false);
                     }
-        
-                    self.loading(false);
                 });
 
             }
@@ -132,6 +131,7 @@ define([
             report['report_json'] = responseJson.report_json;
 
             self.report(report);
+            self.loading(false);
         };
 
         self.initialize();

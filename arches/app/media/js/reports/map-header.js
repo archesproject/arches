@@ -5,8 +5,8 @@ define([
     'geojson-extent',
     'views/components/map',
     'views/components/cards/select-feature-layers',
-    'utils/create-async-component',
-], function(ko, koMapping, _, geojsonExtent, MapComponentViewModel, selectFeatureLayersFactory, createAsyncComponent) {
+    'templates/views/components/map.htm',
+], function(ko, koMapping, _, geojsonExtent, MapComponentViewModel, selectFeatureLayersFactory, reportHeaderMapTemplate) {
     const viewModel = function(params) {
         var self = this;
         var featureCollection = ko.computed(function() {
@@ -56,9 +56,8 @@ define([
         });
     };
 
-    return createAsyncComponent(
-        'report-header-map',
-        viewModel,
-        'templates/views/components/map.htm'
-    );
+    ko.components.register('report-header-map', {
+        viewModel: viewModel,
+        template: reportHeaderMapTemplate
+    });
 });
