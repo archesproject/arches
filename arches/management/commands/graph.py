@@ -35,9 +35,12 @@ class Command(BaseCommand):
                 "publish",
                 "unpublish",
             ],
-            help="Operation Type; "
-            + "'publish'=Publishes resource models specified using the --graphs argument. Publishes all resource models if no --graphs value provided"
-            + "'unpublish'=Unublishes resource models specified using the --graphs argument. Unpublishes all resource models if no --graphs value provided",
+            help="""
+            Operation Type
+              'publish' publishes resource models indicated using the --graphs arg.
+              'unpublish' unpublishes resource models indicated using the --graphs arg.
+               Both publish and unpublish apply to all resource models if a --graphs value is not provided",
+            """
         )
         parser.add_argument(
             "-g",
