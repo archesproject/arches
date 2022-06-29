@@ -1,16 +1,15 @@
 define([
     'knockout', 
     'viewmodels/report', 
-    'utils/create-async-component',
-], function(ko, ReportViewModel, createAsyncComponent) {
+    'templates/views/report-templates/default.htm',
+], function(ko, ReportViewModel, defaultTemplate) {
     const viewModel = function(params) {
         params.configKeys = [];
         ReportViewModel.apply(this, [params]);
     };
 
-    return createAsyncComponent(
-        'default-report',
-        viewModel,
-        `templates/views/report-templates/default.htm`
-    );
+    return ko.components.register('default-report', {
+        viewModel: viewModel,
+        template: defaultTemplate
+    });
 });

@@ -1,3 +1,4 @@
+const fetch = require('cross-fetch');
 const Path = require('path');
 const webpack = require('webpack');
 const { CleanWebpackPlugin } = require('clean-webpack-plugin');
@@ -6,7 +7,7 @@ const BundleTracker = require('webpack-bundle-tracker');
 
 const { buildTemplateFilePathLookup } = require('./webpack-utils/build-template-filepath-lookup');
 const { buildJavascriptFilepathLookup } = require('./webpack-utils/build-javascript-filepath-lookup');
-const { ARCHES_CORE_PATH, PROJECT_PATH } = require('./webpack-paths');
+const { ARCHES_CORE_PATH, PROJECT_PATH, SERVER_ADDRESS } = require('./webpack-paths');
 
 
 const archesCoreEntryPointConfiguration = buildJavascriptFilepathLookup(Path.resolve(__dirname, `${ARCHES_CORE_PATH}/media/js`), {});
@@ -26,6 +27,11 @@ const javascriptRelativeFilepathToAbsoluteFilepathLookup = {
     ...archesCoreJavascriptRelativeFilepathToAbsoluteFilepathLookup,
     ...projectJavascriptRelativeFilepathToAbsoluteFilepathLookup 
 };
+
+const templateFilepathLookup = buildTemplateFilePathLookup(
+    Path.resolve(__dirname, `${ARCHES_CORE_PATH}/templates`),
+    Path.resolve(__dirname, `${PROJECT_PATH}/templates`)
+);
 
 module.exports = {
     entry: { 
@@ -59,17 +65,14 @@ module.exports = {
     ],
     resolveLoader: {
         alias: {
-            text: 'text-loader'
+            text: 'raw-loader'
         }
     },
     resolve: {
         modules: [Path.resolve(__dirname, `${PROJECT_PATH}/media/node_modules`)],
         alias: {
             ...javascriptRelativeFilepathToAbsoluteFilepathLookup,
-            ...buildTemplateFilePathLookup(
-                Path.resolve(__dirname, `${ARCHES_CORE_PATH}/templates`),
-                Path.resolve(__dirname, `${PROJECT_PATH}/templates`)
-            ),
+            ...templateFilepathLookup,
             'plugins/knockout-select2': Path.resolve(__dirname, `${ARCHES_CORE_PATH}/media/plugins`, 'knockout-select2.js'),
             'nifty': Path.resolve(__dirname, `${ARCHES_CORE_PATH}/media/plugins`, 'nifty'),
             'leaflet-side-by-side': Path.resolve(__dirname, `${ARCHES_CORE_PATH}/media/plugins`, 'leaflet-side-by-side/index'),
@@ -141,7 +144,21 @@ module.exports = {
             },
             {
                 test: /\.html?$/i,
-                use: [`${PROJECT_PATH}/media/node_modules/html-loader`],
+                loader: `${PROJECT_PATH}/media/node_modules/html-loader`,
+                options: {
+                    esModule: false,
+                    preprocessor: async (_content, loaderContext) => {
+                        const resourcePath = loaderContext['resourcePath'];
+                        const projectResourcePathData = resourcePath.split(`${PROJECT_PATH}/`);
+
+                        const templatePath = projectResourcePathData.length > 1 ? projectResourcePathData[1] : resourcePath.split(`${ARCHES_CORE_PATH}/`)[1]; 
+
+                        const resp = await fetch(SERVER_ADDRESS + templatePath);
+                        const responseText = await resp.text();
+
+                        return responseText;
+                    }
+                }
             },
             {
                 test: /\.txt$/i,
