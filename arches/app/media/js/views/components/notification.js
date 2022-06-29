@@ -3,7 +3,8 @@ define([
     'knockout',
     'moment',
     'arches',
-], function($, ko, moment, arches) {
+    'templates/views/components/notification.htm'
+], function($, ko, moment, arches, notificationTemplate) {
 
     /** 
      * A generic component for displaying notifications
@@ -53,9 +54,7 @@ define([
 
     ko.components.register('notification', {
         viewModel: NotificationViewModel,
-        template: {
-            require: 'text!templates/views/components/notification.htm'
-        }
+        template: notificationTemplate,
     });
 
     return NotificationViewModel;

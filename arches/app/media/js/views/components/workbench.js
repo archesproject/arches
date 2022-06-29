@@ -2,8 +2,9 @@ define([
     'jquery',
     'underscore',
     'knockout',
-    'bindings/sortable'
-], function($, _, ko) {
+    'templates/views/components/workbench.htm',
+    'bindings/sortable',
+], function($, _, ko, workbenchTemplate) {
     var viewModel = function(params) {
         var self = this;
 
@@ -38,9 +39,7 @@ define([
 
     ko.components.register('workbench', {
         viewModel: viewModel,
-        template: {
-            require: 'text!templates/views/components/workbench.htm'
-        }
+        template: workbenchTemplate,
     });
     return viewModel;
 });

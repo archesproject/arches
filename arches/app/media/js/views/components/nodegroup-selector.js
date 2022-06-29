@@ -1,9 +1,12 @@
-define(['knockout', 
+define([
+    'jquery',
+    'knockout', 
     'knockout-mapping',
     'viewmodels/function', 
     'models/graph',
-    'bindings/chosen'], 
-function(ko, koMapping, FunctionViewModel, GraphModel, chosen) {
+    'bindings/chosen',
+    'templates/views/components/nodegroup-selector.htm'
+], function($, ko, koMapping, FunctionViewModel, GraphModel, chosen, nodegroupSelectorTemplate) {
     return ko.components.register('views/components/nodegroup-selector', {
         viewModel: function(params) {
             FunctionViewModel.apply(this, arguments);
@@ -24,8 +27,6 @@ function(ko, koMapping, FunctionViewModel, GraphModel, chosen) {
 
             window.setTimeout(function(){$("select[data-bind^=chosen]").trigger("chosen:updated");}, 300);
         },
-        template: {
-            require: 'text!templates/views/components/nodegroup-selector.htm'
-        }
+        template: nodegroupSelectorTemplate,
     });
 });

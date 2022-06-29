@@ -7,8 +7,9 @@ define([
     'arches',
     'viewmodels/alert-json',
     'views/components/iiif-viewer',
+    'templates/views/components/plugins/manifest-manager.htm',
     'bindings/dropzone'
-], function(ko, koMapping, $, Dropzone, uuid, arches, JsonErrorAlertViewModel, IIIFViewerViewmodel) {
+], function(ko, koMapping, $, Dropzone, uuid, arches, JsonErrorAlertViewModel, IIIFViewerViewmodel, manifestManagerTemplate) {
     return ko.components.register('manifest-manager', {
         viewModel: function(params) {
             var self = this;
@@ -276,6 +277,6 @@ define([
                 }
             };
         },
-        template: { require: 'text!templates/views/components/plugins/manifest-manager.htm' }
+        template: manifestManagerTemplate,
     });
 });

@@ -6,11 +6,12 @@ define([
     'uuid',
     'arches',
     'viewmodels/alert-json',
+    'templates/views/components/etl_modules/import-single-csv.htm',
     'views/components/simple-switch',
     'bindings/datatable',
     'bindings/dropzone',
     'bindings/resizable-sidepanel',
-], function(ko, koMapping, $, dropzone, uuid, arches, JsonErrorAlertViewModel) {
+], function(ko, koMapping, $, dropzone, uuid, arches, JsonErrorAlertViewModel, importSingleCSVTemplate) {
     return ko.components.register('import-single-csv', {
         viewModel: function(params) {
             const self = this;
@@ -248,6 +249,6 @@ define([
 
             this.init();
         },
-        template: { require: 'text!templates/views/components/etl_modules/import-single-csv.htm' }
+        template: importSingleCSVTemplate,
     });
 });

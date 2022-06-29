@@ -6,12 +6,13 @@ define([
     'arches',
     'views/components/workbench',
     'templates/views/components/iiif-popup.htm',
+    'templates/views/components/iiif-viewer.htm',
     'leaflet-iiif',
     'leaflet-fullscreen',
     'leaflet-side-by-side',
     'bindings/select2-query',
     'bindings/leaflet'
-], function($, ko, koMapping, L, arches, WorkbenchViewmodel, iiifPopup) {
+], function($, ko, koMapping, L, arches, WorkbenchViewmodel, iiifPopup, iiifViewerTemplate) {
     var IIIFViewerViewmodel = function(params) {
         var self = this;
         var abortFetchManifest;
@@ -743,9 +744,7 @@ define([
     };
     ko.components.register('iiif-viewer', {
         viewModel: IIIFViewerViewmodel,
-        template: {
-            require: 'text!templates/views/components/iiif-viewer.htm'
-        }
+        template: iiifViewerTemplate,
     });
     return IIIFViewerViewmodel;
 });

@@ -1,4 +1,4 @@
-define(['knockout'], function(ko) {
+define(['knockout', 'templates/views/components/language-switcher.htm'], function(ko, languageSwitcherTemplate) {
     /**
     * knockout components namespace used in arches
     * @external "ko.components"
@@ -19,8 +19,6 @@ define(['knockout'], function(ko) {
                 document.getElementById(this.formid).submit();
             }, this);
         },
-        template: {
-            require: 'text!templates/views/components/language-switcher.htm'
-        }
+        template: languageSwitcherTemplate,
     });
 });

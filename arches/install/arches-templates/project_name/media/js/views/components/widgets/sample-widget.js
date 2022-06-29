@@ -1,4 +1,9 @@
-define(['knockout', 'underscore', 'viewmodels/widget'], function (ko, _, WidgetViewModel) {
+define([
+    'knockout', 
+    'underscore', 
+    'viewmodels/widget',
+    'templates/views/components/widgets/sample-widget.htm',
+], function (ko, _, WidgetViewModel, sampleWidgetTemplate) {
     /**
     * registers a text-widget component for use in forms
     * @function external:"ko.components".text-widget
@@ -31,6 +36,6 @@ define(['knockout', 'underscore', 'viewmodels/widget'], function (ko, _, WidgetV
                 return res;
             }, this);
         },
-        template: { require: 'text!templates/views/components/widgets/sample-widget.htm' }
+        template: sampleWidgetTemplate,
     });
 });

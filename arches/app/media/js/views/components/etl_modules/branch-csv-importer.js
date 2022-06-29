@@ -4,10 +4,11 @@ define([
     'viewmodels/base-import-view-model',
     'arches',
     'viewmodels/alert',
+    'templates/views/components/etl_modules/branch-csv-importer.htm',
     'dropzone',
     'bindings/select2-query',
     'bindings/dropzone',
-], function(_, ko, ImporterViewModel, arches, AlertViewModel) {
+], function(_, ko, ImporterViewModel, arches, AlertViewModel, branchCSVImporterTemplate) {
     return ko.components.register('branch-csv-importer', {
         viewModel: function(params) {
             const self = this;
@@ -130,6 +131,6 @@ define([
                 }
             };
         },
-        template: { require: 'text!templates/views/components/etl_modules/branch-csv-importer.htm' }
+        template: branchCSVImporterTemplate,
     });
 });

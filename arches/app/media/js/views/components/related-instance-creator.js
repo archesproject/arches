@@ -6,8 +6,9 @@ define([
     'arches',
     'models/graph',
     'viewmodels/card',
-    'viewmodels/provisional-tile'
-], function(_, $, ko, koMapping, arches, GraphModel, CardViewModel, ProvisionalTileViewModel) {
+    'viewmodels/provisional-tile',
+    'templates/views/components/related-instance-creator.htm'
+], function(_, $, ko, koMapping, arches, GraphModel, CardViewModel, ProvisionalTileViewModel, relatedInstanceCreatorTemplate) {
     function viewModel(params) {
         var self = this;
 
@@ -194,9 +195,7 @@ define([
 
     ko.components.register('related-instance-creator', {
         viewModel: viewModel,
-        template: {
-            require: 'text!templates/views/components/related-instance-creator.htm'
-        }
+        template: relatedInstanceCreatorTemplate,
     });
     return viewModel;
 });
