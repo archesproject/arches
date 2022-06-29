@@ -2,9 +2,9 @@ define([
     'jquery',
     'knockout',
     'arches',
-    'utils/create-async-component',
+    'templates/views/components/search/saved-searches.htm',
     'bindings/smartresize',
-], function($, ko, arches, createAsyncComponent) {
+], function($, ko, arches, savedSearchesTemplate) {
     var componentName = 'saved-searches';
     const viewModel = function(params) {
         var self = this;
@@ -35,9 +35,8 @@ define([
         };
     };
 
-    return createAsyncComponent(
-        componentName,
-        viewModel,
-        'templates/views/components/search/saved-searches.htm'
-    );
+    return ko.components.register(componentName, {
+        viewModel: viewModel,
+        template: savedSearchesTemplate,
+    });
 });

@@ -2,9 +2,9 @@ define([
     'knockout', 
     'underscore', 
     'viewmodels/widget', 
-    'utils/create-async-component',
+    'templates/views/components/widgets/number.htm',
     'bindings/formattedNumber',
-], function(ko, _, WidgetViewModel, createAsyncComponent) {
+], function(ko, _, WidgetViewModel, numberWidgetTemplate) {
     /**
     * registers a text-widget component for use in forms
     * @function external:"ko.components".text-widget
@@ -65,9 +65,8 @@ define([
         self.disposables.push(this.updateVal);
     };
 
-    return createAsyncComponent(
-        'number-widget',
-        NumberWidget,
-        'templates/views/components/widgets/number.htm'
-    );
+    return ko.components.register('number-widget', {
+        viewModel: NumberWidget,
+        template: numberWidgetTemplate,
+    });
 });

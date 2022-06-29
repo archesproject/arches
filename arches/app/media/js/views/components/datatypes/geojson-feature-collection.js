@@ -3,12 +3,12 @@ define([
     'knockout',
     'underscore',
     'arches',
-    'utils/create-async-component',
+    'templates/views/components/datatypes/geojson-feature-collection.htm',
     'bindings/color-picker',
     'bindings/mapbox-gl',
     'bindings/codemirror',
     'bindings/ckeditor',
-], function($, ko, _, arches, createAsyncComponent) {
+], function($, ko, _, arches, geojsonFeatureCollectionDatatypeTemplate) {
     var name = 'geojson-feature-collection-datatype-config';
     const viewModel = function(params) {
         var self = this;
@@ -201,11 +201,10 @@ define([
         }
     };
 
-    createAsyncComponent(
-        name,
-        viewModel,
-        'templates/views/components/datatypes/geojson-feature-collection.htm'
-    );
-
+    ko.components.register(name, {
+        viewModel: viewModel,
+        template: geojsonFeatureCollectionDatatypeTemplate,
+    });
+    
     return name;
 });

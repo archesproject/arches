@@ -3,8 +3,8 @@ define([
     'knockout',
     'underscore',
     'arches',
-    'utils/create-async-component',
-], function($, ko, _, arches, createAsyncComponent) {
+    'templates/views/components/datatypes/node-value.htm',
+], function($, ko, _, arches, nodeValueDatatypeTemplate) {
     var name = 'node-value-datatype-config';
     const viewModel = function(params) {
         var self = this;
@@ -105,11 +105,10 @@ define([
         }
     };
 
-    createAsyncComponent(
-        name,
-        viewModel,
-        'templates/views/components/datatypes/node-value.htm'
-    );
-
+    ko.components.register(name, {
+        viewModel: viewModel,
+        template: nodeValueDatatypeTemplate,
+    });
+    
     return name;
 });

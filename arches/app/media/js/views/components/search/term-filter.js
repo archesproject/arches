@@ -3,9 +3,9 @@ define([
     'knockout-mapping',
     'underscore',
     'views/components/search/base-filter',
-    'utils/create-async-component',
+    'templates/views/components/search/term-filter.htm',
     'bindings/term-search',
-], function(ko, koMapping, _, BaseFilter, createAsyncComponent) {
+], function(ko, koMapping, _, BaseFilter, termFilterTemplate) {
     var componentName = 'term-filter';
     const viewModel = BaseFilter.extend({
         initialize: function(options) {
@@ -103,10 +103,9 @@ define([
             this.filter.tags.removeAll();
         }
     });
-    
-    return createAsyncComponent(
-        componentName,
-        viewModel,
-        'templates/views/components/search/term-filter.htm'
-    );
+
+    return ko.components.register(componentName, {
+        viewModel: viewModel,
+        template: termFilterTemplate,
+    });
 });

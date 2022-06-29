@@ -5,9 +5,9 @@ define([
     'knockout-mapping',
     'arches',
     'views/components/search/base-filter',
-    'utils/create-async-component',
+    'templates/views/components/search/advanced-search.htm',
     'bindings/let',
-], function($, _, ko, koMapping, arches, BaseFilter, createAsyncComponent) {
+], function($, _, ko, koMapping, arches, BaseFilter, advancedSearchTemplate) {
     var componentName = 'advanced-search';
     const viewModel = BaseFilter.extend({
         initialize: function(options) {
@@ -182,9 +182,8 @@ define([
         }
     });
 
-    return createAsyncComponent(
-        componentName,
-        viewModel,
-        'templates/views/components/search/advanced-search.htm'
-    );
+    return ko.components.register(componentName, {
+        viewModel: viewModel,
+        template: advancedSearchTemplate,
+    });
 });

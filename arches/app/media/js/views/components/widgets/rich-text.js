@@ -2,9 +2,9 @@ define([
     'knockout', 
     'underscore', 
     'viewmodels/widget', 
-    'utils/create-async-component',
+    'templates/views/components/widgets/rich-text.htm',
     'bindings/ckeditor',
-], function(ko, _, WidgetViewModel, createAsyncComponent) {
+], function(ko, _, WidgetViewModel, richTextWidgetTemplate) {
     /**
     * registers a rich-text-widget component for use in forms
     * @function external:"ko.components".rich-text-widget
@@ -19,9 +19,8 @@ define([
         this.displayfullvalue(params.displayfullvalue);
     };
 
-    return createAsyncComponent(
-        'rich-text-widget',
-        viewModel,
-        'templates/views/components/widgets/rich-text.htm'
-    );
+    return ko.components.register('rich-text-widget', {
+        viewModel: viewModel,
+        template: richTextWidgetTemplate,
+    });
 });

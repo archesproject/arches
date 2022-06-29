@@ -1,12 +1,12 @@
 define([
     'knockout',
     'viewmodels/node-value-select',
-    'utils/create-async-component',
+    'templates/views/components/widgets/node-value-select.htm',
     'bindings/select2-query',
-], function(ko, NodeValueSelectViewModel, createAsyncComponent) {
-    return createAsyncComponent(
-        'node-value-select',
-        NodeValueSelectViewModel,
-        'templates/views/components/widgets/node-value-select.htm' 
-    );
+], function(ko, NodeValueSelectViewModel, nodeValueSelectTemplate) {
+
+    return ko.components.register('node-value-select', {
+        viewModel: NodeValueSelectViewModel,
+        template: nodeValueSelectTemplate,
+    });
 });

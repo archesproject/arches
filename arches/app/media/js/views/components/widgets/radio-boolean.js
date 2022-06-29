@@ -2,8 +2,8 @@ define([
     'knockout', 
     'underscore', 
     'viewmodels/widget',
-    'utils/create-async-component',
-], function(ko, _, WidgetViewModel, createAsyncComponent) {
+    'templates/views/components/widgets/radio-boolean.htm',
+], function(ko, _, WidgetViewModel, radioBooleanWidgetTemplate) {
     /**
     * knockout components namespace used in arches
     * @external "ko.components"
@@ -62,9 +62,8 @@ define([
         }
     };
 
-    return createAsyncComponent(
-        'radio-boolean-widget',
-        viewModel,
-        'templates/views/components/widgets/radio-boolean.htm' 
-    );
+    return ko.components.register('radio-boolean-widget', {
+        viewModel: viewModel,
+        template: radioBooleanWidgetTemplate,
+    });
 });

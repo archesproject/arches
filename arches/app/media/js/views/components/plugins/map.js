@@ -1,8 +1,8 @@
 define([
     'knockout',
-    'utils/create-async-component',
+    'templates/views/components/plugins/map.htm',
     'views/components/widgets/map',
-], function(ko, createAsyncComponent) {
+], function(ko, mapPluginTemplate) {
     const viewModel = function() {
         this.configJSON = {
             "zoom": 0,
@@ -27,9 +27,8 @@ define([
         };
     };
 
-    return createAsyncComponent(
-        'map-plugin',
-        viewModel,
-        'templates/views/components/plugins/map.htm'
-    );
+    return ko.components.register('map-plugin', {
+        viewModel: viewModel,
+        template: mapPluginTemplate,
+    });
 });

@@ -1,8 +1,8 @@
 define([
     'knockout',
     'viewmodels/domain-widget',
-    'utils/create-async-component',
-], function(ko, DomainWidgetViewModel, createAsyncComponent) {
+    'templates/views/components/widgets/radio.htm',
+], function(ko, DomainWidgetViewModel, radioTemplate) {
     /**
      * registers a select-widget component for use in forms
      * @function external:"ko.components".select-widget
@@ -19,9 +19,8 @@ define([
         DomainWidgetViewModel.apply(this, [params]);
     };
 
-    createAsyncComponent(
-        'domain-radio-widget',
-        viewModel,
-        'templates/views/components/widgets/radio.htm'
-    );
+    return ko.components.register('domain-radio-widget', {
+        viewModel: viewModel,
+        template: radioTemplate,
+    });
 });

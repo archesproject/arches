@@ -2,8 +2,8 @@ define([
     'knockout', 
     'underscore', 
     'viewmodels/widget',
-    'utils/create-async-component',
-], function(ko, _, WidgetViewModel, createAsyncComponent) {
+    'templates/views/components/widgets/text.htm',
+], function(ko, _, WidgetViewModel, textWidgetTemplate) {
     /**
     * registers a text-widget component for use in forms
     * @function external:"ko.components".text-widget
@@ -27,9 +27,8 @@ define([
         }, self);
     };
 
-    return createAsyncComponent(
-        'text-widget',
-        viewModel,
-        'templates/views/components/widgets/text.htm'
-    );
+    return ko.components.register('text-widget', {
+        viewModel: viewModel,
+        template: textWidgetTemplate,
+    });
 });

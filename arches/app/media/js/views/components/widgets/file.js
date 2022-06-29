@@ -5,9 +5,9 @@ define([
     'dropzone',
     'uuid',
     'viewmodels/file-widget',
-    'utils/create-async-component',
+    'templates/views/components/widgets/file.htm',
     'bindings/dropzone',
-], function($, ko, _, Dropzone, uuid, FileWidgetViewModel, createAsyncComponent) {
+], function($, ko, _, Dropzone, uuid, FileWidgetViewModel, fileWidgetTemplate) {
     /**
      * registers a file-widget component for use in forms
      * @function external:"ko.components".file-widget
@@ -23,9 +23,8 @@ define([
         FileWidgetViewModel.apply(this, [params]);
     };
 
-    return createAsyncComponent(
-        'file-widget',
-        viewModel,
-        'templates/views/components/widgets/file.htm'
-    );
+    return ko.components.register('file-widget', {
+        viewModel: viewModel,
+        template: fileWidgetTemplate,
+    });
 });

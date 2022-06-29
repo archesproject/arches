@@ -3,8 +3,8 @@ define([
     'underscore',
     'arches',
     'viewmodels/widget',
-    'utils/create-async-component',
-], function(ko, _, arches, WidgetViewModel, createAsyncComponent) {
+    'templates/views/components/widgets/edtf.htm',
+], function(ko, _, arches, WidgetViewModel, edtfTemplate) {
     /**
     * registers a edtf-widget component for use in forms
     * @function external:"ko.components".edtf-widget
@@ -47,9 +47,8 @@ define([
         WidgetViewModel.apply(this, [params]);
     };
 
-    return createAsyncComponent(
-        'edtf-widget',
-        viewModel,
-        'templates/views/components/widgets/edtf.htm'
-    );
+    return ko.components.register('edtf-widget', {
+        viewModel: viewModel,
+        template: edtfTemplate,
+    });
 });

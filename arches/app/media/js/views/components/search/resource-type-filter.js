@@ -2,8 +2,8 @@ define([
     'knockout',
     'arches',
     'views/components/search/base-filter',
-    'utils/create-async-component',
-], function(ko, arches, BaseFilter, createAsyncComponent) {
+    'templates/views/components/search/resource-type-filter.htm',
+], function(ko, arches, BaseFilter, resourceTypeFilterTemplate) {
     var componentName = 'resource-type-filter';
     const viewModel = BaseFilter.extend({
         initialize: async function(options) {
@@ -85,9 +85,8 @@ define([
         }
     });
 
-    return createAsyncComponent(
-        componentName,
-        viewModel,
-        'templates/views/components/search/resource-type-filter.htm'
-    );
+    return ko.components.register(componentName, {
+        viewModel: viewModel,
+        template: resourceTypeFilterTemplate,
+    });
 });

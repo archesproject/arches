@@ -1,8 +1,8 @@
 define([
     'knockout',
     'underscore',
-    'utils/create-async-component',
-], function(ko, _, createAsyncComponent) {
+    'templates/views/components/datatypes/file-list.htm',
+], function(ko, _, fileListDatatypeTemplate) {
     var name = 'file-list-datatype-config';
     const viewModel = function(params) {
         this.config = params.config;
@@ -15,11 +15,10 @@ define([
         this.activated = params.config.activateMax;
     };
 
-    createAsyncComponent(
-        name,
-        viewModel,
-        'templates/views/components/datatypes/file-list.htm'
-    );
+    ko.components.register(name, {
+        viewModel: viewModel,
+        template: fileListDatatypeTemplate,
+    });
 
     return name;
 });

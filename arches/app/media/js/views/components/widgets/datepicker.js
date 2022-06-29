@@ -3,11 +3,11 @@ define([
     'underscore',
     'viewmodels/widget',
     'moment',
-    'utils/create-async-component',
+    'templates/views/components/widgets/datepicker.htm',
     'bindings/datepicker',
     'bindings/moment-date',
     'bindings/chosen',
-], function(ko, _, WidgetViewModel, moment, createAsyncComponent) {
+], function(ko, _, WidgetViewModel, moment, datePickerWidgetTemplate) {
     /**
      * registers a datepicker-widget component for use in forms
      * @function external:"ko.components".datepicker-widget
@@ -94,9 +94,8 @@ define([
         this.disposables.push(this.getdefault);
     };
 
-    return createAsyncComponent(
-        'datepicker-widget',
-        DatePickerWidget,
-        'templates/views/components/widgets/datepicker.htm'
-    );
+    return ko.components.register('datepicker-widget', {
+        viewModel: DatePickerWidget,
+        template: datePickerWidgetTemplate,
+    });
 });

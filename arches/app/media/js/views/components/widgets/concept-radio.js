@@ -1,9 +1,9 @@
 define([
     'knockout',
     'viewmodels/concept-widget',
-    'utils/create-async-component',
+    'templates/views/components/widgets/radio.htm',
     'plugins/knockout-select2',
-], function(ko, ConceptWidgetViewModel, createAsyncComponent) {
+], function(ko, ConceptWidgetViewModel, conceptRadioTemplate) {
     /**
      * registers a select-widget component for use in forms
      * @function external:"ko.components".select-widget
@@ -21,9 +21,8 @@ define([
         ConceptWidgetViewModel.apply(this, [params]);
     };
 
-    return createAsyncComponent(
-        'concept-radio-widget',
-        viewModel,
-        'templates/views/components/widgets/radio.htm'
-    );
+    return ko.components.register('concept-radio-widget', {
+        viewModel: viewModel,
+        template: conceptRadioTemplate,
+    });
 });

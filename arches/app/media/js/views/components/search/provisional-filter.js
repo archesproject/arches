@@ -1,8 +1,8 @@
 define([
     'knockout',
     'views/components/search/base-filter',
-    'utils/create-async-component',
-], function(ko, BaseFilter, createAsyncComponent) {
+    'templates/views/components/search/provisional-filter.htm',
+], function(ko, BaseFilter, provisionalFilterTemplate) {
     var componentName = 'provisional-filter';
     const viewModel = BaseFilter.extend({
         initialize: function(options) {
@@ -75,9 +75,8 @@ define([
         }
     });
 
-    return createAsyncComponent(
-        componentName,
-        viewModel,
-        'templates/views/components/search/provisional-filter.htm'
-    );
+    return ko.components.register(componentName, {
+        viewModel: viewModel,
+        template: provisionalFilterTemplate,
+    });
 });

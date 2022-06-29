@@ -1,9 +1,9 @@
 define([
     'knockout',
     'viewmodels/domain-widget',
-    'utils/create-async-component',
+    'templates/views/components/widgets/select.htm',
     'plugins/knockout-select2',
-], function(ko, DomainWidgetViewModel, createAsyncComponent) {
+], function(ko, DomainWidgetViewModel, selectTemplate) {
     /**
      * registers a select-widget component for use in forms
      * @function external:"ko.components".select-widget
@@ -20,9 +20,8 @@ define([
         DomainWidgetViewModel.apply(this, [params]);
     };
 
-    return createAsyncComponent(
-        'domain-select-widget',
-        viewModel,
-        'templates/views/components/widgets/select.htm'
-    );
+    return ko.components.register('domain-select-widget', {
+        viewModel: viewModel,
+        template: selectTemplate,
+    });
 });

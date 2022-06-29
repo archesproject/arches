@@ -1,9 +1,9 @@
 define([
     'knockout',
     'viewmodels/concept-select',
-    'utils/create-async-component',
+    'templates/views/components/widgets/concept-select.htm',
     'bindings/select2-query',
-], function(ko, ConceptSelectViewModel, createAsyncComponent) {
+], function(ko, ConceptSelectViewModel, conceptMultiselectTemplate) {
     const viewModel = function(params) {
         params.multiple = true;
         params.configKeys = ['defaultValue'];
@@ -17,9 +17,8 @@ define([
         }
     };
 
-    return createAsyncComponent(
-        'concept-multiselect-widget',
-        viewModel,
-        'templates/views/components/widgets/concept-select.htm'
-    );
+    return ko.components.register('concept-multiselect-widget', {
+        viewModel: viewModel,
+        template: conceptMultiselectTemplate,
+    });
 });

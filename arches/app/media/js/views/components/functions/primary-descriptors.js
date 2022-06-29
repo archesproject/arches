@@ -5,9 +5,9 @@ define(['jquery',
     'arches',
     'viewmodels/function',
     'bindings/chosen',
-    'utils/create-async-component'
+    'templates/views/components/functions/primary-descriptors.htm'
 ],
-function($, _, ko, koMapping, arches, FunctionViewModel, chosen, createAsyncComponent) {
+function($, _, ko, koMapping, arches, FunctionViewModel, chosen, primaryDescriptorsFunctionTemplate) {
     const viewModel =  function(params) {
         FunctionViewModel.apply(this, arguments);
         var nodegroups = {};
@@ -62,9 +62,9 @@ function($, _, ko, koMapping, arches, FunctionViewModel, chosen, createAsyncComp
         };
         window.setTimeout(function(){$("select[data-bind^=chosen]").trigger("chosen:updated");}, 300);
     };
-    return createAsyncComponent(
-        'views/components/functions/primary-descriptors',
-        viewModel,
-        'templates/views/components/functions/primary-descriptors.htm'
-    );
+    
+    return ko.components.register('views/components/functions/primary-descriptors', {
+        viewModel: viewModel,
+        template: primaryDescriptorsFunctionTemplate,
+    });
 });

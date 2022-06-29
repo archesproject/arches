@@ -4,9 +4,9 @@ define([
     'arches',
     'view-data',
     'utils/ontology',
-    'utils/create-async-component',
+    'templates/views/components/datatypes/resource-instance.htm',
     'views/components/widgets/resource-instance-select',
-], function(ko, _, arches, data, ontologyUtils, createAsyncComponent) {
+], function(ko, _, arches, data, ontologyUtils, resourceInstanceDatatypeTemplate) {
     var name = 'resource-instance-datatype-config';
     const viewModel = function(params) {
         var self = this;
@@ -168,11 +168,10 @@ define([
         }
     };
 
-    createAsyncComponent(
-        name,
-        viewModel,
-        'templates/views/components/datatypes/resource-instance.htm'
-    );
+    ko.components.register(name, {
+        viewModel: viewModel,
+        template: resourceInstanceDatatypeTemplate,
+    });
 
     return name;
 });

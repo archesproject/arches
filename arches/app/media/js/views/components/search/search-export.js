@@ -1,12 +1,12 @@
 define(['jquery',
     'knockout',
     'arches',
-    'utils/create-async-component',
+    'templates/views/components/search/search-export.htm',
     'bindings/fadeVisible',
     'bindings/clipboard',
     'views/components/simple-switch',
 ],
-function($, ko, arches, createAsyncComponent) {
+function($, ko, arches, searchExportTemplate) {
     var componentName = 'search-export';
     const viewModel = function(params) {
         var self = this;
@@ -93,10 +93,9 @@ function($, ko, arches, createAsyncComponent) {
         };
 
     };
-    
-    return createAsyncComponent(
-        componentName,
-        viewModel,
-        'templates/views/components/search/search-export.htm'
-    );
+
+    return ko.components.register(componentName, {
+        viewModel: viewModel,
+        template: searchExportTemplate,
+    });
 });

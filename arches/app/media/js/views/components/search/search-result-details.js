@@ -5,12 +5,12 @@ define([
     'card-components',
     'report-templates',
     'views/components/search/base-filter',
-    'utils/create-async-component',
+    'templates/views/components/search/search-result-details.htm',
     'models/report',
     'viewmodels/card',
     'views/components/resource-report-abstract',
     'bindings/chosen',
-], function($, _, ko, cardComponents, reportLookup, BaseFilter, createAsyncComponent, ReportModel, CardViewModel) {
+], function($, _, ko, cardComponents, reportLookup, BaseFilter, searchResultDetailsTemplate, ReportModel, CardViewModel) {
     var componentName = 'search-result-details';
     const viewModel = BaseFilter.extend({
         initialize: function(options) {
@@ -112,10 +112,9 @@ define([
             };
         }
     });
-
-    return createAsyncComponent(
-        componentName,
-        viewModel,
-        'templates/views/components/search/search-result-details.htm'
-    );
+    
+    return ko.components.register(componentName, {
+        viewModel: viewModel,
+        template: searchResultDetailsTemplate,
+    });
 });

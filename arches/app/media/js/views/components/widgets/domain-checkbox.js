@@ -1,9 +1,9 @@
 define([
     'knockout',
     'viewmodels/domain-widget',
-    'utils/create-async-component',
+    'templates/views/components/widgets/checkbox.htm',
     'plugins/knockout-select2',
-], function(ko, DomainWidgetViewModel, createAsyncComponent) {
+], function(ko, DomainWidgetViewModel, checkboxTemplate) {
     /**
      * registers a select-widget component for use in forms
      * @function external:"ko.components".select-widget
@@ -22,9 +22,8 @@ define([
         this.multiple = true;
     };
 
-    return createAsyncComponent(
-        'domain-checkbox-widget',
-        viewModel,
-        'templates/views/components/widgets/checkbox.htm'
-    );
+    return ko.components.register('domain-checkbox-widget', {
+        viewModel: viewModel,
+        template: checkboxTemplate,
+    });
 });

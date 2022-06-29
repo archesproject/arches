@@ -5,11 +5,11 @@ define([
     'moment',
     'arches',
     'views/components/search/base-filter',
-    'utils/create-async-component',
+    'templates/views/components/search/time-filter.htm',
     'bindings/datepicker',
     'bindings/chosen',
     'bindings/time-wheel',
-], function($, _, ko, moment, arches, BaseFilter, createAsyncComponent) {
+], function($, _, ko, moment, arches, BaseFilter, timeFilterTemplate) {
     var componentName = 'time-filter';
     const viewModel = BaseFilter.extend({
         initialize: function(options) {
@@ -186,9 +186,8 @@ define([
         }
     });
 
-    return createAsyncComponent(
-        componentName,
-        viewModel,
-        'templates/views/components/search/time-filter.htm'
-    );
+    return ko.components.register(componentName, {
+        viewModel: viewModel,
+        template: timeFilterTemplate,
+    });
 });

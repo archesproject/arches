@@ -3,7 +3,7 @@ define([
     'underscore',
     'knockout',
     'arches',
-    'utils/create-async-component',
+    'templates/views/components/search/map-filter.htm',
     'views/components/search/base-filter',
     'views/components/map',
     'views/components/widgets/map/bin-feature-collection',
@@ -13,7 +13,7 @@ define([
     'geojson-extent',
     'uuid',
     'geojsonhint',
-], function($, _, ko, arches, createAsyncComponent, BaseFilter, MapComponentViewModel, binFeatureCollection, mapStyles, turf, geohash,  geojsonExtent, uuid, geojsonhint) {
+], function($, _, ko, arches, mapFilterTemplate, BaseFilter, MapComponentViewModel, binFeatureCollection, mapStyles, turf, geohash,  geojsonExtent, uuid, geojsonhint) {
     var componentName = 'map-filter';
     const viewModel = BaseFilter.extend({
         initialize: function(options) {
@@ -604,9 +604,8 @@ define([
         }
     });
 
-    return createAsyncComponent(
-        componentName,
-        viewModel,
-        'templates/views/components/search/map-filter.htm'
-    );
+    return ko.components.register(componentName, {
+        viewModel: viewModel,
+        template: mapFilterTemplate,
+    });
 });

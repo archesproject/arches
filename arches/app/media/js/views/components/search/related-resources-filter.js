@@ -2,9 +2,9 @@ define(['knockout',
     'arches',
     'views/resource/related-resources-manager',
     'views/components/search/base-filter',
-    'utils/create-async-component',
+    'templates/views/components/search/related-resources-filter.htm',
     'views/components/related-resources-graph',
-], function(ko, arches, RelatedResourcesManager, BaseFilter, createAsyncComponent) {
+], function(ko, arches, RelatedResourcesManager, BaseFilter, relatedResourcesFilterTemplate) {
     var componentName = 'related-resources-filter';
     const viewModel = BaseFilter.extend ({
         initialize: function(options) {
@@ -35,9 +35,8 @@ define(['knockout',
         }
     });
 
-    return createAsyncComponent(
-        componentName,
-        viewModel,
-        'templates/views/components/search/related-resources-filter.htm'
-    );
+    return ko.components.register(componentName, {
+        viewModel: viewModel,
+        template: relatedResourcesFilterTemplate,
+    });
 });

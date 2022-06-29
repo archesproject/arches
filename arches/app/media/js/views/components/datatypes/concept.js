@@ -2,8 +2,8 @@ define([
     'knockout', 
     'arches', 
     'viewmodels/concept-select', 
-    'utils/create-async-component', 
-], function(ko, arches, ConceptSelectViewModel, createAsyncComponent) {
+    'templates/views/components/datatypes/concept.htm', 
+], function(ko, arches, ConceptSelectViewModel, conceptDatatypeTemplate) {
     var name = 'concept-datatype-config';
     const viewModel = function(params) {
         this.search = params.search;
@@ -72,11 +72,10 @@ define([
         }
     };
 
-    createAsyncComponent(
-        name,
-        viewModel,
-        'templates/views/components/datatypes/concept.htm'
-    );
+    ko.components.register(name, {
+        viewModel: viewModel,
+        template: conceptDatatypeTemplate,
+    });
     
     return name;
 });

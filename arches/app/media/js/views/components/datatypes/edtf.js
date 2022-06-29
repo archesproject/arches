@@ -1,4 +1,4 @@
-define(['knockout', 'utils/create-async-component'], function(ko, createAsyncComponent) {
+define(['knockout', 'templates/views/components/datatypes/edtf.htm'], function(ko, edtfDatatypeTemplate) {
     var name = 'edtf-datatype-config';
     const viewModel = function(params) {
         var self = this;
@@ -21,11 +21,10 @@ define(['knockout', 'utils/create-async-component'], function(ko, createAsyncCom
         }
     };
 
-    createAsyncComponent(
-        name,
-        viewModel,
-        'templates/views/components/datatypes/edtf.htm'
-    );
+    ko.components.register(name, {
+        viewModel: viewModel,
+        template: edtfDatatypeTemplate,
+    });
 
     return name;
 });

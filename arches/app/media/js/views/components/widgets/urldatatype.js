@@ -1,8 +1,8 @@
 define([
     'knockout', 
     'viewmodels/widget',
-    'utils/create-async-component',
-], function(ko, WidgetViewModel, createAsyncComponent) {
+    'templates/views/components/widgets/urldatatype.htm',
+], function(ko, WidgetViewModel, urlDatatypeWidgetTemplate) {
     var name = 'urldatatype';
     const viewModel = function(params) {
         params.configKeys = ['url_placeholder','url_label_placeholder','link_color'];
@@ -20,11 +20,10 @@ define([
         }, this);
     };
 
-    createAsyncComponent(
-        name,
-        viewModel,
-        'templates/views/components/widgets/urldatatype.htm'
-    );
+    ko.components.register(name, {
+        viewModel: viewModel,
+        template: urlDatatypeWidgetTemplate,
+    });
     
     return name;
 });

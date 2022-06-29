@@ -2,8 +2,8 @@ define([
     'views/components/search/base-filter',
     'knockout',
     'knockout-mapping',
-    'utils/create-async-component',
-], function(BaseFilter, ko, koMapping, createAsyncComponent) {
+    'templates/views/components/search/paging-filter.htm',
+], function(BaseFilter, ko, koMapping, pagingFilterTemplate) {
     var componentName = 'paging-filter';
     const viewModel = BaseFilter.extend({
         initialize: function(options) {
@@ -77,9 +77,8 @@ define([
         }
     });
 
-    return createAsyncComponent(
-        componentName,
-        viewModel,
-        'templates/views/components/search/paging-filter.htm'
-    );
+    return ko.components.register(componentName, {
+        viewModel: viewModel,
+        template: pagingFilterTemplate,
+    });
 });

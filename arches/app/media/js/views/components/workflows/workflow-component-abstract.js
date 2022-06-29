@@ -9,8 +9,8 @@ define([
     'viewmodels/provisional-tile',
     'viewmodels/alert',
     'uuid',
-    'utils/create-async-component',
-], function(_, $, ko, koMapping, arches, GraphModel, CardViewModel, ProvisionalTileViewModel, AlertViewModel, uuid, createAsyncComponent) {
+    'templates/views/components/workflows/workflow-component-abstract.htm',
+], function(_, $, ko, koMapping, arches, GraphModel, CardViewModel, ProvisionalTileViewModel, AlertViewModel, uuid, workflowComponentAbstractTemplate) {
     WORKFLOW_COMPONENT_ABSTRACTS_LABEL = 'workflow-component-abstracts';
 
     function NonTileBasedComponent() {
@@ -761,7 +761,9 @@ define([
         this.initialize();
     }
 
-    createAsyncComponent('workflow-component-abstract', null, 'templates/views/components/workflows/workflow-component-abstract.htm', true);
+    ko.components.register('workflow-component-abstract', {
+        template: workflowComponentAbstractTemplate,
+    });
 
     return WorkflowComponentAbstract;
 });

@@ -1,7 +1,7 @@
 define([
     'knockout',
-    'utils/create-async-component',
-], function(ko, createAsyncComponent) {
+    'templates/views/components/datatypes/url.htm',
+], function(ko, urlDatatypeTemplate) {
     var name = 'url-datatype-config';
     const viewModel = function(params) {
         var self = this;
@@ -23,11 +23,10 @@ define([
         }
     };
 
-    createAsyncComponent(
-        name,
-        viewModel,
-        'templates/views/components/datatypes/url.htm'
-    );
+    ko.components.register(name, {
+        viewModel: viewModel,
+        template: urlDatatypeTemplate,
+    });
 
     return name;
 });

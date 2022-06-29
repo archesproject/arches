@@ -3,9 +3,9 @@ define([
     'underscore',
     'views/components/search/base-filter',
     'knockout',
-    'utils/create-async-component',
+    'templates/views/components/search/sort-results.htm',
     'chosen',
-], function($, _, BaseFilter, ko, createAsyncComponent) {
+], function($, _, BaseFilter, ko, sortResultsTemplate) {
     var componentName = 'sort-results';
     const viewModel = BaseFilter.extend({
         initialize: function(options) {
@@ -45,9 +45,8 @@ define([
         
     });
 
-    return createAsyncComponent(
-        componentName,
-        viewModel,
-        'templates/views/components/search/sort-results.htm'
-    );
+    return ko.components.register(componentName, {
+        viewModel: viewModel,
+        template: sortResultsTemplate,
+    });
 });

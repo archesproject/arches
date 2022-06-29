@@ -6,9 +6,9 @@ define([
     'viewmodels/widget',
     'views/components/iiif-annotation',
     'geojson-extent',
-    'utils/create-async-component',
+    'templates/views/components/widgets/iiif.htm',
     'leaflet-fullscreen',
-], function(_, L, ko, koMapping, WidgetViewModel, IIIFAnnotationViewmodel, geojsonExtent, createAsyncComponent) {
+], function(_, L, ko, koMapping, WidgetViewModel, IIIFAnnotationViewmodel, geojsonExtent, iiifWidgetTemplate) {
     const viewModel = function(params) {
         var self = this;
 
@@ -81,9 +81,8 @@ define([
         }, this);    
     };
 
-    return createAsyncComponent(
-        'iiif-widget',
-        viewModel,
-        'templates/views/components/widgets/iiif.htm'
-    );
+    return ko.components.register('iiif-widget', {
+        viewModel: viewModel,
+        template: iiifWidgetTemplate,
+    });
 });

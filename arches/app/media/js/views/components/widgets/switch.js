@@ -2,8 +2,8 @@ define([
     'knockout', 
     'underscore', 
     'viewmodels/widget',
-    'utils/create-async-component',
-], function(ko, _, WidgetViewModel, createAsyncComponent) {
+    'templates/views/components/widgets/switch.htm',
+], function(ko, _, WidgetViewModel, switchWidgetTemplate) {
     /**
     * knockout components namespace used in arches
     * @external "ko.components"
@@ -81,9 +81,8 @@ define([
         this.disposables.push(this.getdefault);
     };
 
-    return createAsyncComponent(
-        'switch-widget',
-        SwitchWidget,
-        'templates/views/components/widgets/switch.htm' 
-    );
+    return ko.components.register('switch-widget', {
+        viewModel: SwitchWidget,
+        template: switchWidgetTemplate,
+    });
 });
