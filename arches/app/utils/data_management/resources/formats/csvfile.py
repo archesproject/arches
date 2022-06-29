@@ -744,8 +744,7 @@ class CsvReader(Reader):
                         except Exception as e:
                             logger.warn(
                                 "The following value could not be interpreted as a {0} value: {1}".format(
-                                    datatype_instance.datatype_model.classname,
-                                    value
+                                    datatype_instance.datatype_model.classname, value
                                 )
                             )
                         if len(errors) > 0:
