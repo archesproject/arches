@@ -14,7 +14,6 @@ class Command(BaseCommand):
         if "7.0.0" in arches.__version__:
             self.update_to_v7()
 
-
     def update_to_v7(self):
         with connection.cursor() as cursor:
             cursor.execute("select * from temp_graph_status;")
