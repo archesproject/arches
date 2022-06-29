@@ -1,5 +1,6 @@
 {% extends "views/components/workbench.htm" %}
 {% load i18n %}
+{% load staticfiles %}
 {% load webpack_static from webpack_loader %}
 
 {% block tabs %}
@@ -74,7 +75,7 @@
 
                                         <!-- Image -->
                                         <div class="img-lg img-circle rr-splash-img-container">
-                                            <img class="rr-splash-img" src="{% webpack_static 'img/Answers.png' %}" alt="Resource Editor">
+                                            <img class="rr-splash-img" src="/media/build/img/Answers.png" alt="Resource Editor">
                                         </div>
 
                                         <!-- Splash Title -->

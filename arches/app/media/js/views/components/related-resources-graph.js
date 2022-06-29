@@ -2,9 +2,9 @@ define([
     'knockout',
     'arches',
     'views/components/workbench',
-    'utils/create-async-component',
+    'templates/views/components/related-resources-graph.htm',
     'bindings/cytoscape',
-], function(ko, arches, WorkbenchViewmodel, createAsyncComponent) {
+], function(ko, arches, WorkbenchViewmodel, relatedResourcesGraphTemplate) {
     const viewModel = function(params) {
         var self = this;
         var layout = {
@@ -455,9 +455,8 @@ define([
         updateFocusResource();
     };
 
-    return createAsyncComponent(
-        'related-resources-graph',
-        viewModel,
-        'templates/views/components/related-resources-graph.htm'
-    );
+    return ko.components.register('related-resources-graph', {
+        viewModel: viewModel,
+        template: relatedResourcesGraphTemplate,
+    });
 });

@@ -5,9 +5,9 @@ define([
     'arches',
     'viewmodels/card-component',
     'viewmodels/alert',
-    'utils/create-async-component',
+    'templates/views/components/cards/grouping.htm',
     'chosen',
-], function(_, $, ko, arches, CardComponentViewModel, AlertViewModel, createAsyncComponent) {
+], function(_, $, ko, arches, CardComponentViewModel, AlertViewModel, groupingCardTemplate) {
     var flattenTree = function(parents, flatList) {
         _.each(ko.unwrap(parents), function(parent) {
             flatList.push(parent);
@@ -307,11 +307,9 @@ define([
         };
     }
 
-    createAsyncComponent(
-        'grouping-card-component',
-        viewModel,
-        'templates/views/components/cards/grouping.htm'
-    );
-    
+    ko.components.register('grouping-card-component', {
+        viewModel: viewModel,
+        template: groupingCardTemplate,
+    });
     return viewModel;
 });

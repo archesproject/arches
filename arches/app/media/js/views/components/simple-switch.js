@@ -1,4 +1,4 @@
-define(['knockout', 'viewmodels/widget', 'utils/create-async-component'], function(ko, WidgetViewModel, createAsyncComponent) {
+define(['knockout', 'viewmodels/widget', 'templates/views/components/simple-switch.htm'], function(ko, WidgetViewModel, simpleSwitchTemplate) {
     /**
     * knockout components namespace used in arches
     * @external "ko.components"
@@ -16,10 +16,8 @@ define(['knockout', 'viewmodels/widget', 'utils/create-async-component'], functi
     * @param {string|true} [params.config.on=true] - the value to use for the "on" state of the switch
     * @param {string|false} [params.config.off=false] - the value to use for the "off" state of the switch
     */
-
-    return createAsyncComponent(
-        'views/components/simple-switch', 
-        function(params) {
+    return ko.components.register('views/components/simple-switch', {
+        viewModel: function(params) {
             params.configKeys = ['subtitle'];
             WidgetViewModel.apply(this, [params]);
             this.on = this.config().on || true;
@@ -34,7 +32,7 @@ define(['knockout', 'viewmodels/widget', 'utils/create-async-component'], functi
             this.getvalue = this.config().getvalue || ko.computed(function(){
                 return this.value() === this.on;
             }, this);
-        }, 
-        'templates/views/components/simple-switch.htm'
-    );
+        },
+        template: simpleSwitchTemplate,
+    });
 });

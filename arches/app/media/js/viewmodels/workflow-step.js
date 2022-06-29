@@ -3,9 +3,9 @@ define([
     'underscore',
     'knockout-mapping',
     'uuid',
-    'utils/create-async-component',
     'views/components/workflows/workflow-component-abstract',
-], function(ko, _, koMapping, uuid, createAsyncComponent, WorkflowComponentAbstract) {
+    'templates/views/components/plugins/workflow-step.htm'
+], function(ko, _, koMapping, uuid, WorkflowComponentAbstract, workflowStepTemplate) {
     STEPS_LABEL = 'workflow-steps';
     STEP_ID_LABEL = 'workflow-step-id';
 
@@ -258,8 +258,11 @@ define([
 
         this.initialize();
     };
-    
-    createAsyncComponent('workflow-step', null, 'templates/views/components/plugins/workflow-step.htm', true);
 
+    /* only register template here, params are passed at the workflow level */ 
+    ko.components.register('workflow-step', {
+        template: workflowStepTemplate,
+    });
+    
     return WorkflowStep;
 });

@@ -7,13 +7,13 @@ define([
     'viewmodels/card-component',
     'viewmodels/card-multi-select',
     'views/components/workbench',
-    'utils/create-async-component',
+    'templates/views/components/cards/file-viewer.htm',
     'bindings/slide',
     'bindings/fadeVisible',
     'bindings/scroll-to-file',
     'dropzone',
     'bindings/dropzone',
-], function($, ko, uuid, arches, fileRenderers, CardComponentViewModel, CardMultiSelectViewModel, WorkbenchComponentViewModel, createAsyncComponent) {
+], function($, ko, uuid, arches, fileRenderers, CardComponentViewModel, CardMultiSelectViewModel, WorkbenchComponentViewModel, fileViewerTemplate) {
     const viewModel = function(params) {
         params.configKeys = ['acceptedFiles', 'maxFilesize'];
 
@@ -430,9 +430,8 @@ define([
         };
     };
     
-    return createAsyncComponent(
-        'file-viewer',
-        viewModel,
-        'templates/views/components/cards/file-viewer.htm'
-    );
+    return ko.components.register('file-viewer', {
+        viewModel: viewModel,
+        template: fileViewerTemplate,
+    });
 });
