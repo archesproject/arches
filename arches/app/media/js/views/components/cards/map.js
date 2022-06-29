@@ -3,11 +3,11 @@ define([
     'arches',
     'viewmodels/card-component',
     'viewmodels/map-editor',
-    'utils/create-async-component',
+    'templates/views/components/cards/map.htm',
     'bindings/chosen',
     'bindings/codemirror',
     'views/components/datatypes/geojson-feature-collection',
-], function(ko, arches, CardComponentViewModel, MapEditorViewModel, createAsyncComponent) {
+], function(ko, arches, CardComponentViewModel, MapEditorViewModel, mapCardTemplate) {
     var viewModel = function(params) {
         var self = this;
 
@@ -133,11 +133,9 @@ define([
         }
     };
 
-    createAsyncComponent(
-        'map-card',
-        viewModel,
-        'templates/views/components/cards/map.htm'
-    );
-    
+    ko.components.register('map-card', {
+        viewModel: viewModel,
+        template: mapCardTemplate,
+    });
     return viewModel;
 });

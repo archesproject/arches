@@ -4,8 +4,8 @@ define([
     'viewmodels/card-component',
     'views/components/iiif-annotation',
     'viewmodels/alert',
-    'utils/create-async-component',
-], function(ko, koMapping, CardComponentViewModel, IIIFAnnotationViewmodel, AlertViewModel, createAsyncComponent) {
+    'templates/views/components/cards/iiif-card.htm',
+], function(ko, koMapping, CardComponentViewModel, IIIFAnnotationViewmodel, AlertViewModel, iiifCardTemplate) {
     const viewModel = function(params) {
         var self = this;
 
@@ -111,11 +111,9 @@ define([
         });
     };
 
-    createAsyncComponent(
-        'iiif-card',
-        viewModel,
-        'templates/views/components/cards/iiif-card.htm'
-    );
-    
+    ko.components.register('iiif-card', {
+        viewModel: viewModel,
+        template: iiifCardTemplate,
+    });
     return viewModel;
 });

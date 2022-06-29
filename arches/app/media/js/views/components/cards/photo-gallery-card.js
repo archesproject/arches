@@ -7,12 +7,12 @@ define([
     'viewmodels/card-component',
     'views/components/workbench',
     'viewmodels/photo-gallery',
-    'utils/create-async-component',
+    'templates/views/components/cards/photo-gallery-card.htm',
     'bindings/slide',
     'bindings/fadeVisible',
     'bindings/dropzone',
     'bindings/gallery',
-], function(ko, koMapping, _, Dropzone, uuid, CardComponentViewModel, WorkbenchComponentViewModel, PhotoGallery, createAsyncComponent) {
+], function(ko, koMapping, _, Dropzone, uuid, CardComponentViewModel, WorkbenchComponentViewModel, PhotoGallery, photoGalleryCardTemplate) {
     const viewModel = function(params) {
         params.configKeys = ['acceptedFiles', 'maxFilesize'];
         var self = this;
@@ -177,9 +177,8 @@ define([
         };
     };
 
-    return createAsyncComponent(
-        'photo-gallery-card',
-        viewModel,
-        'templates/views/components/cards/photo-gallery-card.htm'
-    );
+    return ko.components.register('photo-gallery-card', {
+        viewModel: viewModel,
+        template: photoGalleryCardTemplate,
+    });
 });

@@ -153,9 +153,24 @@ module.exports = {
 
                         const templatePath = projectResourcePathData.length > 1 ? projectResourcePathData[1] : resourcePath.split(`${ARCHES_CORE_PATH}/`)[1]; 
 
-                        const resp = await fetch(SERVER_ADDRESS + templatePath);
-                        const responseText = await resp.text();
+                        let resp;
+                        
+                        const renderTemplate = async() => {
+                            /*
+                                Sometimes Django can choke on the number of requests, this function will 
+                                continue attempting to render the template until successful.
+                            */ 
+                            try {
+                                resp = await fetch(SERVER_ADDRESS + templatePath);
+                            }
+                            catch(e) { 
+                                return await renderTemplate();
+                            }
+                        }
 
+                        await renderTemplate();
+
+                        const responseText = await resp.text();
                         return responseText;
                     }
                 }
