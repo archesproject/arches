@@ -53,7 +53,7 @@ class Command(BaseCommand):
             action="store",
             dest="username",
             default="admin",
-            help="A username to required for the publication of graphs.",
+            help="A username required for the publication of graphs.",
         )
 
     def handle(self, *args, **options):
