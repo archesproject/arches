@@ -155,18 +155,25 @@ module.exports = {
 
                         let resp;
                         
-                        const renderTemplate = async() => {
+                        const renderTemplate = async(hasWarning) => {
                             /*
                                 Sometimes Django can choke on the number of requests, this function will 
                                 continue attempting to render the template until successful.
                             */ 
                             try {
                                 resp = await fetch(SERVER_ADDRESS + templatePath);
+
+                                if (hasWarning) {
+                                    console.log(`${templatePath} has successfully loaded.`);
+                                }
                             }
                             catch(e) { 
-                                return await renderTemplate();
+                                console.warn(
+                                    `${templatePath} has failed to load! This is likely due to server congestion. Retrying...`
+                                );
+                                return await renderTemplate(hasWarning=true);
                             }
-                        }
+                        };
 
                         await renderTemplate();
 
