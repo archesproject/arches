@@ -1,5 +1,6 @@
 from django.db import migrations
 
+
 class Migration(migrations.Migration):
     dependencies = [
         ("models", "8528_bulk_load_performance_functions"),
