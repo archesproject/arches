@@ -16,8 +16,19 @@ module.exports = merge(commonWebpackConfig, {
         chunkFilename: 'js/[name].chunk.js',
     },
     devServer: {
-        inline: true,
-        hot: true,
+        historyApiFallback: true,
+        client: {
+            overlay: {
+                errors: true,
+                warnings: false,
+            },
+        },
+        devMiddleware: {
+            index: true,
+            publicPath: '/static',
+            writeToDisk: true,
+        },
+        port: 9000,
     },
     plugins: [
         // new ESLintPlugin({
