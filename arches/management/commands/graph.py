@@ -72,7 +72,7 @@ class Command(BaseCommand):
             self.graphs = [Graph(graphid.strip()) for graphid in options["graphs"].split(",")]
         else:
             self.graphs = Graph.objects.filter(isresource=True)
-        
+
         self.update_instances = True if options["update_instances"] else False
 
         if options["operation"] == "publish":
@@ -92,7 +92,10 @@ class Command(BaseCommand):
         if self.update_instances:
             graphids = tuple(graphids)
             with connection.cursor() as cursor:
-                cursor.execute("update resource_instances r set graphpublicationid = publicationid from graphs g where r.graphid = g.graphid and g.graphid in %s;", (graphids,))
+                cursor.execute(
+                    "update resource_instances r set graphpublicationid = publicationid from graphs g where r.graphid = g.graphid and g.graphid in %s;",
+                    (graphids,),
+                )
 
     def unpublish(self):
         print("Unpublishing...")
