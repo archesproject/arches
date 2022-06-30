@@ -2760,7 +2760,7 @@ anymatch@~3.1.2:
 
 arches-dev-dependencies@archesproject/arches-dev-dependencies#dev/7.0.x:
   version "7.0.0"
-  resolved "https://codeload.github.com/archesproject/arches-dev-dependencies/tar.gz/c0f61e97b05702d3ae519ec9d655374b68852a40"
+  resolved "https://codeload.github.com/archesproject/arches-dev-dependencies/tar.gz/a52cb8908609f5c5996a7864fb6a3459b44b97bd"
   dependencies:
     "@babel/core" "^7.16.7"
     "@babel/eslint-parser" "^7.18.2"
@@ -2781,6 +2781,7 @@ arches-dev-dependencies@archesproject/arches-dev-dependencies#dev/7.0.x:
     html-webpack-plugin "^5.5.0"
     mini-css-extract-plugin "^2.5.1"
     node-sass "^7.0.1"
+    postcss "^8.4.14"
     postcss-loader "^6.2.1"
     postcss-preset-env "^7.2.3"
     raw-loader "^4.0.2"
