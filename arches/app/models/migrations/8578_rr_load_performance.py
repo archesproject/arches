@@ -3,7 +3,7 @@ from django.db import migrations
 
 class Migration(migrations.Migration):
     dependencies = [
-        ("models", "8528_bulk_load_performance_functions"),
+        ("models", "8140_django_upgrade"),
     ]
 
     forward_sql = """
@@ -34,7 +34,7 @@ class Migration(migrations.Migration):
                     (SELECT res.tileid, (res.tiledata || jsonb_object_agg(res.nodeid, res.result)) result
                         FROM 
                         nodes n, 
-                            (SELECT t.tileid, n.nodeid, t.tiledata, jsonb_agg(jsonb_set(tile_data, array['resourceXresourceId'::text], ('"' || uuid_generate_v4()|| '"')::jsonb, false)) result
+                            (SELECT t.tileid, n.nodeid, t.tiledata, jsonb_agg(jsonb_set(tile_data, array['resourceXresourceId'::text], ('"' || uuid_generate_v4()|| '"')::jsonb, true)) result
                                 FROM tiles t LEFT JOIN nodes n ON t.nodegroupid = n.nodegroupid, jsonb_array_elements(t.tiledata->n.nodeid::text) tile_data
                                 WHERE t.tiledata->>n.nodeid::text IS NOT null
                                 AND t.tiledata->>n.nodeid::text != ''
