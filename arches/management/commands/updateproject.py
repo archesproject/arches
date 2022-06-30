@@ -24,5 +24,5 @@ class Command(BaseCommand):
                 active = row[1]
                 if active:
                     graphs.append(graphid)
-            management.call_command("graph", operation="publish", graphs=",".join(graphs))
+            management.call_command("graph", operation="publish", update_instances=True, graphs=",".join(graphs))
             cursor.execute("drop table if exists temp_graph_status")

@@ -19,6 +19,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 from django.core.management.base import BaseCommand
 from arches.app.models.graph import Graph
 from django.contrib.auth.models import User
+from django.db import connection
 
 
 class Command(BaseCommand):
@@ -58,28 +59,43 @@ class Command(BaseCommand):
             default="admin",
             help="A username required for the publication of graphs.",
         )
+        parser.add_argument(
+            "-ui",
+            "--update_instances",
+            action="store_true",
+            dest="update_instances",
+            help="Do would want to assign new graph publication ids to all corresponding resource instances?",
+        )
 
     def handle(self, *args, **options):
         if options["graphs"]:
-            graphs = [Graph(graphid.strip()) for graphid in options["graphs"].split(",")]
+            self.graphs = [Graph(graphid.strip()) for graphid in options["graphs"].split(",")]
         else:
-            graphs = Graph.objects.filter(isresource=True)
+            self.graphs = Graph.objects.filter(isresource=True)
+        
+        self.update_instances = True if options["update_instances"] else False
 
         if options["operation"] == "publish":
-            self.publish(options["username"], graphs)
+            self.publish(options["username"])
 
         if options["operation"] == "unpublish":
-            self.unpublish(graphs)
+            self.unpublish()
 
-    def publish(self, username, graphs=None):
+    def publish(self, username):
         user = User.objects.get(username=username)
         print("\nPublishing ...")
-        for graph in graphs:
+        graphids = []
+        for graph in self.graphs:
             print(graph.name)
             graph.publish(user)
+            graphids.append(str(graph.pk))
+        if self.update_instances:
+            graphids = tuple(graphids)
+            with connection.cursor() as cursor:
+                cursor.execute("update resource_instances r set graphpublicationid = publicationid from graphs g where r.graphid = g.graphid and g.graphid in %s;", (graphids,))
 
-    def unpublish(self, graphs=None):
+    def unpublish(self):
         print("Unpublishing...")
-        for graph in graphs:
+        for graph in self.graphs:
             print(graph.name)
             graph.unpublish()
