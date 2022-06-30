@@ -3,7 +3,8 @@ define([
     'knockout',
     'js-cookie',
     'arches',
-], function($, ko, Cookies, arches) {
+    'viewmodels/alert',
+], function($, ko, Cookies, arches, AlertViewModel) {
     return ko.components.register('etl-manager', {
         viewModel: function(params) {
             const self = this;
@@ -99,26 +100,31 @@ define([
                     self.activeTab("import");
                 });
             };
-
-            this.reverseTransactions = function(event) {
-                const formData = new FormData();
-                const url = arches.urls.etl_manager;
-                formData.append('loadid', event.loadid);
-                formData.append('module', event.etl_module.etlmoduleid);
-                formData.append('action', 'reverse');
-                self.loading(true);
-                window.fetch(url,{
-                    method: 'POST',
-                    body: formData,
-                    credentials: 'include',
-                    headers: {
-                        "X-CSRFToken": Cookies.get('csrftoken')
-                    },
-                }).then(function(response) {
-                    return response.json();
-                }).then(function() {
-                    self.loading(false);
-                });
+            
+            this.reverseTransactions = function(event, undoAlertTitle, undoAlertMessage) {
+                this.alert(new AlertViewModel('ep-alert-red', undoAlertTitle, undoAlertMessage, function() {
+                    return;
+                }, function() {
+                    const formData = new FormData();
+                    const url = arches.urls.etl_manager;
+                    event.status = 'reversing';
+                    formData.append('loadid', event.loadid);
+                    formData.append('module', event.etl_module.etlmoduleid);
+                    formData.append('action', 'reverse');
+                    window.fetch(url,{
+                        method: 'POST',
+                        body: formData,
+                        credentials: 'include',
+                        headers: {
+                            "X-CSRFToken": Cookies.get('csrftoken')
+                        },
+                    }).then(function(response) {
+                        return response.json();
+                    }).then(function() {
+                        //pass
+                    });
+                    }
+                ));
             };
 
             this.formatUserName = function(event){

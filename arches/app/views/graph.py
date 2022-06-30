@@ -115,6 +115,8 @@ class GraphSettingsView(GraphBaseView):
         node.ontologyclass = data.get("ontology_class") if data.get("graph").get("ontology_id") is not None else None
         node.name = graph.name
         graph.root.name = node.name
+        if node.ontologyclass:
+            graph.root.ontologyclass = node.ontologyclass
 
         if graph.isresource is False and "root" in data["graph"]:
             node.config = data["graph"]["root"]["config"]
