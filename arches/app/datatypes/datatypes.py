@@ -1916,7 +1916,9 @@ class ResourceInstanceDataType(BaseDataType):
         ret = False
         sql = """
             SELECT * FROM __arches_create_resource_x_resource_relationships('%s') as t;
-        """ % (tile.pk)
+        """ % (
+            tile.pk
+        )
 
         with connection.cursor() as cursor:
             cursor.execute(sql)

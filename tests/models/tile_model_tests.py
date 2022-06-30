@@ -424,7 +424,7 @@ class TileTests(ArchesTestCase):
 
     def test_related_resources_managed(self):
         """
-        Test that related resource data is managed correctly and that the accompanying table is 
+        Test that related resource data is managed correctly and that the accompanying table is
         managed correctly.  Test that default ontology and inverse ontology infomation is applied properly.
 
         """
@@ -439,22 +439,22 @@ class TileTests(ArchesTestCase):
                         "inverseOntologyProperty": "",
                         "ontologyProperty": "",
                         "resourceId": "92b2db6a-d13f-4cc7-aec7-e4caf91b45f8",
-                        "resourceXresourceId": ""
+                        "resourceXresourceId": "",
                     },
                     {
                         "inverseOntologyProperty": "http://www.cidoc-crm.org/cidoc-crm/P62i_is_depicted_by",
                         "ontologyProperty": "http://www.cidoc-crm.org/cidoc-crm/P62_depicts",
                         "resourceId": "e72844fc-7bc0-4851-89ca-5bb1c6b3ba22",
-                        "resourceXresourceId": "5f418480-534a-4dba-87d9-67eb27f0cc6a"
-                    }
-                ]
+                        "resourceXresourceId": "5f418480-534a-4dba-87d9-67eb27f0cc6a",
+                    },
+                ],
             },
             "nodegroup_id": "487154e3-e222-11e8-be46-a4d18cec433a",
             "parenttile_id": None,
             "provisionaledits": None,
             "resourceinstance_id": "654bb228-37e7-4beb-b0f9-b59b61b53577",
             "sortorder": 0,
-            "tileid": "edbdef07-77fd-4bb6-9fef-641d4a65abce"
+            "tileid": "edbdef07-77fd-4bb6-9fef-641d4a65abce",
         }
 
         main_resource = Resource(pk=json["resourceinstance_id"], graph_id="c35fe0a1-df30-11e8-b280-a4d18cec433a")
@@ -469,7 +469,7 @@ class TileTests(ArchesTestCase):
 
         resource_instances = ResourceXResource.objects.filter(tileid=t.tileid)
         self.assertEqual(2, len(resource_instances))
-        
+
         for ri in resource_instances:
             ri_dict = JSONSerializer().serializeToPython(ri)
             if str(ri.relationshiptype) == "http://www.cidoc-crm.org/cidoc-crm/P62_depicts":
@@ -482,7 +482,7 @@ class TileTests(ArchesTestCase):
                     "resourceinstanceidfrom_id": UUID("654bb228-37e7-4beb-b0f9-b59b61b53577"),
                     "resourceinstanceidto_id": UUID("e72844fc-7bc0-4851-89ca-5bb1c6b3ba22"),
                     "resourceinstanceto_graphid_id": UUID("c35fe0a1-df30-11e8-b280-a4d18cec433a"),
-                    "tileid_id": UUID("edbdef07-77fd-4bb6-9fef-641d4a65abce")
+                    "tileid_id": UUID("edbdef07-77fd-4bb6-9fef-641d4a65abce"),
                 }
                 self.assertTrue(all(item in ri_dict.items() for item in expected.items()))
             else:
@@ -494,7 +494,7 @@ class TileTests(ArchesTestCase):
                     "resourceinstancefrom_graphid_id": UUID("c35fe0a1-df30-11e8-b280-a4d18cec433a"),
                     "resourceinstanceidto_id": UUID("92b2db6a-d13f-4cc7-aec7-e4caf91b45f8"),
                     "resourceinstanceto_graphid_id": UUID("c35fe0a1-df30-11e8-b280-a4d18cec433a"),
-                    "tileid_id": UUID("edbdef07-77fd-4bb6-9fef-641d4a65abce")
+                    "tileid_id": UUID("edbdef07-77fd-4bb6-9fef-641d4a65abce"),
                 }
                 self.assertTrue(all(item in ri_dict.items() for item in expected.items()))
 
@@ -509,16 +509,16 @@ class TileTests(ArchesTestCase):
                         "inverseOntologyProperty": "",
                         "ontologyProperty": "http://www.cidoc-crm.org/cidoc-crm/P62_depicts",
                         "resourceId": "85b2db6a-d13f-4cc7-aec7-e4caf91b45f7",
-                        "resourceXresourceId": ""
+                        "resourceXresourceId": "",
                     }
-                ]
+                ],
             },
             "nodegroup_id": "487154e3-e222-11e8-be46-a4d18cec433a",
             "parenttile_id": None,
             "provisionaledits": None,
             "resourceinstance_id": "654bb228-37e7-4beb-b0f9-b59b61b53577",
             "sortorder": 0,
-            "tileid": "edbdef07-77fd-4bb6-9fef-641d4a65abce"
+            "tileid": "edbdef07-77fd-4bb6-9fef-641d4a65abce",
         }
 
         related_resource3 = Resource(pk="85b2db6a-d13f-4cc7-aec7-e4caf91b45f7", graph_id="c35fe0a1-df30-11e8-b280-a4d18cec433a")
@@ -537,7 +537,7 @@ class TileTests(ArchesTestCase):
             "resourceinstancefrom_graphid_id": UUID("c35fe0a1-df30-11e8-b280-a4d18cec433a"),
             "resourceinstanceidto_id": UUID("85b2db6a-d13f-4cc7-aec7-e4caf91b45f7"),
             "resourceinstanceto_graphid_id": UUID("c35fe0a1-df30-11e8-b280-a4d18cec433a"),
-            "tileid_id": UUID("edbdef07-77fd-4bb6-9fef-641d4a65abce")
+            "tileid_id": UUID("edbdef07-77fd-4bb6-9fef-641d4a65abce"),
         }
         self.assertTrue(all(item in ri_dict.items() for item in expected.items()))
 
