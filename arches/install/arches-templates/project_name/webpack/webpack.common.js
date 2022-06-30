@@ -165,6 +165,9 @@ module.exports = {
                 loader: `${PROJECT_PATH}/media/node_modules/html-loader`,
                 options: {
                     esModule: false,
+                    minimize: {
+                        removeComments: false,
+                    },
                     preprocessor: async (_content, loaderContext) => {
                         const resourcePath = loaderContext['resourcePath'];
                         const projectResourcePathData = resourcePath.split(`${PROJECT_PATH}/`);
