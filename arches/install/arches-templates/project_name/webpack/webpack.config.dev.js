@@ -6,7 +6,7 @@ const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 const ESLintPlugin = require('eslint-webpack-plugin');
 
 const commonWebpackConfig = require('./webpack.common.js');
-const { PROJECT_PATH } = require('./webpack-paths.js');
+const { PROJECT_PATH } = require('./webpack-metadata.js');
 
 
 module.exports = merge(commonWebpackConfig, {

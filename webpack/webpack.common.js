@@ -7,7 +7,7 @@ const BundleTracker = require('webpack-bundle-tracker');
 
 const { buildTemplateFilePathLookup } = require('./webpack-utils/build-template-filepath-lookup');
 const { buildJavascriptFilepathLookup } = require('./webpack-utils/build-javascript-filepath-lookup');
-const { ARCHES_CORE_PATH, PROJECT_PATH, SERVER_ADDRESS } = require('./webpack-paths');
+const { ARCHES_CORE_PATH, PROJECT_PATH, APPLICATION_SERVER_ADDRESS } = require('./webpack-metadata');
 
 
 const archesCoreEntryPointConfiguration = buildJavascriptFilepathLookup(Path.resolve(__dirname, `${ARCHES_CORE_PATH}/media/js`), {});
@@ -32,6 +32,15 @@ const templateFilepathLookup = buildTemplateFilePathLookup(
     Path.resolve(__dirname, `${ARCHES_CORE_PATH}/templates`),
     Path.resolve(__dirname, `${PROJECT_PATH}/templates`)
 );
+
+let applicationServerAddress = APPLICATION_SERVER_ADDRESS;
+for (let arg of process.argv) {
+    const keyValuePair = arg.split('=');
+
+    if (keyValuePair[0] === 'application_server_address') {
+        applicationServerAddress = keyValuePair[1];
+    }
+}
 
 module.exports = {
     entry: { 
@@ -164,23 +173,25 @@ module.exports = {
 
                         let resp;
                         
-                        const renderTemplate = async(hasWarning) => {
+                        const renderTemplate = async(failureCount=0) => {
                             /*
                                 Sometimes Django can choke on the number of requests, this function will 
                                 continue attempting to render the template until successful.
                             */ 
-                            try {
-                                resp = await fetch(SERVER_ADDRESS + templatePath);
-
-                                if (hasWarning) {
-                                    console.log(`${templatePath} has successfully loaded.`);
+                            if (failureCount < 5) {
+                                try {
+                                    resp = await fetch(applicationServerAddress + templatePath);
+                                }
+                                catch(e) { 
+                                    failureCount += 1;
+                                    console.warn(
+                                        `"${templatePath}" has failed to load. Retrying (${failureCount} / 5)...`
+                                    );
+                                    return await renderTemplate(failureCount=failureCount);
                                 }
                             }
-                            catch(e) { 
-                                console.warn(
-                                    `${templatePath} has failed to load! This is likely due to server congestion. Retrying...`
-                                );
-                                return await renderTemplate(hasWarning=true);
+                            else {
+                                console.error(`"${templatePath}" has failed to load!`)
                             }
                         };
 
