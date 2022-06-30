@@ -8,7 +8,7 @@
             <div class="arches-toggle-sm" data-bind="text:label"></div>
                 <div style="margin-top: -17px;">
                 <!-- ko if: node -->
-                <i data-bind="css: {'ion-asterisk widget-label-required': node.isrequired}"></i>
+                <i data-bind="css: {'ion-asterisk widget-label-required': node && node.isrequired}"></i>
                 <!-- /ko -->
                 </div>
             </div>
@@ -27,7 +27,7 @@
   {% trans "Default Value" %}
 </div>
 <div class="toggle-container">
-    <span class="switch switch-small" data-bind="css: {'on': getdefault}, click: setdefault"><small></small></span>
+    <span class="switch switch-small" data-bind="css: {'on': getvalue}, click: setvalue"><small></small></span>
             <div style="display:flex; flex-direction:row;">
             <div class="arches-toggle-sm" data-bind="text:label"></div>
             </div>
