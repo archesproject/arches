@@ -48,8 +48,17 @@ module.exports = {
         new CleanWebpackPlugin(),
         new CopyWebpackPlugin({ 
             patterns: [
-                {from: Path.resolve(__dirname, `${ARCHES_CORE_PATH}/media/img`), to: 'img'}, 
-                {from: Path.resolve(__dirname, `${PROJECT_PATH}/media/img`), to: 'img'} 
+                {
+                    from: Path.resolve(__dirname, `${ARCHES_CORE_PATH}/media/img`), 
+                    to: 'img',
+                    priority: 5,
+                }, 
+                {
+                    from: Path.resolve(__dirname, `${PROJECT_PATH}/media/img`), 
+                    to: 'img',
+                    priority: 10,
+                    force: true
+                } 
             ] 
         }),
         new webpack.DefinePlugin({
