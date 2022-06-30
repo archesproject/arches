@@ -289,15 +289,16 @@ class BaseDataType(object):
             base_query.must(null_query)
         query.must(base_query)
 
-    def handle_request(self, current_tile, request, node):
-        """
-        Updates files
-        """
-        pass
-
     def pre_tile_save(self, tile, nodeid):
         """
         Called during tile.save operation but before the tile is actually saved to the database
+
+        """
+        pass
+
+    def post_tile_save(self, tile, nodeid, request):
+        """
+        Called after the tile is saved to the database
 
         """
         pass

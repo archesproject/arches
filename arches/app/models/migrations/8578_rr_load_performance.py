@@ -15,12 +15,14 @@ class Migration(migrations.Migration):
             
         AS $BODY$
         DECLARE
-            resource_id uuid;
+            resourceinstancefrom_id uuid;
+            from_graphid uuid;
             val boolean = true;
         BEGIN
             --https://dbfiddle.uk/?rdbms=postgres_12&fiddle=21e25754f355a492dfd7b4a134182d2e
 
-            SELECT resourceinstanceid INTO resource_id FROM tiles WHERE tileid = tile_id;
+            SELECT resourceinstanceid INTO resourceinstancefrom_id FROM tiles WHERE tileid = tile_id; 
+            SELECT graphid INTO from_graphid FROM resource_instances WHERE resourceinstanceid = resourceinstancefrom_id; 
 
             DELETE FROM resource_x_resource WHERE tileid = tile_id;
 
@@ -44,24 +46,46 @@ class Migration(migrations.Migration):
                     ) as ret
                 WHERE
                     t.tileid = tile_id
-                RETURNING t.nodegroupid, t.tiledata::jsonb, t.tileid
+                RETURNING t.nodegroupid, t.tiledata::jsonb, t.tileid, t.resourceinstanceid
             )
             , relationships AS (
-                SELECT n.nodeid,
+                SELECT n.nodeid, n.config,
                     jsonb_array_elements(tt.tiledata->n.nodeid::text) AS relationship
                 FROM updated_tiles tt
                     LEFT JOIN nodes n ON tt.nodegroupid = n.nodegroupid
                 WHERE n.datatype IN ('resource-instance-list', 'resource-instance')
                     AND tt.tiledata->>n.nodeid::text IS NOT null
             )
+            , relationships2 AS (
+                SELECT r.nodeid, r.config, r.relationship, (SELECT ri.graphid
+                    FROM resource_instances ri
+                    WHERE r.relationship->>'resourceId' = ri.resourceinstanceid::text) AS to_graphid
+                FROM relationships r
+            )
+            , relationships3 AS (
+                SELECT fr.nodeid, fr.relationship, fr.to_graphid, 
+                (
+                    SELECT graphs->>'ontologyProperty'
+                    FROM jsonb_array_elements(fr.config->'graphs') AS graphs
+                    WHERE graphs->>'graphid' = fr.to_graphid::text
+                ) AS defaultOntologyProperty,
+                (
+                    SELECT graphs->>'inverseOntologyProperty'
+                    FROM jsonb_array_elements(fr.config->'graphs') AS graphs
+                    WHERE graphs->>'graphid' = fr.to_graphid::text
+                ) AS defaultInverseOntologyProperty
+                FROM relationships2 fr
+            )
 
             INSERT INTO resource_x_resource (
                 resourcexid,
                 notes,
                 relationshiptype,
+                inverserelationshiptype,
                 resourceinstanceidfrom,
                 resourceinstanceidto,
-                inverserelationshiptype,
+                resourceinstancefrom_graphid,
+                resourceinstanceto_graphid,
                 tileid,
                 nodeid,
                 created,
@@ -69,15 +93,23 @@ class Migration(migrations.Migration):
             ) (SELECT
                 (relationship->>'resourceXresourceId')::uuid,
                 '',
-                relationship->>'ontologyProperty',
-                resource_id,
+                CASE relationship->>'ontologyProperty'
+                    WHEN '' THEN defaultOntologyProperty
+                    ELSE relationship->>'ontologyProperty'
+                END,
+                CASE relationship->>'inverseOntologyProperty'
+                    WHEN '' THEN defaultInverseOntologyProperty
+                    ELSE relationship->>'inverseOntologyProperty'
+                END,
+                resourceinstancefrom_id,
                 (relationship->>'resourceId')::uuid,
-                relationship->>'inverseOntologyProperty',
+                from_graphid,
+                to_graphid,
                 tile_id,
                 nodeid,
                 now(),
                 now()
-            FROM relationships);
+            FROM relationships3);
 
             RETURN val;
         END;
