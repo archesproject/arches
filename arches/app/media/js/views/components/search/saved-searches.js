@@ -8,7 +8,7 @@ define([
     var componentName = 'saved-searches';
     const viewModel = function(params) {
         var self = this;
-        this.urls = arches.urls;
+        self.urls = arches.urls;
         self.items = ko.observableArray([]);
         $.ajax({
             type: "GET",
