@@ -20,6 +20,7 @@ define([
             this.searchResults = options.searchResultsVm;
             this.editingInstanceId = options.editing_instance_id;
             this.graph = options.graph;
+            this.urls = arches.urls;
             this.loading = options.loading;
             this.rootOntologyClass  = '';
             this.activeTab = ko.observable();

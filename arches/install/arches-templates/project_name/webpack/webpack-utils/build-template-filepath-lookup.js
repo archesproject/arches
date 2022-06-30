@@ -13,7 +13,7 @@ const _buildTemplateFilePathLookup = function(path, outerAcc, templateDirectoryP
             );
         }
         else {
-            const subPath = (path + '/' + name).split('templates/')[1];
+            const subPath = (path + '/' + name).split('/templates/')[1];
             const parsedPath = Path.parse(subPath);
             const filename = parsedPath['dir'] + '/' + parsedPath['base'];
 

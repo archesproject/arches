@@ -18,6 +18,7 @@ define([
         params.configKeys = ['acceptedFiles', 'maxFilesize'];
 
         var self = this;
+        this.urls = arches.urls;
         this.fileFormatRenderers = Object.values(fileRenderers);
         this.rendererComponentName = ko.observable();
 

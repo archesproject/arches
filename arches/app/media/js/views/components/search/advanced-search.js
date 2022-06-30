@@ -14,6 +14,7 @@ define([
             var self = this;
             options.name = 'Advanced Search Filter';
             BaseFilter.prototype.initialize.call(this, options);
+            this.urls = arches.urls;
             this.tagId = "Advanced Search";
             this.searchableGraphs = ko.observableArray();
             this.datatypelookup = {};

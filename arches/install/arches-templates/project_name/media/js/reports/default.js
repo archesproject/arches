@@ -1,4 +1,4 @@
-define(['knockout', 'viewmodels/report', 'templates/views/report-templates/default'], function (ko, ReportViewModel, defaultReportTemplate) {
+define(['knockout', 'viewmodels/report', 'templates/views/report-templates/default.htm'], function (ko, ReportViewModel, defaultReportTemplate) {
     return ko.components.register('default-report', {
         viewModel: function(params) {
             params.configKeys = [];
