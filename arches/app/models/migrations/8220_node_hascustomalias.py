@@ -6,13 +6,13 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('models', '8528_bulk_load_performance_functions'),
+        ("models", "8528_bulk_load_performance_functions"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='node',
-            name='hascustomalias',
+            model_name="node",
+            name="hascustomalias",
             field=models.BooleanField(default=False),
         ),
     ]
