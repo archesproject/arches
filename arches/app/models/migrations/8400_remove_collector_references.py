@@ -8,7 +8,7 @@ import django.db.models.deletion
 class Migration(migrations.Migration):
 
     dependencies = [
-        ("models", "8528__7783_add_graph_publications"),
+        ("models", "8022_userprofile_mfa_hash"),
     ]
 
     operations = [
