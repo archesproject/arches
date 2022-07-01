@@ -60,7 +60,6 @@ from arches.app.utils.geo_utils import GeoUtils
 from arches.app.search.components.base import SearchFilterFactory
 from arches.app.datatypes.datatypes import DataTypeFactory, EDTFDataType
 from arches.app.search.search_engine_factory import SearchEngineFactory
-from arches.app.search.search_export import SearchResultsExporter
 from django.utils import translation
 
 
