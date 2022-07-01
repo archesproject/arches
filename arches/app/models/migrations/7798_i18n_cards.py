@@ -7,7 +7,7 @@ from django.conf import settings
 class Migration(migrations.Migration):
 
     dependencies = [
-        ("models", "8528_bulk_load_performance_functions"),
+        ("models", "8140_django_upgrade"),
     ]
 
     sql = """

@@ -17,7 +17,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 -->
 
 {% extends "base.htm" %}
-{% load staticfiles %}
+{% load static %}
 {% load template_tags %}
 {% load i18n %}
 
@@ -297,14 +297,21 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
             
                 <!-- Login -->
                 {% if nav.login %}
-                <a href="{% url 'auth' %}?next={{ request.get_full_path }}{% if user.username != 'anonymous' %}&logout=true{% endif %}"
-                    class="ep-tools ep-tools-login">
-                    <div class="" data-placement="bottom" data-toggle="tooltip" style="width:max-content;"
-                        data-original-title="{% if user.username != 'anonymous' %}Logout{% else %}Login{% endif %}">
+                <a 
+                    href="{% if user.username != 'anonymous' %}{% url 'user_profile_manager' %}{% else %}{% url 'auth' %}?next={{ home }}{% endif %}" 
+                    class="ep-tools ep-tools-login"
+                >
+                    <div 
+                        class="" 
+                        data-placement="bottom" 
+                        data-toggle="tooltip" 
+                        data-original-title="{% if user.username != 'anonymous' %}{% trans 'Profile' %}{% else %}{% trans 'Login' %}{% endif %}"
+                    >
                         {% if user.username == 'anonymous' %}
-                        <h5 class="hidden-xs">{% trans "Login" %}</h5>
+                            <h5 class="hidden-xs">{% trans "Login" %}</h5>
                         {% else %}
-                        <h5 class="hidden-xs">{% trans "Welcome" %}, {{ user.first_name|default:user.username }}</h5>
+                            <h5 class="hidden-xs">{% trans "Welcome" %}, {{ user.first_name|default:user.username }}</h5>
+                            <i class="fa fa-sign-out"></i>
                         {% endif %}
                     </div>
                 </a>
@@ -379,6 +386,17 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                         <i class="ion-help"></i>
                     </div>
                 </a>
+                {% endif %}
+
+                {% if user.username != 'anonymous' %}
+                    <a 
+                        href="{% url 'auth' %}?next={{ request.get_full_path }}{% if user.username != 'anonymous' %}&logout=true{% endif %}" 
+                        class="ep-help-toggle ep-tools ep-tools-right"
+                    >
+                        <div class="" data-placement="bottom" data-toggle="tooltip" data-original-title='{% trans "Logout" %}'>
+                            <i class="ion-log-out"></i>
+                        </div>
+                    </a>
                 {% endif %}
             </div>
             

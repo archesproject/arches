@@ -16,7 +16,7 @@ You should have received a copy of the GNU Affero General Public License
 along with this program. If not, see <http://www.gnu.org/licenses/>.
 -->
 {% extends "base-manager.htm" %} 
-{% load staticfiles %} 
+{% load static %} 
 {% load template_tags %}
 {% load i18n %} 
 
@@ -105,10 +105,29 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                                 <div class="row">
                                     <div class="col-sm-5">
                                         <div class="relative">
-                                            <h4 class="text-main" style="font-weight: 500;">{{ user.userprofile.phone }}</h4>
+                                            {% if user.userprofile.phone %}
+                                                <h4 class="text-main" style="font-weight: 500;">{{ user.userprofile.phone }}</h4>
+                                            {% else %}
+                                                <h4 class="text-main" style="font-weight: 500;">{% trans 'None' %}</h4>
+                                            {% endif %}
                                             <p class="profile-label-shim">{% trans 'Phone' %}</p>
                                         </div>
                                     </div>
+
+
+                                    <!-- ko if: isTwoFactorAuthenticationEnabled || isTwoFactorAuthenticationForced -->
+                                    <div class="col-sm-5">
+                                        <div class="relative">
+                                            <!-- ko if: hasUserEnabledTwoFactorAuthentication() -->
+                                            <h4 class="text-main" style="font-weight: 500; color: green;">ENABLED</h4>
+                                            <!-- /ko -->
+                                            <!-- ko ifnot: hasUserEnabledTwoFactorAuthentication() -->
+                                            <h4 class="text-main" style="font-weight: 500; color: red;">DISABLED</h4>
+                                            <!-- /ko -->
+                                            <p class="profile-label-shim">{% trans 'Two-Factor Authentication' %}</p>
+                                        </div>
+                                    </div>
+                                    <!-- /ko -->
                                 </div>
                                 <!-- /ko -->
 
@@ -208,6 +227,38 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                                             </p>
                                         </div>
                                     </div>
+
+                                    <!-- ko if: isTwoFactorAuthenticationEnabled || isTwoFactorAuthenticationForced -->
+                                        <hr style="border-color: #eee;">
+                                        
+                                        <!-- Two-Factor Authentication -->
+                                        <div class="row">
+                                            <div class="col-sm-5">
+                                                <div class="form-group">
+                                                    <label class="control-label account-label">{% trans 'Two-Factor Authentication' %}</label>
+                                                    <input 
+                                                        disabled
+                                                        type="text" 
+                                                        class="form-control input-lg account-input" 
+                                                        name="two-factor-authentication-status" 
+                                                        data-bind="value: hasUserEnabledTwoFactorAuthentication() ? 'ENABLED' : 'DISABLED'"
+                                                    >
+                                                </div>
+                                            </div>
+                                            <div class="col-sm-5">
+                                                <p class="account-tips">
+                                                    <button 
+                                                        class="btn btn-link" 
+                                                        type='button' 
+                                                        style="color: #579ddb; padding-top: 24px;"
+                                                        data-bind="click: function() { alertTwoFactorAuthenticationChange('{{ user.email }}'); }"
+                                                    >
+                                                        {% trans 'Click here to update Two-Factor Authentication settings via email' %}
+                                                    </button>
+                                                </p>
+                                            </div>
+                                        </div>
+                                    <!-- /ko -->
                                 </form>
                                 <!-- /ko -->
                             </div>
@@ -358,7 +409,8 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 <script>{% autoescape off %}
     define('profile-manager-data', [], function() {
         return {
-            'error_count': {{form.errors|length}}
+            'error_count': {{form.errors|length}},
+            'two_factor_authentication_settings': {{two_factor_authentication_settings}},
         }
     });
 {% endautoescape %}</script>

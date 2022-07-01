@@ -47,6 +47,7 @@ DATABASES = {
     }
 }
 
+DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 PG_SUPERUSER = ""
 PG_SUPERUSER_PW = ""
 
@@ -212,7 +213,7 @@ LANGUAGE_CODE = "en"
 # a list of language codes can be found here http://www.i18nguy.com/unicode/language-identifiers.html
 LANGUAGES = [
     # ("de", _("German")),
-    # ("en", _("English")),
+    ("en", "English"),
     # ("en-gb", _("British English")),
     # ("es", _("Spanish")),
     # ("ar", _("Arabic")),
@@ -597,6 +598,12 @@ MAP_MAX_ZOOM = 20
 # causing your application to break.
 OVERRIDE_RESOURCE_MODEL_LOCK = False
 
+# If True, allows users to selectively enable two-factor authentication
+ENABLE_TWO_FACTOR_AUTHENTICATION = False
+
+# If True, users cannot log in unless they have enabled two-factor authentication
+FORCE_TWO_FACTOR_AUTHENTICATION = False
+
 # bounds for search results hex binning fabric (search grid).
 # a smaller bbox will give you less distortion in hexes and better performance
 DEFAULT_BOUNDS = {
@@ -713,7 +720,6 @@ JSON_LD_SORT_FUNCTIONS = [lambda x: x.get("@id", "~")]
 
 def JSON_LD_FIX_DATA_FUNCTION(data, jsdata, model):
     return jsdata
-
 
 ##########################################
 ### END RUN TIME CONFIGURABLE SETTINGS ###

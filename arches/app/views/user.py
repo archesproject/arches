@@ -112,6 +112,16 @@ class UserManagerView(BaseManagerView):
             }
             context["validation_help"] = validation.password_validators_help_texts()
 
+            user_profile = models.UserProfile.objects.get(user_id=request.user.pk)
+
+            context["two_factor_authentication_settings"] = JSONSerializer().serialize(
+                {
+                    "ENABLE_TWO_FACTOR_AUTHENTICATION": settings.ENABLE_TWO_FACTOR_AUTHENTICATION,
+                    "FORCE_TWO_FACTOR_AUTHENTICATION": settings.FORCE_TWO_FACTOR_AUTHENTICATION,
+                    "user_has_enabled_two_factor_authentication": bool(user_profile.encrypted_mfa_hash),
+                }
+            )
+
             return render(request, "views/user-profile-manager.htm", context)
 
     def post(self, request):
@@ -159,5 +169,15 @@ class UserManagerView(BaseManagerView):
                     logger.error("Error sending email", exc_info=True)
                 request.user = user
             context["form"] = form
+
+            user_profile = models.UserProfile.objects.get(user_id=request.user.pk)
+
+            context["two_factor_authentication_settings"] = JSONSerializer().serialize(
+                {
+                    "ENABLE_TWO_FACTOR_AUTHENTICATION": settings.ENABLE_TWO_FACTOR_AUTHENTICATION,
+                    "FORCE_TWO_FACTOR_AUTHENTICATION": settings.FORCE_TWO_FACTOR_AUTHENTICATION,
+                    "user_has_enabled_two_factor_authentication": bool(user_profile.encrypted_mfa_hash),
+                }
+            )
 
             return render(request, "views/user-profile-manager.htm", context)
