@@ -190,7 +190,7 @@ class Graph(models.GraphModel):
             node.fieldname = nodeobj.get("fieldname", "")
             node.alias = nodeobj.get("alias", "")
             node.hascustomalias = nodeobj.get("hascustomalias", "")
-            node.alias = self.create_node_alias(node)
+            self.create_node_alias(node)
 
             node.nodeid = uuid.UUID(str(node.nodeid))
 
@@ -374,7 +374,7 @@ class Graph(models.GraphModel):
             if nodeid is not None:
                 node = self.nodes[nodeid]
                 self.update_es_node_mapping(node, datatype_factory, se)
-                node.alias = self.create_node_alias(node)
+                self.create_node_alias(node)
                 node.save()
             else:
                 for node in self.nodes.values():
