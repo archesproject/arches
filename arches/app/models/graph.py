@@ -25,7 +25,6 @@ from django.core.cache import cache
 from django.core.exceptions import ObjectDoesNotExist
 from django.db import transaction, connection
 from django.db.utils import IntegrityError
-from psycopg2.errors import UniqueViolation
 from arches.app.models import models
 from arches.app.models.resource import Resource
 from arches.app.models.system_settings import settings
@@ -190,7 +189,7 @@ class Graph(models.GraphModel):
             node.exportable = nodeobj.get("exportable", False)
             node.fieldname = nodeobj.get("fieldname", "")
             node.alias = nodeobj.get("alias", "")
-            node.hascustomalias = nodeobj.get("hascustomalias", "")
+            node.hascustomalias = nodeobj.get("hascustomalias", False)
             self.create_node_alias(node)
 
             node.nodeid = uuid.UUID(str(node.nodeid))
