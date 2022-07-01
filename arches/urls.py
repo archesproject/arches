@@ -297,7 +297,6 @@ urlpatterns = [
     url(r"^etl-manager$", ETLManagerView.as_view(), name="etl_manager"),
     url(r"^clear-user-permission-cache", ClearUserPermissionCache.as_view(), name="clear_user_permission_cache"),
     url(r"^transform-edtf-for-tile", api.TransformEdtfForTile.as_view(), name="transform_edtf_for_tile"),
-    url(r"^check_node_alias", api.CheckNodeAlias.as_view(), name="check_node_alias"),
 ]
 
 if settings.DEBUG:

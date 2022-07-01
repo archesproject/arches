@@ -189,8 +189,8 @@ class Graph(models.GraphModel):
             node.exportable = nodeobj.get("exportable", False)
             node.fieldname = nodeobj.get("fieldname", "")
             node.alias = nodeobj.get("alias", "")
-            if node.alias is None:
-                self.create_node_alias(node)
+            node.hascustomalias = nodeobj.get("hascustomalias", "")
+            node.alias = self.create_node_alias(node)
 
             node.nodeid = uuid.UUID(str(node.nodeid))
 
@@ -374,8 +374,7 @@ class Graph(models.GraphModel):
             if nodeid is not None:
                 node = self.nodes[nodeid]
                 self.update_es_node_mapping(node, datatype_factory, se)
-                if node.alias is None:
-                    self.create_node_alias(node)
+                node.alias = self.create_node_alias(node)
                 node.save()
             else:
                 for node in self.nodes.values():
@@ -1390,24 +1389,17 @@ class Graph(models.GraphModel):
         """
         Assigns a unique, slugified version of a node's name as that node's alias.
         """
-
-        with connection.cursor() as cursor:
-            cursor.callproc("__arches_slugify", [node.name])
-            row = cursor.fetchone()
-            aliases = [n.alias for n in self.nodes.values() if node.alias != n.alias]
-            node.alias = self.make_name_unique(row[0], aliases, "_n")
+        if node.hascustomalias:
+            with connection.cursor() as cursor:
+                cursor.callproc("__arches_slugify", [node.alias])
+                node.alias = cursor.fetchone()[0]
+        else:
+            with connection.cursor() as cursor:
+                cursor.callproc("__arches_slugify", [node.name])
+                row = cursor.fetchone()
+                aliases = [n.alias for n in self.nodes.values() if node.alias != n.alias]
+                node.alias = self.make_name_unique(row[0], aliases, "_n")
         return node.alias
-
-    def check_duplicate_node_alias(self, new_alias):
-        """
-        check if user defined alias is already used in the graph.
-        """
-
-        with connection.cursor() as cursor:
-            cursor.callproc("__arches_slugify", [new_alias])
-            alias = cursor.fetchone()[0]
-            all_aliases = [n.alias for n in self.nodes.values()]
-        return alias in all_aliases
 
     def validate(self):
         """

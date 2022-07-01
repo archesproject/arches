@@ -4,6 +4,7 @@ define([
     'backbone',
     'knockout',
     'arches',
+    'views/components/simple-switch',
     'bindings/chosen'
 ], function($, _, Backbone, ko, arches) {
     var NodeFormView = Backbone.View.extend({
@@ -137,42 +138,6 @@ define([
                     (isCollector && groupHasNonSemanticNodes && (isInParentGroup || isNodeInChildGroup)) ||
                     (self.graphModel.get('nodes')().length > 1 && node && node.istopnode);
             });
-
-            this.suggestedAlias = ko.observable();
-            this.hasCustomAlias = ko.observable(false);
-            this.aliasValid = ko.observable();
-
-            this.node.subscribe((node) => {
-                if (node) {
-                    if (self.hasCustomAlias()){
-                        node.alias.subscribe((alias) => {
-                            if(alias){
-                                self.checkNodeAlias(alias);
-                            }
-                        });
-                    }
-                }
-            });
-
-            this.checkNodeAlias = (alias) => {
-                window.fetch(
-                    `${arches.urls.check_node_alias}?graph=${this.graph.graphid()}&alias=${alias}`
-                )
-                .then(response => {
-                    if(response.ok) {
-                        return response.json();
-                    } else {
-                        self.suggestedAlias(null);
-                    }
-                })
-                .then(json => {
-                    if (json?.data.valid) {
-                        self.aliasValid(true);
-                    } else {
-                        self.aliasValid(false);
-                    }
-                });
-            };
         },
 
         /**
