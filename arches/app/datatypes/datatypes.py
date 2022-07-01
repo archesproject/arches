@@ -1652,7 +1652,6 @@ class DomainDataType(BaseDomainDataType):
                 key = "text"
 
             domain_val_node_query = models.Node.objects.filter(config__contains={"options": [{key: value}]})
-
             if len(domain_val_node_query) != 1:
                 row_number = row_number if row_number else ""
                 if len(domain_val_node_query) == 0:
@@ -1667,7 +1666,10 @@ class DomainDataType(BaseDomainDataType):
             try:
                 uuid.UUID(value)
             except ValueError:
-                value = self.lookup_domainid_by_value(value, kwargs["nodeid"])
+                try:
+                    value = self.lookup_domainid_by_value(value, kwargs["nodeid"])
+                except KeyError:
+                    value = value
         return value
 
     def get_search_terms(self, nodevalue, nodeid=None):
@@ -1762,12 +1764,16 @@ class DomainListDataType(BaseDomainDataType):
                     uuid.UUID(stripped)
                     v = stripped
                 except ValueError:
-                    v = self.lookup_domainid_by_value(v, kwargs["nodeid"])
+                    try:
+                        v = self.lookup_domainid_by_value(v, kwargs["nodeid"])
+                    except KeyError:
+                        v = v
                 result.append(v)
         return result
 
     def validate(self, values, row_number=None, source="", node=None, nodeid=None, strict=False, **kwargs):
         domainDataType = DomainDataType()
+        domainDataType.datatype_name = "domain-value"
         errors = []
         if values is not None:
             for value in values:

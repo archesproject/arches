@@ -400,12 +400,9 @@ class CsvReader(Reader):
                     save_count = save_count - 1
 
         else:
-            errors.append(
-                {
-                    "type": "WARNING",
-                    "message": f"No resource created for legacyid: {legacyid}. Make sure there is data to be imported \
-                    for this resource and it is mapped properly in your mapping file.",
-                }
+            logger.warn(
+                "No resource created for legacyid: {legacyid}. Make sure there is data to be imported \
+                    for this resource and it is mapped properly in your mapping file."
             )
 
         if len(errors) > 0:
@@ -453,7 +450,7 @@ class CsvReader(Reader):
 
                 for k, v in f["descriptor_types"].items():
                     if "string_template" in v and v["string_template"] != [""]:
-                        print(
+                        logger.warn(
                             "The {0} {1} in the {2} display function.".format(
                                 ", ".join(v["string_template"]),
                                 "nodes participate" if len(v["string_template"]) > 1 else "node participates",
@@ -461,7 +458,7 @@ class CsvReader(Reader):
                             )
                         )
                     else:
-                        print("No nodes participate in the {0} display function.".format(k))
+                        logger.warn("No nodes participate in the {0} display function.".format(k))
 
             return display_nodeids
 
@@ -503,8 +500,8 @@ class CsvReader(Reader):
                     resourceinstanceid = process_resourceid(business_data[0]["ResourceID"], overwrite)
                 except KeyError:
                     print("*" * 80)
-                    print(
-                        "ERROR: No column 'ResourceID' found in business data file. \
+                    logger.error(
+                        "No column 'ResourceID' found in business data file. \
                         Please add a 'ResourceID' column with a unique resource identifier."
                     )
                     print("*" * 80)
@@ -574,8 +571,8 @@ class CsvReader(Reader):
                 if len(non_contiguous_resource_ids) > 0:
                     print("*" * 80)
                     for non_contiguous_resource_id in non_contiguous_resource_ids:
-                        print("ResourceID: " + non_contiguous_resource_id)
-                    print(
+                        logger.error("ResourceID: " + non_contiguous_resource_id)
+                    logger.error(
                         "ERROR: The preceding ResourceIDs are non-contiguous in your csv file. \
                         Please sort your csv file by ResourceID and try import again."
                     )
@@ -598,12 +595,9 @@ class CsvReader(Reader):
                                 collection_legacyoid = node.name + "_" + str(node.graph_id) + "_import"
                                 # check to see that there is not already a collection for this node
                                 if node.config["rdmCollection"] is not None:
-                                    errors.append(
-                                        {
-                                            "type": "WARNING",
-                                            "message": f"A collection already exists for the {node.name} node. \
-                                            Use the add option to add concepts to this collection.",
-                                        }
+                                    logger.warn(
+                                        "A collection already exists for the {node.name} node. \
+                                            Use the add option to add concepts to this collection."
                                     )
                                     if len(errors) > 0:
                                         self.errors += errors
@@ -613,16 +607,6 @@ class CsvReader(Reader):
                                     try:
                                         # check to see that a collection with this legacyid does not already exist
                                         collection = Concept().get(legacyoid=collection_legacyoid)
-                                        errors.append(
-                                            {
-                                                "type": "WARNING",
-                                                "message": "A collection with the legacyid {0} already exists.".format(
-                                                    node.name + "_" + str(node.graph_id) + "_import"
-                                                ),
-                                            }
-                                        )
-                                        if len(errors) > 0:
-                                            self.errors += errors
                                     except:
                                         collection = Concept(
                                             {"id": collectionid, "legacyoid": collection_legacyoid, "nodetype": "Collection"}
@@ -731,13 +715,10 @@ class CsvReader(Reader):
                     errors = []
                     new_row = []
                     if "ADDITIONAL" in row or "MISSING" in row:
-                        errors.append(
-                            {
-                                "type": "WARNING",
-                                "message": "No resource created for ResourceID {0}. Line {1} has additional or missing columns.".format(
-                                    row["ResourceID"], str(int(row_number.split("on line ")[1]))
-                                ),
-                            }
+                        logger.warn(
+                            "No resource created for ResourceID {0}. Line {1} has additional or missing columns.".format(
+                                row["ResourceID"], str(int(row_number.split("on line ")[1]))
+                            )
                         )
                         if len(errors) > 0:
                             self.errors += errors
@@ -761,16 +742,10 @@ class CsvReader(Reader):
                             value = datatype_instance.transform_value_for_tile(value, nodeid=nodeid)
                             errors = datatype_instance.validate(value, row_number=row_number, source=source, nodeid=nodeid)
                         except Exception as e:
-                            errors.append(
-                                {
-                                    "type": "ERROR",
-                                    "message": "datatype: {0} value: {1} {2} - {3}".format(
-                                        datatype_instance.datatype_model.classname,
-                                        value,
-                                        source,
-                                        str(e) + " or is not a prefLabel in the given collection.",
-                                    ),
-                                }
+                            logger.warn(
+                                "The following value could not be interpreted as a {0} value: {1}".format(
+                                    datatype_instance.datatype_model.classname, value
+                                )
                             )
                         if len(errors) > 0:
                             error_types = [error["type"] for error in errors]
@@ -778,7 +753,7 @@ class CsvReader(Reader):
                                 value = None
                             self.errors += errors
                     else:
-                        print(_("No datatype detected for {0}".format(value)))
+                        logger.error(_("No datatype detected for {0}".format(value)))
 
                     return {"value": value, "request": request}
 
@@ -881,7 +856,7 @@ class CsvReader(Reader):
                                 target_resource_model = all_nodes.get(nodeid=list(source_data[0].keys())[0]).graph_id
                             except ObjectDoesNotExist as e:
                                 print("*" * 80)
-                                print(
+                                logger.error(
                                     "ERROR: No resource model found. Please make sure the resource model \
                                     this business data is mapped to has been imported into Arches."
                                 )
@@ -1050,17 +1025,6 @@ class CsvReader(Reader):
 
                 # check for missing display value nodes.
                 errors = []
-                for k, v in missing_display_values.items():
-                    if len(v) > 0:
-                        errors.append(
-                            {
-                                "type": "INFO",
-                                "message": "{0} is null or not mapped on rows {1} and \
-                                participates in a display value function.".format(
-                                    k, ",".join(v)
-                                ),
-                            }
-                        )
                 if len(errors) > 0:
                     self.errors += errors
 
