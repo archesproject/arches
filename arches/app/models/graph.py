@@ -25,6 +25,7 @@ from django.core.cache import cache
 from django.core.exceptions import ObjectDoesNotExist
 from django.db import transaction, connection
 from django.db.utils import IntegrityError
+from psycopg2.errors import UniqueViolation
 from arches.app.models import models
 from arches.app.models.resource import Resource
 from arches.app.models.system_settings import settings
@@ -375,7 +376,13 @@ class Graph(models.GraphModel):
                 node = self.nodes[nodeid]
                 self.update_es_node_mapping(node, datatype_factory, se)
                 self.create_node_alias(node)
-                node.save()
+                try:
+                    node.save()
+                except IntegrityError as err:
+                    if "unique_alias_graph" in str(err):
+                        message = _('Duplicate node alias: "{0}". All aliases must be unique in a resource model.'.format(node.alias))
+                        raise GraphValidationError(message)
+
             else:
                 for node in self.nodes.values():
                     self.update_es_node_mapping(node, datatype_factory, se)
