@@ -123,7 +123,7 @@ class Command(BaseCommand):
             print("Logging detailed error information: set log level to DEBUG to view messages")
             print("Verbosity level 2 will log based on the application's LOGGING settings in settings.py")
             print("Verbosity level 3 will include level 2 logging as well as logging to the console")
-            resp = input("Logging detailed information can slow down the import process.  Continue anyway? (y/n)") 
+            resp = input("Logging detailed information can slow down the import process.  Continue anyway? (y/n)")
 
             if "n" in resp.lower():
                 return
