@@ -91,7 +91,7 @@ class APITests(ArchesTestCase):
         request.user = None
         response = view(request)
         self.assertEqual(request.GET.get("ver"), "2.1")
-        
+
     def test_api_resources_archesjson(self):
         """
         Test that resources POST and PUT accept arches-json format data.
