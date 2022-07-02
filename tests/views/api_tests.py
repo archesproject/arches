@@ -74,25 +74,24 @@ class APITests(ArchesTestCase):
         test_pkg_path = os.path.join(test_settings.TEST_ROOT, "fixtures", "testing_prj", "testing_prj", "pkg")
         management.call_command("packages", operation="load_package", source=test_pkg_path, yes=True)
 
-    # def test_api_base_view(self):
-    #     """
-    #     Test that our custom header parameters get pushed on to the GET QueryDict
+    def test_api_base_view(self):
+        """
+        Test that our custom header parameters get pushed on to the GET QueryDict
 
-    #     """
+        """
+        factory = RequestFactory(HTTP_X_ARCHES_VER="2.1")
+        view = APIBase.as_view()
 
-    #     factory = RequestFactory(HTTP_X_ARCHES_VER="2.1")
-    #     view = APIBase.as_view()
+        request = factory.get(reverse("api_node_value", kwargs={}), {"ver": "2.0"})
+        request.user = None
+        response = view(request)
+        self.assertEqual(request.GET.get("ver"), "2.0")
 
-    #     request = factory.get(reverse("mobileprojects", kwargs={}), {"ver": "2.0"})
-    #     request.user = None
-    #     response = view(request)
-    #     self.assertEqual(request.GET.get("ver"), "2.0")
-
-    #     request = factory.get(reverse("mobileprojects"), kwargs={})
-    #     request.user = None
-    #     response = view(request)
-    #     self.assertEqual(request.GET.get("ver"), "2.1")
-
+        request = factory.get(reverse("api_node_value"), kwargs={})
+        request.user = None
+        response = view(request)
+        self.assertEqual(request.GET.get("ver"), "2.1")
+        
     def test_api_resources_archesjson(self):
         """
         Test that resources POST and PUT accept arches-json format data.
