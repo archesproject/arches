@@ -2,7 +2,7 @@
 
 # For Ubuntu 18.04 (bionic)
 
-# Use the yes command if you would like to install postgres/postgis, couchdb,
+# Use the yes command if you would like to install postgres/postgis,
 # node/yarn, and elasticsearch.
 # Example:
 # yes | sudo ./ubuntu_setup.sh
@@ -34,13 +34,6 @@ function install_postgres {
   sudo -u postgres psql -d template_postgis -c "GRANT ALL ON geometry_columns TO PUBLIC;"
   sudo -u postgres psql -d template_postgis -c "GRANT ALL ON geography_columns TO PUBLIC;"
   sudo -u postgres psql -d template_postgis -c "GRANT ALL ON spatial_ref_sys TO PUBLIC;"
-}
-
-function install_couchdb {
-  sudo add-apt-repository "deb https://apache.bintray.com/couchdb-deb $(lsb_release -sc) main"
-  wget --quiet -O - https://couchdb.apache.org/repo/bintray-pubkey.asc | sudo apt-key add -
-  sudo apt-get update
-  sudo apt-get install couchdb
 }
 
 function install_yarn {
@@ -100,15 +93,6 @@ function main {
     install_postgres
   else
     echo Skipping Postgres/PostGIS installation
-  fi
-
-  echo -n "Would you like to install and configure couchdb? (y/N)? "
-  read answer
-  if echo "$answer" | grep -iq "^y" ;then
-    echo Yes, Installing CouchDB
-    install_couchdb
-  else
-    echo Skipping CouchDB installation
   fi
 
   echo -n "Would you like to install and nodejs/npm/and yarn (y/N)? "

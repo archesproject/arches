@@ -304,8 +304,8 @@ class UserProfileView(View):
 @method_decorator(csrf_exempt, name="dispatch")
 class GetClientIdView(View):
     def post(self, request):
-        if settings.MOBILE_OAUTH_CLIENT_ID == "":
-            message = _("Make sure to set your MOBILE_OAUTH_CLIENT_ID in settings.py")
+        if settings.OAUTH_CLIENT_ID == "":
+            message = _("Make sure to set your OAUTH_CLIENT_ID in settings.py")
             response = HttpResponse(message, status=500)
             logger.warning(message)
         else:
@@ -313,7 +313,7 @@ class GetClientIdView(View):
             password = request.POST.get("password", None)
             user = authenticate(username=username, password=password)
             if user:
-                response = JSONResponse({"clientid": settings.MOBILE_OAUTH_CLIENT_ID})
+                response = JSONResponse({"clientid": settings.OAUTH_CLIENT_ID})
             else:
                 response = Http401Response()
         return response
@@ -322,15 +322,15 @@ class GetClientIdView(View):
 @method_decorator(csrf_exempt, name="dispatch")
 class ServerSettingView(View):
     def post(self, request):
-        if settings.MOBILE_OAUTH_CLIENT_ID == "":
-            message = _("Make sure to set your MOBILE_OAUTH_CLIENT_ID in settings.py")
+        if settings.OAUTH_CLIENT_ID == "":
+            message = _("Make sure to set your OAUTH_CLIENT_ID in settings.py")
             logger.warning(message)
 
         username = request.POST.get("username", None)
         password = request.POST.get("password", None)
         user = authenticate(username=username, password=password)
         if user:
-            server_settings = {"version": __version__, "clientid": settings.MOBILE_OAUTH_CLIENT_ID}
+            server_settings = {"version": __version__, "clientid": settings.OAUTH_CLIENT_ID}
             response = JSONResponse(server_settings)
         else:
             response = Http401Response()
@@ -530,7 +530,7 @@ class Token(View):
             data = {
                 "username": request.GET.get("username", None),
                 "password": request.GET.get("password", None),
-                "client_id": settings.MOBILE_OAUTH_CLIENT_ID,
+                "client_id": settings.OAUTH_CLIENT_ID,
                 "grant_type": "password",
             }
             url = request.get_raw_uri().replace(request.path, "").split("?")[0] + reverse("oauth2:token")
