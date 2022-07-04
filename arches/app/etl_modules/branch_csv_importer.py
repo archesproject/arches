@@ -1,4 +1,5 @@
 from datetime import datetime
+import io
 import json
 import logging
 import math
@@ -17,6 +18,7 @@ from django.core.files.storage import default_storage
 from arches.app.datatypes.datatypes import DataTypeFactory
 from arches.app.models.models import Node
 from arches.app.utils.betterJSONSerializer import JSONSerializer
+from arches.app.utils.file_validator import FileValidator
 from arches.app.utils.index_database import index_resources_by_transaction
 from arches.management.commands.etl_template import create_workbook
 from openpyxl.writer.excel import save_virtual_workbook
@@ -269,6 +271,14 @@ class BranchCsvImporter(BaseImportModule):
         except (FileNotFoundError):
             pass
         result = {"summary": {"name": content.name, "size": self.filesize_format(content.size), "files": {}}}
+        validator = FileValidator()
+        if len(validator.validate_file_type(content)) > 0:
+            return {
+                "status": 400,
+                "success": False,
+                "title": _("Invalid excel file/zip specified"),
+                "message": _("Upload a valid excel file"),
+            }
         if content.content_type == "application/zip":
             with zipfile.ZipFile(content, "r") as zip_ref:
                 files = zip_ref.infolist()
@@ -311,18 +321,18 @@ class BranchCsvImporter(BaseImportModule):
                 if task_management.check_if_celery_available():
                     logger.info(_("Delegating load to Celery task"))
                     tasks.load_branch_csv.apply_async(
-                        (files, summary, result, self.temp_dir, self.loadid),
+                        (self.userid, files, summary, result, self.temp_dir, self.loadid),
                     )
                     result = _("delegated_to_celery")
                     return {"success": True, "data": result}
                 else:
-                    err = _("Celery appears not to be running, you need to have celery running in order to immport large csv.")
+                    err = _("Cannot start process. Unable to run process as a background task at this time.")
                     with connection.cursor() as cursor:
                         cursor.execute(
                             """UPDATE load_event SET status = %s, load_end_time = %s WHERE loadid = %s""",
                             ("failed", datetime.now(), self.loadid),
                         )
-                    return {"success": False, "data": err}
+                    return {"success": False, "data": {"title": _("Error"), "message": err}}
             else:
                 response = self.run_load_task(files, summary, result, self.temp_dir, self.loadid)
 

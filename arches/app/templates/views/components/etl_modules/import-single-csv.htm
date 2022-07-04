@@ -4,7 +4,7 @@
 {% block task_details %}
 <!-- ko ifnot: loading() -->
 <!-- ko ifnot: fileAdded() -->
-<div data-bind="dropzone: dropzoneOptions" class="file-select loader-select" style="height: 100%; width: 100%; background: white">
+<div data-bind="dropzone: dropzoneOptions" class="file-select loader-select" style="height: 100%; width: 100%; margin-top: 65px; background: white">
     <div>
         <div class="manifest-manager-main-menu-circle loader-button">
             <span><i style="color: #000" class="fa fa-cloud-upload r-select-icon"></i></span>
@@ -18,7 +18,7 @@
                         <div style="border-top: 1px solid #c4c4c4; margin-bottom: 15px;" class="btn btn-primary btn-labeled btn-lg fa fa-file fileinput-button dz-clickable" data-bind="css: uniqueidClass" role="button">
                         {% trans 'Select File' %}
                         </div>
-                        <div style="border-top: 1px solid #c4c4c4; margin-bottom: 15px;" class="btn btn-danger btn-labeled btn-lg fa fa-times-circle" data-bind="click: function() { $parent.selectedModule(null) }" role="button">
+                        <div style="border-top: 1px solid #c4c4c4; margin-bottom: 15px;" class="btn btn-danger btn-labeled btn-lg fa fa-times-circle" data-bind="click: function() { $parent.cancel() }" role="button">
                             {% trans 'Cancel File Import' %}
                         </div>
                         <div style="min-height: 100%;">
@@ -36,7 +36,8 @@
 <!-- /ko -->
 
 <!-- ko if: fileAdded() -->
-<div class="etl-module-component-container" style="margin-top: -60px; padding-top: 0px;">
+<div class="etl-module-component-container">
+<div class="etl-module-body">
     <h3 style="margin-top: 15px; margin-bottom: 5px; font-size: 19px;">{% trans "Import Format: Single .csv file" %}</h3>
     <div class="etl-module-component" style="margin-top: 0px;">
         <h4 style="margin-top: 5px; margin-bottom: 0px;">{% trans "File Summary" %}</h4>
@@ -67,10 +68,9 @@
     </div>
     <div class="etl-module-component">
         <h4>{% trans "Import Details" %}</h4>
-        <label class="form-checkbox form-normal form-primary" style="padding-left: 25px; padding-top: 3px;">
-            <input type="checkbox" data-bind="checked: hasHeaders">{% trans "Column names in the first row" %}
-        </label>
-        <table class="table table-striped csv-mapping-table" style="margin-top: 10px; margin-bottom:  5px; border: 1px solid rgba(0,0,0,0.14);" width="100%">
+        <div data-bind="component: { name: 'views/components/simple-switch', params: {value: hasHeaders, config:{ label: '{% trans "Column names in the first row" %}', subtitle: ''}}}"></div>
+        <div class="csv-mapping-table-container">
+        <table class="table table-striped csv-mapping-table">
             <thead>
                 <tr>
                 <!-- ko foreach: { data: fieldMapping, as: 'mapping', noChildContext: true } -->
@@ -106,6 +106,7 @@
                 <!-- /ko -->
             </tbody>
         </table>
+        </div>
         <!-- ko if: csvExample().length >= 5-->
         <div data-bind="text: '{% trans 'Showing First ' %}' + csvExample().length + '{% trans ' Rows' %}'"></div>
         <!-- /ko -->
@@ -114,13 +115,14 @@
         <!-- /ko -->
     </div>
 </div>
-<div class="etl-module-footer">
+<div class="tabbed-workflow-footer, etl-module-footer">
     <button style="margin-right: 8px;" data-bind="click: write" class="btn btn-success">
         <span>{% trans "Import data" %}</span>
     </button>
-    <button data-bind="click: function () { $parent.selectedModule(null); }" class="btn btn-danger">
+    <button data-bind="click: function () { fileAdded(null); }" class="btn btn-danger">
         <span>{% trans "Cancel File Import" %}</span>
     </button>
+</div>
 </div>
 <!-- /ko -->
 <!-- /ko -->
