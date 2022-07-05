@@ -1,17 +1,17 @@
-Django==2.2.24
+Django==3.2.12
 psycopg2-binary==2.8.4
 elasticsearch>=7.11.0,<8.0.0
 rdflib==4.2.2
 django-guardian==2.3.0
 python-memcached==1.59
-celery==4.4.4
-django-celery-results==1.2.1
+celery==5.2.7
+django-celery-results==2.3.1
 mapbox-vector-tile==1.2.0
 SPARQLWrapper==1.8.5
 django-recaptcha==2.0.6
 edtf==4.0.1
 couchdb==1.2
-django-revproxy==0.9.15
+django-revproxy @ git+https://github.com/jazzband/django-revproxy@d2234005135dc0771b7c4e0bb0465664ccfa5787
 django-cors-headers==3.1.1
 django-oauth-toolkit==1.2.0
 python-docx==0.8.10
@@ -24,7 +24,7 @@ python-slugify==4.0.0
 pillow>=7.0.0
 arcgis2geojson==2.0.0
 openpyxl==3.0.7
-django_compressor==2.2
-django-libsass==0.7
+django_compressor==3.1
+django-libsass==0.9
 filetype==1.0.13
 defusedxml==0.7.1
