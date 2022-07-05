@@ -381,6 +381,10 @@ class Graph(models.GraphModel):
                     if "unique_alias_graph" in str(err):
                         message = _('Duplicate node alias: "{0}". All aliases must be unique in a resource model.'.format(node.alias))
                         raise GraphValidationError(message)
+                    else:
+                        logger.error(err)
+                        message = _('Fail to save node "{0}".'.format(node.name))
+                        raise GraphValidationError(message)
 
             else:
                 for node in self.nodes.values():
@@ -1395,12 +1399,11 @@ class Graph(models.GraphModel):
         """
         Assigns a unique, slugified version of a node's name as that node's alias.
         """
-        if node.hascustomalias:
-            with connection.cursor() as cursor:
+        with connection.cursor() as cursor:
+            if node.hascustomalias:
                 cursor.callproc("__arches_slugify", [node.alias])
                 node.alias = cursor.fetchone()[0]
-        else:
-            with connection.cursor() as cursor:
+            else:
                 cursor.callproc("__arches_slugify", [node.name])
                 row = cursor.fetchone()
                 aliases = [n.alias for n in self.nodes.values() if node.alias != n.alias]
