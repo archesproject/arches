@@ -207,6 +207,7 @@ def on_chord_error(request, exc, traceback):
 @shared_task
 def load_branch_csv(userid, files, summary, result, temp_dir, loadid):
     from arches.app.etl_modules import branch_csv_importer
+    logger = logging.getLogger(__name__)
 
     try:
         BranchCsvImporter = branch_csv_importer.BranchCsvImporter(request=None, loadid=loadid, temp_dir=temp_dir)
@@ -217,7 +218,8 @@ def load_branch_csv(userid, files, summary, result, temp_dir, loadid):
         msg = _("Branch Excel Import: {} [{}]").format(summary["name"], status)
         user = User.objects.get(id=userid)
         notify_completion(msg, user)
-    except:
+    except Exception as e:
+        logger.error(e)
         load_event = models.LoadEvent.objects.get(loadid=loadid)
         load_event.status = _("Failed")
         load_event.save()
@@ -225,7 +227,8 @@ def load_branch_csv(userid, files, summary, result, temp_dir, loadid):
 
 @shared_task
 def load_single_csv(userid, loadid, graphid, has_headers, fieldnames, csv_file_name, id_label):
-    from arches.app.etl_modules import import_single_csv
+    from arches.app.etl_modules import import_single_csv    
+    logger = logging.getLogger(__name__)
 
     try:
         ImportSingleCsv = import_single_csv.ImportSingleCsv()
@@ -236,7 +239,8 @@ def load_single_csv(userid, loadid, graphid, has_headers, fieldnames, csv_file_n
         msg = _("Single CSV Import: {} [{}]").format(csv_file_name, status)
         user = User.objects.get(id=userid)
         notify_completion(msg, user)
-    except:
+    except Exception as e:
+        logger.error(e)
         load_event = models.LoadEvent.objects.get(loadid=loadid)
         load_event.status = _("Failed")
         load_event.save()
