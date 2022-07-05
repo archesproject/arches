@@ -168,18 +168,17 @@ module.exports = {
                     minimize: {
                         removeComments: false,
                     },
-                    preprocessor: async (_content, loaderContext) => {
+                    preprocessor: async (content, loaderContext) => {
                         const resourcePath = loaderContext['resourcePath'];
                         const projectResourcePathData = resourcePath.split(`${PROJECT_PATH}/`);
-
                         const templatePath = projectResourcePathData.length > 1 ? projectResourcePathData[1] : resourcePath.split(`${ARCHES_CORE_PATH}/`)[1]; 
 
                         let resp;
-                        
+
                         const renderTemplate = async(failureCount=0) => {
                             /*
                                 Sometimes Django can choke on the number of requests, this function will 
-                                continue attempting to render the template until successful.
+                                continue attempting to render the template until successful or 5 failures.
                             */ 
                             if (failureCount < 5) {
                                 try {
@@ -194,7 +193,8 @@ module.exports = {
                                 }
                             }
                             else {
-                                console.error(`"${templatePath}" has failed to load!`)
+                                console.error(`"${templatePath}" has failed to load! Returning un-rendered file.`);
+                                return content;
                             }
                         };
 
