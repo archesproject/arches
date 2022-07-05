@@ -6,7 +6,7 @@ define([
     'arches',
     'viewmodels/alert',
     'views/base-manager',
-    'profile-manager-data',
+    'views/profile-manager-data',
     'utils/set-csrf-token'
 ], function($, _, ko, koMapping, arches, AlertViewModel, BaseManagerView, data) {
 
