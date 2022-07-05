@@ -207,6 +207,7 @@ def on_chord_error(request, exc, traceback):
 @shared_task
 def load_branch_csv(userid, files, summary, result, temp_dir, loadid):
     from arches.app.etl_modules import branch_csv_importer
+
     logger = logging.getLogger(__name__)
 
     try:
@@ -227,7 +228,8 @@ def load_branch_csv(userid, files, summary, result, temp_dir, loadid):
 
 @shared_task
 def load_single_csv(userid, loadid, graphid, has_headers, fieldnames, csv_file_name, id_label):
-    from arches.app.etl_modules import import_single_csv    
+    from arches.app.etl_modules import import_single_csv
+
     logger = logging.getLogger(__name__)
 
     try:
