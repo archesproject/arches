@@ -34,11 +34,16 @@ const templateFilepathLookup = buildTemplateFilePathLookup(
 );
 
 let applicationServerAddress = APPLICATION_SERVER_ADDRESS;
+let isTestEnvironment = false;
+
 for (let arg of process.argv) {
     const keyValuePair = arg.split('=');
 
     if (keyValuePair[0] === 'application_server_address') {
         applicationServerAddress = keyValuePair[1];
+    }
+    if (keyValuePair[0] === 'test') {
+        isTestEnvironment = keyValuePair[1];
     }
 }
 
@@ -193,8 +198,19 @@ module.exports = {
                                 }
                             }
                             else {
-                                console.error(`"${templatePath}" has failed to load! Returning un-rendered file.`);
-                                return content;
+                                console.error(`"${templatePath}" has failed to load! Falling back to un-rendered file.`);
+                                resp = {
+                                   text: () => (
+                                        new Promise((resolve, _reject) => {
+                                            /*
+                                                if isTestEnvironment is true, failures will return a empty string which will
+                                                still allow the package to build.
+                                            */ 
+                                            
+                                            resolve(isTestEnvironment ? '' : content);  
+                                        })
+                                   )
+                                };
                             }
                         };
 
